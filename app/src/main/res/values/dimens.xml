@@ -1,0 +1,29 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">@dimen/keyline_1</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+         https://developer.android.com/design/patterns/navigation-drawer.html -->
+    <dimen name="navigation_drawer_width">240dp</dimen>
+
+    <dimen name="keyline_1">16dp</dimen>
+    <dimen name="keyline_1_minus_8dp">8dp</dimen>
+    <dimen name="keyline_content_start">72dp</dimen>
+    <dimen name="keyline_content_start_minus_16dp">56dp</dimen>
+    <dimen name="keyline_content_end_with_fab">32dp</dimen>
+
+    <!-- including padding -->
+    <dimen name="floating_add_button_height">72dp</dimen>
+    <dimen name="floating_add_button_height_no_padding">56dp</dimen>
+    <dimen name="fab_elevation">2dp</dimen>
+    <dimen name="fab_press_translation_z">2dp</dimen>
+
+    <!-- Action Bar auto-hide-on-scroll behavior parameters -->
+    <dimen name="action_bar_auto_hide_min_y">152dp</dimen>
+    <dimen name="action_bar_auto_hide_sensivity">48dp</dimen>
+
+    <dimen name="headerbar_elevation">2dp</dimen>
+
+    <dimen name="navdrawer_width">260dp</dimen>
+</resources>

@@ -1,0 +1,3 @@
+[submodule "deps/Simplistic-RSS"]
+	path = deps/Simplistic-RSS
+	url = https://github.com/spacecowboy/Simplistic-RSS.git

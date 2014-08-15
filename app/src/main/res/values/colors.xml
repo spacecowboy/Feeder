@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="primary">#ff5722</color>
+    <color name="primary_dark">#e64a19</color>
+    <color name="accent">#e51c23</color>
+    <color name="accent_light">#f36c60</color>
+    <color name="translucent_actionbar_background">@color/primary</color>
+    <color name="navdrawer_background">#1a1a1a</color>
+    <color name="navdrawer_text_color">@android:color/primary_text_dark</color>
+    <color name="navdrawer_text_color_selected">@color/primary</color>
+    <color name="navdrawer_icon_tint">#808080</color>
+    <color name="navdrawer_icon_tint_selected">@color/primary</color>
+    <color name="black_overlay">#66000000</color>
+
+</resources>

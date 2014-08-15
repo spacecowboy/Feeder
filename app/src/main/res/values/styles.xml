@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sub themes -->
+    <style name="FeedsTheme" parent="AppTheme" >
+        <item name="android:windowActionBarOverlay">true</item>
+    </style>
+    <!-- Final application theme. -->
+    <style name="AppTheme" parent="Theme.IOSched.Base">
+    </style>
+
+    <declare-styleable name="DrawShadowFrameLayout">
+        <attr name="shadowDrawable" format="reference" />
+        <attr name="shadowVisible" format="boolean" />
+    </declare-styleable>
+
+    <!-- Immediate parent theme to specify base values for custom attributes -->
+    <style name="Theme" parent="FrameworkRoot.Theme">
+        <!-- Only needed for pre-L -->
+        <item name="android:actionOverflowButtonStyle">@style/ActionButton.Overflow</item>
+        <item name="android:editTextBackground">@drawable/edit_text</item>
+        <item name="android:editTextStyle">@style/Widget.IOSched.EditText</item>
+        <item name="android:actionBarWidgetTheme">@style/Theme.IOSched.Widget</item>
+        <item name="android:actionDropDownStyle">@style/Widget.IOSched.HeaderBar.Spinner</item>
+    </style>
+
+    <!-- Root styles that vary by API level -->
+    <style name="FrameworkRoot.Theme" parent="android:Theme.Holo" />
+    <style name="FrameworkRoot.ActionBar" parent="android:Widget.Holo.ActionBar" />
+    <style name="FrameworkRoot.ActionBar.TitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title" />
+    <style name="FrameworkRoot.ActionBar.TabBar" parent="android:Widget.Holo.ActionBar.TabBar" />
+    <style name="FrameworkRoot.EditText" parent="android:Widget.Holo.EditText" />
+    <style name="FrameworkRoot.Widget" parent="android:Theme.Holo" />
+    <style name="FrameworkRoot.Widget.ActionButton.Overflow" parent="android:Widget.Holo.ActionButton.Overflow" />
+    <style name="FrameworkRoot.Widget.Spinner" parent="android:Widget.Holo.Spinner" />
+    <style name="FrameworkRoot.Widget.ListView.DropDown" parent="android:Widget.Holo.ListView.DropDown" />
+    <style name="FrameworkRoot.Widget.PopupMenu" parent="android:Widget.Holo.PopupMenu" />
+    <style name="FrameworkRoot.TextAppearance.Widget.PopupMenu.Large" parent="android:TextAppearance.Holo.Widget.PopupMenu.Large" />
+
+    <style name="ActionButton.Overflow" parent="FrameworkRoot.Widget.ActionButton.Overflow">
+        <item name="android:src">@drawable/ic_action_overflow</item>
+    </style>
+
+    <style name="Theme.IOSched.Base" parent="Theme">
+        <item name="actionBarOverlayTopOffset">?android:actionBarSize</item>
+        <item name="actionBarInsetStart">?android:actionBarSize</item>
+        <item name="spinnerBarInsetStart">?android:actionBarSize</item>
+        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackground</item>
+        <item name="popupItemBackground">?android:selectableItemBackground</item>
+        <item name="photoItemForeground">?android:selectableItemBackground</item>
+
+        <item name="android:windowContentOverlay">@null</item>
+        <!--<item name="android:windowBackground">@android:color/white</item>-->
+        <item name="android:actionBarStyle">@style/ActionBar</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
+
+        <item name="android:popupMenuStyle">@style/Widget.IOSched.PopupMenu</item>
+        <item name="android:listPopupWindowStyle">@style/Widget.IOSched.PopupMenu</item>
+        <item name="android:dropDownListViewStyle">@style/Widget.IOSched.ListView.DropDown</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearance.LargePopupMenu</item>
+    </style>
+
+    <style name="Theme.IOSched.Widget" parent="FrameworkRoot.Widget">
+        <item name="android:popupMenuStyle">@style/Widget.IOSched.PopupMenu</item>
+        <item name="android:listPopupWindowStyle">@style/Widget.IOSched.PopupMenu</item>
+        <item name="android:dropDownListViewStyle">@style/Widget.IOSched.ListView.DropDown</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/TextAppearance.LargePopupMenu</item>
+    </style>
+
+    <style name="Widget.IOSched.HeaderBar.Spinner" parent="Widget.IOSched.HeaderBar.Spinner.Base" />
+
+    <style name="Widget.IOSched.HeaderBar.Spinner.Base" parent="FrameworkRoot.Widget.Spinner">
+        <item name="android:background">?android:selectableItemBackground</item>
+        <item name="android:dropDownSelector">?android:selectableItemBackground</item>
+        <item name="android:divider">@null</item>
+        <item name="android:dividerHeight">0dp</item>
+    </style>
+
+    <style name="Widget.IOSched.EditText" parent="FrameworkRoot.EditText">
+        <item name="android:background">@drawable/edit_text</item>
+    </style>
+
+
+    <style name="Widget.IOSched.PopupMenu" parent="FrameworkRoot.Widget.PopupMenu">
+        <item name="android:dropDownSelector">?popupItemBackground</item>
+    </style>
+
+
+    <style name="Widget.IOSched.ListView.DropDown" parent="FrameworkRoot.Widget.ListView.DropDown">
+        <item name="android:listSelector">?popupItemBackground</item>
+        <item name="android:divider">@null</item>
+        <item name="android:dividerHeight">0dp</item>
+    </style>
+
+    <style name="TextAppearance.LargePopupMenu" parent="FrameworkRoot.TextAppearance.Widget.PopupMenu.Large">
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+    </style>
+
+
+
+
+    <style name="HeaderBar">
+    </style>
+
+    <!-- Action bar -->
+    <style name="ActionBar.Base" parent="FrameworkRoot.ActionBar">
+        <item name="android:background">@drawable/actionbar_background</item>
+        <item name="android:icon">@null</item>
+        <item name="android:displayOptions">showHome|showTitle</item>
+        <item name="android:titleTextStyle">@style/ActionBar.TitleText</item>
+        <!--<item name="android:logo">@drawable/actionbar_logo</item>-->
+    </style>
+
+    <style name="ActionBar" parent="ActionBar.Base" />
+
+    <style name="ActionBar.TitleText" parent="FrameworkRoot.ActionBar.TitleText">
+        <item name="android:textColor">#fff</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance"/>
+    <style name="TextAppearance.BigTitle">
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+    </style>
+
+    <style name="TextAppearance.Title">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+    </style>
+
+    <style name="TextAppearance.Subhead"
+           parent="TextAppearance.Title">
+    </style>
+
+    <style name="TextAppearance.Body">
+    <item name="android:textSize">14sp</item>
+    <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@android:color/tertiary_text_dark</item>
+    </style>
+
+</resources>

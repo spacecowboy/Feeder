@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/story"
+                android:layout_width="match_parent"
+                tools:ignore="RtlSymmetry"
+                android:paddingStart="@dimen/keyline_1"
+                android:background="?android:selectableItemBackground"
+                android:layout_height="wrap_content"
+                android:minHeight="?android:listPreferredItemHeight">
+
+    <ImageView
+        android:id="@+id/story_image"
+        android:layout_width="?android:listPreferredItemHeight"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:visibility="visible"
+        android:src="@drawable/bacon"
+        android:layout_alignTop="@+id/story_text"
+        android:layout_alignBottom="@+id/story_text"
+        android:layout_alignParentEnd="true"/>
+
+    <LinearLayout
+        android:id="@+id/story_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:paddingEnd="4dp"
+        android:layout_toStartOf="@id/story_image"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/story_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:text="@string/hello_world"
+            android:maxLines="5"
+            style="@style/TextAppearance.Title"/>
+
+        <TextView
+            android:id="@+id/story_body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="4dp"
+            android:maxLines="5"
+            android:text="@string/app_name"
+            style="@style/TextAppearance.Body"/>
+    </LinearLayout>
+
+</RelativeLayout>

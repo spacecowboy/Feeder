@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="FrameworkRoot.Theme" parent="android:Theme.Material" />
+    <style name="FrameworkRoot.ActionBar" parent="android:Widget.Material.ActionBar" />
+    <style name="FrameworkRoot.ActionBar.TitleText" parent="android:TextAppearance.Material.Widget.ActionBar.Title" />
+    <style name="FrameworkRoot.ActionBar.TabBar" parent="android:Widget.Material.ActionBar.TabBar" />
+    <style name="FrameworkRoot.EditText" parent="android:Widget.Material.EditText" />
+    <style name="FrameworkRoot.Widget" parent="android:Theme.Material" />
+    <style name="FrameworkRoot.Widget.ActionButton.Overflow" parent="android:Widget.Material.ActionButton.Overflow" />
+    <style name="FrameworkRoot.Widget.Spinner" parent="android:Widget.Material.Spinner" />
+    <style name="FrameworkRoot.Widget.ListView.DropDown" parent="android:Widget.Material.ListView.DropDown" />
+    <style name="FrameworkRoot.Widget.PopupMenu" parent="android:Widget.Material.PopupMenu" />
+    <style name="FrameworkRoot.TextAppearance.Widget.PopupMenu.Large" parent="android:TextAppearance.Material.Widget.PopupMenu.Large" />
+
+    <style name="Theme" parent="FrameworkRoot.Theme" /> <!-- doesn't contain the pre-L code from the values/styles.xml -->
+
+    <!-- Sub themes -->
+    <style name="FeedsTheme" parent="AppTheme" >
+        <item name="android:windowActionBar">false</item> <!-- replaced by toolbar -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+    </style>
+
+    <!-- Final application theme. -->
+    <style name="AppTheme" parent="Theme.IOSched.Base">
+        <!-- Customize your theme here. -->
+        <!-- Main theme colors -->
+        <!--   your app's branding color (for the app bar) -->
+        <item name="android:colorPrimary">@color/primary</item>
+        <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="android:colorAccent">@color/accent</item>
+
+        <item name="android:windowActionBarOverlay">true</item>
+
+        <item name="android:windowContentTransitions">true</item>
+
+
+        <item name="actionBarInsetStart">@dimen/keyline_content_start</item>
+        <item name="actionBarIconColor">#fff</item>
+        <item name="actionBarOverlayTopOffset">0dp</item> <!-- action bars replaced by Toolbars -->
+        <item name="android:actionBarTheme">@style/ActionBarThemeOverlay</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
+        <item name="android:navigationBarColor">#000</item>
+
+        <!-- used only if windowContentTransitions is true -->
+        <item name="android:windowSharedElementEnterTransition">@transition/shared_element</item>
+        <item name="android:windowSharedElementExitTransition">@transition/shared_element</item>
+        <item name="android:windowEnterTransition">@android:transition/no_transition</item>
+        <item name="android:windowExitTransition">@android:transition/no_transition</item>
+        <item name="android:windowAllowExitTransitionOverlap">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+    </style>
+
+    <!-- Action bar -->
+    <style name="ActionBar" parent="ActionBar.Base">
+        <item name="android:displayOptions">homeAsUp|showTitle</item>
+        <item name="android:contentInsetStart">?actionBarInsetStart</item>
+    </style>
+    <style name="ActionBarThemeOverlay" parent="">
+        <item name="android:textColorPrimary">#fff</item>
+        <item name="android:colorControlNormal">?actionBarIconColor</item>
+        <item name="android:colorControlHighlight">#3fff</item>
+    </style>
+
+    <style name="ActionBar.Base"
+           parent="android:Widget.Material.ActionBar">
+        <item name="android:background">@drawable/actionbar_background</item>
+        <item name="android:icon">@drawable/ic_launcher</item>
+        <item name="android:displayOptions">showHome|showTitle</item>
+        <item name="android:titleTextStyle">@style/ActionBar.TitleText</item>
+        <!--<item name="android:logo">@drawable/actionbar_logo</item>-->
+    </style>
+    <style name="ActionBar.TitleText"
+           parent="android:TextAppearance.Material.Widget.ActionBar.Title">
+        <item name="android:textColor">#fff</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance.BigTitle"
+           parent="android:TextAppearance.Material.Headline">
+    </style>
+
+    <style name="TextAppearance.Title"
+           parent="android:TextAppearance.Material.Subhead">
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+    </style>
+
+    <style name="TextAppearance.Subhead"
+           parent="android:TextAppearance.Material.Subhead">
+    </style>
+
+    <style name="TextAppearance.Body"
+           parent="android:TextAppearance.Material.Body1">
+        <item name="android:textColor">@android:color/tertiary_text_dark</item>
+    </style>
+
+    <style name="HeaderBar">
+        <item name="android:elevation">@dimen/headerbar_elevation</item>
+        <item name="android:background">?android:colorPrimary</item>
+    </style>
+</resources>
