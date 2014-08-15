@@ -190,13 +190,13 @@ public class FeedFragment extends Fragment
 
             holder.link = item.getLink();
 
-            if (item.getTitle() == null) {
+            if (item.getPlainTitle() == null) {
                 holder.titleTextView.setVisibility(View.GONE);
             } else {
                 holder.titleTextView.setVisibility(View.VISIBLE);
-                holder.titleTextView.setText(item.getTitle());
+                holder.titleTextView.setText(item.getPlainTitle());
             }
-            if (item.getDescription() == null) {
+            if (item.getSnippet() == null) {
                 holder.bodyTextView.setVisibility(View.GONE);
             } else {
                 holder.bodyTextView.setVisibility(View.VISIBLE);
