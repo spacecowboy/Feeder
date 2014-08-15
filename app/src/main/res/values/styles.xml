@@ -4,6 +4,16 @@
     <style name="FeedsTheme" parent="AppTheme" >
         <item name="android:windowActionBarOverlay">true</item>
     </style>
+    <style name="EditFeedTheme" parent="AppTheme" >
+        <item name="isFloatingWindow">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowSoftInputMode">stateAlwaysHidden</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+    </style>
     <!-- Final application theme. -->
     <style name="AppTheme" parent="Theme.IOSched.Base">
     </style>

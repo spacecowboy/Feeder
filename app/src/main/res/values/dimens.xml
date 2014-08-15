@@ -26,4 +26,10 @@
     <dimen name="headerbar_elevation">2dp</dimen>
 
     <dimen name="navdrawer_width">260dp</dimen>
+
+
+    <!-- Edit Feed window size -->
+    <dimen name="session_details_floating_width">300dp</dimen>
+    <dimen name="session_details_floating_height">400dp</dimen>
+    <dimen name="session_details_extra_space_bottom">48dp</dimen>
 </resources>

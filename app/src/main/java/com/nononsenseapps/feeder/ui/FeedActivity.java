@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.ui;
 
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -90,6 +91,10 @@ public class FeedActivity extends BaseActivity {
             @Override
             public void onClick(final View view) {
                 // TODO Add feed
+                Intent i = new Intent(FeedActivity.this,
+                        EditFeedActivity.class);
+                i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
+                startActivity(i);
             }
         });
     }

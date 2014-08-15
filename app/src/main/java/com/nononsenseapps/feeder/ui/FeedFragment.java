@@ -4,12 +4,16 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -95,6 +99,17 @@ public class FeedFragment extends Fragment
         // specify an adapter
         mAdapter = new FeedAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(final AdapterView<?> parent,
+                    final View view, final int position, final long id) {
+                // Just open in browser for now
+                RssItem item = mAdapter.getItem(position);
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                 i.setData(Uri.parse(item.getLink()));
+                 startActivity(i);
+            }
+        });
 
         return rootView;
     }

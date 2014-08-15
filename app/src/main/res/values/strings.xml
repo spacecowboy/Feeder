@@ -15,5 +15,8 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="add_rss_feed">Add RSS feed</string>
+    <string name="title_activity_edit_feed">EditFeedActivity</string>
+    <string name="url">URL</string>
+    <string name="title">Title</string>
 
 </resources>

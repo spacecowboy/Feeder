@@ -11,4 +11,7 @@
         <attr name="popupItemBackground" format="dimension" />
         <attr name="photoItemForeground" format="dimension" />
     </declare-styleable>
+    <declare-styleable name="ThemeIOSched">
+        <attr name="isFloatingWindow" format="boolean" />
+    </declare-styleable>
 </resources>
