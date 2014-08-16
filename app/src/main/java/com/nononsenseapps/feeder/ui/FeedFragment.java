@@ -104,9 +104,10 @@ public class FeedFragment extends Fragment
             public void onItemClick(final AdapterView<?> parent,
                     final View view, final int position, final long id) {
                 // Just open in browser for now
-                RssItem item = mAdapter.getItem(position);
+                FeedAdapter.ViewHolder viewHolder =
+                        (FeedAdapter.ViewHolder) view.getTag();
                 Intent i = new Intent(Intent.ACTION_VIEW);
-                 i.setData(Uri.parse(item.getLink()));
+                 i.setData(Uri.parse(viewHolder.link));
                  startActivity(i);
             }
         });
@@ -157,7 +158,7 @@ public class FeedFragment extends Fragment
         // 64dp at xhdpi is 128 pixels
         private final int defImgWidth = 2 * 128;
         private final int defImgHeight = 2 * 128;
-        //private List<RssItem> items = null;
+        private List<RssItem> items = null;
 
         public FeedAdapter(final Context context) {
             super(context, R.layout.view_story);
@@ -186,7 +187,7 @@ public class FeedFragment extends Fragment
             ViewHolder holder = (ViewHolder) convertView.getTag();
             // position in data set
             final int position = hposition - 1;
-            final RssItem item = getItem(position);
+            final RssItem item = items.get(position);
 
             holder.link = item.getLink();
 
@@ -237,18 +238,18 @@ public class FeedFragment extends Fragment
             return 2;
         }
 
-        //        @Override
-        //        public int getCount() {
-        //            if (items == null) {
-        //                return 0;
-        //            } else {
-        //                // 1 header + the rest
-        //                return 1 + items.size();
-        //            }
-        //        }
+                @Override
+                public int getCount() {
+                    if (items == null) {
+                        return 0;
+                    } else {
+                        // 1 header + the rest
+                        return 1 + items.size();
+                    }
+                }
 
         public void setData(List<RssItem> feed) {
-            //this.items = feed;
+            this.items = feed;
             clear();
             if (feed != null)
                 addAll(feed);
