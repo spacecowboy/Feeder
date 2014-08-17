@@ -1,14 +1,17 @@
 package com.nononsenseapps.feeder.ui;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,11 +107,7 @@ public class FeedFragment extends Fragment
             public void onItemClick(final AdapterView<?> parent,
                     final View view, final int position, final long id) {
                 // Just open in browser for now
-                FeedAdapter.ViewHolder viewHolder =
-                        (FeedAdapter.ViewHolder) view.getTag();
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                 i.setData(Uri.parse(viewHolder.link));
-                 startActivity(i);
+                ((FeedAdapter.ViewHolder) view.getTag()).onClick(view);
             }
         });
 
@@ -189,6 +188,7 @@ public class FeedFragment extends Fragment
             final int position = hposition - 1;
             final RssItem item = items.get(position);
 
+            holder.rssItem = item;
             holder.link = item.getLink();
 
             if (item.getPlainTitle() == null) {
@@ -264,6 +264,7 @@ public class FeedFragment extends Fragment
             public final TextView bodyTextView;
             public final ImageView imageView;
             public String link;
+            public RssItem rssItem;
 
             public ViewHolder(View v) {
                 //v.setOnClickListener(this);
@@ -280,11 +281,24 @@ public class FeedFragment extends Fragment
              */
             //            @TargetApi(Build.VERSION_CODES.L)
             //            @Override
-            //            public void onClick(final View view) {
-            //                // Just open in browser for now
-            //                Intent i = new Intent(Intent.ACTION_VIEW);
-            //                i.setData(Uri.parse(link));
-            //                startActivity(i);
+                        public void onClick(final View view) {
+                            Intent i = new Intent(getActivity(),
+                                    ReaderActivity.class);
+                            //i.setData(Uri.parse(link));
+                            i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
+                            ReaderActivity.setRssExtras(i, -1, rssItem);
+
+                            // TODO add animation
+                            Log.d("JONAS", "View size: w: " + view.getWidth() +
+                                    ", h: " + view.getHeight());
+                            Log.d("JONAS", "View pos: l: " + view.getLeft() +
+                                           ", t: " + view.getTop());
+                            ActivityOptions options = ActivityOptions
+                                    .makeScaleUpAnimation(view, 0, 0,
+                                            view.getWidth(), view.getHeight());
+
+                            startActivity(i, options.toBundle());
+                        }
 
                 /*
                 Intent story = new Intent(getActivity(), StoryActivity.class);

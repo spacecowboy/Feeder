@@ -18,5 +18,6 @@
     <string name="title_activity_edit_feed">EditFeedActivity</string>
     <string name="url">URL</string>
     <string name="title">Title</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui;
 
 import android.app.ActionBar;
+import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,12 +15,6 @@ import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
 
 
 public class FeedActivity extends BaseActivity {
-
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the
-     * navigation drawer.
-     */
-    private NavigationDrawerFragment mNavigationDrawerFragment;
 
     /**
      * Used to store the last screen title. For use in {@link
@@ -65,7 +60,6 @@ public class FeedActivity extends BaseActivity {
 
         if (savedInstanceState == null) {
             mFragment = getDefaultFragment();
-            Log.d("JONAS", "Loading default frag");
             getFragmentManager().beginTransaction()
                     .add(R.id.container, mFragment, "single_pane").commit();
         } else {
@@ -90,11 +84,13 @@ public class FeedActivity extends BaseActivity {
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                // TODO Add feed
                 Intent i = new Intent(FeedActivity.this,
                         EditFeedActivity.class);
                 i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
-                startActivity(i);
+                ActivityOptions options = ActivityOptions
+                        .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
+                                view.getHeight());
+                startActivity(i, options.toBundle());
             }
         });
     }

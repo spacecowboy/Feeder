@@ -12,10 +12,8 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +30,7 @@ import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.util.LPreviewUtils;
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase;
 import com.nononsenseapps.feeder.util.PrefUtils;
+import com.nononsenseapps.feeder.views.ObservableScrollView;
 
 import java.util.ArrayList;
 
@@ -41,6 +40,8 @@ import java.util.ArrayList;
  */
 public class BaseActivity extends Activity
         implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
 
     // Special Navdrawer items
     protected static final int NAVDRAWER_ITEM_INVALID = -1;
@@ -78,6 +79,8 @@ public class BaseActivity extends Activity
 
     private SimpleCursorAdapter mNavAdapter;
     private ListView mDrawerListView;
+    // If pressing home should finish or start new activity
+    private boolean mShouldFinishBack = false;
 
     /**
      * Converts an intent into a {@link Bundle} suitable for use as fragment
@@ -125,6 +128,11 @@ public class BaseActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent i = getIntent();
+        if (i != null) {
+            mShouldFinishBack = i.getBooleanExtra(SHOULD_FINISH_BACK, false);
+        }
+
         mLPreviewUtils = LPreviewUtils.getInstance(this);
         mThemedStatusBarColor = getResources().getColor(R.color.primary_dark);
     }
@@ -149,15 +157,16 @@ public class BaseActivity extends Activity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
+        if (mDrawerToggle != null &&
+            mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
-        if (id == android.R.id.home) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.L) {
-//                finishAfterTransition();
-//            } else {
-                finish();
+        if (id == android.R.id.home && mShouldFinishBack) {
+            //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.L) {
+            //                finishAfterTransition();
+            //            } else {
+            finish();
             //}
             return true;
         }
@@ -181,8 +190,6 @@ public class BaseActivity extends Activity
             mDrawerLayout = null;
             return;
         }
-
-        Log.d("JONAS", "Setting up navdrawer");
 
         mDrawerToggle = mLPreviewUtils.setupDrawerToggle(mDrawerLayout,
                 new DrawerLayout.DrawerListener() {
@@ -223,6 +230,7 @@ public class BaseActivity extends Activity
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
+
 
         mDrawerToggle.syncState();
 
@@ -437,6 +445,20 @@ public class BaseActivity extends Activity
                              (mActionBarAutoHideSignal <=
                               -mActionBarAutoHideSensivity);
         autoShowOrHideActionBar(shouldShow);
+    }
+
+    protected void enableActionBarAutoHide(
+            final ObservableScrollView scrollView) {
+        initActionBarAutoHide();
+        mActionBarAutoHideSignal = 0;
+        scrollView.addOnScrollChangedListener(
+                new ObservableScrollView.OnScrollChangedListener() {
+                    @Override
+                    public void onScrollChanged(final int deltaX,
+                            final int deltaY) {
+                        onMainContentScrolled(scrollView.getScrollY(), deltaY);
+                    }
+                });
     }
 
     protected void registerHideableHeaderView(View hideableHeaderView) {

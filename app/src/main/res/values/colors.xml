@@ -13,6 +13,14 @@
     <color name="navdrawer_icon_tint_selected">@color/primary</color>
     <color name="black_overlay">#66000000</color>
 
+    <!-- Material Text colors -->
+    <!-- 38% = 61 -->
+    <color name="white_38">#61ffffff</color>
+    <!-- 54% = 8A -->
+    <color name="white_54">#8affffff</color>
+    <!-- 87% = DE -->
+    <color name="white_87">#deffffff</color>
+
     <!-- Material Colors -->
 
     <color name="background_material_dark">#ff212121</color>
@@ -31,11 +39,11 @@
     <color name="highlighted_text_material_dark">#6640c4ff</color>
 
     <!-- White 87% -->
-    <color name="primary_text_default_material_dark">#deffffff</color>
+    <color name="primary_text_default_material_dark">@color/white_87</color>
     <!-- White 38% -->
-    <color name="secondary_text_material_dark">#61ffffff</color>
+    <color name="secondary_text_material_dark">@color/white_38</color>
     <!-- White 38% (TODO: same as secondary?) -->
-    <color name="tertiary_text_material_dark">#61ffffff</color>
+    <color name="tertiary_text_material_dark">@color/white_38</color>
 
 
     <!-- Material colors -->
