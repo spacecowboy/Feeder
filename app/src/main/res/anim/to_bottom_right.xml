@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Animate a window to disappear towards the bottom right. -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+     android:interpolator="@android:anim/accelerate_decelerate_interpolator">
+    <translate
+        android:fromXDelta="0"
+        android:toXDelta="100%p"
+        android:duration="@android:integer/config_shortAnimTime"/>
+    <translate
+        android:fromYDelta="0"
+        android:toYDelta="100%p"
+        android:duration="@android:integer/config_shortAnimTime"/>
+    <alpha
+        android:fromAlpha="1.0"
+        android:toAlpha="0.0"
+        android:duration="@android:integer/config_shortAnimTime"/>
+
+</set>

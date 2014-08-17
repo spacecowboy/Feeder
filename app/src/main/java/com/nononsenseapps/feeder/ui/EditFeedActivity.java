@@ -48,6 +48,10 @@ public class EditFeedActivity extends Activity {
                 getContentResolver()
                         .insert(RssContentProvider.URI_FEEDS, values);
                 finish();
+                if (mShouldFinishBack) {
+                    // Only care about exit transition
+                    overridePendingTransition(R.anim.to_bottom_right, R.anim.to_bottom_right);
+                }
             }
         });
 
@@ -60,6 +64,16 @@ public class EditFeedActivity extends Activity {
             } else if (i.hasExtra(Intent.EXTRA_TEXT)) {
                 mTextUrl.setText(i.getStringExtra(Intent.EXTRA_TEXT));
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        if (mShouldFinishBack) {
+            // Only care about exit transition
+            overridePendingTransition(R.anim.to_bottom_right, R.anim.to_bottom_right);
         }
     }
 
@@ -102,6 +116,8 @@ public class EditFeedActivity extends Activity {
             // Was launched from inside app, should just go back
             // Action bar handles other cases.
             finish();
+            // Only care about exit transition
+            overridePendingTransition(R.anim.to_bottom_right, R.anim.to_bottom_right);
             return true;
         }
         return super.onOptionsItemSelected(item);

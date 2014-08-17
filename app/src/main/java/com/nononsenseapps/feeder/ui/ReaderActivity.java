@@ -43,8 +43,6 @@ public class ReaderActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reader);
 
-        //overridePendingTransition(0, 0);
-
         mTitle = getTitle();
 
         if (savedInstanceState == null) {
