@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.nononsenseapps.feeder.R;
@@ -74,8 +75,38 @@ public class ReaderActivity extends BaseActivity {
                 // TODO Mark as read
                 // TODO animate?
                 finish();
+               if (mShouldFinishBack) {
+                   // Only care about exit transition
+                   overridePendingTransition(0, R.anim.contract_to_center);
+               }
             }
         });
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        super.onBackPressed();
+        if (mShouldFinishBack) {
+            // Only care about exit transition
+            overridePendingTransition(0, R.anim.contract_to_center);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if (id == android.R.id.home && mShouldFinishBack) {
+            // Handled by super, except animation
+            boolean val = super.onOptionsItemSelected(item);
+            // Only care about exit transition
+            overridePendingTransition(0, R.anim.contract_to_center);
+            return val;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**

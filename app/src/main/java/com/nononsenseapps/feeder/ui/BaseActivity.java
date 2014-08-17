@@ -80,7 +80,7 @@ public class BaseActivity extends Activity
     private SimpleCursorAdapter mNavAdapter;
     private ListView mDrawerListView;
     // If pressing home should finish or start new activity
-    private boolean mShouldFinishBack = false;
+    protected boolean mShouldFinishBack = false;
 
     /**
      * Converts an intent into a {@link Bundle} suitable for use as fragment

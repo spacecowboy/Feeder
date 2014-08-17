@@ -73,7 +73,7 @@ public class EditFeedActivity extends Activity {
         super.onBackPressed();
         if (mShouldFinishBack) {
             // Only care about exit transition
-            overridePendingTransition(R.anim.to_bottom_right, R.anim.to_bottom_right);
+            overridePendingTransition(0, R.anim.to_bottom_right);
         }
     }
 
