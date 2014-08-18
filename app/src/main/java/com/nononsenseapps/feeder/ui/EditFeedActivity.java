@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +21,9 @@ import com.nononsenseapps.feeder.db.RssContentProvider;
 public class EditFeedActivity extends Activity {
 
     public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
+    public static final String _ID = "_id";
     private boolean mShouldFinishBack = false;
+    private long id = -1;
     private EditText mTextUrl;
     private EditText mTextTitle;
 
@@ -45,8 +47,14 @@ public class EditFeedActivity extends Activity {
 
                 values.put(FeedSQL.COL_TITLE, mTextTitle.getText().toString());
                 values.put(FeedSQL.COL_URL, mTextUrl.getText().toString());
-                getContentResolver()
-                        .insert(RssContentProvider.URI_FEEDS, values);
+                if (id < 1) {
+                    getContentResolver()
+                            .insert(RssContentProvider.URI_FEEDS, values);
+                } else {
+                    getContentResolver().update(Uri
+                            .withAppendedPath(RssContentProvider.URI_FEED_BASE, Long.toString(id)),
+                            values, null, null);
+                }
                 finish();
                 if (mShouldFinishBack) {
                     // Only care about exit transition
@@ -58,7 +66,10 @@ public class EditFeedActivity extends Activity {
         Intent i = getIntent();
         if (i != null) {
             mShouldFinishBack = i.getBooleanExtra(SHOULD_FINISH_BACK, false);
+            // Existing id
+            id = i.getLongExtra(_ID, -1);
 
+            // Link and title
             if (i.getDataString() != null) {
                 mTextUrl.setText(i.getDataString());
             } else if (i.hasExtra(Intent.EXTRA_TEXT)) {
@@ -67,37 +78,37 @@ public class EditFeedActivity extends Activity {
         }
     }
 
-    @Override
-    public void onBackPressed()
-    {
-        super.onBackPressed();
-        if (mShouldFinishBack) {
-            // Only care about exit transition
-            overridePendingTransition(0, R.anim.to_bottom_right);
-        }
-    }
-
-    private void setupFloatingWindow() {
-        // configure this Activity as a floating window, dimming the background
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.width = getResources().getDimensionPixelSize(R.dimen.session_details_floating_width);
-        params.height = getResources().getDimensionPixelSize(R.dimen.session_details_floating_height);
-        params.alpha = 1;
-        params.dimAmount = 0.7f;
-        params.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-        getWindow().setAttributes(params);
-    }
-
     private boolean shouldBeFloatingWindow() {
         Resources.Theme theme = getTheme();
         TypedValue floatingWindowFlag = new TypedValue();
-        if (theme == null || !theme.resolveAttribute(R.attr.isFloatingWindow, floatingWindowFlag, true)) {
+        if (theme == null ||
+                !theme.resolveAttribute(R.attr.isFloatingWindow, floatingWindowFlag, true)) {
             // isFloatingWindow flag is not defined in theme
             return false;
         }
         return (floatingWindowFlag.data != 0);
     }
 
+    private void setupFloatingWindow() {
+        // configure this Activity as a floating window, dimming the background
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.width = getResources().getDimensionPixelSize(R.dimen.session_details_floating_width);
+        params.height =
+                getResources().getDimensionPixelSize(R.dimen.session_details_floating_height);
+        params.alpha = 1;
+        params.dimAmount = 0.7f;
+        params.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+        getWindow().setAttributes(params);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (mShouldFinishBack) {
+            // Only care about exit transition
+            overridePendingTransition(0, R.anim.to_bottom_right);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -255,7 +255,7 @@ public class BaseActivity extends Activity
                             Cursor c = (Cursor) mNavAdapter.getItem(pos);
                             // Make sure these ints match ordering in projection if
                             // changed
-                            onNavigationDrawerItemSelected(c.getString(1),
+                            onNavigationDrawerItemSelected(c.getLong(0), c.getString(1),
                                     c.getString(2));
                         }
                     }
@@ -315,7 +315,7 @@ public class BaseActivity extends Activity
     }
 
     // Subclasses can override to decide what happens on nav item selection
-    protected void onNavigationDrawerItemSelected(String title, String url) {
+    protected void onNavigationDrawerItemSelected(long id, String title, String url) {
         // TODO add default start activity with arguments
     }
 

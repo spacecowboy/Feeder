@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.ReaderActivity">
+    <item
+        android:id="@+id/action_open_in_browser"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_location_web_site"
+        android:title="Open in browser" />
+    <item
+        android:id="@+id/action_share"
+        android:showAsAction="ifRoom"
+        android:actionProviderClass=
+        "android.widget.ShareActionProvider"
+        android:title="Share" />
+</menu>

@@ -97,7 +97,7 @@ public class FeedActivity extends BaseActivity {
 
     private Fragment getDefaultFragment() {
         // TODO do something better
-        return FeedFragment.newInstance("Android Police",
+        return FeedFragment.newInstance(-1, "Android Police",
                 "http://feeds.feedburner.com/AndroidPolice");
     }
 
@@ -127,9 +127,9 @@ public class FeedActivity extends BaseActivity {
     }
 
     @Override
-    protected void onNavigationDrawerItemSelected(String title, String url) {
+    protected void onNavigationDrawerItemSelected(long id, String title, String url) {
         // update the main content by replacing fragments
-        mFragment = FeedFragment.newInstance(title, url);
+        mFragment = FeedFragment.newInstance(id, title, url);
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, mFragment, "single_pane").commit();
     }

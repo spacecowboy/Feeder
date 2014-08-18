@@ -13,12 +13,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
@@ -32,14 +36,16 @@ import java.util.List;
 public class FeedFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<List<RssItem>> {
 
-    private static final int FEED_LOADER = -1;
+    private static final int FEED_LOADER = 1;
 
+    private static final String ARG_FEED_ID = "feed_id";
     private static final String ARG_FEED_TITLE = "feed_title";
     private static final String ARG_FEED_URL = "feed_url";
     private FeedAdapter mAdapter;
     private AbsListView mRecyclerView;
     //private LinearLayoutManager mLayoutManager;
     // TODO change this
+    private long id = -1;
     private String title = "Android Police Dummy";
     private String url = "http://feeds.feedburner.com/AndroidPolice";
 
@@ -50,9 +56,10 @@ public class FeedFragment extends Fragment
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static FeedFragment newInstance(String title, String url) {
+    public static FeedFragment newInstance(long id, String title, String url) {
         FeedFragment fragment = new FeedFragment();
         Bundle args = new Bundle();
+        args.putLong(ARG_FEED_ID, id);
         args.putString(ARG_FEED_TITLE, title);
         args.putString(ARG_FEED_URL, url);
         fragment.setArguments(args);
@@ -70,11 +77,12 @@ public class FeedFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            id = getArguments().getLong(ARG_FEED_ID, -1);
             title = getArguments().getString(ARG_FEED_TITLE);
             url = getArguments().getString(ARG_FEED_URL);
         }
 
-        setHasOptionsMenu(false);
+        setHasOptionsMenu(true);
 
         // Load some RSS
         getLoaderManager().restartLoader(FEED_LOADER, new Bundle(), this);
@@ -119,6 +127,34 @@ public class FeedFragment extends Fragment
         super.onActivityCreated(bundle);
 
         ((BaseActivity) getActivity()).enableActionBarAutoHide(mRecyclerView);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.feed_fragment, menu);
+
+        if (id < 1) {
+            menu.findItem(R.id.action_edit_feed).setVisible(false);
+        }
+
+        // Don't forget super call here
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        final long id = menuItem.getItemId();
+        if (id == R.id.action_edit_feed && id > 0) {
+            Intent i = new Intent(getActivity(),
+                    EditFeedActivity.class);
+            // TODO do not animate the back movement here
+            i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
+            i.putExtra(EditFeedActivity._ID, id);
+            startActivity(i);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(menuItem);
+        }
     }
 
     @Override

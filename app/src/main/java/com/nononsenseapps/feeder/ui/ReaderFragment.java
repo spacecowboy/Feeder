@@ -1,13 +1,17 @@
 package com.nononsenseapps.feeder.ui;
 
 
-
-import android.os.Bundle;
 import android.app.Fragment;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
@@ -18,7 +22,6 @@ import com.shirwa.simplistic_rss.RssItem;
  * A simple {@link Fragment} subclass.
  * Use the {@link ReaderFragment#newInstance} factory method to
  * create an instance of this fragment.
- *
  */
 public class ReaderFragment extends Fragment {
     public static final String ARG_TITLE = "title";
@@ -35,6 +38,10 @@ public class ReaderFragment extends Fragment {
     private TextView mBodyTextView;
     private ObservableScrollView mScrollView;
 
+
+    public ReaderFragment() {
+        // Required empty public constructor
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -55,13 +62,14 @@ public class ReaderFragment extends Fragment {
 
     /**
      * Convert an RssItem into a Bundle for use with Fragment Arguments
-     * @param id potential database id
+     *
+     * @param id      potential database id
      * @param rssItem to convert
-     * @param bundle may be null
+     * @param bundle  may be null
      * @return bundle of rssItem plus id
      */
     public static Bundle RssItemToBundle(long id, RssItem rssItem,
-            Bundle bundle) {
+                                         Bundle bundle) {
         if (bundle == null) {
             bundle = new Bundle();
         }
@@ -71,19 +79,6 @@ public class ReaderFragment extends Fragment {
         bundle.putString(ARG_LINK, rssItem.getLink());
         bundle.putString(ARG_IMAGEURL, rssItem.getImageUrl());
         return bundle;
-    }
-
-    public static RssItem RssItemFromBundle(Bundle bundle) {
-        RssItem rssItem = new RssItem();
-        rssItem.setTitle(bundle.getString(ARG_TITLE));
-        rssItem.setDescription(bundle.getString(ARG_DESCRIPTION));
-        rssItem.setLink(bundle.getString(ARG_LINK));
-        rssItem.setImageUrl(bundle.getString(ARG_IMAGEURL));
-        return rssItem;
-    }
-
-    public ReaderFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -98,6 +93,17 @@ public class ReaderFragment extends Fragment {
             _id = getArguments().getLong(ARG_ID, -1);
             mRssItem = RssItemFromBundle(getArguments());
         }
+
+        setHasOptionsMenu(true);
+    }
+
+    public static RssItem RssItemFromBundle(Bundle bundle) {
+        RssItem rssItem = new RssItem();
+        rssItem.setTitle(bundle.getString(ARG_TITLE));
+        rssItem.setDescription(bundle.getString(ARG_DESCRIPTION));
+        rssItem.setLink(bundle.getString(ARG_LINK));
+        rssItem.setImageUrl(bundle.getString(ARG_IMAGEURL));
+        return rssItem;
     }
 
     @Override
@@ -139,5 +145,37 @@ public class ReaderFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         RssItemToBundle(_id, mRssItem, outState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.reader, menu);
+
+        // Locate MenuItem with ShareActionProvider
+        MenuItem shareItem = menu.findItem(R.id.action_share);
+
+        // Fetch and store ShareActionProvider
+        ShareActionProvider shareActionProvider =
+                (ShareActionProvider) shareItem.getActionProvider();
+
+        // Set intent
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mRssItem.getLink());
+        shareActionProvider.setShareIntent(shareIntent);
+
+        // Don't forget super call here
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        final long id = menuItem.getItemId();
+        if (id == R.id.action_open_in_browser) {
+            // Open in browser
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mRssItem.getLink())));
+            return true;
+        } else {
+            return super.onOptionsItemSelected(menuItem);
+        }
     }
 }
