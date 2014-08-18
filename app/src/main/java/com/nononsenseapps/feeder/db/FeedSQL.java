@@ -15,12 +15,13 @@ public class FeedSQL {
     // These fields can be anything you want.
     public static final String COL_TITLE = "title";
     public static final String COL_URL = "url";
+    public static final String COL_TAG = "tag";
 
     // Does not include "where"
     public static final String WHEREIDIS = COL_ID + " IS ?";
 
     // For database projection so order is consistent
-    public static final String[] FIELDS = { COL_ID, COL_TITLE, COL_URL };
+    public static final String[] FIELDS = {COL_ID, COL_TITLE, COL_URL, COL_TAG};
 
     /*
      * The SQL code that creates a Table for storing Persons in.
@@ -29,15 +30,17 @@ public class FeedSQL {
      */
     public static final String CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + "("
-            + COL_ID + " INTEGER PRIMARY KEY,"
-            + COL_TITLE + " TEXT NOT NULL,"
-            + COL_URL + " TEXT NOT NULL"
-            + ")";
+                    + COL_ID + " INTEGER PRIMARY KEY,"
+                    + COL_TITLE + " TEXT NOT NULL,"
+                    + COL_URL + " TEXT NOT NULL,"
+                    + COL_TAG + " TEXT"
+                    + ")";
 
     // Fields corresponding to database columns
     public long id = -1;
     public String title = null;
     public String url = null;
+    public String tag = null;
 
     /**
      * No need to do anything, fields are already set to default values above
@@ -53,6 +56,7 @@ public class FeedSQL {
         this.id = cursor.getLong(0);
         this.title = cursor.getString(1);
         this.url = cursor.getString(2);
+        this.tag = cursor.getString(3);
     }
 
     /**
@@ -64,6 +68,10 @@ public class FeedSQL {
         // Note that ID is NOT included here
         values.put(COL_TITLE, title);
         values.put(COL_URL, url);
+        if (tag == null)
+            values.putNull(COL_TAG);
+        else
+            values.put(COL_TAG, tag);
 
         return values;
     }
