@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.model;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.util.Log;
 
 import com.shirwa.simplistic_rss.RssItem;
 import com.shirwa.simplistic_rss.RssReader;
@@ -10,6 +11,7 @@ import java.util.List;
 
 public class RssLoader extends AsyncTaskLoader<List<RssItem>> {
 
+    public final static String TAG = "RssLoader";
     public final String url;
 
     public RssLoader(final Context context, final String url) {
@@ -23,6 +25,7 @@ public class RssLoader extends AsyncTaskLoader<List<RssItem>> {
         try {
             return new RssReader(url).getItems();
         } catch (Exception e) {
+            Log.e(TAG, e.getLocalizedMessage());
             return null;
         }
     }
