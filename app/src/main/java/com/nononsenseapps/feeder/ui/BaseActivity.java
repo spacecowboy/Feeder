@@ -505,6 +505,11 @@ public class BaseActivity extends Activity
             if (cursor.getCount() == 0) {
                 ContentValues values = new ContentValues();
 
+                values.put(FeedSQL.COL_TITLE, "XKCD");
+                values.put(FeedSQL.COL_URL, "http://xkcd.com/rss.xml");
+                getContentResolver()
+                        .insert(RssContentProvider.URI_FEEDS, values);
+
                 values.put(FeedSQL.COL_TITLE, "Cowboy Programmer");
                 values.put(FeedSQL.COL_URL, "http://cowboyprogrammer.org/rss");
                 getContentResolver()
