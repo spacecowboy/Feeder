@@ -32,7 +32,7 @@ public class RssLoader extends AsyncTaskLoader<List<RssItem>> {
             e.printStackTrace(printWriter);
             printWriter.flush();
 
-            Log.e(TAG, e.getLocalizedMessage());
+            Log.e(TAG, "" + e.getLocalizedMessage());
             Log.e(TAG, "" + writer.toString());
             return null;
         }
