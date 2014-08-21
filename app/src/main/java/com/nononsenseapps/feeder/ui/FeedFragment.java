@@ -150,6 +150,8 @@ public class FeedFragment extends Fragment
             // TODO do not animate the back movement here
             i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
             i.putExtra(EditFeedActivity._ID, id);
+            i.putExtra(EditFeedActivity.TITLE, title);
+            i.setData(Uri.parse(url));
             startActivity(i);
             return true;
         } else {

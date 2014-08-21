@@ -510,8 +510,8 @@ public class BaseActivity extends Activity
                 getContentResolver()
                         .insert(RssContentProvider.URI_FEEDS, values);
 
-                values.put(FeedSQL.COL_TITLE, "Cowboy Programmer");
-                values.put(FeedSQL.COL_URL, "http://cowboyprogrammer.org/rss");
+                values.put(FeedSQL.COL_TITLE, "CowboyProgrammer");
+                values.put(FeedSQL.COL_URL, "http://feeds.feedburner.com/CowboyProgrammer");
                 getContentResolver()
                         .insert(RssContentProvider.URI_FEEDS, values);
 

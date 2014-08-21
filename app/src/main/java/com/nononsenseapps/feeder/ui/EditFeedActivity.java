@@ -22,6 +22,7 @@ public class EditFeedActivity extends Activity {
 
     public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
     public static final String _ID = "_id";
+    public static final String TITLE = "title";
     private boolean mShouldFinishBack = false;
     private long id = -1;
     private EditText mTextUrl;
@@ -45,8 +46,10 @@ public class EditFeedActivity extends Activity {
                 // TODO error checking and stuff like that
                 ContentValues values = new ContentValues();
 
-                values.put(FeedSQL.COL_TITLE, mTextTitle.getText().toString());
-                values.put(FeedSQL.COL_URL, mTextUrl.getText().toString());
+                values.put(FeedSQL.COL_TITLE, mTextTitle.getText().toString()
+                        .trim());
+                values.put(FeedSQL.COL_URL, mTextUrl.getText().toString()
+                        .trim());
                 if (id < 1) {
                     getContentResolver()
                             .insert(RssContentProvider.URI_FEEDS, values);
@@ -69,11 +72,15 @@ public class EditFeedActivity extends Activity {
             // Existing id
             id = i.getLongExtra(_ID, -1);
 
-            // Link and title
+            // Link
             if (i.getDataString() != null) {
                 mTextUrl.setText(i.getDataString());
             } else if (i.hasExtra(Intent.EXTRA_TEXT)) {
                 mTextUrl.setText(i.getStringExtra(Intent.EXTRA_TEXT));
+            }
+            // Title
+            if (i.hasExtra(TITLE)) {
+                mTextTitle.setText(i.getStringExtra(TITLE));
             }
         }
     }
