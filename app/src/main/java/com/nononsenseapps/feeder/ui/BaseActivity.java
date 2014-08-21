@@ -378,7 +378,7 @@ public class BaseActivity extends Activity
         //                (LinearLayoutManager) listView.getLayoutManager();
         mActionBarAutoHideSignal = 0;
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            final static int ITEMS_THRESHOLD = 3;
+            final static int ITEMS_THRESHOLD = 1;
             int lastFvi = 0;
 
             @Override
