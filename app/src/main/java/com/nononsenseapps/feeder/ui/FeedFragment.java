@@ -28,11 +28,19 @@ import com.shirwa.simplistic_rss.RssFeed;
 import com.shirwa.simplistic_rss.RssItem;
 import com.squareup.picasso.Picasso;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.List;
+import java.util.Locale;
 
 
 public class FeedFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<RssFeed> {
+
+    // TODO change format possibly
+    static final DateTimeFormatter shortDateTimeFormat = DateTimeFormat
+            .shortDateTime().withLocale(Locale.getDefault());
 
     private static final int FEED_LOADER = 1;
 
@@ -240,7 +248,13 @@ public class FeedFragment extends Fragment
 
             holder.rssItem = item;
             holder.link = item.getLink();
-
+            if (item.getPubDate() == null) {
+                holder.dateTextView.setVisibility(View.GONE);
+            } else {
+                holder.dateTextView.setVisibility(View.VISIBLE);
+                holder.dateTextView.setText(
+                        item.getPubDate().toString(shortDateTimeFormat));
+            }
             if (item.getPlainTitle() == null) {
                 holder.titleTextView.setVisibility(View.GONE);
             } else {
@@ -303,6 +317,7 @@ public class FeedFragment extends Fragment
             public final View parent;
             public final TextView titleTextView;
             public final TextView bodyTextView;
+            public final TextView dateTextView;
             public final ImageView imageView;
             public String link;
             public RssItem rssItem;
@@ -312,32 +327,45 @@ public class FeedFragment extends Fragment
                 parent = v;
                 titleTextView = (TextView) v.findViewById(R.id.story_title);
                 bodyTextView = (TextView) v.findViewById(R.id.story_body);
+                dateTextView = (TextView) v.findViewById(R.id.story_date);
                 imageView = (ImageView) v.findViewById(R.id.story_image);
             }
 
             /**
-             * OnItemClickListener replacement
+             * OnItemClickListener replacement.
+             *
+             * If a feeditem does not have any content,
+             * then it opens the link in the browser directly.
              *
              * @param view
              */
             //            @TargetApi(Build.VERSION_CODES.L)
             //            @Override
             public void onClick(final View view) {
-                Intent i = new Intent(getActivity(), ReaderActivity.class);
-                //i.setData(Uri.parse(link));
-                i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
-                ReaderActivity.setRssExtras(i, -1, rssItem);
 
-                // TODO add animation
-                Log.d("JONAS", "View size: w: " + view.getWidth() +
-                               ", h: " + view.getHeight());
-                Log.d("JONAS", "View pos: l: " + view.getLeft() +
-                               ", t: " + view.getTop());
-                ActivityOptions options = ActivityOptions
-                        .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
-                                view.getHeight());
+                // Open item if not empty
+                if (rssItem.getDescription() != null && !rssItem
+                        .getDescription().isEmpty()) {
+                    Intent i = new Intent(getActivity(), ReaderActivity.class);
+                    //i.setData(Uri.parse(link));
+                    i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
+                    ReaderActivity.setRssExtras(i, -1, rssItem);
 
-                startActivity(i, options.toBundle());
+                    // TODO add animation
+                    Log.d("JONAS", "View size: w: " + view.getWidth() +
+                                   ", h: " + view.getHeight());
+                    Log.d("JONAS", "View pos: l: " + view.getLeft() +
+                                   ", t: " + view.getTop());
+                    ActivityOptions options = ActivityOptions
+                            .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
+                                    view.getHeight());
+
+                    startActivity(i, options.toBundle());
+                } else {
+                    // Open in browser since no content was posted
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(rssItem.getLink())));
+                }
             }
 
                 /*
