@@ -7,8 +7,6 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,11 +20,11 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.model.RssLoader;
+import com.shirwa.simplistic_rss.RssFeed;
 import com.shirwa.simplistic_rss.RssItem;
 import com.squareup.picasso.Picasso;
 
@@ -34,7 +32,7 @@ import java.util.List;
 
 
 public class FeedFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<List<RssItem>> {
+        implements LoaderManager.LoaderCallbacks<RssFeed> {
 
     private static final int FEED_LOADER = 1;
 
@@ -110,14 +108,16 @@ public class FeedFragment extends Fragment
         // specify an adapter
         mAdapter = new FeedAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(final AdapterView<?> parent,
-                    final View view, final int position, final long id) {
-                // Just open in browser for now
-                ((FeedAdapter.ViewHolder) view.getTag()).onClick(view);
-            }
-        });
+        mRecyclerView
+                .setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(final AdapterView<?> parent,
+                            final View view, final int position,
+                            final long id) {
+                        // Just open in browser for now
+                        ((FeedAdapter.ViewHolder) view.getTag()).onClick(view);
+                    }
+                });
 
         return rootView;
     }
@@ -127,6 +127,16 @@ public class FeedFragment extends Fragment
         super.onActivityCreated(bundle);
 
         ((BaseActivity) getActivity()).enableActionBarAutoHide(mRecyclerView);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 
     @Override
@@ -145,8 +155,7 @@ public class FeedFragment extends Fragment
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         final long id = menuItem.getItemId();
         if (id == R.id.action_edit_feed && id > 0) {
-            Intent i = new Intent(getActivity(),
-                    EditFeedActivity.class);
+            Intent i = new Intent(getActivity(), EditFeedActivity.class);
             // TODO do not animate the back movement here
             i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
             i.putExtra(EditFeedActivity._ID, id);
@@ -160,18 +169,7 @@ public class FeedFragment extends Fragment
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public Loader<List<RssItem>> onCreateLoader(final int ID,
-            final Bundle bundle) {
+    public Loader<RssFeed> onCreateLoader(final int ID, final Bundle bundle) {
         if (ID == FEED_LOADER) {
             return new RssLoader(getActivity(), url);
         }
@@ -179,13 +177,17 @@ public class FeedFragment extends Fragment
     }
 
     @Override
-    public void onLoadFinished(final Loader<List<RssItem>> rssFeedLoader,
-            final List<RssItem> rssFeed) {
-        mAdapter.setData(rssFeed);
+    public void onLoadFinished(final Loader<RssFeed> rssFeedLoader,
+            final RssFeed rssFeed) {
+        if (rssFeed != null) {
+            mAdapter.setData(rssFeed.getRssItems());
+        } else {
+            mAdapter.setData(null);
+        }
     }
 
     @Override
-    public void onLoaderReset(final Loader<List<RssItem>> rssFeedLoader) {
+    public void onLoaderReset(final Loader<RssFeed> rssFeedLoader) {
         mAdapter.setData(null);
     }
 
@@ -199,6 +201,16 @@ public class FeedFragment extends Fragment
 
         public FeedAdapter(final Context context) {
             super(context, R.layout.view_story);
+        }
+
+        @Override
+        public int getCount() {
+            if (items == null) {
+                return 0;
+            } else {
+                // 1 header + the rest
+                return 1 + items.size();
+            }
         }
 
         @Override
@@ -276,21 +288,12 @@ public class FeedFragment extends Fragment
             return 2;
         }
 
-                @Override
-                public int getCount() {
-                    if (items == null) {
-                        return 0;
-                    } else {
-                        // 1 header + the rest
-                        return 1 + items.size();
-                    }
-                }
-
         public void setData(List<RssItem> feed) {
             this.items = feed;
             clear();
-            if (feed != null)
+            if (feed != null) {
                 addAll(feed);
+            }
 
             notifyDataSetChanged();
         }
@@ -319,24 +322,23 @@ public class FeedFragment extends Fragment
              */
             //            @TargetApi(Build.VERSION_CODES.L)
             //            @Override
-                        public void onClick(final View view) {
-                            Intent i = new Intent(getActivity(),
-                                    ReaderActivity.class);
-                            //i.setData(Uri.parse(link));
-                            i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
-                            ReaderActivity.setRssExtras(i, -1, rssItem);
+            public void onClick(final View view) {
+                Intent i = new Intent(getActivity(), ReaderActivity.class);
+                //i.setData(Uri.parse(link));
+                i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
+                ReaderActivity.setRssExtras(i, -1, rssItem);
 
-                            // TODO add animation
-                            Log.d("JONAS", "View size: w: " + view.getWidth() +
-                                    ", h: " + view.getHeight());
-                            Log.d("JONAS", "View pos: l: " + view.getLeft() +
-                                           ", t: " + view.getTop());
-                            ActivityOptions options = ActivityOptions
-                                    .makeScaleUpAnimation(view, 0, 0,
-                                            view.getWidth(), view.getHeight());
+                // TODO add animation
+                Log.d("JONAS", "View size: w: " + view.getWidth() +
+                               ", h: " + view.getHeight());
+                Log.d("JONAS", "View pos: l: " + view.getLeft() +
+                               ", t: " + view.getTop());
+                ActivityOptions options = ActivityOptions
+                        .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
+                                view.getHeight());
 
-                            startActivity(i, options.toBundle());
-                        }
+                startActivity(i, options.toBundle());
+            }
 
                 /*
                 Intent story = new Intent(getActivity(), StoryActivity.class);

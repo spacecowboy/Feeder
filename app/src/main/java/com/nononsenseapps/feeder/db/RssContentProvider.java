@@ -93,10 +93,38 @@ public class RssContentProvider extends ContentProvider {
         return result;
     }
 
+    /**
+     * Useful for content provider operations to insert Longs and such.
+     * @param vals
+     * @return
+     */
+    public static String[] LongsToStringArray(long... vals) {
+        String[] arr = new String[vals.length];
+        for (int i = 0; i < vals.length; i++) {
+            arr[i] = Long.toString(vals[i]);
+        }
+        return arr;
+    }
+
     @Override
     public int update(Uri uri, ContentValues values, String selection,
             String[] selectionArgs) {
-        // TODO: Implement this to handle requests to update one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        int result = 0;
+        // TODO compare URIs better later
+        if (uri.toString().startsWith(FEED_BASE)) {
+            String id = uri.getLastPathSegment();
+            result =  DatabaseHandler.getInstance(getContext())
+                    .getWritableDatabase()
+                    .update(FeedSQL.TABLE_NAME, values, FeedSQL.WHEREIDIS,
+                           new String[] {id});
+            if (result > 0) {
+                getContext().getContentResolver().notifyChange(URI_FEEDS,
+                        null, false);
+            }
+        } else {
+            throw new UnsupportedOperationException("Not yet implemented");
+        }
+
+        return result;
     }
 }

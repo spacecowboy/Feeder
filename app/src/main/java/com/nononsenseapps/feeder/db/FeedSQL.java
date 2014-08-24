@@ -16,6 +16,9 @@ public class FeedSQL {
     public static final String COL_TITLE = "title";
     public static final String COL_URL = "url";
 
+    // Does not include "where"
+    public static final String WHEREIDIS = COL_ID + " IS ?";
+
     // For database projection so order is consistent
     public static final String[] FIELDS = { COL_ID, COL_TITLE, COL_URL };
 

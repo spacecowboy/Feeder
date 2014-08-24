@@ -4,6 +4,7 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
 
+import com.shirwa.simplistic_rss.RssFeed;
 import com.shirwa.simplistic_rss.RssItem;
 import com.shirwa.simplistic_rss.RssReader;
 
@@ -11,7 +12,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
-public class RssLoader extends AsyncTaskLoader<List<RssItem>> {
+public class RssLoader extends AsyncTaskLoader<RssFeed> {
 
     public final static String TAG = "RssLoader";
     public final String url;
@@ -23,9 +24,9 @@ public class RssLoader extends AsyncTaskLoader<List<RssItem>> {
     }
 
     @Override
-    public List<RssItem> loadInBackground() {
+    public RssFeed loadInBackground() {
         try {
-            return new RssReader(url).getItems();
+            return new RssReader(url).getFeed();
         } catch (Exception e) {
             StringWriter writer = new StringWriter();
             PrintWriter printWriter = new PrintWriter(writer);
