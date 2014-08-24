@@ -2,9 +2,18 @@ package com.nononsenseapps.feeder.ui;
 
 
 import android.app.Fragment;
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
+import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,20 +24,27 @@ import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.feeder.model.ImageTextLoader;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
 import com.shirwa.simplistic_rss.RssItem;
+import com.squareup.picasso.Picasso;
+
+import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ReaderFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ReaderFragment extends Fragment {
+public class ReaderFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Spanned> {
     public static final String ARG_TITLE = "title";
     public static final String ARG_DESCRIPTION = "body";
     public static final String ARG_LINK = "link";
     public static final String ARG_IMAGEURL = "imageurl";
     public static final String ARG_ID = "dbid";
+
+    private static final int TEXT_LOADER = 1;
 
     // TODO database id
     private long _id = -1;
@@ -37,6 +53,7 @@ public class ReaderFragment extends Fragment {
     private TextView mTitleTextView;
     private TextView mBodyTextView;
     private ObservableScrollView mScrollView;
+    private Spanned mBodyText = null;
 
 
     public ReaderFragment() {
@@ -126,10 +143,10 @@ public class ReaderFragment extends Fragment {
         if (mRssItem.getDescription() == null) {
 
         } else {
-            // TODO maybe do formatting in background first...
-            mBodyTextView.setText(
-                    android.text.Html.fromHtml(mRssItem.getDescription()));
+            mBodyTextView.setText("Loading...");
         }
+
+        getLoaderManager().restartLoader(TEXT_LOADER, new Bundle(), this);
 
         return rootView;
     }
@@ -177,5 +194,35 @@ public class ReaderFragment extends Fragment {
         } else {
             return super.onOptionsItemSelected(menuItem);
         }
+    }
+
+
+    /**
+     * Instantiate and return a new Loader for the given ID.
+     *
+     * @param id   The ID whose loader is to be created.
+     * @param args Any arguments supplied by the caller.
+     * @return Return a new Loader instance that is ready to start loading.
+     */
+    @Override
+    public Loader<Spanned> onCreateLoader(final int id, final Bundle args) {
+        Point size = new Point();
+        getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+        // TODO use actual size and not window size
+        return new ImageTextLoader(getActivity(), mRssItem.getDescription(),
+                new Point((4 * size.x) / 5, (4 * size.y) / 5));
+    }
+
+
+    @Override
+    public void onLoadFinished(final Loader<Spanned> loader,
+            final Spanned data) {
+        mBodyText = data;
+        mBodyTextView.setText(data);
+    }
+
+    @Override
+    public void onLoaderReset(final Loader<Spanned> loader) {
+        // nothing really
     }
 }
