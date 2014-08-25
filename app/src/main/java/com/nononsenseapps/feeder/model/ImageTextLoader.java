@@ -21,12 +21,12 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
 
     final Html.ImageGetter imgThing;
     final String text;
-    final Point size;
+    final Point maxSize;
 
     public ImageTextLoader(Context context, String text, Point windowSize) {
         super(context);
         this.text = text;
-        this.size = windowSize;
+        this.maxSize = windowSize;
 
         final Context appContext = context.getApplicationContext();
 
@@ -49,14 +49,23 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                 try {
                     Log.d("JONAS", "Trying to get: " + source);
                     final Bitmap b = Picasso.with(appContext).load(source)
-                            .resize(size.x, size.y).centerInside()
+                            //.resize(size.x, size.y).centerInside()
                             .get();
                     Log.d("JONAS", "Got it!");
+                    int w = b.getWidth();
+                    int h = b.getHeight();
+                    // Shrink if big
+                    if (w > maxSize.x || h > maxSize.y) {
+                        Point newSize = scaleImage(w, h);
+                        w = newSize.x;
+                        h = newSize.y;
+                    }
+
                     d = new BitmapDrawable(appContext.getResources(), b);
                     Log.d("JONAS", "Bounds: " + d.getIntrinsicWidth() + ", " +
-                                                                       "" + d
-                            .getIntrinsicHeight());
-                    d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                                   "" + d.getIntrinsicHeight() + " vs " +
+                                   w + ", " + h);
+                    d.setBounds(0, 0, w, h);
                 } catch (IOException e) {
                     Log.e("JONAS", "" + e.getMessage());
                 }
@@ -65,13 +74,35 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
         };
     }
 
+
     /**
-    * Do shit
+     * Keeps aspect ratio.
+     *
+     * @param w current width of image
+     * @param h current height of image
+     * @return scaled (width, height) of image to fit the intended maxSize
+     */
+    Point scaleImage(int w, int h) {
+        // Which is out of scale the most?
+        final float xratio = ((float) w) / ((float) maxSize.x);
+        final float yratio = ((float) h) / ((float) maxSize.y);
+        float ratio = xratio;
+        if (yratio > xratio) {
+            ratio = yratio;
+        }
+        // Calculate new size. Maintains aspect ratio.
+        int newWidth = (int) ((float) w / ratio);
+        int newHeight = (int) ((float) h / ratio);
+
+        return new Point(newWidth, newHeight);
+    }
+
+    /**
+     * Do shit
      */
     @Override
     public Spanned loadInBackground() {
-        return android.text.Html.fromHtml(text,
-                imgThing, null);
+        return android.text.Html.fromHtml(text, imgThing, null);
     }
 
     /**

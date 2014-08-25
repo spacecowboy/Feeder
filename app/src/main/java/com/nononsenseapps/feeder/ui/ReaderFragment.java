@@ -135,17 +135,19 @@ public class ReaderFragment extends Fragment
         mBodyTextView = (TextView) rootView.findViewById(R.id.story_body);
 
         if (mRssItem.getTitle() == null) {
-
+            mTitleTextView.setText("Nothing to display!");
         } else {
             mTitleTextView
                     .setText(android.text.Html.fromHtml(mRssItem.getTitle()));
         }
         if (mRssItem.getDescription() == null) {
-
+            mBodyTextView.setText("Nothing to display!");
         } else {
-            mBodyTextView.setText("Loading...");
+            // Set without images as a place holder
+            mBodyTextView.setText(android.text.Html.fromHtml(mRssItem.getDescription()));
         }
 
+        // Load images in text
         getLoaderManager().restartLoader(TEXT_LOADER, new Bundle(), this);
 
         return rootView;
