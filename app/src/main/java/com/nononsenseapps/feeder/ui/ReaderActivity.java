@@ -3,33 +3,17 @@ package com.nononsenseapps.feeder.ui;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
-import com.shirwa.simplistic_rss.RssItem;
 
 /**
  * Displays feed items suitable for consumption.
  */
 public class ReaderActivity extends BaseActivity {
-
-    /**
-     * Sets the extras in the intent suitable for opening the item in question.
-     * @param intent to fill extras in
-     * @param id database id of item, if applicable
-     * @param rssItem to read
-     */
-    public static void setRssExtras(Intent intent, long id, RssItem rssItem) {
-        intent.putExtra(ReaderFragment.ARG_ID, id);
-        intent.putExtra(ReaderFragment.ARG_TITLE, rssItem.getTitle());
-        intent.putExtra(ReaderFragment.ARG_DESCRIPTION,
-                rssItem.getDescription());
-        intent.putExtra(ReaderFragment.ARG_LINK, rssItem.getLink());
-        intent.putExtra(ReaderFragment.ARG_IMAGEURL, rssItem.getImageUrl());
-    }
 
     /**
      * Used to store the last screen title.
@@ -38,6 +22,22 @@ public class ReaderActivity extends BaseActivity {
     private Fragment mFragment;
     private DrawShadowFrameLayout mDrawShadowFrameLayout;
     private View mCheckButton;
+
+    /**
+     * Sets the extras in the intent suitable for opening the item in question.
+     *
+     * @param intent  to fill extras in
+     * @param id      database id of item, if applicable
+     * @param rssItem to read
+     */
+    public static void setRssExtras(Intent intent, long id,
+            FeedItemSQL rssItem) {
+        intent.putExtra(ReaderFragment.ARG_ID, id);
+        intent.putExtra(ReaderFragment.ARG_TITLE, rssItem.title);
+        intent.putExtra(ReaderFragment.ARG_DESCRIPTION, rssItem.description);
+        intent.putExtra(ReaderFragment.ARG_LINK, rssItem.link);
+        intent.putExtra(ReaderFragment.ARG_IMAGEURL, rssItem.imageurl);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,22 +75,32 @@ public class ReaderActivity extends BaseActivity {
                 // TODO Mark as read
                 // TODO animate?
                 finish();
-               if (mShouldFinishBack) {
-                   // Only care about exit transition
-                   overridePendingTransition(0, R.anim.contract_to_center);
-               }
+                if (mShouldFinishBack) {
+                    // Only care about exit transition
+                    overridePendingTransition(0, R.anim.contract_to_center);
+                }
             }
         });
     }
 
+    /**
+     * Initializes a fragment based on intent information
+     *
+     * @return ReaderFragment
+     */
+    private Fragment getFragment() {
+        Intent i = getIntent();
+        Fragment fragment = new ReaderFragment();
+        fragment.setArguments(i.getExtras());
+        return fragment;
+    }
+
     @Override
-    public void onBackPressed()
-    {
-        super.onBackPressed();
-        if (mShouldFinishBack) {
-            // Only care about exit transition
-            overridePendingTransition(0, R.anim.contract_to_center);
-        }
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        registerHideableHeaderView(findViewById(R.id.headerbar));
+        registerHideableFooterView(mCheckButton);
     }
 
     @Override
@@ -109,29 +119,18 @@ public class ReaderActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Initializes a fragment based on intent information
-     * @return ReaderFragment
-     */
-    private Fragment getFragment() {
-        Intent i = getIntent();
-        Fragment fragment = new ReaderFragment();
-        fragment.setArguments(i.getExtras());
-        return fragment;
-    }
-
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        registerHideableHeaderView(findViewById(R.id.headerbar));
-        registerHideableFooterView(mCheckButton);
-    }
-
     @Override
     protected void onActionBarAutoShowOrHide(boolean shown) {
         super.onActionBarAutoShowOrHide(shown);
         mDrawShadowFrameLayout.setShadowVisible(shown, shown);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (mShouldFinishBack) {
+            // Only care about exit transition
+            overridePendingTransition(0, R.anim.contract_to_center);
+        }
     }
 }

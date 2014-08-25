@@ -25,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
@@ -35,7 +34,8 @@ import com.nononsenseapps.feeder.db.RssContentProvider;
  * Fragment used for managing interactions for and presentation of a navigation
  * drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
- * design guidelines</a> for a complete explanation of the behaviors implemented
+ * design guidelines</a> for a complete explanation of the behaviors
+ * implemented
  * here.
  */
 public class NavigationDrawerFragment extends Fragment
@@ -48,7 +48,8 @@ public class NavigationDrawerFragment extends Fragment
             "selected_navigation_drawer_position";
 
     /**
-     * Per the design guidelines, you should show the drawer on launch until the
+     * Per the design guidelines, you should show the drawer on launch until
+     * the
      * user manually
      * expands it. This shared preference tracks this.
      */
@@ -197,25 +198,23 @@ public class NavigationDrawerFragment extends Fragment
                 .inflate(R.layout.navdrawer_content, container, false);
         mDrawerListView
                 .setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent,
-                                    View view, int position, long id) {
-                                mCurrentSelectedPosition = position;
-                                //        if (mDrawerListView != null) {
-                                //            mDrawerListView.setItemChecked(position, true);
-                                //        }
-                                if (mDrawerLayout != null) {
-                                    mDrawerLayout.closeDrawer(
-                                            mFragmentContainerView);
-                                }
-                                if (mCallbacks != null && mAdapter != null) {
-                                    Cursor c =
-                                            (Cursor) mAdapter.getItem(position);
-                                    mCallbacks.onNavigationDrawerItemSelected(
-                                            c.getString(1), c.getString(2));
-                                }
-                            }
-                        });
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view,
+                            int position, long id) {
+                        mCurrentSelectedPosition = position;
+                        //        if (mDrawerListView != null) {
+                        //            mDrawerListView.setItemChecked(position, true);
+                        //        }
+                        if (mDrawerLayout != null) {
+                            mDrawerLayout.closeDrawer(mFragmentContainerView);
+                        }
+                        if (mCallbacks != null && mAdapter != null) {
+                            Cursor c = (Cursor) mAdapter.getItem(position);
+                            mCallbacks.onNavigationDrawerItemSelected(
+                                    c.getString(1), c.getString(2));
+                        }
+                    }
+                });
         mAdapter = new SimpleCursorAdapter(getActivity(),
                 android.R.layout.simple_list_item_activated_1, null,
                 new String[]{FeedSQL.COL_TITLE}, new int[]{android.R.id.text1},
@@ -295,11 +294,11 @@ public class NavigationDrawerFragment extends Fragment
             return true;
         }
 
-     //   if (item.getItemId() == R.id.action_example) {
-     //      Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT)
-     //               .show();
-    //        return true;
-     //   }
+        //   if (item.getItemId() == R.id.action_example) {
+        //      Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT)
+        //               .show();
+        //        return true;
+        //   }
 
         return super.onOptionsItemSelected(item);
     }

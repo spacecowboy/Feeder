@@ -58,6 +58,8 @@ public class BaseActivity extends Activity
     private static final TypeEvaluator ARGB_EVALUATOR = new ArgbEvaluator();
     private static final int NAV_FEEDS_LOADER = 1;
     protected boolean mActionBarShown = true;
+    // If pressing home should finish or start new activity
+    protected boolean mShouldFinishBack = false;
     //protected MultiScrollListener mMultiScrollListener;
     private ObjectAnimator mStatusBarColorAnimator;
     // When set, these components will be shown/hidden in sync with the action bar
@@ -76,11 +78,8 @@ public class BaseActivity extends Activity
     private LPreviewUtilsBase.ActionBarDrawerToggleWrapper mDrawerToggle;
     // A Runnable that we should execute when the navigation drawer finishes its closing animation
     private Runnable mDeferredOnDrawerClosedRunnable;
-
     private SimpleCursorAdapter mNavAdapter;
     private ListView mDrawerListView;
-    // If pressing home should finish or start new activity
-    protected boolean mShouldFinishBack = false;
 
     /**
      * Converts an intent into a {@link Bundle} suitable for use as fragment
@@ -255,8 +254,8 @@ public class BaseActivity extends Activity
                             Cursor c = (Cursor) mNavAdapter.getItem(pos);
                             // Make sure these ints match ordering in projection if
                             // changed
-                            onNavigationDrawerItemSelected(c.getLong(0), c.getString(1),
-                                    c.getString(2));
+                            onNavigationDrawerItemSelected(c.getLong(0),
+                                    c.getString(1), c.getString(2));
                         }
                     }
                 });
@@ -315,7 +314,8 @@ public class BaseActivity extends Activity
     }
 
     // Subclasses can override to decide what happens on nav item selection
-    protected void onNavigationDrawerItemSelected(long id, String title, String url) {
+    protected void onNavigationDrawerItemSelected(long id, String title,
+            String url) {
         // TODO add default start activity with arguments
     }
 
@@ -511,7 +511,8 @@ public class BaseActivity extends Activity
                         .insert(RssContentProvider.URI_FEEDS, values);
 
                 values.put(FeedSQL.COL_TITLE, "CowboyProgrammer");
-                values.put(FeedSQL.COL_URL, "http://feeds.feedburner.com/CowboyProgrammer");
+                values.put(FeedSQL.COL_URL,
+                        "http://feeds.feedburner.com/CowboyProgrammer");
                 getContentResolver()
                         .insert(RssContentProvider.URI_FEEDS, values);
 

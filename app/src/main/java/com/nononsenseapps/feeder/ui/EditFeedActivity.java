@@ -40,31 +40,35 @@ public class EditFeedActivity extends Activity {
         mTextUrl = (EditText) findViewById(R.id.feed_url);
         mTextTitle = (EditText) findViewById(R.id.feed_title);
 
-        findViewById(R.id.add_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                // TODO error checking and stuff like that
-                ContentValues values = new ContentValues();
+        findViewById(R.id.add_button)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        // TODO error checking and stuff like that
+                        ContentValues values = new ContentValues();
 
-                values.put(FeedSQL.COL_TITLE, mTextTitle.getText().toString()
-                        .trim());
-                values.put(FeedSQL.COL_URL, mTextUrl.getText().toString()
-                        .trim());
-                if (id < 1) {
-                    getContentResolver()
-                            .insert(RssContentProvider.URI_FEEDS, values);
-                } else {
-                    getContentResolver().update(Uri
-                            .withAppendedPath(RssContentProvider.URI_FEED_BASE, Long.toString(id)),
-                            values, null, null);
-                }
-                finish();
-                if (mShouldFinishBack) {
-                    // Only care about exit transition
-                    overridePendingTransition(R.anim.to_bottom_right, R.anim.to_bottom_right);
-                }
-            }
-        });
+                        values.put(FeedSQL.COL_TITLE,
+                                mTextTitle.getText().toString().trim());
+                        values.put(FeedSQL.COL_URL,
+                                mTextUrl.getText().toString().trim());
+                        if (id < 1) {
+                            getContentResolver()
+                                    .insert(RssContentProvider.URI_FEEDS,
+                                            values);
+                        } else {
+                            getContentResolver().update(Uri.withAppendedPath(
+                                            RssContentProvider.URI_FEED_BASE,
+                                            Long.toString(id)), values, null,
+                                    null);
+                        }
+                        finish();
+                        if (mShouldFinishBack) {
+                            // Only care about exit transition
+                            overridePendingTransition(R.anim.to_bottom_right,
+                                    R.anim.to_bottom_right);
+                        }
+                    }
+                });
 
         Intent i = getIntent();
         if (i != null) {
@@ -89,7 +93,8 @@ public class EditFeedActivity extends Activity {
         Resources.Theme theme = getTheme();
         TypedValue floatingWindowFlag = new TypedValue();
         if (theme == null ||
-                !theme.resolveAttribute(R.attr.isFloatingWindow, floatingWindowFlag, true)) {
+            !theme.resolveAttribute(R.attr.isFloatingWindow, floatingWindowFlag,
+                    true)) {
             // isFloatingWindow flag is not defined in theme
             return false;
         }
@@ -99,9 +104,10 @@ public class EditFeedActivity extends Activity {
     private void setupFloatingWindow() {
         // configure this Activity as a floating window, dimming the background
         WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.width = getResources().getDimensionPixelSize(R.dimen.session_details_floating_width);
-        params.height =
-                getResources().getDimensionPixelSize(R.dimen.session_details_floating_height);
+        params.width = getResources()
+                .getDimensionPixelSize(R.dimen.session_details_floating_width);
+        params.height = getResources()
+                .getDimensionPixelSize(R.dimen.session_details_floating_height);
         params.alpha = 1;
         params.dimAmount = 0.7f;
         params.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
@@ -135,7 +141,8 @@ public class EditFeedActivity extends Activity {
             // Action bar handles other cases.
             finish();
             // Only care about exit transition
-            overridePendingTransition(R.anim.to_bottom_right, R.anim.to_bottom_right);
+            overridePendingTransition(R.anim.to_bottom_right,
+                    R.anim.to_bottom_right);
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -5,9 +5,7 @@ import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -64,9 +62,10 @@ public class FeedActivity extends BaseActivity {
         overridePendingTransition(0, 0);
 
         if (savedInstanceState == null) {
-            mFragment = getDefaultFragment();
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, mFragment, "single_pane").commit();
+            // TODO
+            //mFragment = getDefaultFragment();
+            //getFragmentManager().beginTransaction()
+            //        .add(R.id.container, mFragment, "single_pane").commit();
         } else {
             mFragment = getFragmentManager().findFragmentByTag("single_pane");
         }
@@ -89,8 +88,8 @@ public class FeedActivity extends BaseActivity {
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                Intent i = new Intent(FeedActivity.this,
-                        EditFeedActivity.class);
+                Intent i =
+                        new Intent(FeedActivity.this, EditFeedActivity.class);
                 i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
                 ActivityOptions options = ActivityOptions
                         .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
@@ -135,7 +134,8 @@ public class FeedActivity extends BaseActivity {
     }
 
     @Override
-    protected void onNavigationDrawerItemSelected(long id, String title, String url) {
+    protected void onNavigationDrawerItemSelected(long id, String title,
+            String url) {
         // update the main content by replacing fragments
         mFragment = FeedFragment.newInstance(id, title, url);
         getFragmentManager().beginTransaction()

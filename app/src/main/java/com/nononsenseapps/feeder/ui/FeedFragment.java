@@ -5,8 +5,10 @@ import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,29 +20,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
-import com.nononsenseapps.feeder.model.RssLoader;
-import com.shirwa.simplistic_rss.RssFeed;
-import com.shirwa.simplistic_rss.RssItem;
+import com.nononsenseapps.feeder.db.FeedItemSQL;
+import com.nononsenseapps.feeder.db.RssContentProvider;
+import com.nononsenseapps.feeder.db.Util;
 import com.squareup.picasso.Picasso;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.util.List;
 import java.util.Locale;
 
 
 public class FeedFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<RssFeed> {
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // TODO change format possibly
-    static final DateTimeFormatter shortDateTimeFormat = DateTimeFormat
-            .shortDateTime().withLocale(Locale.getDefault());
+    static final DateTimeFormatter shortDateTimeFormat =
+            DateTimeFormat.shortDateTime().withLocale(Locale.getDefault());
 
     private static final int FEED_LOADER = 1;
 
@@ -166,7 +167,7 @@ public class FeedFragment extends Fragment
             Intent i = new Intent(getActivity(), EditFeedActivity.class);
             // TODO do not animate the back movement here
             i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
-            i.putExtra(EditFeedActivity._ID, id);
+            i.putExtra(EditFeedActivity._ID, this.id);
             i.putExtra(EditFeedActivity.TITLE, title);
             i.setData(Uri.parse(url));
             startActivity(i);
@@ -177,47 +178,48 @@ public class FeedFragment extends Fragment
     }
 
     @Override
-    public Loader<RssFeed> onCreateLoader(final int ID, final Bundle bundle) {
+    public Loader<Cursor> onCreateLoader(final int ID, final Bundle bundle) {
         if (ID == FEED_LOADER) {
-            return new RssLoader(getActivity(), url);
+            return new CursorLoader(getActivity(),
+                    RssContentProvider.URI_FEED_ITEMS, FeedItemSQL.FIELDS,
+                    FeedItemSQL.COL_FEED + " IS ?",
+                    Util.LongsToStringArray(this.id),
+                    FeedItemSQL.COL_PUBDATE + " DESC");
         }
         return null;
     }
 
     @Override
-    public void onLoadFinished(final Loader<RssFeed> rssFeedLoader,
-            final RssFeed rssFeed) {
-        if (rssFeed != null) {
-            mAdapter.setData(rssFeed.getRssItems());
-        } else {
-            mAdapter.setData(null);
-        }
+    public void onLoadFinished(final Loader<Cursor> cursorLoader,
+            final Cursor cursor) {
+        mAdapter.swapCursor(cursor);
     }
 
     @Override
-    public void onLoaderReset(final Loader<RssFeed> rssFeedLoader) {
-        mAdapter.setData(null);
+    public void onLoaderReset(final Loader<Cursor> cursorLoader) {
+        mAdapter.swapCursor(null);
     }
 
 
-    class FeedAdapter extends ArrayAdapter<RssItem> {
+    class FeedAdapter extends SimpleCursorAdapter {
 
         // 64dp at xhdpi is 128 pixels
         private final int defImgWidth = 2 * 128;
         private final int defImgHeight = 2 * 128;
-        private List<RssItem> items = null;
 
         public FeedAdapter(final Context context) {
-            super(context, R.layout.view_story);
+            //super(context, R.layout.view_story);
+            super(context, R.layout.view_story, null, new String[]{},
+                    new int[]{}, 0);
         }
 
         @Override
         public int getCount() {
-            if (items == null) {
+            if (super.getCount() == 0) {
                 return 0;
             } else {
                 // 1 header + the rest
-                return 1 + items.size();
+                return 1 + super.getCount();
             }
         }
 
@@ -244,10 +246,12 @@ public class FeedFragment extends Fragment
             ViewHolder holder = (ViewHolder) convertView.getTag();
             // position in data set
             final int position = hposition - 1;
-            final RssItem item = items.get(position);
+            final FeedItemSQL item =
+                    new FeedItemSQL((Cursor) super.getItem(position));
+            //final RssItem item = items.get(position);
 
             holder.rssItem = item;
-            holder.link = item.getLink();
+            holder.link = item.link;
             if (item.getPubDate() == null) {
                 holder.dateTextView.setVisibility(View.GONE);
             } else {
@@ -255,21 +259,21 @@ public class FeedFragment extends Fragment
                 holder.dateTextView.setText(
                         item.getPubDate().toString(shortDateTimeFormat));
             }
-            if (item.getPlainTitle() == null) {
+            if (item.plaintitle == null) {
                 holder.titleTextView.setVisibility(View.GONE);
             } else {
                 holder.titleTextView.setVisibility(View.VISIBLE);
-                holder.titleTextView.setText(item.getPlainTitle());
+                holder.titleTextView.setText(item.plaintitle);
             }
-            if (item.getSnippet() == null) {
+            if (item.plainsnippet == null) {
                 holder.bodyTextView.setVisibility(View.GONE);
             } else {
                 holder.bodyTextView.setVisibility(View.VISIBLE);
                 //                holder.bodyTextView.setText(android.text.Html.fromHtml(item
                 //                        .getDescription()));
-                holder.bodyTextView.setText(item.getSnippet());
+                holder.bodyTextView.setText(item.plainsnippet);
             }
-            if (item.getImageUrl() == null) {
+            if (item.imageurl == null) {
                 holder.imageView.setVisibility(View.GONE);
             } else {
                 int w = holder.imageView.getWidth();
@@ -280,8 +284,8 @@ public class FeedFragment extends Fragment
                 if (h <= 0) {
                     h = defImgHeight;
                 }
-                Picasso.with(getActivity()).load(item.getImageUrl())
-                        .resize(w, h).centerCrop().into(holder.imageView);
+                Picasso.with(getActivity()).load(item.imageurl).resize(w, h)
+                        .centerCrop().into(holder.imageView);
                 holder.imageView.setVisibility(View.VISIBLE);
             }
 
@@ -302,16 +306,6 @@ public class FeedFragment extends Fragment
             return 2;
         }
 
-        public void setData(List<RssItem> feed) {
-            this.items = feed;
-            clear();
-            if (feed != null) {
-                addAll(feed);
-            }
-
-            notifyDataSetChanged();
-        }
-
         // Provide a reference to the type of views that you are using
         public class ViewHolder {
             public final View parent;
@@ -320,7 +314,7 @@ public class FeedFragment extends Fragment
             public final TextView dateTextView;
             public final ImageView imageView;
             public String link;
-            public RssItem rssItem;
+            public FeedItemSQL rssItem;
 
             public ViewHolder(View v) {
                 //v.setOnClickListener(this);
@@ -333,7 +327,7 @@ public class FeedFragment extends Fragment
 
             /**
              * OnItemClickListener replacement.
-             *
+             * <p/>
              * If a feeditem does not have any content,
              * then it opens the link in the browser directly.
              *
@@ -344,8 +338,8 @@ public class FeedFragment extends Fragment
             public void onClick(final View view) {
 
                 // Open item if not empty
-                if (rssItem.getDescription() != null && !rssItem
-                        .getDescription().isEmpty()) {
+                if (rssItem.description != null &&
+                    !rssItem.description.isEmpty()) {
                     Intent i = new Intent(getActivity(), ReaderActivity.class);
                     //i.setData(Uri.parse(link));
                     i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
@@ -364,7 +358,7 @@ public class FeedFragment extends Fragment
                 } else {
                     // Open in browser since no content was posted
                     startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(rssItem.getLink())));
+                            Uri.parse(rssItem.link)));
                 }
             }
 

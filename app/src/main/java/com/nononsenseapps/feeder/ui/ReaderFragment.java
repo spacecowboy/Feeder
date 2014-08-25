@@ -5,15 +5,10 @@ import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
-import android.graphics.Bitmap;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,9 +22,6 @@ import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.model.ImageTextLoader;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
 import com.shirwa.simplistic_rss.RssItem;
-import com.squareup.picasso.Picasso;
-
-import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -86,7 +78,7 @@ public class ReaderFragment extends Fragment
      * @return bundle of rssItem plus id
      */
     public static Bundle RssItemToBundle(long id, RssItem rssItem,
-                                         Bundle bundle) {
+            Bundle bundle) {
         if (bundle == null) {
             bundle = new Bundle();
         }
@@ -125,12 +117,13 @@ public class ReaderFragment extends Fragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_reader, container,
-                false);
+        View rootView =
+                inflater.inflate(R.layout.fragment_reader, container, false);
 
-        mScrollView = (ObservableScrollView) rootView.findViewById(R.id.scroll_view);
+        mScrollView =
+                (ObservableScrollView) rootView.findViewById(R.id.scroll_view);
         mTitleTextView = (TextView) rootView.findViewById(R.id.story_title);
         mBodyTextView = (TextView) rootView.findViewById(R.id.story_body);
 
@@ -144,7 +137,8 @@ public class ReaderFragment extends Fragment
             mBodyTextView.setText("Nothing to display!");
         } else {
             // Set without images as a place holder
-            mBodyTextView.setText(android.text.Html.fromHtml(mRssItem.getDescription()));
+            mBodyTextView.setText(
+                    android.text.Html.fromHtml(mRssItem.getDescription()));
         }
 
         // Load images in text
@@ -191,7 +185,8 @@ public class ReaderFragment extends Fragment
         final long id = menuItem.getItemId();
         if (id == R.id.action_open_in_browser) {
             // Open in browser
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mRssItem.getLink())));
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(mRssItem.getLink())));
             return true;
         } else {
             return super.onOptionsItemSelected(menuItem);
