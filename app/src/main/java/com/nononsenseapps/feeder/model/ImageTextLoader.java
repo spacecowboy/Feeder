@@ -4,13 +4,21 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.text.Editable;
 import android.text.Html;
+import android.text.Spannable;
 import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.util.Log;
 
 import com.squareup.picasso.Picasso;
+
+import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 
@@ -18,6 +26,11 @@ import java.io.IOException;
  * Created by jonas on 8/24/14.
  */
 public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
+
+    // Used in formatting
+    private static class Monospace { }
+    private static class RelativeSize { }
+    private static class Bold { }
 
     final Html.ImageGetter imgThing;
     final String text;
@@ -102,7 +115,151 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
      */
     @Override
     public Spanned loadInBackground() {
-        return android.text.Html.fromHtml(text, imgThing, null);
+        return android.text.Html.fromHtml(text, imgThing, new Html.TagHandler() {
+            private boolean ordered = false;
+            private int orderCount = 1;
+
+            @Override
+            public void handleTag(final boolean opening, final String tag,
+                    final Editable output, final XMLReader xmlReader) {
+                Log.d("JONAS", "Got tag: " + tag + " opening: " + opening);
+                if (tag.equalsIgnoreCase("ul")) {
+                    handleUl(output, opening);
+                } else if (tag.equalsIgnoreCase("ol")) {
+                    handleOl(output, opening);
+                } else if (tag.equalsIgnoreCase("li")) {
+                    handleLi(output, opening);
+                } else if (tag.equalsIgnoreCase("img")) {
+                    handleImgEnd(output);
+                } else if (tag.equalsIgnoreCase("code")) {
+                    handleCode(output, opening);
+                } else if (tag.equalsIgnoreCase("pre")) {
+                    handlePre(output, opening);
+                }
+            }
+
+            // Am not notified about starts but ends
+            private void handleImgEnd(final Editable text) {
+                // Add a line break if not present
+                int len = text.length();
+                if (len >= 1 && text.charAt(len - 1) == '\n') {
+                    return;
+                }
+                text.append("\n");
+            }
+
+            // Start lists with a line break
+            private void handleOl(final Editable text, final boolean start) {
+                // Remember that we are in an ordered list
+                ordered = start;
+                int len = text.length();
+                if (start) {
+                    // Start at one
+                    orderCount = 1;
+                    if (len >= 1 && text.charAt(len - 1) == '\n') {
+                        return;
+                    }
+                    text.append("\n");
+                }
+            }
+
+            // Start lists with a line break
+            private void handleUl(final Editable text, final boolean start) {
+                int len = text.length();
+                if (start) {
+                    if (len >= 1 && text.charAt(len - 1) == '\n') {
+                        return;
+                    }
+                    text.append("\n");
+                }
+            }
+
+            // List items
+            private void handleLi(final Editable text,
+                    final boolean start) {
+                int len = text.length();
+                if (start) {
+                    // Start with blip or number
+                    if (ordered) {
+                        // Number in bold
+                        start(text, new Bold());
+                        text.append("" + orderCount + ". ");
+                        end(text, Bold.class, new StyleSpan(Typeface.BOLD));
+                    } else {
+                        // Set a bullet point
+                        text.append("\u2022 ");
+                    }
+                } else {
+                    // End line with newline
+                    if (len >= 1 && text.charAt(len - 1) == '\n') {
+                        return;
+                    }
+                    text.append("\n");
+                    // Increment count
+                    orderCount += 1;
+                }
+            }
+
+            private void handlePre(final Editable text,
+                    final boolean start) {
+                int len = text.length();
+                // Make sure it has spaces before and after
+                if (len >= 1 && text.charAt(len - 1) == '\n') {
+                    if (len >= 2 && text.charAt(len - 2) != '\n') {
+                        text.append("\n");
+                    }
+                } else if (len != 0) {
+                    text.append("\n\n");
+                }
+                // TODO It also shouldn't wrap, but not sure how to accomplish
+                // that..
+            }
+
+            // Source code
+            private void handleCode(final Editable text,
+                    final boolean start) {
+                // Should be monospace
+                if (start) {
+                    start(text, new Monospace());
+                    start(text, new RelativeSize());
+                } else {
+                    end(text, Monospace.class,
+                            new TypefaceSpan("monospace"));
+                    end(text, RelativeSize.class,
+                            new RelativeSizeSpan(0.8f));
+                }
+            }
+
+            private void start(Editable text, Object mark) {
+                int len = text.length();
+                text.setSpan(mark, len, len, Spannable.SPAN_MARK_MARK);
+            }
+            private void end(Editable text, Class kind,
+                    Object repl) {
+                int len = text.length();
+                Object obj = getLast(text, kind);
+                int where = text.getSpanStart(obj);
+
+                text.removeSpan(obj);
+
+                if (where != len) {
+                    text.setSpan(repl, where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+            }
+            private Object getLast(Spanned text, Class kind) {
+        /*
+         * This knows that the last returned object from getSpans()
+         * will be the most recently added.
+         */
+                Object[] objs = text.getSpans(0, text.length(), kind);
+
+                if (objs.length == 0) {
+                    return null;
+                } else {
+                    return objs[objs.length - 1];
+                }
+            }
+        });
     }
 
     /**
