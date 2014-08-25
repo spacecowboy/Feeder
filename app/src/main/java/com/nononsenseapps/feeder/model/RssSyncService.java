@@ -125,6 +125,9 @@ public class RssSyncService extends IntentService {
             Log.e(TAG, "" + e.getMessage());
         } finally {
             db.endTransaction();
+            getContentResolver()
+                    .notifyChange(RssContentProvider.URI_FEED_ITEMS, null,
+                            false);
         }
     }
 
