@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.feeder.model.RssSyncService;
 import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
 
 
@@ -38,6 +40,7 @@ public class FeedActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // TODO
         /*
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
@@ -47,7 +50,9 @@ public class FeedActivity extends BaseActivity {
             restoreActionBar();
             return true;
         }*/
-        return super.onCreateOptionsMenu(menu);
+
+        getMenuInflater().inflate(R.menu.feed, menu);
+        return true;
     }
 
     @Override
@@ -116,6 +121,9 @@ public class FeedActivity extends BaseActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            return true;
+        } else if (id == R.id.action_sync) {
+            RssSyncService.syncFeeds(this);
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -1,59 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.nononsenseapps.feeder">
+    package="com.nononsenseapps.feeder" >
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:theme="@style/AppTheme"
-        android:label="@string/app_name">
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".ui.FeedActivity"
-            android:theme="@style/FeedsTheme"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:theme="@style/FeedsTheme" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.ReaderActivity"
-            android:theme="@style/ReaderTheme"
             android:label="@string/app_name"
-            android:parentActivityName=".ui.FeedActivity">>
+            android:parentActivityName=".ui.FeedActivity"
+            android:theme="@style/ReaderTheme" >
+>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
+                android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
         </activity>
-
         <activity
             android:name=".ui.EditFeedActivity"
             android:label="@string/title_activity_edit_feed"
-            android:theme="@style/EditFeedTheme"
-            android:parentActivityName=".ui.FeedActivity">
+            android:parentActivityName=".ui.FeedActivity"
+            android:theme="@style/EditFeedTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
+                android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
 
             <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
+                <action android:name="android.intent.action.SEND" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="http"/>
+                <data android:scheme="http" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
+                <action android:name="android.intent.action.SEND" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:mimeType="text/*"/>
+                <data android:mimeType="text/*" />
             </intent-filter>
         </activity>
 
@@ -61,8 +60,13 @@
             android:name=".db.RssContentProvider"
             android:authorities="com.nononsenseapps.feeder.provider"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false" >
         </provider>
+
+        <service
+            android:name=".model.RssSyncService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

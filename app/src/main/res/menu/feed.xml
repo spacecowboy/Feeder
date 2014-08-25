@@ -4,6 +4,9 @@
     <item android:id="@+id/action_edit_all_feed"
         android:title="Edit all feeds"
         android:showAsAction="never" />
+    <item android:id="@+id/action_sync"
+          android:title="Sync"
+          android:showAsAction="never" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"

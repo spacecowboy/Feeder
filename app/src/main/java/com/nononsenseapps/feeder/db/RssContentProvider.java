@@ -13,9 +13,13 @@ public class RssContentProvider extends ContentProvider {
     // URIs
     public static final String FEEDS = SCHEME + AUTHORITY + "/feed";
     public static final Uri URI_FEEDS = Uri.parse(FEEDS);
-    // Used for a single person, just add the id to the end
+    public static final String FEED_ITEMS = SCHEME + AUTHORITY + "/items";
+    public static final Uri URI_FEED_ITEMS = Uri.parse(FEED_ITEMS);
+    // Used for a single item, just add the id to the end
     public static final String FEED_BASE = FEEDS + "/";
     public static final Uri URI_FEED_BASE = Uri.parse(FEED_BASE);
+    public static final String FEED_ITEM_BASE = FEED_ITEMS + "/";
+    public static final Uri URI_FEED_ITEM_BASE = Uri.parse(FEED_ITEM_BASE);
 
     public RssContentProvider() {
     }
@@ -24,13 +28,21 @@ public class RssContentProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int result = 0;
         if (uri.toString().startsWith(FEED_BASE)) {
-            return delete(URI_FEEDS, FeedSQL.COL_ID + " IS ?",
-                    new String[] {uri.getLastPathSegment()});
+            return delete(URI_FEEDS, Util.WHEREIDIS,
+                    Util.ToStringArray(uri.getLastPathSegment()));
         } else if (URI_FEEDS.equals(uri)) {
             result += DatabaseHandler.getInstance(getContext())
                     .getWritableDatabase().delete(FeedSQL.TABLE_NAME,
                             selection, selectionArgs);
-        } else {
+        } else if (uri.toString().startsWith(FEED_ITEM_BASE)) {
+            return delete(URI_FEED_ITEMS, Util.WHEREIDIS,
+                    Util.ToStringArray(uri.getLastPathSegment()));
+        } else if (URI_FEED_ITEMS.equals(uri)) {
+            result += DatabaseHandler.getInstance(getContext())
+                    .getWritableDatabase().delete(FeedItemSQL.TABLE_NAME,
+                            selection, selectionArgs);
+        }
+        else {
             throw new UnsupportedOperationException("Not yet implemented");
         }
         return result;
@@ -55,7 +67,18 @@ public class RssContentProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(URI_FEEDS,
                         null, false);
             }
-        } else {
+        } else if (URI_FEED_ITEMS.equals(uri)) {
+            long id = DatabaseHandler.getInstance(getContext())
+                    .getWritableDatabase()
+                    .insert(FeedItemSQL.TABLE_NAME, null, values);
+            if (id > -1) {
+                result = Uri.withAppendedPath(URI_FEED_ITEM_BASE,
+                        Long.toString(id));
+                getContext().getContentResolver().notifyChange(URI_FEED_ITEMS,
+                        null, false);
+            }
+        }
+        else {
             throw new UnsupportedOperationException("Not yet implemented");
         }
 
@@ -81,10 +104,23 @@ public class RssContentProvider extends ContentProvider {
             result = DatabaseHandler.getInstance(getContext())
                     .getReadableDatabase()
                     .query(FeedSQL.TABLE_NAME, projection,
-                            FeedSQL.COL_ID + " IS ?",
-                            new String[]{String.valueOf(id)}, null, null, null,
+                            Util.WHEREIDIS,
+                            Util.LongsToStringArray(id), null, null, null,
                             null);
-        } else {
+        } else if (URI_FEED_ITEMS.equals(uri)) {
+            result = DatabaseHandler.getInstance(getContext())
+                    .getReadableDatabase()
+                    .query(FeedItemSQL.TABLE_NAME, projection, selection,
+                            selectionArgs, null, null, sortOrder, null);
+        } else if (uri.toString().startsWith(FEED_ITEM_BASE)) {
+            final long id = Long.parseLong(uri.getLastPathSegment());
+            result = DatabaseHandler.getInstance(getContext())
+                    .getReadableDatabase()
+                    .query(FeedItemSQL.TABLE_NAME, projection,
+                            Util.WHEREIDIS, Util.LongsToStringArray(id),
+                            null, null, null, null);
+        }
+        else {
             throw new UnsupportedOperationException("Not yet implemented");
         }
 
@@ -102,13 +138,24 @@ public class RssContentProvider extends ContentProvider {
             String id = uri.getLastPathSegment();
             result =  DatabaseHandler.getInstance(getContext())
                     .getWritableDatabase()
-                    .update(FeedSQL.TABLE_NAME, values, FeedSQL.WHEREIDIS,
-                           new String[] {id});
+                    .update(FeedSQL.TABLE_NAME, values, Util.WHEREIDIS,
+                           Util.ToStringArray(id));
             if (result > 0) {
                 getContext().getContentResolver().notifyChange(URI_FEEDS,
                         null, false);
             }
-        } else {
+        } else if (uri.toString().startsWith(FEED_ITEM_BASE)) {
+            String id = uri.getLastPathSegment();
+            result =  DatabaseHandler.getInstance(getContext())
+                    .getWritableDatabase()
+                    .update(FeedItemSQL.TABLE_NAME, values, Util.WHEREIDIS,
+                            Util.ToStringArray(id));
+            if (result > 0) {
+                getContext().getContentResolver().notifyChange(URI_FEED_ITEMS,
+                        null, false);
+            }
+        }
+        else {
             throw new UnsupportedOperationException("Not yet implemented");
         }
 
