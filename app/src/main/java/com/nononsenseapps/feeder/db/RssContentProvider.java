@@ -93,19 +93,6 @@ public class RssContentProvider extends ContentProvider {
         return result;
     }
 
-    /**
-     * Useful for content provider operations to insert Longs and such.
-     * @param vals
-     * @return
-     */
-    public static String[] LongsToStringArray(long... vals) {
-        String[] arr = new String[vals.length];
-        for (int i = 0; i < vals.length; i++) {
-            arr[i] = Long.toString(vals[i]);
-        }
-        return arr;
-    }
-
     @Override
     public int update(Uri uri, ContentValues values, String selection,
             String[] selectionArgs) {
