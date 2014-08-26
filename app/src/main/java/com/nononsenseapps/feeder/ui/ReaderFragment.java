@@ -19,6 +19,7 @@ import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.ImageTextLoader;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
 import com.shirwa.simplistic_rss.RssItem;
@@ -104,6 +105,11 @@ public class ReaderFragment extends Fragment
         }
 
         setHasOptionsMenu(true);
+
+        if (_id > 0) {
+            // Mark as read
+            RssContentProvider.MarkAsRead(getActivity(), _id);
+        }
     }
 
     public static RssItem RssItemFromBundle(Bundle bundle) {

@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.db;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
@@ -154,11 +155,39 @@ public class RssContentProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(URI_FEED_ITEMS,
                         null, false);
             }
-        }
-        else {
+        } else if (uri.equals(URI_FEED_ITEMS)) {
+            result = DatabaseHandler.getInstance(getContext())
+                    .getWritableDatabase().update(FeedItemSQL.TABLE_NAME,
+                            values, selection, selectionArgs);
+            if (result > 0) {
+                getContext().getContentResolver().notifyChange(URI_FEED_ITEMS,
+                        null, false);
+            }
+        } else if (uri.equals(URI_FEEDS)) {
+            result = DatabaseHandler.getInstance(getContext())
+                    .getWritableDatabase()
+                    .update(FeedSQL.TABLE_NAME, values, selection,
+                            selectionArgs);
+            if (result > 0) {
+                getContext().getContentResolver()
+                        .notifyChange(URI_FEEDS, null, false);
+            }
+        } else {
             throw new UnsupportedOperationException("Not yet implemented");
         }
 
         return result;
+    }
+
+    /**
+     * Mark a feedItem as read in the database.
+     * @param context
+     * @param itemId
+     */
+    public static void MarkAsRead(final Context context, final long itemId) {
+        ContentValues values = new ContentValues();
+        values.put(FeedItemSQL.COL_UNREAD, 0);
+        context.getContentResolver().update(URI_FEED_ITEMS, values,
+                Util.WHEREIDIS, Util.LongsToStringArray(itemId));
     }
 }

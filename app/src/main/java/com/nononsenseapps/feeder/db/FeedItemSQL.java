@@ -23,7 +23,7 @@ public class FeedItemSQL {
     public static final String COL_LINK = "link";
     public static final String COL_AUTHOR = "author";
     public static final String COL_PUBDATE = "pubdate";
-    private static final String COL_UNREAD = "unread";
+    public static final String COL_UNREAD = "unread";
     // These fields corresponds to columns in Feed table
     public static final String COL_FEED = "feed";
     public static final String COL_TAG = "tag";

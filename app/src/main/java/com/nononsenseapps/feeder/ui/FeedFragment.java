@@ -207,10 +207,18 @@ public class FeedFragment extends Fragment
         private final int defImgWidth = 2 * 128;
         private final int defImgHeight = 2 * 128;
 
+        private final int unreadTextColor;
+        private final int readTextColor;
+
         public FeedAdapter(final Context context) {
             //super(context, R.layout.view_story);
             super(context, R.layout.view_story, null, new String[]{},
                     new int[]{}, 0);
+
+            unreadTextColor = context.getResources()
+                    .getColor(R.color.primary_text_default_material_dark);
+            readTextColor = context.getResources()
+                    .getColor(R.color.secondary_text_material_dark);
         }
 
         @Override
@@ -264,6 +272,10 @@ public class FeedFragment extends Fragment
             } else {
                 holder.titleTextView.setVisibility(View.VISIBLE);
                 holder.titleTextView.setText(item.plaintitle);
+                // Change depending on read status
+                holder.titleTextView.setTextColor(holder.rssItem.isUnread() ?
+                                                  unreadTextColor :
+                                                  readTextColor);
             }
             if (item.plainsnippet == null) {
                 holder.bodyTextView.setVisibility(View.GONE);
@@ -343,7 +355,7 @@ public class FeedFragment extends Fragment
                     Intent i = new Intent(getActivity(), ReaderActivity.class);
                     //i.setData(Uri.parse(link));
                     i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
-                    ReaderActivity.setRssExtras(i, -1, rssItem);
+                    ReaderActivity.setRssExtras(i, rssItem.id, rssItem);
 
                     // TODO add animation
                     Log.d("JONAS", "View size: w: " + view.getWidth() +
