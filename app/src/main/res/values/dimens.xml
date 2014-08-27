@@ -27,6 +27,8 @@
 
     <dimen name="navdrawer_width">260dp</dimen>
 
+    <dimen name="navdrawer_unreadcount_textsize">12sp</dimen>
+
 
     <!-- Edit Feed window size -->
     <dimen name="session_details_floating_width">300dp</dimen>

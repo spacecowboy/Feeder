@@ -14,6 +14,8 @@
         android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
         android:paddingStart="?android:attr/listPreferredItemPaddingStart"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textColor="@color/secondary_text_material_dark"
+        android:textSize="@dimen/navdrawer_unreadcount_textsize"
         />
     <TextView
         android:id="@+id/feed_name"

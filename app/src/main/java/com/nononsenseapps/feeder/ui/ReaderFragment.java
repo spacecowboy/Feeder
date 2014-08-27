@@ -9,11 +9,8 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Layout;
-import android.text.Selection;
-import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -114,7 +111,7 @@ public class ReaderFragment extends Fragment
 
         if (_id > 0) {
             // Mark as read
-            RssContentProvider.MarkAsRead(getActivity(), _id);
+            RssContentProvider.MarkItemAsRead(getActivity(), _id);
         }
     }
 

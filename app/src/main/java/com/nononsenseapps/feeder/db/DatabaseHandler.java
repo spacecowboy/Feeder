@@ -28,6 +28,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (!db.isReadOnly()) {
+            // Enable foreign key constraints
+            db.setForeignKeyConstraintsEnabled(true);
+        }
+    }
+
+    @Override
     public void onCreate(final SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(FeedSQL.CREATE_TABLE);
         sqLiteDatabase.execSQL(FeedItemSQL.CREATE_TABLE);

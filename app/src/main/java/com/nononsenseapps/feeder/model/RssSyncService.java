@@ -131,6 +131,9 @@ public class RssSyncService extends IntentService {
             getContentResolver()
                     .notifyChange(FeedItemSQL.URI_FEED_ITEMS, null,
                             false);
+            getContentResolver()
+                    .notifyChange(FeedSQL.URI_FEEDSWITHCOUNTS, null,
+                            false);
         }
     }
 
@@ -180,9 +183,9 @@ public class RssSyncService extends IntentService {
         FeedItemSQL result = null;
         Cursor c = getContentResolver()
                 .query(FeedItemSQL.URI_FEED_ITEMS, FeedItemSQL.FIELDS,
-                        FeedItemSQL.COL_LINK + " IS ? AND " +
+                        FeedItemSQL.COL_TITLE + " IS ? AND " +
                         FeedItemSQL.COL_FEED + " IS ?",
-                        Util.ToStringArray(item.getLink(),
+                        Util.ToStringArray(item.getTitle(),
                                 Long.toString(feedSQL.id)), null);
 
         try {

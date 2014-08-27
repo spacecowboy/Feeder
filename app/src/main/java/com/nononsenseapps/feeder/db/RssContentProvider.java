@@ -208,10 +208,23 @@ public class RssContentProvider extends ContentProvider {
      * @param context
      * @param itemId
      */
-    public static void MarkAsRead(final Context context, final long itemId) {
+    public static void MarkItemAsRead(final Context context, final long itemId) {
         ContentValues values = new ContentValues();
         values.put(FeedItemSQL.COL_UNREAD, 0);
         context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
                 Util.WHEREIDIS, Util.LongsToStringArray(itemId));
+    }
+    /**
+     * Mark all items in a feed as read in the database.
+     * @param context
+     * @param feedId
+     */
+    public static void MarkFeedAsRead(final Context context,
+            final long feedId) {
+        ContentValues values = new ContentValues();
+        values.put(FeedItemSQL.COL_UNREAD, 0);
+        context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
+                FeedItemSQL.COL_FEED + " IS ?", Util.LongsToStringArray
+                        (feedId));
     }
 }

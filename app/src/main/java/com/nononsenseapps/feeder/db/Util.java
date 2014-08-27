@@ -12,6 +12,15 @@ public class Util {
     public static final String WHEREIDIS = "_ID IS ?";
 
     /**
+     * Returns a String which tells the database to ignore case when sorting.
+     * @param col the column to sort on
+     * @return "{col} COLLATE NOCASE"
+     */
+    public static String SortAlphabeticNoCase(final String col) {
+        return col + " COLLATE NOCASE";
+    }
+
+    /**
      * Useful for content provider operations to insert Longs and such.
      *
      * @param vals

@@ -27,6 +27,7 @@ import android.widget.SimpleCursorAdapter;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
+import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.util.LPreviewUtils;
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase;
 import com.nononsenseapps.feeder.util.PrefUtils;
@@ -491,7 +492,8 @@ public class BaseActivity extends Activity
     public Loader<Cursor> onCreateLoader(final int id, final Bundle bundle) {
         if (id == NAV_FEEDS_LOADER) {
             return new CursorLoader(this, FeedSQL.URI_FEEDSWITHCOUNTS,
-                    FeedSQL.FIELDS_VIEWCOUNT, null, null, FeedSQL.COL_TITLE);
+                    FeedSQL.FIELDS_VIEWCOUNT, null, null,
+                    Util.SortAlphabeticNoCase(FeedSQL.COL_TITLE));
         } else {
             return null;
         }

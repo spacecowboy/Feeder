@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
+import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
 import com.squareup.picasso.Picasso;
@@ -154,6 +156,8 @@ public class FeedFragment extends Fragment
 
         if (id < 1) {
             menu.findItem(R.id.action_edit_feed).setVisible(false);
+            menu.findItem(R.id.action_delete_feed).setVisible(false);
+            menu.findItem(R.id.action_mark_as_read).setVisible(false);
         }
 
         // Don't forget super call here
@@ -163,7 +167,7 @@ public class FeedFragment extends Fragment
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         final long id = menuItem.getItemId();
-        if (id == R.id.action_edit_feed && id > 0) {
+        if (id == R.id.action_edit_feed && this.id > 0) {
             Intent i = new Intent(getActivity(), EditFeedActivity.class);
             // TODO do not animate the back movement here
             i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
@@ -171,6 +175,15 @@ public class FeedFragment extends Fragment
             i.putExtra(EditFeedActivity.TITLE, title);
             i.setData(Uri.parse(url));
             startActivity(i);
+            return true;
+        } else if (id == R.id.action_delete_feed && this.id > 0) {
+            getActivity().getContentResolver()
+                    .delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
+                            Util.LongsToStringArray(this.id));
+            // TODO close fragment
+            return true;
+        } else if (id == R.id.action_mark_as_read && this.id > 0) {
+            RssContentProvider.MarkFeedAsRead(getActivity(), this.id);
             return true;
         } else {
             return super.onOptionsItemSelected(menuItem);
