@@ -95,7 +95,6 @@ public class RssSyncService extends IntentService {
                 if (item.getPubDate() == null) {
                     item.setPubDate(DateTime.now());
                 }
-                // TODO Precache images
                 // Save to database
                 FeedItemSQL itemSQL = getUniqueSQLItem(item, feedSQL);
                 // Set new values. Make sure some are not null
@@ -116,6 +115,11 @@ public class RssSyncService extends IntentService {
                     itemSQL.plainsnippet = "";
                 }
                 itemSQL.imageurl = item.getImageUrl();
+                // TODO pre-cache ALL images
+                if (itemSQL.imageurl != null && !itemSQL.imageurl.isEmpty()) {
+                    Log.d("JONAS", "Pre-fetching " + itemSQL.imageurl);
+                    Picasso.with(this).load(itemSQL.imageurl).fetch();
+                }
                 itemSQL.link = item.getLink();
                 //itemSQL.author = item.getAuthor();
                 itemSQL.setPubDate(item.getPubDate());
