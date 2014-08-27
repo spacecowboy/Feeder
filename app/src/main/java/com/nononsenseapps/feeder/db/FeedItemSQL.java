@@ -1,7 +1,9 @@
 package com.nononsenseapps.feeder.db;
 
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
+import android.net.Uri;
 
 import org.joda.time.DateTime;
 
@@ -9,8 +11,25 @@ import org.joda.time.DateTime;
  * SQL which handles items belonging to a Feed
  */
 public class FeedItemSQL {
-    // SQL convention says Table name should be "singular", so not Persons
+    // SQL convention says Table name should be "singular"
     public static final String TABLE_NAME = "FeedItem";
+    // URIs
+    public static final Uri URI_FEED_ITEMS = Uri.withAppendedPath(
+            Uri.parse(RssContentProvider.SCHEME + RssContentProvider.AUTHORITY),
+            TABLE_NAME);
+    // URI codes, must be unique
+    public static final int URICODE = 201;
+    public static final int ITEMCODE = 202;
+
+
+    public static void addMatcherUris(UriMatcher sURIMatcher) {
+        sURIMatcher
+                .addURI(RssContentProvider.AUTHORITY, URI_FEED_ITEMS.getPath(),
+                        URICODE);
+        sURIMatcher.addURI(RssContentProvider.AUTHORITY,
+                URI_FEED_ITEMS.getPath() + "/#", ITEMCODE);
+    }
+
     // Naming the id column with an underscore is good to be consistent
     // with other Android things. This is ALWAYS needed
     public static final String COL_ID = "_id";

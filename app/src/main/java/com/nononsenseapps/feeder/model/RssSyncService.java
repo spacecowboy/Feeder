@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.db.Util;
 import com.shirwa.simplistic_rss.RssFeed;
 import com.shirwa.simplistic_rss.RssItem;
 import com.shirwa.simplistic_rss.RssReader;
+import com.squareup.picasso.Picasso;
 
 import org.joda.time.DateTime;
 
@@ -53,7 +54,7 @@ public class RssSyncService extends IntentService {
     protected void syncAll() {
         // Iterate over all feeds
         Cursor cursor = getContentResolver()
-                .query(RssContentProvider.URI_FEEDS, FeedSQL.FIELDS, null, null,
+                .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS, null, null,
                         null);
 
         try {
@@ -90,6 +91,8 @@ public class RssSyncService extends IntentService {
                                    item.getPubDate().toString());
                     continue;
                 }
+                // TODO Precache images
+                // Save to database
                 FeedItemSQL itemSQL = getUniqueSQLItem(item, feedSQL);
                 // Set new values. Make sure some are not null
                 itemSQL.title = item.getTitle();
@@ -126,7 +129,7 @@ public class RssSyncService extends IntentService {
         } finally {
             db.endTransaction();
             getContentResolver()
-                    .notifyChange(RssContentProvider.URI_FEED_ITEMS, null,
+                    .notifyChange(FeedItemSQL.URI_FEED_ITEMS, null,
                             false);
         }
     }
@@ -140,7 +143,7 @@ public class RssSyncService extends IntentService {
     protected DateTime getLatestPubDate(final FeedSQL feedSQL) {
         DateTime latest = null;
 
-        Cursor c = getContentResolver().query(RssContentProvider.URI_FEED_ITEMS,
+        Cursor c = getContentResolver().query(FeedItemSQL.URI_FEED_ITEMS,
                 Util.ToStringArray(FeedItemSQL.COL_PUBDATE),
                 FeedItemSQL.COL_FEED + " " +
                 "IS ?", Util.LongsToStringArray(feedSQL.id), null);
@@ -176,7 +179,7 @@ public class RssSyncService extends IntentService {
             final FeedSQL feedSQL) {
         FeedItemSQL result = null;
         Cursor c = getContentResolver()
-                .query(RssContentProvider.URI_FEED_ITEMS, FeedItemSQL.FIELDS,
+                .query(FeedItemSQL.URI_FEED_ITEMS, FeedItemSQL.FIELDS,
                         FeedItemSQL.COL_LINK + " IS ? AND " +
                         FeedItemSQL.COL_FEED + " IS ?",
                         Util.ToStringArray(item.getLink(),

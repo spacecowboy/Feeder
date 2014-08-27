@@ -235,8 +235,10 @@ public class BaseActivity extends Activity
 
         //mNavAdapter = new FeedsAdapter();
         mNavAdapter = new SimpleCursorAdapter(this,
-                android.R.layout.simple_list_item_1, null,
-                new String[]{FeedSQL.COL_TITLE}, new int[]{android.R.id.text1},
+                R.layout.view_feed, null,
+                new String[]{FeedSQL.COL_TITLE, FeedSQL.COL_UNREADCOUNT},
+                new int[]{R.id.feed_name,
+                R.id.feed_unreadcount},
                 0);
         mDrawerListView =
                 (ListView) mDrawerLayout.findViewById(R.id.navdrawer_list);
@@ -488,8 +490,8 @@ public class BaseActivity extends Activity
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle bundle) {
         if (id == NAV_FEEDS_LOADER) {
-            return new CursorLoader(this, RssContentProvider.URI_FEEDS,
-                    FeedSQL.FIELDS, null, null, null);
+            return new CursorLoader(this, FeedSQL.URI_FEEDSWITHCOUNTS,
+                    FeedSQL.FIELDS_VIEWCOUNT, null, null, FeedSQL.COL_TITLE);
         } else {
             return null;
         }
@@ -508,26 +510,26 @@ public class BaseActivity extends Activity
                 values.put(FeedSQL.COL_TITLE, "XKCD");
                 values.put(FeedSQL.COL_URL, "http://xkcd.com/rss.xml");
                 getContentResolver()
-                        .insert(RssContentProvider.URI_FEEDS, values);
+                        .insert(FeedSQL.URI_FEEDS, values);
 
                 values.put(FeedSQL.COL_TITLE, "CowboyProgrammer");
                 values.put(FeedSQL.COL_URL,
                         "http://feeds.feedburner.com/CowboyProgrammer");
                 getContentResolver()
-                        .insert(RssContentProvider.URI_FEEDS, values);
+                        .insert(FeedSQL.URI_FEEDS, values);
 
                 values.clear();
                 values.put(FeedSQL.COL_TITLE, "Bubbla");
                 values.put(FeedSQL.COL_URL, "http://bubb.la/rss/nyheter");
                 getContentResolver()
-                        .insert(RssContentProvider.URI_FEEDS, values);
+                        .insert(FeedSQL.URI_FEEDS, values);
 
                 values.clear();
                 values.put(FeedSQL.COL_TITLE, "Android Police");
                 values.put(FeedSQL.COL_URL,
                         "http://feeds.feedburner.com/AndroidPolice");
                 getContentResolver()
-                        .insert(RssContentProvider.URI_FEEDS, values);
+                        .insert(FeedSQL.URI_FEEDS, values);
             }
         }
     }

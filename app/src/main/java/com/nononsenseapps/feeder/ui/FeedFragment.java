@@ -181,7 +181,7 @@ public class FeedFragment extends Fragment
     public Loader<Cursor> onCreateLoader(final int ID, final Bundle bundle) {
         if (ID == FEED_LOADER) {
             return new CursorLoader(getActivity(),
-                    RssContentProvider.URI_FEED_ITEMS, FeedItemSQL.FIELDS,
+                    FeedItemSQL.URI_FEED_ITEMS, FeedItemSQL.FIELDS,
                     FeedItemSQL.COL_FEED + " IS ?",
                     Util.LongsToStringArray(this.id),
                     FeedItemSQL.COL_PUBDATE + " DESC");

@@ -31,7 +31,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':deps:Simplistic-RSS')
-    compile 'com.squareup.picasso:picasso:+'
+    compile 'com.squareup.picasso:picasso:2.3.3'
     compile 'joda-time:joda-time:2.3'
 
 

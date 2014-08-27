@@ -53,11 +53,11 @@ public class EditFeedActivity extends Activity {
                                 mTextUrl.getText().toString().trim());
                         if (id < 1) {
                             getContentResolver()
-                                    .insert(RssContentProvider.URI_FEEDS,
+                                    .insert(FeedSQL.URI_FEEDS,
                                             values);
                         } else {
                             getContentResolver().update(Uri.withAppendedPath(
-                                            RssContentProvider.URI_FEED_BASE,
+                                            FeedSQL.URI_FEEDS,
                                             Long.toString(id)), values, null,
                                     null);
                         }

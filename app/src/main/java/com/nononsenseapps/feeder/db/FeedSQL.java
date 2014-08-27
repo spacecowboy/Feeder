@@ -1,14 +1,29 @@
 package com.nononsenseapps.feeder.db;
 
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
+import android.net.Uri;
 
 /**
  * SQL which handles the feeds
  */
 public class FeedSQL {
-    // SQL convention says Table name should be "singular", so not Persons
+    // SQL convention says Table name should be "singular"
     public static final String TABLE_NAME = "Feed";
+    // A view which also reports 'unreadcount'
+    public static final String VIEWCOUNT_NAME = "WithUnreadCount";
+    // URIs
+    public static final Uri URI_FEEDS = Uri.withAppendedPath(
+            Uri.parse(RssContentProvider.SCHEME + RssContentProvider.AUTHORITY),
+            TABLE_NAME);
+
+    public static final Uri URI_FEEDSWITHCOUNTS =
+            Uri.withAppendedPath(URI_FEEDS, VIEWCOUNT_NAME);
+    // URI codes, must be unique
+    public static final int URICODE = 101;
+    public static final int ITEMCODE = 102;
+    public static final int VIEWCOUNTCODE = 103;
     // Naming the id column with an underscore is good to be consistent
     // with other Android things. This is ALWAYS needed
     public static final String COL_ID = "_id";
@@ -16,10 +31,12 @@ public class FeedSQL {
     public static final String COL_TITLE = "title";
     public static final String COL_URL = "url";
     public static final String COL_TAG = "tag";
-
+    // Used on count view
+    public static final String COL_UNREADCOUNT = "unreadcount";
     // For database projection so order is consistent
     public static final String[] FIELDS = {COL_ID, COL_TITLE, COL_URL, COL_TAG};
-
+    public static final String[] FIELDS_VIEWCOUNT = {COL_ID, COL_TITLE,
+            COL_URL, COL_TAG, COL_UNREADCOUNT};
     /*
      * The SQL code that creates a Table for storing Persons in.
      * Note that the last row does NOT end in a comma like the others.
@@ -32,13 +49,20 @@ public class FeedSQL {
                     + COL_URL + " TEXT NOT NULL,"
                     + COL_TAG + " TEXT"
                     + ")";
-
+    public static final String CREATE_COUNT_VIEW =
+            "CREATE TEMP VIEW IF NOT EXISTS " + VIEWCOUNT_NAME
+            + " AS SELECT " + Util.arrayToCommaString(FIELDS)
+            + "," + COL_UNREADCOUNT + " FROM " + TABLE_NAME
+            + " LEFT JOIN " + " (SELECT COUNT(1) AS " + COL_UNREADCOUNT
+            + "," + FeedItemSQL.COL_FEED + " FROM " + FeedItemSQL.TABLE_NAME
+            + " WHERE " + FeedItemSQL.COL_UNREAD + " IS 1 " + " GROUP BY "
+            + FeedItemSQL.COL_FEED + ") ON " + TABLE_NAME + "." + COL_ID
+            + " = " + FeedItemSQL.COL_FEED;
     // Fields corresponding to database columns
     public long id = -1;
     public String title = null;
     public String url = null;
     public String tag = null;
-
     /**
      * No need to do anything, fields are already set to default values above
      */
@@ -54,6 +78,15 @@ public class FeedSQL {
         this.title = cursor.getString(1);
         this.url = cursor.getString(2);
         this.tag = cursor.getString(3);
+    }
+
+    public static void addMatcherUris(UriMatcher sURIMatcher) {
+        sURIMatcher.addURI(RssContentProvider.AUTHORITY, URI_FEEDS.getPath(),
+                URICODE);
+        sURIMatcher.addURI(RssContentProvider.AUTHORITY,
+                URI_FEEDS.getPath() + "/#", ITEMCODE);
+        sURIMatcher.addURI(RssContentProvider.AUTHORITY,
+                URI_FEEDSWITHCOUNTS.getPath(), VIEWCOUNTCODE);
     }
 
     /**

@@ -153,6 +153,7 @@ public class ReaderFragment extends Fragment
                     android.text.Html.fromHtml(mRssItem.getDescription()));
         }
 
+        // Catch clicks on links
         mBodyTextView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(final View v, final MotionEvent event) {

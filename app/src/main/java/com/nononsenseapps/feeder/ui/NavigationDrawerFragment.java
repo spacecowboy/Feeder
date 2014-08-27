@@ -305,8 +305,8 @@ public class NavigationDrawerFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(final int i, final Bundle bundle) {
-        return new CursorLoader(getActivity(), RssContentProvider.URI_FEEDS,
-                FeedSQL.FIELDS, null, null, null);
+        return new CursorLoader(getActivity(), FeedSQL.URI_FEEDSWITHCOUNTS,
+                FeedSQL.FIELDS_VIEWCOUNT, null, null, FeedSQL.COL_TITLE);
     }
 
     @Override
@@ -321,20 +321,20 @@ public class NavigationDrawerFragment extends Fragment
             values.put(FeedSQL.COL_TITLE, "Cowboy Programmer");
             values.put(FeedSQL.COL_URL, "http://cowboyprogrammer.org/rss");
             getActivity().getContentResolver()
-                    .insert(RssContentProvider.URI_FEEDS, values);
+                    .insert(FeedSQL.URI_FEEDS, values);
 
             values.clear();
             values.put(FeedSQL.COL_TITLE, "Bubbla");
             values.put(FeedSQL.COL_URL, "http://bubb.la/rss/nyheter");
             getActivity().getContentResolver()
-                    .insert(RssContentProvider.URI_FEEDS, values);
+                    .insert(FeedSQL.URI_FEEDS, values);
 
             values.clear();
             values.put(FeedSQL.COL_TITLE, "Android Police");
             values.put(FeedSQL.COL_URL,
                     "http://feeds.feedburner.com/AndroidPolice");
             getActivity().getContentResolver()
-                    .insert(RssContentProvider.URI_FEEDS, values);
+                    .insert(FeedSQL.URI_FEEDS, values);
         }
     }
 
