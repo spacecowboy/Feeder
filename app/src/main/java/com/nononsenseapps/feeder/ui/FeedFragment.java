@@ -53,6 +53,10 @@ public class FeedFragment extends Fragment
     private FeedAdapter mAdapter;
     private AbsListView mRecyclerView;
     //private LinearLayoutManager mLayoutManager;
+    private boolean onlyUnread = true;
+    // Filter for database loader
+    private static final String AND_UNREAD = " AND " + FeedItemSQL.COL_UNREAD
+                                             + " IS 1 ";
     // TODO change this
     private long id = -1;
     private String title = "Android Police Dummy";
@@ -158,7 +162,14 @@ public class FeedFragment extends Fragment
             menu.findItem(R.id.action_edit_feed).setVisible(false);
             menu.findItem(R.id.action_delete_feed).setVisible(false);
             menu.findItem(R.id.action_mark_as_read).setVisible(false);
+            menu.findItem(R.id.action_only_unread).setVisible(false);
         }
+
+        // Set toggleable state
+        MenuItem menuItem = menu.findItem(R.id.action_only_unread);
+        menuItem.setChecked(onlyUnread);
+        // TODO use string resources
+        menuItem.setTitle(onlyUnread ? "Show all" : "Only unread");
 
         // Don't forget super call here
         super.onCreateOptionsMenu(menu, inflater);
@@ -185,6 +196,15 @@ public class FeedFragment extends Fragment
         } else if (id == R.id.action_mark_as_read && this.id > 0) {
             RssContentProvider.MarkFeedAsRead(getActivity(), this.id);
             return true;
+        } else if (id == R.id.action_only_unread && this.id > 0) {
+            onlyUnread = !menuItem.isChecked();
+            menuItem.setChecked(onlyUnread);
+            // TODO use string resources
+            menuItem.setTitle(onlyUnread ? "Show all" : "Only unread");
+            //getActivity().invalidateOptionsMenu();
+            // Restart loader
+            getLoaderManager().restartLoader(FEED_LOADER, new Bundle(), this);
+            return true;
         } else {
             return super.onOptionsItemSelected(menuItem);
         }
@@ -193,9 +213,10 @@ public class FeedFragment extends Fragment
     @Override
     public Loader<Cursor> onCreateLoader(final int ID, final Bundle bundle) {
         if (ID == FEED_LOADER) {
-            return new CursorLoader(getActivity(),
-                    FeedItemSQL.URI_FEED_ITEMS, FeedItemSQL.FIELDS,
-                    FeedItemSQL.COL_FEED + " IS ?",
+            return new CursorLoader(getActivity(), FeedItemSQL.URI_FEED_ITEMS,
+                    FeedItemSQL.FIELDS, FeedItemSQL.COL_FEED +
+                                        " IS ? " +
+                                        (onlyUnread ? AND_UNREAD : ""),
                     Util.LongsToStringArray(this.id),
                     FeedItemSQL.COL_PUBDATE + " DESC");
         }

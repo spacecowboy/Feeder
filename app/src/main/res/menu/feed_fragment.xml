@@ -2,9 +2,15 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Overriding these values in fragment -->
+    <item android:id="@+id/action_only_unread"
+          android:checkable="true"
+          android:title="Show all"
+          android:checked="true"
+          android:showAsAction="ifRoom" />
     <item android:id="@+id/action_mark_as_read"
           android:title="Mark as read"
-          android:showAsAction="ifRoom" />
+          android:showAsAction="never" />
     <item android:id="@+id/action_edit_feed"
         android:title="Edit feed"
         android:showAsAction="never" />
