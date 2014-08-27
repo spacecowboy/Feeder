@@ -32,6 +32,7 @@ import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
 import com.squareup.picasso.Picasso;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -299,7 +300,8 @@ public class FeedFragment extends Fragment
             } else {
                 holder.dateTextView.setVisibility(View.VISIBLE);
                 holder.dateTextView.setText(
-                        item.getPubDate().toString(shortDateTimeFormat));
+                        item.getPubDate().withZone(DateTimeZone.getDefault())
+                                .toString(shortDateTimeFormat));
             }
             if (item.plaintitle == null) {
                 holder.titleTextView.setVisibility(View.GONE);
