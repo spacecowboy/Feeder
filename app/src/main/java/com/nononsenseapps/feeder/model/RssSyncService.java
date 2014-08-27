@@ -91,6 +91,10 @@ public class RssSyncService extends IntentService {
                                    item.getPubDate().toString());
                     continue;
                 }
+                // if no PubDate, fill in current time
+                if (item.getPubDate() == null) {
+                    item.setPubDate(DateTime.now());
+                }
                 // TODO Precache images
                 // Save to database
                 FeedItemSQL itemSQL = getUniqueSQLItem(item, feedSQL);
