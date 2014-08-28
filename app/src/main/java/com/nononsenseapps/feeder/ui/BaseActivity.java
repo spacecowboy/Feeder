@@ -6,7 +6,6 @@ import android.animation.TypeEvaluator;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.ContentValues;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -14,7 +13,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +23,6 @@ import android.widget.ExpandableListView;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.TaggedFeedsAdapter;
 import com.nononsenseapps.feeder.util.LPreviewUtils;
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase;
@@ -236,16 +233,15 @@ public class BaseActivity extends Activity
         mDrawerToggle.syncState();
 
         //mNavAdapter = new FeedsAdapter();
-//        mNavAdapter = new SimpleCursorAdapter(this,
-//                R.layout.view_feed, null,
-//                new String[]{FeedSQL.COL_TITLE, FeedSQL.COL_UNREADCOUNT},
-//                new int[]{R.id.feed_name,
-//                R.id.feed_unreadcount},
-//                0);
-        mNavAdapter = new TaggedFeedsAdapter(this, null);
-        mDrawerListView =
-                (ExpandableListView) mDrawerLayout.findViewById(R.id
-                        .navdrawer_list);
+        //        mNavAdapter = new SimpleCursorAdapter(this,
+        //                R.layout.view_feed, null,
+        //                new String[]{FeedSQL.COL_TITLE, FeedSQL.COL_UNREADCOUNT},
+        //                new int[]{R.id.feed_name,
+        //                R.id.feed_unreadcount},
+        //                0);
+        mNavAdapter = new TaggedFeedsAdapter(this);
+        mDrawerListView = (ExpandableListView) mDrawerLayout
+                .findViewById(R.id.navdrawer_list);
         //mDrawerListView.setLayoutManager(new LinearLayoutManager(this));
         mDrawerListView.setAdapter(mNavAdapter);
         mDrawerListView.setOnChildClickListener(
@@ -499,9 +495,6 @@ public class BaseActivity extends Activity
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle bundle) {
         if (id == NAV_TAGS_LOADER) {
-//            return new CursorLoader(this, FeedSQL.URI_FEEDSWITHCOUNTS,
-//                    FeedSQL.FIELDS_VIEWCOUNT, null, null,
-//                    Util.SortAlphabeticNoCase(FeedSQL.COL_TITLE));
             return mNavAdapter.getGroupCursorLoader();
         } else {
             // Using id as group position
@@ -518,13 +511,12 @@ public class BaseActivity extends Activity
             for (int i = 0; i < cursor.getCount(); i++) {
                 if (firstload) {
                     // Expand by default
-                    mDrawerListView.expandGroup(i);
+                    //mDrawerListView.expandGroup(i);
                 }
                 Cursor group = mNavAdapter.getGroup(i);
                 Bundle b = new Bundle();
                 // Make sure position is correct
                 b.putString("tag", group.getString(1));
-                Log.d("JONAS", "Restarting loader " + i);
                 getLoaderManager().restartLoader(i, b, this);
             }
 
@@ -535,35 +527,28 @@ public class BaseActivity extends Activity
                 values.put(FeedSQL.COL_TITLE, "XKCD");
                 values.put(FeedSQL.COL_TAG, "Comics");
                 values.put(FeedSQL.COL_URL, "http://xkcd.com/rss.xml");
-                getContentResolver()
-                        .insert(FeedSQL.URI_FEEDS, values);
+                getContentResolver().insert(FeedSQL.URI_FEEDS, values);
 
                 values.put(FeedSQL.COL_TITLE, "CowboyProgrammer");
                 values.put(FeedSQL.COL_TAG, "Android");
                 values.put(FeedSQL.COL_URL,
                         "http://feeds.feedburner.com/CowboyProgrammer");
-                getContentResolver()
-                        .insert(FeedSQL.URI_FEEDS, values);
+                getContentResolver().insert(FeedSQL.URI_FEEDS, values);
 
                 values.clear();
                 values.put(FeedSQL.COL_TITLE, "Bubbla");
                 values.put(FeedSQL.COL_URL, "http://bubb.la/rss/nyheter");
-                getContentResolver()
-                        .insert(FeedSQL.URI_FEEDS, values);
+                getContentResolver().insert(FeedSQL.URI_FEEDS, values);
 
                 values.clear();
                 values.put(FeedSQL.COL_TITLE, "Android Police");
                 values.put(FeedSQL.COL_TAG, "Android");
                 values.put(FeedSQL.COL_URL,
                         "http://feeds.feedburner.com/AndroidPolice");
-                getContentResolver()
-                        .insert(FeedSQL.URI_FEEDS, values);
+                getContentResolver().insert(FeedSQL.URI_FEEDS, values);
             }
         } else {
             // Child loader
-            Log.d("JONAS", "Loader finished " + cursorLoader.getId());
-            // TODO FIX
-//            java.lang.NullPointerException: Attempt to invoke virtual method 'void android.widget.CursorTreeAdapter$MyCursorHelper.changeCursor(android.database.Cursor, boolean)' on a null object reference
             mNavAdapter.setChildrenCursor(cursorLoader.getId(), cursor);
         }
         // Put this last
