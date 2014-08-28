@@ -34,6 +34,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // Enable foreign key constraints
             db.setForeignKeyConstraintsEnabled(true);
         }
+        // Create triggers
+        db.execSQL(FeedItemSQL.CREATE_TAG_TRIGGER);
+        // Create views if not exists
+        db.execSQL(FeedSQL.CREATE_COUNT_VIEW);
+        db.execSQL(FeedSQL.CREATE_TAGS_VIEW);
     }
 
     @Override

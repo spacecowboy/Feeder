@@ -14,20 +14,19 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.ExpandableListView;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
+import com.nononsenseapps.feeder.model.TaggedFeedsAdapter;
 import com.nononsenseapps.feeder.util.LPreviewUtils;
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase;
 import com.nononsenseapps.feeder.util.PrefUtils;
@@ -57,7 +56,8 @@ public class BaseActivity extends Activity
     private static final int MAIN_CONTENT_FADEOUT_DURATION = 150;
     private static final int MAIN_CONTENT_FADEIN_DURATION = 250;
     private static final TypeEvaluator ARGB_EVALUATOR = new ArgbEvaluator();
-    private static final int NAV_FEEDS_LOADER = 1;
+    // Positive numbers reserved for children
+    private static final int NAV_TAGS_LOADER = -2;
     protected boolean mActionBarShown = true;
     // If pressing home should finish or start new activity
     protected boolean mShouldFinishBack = false;
@@ -79,8 +79,9 @@ public class BaseActivity extends Activity
     private LPreviewUtilsBase.ActionBarDrawerToggleWrapper mDrawerToggle;
     // A Runnable that we should execute when the navigation drawer finishes its closing animation
     private Runnable mDeferredOnDrawerClosedRunnable;
-    private SimpleCursorAdapter mNavAdapter;
-    private ListView mDrawerListView;
+    private TaggedFeedsAdapter mNavAdapter;
+    private ExpandableListView mDrawerListView;
+    private boolean firstload = true;
 
     /**
      * Converts an intent into a {@link Bundle} suitable for use as fragment
@@ -235,31 +236,38 @@ public class BaseActivity extends Activity
         mDrawerToggle.syncState();
 
         //mNavAdapter = new FeedsAdapter();
-        mNavAdapter = new SimpleCursorAdapter(this,
-                R.layout.view_feed, null,
-                new String[]{FeedSQL.COL_TITLE, FeedSQL.COL_UNREADCOUNT},
-                new int[]{R.id.feed_name,
-                R.id.feed_unreadcount},
-                0);
+//        mNavAdapter = new SimpleCursorAdapter(this,
+//                R.layout.view_feed, null,
+//                new String[]{FeedSQL.COL_TITLE, FeedSQL.COL_UNREADCOUNT},
+//                new int[]{R.id.feed_name,
+//                R.id.feed_unreadcount},
+//                0);
+        mNavAdapter = new TaggedFeedsAdapter(this, null);
         mDrawerListView =
-                (ListView) mDrawerLayout.findViewById(R.id.navdrawer_list);
+                (ExpandableListView) mDrawerLayout.findViewById(R.id
+                        .navdrawer_list);
         //mDrawerListView.setLayoutManager(new LinearLayoutManager(this));
         mDrawerListView.setAdapter(mNavAdapter);
-        mDrawerListView
-                .setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mDrawerListView.setOnChildClickListener(
+                new ExpandableListView.OnChildClickListener() {
                     @Override
-                    public void onItemClick(final AdapterView<?> adapterView,
-                            final View view, final int pos, final long id) {
+                    public boolean onChildClick(final ExpandableListView parent,
+                            final View v, final int groupPosition,
+                            final int childPosition, final long id) {
                         if (mDrawerLayout != null) {
                             mDrawerLayout.closeDrawer(Gravity.START);
                         }
+
                         if (mNavAdapter != null) {
-                            Cursor c = (Cursor) mNavAdapter.getItem(pos);
+                            Cursor c = mNavAdapter
+                                    .getChild(groupPosition, childPosition);
                             // Make sure these ints match ordering in projection if
                             // changed
                             onNavigationDrawerItemSelected(c.getLong(0),
-                                    c.getString(1), c.getString(2));
+                                    c.getString(1), c.getString(2),
+                                    c.getString(3));
                         }
+                        return true;
                     }
                 });
 
@@ -318,12 +326,12 @@ public class BaseActivity extends Activity
 
     // Subclasses can override to decide what happens on nav item selection
     protected void onNavigationDrawerItemSelected(long id, String title,
-            String url) {
+            String url, String tag) {
         // TODO add default start activity with arguments
     }
 
     private void populateNavDrawer() {
-        getLoaderManager().restartLoader(NAV_FEEDS_LOADER, new Bundle(), this);
+        getLoaderManager().restartLoader(NAV_TAGS_LOADER, new Bundle(), this);
     }
 
     protected void autoShowOrHideActionBar(boolean show) {
@@ -490,31 +498,48 @@ public class BaseActivity extends Activity
 
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle bundle) {
-        if (id == NAV_FEEDS_LOADER) {
-            return new CursorLoader(this, FeedSQL.URI_FEEDSWITHCOUNTS,
-                    FeedSQL.FIELDS_VIEWCOUNT, null, null,
-                    Util.SortAlphabeticNoCase(FeedSQL.COL_TITLE));
+        if (id == NAV_TAGS_LOADER) {
+//            return new CursorLoader(this, FeedSQL.URI_FEEDSWITHCOUNTS,
+//                    FeedSQL.FIELDS_VIEWCOUNT, null, null,
+//                    Util.SortAlphabeticNoCase(FeedSQL.COL_TITLE));
+            return mNavAdapter.getGroupCursorLoader();
         } else {
-            return null;
+            // Using id as group position
+            return mNavAdapter.getChildCursorLoader(bundle.getString("tag"));
         }
     }
 
     @Override
     public void onLoadFinished(final Loader<Cursor> cursorLoader,
             final Cursor cursor) {
-        if (cursorLoader.getId() == NAV_FEEDS_LOADER) {
-            mNavAdapter.swapCursor(cursor);
+        if (cursorLoader.getId() == NAV_TAGS_LOADER) {
+            mNavAdapter.setGroupCursor(cursor);
+            // Load child cursors
+            for (int i = 0; i < cursor.getCount(); i++) {
+                if (firstload) {
+                    // Expand by default
+                    mDrawerListView.expandGroup(i);
+                }
+                Cursor group = mNavAdapter.getGroup(i);
+                Bundle b = new Bundle();
+                // Make sure position is correct
+                b.putString("tag", group.getString(1));
+                Log.d("JONAS", "Restarting loader " + i);
+                getLoaderManager().restartLoader(i, b, this);
+            }
 
             // TODO REMOVE DBUG CODE
             if (cursor.getCount() == 0) {
                 ContentValues values = new ContentValues();
 
                 values.put(FeedSQL.COL_TITLE, "XKCD");
+                values.put(FeedSQL.COL_TAG, "Comics");
                 values.put(FeedSQL.COL_URL, "http://xkcd.com/rss.xml");
                 getContentResolver()
                         .insert(FeedSQL.URI_FEEDS, values);
 
                 values.put(FeedSQL.COL_TITLE, "CowboyProgrammer");
+                values.put(FeedSQL.COL_TAG, "Android");
                 values.put(FeedSQL.COL_URL,
                         "http://feeds.feedburner.com/CowboyProgrammer");
                 getContentResolver()
@@ -528,18 +553,29 @@ public class BaseActivity extends Activity
 
                 values.clear();
                 values.put(FeedSQL.COL_TITLE, "Android Police");
+                values.put(FeedSQL.COL_TAG, "Android");
                 values.put(FeedSQL.COL_URL,
                         "http://feeds.feedburner.com/AndroidPolice");
                 getContentResolver()
                         .insert(FeedSQL.URI_FEEDS, values);
             }
+        } else {
+            // Child loader
+            Log.d("JONAS", "Loader finished " + cursorLoader.getId());
+            // TODO FIX
+//            java.lang.NullPointerException: Attempt to invoke virtual method 'void android.widget.CursorTreeAdapter$MyCursorHelper.changeCursor(android.database.Cursor, boolean)' on a null object reference
+            mNavAdapter.setChildrenCursor(cursorLoader.getId(), cursor);
         }
+        // Put this last
+        firstload = false;
     }
 
     @Override
     public void onLoaderReset(final Loader<Cursor> cursorLoader) {
-        if (cursorLoader.getId() == NAV_FEEDS_LOADER) {
-            mNavAdapter.swapCursor(null);
+        if (cursorLoader.getId() == NAV_TAGS_LOADER) {
+            mNavAdapter.setGroupCursor(null);
+        } else {
+            mNavAdapter.setChildrenCursor(cursorLoader.getId(), null);
         }
     }
 

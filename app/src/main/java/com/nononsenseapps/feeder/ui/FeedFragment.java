@@ -51,6 +51,7 @@ public class FeedFragment extends Fragment
     private static final String ARG_FEED_ID = "feed_id";
     private static final String ARG_FEED_TITLE = "feed_title";
     private static final String ARG_FEED_URL = "feed_url";
+    private static final String ARG_FEED_TAG = "feed_tag";
     private FeedAdapter mAdapter;
     private AbsListView mRecyclerView;
     //private LinearLayoutManager mLayoutManager;
@@ -62,6 +63,7 @@ public class FeedFragment extends Fragment
     private long id = -1;
     private String title = "Android Police Dummy";
     private String url = "http://feeds.feedburner.com/AndroidPolice";
+    private String tag = "";
 
     public FeedFragment() {
     }
@@ -70,12 +72,14 @@ public class FeedFragment extends Fragment
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static FeedFragment newInstance(long id, String title, String url) {
+    public static FeedFragment newInstance(long id, String title, String url,
+     String tag) {
         FeedFragment fragment = new FeedFragment();
         Bundle args = new Bundle();
         args.putLong(ARG_FEED_ID, id);
         args.putString(ARG_FEED_TITLE, title);
         args.putString(ARG_FEED_URL, url);
+        args.putString(ARG_FEED_TAG, tag);
         fragment.setArguments(args);
         return fragment;
     }
@@ -94,6 +98,7 @@ public class FeedFragment extends Fragment
             id = getArguments().getLong(ARG_FEED_ID, -1);
             title = getArguments().getString(ARG_FEED_TITLE);
             url = getArguments().getString(ARG_FEED_URL);
+            tag = getArguments().getString(ARG_FEED_TAG);
         }
 
         setHasOptionsMenu(true);
@@ -185,6 +190,7 @@ public class FeedFragment extends Fragment
             i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
             i.putExtra(EditFeedActivity._ID, this.id);
             i.putExtra(EditFeedActivity.TITLE, title);
+            i.putExtra(EditFeedActivity.TAG, tag);
             i.setData(Uri.parse(url));
             startActivity(i);
             return true;

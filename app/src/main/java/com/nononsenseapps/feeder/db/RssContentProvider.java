@@ -85,13 +85,16 @@ public class RssContentProvider extends ContentProvider {
             case FeedSQL.URICODE:
                 table = FeedSQL.TABLE_NAME;
                 result = FeedSQL.URI_FEEDS;
-                notifyUris = new Uri[] {FeedSQL.URI_FEEDS};
+                notifyUris = new Uri[] {FeedSQL.URI_FEEDS,
+                        FeedSQL.URI_FEEDSWITHCOUNTS,
+                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedItemSQL.URICODE:
                 table = FeedItemSQL.TABLE_NAME;
                 result = FeedItemSQL.URI_FEED_ITEMS;
                 notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS};
+                        FeedSQL.URI_FEEDSWITHCOUNTS,
+                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
@@ -132,9 +135,9 @@ public class RssContentProvider extends ContentProvider {
                 break;
             case FeedSQL.VIEWCOUNTCODE:
                 table = FeedSQL.VIEWCOUNT_NAME;
-                // Create view if not exists
-                DatabaseHandler.getInstance(getContext()).getWritableDatabase()
-                        .execSQL(FeedSQL.CREATE_COUNT_VIEW);
+                break;
+            case FeedSQL.VIEWTAGSCODE:
+                table = FeedSQL.VIEWTAGS_NAME;
                 break;
             case FeedItemSQL.ITEMCODE:
                 table = FeedItemSQL.TABLE_NAME;
@@ -169,24 +172,24 @@ public class RssContentProvider extends ContentProvider {
                 selection = Util.WHEREIDIS;
                 selectionArgs = Util.ToStringArray(uri.getLastPathSegment());
                 notifyUris = new Uri[] {FeedSQL.URI_FEEDS,
-                        FeedItemSQL.URI_FEED_ITEMS};
+                        FeedItemSQL.URI_FEED_ITEMS, FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedSQL.URICODE:
                 table = FeedSQL.TABLE_NAME;
                 notifyUris = new Uri[] {FeedSQL.URI_FEEDS,
-                        FeedItemSQL.URI_FEED_ITEMS};
+                        FeedItemSQL.URI_FEED_ITEMS, FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedItemSQL.ITEMCODE:
                 table = FeedItemSQL.TABLE_NAME;
                 selection = Util.WHEREIDIS;
                 selectionArgs = Util.ToStringArray(uri.getLastPathSegment());
                 notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS};
+                        FeedSQL.URI_FEEDSWITHCOUNTS, FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedItemSQL.URICODE:
                 table = FeedItemSQL.TABLE_NAME;
                 notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS};
+                        FeedSQL.URI_FEEDSWITHCOUNTS, FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");

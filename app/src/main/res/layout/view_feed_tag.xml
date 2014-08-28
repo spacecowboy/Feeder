@@ -3,32 +3,35 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
-              tools:ignore="RtlSymmetry">
+                android:layout_height="?android:attr/listPreferredItemHeightSmall"
+                android:paddingBottom="2dip"
+                android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
+                android:paddingTop="2dip"
+                tools:ignore="RtlSymmetry">
+
     <TextView
-        android:id="@+id/feed_unreadcount"
+        android:id="@+id/tag_unreadcount"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:singleLine="true"
+        android:layout_height="?android:attr/listPreferredItemHeightSmall"
         android:layout_alignParentEnd="true"
-        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:gravity="center_vertical"
         android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
         android:paddingStart="2dp"
+        android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="@color/secondary_text_material_dark"
         android:textSize="@dimen/navdrawer_unreadcount_textsize"
         />
+
     <TextView
-        android:id="@+id/feed_name"
+        android:id="@+id/tag_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:layout_height="?android:attr/listPreferredItemHeightSmall"
         android:layout_alignParentStart="true"
-        android:singleLine="true"
         android:layout_toStartOf="@id/feed_unreadcount"
-        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:gravity="center_vertical"
         android:paddingEnd="2dp"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"/>
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        />
 </RelativeLayout>

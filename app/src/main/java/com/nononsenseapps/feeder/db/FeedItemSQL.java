@@ -71,7 +71,7 @@ public class FeedItemSQL {
                     COL_PUBDATE + " TEXT," +
                     COL_UNREAD + " INTEGER NOT NULL DEFAULT 1," +
                     COL_FEED + " INTEGER NOT NULL," +
-                    COL_TAG + " TEXT," +
+                    COL_TAG + " TEXT NOT NULL," +
                     // Handle foreign key stuff
                     " FOREIGN KEY(" + COL_FEED + ") REFERENCES " + FeedSQL.TABLE_NAME + "(" +
                     FeedSQL.COL_ID + ") ON DELETE CASCADE," +
@@ -79,6 +79,16 @@ public class FeedItemSQL {
                     " UNIQUE(" + COL_LINK + "," + COL_FEED + ") ON CONFLICT " +
                     "REPLACE"
                     + ")";
+    // Trigger which updates Tags of items when feeds' tags are updated
+    public static final String CREATE_TAG_TRIGGER =
+            "CREATE TEMP TRIGGER IF NOT EXISTS trigger_tag_updater "
+            + " AFTER UPDATE OF " + FeedSQL.COL_TAG + " ON " + FeedSQL.TABLE_NAME
+            + " WHEN new." + FeedSQL.COL_TAG + " IS NOT old." + FeedSQL.COL_TAG
+            + " BEGIN "
+            + " UPDATE " + FeedItemSQL.TABLE_NAME + " SET " + COL_TAG + " = "
+            + " new." + FeedSQL.COL_TAG + " WHERE " + COL_FEED + " IS old." +
+            FeedSQL.COL_ID
+            + "; END";
 
     // Fields corresponding to database columns
     public long id = -1;

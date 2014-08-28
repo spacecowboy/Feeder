@@ -23,10 +23,12 @@ public class EditFeedActivity extends Activity {
     public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
     public static final String _ID = "_id";
     public static final String TITLE = "title";
+    public static final String TAG = "tag";
     private boolean mShouldFinishBack = false;
     private long id = -1;
     private EditText mTextUrl;
     private EditText mTextTitle;
+    private EditText mTextTag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class EditFeedActivity extends Activity {
 
         mTextUrl = (EditText) findViewById(R.id.feed_url);
         mTextTitle = (EditText) findViewById(R.id.feed_title);
+        mTextTag = (EditText) findViewById(R.id.feed_tag);
 
         findViewById(R.id.add_button)
                 .setOnClickListener(new View.OnClickListener() {
@@ -51,6 +54,8 @@ public class EditFeedActivity extends Activity {
                                 mTextTitle.getText().toString().trim());
                         values.put(FeedSQL.COL_URL,
                                 mTextUrl.getText().toString().trim());
+                        values.put(FeedSQL.COL_TAG,
+                                mTextTag.getText().toString().trim());
                         if (id < 1) {
                             getContentResolver()
                                     .insert(FeedSQL.URI_FEEDS,
@@ -85,6 +90,10 @@ public class EditFeedActivity extends Activity {
             // Title
             if (i.hasExtra(TITLE)) {
                 mTextTitle.setText(i.getStringExtra(TITLE));
+            }
+            // Tag
+            if (i.hasExtra(TAG)) {
+                mTextTag.setText(i.getStringExtra(TAG));
             }
         }
     }

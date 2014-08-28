@@ -19,5 +19,6 @@
     <string name="url">URL</string>
     <string name="title">Title</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tag">Tag</string>
 
 </resources>

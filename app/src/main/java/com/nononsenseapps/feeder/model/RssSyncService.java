@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.model;
 
 import android.app.IntentService;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -74,10 +75,11 @@ public class RssSyncService extends IntentService {
         Log.d("JONAS", "Syncing feed " + feedSQL.title + " with " +
                        latestPubDate);
 
-        SQLiteDatabase db =
-                DatabaseHandler.getInstance(this).getWritableDatabase();
+//        SQLiteDatabase db =
+//                DatabaseHandler.getInstance(this).getWritableDatabase();
+        ContentResolver resolver = getContentResolver();
         // Want a transaction here
-        db.beginTransactionNonExclusive();
+        //db.beginTransactionNonExclusive();
         try {
             RssFeed feed = new RssReader(feedSQL.url).getFeed();
             // Process each feed item
@@ -128,20 +130,24 @@ public class RssSyncService extends IntentService {
                 itemSQL.tag = feedSQL.tag;
                 // Save it
                 Log.d("JONAS", "Saving the item: " + itemSQL.title);
-                Util.SaveOrUpdate(db, itemSQL);
+                // TODO use apply batch instead
+                Util.SaveOrUpdate(resolver, itemSQL);
             }
             // Mark as success
-            db.setTransactionSuccessful();
+            //db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.e(TAG, "" + e.getMessage());
         } finally {
-            db.endTransaction();
-            getContentResolver()
-                    .notifyChange(FeedItemSQL.URI_FEED_ITEMS, null,
-                            false);
-            getContentResolver()
-                    .notifyChange(FeedSQL.URI_FEEDSWITHCOUNTS, null,
-                            false);
+            //db.endTransaction();
+//            getContentResolver()
+//                    .notifyChange(FeedItemSQL.URI_FEED_ITEMS, null,
+//                            false);
+//            getContentResolver()
+//                    .notifyChange(FeedSQL.URI_FEEDSWITHCOUNTS, null,
+//                            false);
+//            getContentResolver()
+//                    .notifyChange(FeedSQL.URI_TAGSWITHCOUNTS, null,
+//                            false);
         }
     }
 

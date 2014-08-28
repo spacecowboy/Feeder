@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.db;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -21,6 +22,29 @@ public class Util {
     }
 
     /**
+     *
+     * @param col column to filter on
+     * @param val the value of the column
+     * @return 'col' IS NULL, if val is null, else 'col' IS ?
+     */
+    public static String SelectionCouldBeNull(final String col,
+            final Object val) {
+        return val == null ? col + " IS NULL" : col + " IS ?";
+    }
+
+    /**
+     * See SelectionCouldBeNull
+     * @return if Null, null. Else a string array
+     */
+    public static String[] SelectionValCouldBeNull(final String val) {
+        if (val == null) {
+            return null;
+        } else {
+            return ToStringArray(val);
+        }
+    }
+
+    /**
      * Useful for content provider operations to insert Longs and such.
      *
      * @param vals
@@ -30,7 +54,10 @@ public class Util {
         String[] arr = new String[vals.length];
         for (int i = 0; i < vals.length; i++) {
             if (vals[i] == null) {
-                arr[i] = "null";
+                throw new NullPointerException("Can't have null arguments " +
+                                               "here, " +
+                                               "since they can't be combined " +
+                                               "with '?' in SQL.");
             } else {
                 arr[i] = Long.toString(vals[i]);
             }
@@ -48,7 +75,10 @@ public class Util {
         String[] arr = new String[strings.length];
         for (int i = 0; i < strings.length; i++) {
             if (strings[i] == null) {
-                arr[i] = "null";
+                throw new NullPointerException("Can't have null arguments " +
+                                               "here, " +
+                                               "since they can't be combined " +
+                                               "with '?' in SQL.");
             } else {
                 arr[i] = strings[i];
             }
@@ -102,6 +132,20 @@ public class Util {
                     WHEREIDIS, LongsToStringArray(itemSQL.id));
         } else {
             db.insert(FeedItemSQL.TABLE_NAME, null, itemSQL.getContent());
+        }
+    }
+    /**
+     * If the item has an id, will update, else insert.
+     * @param resolver
+     * @param itemSQL
+     */
+    public static void SaveOrUpdate(final ContentResolver resolver,
+            final FeedItemSQL itemSQL) {
+        if (itemSQL.id > 0) {
+            resolver.update(FeedItemSQL.URI_FEED_ITEMS, itemSQL.getContent(),
+                    WHEREIDIS, LongsToStringArray(itemSQL.id));
+        } else {
+            resolver.insert(FeedItemSQL.URI_FEED_ITEMS, itemSQL.getContent());
         }
     }
 
