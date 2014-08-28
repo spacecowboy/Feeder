@@ -1,3 +1,7 @@
+### License
+
+**GPLv2**, for more info see *LICENSE*.
+
 ### How to clone
 
 Since I have a submodule in this repo, remember to clone recursively:
@@ -9,6 +13,12 @@ This is equivalent to doing it in two steps:
     git clone https://github.com/spacecowboy/Feeder.git
     git submodule update --init --recursive
 
-### License
+### How to build
 
-GPLv2, for more info see LICENSE.
+Quick install:
+
+    ./gradlew installKitkatDebug
+
+For more possible options, see:
+
+    ./gradlew tasks
