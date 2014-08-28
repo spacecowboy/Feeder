@@ -270,7 +270,6 @@ public class BaseActivity extends Activity
             @Override
             public boolean onGroupClick(final ExpandableListView parent,
                     final View v, final int groupPosition, final long id) {
-                // TODO return false for collapse/Expand
                 if (mDrawerLayout != null) {
                     mDrawerLayout.closeDrawer(Gravity.START);
                 }
@@ -285,6 +284,17 @@ public class BaseActivity extends Activity
                             c.getString(1));
                 }
                 return true;
+            }
+        });
+        mNavAdapter.setOnExpandClickListener(new TaggedFeedsAdapter.OnExpandClickListener() {
+            @Override
+            public void onExpandClick(final int groupPosition,
+                    final boolean isExpanded) {
+                if (isExpanded) {
+                    mDrawerListView.collapseGroup(groupPosition);
+                } else {
+                    mDrawerListView.expandGroup(groupPosition);
+                }
             }
         });
 

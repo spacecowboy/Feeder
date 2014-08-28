@@ -18,41 +18,41 @@ import com.nononsenseapps.feeder.db.Util;
  * An expandable list adapter which displays feeds sorted under tags. The
  * adapter is designed to be used together with CursorLoaders. See
  * {@link #getGroupCursorLoader()} and {@link #getChildCursorLoader(String)}.
- *
+ * <p/>
  * To use, do something as follows in your activity/fragment:
  * public Loader<Cursor> onCreateLoader(final int id, final Bundle bundle) {
- *     // GROUP_LOADER must be a negative number due to the children
- *     if (id == GROUP_LOADER) {
- *         return adapter.getGroupCursorLoader();
- *     } else {
- *         // Using id as group position
- *         return adapter.getChildCursorLoader(bundle.getString("tag"));
- *     }
+ * // GROUP_LOADER must be a negative number due to the children
+ * if (id == GROUP_LOADER) {
+ * return adapter.getGroupCursorLoader();
+ * } else {
+ * // Using id as group position
+ * return adapter.getChildCursorLoader(bundle.getString("tag"));
  * }
- *
+ * }
+ * <p/>
  * public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
- *     if (cursorLoader.getId() == GROUP_LOADER) {
- *         adapter.setGroupCursor(cursor);
- *         // Load child cursors
- *         for (int i = 0; i < cursor.getCount(); i++) {
- *             Cursor group = adapter.getGroup(i);
- *             Bundle b = new Bundle();
- *             // Make sure position is correct
- *             b.putString("tag", group.getString(1));
- *             getLoaderManager().restartLoader(i, b, this);
- *         }
- *     } else {
- *         // Child loader
- *         mNavAdapter.setChildrenCursor(cursorLoader.getId(), cursor);
- *     }
+ * if (cursorLoader.getId() == GROUP_LOADER) {
+ * adapter.setGroupCursor(cursor);
+ * // Load child cursors
+ * for (int i = 0; i < cursor.getCount(); i++) {
+ * Cursor group = adapter.getGroup(i);
+ * Bundle b = new Bundle();
+ * // Make sure position is correct
+ * b.putString("tag", group.getString(1));
+ * getLoaderManager().restartLoader(i, b, this);
  * }
- *
+ * } else {
+ * // Child loader
+ * mNavAdapter.setChildrenCursor(cursorLoader.getId(), cursor);
+ * }
+ * }
+ * <p/>
  * public void onLoaderReset(final Loader<Cursor> cursorLoader) {
- *    if (cursorLoader.getId() == GROUP_LOADER) {
- *        adapter.setGroupCursor(null);
- *    } else {
- *        adapter.setChildrenCursor(cursorLoader.getId(), null);
- *    }
+ * if (cursorLoader.getId() == GROUP_LOADER) {
+ * adapter.setGroupCursor(null);
+ * } else {
+ * adapter.setChildrenCursor(cursorLoader.getId(), null);
+ * }
  * }
  */
 public class TaggedFeedsAdapter extends BaseExpandableListAdapter {
@@ -61,6 +61,7 @@ public class TaggedFeedsAdapter extends BaseExpandableListAdapter {
     private final LongSparseArray<Cursor> childCursors =
             new LongSparseArray<Cursor>();
     private Cursor groupCursor = null;
+    private OnExpandClickListener onExpandListener = null;
 
     /**
      * Constructor.
@@ -69,6 +70,15 @@ public class TaggedFeedsAdapter extends BaseExpandableListAdapter {
      */
     public TaggedFeedsAdapter(final Context context) {
         mContext = context;
+    }
+
+    /**
+     * Set a listener for when the expand icon is pressed on a tag item
+     *
+     * @param listener to use
+     */
+    public void setOnExpandClickListener(OnExpandClickListener listener) {
+        this.onExpandListener = listener;
     }
 
     /**
@@ -261,6 +271,10 @@ public class TaggedFeedsAdapter extends BaseExpandableListAdapter {
         final Cursor c = getGroup(groupPosition);
         final GroupViewHolder holder = (GroupViewHolder) convertView.getTag();
 
+        // Set position on holder
+        holder.groupPosition = groupPosition;
+        holder.isExpanded = isExpanded;
+
         if (c.getString(1).isEmpty()) {
             // TODO use string resource
             holder.titleTextView.setText("No tag");
@@ -346,6 +360,16 @@ public class TaggedFeedsAdapter extends BaseExpandableListAdapter {
         // nothing to do here
     }
 
+    public interface OnExpandClickListener {
+        /**
+         * Called when the expand/collapse icon is pressed
+         * @param groupPosition of group pressed
+         * @param isExpanded current state of group
+         */
+        public void onExpandClick(final int groupPosition,
+                final boolean isExpanded);
+    }
+
     /**
      * A ViewHolder for group views
      */
@@ -353,12 +377,26 @@ public class TaggedFeedsAdapter extends BaseExpandableListAdapter {
         public final View parent;
         public final TextView titleTextView;
         public final TextView unreadCountTextView;
+        public final View expander;
+        public int groupPosition = -1;
+        public boolean isExpanded = false;
 
         public GroupViewHolder(final View v) {
             parent = v;
             titleTextView = (TextView) v.findViewById(R.id.tag_name);
             unreadCountTextView =
                     (TextView) v.findViewById(R.id.tag_unreadcount);
+            // Handle clicks on expand/collapse icon
+            expander = v.findViewById(R.id.tag_expander);
+            expander.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    if (onExpandListener != null && groupPosition > -1) {
+                        onExpandListener
+                                .onExpandClick(groupPosition, isExpanded);
+                    }
+                }
+            });
         }
     }
 

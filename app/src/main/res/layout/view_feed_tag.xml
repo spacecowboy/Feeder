@@ -5,7 +5,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/listPreferredItemHeightSmall"
                 android:paddingBottom="2dip"
-                android:paddingStart="?android:attr/expandableListPreferredItemPaddingLeft"
                 android:paddingTop="2dip"
                 tools:ignore="RtlSymmetry">
 
@@ -23,11 +22,18 @@
         android:textSize="@dimen/navdrawer_unreadcount_textsize"
         />
 
+    <FrameLayout
+        android:id="@+id/tag_expander"
+        android:layout_width="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:layout_height="match_parent"
+        android:background="?android:selectableItemBackground"
+        android:layout_alignParentStart="true"/>
+
     <TextView
         android:id="@+id/tag_name"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/listPreferredItemHeightSmall"
-        android:layout_alignParentStart="true"
+        android:layout_toEndOf="@id/tag_expander"
         android:layout_toStartOf="@id/feed_unreadcount"
         android:gravity="center_vertical"
         android:paddingEnd="2dp"
