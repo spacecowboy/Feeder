@@ -15,3 +15,11 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+
+# Picasso
+-dontwarn com.squareup.okhttp.**
+
+# JodaTime
+-dontwarn org.joda.convert.FromString
+-dontwarn org.joda.convert.ToString

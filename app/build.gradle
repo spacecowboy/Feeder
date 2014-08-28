@@ -10,6 +10,12 @@ android {
         compileSdkVersion 19
         minSdkVersion 19
         targetSdkVersion 19
+
+        // Reduce bloat by removing stuff we don't need
+        // Only support english right now
+        resConfigs "en"
+        // Low-res devices don't deserve dedicated resources
+        resConfigs "nodpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"
     }
 
     productFlavors {
@@ -21,8 +27,12 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
             runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            runProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
