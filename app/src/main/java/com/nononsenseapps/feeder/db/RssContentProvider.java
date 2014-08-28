@@ -230,4 +230,16 @@ public class RssContentProvider extends ContentProvider {
                 FeedItemSQL.COL_FEED + " IS ?", Util.LongsToStringArray
                         (feedId));
     }
+    /**
+     * Mark all items in feeds as read in the database.
+     * @param context
+     * @param tag all feeds with this tag will be marked as read
+     */
+    public static void MarkItemsAsRead(final Context context,
+            final String tag) {
+        ContentValues values = new ContentValues();
+        values.put(FeedItemSQL.COL_UNREAD, 0);
+        context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
+                FeedItemSQL.COL_TAG + " IS ?", Util.ToStringArray(tag));
+    }
 }

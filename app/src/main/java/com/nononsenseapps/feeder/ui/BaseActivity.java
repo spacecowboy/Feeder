@@ -266,6 +266,27 @@ public class BaseActivity extends Activity
                         return true;
                     }
                 });
+        mDrawerListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(final ExpandableListView parent,
+                    final View v, final int groupPosition, final long id) {
+                // TODO return false for collapse/Expand
+                if (mDrawerLayout != null) {
+                    mDrawerLayout.closeDrawer(Gravity.START);
+                }
+
+                if (mNavAdapter != null) {
+                    Cursor c = mNavAdapter
+                            .getGroup(groupPosition);
+                    // Make sure these ints match ordering in projection if
+                    // changed
+                    onNavigationDrawerItemSelected(-1,
+                            c.getString(1), null,
+                            c.getString(1));
+                }
+                return true;
+            }
+        });
 
         populateNavDrawer();
 

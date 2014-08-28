@@ -57,8 +57,8 @@ public class FeedFragment extends Fragment
     //private LinearLayoutManager mLayoutManager;
     private boolean onlyUnread = true;
     // Filter for database loader
-    private static final String AND_UNREAD = " AND " + FeedItemSQL.COL_UNREAD
-                                             + " IS 1 ";
+    private static final String ONLY_UNREAD = FeedItemSQL.COL_UNREAD + " IS 1 ";
+    private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
     // TODO change this
     private long id = -1;
     private String title = "Android Police Dummy";
@@ -167,8 +167,6 @@ public class FeedFragment extends Fragment
         if (id < 1) {
             menu.findItem(R.id.action_edit_feed).setVisible(false);
             menu.findItem(R.id.action_delete_feed).setVisible(false);
-            menu.findItem(R.id.action_mark_as_read).setVisible(false);
-            menu.findItem(R.id.action_only_unread).setVisible(false);
         }
 
         // Set toggleable state
@@ -200,10 +198,14 @@ public class FeedFragment extends Fragment
                             Util.LongsToStringArray(this.id));
             // TODO close fragment
             return true;
-        } else if (id == R.id.action_mark_as_read && this.id > 0) {
-            RssContentProvider.MarkFeedAsRead(getActivity(), this.id);
+        } else if (id == R.id.action_mark_as_read ) {
+            if (this.id > 0) {
+                RssContentProvider.MarkFeedAsRead(getActivity(), this.id);
+            } else if (this.tag != null) {
+                RssContentProvider.MarkItemsAsRead(getActivity(), this.tag);
+            }
             return true;
-        } else if (id == R.id.action_only_unread && this.id > 0) {
+        } else if (id == R.id.action_only_unread) {
             onlyUnread = !menuItem.isChecked();
             menuItem.setChecked(onlyUnread);
             // TODO use string resources
@@ -217,14 +219,48 @@ public class FeedFragment extends Fragment
         }
     }
 
+    /**
+     *
+     * @return SQL selection
+     */
+    protected String getLoaderSelection() {
+        String filter = null;
+        if (id > 0) {
+            filter = FeedItemSQL.COL_FEED + " IS ? ";
+        } else if (tag != null) {
+            filter = FeedItemSQL.COL_TAG + " IS ? ";
+        }
+
+        if (onlyUnread && filter != null) {
+            filter += AND_UNREAD;
+        } else if (onlyUnread) {
+            filter = ONLY_UNREAD;
+        }
+
+        return filter;
+    }
+
+    /**
+     *
+     * @return args that match getLoaderSelection
+     */
+    protected String[] getLoaderSelectionArgs() {
+        String[] args = null;
+        if (id > 0) {
+            args = Util.LongsToStringArray(this.id);
+        } else if (tag != null) {
+            args = Util.ToStringArray(this.tag);
+        }
+
+        return args;
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(final int ID, final Bundle bundle) {
         if (ID == FEED_LOADER) {
             return new CursorLoader(getActivity(), FeedItemSQL.URI_FEED_ITEMS,
-                    FeedItemSQL.FIELDS, FeedItemSQL.COL_FEED +
-                                        " IS ? " +
-                                        (onlyUnread ? AND_UNREAD : ""),
-                    Util.LongsToStringArray(this.id),
+                    FeedItemSQL.FIELDS, getLoaderSelection(),
+                    getLoaderSelectionArgs(),
                     FeedItemSQL.COL_PUBDATE + " DESC");
         }
         return null;
