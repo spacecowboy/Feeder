@@ -21,11 +21,7 @@ import com.squareup.picasso.Picasso;
 import org.joda.time.DateTime;
 
 /**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p/>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
+ * Synchronizes RSS feeds.
  */
 public class RssSyncService extends IntentService {
 
@@ -75,11 +71,9 @@ public class RssSyncService extends IntentService {
         Log.d("JONAS", "Syncing feed " + feedSQL.title + " with " +
                        latestPubDate);
 
-//        SQLiteDatabase db =
-//                DatabaseHandler.getInstance(this).getWritableDatabase();
         ContentResolver resolver = getContentResolver();
-        // Want a transaction here
-        //db.beginTransactionNonExclusive();
+        // Prevent notifications to be called until we're done
+        RssContentProvider.setShouldNotify(false);
         try {
             RssFeed feed = new RssReader(feedSQL.url).getFeed();
             // Process each feed item
@@ -130,7 +124,6 @@ public class RssSyncService extends IntentService {
                 itemSQL.tag = feedSQL.tag;
                 // Save it
                 Log.d("JONAS", "Saving the item: " + itemSQL.title);
-                // TODO use apply batch instead
                 Util.SaveOrUpdate(resolver, itemSQL);
             }
             // Mark as success
@@ -138,16 +131,10 @@ public class RssSyncService extends IntentService {
         } catch (Exception e) {
             Log.e(TAG, "" + e.getMessage());
         } finally {
-            //db.endTransaction();
-//            getContentResolver()
-//                    .notifyChange(FeedItemSQL.URI_FEED_ITEMS, null,
-//                            false);
-//            getContentResolver()
-//                    .notifyChange(FeedSQL.URI_FEEDSWITHCOUNTS, null,
-//                            false);
-//            getContentResolver()
-//                    .notifyChange(FeedSQL.URI_TAGSWITHCOUNTS, null,
-//                            false);
+            // Enable notifications again
+            RssContentProvider.setShouldNotify(true);
+            // And notify what we changed
+            RssContentProvider.notifyAllUris(this);
         }
     }
 

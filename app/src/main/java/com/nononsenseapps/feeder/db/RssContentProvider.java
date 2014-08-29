@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.net.Uri;
 
 public class RssContentProvider extends ContentProvider {
+    // If the contentprovider notifies changes on uris
+    private static boolean sShouldNotify = true;
     // Match Uris with this
     private static final UriMatcher sURIMatcher = new UriMatcher(
             UriMatcher.NO_MATCH);
@@ -63,8 +65,25 @@ public class RssContentProvider extends ContentProvider {
      * @param uris
      */
     private void notifyChange(Uri... uris) {
+        if (!sShouldNotify) {
+            return;
+        }
         for (Uri uri: uris) {
             getContext().getContentResolver().notifyChange(uri, null, false);
+        }
+    }
+
+    /**
+     * Notify all uris that changes have happened. Should be called if you
+     * ever disabled notifications on the provider.
+     * @param context
+     */
+    public static void notifyAllUris(final Context context) {
+        for (Uri uri : new Uri[]{FeedSQL.URI_FEEDS,
+                FeedSQL.URI_TAGSWITHCOUNTS,
+                FeedSQL.URI_FEEDSWITHCOUNTS,
+                FeedItemSQL.URI_FEED_ITEMS}) {
+            context.getContentResolver().notifyChange(uri, null, false);
         }
     }
 
@@ -166,6 +185,7 @@ public class RssContentProvider extends ContentProvider {
         final String table;
         Uri[] notifyUris = null;
         int result = 0;
+
         switch (sURIMatcher.match(uri)) {
             case FeedSQL.ITEMCODE:
                 table = FeedSQL.TABLE_NAME;
@@ -241,5 +261,9 @@ public class RssContentProvider extends ContentProvider {
         values.put(FeedItemSQL.COL_UNREAD, 0);
         context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
                 FeedItemSQL.COL_TAG + " IS ?", Util.ToStringArray(tag));
+    }
+
+    public static void setShouldNotify(final boolean b) {
+        sShouldNotify = b;
     }
 }
