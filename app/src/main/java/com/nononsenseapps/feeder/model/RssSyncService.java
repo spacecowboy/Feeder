@@ -104,7 +104,7 @@ public class RssSyncService extends IntentService {
                 if (itemSQL.title == null) {
                     itemSQL.title = "";
                 }
-                itemSQL.description = item.getDescription();
+                itemSQL.description = item.getCleanDescription();
                 if (itemSQL.description == null) {
                     itemSQL.description = "";
                 }
