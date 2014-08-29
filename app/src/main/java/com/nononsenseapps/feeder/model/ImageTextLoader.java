@@ -22,10 +22,9 @@ import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 
-/**
- * Created by jonas on 8/24/14.
- */
 public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
+
+    private final float mDensityScale;
 
     // Used in formatting
     private static class Monospace { }
@@ -40,6 +39,8 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
         super(context);
         this.text = text;
         this.maxSize = windowSize;
+        // Get screen density
+        mDensityScale = context.getResources().getDisplayMetrics().density;
 
         final Context appContext = context.getApplicationContext();
 
@@ -67,6 +68,9 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                     Log.d("JONAS", "Got it!");
                     int w = b.getWidth();
                     int h = b.getHeight();
+                    // Scale with screen density
+                    w = (int) (w * mDensityScale + 0.5f);
+                    h = (int) (h * mDensityScale + 0.5f);
                     // Shrink if big
                     if (w > maxSize.x || h > maxSize.y) {
                         Point newSize = scaleImage(w, h);
