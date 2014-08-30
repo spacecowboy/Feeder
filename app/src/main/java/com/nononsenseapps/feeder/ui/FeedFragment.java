@@ -30,6 +30,7 @@ import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
+import com.nononsenseapps.feeder.util.PrefUtils;
 import com.squareup.picasso.Picasso;
 
 import org.joda.time.DateTimeZone;
@@ -54,8 +55,6 @@ public class FeedFragment extends Fragment
     private static final String ARG_FEED_TAG = "feed_tag";
     private FeedAdapter mAdapter;
     private AbsListView mRecyclerView;
-    //private LinearLayoutManager mLayoutManager;
-    private boolean onlyUnread = true;
     // Filter for database loader
     private static final String ONLY_UNREAD = FeedItemSQL.COL_UNREAD + " IS 1 ";
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
@@ -171,6 +170,7 @@ public class FeedFragment extends Fragment
 
         // Set toggleable state
         MenuItem menuItem = menu.findItem(R.id.action_only_unread);
+        final boolean onlyUnread = PrefUtils.isShowOnlyUnread(getActivity());
         menuItem.setChecked(onlyUnread);
         // TODO use string resources
         menuItem.setTitle(onlyUnread ? "Show all" : "Only unread");
@@ -206,7 +206,8 @@ public class FeedFragment extends Fragment
             }
             return true;
         } else if (id == R.id.action_only_unread) {
-            onlyUnread = !menuItem.isChecked();
+            final boolean onlyUnread = !menuItem.isChecked();
+            PrefUtils.setPrefShowOnlyUnread(getActivity(), onlyUnread);
             menuItem.setChecked(onlyUnread);
             // TODO use string resources
             menuItem.setTitle(onlyUnread ? "Show all" : "Only unread");
@@ -231,6 +232,7 @@ public class FeedFragment extends Fragment
             filter = FeedItemSQL.COL_TAG + " IS ? ";
         }
 
+        final boolean onlyUnread = PrefUtils.isShowOnlyUnread(getActivity());
         if (onlyUnread && filter != null) {
             filter += AND_UNREAD;
         } else if (onlyUnread) {
@@ -446,6 +448,8 @@ public class FeedFragment extends Fragment
 
                     startActivity(i, options.toBundle());
                 } else {
+                    // Mark as read
+                    RssContentProvider.MarkItemAsRead(getActivity(), rssItem.id);
                     // Open in browser since no content was posted
                     startActivity(new Intent(Intent.ACTION_VIEW,
                             Uri.parse(rssItem.link)));

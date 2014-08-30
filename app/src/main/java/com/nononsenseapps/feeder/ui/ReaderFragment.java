@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.text.Layout;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -145,6 +146,7 @@ public class ReaderFragment extends Fragment
         if (mRssItem.getDescription() == null) {
             mBodyTextView.setText("Nothing to display!");
         } else {
+            Log.d("JONAS", "Text is:\n" + mRssItem.getDescription());
             // Set without images as a place holder
             mBodyTextView.setText(
                     android.text.Html.fromHtml(mRssItem.getDescription()));
@@ -217,6 +219,12 @@ public class ReaderFragment extends Fragment
     public void onSaveInstanceState(Bundle outState) {
         RssItemToBundle(_id, mRssItem, outState);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onDetach() {
+        getLoaderManager().destroyLoader(TEXT_LOADER);
+        super.onDetach();
     }
 
     @Override
