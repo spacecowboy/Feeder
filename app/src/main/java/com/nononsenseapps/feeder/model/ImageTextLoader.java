@@ -107,19 +107,24 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                     }
 
                     final Bitmap b;
-                    Picasso p = Picasso.with(appContext);
-                    p.setIndicatorsEnabled(true);
+                    final Picasso p = Picasso.with(appContext);
                     if (shrunk) {
                         Log.d("JONAS2", "Resizing with picasso");
-                        b = p.load(source)
-                                .resize(w, h).get();
-                    } else if (img.hasPercentSize()) {
-                        Log.d("JONAS2", "Percentsize resizing..");
+                        b = p.load(source).resize(w, h).get();
+                    } else if (img.hasSize()) {
+                        Log.d("JONAS", "Image is small enough, getting");
+                        // No resize necessary since we know it is "small"
+                        b = p.load(source).get();
+                    } else { // if (img.hasPercentSize()) {
+                        Log.d("JONAS2", "Percentsize or no size info, " +
+                                        "scaling for max");
                         b = p.load(source).resize(maxSize.x,
                                 maxSize.y).centerInside().get();
-                    } else {
-                        b = p.load(source).get();
                     }
+//                    else {
+//                        Log.d("JONAS2", "No size present, just loading..");
+//                        b = p.load(source).get();
+//                    }
 
                     if (w == -1) {
                         w = b.getWidth();

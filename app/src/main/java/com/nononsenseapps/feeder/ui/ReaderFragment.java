@@ -274,8 +274,9 @@ public class ReaderFragment extends Fragment
         Point size = new Point();
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
         // TODO use actual size and not window size
+        // Using twice window height since we do scroll vertically
         return new ImageTextLoader(getActivity(), mRssItem.getDescription(),
-                new Point((4 * size.x) / 5, (4 * size.y) / 5));
+                new Point((5 * size.x) / 6, 2 * size.y));
     }
 
 

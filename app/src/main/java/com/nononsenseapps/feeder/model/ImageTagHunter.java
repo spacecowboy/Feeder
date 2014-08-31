@@ -7,8 +7,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.HashMap;
 
 public class ImageTagHunter {
@@ -19,42 +17,12 @@ public class ImageTagHunter {
         //Get all elements with img tag
         Elements imgtags = doc.getElementsByTag("img");
 
-        for (Element imgtag: imgtags) {
+        for (Element imgtag : imgtags) {
             Image img = getImageAttributes(imgtag);
             images.put(img.src, img);
         }
-
-
-//        xpp.setInput(new StringReader(text));
-//        int eventType = xpp.getEventType();
-//        while (eventType != XmlPullParser.END_DOCUMENT) {
-//            Log.d("JONAS3", "start");
-//            if (eventType == XmlPullParser.START_DOCUMENT) {
-//                Log.d("JONAS2", "Start document");
-//            } else if (eventType == XmlPullParser.START_TAG) {
-//                Log.d("JONAS2", "Start tag " + xpp.getName());
-//                if ("img".equalsIgnoreCase(xpp.getName())) {
-//                    Image img = getImageAttributes(xpp);
-//                    images.put(img.src, img);
-//                }
-//            } else if (eventType == XmlPullParser.END_TAG) {
-//                //Log.d("JONAS2", "End tag " + xpp.getName());
-//            } else if (eventType == XmlPullParser.TEXT) {
-//                //Log.d("JONAS2", "Text " + xpp.getText());
-//            }
-//            Log.d("JONAS3", "pre end");
-//            try {
-//                eventType = xpp.next();
-//            } catch (XmlPullParserException e) {
-//                Log.e("JONAS3", "" + e.getMessage());
-//            } catch (ArrayIndexOutOfBoundsException e) {
-//                Log.d("JONAS3", "Forcing end: " + e.getMessage());
-//                // End of document
-//                eventType = XmlPullParser.END_DOCUMENT;
-//            }
-//            Log.d("JONAS3", "post end");
-//        }
     }
+
     private static Image getImageAttributes(final Element tag) {
         Image img = new Image();
         img.src = tag.absUrl("src");
@@ -73,31 +41,6 @@ public class ImageTagHunter {
         }
         return img;
     }
-//    private static Image getImageAttributes(final XmlPullParser xpp) {
-//        Image img = new Image();
-//        String attrName;
-//        int count = 0;
-//        for (int i = 0; i < xpp.getAttributeCount() && count < 4; i++) {
-//            attrName = xpp.getAttributeName(i);
-//            Log.d("JONAS2", attrName + " " + xpp.getAttributeValue(i));
-//
-//            if ("src".equals(attrName)) {
-//                img.src = xpp.getAttributeValue(null, "src");
-//                count++;
-//            } else if ("width".equals(attrName)) {
-//                img.width = xpp.getAttributeValue(null, "width");
-//                count++;
-//            } else if ("height".equals(attrName)) {
-//                img.height = xpp.getAttributeValue(null, "height");
-//                count++;
-//            } else if ("alt".equals(attrName)) {
-//                img.alt = xpp.getAttributeValue(null, "alt");
-//                count++;
-//            }
-//        }
-//
-//        return img;
-//    }
 
     public static class Image {
         public String src = null;
@@ -106,7 +49,6 @@ public class ImageTagHunter {
         public String alt = null;
 
         /**
-         *
          * @return true if image has any size specified in percent
          */
         public boolean hasPercentSize() {
@@ -122,7 +64,6 @@ public class ImageTagHunter {
         }
 
         /**
-         *
          * @return true if image has width and height specified in pixels
          */
         public boolean hasSize() {
