@@ -43,6 +43,7 @@ dependencies {
     compile project(':deps:Simplistic-RSS')
     compile 'com.squareup.picasso:picasso:2.3.3'
     compile 'joda-time:joda-time:2.3'
+    compile 'org.jsoup:jsoup:1.7.3'
 
 
     compile 'com.android.support:support-v4:20.0.0'

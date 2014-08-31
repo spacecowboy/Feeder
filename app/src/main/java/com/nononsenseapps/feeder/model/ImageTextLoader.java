@@ -17,27 +17,37 @@ import android.text.style.TypefaceSpan;
 import android.util.Log;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import org.xml.sax.XMLReader;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
 
-    private final float mDensityScale;
+    final float mDensityScale;
 
     // Used in formatting
-    private static class Monospace { }
-    private static class RelativeSize { }
-    private static class Bold { }
+    static class Monospace { }
+    static class RelativeSize { }
+    static class Bold { }
+    static class Italic { }
 
     final Html.ImageGetter imgThing;
-    final String text;
+    final String mText;
     final Point maxSize;
+
+    final HashMap<String, ImageTagHunter.Image> images;
+
+    // Used to insert alt text for images
+    ImageTagHunter.Image lastImg = null;
 
     public ImageTextLoader(Context context, String text, Point windowSize) {
         super(context);
-        this.text = text;
+        images = new HashMap<String, ImageTagHunter.Image>();
+        this.mText = text;
         this.maxSize = windowSize;
         // Get screen density
         mDensityScale = context.getResources().getDisplayMetrics().density;
@@ -61,18 +71,66 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
             public Drawable getDrawable(final String source) {
                 Drawable d = null;
                 try {
+                    // Image size
+                    boolean shrunk = false;
+                    int w=-1, h=-1;
+                    // Get the attributes from the hashmap
+                    ImageTagHunter.Image img = images.get(source);
+                    lastImg = img;
                     Log.d("JONAS", "Trying to get: " + source);
-                    final Bitmap b = Picasso.with(appContext).load(source)
-                            //.resize(size.x, size.y).centerInside()
-                            .get();
-                    Log.d("JONAS", "Got it!");
-                    int w = b.getWidth();
-                    int h = b.getHeight();
-                    // Scale with screen density
-                    w = (int) (w * mDensityScale + 0.5f);
-                    h = (int) (h * mDensityScale + 0.5f);
-                    // Shrink if big
-                    if (w > maxSize.x || h > maxSize.y) {
+
+                    // Calculate size first if possible
+                    if (img.hasSize()) {
+                        Log.d("JONAS2", "Pixel size present");
+                        w = img.getIntWidth();
+                        h = img.getIntHeight();
+                        // This should be parsed away, but just in case...
+                        if (w < 10 || h < 10) {
+                            Log.d("JONAS4", "Bullshit image, ignoring...");
+                            lastImg = null;
+                            return null;
+                        }
+                        // Scale with screen density
+                        w = (int) (w * mDensityScale + 0.5f);
+                        h = (int) (h * mDensityScale + 0.5f);
+                        // Shrink if big (used for picasso downloading)
+                        // Don't resize if small, since it can be scaled
+                        // directly in drawable bounds. Need to shrink it to
+                        // save precious memory however.
+                        if (w > maxSize.x) {
+                            Log.d("JONAS2", "Its big, shrinking it");
+                            Point newSize = scaleImage(w, h);
+                            w = newSize.x;
+                            h = newSize.y;
+                            shrunk = true;
+                        }
+                    }
+
+                    final Bitmap b;
+                    Picasso p = Picasso.with(appContext);
+                    p.setIndicatorsEnabled(true);
+                    if (shrunk) {
+                        Log.d("JONAS2", "Resizing with picasso");
+                        b = p.load(source)
+                                .resize(w, h).get();
+                    } else if (img.hasPercentSize()) {
+                        Log.d("JONAS2", "Percentsize resizing..");
+                        b = p.load(source).resize(maxSize.x,
+                                maxSize.y).centerInside().get();
+                    } else {
+                        b = p.load(source).get();
+                    }
+
+                    if (w == -1) {
+                        w = b.getWidth();
+                        h = b.getHeight();
+                        // Scale with screen density
+                        w = (int) (w * mDensityScale + 0.5f);
+                        h = (int) (h * mDensityScale + 0.5f);
+                    }
+                    // Enlarge if close, or shrink if big
+                    if (((float) w) / ((float) maxSize.x) > 0.5) {
+                        Log.d("JONAS2", "Scaling final image bounds");
                         Point newSize = scaleImage(w, h);
                         w = newSize.x;
                         h = newSize.y;
@@ -102,11 +160,11 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
     Point scaleImage(int w, int h) {
         // Which is out of scale the most?
         final float xratio = ((float) w) / ((float) maxSize.x);
-        final float yratio = ((float) h) / ((float) maxSize.y);
+        //final float yratio = ((float) h) / ((float) maxSize.y);
         float ratio = xratio;
-        if (yratio > xratio) {
-            ratio = yratio;
-        }
+//        if (yratio > xratio) {
+//            ratio = yratio;
+//        }
         // Calculate new size. Maintains aspect ratio.
         int newWidth = (int) ((float) w / ratio);
         int newHeight = (int) ((float) h / ratio);
@@ -119,14 +177,22 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
      */
     @Override
     public Spanned loadInBackground() {
-        return android.text.Html.fromHtml(text, imgThing, new Html.TagHandler() {
+        // First find all images manually to get their sizes and alt-texts
+//        try {
+            ImageTagHunter.getImages(this.mText, this.images);
+//        } catch (XmlPullParserException e) {
+//            Log.e("JONAS2", "" + e.getMessage());
+//        } catch (IOException e) {
+//            Log.e("JONAS2", "" + e.getMessage());
+//        }
+        return android.text.Html.fromHtml(mText, imgThing, new Html.TagHandler() {
             private boolean ordered = false;
             private int orderCount = 1;
 
             @Override
             public void handleTag(final boolean opening, final String tag,
                     final Editable output, final XMLReader xmlReader) {
-                Log.d("JONAS", "Got tag: " + tag + " opening: " + opening);
+                //Log.d("JONAS", "Got tag: " + tag + " opening: " + opening);
                 if (tag.equalsIgnoreCase("ul")) {
                     handleUl(output, opening);
                 } else if (tag.equalsIgnoreCase("ol")) {
@@ -147,9 +213,18 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                 // Add a line break if not present
                 int len = text.length();
                 if (len >= 1 && text.charAt(len - 1) == '\n') {
-                    return;
+
+                } else {
+                    text.append("\n");
                 }
-                text.append("\n");
+                // If there's an alt text, add it in italics
+                if (lastImg != null && lastImg.alt != null) {
+                    Log.d("JONAS4", "Last img: " + lastImg.alt);
+                    start(text, new Italic());
+                    text.append(lastImg.alt);
+                    end(text, Italic.class, new StyleSpan(Typeface.ITALIC));
+                    text.append("\n");
+                }
             }
 
             // Start lists with a line break
