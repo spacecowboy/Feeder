@@ -3,12 +3,20 @@
     package="com.nononsenseapps.feeder" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- For getting Google account -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!-- For getting Google account auth token -->
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <activity
             android:name=".ui.FeedActivity"
             android:label="@string/app_name"
@@ -68,5 +76,13 @@
             android:exported="false" >
         </service>
     </application>
+
+    <permission
+        android:name="com.example.gcm.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
 
 </manifest>

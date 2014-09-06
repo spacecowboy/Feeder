@@ -1,52 +1,80 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.nononsenseapps.feeder.ui.EditFeedActivity">
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:orientation="vertical"
+             android:paddingBottom="@dimen/activity_vertical_margin"
+             android:paddingLeft="@dimen/activity_horizontal_margin"
+             android:paddingRight="@dimen/activity_horizontal_margin"
+             android:paddingTop="@dimen/activity_vertical_margin"
+             tools:context="com.nononsenseapps.feeder.ui.EditFeedActivity">
 
     <EditText
-        android:id="@+id/feed_url"
-        android:hint="@string/url"
+        android:id="@+id/search_view"
         style="@style/TextAppearance.Title"
         android:layout_width="match_parent"
-        android:singleLine="true"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="2dp"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/feed_title"
-        android:hint="@string/title"
-        style="@style/TextAppearance.Title"
-        android:layout_width="match_parent"
-        android:singleLine="true"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/feed_tag"
-        android:hint="@string/tag"
-        style="@style/TextAppearance.Title"
-        android:layout_width="match_parent"
-        android:singleLine="true"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
-        android:layout_height="wrap_content" />
-
-
-    <Button
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_rss_feed"
-        android:id="@+id/add_button"
-        android:layout_marginTop="2dp"
         android:layout_marginBottom="4dp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_marginTop="4dp"
+        android:imeOptions="actionSearch"
+        android:inputType="textAutoComplete|textAutoCorrect"
+        android:hint="@string/add_feed_search_hint"
+        android:singleLine="true"/>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/feed_details_frame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/feed_url"
+            style="@style/TextAppearance.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="4dp"
+            android:hint="@string/url"
+            android:singleLine="true"/>
+
+        <EditText
+            android:id="@+id/feed_title"
+            style="@style/TextAppearance.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:hint="@string/title"
+            android:singleLine="true"/>
+
+        <EditText
+            android:id="@+id/feed_tag"
+            style="@style/TextAppearance.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:hint="@string/tag"
+            android:singleLine="true"/>
+
+
+        <Button
+            android:id="@+id/add_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="2dp"
+            android:text="@string/add_rss_feed"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/results_listview"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp"/>
+
 
 </LinearLayout>

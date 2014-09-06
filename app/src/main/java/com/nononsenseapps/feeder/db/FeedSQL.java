@@ -35,16 +35,18 @@ public class FeedSQL {
     public static final String COL_TITLE = "title";
     public static final String COL_URL = "url";
     public static final String COL_TAG = "tag";
+    public static final String COL_TIMESTAMP = "timestamp";
     // Used on count view
     public static final String COL_UNREADCOUNT = "unreadcount";
     // For database projection so order is consistent
-    public static final String[] FIELDS = {COL_ID, COL_TITLE, COL_URL, COL_TAG};
+    public static final String[] FIELDS = {COL_ID, COL_TITLE, COL_URL,
+            COL_TAG, COL_TIMESTAMP};
     public static final String[] FIELDS_VIEWCOUNT = {COL_ID, COL_TITLE,
-            COL_URL, COL_TAG, COL_UNREADCOUNT};
+            COL_URL, COL_TAG, COL_TIMESTAMP, COL_UNREADCOUNT};
     public static final String[] FIELDS_TAGSWITHCOUNT = {COL_ID, COL_TAG,
             COL_UNREADCOUNT};
     /*
-     * The SQL code that creates a Table for storing Persons in.
+     * The SQL code that creates a Table for storing stuff in.
      * Note that the last row does NOT end in a comma like the others.
      * This is a common source of error.
      */
@@ -53,7 +55,10 @@ public class FeedSQL {
                     + COL_ID + " INTEGER PRIMARY KEY,"
                     + COL_TITLE + " TEXT NOT NULL,"
                     + COL_URL + " TEXT NOT NULL,"
-                    + COL_TAG + " TEXT NOT NULL DEFAULT ''"
+                    + COL_TAG + " TEXT NOT NULL DEFAULT '',"
+                    + COL_TIMESTAMP + " TEXT,"
+                    // Unique constraint
+                    + " UNIQUE(" + COL_URL +") ON CONFLICT REPLACE"
                     + ")";
     public static final String CREATE_COUNT_VIEW =
             "CREATE TEMP VIEW IF NOT EXISTS " + VIEWCOUNT_NAME
@@ -83,6 +88,7 @@ public class FeedSQL {
     public String title = null;
     public String url = null;
     public String tag = null;
+    public String timestamp = null;
     /**
      * No need to do anything, fields are already set to default values above
      */
@@ -90,7 +96,7 @@ public class FeedSQL {
     }
 
     /**
-     * Convert information from the database into a Person object.
+     * Convert information from the database into a Feed object.
      */
     public FeedSQL(final Cursor cursor) {
         // Indices expected to match order in FIELDS!
@@ -98,6 +104,7 @@ public class FeedSQL {
         this.title = cursor.getString(1);
         this.url = cursor.getString(2);
         this.tag = cursor.getString(3);
+        this.timestamp = cursor.getString(4);
     }
 
     public static void addMatcherUris(UriMatcher sURIMatcher) {
@@ -121,9 +128,12 @@ public class FeedSQL {
         values.put(COL_TITLE, title);
         values.put(COL_URL, url);
         if (tag == null)
-            values.putNull(COL_TAG);
+            tag = "";
+        values.put(COL_TAG, tag);
+        if (timestamp == null)
+            values.putNull(COL_TIMESTAMP);
         else
-            values.put(COL_TAG, tag);
+            values.put(COL_TIMESTAMP, timestamp);
 
         return values;
     }

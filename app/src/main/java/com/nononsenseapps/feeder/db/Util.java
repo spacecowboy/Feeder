@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.db;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 
 /**
  * Various database utility methods
@@ -146,6 +147,23 @@ public class Util {
                     WHEREIDIS, LongsToStringArray(itemSQL.id));
         } else {
             resolver.insert(FeedItemSQL.URI_FEED_ITEMS, itemSQL.getContent());
+        }
+    }
+    /**
+     * If the item has an id, will update, else insert. Returns the id of the
+     * object.
+     * @param resolver
+     * @param feedSQL
+     */
+    public static long SaveOrUpdate(final ContentResolver resolver,
+            final FeedSQL feedSQL) {
+        if (feedSQL.id > 0) {
+            resolver.update(FeedSQL.URI_FEEDS, feedSQL.getContent(),
+                    WHEREIDIS, LongsToStringArray(feedSQL.id));
+            return feedSQL.id;
+        } else {
+            Uri uri = resolver.insert(FeedSQL.URI_FEEDS, feedSQL.getContent());
+            return Long.parseLong(uri.getLastPathSegment());
         }
     }
 

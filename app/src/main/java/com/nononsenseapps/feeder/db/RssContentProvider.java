@@ -33,8 +33,11 @@ public class RssContentProvider extends ContentProvider {
 
         switch (sURIMatcher.match(uri)) {
             case FeedSQL.ITEMCODE:
-                return delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
+                result += delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.getLastPathSegment()));
+                notifyUris = new Uri[] {FeedSQL.URI_FEEDS,
+                        FeedItemSQL.URI_FEED_ITEMS};
+                break;
             case FeedSQL.URICODE:
                 result += DatabaseHandler.getInstance(getContext())
                         .getWritableDatabase().delete(FeedSQL.TABLE_NAME,
@@ -43,13 +46,24 @@ public class RssContentProvider extends ContentProvider {
                         FeedItemSQL.URI_FEED_ITEMS};
                 break;
             case FeedItemSQL.ITEMCODE:
-                return delete(FeedItemSQL.URI_FEED_ITEMS, Util.WHEREIDIS,
+                result += delete(FeedItemSQL.URI_FEED_ITEMS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.getLastPathSegment()));
+                notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS};
+                break;
             case FeedItemSQL.URICODE:
                 result += DatabaseHandler.getInstance(getContext())
                         .getWritableDatabase().delete(FeedItemSQL.TABLE_NAME,
                                 selection, selectionArgs);
                 notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS};
+                break;
+            case PendingNetworkSQL.ITEMCODE:
+                result += delete(PendingNetworkSQL.URI, Util.WHEREIDIS,
+                        Util.ToStringArray(uri.getLastPathSegment()));
+                break;
+            case PendingNetworkSQL.URICODE:
+                result += DatabaseHandler.getInstance(getContext())
+                        .getWritableDatabase().delete(PendingNetworkSQL.TABLE_NAME,
+                                selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
@@ -115,6 +129,11 @@ public class RssContentProvider extends ContentProvider {
                         FeedSQL.URI_FEEDSWITHCOUNTS,
                         FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
+            case PendingNetworkSQL.URICODE:
+                table = PendingNetworkSQL.TABLE_NAME;
+                result = PendingNetworkSQL.URI;
+                notifyUris = null;
+                break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
         }
@@ -166,6 +185,14 @@ public class RssContentProvider extends ContentProvider {
             case FeedItemSQL.URICODE:
                 table = FeedItemSQL.TABLE_NAME;
                 break;
+            case PendingNetworkSQL.ITEMCODE:
+                table = PendingNetworkSQL.TABLE_NAME;
+                selection = Util.WHEREIDIS;
+                selectionArgs = Util.ToStringArray(uri.getLastPathSegment());
+                break;
+            case PendingNetworkSQL.URICODE:
+                table = PendingNetworkSQL.TABLE_NAME;
+                break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
         }
@@ -210,6 +237,16 @@ public class RssContentProvider extends ContentProvider {
                 table = FeedItemSQL.TABLE_NAME;
                 notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS,
                         FeedSQL.URI_FEEDSWITHCOUNTS, FeedSQL.URI_TAGSWITHCOUNTS};
+                break;
+            case PendingNetworkSQL.ITEMCODE:
+                table = PendingNetworkSQL.TABLE_NAME;
+                selection = Util.WHEREIDIS;
+                selectionArgs = Util.ToStringArray(uri.getLastPathSegment());
+                notifyUris = null;
+                break;
+            case PendingNetworkSQL.URICODE:
+                table = PendingNetworkSQL.TABLE_NAME;
+                notifyUris = null;
                 break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");

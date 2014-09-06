@@ -120,7 +120,7 @@ public class FeedItemSQL {
     }
 
     /**
-     * Convert information from the database into a Person object.
+     * Convert information from the database into a FeedItem object.
      */
     public FeedItemSQL(final Cursor cursor) {
         // Indices expected to match order in FIELDS!

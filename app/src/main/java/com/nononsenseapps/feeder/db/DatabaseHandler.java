@@ -45,6 +45,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(final SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(FeedSQL.CREATE_TABLE);
         sqLiteDatabase.execSQL(FeedItemSQL.CREATE_TABLE);
+        sqLiteDatabase.execSQL(PendingNetworkSQL.CREATE_TABLE);
     }
 
     @Override

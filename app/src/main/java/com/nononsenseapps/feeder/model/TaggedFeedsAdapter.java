@@ -326,11 +326,11 @@ public class TaggedFeedsAdapter extends BaseExpandableListAdapter {
         holder.id = c.getLong(0);
         holder.link = c.getString(2);
 
-        if (c.isNull(4) || c.getString(4).isEmpty()) {
+        if (c.isNull(5) || c.getString(5).isEmpty()) {
             holder.unreadCountTextView.setVisibility(View.GONE);
         } else {
             holder.unreadCountTextView.setVisibility(View.VISIBLE);
-            holder.unreadCountTextView.setText(c.getString(4));
+            holder.unreadCountTextView.setText(c.getString(5));
         }
 
         return convertView;

@@ -2,16 +2,22 @@ package com.nononsenseapps.feeder.ui;
 
 import android.app.ActionBar;
 import android.app.ActivityOptions;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.model.RssSyncService;
+import com.nononsenseapps.feeder.model.SyncHelper;
+import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
 import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
+
+import java.util.ArrayList;
 
 
 public class FeedActivity extends BaseActivity {
@@ -122,7 +128,14 @@ public class FeedActivity extends BaseActivity {
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_sync) {
-            RssSyncService.syncFeeds(this);
+            if (null == SyncHelper.getSavedAccountName(this)) {
+                DialogFragment dialog = new AccountDialog();
+                dialog.show(getFragmentManager(), "account_dialog");
+            } else {
+                Toast.makeText(this, "Syncing feeds...",
+                        Toast.LENGTH_SHORT).show();
+                RssSyncService.syncFeeds(this);
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
