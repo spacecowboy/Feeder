@@ -1,4 +1,15 @@
-from datetime import datetime
+from datetime import datetime, tzinfo, timedelta
+
+
+class UTC(tzinfo):
+    def utcoffset(self, dt):
+        return timedelta(0)
+
+    def dst(self, dt):
+        return timedelta(0)
+
+    def tzname(self, dt):
+        return "UTC"
 
 
 def datetime_to_string(dt):
@@ -18,6 +29,28 @@ def datetime_now():
 def datetime_string_now():
     '''Return current datetime as a string'''
     return datetime_to_string(datetime_now())
+
+
+def convert_timestamp(timestamp):
+    '''Convert timestamp to ISO8601 in UTC
+
+    Example:
+
+    >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 +0200")
+    '2014-09-05T10:55:00+00:00'
+
+    >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 +0000")
+    '2014-09-05T12:55:00+00:00'
+    '''
+    dt = parse_timestamp(timestamp)
+    if dt is None:
+        # Failed, return original
+        return timestamp
+
+    if dt.utcoffset() is not None:
+        dt = dt.astimezone(UTC())
+
+    return datetime_to_string(dt)
 
 
 def parse_timestamp(timestamp):

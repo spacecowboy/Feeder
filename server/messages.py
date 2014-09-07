@@ -1,7 +1,7 @@
 import endpoints
 from protorpc import messages
 #from protorpc import message_types
-from util import datetime_to_string
+from util import datetime_to_string, convert_timestamp
 
 from protorpc.message_types import VoidMessage
 
@@ -35,7 +35,7 @@ def feeditem_from_model(item):
                     link=item.link,
                     title_stripped=item.title_stripped,
                     snippet=item.snippet,
-                    published=item.published,
+                    published=convert_timestamp(item.published),
                     author=item.author,
                     comments=item.comments,
                     enclosures=item.enclosures,
