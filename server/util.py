@@ -22,9 +22,9 @@ def datetime_string_now():
 
 def parse_timestamp(timestamp):
     '''Parses a timestamp string.
-    Supports two formats, examples:
+    Supports several formats, examples:
 
-    In second precision
+    In second precision, format common in RSS feeds
     >>> parse_timestamp("2013-09-29T13:21:42")
     datetime.datetime(2013, 9, 29, 13, 21, 42)
 
@@ -32,13 +32,28 @@ def parse_timestamp(timestamp):
     >>> parse_timestamp("2013-09-29T13:21:42.123456")
     datetime.datetime(2013, 9, 29, 13, 21, 42, 123456)
 
+    Formats common in Atom feeds
+    >>> parse_timestamp("Fri, 05 Sep 2014 12:55:00 +0200")
+    datetime.datetime(2014, 9, 5, 12, 55, tzinfo=datetime.timezone(datetime.timedelta(0, 7200)))
+
+    >>> parse_timestamp("Fri, 23 May 2014 10:56:50 GMT")
+    datetime.datetime(2014, 5, 23, 10, 56, 50)
+
+    >>> parse_timestamp("Fri 23 May 2014 10:56:50 -0200")
+    datetime.datetime(2014, 5, 23, 10, 56, 50, tzinfo=datetime.timezone(datetime.timedelta(-1, 79200)))
+
+
     Returns None on failure to parse
     >>> parse_timestamp("2013-09-22")
     '''
     result = None
 
     formats = ['%Y-%m-%dT%H:%M:%S.%f',
-               '%Y-%m-%dT%H:%M:%S']
+               '%Y-%m-%dT%H:%M:%S',
+               '%a, %d %b %Y %H:%M:%S %z',
+               '%a, %d %b %Y %H:%M:%S %Z',
+               '%a %d %b %Y %H:%M:%S %z',
+               '%a %d %b %Y %H:%M:%S %Z']
 
     for fmt in formats:
         if result is not None:
