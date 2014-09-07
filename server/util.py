@@ -1,22 +1,35 @@
 from datetime import datetime, tzinfo, timedelta
+import re
 
 
-class UTC(tzinfo):
+class TimeZone(tzinfo):
+    def __init__(self, offset):
+        super(tzinfo, self)
+        self.offset = offset
+
     def utcoffset(self, dt):
-        return timedelta(0)
+        return timedelta(self.offset)
 
     def dst(self, dt):
         return timedelta(0)
 
     def tzname(self, dt):
-        return "UTC"
+        return "TZ{}".format(self.offset)
+
+UTC = TimeZone(0)
 
 
 def datetime_to_string(dt):
     '''Converts a datetime object to a
-    timestamp string in the format:
+    timestamp string in the format (in UTC):
 
     2013-09-23T23:23:12.123456'''
+    if dt is None:
+        return dt
+
+    if dt.utcoffset() is not None:
+        dt = dt.astimezone(UTC)
+
     return dt.isoformat()
 
 
@@ -36,19 +49,24 @@ def convert_timestamp(timestamp):
 
     Example:
 
+    Note that timezones are not supported
     >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 +0200")
-    '2014-09-05T10:55:00+00:00'
+    '2014-09-05T12:55:00'
 
     >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 +0000")
-    '2014-09-05T12:55:00+00:00'
+    '2014-09-05T12:55:00'
+
+    >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 GMT")
+    '2014-09-05T12:55:00'
+
+    >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 CET")
+    '2014-09-05T12:55:00'
     '''
     dt = parse_timestamp(timestamp)
     if dt is None:
         # Failed, return original
+        #print("Conversion failed: " + timestamp)
         return timestamp
-
-    if dt.utcoffset() is not None:
-        dt = dt.astimezone(UTC())
 
     return datetime_to_string(dt)
 
@@ -67,13 +85,13 @@ def parse_timestamp(timestamp):
 
     Formats common in Atom feeds
     >>> parse_timestamp("Fri, 05 Sep 2014 12:55:00 +0200")
-    datetime.datetime(2014, 9, 5, 12, 55, tzinfo=datetime.timezone(datetime.timedelta(0, 7200)))
+    datetime.datetime(2014, 9, 5, 12, 55)
 
     >>> parse_timestamp("Fri, 23 May 2014 10:56:50 GMT")
     datetime.datetime(2014, 5, 23, 10, 56, 50)
 
     >>> parse_timestamp("Fri 23 May 2014 10:56:50 -0200")
-    datetime.datetime(2014, 5, 23, 10, 56, 50, tzinfo=datetime.timezone(datetime.timedelta(-1, 79200)))
+    datetime.datetime(2014, 5, 23, 10, 56, 50)
 
 
     Returns None on failure to parse
@@ -83,10 +101,19 @@ def parse_timestamp(timestamp):
 
     formats = ['%Y-%m-%dT%H:%M:%S.%f',
                '%Y-%m-%dT%H:%M:%S',
-               '%a, %d %b %Y %H:%M:%S %z',
+               '%a, %d %b %Y %H:%M:%S',
+               '%a %d %b %Y %H:%M:%S',
                '%a, %d %b %Y %H:%M:%S %Z',
-               '%a %d %b %Y %H:%M:%S %z',
                '%a %d %b %Y %H:%M:%S %Z']
+
+    # Fucking python2 does not support timezones...
+    # First extract timezone
+    tzpattern = r"\s?([+-]([0-9]){4})"
+    offset = re.search(tzpattern, timestamp)
+    if offset is not None:
+        offset = offset.group(1)
+    # Then remove from timestamp
+    timestamp = re.sub(tzpattern, "", timestamp)
 
     for fmt in formats:
         if result is not None:
@@ -95,8 +122,9 @@ def parse_timestamp(timestamp):
         try:
             result = datetime.strptime(timestamp,
                                        fmt)
-        except ValueError:
+        except ValueError as e:
             result = None
+            #print("Conversion error: ", e)
 
     return result
 
