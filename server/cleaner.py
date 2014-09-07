@@ -1,6 +1,12 @@
 """ Contains methods relevant for cleaning up RSS feeds."""
 
-from models import FeedItemModel, FeedItemKey
+try:
+    from models import FeedItemModel, FeedItemKey
+except:
+    # This is OK if running tests...
+    pass
+
+import re
 
 
 def get_feeditem_model(url, timestamp, item):
@@ -40,8 +46,15 @@ def get_snippet(text, maxlen=120):
 def strip_tags(text):
     """
     Strips all html formatting from a string.
+
+    Example:
+    >>> strip_tags("An <tag>example text</tag> with tag.")
+    'An example text with tag.'
     """
-    # TODO
+    # Remove all tags
+    text = re.sub(r"<[^>]*>", "", text)
+    # This might have introduced extra spaces, reduce to one
+    text = re.sub(r"\s+", " ", text)
     return text
 
 
@@ -49,6 +62,37 @@ def strip_bloat(text):
     """
     Removes bloat, such as 1-pixel images, feedflare,
     share shit, etc, from the string.
+
+    Examples:
+
+    Too many newlines
+    >>> strip_bloat('<br/> <br/>')
+    '<br/>'
+    >>> strip_bloat('<br><br><br>')
+    '<br/>'
+    >>> strip_bloat('<p> <br>')
+    '<p>'
+    >>> strip_bloat('<p>   </p>')
+    ''
+
+    Feedflare
+    >>> strip_bloat('<div class="feedflare">blabla</div>')
+    ''
+
+    Feedsportal links
+    >>> strip_bloat('<a href="http://feedsportal.com">bla</a>')
+    ''
+
+    Zero size images
+    >>> strip_bloat('<img width="1" src="bla"/>')
+    ''
+    >>> strip_bloat('<img src="bla" width="1">blaa</img>')
+    ''
     """
     # TODO
     return text
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
