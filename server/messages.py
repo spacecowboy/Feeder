@@ -27,6 +27,7 @@ class FeedItem(messages.Message):
     comments = messages.StringField(8)
     enclosures = messages.StringField(9, repeated=True)
     tags = messages.StringField(10, repeated=True)
+    read = messages.BooleanField(11, required=True, default=False)
 
 
 def feeditem_from_model(item):
