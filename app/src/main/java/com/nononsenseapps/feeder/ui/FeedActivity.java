@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.model.RssSyncService;
 import com.nononsenseapps.feeder.model.SyncHelper;
 import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
+import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
 
 import java.util.ArrayList;
@@ -68,10 +69,11 @@ public class FeedActivity extends BaseActivity {
         overridePendingTransition(0, 0);
 
         if (savedInstanceState == null) {
-            // TODO
-            //mFragment = getDefaultFragment();
-            //getFragmentManager().beginTransaction()
-            //        .add(R.id.container, mFragment, "single_pane").commit();
+            mFragment = getDefaultFragment();
+            if (mFragment != null) {
+                getFragmentManager().beginTransaction()
+                        .add(R.id.container, mFragment, "single_pane").commit();
+            }
         } else {
             mFragment = getFragmentManager().findFragmentByTag("single_pane");
         }
@@ -106,9 +108,14 @@ public class FeedActivity extends BaseActivity {
     }
 
     private Fragment getDefaultFragment() {
-        // TODO do something better
-        return FeedFragment.newInstance(-1, "Android Police",
-                "http://feeds.feedburner.com/AndroidPolice", "Android");
+        final String tag = PrefUtils.getLastOpenFeedTag(this);
+        final long id = PrefUtils.getLastOpenFeedId(this);
+        // Will load title and url in fragment
+        if (tag != null || id > 0) {
+            return FeedFragment.newInstance(id, "", "", tag);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -153,6 +160,8 @@ public class FeedActivity extends BaseActivity {
         mFragment = FeedFragment.newInstance(id, title, url, tag);
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, mFragment, "single_pane").commit();
+        // Remember choice in future
+        PrefUtils.setLastOpenFeed(this, id, tag);
     }
 
     @Override

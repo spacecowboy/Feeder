@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -48,7 +47,8 @@ public class FeedFragment extends Fragment
     static final DateTimeFormatter shortDateTimeFormat =
             DateTimeFormat.shortDateTime().withLocale(Locale.getDefault());
 
-    private static final int FEED_LOADER = 1;
+    private static final int FEEDITEMS_LOADER = 1;
+    private static final int FEED_LOADER = 2;
 
     private static final String ARG_FEED_ID = "feed_id";
     private static final String ARG_FEED_TITLE = "feed_title";
@@ -104,7 +104,11 @@ public class FeedFragment extends Fragment
         setHasOptionsMenu(true);
 
         // Load some RSS
-        getLoaderManager().restartLoader(FEED_LOADER, new Bundle(), this);
+        getLoaderManager().restartLoader(FEEDITEMS_LOADER, new Bundle(), this);
+        // Load feed itself if missing info
+        if (id > 0 && (title.isEmpty() || url.isEmpty())) {
+            getLoaderManager().restartLoader(FEED_LOADER, new Bundle(), this);
+        }
     }
 
     @Override
@@ -216,7 +220,7 @@ public class FeedFragment extends Fragment
             menuItem.setTitle(onlyUnread ? "Show all" : "Only unread");
             //getActivity().invalidateOptionsMenu();
             // Restart loader
-            getLoaderManager().restartLoader(FEED_LOADER, new Bundle(), this);
+            getLoaderManager().restartLoader(FEEDITEMS_LOADER, new Bundle(), this);
             return true;
         } else {
             return super.onOptionsItemSelected(menuItem);
@@ -262,11 +266,15 @@ public class FeedFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(final int ID, final Bundle bundle) {
-        if (ID == FEED_LOADER) {
+        if (ID == FEEDITEMS_LOADER) {
             return new CursorLoader(getActivity(), FeedItemSQL.URI_FEED_ITEMS,
                     FeedItemSQL.FIELDS, getLoaderSelection(),
                     getLoaderSelectionArgs(),
                     FeedItemSQL.COL_PUBDATE + " DESC");
+        } else if (ID == FEED_LOADER) {
+            return new CursorLoader(getActivity(),
+                    Uri.withAppendedPath(FeedSQL.URI_FEEDS, Long.toString(id)),
+                    FeedSQL.FIELDS, null, null, null);
         }
         return null;
     }
@@ -274,12 +282,24 @@ public class FeedFragment extends Fragment
     @Override
     public void onLoadFinished(final Loader<Cursor> cursorLoader,
             final Cursor cursor) {
-        mAdapter.swapCursor(cursor);
+        if (FEEDITEMS_LOADER == cursorLoader.getId()) {
+            mAdapter.swapCursor(cursor);
+        } else if (FEED_LOADER == cursorLoader.getId()) {
+            if (cursor.moveToNext()) {
+                FeedSQL feed = new FeedSQL(cursor);
+                this.title = feed.title;
+                this.url = feed.url;
+            }
+            // Reset loader
+            getLoaderManager().destroyLoader(cursorLoader.getId());
+        }
     }
 
     @Override
     public void onLoaderReset(final Loader<Cursor> cursorLoader) {
-        mAdapter.swapCursor(null);
+        if (FEEDITEMS_LOADER == cursorLoader.getId()) {
+            mAdapter.swapCursor(null);
+        }
     }
 
 
