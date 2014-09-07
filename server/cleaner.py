@@ -6,6 +6,7 @@ except:
     # This is OK if running tests...
     pass
 
+from util import convert_timestamp
 import re
 
 
@@ -27,7 +28,7 @@ def get_feeditem_model(url, timestamp, item):
                          snippet=get_snippet(clean_description),
                          timestamp=timestamp,
                          feed_link=url,
-                         published=item.get("published", None),
+                         published=convert_timestamp(item.get("published", None)),
                          author=item.get("author", None),
                          comments=item.get("comments", None),
                          enclosures=[e.href for e in item.get("enclosures", [])],
