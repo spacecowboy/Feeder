@@ -9,6 +9,27 @@ except:
 from util import convert_timestamp
 import re
 
+# Bloat patterns
+PATTERN_FEEDFLARE = re.compile(r"(<|&lt;)div class=('|\")feedflare('|\").*?/div(>|&gt;)",
+                               re.IGNORECASE | re.MULTILINE)
+PATTERN_FEEDSPORTAL = re.compile(r"(<|&lt;)a((?!/a).)*feedsportal.*?/a(>|gt;)",
+                                 re.IGNORECASE | re.MULTILINE)
+PATTERN_LINKED_ZEROIMAGES = \
+    re.compile(r"(<|&lt;)a((?!/a).)*width=('|\")1('|\")((?!/a).)*/a(>|&gt;)",
+               re.IGNORECASE | re.MULTILINE)
+PATTERN_ZEROIMAGES = \
+    re.compile(r"(<|&lt;)img((?!/((>|&gt;)|img)).)*width=('|\")1('|\").*?/(img)?(>|&gt;)",
+               re.IGNORECASE | re.MULTILINE)
+PATTERN_PARAGRAPH_NEWLINE = \
+    re.compile(r"((<|&lt;)/?p/?(>|&gt;))(\s*(<|&lt;)/?br/?(>|&gt;))+",
+               re.IGNORECASE | re.MULTILINE)
+PATTERN_MULTIPLE_NEWLINES = \
+    re.compile(r"(((<|&lt;)/?br/?(>|&gt;))\s*){2,}",
+               re.IGNORECASE | re.MULTILINE)
+PATTERN_EMPTY_PARAGRAPHS = \
+    re.compile(r"(((<|&lt;)(p)(>|&gt;))\s*((<|&lt;)/p(>|&gt;))|(<|&lt;)p/(>|&gt;))",
+               re.IGNORECASE | re.MULTILINE)
+
 
 def get_feeditem_model(url, timestamp, item):
     """
@@ -90,7 +111,15 @@ def strip_bloat(text):
     >>> strip_bloat('<img src="bla" width="1">blaa</img>')
     ''
     """
-    # TODO
+    text = PATTERN_FEEDFLARE.sub("", text)
+    text = PATTERN_FEEDSPORTAL.sub("", text)
+    text = PATTERN_LINKED_ZEROIMAGES.sub("", text)
+    text = PATTERN_ZEROIMAGES.sub("", text)
+    text = PATTERN_MULTIPLE_NEWLINES.sub("<br/>", text)
+    text = PATTERN_PARAGRAPH_NEWLINE.sub("<p>", text)
+    # Take this last
+    text = PATTERN_EMPTY_PARAGRAPHS.sub("", text)
+
     return text
 
 
