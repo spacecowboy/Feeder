@@ -8,88 +8,28 @@ import android.database.Cursor;
 import android.net.Uri;
 
 public class RssContentProvider extends ContentProvider {
-    // If the contentprovider notifies changes on uris
-    private static boolean sShouldNotify = true;
+    // All URIs share these parts
+    public static final String AUTHORITY = "com.nononsenseapps.feeder.provider";
+    public static final String SCHEME = "content://";
     // Match Uris with this
-    private static final UriMatcher sURIMatcher = new UriMatcher(
-            UriMatcher.NO_MATCH);
+    private static final UriMatcher sURIMatcher =
+            new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
         FeedSQL.addMatcherUris(sURIMatcher);
         FeedItemSQL.addMatcherUris(sURIMatcher);
     }
 
-    // All URIs share these parts
-    public static final String AUTHORITY = "com.nononsenseapps.feeder.provider";
-    public static final String SCHEME = "content://";
+    // If the contentprovider notifies changes on uris
+    private static boolean sShouldNotify = true;
 
     public RssContentProvider() {
-    }
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        int result = 0;
-        Uri[] notifyUris = null;
-
-        switch (sURIMatcher.match(uri)) {
-            case FeedSQL.ITEMCODE:
-                result += delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
-                        Util.ToStringArray(uri.getLastPathSegment()));
-                notifyUris = new Uri[] {FeedSQL.URI_FEEDS,
-                        FeedItemSQL.URI_FEED_ITEMS};
-                break;
-            case FeedSQL.URICODE:
-                result += DatabaseHandler.getInstance(getContext())
-                        .getWritableDatabase().delete(FeedSQL.TABLE_NAME,
-                                selection, selectionArgs);
-                notifyUris = new Uri[] {FeedSQL.URI_FEEDS,
-                        FeedItemSQL.URI_FEED_ITEMS};
-                break;
-            case FeedItemSQL.ITEMCODE:
-                result += delete(FeedItemSQL.URI_FEED_ITEMS, Util.WHEREIDIS,
-                        Util.ToStringArray(uri.getLastPathSegment()));
-                notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS};
-                break;
-            case FeedItemSQL.URICODE:
-                result += DatabaseHandler.getInstance(getContext())
-                        .getWritableDatabase().delete(FeedItemSQL.TABLE_NAME,
-                                selection, selectionArgs);
-                notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS};
-                break;
-            case PendingNetworkSQL.ITEMCODE:
-                result += delete(PendingNetworkSQL.URI, Util.WHEREIDIS,
-                        Util.ToStringArray(uri.getLastPathSegment()));
-                break;
-            case PendingNetworkSQL.URICODE:
-                result += DatabaseHandler.getInstance(getContext())
-                        .getWritableDatabase().delete(PendingNetworkSQL.TABLE_NAME,
-                                selection, selectionArgs);
-                break;
-            default:
-                throw new UnsupportedOperationException("Not yet implemented");
-        }
-        if (notifyUris != null) {
-            notifyChange(notifyUris);
-        }
-        return result;
-    }
-
-    /**
-     * Notify that a change has happened on each specified uri
-     * @param uris
-     */
-    private void notifyChange(Uri... uris) {
-        if (!sShouldNotify) {
-            return;
-        }
-        for (Uri uri: uris) {
-            getContext().getContentResolver().notifyChange(uri, null, false);
-        }
     }
 
     /**
      * Notify all uris that changes have happened. Should be called if you
      * ever disabled notifications on the provider.
+     *
      * @param context
      */
     public static void notifyAllUris(final Context context) {
@@ -101,54 +41,81 @@ public class RssContentProvider extends ContentProvider {
         }
     }
 
-    @Override
-    public String getType(Uri uri) {
-        // Implement this to handle requests for the MIME type of the data
-        // at the given URI.
-        throw new UnsupportedOperationException("Not yet implemented");
+    /**
+     * Mark a feedItem as read in the database.
+     *
+     * @param context
+     * @param itemId
+     */
+    public static void MarkItemAsRead(final Context context,
+            final long itemId) {
+        ContentValues values = new ContentValues();
+        values.put(FeedItemSQL.COL_UNREAD, 0);
+        context.getContentResolver()
+                .update(FeedItemSQL.URI_FEED_ITEMS, values, Util.WHEREIDIS,
+                        Util.LongsToStringArray(itemId));
     }
 
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        Uri result;
-        Uri[] notifyUris;
-        final String table;
+    /**
+     * Mark all items in a feed as read in the database.
+     *
+     * @param context
+     * @param feedId
+     */
+    public static void MarkFeedAsRead(final Context context,
+            final long feedId) {
+        ContentValues values = new ContentValues();
+        values.put(FeedItemSQL.COL_UNREAD, 0);
+        context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
+                FeedItemSQL.COL_FEED + " IS ?",
+                Util.LongsToStringArray(feedId));
+    }
 
-        switch (sURIMatcher.match(uri)) {
-            case FeedSQL.URICODE:
-                table = FeedSQL.TABLE_NAME;
-                result = FeedSQL.URI_FEEDS;
-                notifyUris = new Uri[] {FeedSQL.URI_FEEDS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS,
-                        FeedSQL.URI_TAGSWITHCOUNTS};
-                break;
-            case FeedItemSQL.URICODE:
-                table = FeedItemSQL.TABLE_NAME;
-                result = FeedItemSQL.URI_FEED_ITEMS;
-                notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS,
-                        FeedSQL.URI_TAGSWITHCOUNTS};
-                break;
-            case PendingNetworkSQL.URICODE:
-                table = PendingNetworkSQL.TABLE_NAME;
-                result = PendingNetworkSQL.URI;
-                notifyUris = null;
-                break;
-            default:
-                throw new UnsupportedOperationException("Not yet implemented");
+    /**
+     * Mark all items in feeds as read in the database.
+     *
+     * @param context
+     * @param tag     all feeds with this tag will be marked as read
+     */
+    public static void MarkItemsAsRead(final Context context,
+            final String tag) {
+        ContentValues values = new ContentValues();
+        values.put(FeedItemSQL.COL_UNREAD, 0);
+        context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
+                FeedItemSQL.COL_TAG + " IS ?", Util.ToStringArray(tag));
+    }
+
+    /**
+     * Fetch the latest timestamp used in syncing
+     *
+     * @param context
+     * @return timestamp or null if none exists
+     */
+    public static String GetLatestTimestamp(final Context context) {
+        String result = null;
+        // Adding distinct manually works atleast for single columns
+        Cursor c = context.getContentResolver().query(FeedSQL.URI_FEEDS,
+                new String[]{"DISTINCT " + FeedSQL.COL_TIMESTAMP},
+                FeedSQL.COL_TIMESTAMP +
+                " IS NOT NULL AND " +
+                FeedSQL.COL_TIMESTAMP +
+                " IS NOT ''", null, FeedSQL.COL_TIMESTAMP + " DESC");
+
+        try {
+            if (c.moveToNext()) {
+                result = c.getString(0);
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
         }
 
-        long id = DatabaseHandler.getInstance(getContext())
-                .getWritableDatabase()
-                .insert(table, null, values);
-        if (id > -1) {
-            result = Uri.withAppendedPath(result, Long.toString(id));
-        }
-
-        if (result != null && notifyUris != null) {
-            notifyChange(notifyUris);
-        }
         return result;
+    }
+
+    public static void setShouldNotify(final boolean b) {
+        sShouldNotify = b;
     }
 
     @Override
@@ -196,13 +163,112 @@ public class RssContentProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
         }
-        result = DatabaseHandler.getInstance(getContext())
-                .getReadableDatabase()
-                .query(table, projection, selection,
-                        selectionArgs, null, null, sortOrder, null);
+        result = DatabaseHandler.getInstance(getContext()).getReadableDatabase()
+                .query(table, projection, selection, selectionArgs, null, null,
+                        sortOrder, null);
 
         // Make sure you don't override another uri here
         result.setNotificationUri(getContext().getContentResolver(), uri);
+        return result;
+    }
+
+    @Override
+    public String getType(Uri uri) {
+        // Implement this to handle requests for the MIME type of the data
+        // at the given URI.
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public Uri insert(Uri uri, ContentValues values) {
+        Uri result;
+        Uri[] notifyUris;
+        final String table;
+
+        switch (sURIMatcher.match(uri)) {
+            case FeedSQL.URICODE:
+                table = FeedSQL.TABLE_NAME;
+                result = FeedSQL.URI_FEEDS;
+                notifyUris = new Uri[]{FeedSQL.URI_FEEDS,
+                        FeedSQL.URI_FEEDSWITHCOUNTS,
+                        FeedSQL.URI_TAGSWITHCOUNTS};
+                break;
+            case FeedItemSQL.URICODE:
+                table = FeedItemSQL.TABLE_NAME;
+                result = FeedItemSQL.URI_FEED_ITEMS;
+                notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS,
+                        FeedSQL.URI_FEEDSWITHCOUNTS,
+                        FeedSQL.URI_TAGSWITHCOUNTS};
+                break;
+            case PendingNetworkSQL.URICODE:
+                table = PendingNetworkSQL.TABLE_NAME;
+                result = PendingNetworkSQL.URI;
+                notifyUris = null;
+                break;
+            default:
+                throw new UnsupportedOperationException("Not yet implemented");
+        }
+
+        long id =
+                DatabaseHandler.getInstance(getContext()).getWritableDatabase()
+                        .insert(table, null, values);
+        if (id > -1) {
+            result = Uri.withAppendedPath(result, Long.toString(id));
+        }
+
+        if (result != null && notifyUris != null) {
+            notifyChange(notifyUris);
+        }
+        return result;
+    }
+
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        int result = 0;
+        Uri[] notifyUris = null;
+
+        switch (sURIMatcher.match(uri)) {
+            case FeedSQL.ITEMCODE:
+                result += delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
+                        Util.ToStringArray(uri.getLastPathSegment()));
+                notifyUris = new Uri[]{FeedSQL.URI_FEEDS,
+                        FeedItemSQL.URI_FEED_ITEMS};
+                break;
+            case FeedSQL.URICODE:
+                result += DatabaseHandler.getInstance(getContext())
+                        .getWritableDatabase()
+                        .delete(FeedSQL.TABLE_NAME, selection, selectionArgs);
+                notifyUris = new Uri[]{FeedSQL.URI_FEEDS,
+                        FeedItemSQL.URI_FEED_ITEMS};
+                break;
+            case FeedItemSQL.ITEMCODE:
+                result += delete(FeedItemSQL.URI_FEED_ITEMS, Util.WHEREIDIS,
+                        Util.ToStringArray(uri.getLastPathSegment()));
+                notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS};
+                break;
+            case FeedItemSQL.URICODE:
+                result += DatabaseHandler.getInstance(getContext())
+                        .getWritableDatabase()
+                        .delete(FeedItemSQL.TABLE_NAME, selection,
+                                selectionArgs);
+                notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS};
+                break;
+            case PendingNetworkSQL.ITEMCODE:
+                result += delete(PendingNetworkSQL.URI, Util.WHEREIDIS,
+                        Util.ToStringArray(uri.getLastPathSegment()));
+                break;
+            case PendingNetworkSQL.URICODE:
+                result += DatabaseHandler.getInstance(getContext())
+                        .getWritableDatabase()
+                        .delete(PendingNetworkSQL.TABLE_NAME, selection,
+                                selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Not yet implemented");
+        }
+        if (notifyUris != null) {
+            notifyChange(notifyUris);
+        }
         return result;
     }
 
@@ -218,25 +284,29 @@ public class RssContentProvider extends ContentProvider {
                 table = FeedSQL.TABLE_NAME;
                 selection = Util.WHEREIDIS;
                 selectionArgs = Util.ToStringArray(uri.getLastPathSegment());
-                notifyUris = new Uri[] {FeedSQL.URI_FEEDS,
-                        FeedItemSQL.URI_FEED_ITEMS, FeedSQL.URI_TAGSWITHCOUNTS};
+                notifyUris = new Uri[]{FeedSQL.URI_FEEDS,
+                        FeedItemSQL.URI_FEED_ITEMS,
+                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedSQL.URICODE:
                 table = FeedSQL.TABLE_NAME;
-                notifyUris = new Uri[] {FeedSQL.URI_FEEDS,
-                        FeedItemSQL.URI_FEED_ITEMS, FeedSQL.URI_TAGSWITHCOUNTS};
+                notifyUris = new Uri[]{FeedSQL.URI_FEEDS,
+                        FeedItemSQL.URI_FEED_ITEMS,
+                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedItemSQL.ITEMCODE:
                 table = FeedItemSQL.TABLE_NAME;
                 selection = Util.WHEREIDIS;
                 selectionArgs = Util.ToStringArray(uri.getLastPathSegment());
-                notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS, FeedSQL.URI_TAGSWITHCOUNTS};
+                notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS,
+                        FeedSQL.URI_FEEDSWITHCOUNTS,
+                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedItemSQL.URICODE:
                 table = FeedItemSQL.TABLE_NAME;
-                notifyUris = new Uri[] {FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS, FeedSQL.URI_TAGSWITHCOUNTS};
+                notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS,
+                        FeedSQL.URI_FEEDSWITHCOUNTS,
+                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case PendingNetworkSQL.ITEMCODE:
                 table = PendingNetworkSQL.TABLE_NAME;
@@ -252,9 +322,8 @@ public class RssContentProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Not yet implemented");
         }
 
-        result = DatabaseHandler.getInstance(getContext())
-                .getWritableDatabase().update(table,
-                        values, selection, selectionArgs);
+        result = DatabaseHandler.getInstance(getContext()).getWritableDatabase()
+                .update(table, values, selection, selectionArgs);
 
         if (result > 0 && notifyUris != null) {
             notifyChange(notifyUris);
@@ -264,43 +333,16 @@ public class RssContentProvider extends ContentProvider {
     }
 
     /**
-     * Mark a feedItem as read in the database.
-     * @param context
-     * @param itemId
+     * Notify that a change has happened on each specified uri
+     *
+     * @param uris
      */
-    public static void MarkItemAsRead(final Context context, final long itemId) {
-        ContentValues values = new ContentValues();
-        values.put(FeedItemSQL.COL_UNREAD, 0);
-        context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
-                Util.WHEREIDIS, Util.LongsToStringArray(itemId));
-    }
-    /**
-     * Mark all items in a feed as read in the database.
-     * @param context
-     * @param feedId
-     */
-    public static void MarkFeedAsRead(final Context context,
-            final long feedId) {
-        ContentValues values = new ContentValues();
-        values.put(FeedItemSQL.COL_UNREAD, 0);
-        context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
-                FeedItemSQL.COL_FEED + " IS ?", Util.LongsToStringArray
-                        (feedId));
-    }
-    /**
-     * Mark all items in feeds as read in the database.
-     * @param context
-     * @param tag all feeds with this tag will be marked as read
-     */
-    public static void MarkItemsAsRead(final Context context,
-            final String tag) {
-        ContentValues values = new ContentValues();
-        values.put(FeedItemSQL.COL_UNREAD, 0);
-        context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
-                FeedItemSQL.COL_TAG + " IS ?", Util.ToStringArray(tag));
-    }
-
-    public static void setShouldNotify(final boolean b) {
-        sShouldNotify = b;
+    private void notifyChange(Uri... uris) {
+        if (!sShouldNotify) {
+            return;
+        }
+        for (Uri uri : uris) {
+            getContext().getContentResolver().notifyChange(uri, null, false);
+        }
     }
 }

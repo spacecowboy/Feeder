@@ -264,14 +264,14 @@ public class RssSyncService extends IntentService {
         FeedItemSQL result = null;
         Cursor c = getContentResolver()
                 .query(FeedItemSQL.URI_FEED_ITEMS, FeedItemSQL.FIELDS,
-                        FeedItemSQL.COL_TITLE + " IS ? AND " +
+                        FeedItemSQL.COL_LINK + " IS ? AND " +
                         FeedItemSQL.COL_FEED + " IS ?",
-                        Util.ToStringArray(item.title,
+                        Util.ToStringArray(item.link,
                                 Long.toString(feedSQL.id)), null);
 
         try {
             if (c.moveToNext()) {
-                Log.d("JONAS", "Found existing item");
+                Log.d("JONAS", "Found existing feeditem");
                 result = new FeedItemSQL(c);
             }
         } finally {
@@ -281,7 +281,7 @@ public class RssSyncService extends IntentService {
         }
 
         if (result == null) {
-            Log.d("JONAS", "Creating new item");
+            Log.d("JONAS", "Creating new feeditem");
             result = new FeedItemSQL();
         }
 
@@ -305,7 +305,6 @@ public class RssSyncService extends IntentService {
 
         try {
             if (c.moveToNext()) {
-                Log.d("JONAS", "Found existing item");
                 result = new FeedSQL(c);
             }
         } finally {
@@ -315,7 +314,6 @@ public class RssSyncService extends IntentService {
         }
 
         if (result == null) {
-            Log.d("JONAS", "Creating new item");
             result = new FeedSQL();
         }
 
@@ -341,16 +339,21 @@ public class RssSyncService extends IntentService {
         try {
             BackendAPIClient.FeedsRequest request =
                     new BackendAPIClient.FeedsRequest();
-            // TODO fetch timestamp from database, set on request
+            // fetch timestamp from database, set on request so we only
+            // download items we haven't seen
+            request.min_timestamp = RssContentProvider.GetLatestTimestamp(this);
+            Log.d(TAG, "Using min_timestamp: " + request.min_timestamp);
 
             BackendAPIClient.FeedsResponse response = api.getFeeds(request);
 
             if (response.feeds == null) {
                 Log.d(TAG, "Feeds was null");
             } else {
+                Log.d(TAG, "Number of feeds to sync: " + response.feeds.size());
                 for (BackendAPIClient.Feed feed : response.feeds) {
                     Log.d(TAG, "ftitle " + feed.title);
                     Log.d(TAG, "fdesc " + feed.description);
+                    Log.d(TAG, "ftimestamp " + feed.timestamp);
                     // Sync feed
                     syncFeedRetro(feed);
                 }
@@ -369,9 +372,11 @@ public class RssSyncService extends IntentService {
 
             // Handle items
             if (feed.items == null) {
+                Log.d(TAG, "Items in feed was null");
                 // Done
                 return;
             }
+            Log.d(TAG, "Number of items in feed: " + feed.items.size());
             for (BackendAPIClient.FeedItem item : feed.items) {
                 Log.d(TAG, "ititle " + item.title);
                 Log.d(TAG, "isnippet " + item.snippet);
@@ -404,9 +409,11 @@ public class RssSyncService extends IntentService {
                 itemSQL.link = item.link;
                 //itemSQL.author = item.getAuthor();
                 try {
+                    Log.d("JONASTIME", "" + item.published);
                     itemSQL.setPubDate(item.published);
                 } catch (Exception e) {
-                    // TODO server should deal with timestamps and convert them
+                    // server should deal with timestamps and convert them,
+                    // but some formats may slip through.
                     Log.d(TAG, "published error: " + e.getMessage());
                     itemSQL.setPubDate(DateTime.now());
                 }
