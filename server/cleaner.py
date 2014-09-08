@@ -9,6 +9,9 @@ except:
 from util import convert_timestamp
 import re
 
+# Productive patterns
+PATTERN_IMG_URL = re.compile(r"(&lt;|<)img.*?src=(\"|')(.*?)(\"|')",
+                             re.IGNORECASE | re.MULTILINE)
 # Bloat patterns
 PATTERN_FEEDFLARE = re.compile(r"(<|&lt;)div class=('|\")feedflare('|\").*?/div(>|&gt;)",
                                re.IGNORECASE | re.MULTILINE)
@@ -36,13 +39,18 @@ PATTERN_EMPTY_DIVS = \
 
 def get_feeditem_model(url, timestamp, item):
     """
-    Returns a feeditem model with cleaned attributes.
+    Returns a new feeditem model with cleaned attributes.
+    Returns none if item already exists.
 
     Parameters:
 
     url - The feed's url
     item - A feedparser rss-entry
     """
+    for feeditem in FeedItemModel.query(FeedItemModel.key == FeedItemKey(url, item.link)).iter(keys_only=True):
+        # Existing feed, so ignore
+        return None
+
     clean_description = strip_bloat(item.get("description", ""))
     return FeedItemModel(key=FeedItemKey(url, item.link),
                          title=item.title,
@@ -52,6 +60,7 @@ def get_feeditem_model(url, timestamp, item):
                          snippet=get_snippet(clean_description),
                          timestamp=timestamp,
                          feed_link=url,
+                         images=get_images(clean_description),
                          published=convert_timestamp(item.get("published", None)),
                          author=item.get("author", None),
                          comments=item.get("comments", None),
@@ -62,10 +71,58 @@ def get_feeditem_model(url, timestamp, item):
 def get_snippet(text, maxlen=120):
     """
     Returns a stripped version of text which will
-    not exceed maxlen in length.
+    not exceed maxlen in length and which is unescaped
+
+    Example:
+    >>> get_snippet("I &amp; <i>you</i> are <i>very silly</i>.", maxlen=10)
+    'I & you ar'
     """
     #return s[:maxlen-1] + "\u2026"
-    return strip_tags(text)[:maxlen]
+    return unescape(strip_tags(text))[:maxlen]
+
+
+def unescape(text):
+    """
+    Unescapes HTML-escaped text.
+
+    Examples:
+    >>> unescape("&lt; &rt;")
+    '< >'
+    >>> unescape("&quot;")
+    '"'
+    >>> unescape("&apos;")
+    "'"
+    >>> unescape("&amp;")
+    '&'
+    """
+    text = text.replace("&lt;", "<")
+    text = text.replace("&rt;", ">")
+    text = text.replace("&quot;", '"')
+    text = text.replace("&apos;", "'")
+    text = text.replace("&amp;", "&")
+    return text
+
+
+def get_images(text):
+    """
+    Find and return the first image url in the document.
+    None if nothing could be found.
+
+    Examples:
+    >>> get_images("No image here")
+    []
+
+    >>> get_images("Here's one: <img src='url'/>")
+    ['url']
+
+    >>> get_images("one: <img src='url1'/>, two: <img width='10' src='url2' height='50'/>")
+    ['url1', 'url2']
+    """
+    images = []
+    for m in PATTERN_IMG_URL.finditer(text):
+        images.append(m.group(3))
+
+    return images
 
 
 def strip_tags(text):

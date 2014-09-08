@@ -1,11 +1,18 @@
 import webapp2
 
 from google.appengine.api import taskqueue
-from util import (datetime_now, parse_timestamp, domain_from_url)
+from util import (datetime_now, parse_timestamp, domain_from_url,
+                  datetuple_to_string)
 from cleaner import get_feeditem_model
 from models import (FeedModel, FeedItemModel,
                     FeedModelKey, FeedItemKey)
 import feedparser as fp
+
+# Don't remove embedded videos
+fp._HTMLSanitizer.acceptable_elements = \
+    set(list(fp._HTMLSanitizer.acceptable_elements) + ['object',
+                                                       'embed',
+                                                       'iframe'])
 
 
 class Cacher(webapp2.RequestHandler):
@@ -24,6 +31,8 @@ class Cacher(webapp2.RequestHandler):
 
         for feed in feeds:
             self._cache_feed(feed.link, feed.etag, feed.modified)
+
+        self.printpage("Caching done.")
 
     def post(self):
         """Post is used when new feeds are added."""
@@ -85,30 +94,48 @@ class Cacher(webapp2.RequestHandler):
             # If feed does not have title, which is a required attribute,
             # we skip it.
             if not hasattr(f, "title"):
-                print(rss)
-                print(rss.debug_message)
+                try:
+                    print(rss.debug_message)
+                except:
+                    pass
                 return
 
-            # Update feed first
+            # If no items, move on
+            if len(rss.entries) == 0:
+                print("No new items, ignoring {}".format(f.title))
+                return
+
+            # Update feed last
             timestamp = datetime_now()
-            feeds = FeedModel.query((FeedModel.link == url))
-            for feed in feeds:
-                # Update fields
-                feed.timestamp = timestamp
-                feed.description = f.get("description", "")
-                feed.title = f.title
-                feed.published = f.get("published", None)
-                feed.etag = rss.get("etag", None)
-                feed.modified = rss.get("modified", None)
-                # Save
-                print("Caching:", feed.title)
-                # TODO use put_multi or such
-                feed.put()
 
             # Get individual items
+            any_new_items = False
             for item in rss.entries:
                 feeditem = get_feeditem_model(url, timestamp, item)
-                feeditem.put()
+                # Ignores existing items
+                if feeditem is not None:
+                    any_new_items = True
+                    feeditem.put()
+                #else:
+                #    print("Ignoring existing feeditem")
+
+            # Only update feed if any new items were retrieved
+            if any_new_items:
+                feeds = FeedModel.query((FeedModel.link == url))
+                for feed in feeds:
+                    # Update fields
+                    feed.timestamp = timestamp
+                    feed.description = f.get("description", "")
+                    # Don't override user's own title
+                    #feed.title = f.title
+                    feed.published = datetuple_to_string(f.get("published_parsed", None))
+                    feed.etag = rss.get("etag", None)
+                    feed.modified = rss.get("modified", None)
+                    # Save
+                    print("Cached:", feed.title)
+                    # TODO use put_multi or such
+                    feed.put()
+
 
 
 application = webapp2.WSGIApplication([('/tasks/cache', Cacher)], debug=True)

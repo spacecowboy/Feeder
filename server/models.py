@@ -18,35 +18,46 @@ def FeedItemKey(feed_url, item_link):
 
 
 class FeedModel(ndb.Model):
-    user = ndb.UserProperty(required=True)
-    title = ndb.TextProperty(required=True)
-    description = ndb.TextProperty(required=True)
-    link = ndb.StringProperty(required=True)
+    user = ndb.UserProperty(required=True, indexed=True)
+    title = ndb.TextProperty(required=True, indexed=False)
+    description = ndb.TextProperty(required=True, indexed=False)
+    link = ndb.StringProperty(required=True, indexed=True)
     # Internal use
-    timestamp = ndb.DateTimeProperty(required=True)
+    timestamp = ndb.DateTimeProperty(required=True, indexed=True)
     # Optionals
     # tag in app
-    tag = ndb.StringProperty()
+    tag = ndb.StringProperty(indexed=False)
     # pubdate
-    published = ndb.StringProperty()
+    published = ndb.StringProperty(indexed=False)
     # For requests
-    etag = ndb.StringProperty()
-    modified = ndb.StringProperty()
+    etag = ndb.StringProperty(indexed=True)
+    modified = ndb.StringProperty(indexed=True)
 
 
 class FeedItemModel(ndb.Model):
-    title = ndb.TextProperty(required=True)
-    description = ndb.TextProperty(required=True)
-    link = ndb.StringProperty(required=True)
-    title_stripped = ndb.StringProperty(required=True)
-    snippet = ndb.StringProperty(required=True)
+    title = ndb.TextProperty(required=True, indexed=False)
+    description = ndb.TextProperty(required=True, indexed=False)
+    link = ndb.StringProperty(required=True, indexed=True)
+    title_stripped = ndb.StringProperty(required=True, indexed=False)
+    snippet = ndb.StringProperty(required=True, indexed=False)
     # Internal use
-    timestamp = ndb.DateTimeProperty(required=True)
+    timestamp = ndb.DateTimeProperty(required=True, indexed=True)
     # Related feed
-    feed_link = ndb.StringProperty(required=True)
+    feed_link = ndb.StringProperty(required=True, indexed=True)
     # Optionals
-    published = ndb.StringProperty()
-    author = ndb.StringProperty()
-    comments = ndb.StringProperty()
-    enclosures = ndb.StringProperty(repeated=True)
-    tags = ndb.StringProperty(repeated=True)
+    images = ndb.StringProperty(repeated=True, indexed=False)
+    published = ndb.StringProperty(indexed=False)
+    author = ndb.StringProperty(indexed=False)
+    comments = ndb.StringProperty(indexed=False)
+    enclosures = ndb.StringProperty(repeated=True, indexed=False)
+    tags = ndb.StringProperty(repeated=True, indexed=False)
+
+
+# DeviceID in NDB
+def GCMRegIdModelKey(regid):
+    return ndb.Key(GCMRegIdModel, regid)
+
+
+class GCMRegIdModel(ndb.Model):
+    regid = ndb.StringProperty(required=True, indexed=False)
+    userid = ndb.UserProperty(required=True, indexed=True)

@@ -1,46 +1,34 @@
 from __future__ import print_function, division
-from threading import Thread
-from functools import wraps
 from gcm import GCM
 
 from google.appengine.ext import ndb
 
-gcm = GCM('AIzaSyALWhrcJKnGWVjOisD_WjmP2SOiOIJA9F4')
+gcm = GCM('AIzaSyDH8p6RpggRjDp1PcGewmYsLGsoZC2kBJ0')
+
+# ACTIONS
+ACTION_SYNC = "sync"
+
 
 class GCMRegIdModel(ndb.Model):
     regid = ndb.StringProperty(required=True)
     userid = ndb.UserProperty(required=True)
 
-def to_dict(link):
-    return dict(sha=link.sha,
-                url=link.url,
-                timestamp=link.timestamp.isoformat(sep=" "),
-                deleted=link.deleted)
 
-
-def send_link(link, excludeid=None):
-    '''Transmits the link specified by the sha to the users devices.
-
-    Does not run in a separate thread because App-Engine did not
-    seem to support that.
+def send_sync_notices(userids):
     '''
-    # Get devices
-    reg_ids = []
-    query = GCMRegIdModel.query(GCMRegIdModel.userid == link.userid)
+    Send a notice for the users' devices to do a sync.
+    '''
+    for userid in userids:
+        # Get devices
+        reg_ids = []
+        query = GCMRegIdModel.query(GCMRegIdModel.userid == userid)
 
-    for reg_model in query:
-        reg_ids.append(reg_model.regid)
+        for reg_model in query:
+            reg_ids.append(reg_model.regid)
 
-    # Dont send to origin device, if specified
-    try:
-        reg_ids.remove(excludeid)
-    except ValueError:
-        pass # not in list, or None
-
-    if len(reg_ids) < 1:
-        return
-
-    _send(link.userid, reg_ids, to_dict(link))
+        if len(reg_ids) > 0:
+            print("Sending sync notice to:", userid, reg_ids[0])
+            _send(userid, reg_ids, dict(action=ACTION_SYNC))
 
 
 def _remove_regid(regid):
@@ -70,6 +58,7 @@ def _send(userid, rids, data):
     # Handling errors
     if 'errors' in response:
         for error, reg_ids in response['errors'].items():
+            print("Got error in GCM:", error)
             # Check for errors and act accordingly
             if (error == 'NotRegistered' or
                 error == 'InvalidRegistration'):

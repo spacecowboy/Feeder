@@ -19,6 +19,22 @@ class TimeZone(tzinfo):
 UTC = TimeZone(0)
 
 
+def datetuple_to_string(tup):
+    '''
+    Convert a Python date tuple, as returned by feedparser's published_parsed,
+    to a ISO date string. If None, returns None.
+
+    Example:
+    >>> datetuple_to_string(None)
+
+    >>> datetuple_to_string((2009, 3, 23, 13, 6, 34, 0, 82, 0))
+    '2009-03-23T13:06:34'
+    '''
+    if tup is None:
+        return None
+    return datetime_to_string(datetime(*tup[:6]))
+
+
 def datetime_to_string(dt):
     '''Converts a datetime object to a
     timestamp string in the format (in UTC):

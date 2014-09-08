@@ -28,6 +28,7 @@ class FeedItem(messages.Message):
     enclosures = messages.StringField(9, repeated=True)
     tags = messages.StringField(10, repeated=True)
     read = messages.BooleanField(11, required=True, default=False)
+    images = messages.StringField(12, repeated=True)
 
 
 def feeditem_from_model(item):
@@ -37,6 +38,7 @@ def feeditem_from_model(item):
                     title_stripped=item.title_stripped,
                     snippet=item.snippet,
                     published=convert_timestamp(item.published),
+                    images=item.images,
                     author=item.author,
                     comments=item.comments,
                     enclosures=item.enclosures,

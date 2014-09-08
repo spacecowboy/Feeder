@@ -5,9 +5,11 @@ from messages import (FeedsResponse, VoidMessage,
                       Feed, feed_from_model,
                       feeditem_from_model,
                       REQUEST_FEEDQUERY, REQUEST_PUTFEED,
-                      REQUEST_DELFEED, REQUEST_CACHEFEEDS)
+                      REQUEST_DELFEED, REQUEST_CACHEFEEDS,
+                      GCMRegId)
 from models import (FeedModel, FeedItemModel,
-                    FeedModelKey, FeedItemKey)
+                    FeedModelKey, FeedItemKey,
+                    GCMRegIdModel, GCMRegIdModelKey)
 from util import (datetime_now, parse_timestamp, domain_from_url)
 from cleaner import get_feeditem_model
 #from google.appengine.ext import ndb
@@ -167,6 +169,24 @@ class FeederApi(remote.Service):
         # Notify through GCM
         #send_link(link, request.regid)
 
+        return VoidMessage()
+
+    @endpoints.method(GCMRegId, VoidMessage,
+                      name='gcm.register',
+                      path='registergcm',
+                      http_method='POST')
+    def register_gcm(self, request):
+        current_user = endpoints.get_current_user()
+        if current_user is None:
+            raise endpoints.UnauthorizedException('Invalid token.')
+
+        device = GCMRegIdModel(key=GCMRegIdModelKey(request.regid),
+                               regid=request.regid,
+                               userid=current_user)
+        # And save it
+        device.put()
+
+        # Return nothing
         return VoidMessage()
 
 
