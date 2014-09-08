@@ -9,20 +9,33 @@ import feedparser as fp
 
 
 class Cacher(webapp2.RequestHandler):
-    def get(self):
+    def printpage(self, msg):
         self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write('url: ' + self.request.get("url"))
+        self.response.write(str(msg))
+
+    def get(self):
+        """Get is called by cron, which caches all feeds."""
+        print("In cache get")
+        feeds = self._fetch_all_feeds()
+
+        if feeds is None:
+            print("No feeds")
+            self.printpage("No feeds")
+            return
+
+        for feed in feeds:
+            self._cache_feed(feed.link, feed.etag, feed.modified)
 
     def post(self):
+        """Post is used when new feeds are added."""
         print("In cache post")
 
-        # If no urls specified, fetch from user's store
+        # If no urls specified, fetch all
         etag, modified = None, None
         url = self.request.get("url")
         if url is None or len(url) == 0:
             print("No url was specified")
-            urls = FeedModel.query(projection=["link", "etag", "modified"],
-                                   distinct=True)
+            urls = self._fetch_all_feeds()
         else:
             print("Using " + url)
             urls = [url]
@@ -54,9 +67,16 @@ class Cacher(webapp2.RequestHandler):
                 print("Exists, caching..")
                 self._cache_feed(url, etag, modified)
 
+    def _fetch_all_feeds(self):
+        # If no urls specified, fetch all
+        return FeedModel.query(projection=["link", "etag", "modified"],
+                               distinct=True)
+
     def _cache_feed(self, url, etag=None, modified=None, tag=None):
             '''
             Caches a feed to the database.
+
+            url can be either a string or a feedmodel.
 
             '''
             if not "://" in url:
