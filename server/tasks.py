@@ -15,7 +15,6 @@ class Cacher(webapp2.RequestHandler):
 
     def get(self):
         """Get is called by cron, which caches all feeds."""
-        print("In cache get")
         feeds = self._fetch_all_feeds()
 
         if feeds is None:
@@ -34,10 +33,8 @@ class Cacher(webapp2.RequestHandler):
         etag, modified = None, None
         url = self.request.get("url")
         if url is None or len(url) == 0:
-            print("No url was specified")
             urls = self._fetch_all_feeds()
         else:
-            print("Using " + url)
             urls = [url]
 
         # Fetch RSS items
@@ -49,10 +46,7 @@ class Cacher(webapp2.RequestHandler):
                 etag = url.etag
                 modified = url.modified
                 url = url.link
-                print("From DB: ", url)
-
             else:
-                print("From request: ", url)
                 # Make sure it exists in feeds list
                 feeds = FeedModel.query(FeedModel.link == url)
                 exists = False
@@ -64,7 +58,6 @@ class Cacher(webapp2.RequestHandler):
 
             # cache it if it exists in database
             if exists:
-                print("Exists, caching..")
                 self._cache_feed(url, etag, modified)
 
     def _fetch_all_feeds(self):
@@ -84,10 +77,10 @@ class Cacher(webapp2.RequestHandler):
 
             # Parse the result
             rss = fp.parse(url, etag=etag, modified=modified)
-            if "etag" in rss:
-                print("etag:", rss.etag)
-            if "modified" in rss:
-                print("modified:", rss.modified)
+            #if "etag" in rss:
+            #    print("etag:", rss.etag)
+            #if "modified" in rss:
+            #    print("modified:", rss.modified)
             f = rss.feed
             # If feed does not have title, which is a required attribute,
             # we skip it.
@@ -115,7 +108,6 @@ class Cacher(webapp2.RequestHandler):
             # Get individual items
             for item in rss.entries:
                 feeditem = get_feeditem_model(url, timestamp, item)
-                print("Got and item and putting it:", item.title)
                 feeditem.put()
 
 
