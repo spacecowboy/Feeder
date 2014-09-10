@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ Contains methods relevant for cleaning up RSS feeds."""
 
 try:
@@ -11,30 +12,30 @@ import re
 
 # Productive patterns
 PATTERN_IMG_URL = re.compile(r"(&lt;|<)img.*?src=(\"|')(.*?)(\"|')",
-                             re.IGNORECASE | re.MULTILINE)
+                             re.IGNORECASE | re.DOTALL)
 # Bloat patterns
-PATTERN_FEEDFLARE = re.compile(r"(<|&lt;)div class=('|\")feedflare('|\").*?/div(>|&gt;)",
-                               re.IGNORECASE | re.MULTILINE)
+PATTERN_FEEDFLARE = re.compile(r"(<|&lt;)div\s+?class=('|\")feedflare('|\").*?/div(>|&gt;)",
+                               re.IGNORECASE | re.DOTALL)
 PATTERN_FEEDSPORTAL = re.compile(r"(<|&lt;)a((?!/a).)*feedsportal.*?/a(>|gt;)",
-                                 re.IGNORECASE | re.MULTILINE)
+                                 re.IGNORECASE | re.DOTALL)
 PATTERN_LINKED_ZEROIMAGES = \
     re.compile(r"(<|&lt;)a((?!/a).)*width=('|\")1('|\")((?!/a).)*/a(>|&gt;)",
-               re.IGNORECASE | re.MULTILINE)
+               re.IGNORECASE | re.DOTALL)
 PATTERN_ZEROIMAGES = \
     re.compile(r"(<|&lt;)img((?!/((>|&gt;)|img)).)*width=\\?('|\")1\\?('|\").*?/(img)?(>|&gt;)",
-               re.IGNORECASE | re.MULTILINE)
+               re.IGNORECASE | re.DOTALL)
 PATTERN_PARAGRAPH_NEWLINE = \
     re.compile(r"((<|&lt;)/?p/?(>|&gt;))(\s*(<|&lt;)/?br/?(>|&gt;))+",
-               re.IGNORECASE | re.MULTILINE)
+               re.IGNORECASE | re.DOTALL)
 PATTERN_MULTIPLE_NEWLINES = \
     re.compile(r"(((<|&lt;)/?br/?(>|&gt;))\s*){2,}",
-               re.IGNORECASE | re.MULTILINE)
+               re.IGNORECASE | re.DOTALL)
 PATTERN_EMPTY_PARAGRAPHS = \
     re.compile(r"(((<|&lt;)(p)(>|&gt;))\s*((<|&lt;)/p(>|&gt;))|(<|&lt;)p/(>|&gt;))",
-               re.IGNORECASE | re.MULTILINE)
+               re.IGNORECASE | re.DOTALL)
 PATTERN_EMPTY_DIVS = \
     re.compile(r"<div[^>]*>\s*</div>",
-               re.IGNORECASE | re.MULTILINE)
+               re.IGNORECASE | re.DOTALL)
 
 
 def get_feeditem_model(url, timestamp, item):
@@ -148,21 +149,23 @@ def strip_bloat(text):
     Examples:
 
     Too many newlines
-    >>> strip_bloat('<br/> <br/>')
+    >>> strip_bloat('<br/>\\n<br/>')
     '<br/>'
-    >>> strip_bloat('<br><br><br>')
+    >>> strip_bloat('<br>\\n<br>\\n<br>')
     '<br/>'
-    >>> strip_bloat('<p> <br>')
+    >>> strip_bloat('<p>\\n<br>')
     '<p>'
-    >>> strip_bloat('<p>   </p>')
+    >>> strip_bloat('<p> \\n </p>')
     ''
 
     Feedflare
-    >>> strip_bloat('<div class="feedflare">blabla</div>')
+    >>> strip_bloat('<div class="feedflare">\\nblabla</div>')
+    ''
+    >>> strip_bloat("<div class='feedflare'>\\nblabla</div>")
     ''
 
     Feedsportal links
-    >>> strip_bloat('<a href="http://feedsportal.com">bla</a>')
+    >>> strip_bloat('<a href="http://feedsportal.com">\\nbla</a>')
     ''
 
     Zero size images
