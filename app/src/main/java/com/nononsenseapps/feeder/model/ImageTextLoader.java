@@ -2,27 +2,35 @@ package com.nononsenseapps.feeder.model;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.net.Uri;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.Spanned;
+import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.util.Log;
 
+import com.nononsenseapps.feeder.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.xml.sax.XMLReader;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
@@ -38,8 +46,11 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
     final Html.ImageGetter imgThing;
     final String mText;
     final Point maxSize;
+    final Picasso p;
 
     final HashMap<String, ImageTagHunter.Image> images;
+    final ArrayList<VideoTagHunter.Video> videos;
+    int videoIndex = 0;
 
     // Used to insert alt text for images
     ImageTagHunter.Image lastImg = null;
@@ -47,17 +58,19 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
     public ImageTextLoader(Context context, String text, Point windowSize) {
         super(context);
         images = new HashMap<String, ImageTagHunter.Image>();
+        videos = new ArrayList<VideoTagHunter.Video>();
         this.mText = text;
         this.maxSize = windowSize;
         // Get screen density
         mDensityScale = context.getResources().getDisplayMetrics().density;
 
         final Context appContext = context.getApplicationContext();
+        p = Picasso.with(appContext);
 
         imgThing = new Html.ImageGetter() {
 
             /**
-             * This methos is called when the HTML parser encounters an
+             * This method is called when the HTML parser encounters an
              * &lt;img&gt; tag.  The <code>source</code> argument is the
              * string from the "src" attribute; the return value should be
              * a Drawable representation of the image or <code>null</code>
@@ -107,7 +120,6 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                     }
 
                     final Bitmap b;
-                    final Picasso p = Picasso.with(appContext);
                     if (shrunk) {
                         Log.d("JONAS2", "Resizing with picasso");
                         b = p.load(source).resize(w, h).get();
@@ -184,7 +196,11 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
     public Spanned loadInBackground() {
         // First find all images manually to get their sizes and alt-texts
 //        try {
-            ImageTagHunter.getImages(this.mText, this.images);
+        // Parse the document once and reuse
+        final Document doc = Jsoup.parse(mText);
+        ImageTagHunter.getImages(doc, this.images);
+        VideoTagHunter.getVideos(doc, this.videos);
+        Log.d("JONASFULL", mText);
 //        } catch (XmlPullParserException e) {
 //            Log.e("JONAS2", "" + e.getMessage());
 //        } catch (IOException e) {
@@ -210,6 +226,9 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                     handleCode(output, opening);
                 } else if (tag.equalsIgnoreCase("pre")) {
                     handlePre(output, opening);
+                } else if (tag.equalsIgnoreCase("iframe")) {
+                    // TODO handle embed and object also
+                    handleIframe(output, opening);
                 }
             }
 
@@ -230,6 +249,49 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                     end(text, Italic.class, new StyleSpan(Typeface.ITALIC));
                     text.append("\n");
                 }
+            }
+
+            // Show thumbnail for video
+            private void handleIframe(final Editable text,
+                    final boolean start) {
+                if (!start) {
+                    // Ignore end now
+                    return;
+                }
+
+                // Fetch the video from list since I am given no information
+                // about attributes here...
+                final VideoTagHunter.Video video = videos.get(videoIndex);
+
+                // For now only handle youtube videos
+                // TODO handle more than youtube
+                Log.d("JONASYOUTUBE", "src: " + video.src);
+                if (video.src.toLowerCase().contains("youtube")) {
+                    ClickableImageSpan span = new ClickableImageSpan
+                            (getYoutubeThumb(video)) {
+                        @Override
+                        public void onClick() {
+                            Log.d("YOUTUBECLICK", "Url: " + video.link);
+                            final Intent i = new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse(video.link));
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            getContext().startActivity(i);
+                        }
+                    };
+                    int len = text.length();
+                    text.append("\uFFFC");
+                    text.setSpan(span, len, text.length(),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    // Add newline also
+                    text.append("\n");
+                    start(text, new Italic());
+                    text.append("Touch to play video");
+                    end(text, Italic.class, new StyleSpan(Typeface.ITALIC));
+                    text.append("\n\n");
+                }
+
+                // Do this last
+                videoIndex++;
             }
 
             // Start lists with a line break
@@ -344,6 +406,65 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                 }
             }
         });
+    }
+
+    /**
+     *
+     * @return a Drawable with a youtube logo in the center
+     */
+    protected Drawable getYoutubeThumb(final VideoTagHunter.Video video) {
+        Drawable[] layers = new Drawable[2];
+
+        int w1 = 1, h1 = 1;
+        try {
+            final Bitmap b = p.load(video.imageurl).get();
+            final Point newSize = scaleImage(b.getWidth(), b.getHeight());
+            w1 = newSize.x;
+            h1 = newSize.y;
+            final BitmapDrawable d = new BitmapDrawable(getContext()
+                    .getResources(), b);
+            Log.d("JONASYOUTUBE", "Bounds: " + d.getIntrinsicWidth() + ", " +
+                       "" + d.getIntrinsicHeight() + " vs " +
+                       w1 + ", " + h1);
+            // Settings bounds later
+            //d.setBounds(0, 0, w1, h1);
+            // Set in layer
+            layers[0] = d;
+        } catch (IOException e) {
+            Log.e("JONASYOUTUBE", "" + e.getMessage());
+        }
+
+        // Add layer with play icon
+        // TODO
+        final Drawable playicon = getContext().getResources().getDrawable(R
+                .drawable
+                .youtube_icon);
+        // 20% size, in middle
+        int w2 = playicon.getIntrinsicWidth();
+        int h2 = playicon.getIntrinsicHeight();
+
+        final double ratio = ((double) h2) / ((double) w2);
+
+        // Start with width which is known
+        final double relSize = 0.2;
+        w2 = (int) (relSize * w1);
+        final int left = (int) (((double) (w1 - w2)) / 2.0);
+        // Then height is simple
+        h2 = (int) (ratio * w2);
+        final int top = (int) (((double) (h1 - h2)) / 2.0);
+
+        Log.d("JONASYOUTUBE", "l t w h: " + left + " " + top + " " + w2 + " "
+                              + h2);
+
+        // And add to layer
+        layers[1] = playicon;
+        final LayerDrawable ld = new LayerDrawable(layers);
+        // Need to set bounds on outer drawable first as it seems to override
+        // child bounds
+        ld.setBounds(0, 0, w1, h1);
+        // Now set smaller bounds on youtube icon
+        playicon.setBounds(left, top, left+w2, top+h2);
+        return ld;
     }
 
     /**

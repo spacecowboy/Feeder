@@ -39,6 +39,7 @@ public class FeedItemSQL {
     public static final String COL_PLAINTITLE = "plaintitle";
     public static final String COL_PLAINSNIPPET = "plainsnippet";
     public static final String COL_IMAGEURL = "imageurl";
+    public static final String COL_ENCLOSURELINK = "enclosurelink";
     public static final String COL_LINK = "link";
     public static final String COL_AUTHOR = "author";
     public static final String COL_PUBDATE = "pubdate";
@@ -51,7 +52,7 @@ public class FeedItemSQL {
     public static final String[] FIELDS =
             {COL_ID, COL_TITLE, COL_DESCRIPTION, COL_PLAINTITLE, COL_PLAINSNIPPET, COL_IMAGEURL,
                     COL_LINK, COL_AUTHOR,
-                    COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG};
+                    COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG, COL_ENCLOSURELINK};
 
     /*
      * The SQL code that creates a Table for storing Persons in.
@@ -67,6 +68,7 @@ public class FeedItemSQL {
                     + COL_PLAINSNIPPET + " TEXT NOT NULL," +
                     COL_IMAGEURL + " TEXT," +
                     COL_LINK + " TEXT," +
+                    COL_ENCLOSURELINK + " TEXT," +
                     COL_AUTHOR + " TEXT," +
                     COL_PUBDATE + " TEXT," +
                     COL_UNREAD + " INTEGER NOT NULL DEFAULT 1," +
@@ -97,6 +99,7 @@ public class FeedItemSQL {
     public String plaintitle = null;
     public String plainsnippet = null;
     public String imageurl = null;
+    public String enclosurelink = null;
     public String author = null;
     private DateTime pubDate = null;
     public String link = null;
@@ -136,6 +139,7 @@ public class FeedItemSQL {
        this.unread = cursor.getInt(9);
         this.feed_id = cursor.getLong(10);
         this.tag = cursor.getString(11);
+        this.enclosurelink = cursor.getString(12);
     }
 
     public DateTime getPubDate() {
@@ -187,6 +191,7 @@ public class FeedItemSQL {
         Util.PutNullable(values, COL_AUTHOR, author);
         Util.PutNullable(values, COL_PUBDATE, getPubDateString());
         Util.PutNullable(values, COL_TAG, tag);
+        Util.PutNullable(values, COL_ENCLOSURELINK, enclosurelink);
 
         return values;
     }

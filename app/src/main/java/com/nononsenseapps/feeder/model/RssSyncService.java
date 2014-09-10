@@ -400,14 +400,16 @@ public class RssSyncService extends IntentService {
                 if (itemSQL.plainsnippet == null) {
                     itemSQL.plainsnippet = "";
                 }
-                itemSQL.imageurl = item.imageurl;
-                // TODO pre-cache ALL images
-                if (itemSQL.imageurl != null && !itemSQL.imageurl.isEmpty()) {
-                    Log.d("JONAS", "Pre-fetching " + itemSQL.imageurl);
-                    Picasso.with(this).load(itemSQL.imageurl).fetch();
+                if (item.images != null && !item.images.isEmpty()) {
+                    itemSQL.imageurl = item.images.get(0);
+                    // TODO pre-cache ALL images
+                    if (itemSQL.imageurl != null && !itemSQL.imageurl.isEmpty()) {
+                        Log.d("JONAS", "Pre-fetching " + itemSQL.imageurl);
+                        Picasso.with(this).load(itemSQL.imageurl).fetch();
+                    }
                 }
                 itemSQL.link = item.link;
-                //itemSQL.author = item.getAuthor();
+                itemSQL.author = item.author;
                 try {
                     Log.d("JONASTIME", "" + item.published);
                     itemSQL.setPubDate(item.published);

@@ -361,7 +361,8 @@ public class FeedFragment extends Fragment
             //final RssItem item = items.get(position);
 
             holder.rssItem = item;
-            holder.link = item.link;
+            holder.link = item.enclosurelink != null ? item.enclosurelink :
+            item.link;
             if (item.getPubDate() == null) {
                 holder.dateTextView.setVisibility(View.GONE);
             } else {

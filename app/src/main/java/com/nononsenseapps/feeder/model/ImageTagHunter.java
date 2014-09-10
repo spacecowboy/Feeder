@@ -11,9 +11,8 @@ import java.util.HashMap;
 
 public class ImageTagHunter {
 
-    public static void getImages(final String text,
+    public static void getImages(final Document doc,
             HashMap<String, Image> images) {
-        Document doc = Jsoup.parse(text);
         //Get all elements with img tag
         Elements imgtags = doc.getElementsByTag("img");
 

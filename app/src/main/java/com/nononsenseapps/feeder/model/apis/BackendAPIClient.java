@@ -72,7 +72,7 @@ public class BackendAPIClient {
         public String description;
         public String snippet;
         public String link;
-        public String imageurl;
+        public List<String> images;
         public String published;
         public String author;
         public String comments;

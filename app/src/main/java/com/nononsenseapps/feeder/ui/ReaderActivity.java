@@ -35,7 +35,9 @@ public class ReaderActivity extends BaseActivity {
         intent.putExtra(ReaderFragment.ARG_ID, id);
         intent.putExtra(ReaderFragment.ARG_TITLE, rssItem.title);
         intent.putExtra(ReaderFragment.ARG_DESCRIPTION, rssItem.description);
-        intent.putExtra(ReaderFragment.ARG_LINK, rssItem.link);
+        intent.putExtra(ReaderFragment.ARG_LINK, rssItem.enclosurelink !=
+                                                 null ? rssItem.enclosurelink
+                                                      : rssItem.link);
         intent.putExtra(ReaderFragment.ARG_IMAGEURL, rssItem.imageurl);
     }
 
