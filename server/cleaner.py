@@ -52,7 +52,23 @@ def get_feeditem_model(url, timestamp, item):
         # Existing feed, so ignore
         return None
 
-    clean_description = strip_bloat(item.get("description", ""))
+    # Some feeds use content, some description.
+    # Take the longest.
+    d = item.get("description", "")
+    try:
+        c = item.get("content", None)
+        # Can be many content, with different types
+        # This might fail for some
+        c = c[0].value
+    except:
+        c = ""
+
+    # Use d
+    if len(c) > len(d):
+        d = c
+
+    clean_description = strip_bloat(d)
+
     return FeedItemModel(key=FeedItemKey(url, item.link),
                          title=item.title,
                          description=clean_description,
