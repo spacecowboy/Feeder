@@ -24,11 +24,18 @@ import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.ClickableImageSpan;
 import com.nononsenseapps.feeder.model.ImageTextLoader;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
 import com.shirwa.simplistic_rss.RssItem;
+
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,17 +49,26 @@ public class ReaderFragment extends Fragment
     public static final String ARG_LINK = "link";
     public static final String ARG_IMAGEURL = "imageurl";
     public static final String ARG_ID = "dbid";
+    public static final String ARG_FEEDTITLE = "feedtitle";
+    public static final String ARG_AUTHOR = "author";
+    public static final String ARG_DATE = "date";
 
     private static final int TEXT_LOADER = 1;
 
     // TODO database id
     private long _id = -1;
     // All content contained in RssItem
-    private RssItem mRssItem;
+    private FeedItemSQL mRssItem;
     private TextView mTitleTextView;
     private TextView mBodyTextView;
     private ObservableScrollView mScrollView;
     private Spanned mBodyText = null;
+    private TextView mAuthorTextView;
+    private TextView mFeedTitleTextView;
+
+    // TODO Change
+    static final DateTimeFormatter dateTimeFormat =
+            DateTimeFormat.mediumDate().withLocale(Locale.getDefault());
 
 
     public ReaderFragment() {
@@ -66,34 +82,36 @@ public class ReaderFragment extends Fragment
      * @param rssItem the Item to open in the reader
      * @return A new instance of fragment ReaderFragment.
      */
-    public static ReaderFragment newInstance(long id, RssItem rssItem) {
+    public static ReaderFragment newInstance(FeedItemSQL rssItem) {
         ReaderFragment fragment = new ReaderFragment();
         // Save some time on load
         fragment.mRssItem = rssItem;
-        fragment._id = id;
+        fragment._id = rssItem.id;
 
-        fragment.setArguments(RssItemToBundle(id, rssItem, null));
+        fragment.setArguments(RssItemToBundle(rssItem, null));
         return fragment;
     }
 
     /**
      * Convert an RssItem into a Bundle for use with Fragment Arguments
      *
-     * @param id      potential database id
      * @param rssItem to convert
      * @param bundle  may be null
      * @return bundle of rssItem plus id
      */
-    public static Bundle RssItemToBundle(long id, RssItem rssItem,
+    public static Bundle RssItemToBundle(FeedItemSQL rssItem,
             Bundle bundle) {
         if (bundle == null) {
             bundle = new Bundle();
         }
-        bundle.putLong(ARG_ID, id);
-        bundle.putString(ARG_TITLE, rssItem.getTitle());
-        bundle.putString(ARG_DESCRIPTION, rssItem.getDescription());
-        bundle.putString(ARG_LINK, rssItem.getLink());
-        bundle.putString(ARG_IMAGEURL, rssItem.getImageUrl());
+        bundle.putLong(ARG_ID, rssItem.id);
+        bundle.putString(ARG_TITLE, rssItem.title);
+        bundle.putString(ARG_DESCRIPTION, rssItem.description);
+        bundle.putString(ARG_LINK, rssItem.link);
+        bundle.putString(ARG_IMAGEURL, rssItem.imageurl);
+        bundle.putString(ARG_FEEDTITLE, rssItem.feedtitle);
+        bundle.putString(ARG_AUTHOR, rssItem.author);
+        bundle.putString(ARG_DATE, rssItem.getPubDateString());
         return bundle;
     }
 
@@ -118,12 +136,15 @@ public class ReaderFragment extends Fragment
         }
     }
 
-    public static RssItem RssItemFromBundle(Bundle bundle) {
-        RssItem rssItem = new RssItem();
-        rssItem.setTitle(bundle.getString(ARG_TITLE));
-        rssItem.setDescription(bundle.getString(ARG_DESCRIPTION));
-        rssItem.setLink(bundle.getString(ARG_LINK));
-        rssItem.setImageUrl(bundle.getString(ARG_IMAGEURL));
+    public static FeedItemSQL RssItemFromBundle(Bundle bundle) {
+        FeedItemSQL rssItem = new FeedItemSQL();
+        rssItem.title = bundle.getString(ARG_TITLE);
+        rssItem.description = (bundle.getString(ARG_DESCRIPTION));
+        rssItem.link = (bundle.getString(ARG_LINK));
+        rssItem.imageurl = (bundle.getString(ARG_IMAGEURL));
+        rssItem.author = (bundle.getString(ARG_AUTHOR));
+        rssItem.setPubDate(bundle.getString(ARG_DATE));
+        rssItem.feedtitle = (bundle.getString(ARG_FEEDTITLE));
         return rssItem;
     }
 
@@ -138,20 +159,40 @@ public class ReaderFragment extends Fragment
                 (ObservableScrollView) rootView.findViewById(R.id.scroll_view);
         mTitleTextView = (TextView) rootView.findViewById(R.id.story_title);
         mBodyTextView = (TextView) rootView.findViewById(R.id.story_body);
+        mAuthorTextView = (TextView) rootView.findViewById(R.id.story_author);
+        mFeedTitleTextView = (TextView) rootView.findViewById(R.id
+                .story_feedtitle);
 
-        if (mRssItem.getTitle() == null) {
+        if (mRssItem.title == null) {
             mTitleTextView.setText("Nothing to display!");
         } else {
             mTitleTextView
-                    .setText(android.text.Html.fromHtml(mRssItem.getTitle()));
+                    .setText(android.text.Html.fromHtml(mRssItem.title));
         }
-        if (mRssItem.getDescription() == null) {
+        if (mRssItem.description == null) {
             mBodyTextView.setText("Nothing to display!");
         } else {
-            Log.d("JONAS", "Text is:\n" + mRssItem.getDescription());
+            Log.d("JONAS", "Text is:\n" + mRssItem.description);
             // Set without images as a place holder
             mBodyTextView.setText(
-                    android.text.Html.fromHtml(mRssItem.getDescription()));
+                    android.text.Html.fromHtml(mRssItem.description));
+        }
+
+        if (mRssItem.feedtitle == null) {
+            mFeedTitleTextView.setText("NOthing to display!");
+        } else {
+            mFeedTitleTextView.setText(mRssItem.feedtitle);
+        }
+
+        if (mRssItem.author == null) {
+            mAuthorTextView.setText(getString(R.string.on_date,
+                    mRssItem.getPubDate().withZone(DateTimeZone.getDefault())
+                            .toString(dateTimeFormat)));
+        } else {
+            mAuthorTextView.setText(getString(R.string.by_author_on_date,
+                    mRssItem.author,
+                    mRssItem.getPubDate().withZone(DateTimeZone.getDefault())
+                            .toString(dateTimeFormat)));
         }
 
         // Load images in text
@@ -169,7 +210,7 @@ public class ReaderFragment extends Fragment
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        RssItemToBundle(_id, mRssItem, outState);
+        RssItemToBundle(mRssItem, outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -193,7 +234,7 @@ public class ReaderFragment extends Fragment
         // Set intent
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mRssItem.getLink());
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mRssItem.link);
         shareActionProvider.setShareIntent(shareIntent);
 
         // Don't forget super call here
@@ -206,7 +247,7 @@ public class ReaderFragment extends Fragment
         if (id == R.id.action_open_in_browser) {
             // Open in browser
             startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse(mRssItem.getLink())));
+                    Uri.parse(mRssItem.link)));
             return true;
         } else {
             return super.onOptionsItemSelected(menuItem);
@@ -227,7 +268,7 @@ public class ReaderFragment extends Fragment
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
         // TODO use actual size and not window size
         // Using twice window height since we do scroll vertically
-        return new ImageTextLoader(getActivity(), mRssItem.getDescription(),
+        return new ImageTextLoader(getActivity(), mRssItem.description,
                 new Point((5 * size.x) / 6, 2 * size.y));
     }
 

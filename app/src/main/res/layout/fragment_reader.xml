@@ -21,9 +21,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/TextAppearance.Reader.Title"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="6dp"
             android:textIsSelectable="true"
             android:text="@string/title"/>
+
+        <TextView
+            android:id="@+id/story_feedtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Reader.Author"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:textIsSelectable="true"
+            android:text="CowboyProgrammer"/>
+
+        <TextView
+            android:id="@+id/story_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Reader.Author"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="8dp"
+            android:textIsSelectable="true"
+            android:text="by Jonas, Sep 14 2015"/>
 
         <com.nononsenseapps.feeder.views.LinkedTextView
             android:id="@+id/story_body"

@@ -47,12 +47,15 @@ public class FeedItemSQL {
     // These fields corresponds to columns in Feed table
     public static final String COL_FEED = "feed";
     public static final String COL_TAG = "tag";
+    public static final String COL_FEEDTITLE = "feedtitle";
 
     // For database projection so order is consistent
     public static final String[] FIELDS =
             {COL_ID, COL_TITLE, COL_DESCRIPTION, COL_PLAINTITLE, COL_PLAINSNIPPET, COL_IMAGEURL,
                     COL_LINK, COL_AUTHOR,
-                    COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG, COL_ENCLOSURELINK};
+                    COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG,
+                    COL_ENCLOSURELINK,
+                    COL_FEEDTITLE};
 
     /*
      * The SQL code that creates a Table for storing Persons in.
@@ -74,6 +77,7 @@ public class FeedItemSQL {
                     COL_UNREAD + " INTEGER NOT NULL DEFAULT 1," +
                     COL_FEED + " INTEGER NOT NULL," +
                     COL_TAG + " TEXT NOT NULL," +
+                    COL_FEEDTITLE + " TEXT NOT NULL," +
                     // Handle foreign key stuff
                     " FOREIGN KEY(" + COL_FEED + ") REFERENCES " + FeedSQL.TABLE_NAME + "(" +
                     FeedSQL.COL_ID + ") ON DELETE CASCADE," +
@@ -84,12 +88,18 @@ public class FeedItemSQL {
     // Trigger which updates Tags of items when feeds' tags are updated
     public static final String CREATE_TAG_TRIGGER =
             "CREATE TEMP TRIGGER IF NOT EXISTS trigger_tag_updater "
-            + " AFTER UPDATE OF " + FeedSQL.COL_TAG + " ON " + FeedSQL.TABLE_NAME
-            + " WHEN new." + FeedSQL.COL_TAG + " IS NOT old." + FeedSQL.COL_TAG
+            + " AFTER UPDATE OF " +
+            Util.arrayToCommaString(FeedSQL.COL_TAG, FeedSQL.COL_TITLE)
+            + " ON " + FeedSQL.TABLE_NAME
+            + " WHEN "
+            + "new." + FeedSQL.COL_TAG + " IS NOT old." + FeedSQL.COL_TAG
+            + " OR "
+            + "new." + FeedSQL.COL_TITLE + " IS NOT old." + FeedSQL.COL_TITLE
             + " BEGIN "
             + " UPDATE " + FeedItemSQL.TABLE_NAME + " SET " + COL_TAG + " = "
-            + " new." + FeedSQL.COL_TAG + " WHERE " + COL_FEED + " IS old." +
-            FeedSQL.COL_ID
+            + " new." + FeedSQL.COL_TAG + ", " + COL_FEEDTITLE + " = "
+            + " new." + FeedSQL.COL_TITLE
+            + " WHERE " + COL_FEED + " IS old." + FeedSQL.COL_ID
             + "; END";
 
     // Fields corresponding to database columns
@@ -104,6 +114,7 @@ public class FeedItemSQL {
     private DateTime pubDate = null;
     public String link = null;
     public String tag = null;
+    public String feedtitle = null;
 
     public boolean isUnread() {
         return unread == 1;
@@ -136,10 +147,11 @@ public class FeedItemSQL {
         this.link = cursor.getString(6);
         this.author = cursor.getString(7);
         setPubDate(cursor.getString(8));
-       this.unread = cursor.getInt(9);
+        this.unread = cursor.getInt(9);
         this.feed_id = cursor.getLong(10);
         this.tag = cursor.getString(11);
         this.enclosurelink = cursor.getString(12);
+        this.feedtitle = cursor.getString(13);
     }
 
     public DateTime getPubDate() {
@@ -185,6 +197,7 @@ public class FeedItemSQL {
         values.put(COL_PLAINSNIPPET, plainsnippet);
         values.put(COL_FEED, feed_id);
         values.put(COL_UNREAD, unread);
+        values.put(COL_FEEDTITLE, feedtitle);
 
         Util.PutNullable(values, COL_IMAGEURL, imageurl);
         Util.PutNullable(values, COL_LINK, link);

@@ -17,10 +17,13 @@
     <string name="add_rss_feed">Add RSS feed</string>
     <string name="title_activity_edit_feed">EditFeedActivity</string>
     <string name="url">URL</string>
-    <string name="title">Title</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tag">Tag</string>
     <string name="add_feed_search_hint">URL or search query</string>
     <string name="select_account">Select account</string>
+    <string name="title">Title</string>
+
+    <string name="by_author_on_date">by %1$s, %2$s</string>
+    <string name="on_date">%1$s</string>
 
 </resources>

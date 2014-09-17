@@ -30,15 +30,17 @@ public class ReaderActivity extends BaseActivity {
      * @param id      database id of item, if applicable
      * @param rssItem to read
      */
-    public static void setRssExtras(Intent intent, long id,
-            FeedItemSQL rssItem) {
-        intent.putExtra(ReaderFragment.ARG_ID, id);
+    public static void setRssExtras(Intent intent, FeedItemSQL rssItem) {
+        intent.putExtra(ReaderFragment.ARG_ID, rssItem.id);
         intent.putExtra(ReaderFragment.ARG_TITLE, rssItem.title);
         intent.putExtra(ReaderFragment.ARG_DESCRIPTION, rssItem.description);
         intent.putExtra(ReaderFragment.ARG_LINK, rssItem.enclosurelink !=
                                                  null ? rssItem.enclosurelink
                                                       : rssItem.link);
         intent.putExtra(ReaderFragment.ARG_IMAGEURL, rssItem.imageurl);
+        intent.putExtra(ReaderFragment.ARG_DATE, rssItem.getPubDateString());
+        intent.putExtra(ReaderFragment.ARG_AUTHOR, rssItem.author);
+        intent.putExtra(ReaderFragment.ARG_FEEDTITLE, rssItem.feedtitle);
     }
 
     @Override

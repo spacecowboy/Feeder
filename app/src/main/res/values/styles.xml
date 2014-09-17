@@ -153,10 +153,22 @@
         <item name="android:textColor">@color/tertiary_text_material_dark</item>
     </style>
 
+    <style name="TextAppearance.ListItem"/>
+    <style name="TextAppearance.ListItem.Author">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/tertiary_text_material_dark</item>
+    </style>
+
     <style name="TextAppearance.Reader"/>
     <style name="TextAppearance.Reader.Title">
         <item name="android:textColor">@color/white_54</item>
         <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+    <style name="TextAppearance.Reader.Author">
+        <item name="android:textColor">@color/white_54</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
     <style name="TextAppearance.Reader.Body">

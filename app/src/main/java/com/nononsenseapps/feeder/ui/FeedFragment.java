@@ -9,8 +9,12 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,7 +49,7 @@ public class FeedFragment extends Fragment
 
     // TODO change format possibly
     static final DateTimeFormatter shortDateTimeFormat =
-            DateTimeFormat.shortDateTime().withLocale(Locale.getDefault());
+            DateTimeFormat.mediumDate().withLocale(Locale.getDefault());
 
     private static final int FEEDITEMS_LOADER = 1;
     private static final int FEED_LOADER = 2;
@@ -312,6 +316,8 @@ public class FeedFragment extends Fragment
         private final int unreadTextColor;
         private final int readTextColor;
 
+        String temps;
+
         public FeedAdapter(final Context context) {
             //super(context, R.layout.view_story);
             super(context, R.layout.view_story, null, new String[]{},
@@ -363,6 +369,7 @@ public class FeedFragment extends Fragment
             holder.rssItem = item;
             holder.link = item.enclosurelink != null ? item.enclosurelink :
             item.link;
+            holder.authorTextView.setText(item.feedtitle);
             if (item.getPubDate() == null) {
                 holder.dateTextView.setVisibility(View.GONE);
             } else {
@@ -375,20 +382,34 @@ public class FeedFragment extends Fragment
                 holder.titleTextView.setVisibility(View.GONE);
             } else {
                 holder.titleTextView.setVisibility(View.VISIBLE);
-                holder.titleTextView.setText(item.plaintitle);
+                // \u2014 is a EM-dash, basically a long version of '-'
+                temps = item.plainsnippet == null ? item.plaintitle :
+                        item.plaintitle + " \u2014 " + item.plainsnippet;
+                Spannable textSpan = new SpannableString(temps);
+                // Body is always grey
+                textSpan.setSpan(new ForegroundColorSpan(readTextColor),
+                        item.plaintitle.length(), temps.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                // Title depends on status
+                textSpan.setSpan(new ForegroundColorSpan(holder.rssItem.isUnread() ?
+                                                         unreadTextColor :
+                                                         readTextColor),
+                        0, item.plaintitle.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.titleTextView.setText(textSpan);
                 // Change depending on read status
-                holder.titleTextView.setTextColor(holder.rssItem.isUnread() ?
-                                                  unreadTextColor :
-                                                  readTextColor);
+//                holder.titleTextView.setTextColor(holder.rssItem.isUnread() ?
+//                                                  unreadTextColor :
+//                                                  readTextColor);
             }
-            if (item.plainsnippet == null) {
-                holder.bodyTextView.setVisibility(View.GONE);
-            } else {
-                holder.bodyTextView.setVisibility(View.VISIBLE);
-                //                holder.bodyTextView.setText(android.text.Html.fromHtml(item
-                //                        .getDescription()));
-                holder.bodyTextView.setText(item.plainsnippet);
-            }
+//            if (item.plainsnippet == null) {
+//                holder.bodyTextView.setVisibility(View.GONE);
+//            } else {
+//                holder.bodyTextView.setVisibility(View.VISIBLE);
+//                //                holder.bodyTextView.setText(android.text.Html.fromHtml(item
+//                //                        .getDescription()));
+//                holder.bodyTextView.setText(item.plainsnippet);
+//            }
             if (item.imageurl == null) {
                 holder.imageView.setVisibility(View.GONE);
             } else {
@@ -428,6 +449,7 @@ public class FeedFragment extends Fragment
             public final TextView titleTextView;
             public final TextView bodyTextView;
             public final TextView dateTextView;
+            public final TextView authorTextView;
             public final ImageView imageView;
             public String link;
             public FeedItemSQL rssItem;
@@ -438,6 +460,7 @@ public class FeedFragment extends Fragment
                 titleTextView = (TextView) v.findViewById(R.id.story_title);
                 bodyTextView = (TextView) v.findViewById(R.id.story_body);
                 dateTextView = (TextView) v.findViewById(R.id.story_date);
+                authorTextView = (TextView) v.findViewById(R.id.story_author);
                 imageView = (ImageView) v.findViewById(R.id.story_image);
             }
 
@@ -459,7 +482,7 @@ public class FeedFragment extends Fragment
                     Intent i = new Intent(getActivity(), ReaderActivity.class);
                     //i.setData(Uri.parse(link));
                     i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
-                    ReaderActivity.setRssExtras(i, rssItem.id, rssItem);
+                    ReaderActivity.setRssExtras(i, rssItem);
 
                     // TODO add animation
                     Log.d("JONAS", "View size: w: " + view.getWidth() +

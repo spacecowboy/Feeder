@@ -421,6 +421,7 @@ public class RssSyncService extends IntentService {
                 }
                 // Always need these
                 itemSQL.feed_id = feedSQL.id;
+                itemSQL.feedtitle = feedSQL.title;
                 itemSQL.tag = feedSQL.tag;
                 // Save it
                 Log.d("JONAS", "Saving the item: " + itemSQL.title);
