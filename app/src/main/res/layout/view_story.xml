@@ -74,7 +74,7 @@
             android:id="@+id/story_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
+            android:layout_marginBottom="4dp"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="4dp"
             android:text="A long text that is supposed to touch the end of the line"
