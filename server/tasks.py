@@ -6,6 +6,7 @@ from util import (datetime_now, parse_timestamp, domain_from_url,
 from cleaner import get_feeditem_model
 from models import (FeedModel, FeedItemModel,
                     FeedModelKey, FeedItemKey)
+from storage import (get_feed, get_feedurls)
 import feedparser as fp
 
 # Don't remove embedded videos
@@ -42,37 +43,17 @@ class Cacher(webapp2.RequestHandler):
         etag, modified = None, None
         url = self.request.get("url")
         if url is None or len(url) == 0:
-            urls = self._fetch_all_feeds()
+            urls = get_feedurls(distinct=True)
         else:
             urls = [url]
 
         # Fetch RSS items
         for url in urls:
-            # Check if it is a feed or string
-            if hasattr(url, "link"):
-                # It's a feed
-                exists = True
-                etag = url.etag
-                modified = url.modified
-                url = url.link
-            else:
-                # Make sure it exists in feeds list
-                feeds = FeedModel.query(FeedModel.link == url)
-                exists = False
-                for feed in feeds:
-                    exists = True
-                    etag = feed.etag
-                    modified = feed.modified
-                    break
-
+            # Make sure it exists in feeds list
+            feed = get_feed(url)
             # cache it if it exists in database
-            if exists:
-                self._cache_feed(url, etag, modified)
-
-    def _fetch_all_feeds(self):
-        # If no urls specified, fetch all
-        return FeedModel.query(projection=["link", "etag", "modified"],
-                               distinct=True)
+            if feed is not None:
+                self._cache_feed(url, feed.etag, feed.modified)
 
     def _cache_feed(self, url, etag=None, modified=None, tag=None):
             '''

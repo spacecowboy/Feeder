@@ -1,5 +1,3 @@
-import feedparser as fp
-
 import endpoints
 from messages import (FeedsResponse, VoidMessage,
                       Feed, feed_from_model,
@@ -7,16 +5,12 @@ from messages import (FeedsResponse, VoidMessage,
                       REQUEST_FEEDQUERY, REQUEST_PUTFEED,
                       REQUEST_DELFEED, REQUEST_CACHEFEEDS,
                       GCMRegId)
-from models import (FeedModel, FeedItemModel,
-                    FeedModelKey, FeedItemKey,
-                    GCMRegIdModel, GCMRegIdModelKey)
-from util import (datetime_now, parse_timestamp, domain_from_url)
-from cleaner import get_feeditem_model
-#from google.appengine.ext import ndb
 
 from google.appengine.api import taskqueue
-
 from protorpc import remote
+
+from storage import (get_distinct_feeds, get_feeditems, get_feed_with_items,
+                     put_feed, delete_feeds, put_gcm)
 
 #from app_gcm import send_link, GCMRegIdModel
 
@@ -54,57 +48,21 @@ class FeederApi(remote.Service):
 
         # If no urls specified, fetch from user's store
         if len(request.urls) == 0:
-            urls = FeedModel.query(FeedModel.user == current_user)
+            urls = get_distinct_feeds(user=current_user)
         else:
             urls = request.urls
 
         # Fetch RSS items
         for url in urls:
             try:
-                # Check if it is a feed or string
-                if hasattr(url, "link"):
-                    # It's a feed
-                    print("Feed is already here")
-                    fm = url
-                    url = fm.link
-                else:
-                    if not "://" in url:
-                        url = "http://" + url
-                    # Try to look in cache
-                    print("Looking in DB")
-                    fm = FeedModelKey(current_user, url).get()
-                print("DB result:", fm)
-                if fm is None:
-                    print("fm was none")
-                    entries = None
-                    # Not seen this before, cache it first
-                    #fm, entries = self._cache_feed(url, current_user)
-                    #print("cache result:", fm, entries)
-                    if fm is None or entries is None:
-                        # Nothing to do here
-                        print("No cache result")
-                        continue
-                else:
-                    # It is cached, fetch items
-                    print("Fetching from db")
-                    entries = FeedItemModel.query(FeedItemModel.feed_link == url)
-                    entries.order(FeedItemModel.published)
-                    # filter on timestamps
-                    if (request.min_timestamp is not None and
-                        parse_timestamp(request.min_timestamp) is not None):
-                        entries = entries.filter(FeedItemModel.timestamp >\
-                                                 parse_timestamp(request.min_timestamp))
+                if not "://" in url:
+                    url = "http://" + url
 
-                # Get individual items
-                items = []
-                for item in entries:
-                    print("Iterating an item:", item.title)
-                    items.append(feeditem_from_model(item))
-                # Construct feed
-                feed = feed_from_model(fm, items)
-
+                print("Fetching from db")
+                feed = get_feed_with_items(url, request.min_timestamp)
                 # Append to response
-                feeds.append(feed)
+                if feed is not None:
+                    feeds.append(feed)
             except Exception as e:
                 raise(e)
 
@@ -128,29 +86,17 @@ class FeederApi(remote.Service):
         print("Got a feed and putting it:", request.link)
 
         # Put in database
-        feed = FeedModel(key=FeedModelKey(current_user, request.link),
-                         user=current_user,
-                         timestamp=datetime_now(),
-                         title=request.title,
-                         description=request.description,
-                         link=request.link,
-                         tag=request.tag)
-        # Make sure feed has required items
-        if feed.title is None:
-            feed.title = domain_from_url(request.link)
-        if feed.description is None:
-            feed.description = ""
-        # And save
-        feed.put()
+        feed = put_feed(request.link, current_user, request.title,
+                        request.description, request.tag)
 
         # Cache it
         # Add the task to the default queue.
-        taskqueue.add(url='/tasks/cache', params={'url': feed.link})
+        taskqueue.add(url='/tasks/cache', params={'url': request.link})
 
         # Notify through GCM
         #send_link(link, request.regid)
 
-        return feed_from_model(feed)
+        return feed
 
     @endpoints.method(REQUEST_DELFEED, VoidMessage,
                       name='feeds.delete',
@@ -162,9 +108,7 @@ class FeederApi(remote.Service):
             raise endpoints.UnauthorizedException('Invalid token.')
 
         # Delete RSS feeds
-        for url in request.urls:
-            print("Deleting:", url)
-            FeedModelKey(current_user, url).delete()
+        delete_feeds(request.urls, current_user)
 
         # Notify through GCM
         #send_link(link, request.regid)
@@ -180,11 +124,7 @@ class FeederApi(remote.Service):
         if current_user is None:
             raise endpoints.UnauthorizedException('Invalid token.')
 
-        device = GCMRegIdModel(key=GCMRegIdModelKey(request.regid),
-                               regid=request.regid,
-                               userid=current_user)
-        # And save it
-        device.put()
+        put_gcm(request.regid, current_user)
 
         # Return nothing
         return VoidMessage()
