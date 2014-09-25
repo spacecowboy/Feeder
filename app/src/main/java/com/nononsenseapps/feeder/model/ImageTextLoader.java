@@ -267,27 +267,29 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                 // TODO handle more than youtube
                 Log.d("JONASYOUTUBE", "src: " + video.src);
                 if (video.src.toLowerCase().contains("youtube")) {
-                    ClickableImageSpan span = new ClickableImageSpan
-                            (getYoutubeThumb(video)) {
-                        @Override
-                        public void onClick() {
-                            Log.d("YOUTUBECLICK", "Url: " + video.link);
-                            final Intent i = new Intent(Intent.ACTION_VIEW,
-                                    Uri.parse(video.link));
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            getContext().startActivity(i);
-                        }
-                    };
-                    int len = text.length();
-                    text.append("\uFFFC");
-                    text.setSpan(span, len, text.length(),
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    // Add newline also
-                    text.append("\n");
-                    start(text, new Italic());
-                    text.append("Touch to play video");
-                    end(text, Italic.class, new StyleSpan(Typeface.ITALIC));
-                    text.append("\n\n");
+                    try {
+                        ClickableImageSpan span = new ClickableImageSpan(getYoutubeThumb(video)) {
+                            @Override
+                            public void onClick() {
+                                Log.d("YOUTUBECLICK", "Url: " + video.link);
+                                final Intent i =
+                                        new Intent(Intent.ACTION_VIEW, Uri.parse(video.link));
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                getContext().startActivity(i);
+                            }
+                        };
+                        int len = text.length();
+                        text.append("\uFFFC");
+                        text.setSpan(span, len, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        // Add newline also
+                        text.append("\n");
+                        start(text, new Italic());
+                        text.append("Touch to play video");
+                        end(text, Italic.class, new StyleSpan(Typeface.ITALIC));
+                        text.append("\n\n");
+                    } catch (NullPointerException e) {
+                        // Error is already logged..
+                    }
                 }
 
                 // Do this last
@@ -432,6 +434,7 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
             layers[0] = d;
         } catch (IOException e) {
             Log.e("JONASYOUTUBE", "" + e.getMessage());
+            throw new NullPointerException(e.getLocalizedMessage());
         }
 
         // Add layer with play icon
