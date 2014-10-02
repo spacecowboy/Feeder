@@ -1,0 +1,6 @@
+flask
+Flask-SQLAlchemy
+
+# Need newer version than available on pip
+#flask-restful
+git+https://github.com/twilio/flask-restful
