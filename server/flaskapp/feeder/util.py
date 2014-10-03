@@ -1,22 +1,4 @@
-from datetime import datetime, tzinfo, timedelta
-import re
-
-
-class TimeZone(tzinfo):
-    def __init__(self, offset):
-        super(tzinfo, self)
-        self.offset = offset
-
-    def utcoffset(self, dt):
-        return timedelta(self.offset)
-
-    def dst(self, dt):
-        return timedelta(0)
-
-    def tzname(self, dt):
-        return "TZ{}".format(self.offset)
-
-UTC = TimeZone(0)
+from datetime import datetime, timezone
 
 
 def datetuple_to_string(tup):
@@ -35,6 +17,22 @@ def datetuple_to_string(tup):
     return datetime_to_string(datetime(*tup[:6]))
 
 
+def datetuple_to_datetime(tup):
+    '''
+    Convert a Python date tuple, as returned by feedparser's published_parsed,
+    to a datetime. If None, returns None.
+
+    Example:
+    >>> datetuple_to_datetime(None)
+
+    >>> datetuple_to_datetime((2009, 3, 23, 13, 6, 34, 0, 82, 0))
+    datetime.datetime(2009, 3, 23, 13, 6, 34)
+    '''
+    if tup is None:
+        return None
+    return parse_timestamp(datetuple_to_string(tup))
+
+
 def datetime_to_string(dt):
     '''Converts a datetime object to a
     timestamp string in the format (in UTC):
@@ -44,7 +42,7 @@ def datetime_to_string(dt):
         return dt
 
     if dt.utcoffset() is not None:
-        dt = dt.astimezone(UTC)
+        dt = dt.astimezone(timezone.utc)
 
     return dt.isoformat()
 
@@ -65,12 +63,12 @@ def convert_timestamp(timestamp):
 
     Example:
 
-    Note that timezones are not supported
-    >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 +0200")
-    '2014-09-05T12:55:00'
-
+    Note that named timezones are not supported
     >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 +0000")
-    '2014-09-05T12:55:00'
+    '2014-09-05T12:55:00+00:00'
+
+    >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 +0200")
+    '2014-09-05T10:55:00+00:00'
 
     >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 GMT")
     '2014-09-05T12:55:00'
@@ -99,37 +97,47 @@ def parse_timestamp(timestamp):
     >>> parse_timestamp("2013-09-29T13:21:42.123456")
     datetime.datetime(2013, 9, 29, 13, 21, 42, 123456)
 
+    With timezone specified
+    >>> parse_timestamp("2013-09-29T13:21:42Z")
+    datetime.datetime(2013, 9, 29, 13, 21, 42)
+
+    >>> parse_timestamp("2013-09-29T13:21:42+0200")
+    datetime.datetime(2013, 9, 29, 11, 21, 42, tzinfo=datetime.timezone.utc)
+
+
     Formats common in Atom feeds
     >>> parse_timestamp("Fri, 05 Sep 2014 12:55:00 +0200")
-    datetime.datetime(2014, 9, 5, 12, 55)
+    datetime.datetime(2014, 9, 5, 10, 55, tzinfo=datetime.timezone.utc)
 
     >>> parse_timestamp("Fri, 23 May 2014 10:56:50 GMT")
     datetime.datetime(2014, 5, 23, 10, 56, 50)
 
     >>> parse_timestamp("Fri 23 May 2014 10:56:50 -0200")
-    datetime.datetime(2014, 5, 23, 10, 56, 50)
+    datetime.datetime(2014, 5, 23, 12, 56, 50, tzinfo=datetime.timezone.utc)
 
 
     Returns None on failure to parse
     >>> parse_timestamp("2013-09-22")
+
+    >>> parse_timestamp(None)
     '''
     result = None
 
-    formats = ['%Y-%m-%dT%H:%M:%S.%f',
-               '%Y-%m-%dT%H:%M:%S',
+    if timestamp is None:
+        return None
+
+    formats = ['%Y-%m-%dT%H:%M:%S',
+               '%Y-%m-%dT%H:%M:%SZ',
+               '%Y-%m-%dT%H:%M:%S%z',
+               '%Y-%m-%dT%H:%M:%S.%f',
+               '%Y-%m-%dT%H:%M:%S.%fZ',
+               '%Y-%m-%dT%H:%M:%S.%f%z',
                '%a, %d %b %Y %H:%M:%S',
                '%a %d %b %Y %H:%M:%S',
+               '%a, %d %b %Y %H:%M:%S %z',
+               '%a %d %b %Y %H:%M:%S %z',
                '%a, %d %b %Y %H:%M:%S %Z',
                '%a %d %b %Y %H:%M:%S %Z']
-
-    # Fucking python2 does not support timezones...
-    # First extract timezone
-    tzpattern = r"\s?([+-]([0-9]){4})"
-    offset = re.search(tzpattern, timestamp)
-    if offset is not None:
-        offset = offset.group(1)
-    # Then remove from timestamp
-    timestamp = re.sub(tzpattern, "", timestamp)
 
     for fmt in formats:
         if result is not None:
@@ -138,6 +146,8 @@ def parse_timestamp(timestamp):
         try:
             result = datetime.strptime(timestamp,
                                        fmt)
+            if result.utcoffset() is not None:
+                result = result.astimezone(timezone.utc)
         except ValueError as e:
             result = None
             #print("Conversion error: ", e)

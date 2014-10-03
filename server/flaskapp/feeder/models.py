@@ -4,10 +4,61 @@ The database models (tables)
 '''
 
 from sqlalchemy import (Column, Integer, String, Text,
-                        DateTime, ForeignKey)
+                        DateTime, ForeignKey, desc)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
 from feeder.database import db
+from datetime import datetime
+
+
+def get_user(email):
+    '''
+    Return a valid database user, creating one first if necessary.
+    '''
+    # Try to find it first
+    user = User.query.filter_by(email=email).first()
+
+    if user is None:
+        # Add to database first
+        user = User(email=email)
+        db.session.add(user)
+        db.session.commit()
+
+    return user
+
+
+def get_feed(link):
+    '''
+    Add a feed to database if it does not exist yet.
+
+    Returns a valid feed object
+    '''
+    if "://" not in link:
+        link = "http://" + link
+    feed = Feed.query.filter_by(link=link).first()
+
+    if feed is None:
+        feed = Feed(title='', description='', link=link,
+                    timestamp=datetime.utcnow())
+        db.session.add(feed)
+        db.session.commit()
+
+    return feed
+
+
+def get_userfeed(user, feed, tag=None, title=None):
+    '''
+    Return a valid userfeed item, adding it if it doesn't exist.
+    '''
+    userfeed = UserFeed.query.filter_by(user_id=user.id,
+                                        feed_id=feed.id).first()
+
+    if userfeed is None:
+        userfeed = UserFeed(user, feed, tag, title)
+        db.session.add(userfeed)
+        db.session.commit()
+
+    return userfeed
 
 
 class User(db.Model):
@@ -80,7 +131,7 @@ class UserFeed(db.Model):
 class FeedItem(db.Model):
     __tablename__ = "feeditems"
     id = Column(Integer, primary_key=True)
-    link = Column(String, nullable=False, unique=True)
+    link = Column(String, nullable=False)
     title = Column(Text, nullable=False)
     description = Column(Text, nullable=False)
     title_stripped = Column(Text, nullable=False)
@@ -94,23 +145,8 @@ class FeedItem(db.Model):
     # Related feed
     feed_id = Column(Integer, ForeignKey('feeds.id'))
     feed = relationship("Feed", backref=backref('items',
-                                                order_by=published,
+                                                order_by=desc(published),
                                                 lazy='dynamic'))
-
-    def __init__(self, title, description, link, title_stripped,
-                 snippet, feed_id, published, author, comments,
-                 enclosure, timestamp):
-        self.title = title
-        self.description = description
-        self.link = link
-        self.title_stripped = title_stripped
-        self.snippet = snippet
-        self.feed_id = feed_id
-        self.published = published
-        self.author = author
-        self.comments = comments
-        self.enclosure = enclosure
-        self.timestamp = timestamp
 
     def ___repr__(self):
         return '<FeedItem {}>'.format(self.link)

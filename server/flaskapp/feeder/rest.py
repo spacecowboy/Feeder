@@ -4,12 +4,11 @@ The REST-API of Feeder
 '''
 
 from feeder import app, db
-from feeder.models import User, Feed, FeedItem, UserFeed
+from .models import Feed, UserFeed, get_user, get_feed
 #from flask_oauthlib.client import OAuth
 from flask.ext.restful import (Resource, Api, reqparse, fields,
                                marshal_with, marshal_with_field)
-from feeder.util import parse_timestamp
-from datetime import datetime
+from .util import parse_timestamp
 
 
 # Want a boolean class
@@ -87,39 +86,6 @@ feed_fields = {
 }
 
 
-def get_user(email):
-    '''
-    Return a valid database user, creating one first if necessary.
-    '''
-    # Try to find it first
-    user = User.query.filter_by(email=email).first()
-
-    if user is None:
-        # Add to database first
-        user = User(email=email)
-        db.session.add(user)
-        db.session.commit()
-
-    return user
-
-
-def add_feed(link):
-    '''
-    Add a feed to database if it does not exist yet.
-
-    Returns a valid feed object
-    '''
-    feed = Feed.query.filter_by(link=link).first()
-
-    if feed is None:
-        feed = Feed(title='', description='', link=link,
-                    timestamp=datetime.utcnow())
-        db.session.add(feed)
-        db.session.commit()
-
-    return feed
-
-
 class Feeds(Resource):
     '''
     This class is the entire REST-interface for dealing with feeds.
@@ -165,7 +131,7 @@ class Feeds(Resource):
         args = postparser.parse_args()
 
         # Make sure feed exists
-        feed = add_feed(args.link)
+        feed = get_feed(args.link)
         # Set link between user and feed
         userfeed = UserFeed(user, feed, args.tag, args.title)
         db.session.add(userfeed)
