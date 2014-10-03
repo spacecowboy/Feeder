@@ -4,7 +4,7 @@ python -m feeder.tests
 '''
 
 import unittest
-from .sync import cache_all_feeds
+from .sync import cache_all_feeds, delete_orphan_feeds
 from .models import (User, Feed, UserFeed, FeedItem,
                      get_user, get_feed, get_userfeed)
 from feeder import db
@@ -43,9 +43,9 @@ def setUpModule():
 
 
 def tearDownModule():
-    #db.session.rollback()
-    #db.drop_all()
-    pass
+    db.session.rollback()
+    db.drop_all()
+    #pass
 
 
 class CacheTests(unittest.TestCase):
@@ -103,7 +103,7 @@ class CacheTests(unittest.TestCase):
                 self.assertIsNone(uf.tag)
                 self.assertNotEqual(uf.title, uf.feed.title)
 
-    def test_delete_user_cascade(self):
+    def test_z_delete_user_cascade(self):
         # Delete user should delete connected user feeds
         frank = get_user("frank@frank.frank")
         frankfeeds = frank.feeds.all()
@@ -119,16 +119,40 @@ class CacheTests(unittest.TestCase):
 
         self.assertEqual(expected_len, len(userfeeds))
 
-    @unittest.skip("Not implemented")
-    def test_delete_feed_cascade(self):
+    def test_z_delete_feed_cascade(self):
         # Deleting a feed should cascade and delete all feeditems
-        pass
+        feed = Feed.query.first()
 
-    @unittest.skip("Not implemented")
-    def test_delete_orphan_feeds(self):
+        fid = feed.id
+
+        targetlen = FeedItem.query.filter_by(feed_id=fid).count()
+        prev_len = FeedItem.query.count()
+
+        db.session.delete(feed)
+        db.session.commit()
+
+        new_len = FeedItem.query.count()
+
+        self.assertEqual(new_len, prev_len - targetlen)
+
+    def test_z_delete_orphan_feeds(self):
         # Test method which deletes feeds not connected to any user
-        pass
+        # Get number of existing feeds
+        feeds_count = Feed.query.count()
+        # Get count of frank's feeds
+        frank = get_user("frank@frank.frank")
+        franks_count = UserFeed.query.filter_by(user_id=frank.id).count()
+        # He shares one feed with bob, so subtract that
+        franks_count -= 1
+        # Remove frank
+        db.session.delete(frank)
+        db.session.commit()
 
+        # Call clean up function
+        delete_orphan_feeds()
+
+        # Now just check the results
+        self.assertEqual(Feed.query.count(), feeds_count - franks_count)
 
 if __name__ == '__main__':
     unittest.main()

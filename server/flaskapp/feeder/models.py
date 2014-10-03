@@ -144,9 +144,11 @@ class FeedItem(db.Model):
     timestamp = Column(DateTime, nullable=False)
     # Related feed
     feed_id = Column(Integer, ForeignKey('feeds.id'))
-    feed = relationship("Feed", backref=backref('items',
-                                                order_by=desc(published),
-                                                lazy='dynamic'))
+    feed = relationship("Feed",
+                        backref=backref('items',
+                                        cascade="all,delete",
+                                        order_by=desc(published),
+                                        lazy='dynamic'))
 
     def ___repr__(self):
         return '<FeedItem {}>'.format(self.link)

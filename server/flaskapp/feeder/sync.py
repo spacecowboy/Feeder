@@ -5,7 +5,8 @@ This file handles syncing the actual RSS/Atom feeds.
 
 import feedparser as fp
 from feeder import db
-from .models import FeedItem, Feed
+from sqlalchemy import distinct
+from .models import FeedItem, Feed, UserFeed
 from .util import (datetime_now,
                    datetuple_to_datetime)
 from .cleaner import clean_entry
@@ -96,9 +97,19 @@ def cache_feed(feed):
     else:
         print("No new items in {}".format(feed.title))
 
-    def delete_orphan_feeds(self):
-        '''
-        Delete feeds which are no longer connected to any users.
-        '''
-        # TODO
-        pass
+
+def delete_orphan_feeds():
+    '''
+    Delete feeds which are no longer connected to any users.
+    '''
+    # Get all unique feed_ids connected by users
+    user_feed_ids = db.session.query(distinct(UserFeed.feed_id)).all()
+    # Convert from ((1,), (2,)) to [1, 2]
+    user_feed_ids = [x[0] for x in user_feed_ids]
+    # Now get all feeds not in that list
+    feeds = Feed.query.filter(~Feed.id.in_(user_feed_ids)).all()
+    # And remove them
+    if len(feeds) > 0:
+        for feed in feeds:
+            db.session.delete(feed)
+        db.session.commit()
