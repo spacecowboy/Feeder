@@ -21,6 +21,8 @@ import com.squareup.picasso.Picasso;
 
 import org.joda.time.DateTime;
 
+import java.util.List;
+
 import retrofit.RetrofitError;
 
 /**
@@ -112,18 +114,19 @@ public class RssSyncService extends IntentService {
         if (token != null) {
             BackendAPIClient.BackendAPI api =
                     BackendAPIClient.GetBackendAPI(token);
-            BackendAPIClient.FeedsRequest f =
-                    new BackendAPIClient.FeedsRequest(link);
+//            BackendAPIClient.FeedsRequest f =
+//                    new BackendAPIClient.FeedsRequest(link);
 
             try {
-                api.deleteFeed(f);
+                api.deleteFeed(link);
             } catch (RetrofitError e) {
                 Log.e(TAG, "put error: " + e.getMessage());
                 Toast.makeText(getApplicationContext(),
                         "Put failed: " + e.getMessage(), Toast.LENGTH_SHORT)
                         .show();
-                // Store for later
-                PendingNetworkSQL.storeDelete(this, -1, link);
+                // Store for later unless 404
+                // TODO
+                // PendingNetworkSQL.storeDelete(this, -1, link);
             }
         }
     }
@@ -337,20 +340,21 @@ public class RssSyncService extends IntentService {
 
         BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(token);
         try {
-            BackendAPIClient.FeedsRequest request =
-                    new BackendAPIClient.FeedsRequest();
+            //BackendAPIClient.FeedsRequest request =
+            //        new BackendAPIClient.FeedsRequest();
             // fetch timestamp from database, set on request so we only
             // download items we haven't seen
-            request.min_timestamp = RssContentProvider.GetLatestTimestamp(this);
-            Log.d(TAG, "Using min_timestamp: " + request.min_timestamp);
+            //request.min_timestamp = RssContentProvider.GetLatestTimestamp
+           //        (this);
+            Log.d(TAG, "Using min_timestamp: " + RssContentProvider.GetLatestTimestamp(this));
 
-            BackendAPIClient.FeedsResponse response = api.getFeeds(request);
+            List<BackendAPIClient.Feed> feeds = api.getFeeds(RssContentProvider.GetLatestTimestamp(this));
 
-            if (response.feeds == null) {
+            if (feeds == null) {
                 Log.d(TAG, "Feeds was null");
             } else {
-                Log.d(TAG, "Number of feeds to sync: " + response.feeds.size());
-                for (BackendAPIClient.Feed feed : response.feeds) {
+                Log.d(TAG, "Number of feeds to sync: " + feeds.size());
+                for (BackendAPIClient.Feed feed : feeds) {
                     Log.d(TAG, "ftitle " + feed.title);
                     Log.d(TAG, "fdesc " + feed.description);
                     Log.d(TAG, "ftimestamp " + feed.timestamp);
@@ -400,14 +404,15 @@ public class RssSyncService extends IntentService {
                 if (itemSQL.plainsnippet == null) {
                     itemSQL.plainsnippet = "";
                 }
-                if (item.images != null && !item.images.isEmpty()) {
-                    itemSQL.imageurl = item.images.get(0);
-                    // TODO pre-cache ALL images
-                    if (itemSQL.imageurl != null && !itemSQL.imageurl.isEmpty()) {
-                        Log.d("JONAS", "Pre-fetching " + itemSQL.imageurl);
-                        Picasso.with(this).load(itemSQL.imageurl).fetch();
-                    }
-                }
+                itemSQL.imageurl = item.image;
+//                if (item.image != null) {
+ //                   itemSQL.imageurl = item.images.get(0);
+//                    // TODO pre-cache ALL images
+//                    if (itemSQL.imageurl != null && !itemSQL.imageurl.isEmpty()) {
+//                        Log.d("JONAS", "Pre-fetching " + itemSQL.imageurl);
+//                        Picasso.with(this).load(itemSQL.imageurl).fetch();
+//                    }
+ //               }
                 itemSQL.link = item.link;
                 itemSQL.author = item.author;
                 try {

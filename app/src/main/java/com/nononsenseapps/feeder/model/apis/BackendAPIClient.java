@@ -8,7 +8,11 @@ import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.http.Body;
+import retrofit.http.DELETE;
+import retrofit.http.GET;
 import retrofit.http.POST;
+import retrofit.http.Path;
+import retrofit.http.Query;
 
 /**
  * Client class for talking to the backend REST API.
@@ -16,8 +20,8 @@ import retrofit.http.POST;
 public class BackendAPIClient {
     // TODO
     private static final String API_URL =
-            "https://northern-gasket-694.appspot.com/_ah/api/feeder/v1";
-            //"http://192.168.1.17:9988/_ah/api/feeder/v1";
+            //"https://northern-gasket-694.appspot.com/_ah/api/feeder/v1";
+            "http://192.168.1.17:5000";
 
     /**
      * @return a FeedAPI implementation.
@@ -38,28 +42,14 @@ public class BackendAPIClient {
     }
 
     public interface BackendAPI {
+        @GET("/feeds")
+        List<Feed> getFeeds(@Query("min_timestamp") String min_timestamp);
+
         @POST("/feeds")
-        FeedsResponse getFeeds(@Body FeedsRequest request);
-
-        @POST("/feeds/put")
         Feed putFeed(@Body FeedMessage feedMessage);
-        //@POST("/feeds/put")
-        //void putFeedAsync(@Body FeedMessage feedMessage, Callback<Feed> cb);
 
-        @POST("/feeds/delete")
-        VoidResponse deleteFeed(@Body FeedsRequest request);
-    }
-
-    public static class FeedsRequest {
-        public String min_timestamp;
-        public List<String> urls;
-        public String regid;
-
-        public FeedsRequest() {};
-        public FeedsRequest(String... links) {
-            this.urls = new ArrayList<String>(links.length);
-            Collections.addAll(urls, links);
-        }
+        @DELETE("/feeds/{link}")
+        VoidResponse deleteFeed(@Path("link") String link);
     }
 
     public static class FeedMessage extends Feed {
@@ -72,11 +62,11 @@ public class BackendAPIClient {
         public String description;
         public String snippet;
         public String link;
-        public List<String> images;
+        public String image;
         public String published;
         public String author;
         public String comments;
-        public List<String> enclosures;
+        public String enclosure;
         public List<String> tags;
     }
 
@@ -88,10 +78,6 @@ public class BackendAPIClient {
         public String tag;
         public String timestamp;
         public List<FeedItem> items;
-    }
-
-    public static class FeedsResponse {
-        public List<Feed> feeds;
     }
 
     public static class VoidResponse {}

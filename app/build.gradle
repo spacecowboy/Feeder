@@ -48,7 +48,7 @@ dependencies {
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'com.squareup.retrofit:retrofit:1.6.1'
     compile 'com.android.support:support-v4:20.0.0'
-    compile 'com.google.android.gms:play-services:5.0.77'
+    compile 'com.google.android.gms:play-services:5.2.08'
 
     // Don't work on L-preview yet
     kitkatCompile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
