@@ -67,6 +67,9 @@ def convert_timestamp(timestamp):
     >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 +0000")
     '2014-09-05T12:55:00+00:00'
 
+    >>> convert_timestamp("Fri, 26 Sep 2014 04:00:00 -0000")
+    '2014-09-26T04:00:00+00:00'
+
     >>> convert_timestamp("Fri, 05 Sep 2014 12:55:00 +0200")
     '2014-09-05T10:55:00+00:00'
 

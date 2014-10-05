@@ -68,6 +68,7 @@ def clean_entry(feeditem, item):
     feeditem.published = parse_timestamp(item.get("published", None))
     feeditem.author = item.get("author", None)
     feeditem.comments = item.get("comments", None)
+    feeditem.image = get_image(clean_description)
 
     e = [e.href for e in item.get("enclosures", [])]
     if len(e) > 0:
@@ -107,6 +108,18 @@ def unescape(text):
     text = text.replace("&apos;", "'")
     text = text.replace("&amp;", "&")
     return text
+
+
+def get_image(text):
+    '''
+    Returns the first image referenced in the document.
+    None if no images could be found.
+    '''
+    imgs = get_images(text)
+    if imgs is None or len(imgs) == 0:
+        return None
+    else:
+        return imgs[0]
 
 
 def get_images(text):

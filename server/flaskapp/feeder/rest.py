@@ -8,31 +8,27 @@ from .models import Feed, UserFeed, get_user, get_feed
 #from flask_oauthlib.client import OAuth
 from flask.ext.restful import (Resource, Api, reqparse, fields,
                                marshal_with, marshal_with_field)
-from .util import parse_timestamp
+from .util import parse_timestamp, datetime_to_string
+from .gauth import authorized
 
 
 # Want a boolean class
-class fieldbool(fields.Raw):
+class FieldBool(fields.Raw):
     def format(self, value):
         if value:
             return 'true'
         else:
             return 'false'
 
-# Set up Auth
-#oauth = OAuth(app)
 
-#github = oauth.remote_app(
-#    'github',
-#    consumer_key='a11a1bda412d928fb39a',
-#    consumer_secret='92b7cf30bc42c49d589a10372c3f9ff3bb310037',
-#    request_token_params={'scope': 'user:email'},
-#    base_url='https://api.github.com/',
-#    request_token_url=None,
-#    access_token_method='POST',
-#    access_token_url='https://github.com/login/oauth/access_token',
-#    authorize_url='https://github.com/login/oauth/authorize'
-#)
+# Parse dates properly
+class FieldDateTime(fields.Raw):
+    def format(self, value):
+        if value is None:
+            return None
+
+        return datetime_to_string(value)
+
 
 # Set up the REST API
 api = Api(app)
@@ -67,21 +63,22 @@ feeditem_fields = {
     'link': fields.String,
     'title_stripped': fields.String,
     'snippet': fields.String,
-    'published': fields.DateTime,
+    'published': FieldDateTime,
     'author': fields.String,
     'comments': fields.String,
     'enclosure': fields.String,
     'tags': fields.List(fields.String),
-    'read': fieldbool(default=False)
+    'image': fields.String,
+    'read': FieldBool(default=False)
 }
 ### Single feed with a possible list of items
 feed_fields = {
     'link': fields.String,
     'title': fields.String,
     'description': fields.String,
-    'published': fields.DateTime,
+    'published': FieldDateTime,
     'tag': fields.String,
-    'timestamp': fields.DateTime,
+    'timestamp': FieldDateTime,
     'items': fields.List(fields.Nested(feeditem_fields))
 }
 
@@ -92,14 +89,15 @@ class Feeds(Resource):
     '''
 
     @marshal_with_field(fields.List(fields.Nested(feed_fields)))
-    def get(self):
+    @authorized
+    def get(self, userid):
         '''Return all feeds'''
         args = getparser.parse_args()
 
         # Placeholder until auth
-        email = "jonas@kalderstam.se"
+        #userid = "jonas@kalderstam.se"
 
-        user = get_user(email)
+        user = get_user(userid)
 
         #Wrong
         # Query for feeds using lazy relationship
@@ -121,12 +119,13 @@ class Feeds(Resource):
         return feeds
 
     @marshal_with(feed_fields)
-    def post(self):
+    @authorized
+    def post(self, userid):
         '''Add new feed'''
         # Placeholder until auth
-        email = "jonas@kalderstam.se"
+        #userid = "jonas@kalderstam.se"
 
-        user = get_user(email)
+        user = get_user(userid)
 
         args = postparser.parse_args()
 
@@ -141,11 +140,12 @@ class Feeds(Resource):
         # Return feed
         return userfeed
 
-    def delete(self):
+    @authorized
+    def delete(self, userid):
         '''Delete a feed'''
         # Placeholder until auth
-        email = "jonas@kalderstam.se"
-        user = get_user(email)
+        #userid = "jonas@kalderstam.se"
+        user = get_user(userid)
 
         args = deleteparser.parse_args()
 

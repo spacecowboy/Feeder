@@ -140,6 +140,7 @@ class FeedItem(db.Model):
     author = Column(String)
     comments = Column(String)
     enclosure = Column(String)
+    image = Column(String)
     # Internal use
     timestamp = Column(DateTime, nullable=False)
     # Related feed

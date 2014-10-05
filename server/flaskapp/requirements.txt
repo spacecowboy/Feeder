@@ -1,9 +1,8 @@
 flask
 Flask-SQLAlchemy
+httplib2
 
 # Need newer version than available on pip
 #flask-restful
 git+https://github.com/twilio/flask-restful
-# Oauth handling
-git+git://github.com/lepture/flask-oauthlib.git
 

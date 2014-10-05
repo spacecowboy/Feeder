@@ -85,6 +85,8 @@ def cache_feed(feed):
         feed.description = f.get("description", "")
         feed.published = datetuple_to_datetime(f.get("published_parsed",
                                                      None))
+        if feed.published is None:
+            feed.published = timestamp
         feed.etag = rss.get("etag", None)
         feed.modified = rss.get("modified", None)
 
