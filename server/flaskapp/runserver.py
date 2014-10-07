@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Usage:
     python runserver.py [-d][-h 127.0.0.1][-p 5000]
