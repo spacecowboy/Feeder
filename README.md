@@ -13,7 +13,7 @@ This is equivalent to doing it in two steps:
     git clone https://github.com/spacecowboy/Feeder.git
     git submodule update --init --recursive
 
-### How to build
+### How to build Android client?
 
 Quick install:
 
@@ -22,3 +22,7 @@ Quick install:
 For more possible options, see:
 
     ./gradlew tasks
+
+### How to run the server?
+
+See [server/flaskapp](server/flaskapp).
