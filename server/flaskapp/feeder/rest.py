@@ -4,7 +4,7 @@ The REST-API of Feeder
 '''
 
 from feeder import app, db
-from .models import Feed, UserFeed, get_user, get_feed
+from .models import Feed, UserFeed, get_user, get_feed, get_userfeed
 #from flask_oauthlib.client import OAuth
 from flask.ext.restful import (Resource, Api, reqparse, fields,
                                marshal_with, marshal_with_field)
@@ -94,9 +94,6 @@ class Feeds(Resource):
         '''Return all feeds'''
         args = getparser.parse_args()
 
-        # Placeholder until auth
-        #userid = "jonas@kalderstam.se"
-
         user = get_user(userid)
 
         #Wrong
@@ -121,10 +118,7 @@ class Feeds(Resource):
     @marshal_with(feed_fields)
     @authorized
     def post(self, userid):
-        '''Add new feed'''
-        # Placeholder until auth
-        #userid = "jonas@kalderstam.se"
-
+        '''Add new/Edit feed'''
         user = get_user(userid)
 
         args = postparser.parse_args()
@@ -132,9 +126,15 @@ class Feeds(Resource):
         # Make sure feed exists
         feed = get_feed(args.link)
         # Set link between user and feed
-        userfeed = UserFeed(user, feed, args.tag, args.title)
-        db.session.add(userfeed)
-        db.session.commit()
+        userfeed = get_userfeed(user, feed, args.tag, args.title)
+
+        # If we should update tag or title
+        if userfeed.tag != args.tag or userfeed.title != args.title:
+            userfeed.tag = args.tag
+            userfeed.title = args.title
+            db.session.add(userfeed)
+            db.session.commit()
+        # Else, already saved
 
         userfeed.items = None
         # Return feed
@@ -143,8 +143,6 @@ class Feeds(Resource):
     @authorized
     def delete(self, userid):
         '''Delete a feed'''
-        # Placeholder until auth
-        #userid = "jonas@kalderstam.se"
         user = get_user(userid)
 
         args = deleteparser.parse_args()
