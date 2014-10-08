@@ -366,8 +366,7 @@ public class FeedFragment extends Fragment
             //final RssItem item = items.get(position);
 
             holder.rssItem = item;
-            holder.link = item.enclosurelink != null ? item.enclosurelink :
-            item.link;
+
             holder.authorTextView.setText(item.feedtitle);
             if (item.getPubDate() == null) {
                 holder.dateTextView.setVisibility(View.GONE);
@@ -451,7 +450,7 @@ public class FeedFragment extends Fragment
             public final TextView dateTextView;
             public final TextView authorTextView;
             public final ImageView imageView;
-            public String link;
+            //public String link;
             public FeedItemSQL rssItem;
 
             public ViewHolder(View v) {
@@ -499,7 +498,9 @@ public class FeedFragment extends Fragment
                     RssContentProvider.MarkItemAsRead(getActivity(), rssItem.id);
                     // Open in browser since no content was posted
                     startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(rssItem.link)));
+                            Uri.parse(rssItem.enclosurelink != null ?
+                                      rssItem.enclosurelink :
+                                      rssItem.link)));
                 }
             }
 
