@@ -75,6 +75,9 @@ def cache_feed(feed):
         feeditem.feed_id = feed.id
         feeditem.timestamp = timestamp
         clean_entry(feeditem, item)
+        # If published is none, use timestamp
+        if feeditem.published is None:
+            feeditem.published = timestamp
         # Add to database (commit later)
         db.session.add(feeditem)
 
