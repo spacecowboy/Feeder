@@ -7,19 +7,30 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <!-- For getting Google account auth token -->
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <!-- For syncing -->
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+
+    <permission
+        android:name="com.example.gcm.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ui.FeedActivity"
+            android:name="com.nononsenseapps.feeder.ui.FeedActivity"
             android:label="@string/app_name"
             android:theme="@style/FeedsTheme" >
             <intent-filter>
@@ -29,9 +40,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.ReaderActivity"
+            android:name="com.nononsenseapps.feeder.ui.ReaderActivity"
             android:label="@string/app_name"
-            android:parentActivityName=".ui.FeedActivity"
+            android:parentActivityName="com.nononsenseapps.feeder.ui.FeedActivity"
             android:theme="@style/ReaderTheme" >
 >
             <meta-data
@@ -39,9 +50,9 @@
                 android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
         </activity>
         <activity
-            android:name=".ui.EditFeedActivity"
+            android:name="com.nononsenseapps.feeder.ui.EditFeedActivity"
             android:label="@string/title_activity_edit_feed"
-            android:parentActivityName=".ui.FeedActivity"
+            android:parentActivityName="com.nononsenseapps.feeder.ui.FeedActivity"
             android:theme="@style/EditFeedTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -66,24 +77,27 @@
         </activity>
 
         <provider
-            android:name=".db.RssContentProvider"
+            android:name="com.nononsenseapps.feeder.db.RssContentProvider"
             android:authorities="com.nononsenseapps.feeder.provider"
             android:enabled="true"
             android:exported="false" >
         </provider>
 
         <service
-            android:name=".model.RssSyncService"
-            android:exported="false" >
+            android:name="com.nononsenseapps.feeder.model.RssSyncHelper"
+            android:exported="false">
+        </service>
+        <service
+            android:name="com.nononsenseapps.feeder.model.RssSyncAdapterService"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
         </service>
     </application>
-
-    <permission
-        android:name="com.example.gcm.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
 
 </manifest>

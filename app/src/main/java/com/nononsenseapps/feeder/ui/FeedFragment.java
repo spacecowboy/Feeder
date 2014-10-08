@@ -9,7 +9,6 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -33,7 +32,7 @@ import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
-import com.nononsenseapps.feeder.model.RssSyncService;
+import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.squareup.picasso.Picasso;
 
@@ -206,7 +205,7 @@ public class FeedFragment extends Fragment
                     .delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
                             Util.LongsToStringArray(this.id));
             // Upload change
-            RssSyncService.deleteFeed(getActivity(), url);
+            RssSyncHelper.deleteFeed(getActivity(), url);
             // TODO close fragment
             return true;
         } else if (id == R.id.action_mark_as_read ) {

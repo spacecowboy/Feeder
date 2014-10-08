@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Important to use my own authority
+  also specify that we want to use standard google account as the type
+  also we want to be able to upload etc...
+-->
+
+<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+              android:accountType="com.google"
+              android:contentAuthority="com.nononsenseapps.feeder.provider"
+              android:supportsUploading="true"
+              android:userVisible="false"
+              android:allowParallelSyncs="false"
+              android:isAlwaysSyncable="true"
+    />

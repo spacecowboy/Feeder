@@ -9,11 +9,10 @@ import android.util.Log;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableNotifiedException;
-import com.nononsenseapps.feeder.db.RssContentProvider;
 
 import java.io.IOException;
 
-public class SyncHelper {
+public class AuthHelper {
 
     public static final String KEY_ACCOUNT = "key_account";
     public static final String SCOPE =
@@ -22,7 +21,7 @@ public class SyncHelper {
 
     public static String getSavedAccountName(final Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(SyncHelper.KEY_ACCOUNT, null);
+                .getString(AuthHelper.KEY_ACCOUNT, null);
     }
 
     public static String getAuthToken(final Context context) {
@@ -53,6 +52,10 @@ public class SyncHelper {
             Log.e(TAG, e.getMessage());
         }
         return null;
+    }
+
+    public static Account getSavedAccount(final Context context) {
+        return getAccount(context, getSavedAccountName(context));
     }
 
     public static Account getAccount(final Context context,

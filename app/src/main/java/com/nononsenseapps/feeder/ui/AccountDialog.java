@@ -17,7 +17,7 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.nononsenseapps.feeder.R;
-import com.nononsenseapps.feeder.model.SyncHelper;
+import com.nononsenseapps.feeder.model.AuthHelper;
 
 import java.io.IOException;
 
@@ -58,7 +58,7 @@ public class AccountDialog extends DialogFragment {
     public void accountSelected(Account account) {
         if (account != null) {
             //new TokenGetter().execute(account.name);
-            new GetTokenTask(getActivity(), account.name, SyncHelper.SCOPE)
+            new GetTokenTask(getActivity(), account.name, AuthHelper.SCOPE)
                     .execute();
         }
     }
@@ -92,7 +92,7 @@ public class AccountDialog extends DialogFragment {
 
             if (token != null) {
                 PreferenceManager.getDefaultSharedPreferences(mActivity).edit()
-                        .putString(SyncHelper.KEY_ACCOUNT, mEmail).commit();
+                        .putString(AuthHelper.KEY_ACCOUNT, mEmail).commit();
             }
 
             return token;

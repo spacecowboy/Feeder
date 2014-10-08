@@ -1,11 +1,18 @@
 package com.nononsenseapps.feeder.db;
 
 import android.content.ContentProvider;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+
+import java.util.ArrayList;
 
 public class RssContentProvider extends ContentProvider {
     // All URIs share these parts
@@ -112,10 +119,6 @@ public class RssContentProvider extends ContentProvider {
         }
 
         return result;
-    }
-
-    public static void setShouldNotify(final boolean b) {
-        sShouldNotify = b;
     }
 
     @Override
@@ -330,6 +333,42 @@ public class RssContentProvider extends ContentProvider {
         }
 
         return result;
+    }
+
+    /**
+     * Apply the given set of {@link android.content.ContentProviderOperation},
+     * executing inside
+     * a {@link android.database.sqlite.SQLiteDatabase} transaction. All changes
+     * will be rolled back if
+     * any single one fails.
+     */
+    @Override
+    public ContentProviderResult[] applyBatch(
+            @NonNull ArrayList<ContentProviderOperation> operations)
+            throws OperationApplicationException {
+        final SQLiteDatabase db =
+                DatabaseHandler.getInstance(getContext()).getWritableDatabase();
+        // UI will explode if we don't block notifications
+        setShouldNotify(false);
+        db.beginTransaction();
+        try {
+            final int numOperations = operations.size();
+            final ContentProviderResult[] results =
+                    new ContentProviderResult[numOperations];
+            for (int i = 0; i < numOperations; i++) {
+                results[i] = operations.get(i).apply(this, results, i);
+            }
+            db.setTransactionSuccessful();
+            return results;
+        } finally {
+            db.endTransaction();
+            // Enable them again
+            setShouldNotify(true);
+        }
+    }
+
+    public static void setShouldNotify(final boolean b) {
+        sShouldNotify = b;
     }
 
     /**

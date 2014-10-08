@@ -24,21 +24,14 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.model.RssSyncService;
-import com.nononsenseapps.feeder.model.SyncHelper;
-import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
+import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.model.apis.GoogleFeedAPIClient;
 import com.nononsenseapps.feeder.model.RssSearchLoader;
 
 import java.util.List;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class EditFeedActivity extends Activity
         implements LoaderManager.LoaderCallbacks<GoogleFeedAPIClient.FindResponse> {
@@ -131,8 +124,7 @@ public class EditFeedActivity extends Activity
                                     null);
                         }
 
-                        RssSyncService.uploadFeed(EditFeedActivity.this,
-                                id,
+                        RssSyncHelper.uploadFeed(EditFeedActivity.this, id,
                                 mTextTitle.getText().toString().trim(),
                                 mTextUrl.getText().toString().trim(),
                                 mTextTag.getText().toString().trim());

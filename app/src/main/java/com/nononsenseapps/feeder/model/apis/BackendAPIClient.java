@@ -21,7 +21,8 @@ public class BackendAPIClient {
     // TODO
     private static final String API_URL =
             //"https://northern-gasket-694.appspot.com/_ah/api/feeder/v1";
-            "http://192.168.1.17:5000";
+            //"http://192.168.1.17:5000";
+            "http://feeder.nononsenseapps.com";
 
     /**
      * @return a FeedAPI implementation.

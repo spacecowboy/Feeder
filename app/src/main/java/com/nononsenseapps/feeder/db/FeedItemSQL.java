@@ -185,6 +185,23 @@ public class FeedItemSQL {
     }
 
     /**
+     * Parse a timestamp and return what should be set on the database item.
+     * @param datetime a timestamp to parse. Allowed to be null
+     * @return null, or valid timestamp
+     */
+    public static String getPubDateFromString(String datetime) {
+        if (datetime == null) {
+            return null;
+        }
+
+        try {
+            return DateTime.parse(datetime).toString();
+        } catch (Exception e) {
+            return DateTime.now().toString();
+        }
+    }
+
+    /**
      * Return the fields in a ContentValues object, suitable for insertion
      * into the database.
      */

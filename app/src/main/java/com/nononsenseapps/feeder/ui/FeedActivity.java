@@ -1,9 +1,11 @@
 package com.nononsenseapps.feeder.ui;
 
+import android.accounts.Account;
 import android.app.ActionBar;
 import android.app.ActivityOptions;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,13 +14,11 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.nononsenseapps.feeder.R;
-import com.nononsenseapps.feeder.model.RssSyncService;
-import com.nononsenseapps.feeder.model.SyncHelper;
-import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
+import com.nononsenseapps.feeder.db.RssContentProvider;
+import com.nononsenseapps.feeder.model.AuthHelper;
+import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
-
-import java.util.ArrayList;
 
 
 public class FeedActivity extends BaseActivity {
@@ -135,13 +135,33 @@ public class FeedActivity extends BaseActivity {
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_sync) {
-            if (null == SyncHelper.getSavedAccountName(this)) {
+            if (null == AuthHelper.getSavedAccountName(this)) {
                 DialogFragment dialog = new AccountDialog();
                 dialog.show(getFragmentManager(), "account_dialog");
             } else {
                 Toast.makeText(this, "Syncing feeds...",
                         Toast.LENGTH_SHORT).show();
-                RssSyncService.syncFeeds(this);
+                //RssSyncHelper.syncFeeds(this);
+                final Account account = AuthHelper.getSavedAccount(this);
+                // Enable syncing
+                ContentResolver.setIsSyncable(account,
+                        RssContentProvider.AUTHORITY, 1);
+                // Set sync automatic
+                ContentResolver.setSyncAutomatically(account,
+                        RssContentProvider.AUTHORITY, true);
+                // Once per hour: mins * secs * msecs
+//                ContentResolver.addPeriodicSync(account,
+//                        RssContentProvider.AUTHORITY,
+//                        null,
+//                        60L * 60L * 1000L);
+                // And sync manually
+                final Bundle settingsBundle = new Bundle();
+                settingsBundle.putBoolean(
+                        ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                settingsBundle.putBoolean(
+                        ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                ContentResolver.requestSync(account,
+                        RssContentProvider.AUTHORITY, settingsBundle);
             }
             return true;
         }

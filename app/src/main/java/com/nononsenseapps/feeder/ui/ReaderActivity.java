@@ -27,7 +27,6 @@ public class ReaderActivity extends BaseActivity {
      * Sets the extras in the intent suitable for opening the item in question.
      *
      * @param intent  to fill extras in
-     * @param id      database id of item, if applicable
      * @param rssItem to read
      */
     public static void setRssExtras(Intent intent, FeedItemSQL rssItem) {
