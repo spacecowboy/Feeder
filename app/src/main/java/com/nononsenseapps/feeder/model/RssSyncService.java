@@ -6,11 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.PendingNetworkSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
@@ -100,11 +98,11 @@ public class RssSyncService extends IntentService {
                 api.putFeed(f);
             } catch (RetrofitError e) {
                 Log.e(TAG, "put error: " + e.getMessage());
-                Toast.makeText(getApplicationContext(),
-                        "Put failed: " + e.getMessage(), Toast.LENGTH_SHORT)
-                        .show();
+//                Toast.makeText(getApplicationContext(),
+//                        "Put failed: " + e.getMessage(), Toast.LENGTH_SHORT)
+//                        .show();
                 // Store for later
-                PendingNetworkSQL.storePut(this, id, link);
+                // PendingNetworkSQL.storePut(this, id, link);
             }
         }
     }
@@ -121,9 +119,9 @@ public class RssSyncService extends IntentService {
                 api.deleteFeed(link);
             } catch (RetrofitError e) {
                 Log.e(TAG, "put error: " + e.getMessage());
-                Toast.makeText(getApplicationContext(),
-                        "Put failed: " + e.getMessage(), Toast.LENGTH_SHORT)
-                        .show();
+//                Toast.makeText(getApplicationContext(),
+//                        "Put failed: " + e.getMessage(), Toast.LENGTH_SHORT)
+//                        .show();
                 // Store for later unless 404
                 // TODO
                 // PendingNetworkSQL.storeDelete(this, -1, link);
@@ -414,6 +412,7 @@ public class RssSyncService extends IntentService {
 //                    }
  //               }
                 itemSQL.link = item.link;
+                itemSQL.enclosurelink = item.enclosure;
                 itemSQL.author = item.author;
                 try {
                     Log.d("JONASTIME", "" + item.published);
