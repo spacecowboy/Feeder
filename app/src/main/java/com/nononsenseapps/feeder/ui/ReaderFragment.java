@@ -184,15 +184,17 @@ public class ReaderFragment extends Fragment
             mFeedTitleTextView.setText(mRssItem.feedtitle);
         }
 
-        if (mRssItem.author == null) {
+        if (mRssItem.author == null && mRssItem.getPubDate() != null) {
             mAuthorTextView.setText(getString(R.string.on_date,
                     mRssItem.getPubDate().withZone(DateTimeZone.getDefault())
                             .toString(dateTimeFormat)));
-        } else {
+        } else if (mRssItem.getPubDate() != null) {
             mAuthorTextView.setText(getString(R.string.by_author_on_date,
                     mRssItem.author,
                     mRssItem.getPubDate().withZone(DateTimeZone.getDefault())
                             .toString(dateTimeFormat)));
+        } else {
+            mAuthorTextView.setVisibility(View.GONE);
         }
 
         // Load images in text
