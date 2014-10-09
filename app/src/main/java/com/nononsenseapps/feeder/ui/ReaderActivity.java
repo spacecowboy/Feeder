@@ -21,7 +21,6 @@ public class ReaderActivity extends BaseActivity {
     private CharSequence mTitle;
     private Fragment mFragment;
     private DrawShadowFrameLayout mDrawShadowFrameLayout;
-    private View mCheckButton;
 
     /**
      * Sets the extras in the intent suitable for opening the item in question.
@@ -70,20 +69,7 @@ public class ReaderActivity extends BaseActivity {
         //mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
         //        (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        // Handle plus icon press
-        mCheckButton = findViewById(R.id.add_button);
-        mCheckButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                // TODO Mark as read
-                // TODO animate?
-                finish();
-                if (mShouldFinishBack) {
-                    // Only care about exit transition
-                    overridePendingTransition(0, R.anim.contract_to_center);
-                }
-            }
-        });
+
     }
 
     /**
@@ -103,7 +89,7 @@ public class ReaderActivity extends BaseActivity {
         super.onPostCreate(savedInstanceState);
 
         registerHideableHeaderView(findViewById(R.id.headerbar));
-        registerHideableFooterView(mCheckButton);
+        //registerHideableFooterView(mCheckButton);
     }
 
     @Override

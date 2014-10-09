@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <com.nononsenseapps.feeder.views.DrawShadowFrameLayout
+    android:id="@+id/main_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
@@ -12,21 +11,13 @@
     <!-- As the main content view, the view below consumes the entire
          space available using match_parent in both dimensions. -->
     <FrameLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <FrameLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-        <include layout="@layout/include_floating_add_button"/>
-
-    </FrameLayout>
+        android:layout_height="match_parent"/>
 
     <LinearLayout
-        style="@style/HeaderBar"
         android:id="@+id/headerbar"
+        style="@style/HeaderBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -37,16 +28,16 @@
 
         <TextView
             android:id="@+id/filters_box"
-            android:visibility="gone"
-            android:layout_marginTop="?actionBarOverlayTopOffset"
-            android:paddingLeft="@dimen/keyline_content_start_minus_16dp"
-            android:paddingRight="@dimen/keyline_content_start_minus_16dp"
+            style="@style/TextAppearance.Body"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:layout_marginTop="?actionBarOverlayTopOffset"
             android:background="@color/primary"
-            style="@style/TextAppearance.Body"
+            android:paddingLeft="@dimen/keyline_content_start_minus_16dp"
+            android:paddingRight="@dimen/keyline_content_start_minus_16dp"
+            android:text="Add some filter actions here"
             android:textColor="@android:color/primary_text_dark"
-            android:text="Add some filter actions here"/>
+            android:visibility="gone"/>
     </LinearLayout>
 
 </com.nononsenseapps.feeder.views.DrawShadowFrameLayout>

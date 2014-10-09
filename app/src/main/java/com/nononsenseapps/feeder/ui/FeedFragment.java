@@ -64,7 +64,6 @@ public class FeedFragment extends Fragment
     private static final String ARG_FEED_TAG = "feed_tag";
     private FeedAdapter mAdapter;
     private AbsListView mRecyclerView;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     // Filter for database loader
     private static final String ONLY_UNREAD = FeedItemSQL.COL_UNREAD + " IS 1 ";
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
@@ -78,10 +77,10 @@ public class FeedFragment extends Fragment
     private BroadcastReceiver mSyncMsgReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            // Extract data included in the Intent
-            mSwipeRefreshLayout.setRefreshing(intent.getBooleanExtra
-                    (RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE,
-                    false));
+            // TODO
+            //mSwipeRefreshLayout.setRefreshing(intent.getBooleanExtra
+            //        (RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE,
+            //        false));
         }
     };
 
@@ -164,26 +163,6 @@ public class FeedFragment extends Fragment
                     }
                 });
 
-        // Configure swipe to refresh
-        mSwipeRefreshLayout =
-                (SwipeRefreshLayout) rootView.findViewById(R.id
-                        .swipe_container);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (!((FeedActivity) getActivity()).syncOrConfig()) {
-                    // Not syncing, stop animation
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
-            }
-        });
-        // TODO select colors
-        mSwipeRefreshLayout.setColorSchemeColors(
-                android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-
         return rootView;
     }
 
@@ -206,8 +185,6 @@ public class FeedFragment extends Fragment
 
     @Override
     public void onPause() {
-        // Stop animation
-        mSwipeRefreshLayout.setRefreshing(false);
         // Stop listening to broadcasts
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver
                 (mSyncMsgReceiver);
