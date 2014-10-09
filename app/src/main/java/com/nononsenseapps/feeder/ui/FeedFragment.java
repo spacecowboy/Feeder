@@ -4,13 +4,17 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -32,6 +36,7 @@ import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
+import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.squareup.picasso.Picasso;
@@ -59,6 +64,7 @@ public class FeedFragment extends Fragment
     private static final String ARG_FEED_TAG = "feed_tag";
     private FeedAdapter mAdapter;
     private AbsListView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     // Filter for database loader
     private static final String ONLY_UNREAD = FeedItemSQL.COL_UNREAD + " IS 1 ";
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
@@ -67,6 +73,17 @@ public class FeedFragment extends Fragment
     private String title = "Android Police Dummy";
     private String url = "http://feeds.feedburner.com/AndroidPolice";
     private String tag = "";
+
+    // Broadcastreceiver for sync events
+    private BroadcastReceiver mSyncMsgReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            // Extract data included in the Intent
+            mSwipeRefreshLayout.setRefreshing(intent.getBooleanExtra
+                    (RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE,
+                    false));
+        }
+    };
 
     public FeedFragment() {
     }
@@ -147,6 +164,26 @@ public class FeedFragment extends Fragment
                     }
                 });
 
+        // Configure swipe to refresh
+        mSwipeRefreshLayout =
+                (SwipeRefreshLayout) rootView.findViewById(R.id
+                        .swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (!((FeedActivity) getActivity()).syncOrConfig()) {
+                    // Not syncing, stop animation
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+            }
+        });
+        // TODO select colors
+        mSwipeRefreshLayout.setColorSchemeColors(
+                android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         return rootView;
     }
 
@@ -160,6 +197,22 @@ public class FeedFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
+
+        // Register mMessageReceiver to receive messages.
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver
+                (mSyncMsgReceiver,
+                new IntentFilter(RssSyncAdapter.SYNC_BROADCAST)); // TODO
+    }
+
+    @Override
+    public void onPause() {
+        // Stop animation
+        mSwipeRefreshLayout.setRefreshing(false);
+        // Stop listening to broadcasts
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver
+                (mSyncMsgReceiver);
+
+        super.onPause();
     }
 
     @Override

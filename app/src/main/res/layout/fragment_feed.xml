@@ -22,13 +22,20 @@
              android:layout_height="match_parent"
              tools:context="com.nononsenseapps.feeder.ui.FeedActivity">
 
-    <ListView
-        android:id="@android:id/list"
-        android:scrollbars="vertical"
-        android:divider="?android:listDivider"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_container"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbarStyle="outsideOverlay"
-        />
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="?android:listDivider"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbars="vertical"
+            />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </FrameLayout>

@@ -135,37 +135,49 @@ public class FeedActivity extends BaseActivity {
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_sync) {
-            if (null == AuthHelper.getSavedAccountName(this)) {
-                DialogFragment dialog = new AccountDialog();
-                dialog.show(getFragmentManager(), "account_dialog");
-            } else {
-                Toast.makeText(this, "Syncing feeds...",
-                        Toast.LENGTH_SHORT).show();
-                //RssSyncHelper.syncFeeds(this);
-                final Account account = AuthHelper.getSavedAccount(this);
-                // Enable syncing
-                ContentResolver.setIsSyncable(account,
-                        RssContentProvider.AUTHORITY, 1);
-                // Set sync automatic
-                ContentResolver.setSyncAutomatically(account,
-                        RssContentProvider.AUTHORITY, true);
-                // Once per hour: mins * secs
-                ContentResolver.addPeriodicSync(account,
-                        RssContentProvider.AUTHORITY,
-                        Bundle.EMPTY,
-                        60L * 60L);
-                // And sync manually
-                final Bundle settingsBundle = new Bundle();
-                settingsBundle.putBoolean(
-                        ContentResolver.SYNC_EXTRAS_MANUAL, true);
-                settingsBundle.putBoolean(
-                        ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-                ContentResolver.requestSync(account,
-                        RssContentProvider.AUTHORITY, settingsBundle);
-            }
+            syncOrConfig();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Request a sync or ask for account if required.
+     *
+     * @return true if sync is underway, or false otherwise
+     */
+    public boolean syncOrConfig() {
+        if (null == AuthHelper.getSavedAccountName(this)) {
+            DialogFragment dialog = new AccountDialog();
+            dialog.show(getFragmentManager(), "account_dialog");
+            return false;
+        } else {
+            Toast.makeText(this, "Syncing feeds...",
+                    Toast.LENGTH_SHORT).show();
+            //RssSyncHelper.syncFeeds(this);
+            final Account account = AuthHelper.getSavedAccount(this);
+            // Enable syncing
+            ContentResolver.setIsSyncable(account,
+                    RssContentProvider.AUTHORITY, 1);
+            // Set sync automatic
+            ContentResolver.setSyncAutomatically(account,
+                    RssContentProvider.AUTHORITY, true);
+            // Once per hour: mins * secs
+            ContentResolver.addPeriodicSync(account,
+                    RssContentProvider.AUTHORITY,
+                    Bundle.EMPTY,
+                    60L * 60L);
+            // And sync manually
+            final Bundle settingsBundle = new Bundle();
+            settingsBundle.putBoolean(
+                    ContentResolver.SYNC_EXTRAS_MANUAL, true);
+            settingsBundle.putBoolean(
+                    ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+            ContentResolver.requestSync(account,
+                    RssContentProvider.AUTHORITY, settingsBundle);
+
+            return true;
+        }
     }
 
     @Override

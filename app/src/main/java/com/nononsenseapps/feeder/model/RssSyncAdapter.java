@@ -5,10 +5,12 @@ import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
 import android.content.Context;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.nononsenseapps.feeder.db.RssContentProvider;
@@ -23,6 +25,11 @@ import retrofit.RetrofitError;
 public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private static final String TAG = "FeederRssSyncAdapter";
+
+    public static final String SYNC_BROADCAST =
+            "feeder.nononsenseapps.RSS_SYNC_BROADCAST";
+    public static final String SYNC_BROADCAST_IS_ACTIVE = "IS_ACTIVE";
+
 
     /**
      * Creates an {@link android.content.AbstractThreadedSyncAdapter}.
@@ -82,9 +89,15 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             final String authority, final ContentProviderClient provider,
             final SyncResult syncResult) {
 
+        final Intent bcast = new Intent(SYNC_BROADCAST)
+                .putExtra(SYNC_BROADCAST_IS_ACTIVE, true);
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(bcast);
+
         final String token = AuthHelper.getAuthToken(getContext());
         if (token == null) {
             Log.e(TAG, "No token exists! Aborting sync...");
+            LocalBroadcastManager.getInstance(getContext()).sendBroadcast
+                    (bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false));
             return;
         }
 
@@ -149,6 +162,9 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
         } finally {
             // Notify that we've updated
             RssContentProvider.notifyAllUris(getContext());
+            // And broadcast end of sync
+            LocalBroadcastManager.getInstance(getContext()).sendBroadcast
+                    (bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false));
         }
     }
 }
