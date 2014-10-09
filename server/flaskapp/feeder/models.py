@@ -125,7 +125,7 @@ class UserFeed(db.Model):
         self.title = title or feed.title
 
     def __repr__(self):
-        return '<Feed {}>'.format(self.link)
+        return '<UserFeed {}>'.format(self.link)
 
 
 class FeedItem(db.Model):
@@ -151,5 +151,5 @@ class FeedItem(db.Model):
                                         order_by=desc(published),
                                         lazy='dynamic'))
 
-    def ___repr__(self):
+    def __repr__(self):
         return '<FeedItem {}>'.format(self.link)

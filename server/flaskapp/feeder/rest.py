@@ -4,7 +4,7 @@ The REST-API of Feeder
 '''
 
 from feeder import app, db
-from .models import Feed, UserFeed, get_user, get_feed, get_userfeed
+from .models import Feed, FeedItem, UserFeed, get_user, get_feed, get_userfeed
 #from flask_oauthlib.client import OAuth
 from flask.ext.restful import (Resource, Api, reqparse, fields,
                                marshal_with, marshal_with_field)
@@ -109,8 +109,11 @@ class Feeds(Resource):
                 q = q.filter(Feed.timestamp > dt)
 
         feeds = q.all()
-        # Set the items on the outer object
         for f in feeds:
+            # Make sure to only return items with correct timestamp
+            # Set the items on the outer object
+            f.items = FeedItem.query.filter(FeedItem.timestamp > dt,
+                                            FeedItem.feed_id == f.id).all()
             f.items = f.feed.items
 
         return feeds
