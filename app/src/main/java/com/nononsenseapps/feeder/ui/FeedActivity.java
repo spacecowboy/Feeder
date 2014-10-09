@@ -147,15 +147,15 @@ public class FeedActivity extends BaseActivity {
                 ContentResolver.setIsSyncable(account,
                         RssContentProvider.AUTHORITY, 1);
                 // Set sync automatic
-//                ContentResolver.setSyncAutomatically(account,
-//                        RssContentProvider.AUTHORITY, true);
-                // Once per hour: mins * secs * msecs
-                final Bundle settingsBundle = new Bundle();
+                ContentResolver.setSyncAutomatically(account,
+                        RssContentProvider.AUTHORITY, true);
+                // Once per hour: mins * secs
                 ContentResolver.addPeriodicSync(account,
                         RssContentProvider.AUTHORITY,
-                        settingsBundle,
-                        60L * 60L * 1000L);
+                        Bundle.EMPTY,
+                        60L * 60L);
                 // And sync manually
+                final Bundle settingsBundle = new Bundle();
                 settingsBundle.putBoolean(
                         ContentResolver.SYNC_EXTRAS_MANUAL, true);
                 settingsBundle.putBoolean(
