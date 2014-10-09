@@ -112,29 +112,34 @@ public class RssSyncHelper extends IntentService {
             ContentProviderOperation.Builder itemOp = ContentProviderOperation
                     .newInsert(FeedItemSQL.URI_FEED_ITEMS);
 
-            // First, reference feed's id with back ref
-            itemOp.withValueBackReference(FeedItemSQL.COL_FEED, feedIndex)
-                    // Next all the other values. Make sure non null
-                    .withValue(FeedItemSQL.COL_LINK, item.link)
-                    .withValue(FeedItemSQL.COL_FEEDTITLE, feed.title)
-                    .withValue(FeedItemSQL.COL_TAG,
-                            feed.tag == null ? "" : feed.tag)
-                    .withValue(FeedItemSQL.COL_IMAGEURL, item.image)
-                    .withValue(FeedItemSQL.COL_ENCLOSURELINK, item.enclosure)
-                    .withValue(FeedItemSQL.COL_AUTHOR, item.author)
-                    .withValue(FeedItemSQL.COL_PUBDATE,
-                            FeedItemSQL.getPubDateFromString(item.published))
-                    // Make sure these are non-null
-                    .withValue(FeedItemSQL.COL_TITLE,
-                            item.title == null ? "" : item.title)
-                    .withValue(FeedItemSQL.COL_DESCRIPTION,
-                            item.description == null ? "" : item.description)
-                    .withValue(FeedItemSQL.COL_PLAINTITLE,
-                            item.title_stripped == null ?
-                            "" :
-                            item.title_stripped)
-                    .withValue(FeedItemSQL.COL_PLAINSNIPPET,
-                            item.snippet == null ? "" : item.snippet);
+            // First, reference feed's id with back ref if insert
+            if (feedId < 1) {
+              itemOp.withValueBackReference(FeedItemSQL.COL_FEED, feedIndex);
+            } else {
+              // Use the actual id, because update operation will not return id
+              itemOp.withValue(FeedItemSQL.COL_FEED, feedId);
+            }
+            // Next all the other values. Make sure non null
+            itemOp.withValue(FeedItemSQL.COL_LINK, item.link)
+                  .withValue(FeedItemSQL.COL_FEEDTITLE, feed.title)
+                  .withValue(FeedItemSQL.COL_TAG,
+                             feed.tag == null ? "" : feed.tag)
+                  .withValue(FeedItemSQL.COL_IMAGEURL, item.image)
+                  .withValue(FeedItemSQL.COL_ENCLOSURELINK, item.enclosure)
+                  .withValue(FeedItemSQL.COL_AUTHOR, item.author)
+                  .withValue(FeedItemSQL.COL_PUBDATE,
+                             FeedItemSQL.getPubDateFromString(item.published))
+                  // Make sure these are non-null
+                  .withValue(FeedItemSQL.COL_TITLE,
+                             item.title == null ? "" : item.title)
+                  .withValue(FeedItemSQL.COL_DESCRIPTION,
+                             item.description == null ? "" : item.description)
+                  .withValue(FeedItemSQL.COL_PLAINTITLE,
+                             item.title_stripped == null ?
+                             "" :
+                             item.title_stripped)
+                  .withValue(FeedItemSQL.COL_PLAINSNIPPET,
+                             item.snippet == null ? "" : item.snippet);
 
             // Add to list of operations
             operations.add(itemOp.build());
