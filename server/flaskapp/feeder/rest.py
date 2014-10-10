@@ -119,8 +119,12 @@ class Feeds(Resource):
                 f.items = f.feed.items
             else:
                 print("dt:", dt)
-                f.items = FeedItem.query.filter(FeedItem.timestamp > dt,
+                try:
+                    f.items = FeedItem.query.filter(FeedItem.timestamp > dt,
                                                 FeedItem.feed_id == f.id).all()
+                except Exception as e:
+                    print("oh shit")
+                    print(e)
 
         print("returning", len(f.items))
         return feeds
