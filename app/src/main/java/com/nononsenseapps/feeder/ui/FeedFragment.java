@@ -4,17 +4,13 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.app.LoaderManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -36,7 +32,6 @@ import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
-import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.squareup.picasso.Picasso;
@@ -72,17 +67,6 @@ public class FeedFragment extends Fragment
     private String title = "Android Police Dummy";
     private String url = "http://feeds.feedburner.com/AndroidPolice";
     private String tag = "";
-
-    // Broadcastreceiver for sync events
-    private BroadcastReceiver mSyncMsgReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            // TODO
-            //mSwipeRefreshLayout.setRefreshing(intent.getBooleanExtra
-            //        (RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE,
-            //        false));
-        }
-    };
 
     public FeedFragment() {
     }
@@ -171,25 +155,6 @@ public class FeedFragment extends Fragment
         super.onActivityCreated(bundle);
 
         ((BaseActivity) getActivity()).enableActionBarAutoHide(mRecyclerView);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Register mMessageReceiver to receive messages.
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver
-                (mSyncMsgReceiver,
-                new IntentFilter(RssSyncAdapter.SYNC_BROADCAST)); // TODO
-    }
-
-    @Override
-    public void onPause() {
-        // Stop listening to broadcasts
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver
-                (mSyncMsgReceiver);
-
-        super.onPause();
     }
 
     @Override

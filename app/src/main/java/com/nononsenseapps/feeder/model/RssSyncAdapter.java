@@ -104,6 +104,8 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
         BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(token);
 
         try {
+            Log.d(TAG, "With timestamp: " + RssContentProvider
+                    .GetLatestTimestamp(getContext()));
             List<BackendAPIClient.Feed> feeds = api.getFeeds(
                     RssContentProvider.GetLatestTimestamp(getContext()));
 
@@ -120,7 +122,8 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
                 cause the exception. Seems safe inside same process though.
                  */
                 for (BackendAPIClient.Feed feed : feeds) {
-                    Log.d(TAG, "Syncing: " + feed.title);
+                    Log.d(TAG, "Syncing: " + feed.title + "(" + (feed.items
+                            == null ? 0 : feed.items.size()) + ")");
                     // Sync feed
                     RssSyncHelper.syncFeedBatch(getContext(), operations, feed);
                 }

@@ -50,6 +50,9 @@ dependencies {
     compile 'com.android.support:support-v4:20.0.0'
     compile 'com.google.android.gms:play-services:5.2.08'
 
+    // For nice looking progress bars
+    compile 'com.github.castorflex.smoothprogressbar:library:1.0.0'
+
     // Don't work on L-preview yet
     kitkatCompile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
     kitkatCompile 'com.squareup.okhttp:okhttp:2.0.0'

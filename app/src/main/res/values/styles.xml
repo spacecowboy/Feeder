@@ -19,6 +19,7 @@
     </style>
     <!-- Final application theme. -->
     <style name="AppTheme" parent="Theme.IOSched.Base">
+        <item name="spbStyle">@style/SyncIndicatorStyle</item>
     </style>
 
     <declare-styleable name="DrawShadowFrameLayout">
@@ -175,6 +176,15 @@
         <item name="android:textColor">@color/white_87</item>
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif</item>
-        </style>
+    </style>
+
+    <!-- progress bar -->
+    <style name="SyncIndicatorStyle" parent="SmoothProgressBar">
+        <item name="spb_stroke_separator_length">12dp</item>
+        <item name="spb_sections_count">4</item>
+        <item name="spb_speed">0.7</item>
+        <item name="spb_interpolator">spb_interpolator_linear</item>
+        <item name="spb_colors">@array/gplus_colors</item>
+    </style>
 
 </resources>

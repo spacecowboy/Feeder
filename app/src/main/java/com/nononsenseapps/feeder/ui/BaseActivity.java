@@ -551,33 +551,6 @@ public class BaseActivity extends Activity
                 getLoaderManager().restartLoader(i, b, this);
             }
 
-            // TODO REMOVE DBUG CODE
-            if (cursor.getCount() == 0) {
-                ContentValues values = new ContentValues();
-
-                values.put(FeedSQL.COL_TITLE, "XKCD");
-                values.put(FeedSQL.COL_TAG, "Comics");
-                values.put(FeedSQL.COL_URL, "http://xkcd.com/rss.xml");
-                getContentResolver().insert(FeedSQL.URI_FEEDS, values);
-
-                values.put(FeedSQL.COL_TITLE, "CowboyProgrammer");
-                values.put(FeedSQL.COL_TAG, "Android");
-                values.put(FeedSQL.COL_URL,
-                        "http://feeds.feedburner.com/CowboyProgrammer");
-                getContentResolver().insert(FeedSQL.URI_FEEDS, values);
-
-                values.clear();
-                values.put(FeedSQL.COL_TITLE, "Bubbla");
-                values.put(FeedSQL.COL_URL, "http://bubb.la/rss/nyheter");
-                getContentResolver().insert(FeedSQL.URI_FEEDS, values);
-
-                values.clear();
-                values.put(FeedSQL.COL_TITLE, "Android Police");
-                values.put(FeedSQL.COL_TAG, "Android");
-                values.put(FeedSQL.COL_URL,
-                        "http://feeds.feedburner.com/AndroidPolice");
-                getContentResolver().insert(FeedSQL.URI_FEEDS, values);
-            }
         } else {
             // Child loader
             mNavAdapter.setChildrenCursor(cursorLoader.getId(), cursor);

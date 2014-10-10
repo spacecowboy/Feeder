@@ -9,7 +9,7 @@
               android:accountType="com.google"
               android:contentAuthority="com.nononsenseapps.feeder.provider"
               android:supportsUploading="true"
-              android:userVisible="false"
+              android:userVisible="true"
               android:allowParallelSyncs="false"
               android:isAlwaysSyncable="true"
     />

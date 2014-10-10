@@ -5,9 +5,13 @@ import android.app.ActionBar;
 import android.app.ActivityOptions;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +20,7 @@ import android.widget.Toast;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.AuthHelper;
+import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
@@ -31,6 +36,29 @@ public class FeedActivity extends BaseActivity {
     private Fragment mFragment;
     private DrawShadowFrameLayout mDrawShadowFrameLayout;
     private View mAddButton;
+    private View mSyncIndicator1;
+    private View mSyncIndicator2;
+    private boolean isSyncing = false;
+
+    // Broadcastreceiver for sync events
+    private BroadcastReceiver mSyncMsgReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            isSyncing = intent.getBooleanExtra
+                                (RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE,
+                                        false);
+            showHideSyncIndicators(isSyncing);
+        }
+    };
+
+    private void showHideSyncIndicators(final boolean isSyncing) {
+        mSyncIndicator1.setVisibility(isSyncing ?
+                                      View.VISIBLE :
+                                      View.GONE);
+        mSyncIndicator2.setVisibility(isSyncing ?
+                                      View.VISIBLE :
+                                      View.GONE);
+    }
 
     public void onFragmentAttached(String title) {
         mTitle = title;
@@ -105,6 +133,31 @@ public class FeedActivity extends BaseActivity {
                 startActivity(i, options.toBundle());
             }
         });
+
+        // Sync indicators
+        mSyncIndicator1 = findViewById(R.id.sync_indicator_1);
+        mSyncIndicator2 = findViewById(R.id.sync_indicator_2);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Register mMessageReceiver to receive messages.
+        LocalBroadcastManager.getInstance(this).registerReceiver
+                (mSyncMsgReceiver,
+                        new IntentFilter(RssSyncAdapter.SYNC_BROADCAST));
+    }
+
+    @Override
+    public void onPause() {
+        // Stop listening to broadcasts
+        LocalBroadcastManager.getInstance(this).unregisterReceiver
+                (mSyncMsgReceiver);
+        // hide sync indicators
+        showHideSyncIndicators(false);
+
+        super.onPause();
     }
 
     private Fragment getDefaultFragment() {
@@ -123,6 +176,7 @@ public class FeedActivity extends BaseActivity {
         super.onPostCreate(savedInstanceState);
 
         registerHideableHeaderView(findViewById(R.id.headerbar));
+        registerHideableHeaderView(mSyncIndicator2);
         registerHideableFooterView(mAddButton);
     }
 
@@ -200,5 +254,9 @@ public class FeedActivity extends BaseActivity {
     protected void onActionBarAutoShowOrHide(boolean shown) {
         super.onActionBarAutoShowOrHide(shown);
         mDrawShadowFrameLayout.setShadowVisible(shown, shown);
+
+        // Hide progress bar if no sync underway
+        // header bar overrides this, hence this call
+        showHideSyncIndicators(isSyncing);
     }
 }

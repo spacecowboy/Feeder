@@ -25,6 +25,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 
+            <include layout="@layout/sync_progress_indicator"
+                     android:id="@+id/sync_indicator_1"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:visibility="gone"
+                     android:minHeight="3dp"/>
+
             <include layout="@layout/include_floating_add_button"/>
 
         </FrameLayout>
@@ -53,6 +60,14 @@
                 android:textColor="@android:color/primary_text_dark"
                 android:text="Add some filter actions here"/>
         </LinearLayout>
+
+        <include layout="@layout/sync_progress_indicator"
+                 android:id="@+id/sync_indicator_2"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:minHeight="3dp"
+                 android:visibility="gone"
+                 android:layout_marginTop="?android:attr/actionBarSize"/>
 
     </com.nononsenseapps.feeder.views.DrawShadowFrameLayout>
 
