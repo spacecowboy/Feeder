@@ -105,8 +105,16 @@ class Feed(db.Model):
 # Tie Users and Feeds together with a Helper table
 class UserFeed(db.Model):
     __tablename__ = "userfeeds"
-    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    feed_id = Column(Integer, ForeignKey('feeds.id'), primary_key=True)
+    user_id = Column(Integer,
+                     ForeignKey('users.id',
+                                ondelete="CASCADE",
+                                onupdate="CASCADE"),
+                     primary_key=True)
+    feed_id = Column(Integer,
+                     ForeignKey('feeds.id',
+                                ondelete="CASCADE",
+                                onupdate="CASCADE"),
+                     primary_key=True)
     tag = Column(String)
     title = Column(String, nullable=False)
     feed = relationship(Feed, lazy='joined')
@@ -144,7 +152,9 @@ class FeedItem(db.Model):
     # Internal use
     timestamp = Column(DateTime, nullable=False)
     # Related feed
-    feed_id = Column(Integer, ForeignKey('feeds.id'))
+    feed_id = Column(Integer, ForeignKey('feeds.id',
+                                         ondelete="CASCADE",
+                                         onupdate="CASCADE"))
     feed = relationship("Feed",
                         backref=backref('items',
                                         cascade="all,delete",

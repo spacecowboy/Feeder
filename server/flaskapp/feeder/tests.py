@@ -19,10 +19,10 @@ def setUpModule():
     frank = get_user("frank@frank.frank")
 
     # Some feeds
+    cornu = get_feed("http://feeds.feedburner.com/cornubot")
     cowboy = get_feed("cowboyprogrammer.org/rss/")
     bubbla = get_feed("bubb.la/rss.xml")
     slashdot = get_feed("http://rss.slashdot.org/Slashdot/slashdot")
-    cornu = get_feed("http://feeds.feedburner.com/cornubot")
     torrent = get_feed("http://kickass.to/tv/?rss=1")
 
     # bob likes three
@@ -103,56 +103,57 @@ class CacheTests(unittest.TestCase):
                 self.assertIsNone(uf.tag)
                 self.assertNotEqual(uf.title, uf.feed.title)
 
-    def test_z_delete_user_cascade(self):
-        # Delete user should delete connected user feeds
-        frank = get_user("frank@frank.frank")
-        frankfeeds = frank.feeds.all()
-        userfeeds = UserFeed.query.all()
+#    def test_z_delete_feed_cascade(self):
+#        # Deleting a feed should cascade and delete all feeditems
+#        feed = Feed.query.first()
+#
+#        fid = feed.id
+#
+#        targetlen = FeedItem.query.filter_by(feed_id=fid).count()
+#        prev_len = FeedItem.query.count()
+#
+#        db.session.delete(feed)
+#        db.session.commit()
+#
+#        new_len = FeedItem.query.count()
+#
+#        self.assertEqual(new_len, prev_len - targetlen)
 
-        prev_len = len(userfeeds)
-        expected_len = prev_len - len(frankfeeds)
-
-        db.session.delete(frank)
-        db.session.commit()
-
-        userfeeds = UserFeed.query.all()
-
-        self.assertEqual(expected_len, len(userfeeds))
-
-    def test_z_delete_feed_cascade(self):
-        # Deleting a feed should cascade and delete all feeditems
-        feed = Feed.query.first()
-
-        fid = feed.id
-
-        targetlen = FeedItem.query.filter_by(feed_id=fid).count()
-        prev_len = FeedItem.query.count()
-
-        db.session.delete(feed)
-        db.session.commit()
-
-        new_len = FeedItem.query.count()
-
-        self.assertEqual(new_len, prev_len - targetlen)
-
-    def test_z_delete_orphan_feeds(self):
+    def test_z_delete_cascades(self):
         # Test method which deletes feeds not connected to any user
         # Get number of existing feeds
         feeds_count = Feed.query.count()
+        print("Before delete")
+        for f in Feed.query.all():
+            print(f)
         # Get count of frank's feeds
         frank = get_user("frank@frank.frank")
         franks_count = UserFeed.query.filter_by(user_id=frank.id).count()
-        # He shares one feed with bob, so subtract that
-        franks_count -= 1
+        userfeeds = UserFeed.query.count()
+
+        self.assertEqual(franks_count, 3)
         # Remove frank
         db.session.delete(frank)
         db.session.commit()
 
+        # Delete user should delete connected user feeds
+        self.assertEqual(userfeeds - franks_count, UserFeed.query.count())
+
+        # There will be some feeds not connected to any users now
+        print("After delete")
+        for f in Feed.query.all():
+            print(f)
+
         # Call clean up function
         delete_orphan_feeds()
 
+        print("After clean")
+        for f in Feed.query.all():
+            print(f)
+
         # Now just check the results
-        self.assertEqual(Feed.query.count(), feeds_count - franks_count)
+        # He shares one feed with bob, so subtract that
+        self.assertEqual(Feed.query.count(), feeds_count - franks_count + 1)
 
 if __name__ == '__main__':
     unittest.main()
