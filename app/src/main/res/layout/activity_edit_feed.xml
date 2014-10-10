@@ -17,7 +17,7 @@
         android:layout_marginBottom="4dp"
         android:layout_marginTop="4dp"
         android:imeOptions="actionSearch"
-        android:inputType="textAutoComplete|textAutoCorrect"
+        android:inputType="text|textAutoComplete|textAutoCorrect"
         android:hint="@string/add_feed_search_hint"
         android:singleLine="true"/>
 
@@ -35,7 +35,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="4dp"
+            android:inputType="textUri"
             android:hint="@string/url"
+            android:imeOptions="actionNext"
             android:singleLine="true"/>
 
         <EditText
@@ -46,16 +48,21 @@
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
             android:hint="@string/title"
+            android:imeOptions="actionNext"
+            android:inputType="text|textAutoComplete|textAutoCorrect|textCapSentences"
             android:singleLine="true"/>
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/feed_tag"
             style="@style/TextAppearance.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
+            android:inputType="text|textAutoComplete|textAutoCorrect|textCapSentences"
             android:hint="@string/tag"
+            android:imeOptions="actionDone"
+            android:completionThreshold="1"
             android:singleLine="true"/>
 
 

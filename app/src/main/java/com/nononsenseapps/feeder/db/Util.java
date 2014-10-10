@@ -214,4 +214,8 @@ public class Util {
         }
         return result.toString();
     }
+
+    public static int[] ToIntArray(final int... numbers) {
+        return numbers;
+    }
 }

@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -20,14 +22,18 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FilterQueryProvider;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.model.apis.GoogleFeedAPIClient;
 import com.nononsenseapps.feeder.model.RssSearchLoader;
@@ -43,12 +49,14 @@ public class EditFeedActivity extends Activity
     public static final String TAG = "tag";
     private static final int RSSFINDER = 1;
     private static final String SEARCHQUERY = "searchquery";
+    private static final int LOADER_TAG_SUGGESTIONS = 1;
+    private static final String TAGSFILTER = "TAGSFILTER";
     private boolean mShouldFinishBack = false;
     private long id = -1;
     // Views and shit
     private EditText mTextUrl;
     private EditText mTextTitle;
-    private EditText mTextTag;
+    private AutoCompleteTextView mTextTag;
     private EditText mTextSearch;
     private View mDetailsFrame;
     private ListView mListResults;
@@ -66,7 +74,7 @@ public class EditFeedActivity extends Activity
         // Setup views
         mTextUrl = (EditText) findViewById(R.id.feed_url);
         mTextTitle = (EditText) findViewById(R.id.feed_title);
-        mTextTag = (EditText) findViewById(R.id.feed_tag);
+        mTextTag = (AutoCompleteTextView) findViewById(R.id.feed_tag);
         mDetailsFrame = findViewById(R.id.feed_details_frame);
         mTextSearch = (EditText) findViewById(R.id.search_view);
         mListResults = (ListView) findViewById(R.id.results_listview);
@@ -171,6 +179,75 @@ public class EditFeedActivity extends Activity
                 mTextTag.setText(i.getStringExtra(TAG));
             }
         }
+
+        // Create an adapter
+        final SimpleCursorAdapter tagsAdapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_1,
+                null, Util.ToStringArray(FeedSQL.COL_TAG),
+                Util.ToIntArray(android.R.id.text1), 0);
+
+        // Create a loader manager
+        final LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks =
+                new LoaderManager.LoaderCallbacks<Cursor>() {
+            @Override
+            public Loader<Cursor> onCreateLoader(final int id,
+                    final Bundle args) {
+                String filter = null;
+                if (args != null && args.containsKey(TAGSFILTER)) {
+                    filter = FeedSQL.COL_TAG + " LIKE '" + args
+                            .getCharSequence(TAGSFILTER, "") + "%'";
+                }
+                return new CursorLoader(EditFeedActivity.this,
+                        FeedSQL.URI_TAGSWITHCOUNTS,
+                        Util.ToStringArray(FeedSQL.COL_ID,
+                                FeedSQL.COL_TAG), filter, null,
+                        Util.SortAlphabeticNoCase(FeedSQL.COL_TAG));
+            }
+
+            @Override
+            public void onLoadFinished(final Loader<Cursor> loader,
+                    final Cursor data) {
+                tagsAdapter.swapCursor(data);
+            }
+
+            @Override
+            public void onLoaderReset(final Loader<Cursor> loader) {
+                tagsAdapter.swapCursor(null);
+            }
+        };
+
+        // Tell adapter how to return result
+        tagsAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
+            @Override
+            public CharSequence convertToString(final Cursor cursor) {
+                if (cursor == null) {
+                    return null;
+                }
+
+                return cursor.getString(1);
+            }
+        });
+
+        // Tell adapter how to filter
+        tagsAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(final CharSequence constraint) {
+                // Restart loader with filter
+                Bundle filter = new Bundle();
+                filter.putCharSequence(TAGSFILTER, constraint);
+                getLoaderManager().restartLoader(LOADER_TAG_SUGGESTIONS,
+                        filter, loaderCallbacks);
+                // Return existing cursor for now
+                return tagsAdapter.getCursor();
+            }
+        });
+
+        // Set the adapter
+        mTextTag.setAdapter(tagsAdapter);
+
+        // Start suggestions loader
+        getLoaderManager().restartLoader(LOADER_TAG_SUGGESTIONS,
+                Bundle.EMPTY, loaderCallbacks);
     }
 
     private boolean shouldBeFloatingWindow() {
