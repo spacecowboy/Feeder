@@ -96,6 +96,7 @@ class Feeds(Resource):
 
         user = get_user(userid)
 
+        print("Get:", user)
         #Wrong
         # Query for feeds using lazy relationship
         q = user.feeds
@@ -107,15 +108,21 @@ class Feeds(Resource):
             dt = parse_timestamp(args['min_timestamp'])
             if dt is not None:
                 q = q.filter(Feed.timestamp > dt)
-
+        print("feeds = q.all()")
         feeds = q.all()
         for f in feeds:
             # Make sure to only return items with correct timestamp
             # Set the items on the outer object
-            f.items = FeedItem.query.filter(FeedItem.timestamp > dt,
-                                            FeedItem.feed_id == f.id).all()
-            f.items = f.feed.items
+            print("inner query")
+            if dt is None:
+                print("dt none")
+                f.items = f.feed.items
+            else:
+                print("dt:", dt)
+                f.items = FeedItem.query.filter(FeedItem.timestamp > dt,
+                                                FeedItem.feed_id == f.id).all()
 
+        print("returning", len(f.items))
         return feeds
 
     @marshal_with(feed_fields)
