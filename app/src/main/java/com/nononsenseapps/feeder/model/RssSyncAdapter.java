@@ -89,6 +89,10 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             final String authority, final ContentProviderClient provider,
             final SyncResult syncResult) {
 
+      // By default, if a sync is performed, we can wait at least an hour
+      // to the next one. Unit is seconds
+      syncResult.delayUntil = 60L * 60L;
+
         final Intent bcast = new Intent(SYNC_BROADCAST)
                 .putExtra(SYNC_BROADCAST_IS_ACTIVE, true);
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(bcast);
@@ -145,8 +149,12 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             // An HTTP error was encountered.
             switch (status) {
                 case 401: // Unauthorized, token could possibly just be stale
-                    syncResult.stats.numAuthExceptions++;
-                    break;
+                  // auth-exceptions are hard errors, and if the token is stale,
+                  // that's too harsh
+                  //syncResult.stats.numAuthExceptions++;
+                  // Instead, report ioerror, which is a soft error
+                  syncResult.stats.numIoExceptions++;
+                  break;
                 case 404: // No such item, should never happen, programming error
                 case 415: // Not proper body, programming error
                 case 400: // Didn't specify url, programming error
