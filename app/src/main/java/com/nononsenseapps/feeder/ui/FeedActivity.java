@@ -37,7 +37,6 @@ public class FeedActivity extends BaseActivity {
     private Fragment mFragment;
     private DrawShadowFrameLayout mDrawShadowFrameLayout;
     private View mAddButton;
-    private View mEmptyAddFeed;
     private View mSyncIndicator1;
     private View mSyncIndicator2;
     private boolean isSyncing = false;
@@ -52,6 +51,7 @@ public class FeedActivity extends BaseActivity {
             showHideSyncIndicators(isSyncing);
         }
     };
+    private View mEmptyView;
 
     private void showHideSyncIndicators(final boolean isSyncing) {
         mSyncIndicator1.setVisibility(isSyncing ?
@@ -68,9 +68,11 @@ public class FeedActivity extends BaseActivity {
 
     public void restoreActionBar() {
         ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        if (actionBar != null) {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
+        }
     }
 
     @Override
@@ -121,7 +123,7 @@ public class FeedActivity extends BaseActivity {
         //mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
         //        (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        // Handle add buttons
+        // For add buttons
         View.OnClickListener onAddListener = new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
@@ -138,17 +140,39 @@ public class FeedActivity extends BaseActivity {
                 }
             }
         };
-        mEmptyAddFeed = findViewById(R.id.empty_add_feed);
-        ((TextView) mEmptyAddFeed).setText(android.text.Html.fromHtml
-                (getString(R.string.empty_no_feeds)));
-        mEmptyAddFeed.setVisibility(mFragment == null ? View.VISIBLE : View.GONE);
-        mEmptyAddFeed.setOnClickListener(onAddListener);
+        // Empty view
+        mEmptyView = findViewById(android.R.id.empty);
+        mEmptyView.setVisibility(mFragment == null ? View.VISIBLE : View.GONE);
+
+        TextView emptyLogin = (TextView) findViewById(R.id.empty_login);
+        emptyLogin.setVisibility(null == AuthHelper.getSavedAccountName(this)
+                                 ? View.VISIBLE : View.GONE);
+        emptyLogin.setText(android.text.Html
+                .fromHtml(getString(R.string.empty_no_feeds_login)));
+        emptyLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                askForLogin();
+            }
+        });
+
+        TextView emptyAddFeed = (TextView) findViewById(R.id.empty_add_feed);
+        emptyAddFeed.setText(android.text.Html
+                .fromHtml(getString(R.string.empty_no_feeds_add)));
+        emptyAddFeed.setOnClickListener(onAddListener);
+
+        // Add button
         mAddButton = findViewById(R.id.add_button);
         mAddButton.setOnClickListener(onAddListener);
 
         // Sync indicators
         mSyncIndicator1 = findViewById(R.id.sync_indicator_1);
         mSyncIndicator2 = findViewById(R.id.sync_indicator_2);
+    }
+
+    private void askForLogin() {
+        DialogFragment dialog = new AccountDialog();
+        dialog.show(getFragmentManager(), "account_dialog");
     }
 
     @Override
@@ -214,33 +238,13 @@ public class FeedActivity extends BaseActivity {
      */
     public boolean syncOrConfig() {
         if (null == AuthHelper.getSavedAccountName(this)) {
-            DialogFragment dialog = new AccountDialog();
-            dialog.show(getFragmentManager(), "account_dialog");
+            askForLogin();
             return false;
         } else {
             Toast.makeText(this, "Syncing feeds...",
                     Toast.LENGTH_SHORT).show();
             //RssSyncHelper.syncFeeds(this);
-            final Account account = AuthHelper.getSavedAccount(this);
-            // Enable syncing
-            ContentResolver.setIsSyncable(account,
-                    RssContentProvider.AUTHORITY, 1);
-            // Set sync automatic
-            ContentResolver.setSyncAutomatically(account,
-                    RssContentProvider.AUTHORITY, true);
-            // Once per hour: mins * secs
-            ContentResolver.addPeriodicSync(account,
-                    RssContentProvider.AUTHORITY,
-                    Bundle.EMPTY,
-                    60L * 60L);
-            // And sync manually
-            final Bundle settingsBundle = new Bundle();
-            settingsBundle.putBoolean(
-                    ContentResolver.SYNC_EXTRAS_MANUAL, true);
-            settingsBundle.putBoolean(
-                    ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-            ContentResolver.requestSync(account,
-                    RssContentProvider.AUTHORITY, settingsBundle);
+            RssContentProvider.RequestSync(this);
 
             return true;
         }
@@ -255,6 +259,7 @@ public class FeedActivity extends BaseActivity {
     protected void onNavigationDrawerItemSelected(long id, String title,
             String url, String tag) {
         // update the main content by replacing fragments
+        mEmptyView.setVisibility(View.GONE);
         mFragment = FeedFragment.newInstance(id, title, url, tag);
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, mFragment, "single_pane").commit();

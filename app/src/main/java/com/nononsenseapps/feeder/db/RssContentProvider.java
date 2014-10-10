@@ -1,8 +1,10 @@
 package com.nononsenseapps.feeder.db;
 
+import android.accounts.Account;
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
@@ -10,7 +12,11 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+
+import com.nononsenseapps.feeder.model.AuthHelper;
+import com.nononsenseapps.feeder.ui.FeedActivity;
 
 import java.util.ArrayList;
 
@@ -384,5 +390,36 @@ public class RssContentProvider extends ContentProvider {
         for (Uri uri : uris) {
             getContext().getContentResolver().notifyChange(uri, null, false);
         }
+    }
+
+    /**
+     * Request a manual synchronization. Also configures automatic syncing.
+     * @param context
+     */
+    public static void RequestSync(final Context context) {
+        final Account account = AuthHelper.getSavedAccount(context);
+        if (account == null) {
+            // Can't do shit without an account
+            return;
+        }
+        // Enable syncing
+        ContentResolver
+                .setIsSyncable(account, RssContentProvider.AUTHORITY, 1);
+        // Set sync automatic
+        ContentResolver.setSyncAutomatically(account,
+                RssContentProvider.AUTHORITY, true);
+        // Once per hour: mins * secs
+        ContentResolver.addPeriodicSync(account,
+                RssContentProvider.AUTHORITY,
+                Bundle.EMPTY,
+                60L * 60L);
+        // And sync manually NOW
+        final Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        ContentResolver.requestSync(account,
+                RssContentProvider.AUTHORITY, settingsBundle);
     }
 }

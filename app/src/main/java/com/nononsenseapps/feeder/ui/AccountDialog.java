@@ -17,6 +17,7 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.AuthHelper;
 
 import java.io.IOException;
@@ -93,15 +94,15 @@ public class AccountDialog extends DialogFragment {
             if (token != null) {
                 PreferenceManager.getDefaultSharedPreferences(mActivity).edit()
                         .putString(AuthHelper.KEY_ACCOUNT, mEmail).commit();
+                RssContentProvider.RequestSync(mActivity);
             }
 
             return token;
         }
 
         /**
-         * Get a authentication token if one is not available. If the error is
-         * not
-         * recoverable then it displays the error message on parent activity.
+         * Get an authentication token if one is not available. If the error is
+         * not recoverable then it displays the error message on parent activity.
          */
         protected String fetchToken() throws IOException {
             try {

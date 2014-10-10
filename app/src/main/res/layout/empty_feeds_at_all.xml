@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@android:id/empty"
+              android:orientation="vertical"
+              android:layout_gravity="center"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
 <TextView
-    android:id="@+id/empty_add_feed"
-    style="@style/TextAppearance.EmptyView"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:gravity="center"
+    style="@style/TextAppearance.EmptyView"
+    android:text="@string/empty_no_feeds_top"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:gravity="center"/>
+
+<TextView
+    android:id="@+id/empty_login"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/TextAppearance.EmptyView"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
     android:background="?android:selectableItemBackground"
-    android:text="@string/empty_no_feeds"/>
+    android:text="@string/empty_no_feeds_login"
+    android:gravity="center"/>
+
+<TextView
+    android:id="@+id/empty_add_feed"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/TextAppearance.EmptyView"
+    android:text="@string/empty_no_feeds_add"
+    android:background="?android:selectableItemBackground"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:gravity="center"/>
+</LinearLayout>
