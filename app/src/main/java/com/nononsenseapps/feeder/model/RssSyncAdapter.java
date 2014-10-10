@@ -8,11 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.nononsenseapps.feeder.db.PendingNetworkSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
 
@@ -108,6 +110,13 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
         BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(token);
 
         try {
+            final ArrayList<ContentProviderOperation> operations =
+                    new ArrayList<ContentProviderOperation>();
+
+            // First perform uploads
+            RssSyncHelper.syncPending(getContext(), token, operations);
+
+            // Then downloads
             Log.d(TAG, "With timestamp: " + RssContentProvider
                     .GetLatestTimestamp(getContext()));
             List<BackendAPIClient.Feed> feeds = api.getFeeds(
@@ -117,8 +126,6 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
                 Log.d(TAG, "Feeds was null");
             } else {
                 Log.d(TAG, "Number of feeds to sync: " + feeds.size());
-                ArrayList<ContentProviderOperation> operations =
-                        new ArrayList<ContentProviderOperation>();
                 /*
                 If you encounter TransactionTooLargeException here, make
                 sure you don't run the syncadapter in a different process.
@@ -131,6 +138,8 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
                     // Sync feed
                     RssSyncHelper.syncFeedBatch(getContext(), operations, feed);
                 }
+            }
+            if (!operations.isEmpty()) {
                 getContext().getContentResolver()
                         .applyBatch(RssContentProvider.AUTHORITY, operations);
             }

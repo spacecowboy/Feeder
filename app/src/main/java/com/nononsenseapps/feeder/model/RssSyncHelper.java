@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.PendingNetworkSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
@@ -50,7 +51,7 @@ public class RssSyncHelper extends IntentService {
         context.startService(intent);
     }
 
-    public static void uploadFeed(Context context, long id, String title,
+    public static void uploadFeedAsync(Context context, long id, String title,
             String link, String tag) {
         Intent intent = new Intent(context, RssSyncHelper.class);
         intent.setAction(ACTION_PUT_FEED);
@@ -61,11 +62,70 @@ public class RssSyncHelper extends IntentService {
         context.startService(intent);
     }
 
-    public static void deleteFeed(Context context, String link) {
+    public static void deleteFeedAsync(Context context, String link) {
         Intent intent = new Intent(context, RssSyncHelper.class);
         intent.setAction(ACTION_DELETE_FEED);
         intent.putExtra("link", link);
         context.startService(intent);
+    }
+
+    /**
+     * Synchronize pending updates
+     * @param context
+     * @param operations deletes will be added to operations
+     */
+    public static void syncPending(final Context context,
+            final String token,
+            final ArrayList<ContentProviderOperation> operations) {
+        if (token == null) {
+            throw new NullPointerException("Token was null");
+        }
+
+        Cursor c = null;
+        try {
+            c = context.getContentResolver()
+                    .query(PendingNetworkSQL.URI, PendingNetworkSQL.FIELDS,
+                            null, null, null);
+
+            while (c != null && c.moveToNext()) {
+                PendingNetworkSQL pending = new PendingNetworkSQL(c);
+                boolean success = false;
+
+                if (pending.isDelete()) {
+                    try {
+                        // catch 404 special
+                        deleteFeed(context, token, pending.url);
+                        success = true;
+                    } catch (RetrofitError e) {
+                        if (e.getResponse() != null && e.getResponse()
+                                .getStatus() == 404) {
+                            // 404 is fine, already deleted
+                            success = true;
+                        } else {
+                            // Not OK, throw it
+                            throw e;
+                        }
+
+                    }
+                } else if (pending.isPut()) {
+                    putFeed(context, token, pending.title, pending.url,
+                            pending.tag);
+                    success = true;
+                }
+
+                if (success) {
+                    // Remove from db
+                    operations.add(ContentProviderOperation.newDelete(Uri.withAppendedPath
+                                    (PendingNetworkSQL.URI,
+                                            Long.toString(pending.id))).build());
+                }
+            }
+
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
     }
 
     /**
@@ -170,65 +230,83 @@ public class RssSyncHelper extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        final String token = AuthHelper.getAuthToken(this);
+        boolean storePending = token == null;
+
         if (ACTION_PUT_FEED.equals(intent.getAction())) {
-            putFeed(intent.getLongExtra("id", -1),
-                    intent.getStringExtra("title"),
-                    intent.getStringExtra("link"),
-                    intent.getStringExtra("tag"));
+            try {
+                if (token != null) {
+                    putFeed(this, token,
+                            intent.getStringExtra("title"),
+                            intent.getStringExtra("link"),
+                            intent.getStringExtra("tag"));
+                }
+            } catch (RetrofitError e) {
+                Log.e(TAG, "put error: " + e.getMessage());
+                storePending = true;
+            }
+
+            if (storePending) {
+                Log.d(TAG, "Storing put for later...");
+                PendingNetworkSQL.storePut(this, intent.getStringExtra("title"),
+                        intent.getStringExtra("link"),
+                        intent.getStringExtra("tag"));
+            }
         } else if (ACTION_DELETE_FEED.equals(intent.getAction())) {
-            deleteFeed(intent.getStringExtra("link"));
+            try {
+                if (token != null) {
+                    deleteFeed(this, token, intent.getStringExtra("link"));
+                }
+            } catch (RetrofitError e) {
+                Log.e(TAG, "put error: " + e.getMessage());
+                // Store for later unless 404, which means feed is already
+                // deleted
+                if (e.getResponse() == null ||
+                    e.getResponse().getStatus() != 404) {
+                    storePending = true;
+                }
+            }
+
+            if (storePending) {
+                    Log.d(TAG, "Storing delete for later...");
+                    PendingNetworkSQL.storeDelete(this,
+                            intent.getStringExtra("link"));
+            }
         } else {
             //syncAll();
             syncAllRetro();
         }
     }
 
-    protected void putFeed(final long id, final String title, final String link,
-            final String tag) {
-        final String token = AuthHelper.getAuthToken(this);
-        if (token != null) {
-            BackendAPIClient.BackendAPI api =
-                    BackendAPIClient.GetBackendAPI(token);
-            BackendAPIClient.FeedMessage f = new BackendAPIClient.FeedMessage();
-            f.title = title;
-            f.link = link;
-            if (tag != null && !tag.isEmpty()) {
-                f.tag = tag;
-            }
-
-            try {
-                api.putFeed(f);
-            } catch (RetrofitError e) {
-                Log.e(TAG, "put error: " + e.getMessage());
-                //                Toast.makeText(getApplicationContext(),
-                //                        "Put failed: " + e.getMessage(), Toast.LENGTH_SHORT)
-                //                        .show();
-                // Store for later
-                // PendingNetworkSQL.storePut(this, id, link);
-            }
+    protected static void putFeed(final Context context,
+            final String token,
+            final String title,
+            final String link,
+            final String tag) throws RetrofitError {
+        if (token == null) {
+            throw new NullPointerException("No token");
         }
+        BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(token);
+        BackendAPIClient.FeedMessage f = new BackendAPIClient.FeedMessage();
+        f.title = title;
+        f.link = link;
+        if (tag != null && !tag.isEmpty()) {
+            f.tag = tag;
+        }
+
+        api.putFeed(f);
     }
 
-    protected void deleteFeed(final String link) {
-        final String token = AuthHelper.getAuthToken(this);
-        if (token != null) {
+    protected static void deleteFeed(final Context context,
+            final String token,
+            final String link) throws RetrofitError {
+        if (token == null) {
+            throw new NullPointerException("Token was null");
+        }
             BackendAPIClient.BackendAPI api =
                     BackendAPIClient.GetBackendAPI(token);
-            //            BackendAPIClient.FeedsRequest f =
-            //                    new BackendAPIClient.FeedsRequest(link);
 
-            try {
-                api.deleteFeed(link);
-            } catch (RetrofitError e) {
-                Log.e(TAG, "put error: " + e.getMessage());
-                //                Toast.makeText(getApplicationContext(),
-                //                        "Put failed: " + e.getMessage(), Toast.LENGTH_SHORT)
-                //                        .show();
-                // Store for later unless 404
-                // TODO
-                // PendingNetworkSQL.storeDelete(this, -1, link);
-            }
-        }
+            api.deleteFeed(link);
     }
 
     protected void syncAllRetro() {

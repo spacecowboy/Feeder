@@ -25,6 +25,7 @@ public class RssContentProvider extends ContentProvider {
     static {
         FeedSQL.addMatcherUris(sURIMatcher);
         FeedItemSQL.addMatcherUris(sURIMatcher);
+        PendingNetworkSQL.addMatcherUris(sURIMatcher);
     }
 
     // If the contentprovider notifies changes on uris

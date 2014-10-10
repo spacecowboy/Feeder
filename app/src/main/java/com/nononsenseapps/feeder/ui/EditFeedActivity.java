@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -100,7 +101,8 @@ public class EditFeedActivity extends Activity
                     }
                 });
 
-        findViewById(R.id.add_button)
+        Button addButton = (Button) findViewById(R.id.add_button);
+        addButton
                 .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(final View v) {
@@ -124,7 +126,7 @@ public class EditFeedActivity extends Activity
                                     null);
                         }
 
-                        RssSyncHelper.uploadFeed(EditFeedActivity.this, id,
+                        RssSyncHelper.uploadFeedAsync(EditFeedActivity.this, id,
                                 mTextTitle.getText().toString().trim(),
                                 mTextUrl.getText().toString().trim(),
                                 mTextTag.getText().toString().trim());
@@ -146,6 +148,13 @@ public class EditFeedActivity extends Activity
             mListResults.setVisibility(View.GONE);
             // Existing id
             id = i.getLongExtra(_ID, -1);
+
+            // Existing item, do not allow URL to be edited
+            if (id > 0) {
+                mTextUrl.setVisibility(View.GONE);
+                mTextSearch.setVisibility(View.GONE);
+                addButton.setText(getString(R.string.save));
+            }
 
             // Link
             if (i.getDataString() != null) {

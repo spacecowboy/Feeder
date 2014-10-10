@@ -200,7 +200,7 @@ public class FeedFragment extends Fragment
                     .delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
                             Util.LongsToStringArray(this.id));
             // Upload change
-            RssSyncHelper.deleteFeed(getActivity(), url);
+            RssSyncHelper.deleteFeedAsync(getActivity(), url);
             // TODO close fragment
             return true;
         } else if (id == R.id.action_mark_as_read ) {

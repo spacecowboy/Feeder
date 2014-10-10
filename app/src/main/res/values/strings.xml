@@ -25,5 +25,6 @@
 
     <string name="by_author_on_date">by %1$s, %2$s</string>
     <string name="on_date">%1$s</string>
+    <string name="save">Save</string>
 
 </resources>
