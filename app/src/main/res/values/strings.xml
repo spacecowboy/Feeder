@@ -26,5 +26,12 @@
     <string name="by_author_on_date">by %1$s, %2$s</string>
     <string name="on_date">%1$s</string>
     <string name="save">Save</string>
+    <string name="empty_feed_top">Nothing to read here. Would you like to…</string>
+    <string
+        name="empty_feed_open"><![CDATA[<font color="#33B5E5">Open</font> another feed?]]></string>
+    <string
+        name="empty_feed_add"><![CDATA[<font color="#33B5E5">Add</font> more feeds?]]></string>
+    <string name="empty_no_feeds"><![CDATA[Nothing to read yet.<p/>Would you like to
+        <font color="#33B5E5">add</font> some feeds?]]></string>
 
 </resources>

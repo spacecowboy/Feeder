@@ -148,6 +148,12 @@
            parent="TextAppearance.Title">
     </style>
 
+    <style name="TextAppearance.EmptyView">
+        <item name="android:textColor">@color/white_54</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
     <style name="TextAppearance.Body">
     <item name="android:textSize">14sp</item>
     <item name="android:fontFamily">sans-serif</item>

@@ -310,6 +310,13 @@ public class BaseActivity extends Activity
     }
 
     /**
+     * Open the nav drawer
+     */
+    public void openNavDrawer() {
+        mDrawerLayout.openDrawer(Gravity.START);
+    }
+
+    /**
      * Returns the navigation drawer item that corresponds to this Activity.
      * Subclasses
      * of BaseActivity override this to indicate what nav drawer item

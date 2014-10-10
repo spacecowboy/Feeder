@@ -15,6 +15,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nononsenseapps.feeder.R;
@@ -36,6 +37,7 @@ public class FeedActivity extends BaseActivity {
     private Fragment mFragment;
     private DrawShadowFrameLayout mDrawShadowFrameLayout;
     private View mAddButton;
+    private View mEmptyAddFeed;
     private View mSyncIndicator1;
     private View mSyncIndicator2;
     private boolean isSyncing = false;
@@ -119,20 +121,30 @@ public class FeedActivity extends BaseActivity {
         //mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
         //        (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        // Handle plus icon press
-        mAddButton = findViewById(R.id.add_button);
-        mAddButton.setOnClickListener(new View.OnClickListener() {
+        // Handle add buttons
+        View.OnClickListener onAddListener = new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 Intent i =
                         new Intent(FeedActivity.this, EditFeedActivity.class);
-                i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
-                ActivityOptions options = ActivityOptions
-                        .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
-                                view.getHeight());
-                startActivity(i, options.toBundle());
+                if (view == mAddButton) {
+                    i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
+                    ActivityOptions options = ActivityOptions
+                            .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
+                                    view.getHeight());
+                    startActivity(i, options.toBundle());
+                } else {
+                    startActivity(i);
+                }
             }
-        });
+        };
+        mEmptyAddFeed = findViewById(R.id.empty_add_feed);
+        ((TextView) mEmptyAddFeed).setText(android.text.Html.fromHtml
+                (getString(R.string.empty_no_feeds)));
+        mEmptyAddFeed.setVisibility(mFragment == null ? View.VISIBLE : View.GONE);
+        mEmptyAddFeed.setOnClickListener(onAddListener);
+        mAddButton = findViewById(R.id.add_button);
+        mAddButton.setOnClickListener(onAddListener);
 
         // Sync indicators
         mSyncIndicator1 = findViewById(R.id.sync_indicator_1);

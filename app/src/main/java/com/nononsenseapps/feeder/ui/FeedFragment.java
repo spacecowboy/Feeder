@@ -59,6 +59,9 @@ public class FeedFragment extends Fragment
     private static final String ARG_FEED_TAG = "feed_tag";
     private FeedAdapter mAdapter;
     private AbsListView mRecyclerView;
+    private View mEmptyView;
+    private View mEmptyAddFeed;
+    private View mEmptyOpenFeeds;
     // Filter for database loader
     private static final String ONLY_UNREAD = FeedItemSQL.COL_UNREAD + " IS 1 ";
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
@@ -133,8 +136,33 @@ public class FeedFragment extends Fragment
         //mRecyclerView.addItemDecoration(new DividerItemDecoration
         //       (getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
+        // Set up the empty view
+        mEmptyView = rootView.findViewById(android.R.id.empty);
+        mEmptyAddFeed = mEmptyView.findViewById(R.id.empty_add_feed);
+        ((TextView) mEmptyAddFeed).setText(android.text.Html.fromHtml
+                (getString(R.string.empty_feed_add)));
+        mEmptyOpenFeeds = mEmptyView.findViewById(R.id.empty_open_feeds);
+        ((TextView) mEmptyOpenFeeds).setText(android.text.Html.fromHtml
+                (getString(R.string.empty_feed_open)));
+
+        mEmptyAddFeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                startActivity(new Intent(getActivity(),
+                        EditFeedActivity.class));
+            }
+        });
+
+        mEmptyOpenFeeds.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                ((BaseActivity) getActivity()).openNavDrawer();
+            }
+        });
+
         // specify an adapter
         mAdapter = new FeedAdapter(getActivity());
+        mRecyclerView.setEmptyView(mEmptyView);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView
                 .setOnItemClickListener(new AdapterView.OnItemClickListener() {

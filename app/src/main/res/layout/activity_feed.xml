@@ -23,7 +23,9 @@
             <FrameLayout
                 android:id="@+id/container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent">
+                <include layout="@layout/empty_feeds_at_all"/>
+            </FrameLayout>
 
             <include layout="@layout/sync_progress_indicator"
                      android:id="@+id/sync_indicator_1"
