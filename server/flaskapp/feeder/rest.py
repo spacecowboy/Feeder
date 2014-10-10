@@ -100,6 +100,7 @@ class Feeds(Resource):
         #Wrong
         # Query for feeds using lazy relationship
         q = user.feeds
+        dt = None
         # Filters
         if args['link'] is not None:
             urls = [u for u in args['link']]
