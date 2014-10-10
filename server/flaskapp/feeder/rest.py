@@ -108,25 +108,16 @@ class Feeds(Resource):
             dt = parse_timestamp(args['min_timestamp'])
             if dt is not None:
                 q = q.filter(Feed.timestamp > dt)
-        print("feeds = q.all()")
         feeds = q.all()
         for f in feeds:
             # Make sure to only return items with correct timestamp
             # Set the items on the outer object
-            print("inner query")
             if dt is None:
-                print("dt none")
                 f.items = f.feed.items
             else:
-                print("dt:", dt)
-                try:
-                    f.items = FeedItem.query.filter(FeedItem.timestamp > dt,
+                f.items = FeedItem.query.filter(FeedItem.timestamp > dt,
                                                 FeedItem.feed_id == f.feed.id).all()
-                except Exception as e:
-                    print("oh shit")
-                    print(e)
 
-        print("returning", len(f.items))
         return feeds
 
     @marshal_with(feed_fields)
