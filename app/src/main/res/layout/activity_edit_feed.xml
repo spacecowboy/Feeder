@@ -9,18 +9,6 @@
              android:paddingTop="@dimen/activity_vertical_margin"
              tools:context="com.nononsenseapps.feeder.ui.EditFeedActivity">
 
-    <EditText
-        android:id="@+id/search_view"
-        style="@style/TextAppearance.Title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp"
-        android:imeOptions="actionSearch"
-        android:inputType="text|textAutoComplete|textAutoCorrect"
-        android:hint="@string/add_feed_search_hint"
-        android:singleLine="true"/>
-
     <LinearLayout
         android:visibility="gone"
         android:id="@+id/feed_details_frame"
@@ -29,24 +17,11 @@
         android:orientation="vertical">
 
         <EditText
-            android:id="@+id/feed_url"
-            style="@style/TextAppearance.Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:layout_marginTop="4dp"
-            android:inputType="textUri"
-            android:hint="@string/url"
-            android:imeOptions="actionNext"
-            android:singleLine="true"/>
-
-        <EditText
             android:id="@+id/feed_title"
             style="@style/TextAppearance.Title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp"
             android:hint="@string/title"
             android:imeOptions="actionNext"
             android:inputType="text|textAutoComplete|textAutoCorrect|textCapSentences"
@@ -65,23 +40,65 @@
             android:completionThreshold="1"
             android:singleLine="true"/>
 
+        <!--<View-->
+            <!--android:layout_height="1dp"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:background="?android:attr/dividerHorizontal"-->
+            <!--android:layout_marginBottom="2dip"-->
+            <!--android:layout_marginTop="2dip"-->
+            <!--/>-->
 
         <Button
             android:id="@+id/add_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
-            android:text="@string/add_rss_feed"/>
+            android:background="?android:attr/selectableItemBackground"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@string/add_feed"/>
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/results_listview"
+    <LinearLayout
+        android:id="@+id/feed_search_frame"
         android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="0dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/search_view"
+            style="@style/TextAppearance.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:imeOptions="actionSearch"
+            android:inputType="text|textAutoComplete|textAutoCorrect"
+            android:hint="@string/add_feed_search_hint"
+            android:singleLine="true"/>
+        <ListView
+            android:id="@+id/results_listview"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="0dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:id="@android:id/empty"
+            style="@style/TextAppearance.EmptyView"
+            android:text="@string/search_feed_empty_hint"/>
+        <fr.castorflex.android.circularprogressbar.CircularProgressBar
+            android:id="@+id/loading_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            style="@style/FeedSearchProgressStyle"/>
 
+    </LinearLayout>
 
 </LinearLayout>

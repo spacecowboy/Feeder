@@ -8,6 +8,8 @@
         <item name="android:windowActionBarOverlay">true</item>
     </style>
     <style name="EditFeedTheme" parent="AppTheme" >
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
         <item name="isFloatingWindow">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsFloating">false</item>
@@ -20,6 +22,7 @@
     <!-- Final application theme. -->
     <style name="AppTheme" parent="Theme.IOSched.Base">
         <item name="spbStyle">@style/SyncIndicatorStyle</item>
+        <item name="cpbStyle">@style/FeedSearchProgressStyle</item>
     </style>
 
     <declare-styleable name="DrawShadowFrameLayout">
@@ -191,6 +194,9 @@
         <item name="spb_speed">0.7</item>
         <item name="spb_interpolator">spb_interpolator_linear</item>
         <item name="spb_colors">@array/gplus_colors</item>
+    </style>
+    <style name="FeedSearchProgressStyle" parent="CircularProgressBar">
+        <item name="cpb_colors">@array/gplus_colors</item>
     </style>
 
 </resources>

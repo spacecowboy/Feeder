@@ -28,7 +28,7 @@
     android:focusable="true"
     android:layout_gravity="bottom|end"
     android:background="@drawable/add_schedule_fab_background"
-    android:contentDescription="@string/add_rss_feed">
+    android:contentDescription="@string/add_feed">
     <!--android:elevation="@dimen/fab_elevation"
     android:stateListAnimator="@anim/floating_add_button_state_list_anim"-->
 

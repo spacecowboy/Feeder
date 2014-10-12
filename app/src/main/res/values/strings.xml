@@ -14,8 +14,8 @@
     <string name="title_activity_fullscreen">FullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="add_rss_feed">Add RSS feed</string>
-    <string name="title_activity_edit_feed">EditFeedActivity</string>
+    <string name="add_feed">Add feed</string>
+    <string name="title_activity_edit_feed">Subscribe to feed</string>
     <string name="url">URL</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tag">Tag</string>
@@ -38,5 +38,7 @@
         server and…]]></string>
     <string  name="empty_no_feeds_add">
         <![CDATA[<font color="#33B5E5">Adding</font> some feeds]]></string>
+    <string name="no_feeds_found">Couldn\'t find any relevant feeds. Try to search for a single word.</string>
+    <string name="search_feed_empty_hint">Enter a feed address or a topic to search for</string>
 
 </resources>

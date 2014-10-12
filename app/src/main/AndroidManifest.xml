@@ -52,6 +52,7 @@
         <activity
             android:name="com.nononsenseapps.feeder.ui.EditFeedActivity"
             android:label="@string/title_activity_edit_feed"
+            android:windowSoftInputMode="adjustResize|stateVisible"
             android:parentActivityName="com.nononsenseapps.feeder.ui.FeedActivity"
             android:theme="@style/EditFeedTheme" >
             <meta-data

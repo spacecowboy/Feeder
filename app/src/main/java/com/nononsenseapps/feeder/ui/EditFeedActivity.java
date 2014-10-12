@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
@@ -54,17 +55,19 @@ public class EditFeedActivity extends Activity
     private boolean mShouldFinishBack = false;
     private long id = -1;
     // Views and shit
-    private EditText mTextUrl;
     private EditText mTextTitle;
     private AutoCompleteTextView mTextTag;
     private EditText mTextSearch;
     private View mDetailsFrame;
     private ListView mListResults;
     private ResultsAdapter mResultAdapter;
+    private View mSearchFrame;
+    private String mFeedUrl = null;
+    private TextView mEmptyText;
+    private View mLoadingProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_ACTION_BAR);
         if (shouldBeFloatingWindow()) {
             setupFloatingWindow();
         }
@@ -72,13 +75,16 @@ public class EditFeedActivity extends Activity
         setContentView(R.layout.activity_edit_feed);
 
         // Setup views
-        mTextUrl = (EditText) findViewById(R.id.feed_url);
         mTextTitle = (EditText) findViewById(R.id.feed_title);
         mTextTag = (AutoCompleteTextView) findViewById(R.id.feed_tag);
         mDetailsFrame = findViewById(R.id.feed_details_frame);
+        mSearchFrame = findViewById(R.id.feed_search_frame);
         mTextSearch = (EditText) findViewById(R.id.search_view);
         mListResults = (ListView) findViewById(R.id.results_listview);
+        mEmptyText = (TextView) findViewById(android.R.id.empty);
+        mLoadingProgress = findViewById(R.id.loading_progress);
         mResultAdapter = new ResultsAdapter(this);
+        mListResults.setEmptyView(mEmptyText);
         mListResults.setAdapter(mResultAdapter);
         mListResults
                 .setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -98,6 +104,17 @@ public class EditFeedActivity extends Activity
                     public boolean onEditorAction(final TextView v,
                             final int actionId, final KeyEvent event) {
                         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                            // Hide keyboard
+                            View f = getCurrentFocus();
+                            if (f != null) {
+                                InputMethodManager imm =
+                                        (InputMethodManager) getSystemService(
+                                                Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(f.getWindowToken(),
+                                        0);
+                            }
+
+                            // Issue search
                             Bundle args = new Bundle();
                             args.putString(SEARCHQUERY,
                                     mTextSearch.getText().toString().trim());
@@ -120,7 +137,7 @@ public class EditFeedActivity extends Activity
                         values.put(FeedSQL.COL_TITLE,
                                 mTextTitle.getText().toString().trim());
                         values.put(FeedSQL.COL_URL,
-                                mTextUrl.getText().toString().trim());
+                                mFeedUrl);
                         values.put(FeedSQL.COL_TAG,
                                 mTextTag.getText().toString().trim());
                         if (id < 1) {
@@ -136,7 +153,7 @@ public class EditFeedActivity extends Activity
 
                         RssSyncHelper.uploadFeedAsync(EditFeedActivity.this, id,
                                 mTextTitle.getText().toString().trim(),
-                                mTextUrl.getText().toString().trim(),
+                                mFeedUrl,
                                 mTextTag.getText().toString().trim());
 
                         finish();
@@ -152,23 +169,30 @@ public class EditFeedActivity extends Activity
         Intent i = getIntent();
         if (i != null) {
             mShouldFinishBack = i.getBooleanExtra(SHOULD_FINISH_BACK, false);
-            mDetailsFrame.setVisibility(View.VISIBLE);
-            mListResults.setVisibility(View.GONE);
             // Existing id
             id = i.getLongExtra(_ID, -1);
 
             // Existing item, do not allow URL to be edited
             if (id > 0) {
-                mTextUrl.setVisibility(View.GONE);
-                mTextSearch.setVisibility(View.GONE);
+                mSearchFrame.setVisibility(View.GONE);
+                mDetailsFrame.setVisibility(View.VISIBLE);
+                // Focus on tag
+                mTextTag.requestFocus();
                 addButton.setText(getString(R.string.save));
+            } else {
+                mSearchFrame.setVisibility(View.VISIBLE);
+                mDetailsFrame.setVisibility(View.GONE);
+                // Focus on search
+                mSearchFrame.requestFocus();
             }
 
             // Link
             if (i.getDataString() != null) {
-                mTextUrl.setText(i.getDataString());
+                mFeedUrl = i.getDataString().trim();
+                mTextSearch.setText(mFeedUrl);
             } else if (i.hasExtra(Intent.EXTRA_TEXT)) {
-                mTextUrl.setText(i.getStringExtra(Intent.EXTRA_TEXT));
+                mFeedUrl = i.getStringExtra(Intent.EXTRA_TEXT).trim();
+                mTextSearch.setText(mFeedUrl);
             }
             // Title
             if (i.hasExtra(TITLE)) {
@@ -237,8 +261,8 @@ public class EditFeedActivity extends Activity
                 filter.putCharSequence(TAGSFILTER, constraint);
                 getLoaderManager().restartLoader(LOADER_TAG_SUGGESTIONS,
                         filter, loaderCallbacks);
-                // Return existing cursor for now
-                return tagsAdapter.getCursor();
+                // Return null since existing cursor is going to be closed
+                return null;
             }
         });
 
@@ -276,10 +300,16 @@ public class EditFeedActivity extends Activity
     }
 
     void useEntry(final String title, final String url) {
+        mFeedUrl = url.trim();
         mTextTitle.setText(android.text.Html.fromHtml(title).toString());
-        mTextUrl.setText(url);
         mDetailsFrame.setVisibility(View.VISIBLE);
-        mListResults.setVisibility(View.GONE);
+        mSearchFrame.setVisibility(View.GONE);
+        // Focus on tag
+        mTextTag.requestFocus();
+        InputMethodManager imm =
+                (InputMethodManager) getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mTextTag, 0);
     }
 
     @Override
@@ -326,19 +356,25 @@ public class EditFeedActivity extends Activity
     @Override
     public Loader<GoogleFeedAPIClient.FindResponse> onCreateLoader(final int id,
             final Bundle args) {
+        mListResults.setVisibility(View.GONE);
+        mEmptyText.setVisibility(View.GONE);
+        mLoadingProgress.setVisibility(View.VISIBLE);
         return new RssSearchLoader(this, args.getString(SEARCHQUERY));
     }
 
     @Override
     public void onLoadFinished(final Loader<GoogleFeedAPIClient.FindResponse> loader,
             final GoogleFeedAPIClient.FindResponse data) {
+        mEmptyText.setText(R.string.no_feeds_found);
+        mLoadingProgress.setVisibility(View.GONE);
         if (data.responseData.feed != null) {
             useEntry(data.responseData.feed.title,
                     data.responseData.feed.feedUrl);
         } else {
-            mResultAdapter.setEntries(data.responseData.entries);
             mDetailsFrame.setVisibility(View.GONE);
+            mSearchFrame.setVisibility(View.VISIBLE);
             mListResults.setVisibility(View.VISIBLE);
+            mResultAdapter.setEntries(data.responseData.entries);
         }
     }
 

@@ -52,6 +52,7 @@ dependencies {
 
     // For nice looking progress bars
     compile 'com.github.castorflex.smoothprogressbar:library:1.0.0'
+    compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.1'
 
     // Don't work on L-preview yet
     kitkatCompile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
