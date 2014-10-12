@@ -136,10 +136,14 @@ def get_images(text):
 
     >>> get_images("one: <img src='url1'/>, two: <img width='10' src='url2' height='50'/>")
     ['url1', 'url2']
+
+    >>> get_images("Silly urls: <img src='bob&amp;jones'")
+    ['bob&jones']
     """
     images = []
     for m in PATTERN_IMG_URL.finditer(text):
-        images.append(m.group(3))
+        # Do this somewhere else perhaps. Sweclockers has stupid image urls.
+        images.append(m.group(3).replace("&amp;", "&"))
 
     return images
 
