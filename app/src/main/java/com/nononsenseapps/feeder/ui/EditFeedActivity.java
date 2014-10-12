@@ -200,7 +200,8 @@ public class EditFeedActivity extends Activity
             }
             // Tag
             if (i.hasExtra(TAG)) {
-                mTextTag.setText(i.getStringExtra(TAG));
+                // Use append instead of setText to make sure cursor is at end
+                mTextTag.append(i.getStringExtra(TAG));
             }
         }
 
