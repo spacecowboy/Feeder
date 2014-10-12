@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -339,6 +340,7 @@ public class FeedFragment extends Fragment
 
         private final int unreadTextColor;
         private final int readTextColor;
+        private final int linkColor;
 
         String temps;
 
@@ -351,6 +353,8 @@ public class FeedFragment extends Fragment
                     .getColor(R.color.primary_text_default_material_dark);
             readTextColor = context.getResources()
                     .getColor(R.color.secondary_text_material_dark);
+            linkColor = context.getResources().getColor(R.color
+                    .linked_text_blue);
         }
 
         @Override
@@ -388,11 +392,24 @@ public class FeedFragment extends Fragment
             final int position = hposition - 1;
             final FeedItemSQL item =
                     new FeedItemSQL((Cursor) super.getItem(position));
-            //final RssItem item = items.get(position);
 
             holder.rssItem = item;
 
-            holder.authorTextView.setText(item.feedtitle);
+            // Set the title first
+            SpannableStringBuilder titleText = new SpannableStringBuilder
+                    (item.feedtitle);
+            // If no body, display domain of link to be opened
+            if (holder.rssItem.description == null ||
+                holder.rssItem.description.isEmpty()) {
+                // append to title field
+                titleText.append(" \u2014 " +
+                                 holder.rssItem.getDomain());
+                titleText.setSpan(new ForegroundColorSpan(linkColor),
+                        item.feedtitle.length() + 3, titleText.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            holder.authorTextView.setText(titleText);
+
             if (item.getPubDate() == null) {
                 holder.dateTextView.setVisibility(View.GONE);
             } else {
@@ -421,20 +438,8 @@ public class FeedFragment extends Fragment
                         0, item.plaintitle.length(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.titleTextView.setText(textSpan);
-                // Change depending on read status
-//                holder.titleTextView.setTextColor(holder.rssItem.isUnread() ?
-//                                                  unreadTextColor :
-//                                                  readTextColor);
             }
-//            if (item.plainsnippet == null) {
-//                holder.bodyTextView.setVisibility(View.GONE);
-//            } else {
-//                holder.bodyTextView.setVisibility(View.VISIBLE);
-//                //                holder.bodyTextView.setText(android.text.Html.fromHtml(item
-//                //                        .getDescription()));
-//                holder.bodyTextView.setText(item.plainsnippet);
-//            }
-            if (item.imageurl == null) {
+            if (item.imageurl == null || item.imageurl.isEmpty()) {
                 holder.imageView.setVisibility(View.GONE);
             } else {
                 int w = holder.imageView.getWidth();

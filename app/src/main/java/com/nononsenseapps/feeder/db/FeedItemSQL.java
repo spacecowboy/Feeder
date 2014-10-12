@@ -116,6 +116,37 @@ public class FeedItemSQL {
     public String tag = null;
     public String feedtitle = null;
 
+    // Convenience field for list views. Only converted first time
+    private String domain;
+
+    /**
+     * Given an enclosurelink/link of http://www.bla.com/foo/bar, this method
+     * returns bla.com
+     * @return the domain of the enclosure link, or if null, the link's domain
+     */
+    public String getDomain() {
+        if (domain == null) {
+            domain = enclosurelink != null ? enclosurelink : link;
+            // Strip http://
+            int start = domain.indexOf("://");
+            if (start > 0)
+                start += 3;
+            else
+                start = 0;
+            // If www, strip that too
+            if (domain.indexOf("www.") == start) {
+                start += 4;
+            }
+            // Strip /foo/bar
+            int end = domain.indexOf("/", start);
+            if (end < 1)
+                domain = domain.substring(start);
+            else
+                domain = domain.substring(start, end);
+        }
+        return domain;
+    }
+
     public boolean isUnread() {
         return unread == 1;
     }

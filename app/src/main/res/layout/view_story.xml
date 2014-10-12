@@ -64,6 +64,7 @@
                 android:layout_marginEnd="2dp"
                 android:singleLine="true"
                 android:visibility="visible"
+                android:ellipsize="middle"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/story_date"
                 android:text="SuperDuperFeedWithVeryLongAddressIOnded.com"
