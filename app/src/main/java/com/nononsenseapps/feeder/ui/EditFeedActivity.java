@@ -270,8 +270,10 @@ public class EditFeedActivity extends Activity
         mTextTag.setAdapter(tagsAdapter);
 
         // Start suggestions loader
+        Bundle args = new Bundle();
+        args.putCharSequence(TAGSFILTER, mTextTag.getText());
         getLoaderManager().restartLoader(LOADER_TAG_SUGGESTIONS,
-                Bundle.EMPTY, loaderCallbacks);
+                args, loaderCallbacks);
     }
 
     private boolean shouldBeFloatingWindow() {
