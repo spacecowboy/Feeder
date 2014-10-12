@@ -162,7 +162,6 @@ public class FeedFragment extends Fragment
 
         // specify an adapter
         mAdapter = new FeedAdapter(getActivity());
-        mRecyclerView.setEmptyView(mEmptyView);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView
                 .setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -310,6 +309,9 @@ public class FeedFragment extends Fragment
             final Cursor cursor) {
         if (FEEDITEMS_LOADER == cursorLoader.getId()) {
             mAdapter.swapCursor(cursor);
+            boolean empty = mAdapter.getCount() < 1;
+            mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
+            mRecyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
         } else if (FEED_LOADER == cursorLoader.getId()) {
             if (cursor.moveToNext()) {
                 FeedSQL feed = new FeedSQL(cursor);
