@@ -136,6 +136,26 @@ class UserFeed(db.Model):
         return '<UserFeed {}>'.format(self.link)
 
 
+# Keep track of deletions with a similar table
+class UserDeletion(db.Model):
+    __tablename__ = "userdeletions"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer,
+                     ForeignKey('users.id',
+                                ondelete="CASCADE",
+                                onupdate="CASCADE"))
+    link = Column(String, nullable=False, unique=True)
+    timestamp = Column(DateTime, nullable=False)
+
+    def __init__(self, user, feed):
+        self.user_id = user.id
+        self.link = feed.link
+        self.timestamp = datetime.utcnow()
+
+    def __repr__(self):
+        return '<UserDeletion {}>'.format(self.link)
+
+
 class FeedItem(db.Model):
     __tablename__ = "feeditems"
     id = Column(Integer, primary_key=True)

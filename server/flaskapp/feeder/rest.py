@@ -9,6 +9,7 @@ from .models import Feed, FeedItem, UserFeed, get_user, get_feed, get_userfeed
 from flask.ext.restful import (Resource, Api, reqparse, fields,
                                marshal_with, marshal_with_field)
 from .util import parse_timestamp, datetime_to_string
+
 from .gauth import authorized
 
 
@@ -119,7 +120,14 @@ class Feeds(Resource):
                 f.items = FeedItem.query.filter(FeedItem.timestamp > dt,
                                                 FeedItem.feed_id == f.feed.id).all()
 
-        return feeds
+        # If we have a timestamp, also return deletes done
+        if dt is None:
+            deletes = []
+        else:
+            q = UserDeletion.query.filter(UserDeletion.timestamp > dt)
+            deletes = q.all()
+
+        return dict(feeds=feeds, deletes=deletes)
 
     @marshal_with(feed_fields)
     @authorized
@@ -134,13 +142,19 @@ class Feeds(Resource):
         # Set link between user and feed
         userfeed = get_userfeed(user, feed, args.tag, args.title)
 
+        # Remove possible deletes
+        UserDeletion.query.\
+            filter_by(user_id=user.id).\
+            filter_by(link=feed.link).\
+            delete()
+
         # If we should update tag or title
         if userfeed.tag != args.tag or userfeed.title != args.title:
             userfeed.tag = args.tag
             userfeed.title = args.title
             db.session.add(userfeed)
-            db.session.commit()
         # Else, already saved
+        db.session.commit()
 
         userfeed.items = None
         # Return feed
@@ -158,10 +172,17 @@ class Feeds(Resource):
         if feed is None:
             return None, 404
 
+        # Store delete for other devices
+        ud = UserDeletion(user, feed)
+        db.session.add(ud)
+
+        # Perform delete
         UserFeed.query.\
             filter_by(user_id=user.id).\
             filter_by(feed_id=feed.id).\
             delete()
+
+        db.session.commit()
 
         return None, 204
 

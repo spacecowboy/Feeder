@@ -128,9 +128,27 @@ public class RssSyncHelper extends IntentService {
         }
     }
 
+
+  /**
+   * Remove the designated feed from local storage. Adds the delete to the
+   * list of operations, to be committed with applyBatch.
+   *
+   * @param context
+   * @param operations
+   * @param delete
+   */
+  public static void syncDeleteBatch(final Context context,
+                                     final ArrayList<ContentProviderOperation> operations,
+                                     final BackendAPIClient.Delete delete) {
+    operations.add(ContentProviderOperation.newDelete(FeedSQL.URI_FEEDS)
+                   .withSelection(FeedSQL.COL_LINK + " IS ?",
+                                  Util.ToStringArray(delete.link))
+                   .build());
+  }
+
     /**
      * Adds the information contained in the feed to the list of pending
-     * operations, to be commited with applyBatch.
+     * operations, to be committed with applyBatch.
      *
      * @param context
      * @param operations
@@ -327,8 +345,10 @@ public class RssSyncHelper extends IntentService {
             Log.d(TAG, "Using min_timestamp: " +
                        RssContentProvider.GetLatestTimestamp(this));
 
-            List<BackendAPIClient.Feed> feeds =
+            BackendAPIClient.FeedsResponse feedsResponse =
                     api.getFeeds(RssContentProvider.GetLatestTimestamp(this));
+
+            List<BackendAPIClient.Feed> feeds = feedsResponse.feeds;
 
             if (feeds == null) {
                 Log.d(TAG, "Feeds was null");
@@ -346,6 +366,7 @@ public class RssSyncHelper extends IntentService {
             Log.e(TAG, "" + e.getMessage());
         }
     }
+
 
     public static void syncFeedRetro(final Context context,
             final BackendAPIClient.Feed feed) {

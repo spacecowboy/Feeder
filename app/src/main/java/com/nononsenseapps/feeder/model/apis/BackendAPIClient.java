@@ -44,7 +44,7 @@ public class BackendAPIClient {
 
     public interface BackendAPI {
         @GET("/feeds")
-        List<Feed> getFeeds(@Query("min_timestamp") String min_timestamp);
+        FeedsResponse getFeeds(@Query("min_timestamp") String min_timestamp);
 
         @POST("/feeds")
         Feed putFeed(@Body FeedMessage feedMessage);
@@ -52,6 +52,11 @@ public class BackendAPIClient {
         @DELETE("/feeds/{link}")
         VoidResponse deleteFeed(@Path("link") String link);
     }
+
+  public static class FeedsResponse {
+    public List<Feed> feeds;
+    public List<Deletes> deletes;
+  }
 
     public static class FeedMessage extends Feed {
         public String regid;
@@ -80,6 +85,11 @@ public class BackendAPIClient {
         public String timestamp;
         public List<FeedItem> items;
     }
+
+  public static class Delete {
+    public String link;
+    public String timestamp;
+  }
 
     public static class VoidResponse {}
 }

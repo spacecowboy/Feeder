@@ -119,8 +119,12 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             // Then downloads
             Log.d(TAG, "With timestamp: " + RssContentProvider
                     .GetLatestTimestamp(getContext()));
-            List<BackendAPIClient.Feed> feeds = api.getFeeds(
+            BackendAPIClient.FeedsResponse feedsResponse =
+                api.getFeeds(
                     RssContentProvider.GetLatestTimestamp(getContext()));
+
+            // Start with feeds
+            List<BackendAPIClient.Feed> feeds = feedsResponse.feeds;
 
             if (feeds == null) {
                 Log.d(TAG, "Feeds was null");
@@ -139,6 +143,20 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
                     RssSyncHelper.syncFeedBatch(getContext(), operations, feed);
                 }
             }
+
+            // End with deletes
+            List<BackendAPIClient.Delete> deletes = feedsResponse.deletes;
+            if (deletes == null) {
+              Log.d(TAG, "Deletes was null");
+            } else {
+              Log.d(TAG, "Number of deletes to sync: " + deletes.size());
+              for (BackendAPIClient.Delete delete : deletes) {
+                Log.d(TAG, "Deleting: " + delete.link);
+                // Delete feed
+                RssSyncHelper.syncDeleteBatch(getContext(), operations, delete);
+              }
+            }
+
             if (!operations.isEmpty()) {
                 getContext().getContentResolver()
                         .applyBatch(RssContentProvider.AUTHORITY, operations);
