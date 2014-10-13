@@ -198,6 +198,7 @@ class Feeds(Resource):
 
         args = deleteparser.parse_args()
         # Unquote the url
+        print("Unquoting link:", args.link)
         link = unquote(args.link)
         print("delete link:", link)
 
