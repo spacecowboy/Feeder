@@ -153,7 +153,7 @@ class Feeds(Resource):
             q = UserDeletion.query.filter(UserDeletion.timestamp > dt)
             deletes = q.all()
 
-        return dict(feeds=feeds, deletes=deletes)
+        return {"feeds": feeds, "deletes": deletes}
 
     @print_errors
     @marshal_with(feed_fields)
