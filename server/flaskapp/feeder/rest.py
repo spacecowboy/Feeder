@@ -13,6 +13,8 @@ from .util import parse_timestamp, datetime_to_string
 
 from .gauth import authorized
 
+from urllib.parse import unquote
+
 
 # Want a boolean class
 class FieldBool(fields.Raw):
@@ -194,8 +196,10 @@ class Feeds(Resource):
         user = get_user(userid)
 
         args = deleteparser.parse_args()
+        # Unquote the url
+        link = unquote(args.link)
 
-        feed = Feed.query.filter_by(link=args.link).first()
+        feed = Feed.query.filter_by(link=link).first()
 
         if feed is None:
             return None, 404
