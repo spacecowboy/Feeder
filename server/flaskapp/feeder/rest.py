@@ -110,6 +110,7 @@ def print_errors(f):
             return f(*args, **kwargs)
         except Exception as e:
             print(e)
+            app.logger.error(str(e))
             raise e
 
     return wrapped_f
