@@ -15,6 +15,12 @@ from .gauth import authorized
 
 from urllib.parse import unquote
 
+# Configure some logging
+import logging
+file_handler = logging.FileHandler('rest.log')
+app.logger.addHandler(file_handler)
+app.logger.setLevel(logging.INFO)
+
 
 # Want a boolean class
 class FieldBool(fields.Raw):
@@ -166,8 +172,9 @@ class Feeds(Resource):
 
         args = postparser.parse_args()
 
+        # Make sure link is correct
+        args.link = unquote(args.link)
         # Make sure feed exists
-        print("add link:", args.link)
         feed = get_feed(args.link)
         # Set link between user and feed
         userfeed = get_userfeed(user, feed, args.tag, args.title)
@@ -198,13 +205,16 @@ class Feeds(Resource):
 
         args = deleteparser.parse_args()
         # Unquote the url
+        app.logger.info("Unquoting link: {}".format(args.link))
         print("Unquoting link:", args.link)
-        link = unquote(args.link)
-        print("delete link:", link)
+        args.link = unquote(args.link)
+        app.logger.info("delete link: {}".format(args.link))
+        print("delete link:", args.link)
 
-        feed = Feed.query.filter_by(link=link).first()
+        feed = Feed.query.filter_by(link=args.link).first()
 
         if feed is None:
+            app.logger.error("No such feed: {}".format(args.link))
             return None, 404
 
         # Store delete for other devices
