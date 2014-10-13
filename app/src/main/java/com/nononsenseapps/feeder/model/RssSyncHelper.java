@@ -129,22 +129,21 @@ public class RssSyncHelper extends IntentService {
     }
 
 
-  /**
-   * Remove the designated feed from local storage. Adds the delete to the
-   * list of operations, to be committed with applyBatch.
-   *
-   * @param context
-   * @param operations
-   * @param delete
-   */
-  public static void syncDeleteBatch(final Context context,
-                                     final ArrayList<ContentProviderOperation> operations,
-                                     final BackendAPIClient.Delete delete) {
-    operations.add(ContentProviderOperation.newDelete(FeedSQL.URI_FEEDS)
-                   .withSelection(FeedSQL.COL_LINK + " IS ?",
-                                  Util.ToStringArray(delete.link))
-                   .build());
-  }
+    /**
+     * Remove the designated feed from local storage. Adds the delete to the
+     * list of operations, to be committed with applyBatch.
+     *
+     * @param context
+     * @param operations
+     * @param delete
+     */
+    public static void syncDeleteBatch(final Context context,
+            final ArrayList<ContentProviderOperation> operations,
+            final BackendAPIClient.Delete delete) {
+        operations.add(ContentProviderOperation.newDelete(FeedSQL.URI_FEEDS)
+                .withSelection(FeedSQL.COL_URL + " IS ?",
+                        Util.ToStringArray(delete.link)).build());
+    }
 
     /**
      * Adds the information contained in the feed to the list of pending

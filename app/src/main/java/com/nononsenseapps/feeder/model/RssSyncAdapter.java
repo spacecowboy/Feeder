@@ -147,14 +147,15 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             // End with deletes
             List<BackendAPIClient.Delete> deletes = feedsResponse.deletes;
             if (deletes == null) {
-              Log.d(TAG, "Deletes was null");
+                Log.d(TAG, "Deletes was null");
             } else {
-              Log.d(TAG, "Number of deletes to sync: " + deletes.size());
-              for (BackendAPIClient.Delete delete : deletes) {
-                Log.d(TAG, "Deleting: " + delete.link);
-                // Delete feed
-                RssSyncHelper.syncDeleteBatch(getContext(), operations, delete);
-              }
+                Log.d(TAG, "Number of deletes to sync: " + deletes.size());
+                for (BackendAPIClient.Delete delete : deletes) {
+                    Log.d(TAG, "Deleting: " + delete.link);
+                    // Delete feed
+                    RssSyncHelper
+                            .syncDeleteBatch(getContext(), operations, delete);
+                }
             }
 
             if (!operations.isEmpty()) {

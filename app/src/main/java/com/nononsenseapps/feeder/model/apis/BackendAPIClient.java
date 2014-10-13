@@ -55,7 +55,7 @@ public class BackendAPIClient {
 
   public static class FeedsResponse {
     public List<Feed> feeds;
-    public List<Deletes> deletes;
+    public List<Delete> deletes;
   }
 
     public static class FeedMessage extends Feed {
