@@ -167,6 +167,7 @@ class Feeds(Resource):
         args = postparser.parse_args()
 
         # Make sure feed exists
+        print("add link:", args.link)
         feed = get_feed(args.link)
         # Set link between user and feed
         userfeed = get_userfeed(user, feed, args.tag, args.title)
@@ -198,6 +199,7 @@ class Feeds(Resource):
         args = deleteparser.parse_args()
         # Unquote the url
         link = unquote(args.link)
+        print("delete link:", link)
 
         feed = Feed.query.filter_by(link=link).first()
 
