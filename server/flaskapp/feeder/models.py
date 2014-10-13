@@ -144,8 +144,10 @@ class UserDeletion(db.Model):
                      ForeignKey('users.id',
                                 ondelete="CASCADE",
                                 onupdate="CASCADE"))
-    link = Column(String, nullable=False, unique=True)
+    link = Column(String, nullable=False)
     timestamp = Column(DateTime, nullable=False)
+    # Would want unique constraint, but can't get
+    # on conflict things
 
     def __init__(self, user, feed):
         self.user_id = user.id
