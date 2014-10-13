@@ -322,8 +322,9 @@ public class RssSyncHelper extends IntentService {
         }
             BackendAPIClient.BackendAPI api =
                     BackendAPIClient.GetBackendAPI(token);
-
-            api.deleteFeed(link);
+      BackendAPIClient.DeleteMessage d = new BackendAPIClient.DeleteMessage();
+      d.link = link;
+      api.deleteFeed(d);
     }
 
     protected void syncAllRetro() {

@@ -49,8 +49,8 @@ public class BackendAPIClient {
         @POST("/feeds")
         Feed putFeed(@Body FeedMessage feedMessage);
 
-        @DELETE("/feeds/{link}")
-        VoidResponse deleteFeed(@Path("link") String link);
+        @POST("/feeds/delete")
+        VoidResponse deleteFeed(@Body DeleteMessage deleteMessage);
     }
 
   public static class FeedsResponse {
@@ -61,6 +61,10 @@ public class BackendAPIClient {
     public static class FeedMessage extends Feed {
         public String regid;
     }
+
+  public static class DeleteMessage {
+    public String link;
+  }
 
     public static class FeedItem {
         public String title;
