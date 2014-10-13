@@ -8,7 +8,7 @@ from .models import (Feed, FeedItem, UserFeed, UserDeletion,
                      get_user, get_feed, get_userfeed)
 #from flask_oauthlib.client import OAuth
 from flask.ext.restful import (Resource, Api, reqparse, fields,
-                               marshal_with, marshal_with_field)
+                               marshal_with)
 from .util import parse_timestamp, datetime_to_string
 
 from .gauth import authorized
@@ -115,7 +115,7 @@ class Feeds(Resource):
     '''
 
     @print_errors
-    @marshal_with_field(feeds_response)
+    @marshal_with(feeds_response)
     @authorized
     def get(self, userid):
         '''Return all feeds'''
