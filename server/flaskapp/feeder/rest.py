@@ -4,7 +4,8 @@ The REST-API of Feeder
 '''
 
 from feeder import app, db
-from .models import Feed, FeedItem, UserFeed, get_user, get_feed, get_userfeed
+from .models import (Feed, FeedItem, UserFeed, UserDeletion,
+                     get_user, get_feed, get_userfeed)
 #from flask_oauthlib.client import OAuth
 from flask.ext.restful import (Resource, Api, reqparse, fields,
                                marshal_with, marshal_with_field)
