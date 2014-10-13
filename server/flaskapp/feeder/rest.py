@@ -13,8 +13,6 @@ from .util import parse_timestamp, datetime_to_string
 
 from .gauth import authorized
 
-from urllib.parse import unquote
-
 # Configure some logging
 import logging
 file_handler = logging.FileHandler('rest.log')
@@ -172,8 +170,6 @@ class Feeds(Resource):
 
         args = postparser.parse_args()
 
-        # Make sure link is correct
-        args.link = unquote(args.link)
         # Make sure feed exists
         feed = get_feed(args.link)
         # Set link between user and feed
@@ -197,19 +193,15 @@ class Feeds(Resource):
         # Return feed
         return userfeed
 
+
+class FeedsDeleter(Resource):
     @print_errors
     @authorized
-    def delete(self, userid):
+    def post(self, userid):
         '''Delete a feed'''
         user = get_user(userid)
 
         args = deleteparser.parse_args()
-        # Unquote the url
-        app.logger.info("Unquoting link: {}".format(args.link))
-        print("Unquoting link:", args.link)
-        args.link = unquote(args.link)
-        app.logger.info("delete link: {}".format(args.link))
-        print("delete link:", args.link)
 
         feed = Feed.query.filter_by(link=args.link).first()
 
@@ -232,4 +224,5 @@ class Feeds(Resource):
         return None, 204
 
 # Connect with API URLs
-api.add_resource(Feeds, '/feeds', '/feeds/<string:link>')
+api.add_resource(Feeds, '/feeds')
+api.add_resource(FeedsDeleter, '/feeds/delete')
