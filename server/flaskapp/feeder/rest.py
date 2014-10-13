@@ -83,6 +83,16 @@ feed_fields = {
     'timestamp': FieldDateTime,
     'items': fields.List(fields.Nested(feeditem_fields))
 }
+### Single delete
+delete_fields = {
+    'link': fields.String,
+    'timestamp': FieldDateTime
+}
+### Response with list of feeds, and list of deletes
+feeds_response = {
+    'feeds': fields.List(fields.Nested(feed_fields)),
+    'deletes': fields.List(fields.Nested(delete_fields))
+}
 
 
 def print_errors(f):
@@ -104,8 +114,8 @@ class Feeds(Resource):
     This class is the entire REST-interface for dealing with feeds.
     '''
 
-    @marshal_with_field(fields.List(fields.Nested(feed_fields)))
     @print_errors
+    @marshal_with_field(feeds_response)
     @authorized
     def get(self, userid):
         '''Return all feeds'''
@@ -145,8 +155,8 @@ class Feeds(Resource):
 
         return dict(feeds=feeds, deletes=deletes)
 
-    @marshal_with(feed_fields)
     @print_errors
+    @marshal_with(feed_fields)
     @authorized
     def post(self, userid):
         '''Add new/Edit feed'''
@@ -177,8 +187,8 @@ class Feeds(Resource):
         # Return feed
         return userfeed
 
-    @authorized
     @print_errors
+    @authorized
     def delete(self, userid):
         '''Delete a feed'''
         user = get_user(userid)
