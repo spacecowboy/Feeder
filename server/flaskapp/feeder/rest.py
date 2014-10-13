@@ -85,12 +85,27 @@ feed_fields = {
 }
 
 
+def print_errors(f):
+    '''Print errors in the wrapped function
+    re-raise them.'''
+
+    def wrapped_f(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            print(e)
+            raise e
+
+    return wrapped_f
+
+
 class Feeds(Resource):
     '''
     This class is the entire REST-interface for dealing with feeds.
     '''
 
     @marshal_with_field(fields.List(fields.Nested(feed_fields)))
+    @print_errors
     @authorized
     def get(self, userid):
         '''Return all feeds'''
@@ -131,6 +146,7 @@ class Feeds(Resource):
         return dict(feeds=feeds, deletes=deletes)
 
     @marshal_with(feed_fields)
+    @print_errors
     @authorized
     def post(self, userid):
         '''Add new/Edit feed'''
@@ -162,6 +178,7 @@ class Feeds(Resource):
         return userfeed
 
     @authorized
+    @print_errors
     def delete(self, userid):
         '''Delete a feed'''
         user = get_user(userid)
