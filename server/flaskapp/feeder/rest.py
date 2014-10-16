@@ -13,6 +13,8 @@ from .util import parse_timestamp, datetime_to_string
 
 from .gauth import authorized
 
+from datetime import datetime, timedelta
+
 # Configure some logging
 import logging
 file_handler = logging.FileHandler('rest.log')
@@ -141,8 +143,11 @@ class Feeds(Resource):
             q = q.filter(Feed.link.in_(urls))
         if args['min_timestamp'] is not None:
             dt = parse_timestamp(args['min_timestamp'])
-            if dt is not None:
-                q = q.filter(Feed.timestamp > dt)
+        # Require a timestap. If one was not provided in decent form,
+        # default to two weeks ago
+        if dt is None:
+            dt = datetime.utcnow() - timedelta(days=14)
+        q = q.filter(Feed.timestamp > dt)
         feeds = q.all()
         for f in feeds:
             # Make sure to only return items with correct timestamp
@@ -154,7 +159,7 @@ class Feeds(Resource):
                                                 FeedItem.feed_id == f.feed.id).all()
 
         # If we have a timestamp, also return deletes done
-        if dt is None:
+        if args['min_timestamp'] is None:
             deletes = []
         else:
             q = UserDeletion.query.filter(UserDeletion.timestamp > dt)
