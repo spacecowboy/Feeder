@@ -144,9 +144,9 @@ class Feeds(Resource):
         if args['min_timestamp'] is not None:
             dt = parse_timestamp(args['min_timestamp'])
         # Require a timestap. If one was not provided in decent form,
-        # default to two weeks ago
+        # default to x days ago
         if dt is None:
-            dt = datetime.utcnow() - timedelta(days=14)
+            dt = datetime.utcnow() - timedelta(days=7)
         q = q.filter(Feed.timestamp > dt)
         feeds = q.all()
         for f in feeds:
