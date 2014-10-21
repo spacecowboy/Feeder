@@ -11,6 +11,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
@@ -36,6 +37,7 @@ import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
+import com.nononsenseapps.feeder.util.TabletUtils;
 import com.squareup.picasso.Picasso;
 
 import org.joda.time.DateTimeZone;
@@ -131,10 +133,28 @@ public class FeedFragment extends Fragment
 
         // improve performance if you know that changes in content
         // do not change the size of the RecyclerView
-        //mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(getActivity());
+        if (TabletUtils.isTablet(getActivity())) {
+            final int cols = TabletUtils.numberOfFeedColumns(getActivity());
+            // use a grid layout
+            mLayoutManager = new GridLayoutManager(getActivity(),
+                    cols);
+            // I want the padding header to span the entire width
+            ((GridLayoutManager) mLayoutManager).setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    if (FeedAdapter.HEADERTYPE == mAdapter.getItemViewType(position)) {
+                        return cols;
+                    } else {
+                        return 1;
+                    }
+                }
+            });
+        } else {
+            // use a linear layout manager
+            mLayoutManager = new LinearLayoutManager(getActivity());
+        }
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // I want some dividers
@@ -326,12 +346,12 @@ public class FeedFragment extends Fragment
 
     class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        private final int HEADERTYPE = 0;
-        private final int ITEMTYPE = 1;
+        public static final int HEADERTYPE = 0;
+        public static final int ITEMTYPE = 1;
 
         // 64dp at xhdpi is 128 pixels
-        private final int defImgWidth = 2 * 128;
-        private final int defImgHeight = 2 * 128;
+        private static final int defImgWidth = 2 * 128;
+        private static final int defImgHeight = 2 * 128;
 
         private final int unreadTextColor;
         private final int readTextColor;
@@ -362,7 +382,7 @@ public class FeedFragment extends Fragment
             if (cursor == null || cursor.getCount() == 0) {
                 return 0;
             } else {
-                // 1 header + the rest
+                // header + the rest
                 return 1 + cursor.getCount();
             }
         }
@@ -387,9 +407,15 @@ public class FeedFragment extends Fragment
                                 R.layout.padding_header_item, parent, false));
             } else {
                 // normal item
+                final int item_layout = R.layout.view_story;
+                if (TabletUtils.isTablet(parent.getContext())) {
+                    // TODO
+                } else {
+                    //item_layout = R.layout.view_story;
+                }
                 return new ViewHolder(
                         LayoutInflater.from(parent.getContext())
-                                .inflate(R.layout.view_story, parent, false));
+                                .inflate(item_layout, parent, false));
             }
         }
 
