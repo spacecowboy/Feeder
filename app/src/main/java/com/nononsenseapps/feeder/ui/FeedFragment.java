@@ -9,6 +9,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -151,15 +152,21 @@ public class FeedFragment extends Fragment
                     }
                 }
             });
+            // TODO, use better dividers such as simple padding
+            // I want some dividers
+            mRecyclerView.addItemDecoration(new DividerItemDecoration
+                    (getActivity(), DividerItemDecoration.VERTICAL_LIST));
+            // I want some dividers
+            mRecyclerView.addItemDecoration(new DividerItemDecoration
+                    (getActivity(), DividerItemDecoration.HORIZONTAL_LIST));
         } else {
             // use a linear layout manager
             mLayoutManager = new LinearLayoutManager(getActivity());
+            // I want some dividers
+            mRecyclerView.addItemDecoration(new DividerItemDecoration
+                    (getActivity(), DividerItemDecoration.VERTICAL_LIST));
         }
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-        // I want some dividers
-        mRecyclerView.addItemDecoration(new DividerItemDecoration
-                (getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
         // Set up the empty view
         mEmptyView = rootView.findViewById(android.R.id.empty);
@@ -353,9 +360,12 @@ public class FeedFragment extends Fragment
         private static final int defImgWidth = 2 * 128;
         private static final int defImgHeight = 2 * 128;
 
+        private final boolean isGrid;
+
         private final int unreadTextColor;
         private final int readTextColor;
         private final int linkColor;
+        private final Drawable bgProtection;
 
         String temps;
         private Cursor cursor;
@@ -363,12 +373,15 @@ public class FeedFragment extends Fragment
         public FeedAdapter(final Context context) {
             super();
 
+            isGrid = TabletUtils.isTablet(context);
+
             unreadTextColor = context.getResources()
                     .getColor(R.color.primary_text_default_material_dark);
             readTextColor = context.getResources()
                     .getColor(R.color.secondary_text_material_dark);
             linkColor = context.getResources().getColor(R.color
                     .linked_text_blue);
+            bgProtection = context.getResources().getDrawable(R.drawable.bg_protect);
         }
 
         public void swapCursor(Cursor cursor) {
@@ -485,6 +498,7 @@ public class FeedFragment extends Fragment
             }
             if (item.imageurl == null || item.imageurl.isEmpty()) {
                 holder.imageView.setVisibility(View.GONE);
+                holder.textGroup.setBackground(null);
             } else {
                 int w = holder.imageView.getWidth();
                 if (w <= 0) {
@@ -497,6 +511,7 @@ public class FeedFragment extends Fragment
                 }
                 Picasso.with(getActivity()).load(item.imageurl).resize(w, h)
                         .centerCrop().into(holder.imageView);
+                holder.textGroup.setBackground(bgProtection);
                 holder.imageView.setVisibility(View.VISIBLE);
             }
         }
@@ -510,6 +525,7 @@ public class FeedFragment extends Fragment
             public final TextView bodyTextView;
             public final TextView dateTextView;
             public final TextView authorTextView;
+            public final View textGroup;
             public final ImageView imageView;
 
             public FeedItemSQL rssItem;
@@ -517,6 +533,7 @@ public class FeedFragment extends Fragment
             public ViewHolder(View v) {
                 super(v);
                 v.setOnClickListener(this);
+                textGroup = v.findViewById(R.id.story_text);
                 titleTextView = (TextView) v.findViewById(R.id.story_title);
                 bodyTextView = (TextView) v.findViewById(R.id.story_body);
                 dateTextView = (TextView) v.findViewById(R.id.story_date);

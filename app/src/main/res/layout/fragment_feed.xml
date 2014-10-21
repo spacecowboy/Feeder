@@ -12,6 +12,8 @@
         android:layout_height="match_parent"
         android:scrollbarStyle="outsideOverlay"
         android:scrollbars="vertical"
+        android:paddingLeft="@dimen/feed_list_padding"
+        android:paddingRight="@dimen/feed_list_padding"
         />
 
     <include
