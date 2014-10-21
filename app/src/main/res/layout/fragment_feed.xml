@@ -6,16 +6,16 @@
              android:layout_height="match_parent"
              tools:context="com.nononsenseapps.feeder.ui.FeedActivity">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="?android:listDivider"
         android:scrollbarStyle="outsideOverlay"
         android:scrollbars="vertical"
         />
 
-    <include layout="@layout/empty_feed"
-             android:visibility="gone"/>
+    <include
+        layout="@layout/empty_feed"
+        android:visibility="gone"/>
 
 </FrameLayout>

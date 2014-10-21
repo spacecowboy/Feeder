@@ -11,6 +11,8 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -20,12 +22,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
@@ -43,6 +44,8 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
 
+import retrofit.http.HEAD;
+
 
 public class FeedFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -58,19 +61,20 @@ public class FeedFragment extends Fragment
     private static final String ARG_FEED_TITLE = "feed_title";
     private static final String ARG_FEED_URL = "feed_url";
     private static final String ARG_FEED_TAG = "feed_tag";
-    private FeedAdapter mAdapter;
-    private AbsListView mRecyclerView;
-    private View mEmptyView;
-    private View mEmptyAddFeed;
-    private View mEmptyOpenFeeds;
     // Filter for database loader
     private static final String ONLY_UNREAD = FeedItemSQL.COL_UNREAD + " IS 1 ";
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
+    private FeedAdapter mAdapter;
+    private RecyclerView mRecyclerView;
+    private View mEmptyView;
+    private View mEmptyAddFeed;
+    private View mEmptyOpenFeeds;
     // TODO change this
     private long id = -1;
     private String title = "Android Police Dummy";
     private String url = "http://feeds.feedburner.com/AndroidPolice";
     private String tag = "";
+    private LinearLayoutManager mLayoutManager;
 
     public FeedFragment() {
     }
@@ -80,7 +84,7 @@ public class FeedFragment extends Fragment
      * number.
      */
     public static FeedFragment newInstance(long id, String title, String url,
-     String tag) {
+                                           String tag) {
         FeedFragment fragment = new FeedFragment();
         Bundle args = new Bundle();
         args.putLong(ARG_FEED_ID, id);
@@ -120,22 +124,22 @@ public class FeedFragment extends Fragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         View rootView =
                 inflater.inflate(R.layout.fragment_feed, container, false);
-        mRecyclerView = (AbsListView) rootView.findViewById(android.R.id.list);
+        mRecyclerView = (RecyclerView) rootView.findViewById(android.R.id.list);
 
         // improve performance if you know that changes in content
         // do not change the size of the RecyclerView
         //mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        //mLayoutManager = new LinearLayoutManager(getActivity());
-        //mRecyclerView.setLayoutManager(mLayoutManager);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
         // I want some dividers
-        //mRecyclerView.addItemDecoration(new DividerItemDecoration
-        //       (getActivity(), DividerItemDecoration.VERTICAL_LIST));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration
+                (getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
         // Set up the empty view
         mEmptyView = rootView.findViewById(android.R.id.empty);
@@ -164,16 +168,6 @@ public class FeedFragment extends Fragment
         // specify an adapter
         mAdapter = new FeedAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView
-                .setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(final AdapterView<?> parent,
-                            final View view, final int position,
-                            final long id) {
-                        // Just open in browser for now
-                        ((FeedAdapter.ViewHolder) view.getTag()).onClick(view);
-                    }
-                });
 
         return rootView;
     }
@@ -231,7 +225,7 @@ public class FeedFragment extends Fragment
             RssSyncHelper.deleteFeedAsync(getActivity(), url);
             // TODO close fragment
             return true;
-        } else if (id == R.id.action_mark_as_read ) {
+        } else if (id == R.id.action_mark_as_read) {
             if (this.id > 0) {
                 RssContentProvider.MarkFeedAsRead(getActivity(), this.id);
             } else if (this.tag != null) {
@@ -254,7 +248,6 @@ public class FeedFragment extends Fragment
     }
 
     /**
-     *
      * @return SQL selection
      */
     protected String getLoaderSelection() {
@@ -276,7 +269,6 @@ public class FeedFragment extends Fragment
     }
 
     /**
-     *
      * @return args that match getLoaderSelection
      */
     protected String[] getLoaderSelectionArgs() {
@@ -307,10 +299,10 @@ public class FeedFragment extends Fragment
 
     @Override
     public void onLoadFinished(final Loader<Cursor> cursorLoader,
-            final Cursor cursor) {
+                               final Cursor cursor) {
         if (FEEDITEMS_LOADER == cursorLoader.getId()) {
             mAdapter.swapCursor(cursor);
-            boolean empty = mAdapter.getCount() < 1;
+            boolean empty = mAdapter.getItemCount() < 1;
             mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
             mRecyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
         } else if (FEED_LOADER == cursorLoader.getId()) {
@@ -332,7 +324,10 @@ public class FeedFragment extends Fragment
     }
 
 
-    class FeedAdapter extends SimpleCursorAdapter {
+    class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+        private final int HEADERTYPE = 0;
+        private final int ITEMTYPE = 1;
 
         // 64dp at xhdpi is 128 pixels
         private final int defImgWidth = 2 * 128;
@@ -343,11 +338,10 @@ public class FeedFragment extends Fragment
         private final int linkColor;
 
         String temps;
+        private Cursor cursor;
 
         public FeedAdapter(final Context context) {
-            //super(context, R.layout.view_story);
-            super(context, R.layout.view_story, null, new String[]{},
-                    new int[]{}, 0);
+            super();
 
             unreadTextColor = context.getResources()
                     .getColor(R.color.primary_text_default_material_dark);
@@ -357,41 +351,65 @@ public class FeedFragment extends Fragment
                     .linked_text_blue);
         }
 
+        public void swapCursor(Cursor cursor) {
+            // TODO notify about updates
+            this.cursor = cursor;
+            notifyDataSetChanged();
+        }
+
         @Override
-        public int getCount() {
-            if (super.getCount() == 0) {
+        public int getItemCount() {
+            if (cursor == null || cursor.getCount() == 0) {
                 return 0;
             } else {
                 // 1 header + the rest
-                return 1 + super.getCount();
+                return 1 + cursor.getCount();
+            }
+        }
+
+
+        @Override
+        public int getItemViewType(int position) {
+            if (position == 0) {
+                return HEADERTYPE;
+            } else {
+                return ITEMTYPE;
             }
         }
 
         @Override
-        public View getView(int hposition, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                if (getItemViewType(hposition) == 0) {
-                    convertView = LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.padding_header_item, parent,
-                                    false);
-                } else {
-                    convertView = LayoutInflater.from(parent.getContext())
-                            .inflate(R.layout.view_story, parent, false);
-                    convertView.setTag(new ViewHolder(convertView));
-                }
-            }
-
-            if (getItemViewType(hposition) == 0) {
+        public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent,
+                                                          final int position) {
+            if (getItemViewType(position) == HEADERTYPE) {
                 // Header
-                return convertView;
+                return new HeaderHolder(LayoutInflater.from(parent.getContext())
+                        .inflate(
+                                R.layout.padding_header_item, parent, false));
+            } else {
+                // normal item
+                return new ViewHolder(
+                        LayoutInflater.from(parent.getContext())
+                                .inflate(R.layout.view_story, parent, false));
+            }
+        }
+
+        @Override
+        public void onBindViewHolder(final RecyclerView.ViewHolder vHolder,
+                                     final int hposition) {
+            if (getItemViewType(hposition) == HEADERTYPE) {
+                // Nothing to bind for padding
+                return;
             }
 
-            // Item
-            ViewHolder holder = (ViewHolder) convertView.getTag();
-            // position in data set
-            final int position = hposition - 1;
+            final ViewHolder holder = (ViewHolder) vHolder;
+
+            // Compensate for header
+            final int position = hposition -1 ;
+
+            // Get item
+            cursor.moveToPosition(position);
             final FeedItemSQL item =
-                    new FeedItemSQL((Cursor) super.getItem(position));
+                    new FeedItemSQL((Cursor) cursor);
 
             holder.rssItem = item;
 
@@ -400,10 +418,10 @@ public class FeedFragment extends Fragment
                     (item.feedtitle);
             // If no body, display domain of link to be opened
             if (holder.rssItem.description == null ||
-                holder.rssItem.description.isEmpty()) {
+                    holder.rssItem.description.isEmpty()) {
                 // append to title field
                 titleText.append(" \u2014 " +
-                                 holder.rssItem.getDomain());
+                        holder.rssItem.getDomain());
                 titleText.setSpan(new ForegroundColorSpan(linkColor),
                         item.feedtitle.length() + 3, titleText.length(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -433,8 +451,8 @@ public class FeedFragment extends Fragment
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 // Title depends on status
                 textSpan.setSpan(new ForegroundColorSpan(holder.rssItem.isUnread() ?
-                                                         unreadTextColor :
-                                                         readTextColor),
+                                unreadTextColor :
+                                readTextColor),
                         0, item.plaintitle.length(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.titleTextView.setText(textSpan);
@@ -446,7 +464,8 @@ public class FeedFragment extends Fragment
                 if (w <= 0) {
                     w = defImgWidth;
                 }
-                int h = holder.parent.getHeight();
+                // TODO correct thing to measure height on?
+                int h = holder.itemView.getHeight();
                 if (h <= 0) {
                     h = defImgHeight;
                 }
@@ -454,38 +473,24 @@ public class FeedFragment extends Fragment
                         .centerCrop().into(holder.imageView);
                 holder.imageView.setVisibility(View.VISIBLE);
             }
-
-            return convertView;
         }
 
-        @Override
-        public int getItemViewType(int position) {
-            if (position == 0) {
-                return 0;
-            } else {
-                return 1;
-            }
-        }
-
-        @Override
-        public int getViewTypeCount() {
-            return 2;
-        }
-
-        // Provide a reference to the type of views that you are using
-        public class ViewHolder {
-            public final View parent;
+        // Provide a reference to the views for each data item
+        // Complex data items may need more than one view per item, and
+        // you provide access to all the views for a data item in a view holder
+        public class ViewHolder extends RecyclerView.ViewHolder
+                implements View.OnClickListener {
             public final TextView titleTextView;
             public final TextView bodyTextView;
             public final TextView dateTextView;
             public final TextView authorTextView;
             public final ImageView imageView;
-            //public String link;
+
             public FeedItemSQL rssItem;
 
             public ViewHolder(View v) {
-                //v.setOnClickListener(this);
-                parent = v;
+                super(v);
+                v.setOnClickListener(this);
                 titleTextView = (TextView) v.findViewById(R.id.story_title);
                 bodyTextView = (TextView) v.findViewById(R.id.story_body);
                 dateTextView = (TextView) v.findViewById(R.id.story_date);
@@ -501,13 +506,12 @@ public class FeedFragment extends Fragment
              *
              * @param view
              */
-            //            @TargetApi(Build.VERSION_CODES.L)
-            //            @Override
+            @Override
             public void onClick(final View view) {
 
                 // Open item if not empty
                 if (rssItem.description != null &&
-                    !rssItem.description.isEmpty()) {
+                        !rssItem.description.isEmpty()) {
                     Intent i = new Intent(getActivity(), ReaderActivity.class);
                     //i.setData(Uri.parse(link));
                     i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
@@ -515,9 +519,9 @@ public class FeedFragment extends Fragment
 
                     // TODO add animation
                     Log.d("JONAS", "View size: w: " + view.getWidth() +
-                                   ", h: " + view.getHeight());
+                            ", h: " + view.getHeight());
                     Log.d("JONAS", "View pos: l: " + view.getLeft() +
-                                   ", t: " + view.getTop());
+                            ", t: " + view.getTop());
                     ActivityOptions options = ActivityOptions
                             .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
                                     view.getHeight());
@@ -529,8 +533,8 @@ public class FeedFragment extends Fragment
                     // Open in browser since no content was posted
                     startActivity(new Intent(Intent.ACTION_VIEW,
                             Uri.parse(rssItem.enclosurelink != null ?
-                                      rssItem.enclosurelink :
-                                      rssItem.link)));
+                                    rssItem.enclosurelink :
+                                    rssItem.link)));
                 }
             }
 
@@ -565,6 +569,13 @@ public class FeedFragment extends Fragment
 
                 startActivity(story, activityOptions);*/
             //            }
+        }
+    }
+
+    public class HeaderHolder extends RecyclerView.ViewHolder {
+
+        public HeaderHolder(final View itemView) {
+            super(itemView);
         }
     }
 }

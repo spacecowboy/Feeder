@@ -22,12 +22,7 @@ import com.nononsenseapps.feeder.model.AuthHelper;
 
 import java.io.IOException;
 
-/**
- * A copy of AccountDialog in SyncPrefs, but extending from support library
- * fragment.
- * <p/>
- * In addition, a successful account choice will trigger an immediate sync.
- */
+
 public class AccountDialog extends DialogFragment {
 
     @Override

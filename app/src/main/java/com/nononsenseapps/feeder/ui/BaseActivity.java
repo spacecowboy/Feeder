@@ -5,24 +5,24 @@ import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.app.Activity;
 import android.app.LoaderManager;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 
 import com.nononsenseapps.feeder.R;
-import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.model.TaggedFeedsAdapter;
 import com.nononsenseapps.feeder.util.LPreviewUtils;
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase;
@@ -156,16 +156,16 @@ public class BaseActivity extends Activity
         int id = item.getItemId();
 
         if (mDrawerToggle != null &&
-            mDrawerToggle.onOptionsItemSelected(item)) {
+                mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
         if (id == android.R.id.home && mShouldFinishBack) {
-            //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.L) {
-            //                finishAfterTransition();
-            //            } else {
-            finish();
-            //}
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                finishAfterTransition();
+            } else {
+                finish();
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -219,7 +219,7 @@ public class BaseActivity extends Activity
 
                     @Override
                     public void onDrawerSlide(View drawerView,
-                            float slideOffset) {
+                                              float slideOffset) {
                         updateStatusBarForNavDrawerSlide(slideOffset);
                         onNavDrawerSlide(slideOffset);
                     }
@@ -232,13 +232,6 @@ public class BaseActivity extends Activity
 
         mDrawerToggle.syncState();
 
-        //mNavAdapter = new FeedsAdapter();
-        //        mNavAdapter = new SimpleCursorAdapter(this,
-        //                R.layout.view_feed, null,
-        //                new String[]{FeedSQL.COL_TITLE, FeedSQL.COL_UNREADCOUNT},
-        //                new int[]{R.id.feed_name,
-        //                R.id.feed_unreadcount},
-        //                0);
         mNavAdapter = new TaggedFeedsAdapter(this);
         mDrawerListView = (ExpandableListView) mDrawerLayout
                 .findViewById(R.id.navdrawer_list);
@@ -248,8 +241,8 @@ public class BaseActivity extends Activity
                 new ExpandableListView.OnChildClickListener() {
                     @Override
                     public boolean onChildClick(final ExpandableListView parent,
-                            final View v, final int groupPosition,
-                            final int childPosition, final long id) {
+                                                final View v, final int groupPosition,
+                                                final int childPosition, final long id) {
                         if (mDrawerLayout != null) {
                             mDrawerLayout.closeDrawer(Gravity.START);
                         }
@@ -269,7 +262,7 @@ public class BaseActivity extends Activity
         mDrawerListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(final ExpandableListView parent,
-                    final View v, final int groupPosition, final long id) {
+                                        final View v, final int groupPosition, final long id) {
                 if (mDrawerLayout != null) {
                     mDrawerLayout.closeDrawer(Gravity.START);
                 }
@@ -289,7 +282,7 @@ public class BaseActivity extends Activity
         mNavAdapter.setOnExpandClickListener(new TaggedFeedsAdapter.OnExpandClickListener() {
             @Override
             public void onExpandClick(final int groupPosition,
-                    final boolean isExpanded) {
+                                      final boolean isExpanded) {
                 if (isExpanded) {
                     mDrawerListView.collapseGroup(groupPosition);
                 } else {
@@ -344,7 +337,7 @@ public class BaseActivity extends Activity
 
     // Subclasses can override this for custom behavior
     protected void onNavDrawerStateChanged(boolean isOpen,
-            boolean isAnimating) {
+                                           boolean isAnimating) {
         if (mActionBarAutoHideEnabled && isOpen) {
             autoShowOrHideActionBar(true);
         }
@@ -352,7 +345,7 @@ public class BaseActivity extends Activity
 
     protected boolean isNavDrawerOpen() {
         return mDrawerLayout != null &&
-               mDrawerLayout.isDrawerOpen(Gravity.START);
+                mDrawerLayout.isDrawerOpen(Gravity.START);
     }
 
     protected void onNavDrawerSlide(float offset) {
@@ -360,7 +353,7 @@ public class BaseActivity extends Activity
 
     // Subclasses can override to decide what happens on nav item selection
     protected void onNavigationDrawerItemSelected(long id, String title,
-            String url, String tag) {
+                                                  String url, String tag) {
         // TODO add default start activity with arguments
     }
 
@@ -417,31 +410,31 @@ public class BaseActivity extends Activity
         }
     }
 
-    protected void enableActionBarAutoHide(final AbsListView listView) {
+    protected void enableActionBarAutoHide(final RecyclerView listView) {
         initActionBarAutoHide();
-        //        final LinearLayoutManager layoutManager =
-        //                (LinearLayoutManager) listView.getLayoutManager();
+        final LinearLayoutManager layoutManager =
+                (LinearLayoutManager) listView.getLayoutManager();
         mActionBarAutoHideSignal = 0;
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        listView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             final static int ITEMS_THRESHOLD = 1;
             int lastFvi = 0;
 
             @Override
-            public void onScrollStateChanged(AbsListView view,
-                    int scrollState) {
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
             }
 
             @Override
-            public void onScroll(AbsListView view, int firstVisibleItem,
-                    int visibleItemCount, int totalItemCount) {
-                //int firstVisibleItem =
-                //        layoutManager.findFirstVisibleItemPosition();
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int firstVisibleItem =
+                        layoutManager.findFirstVisibleItemPosition();
                 onMainContentScrolled(firstVisibleItem <= ITEMS_THRESHOLD ?
-                                      0 :
-                                      Integer.MAX_VALUE,
+                                0 :
+                                Integer.MAX_VALUE,
                         lastFvi - firstVisibleItem > 0 ?
-                        Integer.MIN_VALUE :
-                        lastFvi == firstVisibleItem ? 0 : Integer.MAX_VALUE);
+                                Integer.MIN_VALUE :
+                                lastFvi == firstVisibleItem ? 0 : Integer.MAX_VALUE);
                 lastFvi = firstVisibleItem;
             }
         });
@@ -487,8 +480,8 @@ public class BaseActivity extends Activity
         }
 
         boolean shouldShow = currentY < mActionBarAutoHideMinY ||
-                             (mActionBarAutoHideSignal <=
-                              -mActionBarAutoHideSensivity);
+                (mActionBarAutoHideSignal <=
+                        -mActionBarAutoHideSensivity);
         autoShowOrHideActionBar(shouldShow);
     }
 
@@ -500,7 +493,7 @@ public class BaseActivity extends Activity
                 new ObservableScrollView.OnScrollChangedListener() {
                     @Override
                     public void onScrollChanged(final int deltaX,
-                            final int deltaY) {
+                                                final int deltaY) {
                         onMainContentScrolled(scrollView.getScrollY(), deltaY);
                     }
                 });
@@ -542,7 +535,7 @@ public class BaseActivity extends Activity
 
     @Override
     public void onLoadFinished(final Loader<Cursor> cursorLoader,
-            final Cursor cursor) {
+                               final Cursor cursor) {
         if (cursorLoader.getId() == NAV_TAGS_LOADER) {
             mNavAdapter.setGroupCursor(cursor);
             // Load child cursors
