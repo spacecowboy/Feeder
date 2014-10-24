@@ -18,7 +18,7 @@
 
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/add_button"
+    android:id="@+id/checkall_button"
     android:layout_width="@dimen/floating_add_button_height"
     android:layout_height="@dimen/floating_add_button_height"
     android:layout_marginEnd="@dimen/keyline_1"
@@ -28,15 +28,15 @@
     android:focusable="true"
     android:layout_gravity="bottom|end"
     android:background="@drawable/add_schedule_fab_background"
-    android:contentDescription="@string/add_feed">
-    <!--android:elevation="@dimen/fab_elevation"
-    android:stateListAnimator="@anim/floating_button_state_list_anim"-->
+    android:contentDescription="@string/mark_all_as_read"
+    android:elevation="@dimen/fab_elevation"
+    android:stateListAnimator="@anim/floating_button_state_list_anim">
 
     <ImageView android:id="@+id/add_icon"
                android:layout_width="match_parent"
                android:layout_height="match_parent"
                android:scaleType="center"
-               android:src="@drawable/plus_fab_icon"
+               android:src="@drawable/ic_action_done_all"
                android:contentDescription="@null"
                android:layout_gravity="center" />
 

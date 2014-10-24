@@ -1,8 +1,8 @@
 package com.nononsenseapps.feeder.ui;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -45,30 +45,23 @@ public class ReaderActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reader);
+        getActionBarToolbar();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mTitle = getTitle();
 
         if (savedInstanceState == null) {
             mFragment = getFragment();
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, mFragment, "single_pane").commit();
         } else {
-            mFragment = getFragmentManager().findFragmentByTag("single_pane");
+            mFragment = getSupportFragmentManager().findFragmentByTag("single_pane");
         }
-
-        getLPreviewUtils().trySetActionBar();
 
         mDrawShadowFrameLayout =
                 (DrawShadowFrameLayout) findViewById(R.id.main_content);
-
-        //mNavigationDrawerFragment =
-        //        (NavigationDrawerFragment) getFragmentManager()
-        //                .findFragmentById(R.id.navigation_drawer);
-
-        // Set up the drawer.
-        //mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
-        //        (DrawerLayout) findViewById(R.id.drawer_layout));
-
 
     }
 

@@ -1,14 +1,13 @@
 package com.nononsenseapps.feeder.ui;
 
-import android.app.ActionBar;
 import android.app.ActivityOptions;
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,14 +25,9 @@ import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
 
 public class FeedActivity extends BaseActivity {
 
-  /**
-   * Used to store the last screen title. For use in {@link
-   * #restoreActionBar()}.
-   */
-  private CharSequence mTitle;
   private Fragment mFragment;
   private DrawShadowFrameLayout mDrawShadowFrameLayout;
-  private View mAddButton;
+  private View mCheckAllButton;
   private View mSyncIndicator1;
   private View mSyncIndicator2;
   private boolean isSyncing = false;
@@ -50,64 +44,41 @@ public class FeedActivity extends BaseActivity {
   private View mEmptyView;
   private View mNewItemsButton;
 
-  public void onFragmentAttached(String title) {
-    mTitle = title;
-  }
-
-  public void restoreActionBar() {
-    ActionBar actionBar = getActionBar();
-    if (actionBar != null) {
-      actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-      actionBar.setDisplayShowTitleEnabled(true);
-      actionBar.setTitle(mTitle);
-    }
-  }
-
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_feed);
-    mTitle = getTitle();
+    getActionBarToolbar();
 
     overridePendingTransition(0, 0);
 
     if (savedInstanceState == null) {
       mFragment = getDefaultFragment();
       if (mFragment != null) {
-        getFragmentManager().beginTransaction()
+        getSupportFragmentManager().beginTransaction()
             .add(R.id.container, mFragment, "single_pane").commit();
       }
     } else {
-      mFragment = getFragmentManager().findFragmentByTag("single_pane");
+      mFragment = getSupportFragmentManager().findFragmentByTag("single_pane");
     }
-
-    getLPreviewUtils().trySetActionBar();
 
     mDrawShadowFrameLayout =
         (DrawShadowFrameLayout) findViewById(R.id.main_content);
-
-    //mNavigationDrawerFragment =
-    //        (NavigationDrawerFragment) getFragmentManager()
-    //                .findFragmentById(R.id.navigation_drawer);
-
-    // Set up the drawer.
-    //mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
-    //        (DrawerLayout) findViewById(R.id.drawer_layout));
 
     // For add buttons
     View.OnClickListener onAddListener = new View.OnClickListener() {
       @Override
       public void onClick(final View view) {
         Intent i = new Intent(FeedActivity.this, EditFeedActivity.class);
-        if (view == mAddButton) {
-          i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
-          ActivityOptions options = ActivityOptions
-              .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
-                  view.getHeight());
-          startActivity(i, options.toBundle());
-        } else {
+//        if (view == mAddButton) {
+//          i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
+//          ActivityOptions options = ActivityOptions
+//              .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
+//                  view.getHeight());
+//          startActivity(i, options.toBundle());
+//        } else {
           startActivity(i);
-        }
+//        }
       }
     };
     // Empty view
@@ -133,8 +104,10 @@ public class FeedActivity extends BaseActivity {
     emptyAddFeed.setOnClickListener(onAddListener);
 
     // Add button
-    mAddButton = findViewById(R.id.add_button);
-    mAddButton.setOnClickListener(onAddListener);
+    //mAddButton = findViewById(R.id.add_button);
+    //mAddButton.setOnClickListener(onAddListener);
+      mCheckAllButton = findViewById(R.id.checkall_button);
+
 
     // New items button
     mNewItemsButton = findViewById(R.id.new_items_button);
@@ -163,7 +136,7 @@ public class FeedActivity extends BaseActivity {
 
   private void askForLogin() {
     DialogFragment dialog = new AccountDialog();
-    dialog.show(getFragmentManager(), "account_dialog");
+    dialog.show(getSupportFragmentManager(), "account_dialog");
   }
 
   @Override
@@ -172,7 +145,7 @@ public class FeedActivity extends BaseActivity {
 
     registerHideableHeaderView(findViewById(R.id.headerbar));
     registerHideableHeaderView(mSyncIndicator2);
-    registerHideableFooterView(mAddButton);
+    registerHideableFooterView(mCheckAllButton);
     registerHideableFooterView(mNewItemsButton);
   }
 
@@ -187,6 +160,9 @@ public class FeedActivity extends BaseActivity {
     } else if (id == R.id.action_sync) {
       syncOrConfig();
       return true;
+    } else if (id == R.id.action_add) {
+        startActivity(new Intent(FeedActivity.this, EditFeedActivity.class));
+        return true;
     }
     return super.onOptionsItemSelected(item);
   }
@@ -220,7 +196,7 @@ public class FeedActivity extends BaseActivity {
     // update the main content by replacing fragments
     mEmptyView.setVisibility(View.GONE);
     mFragment = FeedFragment.newInstance(id, title, url, tag);
-    getFragmentManager().beginTransaction()
+    getSupportFragmentManager().beginTransaction()
         .replace(R.id.container, mFragment, "single_pane").commit();
     // Remember choice in future
     PrefUtils.setLastOpenFeed(this, id, tag);
@@ -263,18 +239,9 @@ public class FeedActivity extends BaseActivity {
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    // TODO
-        /*
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.feed, menu);
-            restoreActionBar();
-            return true;
-        }*/
+      super.onCreateOptionsMenu(menu);
 
     getMenuInflater().inflate(R.menu.feed, menu);
-    return true;
+      return true;
   }
 }

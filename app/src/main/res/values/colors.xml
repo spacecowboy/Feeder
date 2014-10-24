@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="primary">@color/material_deep_orange_500</color>
-    <color name="primary_dark">@color/material_deep_orange_700</color>
-    <color name="accent">#e51c23</color>
-    <color name="accent_light">#f36c60</color>
+    <color name="primary">@color/material_deep_purple_700</color>
+    <color name="primary_dark">@color/material_deep_purple_900</color>
+    <color name="accent">@color/material_blue_grey_500</color>
+    <color name="accent_light">@color/material_blue_grey_300</color>
     <color name="translucent_actionbar_background">@color/primary</color>
     <color name="navdrawer_background">@color/background_material_dark</color>
     <color name="navdrawer_text_color">@color/primary_text_default_material_dark</color>
@@ -138,6 +138,12 @@
     <color name="material_brown_300">#ffa1887f</color>
     <color name="material_brown_500">#ff795548</color>
     <color name="material_brown_700">#ff5d4037</color>
+
+    <color name="material_deep_purple_100">#d1c4e9</color>
+    <color name="material_deep_purple_300">#9575cd</color>
+    <color name="material_deep_purple_500">#673ab7</color>
+    <color name="material_deep_purple_700">#512da8</color>
+    <color name="material_deep_purple_900">#311b92</color>
 
     <!-- Sync indicator -->
     <integer-array name="gplus_colors">

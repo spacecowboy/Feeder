@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.model;
 
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
+import android.support.v4.content.AsyncTaskLoader;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;

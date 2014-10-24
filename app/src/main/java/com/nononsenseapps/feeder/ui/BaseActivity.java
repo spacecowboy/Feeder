@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Intent;
@@ -13,8 +14,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +38,7 @@ import java.util.ArrayList;
  * Base activity which handles navigation drawer and other bloat common
  * between activities.
  */
-public class BaseActivity extends Activity
+public class BaseActivity extends ActionBarActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
@@ -79,6 +82,7 @@ public class BaseActivity extends Activity
     private TaggedFeedsAdapter mNavAdapter;
     private ExpandableListView mDrawerListView;
     private boolean firstload = true;
+    protected Toolbar mActionBarToolbar;
 
     /**
      * Converts an intent into a {@link Bundle} suitable for use as fragment
@@ -133,6 +137,16 @@ public class BaseActivity extends Activity
 
         mLPreviewUtils = LPreviewUtils.getInstance(this);
         mThemedStatusBarColor = getResources().getColor(R.color.primary_dark);
+    }
+
+    protected Toolbar getActionBarToolbar() {
+        if (mActionBarToolbar == null) {
+            mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+            if (mActionBarToolbar != null) {
+                setSupportActionBar(mActionBarToolbar);
+            }
+        }
+        return mActionBarToolbar;
     }
 
     @Override
@@ -225,10 +239,6 @@ public class BaseActivity extends Activity
                     }
                 });
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
-
 
         mDrawerToggle.syncState();
 
@@ -367,7 +377,10 @@ public class BaseActivity extends Activity
         }
 
         mActionBarShown = show;
-        getLPreviewUtils().showHideActionBarIfPartOfDecor(show);
+        if (mActionBarShown) {
+
+        }
+        //getLPreviewUtils().showHideActionBarIfPartOfDecor(show);
         onActionBarAutoShowOrHide(show);
     }
 

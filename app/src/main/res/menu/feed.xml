@@ -1,14 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.FeedActivity" >
-    <item android:id="@+id/action_edit_all_feed"
-        android:title="Edit all feeds"
-        android:showAsAction="never" />
+    <item android:id="@+id/action_add"
+        android:title="@string/add_feed"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_add"/>
     <item android:id="@+id/action_sync"
           android:title="Sync"
-          android:showAsAction="never" />
+          app:showAsAction="never" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
 </menu>

@@ -2,16 +2,16 @@ package com.nononsenseapps.feeder.ui;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.app.Fragment;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -78,6 +78,7 @@ public class FeedFragment extends Fragment
     private String url = "http://feeds.feedburner.com/AndroidPolice";
     private String tag = "";
     private LinearLayoutManager mLayoutManager;
+    private View mCheckAllButton;
 
     public FeedFragment() {
     }
@@ -96,13 +97,6 @@ public class FeedFragment extends Fragment
         args.putString(ARG_FEED_TAG, tag);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        ((FeedActivity) activity)
-                .onFragmentAttached(getArguments().getString(ARG_FEED_TITLE));
     }
 
     @Override
@@ -196,6 +190,15 @@ public class FeedFragment extends Fragment
         mAdapter = new FeedAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
+        // check all button is in activity
+        mCheckAllButton = getActivity().findViewById(R.id.checkall_button);
+        mCheckAllButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                markAsRead();
+            }
+        });
+
         return rootView;
     }
 
@@ -231,6 +234,14 @@ public class FeedFragment extends Fragment
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    private void markAsRead() {
+        if (this.id > 0) {
+            RssContentProvider.MarkFeedAsRead(getActivity(), this.id);
+        } else if (this.tag != null) {
+            RssContentProvider.MarkItemsAsRead(getActivity(), this.tag);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         final long id = menuItem.getItemId();
@@ -252,14 +263,12 @@ public class FeedFragment extends Fragment
             RssSyncHelper.deleteFeedAsync(getActivity(), url);
             // TODO close fragment
             return true;
-        } else if (id == R.id.action_mark_as_read) {
-            if (this.id > 0) {
-                RssContentProvider.MarkFeedAsRead(getActivity(), this.id);
-            } else if (this.tag != null) {
-                RssContentProvider.MarkItemsAsRead(getActivity(), this.tag);
-            }
-            return true;
-        } else if (id == R.id.action_only_unread) {
+        }
+//        else if (id == R.id.action_mark_as_read) {
+//            markAsRead();
+//            return true;
+//        }
+        else if (id == R.id.action_only_unread) {
             final boolean onlyUnread = !menuItem.isChecked();
             PrefUtils.setPrefShowOnlyUnread(getActivity(), onlyUnread);
             menuItem.setChecked(onlyUnread);
@@ -511,8 +520,10 @@ public class FeedFragment extends Fragment
                 }
                 Picasso.with(getActivity()).load(item.imageurl).resize(w, h)
                         .centerCrop().into(holder.imageView);
-                holder.textGroup.setBackground(bgProtection);
                 holder.imageView.setVisibility(View.VISIBLE);
+                if (isGrid) {
+                    holder.textGroup.setBackground(bgProtection);
+                }
             }
         }
 
@@ -569,7 +580,7 @@ public class FeedFragment extends Fragment
                             .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
                                     view.getHeight());
 
-                    startActivity(i, options.toBundle());
+                    getActivity().startActivity(i, options.toBundle());
                 } else {
                     // Mark as read
                     RssContentProvider.MarkItemAsRead(getActivity(), rssItem.id);

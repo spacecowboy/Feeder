@@ -35,7 +35,7 @@
                      android:minHeight="3dp"/>
 
             <include layout="@layout/include_new_items_button"/>
-            <include layout="@layout/include_floating_add_button"/>
+            <include layout="@layout/include_floating_checkall_button"/>
 
         </FrameLayout>
 
@@ -48,7 +48,6 @@
             android:orientation="vertical">
 
             <include layout="@layout/toolbar_actionbar"/>
-            <!-- placeholder, empty except on L -->
 
             <TextView
                 android:id="@+id/filters_box"
@@ -62,15 +61,14 @@
                 style="@style/TextAppearance.Body"
                 android:textColor="@android:color/primary_text_dark"
                 android:text="Add some filter actions here"/>
-        </LinearLayout>
 
-        <include layout="@layout/sync_progress_indicator"
-                 android:id="@+id/sync_indicator_2"
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
-                 android:minHeight="3dp"
-                 android:visibility="gone"
-                 android:layout_marginTop="?android:attr/actionBarSize"/>
+            <include layout="@layout/sync_progress_indicator"
+            android:id="@+id/sync_indicator_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="3dp"
+            android:visibility="gone"/>
+        </LinearLayout>
 
     </com.nononsenseapps.feeder.views.DrawShadowFrameLayout>
 

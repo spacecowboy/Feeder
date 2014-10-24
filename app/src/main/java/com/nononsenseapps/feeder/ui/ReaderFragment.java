@@ -1,13 +1,15 @@
 package com.nononsenseapps.feeder.ui;
 
 
-import android.app.Fragment;
-import android.app.LoaderManager;
 import android.content.Intent;
-import android.content.Loader;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.Spanned;
@@ -20,7 +22,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
@@ -231,7 +232,7 @@ public class ReaderFragment extends Fragment
 
         // Fetch and store ShareActionProvider
         ShareActionProvider shareActionProvider =
-                (ShareActionProvider) shareItem.getActionProvider();
+                (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
 
         // Set intent
         Intent shareIntent = new Intent(Intent.ACTION_SEND);

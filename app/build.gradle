@@ -47,15 +47,15 @@ dependencies {
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'com.squareup.retrofit:retrofit:1.6.1'
     compile 'com.android.support:support-v4:21.0.0'
+    compile "com.android.support:appcompat-v7:21.0.+"
 
     // For nice looking progress bars
     compile 'com.github.castorflex.smoothprogressbar:library:1.0.0'
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.1'
 
+    // Only include play services on play devices
     playCompile 'com.google.android.gms:play-services:6.1.11'
     // Don't work on L-preview yet
-    fdroidCompile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
-    fdroidCompile 'com.squareup.okhttp:okhttp:2.0.0'
-    playCompile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
-    playCompile 'com.squareup.okhttp:okhttp:2.0.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+    compile 'com.squareup.okhttp:okhttp:2.0.0'
 }

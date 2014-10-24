@@ -7,7 +7,6 @@
         <attr name="actionBarOverlayTopOffset" format="dimension" />
         <attr name="actionBarInsetStart" format="dimension" />
         <attr name="spinnerBarInsetStart" format="dimension" />
-        <attr name="selectableItemBackgroundBorderless" format="dimension" />
         <attr name="popupItemBackground" format="dimension" />
         <attr name="photoItemForeground" format="dimension" />
     </declare-styleable>

@@ -21,9 +21,7 @@
               android:id="@+id/navdrawer"
               android:orientation="vertical"
               android:layout_gravity="start"
-              android:paddingTop="?actionBarOverlayTopOffset"
               android:clipToPadding="false">
-    <!--android:paddingTop="?android:actionBarSize"-->
 
     <!--<android.support.v7.widget.RecyclerView-->
         <!--android:id="@+id/navdrawer_list"-->

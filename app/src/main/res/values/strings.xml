@@ -28,18 +28,19 @@
     <string name="save">Save</string>
     <string name="empty_feed_top">Nothing to read here. Would you like to…</string>
     <string name="empty_feed_open">
-        <![CDATA[<font color="#33B5E5">Open</font> another feed?]]></string>
+        <![CDATA[<font color="#607D8B">Open</font> another feed?]]></string>
     <string name="empty_feed_add">
-        <![CDATA[<font color="#33B5E5">Add</font> more feeds?]]></string>
+        <![CDATA[<font color="#607D8B">Add</font> more feeds?]]></string>
     <string name="empty_no_feeds_top">Nothing to read yet.\nGet started
         by…</string>
     <string name="empty_no_feeds_login">
-        <![CDATA[<font color="#33B5E5">Logging in</font> to the
+        <![CDATA[<font color="#607D8B">Logging in</font> to the
         server and…]]></string>
     <string  name="empty_no_feeds_add">
-        <![CDATA[<font color="#33B5E5">Adding</font> some feeds]]></string>
+        <![CDATA[<font color="#607D8B">Adding</font> some feeds]]></string>
     <string name="no_feeds_found">Couldn\'t find any relevant feeds. Try to search for a single word.</string>
     <string name="search_feed_empty_hint">Enter a feed address or a topic to search for</string>
     <string name="new_items_touch_to_view">New items! Touch to view them</string>
+    <string name="mark_all_as_read">Mark all as read</string>
 
 </resources>

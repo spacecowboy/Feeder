@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<android.support.v7.widget.RecyclerView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:scrollbars="vertical"
-    android:background="@color/navdrawer_background"
-    android:layout_marginTop="120dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />

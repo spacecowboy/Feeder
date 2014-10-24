@@ -2,16 +2,17 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.ReaderActivity">
     <item
         android:id="@+id/action_open_in_browser"
-        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_location_web_site"
         android:title="Open in browser" />
     <item
         android:id="@+id/action_share"
-        android:showAsAction="ifRoom"
-        android:actionProviderClass=
-        "android.widget.ShareActionProvider"
+        app:showAsAction="ifRoom"
+        app:actionProviderClass=
+        "android.support.v7.widget.ShareActionProvider"
         android:title="Share" />
 </menu>
