@@ -282,8 +282,7 @@ public class FeedFragment extends Fragment
                 menuItem.setIcon(R.drawable.ic_action_visibility_off);
             }
 
-            // TODO use string resources
-            menuItem.setTitle(onlyUnread ? "Show all" : "Only unread");
+            menuItem.setTitle(onlyUnread ? R.string.show_all_items : R.string.show_unread_items);
             //getActivity().invalidateOptionsMenu();
             // Restart loader
             getLoaderManager().restartLoader(FEEDITEMS_LOADER, new Bundle(), this);
