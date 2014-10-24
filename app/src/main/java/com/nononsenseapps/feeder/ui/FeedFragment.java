@@ -227,8 +227,12 @@ public class FeedFragment extends Fragment
         MenuItem menuItem = menu.findItem(R.id.action_only_unread);
         final boolean onlyUnread = PrefUtils.isShowOnlyUnread(getActivity());
         menuItem.setChecked(onlyUnread);
-        // TODO use string resources
-        menuItem.setTitle(onlyUnread ? "Show all" : "Only unread");
+        menuItem.setTitle(onlyUnread ? R.string.show_all_items : R.string.show_unread_items);
+        if (onlyUnread) {
+            menuItem.setIcon(R.drawable.ic_action_visibility);
+        } else {
+            menuItem.setIcon(R.drawable.ic_action_visibility_off);
+        }
 
         // Don't forget super call here
         super.onCreateOptionsMenu(menu, inflater);
@@ -272,6 +276,12 @@ public class FeedFragment extends Fragment
             final boolean onlyUnread = !menuItem.isChecked();
             PrefUtils.setPrefShowOnlyUnread(getActivity(), onlyUnread);
             menuItem.setChecked(onlyUnread);
+            if (onlyUnread) {
+                menuItem.setIcon(R.drawable.ic_action_visibility);
+            } else {
+                menuItem.setIcon(R.drawable.ic_action_visibility_off);
+            }
+
             // TODO use string resources
             menuItem.setTitle(onlyUnread ? "Show all" : "Only unread");
             //getActivity().invalidateOptionsMenu();

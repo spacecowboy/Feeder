@@ -6,13 +6,17 @@
     <!-- Overriding these values in fragment -->
     <item android:id="@+id/action_only_unread"
           android:checkable="true"
-          android:title="Show all"
+          android:title="@string/show_all_items"
+        android:icon="@drawable/ic_action_visibility"
           android:checked="true"
+        android:orderInCategory="1"
           app:showAsAction="ifRoom" />
     <item android:id="@+id/action_edit_feed"
-        android:title="Edit feed"
+        android:icon="@drawable/ic_action_edit"
+        android:title="@string/edit_feed"
         app:showAsAction="never" />
     <item android:id="@+id/action_delete_feed"
-          android:title="Delete feed"
+        android:icon="@drawable/ic_action_delete"
+          android:title="@string/delete_feed"
           app:showAsAction="never" />
 </menu>

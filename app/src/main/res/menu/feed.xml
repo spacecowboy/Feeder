@@ -5,12 +5,16 @@
     <item android:id="@+id/action_add"
         android:title="@string/add_feed"
         app:showAsAction="ifRoom"
+        android:orderInCategory="100"
         android:icon="@drawable/ic_action_add"/>
     <item android:id="@+id/action_sync"
           android:title="Sync"
-          app:showAsAction="never" />
+        android:icon="@drawable/ic_action_sync"
+        android:orderInCategory="900"
+          app:showAsAction="ifRoom" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_action_settings"
+        android:orderInCategory="1000"
+        app:showAsAction="ifRoom" />
 </menu>
