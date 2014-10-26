@@ -51,4 +51,7 @@
     <dimen name="snackbar_min_width">288dp</dimen>
     <dimen name="snackbar_max_width">568dp</dimen>
     <dimen name="snackbar_margins">@dimen/keyline_1</dimen>
+
+    <dimen name="item_img_def_width">64dp</dimen>
+    <dimen name="item_img_def_height">128dp</dimen>
 </resources>

@@ -384,8 +384,8 @@ public class FeedFragment extends Fragment
         public static final int ITEMTYPE = 1;
 
         // 64dp at xhdpi is 128 pixels
-        private static final int defImgWidth = 2 * 128;
-        private static final int defImgHeight = 2 * 128;
+        private final int defImgWidth;
+        private final int defImgHeight;
 
         private final boolean isGrid;
 
@@ -409,6 +409,10 @@ public class FeedFragment extends Fragment
             linkColor = context.getResources().getColor(R.color
                     .linked_text_blue);
             bgProtection = context.getResources().getDrawable(R.drawable.bg_protect);
+
+            defImgWidth = Math.round(context.getResources().getDimension(R.dimen.item_img_def_width));
+            defImgHeight = Math.round(context.getResources().getDimension(R.dimen.item_img_def_height));
+
         }
 
         public void swapCursor(Cursor cursor) {
@@ -531,11 +535,12 @@ public class FeedFragment extends Fragment
                 if (w <= 0) {
                     w = defImgWidth;
                 }
-                // TODO correct thing to measure height on?
+                // TODO better height handling
                 int h = holder.itemView.getHeight();
                 if (h <= 0) {
                     h = defImgHeight;
                 }
+                Log.d("HECTOR", "item height:" + h);
                 Picasso.with(getActivity()).load(item.imageurl).resize(w, h)
                         .centerCrop().into(holder.imageView);
                 holder.imageView.setVisibility(View.VISIBLE);

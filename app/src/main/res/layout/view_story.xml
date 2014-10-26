@@ -21,7 +21,7 @@
         android:layout_alignParentEnd="true">
         <ImageView
             android:id="@+id/story_image"
-            android:layout_width="?android:listPreferredItemHeight"
+            android:layout_width="@dimen/item_img_def_width"
             android:layout_height="wrap_content"
             android:scaleType="centerCrop"
             android:visibility="gone"
