@@ -23,6 +23,7 @@
             style="@style/TextAppearance.Reader.Title"
             android:layout_marginBottom="6dp"
             android:textIsSelectable="true"
+            android:transitionName="title"
             android:text="@string/title"/>
 
         <TextView

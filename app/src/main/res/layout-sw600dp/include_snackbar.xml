@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/snackbar"
+    android:layout_width="wrap_content"
+    android:layout_height="48dp"
+    android:layout_gravity="bottom|start"
+    android:background="@drawable/snackbar_bg"
+    android:orientation="horizontal"
+    android:minWidth="@dimen/snackbar_min_width"
+    android:maxWidth="@dimen/snackbar_max_width"
+    android:layout_margin="@dimen/snackbar_margins"
+    android:paddingEnd="0dp"
+    android:paddingStart="24dp">
+
+    <TextView
+        android:id="@android:id/text1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:singleLine="true"
+        android:text="@string/new_items_available"
+        android:textColor="@color/white_87"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@android:id/text2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:singleLine="true"
+        android:text="@string/view"
+        android:textAllCaps="true"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:textColor="@color/accent"
+        android:textSize="14sp" />
+
+</LinearLayout>

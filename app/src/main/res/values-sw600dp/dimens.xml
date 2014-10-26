@@ -3,7 +3,7 @@
     <dimen name="floating_add_button_height">86dp</dimen>
     <dimen name="floating_add_button_height_no_padding">72dp</dimen>
 
-    !-- text sizes -->
+    <!-- text sizes -->
     <dimen name="reader_title">30sp</dimen>
     <dimen name="reader_author">18sp</dimen>
     <dimen name="reader_body">20sp</dimen>

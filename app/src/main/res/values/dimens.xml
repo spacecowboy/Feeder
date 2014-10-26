@@ -31,6 +31,8 @@
 
     <dimen name="grid_item_size">200dp</dimen>
 
+    <dimen name="elevation1">2dp</dimen>
+
 
     <!-- Edit Feed window size -->
     <dimen name="session_details_floating_width">300dp</dimen>
@@ -44,4 +46,9 @@
     <dimen name="reader_body">16sp</dimen>
     <dimen name="listitem_author">12sp</dimen>
     <dimen name="listitem_body">14sp</dimen>
+
+    <!-- snackbar, match_width -->
+    <dimen name="snackbar_min_width">288dp</dimen>
+    <dimen name="snackbar_max_width">568dp</dimen>
+    <dimen name="snackbar_margins">@dimen/keyline_1</dimen>
 </resources>

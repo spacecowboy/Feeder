@@ -40,11 +40,12 @@
         <![CDATA[<font color="#607D8B">Adding</font> some feeds]]></string>
     <string name="no_feeds_found">Couldn\'t find any relevant feeds. Try to search for a single word.</string>
     <string name="search_feed_empty_hint">Enter a feed address or a topic to search for</string>
-    <string name="new_items_touch_to_view">New items! Touch to view them</string>
     <string name="mark_all_as_read">Mark all as read</string>
     <string name="edit_feed">Edit feed</string>
     <string name="delete_feed">Delete feed</string>
     <string name="show_all_items">Show all items</string>
     <string name="show_unread_items">Show unread items</string>
+    <string name="new_items_available">New items available</string>
+    <string name="view">View</string>
 
 </resources>

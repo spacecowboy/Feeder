@@ -1,13 +1,13 @@
 package com.nononsenseapps.feeder.ui;
 
-import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -19,15 +19,12 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -46,8 +43,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
-
-import retrofit.http.HEAD;
 
 
 public class FeedFragment extends Fragment
@@ -461,7 +456,7 @@ public class FeedFragment extends Fragment
             final ViewHolder holder = (ViewHolder) vHolder;
 
             // Compensate for header
-            final int position = hposition -1 ;
+            final int position = hposition - 1;
 
             // Get item
             cursor.moveToPosition(position);
@@ -580,16 +575,16 @@ public class FeedFragment extends Fragment
                     i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
                     ReaderActivity.setRssExtras(i, rssItem);
 
-                    // TODO add animation
-                    Log.d("JONAS", "View size: w: " + view.getWidth() +
-                            ", h: " + view.getHeight());
-                    Log.d("JONAS", "View pos: l: " + view.getLeft() +
-                            ", t: " + view.getTop());
-                    ActivityOptions options = ActivityOptions
+                    ActivityOptionsCompat options = ActivityOptionsCompat
                             .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
                                     view.getHeight());
 
-                    getActivity().startActivity(i, options.toBundle());
+//                    ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
+//                            new Pair<View, String>(titleTextView,
+//                                    "title"));
+                    //new Pair<View, String>(imageView, "image"));
+
+                    ActivityCompat.startActivity(getActivity(), i, options.toBundle());
                 } else {
                     // Mark as read
                     RssContentProvider.MarkItemAsRead(getActivity(), rssItem.id);

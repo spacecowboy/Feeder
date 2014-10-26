@@ -34,8 +34,7 @@
                      android:visibility="gone"
                      android:minHeight="3dp"/>
 
-            <include layout="@layout/include_new_items_button"/>
-            <include layout="@layout/include_floating_checkall_button"/>
+            <include layout="@layout/include_snack_fca" />
 
         </FrameLayout>
 

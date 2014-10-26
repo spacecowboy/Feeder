@@ -3,8 +3,6 @@ package com.nononsenseapps.feeder.ui;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
@@ -42,13 +40,10 @@ public class BaseActivity extends ActionBarActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
-
+    // Durations for certain animations we use:
+    public static final int HEADER_HIDE_ANIM_DURATION = 300;
     // Special Navdrawer items
     protected static final int NAVDRAWER_ITEM_INVALID = -1;
-    protected static final int NAVDRAWER_ITEM_SEPARATOR = -2;
-    protected static final int NAVDRAWER_ITEM_SEPARATOR_SPECIAL = -3;
-    // Durations for certain animations we use:
-    private static final int HEADER_HIDE_ANIM_DURATION = 300;
     // delay to launch nav drawer item, to allow close animation to play
     private static final int NAVDRAWER_LAUNCH_DELAY = 250;
     // fade in and fade out durations for the main content when switching between
@@ -61,6 +56,7 @@ public class BaseActivity extends ActionBarActivity
     protected boolean mActionBarShown = true;
     // If pressing home should finish or start new activity
     protected boolean mShouldFinishBack = false;
+    protected Toolbar mActionBarToolbar;
     //protected MultiScrollListener mMultiScrollListener;
     private ObjectAnimator mStatusBarColorAnimator;
     // When set, these components will be shown/hidden in sync with the action bar
@@ -82,7 +78,6 @@ public class BaseActivity extends ActionBarActivity
     private TaggedFeedsAdapter mNavAdapter;
     private ExpandableListView mDrawerListView;
     private boolean firstload = true;
-    protected Toolbar mActionBarToolbar;
 
     /**
      * Converts an intent into a {@link Bundle} suitable for use as fragment
@@ -377,15 +372,7 @@ public class BaseActivity extends ActionBarActivity
         }
 
         mActionBarShown = show;
-        if (mActionBarShown) {
-
-        }
-        //getLPreviewUtils().showHideActionBarIfPartOfDecor(show);
         onActionBarAutoShowOrHide(show);
-    }
-
-    public LPreviewUtilsBase getLPreviewUtils() {
-        return mLPreviewUtils;
     }
 
     protected void onActionBarAutoShowOrHide(boolean shown) {
@@ -553,10 +540,10 @@ public class BaseActivity extends ActionBarActivity
             mNavAdapter.setGroupCursor(cursor);
             // Load child cursors
             for (int i = 0; i < cursor.getCount(); i++) {
-                if (firstload) {
+                //if (firstload) {
                     // Expand by default
                     //mDrawerListView.expandGroup(i);
-                }
+                //}
                 Cursor group = mNavAdapter.getGroup(i);
                 Bundle b = new Bundle();
                 // Make sure position is correct
