@@ -495,7 +495,7 @@ public class FeedFragment extends Fragment
                 // \u2014 is a EM-dash, basically a long version of '-'
                 temps = (item.plainsnippet == null || item.plainsnippet.isEmpty()) ?
                         item.plaintitle :
-                        item.plaintitle + " \u2014 " + item.plainsnippet;
+                        item.plaintitle + " \u2014 " + item.plainsnippet + "\u2026";
                 Spannable textSpan = new SpannableString(temps);
                 // Body is always grey
                 textSpan.setSpan(new ForegroundColorSpan(readTextColor),
