@@ -3,6 +3,8 @@
 
 from .util import parse_timestamp
 import re
+import html
+
 
 # Productive patterns
 PATTERN_IMG_URL = re.compile(r"(&lt;|<)img.*?src=(\"|')(.*?)(\"|')",
@@ -93,20 +95,18 @@ def unescape(text):
     Unescapes HTML-escaped text.
 
     Examples:
-    >>> unescape("&lt; &rt;")
+    >>> unescape("&lt; &gt;")
     '< >'
     >>> unescape("&quot;")
     '"'
     >>> unescape("&apos;")
     "'"
+    >>> unescape("&#8217;")
+    '’'
     >>> unescape("&amp;")
     '&'
     """
-    text = text.replace("&lt;", "<")
-    text = text.replace("&rt;", ">")
-    text = text.replace("&quot;", '"')
-    text = text.replace("&apos;", "'")
-    text = text.replace("&amp;", "&")
+    text = html.unescape(text)
     return text
 
 
