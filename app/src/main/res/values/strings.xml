@@ -47,5 +47,6 @@
     <string name="show_unread_items">Show unread items</string>
     <string name="new_items_available">New items available</string>
     <string name="view">View</string>
+    <string name="no_tag">No tag</string>
 
 </resources>

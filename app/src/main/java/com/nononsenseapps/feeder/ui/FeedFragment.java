@@ -67,10 +67,10 @@ public class FeedFragment extends Fragment
     private View mEmptyView;
     private View mEmptyAddFeed;
     private View mEmptyOpenFeeds;
-    // TODO change this
+
     private long id = -1;
-    private String title = "Android Police Dummy";
-    private String url = "http://feeds.feedburner.com/AndroidPolice";
+    private String title = "";
+    private String url = "";
     private String tag = "";
     private LinearLayoutManager mLayoutManager;
     private View mCheckAllButton;
@@ -102,6 +102,10 @@ public class FeedFragment extends Fragment
             title = getArguments().getString(ARG_FEED_TITLE);
             url = getArguments().getString(ARG_FEED_URL);
             tag = getArguments().getString(ARG_FEED_TAG);
+
+            if (title == null || title.isEmpty()) {
+                title = getString(R.string.no_tag);
+            }
         }
 
         setHasOptionsMenu(true);
@@ -201,6 +205,7 @@ public class FeedFragment extends Fragment
     public void onActivityCreated(Bundle bundle) {
         super.onActivityCreated(bundle);
 
+        ((BaseActivity) getActivity()).getSupportActionBar().setTitle(title);
         ((BaseActivity) getActivity()).enableActionBarAutoHide(mRecyclerView);
     }
 

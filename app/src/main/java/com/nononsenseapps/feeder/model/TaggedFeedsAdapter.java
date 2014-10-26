@@ -276,8 +276,7 @@ public class TaggedFeedsAdapter extends BaseExpandableListAdapter {
         holder.isExpanded = isExpanded;
 
         if (c.getString(1).isEmpty()) {
-            // TODO use string resource
-            holder.titleTextView.setText("No tag");
+            holder.titleTextView.setText(mContext.getString(R.string.no_tag));
         } else {
             holder.titleTextView.setText(c.getString(1));
         }
