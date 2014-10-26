@@ -65,13 +65,13 @@
     <style name="TextAppearance"/>
     <style name="TextAppearance.BigTitle">
         <item name="android:textSize">24sp</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/primary_text_default_material_dark</item>
     </style>
 
     <style name="TextAppearance.Title">
         <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/primary_text_default_material_dark</item>
     </style>
 
@@ -87,38 +87,38 @@
 
     <style name="TextAppearance.Body">
     <item name="android:textSize">14sp</item>
-    <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/tertiary_text_material_dark</item>
     </style>
 
     <style name="TextAppearance.ListItem"/>
     <style name="TextAppearance.ListItem.Author">
         <item name="android:textSize">@dimen/listitem_author</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/tertiary_text_material_dark</item>
     </style>
 
     <style name="TextAppearance.NewItems">
         <item name="android:textColor">@color/primary_text_default_material_dark</item>
         <item name="android:textSize">@dimen/listitem_body</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="TextAppearance.Reader"/>
     <style name="TextAppearance.Reader.Title">
         <item name="android:textColor">@color/white_54</item>
         <item name="android:textSize">@dimen/reader_title</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
     <style name="TextAppearance.Reader.Author">
         <item name="android:textColor">@color/white_54</item>
         <item name="android:textSize">@dimen/reader_author</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
     <style name="TextAppearance.Reader.Body">
         <item name="android:textColor">@color/white_87</item>
         <item name="android:textSize">@dimen/reader_body</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <!-- progress bar -->
