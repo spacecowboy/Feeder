@@ -148,7 +148,7 @@ public class FeedFragment extends Fragment
             // TODO, use better dividers such as simple padding
             // I want some dividers
             mRecyclerView.addItemDecoration(new DividerColor
-                    (getActivity(), DividerColor.VERTICAL_LIST, 1, cols));
+                    (getActivity(), DividerColor.VERTICAL_LIST, 0, cols));
             // I want some dividers
             mRecyclerView.addItemDecoration(new DividerColor
                     (getActivity(), DividerColor.HORIZONTAL_LIST));
@@ -157,7 +157,7 @@ public class FeedFragment extends Fragment
             mLayoutManager = new LinearLayoutManager(getActivity());
             // I want some dividers
             mRecyclerView.addItemDecoration(new DividerColor
-                    (getActivity(), DividerColor.VERTICAL_LIST, 1, 1));
+                    (getActivity(), DividerColor.VERTICAL_LIST, 0, 1));
         }
         mRecyclerView.setLayoutManager(mLayoutManager);
 
