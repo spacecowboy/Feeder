@@ -58,11 +58,16 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
             // Image size
             boolean shrunk = false;
             boolean hasSize = false;
+            boolean hasPercentSize = false;
             int w=-1, h=-1;
 
             Log.d("JONAS", "Trying to get: " + source);
 
             // Calculate size first if possible
+            if (sWidth != null && sWidth.contains("%") &&
+                    sHeight != null && sHeight.contains("%")) {
+                hasPercentSize = true;
+            }
             if (sWidth != null && !sWidth.contains("%") &&
                     sHeight != null && !sHeight.contains("%")) {
                 hasSize = true;
@@ -99,16 +104,16 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                 Log.d("JONAS", "Image is small enough, getting");
                 // No resize necessary since we know it is "small"
                 b = p.load(source).get();
-            } else { // if (img.hasPercentSize()) {
-                Log.d("JONAS2", "Percentsize or no size info, " +
-                                "scaling for max");
+            } else if (hasPercentSize) {
+                Log.d("JONAS2", "Percentsize, " +
+                        "scaling for max");
                 b = p.load(source).resize(maxSize.x,
                         maxSize.y).centerInside().get();
+            } else {
+                Log.d("JONAS2", "no size info, " +
+                        "using intrinsic");
+                b = p.load(source).get();
             }
-            //                    else {
-            //                        Log.d("JONAS2", "No size present, just loading..");
-            //                        b = p.load(source).get();
-            //                    }
 
             if (w == -1) {
                 w = b.getWidth();
