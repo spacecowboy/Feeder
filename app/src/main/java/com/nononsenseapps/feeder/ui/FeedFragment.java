@@ -19,6 +19,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -103,7 +104,13 @@ public class FeedFragment extends Fragment
             url = getArguments().getString(ARG_FEED_URL);
             tag = getArguments().getString(ARG_FEED_TAG);
 
-            if (title == null || title.isEmpty()) {
+            // It's a tag, use as title
+            if (id < 1) {
+                title = tag;
+            }
+
+            // Special tag
+            if (id < 1 && (title == null || title.isEmpty())) {
                 title = getString(R.string.no_tag);
             }
         }
@@ -113,7 +120,7 @@ public class FeedFragment extends Fragment
         // Load some RSS
         getLoaderManager().restartLoader(FEEDITEMS_LOADER, new Bundle(), this);
         // Load feed itself if missing info
-        if (id > 0 && (title.isEmpty() || url.isEmpty())) {
+        if (id > 0 && (title == null || title.isEmpty())) {
             getLoaderManager().restartLoader(FEED_LOADER, new Bundle(), this);
         }
     }
@@ -355,6 +362,8 @@ public class FeedFragment extends Fragment
                 FeedSQL feed = new FeedSQL(cursor);
                 this.title = feed.title;
                 this.url = feed.url;
+
+                ((BaseActivity) getActivity()).getSupportActionBar().setTitle(title);
             }
             // Reset loader
             getLoaderManager().destroyLoader(cursorLoader.getId());
