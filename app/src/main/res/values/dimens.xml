@@ -20,8 +20,8 @@
     <dimen name="fab_press_translation_z">2dp</dimen>
 
     <!-- Action Bar auto-hide-on-scroll behavior parameters -->
-    <dimen name="action_bar_auto_hide_min_y">152dp</dimen>
-    <dimen name="action_bar_auto_hide_sensivity">48dp</dimen>
+    <dimen name="action_bar_auto_hide_min_y">56dp</dimen>
+    <dimen name="action_bar_auto_hide_sensivity">12dp</dimen>
 
     <dimen name="headerbar_elevation">2dp</dimen>
 
