@@ -32,14 +32,22 @@ public class DividerColor extends RecyclerView.ItemDecoration {
     public static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;
 
     private final Drawable mDivider;
+    private final int skipHeaders;
 
     private int mOrientation;
     // in pixels
     private static final int size = 1;
+    private final int skipFooters;
 
     public DividerColor(Context context, int orientation) {
+        this(context, orientation, 0, 0);
+    }
+
+    public DividerColor(Context context, int orientation, int skipHeaders, int skipFooters) {
         mDivider = context.getResources().getDrawable(R.drawable.simple_divider);
         setOrientation(orientation);
+        this.skipHeaders = skipHeaders;
+        this.skipFooters = skipFooters;
     }
 
     public void setOrientation(int orientation) {
@@ -63,12 +71,11 @@ public class DividerColor extends RecyclerView.ItemDecoration {
         final int right = parent.getWidth() - parent.getPaddingRight();
 
         final int childCount = parent.getChildCount();
-        for (int i = 0; i < childCount; i++) {
+        for (int i = skipHeaders; i < childCount - skipFooters; i++) {
             final View child = parent.getChildAt(i);
             final RecyclerView.LayoutParams params =
                     (RecyclerView.LayoutParams) child.getLayoutParams();
             final int top = child.getBottom() + params.bottomMargin;
-            //final int bottom = top + mDivider.getIntrinsicHeight();
             final int bottom = top + size;
             mDivider.setBounds(left, top, right, bottom);
             mDivider.draw(c);
@@ -76,16 +83,13 @@ public class DividerColor extends RecyclerView.ItemDecoration {
     }
 
     public void drawHorizontal(Canvas c, RecyclerView parent) {
-//        final int top = parent.getPaddingTop();
-//        final int bottom = parent.getHeight() - parent.getPaddingBottom();
-
         final int childCount = parent.getChildCount();
-        for (int i = 0; i < childCount; i++) {
+        for (int i = skipHeaders; i < childCount; i++) {
             final View child = parent.getChildAt(i);
             final RecyclerView.LayoutParams params =
                     (RecyclerView.LayoutParams) child.getLayoutParams();
             final int left = child.getRight() + params.rightMargin;
-            final int right = left + mDivider.getIntrinsicHeight();
+            final int right = left + size;
             final int top = child.getTop();
             final int bottom = child.getBottom();
             mDivider.setBounds(left, top, right, bottom);

@@ -144,16 +144,16 @@ public class FeedFragment extends Fragment
             // TODO, use better dividers such as simple padding
             // I want some dividers
             mRecyclerView.addItemDecoration(new DividerColor
-                    (getActivity(), DividerItemDecoration.VERTICAL_LIST));
+                    (getActivity(), DividerColor.VERTICAL_LIST, 1, cols));
             // I want some dividers
             mRecyclerView.addItemDecoration(new DividerColor
-                    (getActivity(), DividerItemDecoration.HORIZONTAL_LIST));
+                    (getActivity(), DividerColor.HORIZONTAL_LIST));
         } else {
             // use a linear layout manager
             mLayoutManager = new LinearLayoutManager(getActivity());
             // I want some dividers
             mRecyclerView.addItemDecoration(new DividerColor
-                    (getActivity(), DividerItemDecoration.VERTICAL_LIST));
+                    (getActivity(), DividerColor.VERTICAL_LIST, 1, 1));
         }
         mRecyclerView.setLayoutManager(mLayoutManager);
 
