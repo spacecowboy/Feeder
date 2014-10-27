@@ -408,7 +408,7 @@ public class FeedFragment extends Fragment
             readTextColor = context.getResources()
                     .getColor(R.color.secondary_text_material_dark);
             linkColor = context.getResources().getColor(R.color
-                    .linked_text_blue);
+                    .accent);
             bgProtection = context.getResources().getDrawable(R.drawable.bg_protect);
 
             defImgWidth = Math.round(context.getResources().getDimension(R.dimen.item_img_def_width));
