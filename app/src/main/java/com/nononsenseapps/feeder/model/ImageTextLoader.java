@@ -172,7 +172,7 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
 //            Log.e("JONAS2", "" + e.getMessage());
 //        }
         MyHtml html = new MyHtml();
-        return html.fromHtml(mText);
+        return html.fromHtml(mText, getContext());
     }
 
     /**
@@ -264,15 +264,15 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
 
     class MyHtml extends com.nononsenseapps.text.Html {
         public HtmlToSpannedConverter getConverter(String source,
-                Parser parser) {
-            return new PicassoConverter(source, parser);
+                Parser parser, Context context) {
+            return new PicassoConverter(source, parser, context);
         }
     }
 
     class PicassoConverter extends HtmlToSpannedConverter {
 
-        public PicassoConverter(final String source, final Parser parser) {
-            super(source, parser);
+        public PicassoConverter(final String source, final Parser parser, final Context context) {
+            super(source, parser, context);
         }
 
         @Override

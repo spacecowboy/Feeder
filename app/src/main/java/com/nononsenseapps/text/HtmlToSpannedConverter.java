@@ -1,12 +1,11 @@
 package com.nononsenseapps.text;
 
-import android.content.Intent;
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -18,7 +17,6 @@ import android.text.style.BulletSpan;
 import android.text.style.ImageSpan;
 import android.text.style.LeadingMarginSpan;
 import android.text.style.ParagraphStyle;
-import android.text.style.QuoteSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.text.style.SubscriptSpan;
@@ -27,10 +25,8 @@ import android.text.style.TextAppearanceSpan;
 import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
 
 import com.nononsenseapps.feeder.R;
-import com.nononsenseapps.feeder.model.ClickableImageSpan;
 
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
@@ -50,15 +46,21 @@ public class HtmlToSpannedConverter implements ContentHandler {
 
     protected static final float[] HEADER_SIZES =
             {1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,};
+    protected int mAccentColor;
+    protected int mQuoteGapWidth;
+    protected int mQuoteStripeWidth;
 
     protected String mSource;
     protected XMLReader mReader;
     protected SpannableStringBuilder mSpannableStringBuilder;
 
-    public HtmlToSpannedConverter(String source, Parser parser) {
+    public HtmlToSpannedConverter(String source, Parser parser, Context context) {
         mSource = source;
         mSpannableStringBuilder = new SpannableStringBuilder();
         mReader = parser;
+        mAccentColor = context.getResources().getColor(R.color.accent);
+        mQuoteGapWidth = Math.round(context.getResources().getDimension(R.dimen.reader_quote_gap_width));
+        mQuoteStripeWidth = Math.round(context.getResources().getDimension(R.dimen.reader_quote_stripe_width));
     }
 
     public Spanned convert() {
@@ -78,20 +80,20 @@ public class HtmlToSpannedConverter implements ContentHandler {
         Object[] obj = mSpannableStringBuilder
                 .getSpans(0, mSpannableStringBuilder.length(),
                         ParagraphStyle.class);
-        for (int i = 0; i < obj.length; i++) {
-            int start = mSpannableStringBuilder.getSpanStart(obj[i]);
-            int end = mSpannableStringBuilder.getSpanEnd(obj[i]);
+        for (Object anObj : obj) {
+            int start = mSpannableStringBuilder.getSpanStart(anObj);
+            int end = mSpannableStringBuilder.getSpanEnd(anObj);
 
             // If the last line of the range is blank, back off by one.
             if (end - 2 >= 0) {
                 if (mSpannableStringBuilder.charAt(end - 1) == '\n' &&
-                    mSpannableStringBuilder.charAt(end - 2) == '\n') {
+                        mSpannableStringBuilder.charAt(end - 2) == '\n') {
                     end--;
                 }
             }
 
             if (end == start) {
-                mSpannableStringBuilder.removeSpan(obj[i]);
+                mSpannableStringBuilder.removeSpan(anObj);
             }
 //            else {
 //                mSpannableStringBuilder
@@ -125,11 +127,12 @@ public class HtmlToSpannedConverter implements ContentHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName,
-            Attributes attributes) throws SAXException {
+                             Attributes attributes) throws SAXException {
         handleStartTag(localName, attributes);
     }
 
     protected void handleStartTag(String tag, Attributes attributes) {
+        //noinspection StatementWithEmptyBody
         if (tag.equalsIgnoreCase("br")) {
             // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
             // so we can safely emite the linebreaks when we handle the close tag.
@@ -169,8 +172,8 @@ public class HtmlToSpannedConverter implements ContentHandler {
         } else if (tag.equalsIgnoreCase("sub")) {
             start(mSpannableStringBuilder, new Sub());
         } else if (tag.length() == 2 &&
-                   Character.toLowerCase(tag.charAt(0)) == 'h' &&
-                   tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
+                Character.toLowerCase(tag.charAt(0)) == 'h' &&
+                tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
             handleP(mSpannableStringBuilder);
             start(mSpannableStringBuilder, new Header(tag.charAt(1) - '1'));
         } else if (tag.equalsIgnoreCase("img")) {
@@ -215,7 +218,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void startFont(SpannableStringBuilder text,
-            Attributes attributes) {
+                             Attributes attributes) {
         String color = attributes.getValue("", "color");
         String face = attributes.getValue("", "face");
 
@@ -224,7 +227,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void startA(SpannableStringBuilder text,
-            Attributes attributes) {
+                          Attributes attributes) {
         String href = attributes.getValue("", "href");
 
         int len = text.length();
@@ -232,7 +235,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void startImg(SpannableStringBuilder text,
-            Attributes attributes) {
+                            Attributes attributes) {
         // Override me
         String src = attributes.getValue("", "src");
         Drawable d = Resources.getSystem().
@@ -248,11 +251,10 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void startUl(final SpannableStringBuilder text,
-            final Attributes attributes) {
+                           final Attributes attributes) {
         // Start lists with linebreak
         int len = text.length();
-        if (len >= 1 && text.charAt(len - 1) == '\n') {
-        } else {
+        if (len < 1 || text.charAt(len - 1) != '\n') {
             text.append("\n");
         }
 
@@ -261,11 +263,10 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void startOl(final SpannableStringBuilder text,
-            final Attributes attributes) {
+                           final Attributes attributes) {
         // Start lists with linebreak
         int len = text.length();
-        if (len >= 1 && text.charAt(len - 1) == '\n') {
-        } else {
+        if (len < 1 || text.charAt(len - 1) != '\n') {
             text.append("\n");
         }
 
@@ -274,7 +275,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void startLi(final SpannableStringBuilder text,
-            final Attributes attributes) {
+                           final Attributes attributes) {
         // Get type of list
         Listing list = (Listing) getLast(text, Listing.class);
 
@@ -282,7 +283,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
             // Numbered
             // Add number in bold
             start(text, new Bold());
-            text.append("" + list.mNumber++ + ". ");
+            text.append("" + list.mNumber++).append(". ");
             end(text, Bold.class, new StyleSpan(Typeface.BOLD));
             // Then do a leading margin
             start(text, new CountBullet());
@@ -293,7 +294,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void startPre(final SpannableStringBuilder text,
-            final Attributes attributes) {
+                            final Attributes attributes) {
         int len = text.length();
         // Make sure it has spaces before and after
         if (len >= 1 && text.charAt(len - 1) == '\n') {
@@ -307,17 +308,17 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void startCode(final SpannableStringBuilder text,
-            final Attributes attributes) {
+                             final Attributes attributes) {
         start(text, new Code());
     }
 
     protected void startIframe(final SpannableStringBuilder text,
-            final Attributes attributes) {
+                               final Attributes attributes) {
         // Override me
     }
 
     protected void startUnknownTag(String tag, SpannableStringBuilder text,
-            Attributes attr) {
+                                   Attributes attr) {
         // Override me
     }
 
@@ -336,8 +337,9 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void end(SpannableStringBuilder text, Class kind,
-            Object repl) {
+                       Object repl) {
         int len = text.length();
+
         Object obj = getLast(text, kind);
         int where = text.getSpanStart(obj);
 
@@ -345,6 +347,29 @@ public class HtmlToSpannedConverter implements ContentHandler {
 
         if (where != len) {
             text.setSpan(repl, where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+    }
+
+    protected void endQuote(SpannableStringBuilder text) {
+        // Don't want end newlines inside block
+        removeLastNewlines(text);
+
+        int len = text.length();
+        Object obj = getLast(text, Blockquote.class);
+        int where = text.getSpanStart(obj);
+
+        text.removeSpan(obj);
+
+        if (where != len) {
+            // Set quote span
+            text.setSpan(new MyQuoteSpan(mAccentColor, mQuoteGapWidth, mQuoteStripeWidth), where, len,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            // Be slightly smaller
+            text.setSpan(new RelativeSizeSpan(0.8f), where, len,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            // And have background color
+//            text.setSpan(new BackgroundColorSpan(Color.DKGRAY), where, len,
+//                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 
@@ -388,8 +413,8 @@ public class HtmlToSpannedConverter implements ContentHandler {
         } else if (tag.equalsIgnoreCase("font")) {
             endFont(mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("blockquote")) {
+            endQuote(mSpannableStringBuilder);
             handleP(mSpannableStringBuilder);
-            end(mSpannableStringBuilder, Blockquote.class, new QuoteSpan());
         } else if (tag.equalsIgnoreCase("tt")) {
             end(mSpannableStringBuilder, Monospace.class,
                     new TypefaceSpan("monospace"));
@@ -402,8 +427,8 @@ public class HtmlToSpannedConverter implements ContentHandler {
         } else if (tag.equalsIgnoreCase("sub")) {
             end(mSpannableStringBuilder, Sub.class, new SubscriptSpan());
         } else if (tag.length() == 2 &&
-                   Character.toLowerCase(tag.charAt(0)) == 'h' &&
-                   tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
+                Character.toLowerCase(tag.charAt(0)) == 'h' &&
+                tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
             handleP(mSpannableStringBuilder);
             endHeader(mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("img")) {
@@ -425,8 +450,27 @@ public class HtmlToSpannedConverter implements ContentHandler {
         }
     }
 
+    /**
+     * Remove the last newlines from the string, don't want them inside this span
+     *
+     * @param text spannablestringbuilder
+     */
+    private void removeLastNewlines(SpannableStringBuilder text) {
+        int len = text.length();
+        while (len >= 1 && text.charAt(len - 1) == '\n') {
+            text.delete(len - 1, len);
+            len = text.length();
+        }
+    }
+
     protected void handleBr(SpannableStringBuilder text) {
-        text.append("\n");
+        int len = text.length();
+        if (len >= 1 && text.charAt(len - 1) == '\n') {
+            return;
+        }
+        if (len != 0) {
+            text.append("\n");
+        }
     }
 
     protected void endFont(SpannableStringBuilder text) {
@@ -560,7 +604,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
             // Make sure text does not wrap.
             // No easy solution exists for this
             text.setSpan(new AlignmentSpan.Standard(Layout.Alignment
-                    .ALIGN_NORMAL), where, len,
+                            .ALIGN_NORMAL), where, len,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }

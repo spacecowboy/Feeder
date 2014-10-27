@@ -54,4 +54,9 @@
 
     <dimen name="item_img_def_width">64dp</dimen>
     <dimen name="item_img_def_height">128dp</dimen>
+    <dimen name="reader_tablet_width">500dp</dimen>
+
+    <!-- Used for MyQuoteSpan -->
+    <dimen name="reader_quote_gap_width">8dp</dimen>
+    <dimen name="reader_quote_stripe_width">2dp</dimen>
 </resources>

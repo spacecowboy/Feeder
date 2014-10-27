@@ -10,16 +10,12 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
-import android.text.Layout;
-import android.text.Selection;
 import android.text.Spanned;
-import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -27,10 +23,9 @@ import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
-import com.nononsenseapps.feeder.model.ClickableImageSpan;
 import com.nononsenseapps.feeder.model.ImageTextLoader;
+import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
-import com.shirwa.simplistic_rss.RssItem;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -53,9 +48,10 @@ public class ReaderFragment extends Fragment
     public static final String ARG_FEEDTITLE = "feedtitle";
     public static final String ARG_AUTHOR = "author";
     public static final String ARG_DATE = "date";
-
+    // TODO Change
+    static final DateTimeFormatter dateTimeFormat =
+            DateTimeFormat.mediumDate().withLocale(Locale.getDefault());
     private static final int TEXT_LOADER = 1;
-
     // TODO database id
     private long _id = -1;
     // All content contained in RssItem
@@ -63,13 +59,8 @@ public class ReaderFragment extends Fragment
     private TextView mTitleTextView;
     private TextView mBodyTextView;
     private ObservableScrollView mScrollView;
-    private Spanned mBodyText = null;
     private TextView mAuthorTextView;
     private TextView mFeedTitleTextView;
-
-    // TODO Change
-    static final DateTimeFormatter dateTimeFormat =
-            DateTimeFormat.mediumDate().withLocale(Locale.getDefault());
 
 
     public ReaderFragment() {
@@ -101,7 +92,7 @@ public class ReaderFragment extends Fragment
      * @return bundle of rssItem plus id
      */
     public static Bundle RssItemToBundle(FeedItemSQL rssItem,
-            Bundle bundle) {
+                                         Bundle bundle) {
         if (bundle == null) {
             bundle = new Bundle();
         }
@@ -114,6 +105,18 @@ public class ReaderFragment extends Fragment
         bundle.putString(ARG_AUTHOR, rssItem.author);
         bundle.putString(ARG_DATE, rssItem.getPubDateString());
         return bundle;
+    }
+
+    public static FeedItemSQL RssItemFromBundle(Bundle bundle) {
+        FeedItemSQL rssItem = new FeedItemSQL();
+        rssItem.title = bundle.getString(ARG_TITLE);
+        rssItem.description = (bundle.getString(ARG_DESCRIPTION));
+        rssItem.link = (bundle.getString(ARG_LINK));
+        rssItem.imageurl = (bundle.getString(ARG_IMAGEURL));
+        rssItem.author = (bundle.getString(ARG_AUTHOR));
+        rssItem.setPubDate(bundle.getString(ARG_DATE));
+        rssItem.feedtitle = (bundle.getString(ARG_FEEDTITLE));
+        return rssItem;
     }
 
     @Override
@@ -137,24 +140,17 @@ public class ReaderFragment extends Fragment
         }
     }
 
-    public static FeedItemSQL RssItemFromBundle(Bundle bundle) {
-        FeedItemSQL rssItem = new FeedItemSQL();
-        rssItem.title = bundle.getString(ARG_TITLE);
-        rssItem.description = (bundle.getString(ARG_DESCRIPTION));
-        rssItem.link = (bundle.getString(ARG_LINK));
-        rssItem.imageurl = (bundle.getString(ARG_IMAGEURL));
-        rssItem.author = (bundle.getString(ARG_AUTHOR));
-        rssItem.setPubDate(bundle.getString(ARG_DATE));
-        rssItem.feedtitle = (bundle.getString(ARG_FEEDTITLE));
-        return rssItem;
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView =
-                inflater.inflate(R.layout.fragment_reader, container, false);
+        final int theLayout;
+        if (TabletUtils.isTablet(getActivity())) {
+            theLayout = R.layout.fragment_reader_tablet;
+        } else {
+            theLayout = R.layout.fragment_reader;
+        }
+        View rootView = inflater.inflate(theLayout, container, false);
 
         mScrollView =
                 (ObservableScrollView) rootView.findViewById(R.id.scroll_view);
@@ -270,16 +266,23 @@ public class ReaderFragment extends Fragment
         Point size = new Point();
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
         // Using twice window height since we do scroll vertically
-        return new ImageTextLoader(getActivity(), mRssItem.description,
-                new Point(size.x - 2 * Math.round(getResources().getDimension(R.dimen.keyline_1)),
-                        2 * size.y));
+        if (TabletUtils.isTablet(getActivity())) {
+            // Tablet has fixed width
+            return new ImageTextLoader(getActivity(), mRssItem.description,
+                    new Point(Math.round(getResources().getDimension(R.dimen.reader_tablet_width)),
+                            2 * size.y));
+        } else {
+            // Base it on window size
+            return new ImageTextLoader(getActivity(), mRssItem.description,
+                    new Point(size.x - 2 * Math.round(getResources().getDimension(R.dimen.keyline_1)),
+                            2 * size.y));
+        }
     }
 
 
     @Override
     public void onLoadFinished(final Loader<Spanned> loader,
-            final Spanned data) {
-        mBodyText = data;
+                               final Spanned data) {
         mBodyTextView.setText(data);
     }
 

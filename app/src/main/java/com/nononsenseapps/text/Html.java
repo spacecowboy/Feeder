@@ -1,6 +1,7 @@
 package com.nononsenseapps.text;
 
 
+import android.content.Context;
 import android.text.Spanned;
 
 import org.ccil.cowan.tagsoup.HTMLSchema;
@@ -29,7 +30,7 @@ public class Html {
      * <p>This uses TagSoup to handle real HTML, including all of the brokenness
      * found in the wild.
      */
-    public Spanned fromHtml(String source) {
+    public Spanned fromHtml(String source, Context context) {
         Parser parser = new Parser();
         try {
             parser.setProperty(Parser.schemaProperty, HtmlParser.schema);
@@ -41,14 +42,14 @@ public class Html {
             throw new RuntimeException(e);
         }
 
-        HtmlToSpannedConverter converter = getConverter(source, parser);
+        HtmlToSpannedConverter converter = getConverter(source, parser, context);
 
         return converter.convert();
     }
 
     public HtmlToSpannedConverter getConverter(String source,
-            Parser parser) {
-        return new HtmlToSpannedConverter(source, parser);
+            Parser parser, Context context) {
+        return new HtmlToSpannedConverter(source, parser, context);
     }
 
     /**
