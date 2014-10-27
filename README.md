@@ -17,12 +17,23 @@ This is equivalent to doing it in two steps:
 
 Quick install:
 
-    ./gradlew installKitkatDebug
+    ./gradlew installPlayDebug
 
 For more possible options, see:
 
     ./gradlew tasks
 
-### How to run the server?
+The client is currently hardcoded to sync with the server I'm running.
+It requires you to authenticate with your Google account so you don't
+mess with other people's feeds. Note that no passwords are transmitted
+or stored. Only an auth-token (time limited access code) is requested
+on device which only authorizes me to check what e-mail address requested
+the token.
+
+The app is useless without the server. Future versions of the server
+will support simple username/password to be able to build the app without
+play services available.
+
+### How to run the server yourself?
 
 See [server/flaskapp](server/flaskapp).
