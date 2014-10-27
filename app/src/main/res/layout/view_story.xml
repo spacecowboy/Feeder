@@ -22,8 +22,8 @@
         <ImageView
             android:id="@+id/story_image"
             android:layout_width="@dimen/item_img_def_width"
-            android:layout_height="wrap_content"
-            android:visibility="gone"/>
+            android:layout_height="match_parent"
+            android:visibility="visible"/>
     </FrameLayout>
 
     <LinearLayout

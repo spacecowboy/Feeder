@@ -26,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -531,13 +532,10 @@ public class FeedFragment extends Fragment
                 holder.imageView.setVisibility(View.GONE);
                 holder.textGroup.setBackground(null);
             } else {
-                // fit centercrop will wait until view is measured
-                Picasso.with(getActivity()).load(item.imageurl).fit().centerCrop()
-                        .into(holder.imageView);
-                holder.imageView.setVisibility(View.VISIBLE);
-                if (isGrid) {
-                    holder.textGroup.setBackground(bgProtection);
-                }
+                // Take up width
+                holder.imageView.setVisibility(View.INVISIBLE);
+                // Load image when item has been measured
+                holder.itemView.getViewTreeObserver().addOnPreDrawListener(holder);
             }
         }
 
@@ -545,7 +543,7 @@ public class FeedFragment extends Fragment
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
         public class ViewHolder extends RecyclerView.ViewHolder
-                implements View.OnClickListener {
+                implements View.OnClickListener, ViewTreeObserver.OnPreDrawListener {
             public final TextView titleTextView;
             public final TextView bodyTextView;
             public final TextView dateTextView;
@@ -604,6 +602,32 @@ public class FeedFragment extends Fragment
                                     rssItem.enclosurelink :
                                     rssItem.link)));
                 }
+            }
+
+            /**
+             * Called when item has been measured, it is now the time to insert the image.
+             *
+             * @return Return true to proceed with the current drawing pass, or false to cancel.
+             */
+            @Override
+            public boolean onPreDraw() {
+                imageView.setVisibility(View.VISIBLE);
+                // Width is fixed
+                int w = defImgWidth;
+
+                // Use the parent's height
+                int h = itemView.getHeight();
+
+                Picasso.with(getActivity()).load(rssItem.imageurl).resize(w, h).centerCrop().noFade()
+                        .into(imageView);
+                if (isGrid) {
+                    textGroup.setBackground(bgProtection);
+                }
+
+                // Remove as listener
+                itemView.getViewTreeObserver().removeOnPreDrawListener(this);
+
+                return true;
             }
 
                 /*
