@@ -10,8 +10,6 @@
         android:id="@+id/story_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/bacon"
         android:visibility="visible" />
 
     <!-- Background set in code, present here to preview layout -->

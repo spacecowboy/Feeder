@@ -23,9 +23,7 @@
             android:id="@+id/story_image"
             android:layout_width="@dimen/item_img_def_width"
             android:layout_height="wrap_content"
-            android:scaleType="centerCrop"
-            android:visibility="gone"
-            android:src="@drawable/bacon"/>
+            android:visibility="gone"/>
     </FrameLayout>
 
     <LinearLayout

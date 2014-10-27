@@ -531,18 +531,9 @@ public class FeedFragment extends Fragment
                 holder.imageView.setVisibility(View.GONE);
                 holder.textGroup.setBackground(null);
             } else {
-                int w = holder.imageView.getWidth();
-                if (w <= 0) {
-                    w = defImgWidth;
-                }
-                // TODO better height handling
-                int h = holder.itemView.getHeight();
-                if (h <= 0) {
-                    h = defImgHeight;
-                }
-                Log.d("HECTOR", "item height:" + h);
-                Picasso.with(getActivity()).load(item.imageurl).resize(w, h)
-                        .centerCrop().into(holder.imageView);
+                // fit centercrop will wait until view is measured
+                Picasso.with(getActivity()).load(item.imageurl).fit().centerCrop()
+                        .into(holder.imageView);
                 holder.imageView.setVisibility(View.VISIBLE);
                 if (isGrid) {
                     holder.textGroup.setBackground(bgProtection);
