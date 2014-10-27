@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -411,9 +412,15 @@ public class FeedFragment extends Fragment
                     .accent);
             bgProtection = context.getResources().getDrawable(R.drawable.bg_protect);
 
-            defImgWidth = Math.round(context.getResources().getDimension(R.dimen.item_img_def_width));
-            defImgHeight = Math.round(context.getResources().getDimension(R.dimen.item_img_def_height));
-
+            if (isGrid) {
+                defImgHeight = Math.round(context.getResources().getDimension(R.dimen.grid_item_size));
+                Point size = new Point();
+                getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+                defImgWidth = size.x / TabletUtils.numberOfFeedColumns(context);
+            } else {
+                defImgWidth = Math.round(context.getResources().getDimension(R.dimen.item_img_def_width));
+                defImgHeight = Math.round(context.getResources().getDimension(R.dimen.item_img_def_height));
+            }
         }
 
         public void swapCursor(Cursor cursor) {

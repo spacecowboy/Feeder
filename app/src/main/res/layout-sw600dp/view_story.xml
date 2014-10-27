@@ -21,6 +21,7 @@
         android:orientation="vertical"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
+        android:paddingBottom="4dp"
         android:background="@drawable/bg_protect">
 
         <RelativeLayout
@@ -62,8 +63,6 @@
             style="@style/TextAppearance.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:layout_marginEnd="4dp"
             android:layout_marginTop="2dp"
             android:maxLines="5"
             android:text="A long text that is supposed to touch the end of the line" />
