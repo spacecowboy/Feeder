@@ -2,18 +2,16 @@ package com.nononsenseapps.feeder.model;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.preference.PreferenceManager;
-import android.util.Log;
-
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableNotifiedException;
 
 import java.io.IOException;
 
 public class AuthHelper {
 
+    public static final String GOOGLE_ACCOUNT_TYPE = "com.google";
     public static final String KEY_ACCOUNT = "key_account";
     public static final String SCOPE =
             "oauth2:https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
@@ -38,18 +36,24 @@ public class AuthHelper {
      */
     public static String getAuthToken(final Context context,
             final String accountName) {
+        String authToken = "";
         try {
-            return "Bearer " +
-                   GoogleAuthUtil.getTokenWithNotification(context, accountName,
-                           SCOPE, null);
-        } catch (UserRecoverableNotifiedException userRecoverableException) {
-            // Unable to authenticate, but the user can fix this.
-            Log.e(TAG, "Could not fetch token: " +
-                       userRecoverableException.getMessage());
-        } catch (GoogleAuthException fatalException) {
-            Log.e(TAG, "Unrecoverable error " + fatalException.getMessage());
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+            // Might be invalid in the cache
+            AccountManager accountManager = AccountManager.get(context);
+            authToken = accountManager.blockingGetAuthToken(getAccount(context, accountName),
+                    SCOPE, true);
+            accountManager.invalidateAuthToken(GOOGLE_ACCOUNT_TYPE, authToken);
+
+            authToken = accountManager.blockingGetAuthToken(getAccount(context, accountName),
+                    SCOPE, true);
+
+            return "Bearer " + authToken;
+        }
+        catch (OperationCanceledException ignored) {
+        }
+        catch (AuthenticatorException ignored) {
+        }
+        catch (IOException ignored) {
         }
         return null;
     }
@@ -62,7 +66,7 @@ public class AuthHelper {
             final String accountName) {
         final AccountManager manager = AccountManager.get(context);
         Account[] accounts =
-                manager.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
+                manager.getAccountsByType(GOOGLE_ACCOUNT_TYPE);
         for (Account account : accounts) {
             if (account.name.equals(accountName)) {
                 return account;

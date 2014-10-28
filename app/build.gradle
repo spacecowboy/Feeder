@@ -18,12 +18,12 @@ android {
         resConfigs "nodpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"
     }
 
-    productFlavors {
-        fdroid {
-        }
-        play {
-        }
-    }
+//    productFlavors {
+//        free {
+//        }
+//        play {
+//        }
+//    }
 
     buildTypes {
         debug {
@@ -53,8 +53,6 @@ dependencies {
     compile 'com.github.castorflex.smoothprogressbar:library:1.0.0'
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.1'
 
-    // Only include play services on play devices
-    playCompile 'com.google.android.gms:play-services:6.1.11'
     // Don't work on L-preview yet
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
     compile 'com.squareup.okhttp:okhttp:2.0.0'
