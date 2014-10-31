@@ -333,7 +333,8 @@ public class RssSyncHelper extends IntentService {
                 }
             }
         }
-
+        // Notify URIs
+        RssContentProvider.notifyAllUris(context);
         // And broadcast that feed has been added, so UI may update and select it if suitable
         LocalBroadcastManager.getInstance(context).sendBroadcast
                 (new Intent(RssSyncAdapter.FEED_ADDED_BROADCAST)

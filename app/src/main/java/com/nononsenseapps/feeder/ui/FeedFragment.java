@@ -274,7 +274,8 @@ public class FeedFragment extends Fragment
                             Util.LongsToStringArray(this.id));
             // Upload change
             RssSyncHelper.deleteFeedAsync(getActivity(), url);
-            // TODO close fragment
+            // Tell activity to open another fragment
+            ((FeedActivity) getActivity()).loadFirstFeedInDB(true);
             return true;
         }
 //        else if (id == R.id.action_mark_as_read) {

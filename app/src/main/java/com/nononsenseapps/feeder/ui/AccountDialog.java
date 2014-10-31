@@ -8,6 +8,7 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -26,10 +27,12 @@ public class
         AccountManagerCallback<Bundle> {
 
     private Account mAccount = null;
+    private Context mContext = null;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle args) {
+        mContext = getActivity().getApplicationContext();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.select_account);
         final Account[] accounts = AccountManager.get(getActivity())
@@ -71,10 +74,10 @@ public class
                     AccountManager.KEY_AUTHTOKEN);
             if (token != null && !token.isEmpty() && mAccount != null) {
                 // Valid token
-                PreferenceManager.getDefaultSharedPreferences(getActivity()).edit()
+                PreferenceManager.getDefaultSharedPreferences(mContext).edit()
                         .putString(AuthHelper.KEY_ACCOUNT, mAccount.name).commit();
                 // Request sync
-                RssContentProvider.RequestSync(getActivity());
+                RssContentProvider.RequestSync(mContext);
             }
         } catch (OperationCanceledException e) {
             // if the request was canceled for any reason

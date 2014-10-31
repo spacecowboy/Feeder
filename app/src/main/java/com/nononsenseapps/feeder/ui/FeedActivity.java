@@ -1,9 +1,13 @@
 package com.nononsenseapps.feeder.ui;
 
+import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -12,7 +16,6 @@ import android.support.v4.view.ViewCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +45,11 @@ public class FeedActivity extends BaseActivity {
                 isSyncing = intent
                         .getBooleanExtra(RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE, false);
                 showHideSyncIndicators(isSyncing);
+
+                if (mFragment == null) {
+                    // Load first feed if nothing is showing
+                    loadFirstFeedInDB(false);
+                }
             } else if (RssSyncAdapter.FEED_ADDED_BROADCAST.equals(intent.getAction())) {
                 // If nothing is loaded, select this first feed
                 if (mFragment == null && intent.getLongExtra(FeedSQL.COL_ID, -1) > 0) {
@@ -65,7 +73,9 @@ public class FeedActivity extends BaseActivity {
 
         if (savedInstanceState == null) {
             mFragment = getDefaultFragment();
-            if (mFragment != null) {
+            if (mFragment == null) {
+                loadFirstFeedInDB(false);
+            } else {
                 getSupportFragmentManager().beginTransaction()
                         .add(R.id.container, mFragment, "single_pane").commit();
             }
@@ -131,13 +141,48 @@ public class FeedActivity extends BaseActivity {
         mSyncIndicator2 = findViewById(R.id.sync_indicator_2);
     }
 
+    /**
+     * Load list of all feeds in DB and open the first one returned.
+     * @param overrideCurrent if True, will always open the first feed. If False, will only open the first feed if no feed is currently showing (first boot).
+     */
+    public void loadFirstFeedInDB(final boolean overrideCurrent) {
+        final int loaderId = 2523;
+        // See if we have any feeds at all in the DB
+        getLoaderManager().restartLoader(loaderId, Bundle.EMPTY, new LoaderManager.LoaderCallbacks<Cursor>() {
+            @Override
+            public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+                return new CursorLoader(FeedActivity.this, FeedSQL.URI_FEEDS,
+                        FeedSQL.FIELDS, null, null, null);
+            }
+
+            @Override
+            public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+                if (loader.getId() == loaderId) {
+                    if (cursor.moveToNext() && (overrideCurrent || mFragment == null)) {
+                        FeedSQL feed = new FeedSQL(cursor);
+                        onNavigationDrawerItemSelected(feed.id, feed.title, feed.url, feed.tag);
+                    }
+                    getLoaderManager().destroyLoader(loader.getId());
+                }
+            }
+
+            @Override
+            public void onLoaderReset(Loader<Cursor> loader) {
+                // Nothing
+            }
+        });
+    }
+
     private Fragment getDefaultFragment() {
         final String tag = PrefUtils.getLastOpenFeedTag(this);
         final long id = PrefUtils.getLastOpenFeedId(this);
+
         // Will load title and url in fragment
         if (tag != null || id > 0) {
             return FeedFragment.newInstance(id, "", "", tag);
         } else {
+            loadFirstFeedInDB(false);
+
             return null;
         }
     }
