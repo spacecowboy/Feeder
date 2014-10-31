@@ -7,7 +7,7 @@ from sqlalchemy import (Column, Integer, String, Text,
                         DateTime, ForeignKey, desc)
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.associationproxy import association_proxy
-from feeder.database import db
+from .database import db
 from datetime import datetime
 
 
@@ -27,11 +27,18 @@ def get_user(email):
     return user
 
 
-def get_feed(link):
+def get_feed(link, indicate_new=False):
     '''
     Add a feed to database if it does not exist yet.
 
     Returns a valid feed object
+
+    If indicate_new is true, then a tuple is returned instead:
+
+    (feed, new)
+
+    Where feed is a valid feed object and new is a boolean
+    indicating if the feed was added or not.
     '''
     if "://" not in link:
         link = "http://" + link
@@ -43,7 +50,14 @@ def get_feed(link):
         db.session.add(feed)
         db.session.commit()
 
-    return feed
+        new = True
+    else:
+        new = False
+
+    if indicate_new:
+        return feed, new
+    else:
+        return feed
 
 
 def get_userfeed(user, feed, tag=None, title=None):

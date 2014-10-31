@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.AuthHelper;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
@@ -33,13 +34,21 @@ public class FeedActivity extends BaseActivity {
     private View mSyncIndicator2;
     private boolean isSyncing = false;
 
-    // Broadcastreceiver for sync events
+    // Broadcast receiver for sync events
     private BroadcastReceiver mSyncMsgReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            isSyncing = intent
-                    .getBooleanExtra(RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE, false);
-            showHideSyncIndicators(isSyncing);
+            if (RssSyncAdapter.SYNC_BROADCAST.equals(intent.getAction())) {
+                isSyncing = intent
+                        .getBooleanExtra(RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE, false);
+                showHideSyncIndicators(isSyncing);
+            } else if (RssSyncAdapter.FEED_ADDED_BROADCAST.equals(intent.getAction())) {
+                // If nothing is loaded, select this first feed
+                if (mFragment == null && intent.getLongExtra(FeedSQL.COL_ID, -1) > 0) {
+                        onNavigationDrawerItemSelected(intent.getLongExtra(FeedSQL.COL_ID, -1),
+                                "", "", null);
+                }
+            }
         }
     };
     private View mEmptyView;

@@ -10,6 +10,7 @@ from .models import (Feed, FeedItem, UserFeed, UserDeletion,
 from flask.ext.restful import (Resource, Api, reqparse, fields,
                                marshal_with)
 from .util import parse_timestamp, datetime_to_string
+from .sync import cache_feed
 
 from .gauth import authorized
 
@@ -177,7 +178,10 @@ class Feeds(Resource):
         args = postparser.parse_args()
 
         # Make sure feed exists
-        feed = get_feed(args.link)
+        feed, new = get_feed(args.link, indicate_new=True)
+        if new:
+            cache_feed(feed)
+
         # Set link between user and feed
         userfeed = get_userfeed(user, feed, args.tag, args.title)
 
@@ -195,7 +199,13 @@ class Feeds(Resource):
         # Else, already saved
         db.session.commit()
 
-        userfeed.items = None
+        # TODO limit number of items instead of time
+        # TODO include read information
+        dt = datetime.utcnow() - timedelta(days=1)
+        userfeed.items = FeedItem.query.filter(FeedItem.timestamp > dt,
+                                               FeedItem.feed_id == feed.id)\
+                                              .all()
+
         # Return feed
         return userfeed
 

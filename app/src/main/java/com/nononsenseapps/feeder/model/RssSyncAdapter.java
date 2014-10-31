@@ -28,6 +28,8 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private static final String TAG = "FeederRssSyncAdapter";
 
+    public static final String FEED_ADDED_BROADCAST =
+            "feeder.nononsenseapps.RSS_FEED_ADDED_BROADCAST";
     public static final String SYNC_BROADCAST =
             "feeder.nononsenseapps.RSS_SYNC_BROADCAST";
     public static final String SYNC_BROADCAST_IS_ACTIVE = "IS_ACTIVE";

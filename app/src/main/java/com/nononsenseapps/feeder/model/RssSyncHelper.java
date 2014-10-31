@@ -5,8 +5,11 @@ import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.nononsenseapps.feeder.db.FeedItemSQL;
@@ -303,15 +306,38 @@ public class RssSyncHelper extends IntentService {
         if (token == null) {
             throw new NullPointerException("No token");
         }
-        BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(token);
-        BackendAPIClient.FeedMessage f = new BackendAPIClient.FeedMessage();
+        final BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(token);
+        final BackendAPIClient.FeedMessage f = new BackendAPIClient.FeedMessage();
         f.title = title;
         f.link = link;
         if (tag != null && !tag.isEmpty()) {
             f.tag = tag;
         }
 
-        api.putFeed(f);
+        final BackendAPIClient.Feed feed = api.putFeed(f);
+        // If any items were returned
+        if (feed.items != null && !feed.items.isEmpty()) {
+            // Save the items
+            final ArrayList<ContentProviderOperation> operations =
+                    new ArrayList<ContentProviderOperation>();
+
+            syncFeedBatch(context, operations, feed);
+            if (!operations.isEmpty()) {
+                try {
+                    context.getContentResolver()
+                            .applyBatch(RssContentProvider.AUTHORITY, operations);
+                } catch (RemoteException e) {
+                    Log.e(TAG, "RemoteExc.: " + e);
+                } catch (OperationApplicationException e) {
+                    Log.e(TAG, "OperationAppl.Exc.: " + e);
+                }
+            }
+        }
+
+        // And broadcast that feed has been added, so UI may update and select it if suitable
+        LocalBroadcastManager.getInstance(context).sendBroadcast
+                (new Intent(RssSyncAdapter.FEED_ADDED_BROADCAST)
+                        .putExtra(FeedSQL.COL_ID,getFeedSQLId(context, feed)));
     }
 
     protected static void deleteFeed(final Context context,
