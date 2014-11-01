@@ -89,7 +89,6 @@ public class ServerEditorFragment extends DialogFragment implements
                     hideAccountList();
                     showUserPassFrame();
                 }
-                // TODO handle empty view
             }
         });
         // Do it separately without animation
@@ -151,7 +150,6 @@ public class ServerEditorFragment extends DialogFragment implements
         boolean serverValid = mServerText.getText().length() > 0;
         result &= serverValid;
         if (!serverValid) {
-            // TODO indicate error
             mServerLabel.showError("Missing URL");
         }
 
@@ -239,6 +237,9 @@ public class ServerEditorFragment extends DialogFragment implements
         final String currentAccountName = PrefUtils.getUsername(getActivity(), null);
         final Account[] accounts = AccountManager.get(getActivity())
                 .getAccountsByType(AuthHelper.GOOGLE_ACCOUNT_TYPE);
+        if (accounts.length == 0) {
+            // TODO add empty view here
+        }
         for (final Account account : accounts) {
             final CheckedTextView itemView = (CheckedTextView) LayoutInflater.from(getActivity()).inflate(android.R.layout.simple_list_item_single_choice,
                     mAccountList, false);
