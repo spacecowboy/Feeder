@@ -128,7 +128,7 @@ public class PrefUtils {
         sp(context).registerOnSharedPreferenceChangeListener(listener);
     }
 
-    public static void unrgisterOnSharedPreferenceChangeListener(final Context context,
+    public static void unregisterOnSharedPreferenceChangeListener(final Context context,
             SharedPreferences.OnSharedPreferenceChangeListener listener) {
         sp(context).unregisterOnSharedPreferenceChangeListener(listener);
     }

@@ -6,6 +6,7 @@ import android.animation.TypeEvaluator;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -39,7 +40,7 @@ import java.util.ArrayList;
  * between activities.
  */
 public class BaseActivity extends ActionBarActivity
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
     // Durations for certain animations we use:
@@ -80,6 +81,8 @@ public class BaseActivity extends ActionBarActivity
     private TaggedFeedsAdapter mNavAdapter;
     private ExpandableListView mDrawerListView;
     private boolean firstload = true;
+    private TextView mUserText;
+    private TextView mServerText;
 
     /**
      * Converts an intent into a {@link Bundle} suitable for use as fragment
@@ -182,6 +185,12 @@ public class BaseActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        PrefUtils.unregisterOnSharedPreferenceChangeListener(this, this);
+        super.onDestroy();
+    }
+
     private void setupNavDrawer() {
     // What nav drawer item should be selected?
         int selfItem = getSelfNavDrawerItem();
@@ -192,18 +201,20 @@ public class BaseActivity extends ActionBarActivity
         }
 
         // Set up account fields
-        TextView userText = (TextView) findViewById(R.id.user_text);
-        TextView serverText = (TextView) findViewById(R.id.server_text);
+        mUserText = (TextView) findViewById(R.id.user_text);
+        mServerText = (TextView) findViewById(R.id.server_text);
 
         final String user = PrefUtils.getUsername(this, null);
         final String server = PrefUtils.getServerUrl(this);
 
         if (user != null) {
-            userText.setText(user);
+            mUserText.setText(user);
         }
         if (server != null) {
-            serverText.setText(server);
+            mServerText.setText(server);
         }
+        // Listen for changes to account and server
+        PrefUtils.registerOnSharedPreferenceChangeListener(this, this);
 
         // Listener for editor
         View accountBox = findViewById(R.id.account_box);
@@ -593,6 +604,15 @@ public class BaseActivity extends ActionBarActivity
             mNavAdapter.setGroupCursor(null);
         } else {
             mNavAdapter.setChildrenCursor(cursorLoader.getId(), null);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
+        if (PrefUtils.PREF_USERNAME.equals(key)) {
+            mUserText.setText(sp.getString(key, ""));
+        } else if (PrefUtils.PREF_SERVER_URL.equals(key)) {
+            mServerText.setText(sp.getString(key, ""));
         }
     }
 
