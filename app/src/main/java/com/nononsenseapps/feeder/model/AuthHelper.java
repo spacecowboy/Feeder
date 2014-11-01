@@ -7,19 +7,19 @@ import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.preference.PreferenceManager;
 
+import com.nononsenseapps.feeder.util.PrefUtils;
+
 import java.io.IOException;
 
 public class AuthHelper {
 
     public static final String GOOGLE_ACCOUNT_TYPE = "com.google";
-    public static final String KEY_ACCOUNT = "key_account";
     public static final String SCOPE =
             "oauth2:https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
     static final String TAG = "SyncHelper";
 
     public static String getSavedAccountName(final Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(AuthHelper.KEY_ACCOUNT, null);
+        return PrefUtils.getUsername(context, null);
     }
 
     public static String getAuthToken(final Context context) {

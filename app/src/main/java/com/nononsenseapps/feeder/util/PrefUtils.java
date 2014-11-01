@@ -3,7 +3,8 @@ package com.nononsenseapps.feeder.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
+
+import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
 
 /**
  * Utilities and constants related to app preferences.
@@ -24,6 +25,14 @@ public class PrefUtils {
      */
     public static final String PREF_LAST_FEED_TAG = "pref_last_feed_tag";
     public static final String PREF_LAST_FEED_ID = "pref_last_feed_id";
+
+    /**
+     * Accounts and server settings
+     */
+    public static final String PREF_USERNAME = "key_account";
+    public static final String PREF_PASSWORD = "pref_password";
+    public static final String PREF_USE_GOOGLE_ACCOUNT = "pref_use_google_account";
+    public static final String PREF_SERVER_URL = "pref_server_url";
 
     /**
      * A shorthand method
@@ -47,6 +56,38 @@ public class PrefUtils {
     public static void setPrefShowOnlyUnread(final Context context,
             final boolean value) {
         sp(context).edit().putBoolean(PREF_SHOW_ONLY_UNREAD, value).apply();
+    }
+
+    public static String getUsername(final Context context, final String def) {
+        return sp(context).getString(PREF_USERNAME, def);
+    }
+
+    public static String getServerUrl(final Context context) {
+        return sp(context).getString(PREF_SERVER_URL, BackendAPIClient.DEFAULT_API_URL);
+    }
+
+    public static void setServerUrl(final Context context, final String url) {
+        sp(context).edit().putString(PREF_SERVER_URL, url).apply();
+    }
+
+    public static void setUsername(final Context context, final String user) {
+        sp(context).edit().putString(PREF_USERNAME, user).apply();
+    }
+
+    public static boolean getUseGoogleAccount(final Context context) {
+        return sp(context).getBoolean(PREF_USE_GOOGLE_ACCOUNT, true);
+    }
+
+    public static void setUseGoogleAccount(final Context context, final boolean useGoogle) {
+        sp(context).edit().putBoolean(PREF_USE_GOOGLE_ACCOUNT, useGoogle).apply();
+    }
+
+    public static String getPassword(final Context context, final String def) {
+        return sp(context).getString(PREF_PASSWORD, def);
+    }
+
+    public static void setPassword(final Context context, final String password) {
+        sp(context).edit().putString(PREF_PASSWORD, password).apply();
     }
 
     /**

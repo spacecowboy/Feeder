@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Sub themes -->
+    <style name="DialogTheme" parent="AppThemeDialog" >
+    </style>
     <style name="FeedsTheme" parent="AppTheme" >
         <!--<item name="android:windowActionBarOverlay">true</item>-->
     </style>
@@ -24,6 +26,10 @@
         <item name="spbStyle">@style/SyncIndicatorStyle</item>
         <item name="cpbStyle">@style/FeedSearchProgressStyle</item>
     </style>
+    <style name="AppThemeDialog" parent="Theme.IOSched.BaseDialog">
+        <item name="spbStyle">@style/SyncIndicatorStyle</item>
+        <item name="cpbStyle">@style/FeedSearchProgressStyle</item>
+    </style>
 
     <declare-styleable name="DrawShadowFrameLayout">
         <attr name="shadowDrawable" format="reference" />
@@ -35,10 +41,35 @@
         <!-- Only needed for pre-L -->
         <item name="android:editTextBackground">@drawable/edit_text</item>
     </style>
+    <style name="ThemeDialog" parent="FrameworkRoot.ThemeDialog">
+        <!-- Only needed for pre-L -->
+        <item name="android:editTextBackground">@drawable/edit_text</item>
+    </style>
 
     <style name="FrameworkRoot.Theme" parent="Theme.AppCompat.NoActionBar" />
+    <style name="FrameworkRoot.ThemeDialog" parent="Theme.AppCompat.Dialog" />
 
     <style name="Theme.IOSched.Base" parent="Theme">
+        <item name="actionBarOverlayTopOffset">?actionBarSize</item>
+        <item name="actionBarInsetStart">?actionBarSize</item>
+        <item name="spinnerBarInsetStart">?actionBarSize</item>
+        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackground</item>
+        <item name="popupItemBackground">?android:selectableItemBackground</item>
+        <item name="photoItemForeground">?android:selectableItemBackground</item>
+
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@color/background_material_dark</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
+
+
+        <item name="colorPrimary">@color/primary</item>
+        <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">@color/accent</item>
+
+    </style>
+    <style name="Theme.IOSched.BaseDialog" parent="ThemeDialog">
         <item name="actionBarOverlayTopOffset">?actionBarSize</item>
         <item name="actionBarInsetStart">?actionBarSize</item>
         <item name="spinnerBarInsetStart">?actionBarSize</item>
@@ -119,6 +150,26 @@
         <item name="android:textColor">@color/white_87</item>
         <item name="android:textSize">@dimen/reader_body</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.InputField">
+        <item name="android:textColor">@color/white_87</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+    <style name="TextAppearance.FloatLabel" parent="android:TextAppearance.Small">
+        <item name="android:textColor">@color/accent</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="TextAppearance.ErrorLabel" parent="android:TextAppearance.Small">
+        <item name="android:textColor">@color/material_red_700</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <!-- progress bar -->

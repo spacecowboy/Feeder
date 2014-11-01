@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
    Copyright 2014 Google Inc. All rights reserved.
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,29 +15,79 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="@dimen/navdrawer_width"
-              android:layout_height="match_parent"
-              android:id="@+id/navdrawer"
-              android:orientation="vertical"
-              android:layout_gravity="start"
-              android:clipToPadding="false">
+    android:id="@+id/navdrawer"
+    android:layout_width="@dimen/navdrawer_width"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:background="@color/navdrawer_background"
+    android:clipToPadding="false"
+    android:orientation="vertical">
 
-    <!--<android.support.v7.widget.RecyclerView-->
-        <!--android:id="@+id/navdrawer_list"-->
-        <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--android:scrollbars="vertical"-->
-        <!--android:background="@color/navdrawer_background"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
-
-    <ExpandableListView
-        android:id="@+id/navdrawer_list"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:scrollbars="vertical"
-
-        android:background="@color/navdrawer_background"
+    <RelativeLayout
+        android:id="@+id/account_box"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:paddingBottom="@dimen/keyline_1"
+        android:paddingEnd="@dimen/keyline_1"
+        android:paddingStart="@dimen/keyline_1"
+        android:paddingTop="@dimen/keyline_1">
+
+        <ImageView
+            android:id="@+id/icon_img"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_action_settings" />
+
+        <TextView
+            android:id="@+id/user_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="2dp"
+            android:layout_toStartOf="@id/icon_img"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="@string/username"
+            android:textColor="@color/accent"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/server_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/user_text"
+            android:layout_marginTop="2dp"
+            android:layout_toStartOf="@id/icon_img"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="@string/server_address"
+            android:textColor="@color/accent"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/accent"/>
+
+    <ExpandableListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/navdrawer_list"
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+        android:scrollbars="vertical" />
 
 
 </LinearLayout>

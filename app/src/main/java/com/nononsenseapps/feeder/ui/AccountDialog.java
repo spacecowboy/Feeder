@@ -18,6 +18,7 @@ import android.support.v4.app.DialogFragment;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.AuthHelper;
+import com.nononsenseapps.feeder.util.PrefUtils;
 
 import java.io.IOException;
 
@@ -74,8 +75,7 @@ public class
                     AccountManager.KEY_AUTHTOKEN);
             if (token != null && !token.isEmpty() && mAccount != null) {
                 // Valid token
-                PreferenceManager.getDefaultSharedPreferences(mContext).edit()
-                        .putString(AuthHelper.KEY_ACCOUNT, mAccount.name).commit();
+                PrefUtils.setUsername(mContext, mAccount.name);
                 // Request sync
                 RssContentProvider.RequestSync(mContext);
             }

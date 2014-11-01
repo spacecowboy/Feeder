@@ -1,17 +1,12 @@
 package com.nononsenseapps.feeder.model.apis;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.http.Body;
-import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.POST;
-import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
@@ -19,7 +14,7 @@ import retrofit.http.Query;
  */
 public class BackendAPIClient {
     // TODO
-    private static final String API_URL =
+    public static final String DEFAULT_API_URL =
             //"https://northern-gasket-694.appspot.com/_ah/api/feeder/v1";
             //"http://192.168.1.17:5000";
             "https://feeder.nononsenseapps.com";
@@ -29,7 +24,7 @@ public class BackendAPIClient {
      */
     public static BackendAPI GetBackendAPI(final String accessToken) {
         // Create a very simple REST adapter, with oauth header
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(API_URL)
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(DEFAULT_API_URL)
                 .setRequestInterceptor(new RequestInterceptor() {
                     @Override
                     public void intercept(RequestFacade request) {

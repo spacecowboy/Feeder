@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="350dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Headline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="300dp"
+                android:padding="24dp"
+                android:text="Sync settings" />
+
+            <com.nononsenseapps.feeder.views.FloatLabelLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:layout_marginStart="24dp"
+                app:floatErrorTextAppearance="@style/TextAppearance.ErrorLabel"
+                app:floatLabelTextAppearance="@style/TextAppearance.FloatLabel">
+
+                <EditText
+                    android:id="@+id/server_text"
+                    style="@style/TextAppearance.InputField"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="@string/server_address"
+                    android:imeOptions="actionNext"
+                    android:inputType="textUri"
+                    android:maxLines="1"
+                    android:paddingBottom="8dp"
+                    android:paddingEnd="0dp"
+                    android:paddingStart="0dp"
+                    android:singleLine="true" />
+            </com.nononsenseapps.feeder.views.FloatLabelLayout>
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switch_google"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="24dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif"
+                android:text="Log in with Google"
+                android:textColor="@color/white_87" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/frame_userpass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.nononsenseapps.feeder.views.FloatLabelLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    app:floatErrorTextAppearance="@style/TextAppearance.ErrorLabel"
+                    app:floatLabelTextAppearance="@style/TextAppearance.FloatLabel">
+
+                    <EditText
+                        android:id="@+id/user_text"
+                        style="@style/TextAppearance.InputField"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:hint="@string/username"
+                        android:imeOptions="actionNext"
+                        android:inputType="textEmailAddress"
+                        android:maxLines="1"
+                        android:paddingBottom="8dp"
+                        android:paddingEnd="0dp"
+                        android:paddingStart="0dp"
+                        android:singleLine="true" />
+                </com.nononsenseapps.feeder.views.FloatLabelLayout>
+
+                <com.nononsenseapps.feeder.views.FloatLabelLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="24dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    app:floatErrorTextAppearance="@style/TextAppearance.ErrorLabel"
+                    app:floatLabelTextAppearance="@style/TextAppearance.FloatLabel">
+
+                    <EditText
+                        android:id="@+id/password_text"
+                        style="@style/TextAppearance.InputField"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginBottom="8dp"
+                        android:hint="Password"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:paddingBottom="8dp"
+                        android:paddingEnd="0dp"
+                        android:paddingStart="0dp"
+                        android:singleLine="true" />
+                </com.nononsenseapps.feeder.views.FloatLabelLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/account_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:layout_marginStart="24dp"
+                android:visibility="gone"
+                android:orientation="vertical"/>
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom">
+        <!-- divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentTop="true"
+            android:background="?android:attr/dividerHorizontal" />
+        <!--buttons-->
+        <TextView
+            android:id="@+id/button_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:gravity="center_vertical"
+            android:paddingEnd="48dp"
+            android:paddingStart="24dp"
+            android:text="@android:string/ok"
+            android:textColor="@color/accent"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/button_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toStartOf="@id/button_ok"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:gravity="center_vertical"
+            android:paddingEnd="24dp"
+            android:paddingStart="24dp"
+            android:text="@android:string/cancel"
+            android:textColor="@color/white_87"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
+</LinearLayout>

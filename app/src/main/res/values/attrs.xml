@@ -13,4 +13,9 @@
     <declare-styleable name="ThemeIOSched">
         <attr name="isFloatingWindow" format="boolean" />
     </declare-styleable>
+    <declare-styleable name="FloatLabelLayout">
+        <attr name="floatLabelTextAppearance" format="reference" />
+        <attr name="floatErrorTextAppearance" format="reference" />
+        <attr name="floatLabelSidePadding" format="reference|dimension" />
+    </declare-styleable>
 </resources>

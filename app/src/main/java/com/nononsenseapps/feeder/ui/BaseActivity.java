@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.model.TaggedFeedsAdapter;
@@ -181,13 +183,39 @@ public class BaseActivity extends ActionBarActivity
     }
 
     private void setupNavDrawer() {
-        // What nav drawer item should be selected?
+    // What nav drawer item should be selected?
         int selfItem = getSelfNavDrawerItem();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (mDrawerLayout == null) {
             return;
         }
+
+        // Set up account fields
+        TextView userText = (TextView) findViewById(R.id.user_text);
+        TextView serverText = (TextView) findViewById(R.id.server_text);
+
+        final String user = PrefUtils.getUsername(this, null);
+        final String server = PrefUtils.getServerUrl(this);
+
+        if (user != null) {
+            userText.setText(user);
+        }
+        if (server != null) {
+            serverText.setText(server);
+        }
+
+        // Listener for editor
+        View accountBox = findViewById(R.id.account_box);
+        accountBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Open server editor
+                DialogFragment dialog = new ServerEditorFragment();
+                dialog.show(getSupportFragmentManager(), "server_dialog");
+            }
+        });
+
         if (selfItem == NAVDRAWER_ITEM_INVALID) {
             // do not show a nav drawer
             View navDrawer = mDrawerLayout.findViewById(R.id.navdrawer);
