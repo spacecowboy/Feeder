@@ -1,3 +1,5 @@
+<a href="https://flattr.com/submit/auto?user_id=spacecowboy&url=https%3A%2F%2Fgithub.com%2Fspacecowboy%2FFeeder" target="_blank"><img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
+
 ### License
 
 **GPLv2**, for more info see *LICENSE*.
