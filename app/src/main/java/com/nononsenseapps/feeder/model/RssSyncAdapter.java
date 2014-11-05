@@ -17,6 +17,8 @@ import android.util.Log;
 import com.nononsenseapps.feeder.db.PendingNetworkSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
+import com.nononsenseapps.feeder.util.PasswordUtils;
+import com.nononsenseapps.feeder.util.PrefUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +103,7 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
                 .putExtra(SYNC_BROADCAST_IS_ACTIVE, true);
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(bcast);
 
-        final String token = AuthHelper.getAuthToken(getContext());
+        final String token = RssSyncHelper.getSuitableToken(getContext());
         if (token == null) {
             Log.e(TAG, "No token exists! Aborting sync...");
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast
@@ -109,7 +111,7 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             return;
         }
 
-        BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(token);
+        BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(PrefUtils.getServerUrl(getContext()), token);
 
         try {
             final ArrayList<ContentProviderOperation> operations =

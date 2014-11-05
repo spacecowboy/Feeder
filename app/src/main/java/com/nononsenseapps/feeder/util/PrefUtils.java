@@ -66,7 +66,10 @@ public class PrefUtils {
         return sp(context).getString(PREF_SERVER_URL, BackendAPIClient.DEFAULT_API_URL);
     }
 
-    public static void setServerUrl(final Context context, final String url) {
+    public static void setServerUrl(final Context context, String url) {
+        if (!url.contains("://")) {
+            url = "http://" + url;
+        }
         sp(context).edit().putString(PREF_SERVER_URL, url).apply();
     }
 
@@ -86,6 +89,7 @@ public class PrefUtils {
         return sp(context).getString(PREF_PASSWORD, def);
     }
 
+    // See PasswordUtils to store a hashed version of the password!
     public static void setPassword(final Context context, final String password) {
         sp(context).edit().putString(PREF_PASSWORD, password).apply();
     }

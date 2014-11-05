@@ -13,22 +13,21 @@ import retrofit.http.Query;
  * Client class for talking to the backend REST API.
  */
 public class BackendAPIClient {
-    // TODO
-    public static final String DEFAULT_API_URL =
-            //"https://northern-gasket-694.appspot.com/_ah/api/feeder/v1";
-            //"http://192.168.1.17:5000";
-            "https://feeder.nononsenseapps.com";
+    public static final String DEFAULT_API_URL = "https://feeder.nononsenseapps.com";
 
     /**
-     * @return a FeedAPI implementation.
+     * @param server        The server's address
+     * @param authorization Authorization header to use. Either "Bearer xxxxtokenxxxx" or
+     *                      "Basic xxxxBASE64xxusername:passwordxxx"
+     * @return a FeedAPI implementation
      */
-    public static BackendAPI GetBackendAPI(final String accessToken) {
+    public static BackendAPI GetBackendAPI(final String server, final String authorization) {
         // Create a very simple REST adapter, with oauth header
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(DEFAULT_API_URL)
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(server)
                 .setRequestInterceptor(new RequestInterceptor() {
                     @Override
                     public void intercept(RequestFacade request) {
-                        request.addHeader("Authorization", accessToken);
+                        request.addHeader("Authorization", authorization);
                     }
                 }).build();
         // Create an instance of the interface
@@ -48,18 +47,18 @@ public class BackendAPIClient {
         VoidResponse deleteFeed(@Body DeleteMessage deleteMessage);
     }
 
-  public static class FeedsResponse {
-    public List<Feed> feeds;
-    public List<Delete> deletes;
-  }
+    public static class FeedsResponse {
+        public List<Feed> feeds;
+        public List<Delete> deletes;
+    }
 
     public static class FeedMessage extends Feed {
         public String regid;
     }
 
-  public static class DeleteMessage {
-    public String link;
-  }
+    public static class DeleteMessage {
+        public String link;
+    }
 
     public static class FeedItem {
         public String title;
@@ -86,10 +85,11 @@ public class BackendAPIClient {
         public List<FeedItem> items;
     }
 
-  public static class Delete {
-    public String link;
-    public String timestamp;
-  }
+    public static class Delete {
+        public String link;
+        public String timestamp;
+    }
 
-    public static class VoidResponse {}
+    public static class VoidResponse {
+    }
 }

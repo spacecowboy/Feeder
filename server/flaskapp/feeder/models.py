@@ -11,14 +11,14 @@ from .database import db
 from datetime import datetime
 
 
-def get_user(email):
+def get_user(email, allow_creation=True):
     '''
     Return a valid database user, creating one first if necessary.
     '''
     # Try to find it first
     user = User.query.filter_by(email=email).first()
 
-    if user is None:
+    if user is None and allow_creation:
         # Add to database first
         user = User(email=email)
         db.session.add(user)
@@ -79,6 +79,7 @@ class User(db.Model):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     email = Column(String, nullable=False, unique=True)
+    passwordhash = Column(String)
     feeds = relationship('UserFeed', lazy='dynamic',
                          cascade='all, delete-orphan',
                          backref=backref('user'))

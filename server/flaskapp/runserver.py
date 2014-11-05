@@ -22,7 +22,23 @@ The arguments are as follows:
   -p - specify the listening port. Defaults to 5000.
 
 In production it might be sensible to run this with something like
-uwsgi behind nginx.
+uwsgi behind nginx. Note that any arguments specified will override
+duplicates in the configfile.
+
+You specify a configfile by setting the environment variable:
+
+    export FEEDER_CONFIG=/path/to/settings.py
+
+You can call the file whatever you like but it will be read like a
+python file. Example configuration would be:
+
+    # Example config
+    DEBUG = False
+    ## Use /// for relative paths and //// for absolute paths
+    SQLALCHEMY_DATABASE_URI = 'sqlite:////path/to/test.db'
+    FEEDER_ALLOW_GOOGLE = True
+    FEEDER_ALLOW_USERPASS = True
+
 '''
 from feeder import app
 
@@ -30,7 +46,10 @@ from feeder import app
 if __name__ == '__main__':
     import sys
 
+    # Put config/arguments here
     kw = {}
+
+    # If arguments are specified, they override config values
     args = sys.argv[1:]
     if '--help' in args:
         exit(__doc__)

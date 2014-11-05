@@ -1,1 +1,1 @@
-include ':app', ':deps:Simplistic-RSS'
+include ':app'

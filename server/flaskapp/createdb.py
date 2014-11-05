@@ -5,7 +5,9 @@ Edit the path in feeder/database.py to change
 where the database is created.
 
 By default it is:
-    /tmp/test.db.
+    ./feeder.db.
+
+where ./ refers to the location of the feeder module
 '''
 from feeder import db
 

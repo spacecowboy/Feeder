@@ -104,10 +104,8 @@ feeds_response = {
 }
 
 
-def print_errors(f):
-    '''Print errors in the wrapped function
-    re-raise them.'''
-
+def log_errors(f):
+    '''Log errors in the wrapped function and re-raise them.'''
     def wrapped_f(*args, **kwargs):
         try:
             return f(*args, **kwargs)
@@ -124,7 +122,7 @@ class Feeds(Resource):
     This class is the entire REST-interface for dealing with feeds.
     '''
 
-    @print_errors
+    @log_errors
     @marshal_with(feeds_response)
     @authorized
     def get(self, userid):
@@ -133,7 +131,6 @@ class Feeds(Resource):
 
         user = get_user(userid)
 
-        print("Get:", user)
         #Wrong
         # Query for feeds using lazy relationship
         q = user.feeds
@@ -168,7 +165,7 @@ class Feeds(Resource):
 
         return {"feeds": feeds, "deletes": deletes}
 
-    @print_errors
+    @log_errors
     @marshal_with(feed_fields)
     @authorized
     def post(self, userid):
@@ -211,7 +208,7 @@ class Feeds(Resource):
 
 
 class FeedsDeleter(Resource):
-    @print_errors
+    @log_errors
     @authorized
     def post(self, userid):
         '''Delete a feed'''
@@ -239,6 +236,17 @@ class FeedsDeleter(Resource):
 
         return None, 204
 
+
+class PingResponder(Resource):
+    '''
+    A method that allows the app to query if the server is alive.
+    '''
+    @log_errors
+    def get(self):
+        return {}, 200
+
+
 # Connect with API URLs
 api.add_resource(Feeds, '/feeds')
 api.add_resource(FeedsDeleter, '/feeds/delete')
+api.add_resource(PingResponder, '/ping')

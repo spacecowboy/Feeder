@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,8 +24,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
-import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.AuthHelper;
+import com.nononsenseapps.feeder.util.PasswordUtils;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.views.FloatLabelLayout;
 
@@ -71,7 +70,8 @@ public class ServerEditorFragment extends DialogFragment implements
         mUserText.setText(PrefUtils.getUsername(getActivity(), ""));
         mPassText = (TextView) root.findViewById(R.id.password_text);
         mPassLabel = ((FloatLabelLayout) mPassText.getParent());
-        mPassText.setText(PrefUtils.getPassword(getActivity(), ""));
+        // Do NOT fill in the user's hash. Might override stored password!
+        mPassText.setText("");
 
         mAccountList = (LinearLayout) root.findViewById(R.id.account_list);
         populateAccountList();
@@ -113,8 +113,11 @@ public class ServerEditorFragment extends DialogFragment implements
             }
         });
 
+        // TODO handle resizing the window
+
         return root;
     }
+
 
     private void onOkClicked() {
         // don't do shit unless fields are valid and filled in
@@ -130,7 +133,9 @@ public class ServerEditorFragment extends DialogFragment implements
             PrefUtils.setPassword(getActivity(), null);
         } else {
             PrefUtils.setUsername(getActivity(), mUserText.getText().toString());
-            PrefUtils.setPassword(getActivity(), mPassText.getText().toString());
+            // Actually store a salted-hashed version of the password
+            PrefUtils.setPassword(getActivity(),
+                    PasswordUtils.getSaltedHashedPassword(mPassText.getText().toString()));
         }
 
         // TODO clear database and request sync with new settings
@@ -140,7 +145,6 @@ public class ServerEditorFragment extends DialogFragment implements
     }
 
     /**
-     *
      * @return true if all visible fields are OK to save
      */
     private boolean validateFields() {
@@ -278,12 +282,10 @@ public class ServerEditorFragment extends DialogFragment implements
             }
         } catch (OperationCanceledException e) {
             // if the request was canceled for any reason
-        }
-        catch (AuthenticatorException e) {
+        } catch (AuthenticatorException e) {
             // if there was an error communicating with the authenticator or
             // if the authenticator returned an invalid response
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             // if the authenticator returned an error response that
             // indicates that it encountered an IOException while
             // communicating with the authentication server
