@@ -4,10 +4,8 @@
     <style name="DialogTheme" parent="AppThemeDialog" >
     </style>
     <style name="FeedsTheme" parent="AppTheme" >
-        <!--<item name="android:windowActionBarOverlay">true</item>-->
     </style>
     <style name="ReaderTheme" parent="AppTheme" >
-        <!--<item name="android:windowActionBarOverlay">true</item>-->
     </style>
     <style name="EditFeedTheme" parent="AppTheme" >
         <item name="android:windowActionBar">false</item>
@@ -23,6 +21,9 @@
     </style>
     <!-- Final application theme. -->
     <style name="AppTheme" parent="Theme.IOSched.Base">
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
+
         <item name="spbStyle">@style/SyncIndicatorStyle</item>
         <item name="cpbStyle">@style/FeedSearchProgressStyle</item>
     </style>
