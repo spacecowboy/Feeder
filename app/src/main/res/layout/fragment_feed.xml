@@ -6,7 +6,7 @@
              android:layout_height="match_parent"
              tools:context="com.nononsenseapps.feeder.ui.FeedActivity">
 
-    <android.support.v7.widget.RecyclerView
+    <com.nononsenseapps.feeder.views.FlingingRecyclerView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

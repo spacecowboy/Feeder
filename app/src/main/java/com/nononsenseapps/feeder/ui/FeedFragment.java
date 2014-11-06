@@ -39,6 +39,7 @@ import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
+import com.nononsenseapps.feeder.views.FlingingRecyclerView;
 import com.squareup.picasso.Picasso;
 
 import org.joda.time.DateTimeZone;
@@ -66,7 +67,7 @@ public class FeedFragment extends Fragment
     private static final String ONLY_UNREAD = FeedItemSQL.COL_UNREAD + " IS 1 ";
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
     private FeedAdapter mAdapter;
-    private RecyclerView mRecyclerView;
+    private FlingingRecyclerView mRecyclerView;
     private View mEmptyView;
     private View mEmptyAddFeed;
     private View mEmptyOpenFeeds;
@@ -82,8 +83,7 @@ public class FeedFragment extends Fragment
     }
 
     /**
-     * Returns a new instance of this fragment for the given section
-     * number.
+     * Returns a new instance of this fragment
      */
     public static FeedFragment newInstance(long id, String title, String url,
                                            String tag) {
@@ -132,7 +132,7 @@ public class FeedFragment extends Fragment
                              Bundle savedInstanceState) {
         View rootView =
                 inflater.inflate(R.layout.fragment_feed, container, false);
-        mRecyclerView = (RecyclerView) rootView.findViewById(android.R.id.list);
+        mRecyclerView = (FlingingRecyclerView) rootView.findViewById(android.R.id.list);
 
         // improve performance if you know that changes in content
         // do not change the size of the RecyclerView
@@ -207,6 +207,30 @@ public class FeedFragment extends Fragment
             }
         });
 
+        // Pause image loading when flinging
+        mRecyclerView.setOnFlingListener(new FlingingRecyclerView.OnFlingListener() {
+            @Override
+            public void flingStateChange(boolean flinging) {
+                if (flinging) {
+                    Picasso.with(getActivity()).pauseTag(FeedFragment.this);
+                } else {
+                    Picasso.with(getActivity()).resumeTag(FeedFragment.this);
+                }
+            }
+        });
+        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (RecyclerView.SCROLL_STATE_IDLE == newState ||
+                        RecyclerView.SCROLL_STATE_DRAGGING == newState) {
+                    Picasso.with(getActivity()).resumeTag(FeedFragment.this);
+                } else {
+                    Picasso.with(getActivity()).pauseTag(FeedFragment.this);
+                }
+            }
+        });
+
         return rootView;
     }
 
@@ -220,6 +244,8 @@ public class FeedFragment extends Fragment
 
     @Override
     public void onDetach() {
+        // cancel any pending image loading
+        Picasso.with(getActivity()).cancelTag(FeedFragment.this);
         super.onDetach();
     }
 
@@ -627,7 +653,9 @@ public class FeedFragment extends Fragment
                 int h = itemView.getHeight();
 
                 Picasso.with(getActivity()).load(rssItem.imageurl).resize(w, h).centerCrop().noFade()
+                        .tag(FeedFragment.this)
                         .into(imageView);
+
                 if (isGrid) {
                     textGroup.setBackground(bgProtection);
                 }
