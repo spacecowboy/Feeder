@@ -486,7 +486,7 @@ public class FeedFragment extends Fragment
                                 R.layout.padding_header_item, parent, false));
             } else {
                 // normal item
-                final int item_layout = R.layout.view_story;
+                final int item_layout = R.layout.list_story_item;
                 if (TabletUtils.isTablet(parent.getContext())) {
                     // TODO
                 } else {
@@ -564,7 +564,7 @@ public class FeedFragment extends Fragment
             }
             if (item.imageurl == null || item.imageurl.isEmpty()) {
                 holder.imageView.setVisibility(View.GONE);
-                holder.textGroup.setBackground(null);
+                //holder.textGroup.setBackground(null);
             } else {
                 // Take up width
                 holder.imageView.setVisibility(View.INVISIBLE);
@@ -582,7 +582,7 @@ public class FeedFragment extends Fragment
             public final TextView bodyTextView;
             public final TextView dateTextView;
             public final TextView authorTextView;
-            public final View textGroup;
+            //public final View textGroup;
             public final ImageView imageView;
 
             public FeedItemSQL rssItem;
@@ -590,12 +590,13 @@ public class FeedFragment extends Fragment
             public ViewHolder(View v) {
                 super(v);
                 v.setOnClickListener(this);
-                textGroup = v.findViewById(R.id.story_text);
-                titleTextView = (TextView) v.findViewById(R.id.story_title);
+                //textGroup = v.findViewById(R.id.story_text);
+                titleTextView = (TextView) v.findViewById(R.id.story_snippet);
                 bodyTextView = (TextView) v.findViewById(R.id.story_body);
                 dateTextView = (TextView) v.findViewById(R.id.story_date);
                 authorTextView = (TextView) v.findViewById(R.id.story_author);
                 imageView = (ImageView) v.findViewById(R.id.story_image);
+                Log.d("JHEIGHT", "dateheight:" + dateTextView.getHeight());
             }
 
             /**
@@ -656,9 +657,9 @@ public class FeedFragment extends Fragment
                         .tag(FeedFragment.this)
                         .into(imageView);
 
-                if (isGrid) {
-                    textGroup.setBackground(bgProtection);
-                }
+//                if (isGrid) {
+//                    textGroup.setBackground(bgProtection);
+//                }
 
                 // Remove as listener
                 itemView.getViewTreeObserver().removeOnPreDrawListener(this);

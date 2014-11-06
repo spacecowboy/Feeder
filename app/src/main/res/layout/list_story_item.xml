@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.nononsenseapps.feeder.views.ListStoryItem xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/story"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:selectableItemBackground"
+    android:minHeight="?android:listPreferredItemHeight"
+    android:paddingStart="@dimen/keyline_1"
+    tools:ignore="RtlSymmetry" />
