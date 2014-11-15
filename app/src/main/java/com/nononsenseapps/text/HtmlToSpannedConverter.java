@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2014 Jonas Kalderstam.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.nononsenseapps.text;
 
 import android.content.Context;
@@ -46,6 +63,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
 
     protected static final float[] HEADER_SIZES =
             {1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,};
+    private final Context mContext;
     protected int mAccentColor;
     protected int mQuoteGapWidth;
     protected int mQuoteStripeWidth;
@@ -55,6 +73,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
     protected SpannableStringBuilder mSpannableStringBuilder;
 
     public HtmlToSpannedConverter(String source, Parser parser, Context context) {
+        mContext = context;
         mSource = source;
         mSpannableStringBuilder = new SpannableStringBuilder();
         mReader = parser;
@@ -238,8 +257,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
                             Attributes attributes) {
         // Override me
         String src = attributes.getValue("", "src");
-        Drawable d = Resources.getSystem().
-                getDrawable(R.drawable.unknown_image);
+        Drawable d = mContext.getResources().getDrawable(R.drawable.unknown_image);
         d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
 
 
@@ -248,6 +266,8 @@ public class HtmlToSpannedConverter implements ContentHandler {
 
         text.setSpan(new ImageSpan(d, src), len, text.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        // Add a line break
+        text.append("\n");
     }
 
     protected void startUl(final SpannableStringBuilder text,

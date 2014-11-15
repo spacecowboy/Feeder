@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2014 Jonas Kalderstam.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.nononsenseapps.feeder.ui;
 
 
@@ -26,6 +43,7 @@ import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.ImageTextLoader;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
+import com.nononsenseapps.text.Html;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -62,9 +80,11 @@ public class ReaderFragment extends Fragment
     private TextView mAuthorTextView;
     private TextView mFeedTitleTextView;
 
+    private final Html htmlformatter;
+
 
     public ReaderFragment() {
-        // Required empty public constructor
+        htmlformatter = new Html();
     }
 
     /**
@@ -164,7 +184,7 @@ public class ReaderFragment extends Fragment
             mTitleTextView.setText("Nothing to display!");
         } else {
             mTitleTextView
-                    .setText(android.text.Html.fromHtml(mRssItem.title));
+                    .setText(htmlformatter.fromHtml(mRssItem.title, getActivity()));
         }
         if (mRssItem.description == null) {
             mBodyTextView.setText("Nothing to display!");
@@ -172,7 +192,7 @@ public class ReaderFragment extends Fragment
             Log.d("JONAS", "Text is:\n" + mRssItem.description);
             // Set without images as a place holder
             mBodyTextView.setText(
-                    android.text.Html.fromHtml(mRssItem.description));
+                    htmlformatter.fromHtml(mRssItem.description, getActivity()));
         }
 
         if (mRssItem.feedtitle == null) {

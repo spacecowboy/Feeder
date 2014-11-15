@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2014 Jonas Kalderstam.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.nononsenseapps.feeder.model;
 
 import android.content.Context;
@@ -99,20 +116,20 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
             final Bitmap b;
             if (shrunk) {
                 Log.d("JONAS2", "Resizing with picasso");
-                b = p.load(source).resize(w, h).get();
+                b = p.load(source).resize(w, h).tag(ImageTextLoader.this).get();
             } else if (hasSize) {
                 Log.d("JONAS", "Image is small enough, getting");
                 // No resize necessary since we know it is "small"
-                b = p.load(source).get();
+                b = p.load(source).tag(ImageTextLoader.this).get();
             } else if (hasPercentSize) {
                 Log.d("JONAS2", "Percentsize, " +
                         "scaling for max");
                 b = p.load(source).resize(maxSize.x,
-                        maxSize.y).centerInside().get();
+                        maxSize.y).centerInside().tag(ImageTextLoader.this).get();
             } else {
                 Log.d("JONAS2", "no size info, " +
                         "using intrinsic");
-                b = p.load(source).get();
+                b = p.load(source).tag(ImageTextLoader.this).get();
             }
 
             if (w == -1) {
@@ -151,8 +168,7 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
      */
     Point scaleImage(int w, int h) {
         // Which is out of scale the most?
-        final float xratio = ((float) w) / ((float) maxSize.x);
-        float ratio = xratio;
+        float ratio = ((float) w) / ((float) maxSize.x);
         // Calculate new size. Maintains aspect ratio.
         int newWidth = (int) ((float) w / ratio);
         int newHeight = (int) ((float) h / ratio);
@@ -184,7 +200,7 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
 
         int w1, h1;
         try {
-            final Bitmap b = p.load(video.imageurl).get();
+            final Bitmap b = p.load(video.imageurl).tag(ImageTextLoader.this).get();
             final Point newSize = scaleImage(b.getWidth(), b.getHeight());
             w1 = newSize.x;
             h1 = newSize.y;
@@ -248,6 +264,7 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
     @Override
     protected void onStopLoading() {
         // Attempt to cancel the current load task if possible.
+        p.cancelTag(ImageTextLoader.this);
         cancelLoad();
     }
 
