@@ -103,7 +103,7 @@ public class ListStoryItem extends FrameLayout {
 
         // Image last
         if (mStoryImage.getVisibility() != View.GONE) {
-            layoutView(mStoryImage, getRight() - imgWidth, 0, imgWidth, currentTop);
+          layoutView(mStoryImage, getRight() - imgWidth, 0, imgWidth, getMeasuredHeightWithMargins(mStoryImage));
         }
     }
 
@@ -113,6 +113,7 @@ public class ListStoryItem extends FrameLayout {
         int widthUsed = getPaddingLeft();
         int heightUsed = 0;
 
+        // TODO could setPaddingRight to 0
         if (mStoryImage.getVisibility() != View.GONE) {
             widthUsed += imgWidth;
         } else {
@@ -128,23 +129,26 @@ public class ListStoryItem extends FrameLayout {
                 widthMeasureSpec, widthUsed,
                 heightMeasureSpec, heightUsed);
         widthUsed += getMeasuredWidthWithMargins(mStoryDate);
-        heightUsed += getMeasuredHeightWithMargins(mStoryDate);
-
+        // They are on the same height
         measureChildWithMargins(mStoryAuthor,
                 widthMeasureSpec, widthUsed,
                 heightMeasureSpec, heightUsed);
 
-        if (mStoryImage.getVisibility() != View.GONE) {
-            measureChildWithMargins(mStoryImage,
-                    widthMeasureSpec, getPaddingLeft(),
-                    heightMeasureSpec, heightUsed);
-        }
+        // Now update height
+        heightUsed += getMeasuredHeightWithMargins(mStoryDate);
 
         // Respect minimum size
-        int heightSize = heightUsed + getPaddingBottom() + getPaddingTop();
+        int heightSize = heightUsed;
         if (heightSize < getMinimumHeight()) {
             heightSize = getMinimumHeight();
         }
+
+        if (mStoryImage.getVisibility() != View.GONE) {
+            measureChildWithMargins(mStoryImage,
+                    widthMeasureSpec, getPaddingLeft(),
+                    heightMeasureSpec, 0);
+        }
+
         setMeasuredDimension(widthSize, heightSize);
     }
 }
