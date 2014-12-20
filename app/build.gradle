@@ -56,7 +56,7 @@ dependencies {
     compile 'joda-time:joda-time:2.3'
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'com.squareup.retrofit:retrofit:1.6.1'
-    compile 'com.android.support:support-v4:21.0.0'
+    compile 'com.android.support:support-v4:21.0.2'
     compile "com.android.support:appcompat-v7:21.0.+"
 
     // For nice looking progress bars
