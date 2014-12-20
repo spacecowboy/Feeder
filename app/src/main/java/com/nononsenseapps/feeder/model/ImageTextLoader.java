@@ -181,7 +181,7 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
      */
     @Override
     public Spanned loadInBackground() {
-        Log.d("JONASFULL", mText);
+//        Log.d("JONASFULL", mText);
 //        } catch (XmlPullParserException e) {
 //            Log.e("JONAS2", "" + e.getMessage());
 //        } catch (IOException e) {

@@ -129,6 +129,7 @@ public class ReaderFragment extends Fragment
 
     public static FeedItemSQL RssItemFromBundle(Bundle bundle) {
         FeedItemSQL rssItem = new FeedItemSQL();
+        rssItem.id = bundle.getLong(ARG_ID, -1);
         rssItem.title = bundle.getString(ARG_TITLE);
         rssItem.description = (bundle.getString(ARG_DESCRIPTION));
         rssItem.link = (bundle.getString(ARG_LINK));
@@ -152,12 +153,11 @@ public class ReaderFragment extends Fragment
             mRssItem = RssItemFromBundle(getArguments());
         }
 
-        setHasOptionsMenu(true);
-
         if (_id > 0) {
-            // Mark as read
             RssContentProvider.MarkItemAsRead(getActivity(), _id);
         }
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class ReaderFragment extends Fragment
         if (mRssItem.description == null) {
             mBodyTextView.setText("Nothing to display!");
         } else {
-            Log.d("JONAS", "Text is:\n" + mRssItem.description);
+            //Log.d("JONAS", "Text is:\n" + mRssItem.description);
             // Set without images as a place holder
             mBodyTextView.setText(
                     htmlformatter.fromHtml(mRssItem.description, getActivity()));
