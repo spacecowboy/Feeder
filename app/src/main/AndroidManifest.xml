@@ -3,6 +3,8 @@
     package="com.nononsenseapps.feeder" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Writing sync files to SD card -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <!-- For getting Google account -->
     <!--<uses-permission android:name="android.permission.GET_ACCOUNTS" />-->
     <!-- For getting Google account auth token -->
