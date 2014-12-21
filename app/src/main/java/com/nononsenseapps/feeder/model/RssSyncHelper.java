@@ -141,22 +141,23 @@ public class RssSyncHelper extends IntentService {
     }
 
     /**
-     * Get a suitable token depending on the user specified google login or user/password
+     * Get a suitable token depending on the user specified user/password
      *
      * @param context
-     * @return
+     * @return non-null if OK, null on error
      */
     public static String getSuitableToken(final Context context) {
         String token;
-        if (PrefUtils.getUseGoogleAccount(context)) {
-            token = AuthHelper.getAuthToken(context);
-        } else {
+        if (PrefUtils.getUseAccount(context)) {
             try {
                 token = PasswordUtils.getBase64BasicHeader(PrefUtils.getUsername(context, null),
                         PrefUtils.getPassword(context, null));
             } catch (NullPointerException e) {
                 token = null;
             }
+        } else {
+            // No account needed
+            token = "";
         }
         return token;
     }
@@ -220,8 +221,8 @@ public class RssSyncHelper extends IntentService {
         LocalBroadcastManager.getInstance(context).sendBroadcast(bcast);
 
         final String token = RssSyncHelper.getSuitableToken(context);
+        // Token is non-null but empty if no account is needed
         if (token == null) {
-            // TODO allow no account
             Log.e(TAG, "No token exists! Aborting sync...");
             LocalBroadcastManager.getInstance(context).sendBroadcast
                     (bcast.putExtra(RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE, false));

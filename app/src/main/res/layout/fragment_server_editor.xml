@@ -47,7 +47,7 @@
             </com.nononsenseapps.feeder.views.FloatLabelLayout>
 
             <android.support.v7.widget.SwitchCompat
-                android:id="@+id/switch_google"
+                android:id="@+id/switch_account"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:layout_gravity="end"
@@ -56,7 +56,7 @@
                 android:layout_marginTop="8dp"
                 android:textSize="16sp"
                 android:fontFamily="sans-serif"
-                android:text="Log in with Google"
+                android:text="Requires account"
                 android:textColor="@color/white_87" />
 
             <FrameLayout
@@ -117,14 +117,6 @@
                         android:singleLine="true" />
                 </com.nononsenseapps.feeder.views.FloatLabelLayout>
             </LinearLayout>
-            <LinearLayout
-                android:id="@+id/account_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="24dp"
-                android:layout_marginStart="24dp"
-                android:visibility="gone"
-                android:orientation="vertical"/>
             </FrameLayout>
         </LinearLayout>
     </ScrollView>

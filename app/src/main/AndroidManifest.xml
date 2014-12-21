@@ -4,9 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- For getting Google account -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!--<uses-permission android:name="android.permission.GET_ACCOUNTS" />-->
     <!-- For getting Google account auth token -->
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <!--<uses-permission android:name="android.permission.USE_CREDENTIALS" />-->
     <!-- For syncing -->
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
@@ -78,10 +78,11 @@
             android:name="com.nononsenseapps.feeder.model.RssSyncHelper"
             android:exported="false">
         </service>
+        <!-- todo later -->
         <service
             android:name="com.nononsenseapps.feeder.model.RssSyncAdapterService"
-            android:enabled="true"
-            android:exported="true" >
+            android:enabled="false"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
