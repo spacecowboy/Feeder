@@ -525,8 +525,13 @@ public class FeedFragment extends Fragment
             if (holder.rssItem.description == null ||
                     holder.rssItem.description.isEmpty()) {
                 // append to title field
-                titleText.append(" \u2014 " +
-                        holder.rssItem.getDomain());
+                if (holder.rssItem.enclosurelink != null) {
+                    titleText.append(" \u2014 " +
+                            holder.rssItem.getEnclosureFilename());
+                } else {
+                    titleText.append(" \u2014 " +
+                            holder.rssItem.getDomain());
+                }
                 titleText.setSpan(new ForegroundColorSpan(linkColor),
                         item.feedtitle.length() + 3, titleText.length(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
