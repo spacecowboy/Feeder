@@ -147,6 +147,22 @@ public class FeedItemSQL {
         return domain;
     }
 
+    /**
+     *
+     * @return Last bit of a URL. Example, bob/sam/floff will return floff
+     */
+    public String getEnclosureFilename() {
+        if (enclosurelink == null)
+            return null;
+
+        String[] parts = enclosurelink.split("/");
+        if (parts.length == 0)
+            return null;
+
+        // Return last bit
+        return parts[parts.length - 1];
+    }
+
     public boolean isUnread() {
         return unread == 1;
     }

@@ -261,6 +261,12 @@ public class ReaderFragment extends Fragment
 
         // Show/Hide enclosure
         menu.findItem(R.id.action_open_enclosure).setVisible(mRssItem.enclosurelink != null);
+        // Add filename to tooltip
+        if (mRssItem.enclosurelink != null) {
+            String filename = mRssItem.getEnclosureFilename();
+            if (filename != null)
+                menu.findItem(R.id.action_open_enclosure).setTitle(filename);
+        }
 
         // Don't forget super call here
         super.onCreateOptionsMenu(menu, inflater);
