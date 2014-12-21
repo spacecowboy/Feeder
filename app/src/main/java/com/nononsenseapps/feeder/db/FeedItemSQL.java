@@ -44,6 +44,7 @@ public class FeedItemSQL {
     public static final String COL_AUTHOR = "author";
     public static final String COL_PUBDATE = "pubdate";
     public static final String COL_UNREAD = "unread";
+    public static final String COL_NOTIFIED = "notified";
     // These fields corresponds to columns in Feed table
     public static final String COL_FEED = "feed";
     public static final String COL_TAG = "tag";
@@ -55,7 +56,8 @@ public class FeedItemSQL {
                     COL_LINK, COL_AUTHOR,
                     COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG,
                     COL_ENCLOSURELINK,
-                    COL_FEEDTITLE};
+                    COL_FEEDTITLE,
+            COL_NOTIFIED};
 
     /*
      * The SQL code that creates a Table for storing Persons in.
@@ -75,6 +77,7 @@ public class FeedItemSQL {
                     COL_AUTHOR + " TEXT," +
                     COL_PUBDATE + " TEXT," +
                     COL_UNREAD + " INTEGER NOT NULL DEFAULT 1," +
+                    COL_NOTIFIED + " INTEGER NOT NULL DEFAULT 0," +
                     COL_FEED + " INTEGER NOT NULL," +
                     COL_TAG + " TEXT NOT NULL," +
                     COL_FEEDTITLE + " TEXT NOT NULL," +
@@ -115,6 +118,7 @@ public class FeedItemSQL {
     public String link = null;
     public String tag = null;
     public String feedtitle = null;
+    public int notified = 0;
 
     // Convenience field for list views. Only converted first time
     private String domain;
@@ -199,6 +203,7 @@ public class FeedItemSQL {
         this.tag = cursor.getString(11);
         this.enclosurelink = cursor.getString(12);
         this.feedtitle = cursor.getString(13);
+        this.notified = cursor.getInt(14);
     }
 
     public DateTime getPubDate() {
@@ -262,6 +267,7 @@ public class FeedItemSQL {
         values.put(COL_FEED, feed_id);
         values.put(COL_UNREAD, unread);
         values.put(COL_FEEDTITLE, feedtitle);
+        values.put(COL_NOTIFIED, notified);
 
         Util.PutNullable(values, COL_IMAGEURL, imageurl);
         Util.PutNullable(values, COL_LINK, link);

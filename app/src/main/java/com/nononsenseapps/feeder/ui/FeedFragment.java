@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -78,6 +79,7 @@ public class FeedFragment extends Fragment
     private String tag = "";
     private LinearLayoutManager mLayoutManager;
     private View mCheckAllButton;
+    private int notify = 0;
 
     public FeedFragment() {
     }
@@ -264,6 +266,7 @@ public class FeedFragment extends Fragment
             menu.findItem(R.id.action_edit_feed).setVisible(false);
             menu.findItem(R.id.action_delete_feed).setVisible(false);
             menu.findItem(R.id.action_add_templated).setVisible(false);
+            menu.findItem(R.id.action_toggle_notifications).setVisible(false);
         }
 
         // Set toggleable state
@@ -320,6 +323,27 @@ public class FeedFragment extends Fragment
             RssSyncHelper.deleteFeedAsync(getActivity(), url);
             // Tell activity to open another fragment
             ((FeedActivity) getActivity()).loadFirstFeedInDB(true);
+            return true;
+        } else if (id == R.id.action_toggle_notifications) {
+            // TODO, entire tag?
+            if (this.id > 0) {
+                ContentValues values = new ContentValues();
+                if (notify == 0) {
+                    // First mark all existing as notified so we don't spam
+                    values.put(FeedItemSQL.COL_NOTIFIED, 1);
+                    getActivity().getContentResolver()
+                            .update(FeedItemSQL.URI_FEED_ITEMS, values,
+                                    FeedItemSQL.COL_FEED + " IS ?",
+                                    Util.LongsToStringArray(this.id));
+                }
+                // Now toggle notifications
+                values.clear();
+                values.put(FeedSQL.COL_NOTIFY, 1 - notify);
+                getActivity().getContentResolver()
+                        .update(FeedSQL.URI_FEEDS, values,
+                                Util.WHEREIDIS,
+                                Util.LongsToStringArray(this.id));
+            }
             return true;
         }
 //        else if (id == R.id.action_mark_as_read) {
@@ -409,6 +433,7 @@ public class FeedFragment extends Fragment
                 FeedSQL feed = new FeedSQL(cursor);
                 this.title = feed.title;
                 this.url = feed.url;
+                this.notify = feed.notify;
 
                 ((BaseActivity) getActivity()).getSupportActionBar().setTitle(title);
             }

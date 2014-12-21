@@ -36,11 +36,12 @@ public class FeedSQL {
     public static final String COL_URL = "url";
     public static final String COL_TAG = "tag";
     public static final String COL_TIMESTAMP = "timestamp";
+    public static final String COL_NOTIFY = "notify";
     // Used on count view
     public static final String COL_UNREADCOUNT = "unreadcount";
     // For database projection so order is consistent
     public static final String[] FIELDS = {COL_ID, COL_TITLE, COL_URL,
-            COL_TAG, COL_TIMESTAMP};
+            COL_TAG, COL_TIMESTAMP, COL_NOTIFY};
     public static final String[] FIELDS_VIEWCOUNT = {COL_ID, COL_TITLE,
             COL_URL, COL_TAG, COL_TIMESTAMP, COL_UNREADCOUNT};
     public static final String[] FIELDS_TAGSWITHCOUNT = {COL_ID, COL_TAG,
@@ -57,6 +58,7 @@ public class FeedSQL {
                     + COL_URL + " TEXT NOT NULL,"
                     + COL_TAG + " TEXT NOT NULL DEFAULT '',"
                     + COL_TIMESTAMP + " TEXT,"
+                    + COL_NOTIFY + " INTEGER NOT NULL DEFAULT 0,"
                     // Unique constraint
                     + " UNIQUE(" + COL_URL +") ON CONFLICT REPLACE"
                     + ")";
@@ -89,6 +91,7 @@ public class FeedSQL {
     public String url = null;
     public String tag = null;
     public String timestamp = null;
+    public int notify = 0;
     /**
      * No need to do anything, fields are already set to default values above
      */
@@ -105,6 +108,7 @@ public class FeedSQL {
         this.url = cursor.getString(2);
         this.tag = cursor.getString(3);
         this.timestamp = cursor.getString(4);
+        this.notify = cursor.getInt(5);
     }
 
     public static void addMatcherUris(UriMatcher sURIMatcher) {
@@ -130,6 +134,7 @@ public class FeedSQL {
         if (tag == null)
             tag = "";
         values.put(COL_TAG, tag);
+        values.put(COL_NOTIFY, notify);
         if (timestamp == null)
             values.putNull(COL_TIMESTAMP);
         else
