@@ -32,9 +32,8 @@ public class ReaderActivity extends BaseActivity {
         intent.putExtra(ReaderFragment.ARG_ID, rssItem.id);
         intent.putExtra(ReaderFragment.ARG_TITLE, rssItem.title);
         intent.putExtra(ReaderFragment.ARG_DESCRIPTION, rssItem.description);
-        intent.putExtra(ReaderFragment.ARG_LINK, rssItem.enclosurelink !=
-                                                 null ? rssItem.enclosurelink
-                                                      : rssItem.link);
+        intent.putExtra(ReaderFragment.ARG_LINK, rssItem.link);
+        intent.putExtra(ReaderFragment.ARG_ENCLOSURE, rssItem.enclosurelink);
         intent.putExtra(ReaderFragment.ARG_IMAGEURL, rssItem.imageurl);
         intent.putExtra(ReaderFragment.ARG_DATE, rssItem.getPubDateString());
         intent.putExtra(ReaderFragment.ARG_AUTHOR, rssItem.author);

@@ -5,6 +5,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.ReaderActivity">
     <item
+        android:id="@+id/action_open_enclosure"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_av_play_circle_outline"
+        android:title="Play enclosed media" />
+    <item
         android:id="@+id/action_open_in_browser"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_location_web_site"

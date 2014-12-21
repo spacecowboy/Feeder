@@ -61,6 +61,7 @@ public class ReaderFragment extends Fragment
     public static final String ARG_TITLE = "title";
     public static final String ARG_DESCRIPTION = "body";
     public static final String ARG_LINK = "link";
+    public static final String ARG_ENCLOSURE = "enclosure";
     public static final String ARG_IMAGEURL = "imageurl";
     public static final String ARG_ID = "dbid";
     public static final String ARG_FEEDTITLE = "feedtitle";
@@ -120,6 +121,7 @@ public class ReaderFragment extends Fragment
         bundle.putString(ARG_TITLE, rssItem.title);
         bundle.putString(ARG_DESCRIPTION, rssItem.description);
         bundle.putString(ARG_LINK, rssItem.link);
+        bundle.putString(ARG_ENCLOSURE, rssItem.enclosurelink);
         bundle.putString(ARG_IMAGEURL, rssItem.imageurl);
         bundle.putString(ARG_FEEDTITLE, rssItem.feedtitle);
         bundle.putString(ARG_AUTHOR, rssItem.author);
@@ -133,6 +135,7 @@ public class ReaderFragment extends Fragment
         rssItem.title = bundle.getString(ARG_TITLE);
         rssItem.description = (bundle.getString(ARG_DESCRIPTION));
         rssItem.link = (bundle.getString(ARG_LINK));
+        rssItem.enclosurelink = (bundle.getString(ARG_ENCLOSURE));
         rssItem.imageurl = (bundle.getString(ARG_IMAGEURL));
         rssItem.author = (bundle.getString(ARG_AUTHOR));
         rssItem.setPubDate(bundle.getString(ARG_DATE));
@@ -256,6 +259,9 @@ public class ReaderFragment extends Fragment
         shareIntent.putExtra(Intent.EXTRA_TEXT, mRssItem.link);
         shareActionProvider.setShareIntent(shareIntent);
 
+        // Show/Hide enclosure
+        menu.findItem(R.id.action_open_enclosure).setVisible(mRssItem.enclosurelink != null);
+
         // Don't forget super call here
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -267,6 +273,11 @@ public class ReaderFragment extends Fragment
             // Open in browser
             startActivity(new Intent(Intent.ACTION_VIEW,
                     Uri.parse(mRssItem.link)));
+            return true;
+        } else if (id == R.id.action_open_enclosure) {
+            // Open enclosure link
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse(mRssItem.enclosurelink)));
             return true;
         } else {
             return super.onOptionsItemSelected(menuItem);
