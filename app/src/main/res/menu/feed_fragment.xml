@@ -4,19 +4,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Overriding these values in fragment -->
-    <item android:id="@+id/action_only_unread"
-          android:checkable="true"
-          android:title="@string/show_all_items"
+    <item
+        android:id="@+id/action_only_unread"
+        android:checkable="true"
+        android:checked="true"
         android:icon="@drawable/ic_action_visibility"
-          android:checked="true"
         android:orderInCategory="1"
-          app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_edit_feed"
+        android:title="@string/show_all_items"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_edit_feed"
         android:icon="@drawable/ic_action_edit"
         android:title="@string/edit_feed"
         app:showAsAction="never" />
-    <item android:id="@+id/action_delete_feed"
+    <item
+        android:id="@+id/action_add_templated"
+        android:icon="@drawable/ic_action_edit"
+        android:title="New based on this"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_delete_feed"
         android:icon="@drawable/ic_action_delete"
-          android:title="@string/delete_feed"
-          app:showAsAction="never" />
+        android:title="@string/delete_feed"
+        app:showAsAction="never" />
 </menu>

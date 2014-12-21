@@ -18,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -35,9 +34,9 @@ import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.Util;
+import com.nononsenseapps.feeder.model.RssSearchLoader;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.model.apis.GoogleFeedAPIClient;
-import com.nononsenseapps.feeder.model.RssSearchLoader;
 import com.nononsenseapps.feeder.views.FloatLabelLayout;
 
 import java.util.List;
@@ -49,6 +48,7 @@ public class EditFeedActivity extends Activity
     public static final String _ID = "_id";
     public static final String TITLE = "title";
     public static final String TAG = "tag";
+    public static final String TEMPLATE = "template";
     private static final int RSSFINDER = 1;
     private static final String SEARCHQUERY = "searchquery";
     private static final int LOADER_TAG_SUGGESTIONS = 1;
@@ -99,8 +99,8 @@ public class EditFeedActivity extends Activity
                 .setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(final AdapterView<?> parent,
-                            final View view, final int position,
-                            final long id) {
+                                            final View view, final int position,
+                                            final long id) {
                         GoogleFeedAPIClient.Entry entry =
                                 mResultAdapter.getItem(position);
                         useEntry(entry.title, entry.url);
@@ -111,7 +111,7 @@ public class EditFeedActivity extends Activity
                 new TextView.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(final TextView v,
-                            final int actionId, final KeyEvent event) {
+                                                  final int actionId, final KeyEvent event) {
                         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                             // Hide keyboard
                             View f = getCurrentFocus();
@@ -180,14 +180,22 @@ public class EditFeedActivity extends Activity
             mShouldFinishBack = i.getBooleanExtra(SHOULD_FINISH_BACK, false);
             // Existing id
             id = i.getLongExtra(_ID, -1);
+            // Edit like existing, but it's really new
+            final boolean template = i.getBooleanExtra(TEMPLATE, false);
 
-            // Existing item, do not allow URL to be edited
-            if (id > 0) {
+            // Existing item
+            if (id > 0 || template) {
                 mSearchFrame.setVisibility(View.GONE);
                 mDetailsFrame.setVisibility(View.VISIBLE);
-                // Focus on tag
-                mTextTag.requestFocus();
-                addButton.setText(getString(R.string.save));
+                if (id > 0) {
+                    // Don't allow editing url
+                    ((FloatLabelLayout) mTextUrl.getParent()).setVisibility(View.GONE);
+                    // Focus on tag
+                    mTextTag.requestFocus();
+                    addButton.setText(getString(R.string.save));
+                } else {
+                    mTextUrl.requestFocus();
+                }
             } else {
                 mSearchFrame.setVisibility(View.VISIBLE);
                 mDetailsFrame.setVisibility(View.GONE);
@@ -226,32 +234,32 @@ public class EditFeedActivity extends Activity
         // Create a loader manager
         final LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks =
                 new LoaderManager.LoaderCallbacks<Cursor>() {
-            @Override
-            public Loader<Cursor> onCreateLoader(final int id,
-                    final Bundle args) {
-                String filter = null;
-                if (args != null && args.containsKey(TAGSFILTER)) {
-                    filter = FeedSQL.COL_TAG + " LIKE '" + args
-                            .getCharSequence(TAGSFILTER, "") + "%'";
-                }
-                return new CursorLoader(EditFeedActivity.this,
-                        FeedSQL.URI_TAGSWITHCOUNTS,
-                        Util.ToStringArray(FeedSQL.COL_ID,
-                                FeedSQL.COL_TAG), filter, null,
-                        Util.SortAlphabeticNoCase(FeedSQL.COL_TAG));
-            }
+                    @Override
+                    public Loader<Cursor> onCreateLoader(final int id,
+                                                         final Bundle args) {
+                        String filter = null;
+                        if (args != null && args.containsKey(TAGSFILTER)) {
+                            filter = FeedSQL.COL_TAG + " LIKE '" + args
+                                    .getCharSequence(TAGSFILTER, "") + "%'";
+                        }
+                        return new CursorLoader(EditFeedActivity.this,
+                                FeedSQL.URI_TAGSWITHCOUNTS,
+                                Util.ToStringArray(FeedSQL.COL_ID,
+                                        FeedSQL.COL_TAG), filter, null,
+                                Util.SortAlphabeticNoCase(FeedSQL.COL_TAG));
+                    }
 
-            @Override
-            public void onLoadFinished(final Loader<Cursor> loader,
-                    final Cursor data) {
-                tagsAdapter.swapCursor(data);
-            }
+                    @Override
+                    public void onLoadFinished(final Loader<Cursor> loader,
+                                               final Cursor data) {
+                        tagsAdapter.swapCursor(data);
+                    }
 
-            @Override
-            public void onLoaderReset(final Loader<Cursor> loader) {
-                tagsAdapter.swapCursor(null);
-            }
-        };
+                    @Override
+                    public void onLoaderReset(final Loader<Cursor> loader) {
+                        tagsAdapter.swapCursor(null);
+                    }
+                };
 
         // Tell adapter how to return result
         tagsAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
@@ -293,8 +301,8 @@ public class EditFeedActivity extends Activity
         Resources.Theme theme = getTheme();
         TypedValue floatingWindowFlag = new TypedValue();
         if (theme == null ||
-            !theme.resolveAttribute(R.attr.isFloatingWindow, floatingWindowFlag,
-                    true)) {
+                !theme.resolveAttribute(R.attr.isFloatingWindow, floatingWindowFlag,
+                        true)) {
             // isFloatingWindow flag is not defined in theme
             return false;
         }
@@ -371,7 +379,7 @@ public class EditFeedActivity extends Activity
      */
     @Override
     public Loader<GoogleFeedAPIClient.FindResponse> onCreateLoader(final int id,
-            final Bundle args) {
+                                                                   final Bundle args) {
         mListResults.setVisibility(View.GONE);
         mEmptyText.setVisibility(View.GONE);
         mLoadingProgress.setVisibility(View.VISIBLE);
@@ -380,7 +388,7 @@ public class EditFeedActivity extends Activity
 
     @Override
     public void onLoadFinished(final Loader<GoogleFeedAPIClient.FindResponse> loader,
-            final GoogleFeedAPIClient.FindResponse data) {
+                               final GoogleFeedAPIClient.FindResponse data) {
         mEmptyText.setText(R.string.no_feeds_found);
         mLoadingProgress.setVisibility(View.GONE);
         if (data.responseData.feed != null) {
@@ -503,7 +511,7 @@ public class EditFeedActivity extends Activity
          */
         @Override
         public View getView(final int position, final View convertView,
-                final ViewGroup parent) {
+                            final ViewGroup parent) {
 
             View v = convertView;
             if (v == null) {

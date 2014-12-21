@@ -263,6 +263,7 @@ public class FeedFragment extends Fragment
         if (id < 1) {
             menu.findItem(R.id.action_edit_feed).setVisible(false);
             menu.findItem(R.id.action_delete_feed).setVisible(false);
+            menu.findItem(R.id.action_add_templated).setVisible(false);
         }
 
         // Set toggleable state
@@ -297,6 +298,16 @@ public class FeedFragment extends Fragment
             i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
             i.putExtra(EditFeedActivity._ID, this.id);
             i.putExtra(EditFeedActivity.TITLE, title);
+            i.putExtra(EditFeedActivity.TAG, tag);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+            return true;
+        } else if (id == R.id.action_add_templated && this.id > 0) {
+            Intent i = new Intent(getActivity(), EditFeedActivity.class);
+            // TODO do not animate the back movement here
+            i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
+            i.putExtra(EditFeedActivity.TEMPLATE, true);
+            //i.putExtra(EditFeedActivity.TITLE, title);
             i.putExtra(EditFeedActivity.TAG, tag);
             i.setData(Uri.parse(url));
             startActivity(i);
