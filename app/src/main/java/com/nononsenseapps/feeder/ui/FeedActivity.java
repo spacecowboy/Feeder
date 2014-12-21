@@ -211,7 +211,7 @@ public class FeedActivity extends BaseActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
-        } else if (id == R.id.action_sync) {
+        } else if (id == R.id.action_sync_all) {
             syncOrConfig();
             return true;
         } else if (id == R.id.action_add) {

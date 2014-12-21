@@ -301,6 +301,9 @@ public class FeedFragment extends Fragment
             // Tell activity to open another fragment
             ((FeedActivity) getActivity()).loadFirstFeedInDB(true);
             return true;
+        } else if (id == R.id.action_sync_this) {
+            syncThisOrConfig();
+            return true;
         }
 //        else if (id == R.id.action_mark_as_read) {
 //            markAsRead();
@@ -323,6 +326,14 @@ public class FeedFragment extends Fragment
             return true;
         } else {
             return super.onOptionsItemSelected(menuItem);
+        }
+    }
+
+    private void syncThisOrConfig() {
+        if (id > 0) {
+            RssSyncHelper.syncFeedAsync(getActivity(), id);
+        } else if (tag != null) {
+            RssSyncHelper.syncTagAsync(getActivity(), tag);
         }
     }
 

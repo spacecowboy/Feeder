@@ -26,13 +26,13 @@ public class BackendAPIClient {
     public static BackendAPI GetBackendAPI(final String server, final String authorization) {
         // Create a very simple REST adapter, with oauth header
         Log.d("FeederDebug", "Server: " + server);
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(server).build();
-//                .setRequestInterceptor(new RequestInterceptor() {
-//                    @Override
-//                    public void intercept(RequestFacade request) {
-//                        request.addHeader("Authorization", authorization);
-//                    }
-//                }).build();
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(server)
+                .setRequestInterceptor(new RequestInterceptor() {
+                    @Override
+                    public void intercept(RequestFacade request) {
+                        request.addHeader("Authorization", authorization);
+                    }
+                }).build();
         // Create an instance of the interface
         BackendAPI api = restAdapter.create(BackendAPI.class);
 

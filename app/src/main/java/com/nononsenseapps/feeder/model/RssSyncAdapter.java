@@ -75,29 +75,6 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     /**
-     * @param context
-     * @return a list of all feeds in the database
-     */
-    public static ArrayList<FeedSQL> getFeeds(Context context) {
-        ArrayList<FeedSQL> feeds = new ArrayList<FeedSQL>();
-        Cursor c = null;
-        try {
-            c = context.getContentResolver()
-                    .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
-                            null, null, null);
-            while (c != null && c.moveToNext()) {
-                feeds.add(new FeedSQL(c));
-            }
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-
-        return feeds;
-    }
-
-    /**
      * Perform a sync for this account. SyncAdapter-specific parameters may
      * be specified in extras, which is guaranteed to not be null. Invocations
      * of this method are guaranteed to be serialized.
@@ -119,111 +96,15 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
         // to the next one. Unit is seconds
         syncResult.delayUntil = 60L * 60L;
 
-        final Intent bcast = new Intent(SYNC_BROADCAST)
-                .putExtra(SYNC_BROADCAST_IS_ACTIVE, true);
-
-        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(new Intent(SYNC_BROADCAST)
-                .putExtra(SYNC_BROADCAST_IS_ACTIVE, true));
-
-        final String token = RssSyncHelper.getSuitableToken(getContext());
-        if (token == null) {
-            Log.e(TAG, "No token exists! Aborting sync...");
-            LocalBroadcastManager.getInstance(getContext()).sendBroadcast
-                    (bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false));
-            return;
-        }
-
-        BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(PrefUtils.getServerUrl(getContext()), token);
-
         try {
-            final ArrayList<ContentProviderOperation> operations =
-                    new ArrayList<ContentProviderOperation>();
-
-            final BackendAPIClient.MiddleManMessage msg = new BackendAPIClient.MiddleManMessage();
-            msg.links = new ArrayList<String>();
-
-            final ArrayList<FeedSQL> dbfeeds = getFeeds(getContext());
-
-            msg.links.clear();
-            for (int i = 0; i < dbfeeds.size(); i++) {
-                // Query server
-                msg.links.clear();
-                msg.links.add(dbfeeds.get(i).url);
-                try {
-                    BackendAPIClient.MiddleManResponse feedsResponse =
-                            api.getFreshFeeds(msg);
-
-                    if (feedsResponse.feeds == null || feedsResponse.feeds.isEmpty()) {
-                        continue;
-                    } else {
-                        BackendAPIClient.Feed feed = feedsResponse.feeds.get(0);
-                /*
-                If you encounter TransactionTooLargeException here, make
-                sure you don't run the syncadapter in a different process.
-                Sending several hundred operations across processes will
-                cause the exception. Seems safe inside same process though.
-                 */
-
-                        Log.d(TAG, "Syncing: " + feed.title + "(" + (feed.items
-                                == null ? 0 : feed.items.size()) + ")");
-                        // Sync feed with database
-                        RssSyncHelper.syncFeedBatch(getContext(), operations, feed, dbfeeds.get(i).id);
-                    }
-
-                    // Could put this after as well, checking speed
-                    if (!operations.isEmpty()) {
-                        getContext().getContentResolver()
-                                .applyBatch(RssContentProvider.AUTHORITY, operations);
-
-                        operations.clear();
-                    }
-                } catch (RetrofitError e) {
-                    Log.d(TAG, "Retrofit: " + e);
-                    final int status;
-                    if (e.getResponse() != null) {
-                        Log.e(TAG, "" +
-                                e.getResponse().getStatus() +
-                                "; " +
-                                e.getResponse().getReason());
-                        status = e.getResponse().getStatus();
-                    } else {
-                        status = 999;
-                    }
-                    // An HTTP error was encountered.
-//                    switch (status) {
-//                        case 401: // Unauthorized, token could possibly just be stale
-//                            // auth-exceptions are hard errors, and if the token is stale,
-//                            // that's too harsh
-//                            //syncResult.stats.numAuthExceptions++;
-//                            // Instead, report ioerror, which is a soft error
-//                            syncResult.stats.numIoExceptions++;
-//                            break;
-//                        case 404: // No such item, should never happen, programming error
-//                        case 415: // Not proper body, programming error
-//                        case 400: // Didn't specify url, programming error
-//                            syncResult.databaseError = true;
-//                            break;
-//                        default: // Default is to consider it a networking/server issue
-//                            syncResult.stats.numIoExceptions++;
-//                            break;
-//                    }
-                }
-            }
+            RssSyncHelper.syncAll(getContext());
         } catch (RemoteException e) {
             Log.d(TAG, "RemoteExc.: " + e);
             syncResult.databaseError = true;
         } catch (OperationApplicationException e) {
             Log.d(TAG, "OperationAppl.Exc.: " + e);
             syncResult.databaseError = true;
-        } finally {
-            // Notify that we've updated
-            RssContentProvider.notifyAllUris(getContext());
-            // And broadcast end of sync
-            LocalBroadcastManager.getInstance(getContext()).sendBroadcast
-                    (bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false));
         }
-        LocalBroadcastManager.getInstance(getContext()).sendBroadcast
-                (bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false));
     }
 
     private ArrayList<String> getLinksInFeeds(ArrayList<FeedSQL> feeds) {
