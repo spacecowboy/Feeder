@@ -243,6 +243,13 @@ public class FeedFragment extends Fragment
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        // List might be shorter than screen once item has been read
+        ((BaseActivity) getActivity()).showActionBar();
+    }
+
+    @Override
     public void onDetach() {
         // cancel any pending image loading
         Picasso.with(getActivity()).cancelTag(FeedFragment.this);

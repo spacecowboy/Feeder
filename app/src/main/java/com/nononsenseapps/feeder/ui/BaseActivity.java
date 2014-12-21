@@ -405,6 +405,10 @@ public class BaseActivity extends ActionBarActivity
         getLoaderManager().restartLoader(NAV_TAGS_LOADER, new Bundle(), this);
     }
 
+    public void showActionBar() {
+        autoShowOrHideActionBar(true);
+    }
+
     protected void autoShowOrHideActionBar(boolean show) {
         if (show == mActionBarShown) {
             return;
