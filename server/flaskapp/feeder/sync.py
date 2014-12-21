@@ -19,6 +19,11 @@ fp._HTMLSanitizer.acceptable_elements = \
                                                        'iframe'])
 
 
+class AttributeDict(dict):
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+
+
 def cache_all_feeds():
     '''
     Download all feeds in database
@@ -26,13 +31,96 @@ def cache_all_feeds():
     for feed in Feed.query.all():
         cache_feed(feed)
 
+class Feed(object):
+    def __init__(self, title, description, link, timestamp,
+                 published=None, etag=None, modified=None):
+        self.title = title
+        self.description = description
+        self.link = link
+        self.timestamp = timestamp
+        self.published = published
+        self.etag = etag
+        self.modified = modified
+        self.items = []
+
+
+class FeedItem():
+    def __init__(self):
+        self.link = None
+        self.title = None
+        self.description = None
+        self.title_stripped = None
+        self.snippet = None
+        self.published = None
+        self.author = None
+        self.comments = None
+        self.enclosure = None
+        self.image = None
+        # Internal use
+        self.timestamp = None
+
+
+
+def get_fresh_feed(url, etag=None, modified=None):
+    if "://" not in url:
+        url = "http://" + url
+
+    # Parse the result
+    rss = fp.parse(url, etag=etag, modified=modified)
+
+    # The feed object
+    f = rss.feed
+
+    # If feed does not have title,
+    # which is a required attribute,
+    # we skip it
+    if not hasattr(f, "title"):
+        try:
+            print(rss.debug_message)
+        except:
+            pass
+        return None
+
+    # Update feed timestamp
+    timestamp = datetime_now()
+
+    feed = Feed(
+title=f.title,
+description=f.get("description", ""),
+link=url,
+timestamp=timestamp)
+    feed.published = datetuple_to_datetime(f.get("published_parsed",
+                                                 None))
+    if feed.published is None:
+        feed.published = timestamp
+    feed.etag = rss.get("etag", None)
+    feed.modified = rss.get("modified", None)
+
+    feed.items = []
+
+    # Get individual entries
+    for item in rss.entries:
+        # Fill with cleaned data
+        feeditem = FeedItem() # AttributeDict()# FeedItem()
+        #feeditem.feed_id = feed.id
+        feeditem.timestamp = timestamp
+        clean_entry(feeditem, item)
+        # If published is none, use timestamp
+        if feeditem.published is None:
+            feeditem.published = timestamp
+
+        # Add to feed
+        feed.items.append(feeditem)
+
+    return feed
+
 
 def cache_feed(feed):
     '''
     Download the feed.
     '''
     url = feed.link
-    if not "://" in url:
+    if "://" not in url:
         url = "http://" + url
 
     # Parse the result

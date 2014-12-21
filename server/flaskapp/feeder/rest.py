@@ -7,10 +7,11 @@ from feeder import app, db
 from .models import (Feed, FeedItem, UserFeed, UserDeletion,
                      get_user, get_feed, get_userfeed)
 #from flask_oauthlib.client import OAuth
+from flask import request
 from flask.ext.restful import (Resource, Api, reqparse, fields,
                                marshal_with)
 from .util import parse_timestamp, datetime_to_string
-from .sync import cache_feed
+from .sync import cache_feed, get_fresh_feed
 
 from .gauth import authorized
 
@@ -60,6 +61,13 @@ postparser.add_argument('title', type=str, required=False,
 postparser.add_argument('tag', type=str, required=False,
                         help='Tag to categorize feed under')
 
+# Middle man parses feeds
+middlemanparser = reqparse.RequestParser()
+middlemanparser.add_argument('links', type=str, required=True, action='append',
+                             help='RSS feed(s) to fetch.')
+middlemanparser.add_argument('min_timestamp', type=str, required=False,
+                             help='Timestamp to filter on (only newer will be returned)')
+
 ## Deleting a feed
 deleteparser = reqparse.RequestParser()
 deleteparser.add_argument('link', type=str, required=True,
@@ -101,6 +109,10 @@ delete_fields = {
 feeds_response = {
     'feeds': fields.List(fields.Nested(feed_fields)),
     'deletes': fields.List(fields.Nested(delete_fields))
+}
+# Response with list of feeds
+middleman_response = {
+    'feeds': fields.List(fields.Nested(feed_fields))
 }
 
 
@@ -246,7 +258,39 @@ class PingResponder(Resource):
         return {}, 200
 
 
+class MiddleMan(Resource):
+    '''
+    Talks with RSS servers on behalf of clients
+    '''
+
+    #@log_errors
+    @marshal_with(middleman_response)
+    def post(self):
+        '''Return all feeds'''
+        links = request.json['links']
+
+        #dt = None
+        # Filters
+        #if args['min_timestamp'] is not None:
+        #    dt = parse_timestamp(args['min_timestamp'])
+
+        feeds = []
+        for url in links:
+            print("Url:", url)
+            if "://" not in url:
+                url = "http://" + url
+
+            feed = get_fresh_feed(url)
+            if feed is not None:
+                feeds.append(feed)
+            else:
+                print("feed was None")
+
+        return {"feeds": feeds}
+
+
 # Connect with API URLs
 api.add_resource(Feeds, '/feeds')
 api.add_resource(FeedsDeleter, '/feeds/delete')
 api.add_resource(PingResponder, '/ping')
+api.add_resource(MiddleMan, '/middleman')

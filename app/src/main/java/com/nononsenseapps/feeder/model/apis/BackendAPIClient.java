@@ -1,5 +1,7 @@
 package com.nononsenseapps.feeder.model.apis;
 
+import android.util.Log;
+
 import java.util.List;
 
 import retrofit.RequestInterceptor;
@@ -23,13 +25,14 @@ public class BackendAPIClient {
      */
     public static BackendAPI GetBackendAPI(final String server, final String authorization) {
         // Create a very simple REST adapter, with oauth header
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(server)
-                .setRequestInterceptor(new RequestInterceptor() {
-                    @Override
-                    public void intercept(RequestFacade request) {
-                        request.addHeader("Authorization", authorization);
-                    }
-                }).build();
+        Log.d("FeederDebug", "Server: " + server);
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(server).build();
+//                .setRequestInterceptor(new RequestInterceptor() {
+//                    @Override
+//                    public void intercept(RequestFacade request) {
+//                        request.addHeader("Authorization", authorization);
+//                    }
+//                }).build();
         // Create an instance of the interface
         BackendAPI api = restAdapter.create(BackendAPI.class);
 
@@ -37,6 +40,7 @@ public class BackendAPIClient {
     }
 
     public interface BackendAPI {
+        /*
         @GET("/feeds")
         FeedsResponse getFeeds(@Query("min_timestamp") String min_timestamp);
 
@@ -44,7 +48,17 @@ public class BackendAPIClient {
         Feed putFeed(@Body FeedMessage feedMessage);
 
         @POST("/feeds/delete")
-        VoidResponse deleteFeed(@Body DeleteMessage deleteMessage);
+        VoidResponse deleteFeed(@Body DeleteMessage deleteMessage);*/
+
+        @POST("/middleman")
+        MiddleManResponse getFreshFeeds(@Body MiddleManMessage message);
+    }
+
+    public static class MiddleManMessage {
+        public List<String> links;
+    }
+    public static class MiddleManResponse {
+        public List<Feed> feeds;
     }
 
     public static class FeedsResponse {

@@ -38,112 +38,6 @@ public class RssSyncHelper extends IntentService {
     }
 
     /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    public static void syncFeeds(Context context) {
-        Intent intent = new Intent(context, RssSyncHelper.class);
-        context.startService(intent);
-    }
-
-    public static void uploadFeedAsync(Context context, long id, String title,
-                                       String link, String tag) {
-        Intent intent = new Intent(context, RssSyncHelper.class);
-        intent.setAction(ACTION_PUT_FEED);
-        intent.putExtra("id", id);
-        intent.putExtra("title", title);
-        intent.putExtra("link", link);
-        intent.putExtra("tag", tag);
-        context.startService(intent);
-    }
-
-    public static void deleteFeedAsync(Context context, String link) {
-        Intent intent = new Intent(context, RssSyncHelper.class);
-        intent.setAction(ACTION_DELETE_FEED);
-        intent.putExtra("link", link);
-        context.startService(intent);
-    }
-
-    /**
-     * Synchronize pending updates
-     *
-     * @param context
-     * @param operations deletes will be added to operations
-     */
-    public static void syncPending(final Context context,
-                                   final String token,
-                                   final ArrayList<ContentProviderOperation> operations) {
-        if (token == null) {
-            throw new NullPointerException("Token was null");
-        }
-
-        Cursor c = null;
-        try {
-            c = context.getContentResolver()
-                    .query(PendingNetworkSQL.URI, PendingNetworkSQL.FIELDS,
-                            null, null, null);
-
-            while (c != null && c.moveToNext()) {
-                PendingNetworkSQL pending = new PendingNetworkSQL(c);
-                boolean success = false;
-
-                if (pending.isDelete()) {
-                    try {
-                        // catch 404 special
-                        deleteFeed(context, token, pending.url);
-                        success = true;
-                    } catch (RetrofitError e) {
-                        if (e.getResponse() != null && e.getResponse()
-                                .getStatus() == 404) {
-                            // 404 is fine, already deleted
-                            success = true;
-                        } else {
-                            // Not OK, throw it
-                            throw e;
-                        }
-
-                    }
-                } else if (pending.isPut()) {
-                    putFeed(context, token, pending.title, pending.url,
-                            pending.tag);
-                    success = true;
-                }
-
-                if (success) {
-                    // Remove from db
-                    operations.add(ContentProviderOperation.newDelete(Uri.withAppendedPath
-                            (PendingNetworkSQL.URI,
-                                    Long.toString(pending.id))).build());
-                }
-            }
-
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
-
-    /**
-     * Remove the designated feed from local storage. Adds the delete to the
-     * list of operations, to be committed with applyBatch.
-     *
-     * @param context
-     * @param operations
-     * @param delete
-     */
-    public static void syncDeleteBatch(final Context context,
-                                       final ArrayList<ContentProviderOperation> operations,
-                                       final BackendAPIClient.Delete delete) {
-        operations.add(ContentProviderOperation.newDelete(FeedSQL.URI_FEEDS)
-                .withSelection(FeedSQL.COL_URL + " IS ?",
-                        Util.ToStringArray(delete.link)).build());
-    }
-
-    /**
      * Adds the information contained in the feed to the list of pending
      * operations, to be committed with applyBatch.
      *
@@ -153,27 +47,21 @@ public class RssSyncHelper extends IntentService {
      */
     public static void syncFeedBatch(final Context context,
                                      final ArrayList<ContentProviderOperation> operations,
-                                     final BackendAPIClient.Feed feed) {
+                                     final BackendAPIClient.Feed feed,
+                                     final long feedId) {
 
         // This is the index of the feed, if needed for backreferences
         final int feedIndex = operations.size();
 
         // Create the insert/update feed operation first
         final ContentProviderOperation.Builder feedOp;
-        // Might not exist yet
-        final long feedId = getFeedSQLId(context, feed);
-        if (feedId < 1) {
-            feedOp = ContentProviderOperation.newInsert(FeedSQL.URI_FEEDS);
-        } else {
-            feedOp = ContentProviderOperation.newUpdate(
-                    Uri.withAppendedPath(FeedSQL.URI_FEEDS,
-                            Long.toString(feedId)));
-        }
+
+        feedOp = ContentProviderOperation.newUpdate(
+                Uri.withAppendedPath(FeedSQL.URI_FEEDS,
+                        Long.toString(feedId)));
+
         // Populate with values
-        feedOp.withValue(FeedSQL.COL_TITLE, feed.title)
-                .withValue(FeedSQL.COL_TAG, feed.tag == null ? "" : feed.tag)
-                .withValue(FeedSQL.COL_TIMESTAMP, feed.timestamp)
-                .withValue(FeedSQL.COL_URL, feed.link);
+        feedOp.withValue(FeedSQL.COL_TIMESTAMP, feed.timestamp);
         // Add to list of operations
         operations.add(feedOp.build());
 
@@ -187,13 +75,9 @@ public class RssSyncHelper extends IntentService {
             ContentProviderOperation.Builder itemOp = ContentProviderOperation
                     .newInsert(FeedItemSQL.URI_FEED_ITEMS);
 
-            // First, reference feed's id with back ref if insert
-            if (feedId < 1) {
-                itemOp.withValueBackReference(FeedItemSQL.COL_FEED, feedIndex);
-            } else {
-                // Use the actual id, because update operation will not return id
-                itemOp.withValue(FeedItemSQL.COL_FEED, feedId);
-            }
+            // Use the actual id, because update operation will not return id
+            itemOp.withValue(FeedItemSQL.COL_FEED, feedId);
+
             // Next all the other values. Make sure non null
             itemOp.withValue(FeedItemSQL.COL_LINK, item.link)
                     .withValue(FeedItemSQL.COL_FEEDTITLE, feed.title)
@@ -264,106 +148,13 @@ public class RssSyncHelper extends IntentService {
         return token;
     }
 
-    protected static void putFeed(final Context context,
-                                  final String token,
-                                  final String title,
-                                  final String link,
-                                  final String tag) throws RetrofitError {
-        if (token == null) {
-            throw new NullPointerException("No token");
-        }
-        final BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(PrefUtils.getServerUrl(context), token);
-        final BackendAPIClient.FeedMessage f = new BackendAPIClient.FeedMessage();
-        f.title = title;
-        f.link = link;
-        if (tag != null && !tag.isEmpty()) {
-            f.tag = tag;
-        }
 
-        final BackendAPIClient.Feed feed = api.putFeed(f);
-        // If any items were returned
-        if (feed.items != null && !feed.items.isEmpty()) {
-            // Save the items
-            final ArrayList<ContentProviderOperation> operations =
-                    new ArrayList<ContentProviderOperation>();
-
-            syncFeedBatch(context, operations, feed);
-            if (!operations.isEmpty()) {
-                try {
-                    context.getContentResolver()
-                            .applyBatch(RssContentProvider.AUTHORITY, operations);
-                } catch (RemoteException e) {
-                    Log.e(TAG, "RemoteExc.: " + e);
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, "OperationAppl.Exc.: " + e);
-                }
-            }
-        }
-        // Notify URIs
-        RssContentProvider.notifyAllUris(context);
-        // And broadcast that feed has been added, so UI may update and select it if suitable
-        LocalBroadcastManager.getInstance(context).sendBroadcast
-                (new Intent(RssSyncAdapter.FEED_ADDED_BROADCAST)
-                        .putExtra(FeedSQL.COL_ID, getFeedSQLId(context, feed)));
-    }
-
-    protected static void deleteFeed(final Context context,
-                                     final String token,
-                                     final String link) throws RetrofitError {
-        if (token == null) {
-            throw new NullPointerException("Token was null");
-        }
-        BackendAPIClient.BackendAPI api =
-                BackendAPIClient.GetBackendAPI(PrefUtils.getServerUrl(context), token);
-        BackendAPIClient.DeleteMessage d = new BackendAPIClient.DeleteMessage();
-        d.link = link;
-        api.deleteFeed(d);
-    }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         final String token = getSuitableToken(this);
         boolean storePending = token == null;
 
-        if (ACTION_PUT_FEED.equals(intent.getAction())) {
-            try {
-                if (token != null) {
-                    putFeed(this, token,
-                            intent.getStringExtra("title"),
-                            intent.getStringExtra("link"),
-                            intent.getStringExtra("tag"));
-                }
-            } catch (RetrofitError e) {
-                Log.e(TAG, "put error: " + e.getMessage());
-                storePending = true;
-            }
 
-            if (storePending) {
-                Log.d(TAG, "Storing put for later...");
-                PendingNetworkSQL.storePut(this, intent.getStringExtra("title"),
-                        intent.getStringExtra("link"),
-                        intent.getStringExtra("tag"));
-            }
-        } else if (ACTION_DELETE_FEED.equals(intent.getAction())) {
-            try {
-                if (token != null) {
-                    deleteFeed(this, token, intent.getStringExtra("link"));
-                }
-            } catch (RetrofitError e) {
-                Log.e(TAG, "put error: " + e.getMessage());
-                // Store for later unless 404, which means feed is already
-                // deleted
-                if (e.getResponse() == null ||
-                        e.getResponse().getStatus() != 404) {
-                    storePending = true;
-                }
-            }
-
-            if (storePending) {
-                Log.d(TAG, "Storing delete for later...");
-                PendingNetworkSQL.storeDelete(this,
-                        intent.getStringExtra("link"));
-            }
-        }
     }
 }

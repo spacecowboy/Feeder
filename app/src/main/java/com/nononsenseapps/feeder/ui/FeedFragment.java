@@ -298,8 +298,6 @@ public class FeedFragment extends Fragment
             getActivity().getContentResolver()
                     .delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
                             Util.LongsToStringArray(this.id));
-            // Upload change
-            RssSyncHelper.deleteFeedAsync(getActivity(), url);
             // Tell activity to open another fragment
             ((FeedActivity) getActivity()).loadFirstFeedInDB(true);
             return true;

@@ -151,11 +151,6 @@ public class EditFeedActivity extends Activity
                                     null);
                         }
 
-                        RssSyncHelper.uploadFeedAsync(EditFeedActivity.this, id,
-                                mTextTitle.getText().toString().trim(),
-                                mFeedUrl,
-                                mTextTag.getText().toString().trim());
-
                         finish();
                         if (mShouldFinishBack) {
                             // Only care about exit transition
