@@ -82,10 +82,10 @@ public class BackendAPIClient {
         public String image;
         public String published;
         public String author;
-        public String comments;
+        //public String comments;
         public String enclosure;
-        public boolean read;
-        public List<String> tags;
+        //public boolean read;
+        //public List<String> tags;
     }
 
     public static class Feed {
@@ -93,7 +93,9 @@ public class BackendAPIClient {
         public String title;
         public String description;
         public String published;
-        public String tag;
+        public String etag;
+        public String modified;
+        //public String tag;
         public String timestamp;
         public List<FeedItem> items;
     }

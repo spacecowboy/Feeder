@@ -33,6 +33,7 @@ public class RssSyncHelper extends IntentService {
     private static final String ACTION_DELETE_FEED = "DELETEFEED";
     private static final String ACTION_SYNC_FEED = "SYNCFEED";
     private static final String ACTION_SYNC_TAG = "SYNCTAG";
+    private static final String ACTION_SYNC_ALL = "SYNCALL";
 
     public RssSyncHelper() {
         super("RssSyncService");
@@ -42,6 +43,12 @@ public class RssSyncHelper extends IntentService {
         Intent intent = new Intent(context, RssSyncHelper.class);
         intent.setAction(ACTION_SYNC_FEED);
         intent.putExtra("id", id);
+        context.startService(intent);
+    }
+
+    public static void syncAllFeedsAsync(Context context) {
+        Intent intent = new Intent(context, RssSyncHelper.class);
+        intent.setAction(ACTION_SYNC_ALL);
         context.startService(intent);
     }
 
@@ -59,11 +66,12 @@ public class RssSyncHelper extends IntentService {
      * @param context
      * @param operations
      * @param feed
+     * @param dbFeed
      */
     public static void syncFeedBatch(final Context context,
                                      final ArrayList<ContentProviderOperation> operations,
                                      final BackendAPIClient.Feed feed,
-                                     final long feedId) {
+                                     final FeedSQL dbFeed) {
 
         // This is the index of the feed, if needed for backreferences
         final int feedIndex = operations.size();
@@ -73,10 +81,12 @@ public class RssSyncHelper extends IntentService {
 
         feedOp = ContentProviderOperation.newUpdate(
                 Uri.withAppendedPath(FeedSQL.URI_FEEDS,
-                        Long.toString(feedId)));
+                        Long.toString(dbFeed.id)));
 
         // Populate with values
-        feedOp.withValue(FeedSQL.COL_TIMESTAMP, feed.timestamp);
+        feedOp.withValue(FeedSQL.COL_TIMESTAMP, feed.timestamp)
+                .withValue(FeedSQL.COL_ETAG, feed.etag)
+                .withValue(FeedSQL.COL_MODIFIED, feed.modified);
         // Add to list of operations
         operations.add(feedOp.build());
 
@@ -91,13 +101,13 @@ public class RssSyncHelper extends IntentService {
                     .newInsert(FeedItemSQL.URI_FEED_ITEMS);
 
             // Use the actual id, because update operation will not return id
-            itemOp.withValue(FeedItemSQL.COL_FEED, feedId);
+            itemOp.withValue(FeedItemSQL.COL_FEED, dbFeed.id);
 
             // Next all the other values. Make sure non null
             itemOp.withValue(FeedItemSQL.COL_LINK, item.link)
                     .withValue(FeedItemSQL.COL_FEEDTITLE, feed.title)
                     .withValue(FeedItemSQL.COL_TAG,
-                            feed.tag == null ? "" : feed.tag)
+                            dbFeed.tag == null ? "" : dbFeed.tag)
                     .withValue(FeedItemSQL.COL_IMAGEURL, item.image)
                     .withValue(FeedItemSQL.COL_ENCLOSURELINK, item.enclosure)
                     .withValue(FeedItemSQL.COL_AUTHOR, item.author)
@@ -261,7 +271,7 @@ public class RssSyncHelper extends IntentService {
                         Log.d(TAG, "Syncing: " + feed.title + "(" + (feed.items
                                 == null ? 0 : feed.items.size()) + ")");
                         // Sync feed with database
-                        RssSyncHelper.syncFeedBatch(context, operations, feed, dbfeeds.get(i).id);
+                        RssSyncHelper.syncFeedBatch(context, operations, feed, dbfeeds.get(i));
                     }
 
                     // Could put this after as well, checking speed
@@ -327,6 +337,8 @@ public class RssSyncHelper extends IntentService {
                 syncFeed(this, intent.getLongExtra("id", -1));
             } else if (ACTION_SYNC_TAG.equals(intent.getAction())) {
                 syncTag(this, intent.getStringExtra("tag"));
+            } else if (ACTION_SYNC_ALL.equals(intent.getAction())) {
+                syncAll(this);
             }
         } catch (RemoteException | OperationApplicationException e) {
             Log.e(TAG, e.toString());

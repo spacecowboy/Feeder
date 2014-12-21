@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "rssDatabase";
     private static DatabaseHandler singleton;
     private final Context context;
@@ -35,12 +35,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(final SQLiteDatabase sqLiteDatabase, final int i,
             final int i2) {
-        // TODO remove
-        sqLiteDatabase.execSQL("DROP TABLE " +
-                               PendingNetworkSQL.TABLE_NAME +
-                               ";");
-
-        sqLiteDatabase.execSQL(PendingNetworkSQL.CREATE_TABLE);
     }
 
     @Override

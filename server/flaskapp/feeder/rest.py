@@ -65,8 +65,10 @@ postparser.add_argument('tag', type=str, required=False,
 middlemanparser = reqparse.RequestParser()
 middlemanparser.add_argument('links', type=str, required=True, action='append',
                              help='RSS feed(s) to fetch.')
-middlemanparser.add_argument('min_timestamp', type=str, required=False,
-                             help='Timestamp to filter on (only newer will be returned)')
+middlemanparser.add_argument('etag', type=str, required=False,
+                             help='Etag of last sync')
+middlemanparser.add_argument('modified', type=str, required=False,
+                             help='Date of last sync')
 
 ## Deleting a feed
 deleteparser = reqparse.RequestParser()
@@ -97,6 +99,8 @@ feed_fields = {
     'description': fields.String,
     'published': FieldDateTime,
     'tag': fields.String,
+    'etag': fields.String,
+    'modified': fields.String,
     'timestamp': FieldDateTime,
     'items': fields.List(fields.Nested(feeditem_fields))
 }
@@ -268,11 +272,8 @@ class MiddleMan(Resource):
     def post(self):
         '''Return all feeds'''
         links = request.json['links']
-
-        #dt = None
-        # Filters
-        #if args['min_timestamp'] is not None:
-        #    dt = parse_timestamp(args['min_timestamp'])
+        etag = request.json.get('etag', None)
+        modified = request.json.get('modified', None)
 
         feeds = []
         for url in links:
@@ -280,7 +281,7 @@ class MiddleMan(Resource):
             if "://" not in url:
                 url = "http://" + url
 
-            feed = get_fresh_feed(url)
+            feed = get_fresh_feed(url, etag=etag, modified=modified)
             if feed is not None:
                 feeds.append(feed)
             else:

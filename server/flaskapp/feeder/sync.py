@@ -82,6 +82,8 @@ def get_fresh_feed(url, etag=None, modified=None):
         # Add to feed
         feed.items.append(feeditem)
 
+    print("Returning etag:", etag, ", modified:", modified)
+
     return feed
 
 

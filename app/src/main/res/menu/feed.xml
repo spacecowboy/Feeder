@@ -17,6 +17,10 @@
         android:icon="@drawable/ic_action_sync"
         android:orderInCategory="901"
           app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_clear_items"
+        android:title="Clear all items"
+        android:orderInCategory="902"
+        app:showAsAction="never" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:icon="@drawable/ic_action_settings"
