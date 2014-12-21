@@ -13,7 +13,6 @@ import android.util.Log;
 
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.PendingNetworkSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
@@ -32,115 +31,32 @@ public class RssSyncHelper extends IntentService {
     private static final String TAG = "RssSyncHelper";
     private static final String ACTION_PUT_FEED = "PUTFEED";
     private static final String ACTION_DELETE_FEED = "DELETEFEED";
+    private static final String ACTION_SYNC_FEED = "SYNCFEED";
+    private static final String ACTION_SYNC_TAG = "SYNCTAG";
+    private static final String ACTION_SYNC_ALL = "SYNCALL";
 
     public RssSyncHelper() {
         super("RssSyncService");
     }
 
-    /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    public static void syncFeeds(Context context) {
+    public static void syncFeedAsync(Context context, long id) {
         Intent intent = new Intent(context, RssSyncHelper.class);
+        intent.setAction(ACTION_SYNC_FEED);
+        intent.putExtra("id", id);
         context.startService(intent);
     }
 
-    public static void uploadFeedAsync(Context context, long id, String title,
-                                       String link, String tag) {
+    public static void syncAllFeedsAsync(Context context) {
         Intent intent = new Intent(context, RssSyncHelper.class);
-        intent.setAction(ACTION_PUT_FEED);
-        intent.putExtra("id", id);
-        intent.putExtra("title", title);
-        intent.putExtra("link", link);
+        intent.setAction(ACTION_SYNC_ALL);
+        context.startService(intent);
+    }
+
+    public static void syncTagAsync(Context context, String tag) {
+        Intent intent = new Intent(context, RssSyncHelper.class);
+        intent.setAction(ACTION_SYNC_TAG);
         intent.putExtra("tag", tag);
         context.startService(intent);
-    }
-
-    public static void deleteFeedAsync(Context context, String link) {
-        Intent intent = new Intent(context, RssSyncHelper.class);
-        intent.setAction(ACTION_DELETE_FEED);
-        intent.putExtra("link", link);
-        context.startService(intent);
-    }
-
-    /**
-     * Synchronize pending updates
-     *
-     * @param context
-     * @param operations deletes will be added to operations
-     */
-    public static void syncPending(final Context context,
-                                   final String token,
-                                   final ArrayList<ContentProviderOperation> operations) {
-        if (token == null) {
-            throw new NullPointerException("Token was null");
-        }
-
-        Cursor c = null;
-        try {
-            c = context.getContentResolver()
-                    .query(PendingNetworkSQL.URI, PendingNetworkSQL.FIELDS,
-                            null, null, null);
-
-            while (c != null && c.moveToNext()) {
-                PendingNetworkSQL pending = new PendingNetworkSQL(c);
-                boolean success = false;
-
-                if (pending.isDelete()) {
-                    try {
-                        // catch 404 special
-                        deleteFeed(context, token, pending.url);
-                        success = true;
-                    } catch (RetrofitError e) {
-                        if (e.getResponse() != null && e.getResponse()
-                                .getStatus() == 404) {
-                            // 404 is fine, already deleted
-                            success = true;
-                        } else {
-                            // Not OK, throw it
-                            throw e;
-                        }
-
-                    }
-                } else if (pending.isPut()) {
-                    putFeed(context, token, pending.title, pending.url,
-                            pending.tag);
-                    success = true;
-                }
-
-                if (success) {
-                    // Remove from db
-                    operations.add(ContentProviderOperation.newDelete(Uri.withAppendedPath
-                            (PendingNetworkSQL.URI,
-                                    Long.toString(pending.id))).build());
-                }
-            }
-
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-    }
-
-
-    /**
-     * Remove the designated feed from local storage. Adds the delete to the
-     * list of operations, to be committed with applyBatch.
-     *
-     * @param context
-     * @param operations
-     * @param delete
-     */
-    public static void syncDeleteBatch(final Context context,
-                                       final ArrayList<ContentProviderOperation> operations,
-                                       final BackendAPIClient.Delete delete) {
-        operations.add(ContentProviderOperation.newDelete(FeedSQL.URI_FEEDS)
-                .withSelection(FeedSQL.COL_URL + " IS ?",
-                        Util.ToStringArray(delete.link)).build());
     }
 
     /**
@@ -150,30 +66,27 @@ public class RssSyncHelper extends IntentService {
      * @param context
      * @param operations
      * @param feed
+     * @param dbFeed
      */
     public static void syncFeedBatch(final Context context,
                                      final ArrayList<ContentProviderOperation> operations,
-                                     final BackendAPIClient.Feed feed) {
+                                     final BackendAPIClient.Feed feed,
+                                     final FeedSQL dbFeed) {
 
         // This is the index of the feed, if needed for backreferences
         final int feedIndex = operations.size();
 
         // Create the insert/update feed operation first
         final ContentProviderOperation.Builder feedOp;
-        // Might not exist yet
-        final long feedId = getFeedSQLId(context, feed);
-        if (feedId < 1) {
-            feedOp = ContentProviderOperation.newInsert(FeedSQL.URI_FEEDS);
-        } else {
-            feedOp = ContentProviderOperation.newUpdate(
-                    Uri.withAppendedPath(FeedSQL.URI_FEEDS,
-                            Long.toString(feedId)));
-        }
+
+        feedOp = ContentProviderOperation.newUpdate(
+                Uri.withAppendedPath(FeedSQL.URI_FEEDS,
+                        Long.toString(dbFeed.id)));
+
         // Populate with values
-        feedOp.withValue(FeedSQL.COL_TITLE, feed.title)
-                .withValue(FeedSQL.COL_TAG, feed.tag == null ? "" : feed.tag)
-                .withValue(FeedSQL.COL_TIMESTAMP, feed.timestamp)
-                .withValue(FeedSQL.COL_URL, feed.link);
+        feedOp.withValue(FeedSQL.COL_TIMESTAMP, feed.timestamp)
+                .withValue(FeedSQL.COL_ETAG, feed.etag)
+                .withValue(FeedSQL.COL_MODIFIED, feed.modified);
         // Add to list of operations
         operations.add(feedOp.build());
 
@@ -187,18 +100,14 @@ public class RssSyncHelper extends IntentService {
             ContentProviderOperation.Builder itemOp = ContentProviderOperation
                     .newInsert(FeedItemSQL.URI_FEED_ITEMS);
 
-            // First, reference feed's id with back ref if insert
-            if (feedId < 1) {
-                itemOp.withValueBackReference(FeedItemSQL.COL_FEED, feedIndex);
-            } else {
-                // Use the actual id, because update operation will not return id
-                itemOp.withValue(FeedItemSQL.COL_FEED, feedId);
-            }
+            // Use the actual id, because update operation will not return id
+            itemOp.withValue(FeedItemSQL.COL_FEED, dbFeed.id);
+
             // Next all the other values. Make sure non null
             itemOp.withValue(FeedItemSQL.COL_LINK, item.link)
                     .withValue(FeedItemSQL.COL_FEEDTITLE, feed.title)
                     .withValue(FeedItemSQL.COL_TAG,
-                            feed.tag == null ? "" : feed.tag)
+                            dbFeed.tag == null ? "" : dbFeed.tag)
                     .withValue(FeedItemSQL.COL_IMAGEURL, item.image)
                     .withValue(FeedItemSQL.COL_ENCLOSURELINK, item.enclosure)
                     .withValue(FeedItemSQL.COL_AUTHOR, item.author)
@@ -218,8 +127,6 @@ public class RssSyncHelper extends IntentService {
 
             // Add to list of operations
             operations.add(itemOp.build());
-
-            // TODO pre-cache all images
         }
     }
 
@@ -244,126 +151,197 @@ public class RssSyncHelper extends IntentService {
     }
 
     /**
-     * Get a suitable token depending on the user specified google login or user/password
+     * Get a suitable token depending on the user specified user/password
      *
      * @param context
-     * @return
+     * @return non-null if OK, null on error
      */
     public static String getSuitableToken(final Context context) {
         String token;
-        if (PrefUtils.getUseGoogleAccount(context)) {
-            token = AuthHelper.getAuthToken(context);
-        } else {
+        if (PrefUtils.getUseAccount(context)) {
             try {
                 token = PasswordUtils.getBase64BasicHeader(PrefUtils.getUsername(context, null),
                         PrefUtils.getPassword(context, null));
             } catch (NullPointerException e) {
                 token = null;
             }
+        } else {
+            // No account needed
+            token = "";
         }
         return token;
     }
 
-    protected static void putFeed(final Context context,
-                                  final String token,
-                                  final String title,
-                                  final String link,
-                                  final String tag) throws RetrofitError {
-        if (token == null) {
-            throw new NullPointerException("No token");
-        }
-        final BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(PrefUtils.getServerUrl(context), token);
-        final BackendAPIClient.FeedMessage f = new BackendAPIClient.FeedMessage();
-        f.title = title;
-        f.link = link;
-        if (tag != null && !tag.isEmpty()) {
-            f.tag = tag;
+    /**
+     * @param context
+     * @return a list of all feeds in the database
+     */
+    public static ArrayList<FeedSQL> getFeeds(Context context, String tag) {
+        ArrayList<FeedSQL> feeds = new ArrayList<FeedSQL>();
+        Cursor c = null;
+        try {
+            c = context.getContentResolver()
+                    .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
+                            tag == null ? null : FeedSQL.COL_TAG + " IS ?",
+                            tag == null ? null : Util.ToStringArray(tag),
+                            null);
+            while (c != null && c.moveToNext()) {
+                feeds.add(new FeedSQL(c));
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
         }
 
-        final BackendAPIClient.Feed feed = api.putFeed(f);
-        // If any items were returned
-        if (feed.items != null && !feed.items.isEmpty()) {
-            // Save the items
+        return feeds;
+    }
+
+    public static void syncFeed(final Context context, final long id) throws RemoteException, OperationApplicationException {
+        ArrayList<FeedSQL> feeds = new ArrayList<FeedSQL>();
+        Cursor c = null;
+        try {
+            c = context.getContentResolver()
+                    .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
+                            Util.WHEREIDIS,
+                            Util.LongsToStringArray(id),
+                            null);
+            while (c != null && c.moveToNext()) {
+                feeds.add(new FeedSQL(c));
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        syncFeeds(context, feeds);
+    }
+
+    public static void syncFeed(final Context context, final FeedSQL feed) throws RemoteException, OperationApplicationException {
+        ArrayList<FeedSQL> feeds = new ArrayList<FeedSQL>(1);
+        feeds.add(feed);
+        syncFeeds(context, feeds);
+    }
+
+    public static void syncFeeds(final Context context, final ArrayList<FeedSQL> dbfeeds) throws RemoteException, OperationApplicationException {
+        final Intent bcast = new Intent(RssSyncAdapter.SYNC_BROADCAST)
+                .putExtra(RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE, true);
+
+        LocalBroadcastManager.getInstance(context).sendBroadcast(bcast);
+
+        final String token = RssSyncHelper.getSuitableToken(context);
+        // Token is non-null but empty if no account is needed
+        if (token == null) {
+            Log.e(TAG, "No token exists! Aborting sync...");
+            LocalBroadcastManager.getInstance(context).sendBroadcast
+                    (bcast.putExtra(RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE, false));
+            return;
+        }
+
+        BackendAPIClient.BackendAPI api = BackendAPIClient.GetBackendAPI(PrefUtils.getServerUrl(context), token);
+
+        try {
             final ArrayList<ContentProviderOperation> operations =
                     new ArrayList<ContentProviderOperation>();
 
-            syncFeedBatch(context, operations, feed);
-            if (!operations.isEmpty()) {
+            final BackendAPIClient.MiddleManMessage msg = new BackendAPIClient.MiddleManMessage();
+            msg.links = new ArrayList<String>();
+
+            msg.links.clear();
+            for (int i = 0; i < dbfeeds.size(); i++) {
+                // Query server
+                msg.links.clear();
+                msg.links.add(dbfeeds.get(i).url);
                 try {
-                    context.getContentResolver()
-                            .applyBatch(RssContentProvider.AUTHORITY, operations);
-                } catch (RemoteException e) {
-                    Log.e(TAG, "RemoteExc.: " + e);
-                } catch (OperationApplicationException e) {
-                    Log.e(TAG, "OperationAppl.Exc.: " + e);
+                    BackendAPIClient.MiddleManResponse feedsResponse =
+                            api.getFreshFeeds(msg);
+
+                    if (feedsResponse.feeds == null || feedsResponse.feeds.isEmpty()) {
+                        continue;
+                    } else {
+                        BackendAPIClient.Feed feed = feedsResponse.feeds.get(0);
+                /*
+                If you encounter TransactionTooLargeException here, make
+                sure you don't run the syncadapter in a different process.
+                Sending several hundred operations across processes will
+                cause the exception. Seems safe inside same process though.
+                 */
+
+                        Log.d(TAG, "Syncing: " + feed.title + "(" + (feed.items
+                                == null ? 0 : feed.items.size()) + ")");
+                        // Sync feed with database
+                        RssSyncHelper.syncFeedBatch(context, operations, feed, dbfeeds.get(i));
+                    }
+
+                    // Could put this after as well, checking speed
+                    if (!operations.isEmpty()) {
+                        context.getContentResolver()
+                                .applyBatch(RssContentProvider.AUTHORITY, operations);
+
+                        operations.clear();
+                    }
+                } catch (RetrofitError e) {
+                    Log.d(TAG, "Retrofit: " + e);
+                    final int status;
+                    if (e.getResponse() != null) {
+                        Log.e(TAG, "" +
+                                e.getResponse().getStatus() +
+                                "; " +
+                                e.getResponse().getReason());
+                        status = e.getResponse().getStatus();
+                    } else {
+                        status = 999;
+                    }
+                    // An HTTP error was encountered.
+//                    switch (status) {
+//                        case 401: // Unauthorized, token could possibly just be stale
+//                            // auth-exceptions are hard errors, and if the token is stale,
+//                            // that's too harsh
+//                            //syncResult.stats.numAuthExceptions++;
+//                            // Instead, report ioerror, which is a soft error
+//                            syncResult.stats.numIoExceptions++;
+//                            break;
+//                        case 404: // No such item, should never happen, programming error
+//                        case 415: // Not proper body, programming error
+//                        case 400: // Didn't specify url, programming error
+//                            syncResult.databaseError = true;
+//                            break;
+//                        default: // Default is to consider it a networking/server issue
+//                            syncResult.stats.numIoExceptions++;
+//                            break;
+//                    }
                 }
             }
+        } finally {
+            // Notify that we've updated
+            RssContentProvider.notifyAllUris(context);
+            // And broadcast end of sync
+            LocalBroadcastManager.getInstance(context).sendBroadcast
+                    (bcast.putExtra(RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE, false));
         }
-        // Notify URIs
-        RssContentProvider.notifyAllUris(context);
-        // And broadcast that feed has been added, so UI may update and select it if suitable
-        LocalBroadcastManager.getInstance(context).sendBroadcast
-                (new Intent(RssSyncAdapter.FEED_ADDED_BROADCAST)
-                        .putExtra(FeedSQL.COL_ID, getFeedSQLId(context, feed)));
     }
 
-    protected static void deleteFeed(final Context context,
-                                     final String token,
-                                     final String link) throws RetrofitError {
-        if (token == null) {
-            throw new NullPointerException("Token was null");
-        }
-        BackendAPIClient.BackendAPI api =
-                BackendAPIClient.GetBackendAPI(PrefUtils.getServerUrl(context), token);
-        BackendAPIClient.DeleteMessage d = new BackendAPIClient.DeleteMessage();
-        d.link = link;
-        api.deleteFeed(d);
+    public static void syncAll(final Context context) throws RemoteException, OperationApplicationException {
+        syncFeeds(context, getFeeds(context, null));
+    }
+
+    public static void syncTag(final Context context, final String tag) throws RemoteException, OperationApplicationException {
+        syncFeeds(context, getFeeds(context, tag));
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        final String token = getSuitableToken(this);
-        boolean storePending = token == null;
-
-        if (ACTION_PUT_FEED.equals(intent.getAction())) {
-            try {
-                if (token != null) {
-                    putFeed(this, token,
-                            intent.getStringExtra("title"),
-                            intent.getStringExtra("link"),
-                            intent.getStringExtra("tag"));
-                }
-            } catch (RetrofitError e) {
-                Log.e(TAG, "put error: " + e.getMessage());
-                storePending = true;
+        try {
+            if (ACTION_SYNC_FEED.equals(intent.getAction())) {
+                syncFeed(this, intent.getLongExtra("id", -1));
+            } else if (ACTION_SYNC_TAG.equals(intent.getAction())) {
+                syncTag(this, intent.getStringExtra("tag"));
+            } else if (ACTION_SYNC_ALL.equals(intent.getAction())) {
+                syncAll(this);
             }
-
-            if (storePending) {
-                Log.d(TAG, "Storing put for later...");
-                PendingNetworkSQL.storePut(this, intent.getStringExtra("title"),
-                        intent.getStringExtra("link"),
-                        intent.getStringExtra("tag"));
-            }
-        } else if (ACTION_DELETE_FEED.equals(intent.getAction())) {
-            try {
-                if (token != null) {
-                    deleteFeed(this, token, intent.getStringExtra("link"));
-                }
-            } catch (RetrofitError e) {
-                Log.e(TAG, "put error: " + e.getMessage());
-                // Store for later unless 404, which means feed is already
-                // deleted
-                if (e.getResponse() == null ||
-                        e.getResponse().getStatus() != 404) {
-                    storePending = true;
-                }
-            }
-
-            if (storePending) {
-                Log.d(TAG, "Storing delete for later...");
-                PendingNetworkSQL.storeDelete(this,
-                        intent.getStringExtra("link"));
-            }
+        } catch (RemoteException | OperationApplicationException e) {
+            Log.e(TAG, e.toString());
         }
     }
 }

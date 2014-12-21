@@ -31,6 +31,7 @@ public class PrefUtils {
      */
     public static final String PREF_USERNAME = "key_account";
     public static final String PREF_PASSWORD = "pref_password";
+    public static final String PREF_USE_ACCOUNT = "pref_use_account";
     public static final String PREF_USE_GOOGLE_ACCOUNT = "pref_use_google_account";
     public static final String PREF_SERVER_URL = "pref_server_url";
 
@@ -83,6 +84,14 @@ public class PrefUtils {
 
     public static void setUseGoogleAccount(final Context context, final boolean useGoogle) {
         sp(context).edit().putBoolean(PREF_USE_GOOGLE_ACCOUNT, useGoogle).apply();
+    }
+
+    public static boolean getUseAccount(final Context context) {
+        return sp(context).getBoolean(PREF_USE_ACCOUNT, true);
+    }
+
+    public static void setUseAccount(final Context context, final boolean useAccount) {
+        sp(context).edit().putBoolean(PREF_USE_ACCOUNT, useAccount).apply();
     }
 
     public static String getPassword(final Context context, final String def) {

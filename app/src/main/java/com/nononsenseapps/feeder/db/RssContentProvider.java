@@ -15,7 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.nononsenseapps.feeder.model.AuthHelper;
+
 import com.nononsenseapps.feeder.ui.FeedActivity;
 
 import java.util.ArrayList;
@@ -397,7 +397,7 @@ public class RssContentProvider extends ContentProvider {
      * @param context
      */
     public static void RequestSync(final Context context) {
-        final Account account = AuthHelper.getSavedAccount(context);
+        final Account account =null;
         if (account == null) {
             // Can't do shit without an account
             return;
@@ -421,5 +421,11 @@ public class RssContentProvider extends ContentProvider {
                 ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         ContentResolver.requestSync(account,
                 RssContentProvider.AUTHORITY, settingsBundle);
+    }
+
+    public static void ClearAllItems(final Context context) {
+        ContentValues values = new ContentValues();
+        values.put(FeedItemSQL.COL_UNREAD, 0);
+        context.getContentResolver().delete(FeedItemSQL.URI_FEED_ITEMS, null, null);
     }
 }

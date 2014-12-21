@@ -1,5 +1,7 @@
 package com.nononsenseapps.feeder.model.apis;
 
+import android.util.Log;
+
 import java.util.List;
 
 import retrofit.RequestInterceptor;
@@ -27,16 +29,17 @@ public class BackendAPIClient {
                 .setRequestInterceptor(new RequestInterceptor() {
                     @Override
                     public void intercept(RequestFacade request) {
-                        request.addHeader("Authorization", authorization);
+                        if (authorization != null && !authorization.isEmpty())
+                            request.addHeader("Authorization", authorization);
                     }
                 }).build();
         // Create an instance of the interface
-        BackendAPI api = restAdapter.create(BackendAPI.class);
 
-        return api;
+        return restAdapter.create(BackendAPI.class);
     }
 
     public interface BackendAPI {
+        /*
         @GET("/feeds")
         FeedsResponse getFeeds(@Query("min_timestamp") String min_timestamp);
 
@@ -44,7 +47,17 @@ public class BackendAPIClient {
         Feed putFeed(@Body FeedMessage feedMessage);
 
         @POST("/feeds/delete")
-        VoidResponse deleteFeed(@Body DeleteMessage deleteMessage);
+        VoidResponse deleteFeed(@Body DeleteMessage deleteMessage);*/
+
+        @POST("/middleman")
+        MiddleManResponse getFreshFeeds(@Body MiddleManMessage message);
+    }
+
+    public static class MiddleManMessage {
+        public List<String> links;
+    }
+    public static class MiddleManResponse {
+        public List<Feed> feeds;
     }
 
     public static class FeedsResponse {
@@ -69,10 +82,10 @@ public class BackendAPIClient {
         public String image;
         public String published;
         public String author;
-        public String comments;
+        //public String comments;
         public String enclosure;
-        public boolean read;
-        public List<String> tags;
+        //public boolean read;
+        //public List<String> tags;
     }
 
     public static class Feed {
@@ -80,7 +93,9 @@ public class BackendAPIClient {
         public String title;
         public String description;
         public String published;
-        public String tag;
+        public String etag;
+        public String modified;
+        //public String tag;
         public String timestamp;
         public List<FeedItem> items;
     }

@@ -144,17 +144,15 @@ public class EditFeedActivity extends Activity
                             Uri uri = getContentResolver()
                                     .insert(FeedSQL.URI_FEEDS, values);
                             id = Long.parseLong(uri.getLastPathSegment());
+
+                            // Request initial sync
+                            RssSyncHelper.syncFeedAsync(EditFeedActivity.this, id);
                         } else {
                             getContentResolver().update(Uri.withAppendedPath(
                                             FeedSQL.URI_FEEDS,
                                             Long.toString(id)), values, null,
                                     null);
                         }
-
-                        RssSyncHelper.uploadFeedAsync(EditFeedActivity.this, id,
-                                mTextTitle.getText().toString().trim(),
-                                mFeedUrl,
-                                mTextTag.getText().toString().trim());
 
                         finish();
                         if (mShouldFinishBack) {

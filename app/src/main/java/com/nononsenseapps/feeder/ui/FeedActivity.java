@@ -22,8 +22,8 @@ import android.widget.Toast;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
-import com.nononsenseapps.feeder.model.AuthHelper;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
+import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
 
@@ -105,20 +105,20 @@ public class FeedActivity extends BaseActivity {
         // Empty view
         mEmptyView = findViewById(android.R.id.empty);
         mEmptyView.setVisibility(mFragment == null ? View.VISIBLE : View.GONE);
-
-        TextView emptyLogin = (TextView) findViewById(R.id.empty_login);
-        emptyLogin.setVisibility(null == AuthHelper.getSavedAccountName(this) ?
-                View.VISIBLE :
-                View.GONE);
-        emptyLogin.setText(
-                android.text.Html.fromHtml(getString(R.string.empty_no_feeds_login)));
-        emptyLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                askForLogin();
-            }
-        });
-
+//
+//        TextView emptyLogin = (TextView) findViewById(R.id.empty_login);
+//        emptyLogin.setVisibility(null == AuthHelper.getSavedAccountName(this) ?
+//                View.VISIBLE :
+//                View.GONE);
+//        emptyLogin.setText(
+//                android.text.Html.fromHtml(getString(R.string.empty_no_feeds_login)));
+//        emptyLogin.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(final View v) {
+//                askForLogin();
+//            }
+//        });
+//
         TextView emptyAddFeed = (TextView) findViewById(R.id.empty_add_feed);
         emptyAddFeed.setText(
                 android.text.Html.fromHtml(getString(R.string.empty_no_feeds_add)));
@@ -187,11 +187,6 @@ public class FeedActivity extends BaseActivity {
         }
     }
 
-    private void askForLogin() {
-        DialogFragment dialog = new AccountDialog();
-        dialog.show(getSupportFragmentManager(), "account_dialog");
-    }
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -211,9 +206,11 @@ public class FeedActivity extends BaseActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
-        } else if (id == R.id.action_sync) {
+        } else if (id == R.id.action_sync_all) {
             syncOrConfig();
             return true;
+        } else if (id == R.id.action_clear_items) {
+            RssContentProvider.ClearAllItems(this);
         } else if (id == R.id.action_add) {
             startActivity(new Intent(FeedActivity.this, EditFeedActivity.class));
             return true;
@@ -227,16 +224,12 @@ public class FeedActivity extends BaseActivity {
      * @return true if sync is underway, or false otherwise
      */
     public boolean syncOrConfig() {
-        if (null == AuthHelper.getSavedAccountName(this)) {
-            askForLogin();
-            return false;
-        } else {
             Toast.makeText(this, "Syncing feeds...", Toast.LENGTH_SHORT).show();
             //RssSyncHelper.syncFeeds(this);
-            RssContentProvider.RequestSync(this);
+            //RssContentProvider.RequestSync(this);
+        RssSyncHelper.syncAllFeedsAsync(this);
 
             return true;
-        }
     }
 
     @Override

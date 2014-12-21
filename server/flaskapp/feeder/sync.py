@@ -19,6 +19,11 @@ fp._HTMLSanitizer.acceptable_elements = \
                                                        'iframe'])
 
 
+class AttributeDict(dict):
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+
+
 def cache_all_feeds():
     '''
     Download all feeds in database
@@ -27,12 +32,67 @@ def cache_all_feeds():
         cache_feed(feed)
 
 
+def get_fresh_feed(url, etag=None, modified=None):
+    if "://" not in url:
+        url = "http://" + url
+
+    # Parse the result
+    rss = fp.parse(url, etag=etag, modified=modified)
+
+    # The feed object
+    f = rss.feed
+
+    # If feed does not have title,
+    # which is a required attribute,
+    # we skip it
+    if not hasattr(f, "title"):
+        try:
+            print(rss.debug_message)
+        except:
+            pass
+        return None
+
+    # Update feed timestamp
+    timestamp = datetime_now()
+
+    feed = Feed(title=f.title,
+                description=f.get("description", ""),
+                link=url,
+                timestamp=timestamp)
+    feed.published = datetuple_to_datetime(f.get("published_parsed",
+                                                 None))
+    if feed.published is None:
+        feed.published = timestamp
+    feed.etag = rss.get("etag", None)
+    feed.modified = rss.get("modified", None)
+
+    feed.items = []
+
+    # Get individual entries
+    for item in rss.entries:
+        # Fill with cleaned data
+        feeditem = FeedItem()
+        # feeditem.feed_id = feed.id
+        feeditem.timestamp = timestamp
+        clean_entry(feeditem, item)
+        # If published is none, use timestamp
+        if feeditem.published is None:
+            feeditem.published = timestamp
+
+        # Add to feed
+        feed.items.append(feeditem)
+
+    print("Returning etag:", etag, ", modified:", modified)
+
+    return feed
+
+
 def cache_feed(feed):
     '''
     Download the feed.
     '''
     url = feed.link
-    if not "://" in url:
+    if "://" not in url:
         url = "http://" + url
 
     # Parse the result

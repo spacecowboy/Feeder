@@ -60,6 +60,6 @@ if __name__ == '__main__':
         kw['host'] = args[i + 1]
     if '-p' in args:
         i = args.index('-p')
-        kw['port'] = args[i + 1]
+        kw['port'] = int(args[i + 1])
 
     app.run(**kw)
