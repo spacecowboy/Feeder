@@ -38,6 +38,7 @@ import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.model.apis.GoogleFeedAPIClient;
 import com.nononsenseapps.feeder.model.RssSearchLoader;
+import com.nononsenseapps.feeder.views.FloatLabelLayout;
 
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class EditFeedActivity extends Activity
     private long id = -1;
     // Views and shit
     private EditText mTextTitle;
+    private EditText mTextUrl;
     private AutoCompleteTextView mTextTag;
     private EditText mTextSearch;
     private View mDetailsFrame;
@@ -65,6 +67,9 @@ public class EditFeedActivity extends Activity
     private String mFeedUrl = null;
     private TextView mEmptyText;
     private View mLoadingProgress;
+    private FloatLabelLayout mUrlLabel;
+    private FloatLabelLayout mTitleLabel;
+    private FloatLabelLayout mTagLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +81,11 @@ public class EditFeedActivity extends Activity
 
         // Setup views
         mTextTitle = (EditText) findViewById(R.id.feed_title);
+        mTitleLabel = (FloatLabelLayout) mTextTitle.getParent();
+        mTextUrl = (EditText) findViewById(R.id.feed_url);
+        mUrlLabel = (FloatLabelLayout) mTextUrl.getParent();
         mTextTag = (AutoCompleteTextView) findViewById(R.id.feed_tag);
+        mTagLabel = (FloatLabelLayout) mTextTag.getParent();
         mDetailsFrame = findViewById(R.id.feed_details_frame);
         mSearchFrame = findViewById(R.id.feed_search_frame);
         mTextSearch = (EditText) findViewById(R.id.search_view);
@@ -137,7 +146,7 @@ public class EditFeedActivity extends Activity
                         values.put(FeedSQL.COL_TITLE,
                                 mTextTitle.getText().toString().trim());
                         values.put(FeedSQL.COL_URL,
-                                mFeedUrl);
+                                mTextUrl.getText().toString().trim());
                         values.put(FeedSQL.COL_TAG,
                                 mTextTag.getText().toString().trim());
                         if (id < 1) {
@@ -153,7 +162,7 @@ public class EditFeedActivity extends Activity
 
                         RssSyncHelper.uploadFeedAsync(EditFeedActivity.this, id,
                                 mTextTitle.getText().toString().trim(),
-                                mFeedUrl,
+                                mTextUrl.getText().toString().trim(),
                                 mTextTag.getText().toString().trim());
 
                         finish();
@@ -194,10 +203,13 @@ public class EditFeedActivity extends Activity
                 mFeedUrl = i.getStringExtra(Intent.EXTRA_TEXT).trim();
                 mTextSearch.setText(mFeedUrl);
             }
+            // URL
+            mTextUrl.setText(mFeedUrl);
             // Title
             if (i.hasExtra(TITLE)) {
                 mTextTitle.setText(i.getStringExtra(TITLE));
             }
+
             // Tag
             if (i.hasExtra(TAG)) {
                 // Use append instead of setText to make sure cursor is at end
@@ -304,6 +316,7 @@ public class EditFeedActivity extends Activity
 
     void useEntry(final String title, final String url) {
         mFeedUrl = url.trim();
+        mTextUrl.setText(mFeedUrl);
         mTextTitle.setText(android.text.Html.fromHtml(title).toString());
         mDetailsFrame.setVisibility(View.VISIBLE);
         mSearchFrame.setVisibility(View.GONE);
