@@ -46,6 +46,8 @@ android {
 }
 
 dependencies {
+    compile project(':deps:Simplistic-RSS')
+
     // This is only used for faster build-times
     compile 'com.android.support:multidex:1.0.0'
 

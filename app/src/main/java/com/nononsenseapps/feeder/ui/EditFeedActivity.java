@@ -35,7 +35,7 @@ import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.Util;
-import com.nononsenseapps.feeder.model.RssSyncHelper;
+//import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.model.apis.GoogleFeedAPIClient;
 import com.nononsenseapps.feeder.model.RssSearchLoader;
 
@@ -151,10 +151,10 @@ public class EditFeedActivity extends Activity
                                     null);
                         }
 
-                        RssSyncHelper.uploadFeedAsync(EditFeedActivity.this, id,
-                                mTextTitle.getText().toString().trim(),
-                                mFeedUrl,
-                                mTextTag.getText().toString().trim());
+//                        RssSyncHelper.uploadFeedAsync(EditFeedActivity.this, id,
+//                                mTextTitle.getText().toString().trim(),
+//                                mFeedUrl,
+//                                mTextTag.getText().toString().trim());
 
                         finish();
                         if (mShouldFinishBack) {
