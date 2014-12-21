@@ -11,6 +11,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -145,11 +146,11 @@ public class EditFeedActivity extends Activity
 
                         values.put(FeedSQL.COL_TITLE,
                                 mTextTitle.getText().toString().trim());
-                        values.put(FeedSQL.COL_URL,
-                                mTextUrl.getText().toString().trim());
                         values.put(FeedSQL.COL_TAG,
                                 mTextTag.getText().toString().trim());
                         if (id < 1) {
+                            values.put(FeedSQL.COL_URL,
+                                    mTextUrl.getText().toString().trim());
                             Uri uri = getContentResolver()
                                     .insert(FeedSQL.URI_FEEDS, values);
                             id = Long.parseLong(uri.getLastPathSegment());
@@ -188,8 +189,9 @@ public class EditFeedActivity extends Activity
                 mSearchFrame.setVisibility(View.GONE);
                 mDetailsFrame.setVisibility(View.VISIBLE);
                 if (id > 0) {
-                    // Don't allow editing url
-                    ((FloatLabelLayout) mTextUrl.getParent()).setVisibility(View.GONE);
+                    // Don't allow editing url, but allow copying the text
+                    mTextUrl.setInputType(InputType.TYPE_NULL);
+                    mTextUrl.setTextIsSelectable(true);
                     // Focus on tag
                     mTextTag.requestFocus();
                     addButton.setText(getString(R.string.save));
