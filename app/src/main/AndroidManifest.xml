@@ -74,12 +74,12 @@
             android:exported="false" >
         </provider>
 
+        <!--<service-->
+            <!--android:name="com.nononsenseapps.feeder.model.RssSyncHelper"-->
+            <!--android:exported="false">-->
+        <!--</service>-->
         <service
-            android:name="com.nononsenseapps.feeder.model.RssSyncHelper"
-            android:exported="false">
-        </service>
-        <service
-            android:name="com.nononsenseapps.feeder.model.RssSyncAdapterService"
+            android:name="com.nononsenseapps.feeder.model.LocalRssSyncAdapterService"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
