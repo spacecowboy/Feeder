@@ -31,35 +31,6 @@ def cache_all_feeds():
     for feed in Feed.query.all():
         cache_feed(feed)
 
-class Feed(object):
-    def __init__(self, title, description, link, timestamp,
-                 published=None, etag=None, modified=None):
-        self.title = title
-        self.description = description
-        self.link = link
-        self.timestamp = timestamp
-        self.published = published
-        self.etag = etag
-        self.modified = modified
-        self.items = []
-
-
-class FeedItem():
-    def __init__(self):
-        self.link = None
-        self.title = None
-        self.description = None
-        self.title_stripped = None
-        self.snippet = None
-        self.published = None
-        self.author = None
-        self.comments = None
-        self.enclosure = None
-        self.image = None
-        # Internal use
-        self.timestamp = None
-
-
 
 def get_fresh_feed(url, etag=None, modified=None):
     if "://" not in url:
@@ -84,11 +55,10 @@ def get_fresh_feed(url, etag=None, modified=None):
     # Update feed timestamp
     timestamp = datetime_now()
 
-    feed = Feed(
-title=f.title,
-description=f.get("description", ""),
-link=url,
-timestamp=timestamp)
+    feed = Feed(title=f.title,
+                description=f.get("description", ""),
+                link=url,
+                timestamp=timestamp)
     feed.published = datetuple_to_datetime(f.get("published_parsed",
                                                  None))
     if feed.published is None:
@@ -101,8 +71,8 @@ timestamp=timestamp)
     # Get individual entries
     for item in rss.entries:
         # Fill with cleaned data
-        feeditem = FeedItem() # AttributeDict()# FeedItem()
-        #feeditem.feed_id = feed.id
+        feeditem = FeedItem()
+        # feeditem.feed_id = feed.id
         feeditem.timestamp = timestamp
         clean_entry(feeditem, item)
         # If published is none, use timestamp

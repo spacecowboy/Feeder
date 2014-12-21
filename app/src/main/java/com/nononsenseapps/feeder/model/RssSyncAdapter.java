@@ -20,7 +20,6 @@ import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
 import com.nononsenseapps.feeder.util.PrefUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit.RetrofitError;
 
@@ -140,74 +139,75 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             final ArrayList<ContentProviderOperation> operations =
                     new ArrayList<ContentProviderOperation>();
 
-            final ArrayList<FeedSQL> dbfeeds = getFeeds(getContext());
             final BackendAPIClient.MiddleManMessage msg = new BackendAPIClient.MiddleManMessage();
-            msg.links = getLinksInFeeds(dbfeeds);
+            msg.links = new ArrayList<String>();
 
-            // Query server
-            BackendAPIClient.MiddleManResponse feedsResponse =
-                    api.getFreshFeeds(msg);
+            final ArrayList<FeedSQL> dbfeeds = getFeeds(getContext());
 
-            List<BackendAPIClient.Feed> feeds = feedsResponse.feeds;
+            msg.links.clear();
+            for (int i = 0; i < dbfeeds.size(); i++) {
+                // Query server
+                msg.links.clear();
+                msg.links.add(dbfeeds.get(i).url);
+                try {
+                    BackendAPIClient.MiddleManResponse feedsResponse =
+                            api.getFreshFeeds(msg);
 
-            if (feeds == null) {
-                Log.d(TAG, "Feeds was null");
-            } else {
-                Log.d(TAG, "Number of feeds to sync: " + feeds.size());
+                    if (feedsResponse.feeds == null || feedsResponse.feeds.isEmpty()) {
+                        continue;
+                    } else {
+                        BackendAPIClient.Feed feed = feedsResponse.feeds.get(0);
                 /*
                 If you encounter TransactionTooLargeException here, make
                 sure you don't run the syncadapter in a different process.
                 Sending several hundred operations across processes will
                 cause the exception. Seems safe inside same process though.
                  */
-                long dbfeed_id = -1;
-                for (BackendAPIClient.Feed feed : feeds) {
-                    Log.d(TAG, "Syncing: " + feed.title + "(" + (feed.items
-                            == null ? 0 : feed.items.size()) + ")");
-                    for (FeedSQL dbf: dbfeeds) {
-                        if (dbf.url.equals(feed.link)) {
-                            dbfeed_id = dbf.id;
-                            break;
-                        }
-                    }
-                    // Sync feed
-                    RssSyncHelper.syncFeedBatch(getContext(), operations, feed, dbfeed_id);
-                }
-            }
 
-            if (!operations.isEmpty()) {
-                getContext().getContentResolver()
-                        .applyBatch(RssContentProvider.AUTHORITY, operations);
-            }
-        } catch (RetrofitError e) {
-            Log.d(TAG, "Retrofit: " + e);
-            final int status;
-            if (e.getResponse() != null) {
-                Log.e(TAG, "" +
-                        e.getResponse().getStatus() +
-                        "; " +
-                        e.getResponse().getReason());
-                status = e.getResponse().getStatus();
-            } else {
-                status = 999;
-            }
-            // An HTTP error was encountered.
-            switch (status) {
-                case 401: // Unauthorized, token could possibly just be stale
-                    // auth-exceptions are hard errors, and if the token is stale,
-                    // that's too harsh
-                    //syncResult.stats.numAuthExceptions++;
-                    // Instead, report ioerror, which is a soft error
-                    syncResult.stats.numIoExceptions++;
-                    break;
-                case 404: // No such item, should never happen, programming error
-                case 415: // Not proper body, programming error
-                case 400: // Didn't specify url, programming error
-                    syncResult.databaseError = true;
-                    break;
-                default: // Default is to consider it a networking/server issue
-                    syncResult.stats.numIoExceptions++;
-                    break;
+                        Log.d(TAG, "Syncing: " + feed.title + "(" + (feed.items
+                                == null ? 0 : feed.items.size()) + ")");
+                        // Sync feed with database
+                        RssSyncHelper.syncFeedBatch(getContext(), operations, feed, dbfeeds.get(i).id);
+                    }
+
+                    // Could put this after as well, checking speed
+                    if (!operations.isEmpty()) {
+                        getContext().getContentResolver()
+                                .applyBatch(RssContentProvider.AUTHORITY, operations);
+
+                        operations.clear();
+                    }
+                } catch (RetrofitError e) {
+                    Log.d(TAG, "Retrofit: " + e);
+                    final int status;
+                    if (e.getResponse() != null) {
+                        Log.e(TAG, "" +
+                                e.getResponse().getStatus() +
+                                "; " +
+                                e.getResponse().getReason());
+                        status = e.getResponse().getStatus();
+                    } else {
+                        status = 999;
+                    }
+                    // An HTTP error was encountered.
+//                    switch (status) {
+//                        case 401: // Unauthorized, token could possibly just be stale
+//                            // auth-exceptions are hard errors, and if the token is stale,
+//                            // that's too harsh
+//                            //syncResult.stats.numAuthExceptions++;
+//                            // Instead, report ioerror, which is a soft error
+//                            syncResult.stats.numIoExceptions++;
+//                            break;
+//                        case 404: // No such item, should never happen, programming error
+//                        case 415: // Not proper body, programming error
+//                        case 400: // Didn't specify url, programming error
+//                            syncResult.databaseError = true;
+//                            break;
+//                        default: // Default is to consider it a networking/server issue
+//                            syncResult.stats.numIoExceptions++;
+//                            break;
+//                    }
+                }
             }
         } catch (RemoteException e) {
             Log.d(TAG, "RemoteExc.: " + e);
