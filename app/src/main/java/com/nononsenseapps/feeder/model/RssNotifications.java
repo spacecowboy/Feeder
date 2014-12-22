@@ -33,7 +33,6 @@ import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.ui.FeedActivity;
 import com.nononsenseapps.feeder.ui.ReaderActivity;
-import com.nononsenseapps.feeder.ui.ReaderFragment;
 
 import java.util.ArrayList;
 
@@ -52,23 +51,34 @@ public class RssNotifications {
     public static void notify(final Context context) {
         ArrayList<FeedItemSQL> feedItems = getItemsToNotify(context);
 
-        if (feedItems.isEmpty())
-            return;
+        NotificationManager nm =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        NotificationCompat.InboxStyle inboxStyle =
-                new NotificationCompat.InboxStyle();
+        if (feedItems.isEmpty()) {
+            // Dismiss since it should be empty
+            nm.cancel(mId);
+            return;
+        }
+
+        NotificationCompat.Style notStyle;
 
         String contentTitle, contentText = "";
         // Many items
         if (feedItems.size() == 1) {
+            notStyle = new NotificationCompat.BigTextStyle();
             contentTitle = "1 new RSS-story";
+            ((NotificationCompat.BigTextStyle) notStyle).setBigContentTitle(contentTitle);
+            contentText = feedItems.get(0).feedtitle + " \u2014 " + feedItems.get(0).plaintitle;
+            ((NotificationCompat.BigTextStyle) notStyle).bigText(contentText);
         } else {
+            notStyle = new NotificationCompat.InboxStyle();
             contentTitle = feedItems.size() + " new RSS-stories";
-        }
-        inboxStyle.setBigContentTitle(contentTitle);
-        for (FeedItemSQL item : feedItems) {
-            inboxStyle.addLine(item.plaintitle);
-            contentText += item.plaintitle + "\n";
+            ((NotificationCompat.InboxStyle) notStyle).setBigContentTitle(contentTitle);
+
+            for (FeedItemSQL item : feedItems) {
+                ((NotificationCompat.InboxStyle) notStyle).addLine(item.plaintitle);
+                contentText += item.feedtitle + " \u2014 " + item.plaintitle + "\n";
+            }
         }
 
         // Actions: markAsRead, enclosureplay, openlink
@@ -79,13 +89,13 @@ public class RssNotifications {
         Bitmap bm = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
 
         // TODO icon
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_stat_rss)
                 .setLargeIcon(bm)
-                        .setNumber(feedItems.size())
-                        .setAutoCancel(true)
+                .setNumber(feedItems.size())
+                .setAutoCancel(true)
                 .setContentTitle(contentTitle)
-                        .setContentText(contentText)
+                .setContentText(contentText)
                 .setCategory(NotificationCompat.CATEGORY_SOCIAL)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
 
@@ -116,12 +126,10 @@ public class RssNotifications {
         // mBuilder.addAction(R.drawable.ic_action_done_all, context.getString(R.string.mark_all_as_read), asreadpe);
 
 
-        inboxStyle.setBuilder(mBuilder);
+        notStyle.setBuilder(mBuilder);
 
-        NotificationManager mNotificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 // mId allows you to update the notification later on.
-        mNotificationManager.notify(mId, inboxStyle.build());
+        nm.notify(mId, notStyle.build());
     }
 
     public static ArrayList<FeedItemSQL> getItemsToNotify(final Context context) {
