@@ -290,11 +290,11 @@ public class FeedFragment extends Fragment
         MenuItem menuItem = menu.findItem(R.id.action_only_unread);
         final boolean onlyUnread = PrefUtils.isShowOnlyUnread(getActivity());
         menuItem.setChecked(onlyUnread);
-        menuItem.setTitle(onlyUnread ? R.string.show_all_items : R.string.show_unread_items);
+        menuItem.setTitle(onlyUnread ? R.string.show_unread_items : R.string.show_all_items);
         if (onlyUnread) {
-            menuItem.setIcon(R.drawable.ic_action_visibility);
-        } else {
             menuItem.setIcon(R.drawable.ic_action_visibility_off);
+        } else {
+            menuItem.setIcon(R.drawable.ic_action_visibility);
         }
 
         // Don't forget super call here
@@ -351,12 +351,12 @@ public class FeedFragment extends Fragment
             PrefUtils.setPrefShowOnlyUnread(getActivity(), onlyUnread);
             menuItem.setChecked(onlyUnread);
             if (onlyUnread) {
-                menuItem.setIcon(R.drawable.ic_action_visibility);
-            } else {
                 menuItem.setIcon(R.drawable.ic_action_visibility_off);
+            } else {
+                menuItem.setIcon(R.drawable.ic_action_visibility);
             }
 
-            menuItem.setTitle(onlyUnread ? R.string.show_all_items : R.string.show_unread_items);
+            menuItem.setTitle(onlyUnread ? R.string.show_unread_items : R.string.show_all_items);
             //getActivity().invalidateOptionsMenu();
             // Restart loader
             getLoaderManager().restartLoader(FEEDITEMS_LOADER, new Bundle(), this);

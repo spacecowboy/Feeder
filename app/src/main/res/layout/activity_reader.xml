@@ -25,19 +25,6 @@
 
         <include layout="@layout/toolbar_actionbar"/>
         <!-- placeholder, empty except on L -->
-
-        <TextView
-            android:id="@+id/filters_box"
-            style="@style/TextAppearance.Body"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="?actionBarOverlayTopOffset"
-            android:background="@color/primary"
-            android:paddingLeft="@dimen/keyline_content_start_minus_16dp"
-            android:paddingRight="@dimen/keyline_content_start_minus_16dp"
-            android:text="Add some filter actions here"
-            android:textColor="@android:color/primary_text_dark"
-            android:visibility="gone"/>
     </LinearLayout>
 
 </com.nononsenseapps.feeder.views.DrawShadowFrameLayout>
