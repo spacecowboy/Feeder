@@ -478,14 +478,23 @@ public class BaseActivity extends ActionBarActivity
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                boolean force = false;
                 int firstVisibleItem =
                         layoutManager.findFirstVisibleItemPosition();
+                if (recyclerView.getAdapter() != null) {
+                    int lastPos = recyclerView.getAdapter().getItemCount() - 1;
+                    if (layoutManager.findLastVisibleItemPosition() == lastPos) {
+                        // Show when last item is visible
+                       force = true;
+                    }
+                }
                 onMainContentScrolled(firstVisibleItem <= ITEMS_THRESHOLD ?
                                 0 :
                                 Integer.MAX_VALUE,
                         lastFvi - firstVisibleItem > 0 ?
                                 Integer.MIN_VALUE :
-                                lastFvi == firstVisibleItem ? 0 : Integer.MAX_VALUE);
+                                lastFvi == firstVisibleItem ? 0 : Integer.MAX_VALUE,
+                        force);
                 lastFvi = firstVisibleItem;
             }
         });
@@ -515,7 +524,7 @@ public class BaseActivity extends ActionBarActivity
      * start of the list" and INT_MAX to mean "we don't know, but not at the
      * start of the list"
      */
-    private void onMainContentScrolled(int currentY, int deltaY) {
+    private void onMainContentScrolled(int currentY, int deltaY, boolean force) {
         if (deltaY > mActionBarAutoHideSensivity) {
             deltaY = mActionBarAutoHideSensivity;
         } else if (deltaY < -mActionBarAutoHideSensivity) {
@@ -533,7 +542,7 @@ public class BaseActivity extends ActionBarActivity
         boolean shouldShow = currentY < mActionBarAutoHideMinY ||
                 (mActionBarAutoHideSignal <=
                         -mActionBarAutoHideSensivity);
-        autoShowOrHideActionBar(shouldShow);
+        autoShowOrHideActionBar(shouldShow | force);
     }
 
     protected void enableActionBarAutoHide(
@@ -545,7 +554,7 @@ public class BaseActivity extends ActionBarActivity
                     @Override
                     public void onScrollChanged(final int deltaX,
                                                 final int deltaY) {
-                        onMainContentScrolled(scrollView.getScrollY(), deltaY);
+                        onMainContentScrolled(scrollView.getScrollY(), deltaY, false);
                     }
                 });
     }
