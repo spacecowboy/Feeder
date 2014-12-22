@@ -12,9 +12,9 @@
         android:icon="@drawable/ic_action_sync"
         android:orderInCategory="900"
           app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:icon="@drawable/ic_action_settings"
-        android:orderInCategory="1000"
-        app:showAsAction="ifRoom" />
+    <!--<item android:id="@+id/action_settings"-->
+        <!--android:title="@string/action_settings"-->
+        <!--android:icon="@drawable/ic_action_settings"-->
+        <!--android:orderInCategory="1000"-->
+        <!--app:showAsAction="ifRoom" />-->
 </menu>
