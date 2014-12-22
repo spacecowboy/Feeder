@@ -16,6 +16,7 @@ import android.support.v4.view.ViewCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckedTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -129,7 +130,6 @@ public class FeedActivity extends BaseActivity {
         //mAddButton.setOnClickListener(onAddListener);
         mCheckAllButton = findViewById(R.id.checkall_button);
         ViewCompat.setElevation(mCheckAllButton, getResources().getDimension(R.dimen.elevation1));
-
 
         // New items button
         mActionFooter = findViewById(R.id.action_footer);

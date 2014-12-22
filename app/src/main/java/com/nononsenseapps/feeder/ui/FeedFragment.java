@@ -29,15 +29,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.RssContentProvider;
+import com.nononsenseapps.feeder.db.RssDatabaseService;
 import com.nononsenseapps.feeder.db.Util;
-import com.nononsenseapps.feeder.model.RssNotifications;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
@@ -60,6 +60,7 @@ public class FeedFragment extends Fragment
 
     private static final int FEEDITEMS_LOADER = 1;
     private static final int FEED_LOADER = 2;
+    private static final int FEED_SETTINGS_LOADER = 3;
 
     private static final String ARG_FEED_ID = "feed_id";
     private static final String ARG_FEED_TITLE = "feed_title";
@@ -81,6 +82,7 @@ public class FeedFragment extends Fragment
     private LinearLayoutManager mLayoutManager;
     private View mCheckAllButton;
     private int notify = 0;
+    private CheckedTextView mNotifyCheck;
 
     public FeedFragment() {
     }
@@ -123,10 +125,13 @@ public class FeedFragment extends Fragment
         setHasOptionsMenu(true);
 
         // Load some RSS
-        getLoaderManager().restartLoader(FEEDITEMS_LOADER, new Bundle(), this);
+        getLoaderManager().restartLoader(FEEDITEMS_LOADER, Bundle.EMPTY, this);
         // Load feed itself if missing info
         if (id > 0 && (title == null || title.isEmpty())) {
-            getLoaderManager().restartLoader(FEED_LOADER, new Bundle(), this);
+            getLoaderManager().restartLoader(FEED_LOADER, Bundle.EMPTY, this);
+        } else {
+            // Get notification settings at least
+            getLoaderManager().restartLoader(FEED_SETTINGS_LOADER, Bundle.EMPTY, this);
         }
     }
 
@@ -210,6 +215,18 @@ public class FeedFragment extends Fragment
             }
         });
 
+        // So is toolbar buttons
+        mNotifyCheck = (CheckedTextView) getActivity().findViewById(R.id.notifycheck);
+        mNotifyCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Remember that we are switching to opposite
+                notify = mNotifyCheck.isChecked() ? 0 : 1;
+                mNotifyCheck.setChecked(notify == 1);
+                setNotifications(notify == 1);
+            }
+        });
+
         // Pause image loading when flinging
         mRecyclerView.setOnFlingListener(new FlingingRecyclerView.OnFlingListener() {
             @Override
@@ -267,7 +284,6 @@ public class FeedFragment extends Fragment
             menu.findItem(R.id.action_edit_feed).setVisible(false);
             menu.findItem(R.id.action_delete_feed).setVisible(false);
             menu.findItem(R.id.action_add_templated).setVisible(false);
-            menu.findItem(R.id.action_toggle_notifications).setVisible(false);
         }
 
         // Set toggleable state
@@ -285,12 +301,12 @@ public class FeedFragment extends Fragment
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    private void setNotifications(boolean on) {
+        RssDatabaseService.setNotify(getActivity(), on, this.id, this.tag);
+    }
+
     private void markAsRead() {
-        if (this.id > 0) {
-            RssContentProvider.MarkFeedAsRead(getActivity(), this.id);
-        } else if (this.tag != null) {
-            RssContentProvider.MarkItemsAsRead(getActivity(), this.tag);
-        }
+        RssDatabaseService.markFeedAsRead(getActivity(), this.id, this.tag);
     }
 
     @Override
@@ -324,27 +340,6 @@ public class FeedFragment extends Fragment
             RssSyncHelper.deleteFeedAsync(getActivity(), url);
             // Tell activity to open another fragment
             ((FeedActivity) getActivity()).loadFirstFeedInDB(true);
-            return true;
-        } else if (id == R.id.action_toggle_notifications) {
-            // TODO, entire tag?
-            if (this.id > 0) {
-                ContentValues values = new ContentValues();
-                if (notify == 0) {
-                    // First mark all existing as notified so we don't spam
-                    values.put(FeedItemSQL.COL_NOTIFIED, 1);
-                    getActivity().getContentResolver()
-                            .update(FeedItemSQL.URI_FEED_ITEMS, values,
-                                    FeedItemSQL.COL_FEED + " IS ?",
-                                    Util.LongsToStringArray(this.id));
-                }
-                // Now toggle notifications
-                values.clear();
-                values.put(FeedSQL.COL_NOTIFY, notify == 1 ? 0 : 1);
-                getActivity().getContentResolver()
-                        .update(FeedSQL.URI_FEEDS, values,
-                                Util.WHEREIDIS,
-                                Util.LongsToStringArray(this.id));
-            }
             return true;
         }
 //        else if (id == R.id.action_mark_as_read) {
@@ -417,6 +412,19 @@ public class FeedFragment extends Fragment
             return new CursorLoader(getActivity(),
                     Uri.withAppendedPath(FeedSQL.URI_FEEDS, Long.toString(id)),
                     FeedSQL.FIELDS, null, null, null);
+        } else if (ID == FEED_SETTINGS_LOADER) {
+            String where;
+            String[] whereArgs;
+            if (id > 0) {
+                where = Util.WHEREIDIS;
+                whereArgs = Util.LongsToStringArray(id);
+            } else {
+                where = FeedSQL.COL_TAG + " IS ?";
+                whereArgs = Util.ToStringArray(tag);
+            }
+            return new CursorLoader(getActivity(), FeedSQL.URI_FEEDS,
+                    Util.ToStringArray("DISTINCT " + FeedSQL.COL_NOTIFY),
+                    where, whereArgs, null);
         }
         return null;
     }
@@ -430,14 +438,26 @@ public class FeedFragment extends Fragment
             mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
             mRecyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
         } else if (FEED_LOADER == cursorLoader.getId()) {
-            if (cursor.moveToNext()) {
+            if (cursor.moveToFirst()) {
                 FeedSQL feed = new FeedSQL(cursor);
                 this.title = feed.title;
                 this.url = feed.url;
                 this.notify = feed.notify;
 
                 ((BaseActivity) getActivity()).getSupportActionBar().setTitle(title);
+                mNotifyCheck.setChecked(this.notify == 1);
             }
+            // Reset loader
+            getLoaderManager().destroyLoader(cursorLoader.getId());
+        } else if (FEED_SETTINGS_LOADER == cursorLoader.getId()) {
+                if (cursor.getCount() == 1 && cursor.moveToFirst()) {
+                    // Conclusive results
+                    this.notify = cursor.getInt(0);
+                } else {
+                    this.notify = 0;
+                }
+            mNotifyCheck.setChecked(this.notify == 1);
+
             // Reset loader
             getLoaderManager().destroyLoader(cursorLoader.getId());
         }
@@ -679,7 +699,7 @@ public class FeedFragment extends Fragment
                     ActivityCompat.startActivity(getActivity(), i, options.toBundle());
                 } else {
                     // Mark as read
-                    RssContentProvider.MarkItemAsRead(getActivity(), rssItem.id);
+                    RssDatabaseService.markItemAsRead(getActivity(), rssItem.id);
                     // Open in browser since no content was posted
                     startActivity(new Intent(Intent.ACTION_VIEW,
                             Uri.parse(rssItem.enclosurelink != null ?

@@ -1,6 +1,5 @@
 <!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. -->
-<android.support.v4.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
@@ -24,54 +23,67 @@
                 android:id="@+id/container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <include layout="@layout/empty_feeds_at_all"/>
+
+                <include layout="@layout/empty_feeds_at_all" />
             </FrameLayout>
 
-            <include layout="@layout/sync_progress_indicator"
-                     android:id="@+id/sync_indicator_1"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:visibility="gone"
-                     android:minHeight="3dp"/>
+            <include
+                android:id="@+id/sync_indicator_1"
+                layout="@layout/sync_progress_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="3dp"
+                android:visibility="gone" />
 
             <include layout="@layout/include_snack_fca" />
 
         </FrameLayout>
 
         <LinearLayout
-            style="@style/HeaderBar"
             android:id="@+id/headerbar"
+            style="@style/HeaderBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:orientation="vertical">
 
-            <include layout="@layout/toolbar_actionbar"/>
+            <include layout="@layout/toolbar_actionbar" />
 
-            <TextView
-                android:id="@+id/filters_box"
-                android:visibility="gone"
-                android:layout_marginTop="?actionBarOverlayTopOffset"
-                android:paddingLeft="@dimen/keyline_content_start_minus_16dp"
-                android:paddingRight="@dimen/keyline_content_start_minus_16dp"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:background="@color/primary"
-                style="@style/TextAppearance.Body"
-                android:textColor="@android:color/primary_text_dark"
-                android:text="Add some filter actions here"/>
+                android:orientation="horizontal">
 
-            <include layout="@layout/sync_progress_indicator"
-            android:id="@+id/sync_indicator_2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="3dp"
-            android:visibility="gone"/>
+                <CheckedTextView
+                    android:id="@+id/notifycheck"
+                    style="@style/TextAppearance.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:background="?selectableItemBackground"
+                    android:checkMark="@drawable/notification_checkmark"
+                    android:clickable="true"
+                    android:gravity="center_vertical|end"
+                    android:minHeight="?actionBarSize"
+                    android:paddingRight="8dp"
+                    android:singleLine="true"
+                    android:text="Notify for new items"
+                    android:textColor="@android:color/primary_text_dark" />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/sync_indicator_2"
+                layout="@layout/sync_progress_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="3dp"
+                android:visibility="gone" />
         </LinearLayout>
 
     </com.nononsenseapps.feeder.views.DrawShadowFrameLayout>
 
     <!-- Nav drawer -->
-    <include layout="@layout/navdrawer_for_ab_overlay"/>
+    <include layout="@layout/navdrawer_for_ab_overlay" />
 
 </android.support.v4.widget.DrawerLayout>

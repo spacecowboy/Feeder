@@ -17,9 +17,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
         <activity
-            android:name="com.nononsenseapps.feeder.ui.FeedActivity"
+            android:name=".ui.FeedActivity"
             android:label="@string/app_name"
             android:theme="@style/FeedsTheme" >
             <intent-filter>
@@ -29,9 +28,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.nononsenseapps.feeder.ui.ReaderActivity"
+            android:name=".ui.ReaderActivity"
             android:label="@string/app_name"
-            android:parentActivityName="com.nononsenseapps.feeder.ui.FeedActivity"
+            android:parentActivityName=".ui.FeedActivity"
             android:theme="@style/ReaderTheme" >
 >
             <meta-data
@@ -39,11 +38,11 @@
                 android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
         </activity>
         <activity
-            android:name="com.nononsenseapps.feeder.ui.EditFeedActivity"
+            android:name=".ui.EditFeedActivity"
             android:label="@string/title_activity_edit_feed"
-            android:windowSoftInputMode="adjustResize|stateVisible"
-            android:parentActivityName="com.nononsenseapps.feeder.ui.FeedActivity"
-            android:theme="@style/EditFeedTheme" >
+            android:parentActivityName=".ui.FeedActivity"
+            android:theme="@style/EditFeedTheme"
+            android:windowSoftInputMode="adjustResize|stateVisible" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
@@ -67,27 +66,32 @@
         </activity>
 
         <provider
-            android:name="com.nononsenseapps.feeder.db.RssContentProvider"
+            android:name=".db.RssContentProvider"
             android:authorities="com.nononsenseapps.feeder.provider"
             android:enabled="true"
-            android:label="@string/app_name"
-            android:exported="false" >
+            android:exported="false"
+            android:label="@string/app_name" >
         </provider>
 
         <service
-            android:name="com.nononsenseapps.feeder.model.RssSyncHelper"
-            android:exported="false">
+            android:name=".model.RssSyncHelper"
+            android:exported="false" >
         </service>
         <service
-            android:name="com.nononsenseapps.feeder.model.RssSyncAdapterService"
+            android:name=".model.RssSyncAdapterService"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
+
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter" />
+        </service>
+        <service
+            android:name=".db.RssDatabaseService"
+            android:exported="false" >
         </service>
     </application>
 

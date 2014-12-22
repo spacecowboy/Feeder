@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 
 import com.nononsenseapps.feeder.model.AuthHelper;
 import com.nononsenseapps.feeder.ui.FeedActivity;
@@ -421,5 +422,95 @@ public class RssContentProvider extends ContentProvider {
                 ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         ContentResolver.requestSync(account,
                 RssContentProvider.AUTHORITY, settingsBundle);
+    }
+
+    public static void SetNotify(Context context, long id, boolean on) {
+        ContentValues values = new ContentValues();
+        if (on) {
+            // First mark all existing as notified so we don't spam
+            values.put(FeedItemSQL.COL_NOTIFIED, 1);
+            context.getContentResolver()
+                    .update(FeedItemSQL.URI_FEED_ITEMS, values,
+                            FeedItemSQL.COL_FEED + " IS ? AND " + FeedItemSQL.COL_NOTIFIED + " IS 0",
+                            Util.LongsToStringArray(id));
+        }
+        // Now toggle notifications
+        values.clear();
+        values.put(FeedSQL.COL_NOTIFY, on ? 1 : 0);
+        context.getContentResolver()
+                .update(FeedSQL.URI_FEEDS, values,
+                        Util.WHEREIDIS,
+                        Util.LongsToStringArray(id));
+    }
+
+    public static void SetNotify(Context context, String tag, boolean on) {
+        ContentValues values = new ContentValues();
+        if (on) {
+            // First mark all existing as notified so we don't spam
+            values.put(FeedItemSQL.COL_NOTIFIED, 1);
+            context.getContentResolver()
+                    .update(FeedItemSQL.URI_FEED_ITEMS, values,
+                            FeedItemSQL.COL_TAG + " IS ? AND " + FeedItemSQL.COL_NOTIFIED + " IS 0",
+                            Util.ToStringArray(tag));
+        }
+        // Now toggle notifications
+        values.clear();
+        values.put(FeedSQL.COL_NOTIFY, on ? 1 : 0);
+        context.getContentResolver()
+                .update(FeedSQL.URI_FEEDS, values,
+                        FeedSQL.COL_TAG + " IS ?",
+                        Util.ToStringArray(tag));
+    }
+
+    /**
+     *
+     * @param context
+     * @param id
+     * @return True if feed has notifications on, false otherwise
+     */
+    public static boolean GetNotify(Context context, long id) {
+        boolean result = false;
+
+        Cursor c = context.getContentResolver().query(FeedSQL.URI_FEEDS,
+                Util.ToStringArray(FeedSQL.COL_NOTIFY),
+                Util.WHEREIDIS, Util.LongsToStringArray(id), null);
+
+        try {
+            if (c.moveToFirst()) {
+                result = (c.getInt(0) == 1);
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        return result;
+    }
+    /**
+     *
+     * @param context
+     * @param tag
+     * @return True if all items have notifications on, false otherwise
+     */
+    public static boolean GetNotify(Context context, String tag) {
+        boolean result = false;
+
+        Cursor c = context.getContentResolver().query(FeedSQL.URI_FEEDS,
+                Util.ToStringArray("DISTINCT " + FeedSQL.COL_NOTIFY),
+                FeedSQL.COL_TAG + " IS ?", Util.ToStringArray(tag), null);
+
+        try {
+            if (c.getCount() == 1 && c.moveToFirst()) {
+                // Conclusive results
+                result = (c.getInt(0) == 1);
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        return result;
     }
 }
