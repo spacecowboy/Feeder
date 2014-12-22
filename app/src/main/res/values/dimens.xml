@@ -60,4 +60,6 @@
     <dimen name="reader_quote_gap_width">8dp</dimen>
     <dimen name="reader_quote_stripe_width">2dp</dimen>
     <dimen name="switch_padding">4dp</dimen>
+    <!-- 52 dp + 48 dp -->
+    <dimen name="toolbar_height">100dp</dimen>
 </resources>

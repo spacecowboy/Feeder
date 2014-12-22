@@ -545,9 +545,10 @@ public class FeedFragment extends Fragment
                                                           final int position) {
             if (getItemViewType(position) == HEADERTYPE) {
                 // Header
-                return new HeaderHolder(LayoutInflater.from(parent.getContext())
+                final View v = LayoutInflater.from(parent.getContext())
                         .inflate(
-                                R.layout.padding_header_item, parent, false));
+                                R.layout.padding_header_item, parent, false);
+                return new HeaderHolder(v);
             } else {
                 // normal item
                 final int item_layout = R.layout.list_story_item;

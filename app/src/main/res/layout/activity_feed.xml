@@ -51,7 +51,8 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
+                android:translationZ="2dp"
                 android:background="@color/primary"
                 android:orientation="horizontal">
 
@@ -59,13 +60,12 @@
                     android:id="@+id/notifycheck"
                     style="@style/TextAppearance.Body"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="end"
                     android:background="?selectableItemBackground"
                     android:checkMark="@drawable/notification_checkmark"
                     android:clickable="true"
                     android:gravity="center_vertical|end"
-                    android:minHeight="?actionBarSize"
                     android:paddingRight="8dp"
                     android:singleLine="true"
                     android:text="Notify for new items"
