@@ -37,6 +37,7 @@ import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
+import com.nononsenseapps.feeder.model.RssNotifications;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
@@ -338,7 +339,7 @@ public class FeedFragment extends Fragment
                 }
                 // Now toggle notifications
                 values.clear();
-                values.put(FeedSQL.COL_NOTIFY, 1 - notify);
+                values.put(FeedSQL.COL_NOTIFY, notify == 1 ? 0 : 1);
                 getActivity().getContentResolver()
                         .update(FeedSQL.URI_FEEDS, values,
                                 Util.WHEREIDIS,

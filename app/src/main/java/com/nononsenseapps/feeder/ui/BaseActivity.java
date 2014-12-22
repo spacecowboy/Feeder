@@ -27,6 +27,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.feeder.model.RssNotifications;
 import com.nononsenseapps.feeder.model.TaggedFeedsAdapter;
 import com.nononsenseapps.feeder.util.LPreviewUtils;
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase;
@@ -137,6 +138,13 @@ public class BaseActivity extends ActionBarActivity
 
         mLPreviewUtils = LPreviewUtils.getInstance(this);
         mThemedStatusBarColor = getResources().getColor(R.color.primary_dark);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Send notifications for configured feeds
+        RssNotifications.notify(this);
     }
 
     protected Toolbar getActionBarToolbar() {

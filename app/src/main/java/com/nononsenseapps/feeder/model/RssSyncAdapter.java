@@ -208,6 +208,8 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             // And broadcast end of sync
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast
                     (bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false));
+            // Send notifications for configured feeds
+            RssNotifications.notify(getContext());
         }
     }
 }
