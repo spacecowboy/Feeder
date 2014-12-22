@@ -20,37 +20,69 @@ The arguments are as follows:
   -d - enable debug mode. Default is False.
   -h - specify the listening address. Use 0.0.0.0 to listen on all.
   -p - specify the listening port. Defaults to 5000.
+  -c - specify the config file. Defaults to config.yaml
 
 In production it might be sensible to run this with something like
 uwsgi behind nginx. Note that any arguments specified will override
 duplicates in the configfile.
 
-You specify a configfile by setting the environment variable:
-
-    export FEEDER_CONFIG=/path/to/settings.py
-
-You can call the file whatever you like but it will be read like a
-python file. Example configuration would be:
-
-    # Example config
-    DEBUG = False
-    ## Use /// for relative paths and //// for absolute paths
-    SQLALCHEMY_DATABASE_URI = 'sqlite:////path/to/test.db'
-    FEEDER_ALLOW_GOOGLE = True
-    FEEDER_ALLOW_USERPASS = True
-
+You can specify a configfile as well. See config-sample.yaml for details.
 '''
-from feeder import app
+import os
+from yaml import load
+from feeder import app, db
+
+
+def load_yaml(filename):
+    '''Read a YAML file'''
+    with open(filename, 'r') as FILE:
+        return load("".join(FILE.readlines()))
+
+
+def ensure_db_exists():
+    '''
+    Tell Flask to create the database which is configured if it doesn't exist
+    '''
+    filepath = app.config.get('FEEDER_DATABASE', './feeder.db')
+    filepath = os.path.abspath(filepath)
+    if not os.path.isfile(filepath):
+        db.create_all()
+        print("Database was created successfully")
 
 
 if __name__ == '__main__':
     import sys
+    args = sys.argv[1:]
 
     # Put config/arguments here
     kw = {}
 
+    if '-c' in args:
+        i = args.index('-c')
+        configfile = args[i + 1]
+    else:
+        configfile = 'config.yaml'
+
+    try:
+        for k, v in load_yaml(configfile).items():
+            if k == 'FEEDER_DATABASE':
+                v = os.path.abspath(v)
+                if v.startswith('/'):
+                    uri = 'sqlite:///' + v
+                else:
+                    uri = 'sqlite:////' + v
+                app.config['SQLALCHEMY_DATABASE_URI'] = uri
+
+            if k.isupper():
+                # Uppercase to flask
+                app.config[k] = v
+            elif k in 'debug,host,port'.split(','):
+                # Lowercase as kwargs in run
+                kw[k] = v
+    except FileNotFoundError as e:
+        print("No config file found.")
+
     # If arguments are specified, they override config values
-    args = sys.argv[1:]
     if '--help' in args:
         exit(__doc__)
     if '-d' in args:
@@ -62,4 +94,5 @@ if __name__ == '__main__':
         i = args.index('-p')
         kw['port'] = args[i + 1]
 
+    ensure_db_exists()
     app.run(**kw)

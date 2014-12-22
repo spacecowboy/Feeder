@@ -1,0 +1,26 @@
+# Lowercase keys can be overridden by command line arguments
+# Debug mode
+debug: false
+# Address to bind to
+host: 127.0.0.1
+# Port to use
+port: 5000
+
+# Location of database file (relative or absolute)
+FEEDER_DATABASE: ./feeder.db
+# Allow login with Google account. If false, only username password can be used.
+FEEDER_ALLOW_GOOGLE: true
+# If anyone with a Google account is allowed access. If false, then the email
+# must be present in the users list below
+FEEDER_ALLOW_ANY_GOOGLE: false
+# Allow specified users to login with passwords. If false, users can only
+# use their google account to login.
+FEEDER_ALLOW_USERPASS: true
+# You can then specify users and passwords here
+FEEDER_USERS:
+  # User bob has a very simple password
+  bob: secretpassword
+  # Alice is smart and stores her password hashed. (Run hashedpassword.py)
+  alice: pbkdf2:sha1:1000$L34u7Py1$bd7bd0ea150a8d6e622bf27c4ec6cb43f590cd7e
+  # Timmy just uses his google account, but can use the password if configured
+  timmy9126@gmail.com: dummypassword

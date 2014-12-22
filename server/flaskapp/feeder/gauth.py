@@ -8,7 +8,8 @@ from httplib2 import Http
 import json
 import base64
 from .models import get_user
-from werkzeug.security import check_password_hash
+from hashlib import sha1
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
 # This is not the salt used to store passwords
@@ -36,7 +37,14 @@ def validate_token(access_token):
         # httplib2 returns byte objects
         data = json.loads(cont.decode())
 
-    return data['email']
+    email = data['email']
+    users = current_app.config.get('FEEDER_USERS', {})
+    if current_app.config.get('FEEDER_ALLOW_ANY_GOOGLE', False):
+        return email
+    elif email in users:
+        return email
+    else:
+        return None
 
 
 def validate_userpass(credentials):
@@ -57,15 +65,30 @@ def validate_userpass(credentials):
         # Enforce lowercase on password hash
         password = password.lower()
         # Check validity of username password
-        user = get_user(username, allow_creation=False)
-        if user is None or user.passwordhash is None:
-            # User does not exist or has no password
+        users = current_app.config.get('FEEDER_USERS', {})
+        #user = get_user(username, allow_creation=False)
+        #if user is None or user.passwordhash is None:
+        if username not in users:
+            # User does not exist
             return None
 
-        # Check password validity for existing user
-        if check_password_hash(user.passwordhash, password):
-            # Valid!
+        valid = False
+        # Get password
+        userpass = users[username]
+        # Stored hashed
+        if userpass.startswith('pbkdf2:sha1'):
+            valid = check_password_hash(userpass, password)
+        else:
+            # Generate hash if stored in plaintext
+            userpasshash = sha1(__ANDROID_SALT__ + userpass.encode('utf-8')).hexdigest().lower()
+            userpasshash = generate_password_hash(userpasshash)
+
+            valid = check_password_hash(userpasshash, password)
+
+        if valid:
             return username
+        else:
+            None
     except:
         # invalid user/pass
         return None

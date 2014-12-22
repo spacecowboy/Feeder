@@ -20,13 +20,6 @@ class DefaultConfig(object):
 
 # Load defaults
 app.config.from_object(DefaultConfig)
-# Read user config
-try:
-    app.config.from_envvar('FEEDER_CONFIG')
-except RuntimeError:
-    print("No config defined in environment variables (FEEDER_CONFIG).\
- Using default settings.")
-
 
 # Import database
 from feeder.database import db
