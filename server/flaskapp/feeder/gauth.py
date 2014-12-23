@@ -131,9 +131,12 @@ def authorized(fn):
             userid = validate_token(credentials)
 
         if userid is None:
+            print("User not authorized")
             # Unauthorized
             abort(401)
             return None
+        else:
+            print("User authorized:", userid)
 
         return fn(userid=userid, *args, **kwargs)
     return _wrap
