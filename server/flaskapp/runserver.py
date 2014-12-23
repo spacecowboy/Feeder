@@ -39,7 +39,9 @@ def ensure_db_exists():
     '''
     filepath = app.config.get('FEEDER_DATABASE', './feeder.db')
     filepath = os.path.abspath(filepath)
+
     if not os.path.isfile(filepath):
+        from feeder.database import db
         db.create_all()
         print("Database was created successfully")
 
@@ -73,9 +75,10 @@ if __name__ == '__main__':
         i = args.index('-p')
         kw['port'] = int(args[i + 1])
 
-    ensure_db_exists()
     # This configures rest api to run. Do it AFTER config loading
     import feeder.rest
+    # After rest import
+    ensure_db_exists()
 
     app.run(**kw)
 else:
@@ -88,5 +91,8 @@ else:
     read_config(configfile)
     # This configures rest api to run. Do it AFTER config loading
     import feeder.rest
+    # After rest import
+    ensure_db_exists()
+
     # Convenience for uwsgi
     application = app
