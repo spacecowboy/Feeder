@@ -16,12 +16,11 @@ class DefaultConfig(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///./feeder.db'
     FEEDER_ALLOW_GOOGLE = True
     FEEDER_ALLOW_USERPASS = True
+    FEEDER_ALLOW_ANY_GOOGLE = False
 
 # Load defaults
 app.config.from_object(DefaultConfig)
 
-# Import database
-from feeder.database import db
 # Import REST API
 import feeder.rest
 # read_config

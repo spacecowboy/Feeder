@@ -123,20 +123,15 @@ def authorized(fn):
         credentials = request.headers['Authorization']
         if (is_basic(credentials) and
                 current_app.config['FEEDER_ALLOW_USERPASS']):
-            print("Checking user...")
             userid = validate_userpass(credentials)
         elif (not is_basic(credentials) and
                 current_app.config['FEEDER_ALLOW_GOOGLE']):
-            print("Checking token...")
             userid = validate_token(credentials)
 
         if userid is None:
-            print("User not authorized")
             # Unauthorized
             abort(401)
             return None
-        else:
-            print("User authorized:", userid)
 
         return fn(userid=userid, *args, **kwargs)
     return _wrap

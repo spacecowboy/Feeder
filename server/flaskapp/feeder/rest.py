@@ -3,7 +3,8 @@
 The REST-API of Feeder
 '''
 
-from feeder import app, db
+from feeder import app
+from .database import db
 from .models import (Feed, FeedItem, UserFeed, UserDeletion,
                      get_user, get_feed, get_userfeed)
 #from flask_oauthlib.client import OAuth
@@ -129,6 +130,7 @@ class Feeds(Resource):
         '''Return all feeds'''
         args = getparser.parse_args()
 
+        print("Getting user")
         user = get_user(userid)
 
         #Wrong

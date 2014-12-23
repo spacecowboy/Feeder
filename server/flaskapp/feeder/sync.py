@@ -4,7 +4,7 @@ This file handles syncing the actual RSS/Atom feeds.
 '''
 
 import feedparser as fp
-from feeder import db
+from .database import db
 from sqlalchemy import distinct
 from .models import FeedItem, Feed, UserFeed
 from .util import (datetime_now,

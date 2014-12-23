@@ -29,7 +29,7 @@ duplicates in the configfile.
 You can specify a configfile as well. See config-sample.yaml for details.
 '''
 import os
-from feeder import app, db, read_config
+from feeder import app, read_config
 
 
 def ensure_db_exists():
@@ -56,13 +56,10 @@ if __name__ == '__main__':
     else:
         configfile = 'config.yaml'
 
-    try:
-        for k, v in read_config(configfile).items():
-            if k in 'debug,host,port'.split(','):
-                # Lowercase as kwargs in run
-                kw[k] = v
-    except FileNotFoundError as e:
-        exit("No config file found:\n", e)
+    for k, v in read_config(configfile).items():
+        if k in 'debug,host,port'.split(','):
+            # Lowercase as kwargs in run
+            kw[k] = v
 
     # If arguments are specified, they override config values
     if '--help' in args:
