@@ -21,6 +21,6 @@ FEEDER_USERS:
   # User bob has a very simple password
   bob: secretpassword
   # Alice is smart and stores her password hashed. (Run hashedpassword.py)
-  alice: pbkdf2:sha1:1000$L34u7Py1$bd7bd0ea150a8d6e622bf27c4ec6cb43f590cd7e
+  alice: pbkdf2:sha1:1000$1SM0kJhk$99a188f2d1dd95d8a21ac6809911fee5b1c216e4
   # Timmy just uses his google account, but can use the password if configured
   timmy9126@gmail.com: dummypassword

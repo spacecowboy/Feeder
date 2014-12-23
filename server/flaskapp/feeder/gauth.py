@@ -79,11 +79,9 @@ def validate_userpass(credentials):
         if userpass.startswith('pbkdf2:sha1'):
             valid = check_password_hash(userpass, password)
         else:
-            # Generate hash if stored in plaintext
+            # Generate android hash if stored in plaintext
             userpasshash = sha1(__ANDROID_SALT__ + userpass.encode('utf-8')).hexdigest().lower()
-            userpasshash = generate_password_hash(userpasshash)
-
-            valid = check_password_hash(userpasshash, password)
+            valid = (userpasshash == password)
 
         if valid:
             return username
