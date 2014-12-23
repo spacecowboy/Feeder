@@ -13,7 +13,5 @@ app = Flask(__name__)
 # Load defaults
 #app.config.from_object(DefaultConfig)
 
-# Import REST API
-import feeder.rest
 # read_config
 from feeder.read_config import read_config

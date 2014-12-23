@@ -29,6 +29,7 @@ duplicates in the configfile.
 You can specify a configfile as well. See config-sample.yaml for details.
 '''
 import os
+import sys
 from feeder import app, read_config
 
 
@@ -44,7 +45,6 @@ def ensure_db_exists():
 
 
 if __name__ == '__main__':
-    import sys
     args = sys.argv[1:]
 
     # Put config/arguments here
@@ -74,9 +74,11 @@ if __name__ == '__main__':
         kw['port'] = int(args[i + 1])
 
     ensure_db_exists()
+    # This configures rest api to run. Do it AFTER config loading
+    import feeder.rest
+
     app.run(**kw)
 else:
-    import sys
     args = sys.argv[1:]
     # Running with uwsgi
     if '-c' in args:
@@ -84,3 +86,7 @@ else:
         configfile = args[i + 1]
 
     read_config(configfile)
+    # This configures rest api to run. Do it AFTER config loading
+    import feeder.rest
+    # Convenience for uwsgi
+    application = app
