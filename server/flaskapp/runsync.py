@@ -8,11 +8,23 @@ Run:
 
 Then enter a line like this (syncs every 10 minutes):
 
-    */10 * * * * /path/to/python /path/to/feeder/flaskapp/runsync.py
+    */10 * * * * /path/to/python /path/to/feeder/flaskapp/runsync.py [-c configfile]
 '''
-from feeder import sync
+from feeder import sync, read_config
+import sys
 
 
-print("Caching feeds...")
-sync.cache_all_feeds()
-print("Caching complete")
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    if '-c' in args:
+        i = args.index('-c')
+        configfile = args[i + 1]
+    else:
+        configfile = 'config.yaml'
+
+    # Read config and configure database path
+    read_config(configfile)
+
+    print("Caching feeds...")
+    sync.cache_all_feeds()
+    print("Caching complete")

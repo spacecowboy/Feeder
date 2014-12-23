@@ -7,7 +7,6 @@ Configuration file can be set with environment variable FEEDER_CONFIG
 
 from flask import Flask
 
-
 app = Flask(__name__)
 
 
@@ -25,3 +24,5 @@ app.config.from_object(DefaultConfig)
 from feeder.database import db
 # Import REST API
 import feeder.rest
+# read_config
+from feeder.read_config import read_config

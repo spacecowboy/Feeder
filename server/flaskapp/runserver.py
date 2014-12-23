@@ -29,14 +29,7 @@ duplicates in the configfile.
 You can specify a configfile as well. See config-sample.yaml for details.
 '''
 import os
-from yaml import load
-from feeder import app, db
-
-
-def load_yaml(filename):
-    '''Read a YAML file'''
-    with open(filename, 'r') as FILE:
-        return load("".join(FILE.readlines()))
+from feeder import app, db, read_config
 
 
 def ensure_db_exists():
@@ -64,23 +57,12 @@ if __name__ == '__main__':
         configfile = 'config.yaml'
 
     try:
-        for k, v in load_yaml(configfile).items():
-            if k == 'FEEDER_DATABASE':
-                v = os.path.abspath(v)
-                if v.startswith('/'):
-                    uri = 'sqlite:///' + v
-                else:
-                    uri = 'sqlite:////' + v
-                app.config['SQLALCHEMY_DATABASE_URI'] = uri
-
-            if k.isupper():
-                # Uppercase to flask
-                app.config[k] = v
-            elif k in 'debug,host,port'.split(','):
+        for k, v in read_config(configfile).items():
+            if k in 'debug,host,port'.split(','):
                 # Lowercase as kwargs in run
                 kw[k] = v
     except FileNotFoundError as e:
-        print("No config file found.")
+        exit("No config file found:\n", e)
 
     # If arguments are specified, they override config values
     if '--help' in args:

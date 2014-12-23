@@ -18,5 +18,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 
 
 # Setup the database
+if 'SQLALCHEMY_DATABASE_URI' not in app.config:
+    exit('No database configured')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 db = SQLAlchemy(app)
