@@ -78,3 +78,7 @@ if __name__ == '__main__':
 
     ensure_db_exists()
     app.run(**kw)
+else:
+    # Running with uwsgi
+    configfile = 'config.yaml'
+    read_config(configfile)
