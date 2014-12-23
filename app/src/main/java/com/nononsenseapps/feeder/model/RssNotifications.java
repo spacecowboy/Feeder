@@ -76,7 +76,7 @@ public class RssNotifications {
             ((NotificationCompat.InboxStyle) notStyle).setBigContentTitle(contentTitle);
 
             for (FeedItemSQL item : feedItems) {
-                ((NotificationCompat.InboxStyle) notStyle).addLine(item.plaintitle);
+                ((NotificationCompat.InboxStyle) notStyle).addLine(item.feedtitle + " \u2014 " + item.plaintitle);
                 contentText += item.feedtitle + " \u2014 " + item.plaintitle + "\n";
             }
         }
