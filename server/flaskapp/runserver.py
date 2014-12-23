@@ -76,6 +76,11 @@ if __name__ == '__main__':
     ensure_db_exists()
     app.run(**kw)
 else:
+    import sys
+    args = sys.argv[1:]
     # Running with uwsgi
-    configfile = 'config.yaml'
+    if '-c' in args:
+        i = args.index('-c')
+        configfile = args[i + 1]
+
     read_config(configfile)
