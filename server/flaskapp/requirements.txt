@@ -1,3 +1,4 @@
+pyyaml
 flask
 Flask-SQLAlchemy
 httplib2
