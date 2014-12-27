@@ -11,16 +11,16 @@ import android.net.Uri;
 public class FeedSQL {
     // SQL convention says Table name should be "singular"
     public static final String TABLE_NAME = "Feed";
-    // A view which also reports 'unreadcount'
-    public static final String VIEWCOUNT_NAME = "WithUnreadCount";
-    // A view of distinct tags and their unread counts
-    public static final String VIEWTAGS_NAME = "TagsWithUnreadCount";
     // URIs
     public static final Uri URI_FEEDS = Uri.withAppendedPath(
             Uri.parse(RssContentProvider.SCHEME + RssContentProvider.AUTHORITY),
             TABLE_NAME);
+    // A view which also reports 'unreadcount'
+    public static final String VIEWCOUNT_NAME = "WithUnreadCount";
     public static final Uri URI_FEEDSWITHCOUNTS =
             Uri.withAppendedPath(URI_FEEDS, VIEWCOUNT_NAME);
+    // A view of distinct tags and their unread counts
+    public static final String VIEWTAGS_NAME = "TagsWithUnreadCount";
     public static final Uri URI_TAGSWITHCOUNTS =
             Uri.withAppendedPath(URI_FEEDS, VIEWTAGS_NAME);
     // URI codes, must be unique
@@ -37,15 +37,9 @@ public class FeedSQL {
     public static final String COL_TAG = "tag";
     public static final String COL_TIMESTAMP = "timestamp";
     public static final String COL_NOTIFY = "notify";
-    // Used on count view
-    public static final String COL_UNREADCOUNT = "unreadcount";
     // For database projection so order is consistent
     public static final String[] FIELDS = {COL_ID, COL_TITLE, COL_URL,
             COL_TAG, COL_TIMESTAMP, COL_NOTIFY};
-    public static final String[] FIELDS_VIEWCOUNT = {COL_ID, COL_TITLE,
-            COL_URL, COL_TAG, COL_TIMESTAMP, COL_UNREADCOUNT};
-    public static final String[] FIELDS_TAGSWITHCOUNT = {COL_ID, COL_TAG,
-            COL_UNREADCOUNT};
     /*
      * The SQL code that creates a Table for storing stuff in.
      * Note that the last row does NOT end in a comma like the others.
@@ -60,31 +54,37 @@ public class FeedSQL {
                     + COL_TIMESTAMP + " TEXT,"
                     + COL_NOTIFY + " INTEGER NOT NULL DEFAULT 0,"
                     // Unique constraint
-                    + " UNIQUE(" + COL_URL +") ON CONFLICT REPLACE"
+                    + " UNIQUE(" + COL_URL + ") ON CONFLICT REPLACE"
                     + ")";
+    // Used on count view
+    public static final String COL_UNREADCOUNT = "unreadcount";
+    public static final String[] FIELDS_VIEWCOUNT = {COL_ID, COL_TITLE,
+            COL_URL, COL_TAG, COL_TIMESTAMP, COL_UNREADCOUNT};
     public static final String CREATE_COUNT_VIEW =
             "CREATE TEMP VIEW IF NOT EXISTS " + VIEWCOUNT_NAME
-            + " AS SELECT " + Util.arrayToCommaString(FIELDS_VIEWCOUNT)
-            + " FROM " + TABLE_NAME
-            + " LEFT JOIN " + " (SELECT COUNT(1) AS " + COL_UNREADCOUNT
-            + "," + FeedItemSQL.COL_FEED + " FROM " + FeedItemSQL.TABLE_NAME
-            + " WHERE " + FeedItemSQL.COL_UNREAD + " IS 1 " + " GROUP BY "
-            + FeedItemSQL.COL_FEED + ") ON " + TABLE_NAME + "." + COL_ID
-            + " = " + FeedItemSQL.COL_FEED;
+                    + " AS SELECT " + Util.arrayToCommaString(FIELDS_VIEWCOUNT)
+                    + " FROM " + TABLE_NAME
+                    + " LEFT JOIN " + " (SELECT COUNT(1) AS " + COL_UNREADCOUNT
+                    + "," + FeedItemSQL.COL_FEED + " FROM " + FeedItemSQL.TABLE_NAME
+                    + " WHERE " + FeedItemSQL.COL_UNREAD + " IS 1 " + " GROUP BY "
+                    + FeedItemSQL.COL_FEED + ") ON " + TABLE_NAME + "." + COL_ID
+                    + " = " + FeedItemSQL.COL_FEED;
+    public static final String[] FIELDS_TAGSWITHCOUNT = {COL_ID, COL_TAG,
+            COL_UNREADCOUNT};
     public static final String CREATE_TAGS_VIEW =
             "CREATE TEMP VIEW IF NOT EXISTS " + VIEWTAGS_NAME
-            + " AS SELECT " + Util.arrayToCommaString(COL_ID, COL_TAG)
-            //+ ",SUM(" + COL_UNREADCOUNT + ") AS " + COL_UNREADCOUNT
-            + "," + COL_UNREADCOUNT
-            + " FROM " + TABLE_NAME
-            + " LEFT JOIN " + " (SELECT COUNT(1) AS " + COL_UNREADCOUNT
-            + "," + FeedItemSQL.COL_TAG + " AS itemtag "
-            + " FROM " + FeedItemSQL.TABLE_NAME
-            + " WHERE " + FeedItemSQL.COL_UNREAD + " IS 1 "
-            + " GROUP BY " + "itemtag"
-            + ") ON " + TABLE_NAME + "." + COL_TAG
-            + " IS " + "itemtag"
-            + " GROUP BY " + COL_TAG;
+                    + " AS SELECT " + Util.arrayToCommaString(COL_ID, COL_TAG)
+                    //+ ",SUM(" + COL_UNREADCOUNT + ") AS " + COL_UNREADCOUNT
+                    + "," + COL_UNREADCOUNT
+                    + " FROM " + TABLE_NAME
+                    + " LEFT JOIN " + " (SELECT COUNT(1) AS " + COL_UNREADCOUNT
+                    + "," + FeedItemSQL.COL_TAG + " AS itemtag "
+                    + " FROM " + FeedItemSQL.TABLE_NAME
+                    + " WHERE " + FeedItemSQL.COL_UNREAD + " IS 1 "
+                    + " GROUP BY " + "itemtag"
+                    + ") ON " + TABLE_NAME + "." + COL_TAG
+                    + " IS " + "itemtag"
+                    + " GROUP BY " + COL_TAG;
     // Fields corresponding to database columns
     public long id = -1;
     public String title = null;
@@ -92,6 +92,7 @@ public class FeedSQL {
     public String tag = null;
     public String timestamp = null;
     public int notify = 0;
+
     /**
      * No need to do anything, fields are already set to default values above
      */
@@ -141,5 +142,36 @@ public class FeedSQL {
             values.put(COL_TIMESTAMP, timestamp);
 
         return values;
+    }
+
+    /**
+     * Given a url of http://www.bla.com/foo/bar, this method
+     * returns bla.com
+     *
+     * @return the domain of the url or null
+     */
+    public String getDomain() {
+        if (url == null)
+            return null;
+
+        String domain = url;
+        // Strip http://
+        int start = domain.indexOf("://");
+        if (start > 0)
+            start += 3;
+        else
+            start = 0;
+        // If www, strip that too
+        if (domain.indexOf("www.") == start) {
+            start += 4;
+        }
+        // Strip /foo/bar
+        int end = domain.indexOf("/", start);
+        if (end < 1)
+            domain = domain.substring(start);
+        else
+            domain = domain.substring(start, end);
+
+        return domain;
     }
 }
