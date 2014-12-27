@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nononsenseapps.feeder" >
 
+    <!-- Import export feeds -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Obvious.. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- For getting Google account -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />

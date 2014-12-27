@@ -1,9 +1,12 @@
 package com.nononsenseapps.feeder.db;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
+
+import java.util.ArrayList;
 
 /**
  * SQL which handles the feeds
@@ -173,5 +176,27 @@ public class FeedSQL {
             domain = domain.substring(start, end);
 
         return domain;
+    }
+
+
+
+    public static ArrayList<FeedSQL> getFeeds(final Context context, final String where,
+                                               final String[] args, final String sort) {
+        ArrayList<FeedSQL> feeds = new ArrayList<FeedSQL>();
+
+        Cursor c = context.getContentResolver()
+                .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS, where, args, sort);
+
+        try {
+            while (c.moveToNext()) {
+                feeds.add(new FeedSQL(c));
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        return feeds;
     }
 }
