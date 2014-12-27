@@ -12,9 +12,12 @@
         android:icon="@drawable/ic_action_sync"
         android:orderInCategory="900"
           app:showAsAction="ifRoom" />
-    <!--<item android:id="@+id/action_settings"-->
-        <!--android:title="@string/action_settings"-->
-        <!--android:icon="@drawable/ic_action_settings"-->
-        <!--android:orderInCategory="1000"-->
-        <!--app:showAsAction="ifRoom" />-->
+    <item android:id="@+id/action_opml_export"
+        android:title="Export feeds to OPML"
+        android:orderInCategory="1001"
+        app:showAsAction="never"/>
+    <item android:id="@+id/action_opml_import"
+        android:title="Import feeds from OPML"
+        android:orderInCategory="1002"
+        app:showAsAction="never"/>
 </menu>

@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui;
 
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -16,21 +18,31 @@ import android.support.v4.view.ViewCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckedTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
+import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.AuthHelper;
+import com.nononsenseapps.feeder.model.OPMLParser;
+import com.nononsenseapps.feeder.model.OPMLWriter;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
 
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 
 public class FeedActivity extends BaseActivity {
 
+    private static final int EXPORT_OPML_CODE = 101;
+    private static final int IMPORT_OPML_CODE = 102;
     private Fragment mFragment;
     private DrawShadowFrameLayout mDrawShadowFrameLayout;
     private View mCheckAllButton;
@@ -215,8 +227,55 @@ public class FeedActivity extends BaseActivity {
         } else if (id == R.id.action_add) {
             startActivity(new Intent(FeedActivity.this, EditFeedActivity.class));
             return true;
+        } else if (R.id.action_opml_export == id) {
+            // Choose file, then export
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intent.setType("text/opml");
+            intent.putExtra(Intent.EXTRA_TITLE, "feeder.opml");
+            startActivityForResult(intent, EXPORT_OPML_CODE);
+        } else if (R.id.action_opml_import == id) {
+            // Choose file
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                    Util.ToStringArray("text/plain", "text/xml", "text/opml", "*/*"));
+            startActivityForResult(intent, IMPORT_OPML_CODE);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        if (EXPORT_OPML_CODE == requestCode && Activity.RESULT_OK == resultCode) {
+            // TODO avoid UI-thread
+            if (resultData != null) {
+                Uri uri = resultData.getData();
+
+                try {
+                    OutputStream os = getContentResolver().openOutputStream(uri);
+                    OPMLWriter writer = new OPMLWriter(this);
+                    writer.writeOutputStream(os);
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    // TODO tell user about error
+                }
+            }
+        } else if (IMPORT_OPML_CODE == requestCode && Activity.RESULT_OK == resultCode) {
+            // TODO avoid UI-thread
+            if (resultData != null) {
+                Uri uri = resultData.getData();
+                try {
+                    InputStream is = getContentResolver().openInputStream(uri);
+                    OPMLParser parser = new OPMLParser(this);
+                    parser.parseInputStream(is);
+                    is.close();
+                } catch (SAXException | IOException e) {
+                    // TODO tell user about error
+                }
+            }
+        }
     }
 
     /**

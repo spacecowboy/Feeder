@@ -17,8 +17,8 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class OPMLParser implements ContentHandler {
 
@@ -47,7 +47,7 @@ public class OPMLParser implements ContentHandler {
             if (c.moveToNext()) {
                 result = new FeedSQL(c);
             } else {
-                result = new FeedSQL(c);
+                result = new FeedSQL();
                 result.url = url;
             }
         } finally {
@@ -60,17 +60,17 @@ public class OPMLParser implements ContentHandler {
     }
 
     public void parseFile(final String path) throws IOException, SAXException {
+        // Open file
+        File file = new File(path);
+
+        parseInputStream(new FileInputStream(file));
+    }
+
+    public void parseInputStream(final InputStream is) throws IOException, SAXException {
         this.mCurrentTag = null;
         ignoring = 0;
         this.isFeedTag = false;
 
-        // Open file
-        File file = new File(path);
-
-        if (!file.isFile()) {
-            throw new FileNotFoundException("Specified path was not a file");
-        }
-        FileInputStream is = new FileInputStream(file);
         InputSource src = new InputSource(is);
         mParser.parse(src);
         is.close();
@@ -108,11 +108,14 @@ public class OPMLParser implements ContentHandler {
 
             if ("rss".equals(attr.getValue("type"))) {
                 isFeedTag = true;
-                FeedSQL feed = getFeed(mContext, attr.getValue("xmlUrl"));
+                // Yes, tagsoup seems to make the tags lowercase
+                FeedSQL feed = getFeed(mContext, attr.getValue("xmlurl"));
                 feed.title = attr.getValue("title");
                 feed.tag = mCurrentTag;
 
-                saveFeed(feed);
+                if (feed.url != null && feed.title != null) {
+                    saveFeed(feed);
+                }
             } else if (mCurrentTag == null) {
                 mCurrentTag = attr.getValue("title");
             } else {

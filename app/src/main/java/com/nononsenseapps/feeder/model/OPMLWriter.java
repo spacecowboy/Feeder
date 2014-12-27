@@ -9,8 +9,11 @@ import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.Util;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class OPMLWriter {
@@ -23,7 +26,7 @@ public class OPMLWriter {
             "  <body>\n";
     private static final String ENDOPML = "  </body>\n" +
             "</opml>";
-    private static final String ENDTAGFMT = "    </outline>";
+    private static final String ENDTAGFMT = "    </outline>\n";
     private static final String STARTTAGFMT = "    <outline title=\"%1$s\" text=\"%1$s\">\n";
     private static final String FEEDFMT = "    <outline title=\"%1$s\" text=\"%1$s\" type=\"rss\" xmlUrl=\"%2$s\"/>\n";
     private static final String TAG = "OPMLWriter";
@@ -35,10 +38,14 @@ public class OPMLWriter {
         this.mContext = context;
     }
 
-    public void writeFile(final String path) {
+    public void writeFile(final String path) throws FileNotFoundException {
+        writeOutputStream(new FileOutputStream(path));
+    }
+
+    public void writeOutputStream(final OutputStream os) {
         try {
             // Open file
-            BufferedWriter bf = new BufferedWriter(new FileWriter(path));
+            BufferedWriter bf = new BufferedWriter(new OutputStreamWriter(os));
 
             bf.write(STARTOPML);
 
