@@ -4,38 +4,56 @@
 
 **GPLv2**, for more info see *LICENSE*.
 
-### How to clone
+### Quick install
 
-Since I have a submodule in this repo, remember to clone recursively:
+Clone the project:
 
     git clone --recursive https://github.com/spacecowboy/Feeder.git
 
-This is equivalent to doing it in two steps:
+Then build and install the app to your phone which is connected via USB:
 
-    git clone https://github.com/spacecowboy/Feeder.git
-    git submodule update --init --recursive
+    ./gradlew installProdDebug
 
-### How to build Android client?
+My server is configured by default and you can use your Google account (no password required) to login.
 
-Quick install:
+### More details
 
-    ./gradlew installPlayDebug
+This is an RSS app for Android.
+Unlike some simple feed readers out there, this app interfaces with a server 
+which is included in the `server/flaskapp` directory. The server allows easy
+configuration with a yaml-file and you can setup the server to only allow
+certain usernames/password. You can also configure it to accept a valid Google token
+so people can login via their Google accounts, without giving up their passwords
+(they only have to reveal their email addresses).
+Furthermore, you can also allow
+anyone with a Google account to login if you so desire.
 
-For more possible options, see:
+The app is currently useless without a server to talk to as all the feed processing
+and parsing happens serverside. This is done to increase the speed (substantially)
+and allows synchronizations to be made extremely fast. Parsing the feeds on device 
+can be quite slow. Future versions of the server might allow anonymous usage, or
+the app might allow device local parsing. I care about speed and that just isn't there
+at the moment.
 
-    ./gradlew tasks
+### Features
 
-The client is currently hardcoded to sync with the server I'm running.
-It requires you to authenticate with your Google account so you don't
-mess with other people's feeds. Note that no passwords are transmitted
-or stored. Only an auth-token (time limited access code) is requested
-on device which only authorizes me to check what e-mail address requested
-the token.
+* Offline reading
+* Lightning fast synchronization
+* Notification support
+* OPML Import/Export
+* Material desing
 
-The app is useless without the server. Future versions of the server
-will support simple username/password to be able to build the app without
-play services available.
+### How to run your own server?
 
-### How to run the server yourself?
+Either directly on your machine if you have Python3 installed, or
+using Docker, which is the most fool-proof way.
 
 See [server/flaskapp](server/flaskapp).
+
+### Screenshots
+
+<img src="graphics/Screenshot_2014-12-28-00-43-24.png" width=50%/>
+<img src="graphics/Screenshot_2014-12-28-00-43-37.png" width=50%/>
+<img src="graphics/Screenshot_2014-12-28-00-43-46.png" width=50%/>
+<img src="graphics/Screenshot_2014-12-28-00-44-02.png" width=50%/>
+<img src="graphics/Screenshot_2014-12-28-00-44-18.png" width=50%/>
