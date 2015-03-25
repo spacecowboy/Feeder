@@ -4,6 +4,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/listPreferredItemHeightSmall"
+    android:background="?android:selectableItemBackground"
                 android:paddingBottom="2dip"
                 android:paddingTop="2dip"
                 tools:ignore="RtlSymmetry">
@@ -26,7 +27,7 @@
         android:id="@+id/tag_expander"
         android:layout_width="?android:attr/expandableListPreferredItemPaddingLeft"
         android:layout_height="match_parent"
-        android:background="?android:selectableItemBackground"
+        android:background="?android:selectableItemBackgroundBorderless"
         android:layout_alignParentStart="true"/>
 
     <TextView

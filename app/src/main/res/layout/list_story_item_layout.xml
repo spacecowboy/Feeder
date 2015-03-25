@@ -7,7 +7,7 @@
     <ImageView
         android:id="@+id/story_image"
         android:layout_width="@dimen/item_img_def_width"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/item_img_def_width"
         android:visibility="visible" />
 
     <TextView

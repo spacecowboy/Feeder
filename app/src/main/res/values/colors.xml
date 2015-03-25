@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="primary">@color/material_deep_purple_700</color>
-    <color name="primary_dark">@color/material_deep_purple_900</color>
+    <color name="primary">@color/background_material_dark</color>
+    <color name="primary_dark">@android:color/black</color>
     <color name="accent">@color/material_blue_grey_500</color>
     <color name="accent_light">@color/material_blue_grey_300</color>
     <color name="translucent_actionbar_background">@color/primary</color>
-    <color name="navdrawer_background">@color/background_material_dark</color>
+    <color name="navdrawer_background">@android:color/black</color>
     <color name="navdrawer_text_color">@color/primary_text_default_material_dark</color>
     <color name="navdrawer_text_color_selected">@color/primary</color>
     <color name="navdrawer_icon_tint">#808080</color>
     <color name="navdrawer_icon_tint_selected">@color/primary</color>
     <color name="black_overlay">#66000000</color>
+
+    <color name="ripple_material_dark">@color/accent</color>
 
     <!-- Material Text colors -->
     <!-- 38% = 61 -->
@@ -24,7 +26,6 @@
     <!-- Material Colors -->
 
     <color name="background_material_dark">#ff212121</color>
-    <color name="ripple_material_dark">#20ffffff</color>
     <color name="button_material_dark">#ff5a595b</color>
     <color name="bright_foreground_material_dark">@android:color/white</color>
     <color name="bright_foreground_material_light">@android:color/black</color>

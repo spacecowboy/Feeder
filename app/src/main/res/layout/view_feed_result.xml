@@ -3,6 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:background="?android:selectableItemBackground"
               android:paddingBottom="6dp"
               android:paddingTop="6dp"
               android:layout_width="match_parent"
