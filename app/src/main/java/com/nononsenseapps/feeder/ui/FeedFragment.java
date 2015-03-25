@@ -33,6 +33,7 @@ import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
@@ -42,7 +43,6 @@ import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.FlingingRecyclerView;
-import com.squareup.picasso.Picasso;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -228,28 +228,28 @@ public class FeedFragment extends Fragment
         });
 
         // Pause image loading when flinging
-        mRecyclerView.setOnFlingListener(new FlingingRecyclerView.OnFlingListener() {
-            @Override
-            public void flingStateChange(boolean flinging) {
-                if (flinging) {
-                    Picasso.with(getActivity()).pauseTag(FeedFragment.this);
-                } else {
-                    Picasso.with(getActivity()).resumeTag(FeedFragment.this);
-                }
-            }
-        });
-        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (RecyclerView.SCROLL_STATE_IDLE == newState ||
-                        RecyclerView.SCROLL_STATE_DRAGGING == newState) {
-                    Picasso.with(getActivity()).resumeTag(FeedFragment.this);
-                } else {
-                    Picasso.with(getActivity()).pauseTag(FeedFragment.this);
-                }
-            }
-        });
+//        mRecyclerView.setOnFlingListener(new FlingingRecyclerView.OnFlingListener() {
+//            @Override
+//            public void flingStateChange(boolean flinging) {
+//                if (flinging) {
+//                    Glide.with(FeedFragment.this).pauseRequests();
+//                } else {
+//                    Glide.with(FeedFragment.this).resumeRequests();
+//                }
+//            }
+//        });
+//        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                if (RecyclerView.SCROLL_STATE_IDLE == newState ||
+//                        RecyclerView.SCROLL_STATE_DRAGGING == newState) {
+//                    Glide.with(FeedFragment.this).resumeRequests();
+//                } else {
+//                    Glide.with(FeedFragment.this).pauseRequests();
+//                }
+//            }
+//        });
 
         return rootView;
     }
@@ -271,8 +271,6 @@ public class FeedFragment extends Fragment
 
     @Override
     public void onDetach() {
-        // cancel any pending image loading
-        Picasso.with(getActivity()).cancelTag(FeedFragment.this);
         super.onDetach();
     }
 
@@ -722,10 +720,12 @@ public class FeedFragment extends Fragment
 
                 // Use the parent's height
                 int h = itemView.getHeight();
+                //Log.d("JONAS3", "iv:" + imageView.getHeight() + ", item:" + h);
 
-                Picasso.with(getActivity()).load(rssItem.imageurl).resize(w, h).centerCrop().noFade()
-                        .tag(FeedFragment.this)
-                        .into(imageView);
+                Glide.with(FeedFragment.this).load(rssItem.imageurl).centerCrop().into(imageView);
+                //Picasso.with(getActivity()).load(rssItem.imageurl).resize(w, h).centerCrop().noFade()
+                //        .tag(FeedFragment.this)
+                //        .into(imageView);
 
 //                if (isGrid) {
 //                    textGroup.setBackground(bgProtection);

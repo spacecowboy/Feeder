@@ -34,14 +34,16 @@ import android.text.style.ImageSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.text.HtmlToSpannedConverter;
-import com.squareup.picasso.Picasso;
 
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
     final Context appContext;
@@ -49,7 +51,7 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
 
     final String mText;
     final Point maxSize;
-    final Picasso p;
+    final RequestManager g;
 
     // Used to insert alt text for images
     ImageTagHunter.Image lastImg = null;
@@ -62,7 +64,8 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
         mDensityScale = context.getResources().getDisplayMetrics().density;
 
         appContext = context.getApplicationContext();
-        p = Picasso.with(appContext);
+        //p = Picasso.with(appContext);
+        g = Glide.with(appContext);
     }
 
     Drawable getImgDrawable(final Attributes attributes) {
@@ -114,22 +117,22 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
             }
 
             final Bitmap b;
-            if (shrunk) {
-                Log.d("JONAS2", "Resizing with picasso");
-                b = p.load(source).resize(w, h).tag(ImageTextLoader.this).get();
-            } else if (hasSize) {
-                Log.d("JONAS", "Image is small enough, getting");
-                // No resize necessary since we know it is "small"
-                b = p.load(source).tag(ImageTextLoader.this).get();
+            if (shrunk || hasSize) {
+                Log.d("JONAS2", "Resizing with library");
+                b = g.load(source).asBitmap().fitCenter().into(w, h).get();
+                //b = p.load(source).resize(w, h).tag(ImageTextLoader.this).get();
+//            } else if (hasSize) {
+//                Log.d("JONAS", "Image is small enough, getting directly");
+//                // No resize necessary since we know it is "small"
+//                //b = p.load(source).tag(ImageTextLoader.this).get();
             } else if (hasPercentSize) {
                 Log.d("JONAS2", "Percentsize, " +
                         "scaling for max");
-                b = p.load(source).resize(maxSize.x,
-                        maxSize.y).centerInside().tag(ImageTextLoader.this).get();
+                b = g.load(source).asBitmap().fitCenter().into(maxSize.x, maxSize.y).get();
             } else {
                 Log.d("JONAS2", "no size info, " +
                         "using intrinsic");
-                b = p.load(source).tag(ImageTextLoader.this).get();
+                b = g.load(source).asBitmap().fitCenter().into(maxSize.x, maxSize.y).get();
             }
 
             if (w == -1) {
@@ -152,7 +155,7 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
                            "" + d.getIntrinsicHeight() + " vs " +
                            w + ", " + h);
             d.setBounds(0, 0, w, h);
-        } catch (IOException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Log.e("JONAS", "" + e.getMessage());
         }
         return d;
@@ -200,10 +203,11 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
 
         int w1, h1;
         try {
-            final Bitmap b = p.load(video.imageurl).tag(ImageTextLoader.this).get();
-            final Point newSize = scaleImage(b.getWidth(), b.getHeight());
-            w1 = newSize.x;
-            h1 = newSize.y;
+            //final Bitmap b = p.load(video.imageurl).tag(ImageTextLoader.this).get();
+            final Bitmap b = g.load(video.imageurl).asBitmap().fitCenter().into(maxSize.x, maxSize.y).get();
+            //final Point newSize = scaleImage(b.getWidth(), b.getHeight());
+            w1 = b.getWidth();
+            h1 = b.getHeight();
             final BitmapDrawable d = new BitmapDrawable(getContext()
                     .getResources(), b);
             Log.d("JONASYOUTUBE", "Bounds: " + d.getIntrinsicWidth() + ", " +
@@ -213,7 +217,7 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
             //d.setBounds(0, 0, w1, h1);
             // Set in layer
             layers[0] = d;
-        } catch (IOException e) {
+        } catch (InterruptedException | ExecutionException e) {
             Log.e("JONASYOUTUBE", "" + e.getMessage());
             throw new NullPointerException(e.getLocalizedMessage());
         }
@@ -264,7 +268,8 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
     @Override
     protected void onStopLoading() {
         // Attempt to cancel the current load task if possible.
-        p.cancelTag(ImageTextLoader.this);
+        //p.cancelTag(ImageTextLoader.this);
+        //g.pauseRequests();
         cancelLoad();
     }
 

@@ -103,7 +103,7 @@ public class ListStoryItem extends FrameLayout {
 
         // Image last
         if (mStoryImage.getVisibility() != View.GONE) {
-          layoutView(mStoryImage, getRight() - imgWidth, 0, imgWidth, getMeasuredHeightWithMargins(mStoryImage));
+          layoutView(mStoryImage, getRight() - imgWidth, 0, imgWidth, currentTop);//getMeasuredHeightWithMargins(mStoryImage));
         }
     }
 
