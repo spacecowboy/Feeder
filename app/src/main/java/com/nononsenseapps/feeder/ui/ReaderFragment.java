@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Jonas Kalderstam.
+ * Copyright (c) 2015 Jonas Kalderstam.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -264,8 +263,9 @@ public class ReaderFragment extends Fragment
         // Add filename to tooltip
         if (mRssItem.enclosurelink != null) {
             String filename = mRssItem.getEnclosureFilename();
-            if (filename != null)
+            if (filename != null) {
                 menu.findItem(R.id.action_open_enclosure).setTitle(filename);
+            }
         }
 
         // Don't forget super call here
@@ -274,19 +274,19 @@ public class ReaderFragment extends Fragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-        final long id = menuItem.getItemId();
-        if (id == R.id.action_open_in_browser) {
-            // Open in browser
-            startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse(mRssItem.link)));
-            return true;
-        } else if (id == R.id.action_open_enclosure) {
-            // Open enclosure link
-            startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse(mRssItem.enclosurelink)));
-            return true;
-        } else {
-            return super.onOptionsItemSelected(menuItem);
+        switch (menuItem.getItemId()) {
+            case R.id.action_open_in_browser:
+                // Open in browser
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(mRssItem.link)));
+                return true;
+            case R.id.action_open_enclosure:
+                // Open enclosure link
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(mRssItem.enclosurelink)));
+                return true;
+            default:
+                return super.onOptionsItemSelected(menuItem);
         }
     }
 
