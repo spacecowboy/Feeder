@@ -1,6 +1,22 @@
+/*
+ * Copyright (c) 2015 Jonas Kalderstam.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.nononsenseapps.feeder.ui;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -22,6 +38,7 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -83,6 +100,65 @@ public class FeedFragment extends Fragment
     private View mCheckAllButton;
     private int notify = 0;
     private CheckedTextView mNotifyCheck;
+    private ActionMode mActionMode = null;
+    private FeedItemSQL mSelectedItem = null;
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        // Called when the action mode is created; startActionMode() was called
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.contextmenu_feedfragment, menu);
+
+            // Show/Hide enclosure
+            menu.findItem(R.id.action_open_enclosure).setVisible(mSelectedItem.enclosurelink != null);
+            // Add filename to tooltip
+            if (mSelectedItem.enclosurelink != null) {
+                String filename = mSelectedItem.getEnclosureFilename();
+                if (filename != null) {
+                    menu.findItem(R.id.action_open_enclosure).setTitle(filename);
+                }
+            }
+
+            return true;
+        }
+
+        // Called each time the action mode is shown. Always called after onCreateActionMode, but
+        // may be called multiple times if the mode is invalidated.
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.action_open_in_browser:
+                    // Open in browser
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(mSelectedItem.link)));
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                case R.id.action_open_enclosure:
+                    // Open enclosure link
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(mSelectedItem.enclosurelink)));
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mActionMode = null;
+            mSelectedItem = null;
+        }
+    };
 
     public FeedFragment() {
     }
@@ -448,12 +524,12 @@ public class FeedFragment extends Fragment
             // Reset loader
             getLoaderManager().destroyLoader(cursorLoader.getId());
         } else if (FEED_SETTINGS_LOADER == cursorLoader.getId()) {
-                if (cursor.getCount() == 1 && cursor.moveToFirst()) {
-                    // Conclusive results
-                    this.notify = cursor.getInt(0);
-                } else {
-                    this.notify = 0;
-                }
+            if (cursor.getCount() == 1 && cursor.moveToFirst()) {
+                // Conclusive results
+                this.notify = cursor.getInt(0);
+            } else {
+                this.notify = 0;
+            }
             mNotifyCheck.setChecked(this.notify == 1);
 
             // Reset loader
@@ -467,7 +543,6 @@ public class FeedFragment extends Fragment
             mAdapter.swapCursor(null);
         }
     }
-
 
     class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -645,7 +720,7 @@ public class FeedFragment extends Fragment
         // Complex data items may need more than one view per item, and
         // you provide access to all the views for a data item in a view holder
         public class ViewHolder extends RecyclerView.ViewHolder
-                implements View.OnClickListener, ViewTreeObserver.OnPreDrawListener {
+                implements View.OnClickListener, View.OnLongClickListener, ViewTreeObserver.OnPreDrawListener {
             public final TextView titleTextView;
             public final TextView bodyTextView;
             public final TextView dateTextView;
@@ -658,6 +733,7 @@ public class FeedFragment extends Fragment
             public ViewHolder(View v) {
                 super(v);
                 v.setOnClickListener(this);
+                v.setOnLongClickListener(this);
                 //textGroup = v.findViewById(R.id.story_text);
                 titleTextView = (TextView) v.findViewById(R.id.story_snippet);
                 bodyTextView = (TextView) v.findViewById(R.id.story_body);
@@ -677,6 +753,9 @@ public class FeedFragment extends Fragment
              */
             @Override
             public void onClick(final View view) {
+                if (mActionMode != null) {
+                    mActionMode.finish();
+                }
 
                 // Open item if not empty
                 if (rssItem.description != null &&
@@ -706,6 +785,25 @@ public class FeedFragment extends Fragment
                                     rssItem.link)));
                 }
             }
+
+            // Called when the user long-clicks on someView
+            @Override
+            public boolean onLongClick(View view) {
+                // Remember which item
+                mSelectedItem = this.rssItem;
+                if (mActionMode == null) {
+                    // Start the CAB using the ActionMode.Callback defined above
+                    mActionMode = getActivity().startActionMode(mActionModeCallback);
+                    //view.setSelected(true);
+                    view.setActivated(true);
+                }
+
+                mActionMode.setSubtitle(mSelectedItem.title);
+                mActionMode.setTitle("Selected");
+
+                return true;
+            }
+
 
             /**
              * Called when item has been measured, it is now the time to insert the image.
