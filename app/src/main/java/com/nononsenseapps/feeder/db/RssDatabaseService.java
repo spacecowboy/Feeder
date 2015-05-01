@@ -31,6 +31,7 @@ public class RssDatabaseService extends IntentService {
     private static final String ACTION_SET_NOTIFY = "com.nononsenseapps.feeder.db.action.SET_NOTIFY";
     private static final String ACTION_MARK_FEED_AS_READ = "com.nononsenseapps.feeder.db.action.MARK_FEED_AS_READ";
     private static final String ACTION_MARK_ITEM_AS_READ = "com.nononsenseapps.feeder.db.action.MARK_ITEM_AS_READ";
+    private static final String ACTION_MARK_ITEM_AS_UNREAD = "com.nononsenseapps.feeder.db.action.MARK_ITEM_AS_UNREAD";
 
     private static final String EXTRA_NOTIFY = "com.nononsenseapps.feeder.db.extra.EXTRA_NOTIFY";
     private static final String EXTRA_TAG = "com.nononsenseapps.feeder.db.extra.EXTRA_TAG";
@@ -80,6 +81,13 @@ public class RssDatabaseService extends IntentService {
         context.startService(intent);
     }
 
+    public static void markItemAsUnread(Context context, long id) {
+        Intent intent = new Intent(context, RssDatabaseService.class);
+        intent.setAction(ACTION_MARK_ITEM_AS_UNREAD);
+        intent.putExtra(EXTRA_ID, id);
+        context.startService(intent);
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
@@ -108,6 +116,12 @@ public class RssDatabaseService extends IntentService {
 
                 if (id > 0) {
                     RssContentProvider.MarkItemAsRead(this, id);
+                }
+            } else if (ACTION_MARK_ITEM_AS_UNREAD.equals(action)) {
+                final long id = intent.getLongExtra(EXTRA_ID, -1);
+
+                if (id > 0) {
+                    RssContentProvider.MarkItemAsUnread(this, id);
                 }
             }
         }

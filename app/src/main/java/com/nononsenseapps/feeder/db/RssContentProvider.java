@@ -72,6 +72,21 @@ public class RssContentProvider extends ContentProvider {
     }
 
     /**
+     * Mark a feedItem as unread in the database.
+     *
+     * @param context
+     * @param itemId
+     */
+    public static void MarkItemAsUnread(final Context context,
+                                      final long itemId) {
+        ContentValues values = new ContentValues();
+        values.put(FeedItemSQL.COL_UNREAD, 1);
+        context.getContentResolver()
+                .update(FeedItemSQL.URI_FEED_ITEMS, values, Util.WHEREIDIS,
+                        Util.LongsToStringArray(itemId));
+    }
+
+    /**
      * Mark all items in a feed as read in the database.
      *
      * @param context

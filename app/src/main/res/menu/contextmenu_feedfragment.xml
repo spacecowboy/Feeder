@@ -28,4 +28,9 @@
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_location_web_site"
         android:title="Open link in browser" />
+    <item
+        android:id="@+id/action_toggle_unread"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_visibility"
+        android:title="Toggle read status" />
 </menu>

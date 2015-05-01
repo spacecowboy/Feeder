@@ -30,6 +30,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -57,6 +58,7 @@ import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssDatabaseService;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
+import com.nononsenseapps.feeder.util.DeltaCursorLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.FlingingRecyclerView;
@@ -65,11 +67,13 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 
 
 public class FeedFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks {
 
     // TODO change format possibly
     static final DateTimeFormatter shortDateTimeFormat =
@@ -145,6 +149,15 @@ public class FeedFragment extends Fragment
                     // Open enclosure link
                     startActivity(new Intent(Intent.ACTION_VIEW,
                             Uri.parse(mSelectedItem.enclosurelink)));
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                case R.id.action_toggle_unread:
+                    //
+                    if (mSelectedItem.isUnread()) {
+                        RssDatabaseService.markItemAsRead(getActivity(), mSelectedItem.id);
+                    } else {
+                        RssDatabaseService.markItemAsUnread(getActivity(), mSelectedItem.id);
+                    }
                     mode.finish(); // Action picked, so close the CAB
                     return true;
                 default:
@@ -476,9 +489,9 @@ public class FeedFragment extends Fragment
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(final int ID, final Bundle bundle) {
+    public Loader onCreateLoader(final int ID, final Bundle bundle) {
         if (ID == FEEDITEMS_LOADER) {
-            return new CursorLoader(getActivity(), FeedItemSQL.URI_FEED_ITEMS,
+            return new DeltaCursorLoader(getActivity(), FeedItemSQL.URI_FEED_ITEMS,
                     FeedItemSQL.FIELDS, getLoaderSelection(),
                     getLoaderSelectionArgs(),
                     FeedItemSQL.COL_PUBDATE + " DESC");
@@ -504,14 +517,17 @@ public class FeedFragment extends Fragment
     }
 
     @Override
-    public void onLoadFinished(final Loader<Cursor> cursorLoader,
-                               final Cursor cursor) {
+    public void onLoadFinished(final Loader cursorLoader,
+                               final Object result) {
         if (FEEDITEMS_LOADER == cursorLoader.getId()) {
-            mAdapter.swapCursor(cursor);
-            boolean empty = mAdapter.getItemCount() < 1;
+            HashMap<FeedItemSQL, Integer> map = (HashMap<FeedItemSQL, Integer>) result;
+            mAdapter.updateData(map);
+            cursorLoader.forceLoad();
+            boolean empty = mAdapter.getItemCount() <= 1;
             mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
             mRecyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
         } else if (FEED_LOADER == cursorLoader.getId()) {
+            Cursor cursor = (Cursor) result;
             if (cursor.moveToFirst()) {
                 FeedSQL feed = new FeedSQL(cursor);
                 this.title = feed.title;
@@ -524,6 +540,7 @@ public class FeedFragment extends Fragment
             // Reset loader
             getLoaderManager().destroyLoader(cursorLoader.getId());
         } else if (FEED_SETTINGS_LOADER == cursorLoader.getId()) {
+            Cursor cursor = (Cursor) result;
             if (cursor.getCount() == 1 && cursor.moveToFirst()) {
                 // Conclusive results
                 this.notify = cursor.getInt(0);
@@ -538,9 +555,9 @@ public class FeedFragment extends Fragment
     }
 
     @Override
-    public void onLoaderReset(final Loader<Cursor> cursorLoader) {
+    public void onLoaderReset(final Loader cursorLoader) {
         if (FEEDITEMS_LOADER == cursorLoader.getId()) {
-            mAdapter.swapCursor(null);
+            //mAdapter.swapCursor(null);
         }
     }
 
@@ -559,12 +576,69 @@ public class FeedFragment extends Fragment
         private final int readTextColor;
         private final int linkColor;
         private final Drawable bgProtection;
+        private final SortedList<FeedItemSQL> mItems;
+        private HashMap<Long, FeedItemSQL> mItemMap;
 
         String temps;
-        private Cursor cursor;
 
         public FeedAdapter(final Context context) {
             super();
+
+            setHasStableIds(true);
+
+            mItemMap = new HashMap<>();
+            mItems = new SortedList<>(FeedItemSQL.class, new SortedList.Callback<FeedItemSQL>() {
+                @Override
+                public int compare(FeedItemSQL a, FeedItemSQL b) {
+                    final int retval;
+                    // Compare pubdates
+                    if (a.getPubDate() == null && b.getPubDate() == null) {
+                        return 0;
+                    } else if (a.getPubDate() != null && b.getPubDate() == null) {
+                        retval = -1;
+                    } else if (a.getPubDate() == null) {
+                        retval = 1;
+                    } else {
+                        retval = b.getPubDate().compareTo(a.getPubDate());
+                    }
+
+                    return retval;
+                }
+
+                @Override
+                public void onInserted(int position, int count) {
+                    FeedAdapter.this.notifyItemRangeInserted(1 + position, count);
+                }
+
+                @Override
+                public void onRemoved(int position, int count) {
+                    FeedAdapter.this.notifyItemRangeRemoved(1 + position, count);
+                }
+
+                @Override
+                public void onMoved(int fromPosition, int toPosition) {
+                    FeedAdapter.this.notifyItemMoved(1 + fromPosition, 1 + toPosition);
+                }
+
+                @Override
+                public void onChanged(int position, int count) {
+                    FeedAdapter.this.notifyItemRangeChanged(1 + position, count);
+                }
+
+                @Override
+                public boolean areContentsTheSame(FeedItemSQL a, FeedItemSQL b) {
+                    return  a.isUnread() == b.isUnread() &&
+                            a.feedtitle.compareToIgnoreCase(b.feedtitle) == 0 &&
+                            a.getDomain().compareToIgnoreCase(b.getDomain()) == 0 &&
+                            a.plainsnippet.compareToIgnoreCase(b.plainsnippet) == 0 &&
+                            a.plaintitle.compareToIgnoreCase(b.plaintitle) == 0;
+                }
+
+                @Override
+                public boolean areItemsTheSame(FeedItemSQL item1, FeedItemSQL item2) {
+                    return item1.id == item2.id;
+                }
+            });
 
             isGrid = TabletUtils.isTablet(context);
 
@@ -587,20 +661,49 @@ public class FeedFragment extends Fragment
             }
         }
 
-        public void swapCursor(Cursor cursor) {
-            // TODO notify about updates
-            this.cursor = cursor;
-            notifyDataSetChanged();
+
+        @Override
+        public long getItemId(final int hposition) {
+            if (hposition == 0) {
+                // header
+                return -2;
+            } else {
+                int position = hposition - 1;
+                return mItems.get(position).id;
+            }
+        }
+
+        public void updateData(HashMap<FeedItemSQL, Integer> map) {
+            HashMap<Long, FeedItemSQL> oldItemMap = mItemMap;
+            mItemMap = new HashMap<>();
+            mItems.beginBatchedUpdates();
+            for (FeedItemSQL item: map.keySet()) {
+                if (map.get(item) >= 0) {
+                    // Sorted list handles inserting of existing elements
+                    mItems.add(item);
+                    // Add to new map as well
+                    mItemMap.put(item.id, item);
+                    // And remove from old
+                    oldItemMap.remove(item.id);
+                } else {
+                    mItems.remove(item);
+                    // And remove from old
+                    oldItemMap.remove(item.id);
+                }
+            }
+            // If any items remain in old set, they are not present in current result set,
+            // remove them. This is pretty much what is done in the delta loader, but if
+            // the loader is restarted, then it has no old data to go on.
+            for (FeedItemSQL item: oldItemMap.values()) {
+                mItems.remove(item);
+            }
+            mItems.endBatchedUpdates();
         }
 
         @Override
         public int getItemCount() {
-            if (cursor == null || cursor.getCount() == 0) {
-                return 0;
-            } else {
-                // header + the rest
-                return 1 + cursor.getCount();
-            }
+                // header + rest
+                return 1 + mItems.size();
         }
 
 
@@ -615,8 +718,8 @@ public class FeedFragment extends Fragment
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent,
-                                                          final int position) {
-            if (getItemViewType(position) == HEADERTYPE) {
+                                                          final int viewType) {
+            if (viewType == HEADERTYPE) {
                 // Header
                 final View v = LayoutInflater.from(parent.getContext())
                         .inflate(
@@ -650,9 +753,7 @@ public class FeedFragment extends Fragment
             final int position = hposition - 1;
 
             // Get item
-            cursor.moveToPosition(position);
-            final FeedItemSQL item =
-                    new FeedItemSQL((Cursor) cursor);
+            final FeedItemSQL item = mItems.get(position);
 
             holder.rssItem = item;
 
@@ -740,7 +841,6 @@ public class FeedFragment extends Fragment
                 dateTextView = (TextView) v.findViewById(R.id.story_date);
                 authorTextView = (TextView) v.findViewById(R.id.story_author);
                 imageView = (ImageView) v.findViewById(R.id.story_image);
-                Log.d("JHEIGHT", "dateheight:" + dateTextView.getHeight());
             }
 
             /**
@@ -820,7 +920,9 @@ public class FeedFragment extends Fragment
                 int h = itemView.getHeight();
                 //Log.d("JONAS3", "iv:" + imageView.getHeight() + ", item:" + h);
 
-                Glide.with(FeedFragment.this).load(rssItem.imageurl).centerCrop().into(imageView);
+                if (!isDetached()) {
+                    Glide.with(FeedFragment.this).load(rssItem.imageurl).centerCrop().into(imageView);
+                }
                 //Picasso.with(getActivity()).load(rssItem.imageurl).resize(w, h).centerCrop().noFade()
                 //        .tag(FeedFragment.this)
                 //        .into(imageView);
