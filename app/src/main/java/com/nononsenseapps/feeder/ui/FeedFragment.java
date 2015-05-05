@@ -40,10 +40,12 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -263,8 +265,8 @@ public class FeedFragment extends Fragment
             // use a linear layout manager
             mLayoutManager = new LinearLayoutManager(getActivity());
             // I want some dividers
-            mRecyclerView.addItemDecoration(new DividerColor
-                    (getActivity(), DividerColor.VERTICAL_LIST, 0, 1));
+//            mRecyclerView.addItemDecoration(new DividerColor
+//                    (getActivity(), DividerColor.VERTICAL_LIST, 0, 1));
         }
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -316,30 +318,6 @@ public class FeedFragment extends Fragment
                 setNotifications(notify == 1);
             }
         });
-
-        // Pause image loading when flinging
-//        mRecyclerView.setOnFlingListener(new FlingingRecyclerView.OnFlingListener() {
-//            @Override
-//            public void flingStateChange(boolean flinging) {
-//                if (flinging) {
-//                    Glide.with(FeedFragment.this).pauseRequests();
-//                } else {
-//                    Glide.with(FeedFragment.this).resumeRequests();
-//                }
-//            }
-//        });
-//        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//                if (RecyclerView.SCROLL_STATE_IDLE == newState ||
-//                        RecyclerView.SCROLL_STATE_DRAGGING == newState) {
-//                    Glide.with(FeedFragment.this).resumeRequests();
-//                } else {
-//                    Glide.with(FeedFragment.this).pauseRequests();
-//                }
-//            }
-//        });
 
         return rootView;
     }
@@ -670,7 +648,11 @@ public class FeedFragment extends Fragment
                 return -2;
             } else {
                 int position = hposition - 1;
-                return mItems.get(position).id;
+                if (position >= mItems.size()) {
+                    return -3;
+                } else {
+                    return mItems.get(position).id;
+                }
             }
         }
 
@@ -704,13 +686,13 @@ public class FeedFragment extends Fragment
         @Override
         public int getItemCount() {
                 // header + rest
-                return 1 + mItems.size();
+                return 2 + mItems.size();
         }
 
 
         @Override
         public int getItemViewType(int position) {
-            if (position == 0) {
+            if (position == 0 || (position - 1) >= mItems.size()) {
                 return HEADERTYPE;
             } else {
                 return ITEMTYPE;
@@ -750,6 +732,9 @@ public class FeedFragment extends Fragment
 
             final ViewHolder holder = (ViewHolder) vHolder;
 
+            // Make sure view is reset if it was dismissed
+            holder.resetView();
+
             // Compensate for header
             final int position = hposition - 1;
 
@@ -786,27 +771,9 @@ public class FeedFragment extends Fragment
                         item.getPubDate().withZone(DateTimeZone.getDefault())
                                 .toString(shortDateTimeFormat));
             }
-            if (item.plaintitle == null) {
-                holder.titleTextView.setVisibility(View.GONE);
-            } else {
-                holder.titleTextView.setVisibility(View.VISIBLE);
-                // \u2014 is a EM-dash, basically a long version of '-'
-                temps = (item.plainsnippet == null || item.plainsnippet.isEmpty()) ?
-                        item.plaintitle :
-                        item.plaintitle + " \u2014 " + item.plainsnippet + "\u2026";
-                Spannable textSpan = new SpannableString(temps);
-                // Body is always grey
-                textSpan.setSpan(new ForegroundColorSpan(readTextColor),
-                        item.plaintitle.length(), temps.length(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                // Title depends on status
-                textSpan.setSpan(new ForegroundColorSpan(holder.rssItem.isUnread() ?
-                                unreadTextColor :
-                                readTextColor),
-                        0, item.plaintitle.length(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                holder.titleTextView.setText(textSpan);
-            }
+
+            holder.fillTitle();
+
             if (item.imageurl == null || item.imageurl.isEmpty()) {
                 holder.imageView.setVisibility(View.GONE);
                 //holder.textGroup.setBackground(null);
@@ -829,11 +796,13 @@ public class FeedFragment extends Fragment
             public final TextView authorTextView;
             //public final View textGroup;
             public final ImageView imageView;
+            public final View view;
 
             public FeedItemSQL rssItem;
 
             public ViewHolder(View v) {
                 super(v);
+                this.view = v;
                 v.setOnClickListener(this);
                 v.setOnLongClickListener(this);
                 //textGroup = v.findViewById(R.id.story_text);
@@ -842,6 +811,64 @@ public class FeedFragment extends Fragment
                 dateTextView = (TextView) v.findViewById(R.id.story_date);
                 authorTextView = (TextView) v.findViewById(R.id.story_author);
                 imageView = (ImageView) v.findViewById(R.id.story_image);
+
+                // Swipe handler
+                v.setOnTouchListener(new SwipeDismissTouchListener(v, null, new SwipeDismissTouchListener.DismissCallbacks() {
+                    @Override
+                    public boolean canDismiss(Object token) {
+                        //return rssItem != null && rssItem.isUnread();
+                        return rssItem != null;
+                    }
+
+                    @Override
+                    public void onDismiss(View view, Object token) {
+                        rssItem.setUnread(!rssItem.isUnread());
+                        // Update the item directly before updating database
+                        if (!PrefUtils.isShowOnlyUnread(getActivity())) {
+                            // Just update the view state
+                            fillTitle();
+                            resetView();
+                        } else {
+                            // Remove it from the dataset directly
+                            mItems.remove(rssItem);
+                        }
+                        // Make database consistent with content
+                        if (rssItem.isUnread()) {
+                            RssDatabaseService.markItemAsUnread(getActivity(), rssItem.id);
+                        } else {
+                            RssDatabaseService.markItemAsRead(getActivity(), rssItem.id);
+                        }
+                    }
+                }));
+            }
+
+            public void resetView() {
+                view.setAlpha(1.0f);
+                view.setTranslationX(0.0f);
+            }
+
+            public void fillTitle() {
+                if (rssItem.plaintitle == null) {
+                    titleTextView.setVisibility(View.GONE);
+                } else {
+                    titleTextView.setVisibility(View.VISIBLE);
+                    // \u2014 is a EM-dash, basically a long version of '-'
+                    temps = (rssItem.plainsnippet == null || rssItem.plainsnippet.isEmpty()) ?
+                            rssItem.plaintitle :
+                            rssItem.plaintitle + " \u2014 " + rssItem.plainsnippet + "\u2026";
+                    Spannable textSpan = new SpannableString(temps);
+                    // Body is always grey
+                    textSpan.setSpan(new ForegroundColorSpan(readTextColor),
+                            rssItem.plaintitle.length(), temps.length(),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    // Title depends on status
+                    textSpan.setSpan(new ForegroundColorSpan(rssItem.isUnread() ?
+                                    unreadTextColor :
+                                    readTextColor),
+                            0, rssItem.plaintitle.length(),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    titleTextView.setText(textSpan);
+                }
             }
 
             /**
