@@ -19,6 +19,7 @@ package com.nononsenseapps.feeder.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -62,6 +63,7 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
     private Object mToken;
     private VelocityTracker mVelocityTracker;
     private float mTranslationX;
+    private final FastOutLinearInInterpolator mInterpolator;
 
     /**
      * The callback interface used by {@link SwipeDismissTouchListener} to inform its client
@@ -100,6 +102,8 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
         mView = view;
         mToken = token;
         mCallbacks = callbacks;
+
+        mInterpolator = new FastOutLinearInInterpolator();
     }
 
     @Override
@@ -219,9 +223,9 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
                 if (mSwiping) {
                     mTranslationX = deltaX;
                     mView.setTranslationX(deltaX - mSwipingSlop);
-                    // TODO: use an ease-out interpolator or such
-                    mView.setAlpha(Math.max(0f, Math.min(1f,
-                            1f - 2f * Math.abs(deltaX) / mViewWidth)));
+                    mView.setAlpha(mInterpolator.getInterpolation(1f - 1f * Math.abs(deltaX) / mViewWidth));
+//                    mView.setAlpha(Math.max(0f, Math.min(1f,
+//                            1f - 2f * Math.abs(deltaX) / mViewWidth)));
                     return true;
                 }
                 break;

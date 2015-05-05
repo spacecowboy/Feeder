@@ -40,12 +40,10 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.ActionMode;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -70,7 +68,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 
 
@@ -606,7 +603,7 @@ public class FeedFragment extends Fragment
 
                 @Override
                 public boolean areContentsTheSame(FeedItemSQL a, FeedItemSQL b) {
-                    return  a.isUnread() == b.isUnread() &&
+                    return a.isUnread() == b.isUnread() &&
                             a.feedtitle.compareToIgnoreCase(b.feedtitle) == 0 &&
                             a.getDomain().compareToIgnoreCase(b.getDomain()) == 0 &&
                             a.plainsnippet.compareToIgnoreCase(b.plainsnippet) == 0 &&
@@ -660,7 +657,7 @@ public class FeedFragment extends Fragment
             HashMap<Long, FeedItemSQL> oldItemMap = mItemMap;
             mItemMap = new HashMap<>();
             mItems.beginBatchedUpdates();
-            for (FeedItemSQL item: map.keySet()) {
+            for (FeedItemSQL item : map.keySet()) {
                 if (map.get(item) >= 0) {
                     // Sorted list handles inserting of existing elements
                     mItems.add(item);
@@ -677,7 +674,7 @@ public class FeedFragment extends Fragment
             // If any items remain in old set, they are not present in current result set,
             // remove them. This is pretty much what is done in the delta loader, but if
             // the loader is restarted, then it has no old data to go on.
-            for (FeedItemSQL item: oldItemMap.values()) {
+            for (FeedItemSQL item : oldItemMap.values()) {
                 mItems.remove(item);
             }
             mItems.endBatchedUpdates();
@@ -685,8 +682,8 @@ public class FeedFragment extends Fragment
 
         @Override
         public int getItemCount() {
-                // header + rest
-                return 2 + mItems.size();
+            // header + rest
+            return 2 + mItems.size();
         }
 
 
@@ -843,6 +840,7 @@ public class FeedFragment extends Fragment
             }
 
             public void resetView() {
+                view.clearAnimation();
                 view.setAlpha(1.0f);
                 view.setTranslationX(0.0f);
             }
