@@ -21,7 +21,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.SparseArray;
+import android.util.Log;
 
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 
@@ -29,7 +29,6 @@ import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * Static library support version of the framework's {@link android.content.CursorLoader}.
@@ -39,6 +38,8 @@ import java.util.HashSet;
  * documentation for a class overview.
  */
 public class DeltaCursorLoader extends AsyncTaskLoader<HashMap<FeedItemSQL, Integer>> {
+    private static final String TAG = "DeltaCursorLoader";
+    // This will call ForceLoad() when data changes
     final ForceLoadContentObserver mObserver;
 
     Uri mUri;
@@ -55,6 +56,7 @@ public class DeltaCursorLoader extends AsyncTaskLoader<HashMap<FeedItemSQL, Inte
     /* Runs on a worker thread */
     @Override
     public HashMap<FeedItemSQL, Integer> loadInBackground() {
+        Log.d(TAG, "loadInBackground");
         Cursor cursor = getContext().getContentResolver().query(mUri, mProjection, mSelection,
                 mSelectionArgs, mSortOrder);
         if (cursor != null) {
@@ -62,22 +64,21 @@ public class DeltaCursorLoader extends AsyncTaskLoader<HashMap<FeedItemSQL, Inte
             cursor.getCount();
             cursor.registerContentObserver(mObserver);
         }
-        if (isReset()) {
-            // An async query came in while the loader is stopped
-            if (cursor != null) {
-                cursor.close();
-            }
-        } else {
-            Cursor oldCursor = mCursor;
-            mCursor = cursor;
 
-            if (oldCursor != null && oldCursor != cursor && !oldCursor.isClosed()) {
-                oldCursor.close();
-            }
+        Cursor oldCursor = mCursor;
+        mCursor = cursor;
+
+        Log.d(TAG, "Time to close...");
+        if (oldCursor != null && oldCursor != cursor) {
+            Log.d(TAG, "Closing oldCursor.");
+            oldCursor.close();
         }
+
+        // Now handle contents
 
         if (mCursor == null) {
             mItems = null;
+            Log.d(TAG, "Cursor was null, returning null");
             return null;
         }
 
@@ -114,9 +115,20 @@ public class DeltaCursorLoader extends AsyncTaskLoader<HashMap<FeedItemSQL, Inte
     /* Runs on the UI thread */
     @Override
     public void deliverResult(HashMap<FeedItemSQL, Integer> result) {
+        if (isReset()) {
+            // An async query came in while the loader is stopped
+//            if (mCursor != null) {
+//                mCursor.close();
+//            }
+            return;
+        }
+
         mLastResult = result;
         if (isStarted()) {
+            Log.d(TAG, "Delivering result");
             super.deliverResult(result);
+        } else {
+            Log.d(TAG, "Not started, so not delivering");
         }
     }
 

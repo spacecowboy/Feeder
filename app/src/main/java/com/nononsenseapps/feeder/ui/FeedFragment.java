@@ -90,6 +90,7 @@ public class FeedFragment extends Fragment
     // Filter for database loader
     private static final String ONLY_UNREAD = FeedItemSQL.COL_UNREAD + " IS 1 ";
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
+    private static final String TAG = "FeedFragment";
     private FeedAdapter mAdapter;
     private FlingingRecyclerView mRecyclerView;
     private View mEmptyView;
@@ -522,7 +523,6 @@ public class FeedFragment extends Fragment
         if (FEEDITEMS_LOADER == cursorLoader.getId()) {
             HashMap<FeedItemSQL, Integer> map = (HashMap<FeedItemSQL, Integer>) result;
             mAdapter.updateData(map);
-            cursorLoader.forceLoad();
             boolean empty = mAdapter.getItemCount() <= 1;
             mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
             mRecyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
@@ -557,6 +557,7 @@ public class FeedFragment extends Fragment
     @Override
     public void onLoaderReset(final Loader cursorLoader) {
         if (FEEDITEMS_LOADER == cursorLoader.getId()) {
+            Log.d(TAG, "onLoaderReset FeedItem");
             //mAdapter.swapCursor(null);
         }
     }
@@ -920,8 +921,13 @@ public class FeedFragment extends Fragment
                 int h = itemView.getHeight();
                 //Log.d("JONAS3", "iv:" + imageView.getHeight() + ", item:" + h);
 
-                if (!isDetached()) {
-                    Glide.with(FeedFragment.this).load(rssItem.imageurl).centerCrop().into(imageView);
+                if (!isDetached() && getActivity() != null) {
+                    try {
+                        Glide.with(FeedFragment.this).load(rssItem.imageurl).centerCrop().into(imageView);
+                    } catch (IllegalArgumentException e) {
+                        // Could still happen if we have a race-condition?
+                        Log.d(TAG, e.getLocalizedMessage());
+                    }
                 }
                 //Picasso.with(getActivity()).load(rssItem.imageurl).resize(w, h).centerCrop().noFade()
                 //        .tag(FeedFragment.this)

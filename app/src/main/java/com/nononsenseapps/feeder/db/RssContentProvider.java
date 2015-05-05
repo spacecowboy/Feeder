@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.nononsenseapps.feeder.model.AuthHelper;
 import com.nononsenseapps.feeder.ui.FeedActivity;
@@ -28,6 +29,7 @@ public class RssContentProvider extends ContentProvider {
     // Match Uris with this
     private static final UriMatcher sURIMatcher =
             new UriMatcher(UriMatcher.NO_MATCH);
+    private static final String TAG = "RssContentProvider";
 
     static {
         FeedSQL.addMatcherUris(sURIMatcher);
@@ -404,6 +406,7 @@ public class RssContentProvider extends ContentProvider {
             return;
         }
         for (Uri uri : uris) {
+            Log.d(TAG, "Notifying change: " + uri.toString());
             getContext().getContentResolver().notifyChange(uri, null, false);
         }
     }
