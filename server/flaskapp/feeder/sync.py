@@ -4,6 +4,7 @@ This file handles syncing the actual RSS/Atom feeds.
 '''
 
 import feedparser as fp
+from datetime import datetime, timedelta
 from .database import db
 from sqlalchemy import distinct
 from .models import FeedItem, Feed, UserFeed
@@ -31,6 +32,9 @@ def cache_feed(feed):
     '''
     Download the feed.
     '''
+    # First clear out old items
+    delete_old_items(feed.id)
+
     url = feed.link
     if not "://" in url:
         url = "http://" + url
@@ -101,6 +105,22 @@ def cache_feed(feed):
         db.session.commit()
     else:
         print("No new items in {}".format(feed.title))
+
+
+def delete_old_items(feed_id, days=14):
+    '''
+    Clear out old items so the database doesn't grow too much.
+    By default, items are deleted when they are 14 days old.
+
+    Args:
+    feed_id - The feed to clear for
+    days - By default items older than [14] days are deleted
+    '''
+    dt = datetime.utcnow() - timedelta(days=days)
+
+    FeedItem.query.filter(FeedItem.timestamp < dt,
+                          FeedItem.feed_id == feed_id).delete()
+    db.session.commit()
 
 
 def delete_orphan_feeds():
