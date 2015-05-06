@@ -289,14 +289,27 @@ public class FeedItemSQL {
 
     // Some interesting values found in certain namespaces
     public String getTorrentMagnetURI() {
+        return getJSONString("torrent_magneturi");
+    }
+    public String getTorrentSeeds() {
+        return getJSONString("torrent_seeds");
+    }
+    public String getTorrentPeers() {
+        return getJSONString("torrent_peers");
+    }
+    public String getTorrentVerified() {
+        return getJSONString("torrent_verified");
+    }
+
+    protected String getJSONString(final String name) {
         JSONObject json = getJson();
         if (json == null) {
             return null;
         }
 
-        if (json.has("torrent_magneturi")) {
+        if (json.has(name)) {
             try {
-                return json.getString("torrent_magneturi");
+                return json.getString(name);
             } catch (JSONException e) {
                 Log.d(TAG, e.getLocalizedMessage());
                 return null;

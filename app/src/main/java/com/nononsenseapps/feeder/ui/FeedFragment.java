@@ -748,9 +748,30 @@ public class FeedFragment extends Fragment
                     holder.rssItem.description.isEmpty()) {
                 titleText.append(" \u2014 ");
                 // append to title field
+                boolean needDash = false;
+                String seeds = holder.rssItem.getTorrentSeeds();
+                if (seeds != null) {
+                    titleText.append("S(").append(seeds).append(") ");
+                    needDash = true;
+                }
+                String peers = holder.rssItem.getTorrentPeers();
+                if (peers != null) {
+                    titleText.append("P(").append(peers).append(") ");
+                    needDash = true;
+                }
+                String verified = holder.rssItem.getTorrentVerified();
+                if (verified != null) {
+                    titleText.append("V(").append(verified).append(") ");
+                    needDash = true;
+                }
+
+                if (needDash) {
+                    titleText.append("\u2014 ");
+                }
+
                 String magnet = holder.rssItem.getTorrentMagnetURI();
                 if (magnet != null) {
-                    titleText.append(magnet);
+                    titleText.append("magnet");
                 } else if (holder.rssItem.enclosurelink != null) {
                     titleText.append(holder.rssItem.getEnclosureFilename());
                 } else {
