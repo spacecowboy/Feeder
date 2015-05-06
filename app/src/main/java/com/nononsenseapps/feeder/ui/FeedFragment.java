@@ -498,7 +498,7 @@ public class FeedFragment extends Fragment
         if (FEEDITEMS_LOADER == cursorLoader.getId()) {
             HashMap<FeedItemSQL, Integer> map = (HashMap<FeedItemSQL, Integer>) result;
             mAdapter.updateData(map);
-            boolean empty = mAdapter.getItemCount() <= 1;
+            boolean empty = mAdapter.getItemCount() <= 2;
             mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
             mRecyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
         } else if (FEED_LOADER == cursorLoader.getId()) {
@@ -746,13 +746,15 @@ public class FeedFragment extends Fragment
             // If no body, display domain of link to be opened
             if (holder.rssItem.description == null ||
                     holder.rssItem.description.isEmpty()) {
+                titleText.append(" \u2014 ");
                 // append to title field
-                if (holder.rssItem.enclosurelink != null) {
-                    titleText.append(" \u2014 " +
-                            holder.rssItem.getEnclosureFilename());
+                String magnet = holder.rssItem.getTorrentMagnetURI();
+                if (magnet != null) {
+                    titleText.append(magnet);
+                } else if (holder.rssItem.enclosurelink != null) {
+                    titleText.append(holder.rssItem.getEnclosureFilename());
                 } else {
-                    titleText.append(" \u2014 " +
-                            holder.rssItem.getDomain());
+                    titleText.append(holder.rssItem.getDomain());
                 }
                 titleText.setSpan(new ForegroundColorSpan(linkColor),
                         item.feedtitle.length() + 3, titleText.length(),
@@ -905,10 +907,18 @@ public class FeedFragment extends Fragment
                     // Mark as read
                     RssDatabaseService.markItemAsRead(getActivity(), rssItem.id);
                     // Open in browser since no content was posted
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(rssItem.enclosurelink != null ?
-                                    rssItem.enclosurelink :
-                                    rssItem.link)));
+                    String magnet = rssItem.getTorrentMagnetURI();
+                    if (magnet != null) {
+                        // Use magnet link if it exists
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(magnet)));
+                    } else {
+                        // Use enclosure or link
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(rssItem.enclosurelink != null ?
+                                        rssItem.enclosurelink :
+                                        rssItem.link)));
+                    }
                 }
             }
 

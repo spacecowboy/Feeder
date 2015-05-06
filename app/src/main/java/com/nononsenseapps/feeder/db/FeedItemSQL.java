@@ -4,8 +4,11 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import org.joda.time.DateTime;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * SQL which handles items belonging to a Feed
@@ -20,6 +23,7 @@ public class FeedItemSQL {
     // URI codes, must be unique
     public static final int URICODE = 201;
     public static final int ITEMCODE = 202;
+    private static final String TAG = "FeedItemSQL";
 
 
     public static void addMatcherUris(UriMatcher sURIMatcher) {
@@ -123,6 +127,9 @@ public class FeedItemSQL {
     public String feedtitle = null;
     public int notified = 0;
     public String json = null;
+
+    // Convenience field for parsing json
+    private JSONObject jsonobject = null;
 
     // Convenience field for list views. Only converted first time
     private String domain;
@@ -255,6 +262,47 @@ public class FeedItemSQL {
             return DateTime.parse(datetime).toString();
         } catch (Exception e) {
             return DateTime.now().toString();
+        }
+    }
+
+
+    /**
+     * Return the parsed json object
+     *
+     * @return JsonObject
+     */
+    public JSONObject getJson() {
+        if (this.json == null) {
+            return null;
+        }
+
+        if (this.jsonobject == null) {
+            try {
+                this.jsonobject = new JSONObject(this.json);
+            } catch (JSONException e) {
+                Log.d(TAG, e.getLocalizedMessage());
+            }
+        }
+
+        return this.jsonobject;
+    }
+
+    // Some interesting values found in certain namespaces
+    public String getTorrentMagnetURI() {
+        JSONObject json = getJson();
+        if (json == null) {
+            return null;
+        }
+
+        if (json.has("torrent_magneturi")) {
+            try {
+                return json.getString("torrent_magneturi");
+            } catch (JSONException e) {
+                Log.d(TAG, e.getLocalizedMessage());
+                return null;
+            }
+        } else {
+            return null;
         }
     }
 
