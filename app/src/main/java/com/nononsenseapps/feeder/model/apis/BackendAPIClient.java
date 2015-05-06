@@ -71,6 +71,7 @@ public class BackendAPIClient {
         public String author;
         public String comments;
         public String enclosure;
+        public String json;
         public boolean read;
         public List<String> tags;
     }

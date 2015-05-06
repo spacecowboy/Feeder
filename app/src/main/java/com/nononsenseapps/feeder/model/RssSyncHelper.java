@@ -200,6 +200,7 @@ public class RssSyncHelper extends IntentService {
                     .withValue(FeedItemSQL.COL_TAG,
                             feed.tag == null ? "" : feed.tag)
                     .withValue(FeedItemSQL.COL_IMAGEURL, item.image)
+                    .withValue(FeedItemSQL.COL_JSON, item.json)
                     .withValue(FeedItemSQL.COL_ENCLOSURELINK, item.enclosure)
                     .withValue(FeedItemSQL.COL_AUTHOR, item.author)
                     .withValue(FeedItemSQL.COL_PUBDATE,

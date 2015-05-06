@@ -45,6 +45,7 @@ public class FeedItemSQL {
     public static final String COL_PUBDATE = "pubdate";
     public static final String COL_UNREAD = "unread";
     public static final String COL_NOTIFIED = "notified";
+    public static final String COL_JSON = "json";
     // These fields corresponds to columns in Feed table
     public static final String COL_FEED = "feed";
     public static final String COL_TAG = "tag";
@@ -57,7 +58,8 @@ public class FeedItemSQL {
                     COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG,
                     COL_ENCLOSURELINK,
                     COL_FEEDTITLE,
-            COL_NOTIFIED};
+            COL_NOTIFIED,
+            COL_JSON};
 
     /*
      * The SQL code that creates a Table for storing Persons in.
@@ -76,6 +78,7 @@ public class FeedItemSQL {
                     COL_ENCLOSURELINK + " TEXT," +
                     COL_AUTHOR + " TEXT," +
                     COL_PUBDATE + " TEXT," +
+                    COL_JSON + " TEXT," +
                     COL_UNREAD + " INTEGER NOT NULL DEFAULT 1," +
                     COL_NOTIFIED + " INTEGER NOT NULL DEFAULT 0," +
                     COL_FEED + " INTEGER NOT NULL," +
@@ -119,6 +122,7 @@ public class FeedItemSQL {
     public String tag = null;
     public String feedtitle = null;
     public int notified = 0;
+    public String json = null;
 
     // Convenience field for list views. Only converted first time
     private String domain;
@@ -204,6 +208,7 @@ public class FeedItemSQL {
         this.enclosurelink = cursor.getString(12);
         this.feedtitle = cursor.getString(13);
         this.notified = cursor.getInt(14);
+        this.json = cursor.getString(15);
     }
 
     public DateTime getPubDate() {
@@ -269,6 +274,7 @@ public class FeedItemSQL {
         values.put(COL_FEEDTITLE, feedtitle);
         values.put(COL_NOTIFIED, notified);
 
+        Util.PutNullable(values, COL_JSON, json);
         Util.PutNullable(values, COL_IMAGEURL, imageurl);
         Util.PutNullable(values, COL_LINK, link);
         Util.PutNullable(values, COL_AUTHOR, author);

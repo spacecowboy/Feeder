@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "rssDatabase";
     private static DatabaseHandler singleton;
     private final Context context;
@@ -35,8 +35,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(final SQLiteDatabase sqLiteDatabase, final int i,
             final int i2) {
-        sqLiteDatabase.execSQL("ALTER TABLE Feed ADD COLUMN notify INTEGER NOT NULL DEFAULT 0;");
-        sqLiteDatabase.execSQL("ALTER TABLE FeedItem ADD COLUMN notified INTEGER NOT NULL DEFAULT 0;");
+        //sqLiteDatabase.execSQL("ALTER TABLE Feed ADD COLUMN notify INTEGER NOT NULL DEFAULT 0;");
+        sqLiteDatabase.execSQL("ALTER TABLE FeedItem ADD COLUMN json TEXT;");
     }
 
     @Override
