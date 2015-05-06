@@ -81,7 +81,8 @@ feeditem_fields = {
     'enclosure': fields.String,
     'tags': fields.List(fields.String),
     'image': fields.String,
-    'read': FieldBool(default=False)
+    'read': FieldBool(default=False),
+    'json': fields.String
 }
 ### Single feed with a possible list of items
 feed_fields = {

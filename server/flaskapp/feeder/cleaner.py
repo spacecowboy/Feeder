@@ -4,6 +4,7 @@
 from .util import parse_timestamp
 import re
 import html
+import json
 
 
 # Productive patterns
@@ -75,6 +76,9 @@ def clean_entry(feeditem, item):
     e = [e.href for e in item.get("enclosures", [])]
     if len(e) > 0:
         feeditem.enclosure = e[0]
+
+    # Set original json representation on item also
+    feeditem.json = json.dumps(item)
 
 
 def get_snippet(text, maxlen=120):

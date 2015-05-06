@@ -186,6 +186,7 @@ class FeedItem(db.Model):
     comments = Column(String)
     enclosure = Column(String)
     image = Column(String)
+    json = Column(Text)
     # Internal use
     timestamp = Column(DateTime, nullable=False)
     # Related feed
