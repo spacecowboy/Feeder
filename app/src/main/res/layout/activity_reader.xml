@@ -12,7 +12,6 @@
          space available using match_parent in both dimensions. -->
     <FrameLayout
         android:id="@+id/container"
-        android:transitionName="shareditem"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

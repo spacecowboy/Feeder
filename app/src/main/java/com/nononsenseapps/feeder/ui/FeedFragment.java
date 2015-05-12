@@ -1068,15 +1068,13 @@ public class FeedFragment extends Fragment
 //                            .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
 //                                    view.getHeight());
 
-                    view.setTransitionName("shareditem");
-                    ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), view, "shareditem");
-
 //                    ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
 //                            new Pair<View, String>(titleTextView,
 //                                    "title"));
                     //new Pair<View, String>(imageView, "image"));
 
-                    ActivityCompat.startActivity(getActivity(), i, options.toBundle());
+                    //ActivityCompat.startActivity(getActivity(), i, null);
+                    startActivity(i);
                 } else {
                     // Mark as read
                     RssDatabaseService.markItemAsRead(getActivity(), rssItem.id);

@@ -100,7 +100,7 @@ public class ReaderActivity extends BaseActivity {
             // Handled by super, except animation
             boolean val = super.onOptionsItemSelected(item);
             // Only care about exit transition
-            overridePendingTransition(0, R.anim.contract_to_center);
+            //overridePendingTransition(0, R.anim.contract_to_center);
             return val;
         }
         return super.onOptionsItemSelected(item);
@@ -117,7 +117,7 @@ public class ReaderActivity extends BaseActivity {
         super.onBackPressed();
         if (mShouldFinishBack) {
             // Only care about exit transition
-            overridePendingTransition(0, R.anim.contract_to_center);
+            //overridePendingTransition(0, R.anim.contract_to_center);
         }
     }
 }
