@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="primary">@color/background_material_dark</color>
-    <color name="primary_dark">@android:color/black</color>
-    <color name="accent">@color/material_blue_grey_500</color>
-    <color name="accent_light">@color/material_blue_grey_300</color>
+    <color name="primary">@color/material_green_700</color>
+    <color name="primary_dark">@color/material_green_900</color>
+    <color name="accent">@color/material_dark_teal_A400</color>
+    <color name="accent_light">@color/material_dark_teal_A400</color>
+
+    <color name="window_background">@color/dark_grey_850</color>
+
     <color name="translucent_actionbar_background">@color/primary</color>
-    <color name="navdrawer_background">@android:color/black</color>
+    <color name="navdrawer_background">@color/dark_grey_850</color>
     <color name="navdrawer_text_color">@color/primary_text_default_material_dark</color>
     <color name="navdrawer_text_color_selected">@color/primary</color>
     <color name="navdrawer_icon_tint">#808080</color>
     <color name="navdrawer_icon_tint_selected">@color/primary</color>
+    <color name="navdrawer_account_textcolor">@color/navdrawer_text_color</color>
+    <color name="navdrawer_accent">@color/accent</color>
     <color name="black_overlay">#66000000</color>
 
 
@@ -19,6 +24,11 @@
     <color name="refresh_progress_3">#ff2979ff</color>
 
     <color name="ripple_material_dark">@color/accent</color>
+
+    <!-- Dark theme colors -->
+    <color name="dark_grey_800">#424242</color>
+    <color name="dark_grey_850">#303030</color>
+    <color name="dark_grey_900">#212121</color>
 
     <!-- Material Text colors -->
     <!-- 38% = 61 -->
@@ -29,7 +39,6 @@
     <color name="white_87">#deffffff</color>
 
     <!-- Material Colors -->
-
     <color name="background_material_dark">#ff212121</color>
     <color name="button_material_dark">#ff5a595b</color>
     <color name="bright_foreground_material_dark">@android:color/white</color>
@@ -85,6 +94,8 @@
     <color name="material_green_300">#ff57bb8a</color>
     <color name="material_green_500">#ff0f9d58</color>
     <color name="material_green_700">#ff0b8043</color>
+    <color name="material_green_800">#ff2e7d32</color>
+    <color name="material_green_900">#ff1b5e20</color>
     <color name="material_green_A200">#ff69f0ae</color>
     <color name="material_green_A400">#ff00e676</color>
 

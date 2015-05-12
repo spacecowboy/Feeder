@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Sub themes -->
+    <style name="NavbarTheme" parent="AppTheme" >
+        <!-- Background is green, so make touch feedback other color -->
+        <item name="colorAccent">@color/navdrawer_accent</item>
+    </style>
     <style name="DialogTheme" parent="AppThemeDialog" >
     </style>
     <style name="FeedsTheme" parent="AppTheme" >
     </style>
     <style name="ReaderTheme" parent="AppTheme" >
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
     <style name="EditFeedTheme" parent="AppTheme" >
         <item name="android:windowActionBar">false</item>
@@ -57,7 +62,7 @@
         <item name="photoItemForeground">?android:selectableItemBackground</item>
 
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowBackground">@color/window_background</item>
         <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
 
 
@@ -90,6 +95,7 @@
     </style>
 
     <style name="HeaderBar">
+        <item name="android:elevation">4dp</item>
     </style>
 
     <style name="TextAppearance"/>

@@ -15,14 +15,20 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navdrawer"
     android:layout_width="@dimen/navdrawer_width"
     android:layout_height="match_parent"
     android:layout_gravity="start"
     android:background="@color/navdrawer_background"
     android:clipToPadding="false"
+    app:theme="@style/NavbarTheme"
     android:orientation="vertical">
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorPrimary">
     <RelativeLayout
         android:id="@+id/account_box"
         android:layout_width="match_parent"
@@ -56,7 +62,7 @@
             android:maxLines="1"
             android:singleLine="true"
             android:text="@string/username"
-            android:textColor="@color/accent"
+            android:textColor="@color/navdrawer_account_textcolor"
             android:textSize="18sp" />
 
         <TextView
@@ -72,20 +78,21 @@
             android:maxLines="1"
             android:singleLine="true"
             android:text="@string/server_address"
-            android:textColor="@color/accent"
+            android:textColor="@color/navdrawer_account_textcolor"
             android:textSize="12sp" />
 
     </RelativeLayout>
+    </FrameLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/accent"/>
+    <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1dp"-->
+        <!--android:background="@color/navdrawer_account_textcolor"/>-->
 
     <ExpandableListView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/navdrawer_list"
         android:layout_width="match_parent"
-
+        android:groupIndicator="@drawable/feed_group_indicator"
         android:layout_height="match_parent"
         android:scrollbars="vertical" />
 

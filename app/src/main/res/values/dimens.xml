@@ -16,7 +16,7 @@
     <!-- including padding -->
     <dimen name="floating_add_button_height">72dp</dimen>
     <dimen name="floating_add_button_height_no_padding">56dp</dimen>
-    <dimen name="fab_elevation">2dp</dimen>
+    <dimen name="fab_elevation">4dp</dimen>
     <dimen name="fab_press_translation_z">2dp</dimen>
 
     <!-- Action Bar auto-hide-on-scroll behavior parameters -->
