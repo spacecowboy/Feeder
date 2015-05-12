@@ -7,6 +7,7 @@
     <color name="accent_light">@color/material_dark_teal_A400</color>
 
     <color name="window_background">@color/dark_grey_850</color>
+    <color name="dialog_background">@color/dark_grey_800</color>
 
     <color name="translucent_actionbar_background">@color/primary</color>
     <color name="navdrawer_background">@color/dark_grey_850</color>

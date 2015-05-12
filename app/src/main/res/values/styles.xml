@@ -82,7 +82,7 @@
         <item name="photoItemForeground">?android:selectableItemBackground</item>
 
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowBackground">@color/dialog_background</item>
         <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
 
 
