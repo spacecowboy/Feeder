@@ -3,6 +3,8 @@ package com.nononsenseapps.feeder.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -15,6 +17,7 @@ import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
  */
 public class ReaderActivity extends BaseActivity {
 
+    private static final String TAG = "ReaderActivity";
     /**
      * Used to store the last screen title.
      */
@@ -45,9 +48,12 @@ public class ReaderActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reader);
         getActionBarToolbar();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+            ab.setHomeButtonEnabled(true);
+            ab.setDisplayShowTitleEnabled(false);
+        }
 
         mTitle = getTitle();
 

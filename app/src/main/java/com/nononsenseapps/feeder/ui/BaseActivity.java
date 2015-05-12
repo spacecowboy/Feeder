@@ -183,15 +183,24 @@ public class BaseActivity extends ActionBarActivity
             return true;
         }
 
-        if (id == android.R.id.home && mShouldFinishBack) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                finishAfterTransition();
-            } else {
-                finish();
-            }
-            return true;
+        switch (id) {
+            case android.R.id.home:
+                if (mShouldFinishBack) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        finishAfterTransition();
+                    } else {
+                        finish();
+                    }
+                } else {
+                    Intent intent = new Intent(this, FeedActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
