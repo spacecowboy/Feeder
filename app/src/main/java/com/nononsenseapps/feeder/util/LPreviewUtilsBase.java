@@ -22,8 +22,8 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Handler;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -44,7 +44,7 @@ public class LPreviewUtilsBase {
             DrawerLayout drawerLayout,
             final DrawerLayout.DrawerListener drawerListener) {
         mDrawerToggle = new ActionBarDrawerToggle(mActivity, drawerLayout,
-                R.drawable.ic_drawer, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close) {
             @Override
             public void onDrawerClosed(View drawerView) {
