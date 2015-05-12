@@ -27,14 +27,6 @@
                 <include layout="@layout/empty_feeds_at_all" />
             </FrameLayout>
 
-            <include
-                android:id="@+id/sync_indicator_1"
-                layout="@layout/sync_progress_indicator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="3dp"
-                android:visibility="gone" />
-
             <include layout="@layout/include_snack_fca" />
 
         </FrameLayout>
@@ -71,14 +63,6 @@
                     android:text="Notify for new items"
                     android:textColor="@android:color/primary_text_dark" />
             </LinearLayout>
-
-            <include
-                android:id="@+id/sync_indicator_2"
-                layout="@layout/sync_progress_indicator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="3dp"
-                android:visibility="gone" />
         </LinearLayout>
 
     </com.nononsenseapps.feeder.views.DrawShadowFrameLayout>

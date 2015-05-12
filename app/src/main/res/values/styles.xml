@@ -24,11 +24,9 @@
         <item name="android:windowActionModeOverlay">true</item>
         <item name="windowActionModeOverlay">true</item>
 
-        <item name="spbStyle">@style/SyncIndicatorStyle</item>
         <item name="cpbStyle">@style/FeedSearchProgressStyle</item>
     </style>
     <style name="AppThemeDialog" parent="Theme.IOSched.BaseDialog">
-        <item name="spbStyle">@style/SyncIndicatorStyle</item>
         <item name="cpbStyle">@style/FeedSearchProgressStyle</item>
     </style>
 
@@ -174,13 +172,6 @@
     </style>
 
     <!-- progress bar -->
-    <style name="SyncIndicatorStyle" parent="SmoothProgressBar">
-        <item name="spb_stroke_separator_length">12dp</item>
-        <item name="spb_sections_count">4</item>
-        <item name="spb_speed">0.7</item>
-        <item name="spb_interpolator">spb_interpolator_linear</item>
-        <item name="spb_colors">@array/gplus_colors</item>
-    </style>
     <style name="FeedSearchProgressStyle" parent="CircularProgressBar">
         <item name="cpb_colors">@array/gplus_colors</item>
     </style>

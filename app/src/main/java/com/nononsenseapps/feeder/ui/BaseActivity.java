@@ -466,7 +466,7 @@ public class BaseActivity extends ActionBarActivity
         final LinearLayoutManager layoutManager =
                 (LinearLayoutManager) listView.getLayoutManager();
         mActionBarAutoHideSignal = 0;
-        listView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             final static int ITEMS_THRESHOLD = 0;
             int lastFvi = 0;
 

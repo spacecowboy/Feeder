@@ -17,8 +17,10 @@
 
 package com.nononsenseapps.feeder.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
@@ -26,14 +28,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -55,13 +62,15 @@ import com.bumptech.glide.Glide;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.RssDatabaseService;
 import com.nononsenseapps.feeder.db.Util;
+import com.nononsenseapps.feeder.model.AuthHelper;
+import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.DeltaCursorLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
-import com.nononsenseapps.feeder.views.FlingingRecyclerView;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -91,10 +100,13 @@ public class FeedFragment extends Fragment
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
     private static final String TAG = "FeedFragment";
     private FeedAdapter mAdapter;
-    private FlingingRecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private View mEmptyView;
     private View mEmptyAddFeed;
     private View mEmptyOpenFeeds;
+
+    private final BroadcastReceiver mSyncReceiver;
 
     private long id = -1;
     private String title = "";
@@ -174,6 +186,15 @@ public class FeedFragment extends Fragment
     };
 
     public FeedFragment() {
+        // Listens on sync broadcasts
+        mSyncReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (RssSyncAdapter.SYNC_BROADCAST.equals(intent.getAction())) {
+                    onSyncBroadcast(intent.getBooleanExtra(RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE, false));
+                }
+            }
+        };
     }
 
     /**
@@ -229,7 +250,7 @@ public class FeedFragment extends Fragment
                              Bundle savedInstanceState) {
         View rootView =
                 inflater.inflate(R.layout.fragment_feed, container, false);
-        mRecyclerView = (FlingingRecyclerView) rootView.findViewById(android.R.id.list);
+        mRecyclerView = (RecyclerView) rootView.findViewById(android.R.id.list);
 
         // improve performance if you know that changes in content
         // do not change the size of the RecyclerView
@@ -266,6 +287,30 @@ public class FeedFragment extends Fragment
 //                    (getActivity(), DividerColor.VERTICAL_LIST, 0, 1));
         }
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+        // Setup swipe refresh
+        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
+        // Set the offset so it comes out of the correct place
+        final int toolbarHeight = getResources().getDimensionPixelOffset(R.dimen.toolbar_height);
+        mSwipeRefreshLayout.setProgressViewOffset(true, toolbarHeight, Math.round(1.5f * toolbarHeight));
+
+        // The arrow will cycle between these colors (in order)
+        mSwipeRefreshLayout.setColorSchemeResources(
+                R.color.refresh_progress_1,
+                R.color.refresh_progress_2,
+                R.color.refresh_progress_3);
+
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                boolean syncing = syncOrConfig();
+
+                if (!syncing) {
+                    // Do not show refresh view
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
+            }
+        });
 
         // Set up the empty view
         mEmptyView = rootView.findViewById(android.R.id.empty);
@@ -319,11 +364,37 @@ public class FeedFragment extends Fragment
         return rootView;
     }
 
+    /**
+     * Request a sync or ask for account if required.
+     *
+     * @return true if sync is underway, or false otherwise
+     */
+    public boolean syncOrConfig() {
+        if (null == AuthHelper.getSavedAccountName(getActivity())) {
+            DialogFragment dialog = new AccountDialog();
+            dialog.show(getFragmentManager(), "account_dialog");
+            return false;
+        } else {
+            RssContentProvider.RequestSync(getActivity());
+            return true;
+        }
+    }
+
+    private void onSyncBroadcast(boolean syncing) {
+        // Background syncs trigger the sync layout
+        if (mSwipeRefreshLayout.isRefreshing() != syncing) {
+            mSwipeRefreshLayout.setRefreshing(syncing);
+        }
+    }
+
     @Override
     public void onActivityCreated(Bundle bundle) {
         super.onActivityCreated(bundle);
 
-        ((BaseActivity) getActivity()).getSupportActionBar().setTitle(title);
+        ActionBar ab = ((BaseActivity) getActivity()).getSupportActionBar();
+        if (ab != null) {
+            ab.setTitle(title);
+        }
         ((BaseActivity) getActivity()).enableActionBarAutoHide(mRecyclerView);
     }
 
@@ -332,6 +403,16 @@ public class FeedFragment extends Fragment
         super.onResume();
         // List might be shorter than screen once item has been read
         ((BaseActivity) getActivity()).showActionBar();
+        // Listen on broadcasts
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mSyncReceiver, new IntentFilter(RssSyncAdapter.SYNC_BROADCAST));
+    }
+
+    @Override
+    public void onPause() {
+        // Unregister receiver
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mSyncReceiver);
+        mSwipeRefreshLayout.setRefreshing(false);
+        super.onPause();
     }
 
     @Override
@@ -375,7 +456,14 @@ public class FeedFragment extends Fragment
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         final long id = menuItem.getItemId();
-        if (id == R.id.action_edit_feed && this.id > 0) {
+        if (id == R.id.action_sync) {
+            mSwipeRefreshLayout.setRefreshing(true);
+            boolean syncing = syncOrConfig();
+            if (mSwipeRefreshLayout.isRefreshing() != syncing) {
+                mSwipeRefreshLayout.setRefreshing(syncing);
+            }
+            return true;
+        } else if (id == R.id.action_edit_feed && this.id > 0) {
             Intent i = new Intent(getActivity(), EditFeedActivity.class);
             // TODO do not animate the back movement here
             i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
@@ -500,7 +588,7 @@ public class FeedFragment extends Fragment
             mAdapter.updateData(map);
             boolean empty = mAdapter.getItemCount() <= 2;
             mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
-            mRecyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
+            mSwipeRefreshLayout.setVisibility(empty ? View.GONE : View.VISIBLE);
         } else if (FEED_LOADER == cursorLoader.getId()) {
             Cursor cursor = (Cursor) result;
             if (cursor.moveToFirst()) {

@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.nononsenseapps.feeder.ui.FeedActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.nononsenseapps.feeder.ui.FeedActivity">
 
-    <com.nononsenseapps.feeder.views.FlingingRecyclerView
-        android:id="@android:id/list"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbarStyle="outsideOverlay"
-        android:scrollbars="vertical"
-        android:paddingLeft="@dimen/feed_list_padding"
-        android:paddingRight="@dimen/feed_list_padding"
-        />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/feed_list_padding"
+            android:paddingRight="@dimen/feed_list_padding"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbars="vertical" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <include
         layout="@layout/empty_feed"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 </FrameLayout>

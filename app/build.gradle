@@ -59,7 +59,6 @@ dependencies {
     compile "com.android.support:appcompat-v7:22.1.1"
 
     // For nice looking progress bars
-    compile 'com.github.castorflex.smoothprogressbar:library:1.0.0'
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.1'
 
     // Image loading

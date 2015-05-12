@@ -46,18 +46,12 @@ public class FeedActivity extends BaseActivity {
     private Fragment mFragment;
     private DrawShadowFrameLayout mDrawShadowFrameLayout;
     private View mCheckAllButton;
-    private View mSyncIndicator1;
-    private View mSyncIndicator2;
-    private boolean isSyncing = false;
 
     // Broadcast receiver for sync events
     private BroadcastReceiver mSyncMsgReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             if (RssSyncAdapter.SYNC_BROADCAST.equals(intent.getAction())) {
-                isSyncing = intent
-                        .getBooleanExtra(RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE, false);
-                showHideSyncIndicators(isSyncing);
 
                 if (mFragment == null) {
                     // Load first feed if nothing is showing
@@ -147,10 +141,6 @@ public class FeedActivity extends BaseActivity {
         mActionFooter = findViewById(R.id.action_footer);
         mSnackBar = findViewById(R.id.snackbar);
         mSnackBar.setVisibility(View.GONE);
-
-        // Sync indicators
-        mSyncIndicator1 = findViewById(R.id.sync_indicator_1);
-        mSyncIndicator2 = findViewById(R.id.sync_indicator_2);
     }
 
     /**
@@ -209,9 +199,6 @@ public class FeedActivity extends BaseActivity {
         super.onPostCreate(savedInstanceState);
 
         registerHideableHeaderView(findViewById(R.id.headerbar));
-        registerHideableHeaderView(mSyncIndicator2);
-//        registerHideableFooterView(mCheckAllButton);
-//        registerHideableFooterView(mSnackBar);
         registerHideableFooterView(mActionFooter);
     }
 
@@ -221,10 +208,11 @@ public class FeedActivity extends BaseActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_sync) {
-            syncOrConfig();
-            return true;
-        } else if (id == R.id.action_add) {
+//        if (id == R.id.action_sync) {
+//            syncOrConfig();
+//            return true;
+//        } else
+        if (id == R.id.action_add) {
             startActivity(new Intent(FeedActivity.this, EditFeedActivity.class));
             return true;
         } else if (R.id.action_opml_export == id) {
@@ -317,10 +305,6 @@ public class FeedActivity extends BaseActivity {
     protected void onActionBarAutoShowOrHide(boolean shown) {
         super.onActionBarAutoShowOrHide(shown);
         mDrawShadowFrameLayout.setShadowVisible(shown, shown);
-
-        // Hide progress bar if no sync underway
-        // header bar overrides this, hence this call
-        showHideSyncIndicators(isSyncing);
     }
 
     @Override
@@ -337,15 +321,8 @@ public class FeedActivity extends BaseActivity {
         // Stop listening to broadcasts
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(mSyncMsgReceiver);
-        // hide sync indicators
-        showHideSyncIndicators(false);
 
         super.onPause();
-    }
-
-    private void showHideSyncIndicators(final boolean isSyncing) {
-        mSyncIndicator1.setVisibility(isSyncing ? View.VISIBLE : View.GONE);
-        mSyncIndicator2.setVisibility(isSyncing ? View.VISIBLE : View.GONE);
     }
 
     @Override

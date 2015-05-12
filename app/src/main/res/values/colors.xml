@@ -13,6 +13,11 @@
     <color name="navdrawer_icon_tint_selected">@color/primary</color>
     <color name="black_overlay">#66000000</color>
 
+
+    <color name="refresh_progress_1">#ffff1744</color>
+    <color name="refresh_progress_2">#ff00e676</color>
+    <color name="refresh_progress_3">#ff2979ff</color>
+
     <color name="ripple_material_dark">@color/accent</color>
 
     <!-- Material Text colors -->
