@@ -12,6 +12,7 @@
     </declare-styleable>
     <declare-styleable name="ThemeIOSched">
         <attr name="isFloatingWindow" format="boolean" />
+        <attr name="itemSwipingBGColor" format="color" />
     </declare-styleable>
     <declare-styleable name="FloatLabelLayout">
         <attr name="floatLabelTextAppearance" format="reference" />

@@ -9,6 +9,8 @@
     <color name="window_background">@color/dark_grey_850</color>
     <color name="dialog_background">@color/dark_grey_800</color>
 
+    <color name="swiping_item_color">#ffff5252</color>
+
     <color name="translucent_actionbar_background">@color/primary</color>
     <color name="navdrawer_background">@color/dark_grey_850</color>
     <color name="navdrawer_text_color">@color/primary_text_default_material_dark</color>

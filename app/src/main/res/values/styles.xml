@@ -65,6 +65,7 @@
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
 
+        <item name="itemSwipingBGColor">@color/swiping_item_color</item>
 
         <item name="colorPrimary">@color/primary</item>
         <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->

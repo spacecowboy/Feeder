@@ -46,6 +46,7 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -905,14 +906,15 @@ public class FeedFragment extends Fragment
             //public final View textGroup;
             public final ImageView imageView;
             public final View view;
+            private final View bgFrame;
+            private final View checkLeft;
+            private final View checkRight;
+            private final View checkBg;
 
             public FeedItemSQL rssItem;
 
             public ViewHolder(View v) {
                 super(v);
-                this.view = v;
-                v.setOnClickListener(this);
-                v.setOnLongClickListener(this);
                 //textGroup = v.findViewById(R.id.story_text);
                 titleTextView = (TextView) v.findViewById(R.id.story_snippet);
                 bodyTextView = (TextView) v.findViewById(R.id.story_body);
@@ -920,6 +922,14 @@ public class FeedFragment extends Fragment
                 authorTextView = (TextView) v.findViewById(R.id.story_author);
                 imageView = (ImageView) v.findViewById(R.id.story_image);
 
+                checkBg = v.findViewById(R.id.check_bg);
+                checkLeft = v.findViewById(R.id.check_left);
+                checkRight = v.findViewById(R.id.check_right);
+                bgFrame = v.findViewById(R.id.swiping_item);
+
+                this.view = v;
+                v.setOnClickListener(this);
+                v.setOnLongClickListener(this);
                 // Swipe handler
                 v.setOnTouchListener(new SwipeDismissTouchListener(v, null, new SwipeDismissTouchListener.DismissCallbacks() {
                     @Override
@@ -947,13 +957,61 @@ public class FeedFragment extends Fragment
                             RssDatabaseService.markItemAsRead(getActivity(), rssItem.id);
                         }
                     }
+
+                    /**
+                     * Called when a swipe is started.
+                     *
+                     * @param goingRight true if swiping to the right, false if left
+                     */
+                    @Override
+                    public void onSwipeStarted(boolean goingRight) {
+                        // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
+                        mSwipeRefreshLayout.setEnabled(false);
+
+                        TypedValue typedValue = new TypedValue();
+                        getActivity().getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+                        bgFrame.setBackgroundColor(typedValue.data);
+                        checkBg.setVisibility(View.VISIBLE);
+                        if (goingRight) {
+                            checkLeft.setVisibility(View.VISIBLE);
+                        } else {
+                            checkRight.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    /**
+                     * Called when user doesn't swipe all the way.
+                     */
+                    @Override
+                    public void onSwipeCancelled() {
+                        // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
+                        mSwipeRefreshLayout.setEnabled(true);
+
+                        checkBg.setVisibility(View.INVISIBLE);
+                        checkLeft.setVisibility(View.INVISIBLE);
+                        checkRight.setVisibility(View.INVISIBLE);
+
+                        bgFrame.setBackground(null);
+                    }
+
+                    /**
+                     * @return the subview which should move
+                     */
+                    @Override
+                    public View getSwipingView() {
+                        return bgFrame;
+                    }
                 }));
             }
 
             public void resetView() {
-                view.clearAnimation();
-                view.setAlpha(1.0f);
-                view.setTranslationX(0.0f);
+                checkBg.setVisibility(View.INVISIBLE);
+                checkLeft.setVisibility(View.INVISIBLE);
+                checkRight.setVisibility(View.INVISIBLE);
+                bgFrame.clearAnimation();
+                bgFrame.setAlpha(1.0f);
+                bgFrame.setTranslationX(0.0f);
+                bgFrame.setBackground(null);
             }
 
             public void fillTitle() {
