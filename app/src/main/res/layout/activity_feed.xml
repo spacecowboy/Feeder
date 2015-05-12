@@ -41,27 +41,41 @@
 
             <include layout="@layout/toolbar_actionbar" />
 
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@color/primary"
                 android:orientation="horizontal">
 
                 <CheckedTextView
+                    android:id="@+id/nightcheck"
+                    style="@style/TextAppearance.Body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:background="?selectableItemBackground"
+                    android:checkMark="@drawable/nightmode_checkmark"
+                    android:clickable="true"
+                    android:gravity="center_vertical|start"
+                    android:paddingStart="16dp"
+                    android:singleLine="true"
+                    android:text="Night mode"
+                    android:textColor="@android:color/primary_text_dark" />
+
+                <CheckedTextView
                     android:id="@+id/notifycheck"
                     style="@style/TextAppearance.Body"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="end"
                     android:background="?selectableItemBackground"
                     android:checkMark="@drawable/notification_checkmark"
                     android:clickable="true"
                     android:gravity="center_vertical|end"
-                    android:paddingRight="8dp"
                     android:singleLine="true"
                     android:text="Notify for new items"
                     android:textColor="@android:color/primary_text_dark" />
-            </LinearLayout>
+            </FrameLayout>
         </LinearLayout>
 
     </com.nononsenseapps.feeder.views.DrawShadowFrameLayout>

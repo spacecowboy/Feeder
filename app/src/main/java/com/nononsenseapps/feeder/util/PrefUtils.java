@@ -16,6 +16,11 @@ public class PrefUtils {
     public static final String PREF_WELCOME_DONE = "pref_welcome_done";
 
     /**
+     * Boolean indicating if night mode should be engaged.
+     */
+    public static final String PREF_NIGHT_MODE = "pref_night_mode";
+
+    /**
      * Boolean indicating if only unread items should be shown
      */
     public static final String PREF_SHOW_ONLY_UNREAD = "pref_show_only_unread";
@@ -47,6 +52,14 @@ public class PrefUtils {
 
     public static void markWelcomeDone(final Context context) {
         sp(context).edit().putBoolean(PREF_WELCOME_DONE, true).apply();
+    }
+
+    public static boolean isNightMode(final Context context) {
+        return sp(context).getBoolean(PREF_NIGHT_MODE, false);
+    }
+
+    public static void setNightMode(final Context context, final boolean value) {
+        sp(context).edit().putBoolean(PREF_NIGHT_MODE, value).apply();
     }
 
     public static boolean isShowOnlyUnread(final Context context) {

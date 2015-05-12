@@ -969,7 +969,11 @@ public class FeedFragment extends Fragment
                         mSwipeRefreshLayout.setEnabled(false);
 
                         TypedValue typedValue = new TypedValue();
-                        getActivity().getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+                        if (PrefUtils.isNightMode(getActivity())) {
+                            getActivity().getTheme().resolveAttribute(R.attr.nightBGColor, typedValue, true);
+                        } else {
+                            getActivity().getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+                        }
                         bgFrame.setBackgroundColor(typedValue.data);
                         checkBg.setVisibility(View.VISIBLE);
                         if (goingRight) {

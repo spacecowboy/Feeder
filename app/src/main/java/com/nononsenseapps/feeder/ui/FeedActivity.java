@@ -9,15 +9,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewCompat;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckedTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -141,6 +144,22 @@ public class FeedActivity extends BaseActivity {
         mActionFooter = findViewById(R.id.action_footer);
         mSnackBar = findViewById(R.id.snackbar);
         mSnackBar.setVisibility(View.GONE);
+
+        // Night mode
+        final CheckedTextView nightCheck = (CheckedTextView) findViewById(R.id.nightcheck);
+        nightCheck.setChecked(PrefUtils.isNightMode(this));
+        nightCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle icon first
+                nightCheck.toggle();
+                // Toggle prefs
+                PrefUtils.setNightMode(FeedActivity.this, nightCheck.isChecked());
+
+                // Change background
+                setNightBackground();
+            }
+        });
     }
 
     /**

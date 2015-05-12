@@ -10,7 +10,7 @@
     <style name="FeedsTheme" parent="AppTheme" >
     </style>
     <style name="ReaderTheme" parent="AppTheme" >
-        <item name="android:windowBackground">@android:color/black</item>
+        <!--<item name="android:windowBackground">@android:color/black</item>-->
     </style>
     <style name="EditFeedTheme" parent="AppTheme" >
         <item name="android:windowActionBar">false</item>
@@ -66,6 +66,7 @@
         <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
 
         <item name="itemSwipingBGColor">@color/swiping_item_color</item>
+        <item name="nightBGColor">@android:color/black</item>
 
         <item name="colorPrimary">@color/primary</item>
         <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
