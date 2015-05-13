@@ -58,7 +58,10 @@ def cache_feed(feed):
 
     # If no items, there is nothing to do
     if len(rss.entries) == 0:
-        print("No new items, ignoring {}".format(f.title))
+        try:
+            print("No new items, ignoring {}".format(f.title))
+        except:
+            print("No new items, ignoring title which I can't print")
         return
 
     # Update feed timestamp
