@@ -1,16 +1,24 @@
 # -*- coding: utf-8 -*-
 '''
-Creates the database used by the app.
-Edit the path in feeder/database.py to change
-where the database is created.
+Usage
+    python createdb.py -c /path/to/config.yaml
 
-By default it is:
-    ./feeder.db.
-
-where ./ refers to the location of the feeder module
+Creates the database whose location is specified by the config file.
+See config-sample.yaml for details.
 '''
-from feeder import db
+import sys
+from feeder import read_config
 
-db.create_all()
 
-exit("Database created successfully")
+if __name__ == '__main__':
+    if len(sys.argv) != 3 or sys.argv[1] != '-c':
+        exit(__doc__)
+
+    configfile = sys.argv[2]
+    read_config(configfile)
+
+    import feeder.rest
+    from feeder.database import db
+    db.create_all()
+
+    exit("Database created successfully")
