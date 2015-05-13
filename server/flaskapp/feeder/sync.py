@@ -108,7 +108,10 @@ def cache_feed(feed):
         # And commit all
         db.session.commit()
     else:
-        print("No new items in {}".format(feed.title))
+        try:
+            print("No new items in {}".format(feed.title))
+        except:
+            print("No new items in erroneous title")
 
 
 def delete_old_items(days=14):
