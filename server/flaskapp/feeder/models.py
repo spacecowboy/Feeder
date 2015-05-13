@@ -78,7 +78,7 @@ def get_userfeed(user, feed, tag=None, title=None):
 class User(db.Model):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    email = Column(String, nullable=False, unique=True)
+    email = Column(String, nullable=False, unique=True, index=True)
     passwordhash = Column(String)
     feeds = relationship('UserFeed', lazy='dynamic',
                          cascade='all, delete-orphan',
@@ -94,10 +94,10 @@ class User(db.Model):
 class Feed(db.Model):
     __tablename__ = 'feeds'
     id = Column(Integer, primary_key=True)
-    link = Column(String, nullable=False, unique=True)
+    link = Column(String, nullable=False, unique=True, index=True)
     title = Column(Text, nullable=False)
     description = Column(Text, nullable=False)
-    timestamp = Column(DateTime, nullable=False)
+    timestamp = Column(DateTime, nullable=False, index=True)
     published = Column(DateTime)
     # For feedparser's benefit
     etag = Column(String)
@@ -160,7 +160,7 @@ class UserDeletion(db.Model):
                                 ondelete="CASCADE",
                                 onupdate="CASCADE"))
     link = Column(String, nullable=False)
-    timestamp = Column(DateTime, nullable=False)
+    timestamp = Column(DateTime, nullable=False, index=True)
     # Would want unique constraint, but can't get
     # on conflict things
 
@@ -176,7 +176,7 @@ class UserDeletion(db.Model):
 class FeedItem(db.Model):
     __tablename__ = "feeditems"
     id = Column(Integer, primary_key=True)
-    link = Column(String, nullable=False)
+    link = Column(String, nullable=False, index=True)
     title = Column(Text, nullable=False)
     description = Column(Text, nullable=False)
     title_stripped = Column(Text, nullable=False)
@@ -188,7 +188,7 @@ class FeedItem(db.Model):
     image = Column(String)
     json = Column(Text)
     # Internal use
-    timestamp = Column(DateTime, nullable=False)
+    timestamp = Column(DateTime, nullable=False, index=True)
     # Related feed
     feed_id = Column(Integer, ForeignKey('feeds.id',
                                          ondelete="CASCADE",
