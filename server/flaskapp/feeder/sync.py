@@ -24,6 +24,9 @@ def cache_all_feeds():
     '''
     Download all feeds in database
     '''
+    # First clear out old items
+    delete_old_items()
+
     for feed in Feed.query.all():
         cache_feed(feed)
 
@@ -32,8 +35,6 @@ def cache_feed(feed):
     '''
     Download the feed.
     '''
-    # First clear out old items
-    delete_old_items(feed.id)
 
     url = feed.link
     if not "://" in url:
@@ -107,20 +108,22 @@ def cache_feed(feed):
         print("No new items in {}".format(feed.title))
 
 
-def delete_old_items(feed_id, days=14):
+def delete_old_items(days=14):
     '''
     Clear out old items so the database doesn't grow too much.
     By default, items are deleted when they are 14 days old.
+    After this a 'vacuum' is run which removes excess database
+    pages.
 
     Args:
-    feed_id - The feed to clear for
     days - By default items older than [14] days are deleted
     '''
     dt = datetime.utcnow() - timedelta(days=days)
 
-    FeedItem.query.filter(FeedItem.timestamp < dt,
-                          FeedItem.feed_id == feed_id).delete()
+    FeedItem.query.filter(FeedItem.timestamp < dt).delete()
     db.session.commit()
+
+    db.engine.execute("vacuum;")
 
 
 def delete_orphan_feeds():
