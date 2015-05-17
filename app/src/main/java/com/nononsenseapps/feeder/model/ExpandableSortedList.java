@@ -121,7 +121,6 @@ public class ExpandableSortedList<T> extends SortedList<T> {
     @Override
     public int add(T item) {
         addSubItem(item);
-        // TODO super handles existing items, but it will fuck up if we move item from tag to root since it does not handle root which should now be removed.
         // Only add to super if item is at top, or in an expanded subtree
         if (isShowing(item)) {
             return super.add(item);
@@ -172,13 +171,20 @@ public class ExpandableSortedList<T> extends SortedList<T> {
 
         T parent = mCallback.getParentOf(item);
 
+        boolean notify = true;
         if (!mGroups.containsKey(parent)) {
             mGroups.put(parent, new HashSet<T>());
             mGroupState.put(parent, CONTRACTED);
             super.add(parent);
+            notify = false;
         }
 
         mGroups.get(parent).add(item);
+
+        if (notify) {
+            // Just notify that it should be updated
+            mCallback.onChanged(super.indexOf(parent), 1);
+        }
     }
 
     private boolean removeSubItem(T item) {
@@ -195,6 +201,9 @@ public class ExpandableSortedList<T> extends SortedList<T> {
                 mGroups.remove(parent);
                 mGroupState.remove(parent);
                 super.remove(parent);
+            } else {
+                // Just notify that it should be updated
+                mCallback.onChanged(super.indexOf(parent), 1);
             }
             return res;
         } else {
