@@ -22,7 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:selectableItemBackground"
-    android:paddingStart="16dp"
+    android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
     tools:ignore="RtlSymmetry">
 
     <TextView

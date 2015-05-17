@@ -345,4 +345,19 @@ public class FeedItemSQL {
 
         return values;
     }
+
+    @Override
+    public int hashCode() {
+        return Long.valueOf(id).hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        return obj instanceof FeedItemSQL && Long.valueOf(id).equals(((FeedItemSQL) obj).id);
+
+    }
 }

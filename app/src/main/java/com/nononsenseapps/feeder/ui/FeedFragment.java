@@ -70,6 +70,7 @@ import com.nononsenseapps.feeder.model.AuthHelper;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.DeltaCursorLoader;
+import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 
@@ -556,7 +557,7 @@ public class FeedFragment extends Fragment
     @Override
     public Loader onCreateLoader(final int ID, final Bundle bundle) {
         if (ID == FEEDITEMS_LOADER) {
-            return new DeltaCursorLoader(getActivity(), FeedItemSQL.URI_FEED_ITEMS,
+            return new FeedItemDeltaCursorLoader(getActivity(), FeedItemSQL.URI_FEED_ITEMS,
                     FeedItemSQL.FIELDS, getLoaderSelection(),
                     getLoaderSelectionArgs(),
                     FeedItemSQL.COL_PUBDATE + " DESC");

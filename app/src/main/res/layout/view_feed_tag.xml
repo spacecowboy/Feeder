@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<!--
+  ~ Copyright (c) 2015 Jonas Kalderstam.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="?android:attr/listPreferredItemHeightSmall"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeightSmall"
     android:background="?android:selectableItemBackground"
-                android:paddingBottom="2dip"
-                android:paddingTop="2dip"
-                tools:ignore="RtlSymmetry">
+    android:paddingBottom="2dip"
+    android:paddingTop="2dip"
+    tools:ignore="RtlSymmetry">
 
     <TextView
         android:id="@+id/tag_unreadcount"
@@ -20,15 +37,15 @@
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="@color/secondary_text_material_dark"
-        android:textSize="@dimen/navdrawer_unreadcount_textsize"
-        />
+        android:textSize="@dimen/navdrawer_unreadcount_textsize" />
 
-    <FrameLayout
+    <ImageView
         android:id="@+id/tag_expander"
         android:layout_width="?android:attr/expandableListPreferredItemPaddingLeft"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
         android:background="?android:selectableItemBackgroundBorderless"
-        android:layout_alignParentStart="true"/>
+        android:src="@drawable/tinted_expand_more" />
 
     <TextView
         android:id="@+id/tag_name"
@@ -39,6 +56,5 @@
         android:gravity="center_vertical"
         android:paddingEnd="2dp"
         android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
-        />
+        android:textAppearance="?android:attr/textAppearanceListItemSmall" />
 </RelativeLayout>

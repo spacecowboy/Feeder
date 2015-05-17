@@ -89,10 +89,11 @@
         <!--android:layout_height="1dp"-->
         <!--android:background="@color/navdrawer_account_textcolor"/>-->
 
-    <ExpandableListView xmlns:android="http://schemas.android.com/apk/res/android"
+    <!--
+        android:groupIndicator="@drawable/feed_group_indicator" -->
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/navdrawer_list"
         android:layout_width="match_parent"
-        android:groupIndicator="@drawable/feed_group_indicator"
         android:layout_height="match_parent"
         android:scrollbars="vertical" />
 

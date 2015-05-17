@@ -23,8 +23,6 @@ import android.net.Uri;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import com.nononsenseapps.feeder.db.FeedItemSQL;
-
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -37,7 +35,7 @@ import java.util.HashMap;
  * to switch to the framework's implementation.  See the framework SDK
  * documentation for a class overview.
  */
-public class DeltaCursorLoader extends AsyncTaskLoader<HashMap<FeedItemSQL, Integer>> {
+public abstract class DeltaCursorLoader<T> extends AsyncTaskLoader<HashMap<T, Integer>> {
     private static final String TAG = "DeltaCursorLoader";
     // This will call ForceLoad() when data changes
     final ForceLoadContentObserver mObserver;
@@ -50,73 +48,15 @@ public class DeltaCursorLoader extends AsyncTaskLoader<HashMap<FeedItemSQL, Inte
 
     Cursor mCursor;
 
-    HashMap<Long, FeedItemSQL> mItems = null;
-    private HashMap<FeedItemSQL, Integer> mLastResult = null;
+    private HashMap<T, Integer> mLastResult = null;
 
     /* Runs on a worker thread */
     @Override
-    public HashMap<FeedItemSQL, Integer> loadInBackground() {
-        Log.d(TAG, "loadInBackground");
-        Cursor cursor = getContext().getContentResolver().query(mUri, mProjection, mSelection,
-                mSelectionArgs, mSortOrder);
-        if (cursor != null) {
-            // Ensure the cursor window is filled
-            cursor.getCount();
-            cursor.registerContentObserver(mObserver);
-        }
-
-        Cursor oldCursor = mCursor;
-        mCursor = cursor;
-
-        Log.d(TAG, "Time to close...");
-        if (oldCursor != null && oldCursor != cursor) {
-            Log.d(TAG, "Closing oldCursor.");
-            oldCursor.close();
-        }
-
-        // Now handle contents
-
-        if (mCursor == null) {
-            mItems = null;
-            Log.d(TAG, "Cursor was null, returning null");
-            return null;
-        }
-
-        HashMap<FeedItemSQL, Integer> result = new HashMap<>();
-        HashMap<Long, FeedItemSQL> oldItems = mItems;
-        mItems = new HashMap<>();
-
-        // Find out which items are currently present
-        while (mCursor.moveToNext()) {
-            FeedItemSQL item = new FeedItemSQL(mCursor);
-            // Also parse JSON while in background
-            item.getJson();
-
-            mItems.put(item.id, item);
-
-            if (oldItems != null && oldItems.containsKey(item.id)) {
-                // 0, already in set
-                result.put(item, 0);
-                oldItems.remove(item.id);
-            } else {
-                // 1, new item
-                result.put(item, 1);
-            }
-        }
-        // Any items which are left in the old set are now deleted
-        if (oldItems != null) {
-            for (FeedItemSQL item : oldItems.values()) {
-                // -1, removed item
-                result.put(item, -1);
-            }
-        }
-
-        return result;
-    }
+    public abstract HashMap<T, Integer> loadInBackground();
 
     /* Runs on the UI thread */
     @Override
-    public void deliverResult(HashMap<FeedItemSQL, Integer> result) {
+    public void deliverResult(HashMap<T, Integer> result) {
         if (isReset()) {
             // An async query came in while the loader is stopped
 //            if (mCursor != null) {
@@ -188,7 +128,7 @@ public class DeltaCursorLoader extends AsyncTaskLoader<HashMap<FeedItemSQL, Inte
     }
 
     @Override
-    public void onCanceled(HashMap<FeedItemSQL, Integer> map) {
+    public void onCanceled(HashMap<T, Integer> map) {
         if (mCursor != null && !mCursor.isClosed()) {
             mCursor.close();
         }

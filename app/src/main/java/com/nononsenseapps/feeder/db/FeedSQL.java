@@ -62,7 +62,7 @@ public class FeedSQL {
     // Used on count view
     public static final String COL_UNREADCOUNT = "unreadcount";
     public static final String[] FIELDS_VIEWCOUNT = {COL_ID, COL_TITLE,
-            COL_URL, COL_TAG, COL_TIMESTAMP, COL_UNREADCOUNT};
+            COL_URL, COL_TAG, COL_TIMESTAMP, COL_NOTIFY, COL_UNREADCOUNT};
     public static final String CREATE_COUNT_VIEW =
             "CREATE TEMP VIEW IF NOT EXISTS " + VIEWCOUNT_NAME
                     + " AS SELECT " + Util.arrayToCommaString(FIELDS_VIEWCOUNT)
@@ -95,6 +95,7 @@ public class FeedSQL {
     public String tag = null;
     public String timestamp = null;
     public int notify = 0;
+    public int unreadCount = -1;
 
     /**
      * No need to do anything, fields are already set to default values above
@@ -113,6 +114,10 @@ public class FeedSQL {
         this.tag = cursor.getString(3);
         this.timestamp = cursor.getString(4);
         this.notify = cursor.getInt(5);
+        if (cursor.getColumnCount() >= 7) {
+            this.unreadCount = cursor.getInt(6);
+        }
+
     }
 
     public static void addMatcherUris(UriMatcher sURIMatcher) {
@@ -198,5 +203,20 @@ public class FeedSQL {
         }
 
         return feeds;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.valueOf(id).hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        return obj instanceof FeedSQL && Long.valueOf(id).equals(((FeedSQL) obj).id);
+
     }
 }

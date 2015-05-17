@@ -3,48 +3,53 @@ package com.nononsenseapps.feeder.ui;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
-import android.app.LoaderManager;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.model.ExpandableSortedList;
 import com.nononsenseapps.feeder.model.RssNotifications;
-import com.nononsenseapps.feeder.model.TaggedFeedsAdapter;
+import com.nononsenseapps.feeder.util.FeedDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.LPreviewUtils;
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
 
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Base activity which handles navigation drawer and other bloat common
  * between activities.
  */
-public class BaseActivity extends ActionBarActivity
-        implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
+public class BaseActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks, SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
     // Durations for certain animations we use:
@@ -82,11 +87,9 @@ public class BaseActivity extends ActionBarActivity
     private LPreviewUtilsBase.ActionBarDrawerToggleWrapper mDrawerToggle;
     // A Runnable that we should execute when the navigation drawer finishes its closing animation
     private Runnable mDeferredOnDrawerClosedRunnable;
-    private TaggedFeedsAdapter mNavAdapter;
-    private ExpandableListView mDrawerListView;
-    private boolean firstload = true;
     private TextView mUserText;
     private TextView mServerText;
+    private FeedsAdapter mNavAdapter;
 
     /**
      * Converts an intent into a {@link Bundle} suitable for use as fragment
@@ -235,7 +238,7 @@ public class BaseActivity extends ActionBarActivity
             ab.setDisplayHomeAsUpEnabled(true);
             ab.setHomeButtonEnabled(true);
         }
-    // What nav drawer item should be selected?
+        // What nav drawer item should be selected?
         int selfItem = getSelfNavDrawerItem();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -319,64 +322,13 @@ public class BaseActivity extends ActionBarActivity
 
         mDrawerToggle.syncState();
 
-        mNavAdapter = new TaggedFeedsAdapter(this);
-        mDrawerListView = (ExpandableListView) mDrawerLayout
-                .findViewById(R.id.navdrawer_list);
-        //mDrawerListView.setLayoutManager(new LinearLayoutManager(this));
-        mDrawerListView.setAdapter(mNavAdapter);
-        mDrawerListView.setOnChildClickListener(
-                new ExpandableListView.OnChildClickListener() {
-                    @Override
-                    public boolean onChildClick(final ExpandableListView parent,
-                                                final View v, final int groupPosition,
-                                                final int childPosition, final long id) {
-                        if (mDrawerLayout != null) {
-                            mDrawerLayout.closeDrawer(Gravity.START);
-                        }
+        // Recycler view stuff
+        RecyclerView mRecyclerView = (RecyclerView) mDrawerLayout.findViewById(R.id.navdrawer_list);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-                        if (mNavAdapter != null) {
-                            Cursor c = mNavAdapter
-                                    .getChild(groupPosition, childPosition);
-                            // Make sure these ints match ordering in projection if
-                            // changed
-                            onNavigationDrawerItemSelected(c.getLong(0),
-                                    c.getString(1), c.getString(2),
-                                    c.getString(3));
-                        }
-                        return true;
-                    }
-                });
-        mDrawerListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(final ExpandableListView parent,
-                                        final View v, final int groupPosition, final long id) {
-                if (mDrawerLayout != null) {
-                    mDrawerLayout.closeDrawer(Gravity.START);
-                }
-
-                if (mNavAdapter != null) {
-                    Cursor c = mNavAdapter
-                            .getGroup(groupPosition);
-                    // Make sure these ints match ordering in projection if
-                    // changed
-                    onNavigationDrawerItemSelected(-1,
-                            c.getString(1), null,
-                            c.getString(1));
-                }
-                return true;
-            }
-        });
-        mNavAdapter.setOnExpandClickListener(new TaggedFeedsAdapter.OnExpandClickListener() {
-            @Override
-            public void onExpandClick(final int groupPosition,
-                                      final boolean isExpanded) {
-                if (isExpanded) {
-                    mDrawerListView.collapseGroup(groupPosition);
-                } else {
-                    mDrawerListView.expandGroup(groupPosition);
-                }
-            }
-        });
+        mNavAdapter = new FeedsAdapter();
+        mRecyclerView.setAdapter(mNavAdapter);
 
         populateNavDrawer();
 
@@ -445,7 +397,7 @@ public class BaseActivity extends ActionBarActivity
     }
 
     private void populateNavDrawer() {
-        getLoaderManager().restartLoader(NAV_TAGS_LOADER, new Bundle(), this);
+        getSupportLoaderManager().restartLoader(NAV_TAGS_LOADER, new Bundle(), this);
     }
 
     public void showActionBar() {
@@ -520,7 +472,7 @@ public class BaseActivity extends ActionBarActivity
                     int lastPos = recyclerView.getAdapter().getItemCount() - 1;
                     if (layoutManager.findLastVisibleItemPosition() == lastPos) {
                         // Show when last item is visible
-                       force = true;
+                        force = true;
                     }
                 }
                 onMainContentScrolled(firstVisibleItem <= ITEMS_THRESHOLD ?
@@ -619,48 +571,19 @@ public class BaseActivity extends ActionBarActivity
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(final int id, final Bundle bundle) {
-        if (id == NAV_TAGS_LOADER) {
-            return mNavAdapter.getGroupCursorLoader();
-        } else {
-            // Using id as group position
-            return mNavAdapter.getChildCursorLoader(bundle.getString("tag"));
-        }
+    public Loader onCreateLoader(final int id, final Bundle bundle) {
+        return new FeedDeltaCursorLoader(this, FeedSQL.URI_FEEDSWITHCOUNTS, FeedSQL.FIELDS_VIEWCOUNT, null, null, null);
     }
 
     @Override
-    public void onLoadFinished(final Loader<Cursor> cursorLoader,
-                               final Cursor cursor) {
-        if (cursorLoader.getId() == NAV_TAGS_LOADER) {
-            mNavAdapter.setGroupCursor(cursor);
-            // Load child cursors
-            for (int i = 0; i < cursor.getCount(); i++) {
-                //if (firstload) {
-                    // Expand by default
-                    //mDrawerListView.expandGroup(i);
-                //}
-                Cursor group = mNavAdapter.getGroup(i);
-                Bundle b = new Bundle();
-                // Make sure position is correct
-                b.putString("tag", group.getString(1));
-                getLoaderManager().restartLoader(i, b, this);
-            }
-
-        } else {
-            // Child loader
-            mNavAdapter.setChildrenCursor(cursorLoader.getId(), cursor);
-        }
-        // Put this last
-        firstload = false;
+    public void onLoadFinished(final Loader Loader,
+                               final Object obj) {
+        mNavAdapter.updateData((HashMap<FeedSQL, Integer>) obj);
     }
 
     @Override
-    public void onLoaderReset(final Loader<Cursor> cursorLoader) {
-        if (cursorLoader.getId() == NAV_TAGS_LOADER) {
-            mNavAdapter.setGroupCursor(null);
-        } else {
-            mNavAdapter.setChildrenCursor(cursorLoader.getId(), null);
-        }
+    public void onLoaderReset(final Loader loader) {
+        // ..
     }
 
     @Override
@@ -672,94 +595,353 @@ public class BaseActivity extends ActionBarActivity
         }
     }
 
-    //    public class MultiScrollListener implements RecyclerView.OnScrollListener {
-    //        private final Set<RecyclerView.OnScrollListener> children =
-    //                new HashSet<RecyclerView.OnScrollListener>();
-    //
-    //        public void addScrollListener(RecyclerView.OnScrollListener child) {
-    //            children.add(child);
-    //        }
-    //
-    //        @Override
-    //        public void onScrollStateChanged(final int i) {
-    //            for (RecyclerView.OnScrollListener child : children) {
-    //                child.onScrollStateChanged(i);
-    //            }
-    //        }
-    //
-    //        @Override
-    //        public void onScrolled(final int dx, final int dy) {
-    //            for (RecyclerView.OnScrollListener child : children) {
-    //                child.onScrolled(dx, dy);
-    //            }
-    //        }
-    //    }
-/*
-    private class FeedsAdapter extends RecyclerView
-            .Adapter<FeedsAdapter.ViewHolder> {
+    static class FeedWrapper {
 
-        Cursor data = null;
+        public final String tag;
+        public final FeedSQL item;
+        public final boolean isTag;
 
-        public void setData(Cursor c) {
-            data = c;
-            notifyDataSetChanged();
+        public FeedWrapper(String tag) {
+            this.tag = tag;
+            item = null;
+            isTag = true;
+        }
+
+        public FeedWrapper(FeedSQL item) {
+            tag = item.tag;
+            this.item = item;
+            isTag = false;
         }
 
         @Override
-        public ViewHolder onCreateViewHolder(final ViewGroup parent,
-                final int i) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(android.R.layout
-                    .simple_list_item_1, parent, false));
+        public boolean equals(Object o) {
+            if (o == null) {
+                return false;
+            } else if (o instanceof FeedWrapper) {
+                FeedWrapper f = (FeedWrapper) o;
+                if (isTag && f.isTag) {
+                    // Compare tags
+                    return tag.equals(f.tag);
+                } else {
+                    // Compare items
+                    return !isTag && !f.isTag && item.equals(f.item);
+                }
+            } else {
+                return false;
+            }
         }
 
         @Override
-        public void onBindViewHolder(final ViewHolder viewHolder,
-                final int position) {
-            this.data.moveToPosition(position);
-            viewHolder.bind(this.data.getString(1), this.data.getString(2));
+        public int hashCode() {
+            if (isTag) {
+                // Tag
+                return tag.hashCode();
+            } else {
+                // Item
+                return item.hashCode();
+            }
         }
+    }
+
+    class FeedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+
+        private static final int VIEWTYPE_TAG = 0;
+        private static final int VIEWTYPE_FEED = 1;
+        private static final int VIEWTYPE_FEED_CHILD = 2;
+        private final ExpandableSortedList<FeedWrapper> mItems;
+        private final Collator mCollator;
+        private HashMap<Long, FeedWrapper> mItemMap;
+
+        public FeedsAdapter() {
+            super();
+
+            mCollator = Collator.getInstance();
+            setHasStableIds(true);
+            mItemMap = new HashMap<>();
+            mItems = new ExpandableSortedList<FeedWrapper>(FeedWrapper.class, new ExpandableSortedList.ExpandableCallback<FeedWrapper>() {
+                @Override
+                public int getItemLevel(FeedWrapper item) {
+                    if (item.isTag || item.item.tag == null || item.item.tag.isEmpty()) {
+                        return ExpandableSortedList.TOP_LEVEL;
+                    } else {
+                        return ExpandableSortedList.TOP_LEVEL + 1;
+                    }
+                }
+
+                @Override
+                public FeedWrapper getParentOf(FeedWrapper o) {
+                    if (o.isTag) {
+                        return null;
+                    } else {
+                        return new FeedWrapper(o.tag);
+                    }
+                }
+
+                @Override
+                public int getParentUnreadCount(FeedWrapper parent, HashSet<FeedWrapper> children) {
+                    if (children == null) {
+                        return 0;
+                    }
+
+                    int result = 0;
+                    for (FeedWrapper wrap : children) {
+                        result += wrap.item.unreadCount;
+                    }
+                    return result;
+                }
+
+                @Override
+                public int compare(FeedWrapper o1, FeedWrapper o2) {
+                    if (o1.isTag && o2.isTag) {
+                        return mCollator.compare(o1.tag, o2.tag);
+                    } else if (!o1.isTag && !o2.isTag) {
+                        if (getItemLevel(o1) == getItemLevel(o2)) {
+                            return mCollator.compare(o1.item.title, o2.item.title);
+                        } else if (getItemLevel(o1) < getItemLevel(o2)) {
+                            // Items with no parent are placed last
+                            return 1;
+                        } else {
+                            // Items with no parent are placed last
+                            return -1;
+                        }
+                    } else if (o1.isTag) {
+                        if (o2.item.tag == null || o2.item.tag.isEmpty()) {
+                            // place tag first
+                            return -1;
+                        } else if (o1.tag.equals(o2.item.tag)) {
+                            return -1;
+                        } else {
+                            return compare(o1, getParentOf(o2));
+                        }
+                    } else { // if o2.istag
+                        if (o1.item.tag == null || o1.item.tag.isEmpty()) {
+                            // place tag first
+                            return 1;
+                        } else if (o2.tag.equals(o1.item.tag)) {
+                            return 1;
+                        } else {
+                            return compare(getParentOf(o1), o2);
+                        }
+                    }
+                }
+
+                @Override
+                public void onInserted(int position, int count) {
+                    notifyItemRangeInserted(position, count);
+                }
+
+                @Override
+                public void onRemoved(int position, int count) {
+                    notifyItemRangeRemoved(position, count);
+                }
+
+                @Override
+                public void onMoved(int fromPosition, int toPosition) {
+                    notifyItemMoved(fromPosition, toPosition);
+                }
+
+                @Override
+                public void onChanged(int position, int count) {
+                    notifyItemRangeChanged(position, count);
+                }
+
+                @Override
+                public boolean areContentsTheSame(FeedWrapper oldItem, FeedWrapper newItem) {
+                    if (oldItem.isTag && newItem.isTag) {
+                        return oldItem.tag.equals(newItem.tag) && mItems.getTagUnreadCount(oldItem) == mItems.getTagUnreadCount(newItem);
+                    } else if (!oldItem.isTag && !newItem.isTag) {
+                        return oldItem.item.title.equals(newItem.item.title) && oldItem.item.unreadCount == newItem.item.unreadCount;
+                    } else {
+                        return false;
+                    }
+                }
+
+                @Override
+
+                public boolean areItemsTheSame(FeedWrapper item1, FeedWrapper item2) {
+                    return item1.equals(item2);
+                }
+            });
+        }
+
 
         @Override
         public int getItemCount() {
-            if (this.data == null)
-                return 0;
-            else
-                return this.data.getCount();
+            return mItems.size();
         }
 
-        class ViewHolder extends RecyclerView.ViewHolder implements View
-                .OnClickListener {
-
-            public String title;
-            public String url;
-            private final TextView text;
-
-            public ViewHolder(final View v) {
-                super(v);
-                v.setOnClickListener(this);
-                text = (TextView) v.findViewById(android.R.id.text1);
-            }
-
-            public void bind(String title, String url) {
-                this.title = title;
-                this.url = url;
-                text.setText(title);
-            }
-
-            @Override
-            public void onClick(final View v) {
-                // TODO
-                //mCurrentSelectedPosition = getPosition();
-                //        if (mDrawerListView != null) {
-                //            mDrawerListView.setItemChecked(position, true);
-                //        }
-                if (mDrawerLayout != null) {
-                    mDrawerLayout.closeDrawer(Gravity.START);
-                }
-                if (mNavAdapter != null) {
-                    onNavigationDrawerItemSelected(title, url);
-                }
+        @Override
+        public long getItemId(final int position) {
+            FeedWrapper item = mItems.get(position);
+            if (item.isTag) {
+                return item.hashCode();
+            } else {
+                return item.item.id;
             }
         }
-    }*/
+
+        @Override
+        public int getItemViewType(int position) {
+            FeedWrapper item = mItems.get(position);
+            if (item.isTag) {
+                return VIEWTYPE_TAG;
+            } else if (item.tag == null || item.tag.isEmpty()) {
+                return VIEWTYPE_FEED;
+            } else {
+                return VIEWTYPE_FEED_CHILD;
+            }
+        }
+
+        public void updateData(HashMap<FeedSQL, Integer> map) {
+            HashMap<Long, FeedWrapper> oldItemMap = mItemMap;
+            mItemMap = new HashMap<>();
+            mItems.beginBatchedUpdates();
+            for (FeedSQL item : map.keySet()) {
+                FeedWrapper wrap = new FeedWrapper(item);
+                if (map.get(item) >= 0) {
+                    if (map.get(item) == 0) {
+                        // First remove it, tree structure needs to be updated
+                        FeedWrapper oldWrap = oldItemMap.remove(item.id);
+                        mItems.remove(oldWrap);
+                    }
+                    mItems.add(wrap);
+                    // Add to new map as well
+                    mItemMap.put(item.id, wrap);
+                } else {
+                    mItems.remove(wrap);
+                    // And remove from old
+                    oldItemMap.remove(item.id);
+                }
+            }
+            // If any items remain in old set, they are not present in current result set,
+            // remove them. This is pretty much what is done in the delta loader, but if
+            // the loader is restarted, then it has no old data to go on.
+            for (FeedWrapper item : oldItemMap.values()) {
+                mItems.remove(item);
+            }
+            mItems.endBatchedUpdates();
+        }
+
+        /**
+         * @param tag
+         * @return true if tag is expanded after this call, false otherwise
+         */
+        public boolean toggleExpansion(FeedWrapper tag) {
+            return mItems.toggleExpansion(tag);
+        }
+
+        public boolean isExpanded(FeedWrapper tag) {
+            return mItems.isExpanded(tag);
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            switch (viewType) {
+                case VIEWTYPE_FEED:
+                    return new FeedHolder(LayoutInflater.from(BaseActivity.this).inflate(R.layout.view_feed, parent, false));
+                case VIEWTYPE_FEED_CHILD:
+                    return new FeedHolder(LayoutInflater.from(BaseActivity.this).inflate(R.layout.view_feed_child, parent, false));
+                case VIEWTYPE_TAG:
+                    return new TagHolder(LayoutInflater.from(BaseActivity.this).inflate(R.layout.view_feed_tag, parent, false));
+                default:
+                    return null;
+            }
+        }
+
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            FeedWrapper wrap = mItems.get(position);
+            switch (getItemViewType(position)) {
+                case VIEWTYPE_FEED:
+                case VIEWTYPE_FEED_CHILD:
+                    FeedHolder fh = (FeedHolder) holder;
+                    fh.item = wrap.item;
+                    fh.title.setText(fh.item.title);
+                    fh.unreadCount.setText(Integer.toString(fh.item.unreadCount));
+                    break;
+                case VIEWTYPE_TAG:
+                    TagHolder th = (TagHolder) holder;
+                    th.wrap = wrap;
+                    th.title.setText(wrap.tag);
+                    if (isExpanded(wrap)) {
+                        th.expander.setImageResource(R.drawable.tinted_expand_less);
+                    } else {
+                        th.expander.setImageResource(R.drawable.tinted_expand_more);
+                    }
+                    th.unreadCount.setText(Integer.toString(mItems.getTagUnreadCount(wrap)));
+                    break;
+            }
+        }
+    }
+
+    public class TagHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private final TextView title;
+        private final TextView unreadCount;
+        private final ImageView expander;
+        private FeedWrapper wrap;
+
+        public TagHolder(View v) {
+            super(v);
+            title = (TextView) v.findViewById(R.id.tag_name);
+            unreadCount = (TextView) v.findViewById(R.id.tag_unreadcount);
+            expander = (ImageView) v.findViewById(R.id.tag_expander);
+            // expander clicker
+            expander.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mNavAdapter.toggleExpansion(wrap)) {
+                        expander.setImageResource(R.drawable.tinted_expand_less);
+                    } else {
+                        expander.setImageResource(R.drawable.tinted_expand_more);
+                    }
+                }
+            });
+            v.setOnClickListener(this);
+        }
+
+        /**
+         * Called when a view has been clicked.
+         *
+         * @param v The view that was clicked.
+         */
+        @Override
+        public void onClick(View v) {
+            if (mDrawerLayout != null) {
+                mDrawerLayout.closeDrawer(Gravity.START);
+            }
+
+            onNavigationDrawerItemSelected(-1, wrap.tag, null, wrap.tag);
+        }
+    }
+
+    public class FeedHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private final TextView unreadCount;
+        private final TextView title;
+        public FeedSQL item = null;
+
+        public FeedHolder(View v) {
+            super(v);
+            unreadCount = (TextView) v.findViewById(R.id.feed_unreadcount);
+            title = (TextView) v.findViewById(R.id.feed_name);
+            v.setOnClickListener(this);
+        }
+
+        /**
+         * Called when a view has been clicked.
+         *
+         * @param v The view that was clicked.
+         */
+        @Override
+        public void onClick(View v) {
+            if (mDrawerLayout != null) {
+                mDrawerLayout.closeDrawer(Gravity.START);
+            }
+
+            onNavigationDrawerItemSelected(item.id, item.title, item.url, item.tag);
+        }
+    }
 }
