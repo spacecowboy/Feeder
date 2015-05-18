@@ -860,6 +860,7 @@ public class BaseActivity extends AppCompatActivity
                     fh.item = wrap.item;
                     fh.title.setText(fh.item.title);
                     fh.unreadCount.setText(Integer.toString(fh.item.unreadCount));
+                    fh.unreadCount.setVisibility(fh.item.unreadCount > 0 ? View.VISIBLE : View.GONE);
                     break;
                 case VIEWTYPE_TAG:
                     TagHolder th = (TagHolder) holder;
@@ -870,7 +871,9 @@ public class BaseActivity extends AppCompatActivity
                     } else {
                         th.expander.setImageResource(R.drawable.tinted_expand_more);
                     }
-                    th.unreadCount.setText(Integer.toString(mItems.getTagUnreadCount(wrap)));
+                    int uc = mItems.getTagUnreadCount(wrap);
+                    th.unreadCount.setText(Integer.toString(uc));
+                    th.unreadCount.setVisibility(uc > 0 ? View.VISIBLE : View.GONE);
                     break;
             }
         }
