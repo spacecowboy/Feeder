@@ -5,82 +5,20 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".FeedActivity">
 
-    <com.nononsenseapps.feeder.views.DrawShadowFrameLayout
-        android:id="@+id/main_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false"
-        app:shadowDrawable="@drawable/header_shadow">
+    <!--<com.nononsenseapps.feeder.views.DrawShadowFrameLayout-->
+        <!--android:id="@+id/main_content"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:clipChildren="false"-->
+        <!--app:shadowDrawable="@drawable/header_shadow">-->
         <!-- As the main content view, the view below consumes the entire
              space available using match_parent in both dimensions. -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <FrameLayout
-                android:id="@+id/container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <include layout="@layout/empty_feeds_at_all" />
-            </FrameLayout>
-
-            <include layout="@layout/include_snack_fca" />
-
-        </FrameLayout>
-
-        <LinearLayout
-            android:id="@+id/headerbar"
-            style="@style/HeaderBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:orientation="vertical">
-
-            <include layout="@layout/toolbar_actionbar" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@color/primary"
-                android:orientation="horizontal">
-
-                <CheckedTextView
-                    android:id="@+id/nightcheck"
-                    style="@style/TextAppearance.Body"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="start"
-                    android:background="?selectableItemBackground"
-                    android:checkMark="@drawable/nightmode_checkmark"
-                    android:clickable="true"
-                    android:gravity="center_vertical|start"
-                    android:paddingStart="16dp"
-                    android:singleLine="true"
-                    android:text="Night mode"
-                    android:textColor="@android:color/primary_text_dark" />
-
-                <CheckedTextView
-                    android:id="@+id/notifycheck"
-                    style="@style/TextAppearance.Body"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="end"
-                    android:background="?selectableItemBackground"
-                    android:checkMark="@drawable/notification_checkmark"
-                    android:clickable="true"
-                    android:gravity="center_vertical|end"
-                    android:singleLine="true"
-                    android:text="Notify for new items"
-                    android:textColor="@android:color/primary_text_dark" />
-            </FrameLayout>
-        </LinearLayout>
-
-    </com.nononsenseapps.feeder.views.DrawShadowFrameLayout>
-
-    <!-- Nav drawer -->
-    <include layout="@layout/navdrawer_for_ab_overlay" />
+        <include layout="@layout/include_activity_feed_main" />
+        <!-- Nav drawer -->
+        <include layout="@layout/navdrawer_for_ab_overlay" />
+    <!--</com.nononsenseapps.feeder.views.DrawShadowFrameLayout>-->
 
 </android.support.v4.widget.DrawerLayout>

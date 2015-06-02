@@ -47,8 +47,6 @@ public class FeedActivity extends BaseActivity {
     private static final int EXPORT_OPML_CODE = 101;
     private static final int IMPORT_OPML_CODE = 102;
     private Fragment mFragment;
-    private DrawShadowFrameLayout mDrawShadowFrameLayout;
-    private View mCheckAllButton;
 
     // Broadcast receiver for sync events
     private BroadcastReceiver mSyncMsgReceiver = new BroadcastReceiver() {
@@ -70,8 +68,6 @@ public class FeedActivity extends BaseActivity {
         }
     };
     private View mEmptyView;
-    private View mSnackBar;
-    private View mActionFooter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,9 +88,6 @@ public class FeedActivity extends BaseActivity {
         } else {
             mFragment = getSupportFragmentManager().findFragmentByTag("single_pane");
         }
-
-        mDrawShadowFrameLayout =
-                (DrawShadowFrameLayout) findViewById(R.id.main_content);
 
         // For add buttons
         View.OnClickListener onAddListener = new View.OnClickListener() {
@@ -133,17 +126,6 @@ public class FeedActivity extends BaseActivity {
         emptyAddFeed.setText(
                 android.text.Html.fromHtml(getString(R.string.empty_no_feeds_add)));
         emptyAddFeed.setOnClickListener(onAddListener);
-
-        // Add button
-        //mAddButton = findViewById(R.id.add_button);
-        //mAddButton.setOnClickListener(onAddListener);
-        mCheckAllButton = findViewById(R.id.checkall_button);
-        ViewCompat.setElevation(mCheckAllButton, getResources().getDimension(R.dimen.elevation1));
-
-        // New items button
-        mActionFooter = findViewById(R.id.action_footer);
-        mSnackBar = findViewById(R.id.snackbar);
-        mSnackBar.setVisibility(View.GONE);
 
         // Night mode
         final CheckedTextView nightCheck = (CheckedTextView) findViewById(R.id.nightcheck);
@@ -218,7 +200,7 @@ public class FeedActivity extends BaseActivity {
         super.onPostCreate(savedInstanceState);
 
         registerHideableHeaderView(findViewById(R.id.headerbar));
-        registerHideableFooterView(mActionFooter);
+        //registerHideableFooterView(mActionFooter);
     }
 
     @Override
@@ -318,12 +300,6 @@ public class FeedActivity extends BaseActivity {
                 .replace(R.id.container, mFragment, "single_pane").commit();
         // Remember choice in future
         PrefUtils.setLastOpenFeed(this, id, tag);
-    }
-
-    @Override
-    protected void onActionBarAutoShowOrHide(boolean shown) {
-        super.onActionBarAutoShowOrHide(shown);
-        mDrawShadowFrameLayout.setShadowVisible(shown, shown);
     }
 
     @Override

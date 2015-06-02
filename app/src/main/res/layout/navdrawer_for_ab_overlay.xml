@@ -22,7 +22,7 @@
     android:layout_gravity="start"
     android:background="@color/navdrawer_background"
     android:clipToPadding="false"
-    app:theme="@style/NavbarTheme"
+    android:theme="@style/NavbarTheme"
     android:orientation="vertical">
 
     <FrameLayout

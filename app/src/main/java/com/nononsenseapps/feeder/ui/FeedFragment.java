@@ -294,7 +294,8 @@ public class FeedFragment extends Fragment
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
         // Set the offset so it comes out of the correct place
         final int toolbarHeight = getResources().getDimensionPixelOffset(R.dimen.toolbar_height);
-        mSwipeRefreshLayout.setProgressViewOffset(true, toolbarHeight, Math.round(1.5f * toolbarHeight));
+        final int totalToolbarHeight = getResources().getDimensionPixelOffset(R.dimen.total_toolbar_height);
+        mSwipeRefreshLayout.setProgressViewOffset(false, toolbarHeight, Math.round(1.5f * totalToolbarHeight));
 
         // The arrow will cycle between these colors (in order)
         mSwipeRefreshLayout.setColorSchemeResources(
@@ -342,8 +343,8 @@ public class FeedFragment extends Fragment
         mAdapter = new FeedAdapter(getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
-        // check all button is in activity
-        mCheckAllButton = getActivity().findViewById(R.id.checkall_button);
+        // check all button
+        mCheckAllButton = rootView.findViewById(R.id.checkall_button);
         mCheckAllButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

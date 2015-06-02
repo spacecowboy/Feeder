@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    buildToolsVersion "21.1.0"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "com.nononsenseapps.feeder"
         versionCode 1
         versionName "1.0"
-        compileSdkVersion 21
+        compileSdkVersion 22
         minSdkVersion 19
-        targetSdkVersion 21
+        targetSdkVersion 22
 
         // Reduce bloat by removing stuff we don't need
         // Only support english right now
@@ -51,12 +51,13 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:recyclerview-v7:22.1.1'
+    compile 'com.android.support:recyclerview-v7:22.2.0'
     compile 'joda-time:joda-time:2.3'
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'com.squareup.retrofit:retrofit:1.6.1'
-    compile 'com.android.support:support-v4:22.1.1'
-    compile "com.android.support:appcompat-v7:22.1.1"
+    compile 'com.android.support:support-v4:22.2.0'
+    compile "com.android.support:appcompat-v7:22.2.0"
+    compile 'com.android.support:design:22.2.0'
 
     // For nice looking progress bars
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.1'

@@ -13,12 +13,14 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -185,12 +187,12 @@ public class BaseActivity extends AppCompatActivity
         super.onPostCreate(savedInstanceState);
         setupNavDrawer();
 
-        View mainContent = findViewById(R.id.main_content);
-        if (mainContent != null) {
-            mainContent.setAlpha(0);
-            mainContent.animate().alpha(1)
-                    .setDuration(MAIN_CONTENT_FADEIN_DURATION);
-        }
+//        View mainContent = findViewById(R.id.main_content);
+//        if (mainContent != null) {
+//            mainContent.setAlpha(0);
+//            mainContent.animate().alpha(1)
+//                    .setDuration(MAIN_CONTENT_FADEIN_DURATION);
+//        }
     }
 
     @Override
@@ -318,7 +320,6 @@ public class BaseActivity extends AppCompatActivity
                         onNavDrawerSlide(slideOffset);
                     }
                 });
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
 
         mDrawerToggle.syncState();
 
@@ -337,7 +338,7 @@ public class BaseActivity extends AppCompatActivity
         if (!PrefUtils.isWelcomeDone(this)) {
             // first run of the app starts with the nav drawer open
             PrefUtils.markWelcomeDone(this);
-            mDrawerLayout.openDrawer(Gravity.START);
+            mDrawerLayout.openDrawer(GravityCompat.START);
         }
     }
 
@@ -345,7 +346,7 @@ public class BaseActivity extends AppCompatActivity
      * Open the nav drawer
      */
     public void openNavDrawer() {
-        mDrawerLayout.openDrawer(Gravity.START);
+        mDrawerLayout.openDrawer(GravityCompat.START);
     }
 
     /**
@@ -384,7 +385,7 @@ public class BaseActivity extends AppCompatActivity
 
     protected boolean isNavDrawerOpen() {
         return mDrawerLayout != null &&
-                mDrawerLayout.isDrawerOpen(Gravity.START);
+                mDrawerLayout.isDrawerOpen(GravityCompat.START);
     }
 
     protected void onNavDrawerSlide(float offset) {
@@ -913,7 +914,7 @@ public class BaseActivity extends AppCompatActivity
         @Override
         public void onClick(View v) {
             if (mDrawerLayout != null) {
-                mDrawerLayout.closeDrawer(Gravity.START);
+                mDrawerLayout.closeDrawers();//GravityCompat.START);
             }
 
             onNavigationDrawerItemSelected(-1, wrap.tag, null, wrap.tag);
@@ -941,7 +942,7 @@ public class BaseActivity extends AppCompatActivity
         @Override
         public void onClick(View v) {
             if (mDrawerLayout != null) {
-                mDrawerLayout.closeDrawer(Gravity.START);
+                mDrawerLayout.closeDrawer(GravityCompat.START);
             }
 
             onNavigationDrawerItemSelected(item.id, item.title, item.url, item.tag);
