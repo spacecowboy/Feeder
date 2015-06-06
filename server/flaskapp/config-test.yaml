@@ -1,0 +1,21 @@
+# Lowercase keys can be overridden by command line arguments
+# Debug mode
+debug: true
+# Address to bind to
+host: 127.0.0.1
+# Port to use
+port: 5000
+
+# Location of database file (relative or absolute)
+FEEDER_DATABASE: /home/jonas/workspace/Feeder/server/flaskapp/database.test.db
+# Allow login with Google account. If false, only username password can be used.
+FEEDER_ALLOW_GOOGLE: true
+# If anyone with a Google account is allowed access. If false, then the email
+# must be present in the users list below
+FEEDER_ALLOW_ANY_GOOGLE: true
+# Allow specified users to login with passwords. If false, users can only
+# use their google account to login.
+FEEDER_ALLOW_USERPASS: true
+# You can then specify users and passwords here
+FEEDER_USERS:
+  jonas@kalderstam.se: pbkdf2:sha1:1000$pzFJBu7a$5151ffb525071b97a00fe2552041c87bf0450f92
