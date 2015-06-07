@@ -101,13 +101,15 @@ def migrate_user(graph, u):
     graph.cypher.execute(cph.format(email=json.dumps(u.email), nullable=nullable))
 
 
-def migrate_userfeed(graph, u, fl):
-    # Relation
-    rel = """MATCH (u:User {{ email: {email} }}), (f:Feed {{link: {fl} }})
-             CREATE (u)-[:SUBSCRIBES {{ timestamp: {ts} }}]->(f)"""
+def migrate_userfeed(graph, u, f):
+    # Subscription
+    cph = """MATCH (u:User {{ email: {email} }}), (f:Feed {{link: {fl} }})
+             CREATE (sub:Subscription {{ usertitle: {title}, timestamp: {ts} }})
+             CREATE (u)-[:HAS]->(sub)-[:TO]->(f)"""
 
-    graph.cypher.execute(rel.format(email=json.dumps(u.email),
-                    fl=json.dumps(fl),
+    graph.cypher.execute(cph.format(email=json.dumps(u.email),
+                    fl=json.dumps(f.link),
+                    title=json.dumps(f.title),
                     ts=json.dumps(int(datetime.utcnow().timestamp()))))
 
 
@@ -148,7 +150,7 @@ if __name__ == "__main__":
 
         for feed in user.feeds.all():
             print("UserFeed")
-            migrate_userfeed(graph, user, feed.link)
+            migrate_userfeed(graph, user, feed)
 
         for feed in UserDeletion.query.filter(UserDeletion.user_id==user.id).all():
             print("UserDel")
