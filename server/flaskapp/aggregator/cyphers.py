@@ -144,3 +144,19 @@ CREATE UNIQUE (i)-[:IN]->(f)
            image=i['image'])
 
     return s
+
+
+def cleanup_items():
+    # No need to keep very old items, so clear them out
+    # I want to remove items which are older than 2 weeks
+    # IF they are not part of the newest 50 items
+    cph = """\
+MATCH (f:Feed)<-[:IN]-(i:Item)
+WITH i
+ORDER BY i.timestamp DESC
+SKIP 100
+OPTIONAL MATCH (i)
+WHERE i.timestamp < (timestamp() - 1209600)
+DELETE i
+"""
+    return cph

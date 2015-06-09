@@ -307,3 +307,17 @@ def test_synced_many(graph):
         else:
             # Second feed has no items
             assert len(items) == 0
+
+
+def test_cleanup(graph):
+    # No need to keep very old items, so clear them out
+    # I want to remove items which are older than X
+    # IF they are not part of the newest Y items
+    graph.cypher.execute(cleanup_items())
+    print("TODO check")
+    assert 0
+
+
+def test_milliseconds(graph):
+    print("Neo timestamp uses milliseconds and python uses seconds")
+    assert 0
