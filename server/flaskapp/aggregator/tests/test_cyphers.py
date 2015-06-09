@@ -3,7 +3,7 @@
 Test the database operations.
 """
 import pytest
-from time import time
+from ..util import timestamp
 from ..cyphers import *
 from ..models import make_item, make_feed
 
@@ -13,6 +13,7 @@ _frank = "frank@bobs.com"
 
 _feed1_link = 'http://site.com/rss'
 _feed2_link = 'http://another.site.com/rss'
+_feed3_link = 'http://yetonemore.site.com/rss'
 
 
 def test_escapedict():
@@ -175,7 +176,7 @@ def test_get_subscribed_feeds(graph):
 
 def test_synced_none(graph):
     # Sync returned no items
-    ts = int(time())
+    ts = timestamp()
     items = []
     f = make_feed(ts, _feed1_link, 'Feed1', 'Feed1 desc', ts)
 
@@ -184,7 +185,7 @@ def test_synced_none(graph):
 
 def test_synced_one(graph):
     # Sync returned one item
-    ts = int(time())
+    ts = timestamp()
     items = []
     for i in range(1):
         si = str(i)
@@ -223,7 +224,7 @@ def test_synced_one(graph):
 
 def test_synced_many(graph):
     # Sync return some new items
-    ts = int(time())
+    ts = timestamp()
 
     items = []
     count = 10
@@ -231,7 +232,7 @@ def test_synced_many(graph):
 
     for i in range(count - 4):
         si = str(i)
-        its = ts - (1 + i)
+        its = ts - 1000 * (1 + i)
         items.append(make_item(its,
                                'guid' + si,
                                _feed1_link + '/item/' + si,
@@ -242,7 +243,7 @@ def test_synced_many(graph):
                                its))
 
     # These are old items
-    graph.cypher.execute(on_synced(f, ts - 100, items))
+    graph.cypher.execute(on_synced(f, ts - 50000, items))
 
     items = []
     for i in range(count - 4, count):
@@ -258,6 +259,26 @@ def test_synced_many(graph):
                                its))
 
     # Newest items
+    graph.cypher.execute(on_synced(f, ts, items))
+
+    # And then the user also unsubscribes to feed 3!
+    graph.cypher.execute(subscribe(_frank, _feed3_link, None, None))
+    graph.cypher.execute(unsubscribe(_frank, _feed3_link))
+    # Which also got some items
+    f = make_feed(ts, _feed3_link, 'Feed3', 'Feed3 desc', ts)
+
+    items = []
+    for i in range(7):
+        si = str(i)
+        its = ts - 1000*(1 + i)
+        items.append(make_item(its,
+                               'f3_guid' + si,
+                               _feed3_link + '/item/' + si,
+                               'title' + si,
+                               'descrip' + si,
+                               'titlestrip' + si,
+                               'snippet' + si,
+                               its))
     graph.cypher.execute(on_synced(f, ts, items))
 
     # Get all feeds and items
@@ -276,14 +297,17 @@ def test_synced_many(graph):
         if feed['link'] == _feed1_link:
             # First feed has X items
             assert len(items) == count
-        else:
+        elif feed['link'] == _feed2_link:
             # Second feed has no items
             assert len(items) == 0
+        else:
+            # Third feed is an unsubscription
+            assert len(items) == 0
+            assert 0
 
     # Now filter items by timestamp
     # Query should only return 4 items now
-    lastsync = ts - 50
-    print("lastsync", lastsync)
+    lastsync = ts - 50000
 
     # Get all feeds and items
     res = graph.cypher.execute(get_users_new_feeditems(_frank, lastsync))
@@ -300,7 +324,6 @@ def test_synced_many(graph):
         items = r['items']
         if feed['link'] == _feed1_link:
             # First feed has X items
-            print([x['timestamp'] for x in items])
             assert len(items) == 4
             for i in items:
                 assert i['timestamp'] > lastsync
@@ -308,16 +331,95 @@ def test_synced_many(graph):
             # Second feed has no items
             assert len(items) == 0
 
+    # And then we have one unsubscription
+    res = graph.cypher.execute(get_users_new_unsubscribes(_frank, lastsync))
+    assert len(res) == 1
+    assert res[0]['feed']['link'] == _feed3_link
+
 
 def test_cleanup(graph):
     # No need to keep very old items, so clear them out
     # I want to remove items which are older than X
     # IF they are not part of the newest Y items
-    graph.cypher.execute(cleanup_items())
-    print("TODO check")
-    assert 0
 
+    # First, no items to delete
+    flink = 'http://cleanup.com/rss'
 
-def test_milliseconds(graph):
-    print("Neo timestamp uses milliseconds and python uses seconds")
-    assert 0
+    res = graph.cypher.execute(cleanup_items(flink))
+    print(res)
+    assert len(res) == 1
+    assert res[0]['deleted'] == 0
+
+    ts = timestamp() - (365 * 24 * 3600 * 1000)
+
+    f = make_feed(ts, flink, 'FeedCleanup', 'Feed desc', ts)
+
+    # Every item is old enough to be targeted for termination
+    # But keep 100 of them
+    items = []
+    count = 138
+    for i in range(count):
+        si = str(i)
+        its = ts
+        items.append(make_item(its,
+                               'fclean_guid' + si,
+                               flink + '/item/' + si,
+                               'title' + si,
+                               'descrip' + si,
+                               'titlestrip' + si,
+                               'snippet' + si,
+                               its))
+    graph.cypher.execute(on_synced(f, ts, items))
+
+    # Now clean up should delete past 100 first items
+    res = graph.cypher.execute(cleanup_items(flink))
+    print(res)
+    assert len(res) == 1
+    assert res[0]['deleted'] == (count - 100)
+
+    # Add some items which are 'too new'
+    ts = timestamp() - (3 * 24 * 3600 * 1000)
+
+    items = []
+    countnew = 23
+    for i in range(count, count + countnew):
+        si = str(i)
+        its = ts
+        items.append(make_item(its,
+                               'fclean2_guid' + si,
+                               flink + '/item/' + si,
+                               'title' + si,
+                               'descrip' + si,
+                               'titlestrip' + si,
+                               'snippet' + si,
+                               its))
+    graph.cypher.execute(on_synced(f, ts, items))
+
+    # Now clean up should delete more old items
+    res = graph.cypher.execute(cleanup_items(flink))
+    print(res)
+    assert len(res) == 1
+    assert res[0]['deleted'] == countnew
+
+    # Now add even more too new items
+    items = []
+    countlast = 150
+    for i in range(countlast):
+        si = str(i)
+        its = ts
+        items.append(make_item(its,
+                               'fclean3_guid' + si,
+                               flink + '/item/' + si,
+                               'title' + si,
+                               'descrip' + si,
+                               'titlestrip' + si,
+                               'snippet' + si,
+                               its))
+    graph.cypher.execute(on_synced(f, ts, items))
+
+    # Now clean up should delete more old items
+    res = graph.cypher.execute(cleanup_items(flink))
+    print(res)
+    assert len(res) == 1
+    # Deletes last of old items
+    assert res[0]['deleted'] == (100 - countnew)

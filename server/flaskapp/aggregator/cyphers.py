@@ -94,6 +94,15 @@ def get_users_new_feeditems(email, lastsync):
     return cph.format(email=email, lastsync=lastsync)
 
 
+@escaped
+def get_users_new_unsubscribes(email, lastsync):
+    cph = """\
+MATCH (:User {{ email: {email} }})-[s:UNSUBSCRIBED]->(feed:Feed)
+WHERE s.timestamp > {lastsync}
+RETURN feed"""
+    return cph.format(email=email, lastsync=lastsync)
+
+
 def get_subscribed_feeds():
     cph = """\
     MATCH (:User)-[:SUBSCRIBES]->(feed:Feed)
@@ -146,17 +155,21 @@ CREATE UNIQUE (i)-[:IN]->(f)
     return s
 
 
-def cleanup_items():
+@escaped
+def cleanup_items(link):
     # No need to keep very old items, so clear them out
     # I want to remove items which are older than 2 weeks
-    # IF they are not part of the newest 50 items
+    # IF they are not part of the newest X items
     cph = """\
-MATCH (f:Feed)<-[:IN]-(i:Item)
+MATCH (f:Feed {{ link: {link} }})--(i:Item)
 WITH i
 ORDER BY i.timestamp DESC
 SKIP 100
-OPTIONAL MATCH (i)
-WHERE i.timestamp < (timestamp() - 1209600)
-DELETE i
+
+MATCH (i)
+WHERE i.timestamp < (timestamp() - 1209600000)
+OPTIONAL MATCH (i)-[r]-()
+DELETE i, r
+RETURN COUNT(i) as deleted
 """
-    return cph
+    return cph.format(link=link)
