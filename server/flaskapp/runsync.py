@@ -10,7 +10,7 @@ Then enter a line like this (syncs every 10 minutes):
 
     */10 * * * * /path/to/python /path/to/feeder/flaskapp/runsync.py [-c configfile]
 '''
-from feeder import read_config
+from aggregator import read_config, sync
 import sys
 
 
@@ -25,8 +25,6 @@ if __name__ == '__main__':
     # Read config and configure database path
     read_config(configfile)
 
-    # ONly import after config reading
-    from feeder import sync
     print("Caching feeds...")
     sync.cache_all_feeds()
     print("Caching complete")

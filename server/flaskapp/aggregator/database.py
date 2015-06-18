@@ -3,8 +3,6 @@
 Wrappers for databases
 '''
 
-#from flask import app as current_app
-from aggregator import app as current_app
 from py2neo import Graph
 from .cyphers import (get_subscribed_feeds, cleanup_items,
                       on_synced, merge_user, subscribe,
@@ -16,13 +14,17 @@ from .cyphers import (get_subscribed_feeds, cleanup_items,
 _db = None
 
 
-def get_database():
+def get_database(url=None):
     '''
     Gets a database object singleton
     '''
     global _db
     if _db is None:
-        _db = GraphDB(url=current_app.config.get('FEEDER_NEO_URL', None))
+        if url is None:
+            from aggregator import app
+            url = app.config.get('FEEDER_NEO_URL', None)
+
+        _db = GraphDB(url=url)
 
     return _db
 

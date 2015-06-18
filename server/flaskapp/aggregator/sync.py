@@ -51,10 +51,10 @@ def parse_feed(db, rss):
     # Title is a required attribute
     if not hasattr(f, "title"):
         try:
-            print(rss.debug_message)
+            print("Ignored:", f.link, rss.debug_message)
         except:
-            pass
-        print("No title, exiting...")
+            print("Ignored:", f.link)
+        # This happens when server reports no new items
         return
 
     # Need current timestamp
@@ -78,4 +78,4 @@ def parse_feed(db, rss):
         feeditems.append(feeditem)
 
     db.on_synced(feed, ts, feeditems)
-    print("Cached:", feed['title'], "(", len(feeditems), ")")
+    print("Cached:", feed.link, "(", len(feeditems), ")")

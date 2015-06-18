@@ -141,9 +141,9 @@ class Feeds(Resource):
 
         feeds = []
         for r in res:
-            feed = r['feed']
+            feed = feed_to_dict(r['feed'])
             # Set items on feed for json conversion
-            feed['items'] = r['items']
+            feed['items'] = [feeditem_to_dict(i) for i in r['items']]
             # Add to list
             feeds.append(feed)
 
@@ -151,7 +151,7 @@ class Feeds(Resource):
         deletes = []
         if ts is not None:
             for r in db.get_users_new_unsubscribes(userid, ts):
-                deletes.append(r['feed'])
+                deletes.append(feed_to_dict(r['feed']))
 
         return {"feeds": feeds, "deletes": deletes}
 
