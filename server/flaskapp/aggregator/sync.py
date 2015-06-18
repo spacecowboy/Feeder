@@ -77,5 +77,6 @@ def parse_feed(db, rss):
         feeditem = get_clean_entry(item, timestamp=ts)
         feeditems.append(feeditem)
 
+    # on_synced will escape items, so they must not be escaped beforehand.
     db.on_synced(feed, ts, feeditems)
-    print("Cached:", feed.link, "(", len(feeditems), ")")
+    print("Cached:", feed['link'], "(", len(feeditems), ")")

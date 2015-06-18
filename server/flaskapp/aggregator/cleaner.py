@@ -211,9 +211,13 @@ def strip_bloat(text):
 
 
 @escaped
-def make_item(timestamp, guid, link, title, description, title_stripped,
-              snippet, published, author=None, comments=None,
-              enclosure=None, image=None, json=None):
+def make_item(*args, **kwargs):
+    return make_unescaped_item(*args, **kwargs)
+
+
+def make_unescaped_item(timestamp, guid, link, title, description,
+                        title_stripped, snippet, published, author=None,
+                        comments=None, enclosure=None, image=None, json=None):
     """
     Easy way to get final result, if your arguments are well formed.
     """
@@ -225,8 +229,12 @@ def make_item(timestamp, guid, link, title, description, title_stripped,
 
 
 @escaped
-def make_feed(timestamp, link, title, description, published,
-              etag=None, modified=None):
+def make_feed(*args, **kwargs):
+    return make_unescaped_feed(*args, **kwargs)
+
+
+def make_unescaped_feed(timestamp, link, title, description, published,
+                        etag=None, modified=None):
     """
     Easy way to get final result, if your arguments are well formed.
     """

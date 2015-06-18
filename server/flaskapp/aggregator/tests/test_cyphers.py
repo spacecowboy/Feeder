@@ -5,8 +5,8 @@ Test the database operations.
 import pytest
 from ..util import timestamp
 from ..cyphers import *
-from ..models import make_item, make_feed
 import json
+from ..cleaner import make_unescaped_item, make_unescaped_feed
 
 
 _bob = "bob@bobs.com"
@@ -151,7 +151,7 @@ def test_synced_none(graph):
     # Sync returned no items
     ts = timestamp()
     items = []
-    f = make_feed(ts, _feed1_link, 'Feed1', 'Feed1 desc', ts)
+    f = make_unescaped_feed(ts, _feed1_link, 'Feed1', 'Feed1 desc', ts)
 
     graph.cypher.execute(on_synced(f, ts, items))
 
@@ -162,7 +162,7 @@ def test_synced_one(graph):
     items = []
     for i in range(1):
         si = str(i)
-        items.append(make_item(ts, 'guid' + si,
+        items.append(make_unescaped_item(ts, 'guid' + si,
                                _feed1_link + '/item/' + si,
                                'title' + si,
                                'descrip' + si,
@@ -170,7 +170,7 @@ def test_synced_one(graph):
                                'snippet' + si,
                                ts - (1+i)))
 
-    f = make_feed(ts, _feed1_link, 'Feed1', 'Feed1 desc', ts)
+    f = make_unescaped_feed(ts, _feed1_link, 'Feed1', 'Feed1 desc', ts)
 
     graph.cypher.execute(on_synced(f, ts, items))
 
@@ -201,12 +201,12 @@ def test_synced_many(graph):
 
     items = []
     count = 10
-    f = make_feed(ts, _feed1_link, 'Feed1', 'Feed1 desc', ts)
+    f = make_unescaped_feed(ts, _feed1_link, 'Feed1', 'Feed1 desc', ts)
 
     for i in range(count - 4):
         si = str(i)
         its = ts - 1000 * (1 + i)
-        items.append(make_item(its,
+        items.append(make_unescaped_item(its,
                                'guid' + si,
                                _feed1_link + '/item/' + si,
                                'title' + si,
@@ -222,7 +222,7 @@ def test_synced_many(graph):
     for i in range(count - 4, count):
         si = str(i)
         its = ts - (1 + i)
-        items.append(make_item(its,
+        items.append(make_unescaped_item(its,
                                'guid' + si,
                                _feed1_link + '/item/' + si,
                                'title' + si,
@@ -238,13 +238,13 @@ def test_synced_many(graph):
     graph.cypher.execute(subscribe(_frank, _feed3_link, None, None))
     graph.cypher.execute(unsubscribe(_frank, _feed3_link))
     # Which also got some items
-    f = make_feed(ts, _feed3_link, 'Feed3', 'Feed3 desc', ts)
+    f = make_unescaped_feed(ts, _feed3_link, 'Feed3', 'Feed3 desc', ts)
 
     items = []
     for i in range(7):
         si = str(i)
         its = ts - 1000*(1 + i)
-        items.append(make_item(its,
+        items.append(make_unescaped_item(its,
                                'f3_guid' + si,
                                _feed3_link + '/item/' + si,
                                'title' + si,
@@ -340,7 +340,7 @@ def test_cleanup(graph):
 
     ts = timestamp() - (365 * 24 * 3600 * 1000)
 
-    f = make_feed(ts, flink, 'FeedCleanup', 'Feed desc', ts)
+    f = make_unescaped_feed(ts, flink, 'FeedCleanup', 'Feed desc', ts)
 
     # Every item is old enough to be targeted for termination
     # But keep 100 of them
@@ -349,7 +349,7 @@ def test_cleanup(graph):
     for i in range(count):
         si = str(i)
         its = ts
-        items.append(make_item(its,
+        items.append(make_unescaped_item(its,
                                'fclean_guid' + si,
                                flink + '/item/' + si,
                                'title' + si,
@@ -373,7 +373,7 @@ def test_cleanup(graph):
     for i in range(count, count + countnew):
         si = str(i)
         its = ts
-        items.append(make_item(its,
+        items.append(make_unescaped_item(its,
                                'fclean2_guid' + si,
                                flink + '/item/' + si,
                                'title' + si,
@@ -395,7 +395,7 @@ def test_cleanup(graph):
     for i in range(countlast):
         si = str(i)
         its = ts
-        items.append(make_item(its,
+        items.append(make_unescaped_item(its,
                                'fclean3_guid' + si,
                                flink + '/item/' + si,
                                'title' + si,
@@ -420,9 +420,9 @@ def test_guid_conflict(graph):
 
     guid = 'guid123adfkilbvjqeo'
 
-    f1 = make_feed(ts, "http://feedfirst.com/rss", 'FeedA', 'FeedA', ts)
+    f1 = make_unescaped_feed(ts, "http://feedfirst.com/rss", 'FeedA', 'FeedA', ts)
 
-    items1 = [make_item(ts,
+    items1 = [make_unescaped_item(ts,
                         guid,
                         f1['link'] + '/item/',
                         'titleA',
@@ -434,9 +434,9 @@ def test_guid_conflict(graph):
     # Save first
     graph.cypher.execute(on_synced(f1, ts, items1))
 
-    f2 = make_feed(ts, "http://feedsecond.com/rss", 'FeedB', 'FeedB', ts)
+    f2 = make_unescaped_feed(ts, "http://feedsecond.com/rss", 'FeedB', 'FeedB', ts)
 
-    items2 = [make_item(ts,
+    items2 = [make_unescaped_item(ts,
                         guid,
                         f2['link'] + '/item/',
                         'titleB',
