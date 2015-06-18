@@ -2,12 +2,12 @@
 # Debug mode
 debug: true
 # Address to bind to
-host: 127.0.0.1
+host: 192.168.1.17
 # Port to use
 port: 5000
 
-# Location of database file (relative or absolute)
-FEEDER_DATABASE: /home/jonas/workspace/Feeder/server/flaskapp/database.test.db
+# URL to Neo database. Include username and password if required
+FEEDER_NEO_URL: http://localhost:7575/db/data
 # Allow login with Google account. If false, only username password can be used.
 FEEDER_ALLOW_GOOGLE: true
 # If anyone with a Google account is allowed access. If false, then the email
@@ -19,3 +19,4 @@ FEEDER_ALLOW_USERPASS: true
 # You can then specify users and passwords here
 FEEDER_USERS:
   jonas@kalderstam.se: pbkdf2:sha1:1000$pzFJBu7a$5151ffb525071b97a00fe2552041c87bf0450f92
+  bob: secret

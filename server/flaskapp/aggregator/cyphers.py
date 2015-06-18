@@ -3,41 +3,21 @@
 Cypher queries to be used with Neo4j.
 """
 
-import json
-
-
-def escapedict(*args, **kwargs):
-    if len(args) > 1:
-        return [escapedict(d) for d in args]
-    elif len(args) == 1:
-        kwargs = args[0]
-
-    return {k: json.dumps(v) for k, v in kwargs.items()}
-
-
-def escaped(f):
-    '''Annotation which pushes every argument through json.dumps'''
-
-    def inner(*args, **kwargs):
-        args = [json.dumps(x) for x in args]
-        kwargs = {k: json.dumps(v) for k, v in kwargs.items()}
-        return f(*args, **kwargs)
-
-    return inner
+from .util import escaped, escapedict
 
 
 @escaped
 def merge_user(email, pwhash):
     cph = "\n".join(("MERGE (u:User {{ email: {email} }})",
                      "ON CREATE SET u.passwordhash = {pwhash}",
-                     "return u"))
+                     "return u as user"))
     return cph.format(email=email, pwhash=pwhash)
 
 
 @escaped
 def get_user(email):
     return """MATCH (u:User {{ email: {} }})
-              RETURN u""".format(email)
+              RETURN u as user""".format(email)
 
 
 @escaped
@@ -66,7 +46,7 @@ s.usertag = {usertag}
     WITH u, f, s
     OPTIONAL MATCH (u)-[us:UNSUBSCRIBED]->(f)
     DELETE us
-    RETURN s as subscription
+    RETURN f as feed, s as subscription
     """.format(ml=email, fl=link, usertitle=usertitle, usertag=usertag)
     return s
 
@@ -92,6 +72,20 @@ def get_users_new_feeditems(email, lastsync):
     RETURN feed, COLLECT(item) as items
     """
     return cph.format(email=email, lastsync=lastsync)
+
+
+@escaped
+def get_feed_and_items(link, limit):
+    cph = """\
+    MATCH (feed:Feed {{link: {link}}})
+    WITH feed
+    OPTIONAL MATCH (feed)<-[:IN]-(item:Item)
+    WITH feed, item
+    ORDER BY item.published DESC
+    LIMIT {limit}
+    RETURN feed, COLLECT(item) as items
+    """
+    return cph.format(link=link, limit=limit)
 
 
 @escaped
@@ -133,12 +127,11 @@ f.modified = {modified}\
     for i in items:
         s += """
 WITH f
-MERGE (i:Item {{ guid: {guid} }} )
+MERGE (f)<-[:IN]-(i:Item {{ guid: {guid} }} )
 SET i.link = {link}, i.title = {title}, i.description = {description}, \
 i.title_stripped = {title_stripped}, i.snippet = {snippet}, \
 i.timestamp = {ts}, i.published = {published}, i.author = {author}, \
 i.comments = {comments}, i.enclosure = {enclosure}, i.image = {image}
-CREATE UNIQUE (i)-[:IN]->(f)
 """.format(ts=ts,
            guid=i['guid'],
            link=i['link'],

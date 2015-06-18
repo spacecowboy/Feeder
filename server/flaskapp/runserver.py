@@ -28,22 +28,8 @@ duplicates in the configfile.
 
 You can specify a configfile as well. See config-sample.yaml for details.
 '''
-import os
 import sys
-from feeder import app, read_config
-
-
-def ensure_db_exists():
-    '''
-    Tell Flask to create the database which is configured if it doesn't exist
-    '''
-    filepath = app.config.get('FEEDER_DATABASE', './feeder.db')
-    filepath = os.path.abspath(filepath)
-
-    if not os.path.isfile(filepath):
-        from feeder.database import db
-        db.create_all()
-        print("Database was created successfully")
+from aggregator import app, read_config
 
 
 if __name__ == '__main__':
@@ -76,10 +62,9 @@ if __name__ == '__main__':
         kw['port'] = int(args[i + 1])
 
     # This configures rest api to run. Do it AFTER config loading
-    import feeder.rest
-    # After rest import
-    ensure_db_exists()
+    import aggregator.rest
 
+    print("Running now")
     app.run(**kw)
 else:
     args = sys.argv[1:]
@@ -90,9 +75,7 @@ else:
 
     read_config(configfile)
     # This configures rest api to run. Do it AFTER config loading
-    import feeder.rest
-    # After rest import
-    ensure_db_exists()
+    import aggregator.rest
 
     # Convenience for uwsgi
     application = app

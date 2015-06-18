@@ -6,6 +6,7 @@ import pytest
 from ..util import timestamp
 from ..cyphers import *
 from ..models import make_item, make_feed
+import json
 
 
 _bob = "bob@bobs.com"
@@ -14,37 +15,6 @@ _frank = "frank@bobs.com"
 _feed1_link = 'http://site.com/rss'
 _feed2_link = 'http://another.site.com/rss'
 _feed3_link = 'http://yetonemore.site.com/rss'
-
-
-def test_escapedict():
-    # One dict as arg
-    res = escapedict(dict(a='a', b='b'))
-    assert res['a'] == '"a"'
-    assert res['b'] == '"b"'
-
-    # One dict as kwargs
-    res = escapedict(a='a', b='b')
-    assert res['a'] == '"a"'
-    assert res['b'] == '"b"'
-
-    # Several dicts
-    res = escapedict(dict(a='a', b='b'),
-                     dict(c='c', d='d'))
-    assert len(res) == 2
-    assert res[0]['a'] == '"a"'
-    assert res[0]['b'] == '"b"'
-    assert res[1]['c'] == '"c"'
-    assert res[1]['d'] == '"d"'
-
-
-def test_escaped():
-
-    @escaped
-    def mytest(arg):
-        return arg
-
-    assert '"bob"' == mytest('bob')
-    assert 'null' == mytest(None)
 
 
 def test_getuser_notregistered(graph):
@@ -108,6 +78,9 @@ def test_subscribe(graph):
     assert sub['timestamp'] > 0
     assert sub['usertitle'] is None
     assert sub['usertag'] is None
+
+    feed = res[0]['feed']
+    assert feed['link'] == _feed1_link
 
     # Getting user's feeds should return a single item
     res = graph.cypher.execute(get_user_feeds(_bob))
@@ -337,6 +310,21 @@ def test_synced_many(graph):
     assert res[0]['feed']['link'] == _feed3_link
 
 
+def test_get_feed_and_items(graph):
+    lim = 3
+    res = graph.cypher.execute(get_feed_and_items(_feed1_link, lim))
+
+    assert len(res) == 1
+    assert res[0]['feed'] is not None
+    assert res[0]['items'] is not None
+
+    assert res[0]['feed']['link'] == _feed1_link
+    assert res[0]['feed']['title'] is not None
+
+    items = res[0]['items']
+    assert len(items) == lim
+
+
 def test_cleanup(graph):
     # No need to keep very old items, so clear them out
     # I want to remove items which are older than X
@@ -423,3 +411,45 @@ def test_cleanup(graph):
     assert len(res) == 1
     # Deletes last of old items
     assert res[0]['deleted'] == (100 - countnew)
+
+
+def test_guid_conflict(graph):
+    # Two items in two different feeds having the same guid
+    # must be possible
+    ts = timestamp()
+
+    guid = 'guid123adfkilbvjqeo'
+
+    f1 = make_feed(ts, "http://feedfirst.com/rss", 'FeedA', 'FeedA', ts)
+
+    items1 = [make_item(ts,
+                        guid,
+                        f1['link'] + '/item/',
+                        'titleA',
+                        'descrip',
+                        'titlestrip',
+                        'snippet',
+                        ts)]
+
+    # Save first
+    graph.cypher.execute(on_synced(f1, ts, items1))
+
+    f2 = make_feed(ts, "http://feedsecond.com/rss", 'FeedB', 'FeedB', ts)
+
+    items2 = [make_item(ts,
+                        guid,
+                        f2['link'] + '/item/',
+                        'titleB',
+                        'descrip',
+                        'titlestrip',
+                        'snippet',
+                        ts)]
+
+    # Save second
+    graph.cypher.execute(on_synced(f2, ts, items2))
+
+    res = graph.cypher.execute("MATCH (i:Item {{ guid: {} }})\n".format(json.dumps(guid)) +
+                               "RETURN COUNT(i) as count")
+
+    assert len(res) == 1
+    assert res[0]['count'] == 2

@@ -104,8 +104,7 @@ def migrate_user(graph, u):
 def migrate_userfeed(graph, u, f):
     # Subscription
     cph = """MATCH (u:User {{ email: {email} }}), (f:Feed {{link: {fl} }})
-             CREATE (sub:Subscription {{ usertitle: {title}, timestamp: {ts} }})
-             CREATE (u)-[:HAS]->(sub)-[:TO]->(f)"""
+             CREATE UNIQUE (u)-[:SUBSCRIBES {{ usertitle: {title}, timestamp: {ts} }}]->(f)"""
 
     graph.cypher.execute(cph.format(email=json.dumps(u.email),
                     fl=json.dumps(f.link),
