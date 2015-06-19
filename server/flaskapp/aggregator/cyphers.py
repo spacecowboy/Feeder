@@ -6,6 +6,14 @@ Cypher queries to be used with Neo4j.
 from .util import escaped, escapedict
 
 
+def feed_constraints():
+    return "CREATE CONSTRAINT ON (feed:Feed) ASSERT feed.link IS UNIQUE"
+
+
+def user_constraints():
+    return  "CREATE CONSTRAINT ON (user:User) ASSERT user.email IS UNIQUE"
+
+
 @escaped
 def merge_user(email, pwhash):
     cph = "\n".join(("MERGE (u:User {{ email: {email} }})",

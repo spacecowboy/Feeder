@@ -8,7 +8,8 @@ from .cyphers import (get_subscribed_feeds, cleanup_items,
                       on_synced, merge_user, subscribe,
                       get_user, get_users_new_feeditems,
                       get_users_new_unsubscribes,
-                      get_feed_and_items, unsubscribe)
+                      get_feed_and_items, unsubscribe,
+                      feed_constraints, user_constraints)
 
 
 _db = None
@@ -36,6 +37,9 @@ class GraphDB(object):
             self.graph = Graph() if url is None else Graph(url)
         else:
             self.graph = graph
+        # Make sure we have constraints
+        self.graph.cypher.execute(feed_constraints())
+        self.graph.cypher.execute(user_constraints())
 
     def merge_user(self, email, pwhash=None):
         res = self.graph.cypher.execute(merge_user(email, pwhash))
