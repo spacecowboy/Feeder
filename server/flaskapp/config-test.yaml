@@ -2,9 +2,12 @@
 # Debug mode
 debug: true
 # Address to bind to
-host: 192.168.1.17
+host: localhost
 # Port to use
 port: 5000
+
+#For migration
+FEEDER_DATABASE: ./database.db
 
 # URL to Neo database. Include username and password if required
 FEEDER_NEO_URL: http://localhost:7575/db/data

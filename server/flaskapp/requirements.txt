@@ -1,9 +1,9 @@
 pyyaml
 flask
+py2neo
 Flask-SQLAlchemy
 httplib2
 
 # Need newer version than available on pip
 #flask-restful
 git+https://github.com/twilio/flask-restful
-

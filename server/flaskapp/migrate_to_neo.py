@@ -31,7 +31,7 @@ def migrate_feeditems(db, feed):
     for item in feed.items:
         its = int(1000 * item.timestamp.timestamp())
         ips = int(1000 * item.published.timestamp()) if item.published else its
-        guid = item.guid if item.guid else item.link
+        guid = item.link
 
         di = dict(timestamp=its,
              guid=guid,
@@ -76,17 +76,17 @@ if __name__ == "__main__":
     from feeder.models import FeedItem, Feed, UserFeed, User, UserDeletion
 
     for user in User.query.all():
-        print("User")
+        print("User:", user.email)
         migrate_user(db, user)
 
         for feed in user.feeds.all():
-            print("UserFeed")
+            print("UserFeed:", feed.title)
             migrate_userfeed(db, user, feed)
-            print("FeedItems")
+            print("FeedItems:", len(feed.feed.items.all()))
             feed = feed.feed
-            migrate_feeditems(db, feed, feed.items)
+            migrate_feeditems(db, feed)
 
 
         for feed in UserDeletion.query.filter(UserDeletion.user_id==user.id).all():
-            print("UserDel")
+            print("UserDel:", feed.link)
             migrate_userdeletion(db, user, feed.link)
