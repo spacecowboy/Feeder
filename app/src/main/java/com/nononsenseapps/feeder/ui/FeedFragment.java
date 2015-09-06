@@ -26,8 +26,6 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -40,7 +38,6 @@ import android.support.v7.util.SortedList;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -69,7 +66,6 @@ import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.AuthHelper;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
-import com.nononsenseapps.feeder.util.DeltaCursorLoader;
 import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
@@ -558,7 +554,9 @@ public class FeedFragment extends Fragment
     @Override
     public Loader onCreateLoader(final int ID, final Bundle bundle) {
         if (ID == FEEDITEMS_LOADER) {
-            return new FeedItemDeltaCursorLoader(getActivity(), FeedItemSQL.URI_FEED_ITEMS,
+            return new FeedItemDeltaCursorLoader(getActivity(),
+                    FeedItemSQL.URI_FEED_ITEMS.buildUpon()
+                            .appendQueryParameter(RssContentProvider.QUERY_PARAM_LIMIT, "50").build(),
                     FeedItemSQL.FIELDS, getLoaderSelection(),
                     getLoaderSelectionArgs(),
                     FeedItemSQL.COL_PUBDATE + " DESC");

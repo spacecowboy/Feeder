@@ -14,11 +14,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.nononsenseapps.feeder.model.AuthHelper;
-import com.nononsenseapps.feeder.ui.FeedActivity;
 
 import java.util.ArrayList;
 
@@ -30,6 +28,7 @@ public class RssContentProvider extends ContentProvider {
     private static final UriMatcher sURIMatcher =
             new UriMatcher(UriMatcher.NO_MATCH);
     private static final String TAG = "RssContentProvider";
+    public static final String QUERY_PARAM_LIMIT = "QUERY_PARAM_LIMIT";
 
     static {
         FeedSQL.addMatcherUris(sURIMatcher);
@@ -193,7 +192,7 @@ public class RssContentProvider extends ContentProvider {
         }
         result = DatabaseHandler.getInstance(getContext()).getReadableDatabase()
                 .query(table, projection, selection, selectionArgs, null, null,
-                        sortOrder, null);
+                        sortOrder, uri.getQueryParameter(QUERY_PARAM_LIMIT));
 
         // Make sure you don't override another uri here
         result.setNotificationUri(getContext().getContentResolver(), uri);
