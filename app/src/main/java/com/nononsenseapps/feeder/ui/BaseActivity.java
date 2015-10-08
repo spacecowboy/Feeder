@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2015 Jonas Kalderstam.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.nononsenseapps.feeder.ui;
 
 import android.animation.ArgbEvaluator;
@@ -22,7 +39,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -642,6 +658,16 @@ public class BaseActivity extends AppCompatActivity
                 return item.hashCode();
             }
         }
+
+
+        @Override
+        public String toString() {
+            if (isTag) {
+                return "Tag: " + tag;
+            } else {
+                return "Item: " + item.title + " (" + tag + ")";
+            }
+        }
     }
 
     class FeedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -650,6 +676,7 @@ public class BaseActivity extends AppCompatActivity
         private static final int VIEWTYPE_TAG = 0;
         private static final int VIEWTYPE_FEED = 1;
         private static final int VIEWTYPE_FEED_CHILD = 2;
+        private final String TAG = FeedsAdapter.class.getSimpleName();
         private final ExpandableSortedList<FeedWrapper> mItems;
         private final Collator mCollator;
         private HashMap<Long, FeedWrapper> mItemMap;
@@ -694,35 +721,54 @@ public class BaseActivity extends AppCompatActivity
 
                 @Override
                 public int compare(FeedWrapper o1, FeedWrapper o2) {
-                    if (o1.isTag && o2.isTag) {
+                    // Compare only on the same level
+                    if (getItemLevel(o1) != getItemLevel(o2)) {
+                        int result;
+                        if (getItemLevel(o1) < getItemLevel(o2)) {
+                            result = compare(o1, getParentOf(o2));
+                            if (result == 0) {
+                                // Was equal to parent, which should come first
+                                // Can only happen if both are my parent
+                                result = -1;
+                            }
+                        } else {
+                            result = compare(getParentOf(o1), o2);
+                            if (result == 0) {
+                                // Was equal to parent, which should come first
+                                // Can only happen if both are my parent
+                                result = 1;
+                            }
+                        }
+
+                        return result;
+                    } // Same level guaranteed now
+                    else if (o1.isTag != o2.isTag) {
+                        // Tags always win
+                        if (o1.isTag) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    } // Both tags, or both not
+                    else if (o1.isTag) {
                         return mCollator.compare(o1.tag, o2.tag);
-                    } else if (!o1.isTag && !o2.isTag) {
-                        if (getItemLevel(o1) == getItemLevel(o2)) {
+                    } // Make sure they have the same parent
+                    else {
+                        FeedWrapper p1 = getParentOf(o1);
+                        FeedWrapper p2 = getParentOf(o2);
+                        if (p1 == null && p2 == null ||
+                                p1 != null && p1.equals(p2)) {
+                            // Same parent
                             return mCollator.compare(o1.item.title, o2.item.title);
-                        } else if (getItemLevel(o1) < getItemLevel(o2)) {
-                            // Items with no parent are placed last
-                            return 1;
                         } else {
-                            // Items with no parent are placed last
-                            return -1;
-                        }
-                    } else if (o1.isTag) {
-                        if (o2.item.tag == null || o2.item.tag.isEmpty()) {
-                            // place tag first
-                            return -1;
-                        } else if (o1.tag.equals(o2.item.tag)) {
-                            return -1;
-                        } else {
-                            return compare(o1, getParentOf(o2));
-                        }
-                    } else { // if o2.istag
-                        if (o1.item.tag == null || o1.item.tag.isEmpty()) {
-                            // place tag first
-                            return 1;
-                        } else if (o2.tag.equals(o1.item.tag)) {
-                            return 1;
-                        } else {
-                            return compare(getParentOf(o1), o2);
+                            // Different parents
+                            // Null should not be possible here, but just in case
+                            try {
+                                return compare(p1, p2);
+                            } catch (NullPointerException e) {
+                                Log.e(TAG, "" + e);
+                                return 0;
+                            }
                         }
                     }
                 }
