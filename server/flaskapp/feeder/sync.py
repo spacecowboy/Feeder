@@ -4,6 +4,8 @@ This file handles syncing the actual RSS/Atom feeds.
 '''
 
 import feedparser as fp
+import socket
+
 from datetime import datetime, timedelta
 from .database import db
 from sqlalchemy import distinct
@@ -18,6 +20,10 @@ fp._HTMLSanitizer.acceptable_elements = \
     set(list(fp._HTMLSanitizer.acceptable_elements) + ['object',
                                                        'embed',
                                                        'iframe'])
+
+# You should timeout if server is not responding.
+# In seconds but feedparser takes about 5x longer before returning.
+socket.setdefaulttimeout(1.0)
 
 
 def cache_all_feeds():
