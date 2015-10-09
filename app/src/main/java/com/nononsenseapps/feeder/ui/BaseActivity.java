@@ -37,7 +37,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -697,12 +696,22 @@ public class BaseActivity extends AppCompatActivity
                     }
                 }
 
+                // Null safe
+                private boolean sameParent(FeedWrapper o1, FeedWrapper o2) {
+                    try {
+                        //noinspection ConstantConditions
+                        return getParentOf(o1).equals(getParentOf(o2));
+                    } catch (NullPointerException e) {
+                        return getParentOf(o1) == null && getParentOf(o2) == null;
+                    }
+                }
+
                 @Override
-                public FeedWrapper getParentOf(FeedWrapper o) {
-                    if (o.isTag) {
+                public FeedWrapper getParentOf(FeedWrapper item) {
+                    if (item.isTag || item.item.tag == null || item.item.tag.isEmpty()) {
                         return null;
                     } else {
-                        return new FeedWrapper(o.tag);
+                        return new FeedWrapper(item.tag);
                     }
                 }
 
@@ -741,7 +750,17 @@ public class BaseActivity extends AppCompatActivity
                         }
 
                         return result;
-                    } // Same level guaranteed now
+                    } // Only compare with same parent
+                    else if (!sameParent(o1, o2)) {
+                        // Same level, so has to be a sublevel where parents exist
+                        // But just to be safe, catch any possible exceptions
+                        try {
+                            return compare(getParentOf(o1), getParentOf(o2));
+                        } catch (NullPointerException e) {
+                            return 0;
+                        }
+                    }
+                    // Same level guaranteed now, with same parent
                     else if (o1.isTag != o2.isTag) {
                         // Tags always win
                         if (o1.isTag) {
@@ -752,24 +771,9 @@ public class BaseActivity extends AppCompatActivity
                     } // Both tags, or both not
                     else if (o1.isTag) {
                         return mCollator.compare(o1.tag, o2.tag);
-                    } // Make sure they have the same parent
+                    } // Both items here with same parent
                     else {
-                        FeedWrapper p1 = getParentOf(o1);
-                        FeedWrapper p2 = getParentOf(o2);
-                        if (p1 == null && p2 == null ||
-                                p1 != null && p1.equals(p2)) {
-                            // Same parent
-                            return mCollator.compare(o1.item.title, o2.item.title);
-                        } else {
-                            // Different parents
-                            // Null should not be possible here, but just in case
-                            try {
-                                return compare(p1, p2);
-                            } catch (NullPointerException e) {
-                                Log.e(TAG, "" + e);
-                                return 0;
-                            }
-                        }
+                        return mCollator.compare(o1.item.title, o2.item.title);
                     }
                 }
 
