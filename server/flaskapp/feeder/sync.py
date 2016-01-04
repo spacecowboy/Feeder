@@ -107,7 +107,10 @@ def cache_feed(feed):
         feed.etag = rss.get("etag", None)
         feed.modified = rss.get("modified", None)
 
-        print("Cached:", feed.title)
+        try:
+            print("Cached:", feed.title)
+        except:
+            print("Cached something with a weird title I can't print")
 
         # Add feed to database
         db.session.add(feed)
