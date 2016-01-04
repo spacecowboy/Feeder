@@ -35,11 +35,14 @@ RUN git clone https://github.com/spacecowboy/Feeder.git /feeder
 # Install requirements
 RUN pip3.4 install -r /feeder/server/flaskapp/requirements.txt
 
-# Mount this dir as a volume
-WORKDIR /feederserver
+COPY run.sh /run.sh
+COPY sync.sh /sync.sh
 
-# Port must match below
-EXPOSE 5000
+# Make sure data directory exists, though it should be mounted as a volume
+RUN mkdir -p /data
 
 # Run server
-CMD python3.4 /feeder/server/flaskapp/runserver.py -p 5000
+CMD /run.sh
+
+# To sync, do this command when the server is running:
+# docker exec [-it] feeder /sync.sh
