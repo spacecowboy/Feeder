@@ -194,7 +194,7 @@ class Feeds(Resource):
         # If we should update tag or title
         if userfeed.tag != args.tag or userfeed.title != args.title:
             userfeed.tag = args.tag
-            userfeed.title = args.title
+            userfeed.title = args.title or feed.title
             db.session.add(userfeed)
         # Else, already saved
         db.session.commit()
