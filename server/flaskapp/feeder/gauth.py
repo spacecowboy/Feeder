@@ -66,6 +66,7 @@ def validate_userpass(credentials):
         password = password.lower()
         # Check validity of username password
         users = current_app.config.get('FEEDER_USERS', {})
+
         #user = get_user(username, allow_creation=False)
         #if user is None or user.passwordhash is None:
         if username not in users:
@@ -82,6 +83,10 @@ def validate_userpass(credentials):
             # Generate android hash if stored in plaintext
             userpasshash = sha1(__ANDROID_SALT__ + userpass.encode('utf-8')).hexdigest().lower()
             valid = (userpasshash == password)
+
+        if not valid:
+            # Try really plain text
+            valid = (userpass == password)
 
         if valid:
             return username
