@@ -70,6 +70,7 @@ deleteparser.add_argument('link', type=str, required=True,
 ## Get
 ### Single feed item
 feeditem_fields = {
+    'guid': fields.String,
     'title': fields.String,
     'description': fields.String,
     'link': fields.String,

@@ -76,16 +76,19 @@ def cache_feed(feed):
     # Get individual entries
     any_new_items = False
     for item in rss.entries:
+        # Guid is exists, otherwise link
+        guid = item.get("id", item.link)
         # Ignore existing
         if db.session.query(FeedItem.query.
                             filter(FeedItem.feed_id == feed.id,
-                                   FeedItem.link == item.link).
+                                   FeedItem.guid == guid).
                             exists()).scalar():
             continue
 
         any_new_items = True
         # Fill with cleaned data
         feeditem = FeedItem()
+        feeditem.guid = guid
         feeditem.feed_id = feed.id
         feeditem.timestamp = timestamp
         clean_entry(feeditem, item)
