@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2016 Jonas Kalderstam.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.nononsenseapps.feeder.db;
 
 import android.content.ContentValues;
@@ -38,6 +55,7 @@ public class FeedItemSQL {
     // with other Android things. This is ALWAYS needed
     public static final String COL_ID = "_id";
     // These fields can be anything you want.
+    public static final String COL_GUID = "guid";
     public static final String COL_TITLE = "title";
     public static final String COL_DESCRIPTION = "description";
     public static final String COL_PLAINTITLE = "plaintitle";
@@ -63,16 +81,17 @@ public class FeedItemSQL {
                     COL_ENCLOSURELINK,
                     COL_FEEDTITLE,
             COL_NOTIFIED,
-            COL_JSON};
+            COL_JSON, COL_GUID};
 
     /*
-     * The SQL code that creates a Table for storing Persons in.
+     * The SQL code that creates a Table.
      * Note that the last row does NOT end in a comma like the others.
      * This is a common source of error.
      */
     public static final String CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + "("
                     + COL_ID + " INTEGER PRIMARY KEY,"
+                    + COL_GUID + " TEXT NOT NULL,"
                     + COL_TITLE + " TEXT NOT NULL,"
                     + COL_DESCRIPTION + " TEXT NOT NULL,"
                     + COL_PLAINTITLE + " TEXT NOT NULL,"
@@ -92,8 +111,8 @@ public class FeedItemSQL {
                     " FOREIGN KEY(" + COL_FEED + ") REFERENCES " + FeedSQL.TABLE_NAME + "(" +
                     FeedSQL.COL_ID + ") ON DELETE CASCADE," +
                     // Handle unique constraint
-                    " UNIQUE(" + COL_LINK + "," + COL_FEED + ") ON CONFLICT " +
-                    "REPLACE"
+                    " UNIQUE(" + COL_GUID + "," + COL_FEED + ") ON CONFLICT " +
+                    "IGNORE"
                     + ")";
     // Trigger which updates Tags of items when feeds' tags are updated
     public static final String CREATE_TAG_TRIGGER =
@@ -114,6 +133,7 @@ public class FeedItemSQL {
 
     // Fields corresponding to database columns
     public long id = -1;
+    public String guid = null;
     public String title = null;
     public String description = null;
     public String plaintitle = null;
@@ -216,6 +236,7 @@ public class FeedItemSQL {
         this.feedtitle = cursor.getString(13);
         this.notified = cursor.getInt(14);
         this.json = cursor.getString(15);
+        this.guid = cursor.getString(16);
     }
 
     public DateTime getPubDate() {
@@ -338,6 +359,7 @@ public class FeedItemSQL {
         Util.PutNullable(values, COL_JSON, json);
         Util.PutNullable(values, COL_IMAGEURL, imageurl);
         Util.PutNullable(values, COL_LINK, link);
+        Util.PutNullable(values, COL_GUID, guid);
         Util.PutNullable(values, COL_AUTHOR, author);
         Util.PutNullable(values, COL_PUBDATE, getPubDateString());
         Util.PutNullable(values, COL_TAG, tag);

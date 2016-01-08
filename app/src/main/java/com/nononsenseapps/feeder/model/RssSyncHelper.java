@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2016 Jonas Kalderstam.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.nononsenseapps.feeder.model;
 
 import android.app.IntentService;
@@ -183,7 +200,7 @@ public class RssSyncHelper extends IntentService {
         }
 
         for (BackendAPIClient.FeedItem item : feed.items) {
-            // Always insert, have on conflict replace
+            // Always insert, have on conflict clause
             ContentProviderOperation.Builder itemOp = ContentProviderOperation
                     .newInsert(FeedItemSQL.URI_FEED_ITEMS);
 
@@ -195,7 +212,8 @@ public class RssSyncHelper extends IntentService {
                 itemOp.withValue(FeedItemSQL.COL_FEED, feedId);
             }
             // Next all the other values. Make sure non null
-            itemOp.withValue(FeedItemSQL.COL_LINK, item.link)
+            itemOp.withValue(FeedItemSQL.COL_GUID, item.guid)
+                    .withValue(FeedItemSQL.COL_LINK, item.link)
                     .withValue(FeedItemSQL.COL_FEEDTITLE, feed.title)
                     .withValue(FeedItemSQL.COL_TAG,
                             feed.tag == null ? "" : feed.tag)
