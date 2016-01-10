@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2016 Jonas Kalderstam.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.nononsenseapps.feeder.db;
 
 import android.accounts.Account;
@@ -11,6 +28,7 @@ import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,6 +47,7 @@ public class RssContentProvider extends ContentProvider {
             new UriMatcher(UriMatcher.NO_MATCH);
     private static final String TAG = "RssContentProvider";
     public static final String QUERY_PARAM_LIMIT = "QUERY_PARAM_LIMIT";
+    public static final String QUERY_PARAM_SKIP = "QUERY_PARAM_SKIP";
 
     static {
         FeedSQL.addMatcherUris(sURIMatcher);
@@ -190,13 +209,37 @@ public class RssContentProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
         }
+        // Must use builder in order to support OFFSET as the regular parser does not allow for
+        // negative numbers in the LIMIT clause.
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setTables(table);
+        String query = queryBuilder.buildQuery(projection, selection,null, null, sortOrder, null);
+        query += getLimitString(uri);
+
         result = DatabaseHandler.getInstance(getContext()).getReadableDatabase()
-                .query(table, projection, selection, selectionArgs, null, null,
-                        sortOrder, uri.getQueryParameter(QUERY_PARAM_LIMIT));
+                .rawQuery(query, selectionArgs);
 
         // Make sure you don't override another uri here
         result.setNotificationUri(getContext().getContentResolver(), uri);
         return result;
+    }
+
+    /**
+     * Return a limit clause as " LIMIT OFFSET,LIMIT", with parameters defined in uri.
+     * If not defined, the default values of -1 are used, which means no offset/return all
+     * respectively.
+     */
+    private String getLimitString(Uri uri) {
+        String offset = uri.getQueryParameter(QUERY_PARAM_SKIP);
+        if (offset == null) {
+            offset = "-1";
+        }
+        String limit = uri.getQueryParameter(QUERY_PARAM_LIMIT);
+        if (limit == null) {
+            limit = "-1";
+        }
+
+        return String.format(" LIMIT %s,%s", offset, limit);
     }
 
     @Override

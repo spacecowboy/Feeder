@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2016 Jonas Kalderstam.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.nononsenseapps.feeder.model;
 
 import android.accounts.Account;
@@ -8,16 +25,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.SyncResult;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.nononsenseapps.feeder.db.PendingNetworkSQL;
+import com.nononsenseapps.feeder.db.Cleanup;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
-import com.nononsenseapps.feeder.util.PasswordUtils;
 import com.nononsenseapps.feeder.util.PrefUtils;
 
 import java.util.ArrayList;
@@ -166,6 +181,9 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
                 getContext().getContentResolver()
                         .applyBatch(RssContentProvider.AUTHORITY, operations);
             }
+
+            // Finally, prune excessive items
+            Cleanup.prune(getContext());
         } catch (RetrofitError e) {
             Log.d(TAG, "Retrofit: " + e);
             final int status;
