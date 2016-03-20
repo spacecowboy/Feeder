@@ -20,6 +20,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.nononsenseapps.feeder.model.OPMLWriter.unescape;
+
 public class OPMLParser implements ContentHandler {
 
     private static final String TAG = "OPMLParser";
@@ -97,7 +99,8 @@ public class OPMLParser implements ContentHandler {
     }
 
     @Override
-    public void startElement(final String uri, final String localName, final String qName, final Attributes attr) throws SAXException {
+    public void startElement(final String uri, final String localName, final String qName,
+                             final Attributes attr) throws SAXException {
         // Not allowing nesting below feeds
         if (ignoring > 0) {
             ignoring += 1;
@@ -109,15 +112,15 @@ public class OPMLParser implements ContentHandler {
             if ("rss".equals(attr.getValue("type"))) {
                 isFeedTag = true;
                 // Yes, tagsoup seems to make the tags lowercase
-                FeedSQL feed = getFeed(mContext, attr.getValue("xmlurl"));
-                feed.title = attr.getValue("title");
-                feed.tag = mCurrentTag;
+                FeedSQL feed = getFeed(mContext, attr.getValue("xmlurl"))
+                        .withTitle(unescape(attr.getValue("title")))
+                        .withTag(mCurrentTag);
 
                 if (feed.url != null && feed.title != null) {
                     saveFeed(feed);
                 }
             } else if (mCurrentTag == null) {
-                mCurrentTag = attr.getValue("title");
+                mCurrentTag = unescape(attr.getValue("title"));
             } else {
                 ignoring += 1;
             }

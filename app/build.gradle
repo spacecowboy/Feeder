@@ -43,6 +43,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -64,4 +68,7 @@ dependencies {
 
     // Image loading
     compile 'com.github.bumptech.glide:glide:3.5.2'
+
+    // tests
+    testCompile 'junit:junit:4.12'
 }

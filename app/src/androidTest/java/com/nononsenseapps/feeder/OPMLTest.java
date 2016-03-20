@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.test.AndroidTestCase;
@@ -9,6 +10,9 @@ import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.Util;
+import com.nononsenseapps.feeder.function.Function;
+import com.nononsenseapps.feeder.function.Supplier;
 import com.nononsenseapps.feeder.model.OPMLParser;
 import com.nononsenseapps.feeder.model.OPMLWriter;
 
@@ -30,25 +34,26 @@ public class OPMLTest extends AndroidTestCase {
             "    <title>Feeder</title>",
             "  </head>",
             "  <body>",
-            "    <outline title=\"0\" text=\"0\" type=\"rss\" xmlUrl=\"http://somedomain0.com/rss.xml\"/>",
-            "    <outline title=\"3\" text=\"3\" type=\"rss\" xmlUrl=\"http://somedomain3.com/rss.xml\"/>",
-            "    <outline title=\"6\" text=\"6\" type=\"rss\" xmlUrl=\"http://somedomain6.com/rss.xml\"/>",
-            "    <outline title=\"9\" text=\"9\" type=\"rss\" xmlUrl=\"http://somedomain9.com/rss.xml\"/>",
+            "    <outline title=\"&quot;0&quot;\" text=\"&quot;0&quot;\" type=\"rss\" xmlUrl=\"http://somedomain0.com/rss.xml\"/>",
+            "    <outline title=\"&quot;3&quot;\" text=\"&quot;3&quot;\" type=\"rss\" xmlUrl=\"http://somedomain3.com/rss.xml\"/>",
+            "    <outline title=\"&quot;6&quot;\" text=\"&quot;6&quot;\" type=\"rss\" xmlUrl=\"http://somedomain6.com/rss.xml\"/>",
+            "    <outline title=\"&quot;9&quot;\" text=\"&quot;9&quot;\" type=\"rss\" xmlUrl=\"http://somedomain9.com/rss.xml\"/>",
             "    <outline title=\"tag1\" text=\"tag1\">",
-            "      <outline title=\"1\" text=\"1\" type=\"rss\" xmlUrl=\"http://somedomain1.com/rss.xml\"/>",
-            "      <outline title=\"4\" text=\"4\" type=\"rss\" xmlUrl=\"http://somedomain4.com/rss.xml\"/>",
-            "      <outline title=\"7\" text=\"7\" type=\"rss\" xmlUrl=\"http://somedomain7.com/rss.xml\"/>",
+            "      <outline title=\"&quot;1&quot;\" text=\"&quot;1&quot;\" type=\"rss\" xmlUrl=\"http://somedomain1.com/rss.xml\"/>",
+            "      <outline title=\"&quot;4&quot;\" text=\"&quot;4&quot;\" type=\"rss\" xmlUrl=\"http://somedomain4.com/rss.xml\"/>",
+            "      <outline title=\"&quot;7&quot;\" text=\"&quot;7&quot;\" type=\"rss\" xmlUrl=\"http://somedomain7.com/rss.xml\"/>",
             "    </outline>",
             "    <outline title=\"tag2\" text=\"tag2\">",
-            "      <outline title=\"2\" text=\"2\" type=\"rss\" xmlUrl=\"http://somedomain2.com/rss.xml\"/>",
-            "      <outline title=\"5\" text=\"5\" type=\"rss\" xmlUrl=\"http://somedomain5.com/rss.xml\"/>",
-            "      <outline title=\"8\" text=\"8\" type=\"rss\" xmlUrl=\"http://somedomain8.com/rss.xml\"/>",
+            "      <outline title=\"&quot;2&quot;\" text=\"&quot;2&quot;\" type=\"rss\" xmlUrl=\"http://somedomain2.com/rss.xml\"/>",
+            "      <outline title=\"&quot;5&quot;\" text=\"&quot;5&quot;\" type=\"rss\" xmlUrl=\"http://somedomain5.com/rss.xml\"/>",
+            "      <outline title=\"&quot;8&quot;\" text=\"&quot;8&quot;\" type=\"rss\" xmlUrl=\"http://somedomain8.com/rss.xml\"/>",
             "    </outline>",
             "  </body>",
             "</opml>"
     };
     private Context context;
     private ContentResolver resolver;
+    private final String fmtTitle = "\"%d\"";
 
     @Override
     public void setUp() throws Exception {
@@ -78,10 +83,10 @@ public class OPMLTest extends AndroidTestCase {
         ArrayList<FeedSQL> feeds = FeedSQL.getFeeds(context, null, null, null);
         assertFalse("No feeds in DB!", feeds.isEmpty());
         for (FeedSQL feed : feeds) {
-            int i = Integer.parseInt(feed.title);
+            int i = Integer.parseInt(feed.title.replaceAll("\"", ""));
             seen.add(i);
             assertEquals("http://somedomain" + i + ".com/rss.xml", feed.url);
-            assertEquals(Integer.toString(i), feed.title);
+            assertEquals( "\"" + Integer.toString(i) + "\"", feed.title);
             if (i % 3 == 1) {
                 assertEquals("tag1", feed.tag);
             } else if (i % 3 == 2) {
@@ -102,7 +107,7 @@ public class OPMLTest extends AndroidTestCase {
         // Create something that does not exist
         final FeedSQL feednew = new FeedSQL();
         feednew.url = "http://somedomain" + 20 + ".com/rss.xml";
-        feednew.title = Integer.toString(20);
+        feednew.title = String.format(fmtTitle, 20);
         feednew.tag = "kapow";
         Uri uri = context.getContentResolver().insert(FeedSQL.URI_FEEDS, feednew.getContent());
         feednew.id = Long.parseLong(uri.getLastPathSegment());
@@ -122,10 +127,10 @@ public class OPMLTest extends AndroidTestCase {
         ArrayList<FeedSQL> feeds = FeedSQL.getFeeds(context, null, null, null);
         assertFalse("No feeds in DB!", feeds.isEmpty());
         for (FeedSQL feed : feeds) {
-            int i = Integer.parseInt(feed.title);
+            int i = Integer.parseInt(feed.title.replaceAll("\"", ""));
             seen.add(i);
             assertEquals("http://somedomain" + i + ".com/rss.xml", feed.url);
-            assertEquals(Integer.toString(i), feed.title);
+            assertEquals("\"" + Integer.toString(i) + "\"", feed.title);
 
             if (i == 20) {
                 assertEquals("Should not have changed", feednew.id, feed.id);
@@ -192,8 +197,55 @@ public class OPMLTest extends AndroidTestCase {
         File dir = Environment.getExternalStorageDirectory();
         File path = new File(dir, "feeds.opml");
 
-        OPMLWriter writer = new OPMLWriter(context);
-        writer.writeFile(path.getAbsolutePath());
+        OPMLWriter writer = new OPMLWriter();
+        writer.writeFile(path.getAbsolutePath(),
+                new Supplier<Iterable<String>>() {
+                    @Override
+                    public Iterable<String> get() {
+                        ArrayList<String> tags = new ArrayList<>();
+
+                        Cursor c = context.getContentResolver()
+                                .query(FeedSQL.URI_TAGSWITHCOUNTS,
+                                        Util.ToStringArray(FeedSQL.COL_TAG), null, null,
+                                        null);
+
+                        try {
+                            while (c.moveToNext()) {
+                                tags.add(c.getString(0));
+                            }
+                        } finally {
+                            if (c != null) {
+                                c.close();
+                            }
+                        }
+
+                        return tags;
+                    }
+                },
+                new Function<String, Iterable<FeedSQL>>() {
+                    @Override
+                    public Iterable<FeedSQL> apply(String tag) {
+                        ArrayList<FeedSQL> feeds = new ArrayList<>();
+
+                        final String where = FeedSQL.COL_TAG + " IS ?";
+                        final String[] args = Util.ToStringArray(tag == null ? "": tag);
+                        Cursor c = context.getContentResolver()
+                                .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
+                                        where, args, null);
+
+                        try {
+                            while (c.moveToNext()) {
+                                feeds.add(new FeedSQL(c));
+                            }
+                        } finally {
+                            if (c != null) {
+                                c.close();
+                            }
+                        }
+
+                        return feeds;
+                    }
+                });
 
         //check contents of file
         BufferedReader br = new BufferedReader(new FileReader(path));
@@ -224,7 +276,7 @@ public class OPMLTest extends AndroidTestCase {
         for (int i = 0; i < 10; i++) {
             FeedSQL feed = new FeedSQL();
             feed.url = "http://somedomain" + i + ".com/rss.xml";
-            feed.title = Integer.toString(i);
+            feed.title = String.format(fmtTitle, i);
             if (i % 3 == 1) {
                 feed.tag = "tag1";
             } else if (i % 3 == 2) {

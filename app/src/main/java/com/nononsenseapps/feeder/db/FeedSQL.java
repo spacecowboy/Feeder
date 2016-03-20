@@ -103,6 +103,41 @@ public class FeedSQL {
     public FeedSQL() {
     }
 
+    public FeedSQL withUnreadCount(int count) {
+        this.unreadCount = count;
+        return this;
+    }
+
+    public FeedSQL withNotify(int flag) {
+        this.notify = flag;
+        return this;
+    }
+
+    public FeedSQL withTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+        return this;
+    }
+
+    public FeedSQL withTag(String tag) {
+        this.tag = tag;
+        return this;
+    }
+
+    public FeedSQL withUrl(String url) {
+        this.url = url;
+        return this;
+    }
+
+    public FeedSQL withTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public FeedSQL withId(long id) {
+        this.id = id;
+        return this;
+    }
+
     /**
      * Convert information from the database into a Feed object.
      */

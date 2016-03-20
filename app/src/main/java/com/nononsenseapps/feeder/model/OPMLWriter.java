@@ -1,12 +1,11 @@
 package com.nononsenseapps.feeder.model;
 
 
-import android.content.Context;
-import android.database.Cursor;
 import android.util.Log;
 
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.Util;
+import com.nononsenseapps.feeder.function.Function;
+import com.nononsenseapps.feeder.function.Supplier;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -14,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 
 public class OPMLWriter {
 
@@ -32,34 +30,36 @@ public class OPMLWriter {
     private static final String TAG = "OPMLWriter";
 
 
-    private final Context mContext;
-
-    public OPMLWriter(final Context context) {
-        this.mContext = context;
+    public OPMLWriter() {
     }
 
-    public void writeFile(final String path) throws FileNotFoundException {
-        writeOutputStream(new FileOutputStream(path));
+    public void writeFile(final String path,
+                          Supplier<Iterable<String>> tagSupplier,
+                          Function<String, Iterable<FeedSQL>> feedsWithTag)
+            throws FileNotFoundException {
+        writeOutputStream(new FileOutputStream(path), tagSupplier, feedsWithTag);
     }
 
-    public void writeOutputStream(final OutputStream os) {
+    public void writeOutputStream(final OutputStream os,
+                                  Supplier<Iterable<String>> tagSupplier,
+                                  Function<String, Iterable<FeedSQL>> feedsWithTag) {
         try {
             // Open file
             BufferedWriter bf = new BufferedWriter(new OutputStreamWriter(os));
 
             bf.write(STARTOPML);
 
-            for (String tag : getTags()) {
+            for (String tag : tagSupplier.get()) {
                 if (tag != null && !tag.isEmpty()) {
                     bf.write(String.format(STARTTAGFMT, escape(tag)));
                 }
 
-                for (FeedSQL feed: getFeedsWithTag(tag)) {
+                for (FeedSQL feed: feedsWithTag.apply(tag)) {
                     if (tag != null && !tag.isEmpty()) {
                         // Indent inside tags
                         bf.write("  ");
                     }
-                    bf.write(String.format(FEEDFMT, escape(feed.title), feed.url));
+                    bf.write(String.format(FEEDFMT, escape(feed.title), escape(feed.url)));
                 }
 
                 if (tag != null && !tag.isEmpty()) {
@@ -79,50 +79,26 @@ public class OPMLWriter {
     /**
      *
      * @param s string to escape
-     * @return String with " replaced by \"
+     * @return String with xml stuff escaped
      */
-    private String escape(final String s) {
-        return s.replaceAll("\"", "\\\"");
+    static String escape(final String s) {
+        return s.replaceAll("&", "&amp;")
+                .replaceAll("\"", "&quot;")
+                .replaceAll("'", "&apos;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
     }
 
-    private ArrayList<FeedSQL> getFeedsWithTag(final String tag) {
-        ArrayList<FeedSQL> feeds = new ArrayList<FeedSQL>();
-
-        final String where = FeedSQL.COL_TAG + " IS ?";
-        final String[] args = Util.ToStringArray(tag == null ? "": tag);
-        Cursor c = mContext.getContentResolver()
-                .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
-                        where, args, null);
-
-        try {
-            while (c.moveToNext()) {
-                feeds.add(new FeedSQL(c));
-            }
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-
-        return feeds;
-    }
-
-    public ArrayList<String> getTags() {
-        ArrayList<String> tags = new ArrayList<String>();
-
-        Cursor c = mContext.getContentResolver()
-                .query(FeedSQL.URI_TAGSWITHCOUNTS, Util.ToStringArray(FeedSQL.COL_TAG), null, null, null);
-
-        try {
-            while (c.moveToNext()) {
-                tags.add(c.getString(0));
-            }
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-
-        return tags;
+    /**
+     *
+     * @param s string to unescape
+     * @return String with xml stuff unescaped
+     */
+    static String unescape(final String s) {
+        return s.replaceAll("&quot;", "\"")
+                .replaceAll("&apos;", "'")
+                .replaceAll("&lt;", "<")
+                .replaceAll("&gt;", ">")
+                .replaceAll("&amp;", "&");
     }
 }

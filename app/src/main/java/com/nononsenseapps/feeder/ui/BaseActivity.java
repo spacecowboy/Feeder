@@ -588,7 +588,8 @@ public class BaseActivity extends AppCompatActivity
 
     @Override
     public Loader onCreateLoader(final int id, final Bundle bundle) {
-        return new FeedDeltaCursorLoader(this, FeedSQL.URI_FEEDSWITHCOUNTS, FeedSQL.FIELDS_VIEWCOUNT, null, null, null);
+        return new FeedDeltaCursorLoader(this, FeedSQL.URI_FEEDSWITHCOUNTS,
+                FeedSQL.FIELDS_VIEWCOUNT, null, null, null);
     }
 
     @Override
@@ -686,7 +687,8 @@ public class BaseActivity extends AppCompatActivity
             mCollator = Collator.getInstance();
             setHasStableIds(true);
             mItemMap = new HashMap<>();
-            mItems = new ExpandableSortedList<FeedWrapper>(FeedWrapper.class, new ExpandableSortedList.ExpandableCallback<FeedWrapper>() {
+            mItems = new ExpandableSortedList<>(
+                    FeedWrapper.class, new ExpandableSortedList.ExpandableCallback<FeedWrapper>() {
                 @Override
                 public int getItemLevel(FeedWrapper item) {
                     if (item.isTag || item.item.tag == null || item.item.tag.isEmpty()) {
@@ -800,9 +802,12 @@ public class BaseActivity extends AppCompatActivity
                 @Override
                 public boolean areContentsTheSame(FeedWrapper oldItem, FeedWrapper newItem) {
                     if (oldItem.isTag && newItem.isTag) {
-                        return oldItem.tag.equals(newItem.tag) && mItems.getTagUnreadCount(oldItem) == mItems.getTagUnreadCount(newItem);
+                        return oldItem.tag.equals(newItem.tag) &&
+                                mItems.getTagUnreadCount(oldItem) ==
+                                        mItems.getTagUnreadCount(newItem);
                     } else if (!oldItem.isTag && !newItem.isTag) {
-                        return oldItem.item.title.equals(newItem.item.title) && oldItem.item.unreadCount == newItem.item.unreadCount;
+                        return oldItem.item.title.equals(newItem.item.title) &&
+                                oldItem.item.unreadCount == newItem.item.unreadCount;
                     } else {
                         return false;
                     }
