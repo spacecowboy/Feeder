@@ -2,6 +2,8 @@ pipeline:
   build-server:
     image: python:3.5
     commands:
+      - python --version
+      - pip --version
       - pip install --upgrade pip
       - pip install --upgrade -r server/flaskapp/requirements.txt
       - pip install -e server/flaskapp
