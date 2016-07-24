@@ -1,9 +1,12 @@
 pipeline:
   build-server:
-    image: python:3.5
+    image: python:${PYTHON_VERSION}
     commands:
-      - python --version
-      - pip --version
-      - pip install --upgrade pip
       - pip install --upgrade -r server/flaskapp/requirements.txt
-      - pip install -e server/flaskapp
+      #- pip install -e server/flaskapp
+
+matrix:
+  PYTHON_VERSION:
+    - 3.4
+    - 3.5
+    - 3.6
