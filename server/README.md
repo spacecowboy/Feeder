@@ -42,5 +42,5 @@ docker run --rm --name=feeder -v /path/to/data:/data spacecowboy/feeder
 To synchronize feeds, you can do (in a crontab or something)
 
 ```
-docker run --rm --name=feeder -v /path/to/data:/data spacecowboy/feeder python runsync.py -c /data/config.yaml
+docker run --rm --name=feeder -v /path/to/data:/data spacecowboy/feeder sync
 ```
