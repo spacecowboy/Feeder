@@ -37,17 +37,27 @@ def cache_all_feeds():
     # First clear out old items
     delete_old_items()
 
+    result = []
+
     # Cpu count * 5
     with ThreadPoolExecutor() as exe:
-        data_to_feed = {exe.submit(download_feed, feed, 2): feed for feed in Feed.query.all()}
+        data_to_feed = {exe.submit(download_feed, feed, 4): feed for feed in Feed.query.all()}
 
         for future in as_completed(data_to_feed):
             feed = data_to_feed[future]
             try:
                 data = future.result()
-                cache_feed(feed, data)
+                result.append((feed, data))
             except Exception as ex:
-                print("Failed to cache <{}> because: {}".format(feed.link, ex))
+                print("Failed to download <{}> because: {}".format(feed.link, ex))
+
+    # Can't do sql multithreaded
+    for (feed, data) in result:
+        try:
+            cache_feed(feed, data)
+        except Exception as ex:
+            print("Failed to cache <{}> because: {}".format(feed.link, ex))
+
 
 
 def download_feed(feed, timeout=2):
