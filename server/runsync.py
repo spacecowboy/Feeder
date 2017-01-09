@@ -12,6 +12,7 @@ Then enter a line like this (syncs every 10 minutes):
 '''
 from feeder import read_config
 import sys
+import os
 
 
 if __name__ == '__main__':
@@ -22,10 +23,13 @@ if __name__ == '__main__':
     else:
         configfile = 'config.yaml'
 
+    if not os.path.isfile(configfile):
+        exit("Config file '{}' does not exist. A config file is required.".format(os.path.abspath(configfile)))
+
     # Read config and configure database path
     read_config(configfile)
 
-    # ONly import after config reading
+    # Only import after config reading
     from feeder import sync
     print("Caching feeds...")
     sync.cache_all_feeds()

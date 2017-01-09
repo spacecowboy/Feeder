@@ -1,4 +1,0 @@
-cron:
-- description: Cache RSS feeds
-  url: /tasks/cache
-  schedule: every 30 minutes

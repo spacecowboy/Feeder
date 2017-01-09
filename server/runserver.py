@@ -3,13 +3,7 @@
 Usage:
     python runserver.py [-d][-h 127.0.0.1][-p 5000]
 
-Example usage with uWSGI:
-    uwsgi --socket 127.0.0.1:8080 -w runserver:app
-
-This small script runs the flask REST app. For development
-it is possible to run the app directly:
-
-    python runserver.py
+This small script runs the flask REST app.
 
 It might be sensible to run it with the debug switch: -d.
 This reloads the server when it detects a change in the code.
@@ -20,13 +14,10 @@ The arguments are as follows:
   -d - enable debug mode. Default is False.
   -h - specify the listening address. Use 0.0.0.0 to listen on all.
   -p - specify the listening port. Defaults to 5000.
-  -c - specify the config file. Defaults to config.yaml
+  -c - specify the config file. Defaults to config.yaml but is mandatory.
 
-In production it might be sensible to run this with something like
-uwsgi behind nginx. Note that any arguments specified will override
+Note that any arguments specified will override
 duplicates in the configfile.
-
-You can specify a configfile as well. See config-sample.yaml for details.
 '''
 import os
 import sys
@@ -46,6 +37,16 @@ def ensure_db_exists():
         print("Database was created successfully")
 
 
+def run_flask_app(kw):
+    app.run(**kw)
+
+
+def run_sync_loop(delay=600):
+    """
+    - delay : time between syncs in seconds.
+    """
+
+
 if __name__ == '__main__':
     args = sys.argv[1:]
 
@@ -57,6 +58,9 @@ if __name__ == '__main__':
         configfile = args[i + 1]
     else:
         configfile = 'config.yaml'
+
+    if not os.path.isfile(configfile):
+        exit("Config file '{}' does not exist. A config file is required.".format(os.path.abspath(configfile)))
 
     for k, v in read_config(configfile).items():
         if k in 'debug,host,port'.split(','):
@@ -80,19 +84,5 @@ if __name__ == '__main__':
     # After rest import
     ensure_db_exists()
 
-    app.run(**kw)
-else:
-    args = sys.argv[1:]
-    # Running with uwsgi
-    if '-c' in args:
-        i = args.index('-c')
-        configfile = args[i + 1]
-
-    read_config(configfile)
-    # This configures rest api to run. Do it AFTER config loading
-    import feeder.rest
-    # After rest import
-    ensure_db_exists()
-
-    # Convenience for uwsgi
-    application = app
+    run_flask_app(kw)
+    #app.run(**kw)
