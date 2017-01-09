@@ -172,7 +172,10 @@ def delete_old_items(days=14):
     FeedItem.query.filter(FeedItem.timestamp < dt).delete()
     db.session.commit()
 
-    db.engine.execute("vacuum;")
+    try:
+        db.engine.execute("vacuum;")
+    except Exception as ex:
+        print("Failed to vacuum: {}".format(ex))
 
 
 def delete_orphan_feeds():
