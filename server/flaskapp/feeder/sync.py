@@ -3,6 +3,10 @@
 This file handles syncing the actual RSS/Atom feeds.
 '''
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import urllib.request
+import ssl
+
 import feedparser as fp
 import socket
 
@@ -33,21 +37,48 @@ def cache_all_feeds():
     # First clear out old items
     delete_old_items()
 
-    for feed in Feed.query.all():
-        cache_feed(feed)
+    # Cpu count * 5
+    with ThreadPoolExecutor() as exe:
+        data_to_feed = {exe.submit(download_feed, feed, 2): feed for feed in Feed.query.all()}
+
+        for future in as_completed(data_to_feed):
+            feed = data_to_feed[future]
+            try:
+                data = future.result()
+                cache_feed(feed, data)
+            except Exception as ex:
+                print("Failed to cache <{}> because: {}".format(feed.link, ex))
 
 
-def cache_feed(feed):
+def download_feed(feed, timeout=2):
     '''
-    Download the feed.
-    '''
+    Downloads a feed and returns it.
 
+    Args:
+    - feed: A Feed database model fetched from the database table
+    - timeout: Timeout in seconds for blocking http actions.
+    '''
     url = feed.link
     if not "://" in url:
         url = "http://" + url
 
+    print("Downloading <{}>".format(url))
+
+    # Allow self-signed certificates
+    myssl = ssl.create_default_context()
+    myssl.check_hostname=False
+    myssl.verify_mode = ssl.CERT_NONE
+
+    with urllib.request.urlopen(url, timeout=timeout, context=myssl) as conn:
+        return conn.read()
+
+
+def cache_feed(feed, data):
+    '''
+    Parse the feed
+    '''
     # Parse the result
-    rss = fp.parse(url, etag=feed.etag, modified=feed.modified)
+    rss = fp.parse(data)
 
     # The feed object
     f = rss.feed
