@@ -37,16 +37,6 @@ def ensure_db_exists():
         print("Database was created successfully")
 
 
-def run_flask_app(kw):
-    app.run(**kw)
-
-
-def run_sync_loop(delay=600):
-    """
-    - delay : time between syncs in seconds.
-    """
-
-
 if __name__ == '__main__':
     args = sys.argv[1:]
 
@@ -84,5 +74,4 @@ if __name__ == '__main__':
     # After rest import
     ensure_db_exists()
 
-    run_flask_app(kw)
-    #app.run(**kw)
+    app.run(**kw)

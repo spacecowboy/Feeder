@@ -20,14 +20,11 @@ Before you can run the server you need to install the requirements
 
 and create the database:
 
-    python createdb.py
-
-By default it is created in */tmp/test.db*. Edit the path in
-*/feeder/database.py* to create it somewhere else.
+    python createdb.py -c config.yaml
 
 Now, you can run the server:
 
-    python runserver.py
+    python runserver.py -c config.yaml
 
 You might want to give some options to it. For developing, it's nice
 to run it in debug mode. You can also specify the listening address
@@ -36,16 +33,14 @@ are default values):
 
     python runserver.py -d -h 127.0.0.1 -p 5000
 
-For actual production use you might want to run it with something like
-[uwsgi](https://uwsgi-docs.readthedocs.org/en/latest/) behind a
-webserver like [Nginx](http://nginx.org/). I might write more info on
-that in the future. For now there are excellent guides from
-[Linode](https://www.linode.com) and
-[DigitalOcean](https://www.digitalocean.com) you can follow. Just
-google "nginx uwsgi flask".
+For use with Docker do:
 
-Example usage with uWSGI:
+```
+docker run --rm --name=feeder -v /path/to/data:/data spacecowboy/feeder
+```
 
-    uwsgi --socket 127.0.0.1:8080 -w runserver:app
+To synchronize feeds, you can do (in a crontab or something)
 
-Just remember to install uwsgi in python3.
+```
+docker run --rm --name=feeder -v /path/to/data:/data spacecowboy/feeder python runsync.py -c /data/config.yaml
+```

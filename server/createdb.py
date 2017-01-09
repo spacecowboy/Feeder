@@ -7,6 +7,7 @@ Creates the database whose location is specified by the config file.
 See config-sample.yaml for details.
 '''
 import sys
+import os
 from feeder import read_config
 
 
@@ -15,6 +16,9 @@ if __name__ == '__main__':
         exit(__doc__)
 
     configfile = sys.argv[2]
+    if not os.path.isfile(configfile):
+        exit("Config file '{}' does not exist. A config file is required.".format(os.path.abspath(configfile)))
+
     read_config(configfile)
 
     import feeder.rest
