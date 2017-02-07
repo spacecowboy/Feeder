@@ -1,3 +1,11 @@
+feeder (1.1.0) stable; urgency=low
+
+  * Fixed scripts.
+  * Include systemd units
+
+ -- Jonas Kalderstam <jonas@cowboyprogrammer.org>  Mon, 07 Feb 2017 19:03:00 +0100
+
+
 feeder (1.0.0) stable; urgency=low
 
   * Initial Release.
