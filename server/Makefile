@@ -9,8 +9,10 @@ LIB=$(patsubst feeder/%.py,$(DESTDIR)/usr/lib/python3/dist-packages/feeder/%.py,
 
 build: ## Build the python library
 
-install: ${PYSCRIPTS} ${BIN} ${LIB} ## Install
-	python3 setup.py install --install-layout=deb --prefix=${DESTDIR}/usr
+install: ## bah
+
+#install: ${PYSCRIPTS} ${BIN} ${LIB} ## Install
+#	python3 setup.py install --install-layout=deb --prefix=${DESTDIR}/usr
 
 help: ## Print this help text
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -20,9 +22,10 @@ debian: ## Build the debian package
 	debuild -b -uc -us --lintian-opts --profile debian
 
 clean: ## Clean build directories
-	rm -rf build
-	rm -rf debian/feeder
-	python setup.py clean
+#	debuild -- clean
+#	rm -rf build
+#	rm -rf debian/feeder
+#	python setup.py clean
 
 build/lib/feeder/%.py: feeder/%.py
 	python3 setup.py build

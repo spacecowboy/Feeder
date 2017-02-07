@@ -4,3 +4,6 @@ build
 .idea
 local.properties
 *.db
+*.substvars
+.pybuild
+*.debhelper
