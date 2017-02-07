@@ -2,6 +2,7 @@ pyyaml
 flask
 Flask-SQLAlchemy
 httplib2
+feedparser
 
 flask-restful>=0.3.5
 # Need newer version than available on pip
