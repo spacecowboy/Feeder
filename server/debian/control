@@ -10,6 +10,6 @@ Vcs-Browser: https://github.com/spacecowboy/feeder
 
 Package: feeder
 Architecture: all
-Depends: ${python3:Depends}
+Depends: ${python3:Depends}, adduser
 Description: An RSS/Atom caching server
  feeder is an RSS/Atom caching server.

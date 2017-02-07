@@ -1,1 +1,5 @@
-debian/feeder.1
+docs/feeder.1
+docs/feeder-pwhash.1
+docs/feeder-server.1
+docs/feeder-sync.1
+docs/feeder-user.1

@@ -15,3 +15,4 @@ app = Flask(__name__)
 
 # read_config
 from feeder.read_config import read_config
+from feeder.version import *
