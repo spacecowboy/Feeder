@@ -9,5 +9,5 @@ setup(name='feeder',
       author_email='jonas@cowboyprogrammer.org',
       url='https://github.com/spacecowboy/feeder',
       packages=['feeder'],
-      scripts=['scripts/runserver.py', 'scripts/runsync.py']
+      scripts=['scripts/feeder']
      )
