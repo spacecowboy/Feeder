@@ -23,6 +23,10 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	/usr/bin/python3 setup.py install --force --no-compile --root=debian/feeder --install-layout=deb
+	mkdir -p debian/feeder/etc/feeder
+	cp config.yaml.debian debian/feeder/etc/feeder/config.yaml
+	mkdir -p debian/feeder/lib/systemd/system/
+	cp debian/feeder-sync.* debian/feeder/lib/systemd/system/
 
 override_dh_auto_clean:
 	rm -rf build

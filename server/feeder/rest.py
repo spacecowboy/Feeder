@@ -19,8 +19,8 @@ from datetime import datetime, timedelta
 
 # Configure some logging
 import logging
-file_handler = logging.FileHandler('rest.log')
-app.logger.addHandler(file_handler)
+#file_handler = logging.FileHandler('rest.log')
+#app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
 
 

@@ -210,6 +210,10 @@ def parse_args(args):
                                 default='/etc/feeder/config.yaml')
     parser_adduser.set_defaults(func=add_user)
 
+    if len(args) == 0:
+        parser.print_help()
+        exit(1)
+
     return parser.parse_args(args)
 
 

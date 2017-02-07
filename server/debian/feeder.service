@@ -1,0 +1,13 @@
+[Unit]
+Description=Web server for RSS feed cache
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/feeder server
+Restart=on-failure
+User=feeder
+PrivateTmp=true
+ProtectSystem=yes
+
+[Install]
+WantedBy=mulit-user.target
