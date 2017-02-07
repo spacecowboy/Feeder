@@ -7,8 +7,8 @@ from feeder import app
 from .database import db
 from .models import (Feed, FeedItem, UserFeed, UserDeletion,
                      get_user, get_feed, get_userfeed)
-#from flask_oauthlib.client import OAuth
-from flask.ext.restful import (Resource, Api, reqparse, fields,
+
+from flask_restful import (Resource, Api, reqparse, fields,
                                marshal_with)
 from .util import parse_timestamp, datetime_to_string
 from .sync import cache_feed

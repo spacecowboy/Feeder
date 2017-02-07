@@ -4,7 +4,7 @@ The database
 '''
 
 from feeder import app
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 
@@ -21,6 +21,6 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 if 'SQLALCHEMY_DATABASE_URI' not in app.config:
     raise ValueError('No database configured')
 else:
-    print('Using database:', app.config['SQLALCHEMY_DATABASE_URI'])
+    #print('Using database:', app.config['SQLALCHEMY_DATABASE_URI'])
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
     db = SQLAlchemy(app)
