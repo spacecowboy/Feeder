@@ -1,2 +1,3 @@
 debian/feeder
-data
+datadebhelper-build-stamp
+debian/files
