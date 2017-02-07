@@ -1,0 +1,138 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2017 Jonas Kalderstam <jonas@cowboyprogrammer.org>,
+.\"
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH Yourss 1 "January 29 2017"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+yourss \- Convert youtube rss feed into site/rss with mp3s
+.SH SYNOPSIS
+.B yourss
+.RI [ options ] ...
+.SH DESCRIPTION
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invode bold face and italics,
+.\" respectively.
+\fByourss\fP is a program that converts a youtube RSS feed into a full
+podcast site with the original youtube videos converted into mp3
+files. The description of each video is placed in the post pody.
+.sp 1
+It is expected that the program is invoked via the bundled systemd service and timer.
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+Show summary of options.
+.TP
+.B \-b, \-\-baseurl
+Url of your podcast site.
+.TP
+.B \-o, \-\-out
+Directory to place site in.
+.TP
+.B \-r, \-\-rss
+Youtube rss feed url.
+.SH ENVIRONMENT
+.TP
+.B SITEDIR
+Location of the hugo site.
+.TP
+.B SCRIPTDIR
+Location of the python scripts.
+.TP
+.B BASEURL
+Url of your podcast site.
+.TP
+.B OUT
+Directory to place site in.
+.TP
+.B RSS
+Youtube rss feed url.
+.SH EXAMPLE
+
+As an example, let's say that you want to put a site up at
+\fBhttp://www.mydomain.com/podcast\fP You want videos from the XYZ
+channel to be placed in this site. The XYZ channel has a youtube
+channel id of \fBABCDEF123\fP. And you host your site at
+\fB/var/www/mydomain/public_html\fP. Then a suitable invocation of
+yourss would be:
+
+  yourss --baseurl="http://www.mydomain.com/podcast" \\
+         --rss="https://www.youtube.com/feeds/videos.xml?channel_id=ABCDEF123" \\
+         --out="/var/www/mydomain/public_html"
+.SH SERVICE EXAMPLE
+
+To do the equivalent invocation on a daily basis you can enable the
+bundled systemd timer unit. First customize the environment variables
+by invoking
+
+.sp 1
+\fBsystemctl edit yourss@XYZ.service\fP
+.sp 1
+
+The content would be:
+.sp 1
+\fI[Service]
+.br
+Environment=BASEURL=http://www.mydomain.com/podcast
+.br
+Environment=RSS=https://www.youtube.com/feeds/videos.xml?channel_id=ABCDEF123
+.br
+Environment=OUT=/var/www/mydomain/public_html
+.br
+\fP
+.sp 1
+
+And then simply enable and start the timer unit as well:
+.sp 1
+
+\fBsystemctl enable yourss@XYZ.timer
+.br
+systemctl start yourss@XYZ.timer
+\fP
+.sp 1
+
+To run the service immediately you can start it explicitly
+.sp1
+
+\fBsystemctl start yourss@XYZ.service\fP
+.sp1
+
+And view its output with
+.sp1
+
+\fBjournalctl -xe\fP
+
+.SH RUNNING AS NON-ROOT USER
+
+By default the service is invoked as root which might not be what you
+want. To run as a different user, add a \fIUSER=...\fP directive to
+the service. To run as the \fIwww\fP user for example, which might be
+appropriate if your web server also runs as that user, you would do:
+
+.sp 1
+\fBsystemctl edit yourss@XYZ.service\fP
+.sp 1
+
+And make it look like
+
+.sp 1
+\fI[Service]
+.br
+USER=www
+.br
+Environment=...
+\fP
+.sp 1

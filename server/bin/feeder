@@ -1,0 +1,81 @@
+#!/bin/bash -e
+
+display_help() {
+  cat >&2 <<EOF
+
+usage: feeder [OPTION]...
+
+Runs a caching RSS web server, or syncs configured feeds if `sync` argument
+is given.
+
+options:
+
+  -h, --help      show this help message and exit
+  -c, --config    path to config file
+  -s, --sync      sync feeds instead of serving web server
+
+environment variables:
+  FEEDER_SCRIPTDIR  location of the python scripts
+
+Examples, to run a server do:
+
+  feeder
+
+to sync feeds do:
+
+  feeder --sync
+
+EOF
+}
+
+print_missing_arg() {
+  # $1 should be argument name
+  echo "Error: missing mandatory argument --$1" >&2
+}
+
+SCRIPT="$0"
+sync=""
+config="/etc/feeder/config.yaml"
+
+while :
+do
+  case "$1" in
+    -h | --help)
+	  display_help
+	  exit 0
+	  ;;
+    -c | --config)
+      config="$2"
+      shift 2
+      ;;
+    -c=* | --config=*)
+      config="${1#*=}"
+      shift 1
+      ;;
+    -s | --sync)
+      sync="YES"
+      shift 1
+      ;;
+    --) # End of all options
+	  shift
+	  break;
+      ;;
+    -*)
+	  echo "Error: unknown option: $1" >&2
+      display_help
+	  exit 1
+	  ;;
+    *)  # No more options
+	  break
+	  ;;
+  esac
+done
+
+
+scripts=${FEEDER_SCRIPTDIR:-/usr/share/feeder/scripts}
+
+if [ -n "${sync}" ]; then
+  python3 "${scripts}/runsync.py" -c "${config}"
+else
+  python3 "${scripts}/runserver.py" -c "${config}"
+fi
