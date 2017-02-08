@@ -1,9 +1,14 @@
+feeder (1.1.2) stable; urgency=low
+
+  * Changed default config to liston only on localhost
+
+ -- Jonas Kalderstam <jonas@cowboyprogrammer.org>  Mon, 08 Feb 2017 10:265:00 +0100
+
 feeder (1.1.1) stable; urgency=low
 
   * Fixed missing feedparser dependency
 
  -- Jonas Kalderstam <jonas@cowboyprogrammer.org>  Mon, 07 Feb 2017 22:25:00 +0100
-
 
 feeder (1.1.0) stable; urgency=low
 
@@ -11,7 +16,6 @@ feeder (1.1.0) stable; urgency=low
   * Include systemd units
 
  -- Jonas Kalderstam <jonas@cowboyprogrammer.org>  Mon, 07 Feb 2017 19:03:00 +0100
-
 
 feeder (1.0.0) stable; urgency=low
 
