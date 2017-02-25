@@ -9,21 +9,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewCompat;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
@@ -35,8 +31,6 @@ import com.nononsenseapps.feeder.model.OPMLParser;
 import com.nononsenseapps.feeder.model.OPMLWriter;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.util.PrefUtils;
-import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
-
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -225,6 +219,7 @@ public class FeedActivity extends BaseActivity {
             intent.setType("text/opml");
             intent.putExtra(Intent.EXTRA_TITLE, "feeder.opml");
             startActivityForResult(intent, EXPORT_OPML_CODE);
+            return true;
         } else if (R.id.action_opml_import == id) {
             // Choose file
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -233,6 +228,10 @@ public class FeedActivity extends BaseActivity {
             intent.putExtra(Intent.EXTRA_MIME_TYPES,
                     Util.ToStringArray("text/plain", "text/xml", "text/opml", "*/*"));
             startActivityForResult(intent, IMPORT_OPML_CODE);
+            return true;
+        } else if (R.id.action_debug_log == id) {
+            startActivity(new Intent(this, DebugLogActivity.class));
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

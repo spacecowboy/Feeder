@@ -29,16 +29,15 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
 import com.nononsenseapps.feeder.db.Cleanup;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.apis.BackendAPIClient;
+import com.nononsenseapps.feeder.util.FileLog;
 import com.nononsenseapps.feeder.util.PrefUtils;
+import retrofit.RetrofitError;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit.RetrofitError;
 
 
 public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
@@ -55,15 +54,17 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Creates an {@link android.content.AbstractThreadedSyncAdapter}.
      *
-     * @param context        the {@link android.content.Context} that this is
-     *                       running within.
-     * @param autoInitialize if true then sync requests that have
-     *                       {@link android.content.ContentResolver#SYNC_EXTRAS_INITIALIZE}
-     *                       set will be internally handled by
-     *                       {@link android.content.AbstractThreadedSyncAdapter}
-     *                       by calling
-     *                       {@link android.content.ContentResolver#setIsSyncable(android.accounts.Account,
-     *                       String, int)} with 1 if it
+     * @param context
+     *         the {@link android.content.Context} that this is
+     *         running within.
+     * @param autoInitialize
+     *         if true then sync requests that have
+     *         {@link android.content.ContentResolver#SYNC_EXTRAS_INITIALIZE}
+     *         set will be internally handled by
+     *         {@link android.content.AbstractThreadedSyncAdapter}
+     *         by calling
+     *         {@link android.content.ContentResolver#setIsSyncable(android.accounts.Account,
+     *         String, int)} with 1 if it
      */
     public RssSyncAdapter(final Context context, final boolean autoInitialize) {
         super(context, autoInitialize);
@@ -72,23 +73,26 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Creates an {@link android.content.AbstractThreadedSyncAdapter}.
      *
-     * @param context            the {@link android.content.Context} that this
-     *                           is running within.
-     * @param autoInitialize     if true then sync requests that have
-     *                           {@link android.content.ContentResolver#SYNC_EXTRAS_INITIALIZE}
-     *                           set will be internally handled by
-     *                           {@link android.content.AbstractThreadedSyncAdapter}
-     *                           by calling
-     *                           {@link android.content.ContentResolver#setIsSyncable(android.accounts.Account,
-     *                           String, int)} with 1 if it is currently set to
-     *                           <0.
-     * @param allowParallelSyncs if true then allow syncs for different
-     *                           accounts to run at the same time, each in
-     *                           their own thread.  This must be consistent
-     *                           with the setting.
+     * @param context
+     *         the {@link android.content.Context} that this
+     *         is running within.
+     * @param autoInitialize
+     *         if true then sync requests that have
+     *         {@link android.content.ContentResolver#SYNC_EXTRAS_INITIALIZE}
+     *         set will be internally handled by
+     *         {@link android.content.AbstractThreadedSyncAdapter}
+     *         by calling
+     *         {@link android.content.ContentResolver#setIsSyncable(android.accounts.Account,
+     *         String, int)} with 1 if it is currently set to
+     *         <0.
+     * @param allowParallelSyncs
+     *         if true then allow syncs for different
+     *         accounts to run at the same time, each in
+     *         their own thread.  This must be consistent
+     *         with the setting.
      */
     public RssSyncAdapter(final Context context, final boolean autoInitialize,
-            final boolean allowParallelSyncs) {
+                          final boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
     }
 
@@ -97,22 +101,28 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
      * be specified in extras, which is guaranteed to not be null. Invocations
      * of this method are guaranteed to be serialized.
      *
-     * @param account    the account that should be synced
-     * @param extras     SyncAdapter-specific parameters
-     * @param authority  the authority of this sync request
-     * @param provider   a ContentProviderClient that points to the
-     *                   ContentProvider for this
-     *                   authority
-     * @param syncResult SyncAdapter-specific parameters
+     * @param account
+     *         the account that should be synced
+     * @param extras
+     *         SyncAdapter-specific parameters
+     * @param authority
+     *         the authority of this sync request
+     * @param provider
+     *         a ContentProviderClient that points to the
+     *         ContentProvider for this
+     *         authority
+     * @param syncResult
+     *         SyncAdapter-specific parameters
      */
     @Override
     public void onPerformSync(final Account account, final Bundle extras,
-            final String authority, final ContentProviderClient provider,
-            final SyncResult syncResult) {
+                              final String authority, final ContentProviderClient provider,
+                              final SyncResult syncResult) {
+        FileLog fileLog = FileLog.instance(getContext());
 
-      // By default, if a sync is performed, we can wait at least an hour
-      // to the next one. Unit is seconds
-      syncResult.delayUntil = 60L * 60L;
+        // By default, if a sync is performed, we can wait at least an hour
+        // to the next one. Unit is seconds
+        syncResult.delayUntil = 60L * 60L;
 
         final Intent bcast = new Intent(SYNC_BROADCAST)
                 .putExtra(SYNC_BROADCAST_IS_ACTIVE, true);
@@ -120,6 +130,7 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
 
         final String token = RssSyncHelper.getSuitableToken(getContext());
         if (token == null) {
+            fileLog.d("No token exists! Aborting sync...");
             Log.e(TAG, "No token exists! Aborting sync...");
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast
                     (bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false));
@@ -136,18 +147,22 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             RssSyncHelper.syncPending(getContext(), token, operations);
 
             // Then downloads
+            fileLog.d("With timestamp: " + RssContentProvider
+                    .GetLatestTimestamp(getContext()));
             Log.d(TAG, "With timestamp: " + RssContentProvider
                     .GetLatestTimestamp(getContext()));
             BackendAPIClient.FeedsResponse feedsResponse =
-                api.getFeeds(
-                    RssContentProvider.GetLatestTimestamp(getContext()));
+                    api.getFeeds(
+                            RssContentProvider.GetLatestTimestamp(getContext()));
 
             // Start with feeds
             List<BackendAPIClient.Feed> feeds = feedsResponse.feeds;
 
             if (feeds == null) {
+                fileLog.d("Feeds was null");
                 Log.d(TAG, "Feeds was null");
             } else {
+                fileLog.d("Number of feeds to sync: " + feeds.size());
                 Log.d(TAG, "Number of feeds to sync: " + feeds.size());
                 /*
                 If you encounter TransactionTooLargeException here, make
@@ -156,6 +171,8 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
                 cause the exception. Seems safe inside same process though.
                  */
                 for (BackendAPIClient.Feed feed : feeds) {
+                    fileLog.d("Syncing: " + feed.title + "(" + (feed.items
+                            == null ? 0 : feed.items.size()) + ")");
                     Log.d(TAG, "Syncing: " + feed.title + "(" + (feed.items
                             == null ? 0 : feed.items.size()) + ")");
                     // Sync feed
@@ -166,10 +183,13 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             // End with deletes
             List<BackendAPIClient.Delete> deletes = feedsResponse.deletes;
             if (deletes == null) {
+                fileLog.d("Deletes was null");
                 Log.d(TAG, "Deletes was null");
             } else {
+                fileLog.d("Number of deletes to sync: " + deletes.size());
                 Log.d(TAG, "Number of deletes to sync: " + deletes.size());
                 for (BackendAPIClient.Delete delete : deletes) {
+                    fileLog.d("Deleting: " + delete.link);
                     Log.d(TAG, "Deleting: " + delete.link);
                     // Delete feed
                     RssSyncHelper
@@ -179,19 +199,24 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
 
             if (!operations.isEmpty()) {
                 getContext().getContentResolver()
-                        .applyBatch(RssContentProvider.AUTHORITY, operations);
+                            .applyBatch(RssContentProvider.AUTHORITY, operations);
             }
 
             // Finally, prune excessive items
             Cleanup.prune(getContext());
         } catch (RetrofitError e) {
+            fileLog.d("Retrofit: " + e);
             Log.d(TAG, "Retrofit: " + e);
             final int status;
             if (e.getResponse() != null) {
+                fileLog.d("" +
+                        e.getResponse().getStatus() +
+                        "; " +
+                        e.getResponse().getReason());
                 Log.e(TAG, "" +
-                           e.getResponse().getStatus() +
-                           "; " +
-                           e.getResponse().getReason());
+                        e.getResponse().getStatus() +
+                        "; " +
+                        e.getResponse().getReason());
                 status = e.getResponse().getStatus();
             } else {
                 status = 999;
@@ -199,12 +224,12 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             // An HTTP error was encountered.
             switch (status) {
                 case 401: // Unauthorized, token could possibly just be stale
-                  // auth-exceptions are hard errors, and if the token is stale,
-                  // that's too harsh
-                  //syncResult.stats.numAuthExceptions++;
-                  // Instead, report ioerror, which is a soft error
-                  syncResult.stats.numIoExceptions++;
-                  break;
+                    // auth-exceptions are hard errors, and if the token is stale,
+                    // that's too harsh
+                    //syncResult.stats.numAuthExceptions++;
+                    // Instead, report ioerror, which is a soft error
+                    syncResult.stats.numIoExceptions++;
+                    break;
                 case 404: // No such item, should never happen, programming error
                 case 415: // Not proper body, programming error
                 case 400: // Didn't specify url, programming error
@@ -215,9 +240,11 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
                     break;
             }
         } catch (RemoteException e) {
+            fileLog.d("RemoteExc.: " + e);
             Log.d(TAG, "RemoteExc.: " + e);
             syncResult.databaseError = true;
         } catch (OperationApplicationException e) {
+            fileLog.d("OperationAppl.Exc.: " + e);
             Log.d(TAG, "OperationAppl.Exc.: " + e);
             syncResult.databaseError = true;
         } finally {

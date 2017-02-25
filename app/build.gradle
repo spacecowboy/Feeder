@@ -7,9 +7,9 @@ android {
         applicationId "com.nononsenseapps.feeder"
         versionCode 1
         versionName "1.0"
-        compileSdkVersion 22
+        compileSdkVersion 24
         minSdkVersion 19
-        targetSdkVersion 22
+        targetSdkVersion 24
 
         // Reduce bloat by removing stuff we don't need
         // Only support english right now
@@ -71,4 +71,5 @@ dependencies {
 
     // tests
     testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.7.11'
 }

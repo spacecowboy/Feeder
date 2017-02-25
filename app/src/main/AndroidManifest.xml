@@ -31,6 +31,16 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.DebugLogActivity"
+            android:label="@string/app_name"
+            android:parentActivityName=".ui.FeedActivity"
+            android:theme="@style/AppTheme" >
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
+        </activity>
+        <activity
             android:name=".ui.ReaderActivity"
             android:label="@string/app_name"
             android:parentActivityName=".ui.FeedActivity"
