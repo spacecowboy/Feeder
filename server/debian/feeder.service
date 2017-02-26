@@ -10,4 +10,4 @@ PrivateTmp=true
 ProtectSystem=yes
 
 [Install]
-WantedBy=mulit-user.target
+WantedBy=multi-user.target
