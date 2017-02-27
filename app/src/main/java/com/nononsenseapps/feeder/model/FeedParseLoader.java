@@ -21,7 +21,7 @@ public class FeedParseLoader extends
         SyndFeed feed = null;
         String msg = null;
         try {
-            feed = FeedParser.parseFeed(searchQuery);
+            feed = FeedParser.parseFeed(searchQuery, getContext().getExternalCacheDir());
         } catch (FeedParser.FeedParsingError feedParsingError) {
             FileLog.d(getContext(), feedParsingError.getLocalizedMessage());
             msg = feedParsingError.getLocalizedMessage();

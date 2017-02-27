@@ -307,7 +307,7 @@ public class FeedItemSQL {
             try {
                 this.jsonobject = new JSONObject(this.json);
             } catch (JSONException e) {
-                Log.d(TAG, e.getLocalizedMessage());
+                Log.d(TAG, "getJSON failed " + e.getLocalizedMessage());
             }
         }
 
@@ -338,7 +338,7 @@ public class FeedItemSQL {
             try {
                 return json.getString(name);
             } catch (JSONException e) {
-                Log.d(TAG, e.getLocalizedMessage());
+                Log.d(TAG, "getJSONString failed " + e.getLocalizedMessage());
                 return null;
             }
         } else {

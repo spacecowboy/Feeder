@@ -2,28 +2,67 @@ package com.nononsenseapps.feeder.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import com.rometools.rome.feed.synd.SyndEnclosure;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.joda.time.DateTime;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.min;
 
 public class FeedParser {
 
-    public static SyndFeed parseFeed(String url) throws FeedParsingError {
+    // Should reuse same instance to have same cache
+    private static OkHttpClient _client;
+
+    private static OkHttpClient cachingClient(File cacheDirectory) {
+        if (_client != null) {
+            return _client;
+        }
+
+        int cacheSize = 10 * 1024 * 1024; // 10 MiB
+        Cache cache = new Cache(cacheDirectory, cacheSize);
+
+        _client = new OkHttpClient.Builder()
+                .cache(cache)
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .build();
+
+        return _client;
+    }
+
+    public static SyndFeed parseFeed(String url, File cacheDir) throws FeedParsingError {
         try {
             if (!url.startsWith("http://") && !url.startsWith("https://")) {
                 url = "http://" + url;
             }
-            return new SyndFeedInput().build(new XmlReader(new URL(url)));
-        } catch (FeedException | IOException e) {
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+
+            Response response = cachingClient(cacheDir).newCall(request).execute();
+
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+
+            Log.d("RSSLOCAL", "cache response: " + response.cacheResponse());
+            Log.d("RSSLOCAL", "network response: " + response.networkResponse());
+
+            return new SyndFeedInput().build(new XmlReader(response.body().source().inputStream()));
+        } catch (Throwable e) {
             throw new FeedParsingError(e);
         }
     }
@@ -77,6 +116,10 @@ public class FeedParser {
 
     public static class FeedParsingError extends Exception {
         FeedParsingError(Exception e) {
+            super(e);
+        }
+
+        public FeedParsingError(Throwable e) {
             super(e);
         }
     }

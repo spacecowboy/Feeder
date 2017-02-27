@@ -60,6 +60,8 @@ dependencies {
 
     // RSS
     compile 'com.rometools:rome:1.7.1'
+    // For better fetching
+    compile 'com.squareup.okhttp3:okhttp:3.6.0'
 
     // For nice looking progress bars
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.1'

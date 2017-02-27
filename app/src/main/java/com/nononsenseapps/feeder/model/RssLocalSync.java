@@ -36,7 +36,7 @@ public class RssLocalSync {
         for (FeedSQL feedSQL: feeds) {
             executor.execute(() -> {
                 try {
-                    SyndFeed parsedFeed = FeedParser.parseFeed(feedSQL.url);
+                    SyndFeed parsedFeed = FeedParser.parseFeed(feedSQL.url, context.getExternalCacheDir());
 
                     ArrayList<ContentProviderOperation> operations = convertFeedToDatabase(parsedFeed, feedSQL);
 
@@ -53,8 +53,8 @@ public class RssLocalSync {
                 } catch (Throwable error) {
                     error.printStackTrace();
                 } finally {
-                    // Notify that we've updated
-                    RssContentProvider.notifyAllUris(context);
+                    // Notify that we've updated - too often for every one
+                    //RssContentProvider.notifyAllUris(context);
                     // And broadcast end of sync
                     /*LocalBroadcastManager.getInstance(getContext()).sendBroadcast
                             (bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false));*/
