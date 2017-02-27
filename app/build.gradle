@@ -58,6 +58,9 @@ dependencies {
     compile "com.android.support:appcompat-v7:24.2.1"
     compile 'com.android.support:design:24.2.1'
 
+    // RSS
+    compile 'com.rometools:rome:1.7.1'
+
     // For nice looking progress bars
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.1'
 

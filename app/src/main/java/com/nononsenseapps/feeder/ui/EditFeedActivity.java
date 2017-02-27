@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.TypedValue;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +21,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -31,19 +29,20 @@ import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.Util;
-import com.nononsenseapps.feeder.model.RssSearchLoader;
+import com.nononsenseapps.feeder.model.FeedParseLoader;
 import com.nononsenseapps.feeder.model.RssSyncHelper;
-import com.nononsenseapps.feeder.model.apis.GoogleFeedAPIClient;
+import com.nononsenseapps.feeder.util.LoaderResult;
 import com.nononsenseapps.feeder.views.FloatLabelLayout;
+import com.rometools.rome.feed.synd.SyndFeed;
 
+import java.util.Collections;
 import java.util.List;
 
 public class EditFeedActivity extends Activity
-        implements LoaderManager.LoaderCallbacks<GoogleFeedAPIClient.FindResponse> {
+        implements LoaderManager.LoaderCallbacks<LoaderResult<SyndFeed>> {
 
     public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
     public static final String _ID = "_id";
@@ -96,82 +95,69 @@ public class EditFeedActivity extends Activity
         mResultAdapter = new ResultsAdapter(this);
         mListResults.setEmptyView(mEmptyText);
         mListResults.setAdapter(mResultAdapter);
-        mListResults
-                .setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(final AdapterView<?> parent,
-                                            final View view, final int position,
-                                            final long id) {
-                        GoogleFeedAPIClient.Entry entry =
-                                mResultAdapter.getItem(position);
-                        useEntry(entry.title, entry.url);
-                    }
-                });
+        mListResults.setOnItemClickListener((parent, view, position, id1) -> {
+            SyndFeed entry =
+                    mResultAdapter.getItem(position);
+            useEntry(entry.getTitle(), entry.getLink());
+        });
 
         mTextSearch.setOnEditorActionListener(
-                new TextView.OnEditorActionListener() {
-                    @Override
-                    public boolean onEditorAction(final TextView v,
-                                                  final int actionId, final KeyEvent event) {
-                        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                            // Hide keyboard
-                            View f = getCurrentFocus();
-                            if (f != null) {
-                                InputMethodManager imm =
-                                        (InputMethodManager) getSystemService(
-                                                Context.INPUT_METHOD_SERVICE);
-                                imm.hideSoftInputFromWindow(f.getWindowToken(),
-                                        0);
-                            }
-
-                            // Issue search
-                            Bundle args = new Bundle();
-                            args.putString(SEARCHQUERY,
-                                    mTextSearch.getText().toString().trim());
-                            getLoaderManager().restartLoader(RSSFINDER, args,
-                                    EditFeedActivity.this);
-                            return true;
+                (v, actionId, event) -> {
+                    if (actionId == EditorInfo.IME_ACTION_GO) {
+                        // Hide keyboard
+                        View f = getCurrentFocus();
+                        if (f != null) {
+                            InputMethodManager imm =
+                                    (InputMethodManager) getSystemService(
+                                            Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(f.getWindowToken(),
+                                    0);
                         }
-                        return false;
+
+                        // Issue search
+                        Bundle args = new Bundle();
+                        args.putString(SEARCHQUERY,
+                                mTextSearch.getText().toString().trim());
+                        getLoaderManager().restartLoader(RSSFINDER, args,
+                                EditFeedActivity.this);
+                        return true;
                     }
+                    return false;
                 });
 
         Button addButton = (Button) findViewById(R.id.add_button);
         addButton
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        // TODO error checking and stuff like that
-                        ContentValues values = new ContentValues();
+                .setOnClickListener(v -> {
+                    // TODO error checking and stuff like that
+                    ContentValues values = new ContentValues();
 
-                        values.put(FeedSQL.COL_TITLE,
-                                mTextTitle.getText().toString().trim());
-                        values.put(FeedSQL.COL_TAG,
-                                mTextTag.getText().toString().trim());
-                        if (id < 1) {
-                            values.put(FeedSQL.COL_URL,
-                                    mTextUrl.getText().toString().trim());
-                            Uri uri = getContentResolver()
-                                    .insert(FeedSQL.URI_FEEDS, values);
-                            id = Long.parseLong(uri.getLastPathSegment());
-                        } else {
-                            getContentResolver().update(Uri.withAppendedPath(
-                                            FeedSQL.URI_FEEDS,
-                                            Long.toString(id)), values, null,
-                                    null);
-                        }
+                    values.put(FeedSQL.COL_TITLE,
+                            mTextTitle.getText().toString().trim());
+                    values.put(FeedSQL.COL_TAG,
+                            mTextTag.getText().toString().trim());
+                    if (id < 1) {
+                        values.put(FeedSQL.COL_URL,
+                                mTextUrl.getText().toString().trim());
+                        Uri uri = getContentResolver()
+                                .insert(FeedSQL.URI_FEEDS, values);
+                        id = Long.parseLong(uri.getLastPathSegment());
+                    } else {
+                        getContentResolver().update(Uri.withAppendedPath(
+                                FeedSQL.URI_FEEDS,
+                                Long.toString(id)), values, null,
+                                null);
+                    }
 
-                        RssSyncHelper.uploadFeedAsync(EditFeedActivity.this, id,
-                                mTextTitle.getText().toString().trim(),
-                                mTextUrl.getText().toString().trim(),
-                                mTextTag.getText().toString().trim());
+                    RssSyncHelper.uploadFeedAsync(EditFeedActivity.this, id,
+                            mTextTitle.getText().toString().trim(),
+                            mTextUrl.getText().toString().trim(),
+                            mTextTag.getText().toString().trim());
 
-                        finish();
-                        if (mShouldFinishBack) {
-                            // Only care about exit transition
-                            overridePendingTransition(R.anim.to_bottom_right,
-                                    R.anim.to_bottom_right);
-                        }
+                    finish();
+                    if (mShouldFinishBack) {
+                        // Only care about exit transition
+                        overridePendingTransition(R.anim.to_bottom_right,
+                                R.anim.to_bottom_right);
                     }
                 });
 
@@ -264,15 +250,12 @@ public class EditFeedActivity extends Activity
                 };
 
         // Tell adapter how to return result
-        tagsAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
-            @Override
-            public CharSequence convertToString(final Cursor cursor) {
-                if (cursor == null) {
-                    return null;
-                }
-
-                return cursor.getString(1);
+        tagsAdapter.setCursorToStringConverter(cursor -> {
+            if (cursor == null) {
+                return null;
             }
+
+            return cursor.getString(1);
         });
 
         // Tell adapter how to filter
@@ -375,37 +358,42 @@ public class EditFeedActivity extends Activity
     /**
      * Instantiate and return a new Loader for the given ID.
      *
-     * @param id   The ID whose loader is to be created.
-     * @param args Any arguments supplied by the caller.
+     * @param id
+     *         The ID whose loader is to be created.
+     * @param args
+     *         Any arguments supplied by the caller.
      * @return Return a new Loader instance that is ready to start loading.
      */
     @Override
-    public Loader<GoogleFeedAPIClient.FindResponse> onCreateLoader(final int id,
-                                                                   final Bundle args) {
+    public Loader<LoaderResult<SyndFeed>> onCreateLoader(final int id,
+                                                         final Bundle args) {
         mListResults.setVisibility(View.GONE);
         mEmptyText.setVisibility(View.GONE);
         mLoadingProgress.setVisibility(View.VISIBLE);
-        return new RssSearchLoader(this, args.getString(SEARCHQUERY));
+        return new FeedParseLoader(this, args.getString(SEARCHQUERY));
     }
 
     @Override
-    public void onLoadFinished(final Loader<GoogleFeedAPIClient.FindResponse> loader,
-                               final GoogleFeedAPIClient.FindResponse data) {
+    public void onLoadFinished(final Loader<LoaderResult<SyndFeed>> loader,
+                               final LoaderResult<SyndFeed> data) {
         mEmptyText.setText(R.string.no_feeds_found);
         mLoadingProgress.setVisibility(View.GONE);
-        if (data.responseData.feed != null) {
-            useEntry(data.responseData.feed.title,
-                    data.responseData.feed.feedUrl);
-        } else {
+        SyndFeed feed = data.result();
+        if (feed != null) {
+            useEntry(feed.getTitle(),
+                    feed.getLink());
             mDetailsFrame.setVisibility(View.GONE);
             mSearchFrame.setVisibility(View.VISIBLE);
             mListResults.setVisibility(View.VISIBLE);
-            mResultAdapter.setEntries(data.responseData.entries);
+            mResultAdapter.setEntries(Collections.singletonList(feed));
+        } else {
+            mEmptyText.setText("No such feed could be found. Try using https maybe.");
+            mEmptyText.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
-    public void onLoaderReset(final Loader<GoogleFeedAPIClient.FindResponse> loader) {
+    public void onLoaderReset(final Loader<LoaderResult<SyndFeed>> loader) {
         mResultAdapter.setEntries(null);
     }
 
@@ -415,13 +403,13 @@ public class EditFeedActivity extends Activity
     class ResultsAdapter extends BaseAdapter {
 
         private final Context mContext;
-        List<GoogleFeedAPIClient.Entry> entries = null;
+        List<SyndFeed> entries = null;
 
         public ResultsAdapter(final Context context) {
             mContext = context;
         }
 
-        public void setEntries(List<GoogleFeedAPIClient.Entry> entries) {
+        public void setEntries(List<SyndFeed> entries) {
             this.entries = entries;
             notifyDataSetChanged();
         }
@@ -444,13 +432,14 @@ public class EditFeedActivity extends Activity
          * Get the data item associated with the specified position in the data
          * set.
          *
-         * @param position Position of the item whose data we want within the
-         *                 adapter's
-         *                 data set.
+         * @param position
+         *         Position of the item whose data we want within the
+         *         adapter's
+         *         data set.
          * @return The data at the specified position.
          */
         @Override
-        public GoogleFeedAPIClient.Entry getItem(final int position) {
+        public SyndFeed getItem(final int position) {
             if (entries == null) {
                 return null;
             }
@@ -461,9 +450,10 @@ public class EditFeedActivity extends Activity
         /**
          * Get the row id associated with the specified position in the list.
          *
-         * @param position The position of the item within the adapter's data
-         *                 set
-         *                 whose row id we want.
+         * @param position
+         *         The position of the item within the adapter's data
+         *         set
+         *         whose row id we want.
          * @return The id of the item at the specified position.
          */
         @Override
@@ -486,29 +476,32 @@ public class EditFeedActivity extends Activity
          * boolean)}
          * to specify a root view and to prevent attachment to the root.
          *
-         * @param position    The position of the item within the adapter's data
-         *                    set
-         *                    of the item whose view
-         *                    we want.
-         * @param convertView The old view to reuse, if possible. Note: You
-         *                    should
-         *                    check that this view
-         *                    is non-null and of an appropriate type before
-         *                    using.
-         *                    If it is not possible to convert
-         *                    this view to display the correct data, this method
-         *                    can
-         *                    create a new view.
-         *                    Heterogeneous lists can specify their number of
-         *                    view
-         *                    types, so that this View is
-         *                    always of the right type (see {@link
-         *                    #getViewTypeCount()}
-         *                    and
-         *                    {@link #getItemViewType(int)}).
-         * @param parent      The parent that this view will eventually be
-         *                    attached
-         *                    to
+         * @param position
+         *         The position of the item within the adapter's data
+         *         set
+         *         of the item whose view
+         *         we want.
+         * @param convertView
+         *         The old view to reuse, if possible. Note: You
+         *         should
+         *         check that this view
+         *         is non-null and of an appropriate type before
+         *         using.
+         *         If it is not possible to convert
+         *         this view to display the correct data, this method
+         *         can
+         *         create a new view.
+         *         Heterogeneous lists can specify their number of
+         *         view
+         *         types, so that this View is
+         *         always of the right type (see {@link
+         *         #getViewTypeCount()}
+         *         and
+         *         {@link #getItemViewType(int)}).
+         * @param parent
+         *         The parent that this view will eventually be
+         *         attached
+         *         to
          * @return A View corresponding to the data at the specified position.
          */
         @Override
@@ -518,19 +511,18 @@ public class EditFeedActivity extends Activity
             View v = convertView;
             if (v == null) {
                 v = LayoutInflater.from(mContext)
-                        .inflate(R.layout.view_feed_result, parent, false);
+                                  .inflate(R.layout.view_feed_result, parent, false);
                 v.setTag(new ViewHolder(v));
             }
 
-            GoogleFeedAPIClient.Entry entry = entries.get(position);
+            SyndFeed entry = entries.get(position);
             ViewHolder vh = (ViewHolder) v.getTag();
 
             vh.entry = entry;
 
-            vh.textTitle.setText(android.text.Html.fromHtml(entry.title));
-            vh.textDescription
-                    .setText(android.text.Html.fromHtml(entry.contentSnippet));
-            vh.textUrl.setText(entry.url);
+            vh.textTitle.setText(entry.getTitle());
+            vh.textDescription.setText(entry.getDescription());
+            vh.textUrl.setText(entry.getLink());
 
             return v;
         }
@@ -542,7 +534,7 @@ public class EditFeedActivity extends Activity
     }
 
     class ViewHolder {
-        public GoogleFeedAPIClient.Entry entry;
+        public SyndFeed entry;
         public TextView textTitle;
         public TextView textUrl;
         public TextView textDescription;

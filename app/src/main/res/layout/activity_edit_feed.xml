@@ -114,8 +114,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:hint="@string/add_feed_search_hint"
-            android:imeOptions="actionSearch"
-            android:inputType="text|textAutoComplete|textAutoCorrect"
+            android:imeOptions="actionGo"
+            android:inputType="text|textAutoComplete|textUri"
             android:singleLine="true" />
 
         <ListView
