@@ -26,7 +26,12 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/action_debug_log"
-        android:orderInCategory="9999"
+        android:orderInCategory="999"
         android:title="View debug log"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_debug_sync"
+        android:orderInCategory="9999"
+        android:title="Sync local test"
         app:showAsAction="never" />
 </menu>

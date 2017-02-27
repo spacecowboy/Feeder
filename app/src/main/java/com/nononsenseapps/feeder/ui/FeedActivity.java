@@ -29,6 +29,7 @@ import com.nononsenseapps.feeder.function.Supplier;
 import com.nononsenseapps.feeder.model.AuthHelper;
 import com.nononsenseapps.feeder.model.OPMLParser;
 import com.nononsenseapps.feeder.model.OPMLWriter;
+import com.nononsenseapps.feeder.model.RssLocalSync;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import org.xml.sax.SAXException;
@@ -231,6 +232,9 @@ public class FeedActivity extends BaseActivity {
             return true;
         } else if (R.id.action_debug_log == id) {
             startActivity(new Intent(this, DebugLogActivity.class));
+            return true;
+        } else if (R.id.action_debug_sync == id) {
+            RssLocalSync.syncFeeds(this);
             return true;
         }
         return super.onOptionsItemSelected(item);

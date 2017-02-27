@@ -263,10 +263,16 @@ public class FeedItemSQL {
      * Set the date time in ISO8601 format (yyyy-MM-ddTHH:mm:ss.SSSZZ).
      */
     public void setPubDate(String datetime) {
-        if (datetime == null)
+        if (datetime == null) {
             pubDate = null;
-        else
-            pubDate = DateTime.parse(datetime);
+        } else {
+            try {
+                pubDate = DateTime.parse(datetime);
+            } catch (Throwable e) {
+                Log.e(tag, "Couldn't parse date: " + datetime + ";" + e);
+                pubDate = null;
+            }
+        }
     }
 
     /**
