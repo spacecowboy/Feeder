@@ -1,37 +1,32 @@
 apply plugin: 'com.android.application'
 
 android {
-    buildToolsVersion "21.1.2"
+    buildToolsVersion "24.0.0"
 
     defaultConfig {
         applicationId "com.nononsenseapps.feeder"
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
         compileSdkVersion 24
-        minSdkVersion 19
+        minSdkVersion 24
         targetSdkVersion 24
 
         // Reduce bloat by removing stuff we don't need
         // Only support english right now
-        resConfigs "en"
+        //resConfigs "en"
         // Low-res devices don't deserve dedicated resources
-        resConfigs "nodpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"
-    }
+        //resConfigs "nodpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"
 
-    productFlavors {
-        // Define separate dev and prod product flavors.
-        dev {
-            // dev utilizes minSDKVersion = 21 to allow the Android gradle plugin
-            // to pre-dex each module and produce an APK that can be tested on
-            // Android Lollipop without time consuming dex merging processes.
-            minSdkVersion 21
-        }
-        prod {
-            // The actual minSdkVersion for the application.
-            minSdkVersion 19
+        // Java8 please
+        jackOptions {
+            enabled true
         }
     }
-
+    // Used with Jack
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     buildTypes {
         debug {
@@ -51,17 +46,17 @@ android {
 
 dependencies {
     // This is only used for faster build-times
-    compile 'com.android.support:multidex:1.0.0'
+    compile 'com.android.support:multidex:1.0.1'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:recyclerview-v7:22.2.0'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
     compile 'joda-time:joda-time:2.3'
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'com.squareup.retrofit:retrofit:1.6.1'
-    compile 'com.android.support:support-v4:22.2.0'
-    compile "com.android.support:appcompat-v7:22.2.0"
-    compile 'com.android.support:design:22.2.0'
+    compile 'com.android.support:support-v4:24.2.1'
+    compile "com.android.support:appcompat-v7:24.2.1"
+    compile 'com.android.support:design:24.2.1'
 
     // For nice looking progress bars
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.1'
