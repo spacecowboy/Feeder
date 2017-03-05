@@ -28,11 +28,8 @@
     <style name="AppTheme" parent="Theme.IOSched.Base">
         <item name="android:windowActionModeOverlay">true</item>
         <item name="windowActionModeOverlay">true</item>
-
-        <item name="cpbStyle">@style/FeedSearchProgressStyle</item>
     </style>
     <style name="AppThemeDialog" parent="Theme.IOSched.BaseDialog">
-        <item name="cpbStyle">@style/FeedSearchProgressStyle</item>
     </style>
 
     <declare-styleable name="DrawShadowFrameLayout">
@@ -177,11 +174,6 @@
         <item name="android:textColor">@color/material_red_700</item>
         <item name="android:textSize">11sp</item>
         <item name="android:textStyle">bold</item>
-    </style>
-
-    <!-- progress bar -->
-    <style name="FeedSearchProgressStyle" parent="CircularProgressBar">
-        <item name="cpb_colors">@array/gplus_colors</item>
     </style>
 
 </resources>

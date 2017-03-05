@@ -60,6 +60,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Fine
+    }
+
+    @Override
     public void onUpgrade(final SQLiteDatabase db, final int i1, final int i2) {
         try {
             createViewsAndTriggers(db);

@@ -134,9 +134,8 @@
             android:gravity="center"
             android:text="@string/search_feed_empty_hint" />
 
-        <fr.castorflex.android.circularprogressbar.CircularProgressBar
+        <ProgressBar
             android:id="@+id/loading_progress"
-            style="@style/FeedSearchProgressStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
