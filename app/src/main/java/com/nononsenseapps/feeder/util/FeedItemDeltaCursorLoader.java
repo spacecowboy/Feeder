@@ -96,8 +96,6 @@ public class FeedItemDeltaCursorLoader extends DeltaCursorLoader<FeedItemSQL> {
         // Find out which items are currently present
         while (mCursor.moveToNext()) {
             FeedItemSQL item = new FeedItemSQL(mCursor);
-            // Also parse JSON while in background
-            item.getJson();
 
             mItems.put(item.id, item);
 

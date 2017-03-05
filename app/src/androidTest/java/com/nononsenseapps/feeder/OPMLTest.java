@@ -8,14 +8,11 @@ import android.os.Environment;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.SmallTest;
-
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.Util;
-import com.nononsenseapps.feeder.function.Function;
-import com.nononsenseapps.feeder.function.Supplier;
+import com.nononsenseapps.feeder.model.OPMLContenProvider;
 import com.nononsenseapps.feeder.model.OPMLParser;
 import com.nononsenseapps.feeder.model.OPMLWriter;
-
 import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
@@ -75,7 +72,7 @@ public class OPMLTest extends AndroidTestCase {
     public void testRead() throws IOException, SAXException {
         String path = writeSampleFile();
 
-        OPMLParser parser = new OPMLParser(context);
+        OPMLParser parser = new OPMLParser(new OPMLContenProvider(context));
         parser.parseFile(path);
 
         // Verify database is correct
@@ -119,7 +116,7 @@ public class OPMLTest extends AndroidTestCase {
         feedold.id = Long.parseLong(uri.getLastPathSegment());
 
         // Read file
-        OPMLParser parser = new OPMLParser(context);
+        OPMLParser parser = new OPMLParser(new OPMLContenProvider(context));
         parser.parseFile(path);
 
         // should not kill the existing stuff
@@ -168,7 +165,7 @@ public class OPMLTest extends AndroidTestCase {
         bw.close();
 
         // Read file
-        OPMLParser parser = new OPMLParser(context);
+        OPMLParser parser = new OPMLParser(new OPMLContenProvider(context));
         parser.parseFile(path.getAbsolutePath());
     }
 
@@ -177,7 +174,7 @@ public class OPMLTest extends AndroidTestCase {
         File dir = Environment.getExternalStorageDirectory();
         File path = new File(dir, "lsadflibaslsdfa.opml");
         // Read file
-        OPMLParser parser = new OPMLParser(context);
+        OPMLParser parser = new OPMLParser(new OPMLContenProvider(context));
         boolean raised = false;
         try {
             parser.parseFile(path.getAbsolutePath());
@@ -199,52 +196,46 @@ public class OPMLTest extends AndroidTestCase {
 
         OPMLWriter writer = new OPMLWriter();
         writer.writeFile(path.getAbsolutePath(),
-                new Supplier<Iterable<String>>() {
-                    @Override
-                    public Iterable<String> get() {
-                        ArrayList<String> tags = new ArrayList<>();
+                () -> {
+                    ArrayList<String> tags = new ArrayList<>();
 
-                        Cursor c = context.getContentResolver()
-                                .query(FeedSQL.URI_TAGSWITHCOUNTS,
-                                        Util.ToStringArray(FeedSQL.COL_TAG), null, null,
-                                        null);
+                    Cursor c = context.getContentResolver()
+                            .query(FeedSQL.URI_TAGSWITHCOUNTS,
+                                    Util.ToStringArray(FeedSQL.COL_TAG), null, null,
+                                    null);
 
-                        try {
-                            while (c.moveToNext()) {
-                                tags.add(c.getString(0));
-                            }
-                        } finally {
-                            if (c != null) {
-                                c.close();
-                            }
+                    try {
+                        while (c.moveToNext()) {
+                            tags.add(c.getString(0));
                         }
-
-                        return tags;
+                    } finally {
+                        if (c != null) {
+                            c.close();
+                        }
                     }
+
+                    return tags;
                 },
-                new Function<String, Iterable<FeedSQL>>() {
-                    @Override
-                    public Iterable<FeedSQL> apply(String tag) {
-                        ArrayList<FeedSQL> feeds = new ArrayList<>();
+                tag -> {
+                    ArrayList<FeedSQL> feeds = new ArrayList<>();
 
-                        final String where = FeedSQL.COL_TAG + " IS ?";
-                        final String[] args = Util.ToStringArray(tag == null ? "": tag);
-                        Cursor c = context.getContentResolver()
-                                .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
-                                        where, args, null);
+                    final String where = FeedSQL.COL_TAG + " IS ?";
+                    final String[] args = Util.ToStringArray(tag == null ? "": tag);
+                    Cursor c = context.getContentResolver()
+                            .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
+                                    where, args, null);
 
-                        try {
-                            while (c.moveToNext()) {
-                                feeds.add(new FeedSQL(c));
-                            }
-                        } finally {
-                            if (c != null) {
-                                c.close();
-                            }
+                    try {
+                        while (c.moveToNext()) {
+                            feeds.add(new FeedSQL(c));
                         }
-
-                        return feeds;
+                    } finally {
+                        if (c != null) {
+                            c.close();
+                        }
                     }
+
+                    return feeds;
                 });
 
         //check contents of file

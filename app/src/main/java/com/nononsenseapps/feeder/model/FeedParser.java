@@ -1,11 +1,15 @@
 package com.nononsenseapps.feeder.model;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import com.nononsenseapps.text.HtmlToPlainTextConverter;
+import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndEnclosure;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.feed.synd.SyndLink;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import okhttp3.Cache;
@@ -14,8 +18,18 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.joda.time.DateTime;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.min;
@@ -33,13 +47,46 @@ public class FeedParser {
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
         Cache cache = new Cache(cacheDirectory, cacheSize);
 
-        _client = new OkHttpClient.Builder()
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .cache(cache)
                 .connectTimeout(5, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
-                .build();
+                .readTimeout(5, TimeUnit.SECONDS);
+
+        trustAllCerts(builder);
+
+        _client = builder.build();
 
         return _client;
+    }
+
+    private static void trustAllCerts(OkHttpClient.Builder builder) {
+        try {
+            X509TrustManager trustManager = new X509TrustManager() {
+                @SuppressLint("TrustAllX509TrustManager")
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }
+
+                @SuppressLint("TrustAllX509TrustManager")
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }
+
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+            };
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, new TrustManager[]{trustManager}, null);
+            SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+            builder.sslSocketFactory(sslSocketFactory, trustManager)
+                   .hostnameVerifier(((hostname, session) -> true));
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            e.printStackTrace();
+        }
     }
 
     public static SyndFeed parseFeed(String url, File cacheDir) throws FeedParsingError {
@@ -61,17 +108,17 @@ public class FeedParser {
             Log.d("RSSLOCAL", "cache response: " + response.cacheResponse());
             Log.d("RSSLOCAL", "network response: " + response.networkResponse());
 
-            return new SyndFeedInput().build(new XmlReader(response.body().source().inputStream()));
+            return parseFeed(response.body().source().inputStream());
         } catch (Throwable e) {
             throw new FeedParsingError(e);
         }
     }
 
-    public static long timestamp(SyndFeed parsedFeed) {
-        if (parsedFeed.getPublishedDate() != null) {
-            return parsedFeed.getPublishedDate().getTime();
-        } else {
-            return DateTime.now().getMillis();
+    static SyndFeed parseFeed(InputStream is) throws FeedParsingError {
+        try {
+            return new SyndFeedInput().build(new XmlReader(is));
+        } catch (Throwable e) {
+            throw new FeedParsingError(e);
         }
     }
 
@@ -101,24 +148,67 @@ public class FeedParser {
     }
 
     @NonNull
+    public static String plainTitle(SyndEntry entry) {
+        return HtmlToPlainTextConverter.HtmlToPlainText(title(entry));
+    }
+
+    @NonNull
     public static String description(SyndEntry entry) {
+        // Atom
+        if (!entry.getContents().isEmpty()) {
+            List<SyndContent> contents = entry.getContents();
+            SyndContent content = null;
+
+            // In case of multiple contents, prioritize html
+            for (SyndContent c: contents) {
+                if (content == null) {
+                    content = c;
+                } else if ("html".equalsIgnoreCase(content.getType()) ||
+                        "xhtml".equalsIgnoreCase(content.getType())) {
+                    // Already html
+                    break;
+                } else if ("html".equalsIgnoreCase(c.getType()) ||
+                        "xhtml".equalsIgnoreCase(c.getType())) {
+                    content = c;
+                    break;
+                }
+            }
+
+            return nonNullString(content.getValue());
+        }
+
+        // Rss
         if (entry.getDescription() != null) {
             return nonNullString(entry.getDescription().getValue());
         }
+
+        // In case of faulty feed
         return "";
+    }
+
+    /**
+     *
+     * @return null in case no self links exist - which is true for some RSS feeds
+     */
+    @Nullable
+    public static String selfLink(SyndFeed feed) {
+        // entry.getUri() can return bad data in case of atom feeds where it returns the ID element
+        for (SyndLink link : feed.getLinks()) {
+            if ("self".equalsIgnoreCase(link.getRel())) {
+                return link.getHref();
+            }
+        }
+
+        return null;
     }
 
     @NonNull
     public static String snippet(SyndEntry entry) {
-        String text = description(entry);
+        String text = HtmlToPlainTextConverter.HtmlToPlainText(FeedParser.description(entry));
         return text.substring(0, min(200, text.length()));
     }
 
     public static class FeedParsingError extends Exception {
-        FeedParsingError(Exception e) {
-            super(e);
-        }
-
         public FeedParsingError(Throwable e) {
             super(e);
         }

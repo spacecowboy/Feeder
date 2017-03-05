@@ -1,13 +1,6 @@
 package com.nononsenseapps.feeder.model;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.Util;
-
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -25,40 +18,17 @@ import static com.nononsenseapps.feeder.model.OPMLWriter.unescape;
 public class OPMLParser implements ContentHandler {
 
     private static final String TAG = "OPMLParser";
-    private final Context mContext;
     private final Parser mParser;
+    private final OPMLParserToDatabase opmlParserToDatabase;
     private String mCurrentTag;
     private int ignoring = 0;
     private boolean isFeedTag;
 
-    public OPMLParser(final Context context) {
-        this.mContext = context;
+    public OPMLParser(final OPMLParserToDatabase opmlParserToDatabase) {
+        this.opmlParserToDatabase = opmlParserToDatabase;
         this.mParser = new Parser();
         mParser.setContentHandler(this);
 
-    }
-
-    private static FeedSQL getFeed(final Context context, final String url) {
-        FeedSQL result = null;
-
-        Cursor c = context.getContentResolver()
-                .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS, FeedSQL.COL_URL + " IS ?",
-                        Util.ToStringArray(url), null);
-
-        try {
-            if (c.moveToNext()) {
-                result = new FeedSQL(c);
-            } else {
-                result = new FeedSQL();
-                result.url = url;
-            }
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-
-        return result;
     }
 
     public void parseFile(final String path) throws IOException, SAXException {
@@ -112,12 +82,13 @@ public class OPMLParser implements ContentHandler {
             if ("rss".equals(attr.getValue("type"))) {
                 isFeedTag = true;
                 // Yes, tagsoup seems to make the tags lowercase
-                FeedSQL feed = getFeed(mContext, attr.getValue("xmlurl"))
+                FeedSQL feed = opmlParserToDatabase.getFeed(attr.getValue("xmlurl"))
                         .withTitle(unescape(attr.getValue("title")))
+                        .withCustomTitle(unescape(attr.getValue("title")))
                         .withTag(mCurrentTag);
 
                 if (feed.url != null && feed.title != null) {
-                    saveFeed(feed);
+                    opmlParserToDatabase.saveFeed(feed);
                 }
             } else if (mCurrentTag == null) {
                 mCurrentTag = unescape(attr.getValue("title"));
@@ -125,27 +96,6 @@ public class OPMLParser implements ContentHandler {
                 ignoring += 1;
             }
         }
-    }
-
-    private void saveFeed(final FeedSQL feed) {
-        // Save it
-        ContentValues values = feed.getContent();
-        if (feed.id < 1) {
-            Uri uri = mContext.getContentResolver()
-                    .insert(FeedSQL.URI_FEEDS, values);
-            feed.id = Long.parseLong(uri.getLastPathSegment());
-        } else {
-            mContext.getContentResolver().update(Uri.withAppendedPath(
-                            FeedSQL.URI_FEEDS,
-                            Long.toString(feed.id)), values, null,
-                    null);
-        }
-        // Upload change
-        RssSyncHelper.uploadFeedAsync(mContext,
-                feed.id,
-                feed.title,
-                feed.url,
-                feed.tag);
     }
 
     @Override

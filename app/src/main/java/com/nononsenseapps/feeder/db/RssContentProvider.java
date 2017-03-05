@@ -18,6 +18,7 @@
 package com.nononsenseapps.feeder.db;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
@@ -33,8 +34,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
-
-import com.nononsenseapps.feeder.model.AuthHelper;
 
 import java.util.ArrayList;
 
@@ -52,7 +51,6 @@ public class RssContentProvider extends ContentProvider {
     static {
         FeedSQL.addMatcherUris(sURIMatcher);
         FeedItemSQL.addMatcherUris(sURIMatcher);
-        PendingNetworkSQL.addMatcherUris(sURIMatcher);
     }
 
     // If the contentprovider notifies changes on uris
@@ -135,35 +133,6 @@ public class RssContentProvider extends ContentProvider {
                 FeedItemSQL.COL_TAG + " IS ?", Util.ToStringArray(tag));
     }
 
-    /**
-     * Fetch the latest timestamp used in syncing
-     *
-     * @param context
-     * @return timestamp or null if none exists
-     */
-    public static String GetLatestTimestamp(final Context context) {
-        String result = null;
-        // Adding distinct manually works atleast for single columns
-        Cursor c = context.getContentResolver().query(FeedSQL.URI_FEEDS,
-                new String[]{"DISTINCT " + FeedSQL.COL_TIMESTAMP},
-                FeedSQL.COL_TIMESTAMP +
-                " IS NOT NULL AND " +
-                FeedSQL.COL_TIMESTAMP +
-                " IS NOT ''", null, FeedSQL.COL_TIMESTAMP + " DESC");
-
-        try {
-            if (c.moveToNext()) {
-                result = c.getString(0);
-            }
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-
-        return result;
-    }
-
     @Override
     public boolean onCreate() {
         return true;
@@ -197,14 +166,6 @@ public class RssContentProvider extends ContentProvider {
                 break;
             case FeedItemSQL.URICODE:
                 table = FeedItemSQL.TABLE_NAME;
-                break;
-            case PendingNetworkSQL.ITEMCODE:
-                table = PendingNetworkSQL.TABLE_NAME;
-                selection = Util.WHEREIDIS;
-                selectionArgs = Util.ToStringArray(uri.getLastPathSegment());
-                break;
-            case PendingNetworkSQL.URICODE:
-                table = PendingNetworkSQL.TABLE_NAME;
                 break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
@@ -270,11 +231,6 @@ public class RssContentProvider extends ContentProvider {
                         FeedSQL.URI_FEEDSWITHCOUNTS,
                         FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
-            case PendingNetworkSQL.URICODE:
-                table = PendingNetworkSQL.TABLE_NAME;
-                result = PendingNetworkSQL.URI;
-                notifyUris = null;
-                break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
         }
@@ -323,16 +279,6 @@ public class RssContentProvider extends ContentProvider {
                                 selectionArgs);
                 notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS};
                 break;
-            case PendingNetworkSQL.ITEMCODE:
-                result += delete(PendingNetworkSQL.URI, Util.WHEREIDIS,
-                        Util.ToStringArray(uri.getLastPathSegment()));
-                break;
-            case PendingNetworkSQL.URICODE:
-                result += DatabaseHandler.getInstance(getContext())
-                        .getWritableDatabase()
-                        .delete(PendingNetworkSQL.TABLE_NAME, selection,
-                                selectionArgs);
-                break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
         }
@@ -377,16 +323,6 @@ public class RssContentProvider extends ContentProvider {
                 notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS,
                         FeedSQL.URI_FEEDSWITHCOUNTS,
                         FeedSQL.URI_TAGSWITHCOUNTS};
-                break;
-            case PendingNetworkSQL.ITEMCODE:
-                table = PendingNetworkSQL.TABLE_NAME;
-                selection = Util.WHEREIDIS;
-                selectionArgs = Util.ToStringArray(uri.getLastPathSegment());
-                notifyUris = null;
-                break;
-            case PendingNetworkSQL.URICODE:
-                table = PendingNetworkSQL.TABLE_NAME;
-                notifyUris = null;
                 break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
@@ -454,34 +390,61 @@ public class RssContentProvider extends ContentProvider {
     }
 
     /**
-     * Request a manual synchronization. Also configures automatic syncing.
-     * @param context
+     * Request a manual synchronization of all feeds.
      */
-    public static void RequestSync(final Context context) {
-        final Account account = AuthHelper.getSavedAccount(context);
-        if (account == null) {
-            // Can't do shit without an account
-            return;
-        }
-        // Enable syncing
-        ContentResolver
-                .setIsSyncable(account, RssContentProvider.AUTHORITY, 1);
-        // Set sync automatic
-        ContentResolver.setSyncAutomatically(account,
-                RssContentProvider.AUTHORITY, true);
-        // Once per hour: mins * secs
-        ContentResolver.addPeriodicSync(account,
-                RssContentProvider.AUTHORITY,
-                Bundle.EMPTY,
-                60L * 60L);
-        // And sync manually NOW
+    public static void RequestSync() {
+        RequestSync(-1);
+    }
+
+    /**
+     * Request a manual synchronization of one feed.
+     */
+    public static void RequestSync(long id) {
+        Account account = AccountService.Account();
         final Bundle settingsBundle = new Bundle();
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        settingsBundle.putBoolean(
-                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        ContentResolver.requestSync(account,
-                RssContentProvider.AUTHORITY, settingsBundle);
+        if (id > 0) {
+            settingsBundle.putLong(FeedSQL.COL_ID, id);
+        }
+        // sync manually NOW
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        ContentResolver.requestSync(account, RssContentProvider.AUTHORITY, settingsBundle);
+    }
+
+    /**
+     * Request a manual synchronization of feeds with a specific tag.
+     */
+    public static void RequestSync(@NonNull String tag) {
+        Account account = AccountService.Account();
+        final Bundle settingsBundle = new Bundle();
+        if (!tag.isEmpty()) {
+            settingsBundle.putString(FeedSQL.COL_TAG, tag);
+        }
+        // sync manually NOW
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        ContentResolver.requestSync(account, RssContentProvider.AUTHORITY, settingsBundle);
+    }
+
+    /**
+     * Adds the account and enables automatic syncing
+     */
+    public static void SetupSync(final Context context) {
+        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+        Account account = AccountService.Account();
+
+        if (accountManager.addAccountExplicitly(account, null, null)) {
+            // New account was added so...
+            // Enable syncing
+            ContentResolver.setIsSyncable(account, RssContentProvider.AUTHORITY, 1);
+            // Set sync automatic
+            ContentResolver.setSyncAutomatically(account, RssContentProvider.AUTHORITY, true);
+            // Once per hour: mins * secs
+            ContentResolver.addPeriodicSync(account,
+                    RssContentProvider.AUTHORITY,
+                    Bundle.EMPTY,
+                    60L * 60L);
+        }
     }
 
     public static void SetNotify(Context context, long id, boolean on) {

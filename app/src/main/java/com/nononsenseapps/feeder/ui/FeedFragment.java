@@ -26,7 +26,6 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -55,7 +54,6 @@ import android.view.ViewTreeObserver;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
@@ -63,13 +61,10 @@ import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.RssDatabaseService;
 import com.nononsenseapps.feeder.db.Util;
-import com.nononsenseapps.feeder.model.AuthHelper;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
-import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -110,6 +105,7 @@ public class FeedFragment extends Fragment
     private String title = "";
     private String url = "";
     private String tag = "";
+    private String customTitle = "";
     private LinearLayoutManager mLayoutManager;
     private View mCheckAllButton;
     private int notify = 0;
@@ -299,15 +295,14 @@ public class FeedFragment extends Fragment
                 R.color.refresh_progress_2,
                 R.color.refresh_progress_3);
 
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                boolean syncing = syncOrConfig();
-
-                if (!syncing) {
-                    // Do not show refresh view
-                    mSwipeRefreshLayout.setRefreshing(false);
-                }
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            // Sync this specific feed(s)
+            if (id > 0) {
+                RssContentProvider.RequestSync(id);
+            } else if (tag != null) {
+                RssContentProvider.RequestSync(tag);
+            } else {
+                RssContentProvider.RequestSync();
             }
         });
 
@@ -361,22 +356,6 @@ public class FeedFragment extends Fragment
         });
 
         return rootView;
-    }
-
-    /**
-     * Request a sync or ask for account if required.
-     *
-     * @return true if sync is underway, or false otherwise
-     */
-    public boolean syncOrConfig() {
-        if (null == AuthHelper.getSavedAccountName(getActivity())) {
-            DialogFragment dialog = new AccountDialog();
-            dialog.show(getFragmentManager(), "account_dialog");
-            return false;
-        } else {
-            RssContentProvider.RequestSync(getActivity());
-            return true;
-        }
     }
 
     private void onSyncBroadcast(boolean syncing) {
@@ -456,18 +435,15 @@ public class FeedFragment extends Fragment
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         final long id = menuItem.getItemId();
         if (id == R.id.action_sync) {
-            mSwipeRefreshLayout.setRefreshing(true);
-            boolean syncing = syncOrConfig();
-            if (mSwipeRefreshLayout.isRefreshing() != syncing) {
-                mSwipeRefreshLayout.setRefreshing(syncing);
-            }
+            // Sync all feeds when menu button pressed
+            RssContentProvider.RequestSync();
             return true;
         } else if (id == R.id.action_edit_feed && this.id > 0) {
             Intent i = new Intent(getActivity(), EditFeedActivity.class);
             // TODO do not animate the back movement here
             i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
             i.putExtra(EditFeedActivity._ID, this.id);
-            i.putExtra(EditFeedActivity.TITLE, title);
+            i.putExtra(EditFeedActivity.TITLE, customTitle);
             i.putExtra(EditFeedActivity.TAG, tag);
             i.setData(Uri.parse(url));
             startActivity(i);
@@ -486,8 +462,7 @@ public class FeedFragment extends Fragment
             getActivity().getContentResolver()
                     .delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
                             Util.LongsToStringArray(this.id));
-            // Upload change
-            RssSyncHelper.deleteFeedAsync(getActivity(), url);
+
             // Tell activity to open another fragment
             ((FeedActivity) getActivity()).loadFirstFeedInDB(true);
             return true;
@@ -595,6 +570,7 @@ public class FeedFragment extends Fragment
             if (cursor.moveToFirst()) {
                 FeedSQL feed = new FeedSQL(cursor);
                 this.title = feed.title;
+                this.customTitle = feed.customTitle;
                 this.url = feed.url;
                 this.notify = feed.notify;
 
@@ -836,32 +812,8 @@ public class FeedFragment extends Fragment
             if (holder.rssItem.description == null ||
                     holder.rssItem.description.isEmpty()) {
                 titleText.append(" \u2014 ");
-                // append to title field
-                boolean needDash = false;
-                String seeds = holder.rssItem.getTorrentSeeds();
-                if (seeds != null) {
-                    titleText.append("S(").append(seeds).append(") ");
-                    needDash = true;
-                }
-                String peers = holder.rssItem.getTorrentPeers();
-                if (peers != null) {
-                    titleText.append("P(").append(peers).append(") ");
-                    needDash = true;
-                }
-                String verified = holder.rssItem.getTorrentVerified();
-                if (verified != null) {
-                    titleText.append("V(").append(verified).append(") ");
-                    needDash = true;
-                }
 
-                if (needDash) {
-                    titleText.append("\u2014 ");
-                }
-
-                String magnet = holder.rssItem.getTorrentMagnetURI();
-                if (magnet != null) {
-                    titleText.append("magnet");
-                } else if (holder.rssItem.enclosurelink != null) {
+                if (holder.rssItem.enclosurelink != null) {
                     titleText.append(holder.rssItem.getEnclosureFilename());
                 } else {
                     titleText.append(holder.rssItem.getDomain());
@@ -1079,18 +1031,12 @@ public class FeedFragment extends Fragment
                     // Mark as read
                     RssDatabaseService.markItemAsRead(getActivity(), rssItem.id);
                     // Open in browser since no content was posted
-                    String magnet = rssItem.getTorrentMagnetURI();
-                    if (magnet != null) {
-                        // Use magnet link if it exists
-                        startActivity(new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(magnet)));
-                    } else {
-                        // Use enclosure or link
-                        startActivity(new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(rssItem.enclosurelink != null ?
-                                        rssItem.enclosurelink :
-                                        rssItem.link)));
-                    }
+
+                    // Use enclosure or link
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(rssItem.enclosurelink != null ?
+                                    rssItem.enclosurelink :
+                                    rssItem.link)));
                 }
             }
 

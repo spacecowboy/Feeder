@@ -42,7 +42,7 @@ import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.ImageTextLoader;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
-import com.nononsenseapps.text.Html;
+import com.nononsenseapps.text.HtmlConverter;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -80,11 +80,11 @@ public class ReaderFragment extends Fragment
     private TextView mAuthorTextView;
     private TextView mFeedTitleTextView;
 
-    private final Html htmlformatter;
+    private final HtmlConverter htmlformatter;
 
 
     public ReaderFragment() {
-        htmlformatter = new Html();
+        htmlformatter = new HtmlConverter();
     }
 
     /**
@@ -186,7 +186,7 @@ public class ReaderFragment extends Fragment
             mTitleTextView.setText("Nothing to display!");
         } else {
             mTitleTextView
-                    .setText(htmlformatter.fromHtml(mRssItem.title, getActivity()));
+                    .setText(htmlformatter.toSpanned(mRssItem.title, getActivity()));
         }
         if (mRssItem.description == null) {
             mBodyTextView.setText("Nothing to display!");
@@ -194,7 +194,7 @@ public class ReaderFragment extends Fragment
             //Log.d("JONAS", "Text is:\n" + mRssItem.description);
             // Set without images as a place holder
             mBodyTextView.setText(
-                    htmlformatter.fromHtml(mRssItem.description, getActivity()));
+                    htmlformatter.toSpanned(mRssItem.description, getActivity()));
         }
 
         if (mRssItem.feedtitle == null) {

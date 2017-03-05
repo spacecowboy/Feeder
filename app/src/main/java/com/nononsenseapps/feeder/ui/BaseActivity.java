@@ -21,13 +21,11 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
@@ -45,9 +43,9 @@ import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.ExpandableSortedList;
 import com.nononsenseapps.feeder.model.RssNotifications;
 import com.nononsenseapps.feeder.util.FeedDeltaCursorLoader;
@@ -66,7 +64,7 @@ import java.util.HashSet;
  * between activities.
  */
 public class BaseActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks, SharedPreferences.OnSharedPreferenceChangeListener {
+        implements LoaderManager.LoaderCallbacks {
 
     public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
     // Durations for certain animations we use:
@@ -104,8 +102,6 @@ public class BaseActivity extends AppCompatActivity
     private LPreviewUtilsBase.ActionBarDrawerToggleWrapper mDrawerToggle;
     // A Runnable that we should execute when the navigation drawer finishes its closing animation
     private Runnable mDeferredOnDrawerClosedRunnable;
-    private TextView mUserText;
-    private TextView mServerText;
     private FeedsAdapter mNavAdapter;
 
     /**
@@ -178,6 +174,8 @@ public class BaseActivity extends AppCompatActivity
         mThemedStatusBarColor = getResources().getColor(R.color.primary_dark);
 
         setNightBackground();
+        // Add account and enable sync - if not done before
+        RssContentProvider.SetupSync(this);
     }
 
     @Override
@@ -242,12 +240,6 @@ public class BaseActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        PrefUtils.unregisterOnSharedPreferenceChangeListener(this, this);
-        super.onDestroy();
-    }
-
     private void setupNavDrawer() {
         // Show icon
         ActionBar ab = getSupportActionBar();
@@ -262,33 +254,6 @@ public class BaseActivity extends AppCompatActivity
         if (mDrawerLayout == null) {
             return;
         }
-
-        // Set up account fields
-        mUserText = (TextView) findViewById(R.id.user_text);
-        mServerText = (TextView) findViewById(R.id.server_text);
-
-        final String user = PrefUtils.getUsername(this, null);
-        final String server = PrefUtils.getServerUrl(this);
-
-        if (user != null) {
-            mUserText.setText(user);
-        }
-        if (server != null) {
-            mServerText.setText(server);
-        }
-        // Listen for changes to account and server
-        PrefUtils.registerOnSharedPreferenceChangeListener(this, this);
-
-        // Listener for editor
-        View accountBox = findViewById(R.id.account_box);
-        accountBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Open server editor
-                DialogFragment dialog = new ServerEditorFragment();
-                dialog.show(getSupportFragmentManager(), "server_dialog");
-            }
-        });
 
         if (selfItem == NAVDRAWER_ITEM_INVALID) {
             // do not show a nav drawer
@@ -603,15 +568,6 @@ public class BaseActivity extends AppCompatActivity
         // ..
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
-        if (PrefUtils.PREF_USERNAME.equals(key)) {
-            mUserText.setText(sp.getString(key, ""));
-        } else if (PrefUtils.PREF_SERVER_URL.equals(key)) {
-            mServerText.setText(sp.getString(key, ""));
-        }
-    }
-
     static class FeedWrapper {
 
         public final String tag;
@@ -665,7 +621,7 @@ public class BaseActivity extends AppCompatActivity
             if (isTag) {
                 return "Tag: " + tag;
             } else {
-                return "Item: " + item.title + " (" + tag + ")";
+                return "Item: " + item.customTitle + " (" + tag + ")";
             }
         }
     }
@@ -775,7 +731,7 @@ public class BaseActivity extends AppCompatActivity
                         return mCollator.compare(o1.tag, o2.tag);
                     } // Both items here with same parent
                     else {
-                        return mCollator.compare(o1.item.title, o2.item.title);
+                        return mCollator.compare(o1.item.customTitle, o2.item.customTitle);
                     }
                 }
 
@@ -806,7 +762,7 @@ public class BaseActivity extends AppCompatActivity
                                 mItems.getTagUnreadCount(oldItem) ==
                                         mItems.getTagUnreadCount(newItem);
                     } else if (!oldItem.isTag && !newItem.isTag) {
-                        return oldItem.item.title.equals(newItem.item.title) &&
+                        return oldItem.item.customTitle.equals(newItem.item.customTitle) &&
                                 oldItem.item.unreadCount == newItem.item.unreadCount;
                     } else {
                         return false;
@@ -914,7 +870,7 @@ public class BaseActivity extends AppCompatActivity
                 case VIEWTYPE_FEED_CHILD:
                     FeedHolder fh = (FeedHolder) holder;
                     fh.item = wrap.item;
-                    fh.title.setText(fh.item.title);
+                    fh.title.setText(fh.item.customTitle);
                     fh.unreadCount.setText(Integer.toString(fh.item.unreadCount));
                     fh.unreadCount.setVisibility(fh.item.unreadCount > 0 ? View.VISIBLE : View.INVISIBLE);
                     break;

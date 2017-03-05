@@ -1,9 +1,0 @@
-[Unit]
-Description=Timer for feeder-sync.service
-
-[Timer]
-OnStartupSec=5min
-OnUnitActiveSec=30min
-
-[Install]
-WantedBy=timers.target

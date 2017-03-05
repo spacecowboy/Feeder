@@ -22,9 +22,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
-
 import org.joda.time.DateTime;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -67,7 +65,6 @@ public class FeedItemSQL {
     public static final String COL_PUBDATE = "pubdate";
     public static final String COL_UNREAD = "unread";
     public static final String COL_NOTIFIED = "notified";
-    public static final String COL_JSON = "json";
     // These fields corresponds to columns in Feed table
     public static final String COL_FEED = "feed";
     public static final String COL_TAG = "tag";
@@ -80,8 +77,7 @@ public class FeedItemSQL {
                     COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG,
                     COL_ENCLOSURELINK,
                     COL_FEEDTITLE,
-            COL_NOTIFIED,
-            COL_JSON, COL_GUID};
+            COL_NOTIFIED, COL_GUID};
 
     /*
      * The SQL code that creates a Table.
@@ -101,7 +97,6 @@ public class FeedItemSQL {
                     COL_ENCLOSURELINK + " TEXT," +
                     COL_AUTHOR + " TEXT," +
                     COL_PUBDATE + " TEXT," +
-                    COL_JSON + " TEXT," +
                     COL_UNREAD + " INTEGER NOT NULL DEFAULT 1," +
                     COL_NOTIFIED + " INTEGER NOT NULL DEFAULT 0," +
                     COL_FEED + " INTEGER NOT NULL," +
@@ -115,8 +110,9 @@ public class FeedItemSQL {
                     "IGNORE"
                     + ")";
     // Trigger which updates Tags of items when feeds' tags are updated
+    public static final String TRIGGER_NAME = "trigger_tag_updater";
     public static final String CREATE_TAG_TRIGGER =
-            "CREATE TEMP TRIGGER IF NOT EXISTS trigger_tag_updater "
+            "CREATE TEMP TRIGGER IF NOT EXISTS " + TRIGGER_NAME
             + " AFTER UPDATE OF " +
             Util.arrayToCommaString(FeedSQL.COL_TAG, FeedSQL.COL_TITLE)
             + " ON " + FeedSQL.TABLE_NAME
@@ -146,7 +142,6 @@ public class FeedItemSQL {
     public String tag = null;
     public String feedtitle = null;
     public int notified = 0;
-    public String json = null;
 
     // Convenience field for parsing json
     private JSONObject jsonobject = null;
@@ -235,8 +230,7 @@ public class FeedItemSQL {
         this.enclosurelink = cursor.getString(12);
         this.feedtitle = cursor.getString(13);
         this.notified = cursor.getInt(14);
-        this.json = cursor.getString(15);
-        this.guid = cursor.getString(16);
+        this.guid = cursor.getString(15);
     }
 
     public DateTime getPubDate() {
@@ -292,60 +286,6 @@ public class FeedItemSQL {
         }
     }
 
-
-    /**
-     * Return the parsed json object
-     *
-     * @return JsonObject
-     */
-    public JSONObject getJson() {
-        if (this.json == null) {
-            return null;
-        }
-
-        if (this.jsonobject == null) {
-            try {
-                this.jsonobject = new JSONObject(this.json);
-            } catch (JSONException e) {
-                Log.d(TAG, "getJSON failed " + e.getLocalizedMessage());
-            }
-        }
-
-        return this.jsonobject;
-    }
-
-    // Some interesting values found in certain namespaces
-    public String getTorrentMagnetURI() {
-        return getJSONString("torrent_magneturi");
-    }
-    public String getTorrentSeeds() {
-        return getJSONString("torrent_seeds");
-    }
-    public String getTorrentPeers() {
-        return getJSONString("torrent_peers");
-    }
-    public String getTorrentVerified() {
-        return getJSONString("torrent_verified");
-    }
-
-    protected String getJSONString(final String name) {
-        JSONObject json = getJson();
-        if (json == null) {
-            return null;
-        }
-
-        if (json.has(name)) {
-            try {
-                return json.getString(name);
-            } catch (JSONException e) {
-                Log.d(TAG, "getJSONString failed " + e.getLocalizedMessage());
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
     /**
      * Return the fields in a ContentValues object, suitable for insertion
      * into the database.
@@ -362,7 +302,6 @@ public class FeedItemSQL {
         values.put(COL_FEEDTITLE, feedtitle);
         values.put(COL_NOTIFIED, notified);
 
-        Util.PutNullable(values, COL_JSON, json);
         Util.PutNullable(values, COL_IMAGEURL, imageurl);
         Util.PutNullable(values, COL_LINK, link);
         Util.PutNullable(values, COL_GUID, guid);

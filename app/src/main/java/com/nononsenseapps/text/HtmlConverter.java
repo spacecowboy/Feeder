@@ -16,9 +16,9 @@ import org.ccil.cowan.tagsoup.Parser;
  * <p/>
  * Adds more extensibility to the parsing.
  */
-public class Html {
+public class HtmlConverter {
 
-    public Html() {}
+    public HtmlConverter() {}
 
     /**
      * Returns displayable styled text from the provided HTML string.
@@ -30,7 +30,7 @@ public class Html {
      * <p>This uses TagSoup to handle real HTML, including all of the brokenness
      * found in the wild.
      */
-    public Spanned fromHtml(String source, Context context) {
+    public Spanned toSpanned(String source, Context context) {
         Parser parser = new Parser();
         try {
             parser.setProperty(Parser.schemaProperty, HtmlParser.schema);
@@ -42,13 +42,24 @@ public class Html {
             throw new RuntimeException(e);
         }
 
-        HtmlToSpannedConverter converter = getConverter(source, parser, context);
+        HtmlToSpannedConverter converter = getSpanConverter(source, parser, context);
 
         return converter.convert();
     }
 
-    public HtmlToSpannedConverter getConverter(String source,
-            Parser parser, Context context) {
+    /**
+     * Returns plain text representation of the provided HTML string.
+     */
+    public String toPlainText(String source) {
+        return getPlainTextConverter(source).convert();
+    }
+
+    private HtmlToPlainTextConverter getPlainTextConverter(String source) {
+        return new HtmlToPlainTextConverter(source);
+    }
+
+    public HtmlToSpannedConverter getSpanConverter(String source,
+                                                   Parser parser, Context context) {
         return new HtmlToSpannedConverter(source, parser, context);
     }
 

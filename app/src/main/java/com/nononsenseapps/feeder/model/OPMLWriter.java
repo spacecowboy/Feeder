@@ -2,10 +2,7 @@ package com.nononsenseapps.feeder.model;
 
 
 import android.util.Log;
-
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.function.Function;
-import com.nononsenseapps.feeder.function.Supplier;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -13,6 +10,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class OPMLWriter {
 
@@ -59,7 +58,7 @@ public class OPMLWriter {
                         // Indent inside tags
                         bf.write("  ");
                     }
-                    bf.write(String.format(FEEDFMT, escape(feed.title), escape(feed.url)));
+                    bf.write(String.format(FEEDFMT, escape(feed.customTitle), escape(feed.url)));
                 }
 
                 if (tag != null && !tag.isEmpty()) {

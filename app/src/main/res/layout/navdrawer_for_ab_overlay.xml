@@ -25,65 +25,6 @@
     android:theme="@style/NavbarTheme"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?colorPrimary">
-    <RelativeLayout
-        android:id="@+id/account_box"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:background="?selectableItemBackground"
-        android:clickable="true"
-        android:paddingBottom="@dimen/keyline_1"
-        android:paddingEnd="@dimen/keyline_1"
-        android:paddingStart="@dimen/keyline_1"
-        android:paddingTop="@dimen/keyline_1">
-
-        <ImageView
-            android:id="@+id/icon_img"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_action_settings" />
-
-        <TextView
-            android:id="@+id/user_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginBottom="2dp"
-            android:layout_toStartOf="@id/icon_img"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-light"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:text="@string/username"
-            android:textColor="@color/navdrawer_account_textcolor"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/server_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/user_text"
-            android:layout_marginTop="2dp"
-            android:layout_toStartOf="@id/icon_img"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:text="@string/server_address"
-            android:textColor="@color/navdrawer_account_textcolor"
-            android:textSize="12sp" />
-
-    </RelativeLayout>
-    </FrameLayout>
-
     <!--<View-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="1dp"-->

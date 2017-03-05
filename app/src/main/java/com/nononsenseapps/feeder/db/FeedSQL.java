@@ -36,13 +36,13 @@ public class FeedSQL {
     public static final String COL_ID = "_id";
     // These fields can be anything you want.
     public static final String COL_TITLE = "title";
+    public static final String COL_CUSTOM_TITLE = "customtitle";
     public static final String COL_URL = "url";
     public static final String COL_TAG = "tag";
-    public static final String COL_TIMESTAMP = "timestamp";
     public static final String COL_NOTIFY = "notify";
     // For database projection so order is consistent
     public static final String[] FIELDS = {COL_ID, COL_TITLE, COL_URL,
-            COL_TAG, COL_TIMESTAMP, COL_NOTIFY};
+            COL_TAG, COL_CUSTOM_TITLE, COL_NOTIFY };
     /*
      * The SQL code that creates a Table for storing stuff in.
      * Note that the last row does NOT end in a comma like the others.
@@ -52,9 +52,9 @@ public class FeedSQL {
             "CREATE TABLE " + TABLE_NAME + "("
                     + COL_ID + " INTEGER PRIMARY KEY,"
                     + COL_TITLE + " TEXT NOT NULL,"
+                    + COL_CUSTOM_TITLE + " TEXT NOT NULL,"
                     + COL_URL + " TEXT NOT NULL,"
                     + COL_TAG + " TEXT NOT NULL DEFAULT '',"
-                    + COL_TIMESTAMP + " TEXT,"
                     + COL_NOTIFY + " INTEGER NOT NULL DEFAULT 0,"
                     // Unique constraint
                     + " UNIQUE(" + COL_URL + ") ON CONFLICT REPLACE"
@@ -62,7 +62,7 @@ public class FeedSQL {
     // Used on count view
     public static final String COL_UNREADCOUNT = "unreadcount";
     public static final String[] FIELDS_VIEWCOUNT = {COL_ID, COL_TITLE,
-            COL_URL, COL_TAG, COL_TIMESTAMP, COL_NOTIFY, COL_UNREADCOUNT};
+            COL_URL, COL_TAG, COL_CUSTOM_TITLE, COL_NOTIFY, COL_UNREADCOUNT};
     public static final String CREATE_COUNT_VIEW =
             "CREATE TEMP VIEW IF NOT EXISTS " + VIEWCOUNT_NAME
                     + " AS SELECT " + Util.arrayToCommaString(FIELDS_VIEWCOUNT)
@@ -91,9 +91,9 @@ public class FeedSQL {
     // Fields corresponding to database columns
     public long id = -1;
     public String title = null;
+    public String customTitle = null;
     public String url = null;
     public String tag = null;
-    public String timestamp = null;
     public int notify = 0;
     public int unreadCount = -1;
 
@@ -113,11 +113,6 @@ public class FeedSQL {
         return this;
     }
 
-    public FeedSQL withTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-        return this;
-    }
-
     public FeedSQL withTag(String tag) {
         this.tag = tag;
         return this;
@@ -130,6 +125,11 @@ public class FeedSQL {
 
     public FeedSQL withTitle(String title) {
         this.title = title;
+        return this;
+    }
+
+    public FeedSQL withCustomTitle(String title) {
+        this.customTitle = title;
         return this;
     }
 
@@ -147,7 +147,7 @@ public class FeedSQL {
         this.title = cursor.getString(1);
         this.url = cursor.getString(2);
         this.tag = cursor.getString(3);
-        this.timestamp = cursor.getString(4);
+        this.customTitle = cursor.getString(4);
         this.notify = cursor.getInt(5);
         if (cursor.getColumnCount() >= 7) {
             this.unreadCount = cursor.getInt(6);
@@ -174,15 +174,12 @@ public class FeedSQL {
         final ContentValues values = new ContentValues();
         // Note that ID is NOT included here
         values.put(COL_TITLE, title);
+        values.put(COL_CUSTOM_TITLE, customTitle);
         values.put(COL_URL, url);
         if (tag == null)
             tag = "";
         values.put(COL_TAG, tag);
         values.put(COL_NOTIFY, notify);
-        if (timestamp == null)
-            values.putNull(COL_TIMESTAMP);
-        else
-            values.put(COL_TIMESTAMP, timestamp);
 
         return values;
     }

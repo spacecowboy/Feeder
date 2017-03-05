@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    buildToolsVersion "24.0.0"
+    buildToolsVersion '25.0.2'
 
     defaultConfig {
         applicationId "com.nononsenseapps.feeder"
         versionCode 2
         versionName "1.1"
-        compileSdkVersion 24
+        compileSdkVersion 25
         minSdkVersion 24
-        targetSdkVersion 24
+        targetSdkVersion 25
 
         // Reduce bloat by removing stuff we don't need
         // Only support english right now
@@ -33,8 +33,8 @@ android {
             minifyEnabled false
         }
         release {
-            minifyEnabled true
-            shrinkResources true
+            //minifyEnabled true
+            //shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -50,13 +50,16 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.android.support:recyclerview-v7:25.2.0'
+    compile 'com.android.support:support-v4:25.2.0'
+    compile "com.android.support:appcompat-v7:25.2.0"
+    compile 'com.android.support:design:25.2.0'
+
+    // Better times
     compile 'joda-time:joda-time:2.3'
+
+    // HTML parsing
     compile 'org.jsoup:jsoup:1.7.3'
-    compile 'com.squareup.retrofit:retrofit:1.6.1'
-    compile 'com.android.support:support-v4:24.2.1'
-    compile "com.android.support:appcompat-v7:24.2.1"
-    compile 'com.android.support:design:24.2.1'
 
     // RSS
     compile 'com.rometools:rome:1.7.1'
@@ -67,7 +70,8 @@ dependencies {
     compile 'com.github.castorflex.smoothprogressbar:library-circular:1.0.1'
 
     // Image loading
-    compile 'com.github.bumptech.glide:glide:3.5.2'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
 
     // tests
     testCompile 'junit:junit:4.12'

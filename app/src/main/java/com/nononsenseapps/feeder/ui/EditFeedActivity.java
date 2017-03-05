@@ -11,7 +11,6 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,9 +30,9 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.FeedParseLoader;
-import com.nononsenseapps.feeder.model.RssSyncHelper;
 import com.nononsenseapps.feeder.util.LoaderResult;
 import com.nononsenseapps.feeder.views.FloatLabelLayout;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -98,7 +97,7 @@ public class EditFeedActivity extends Activity
         mListResults.setOnItemClickListener((parent, view, position, id1) -> {
             SyndFeed entry =
                     mResultAdapter.getItem(position);
-            useEntry(entry.getTitle(), entry.getLink());
+            useEntry(entry.getTitle(), mFeedUrl);
         });
 
         mTextSearch.setOnEditorActionListener(
@@ -115,9 +114,9 @@ public class EditFeedActivity extends Activity
                         }
 
                         // Issue search
+                        mFeedUrl = mTextSearch.getText().toString().trim();
                         Bundle args = new Bundle();
-                        args.putString(SEARCHQUERY,
-                                mTextSearch.getText().toString().trim());
+                        args.putString(SEARCHQUERY, mFeedUrl);
                         getLoaderManager().restartLoader(RSSFINDER, args,
                                 EditFeedActivity.this);
                         return true;
@@ -133,25 +132,22 @@ public class EditFeedActivity extends Activity
 
                     values.put(FeedSQL.COL_TITLE,
                             mTextTitle.getText().toString().trim());
+                    values.put(FeedSQL.COL_CUSTOM_TITLE, values.getAsString(FeedSQL.COL_TITLE));
                     values.put(FeedSQL.COL_TAG,
                             mTextTag.getText().toString().trim());
+                    values.put(FeedSQL.COL_URL,
+                            mTextUrl.getText().toString().trim());
                     if (id < 1) {
-                        values.put(FeedSQL.COL_URL,
-                                mTextUrl.getText().toString().trim());
                         Uri uri = getContentResolver()
                                 .insert(FeedSQL.URI_FEEDS, values);
                         id = Long.parseLong(uri.getLastPathSegment());
+                        RssContentProvider.RequestSync(id);
                     } else {
                         getContentResolver().update(Uri.withAppendedPath(
                                 FeedSQL.URI_FEEDS,
                                 Long.toString(id)), values, null,
                                 null);
                     }
-
-                    RssSyncHelper.uploadFeedAsync(EditFeedActivity.this, id,
-                            mTextTitle.getText().toString().trim(),
-                            mTextUrl.getText().toString().trim(),
-                            mTextTag.getText().toString().trim());
 
                     finish();
                     if (mShouldFinishBack) {
@@ -176,8 +172,8 @@ public class EditFeedActivity extends Activity
                 mDetailsFrame.setVisibility(View.VISIBLE);
                 if (id > 0) {
                     // Don't allow editing url, but allow copying the text
-                    mTextUrl.setInputType(InputType.TYPE_NULL);
-                    mTextUrl.setTextIsSelectable(true);
+                    //mTextUrl.setInputType(InputType.TYPE_NULL);
+                    //mTextUrl.setTextIsSelectable(true);
                     // Focus on tag
                     mTextTag.requestFocus();
                     addButton.setText(getString(R.string.save));
@@ -380,8 +376,6 @@ public class EditFeedActivity extends Activity
         mLoadingProgress.setVisibility(View.GONE);
         SyndFeed feed = data.result();
         if (feed != null) {
-            useEntry(feed.getTitle(),
-                    feed.getLink());
             mDetailsFrame.setVisibility(View.GONE);
             mSearchFrame.setVisibility(View.VISIBLE);
             mListResults.setVisibility(View.VISIBLE);
@@ -522,6 +516,7 @@ public class EditFeedActivity extends Activity
 
             vh.textTitle.setText(entry.getTitle());
             vh.textDescription.setText(entry.getDescription());
+            // Really do want to use the normal link here and not self link
             vh.textUrl.setText(entry.getLink());
 
             return v;

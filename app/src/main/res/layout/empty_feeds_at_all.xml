@@ -17,17 +17,6 @@
     android:gravity="center"/>
 
 <TextView
-    android:id="@+id/empty_login"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    style="@style/TextAppearance.EmptyView"
-    android:paddingTop="16dp"
-    android:paddingBottom="16dp"
-    android:background="?android:selectableItemBackground"
-    android:text="@string/empty_no_feeds_login"
-    android:gravity="center"/>
-
-<TextView
     android:id="@+id/empty_add_feed"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

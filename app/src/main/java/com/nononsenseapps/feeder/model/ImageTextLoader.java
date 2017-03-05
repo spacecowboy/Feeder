@@ -37,12 +37,12 @@ import android.util.Log;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.text.HtmlConverter;
 import com.nononsenseapps.text.HtmlToSpannedConverter;
 
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
@@ -190,8 +190,8 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
 //        } catch (IOException e) {
 //            Log.e("JONAS2", "" + e.getMessage());
 //        }
-        MyHtml html = new MyHtml();
-        return html.fromHtml(mText, getContext());
+        MyHtmlConverter html = new MyHtmlConverter();
+        return html.toSpanned(mText, getContext());
     }
 
     /**
@@ -284,9 +284,9 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
         onStopLoading();
     }
 
-    class MyHtml extends com.nononsenseapps.text.Html {
-        public HtmlToSpannedConverter getConverter(String source,
-                Parser parser, Context context) {
+    class MyHtmlConverter extends HtmlConverter {
+        public HtmlToSpannedConverter getSpanConverter(String source,
+                                                       Parser parser, Context context) {
             return new PicassoConverter(source, parser, context);
         }
     }

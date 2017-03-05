@@ -13,6 +13,10 @@ public class Util {
     // Does not include "where"
     public static final String WHEREIDIS = "_ID IS ?";
 
+    public static String WhereIs(final String col) {
+        return String.format("%s IS ?", col);
+    }
+
     /**
      * Returns a String which tells the database to ignore case when sorting.
      * @param col the column to sort on

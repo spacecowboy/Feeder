@@ -32,7 +32,7 @@
     <string name="empty_feed_add">
         <![CDATA[<font color="#607D8B">Add</font> more feeds?]]></string>
     <string name="empty_no_feeds_top">Nothing to read yet.\nGet started
-        by…</string>
+        by</string>
     <string name="empty_no_feeds_login">
         <![CDATA[<font color="#607D8B">Logging in</font> to the
         server and…]]></string>

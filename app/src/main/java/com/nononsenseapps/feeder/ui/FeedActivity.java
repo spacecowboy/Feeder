@@ -11,7 +11,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
@@ -19,17 +18,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
-import com.nononsenseapps.feeder.function.Function;
-import com.nononsenseapps.feeder.function.Supplier;
-import com.nononsenseapps.feeder.model.AuthHelper;
+import com.nononsenseapps.feeder.model.OPMLContenProvider;
 import com.nononsenseapps.feeder.model.OPMLParser;
 import com.nononsenseapps.feeder.model.OPMLWriter;
-import com.nononsenseapps.feeder.model.RssLocalSync;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import org.xml.sax.SAXException;
@@ -107,19 +102,6 @@ public class FeedActivity extends BaseActivity {
         mEmptyView = findViewById(android.R.id.empty);
         mEmptyView.setVisibility(mFragment == null ? View.VISIBLE : View.GONE);
 
-        TextView emptyLogin = (TextView) findViewById(R.id.empty_login);
-        emptyLogin.setVisibility(null == AuthHelper.getSavedAccountName(this) ?
-                View.VISIBLE :
-                View.GONE);
-        emptyLogin.setText(
-                android.text.Html.fromHtml(getString(R.string.empty_no_feeds_login)));
-        emptyLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                askForLogin();
-            }
-        });
-
         TextView emptyAddFeed = (TextView) findViewById(R.id.empty_add_feed);
         emptyAddFeed.setText(
                 android.text.Html.fromHtml(getString(R.string.empty_no_feeds_add)));
@@ -188,11 +170,6 @@ public class FeedActivity extends BaseActivity {
         }
     }
 
-    private void askForLogin() {
-        DialogFragment dialog = new AccountDialog();
-        dialog.show(getSupportFragmentManager(), "account_dialog");
-    }
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -233,9 +210,6 @@ public class FeedActivity extends BaseActivity {
         } else if (R.id.action_debug_log == id) {
             startActivity(new Intent(this, DebugLogActivity.class));
             return true;
-        } else if (R.id.action_debug_sync == id) {
-            RssLocalSync.syncFeeds(this);
-            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -251,54 +225,48 @@ public class FeedActivity extends BaseActivity {
                     OutputStream os = getContentResolver().openOutputStream(uri);
                     OPMLWriter writer = new OPMLWriter();
                     writer.writeOutputStream(os,
-                            new Supplier<Iterable<String>>() {
-                                @Override
-                                public Iterable<String> get() {
-                                    ArrayList<String> tags = new ArrayList<>();
+                            () -> {
+                                ArrayList<String> tags = new ArrayList<>();
 
-                                    Cursor c = FeedActivity.this.getContentResolver()
-                                            .query(FeedSQL.URI_TAGSWITHCOUNTS,
-                                                    Util.ToStringArray(FeedSQL.COL_TAG), null, null,
-                                                    null);
+                                Cursor c = FeedActivity.this.getContentResolver()
+                                        .query(FeedSQL.URI_TAGSWITHCOUNTS,
+                                                Util.ToStringArray(FeedSQL.COL_TAG), null, null,
+                                                null);
 
-                                    try {
-                                        while (c.moveToNext()) {
-                                            tags.add(c.getString(0));
-                                        }
-                                    } finally {
-                                        if (c != null) {
-                                            c.close();
-                                        }
+                                try {
+                                    while (c.moveToNext()) {
+                                        tags.add(c.getString(0));
                                     }
-
-                                    return tags;
+                                } finally {
+                                    if (c != null) {
+                                        c.close();
+                                    }
                                 }
+
+                                return tags;
                             },
-                            new Function<String, Iterable<FeedSQL>>() {
-                                @Override
-                                public Iterable<FeedSQL> apply(String tag) {
-                                    ArrayList<FeedSQL> feeds = new ArrayList<>();
+                            tag -> {
+                                ArrayList<FeedSQL> feeds = new ArrayList<>();
 
-                                    final String where = FeedSQL.COL_TAG + " IS ?";
-                                    final String[] args = Util.ToStringArray(tag == null ? "": tag);
-                                    Cursor c = FeedActivity.this.getContentResolver()
-                                            .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
-                                                    where, args, null);
+                                final String where = FeedSQL.COL_TAG + " IS ?";
+                                final String[] args = Util.ToStringArray(tag == null ? "": tag);
+                                Cursor c = FeedActivity.this.getContentResolver()
+                                        .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
+                                                where, args, null);
 
-                                    try {
-                                        while (c.moveToNext()) {
-                                            feeds.add(new FeedSQL(c));
-                                        }
-                                    } finally {
-                                        if (c != null) {
-                                            c.close();
-                                        }
+                                try {
+                                    while (c.moveToNext()) {
+                                        feeds.add(new FeedSQL(c));
                                     }
-
-                                    return feeds;
+                                } finally {
+                                    if (c != null) {
+                                        c.close();
+                                    }
                                 }
+
+                                return feeds;
                             }
-                    );
+                                            );
                     os.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -311,31 +279,14 @@ public class FeedActivity extends BaseActivity {
                 Uri uri = resultData.getData();
                 try {
                     InputStream is = getContentResolver().openInputStream(uri);
-                    OPMLParser parser = new OPMLParser(this);
+                    OPMLParser parser = new OPMLParser(new OPMLContenProvider(this));
                     parser.parseInputStream(is);
                     is.close();
+                    RssContentProvider.RequestSync();
                 } catch (SAXException | IOException e) {
                     // TODO tell user about error
                 }
             }
-        }
-    }
-
-    /**
-     * Request a sync or ask for account if required.
-     *
-     * @return true if sync is underway, or false otherwise
-     */
-    public boolean syncOrConfig() {
-        if (null == AuthHelper.getSavedAccountName(this)) {
-            askForLogin();
-            return false;
-        } else {
-            Toast.makeText(this, "Syncing feeds...", Toast.LENGTH_SHORT).show();
-            //RssSyncHelper.syncFeeds(this);
-            RssContentProvider.RequestSync(this);
-
-            return true;
         }
     }
 

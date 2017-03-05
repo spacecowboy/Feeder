@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nononsenseapps.feeder" >
+    package="com.nononsenseapps.feeder">
 
     <!-- Import export feeds -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -19,11 +19,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".ui.FeedActivity"
             android:label="@string/app_name"
-            android:theme="@style/FeedsTheme" >
+            android:theme="@style/FeedsTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,7 +34,7 @@
             android:name=".ui.DebugLogActivity"
             android:label="@string/app_name"
             android:parentActivityName=".ui.FeedActivity"
-            android:theme="@style/AppTheme" >
+            android:theme="@style/AppTheme">
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -44,8 +44,8 @@
             android:name=".ui.ReaderActivity"
             android:label="@string/app_name"
             android:parentActivityName=".ui.FeedActivity"
-            android:theme="@style/ReaderTheme" >
->
+            android:theme="@style/ReaderTheme">
+            >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
@@ -55,7 +55,7 @@
             android:label="@string/title_activity_edit_feed"
             android:parentActivityName=".ui.FeedActivity"
             android:theme="@style/EditFeedTheme"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
+            android:windowSoftInputMode="adjustResize|stateVisible">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
@@ -83,17 +83,12 @@
             android:authorities="com.nononsenseapps.feeder.provider"
             android:enabled="true"
             android:exported="false"
-            android:label="@string/app_name" >
-        </provider>
+            android:label="@string/app_name"></provider>
 
-        <service
-            android:name=".model.RssSyncHelper"
-            android:exported="false" >
-        </service>
         <service
             android:name=".model.RssSyncAdapterService"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -104,7 +99,16 @@
         </service>
         <service
             android:name=".db.RssDatabaseService"
-            android:exported="false" >
+            android:exported="false"></service>
+        <service
+            android:name=".db.AccountService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
         </service>
     </application>
 
