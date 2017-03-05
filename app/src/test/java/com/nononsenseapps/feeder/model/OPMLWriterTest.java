@@ -39,6 +39,7 @@ public class OPMLWriterTest {
                             .withNotify(0)
                             .withTag(tag)
                             .withTitle("A \"feeditem\" with id '9' > 0 & < 10")
+                            .withCustomTitle("A \"feeditem\" with id '9' > 0 & < 10")
                             .withUnreadCount(2)
                             .withUrl("http://somedomain.com/rss.xml?format=feed&type=rss"));
                     return result;
