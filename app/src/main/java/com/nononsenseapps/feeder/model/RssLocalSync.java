@@ -140,7 +140,7 @@ public class RssLocalSync {
                   .withValue(FeedItemSQL.COL_FEEDTITLE, entry.getTitle())
                   .withValue(FeedItemSQL.COL_TAG,
                           feedSQL.tag == null ? "" : feedSQL.tag)
-                  //.withValue(FeedItemSQL.COL_IMAGEURL, entry.get.image)
+                  .withValue(FeedItemSQL.COL_IMAGEURL, FeedParser.thumbnail(entry))
                   .withValue(FeedItemSQL.COL_ENCLOSURELINK, FeedParser.firstEnclosure(entry))
                   .withValue(FeedItemSQL.COL_AUTHOR, entry.getAuthor())
                   .withValue(FeedItemSQL.COL_PUBDATE, FeedParser.publishDate(entry))

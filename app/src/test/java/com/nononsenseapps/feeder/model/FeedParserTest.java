@@ -46,6 +46,8 @@ public class FeedParserTest {
         assertEquals("För tredje månaden på raken ligger Konjunkturinsitutets barometerindikator (\"konjunkturbarometern\") kvar i överhettat läge. Det råder alltså en klart och tydligt långsiktig säljsignal i enlighet med k",
                 FeedParser.snippet(entry));
         assertTrue(FeedParser.description(entry).startsWith("För tredje månaden på raken"));
+        assertEquals("https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s72-c/konj.png",
+                FeedParser.thumbnail(entry));
 
         assertEquals(null, FeedParser.firstEnclosure(entry));
     }
@@ -68,6 +70,8 @@ public class FeedParserTest {
         assertEquals("För tredje månaden på raken ligger Konjunkturinsitutets barometerindikator (\"konjunkturbarometern\") kvar i överhettat läge. Det råder alltså en klart och tydligt långsiktig säljsignal i enlighet med k",
                 FeedParser.snippet(entry));
         assertTrue(FeedParser.description(entry).startsWith("För tredje månaden på raken"));
+        assertEquals("https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s72-c/konj.png",
+                FeedParser.thumbnail(entry));
 
         assertEquals(null, FeedParser.firstEnclosure(entry));
     }

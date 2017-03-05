@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import com.nononsenseapps.text.HtmlToPlainTextConverter;
+import com.rometools.modules.mediarss.MediaModule;
+import com.rometools.modules.mediarss.types.Thumbnail;
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndEnclosure;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -206,6 +208,19 @@ public class FeedParser {
     public static String snippet(SyndEntry entry) {
         String text = HtmlToPlainTextConverter.HtmlToPlainText(FeedParser.description(entry));
         return text.substring(0, min(200, text.length()));
+    }
+
+    @Nullable
+    public static String thumbnail(SyndEntry entry) {
+        MediaModule media = (MediaModule) entry.getModule(MediaModule.URI);
+        if (media != null) {
+            Thumbnail[] thumbnails = media.getMetadata().getThumbnail();
+            if (thumbnails != null && thumbnails.length > 0) {
+                return thumbnails[0].getUrl().toString();
+            }
+        }
+
+        return null;
     }
 
     public static class FeedParsingError extends Exception {
