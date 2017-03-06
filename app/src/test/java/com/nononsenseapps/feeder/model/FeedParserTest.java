@@ -18,14 +18,18 @@ public class FeedParserTest {
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
-    public void basic() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed("https://cowboyprogrammer.org/index.xml", tempFolder.newFolder());
+    public void cowboy() throws Exception {
+        SyndFeed feed = FeedParser.parseFeed(getCowboy());
         assertNotNull(feed);
 
         assertNull(FeedParser.selfLink(feed));
 
-        // TODO this test should not rely on internet
         assertEquals(15, feed.getEntries().size());
+
+        SyndEntry entry = feed.getEntries().get(1);
+
+        assertEquals("https://cowboyprogrammer.org/images/zopfli_all_the_things.jpg",
+                FeedParser.thumbnail(entry));
     }
 
     @Test
@@ -82,5 +86,9 @@ public class FeedParserTest {
 
     private InputStream getRSS() {
         return getClass().getResourceAsStream("rss_cornucopia.xml");
+    }
+
+    private InputStream getCowboy() {
+        return getClass().getResourceAsStream("rss_cowboy.xml");
     }
 }
