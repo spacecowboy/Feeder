@@ -1,3 +1,4 @@
 include ':app'
 
-includeBuild 'rome'
+// idea doesn't support composite builds yet
+//includeBuild 'rome'

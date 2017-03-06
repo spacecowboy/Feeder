@@ -61,10 +61,11 @@ dependencies {
     // HTML parsing
     compile 'org.jsoup:jsoup:1.7.3'
 
-    // RSS - will use git submodule because the standard jar packaging
-    // will raise duplicateFileException
+    // RSS
     compile 'com.rometools:rome:1.7.1'
-    compile 'com.rometools:rome-modules:1.7.1'
+    // will use jar from git submodule because the standard jar packaging
+    // will raise duplicateFileException and android studio doesn't support composite build yet
+    //compile 'com.rometools:rome-modules:1.7.1'
 
     // For better fetching
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
