@@ -137,7 +137,7 @@ public class RssLocalSync {
             // Next all the other values. Make sure non null
             itemOp.withValue(FeedItemSQL.COL_GUID, entry.getUri())
                   .withValue(FeedItemSQL.COL_LINK, entry.getLink())
-                  .withValue(FeedItemSQL.COL_FEEDTITLE, entry.getTitle())
+                  .withValue(FeedItemSQL.COL_FEEDTITLE, feedSQL.title)
                   .withValue(FeedItemSQL.COL_TAG,
                           feedSQL.tag == null ? "" : feedSQL.tag)
                   .withValue(FeedItemSQL.COL_IMAGEURL, FeedParser.thumbnail(entry))
