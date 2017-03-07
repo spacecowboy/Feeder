@@ -80,6 +80,23 @@ public class FeedParserTest {
         assertEquals(null, FeedParser.firstEnclosure(entry));
     }
 
+    @Test
+    public void morningPaper() throws Exception {
+        SyndFeed feed = FeedParser.parseFeed(getMorningPaper());
+
+        assertEquals("https://blog.acolyer.org", feed.getLink());
+        assertNull(FeedParser.selfLink(feed));
+
+        assertEquals(10, feed.getEntries().size());
+        SyndEntry entry = feed.getEntries().get(0);
+
+        assertEquals("Thou shalt not depend on me: analysing the use of outdated JavaScript libraries on the web",
+                FeedParser.plainTitle(entry));
+
+        assertEquals("http://1.gravatar.com/avatar/a795b4f89a6d096f314fc0a2c80479c1?s=96&d=identicon&r=G",
+                FeedParser.thumbnail(entry));
+    }
+
     private InputStream getAtom() {
         return getClass().getResourceAsStream("atom_cornucopia.xml");
     }
@@ -90,5 +107,9 @@ public class FeedParserTest {
 
     private InputStream getCowboy() {
         return getClass().getResourceAsStream("rss_cowboy.xml");
+    }
+
+    private InputStream getMorningPaper() {
+        return getClass().getResourceAsStream("rss_morningpaper.xml");
     }
 }

@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import com.nononsenseapps.text.HtmlToPlainTextConverter;
+import com.rometools.modules.mediarss.MediaEntryModule;
 import com.rometools.modules.mediarss.MediaModule;
+import com.rometools.modules.mediarss.types.MediaContent;
 import com.rometools.modules.mediarss.types.Thumbnail;
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndEnclosure;
@@ -212,11 +214,20 @@ public class FeedParser {
 
     @Nullable
     public static String thumbnail(SyndEntry entry) {
-        MediaModule media = (MediaModule) entry.getModule(MediaModule.URI);
+        MediaEntryModule media = (MediaEntryModule) entry.getModule(MediaModule.URI);
         if (media != null) {
             Thumbnail[] thumbnails = media.getMetadata().getThumbnail();
             if (thumbnails != null && thumbnails.length > 0) {
                 return thumbnails[0].getUrl().toString();
+            }
+            // Fallback to images
+            MediaContent[] contents = media.getMediaContents();
+            if (contents != null && contents.length > 0) {
+                for (MediaContent content: contents) {
+                    if ("image".equalsIgnoreCase(content.getMedium())) {
+                        return content.getReference().toString();
+                    }
+                }
             }
         }
 
