@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.model;
 
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -97,6 +98,24 @@ public class FeedParserTest {
                 FeedParser.thumbnail(entry));
     }
 
+    @Test
+    @Ignore
+    public void fz() throws Exception {
+        SyndFeed feed = FeedParser.parseFeed(getFz());
+
+        assertEquals("http://www.fz.se/nyheter/", feed.getLink());
+        assertNull(FeedParser.selfLink(feed));
+
+        assertEquals(20, feed.getEntries().size());
+        SyndEntry entry = feed.getEntries().get(0);
+
+        assertEquals("Nier: Automata bjuder på maffig lanseringstrailer",
+                FeedParser.plainTitle(entry));
+
+        assertEquals("http://d2ihp3fq52ho68.cloudfront.net/YTo2OntzOjI6ImlkIjtpOjEzOTI3OTM7czoxOiJ3IjtpOjUwMDtzOjE6ImgiO2k6OTk5OTtzOjE6ImMiO2k6MDtzOjE6InMiO2k6MDtzOjE6ImsiO3M6NDA6IjU5YjA2YjgyZjkyY2IxZjBiMDZjZmI5MmE3NTk5NjMzMjIyMmU4NGMiO30=",
+                FeedParser.thumbnail(entry));
+    }
+
     private InputStream getAtom() {
         return getClass().getResourceAsStream("atom_cornucopia.xml");
     }
@@ -111,5 +130,9 @@ public class FeedParserTest {
 
     private InputStream getMorningPaper() {
         return getClass().getResourceAsStream("rss_morningpaper.xml");
+    }
+
+    private InputStream getFz() {
+        return getClass().getResourceAsStream("rss_fz.xml");
     }
 }
