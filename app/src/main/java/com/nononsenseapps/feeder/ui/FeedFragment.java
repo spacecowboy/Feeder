@@ -462,6 +462,7 @@ public class FeedFragment extends Fragment
             getActivity().getContentResolver()
                     .delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
                             Util.LongsToStringArray(this.id));
+            RssContentProvider.notifyAllUris(getActivity());
 
             // Tell activity to open another fragment
             ((FeedActivity) getActivity()).loadFirstFeedInDB(true);

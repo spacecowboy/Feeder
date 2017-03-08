@@ -35,51 +35,56 @@ public class RssLocalSync {
      * @param tag of feeds to sync, only used if feedId is less than 1. If empty, all feeds are synced.
      */
     public static void syncFeeds(final Context context, long feedId, @NonNull String tag) {
-        DateTime start = DateTime.now();
         FileLog log = FileLog.instance(context);
-
-        // Get all stored feeds
-        final List<FeedSQL> feeds;
-        if (feedId > 0) {
-            feeds = listFeed(context, feedId);
-        } else if (!tag.isEmpty()) {
-            feeds = listFeeds(context, tag);
-        } else {
-            feeds = listFeeds(context);
-        }
-        log.d(String.format("Syncing %d feeds: %s", feeds.size(), start.toString()));
-
-        // Run in parallel - important each thread finishes in reasonable time
-        List<ContentProviderOperation> ops =
-                feeds.parallelStream()
-                     .flatMap(f -> syncAndParseFeed(f, context.getExternalCacheDir()))
-                     .collect(Collectors.toList());
-
         try {
-            storeSyncResults(context, ops);
-        } catch (RemoteException | OperationApplicationException e) {
-            log.d(e.getMessage());
+            DateTime start = DateTime.now();
+
+            // Get all stored feeds
+            final List<FeedSQL> feeds;
+            if (feedId > 0) {
+                feeds = listFeed(context, feedId);
+            } else if (!tag.isEmpty()) {
+                feeds = listFeeds(context, tag);
+            } else {
+                feeds = listFeeds(context);
+            }
+            log.d(String.format("Syncing %d feeds: %s", feeds.size(), start.toString()));
+
+            // Run in parallel - important each thread finishes in reasonable time
+            List<ContentProviderOperation> ops =
+                    feeds.parallelStream()
+                         .flatMap(f -> syncAndParseFeed(f, context.getExternalCacheDir()))
+                         .collect(Collectors.toList());
+
+            try {
+                storeSyncResults(context, ops);
+            } catch (RemoteException | OperationApplicationException e) {
+                log.d(e.getMessage());
+                e.printStackTrace();
+            }
+
+            // Finally, prune excessive items
+            try {
+                Cleanup.prune(context);
+            } catch (RemoteException | OperationApplicationException e) {
+                log.d(e.getMessage());
+                e.printStackTrace();
+            }
+
+            DateTime end = DateTime.now();
+
+            Duration duration = Duration.millis(end.getMillis() - start.getMillis());
+            log.d(String.format("Finished sync after %s with %d operations", duration.toString(),
+                    ops.size()));
+
+            // Notify that we've updated
+            RssContentProvider.notifyAllUris(context);
+            // Send notifications for configured feeds
+            RssNotifications.notify(context);
+        } catch (Throwable e) {
+            log.d("Some fatal error during sync: " + e.getMessage());
             e.printStackTrace();
         }
-
-        // Finally, prune excessive items
-        try {
-            Cleanup.prune(context);
-        } catch (RemoteException | OperationApplicationException e) {
-            log.d(e.getMessage());
-            e.printStackTrace();
-        }
-
-        DateTime end = DateTime.now();
-
-        Duration duration = Duration.millis(end.getMillis() - start.getMillis());
-        log.d(String.format("Finished sync after %s with %d operations", duration.toString(),
-                ops.size()));
-
-        // Notify that we've updated
-        RssContentProvider.notifyAllUris(context);
-        // Send notifications for configured feeds
-        RssNotifications.notify(context);
 
     }
 

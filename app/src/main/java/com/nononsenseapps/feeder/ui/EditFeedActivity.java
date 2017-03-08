@@ -141,13 +141,14 @@ public class EditFeedActivity extends Activity
                         Uri uri = getContentResolver()
                                 .insert(FeedSQL.URI_FEEDS, values);
                         id = Long.parseLong(uri.getLastPathSegment());
-                        RssContentProvider.RequestSync(id);
                     } else {
                         getContentResolver().update(Uri.withAppendedPath(
                                 FeedSQL.URI_FEEDS,
                                 Long.toString(id)), values, null,
                                 null);
                     }
+                    RssContentProvider.notifyAllUris(EditFeedActivity.this);
+                    RssContentProvider.RequestSync(id);
 
                     finish();
                     if (mShouldFinishBack) {

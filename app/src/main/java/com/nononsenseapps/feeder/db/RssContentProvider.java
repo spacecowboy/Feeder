@@ -33,7 +33,6 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -52,9 +51,6 @@ public class RssContentProvider extends ContentProvider {
         FeedSQL.addMatcherUris(sURIMatcher);
         FeedItemSQL.addMatcherUris(sURIMatcher);
     }
-
-    // If the contentprovider notifies changes on uris
-    private static boolean sShouldNotify = true;
 
     public RssContentProvider() {
     }
@@ -213,23 +209,16 @@ public class RssContentProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         Uri result;
-        Uri[] notifyUris;
         final String table;
 
         switch (sURIMatcher.match(uri)) {
             case FeedSQL.URICODE:
                 table = FeedSQL.TABLE_NAME;
                 result = FeedSQL.URI_FEEDS;
-                notifyUris = new Uri[]{FeedSQL.URI_FEEDS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS,
-                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedItemSQL.URICODE:
                 table = FeedItemSQL.TABLE_NAME;
                 result = FeedItemSQL.URI_FEED_ITEMS;
-                notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS,
-                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
@@ -242,49 +231,37 @@ public class RssContentProvider extends ContentProvider {
             result = Uri.withAppendedPath(result, Long.toString(id));
         }
 
-        if (result != null && notifyUris != null) {
-            notifyChange(notifyUris);
-        }
         return result;
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int result = 0;
-        Uri[] notifyUris = null;
 
         switch (sURIMatcher.match(uri)) {
             case FeedSQL.ITEMCODE:
                 result += delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.getLastPathSegment()));
-                notifyUris = new Uri[]{FeedSQL.URI_FEEDS,
-                        FeedItemSQL.URI_FEED_ITEMS};
                 break;
             case FeedSQL.URICODE:
                 result += DatabaseHandler.getInstance(getContext())
                         .getWritableDatabase()
                         .delete(FeedSQL.TABLE_NAME, selection, selectionArgs);
-                notifyUris = new Uri[]{FeedSQL.URI_FEEDS,
-                        FeedItemSQL.URI_FEED_ITEMS};
                 break;
             case FeedItemSQL.ITEMCODE:
                 result += delete(FeedItemSQL.URI_FEED_ITEMS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.getLastPathSegment()));
-                notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS};
                 break;
             case FeedItemSQL.URICODE:
                 result += DatabaseHandler.getInstance(getContext())
                         .getWritableDatabase()
                         .delete(FeedItemSQL.TABLE_NAME, selection,
                                 selectionArgs);
-                notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS};
                 break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
         }
-        if (notifyUris != null) {
-            notifyChange(notifyUris);
-        }
+
         return result;
     }
 
@@ -292,7 +269,6 @@ public class RssContentProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection,
             String[] selectionArgs) {
         final String table;
-        Uri[] notifyUris = null;
         int result = 0;
 
         switch (sURIMatcher.match(uri)) {
@@ -300,29 +276,17 @@ public class RssContentProvider extends ContentProvider {
                 table = FeedSQL.TABLE_NAME;
                 selection = Util.WHEREIDIS;
                 selectionArgs = Util.ToStringArray(uri.getLastPathSegment());
-                notifyUris = new Uri[]{FeedSQL.URI_FEEDS,
-                        FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedSQL.URICODE:
                 table = FeedSQL.TABLE_NAME;
-                notifyUris = new Uri[]{FeedSQL.URI_FEEDS,
-                        FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedItemSQL.ITEMCODE:
                 table = FeedItemSQL.TABLE_NAME;
                 selection = Util.WHEREIDIS;
                 selectionArgs = Util.ToStringArray(uri.getLastPathSegment());
-                notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS,
-                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             case FeedItemSQL.URICODE:
                 table = FeedItemSQL.TABLE_NAME;
-                notifyUris = new Uri[]{FeedItemSQL.URI_FEED_ITEMS,
-                        FeedSQL.URI_FEEDSWITHCOUNTS,
-                        FeedSQL.URI_TAGSWITHCOUNTS};
                 break;
             default:
                 throw new UnsupportedOperationException("Not yet implemented");
@@ -330,10 +294,6 @@ public class RssContentProvider extends ContentProvider {
 
         result = DatabaseHandler.getInstance(getContext()).getWritableDatabase()
                 .update(table, values, selection, selectionArgs);
-
-        if (result > 0 && notifyUris != null) {
-            notifyChange(notifyUris);
-        }
 
         return result;
     }
@@ -351,8 +311,6 @@ public class RssContentProvider extends ContentProvider {
             throws OperationApplicationException {
         final SQLiteDatabase db =
                 DatabaseHandler.getInstance(getContext()).getWritableDatabase();
-        // UI will explode if we don't block notifications
-        setShouldNotify(false);
         db.beginTransaction();
         try {
             final int numOperations = operations.size();
@@ -365,27 +323,6 @@ public class RssContentProvider extends ContentProvider {
             return results;
         } finally {
             db.endTransaction();
-            // Enable them again
-            setShouldNotify(true);
-        }
-    }
-
-    public static void setShouldNotify(final boolean b) {
-        sShouldNotify = b;
-    }
-
-    /**
-     * Notify that a change has happened on each specified uri
-     *
-     * @param uris
-     */
-    private void notifyChange(Uri... uris) {
-        if (!sShouldNotify) {
-            return;
-        }
-        for (Uri uri : uris) {
-            Log.d(TAG, "Notifying change: " + uri.toString());
-            getContext().getContentResolver().notifyChange(uri, null, false);
         }
     }
 

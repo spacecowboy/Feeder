@@ -282,6 +282,7 @@ public class FeedActivity extends BaseActivity {
                     OPMLParser parser = new OPMLParser(new OPMLContenProvider(this));
                     parser.parseInputStream(is);
                     is.close();
+                    RssContentProvider.notifyAllUris(this);
                     RssContentProvider.RequestSync();
                 } catch (SAXException | IOException e) {
                     // TODO tell user about error
