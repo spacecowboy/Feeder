@@ -124,6 +124,7 @@ public class RssDatabaseService extends IntentService {
                     RssContentProvider.MarkItemAsUnread(this, id);
                 }
             }
+            RssContentProvider.notifyAllUris(this);
         }
     }
 }
