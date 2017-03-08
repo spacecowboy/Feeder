@@ -83,6 +83,7 @@ public class RssContentProvider extends ContentProvider {
         context.getContentResolver()
                 .update(FeedItemSQL.URI_FEED_ITEMS, values, Util.WHEREIDIS,
                         Util.LongsToStringArray(itemId));
+        context.getContentResolver().notifyChange(FeedItemSQL.URI_FEED_ITEMS, null, false);
     }
 
     /**
@@ -98,6 +99,7 @@ public class RssContentProvider extends ContentProvider {
         context.getContentResolver()
                 .update(FeedItemSQL.URI_FEED_ITEMS, values, Util.WHEREIDIS,
                         Util.LongsToStringArray(itemId));
+        context.getContentResolver().notifyChange(FeedItemSQL.URI_FEED_ITEMS, null, false);
     }
 
     /**
@@ -113,6 +115,7 @@ public class RssContentProvider extends ContentProvider {
         context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
                 FeedItemSQL.COL_FEED + " IS ?",
                 Util.LongsToStringArray(feedId));
+        context.getContentResolver().notifyChange(FeedItemSQL.URI_FEED_ITEMS, null, false);
     }
 
     /**
@@ -127,6 +130,7 @@ public class RssContentProvider extends ContentProvider {
         values.put(FeedItemSQL.COL_UNREAD, 0);
         context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
                 FeedItemSQL.COL_TAG + " IS ?", Util.ToStringArray(tag));
+        context.getContentResolver().notifyChange(FeedItemSQL.URI_FEED_ITEMS, null, false);
     }
 
     @Override
