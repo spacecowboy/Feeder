@@ -27,7 +27,7 @@ public class RssSyncAdapterService extends Service {
         synchronized (sSyncAdapterLock) {
             if (sSyncAdapter == null) {
                 sSyncAdapter =
-                        new RssSyncAdapter(getApplicationContext(), true);
+                        new RssSyncAdapter(getApplicationContext(), true, false);
             }
         }
     }

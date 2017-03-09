@@ -81,11 +81,6 @@ public class RssLocalSync {
                                .collect(Collectors.toList());
             }
 
-            /*List<ContentProviderOperation> ops =
-                    feeds.parallelStream()
-                         .flatMap(f -> syncAndParseFeed(f, context.getExternalCacheDir()))
-                         .collect(Collectors.toList());*/
-
             try {
                 storeSyncResults(context, ops);
             } catch (RemoteException | OperationApplicationException e) {

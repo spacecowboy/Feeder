@@ -55,7 +55,7 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
      *         String, int)} with 1 if it
      */
     public RssSyncAdapter(final Context context, final boolean autoInitialize) {
-        super(context, autoInitialize);
+        this(context, autoInitialize, false);
     }
 
     /**
