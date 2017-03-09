@@ -6,6 +6,7 @@ import android.content.OperationApplicationException;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.util.Pair;
 import com.nononsenseapps.feeder.db.Cleanup;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
@@ -18,7 +19,12 @@ import org.joda.time.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,11 +56,35 @@ public class RssLocalSync {
             }
             log.d(String.format("Syncing %d feeds: %s", feeds.size(), start.toString()));
 
+            final List<Pair<FeedSQL,SyndFeed>> syndFeeds = Collections.synchronizedList(new ArrayList<>());
+            final File cacheDir = context.getExternalCacheDir();
+
             // Run in parallel - important each thread finishes in reasonable time
-            List<ContentProviderOperation> ops =
+            ExecutorService executorService = Executors.newCachedThreadPool();
+
+            feeds.forEach(f -> executorService.execute(
+                    () -> syncFeed(f, cacheDir).ifPresent(sf -> syndFeeds.add(Pair.create(f, sf)))));
+
+            // Call shutdown to reject incoming tasks
+            executorService.shutdown();
+
+            // Wait for tasks to terminate
+            if (!executorService.awaitTermination(1, TimeUnit.MINUTES)) {
+                // Force termination in case timeout was exceeded
+                executorService.shutdownNow();
+            }
+
+            final List<ContentProviderOperation> ops;
+            synchronized (syndFeeds) {
+                ops = syndFeeds.stream()
+                               .flatMap(pair -> convertResultToOperations(pair.second, pair.first).stream())
+                               .collect(Collectors.toList());
+            }
+
+            /*List<ContentProviderOperation> ops =
                     feeds.parallelStream()
                          .flatMap(f -> syncAndParseFeed(f, context.getExternalCacheDir()))
-                         .collect(Collectors.toList());
+                         .collect(Collectors.toList());*/
 
             try {
                 storeSyncResults(context, ops);
@@ -86,6 +116,16 @@ public class RssLocalSync {
             e.printStackTrace();
         }
 
+    }
+
+    private static Optional<SyndFeed> syncFeed(final FeedSQL feedSQL, final File cacheDir) {
+        try {
+            return Optional.of(FeedParser.parseFeed(feedSQL.url, cacheDir));
+        } catch (Throwable error) {
+            System.err.println("Error when syncing " + feedSQL.url);
+            error.printStackTrace();
+        }
+        return Optional.empty();
     }
 
     private static Stream<ContentProviderOperation> syncAndParseFeed(final FeedSQL feedSQL, final File cacheDir) {
