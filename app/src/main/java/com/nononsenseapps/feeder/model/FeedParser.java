@@ -22,7 +22,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.joda.time.DateTime;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -87,7 +89,12 @@ public class FeedParser {
             SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
             builder.sslSocketFactory(sslSocketFactory, trustManager)
-                   .hostnameVerifier(((hostname, session) -> true));
+                   .hostnameVerifier(new HostnameVerifier() {
+                       @Override
+                       public boolean verify(String hostname, SSLSession session) {
+                           return true;
+                       }
+                   });
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             e.printStackTrace();
         }
