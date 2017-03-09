@@ -3,11 +3,10 @@
     package="com.nononsenseapps.feeder">
 
     <!-- Import export feeds -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!-- Obvious.. -->
-    <uses-permission android:name="android.permission.INTERNET" />
     <!-- For syncing -->
-    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
@@ -79,7 +78,7 @@
             android:authorities="com.nononsenseapps.feeder.provider"
             android:enabled="true"
             android:exported="false"
-            android:label="@string/app_name"></provider>
+            android:label="@string/app_name"/>
 
         <service
             android:name=".model.RssSyncAdapterService"
@@ -95,7 +94,7 @@
         </service>
         <service
             android:name=".db.RssDatabaseService"
-            android:exported="false"></service>
+            android:exported="false"/>
         <service
             android:name=".db.AccountService"
             android:enabled="true"
