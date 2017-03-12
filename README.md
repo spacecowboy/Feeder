@@ -2,7 +2,7 @@
 
 ### License
 
-**GPLv2**, for more info see *LICENSE*.
+**GPLv3**, for more info see *LICENSE*.
 
 ### Quick install
 
