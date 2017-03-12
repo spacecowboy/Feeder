@@ -1,4 +1,4 @@
-include ':app'
+include ':app', ':rome/rome-utils', ':rome/rome', ':rome/rome-modules'
 
 // idea doesn't support composite builds yet
 //includeBuild 'rome'
