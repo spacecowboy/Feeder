@@ -33,13 +33,11 @@ import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.text.HtmlConverter;
 import com.nononsenseapps.text.HtmlToSpannedConverter;
-
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
 

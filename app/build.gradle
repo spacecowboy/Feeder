@@ -11,12 +11,6 @@ android {
         minSdkVersion 24
         targetSdkVersion 25
 
-        // Reduce bloat by removing stuff we don't need
-        // Only support english right now
-        //resConfigs "en"
-        // Low-res devices don't deserve dedicated resources
-        //resConfigs "nodpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"
-
         // Java8 please
         jackOptions {
             enabled true
@@ -33,8 +27,7 @@ android {
             minifyEnabled false
         }
         release {
-            //minifyEnabled true
-            //shrinkResources true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -60,6 +53,7 @@ dependencies {
 
     // HTML parsing
     compile 'org.jsoup:jsoup:1.7.3'
+    compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
 
     // RSS
     compile 'com.rometools:rome:1.7.1'
