@@ -43,7 +43,7 @@ public class Cleanup {
     public static void prune(final Context context) throws RemoteException, OperationApplicationException {
         // Delete all stale items in one batch (transaction)
         final ArrayList<ContentProviderOperation> operations =
-                new ArrayList<>();
+                new ArrayList<ContentProviderOperation>();
 
         // Fetch all feeds first
         List<Long> feedIds = getAllFeedIds(context);

@@ -110,7 +110,6 @@ public class ExpandableSortedList<T> extends SortedList<T> {
         }
 
         super.beginBatchedUpdates();
-
         for (T item : mGroups.get(parent)) {
             super.remove(item);
         }

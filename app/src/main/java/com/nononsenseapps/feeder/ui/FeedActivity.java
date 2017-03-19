@@ -83,7 +83,21 @@ public class FeedActivity extends BaseActivity {
         }
 
         // For add buttons
-        View.OnClickListener onAddListener = view -> startActivity(new Intent(FeedActivity.this, EditFeedActivity.class));
+        View.OnClickListener onAddListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                Intent i = new Intent(FeedActivity.this, EditFeedActivity.class);
+//        if (view == mAddButton) {
+//          i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
+//          ActivityOptions options = ActivityOptions
+//              .makeScaleUpAnimation(view, 0, 0, view.getWidth(),
+//                  view.getHeight());
+//          startActivity(i, options.toBundle());
+//        } else {
+                startActivity(i);
+//        }
+            }
+        };
         // Empty view
         mEmptyView = findViewById(android.R.id.empty);
         mEmptyView.setVisibility(mFragment == null ? View.VISIBLE : View.GONE);
@@ -96,14 +110,17 @@ public class FeedActivity extends BaseActivity {
         // Night mode
         final CheckedTextView nightCheck = (CheckedTextView) findViewById(R.id.nightcheck);
         nightCheck.setChecked(PrefUtils.isNightMode(this));
-        nightCheck.setOnClickListener(v -> {
-            // Toggle icon first
-            nightCheck.toggle();
-            // Toggle prefs
-            PrefUtils.setNightMode(FeedActivity.this, nightCheck.isChecked());
+        nightCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle icon first
+                nightCheck.toggle();
+                // Toggle prefs
+                PrefUtils.setNightMode(FeedActivity.this, nightCheck.isChecked());
 
-            // Change background
-            setNightBackground();
+                // Change background
+                setNightBackground();
+            }
         });
     }
 

@@ -138,10 +138,10 @@ public class RssContentProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(@NonNull Uri uri, String[] projection, String selection,
-                        String[] selectionArgs, String sortOrder) {
+    public Cursor query(Uri uri, String[] projection, String selection,
+            String[] selectionArgs, String sortOrder) {
         final String table;
-        Cursor result;
+        Cursor result = null;
 
         switch (sURIMatcher.match(uri)) {
             case FeedSQL.ITEMCODE:
@@ -203,14 +203,14 @@ public class RssContentProvider extends ContentProvider {
     }
 
     @Override
-    public String getType(@NonNull Uri uri) {
+    public String getType(Uri uri) {
         // Implement this to handle requests for the MIME type of the data
         // at the given URI.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
-    public Uri insert(@NonNull Uri uri, ContentValues values) {
+    public Uri insert(Uri uri, ContentValues values) {
         Uri result;
         final String table;
 
@@ -238,7 +238,7 @@ public class RssContentProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
         int result = 0;
 
         switch (sURIMatcher.match(uri)) {
@@ -269,10 +269,10 @@ public class RssContentProvider extends ContentProvider {
     }
 
     @Override
-    public int update(@NonNull Uri uri, ContentValues values, String selection,
-                      String[] selectionArgs) {
+    public int update(Uri uri, ContentValues values, String selection,
+            String[] selectionArgs) {
         final String table;
-        int result;
+        int result = 0;
 
         switch (sURIMatcher.match(uri)) {
             case FeedSQL.ITEMCODE:
@@ -308,7 +308,6 @@ public class RssContentProvider extends ContentProvider {
      * will be rolled back if
      * any single one fails.
      */
-    @NonNull
     @Override
     public ContentProviderResult[] applyBatch(
             @NonNull ArrayList<ContentProviderOperation> operations)

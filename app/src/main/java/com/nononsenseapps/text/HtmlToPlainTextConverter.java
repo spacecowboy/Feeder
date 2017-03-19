@@ -36,8 +36,11 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         mReader.setContentHandler(this);
         try {
             mReader.parse(new InputSource(new StringReader(mSource)));
-        } catch (IOException | SAXException e) {
+        } catch (IOException e) {
             // We are reading from a string. There should not be IO problems.
+            throw new RuntimeException(e);
+        } catch (SAXException e) {
+            // TagSoup doesn't throw parse exceptions.
             throw new RuntimeException(e);
         }
 
@@ -126,7 +129,7 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         builder.append(repeated("  ", listings.size() - 1));
         if (isOrderedList()) {
             HtmlToSpannedConverter.Listing listing = listings.peek();
-            builder.append("").append(listing.mNumber++).append(". ");
+            builder.append("" + listing.mNumber++).append(". ");
         } else {
             builder.append("* ");
         }
@@ -317,7 +320,10 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         Parser parser = new Parser();
         try {
             parser.setProperty(Parser.schemaProperty, new HTMLSchema());
-        } catch (org.xml.sax.SAXNotRecognizedException | org.xml.sax.SAXNotSupportedException e) {
+        } catch (org.xml.sax.SAXNotRecognizedException e) {
+            // Should not happen.
+            throw new RuntimeException(e);
+        } catch (org.xml.sax.SAXNotSupportedException e) {
             // Should not happen.
             throw new RuntimeException(e);
         }

@@ -34,10 +34,10 @@
         android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
         android:paddingStart="2dp"
+        android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="@color/secondary_text_material_dark"
-        android:textSize="@dimen/navdrawer_unreadcount_textsize"
-        android:maxLines="1" />
+        android:textSize="@dimen/navdrawer_unreadcount_textsize" />
 
     <TextView
         android:id="@+id/feed_name"
@@ -48,6 +48,6 @@
         android:gravity="center_vertical"
         android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:paddingEnd="2dp"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
-        android:maxLines="1" />
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall" />
 </RelativeLayout>

@@ -23,8 +23,7 @@
             android:id="@+id/story_image"
             android:layout_width="@dimen/item_img_def_width"
             android:layout_height="match_parent"
-            android:visibility="visible"
-            android:contentDescription="@string/story_thumbnail" />
+            android:visibility="visible"/>
     </FrameLayout>
 
     <LinearLayout
@@ -49,11 +48,11 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginStart="2dp"
+                android:singleLine="true"
                 android:visibility="visible"
                 android:layout_alignParentEnd="true"
                 android:text="2014-04-12 17:12"
-                style="@style/TextAppearance.ListItem.Author"
-                android:maxLines="1" />
+                style="@style/TextAppearance.ListItem.Author"/>
             <TextView
                 android:id="@+id/story_author"
                 android:layout_width="wrap_content"
@@ -61,13 +60,13 @@
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="2dp"
+                android:singleLine="true"
                 android:visibility="visible"
                 android:ellipsize="middle"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@id/story_date"
                 android:text="SuperDuperFeedWithVeryLongAddressIOnded.com"
-                style="@style/TextAppearance.ListItem.Author"
-                android:maxLines="1" />
+                style="@style/TextAppearance.ListItem.Author"/>
             </RelativeLayout>
 
         <TextView

@@ -1,25 +1,26 @@
 package com.nononsenseapps.feeder.views;
 
 import android.content.Context;
-import android.support.v7.widget.AppCompatTextView;
 import android.text.Layout;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.widget.TextView;
+
 import com.nononsenseapps.feeder.model.ClickableImageSpan;
 
 /**
  * A textview containing clickable links.
  */
-public class LinkedTextView extends AppCompatTextView {
+public class LinkedTextView extends TextView {
     public LinkedTextView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        AppCompatTextView widget = this;
+        TextView widget = this;
         Object text = widget.getText();
         if (text instanceof Spanned) {
             Spanned buffer = (Spanned) text;

@@ -315,10 +315,20 @@ public class FeedFragment extends Fragment
         ((TextView) mEmptyOpenFeeds).setText(android.text.Html.fromHtml
                 (getString(R.string.empty_feed_open)));
 
-        mEmptyAddFeed.setOnClickListener(v -> startActivity(new Intent(getActivity(),
-                EditFeedActivity.class)));
+        mEmptyAddFeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                startActivity(new Intent(getActivity(),
+                        EditFeedActivity.class));
+            }
+        });
 
-        mEmptyOpenFeeds.setOnClickListener(v -> ((BaseActivity) getActivity()).openNavDrawer());
+        mEmptyOpenFeeds.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                ((BaseActivity) getActivity()).openNavDrawer();
+            }
+        });
 
         // specify an adapter
         mAdapter = new FeedAdapter(getActivity());
@@ -326,15 +336,23 @@ public class FeedFragment extends Fragment
 
         // check all button
         mCheckAllButton = rootView.findViewById(R.id.checkall_button);
-        mCheckAllButton.setOnClickListener(v -> markAsRead());
+        mCheckAllButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                markAsRead();
+            }
+        });
 
         // So is toolbar buttons
         mNotifyCheck = (CheckedTextView) getActivity().findViewById(R.id.notifycheck);
-        mNotifyCheck.setOnClickListener(v -> {
-            // Remember that we are switching to opposite
-            notify = mNotifyCheck.isChecked() ? 0 : 1;
-            mNotifyCheck.setChecked(notify == 1);
-            setNotifications(notify == 1);
+        mNotifyCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Remember that we are switching to opposite
+                notify = mNotifyCheck.isChecked() ? 0 : 1;
+                mNotifyCheck.setChecked(notify == 1);
+                setNotifications(notify == 1);
+            }
         });
 
         return rootView;
@@ -722,7 +740,9 @@ public class FeedFragment extends Fragment
             // If any items remain in old set, they are not present in current result set,
             // remove them. This is pretty much what is done in the delta loader, but if
             // the loader is restarted, then it has no old data to go on.
-            oldItemMap.values().forEach(mItems::remove);
+            for (FeedItemSQL item : oldItemMap.values()) {
+                mItems.remove(item);
+            }
             mItems.endBatchedUpdates();
         }
 
