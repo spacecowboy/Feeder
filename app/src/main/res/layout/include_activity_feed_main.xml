@@ -65,9 +65,9 @@
                 android:clickable="true"
                 android:gravity="center_vertical|start"
                 android:paddingStart="16dp"
-                android:singleLine="true"
                 android:text="Night mode"
-                android:textColor="@android:color/primary_text_dark" />
+                android:textColor="@android:color/primary_text_dark"
+                android:maxLines="1" />
 
             <CheckedTextView
                 android:id="@+id/notifycheck"
@@ -79,9 +79,9 @@
                 android:checkMark="@drawable/notification_checkmark"
                 android:clickable="true"
                 android:gravity="center_vertical|end"
-                android:singleLine="true"
                 android:text="Notify for new items"
-                android:textColor="@android:color/primary_text_dark" />
+                android:textColor="@android:color/primary_text_dark"
+                android:maxLines="1" />
         </FrameLayout>
     </android.support.design.widget.AppBarLayout>
 

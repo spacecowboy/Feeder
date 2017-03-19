@@ -10,7 +10,8 @@
         android:id="@+id/story_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:contentDescription="@string/story_thumbnail" />
 
     <!-- Background set in code, present here to preview layout -->
     <LinearLayout
@@ -38,9 +39,9 @@
                 android:layout_marginEnd="4dp"
                 android:layout_marginStart="2dp"
                 android:layout_marginTop="4dp"
-                android:singleLine="true"
                 android:text="2014-04-12 17:12"
-                android:visibility="visible" />
+                android:visibility="visible"
+                android:maxLines="1" />
 
             <TextView
                 android:id="@+id/story_author"
@@ -53,9 +54,9 @@
                 android:layout_marginTop="4dp"
                 android:layout_toStartOf="@id/story_date"
                 android:ellipsize="middle"
-                android:singleLine="true"
                 android:text="SuperDuperFeedWithVeryLongAddressIOnded.com"
-                android:visibility="visible" />
+                android:visibility="visible"
+                android:maxLines="1" />
         </RelativeLayout>
 
         <TextView

@@ -133,7 +133,7 @@ public class RssNotifications {
     }
 
     public static ArrayList<FeedItemSQL> getItemsToNotify(final Context context) {
-        ArrayList<FeedItemSQL> feedItems = new ArrayList<FeedItemSQL>();
+        ArrayList<FeedItemSQL> feedItems = new ArrayList<>();
 
         String feeds = getFeedsToNotify(context);
 

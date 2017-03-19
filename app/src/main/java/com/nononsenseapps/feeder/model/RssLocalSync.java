@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.model;
 
+import android.annotation.SuppressLint;
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.OperationApplicationException;
@@ -40,6 +41,7 @@ public class RssLocalSync {
      * @param feedId if less than '1' then all feeds are synchronized
      * @param tag of feeds to sync, only used if feedId is less than 1. If empty, all feeds are synced.
      */
+    @SuppressLint("DefaultLocale")
     public static void syncFeeds(final Context context, long feedId, @NonNull String tag) {
         FileLog log = FileLog.instance(context);
         try {

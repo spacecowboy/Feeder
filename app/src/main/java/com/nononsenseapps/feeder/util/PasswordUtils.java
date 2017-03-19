@@ -64,9 +64,7 @@ public class PasswordUtils {
 
             // This is ~55x faster than looping and String.formating()
             hash = bytesToHex(bytes);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return hash;

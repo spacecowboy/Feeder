@@ -50,5 +50,6 @@
     <string name="no_tag">No tag</string>
     <string name="username">Username</string>
     <string name="server_address">Server address</string>
+    <string name="story_thumbnail">Story thumbnail</string>
 
 </resources>

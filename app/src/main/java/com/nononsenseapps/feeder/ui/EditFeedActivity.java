@@ -256,17 +256,14 @@ public class EditFeedActivity extends Activity
         });
 
         // Tell adapter how to filter
-        tagsAdapter.setFilterQueryProvider(new FilterQueryProvider() {
-            @Override
-            public Cursor runQuery(final CharSequence constraint) {
-                // Restart loader with filter
-                Bundle filter = new Bundle();
-                filter.putCharSequence(TAGSFILTER, constraint);
-                getLoaderManager().restartLoader(LOADER_TAG_SUGGESTIONS,
-                        filter, loaderCallbacks);
-                // Return null since existing cursor is going to be closed
-                return null;
-            }
+        tagsAdapter.setFilterQueryProvider(constraint -> {
+            // Restart loader with filter
+            Bundle filter = new Bundle();
+            filter.putCharSequence(TAGSFILTER, constraint);
+            getLoaderManager().restartLoader(LOADER_TAG_SUGGESTIONS,
+                    filter, loaderCallbacks);
+            // Return null since existing cursor is going to be closed
+            return null;
         });
 
         // Set the adapter

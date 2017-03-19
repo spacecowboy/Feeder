@@ -1,48 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:orientation="vertical"
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
     android:background="?android:selectableItemBackground"
-              android:paddingBottom="6dp"
-              android:paddingTop="6dp"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
+    android:paddingBottom="6dp"
+    android:paddingTop="6dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/feed_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:singleLine="true"
         android:paddingBottom="2dp"
         android:paddingTop="2dp"
         android:textSize="14sp"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"/>
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:maxLines="1" />
 
     <TextView
         android:id="@+id/feed_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:singleLine="true"
         android:paddingBottom="2dp"
         android:paddingTop="2dp"
         android:textSize="14sp"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="@color/secondary_text_material_dark"
-        />
+        android:maxLines="1" />
 
     <TextView
         android:id="@+id/feed_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:singleLine="true"
         android:paddingBottom="2dp"
         android:paddingTop="2dp"
         android:textSize="14sp"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="@color/secondary_text_material_dark"
-        />
+        android:maxLines="1" />
 </LinearLayout>

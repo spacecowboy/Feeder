@@ -26,7 +26,7 @@ import java.util.ArrayList;
  * A custom ScrollView that can accept a scroll listener.
  */
 public class ObservableScrollView extends ScrollView {
-    private ArrayList<OnScrollChangedListener> mCallbacks = new ArrayList<OnScrollChangedListener>();
+    private ArrayList<OnScrollChangedListener> mCallbacks = new ArrayList<>();
 
     public ObservableScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);

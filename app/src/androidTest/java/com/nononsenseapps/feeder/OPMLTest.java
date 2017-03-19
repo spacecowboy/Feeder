@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -76,7 +77,7 @@ public class OPMLTest extends AndroidTestCase {
         parser.parseFile(path);
 
         // Verify database is correct
-        ArrayList<Integer> seen = new ArrayList<Integer>();
+        ArrayList<Integer> seen = new ArrayList<>();
         ArrayList<FeedSQL> feeds = FeedSQL.getFeeds(context, null, null, null);
         assertFalse("No feeds in DB!", feeds.isEmpty());
         for (FeedSQL feed : feeds) {
@@ -97,6 +98,7 @@ public class OPMLTest extends AndroidTestCase {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     @MediumTest
     public void testReadExisting() throws IOException, SAXException {
         String path = writeSampleFile();
@@ -120,7 +122,7 @@ public class OPMLTest extends AndroidTestCase {
         parser.parseFile(path);
 
         // should not kill the existing stuff
-        ArrayList<Integer> seen = new ArrayList<Integer>();
+        ArrayList<Integer> seen = new ArrayList<>();
         ArrayList<FeedSQL> feeds = FeedSQL.getFeeds(context, null, null, null);
         assertFalse("No feeds in DB!", feeds.isEmpty());
         for (FeedSQL feed : feeds) {
@@ -263,6 +265,7 @@ public class OPMLTest extends AndroidTestCase {
         return path.getAbsolutePath();
     }
 
+    @SuppressLint("DefaultLocale")
     private void createSampleFeeds() {
         for (int i = 0; i < 10; i++) {
             FeedSQL feed = new FeedSQL();

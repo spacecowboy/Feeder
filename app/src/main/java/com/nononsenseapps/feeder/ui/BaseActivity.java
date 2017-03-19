@@ -20,6 +20,7 @@ package com.nononsenseapps.feeder.ui;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -63,6 +64,7 @@ import java.util.HashSet;
  * Base activity which handles navigation drawer and other bloat common
  * between activities.
  */
+@SuppressLint("Registered")
 public class BaseActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks {
 
@@ -89,8 +91,8 @@ public class BaseActivity extends AppCompatActivity
     // When set, these components will be shown/hidden in sync with the action bar
     // to implement the "quick recall" effect (the Action Bar and the header views disappear
     // when you scroll down a list, and reappear quickly when you scroll up).
-    private ArrayList<View> mHideableHeaderViews = new ArrayList<View>();
-    private ArrayList<View> mHideableFooterViews = new ArrayList<View>();
+    private ArrayList<View> mHideableHeaderViews = new ArrayList<>();
+    private ArrayList<View> mHideableFooterViews = new ArrayList<>();
     // variables that control the Action Bar auto hide behavior (aka "quick recall")
     private boolean mActionBarAutoHideEnabled = false;
     private int mActionBarAutoHideSensivity = 0;
@@ -518,13 +520,7 @@ public class BaseActivity extends AppCompatActivity
         initActionBarAutoHide();
         mActionBarAutoHideSignal = 0;
         scrollView.addOnScrollChangedListener(
-                new ObservableScrollView.OnScrollChangedListener() {
-                    @Override
-                    public void onScrollChanged(final int deltaX,
-                                                final int deltaY) {
-                        onMainContentScrolled(scrollView.getScrollY(), deltaY, false);
-                    }
-                });
+                (deltaX, deltaY) -> onMainContentScrolled(scrollView.getScrollY(), deltaY, false));
     }
 
     protected void registerHideableHeaderView(View hideableHeaderView) {
@@ -597,7 +593,7 @@ public class BaseActivity extends AppCompatActivity
                     return tag.equals(f.tag);
                 } else {
                     // Compare items
-                    return !isTag && !f.isTag && item.equals(f.item);
+                    return !isTag && !f.isTag && (item != null && item.equals(f.item));
                 }
             } else {
                 return false;
@@ -609,9 +605,11 @@ public class BaseActivity extends AppCompatActivity
             if (isTag) {
                 // Tag
                 return tag.hashCode();
-            } else {
+            } else if (item != null ) {
                 // Item
                 return item.hashCode();
+            } else {
+                return 0;
             }
         }
 
@@ -620,8 +618,10 @@ public class BaseActivity extends AppCompatActivity
         public String toString() {
             if (isTag) {
                 return "Tag: " + tag;
-            } else {
+            } else if (item != null) {
                 return "Item: " + item.customTitle + " (" + tag + ")";
+            } else {
+                return "NULL";
             }
         }
     }
@@ -829,9 +829,7 @@ public class BaseActivity extends AppCompatActivity
             // If any items remain in old set, they are not present in current result set,
             // remove them. This is pretty much what is done in the delta loader, but if
             // the loader is restarted, then it has no old data to go on.
-            for (FeedWrapper item : oldItemMap.values()) {
-                mItems.remove(item);
-            }
+            oldItemMap.values().forEach(mItems::remove);
             mItems.endBatchedUpdates();
         }
 
@@ -904,14 +902,11 @@ public class BaseActivity extends AppCompatActivity
             unreadCount = (TextView) v.findViewById(R.id.tag_unreadcount);
             expander = (ImageView) v.findViewById(R.id.tag_expander);
             // expander clicker
-            expander.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mNavAdapter.toggleExpansion(wrap)) {
-                        expander.setImageResource(R.drawable.tinted_expand_less);
-                    } else {
-                        expander.setImageResource(R.drawable.tinted_expand_more);
-                    }
+            expander.setOnClickListener(v1 -> {
+                if (mNavAdapter.toggleExpansion(wrap)) {
+                    expander.setImageResource(R.drawable.tinted_expand_less);
+                } else {
+                    expander.setImageResource(R.drawable.tinted_expand_more);
                 }
             });
             v.setOnClickListener(this);

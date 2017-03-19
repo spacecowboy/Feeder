@@ -89,12 +89,7 @@ public class FeedParser {
             SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
             builder.sslSocketFactory(sslSocketFactory, trustManager)
-                   .hostnameVerifier(new HostnameVerifier() {
-                       @Override
-                       public boolean verify(String hostname, SSLSession session) {
-                           return true;
-                       }
-                   });
+                   .hostnameVerifier((hostname, session) -> true);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             e.printStackTrace();
         }

@@ -219,7 +219,7 @@ public class FeedSQL {
 
     public static ArrayList<FeedSQL> getFeeds(final Context context, final String where,
                                                final String[] args, final String sort) {
-        ArrayList<FeedSQL> feeds = new ArrayList<FeedSQL>();
+        ArrayList<FeedSQL> feeds = new ArrayList<>();
 
         Cursor c = context.getContentResolver()
                 .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS, where, args, sort);

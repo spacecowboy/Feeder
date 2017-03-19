@@ -8,7 +8,8 @@
         android:id="@+id/story_image"
         android:layout_width="@dimen/item_img_def_width"
         android:layout_height="@dimen/item_img_def_width"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:contentDescription="@string/story_thumbnail" />
 
     <TextView
         android:id="@+id/story_date"
@@ -20,9 +21,9 @@
         android:layout_marginEnd="4dp"
         android:layout_marginStart="2dp"
         android:layout_marginTop="4dp"
-        android:singleLine="true"
         android:text="2014-04-12 17:12"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:maxLines="1" />
 
     <TextView
         android:id="@+id/story_author"
@@ -35,9 +36,9 @@
         android:layout_marginTop="4dp"
         android:layout_toStartOf="@id/story_date"
         android:ellipsize="middle"
-        android:singleLine="true"
         android:text="SuperDuperFeedWithVeryLongAddressIOnded.com"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:maxLines="1" />
 
     <TextView
         android:id="@+id/story_snippet"

@@ -96,9 +96,7 @@ public class ExpandableSortedList<T> extends SortedList<T> {
         }
 
         super.beginBatchedUpdates();
-        for (T item : mGroups.get(parent)) {
-            super.add(item);
-        }
+        mGroups.get(parent).forEach(super::add);
         super.endBatchedUpdates();
 
         mGroupState.put(parent, EXPANDED);
@@ -110,9 +108,7 @@ public class ExpandableSortedList<T> extends SortedList<T> {
         }
 
         super.beginBatchedUpdates();
-        for (T item : mGroups.get(parent)) {
-            super.remove(item);
-        }
+        mGroups.get(parent).forEach(super::remove);
         super.endBatchedUpdates();
 
         mGroupState.put(parent, CONTRACTED);
@@ -173,7 +169,7 @@ public class ExpandableSortedList<T> extends SortedList<T> {
 
         boolean notify = true;
         if (!mGroups.containsKey(parent)) {
-            mGroups.put(parent, new HashSet<T>());
+            mGroups.put(parent, new HashSet<>());
             mGroupState.put(parent, CONTRACTED);
             super.add(parent);
             notify = false;

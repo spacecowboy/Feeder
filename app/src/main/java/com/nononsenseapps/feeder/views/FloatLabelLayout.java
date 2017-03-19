@@ -181,12 +181,7 @@ public final class FloatLabelLayout extends FrameLayout {
 
         // Add focus listener to the EditText so that we can notify the label that it is activated.
         // Allows the use of a ColorStateList for the text color on the label
-        mEditText.setOnFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean focused) {
-                mLabel.setActivated(focused);
-            }
-        });
+        mEditText.setOnFocusChangeListener((view, focused) -> mLabel.setActivated(focused));
 
         mLabel.setText(mEditText.getHint());
     }

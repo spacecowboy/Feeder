@@ -73,9 +73,7 @@ public class FileLog {
     private void persist() {
         ensureSize(memLog);
         try (PrintWriter pw = new PrintWriter(logFile)) {
-            for (String l : memLog) {
-                pw.println(l);
-            }
+            memLog.forEach(pw::println);
         } catch (Exception ignored) {
             ignored.printStackTrace();
         }
