@@ -25,11 +25,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.nononsenseapps.feeder.model.OPMLDatabaseHandler;
 import com.nononsenseapps.feeder.model.OPMLParser;
 import com.nononsenseapps.feeder.model.OPMLWriter;
+import com.nononsenseapps.feeder.util.Function;
+import com.nononsenseapps.feeder.util.Supplier;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static com.nononsenseapps.feeder.db.Util.WhereIs;
 
@@ -117,48 +117,54 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     private Function<String, Iterable<FeedSQL>> feedsWithTag(final SQLiteDatabase db) {
-        return tag -> {
-            ArrayList<FeedSQL> feeds = new ArrayList<>();
+        return new Function<String, Iterable<FeedSQL>>() {
+            @Override
+            public Iterable<FeedSQL> apply(String tag) {
+                ArrayList<FeedSQL> feeds = new ArrayList<>();
 
-            final String where = WhereIs(FeedSQL.COL_TAG);
-            final String[] args = Util.ToStringArray(tag == null ? "": tag);
+                final String where = WhereIs(FeedSQL.COL_TAG);
+                final String[] args = Util.ToStringArray(tag == null ? "" : tag);
 
-            Cursor c = db.query(FeedSQL.TABLE_NAME, FeedSQL.FIELDS, where, args,
-                    null, null, null);
+                Cursor c = db.query(FeedSQL.TABLE_NAME, FeedSQL.FIELDS, where, args,
+                        null, null, null);
 
-            try {
-                while (c.moveToNext()) {
-                    feeds.add(new FeedSQL(c));
+                try {
+                    while (c.moveToNext()) {
+                        feeds.add(new FeedSQL(c));
+                    }
+                } finally {
+                    if (c != null) {
+                        c.close();
+                    }
                 }
-            } finally {
-                if (c != null) {
-                    c.close();
-                }
+
+                return feeds;
             }
-
-            return feeds;
         };
     }
 
-    private Supplier<Iterable<String>> tagSupplier(SQLiteDatabase db) {
-        return () -> {
-            ArrayList<String> tags = new ArrayList<>();
+    private Supplier<Iterable<String>> tagSupplier(final SQLiteDatabase db) {
+        return new Supplier<Iterable<String>>() {
+            @Override
+            public Iterable<String> get() {
+                ArrayList<String> tags = new ArrayList<>();
 
-            Cursor c = db.query(FeedSQL.VIEWTAGS_NAME,
-                    Util.ToStringArray(FeedSQL.COL_TAG),
-                    null, null, null, null, null);
+                Cursor c = db.query(FeedSQL.VIEWTAGS_NAME,
+                        Util.ToStringArray(FeedSQL.COL_TAG),
+                        null, null, null, null, null);
 
-            try {
-                while (c.moveToNext()) {
-                    tags.add(c.getString(0));
+                try {
+                    while (c.moveToNext()) {
+                        tags.add(c.getString(0));
+                    }
+                } finally {
+                    if (c != null) {
+                        c.close();
+                    }
                 }
-            } finally {
-                if (c != null) {
-                    c.close();
-                }
+
+                return tags;
             }
-
-            return tags;
         };
     }
 }

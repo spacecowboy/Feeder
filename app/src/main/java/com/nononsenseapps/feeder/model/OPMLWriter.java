@@ -3,15 +3,10 @@ package com.nononsenseapps.feeder.model;
 
 import android.util.Log;
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.util.Function;
+import com.nononsenseapps.feeder.util.Supplier;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.io.*;
 
 public class OPMLWriter {
 

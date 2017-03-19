@@ -12,7 +12,9 @@ import com.nononsenseapps.feeder.db.Cleanup;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
+import com.nononsenseapps.feeder.util.Consumer;
 import com.nononsenseapps.feeder.util.FileLog;
+import com.nononsenseapps.feeder.util.Optional;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import org.joda.time.DateTime;
@@ -22,17 +24,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static com.nononsenseapps.feeder.db.Util.LongsToStringArray;
-import static com.nononsenseapps.feeder.db.Util.ToStringArray;
-import static com.nononsenseapps.feeder.db.Util.WHEREIDIS;
-import static com.nononsenseapps.feeder.db.Util.WhereIs;
+import static com.nononsenseapps.feeder.db.Util.*;
 
 public class RssLocalSync {
 
@@ -64,8 +60,19 @@ public class RssLocalSync {
             // Run in parallel - important each thread finishes in reasonable time
             ExecutorService executorService = Executors.newCachedThreadPool();
 
-            feeds.forEach(f -> executorService.execute(
-                    () -> syncFeed(f, cacheDir).ifPresent(sf -> syndFeeds.add(Pair.create(f, sf)))));
+            for (final FeedSQL f: feeds) {
+                executorService.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        syncFeed(f, cacheDir).ifPresent(new Consumer<SyndFeed>() {
+                            @Override
+                            public void accept(@NonNull final SyndFeed sf) {
+                                syndFeeds.add(Pair.create(f, sf));
+                            }
+                        });
+                    }
+                });
+            }
 
             // Call shutdown to reject incoming tasks
             executorService.shutdown();
@@ -76,11 +83,11 @@ public class RssLocalSync {
                 executorService.shutdownNow();
             }
 
-            final List<ContentProviderOperation> ops;
+            final ArrayList<ContentProviderOperation> ops = new ArrayList<>();
             synchronized (syndFeeds) {
-                ops = syndFeeds.stream()
-                               .flatMap(pair -> convertResultToOperations(pair.second, pair.first).stream())
-                               .collect(Collectors.toList());
+                for (Pair<FeedSQL, SyndFeed> pair: syndFeeds) {
+                    ops.addAll(convertResultToOperations(pair.second, pair.first));
+                }
             }
 
             try {
@@ -125,15 +132,15 @@ public class RssLocalSync {
         return Optional.empty();
     }
 
-    private static Stream<ContentProviderOperation> syncAndParseFeed(final FeedSQL feedSQL, final File cacheDir) {
+    private static ArrayList<ContentProviderOperation> syncAndParseFeed(final FeedSQL feedSQL, final File cacheDir) {
         try {
             SyndFeed parsedFeed = FeedParser.parseFeed(feedSQL.url, cacheDir);
-            return convertResultToOperations(parsedFeed, feedSQL).stream();
+            return convertResultToOperations(parsedFeed, feedSQL);
         } catch (Throwable error) {
             System.err.println("Error when parsing " + feedSQL.url);
             error.printStackTrace();
         }
-        return Stream.empty();
+        return new ArrayList<>();
     }
 
     private static synchronized void storeSyncResults(final Context context,
