@@ -209,26 +209,17 @@ public class HtmlToSpannedConverter implements ContentHandler {
             startCode(mSpannableStringBuilder, attributes);
         } else if (tag.equalsIgnoreCase("iframe")) {
             startIframe(mSpannableStringBuilder, attributes);
+        } else if (tag.equalsIgnoreCase( "tr" )) {
+            startEndTableRow(mSpannableStringBuilder);
+        } else if (tag.equalsIgnoreCase( "table" )) {
+            startEndTable(mSpannableStringBuilder);
         } else {
             startUnknownTag(tag, mSpannableStringBuilder, attributes);
         }
     }
 
     protected void handleP(SpannableStringBuilder text) {
-        int len = text.length();
-
-        if (len >= 1 && text.charAt(len - 1) == '\n') {
-            if (len >= 2 && text.charAt(len - 2) == '\n') {
-                return;
-            }
-
-            text.append("\n");
-            return;
-        }
-
-        if (len != 0) {
-            text.append("\n\n");
-        }
+        ensureDoubleNewline(text);
     }
 
     protected void start(SpannableStringBuilder text, Object mark) {
@@ -315,6 +306,12 @@ public class HtmlToSpannedConverter implements ContentHandler {
 
     protected void startPre(final SpannableStringBuilder text,
                             final Attributes attributes) {
+        ensureDoubleNewline( text );
+        start(text, new Pre());
+    }
+
+    private static void ensureDoubleNewline( SpannableStringBuilder text )
+    {
         int len = text.length();
         // Make sure it has spaces before and after
         if (len >= 1 && text.charAt(len - 1) == '\n') {
@@ -324,7 +321,6 @@ public class HtmlToSpannedConverter implements ContentHandler {
         } else if (len != 0) {
             text.append("\n\n");
         }
-        start(text, new Pre());
     }
 
     protected void startCode(final SpannableStringBuilder text,
@@ -465,6 +461,10 @@ public class HtmlToSpannedConverter implements ContentHandler {
             endCode(mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase("iframe")) {
             endIframe(mSpannableStringBuilder);
+        } else if (tag.equalsIgnoreCase( "tr" )) {
+            startEndTableRow(mSpannableStringBuilder);
+        } else if (tag.equalsIgnoreCase( "table" )) {
+            startEndTable(mSpannableStringBuilder);
         } else {
             endUnknownTag(tag, mSpannableStringBuilder);
         }
@@ -484,6 +484,10 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void handleBr(SpannableStringBuilder text) {
+        ensureSingleNewline(text);
+    }
+
+    private static void ensureSingleNewline(SpannableStringBuilder text) {
         int len = text.length();
         if (len >= 1 && text.charAt(len - 1) == '\n') {
             return;
@@ -564,8 +568,16 @@ public class HtmlToSpannedConverter implements ContentHandler {
         }
     }
 
+    protected void startEndTable(SpannableStringBuilder text) {
+        ensureDoubleNewline( text );
+    }
+
+    protected void startEndTableRow(SpannableStringBuilder text) {
+        ensureSingleNewline( text );
+    }
+
     protected void endImg(SpannableStringBuilder text) {
-        // Override me
+        ensureDoubleNewline( text );
     }
 
     protected void endUl(final SpannableStringBuilder text) {
@@ -605,15 +617,10 @@ public class HtmlToSpannedConverter implements ContentHandler {
     }
 
     protected void endPre(final SpannableStringBuilder text) {
+        // yes, take len before appending
         int len = text.length();
-        // Make sure it has spaces before and after
-        if (len >= 1 && text.charAt(len - 1) == '\n') {
-            if (len >= 2 && text.charAt(len - 2) != '\n') {
-                text.append("\n");
-            }
-        } else if (len != 0) {
-            text.append("\n\n");
-        }
+        ensureDoubleNewline(text);
+
         Object obj = getLast(text, Pre.class);
         int where = text.getSpanStart(obj);
 
