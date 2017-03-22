@@ -24,7 +24,7 @@ public class VideoTagHunter {
     // www.youtube.com/embed/cjxnVO9RpaQ/crap?feature=oembed
     static final Pattern YoutubeIdPattern = Pattern.compile("youtube" +
                                                             ".com/embed/" +
-                                                            "([^\\?/]*)");
+                                                            "([^?/]*)");
 
     public static void getVideos(final Document doc,
             ArrayList<Video> videos) {

@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -94,67 +96,75 @@ public class EditFeedActivity extends Activity
         mResultAdapter = new ResultsAdapter(this);
         mListResults.setEmptyView(mEmptyText);
         mListResults.setAdapter(mResultAdapter);
-        mListResults.setOnItemClickListener((parent, view, position, id1) -> {
-            SyndFeed entry =
-                    mResultAdapter.getItem(position);
-            useEntry(entry.getTitle(), mFeedUrl);
+        mListResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SyndFeed entry =
+                        mResultAdapter.getItem(position);
+                useEntry(entry.getTitle(), mFeedUrl);
+            }
         });
 
-        mTextSearch.setOnEditorActionListener(
-                (v, actionId, event) -> {
-                    if (actionId == EditorInfo.IME_ACTION_GO) {
-                        // Hide keyboard
-                        View f = getCurrentFocus();
-                        if (f != null) {
-                            InputMethodManager imm =
-                                    (InputMethodManager) getSystemService(
-                                            Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(f.getWindowToken(),
-                                    0);
-                        }
-
-                        // Issue search
-                        mFeedUrl = mTextSearch.getText().toString().trim();
-                        Bundle args = new Bundle();
-                        args.putString(SEARCHQUERY, mFeedUrl);
-                        getLoaderManager().restartLoader(RSSFINDER, args,
-                                EditFeedActivity.this);
-                        return true;
+        mTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_GO) {
+                    // Hide keyboard
+                    View f = getCurrentFocus();
+                    if (f != null) {
+                        InputMethodManager imm =
+                                (InputMethodManager) getSystemService(
+                                        Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(f.getWindowToken(),
+                                0);
                     }
-                    return false;
-                });
+
+                    // Issue search
+                    mFeedUrl = mTextSearch.getText().toString().trim();
+                    Bundle args = new Bundle();
+                    args.putString(SEARCHQUERY, mFeedUrl);
+                    getLoaderManager().restartLoader(RSSFINDER, args,
+                            EditFeedActivity.this);
+                    return true;
+                }
+                return false;
+            }
+        });
 
         Button addButton = (Button) findViewById(R.id.add_button);
         addButton
-                .setOnClickListener(v -> {
-                    // TODO error checking and stuff like that
-                    ContentValues values = new ContentValues();
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO error checking and stuff like that
+                        ContentValues values = new ContentValues();
 
-                    values.put(FeedSQL.COL_TITLE,
-                            mTextTitle.getText().toString().trim());
-                    values.put(FeedSQL.COL_CUSTOM_TITLE, values.getAsString(FeedSQL.COL_TITLE));
-                    values.put(FeedSQL.COL_TAG,
-                            mTextTag.getText().toString().trim());
-                    values.put(FeedSQL.COL_URL,
-                            mTextUrl.getText().toString().trim());
-                    if (id < 1) {
-                        Uri uri = getContentResolver()
-                                .insert(FeedSQL.URI_FEEDS, values);
-                        id = Long.parseLong(uri.getLastPathSegment());
-                    } else {
-                        getContentResolver().update(Uri.withAppendedPath(
-                                FeedSQL.URI_FEEDS,
-                                Long.toString(id)), values, null,
-                                null);
-                    }
-                    RssContentProvider.notifyAllUris(EditFeedActivity.this);
-                    RssContentProvider.RequestSync(id);
+                        values.put(FeedSQL.COL_TITLE,
+                                mTextTitle.getText().toString().trim());
+                        values.put(FeedSQL.COL_CUSTOM_TITLE, values.getAsString(FeedSQL.COL_TITLE));
+                        values.put(FeedSQL.COL_TAG,
+                                mTextTag.getText().toString().trim());
+                        values.put(FeedSQL.COL_URL,
+                                mTextUrl.getText().toString().trim());
+                        if (id < 1) {
+                            Uri uri = getContentResolver()
+                                    .insert(FeedSQL.URI_FEEDS, values);
+                            id = Long.parseLong(uri.getLastPathSegment());
+                        } else {
+                            getContentResolver().update(Uri.withAppendedPath(
+                                    FeedSQL.URI_FEEDS,
+                                    Long.toString(id)), values, null,
+                                    null);
+                        }
+                        RssContentProvider.notifyAllUris(EditFeedActivity.this);
+                        RssContentProvider.RequestSync(id);
 
-                    finish();
-                    if (mShouldFinishBack) {
-                        // Only care about exit transition
-                        overridePendingTransition(R.anim.to_bottom_right,
-                                R.anim.to_bottom_right);
+                        finish();
+                        if (mShouldFinishBack) {
+                            // Only care about exit transition
+                            overridePendingTransition(R.anim.to_bottom_right,
+                                    R.anim.to_bottom_right);
+                        }
                     }
                 });
 
@@ -247,12 +257,15 @@ public class EditFeedActivity extends Activity
                 };
 
         // Tell adapter how to return result
-        tagsAdapter.setCursorToStringConverter(cursor -> {
-            if (cursor == null) {
-                return null;
-            }
+        tagsAdapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
+            @Override
+            public CharSequence convertToString(Cursor cursor) {
+                if (cursor == null) {
+                    return null;
+                }
 
-            return cursor.getString(1);
+                return cursor.getString(1);
+            }
         });
 
         // Tell adapter how to filter

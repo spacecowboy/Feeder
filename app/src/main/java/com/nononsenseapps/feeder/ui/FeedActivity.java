@@ -26,7 +26,9 @@ import com.nononsenseapps.feeder.model.OPMLContenProvider;
 import com.nononsenseapps.feeder.model.OPMLParser;
 import com.nononsenseapps.feeder.model.OPMLWriter;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
+import com.nononsenseapps.feeder.util.Function;
 import com.nononsenseapps.feeder.util.PrefUtils;
+import com.nononsenseapps.feeder.util.Supplier;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -225,48 +227,54 @@ public class FeedActivity extends BaseActivity {
                     OutputStream os = getContentResolver().openOutputStream(uri);
                     OPMLWriter writer = new OPMLWriter();
                     writer.writeOutputStream(os,
-                            () -> {
-                                ArrayList<String> tags = new ArrayList<>();
+                            new Supplier<Iterable<String>>() {
+                                @Override
+                                public Iterable<String> get() {
+                                    ArrayList<String> tags = new ArrayList<>();
 
-                                Cursor c = FeedActivity.this.getContentResolver()
-                                        .query(FeedSQL.URI_TAGSWITHCOUNTS,
-                                                Util.ToStringArray(FeedSQL.COL_TAG), null, null,
-                                                null);
+                                    Cursor c = FeedActivity.this.getContentResolver()
+                                            .query(FeedSQL.URI_TAGSWITHCOUNTS,
+                                                    Util.ToStringArray(FeedSQL.COL_TAG), null, null,
+                                                    null);
 
-                                try {
-                                    while (c.moveToNext()) {
-                                        tags.add(c.getString(0));
+                                    try {
+                                        while (c.moveToNext()) {
+                                            tags.add(c.getString(0));
+                                        }
+                                    } finally {
+                                        if (c != null) {
+                                            c.close();
+                                        }
                                     }
-                                } finally {
-                                    if (c != null) {
-                                        c.close();
-                                    }
+
+                                    return tags;
                                 }
-
-                                return tags;
                             },
-                            tag -> {
-                                ArrayList<FeedSQL> feeds = new ArrayList<>();
+                            new Function<String, Iterable<FeedSQL>>() {
+                                @Override
+                                public Iterable<FeedSQL> apply(String tag) {
+                                    ArrayList<FeedSQL> feeds = new ArrayList<>();
 
-                                final String where = FeedSQL.COL_TAG + " IS ?";
-                                final String[] args = Util.ToStringArray(tag == null ? "": tag);
-                                Cursor c = FeedActivity.this.getContentResolver()
-                                        .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
-                                                where, args, null);
+                                    final String where = FeedSQL.COL_TAG + " IS ?";
+                                    final String[] args = Util.ToStringArray(tag == null ? "" : tag);
+                                    Cursor c = FeedActivity.this.getContentResolver()
+                                            .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS,
+                                                    where, args, null);
 
-                                try {
-                                    while (c.moveToNext()) {
-                                        feeds.add(new FeedSQL(c));
+                                    try {
+                                        while (c.moveToNext()) {
+                                            feeds.add(new FeedSQL(c));
+                                        }
+                                    } finally {
+                                        if (c != null) {
+                                            c.close();
+                                        }
                                     }
-                                } finally {
-                                    if (c != null) {
-                                        c.close();
-                                    }
+
+                                    return feeds;
                                 }
-
-                                return feeds;
                             }
-                                            );
+                    );
                     os.close();
                 } catch (IOException e) {
                     e.printStackTrace();

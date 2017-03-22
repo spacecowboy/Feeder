@@ -23,11 +23,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import static com.nononsenseapps.feeder.db.Util.*;
+import static com.nononsenseapps.feeder.db.Util.LongsToStringArray;
+import static com.nononsenseapps.feeder.db.Util.ToStringArray;
+import static com.nononsenseapps.feeder.db.Util.WHEREIDIS;
+import static com.nononsenseapps.feeder.db.Util.WhereIs;
 
 public class RssLocalSync {
 
@@ -52,33 +52,16 @@ public class RssLocalSync {
             }
             log.d(String.format("Syncing %d feeds: %s", feeds.size(), start.toString()));
 
-            final List<Pair<FeedSQL,SyndFeed>> syndFeeds = Collections.synchronizedList(new ArrayList<>());
+            final List<Pair<FeedSQL,SyndFeed>> syndFeeds = Collections.synchronizedList(new ArrayList<Pair<FeedSQL,SyndFeed>>());
             final File cacheDir = context.getExternalCacheDir();
 
-            // Run in parallel - important each thread finishes in reasonable time
-            ExecutorService executorService = Executors.newCachedThreadPool();
-
-            for (final FeedSQL f: feeds) {
-                executorService.execute(new Runnable() {
+            for (final FeedSQL f : feeds) {
+                syncFeed(f, cacheDir).ifPresent(new Consumer<SyndFeed>() {
                     @Override
-                    public void run() {
-                        syncFeed(f, cacheDir).ifPresent(new Consumer<SyndFeed>() {
-                            @Override
-                            public void accept(@NonNull final SyndFeed sf) {
-                                syndFeeds.add(Pair.create(f, sf));
-                            }
-                        });
+                    public void accept(@NonNull final SyndFeed sf) {
+                        syndFeeds.add(Pair.create(f, sf));
                     }
                 });
-            }
-
-            // Call shutdown to reject incoming tasks
-            executorService.shutdown();
-
-            // Wait for tasks to terminate
-            if (!executorService.awaitTermination(1, TimeUnit.MINUTES)) {
-                // Force termination in case timeout was exceeded
-                executorService.shutdownNow();
             }
 
             final ArrayList<ContentProviderOperation> ops = new ArrayList<>();

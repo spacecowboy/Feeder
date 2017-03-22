@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.model;
 
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.util.Function;
+import com.nononsenseapps.feeder.util.Supplier;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -31,18 +33,26 @@ public class OPMLWriterTest {
     public void shouldEscapeStrings() throws Exception {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         writer.writeOutputStream(bos,
-                () -> Collections.singletonList("quoted \"tag\""),
-                tag -> {
-                    ArrayList<FeedSQL> result = new ArrayList<>();
-                    result.add(new FeedSQL()
-                            .withId(1L)
-                            .withNotify(0)
-                            .withTag(tag)
-                            .withTitle("A \"feeditem\" with id '9' > 0 & < 10")
-                            .withCustomTitle("A \"feeditem\" with id '9' > 0 & < 10")
-                            .withUnreadCount(2)
-                            .withUrl("http://somedomain.com/rss.xml?format=feed&type=rss"));
-                    return result;
+                new Supplier<Iterable<String>>() {
+                    @Override
+                    public Iterable<String> get() {
+                        return Collections.singletonList("quoted \"tag\"");
+                    }
+                },
+                new Function<String, Iterable<FeedSQL>>() {
+                    @Override
+                    public Iterable<FeedSQL> apply(String tag) {
+                        ArrayList<FeedSQL> result = new ArrayList<>();
+                        result.add(new FeedSQL()
+                                .withId(1L)
+                                .withNotify(0)
+                                .withTag(tag)
+                                .withTitle("A \"feeditem\" with id '9' > 0 & < 10")
+                                .withCustomTitle("A \"feeditem\" with id '9' > 0 & < 10")
+                                .withUnreadCount(2)
+                                .withUrl("http://somedomain.com/rss.xml?format=feed&type=rss"));
+                        return result;
+                    }
                 });
         String output = new String(bos.toByteArray());
         assertEquals(expected, output);

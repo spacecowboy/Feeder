@@ -295,14 +295,17 @@ public class FeedFragment extends Fragment
                 R.color.refresh_progress_2,
                 R.color.refresh_progress_3);
 
-        mSwipeRefreshLayout.setOnRefreshListener(() -> {
-            // Sync this specific feed(s)
-            if (id > 0) {
-                RssContentProvider.RequestSync(id);
-            } else if (tag != null) {
-                RssContentProvider.RequestSync(tag);
-            } else {
-                RssContentProvider.RequestSync();
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Sync this specific feed(s)
+                if (id > 0) {
+                    RssContentProvider.RequestSync(id);
+                } else if (tag != null) {
+                    RssContentProvider.RequestSync(tag);
+                } else {
+                    RssContentProvider.RequestSync();
+                }
             }
         });
 

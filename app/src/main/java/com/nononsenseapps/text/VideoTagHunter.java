@@ -2,13 +2,10 @@ package com.nononsenseapps.text;
 
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by jonas on 9/26/14.
- */
+
 public class VideoTagHunter {
 
     // Example strings
@@ -18,7 +15,7 @@ public class VideoTagHunter {
     // www.youtube.com/embed/cjxnVO9RpaQ/crap?feature=oembed
     static final Pattern YoutubeIdPattern = Pattern.compile("youtube" +
                                                             ".com/embed/" +
-                                                            "([^\\?/]*)");
+                                                            "([^?/]*)");
 
     public static Video getVideo(final String src, final String width,
             final String height) {

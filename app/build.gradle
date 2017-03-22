@@ -12,7 +12,7 @@ android {
     versionCode 5
     versionName "1.2.2"
     compileSdkVersion 25
-    minSdkVersion 23
+    minSdkVersion 21
     targetSdkVersion 25
   }
 
