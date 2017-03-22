@@ -1,64 +1,60 @@
 apply plugin: 'com.android.application'
 
 android {
-    buildToolsVersion '25.0.2'
+  buildToolsVersion '25.0.2'
 
-    lintOptions {
-        abortOnError false
-    }
+  lintOptions {
+    abortOnError false
+  }
 
-    defaultConfig {
-        applicationId "com.nononsenseapps.feeder"
-        versionCode 5
-        versionName "1.2.2"
-        compileSdkVersion 25
-        minSdkVersion 23
-        targetSdkVersion 25
-    }
+  defaultConfig {
+    applicationId "com.nononsenseapps.feeder"
+    versionCode 5
+    versionName "1.2.2"
+    compileSdkVersion 25
+    minSdkVersion 23
+    targetSdkVersion 25
+  }
 
-    buildTypes {
-        debug {
-            minifyEnabled false
-        }
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+  buildTypes {
+    debug {
+      minifyEnabled false
     }
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
 
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
+  testOptions {
+    unitTests.returnDefaultValues = true
+  }
+
+  packagingOptions {
+    // Rome incorrectly bundles stuff in its jar
+    pickFirst 'rome-utils-1.7.1.jar'
+  }
 }
 
 dependencies {
-    compile 'com.android.support:recyclerview-v7:25.2.0'
-    compile 'com.android.support:support-v4:25.2.0'
-    compile "com.android.support:appcompat-v7:25.2.0"
-    compile 'com.android.support:design:25.2.0'
-
-    // Better times
-    compile 'joda-time:joda-time:2.3'
-
-    // HTML parsing
-    compile 'org.jsoup:jsoup:1.7.3'
-    compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
-
-    // RSS
-    // uses submodule because the standard jar packaging will raise duplicateFileException
-    // sadly android studio doesn't support composite build in gradle yet
-    compile project(":rome/rome")
-    compile project(":rome/rome-modules")
-
-
-    // For better fetching
-    compile 'com.squareup.okhttp3:okhttp:3.6.0'
-
-    // Image loading
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
-
-    // tests
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.7.11'
+  compile 'com.android.support:recyclerview-v7:25.2.0'
+  compile 'com.android.support:support-v4:25.2.0'
+  compile 'com.android.support:appcompat-v7:25.2.0'
+  compile 'com.android.support:design:25.2.0'
+  // Better times
+  compile 'joda-time:joda-time:2.3'
+  // HTML parsing
+  compile 'org.jsoup:jsoup:1.7.3'
+  compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
+  // RSS
+  compile "com.rometools:rome:1.7.1"
+  compile "com.rometools:rome-modules:1.7.1"
+  // For better fetching
+  compile 'com.squareup.okhttp3:okhttp:3.6.0'
+  // Image loading
+  compile 'com.github.bumptech.glide:glide:3.7.0'
+  compile 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
+  // tests
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.mockito:mockito-core:2.7.11'
 }
