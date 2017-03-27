@@ -50,5 +50,19 @@
     <string name="no_tag">No tag</string>
     <string name="username">Username</string>
     <string name="server_address">Server address</string>
+    <string name="night_mode">Night mode</string>
+    <string name="notify_for_new_items">Notify for new items</string>
+    <string name="toggle_read_status">Toggle read status</string>
+    <string name="open_link_in_browser">Open link in browser</string>
+    <string name="open_enclosed_media">Open enclosed media</string>
+    <string name="sync">Sync</string>
+    <string name="export_feeds_to_opml">Export feeds to OPML</string>
+    <string name="import_feeds_from_opml">Import feeds from OPML</string>
+    <string name="view_debug_log">View debug log</string>
+    <string name="new_based_on_this">New based on this</string>
+    <string name="indicator_for_mark_as_read">Indicator for mark as read</string>
+    <string name="share">Share</string>
+    <string name="no_such_feed">No such feed could be found. Try using https maybe.</string>
+    <string name="nothing_to_display">Nothing to display!</string>
 
 </resources>

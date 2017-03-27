@@ -18,7 +18,7 @@
         android:layout_marginStart="8dp"
         android:visibility="invisible"
         android:src="@drawable/ic_action_visibility"
-        android:contentDescription="Indicator for mark as read" />
+        android:contentDescription="@string/indicator_for_mark_as_read" />
 
     <ImageView
         android:id="@+id/check_right"
@@ -28,7 +28,7 @@
         android:layout_marginEnd="8dp"
         android:visibility="invisible"
         android:src="@drawable/ic_action_visibility"
-        android:contentDescription="Indicator for mark as read" />
+        android:contentDescription="@string/indicator_for_mark_as_read" />
 
 </FrameLayout>
 

@@ -183,13 +183,13 @@ public class ReaderFragment extends Fragment
                 .story_feedtitle);
 
         if (mRssItem.title == null) {
-            mTitleTextView.setText("Nothing to display!");
+            mTitleTextView.setText(R.string.nothing_to_display);
         } else {
             mTitleTextView
                     .setText(htmlformatter.toSpanned(mRssItem.title, getActivity()));
         }
         if (mRssItem.description == null) {
-            mBodyTextView.setText("Nothing to display!");
+            mBodyTextView.setText(R.string.nothing_to_display);
         } else {
             //Log.d("JONAS", "Text is:\n" + mRssItem.description);
             // Set without images as a place holder
@@ -198,7 +198,7 @@ public class ReaderFragment extends Fragment
         }
 
         if (mRssItem.feedtitle == null) {
-            mFeedTitleTextView.setText("NOthing to display!");
+            mFeedTitleTextView.setText(R.string.nothing_to_display);
         } else {
             mFeedTitleTextView.setText(mRssItem.feedtitle);
         }

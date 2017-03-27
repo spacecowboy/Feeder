@@ -395,7 +395,7 @@ public class EditFeedActivity extends Activity
             mListResults.setVisibility(View.VISIBLE);
             mResultAdapter.setEntries(Collections.singletonList(feed));
         } else {
-            mEmptyText.setText("No such feed could be found. Try using https maybe.");
+            mEmptyText.setText(getString(R.string.no_such_feed));
             mEmptyText.setVisibility(View.VISIBLE);
         }
     }

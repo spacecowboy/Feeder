@@ -22,15 +22,15 @@
         android:id="@+id/action_open_enclosure"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_av_play_circle_outline"
-        android:title="Open enclosed media" />
+        android:title="@string/open_enclosed_media" />
     <item
         android:id="@+id/action_open_in_browser"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_location_web_site"
-        android:title="Open link in browser" />
+        android:title="@string/open_link_in_browser" />
     <item
         android:id="@+id/action_toggle_unread"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_visibility"
-        android:title="Toggle read status" />
+        android:title="@string/toggle_read_status" />
 </menu>

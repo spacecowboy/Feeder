@@ -12,21 +12,21 @@
         android:id="@+id/action_sync"
         android:icon="@drawable/ic_action_sync"
         android:orderInCategory="900"
-        android:title="Sync"
+        android:title="@string/sync"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_opml_export"
         android:orderInCategory="1001"
-        android:title="Export feeds to OPML"
+        android:title="@string/export_feeds_to_opml"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_opml_import"
         android:orderInCategory="1002"
-        android:title="Import feeds from OPML"
+        android:title="@string/import_feeds_from_opml"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_debug_log"
         android:orderInCategory="999"
-        android:title="View debug log"
+        android:title="@string/view_debug_log"
         app:showAsAction="never" />
 </menu>
