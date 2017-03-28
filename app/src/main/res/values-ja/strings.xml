@@ -50,5 +50,19 @@
     <string name="no_tag">タグなし</string>
     <string name="username">ユーザー名</string>
     <string name="server_address">サーバーアドレス</string>
+    <string name="night_mode">夜間モード</string>
+    <string name="notify_for_new_items">新しいアイテムの通知</string>
+    <string name="toggle_read_status">既読/未読の切り替え</string>
+    <string name="open_link_in_browser">リンクをブラウザーで開く</string>
+    <string name="open_enclosed_media">閉鎖されたメディアを開く</string>
+    <string name="sync">同期</string>
+    <string name="export_feeds_to_opml">OPML にフィードをエクスポート</string>
+    <string name="import_feeds_from_opml">OPML からフィードをインポート</string>
+    <string name="view_debug_log">デバッグログを表示</string>
+    <string name="new_based_on_this">これに基づき新規</string>
+    <string name="indicator_for_mark_as_read">既読のインジケータ―</string>
+    <string name="share">共有</string>
+    <string name="no_such_feed">そのようなフィードは見つかりませんでした。 https を使用してみてください。</string>
+    <string name="nothing_to_display">表示するものはありません!</string>
 
 </resources>
