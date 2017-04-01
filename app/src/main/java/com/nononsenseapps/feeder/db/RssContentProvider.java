@@ -31,10 +31,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+
+import static android.content.ContentResolver.SYNC_EXTRAS_REQUIRE_CHARGING;
+import static com.nononsenseapps.feeder.util.PrefUtils.PREF_SYNC_ONLY_CHARGING;
 
 public class RssContentProvider extends ContentProvider {
     // All URIs share these parts
@@ -76,7 +81,7 @@ public class RssContentProvider extends ContentProvider {
      * @param itemId
      */
     public static void MarkItemAsRead(final Context context,
-            final long itemId) {
+                                      final long itemId) {
         ContentValues values = new ContentValues();
         values.put(FeedItemSQL.COL_UNREAD, 0);
         context.getContentResolver()
@@ -92,7 +97,7 @@ public class RssContentProvider extends ContentProvider {
      * @param itemId
      */
     public static void MarkItemAsUnread(final Context context,
-                                      final long itemId) {
+                                        final long itemId) {
         ContentValues values = new ContentValues();
         values.put(FeedItemSQL.COL_UNREAD, 1);
         context.getContentResolver()
@@ -108,7 +113,7 @@ public class RssContentProvider extends ContentProvider {
      * @param feedId
      */
     public static void MarkFeedAsRead(final Context context,
-            final long feedId) {
+                                      final long feedId) {
         ContentValues values = new ContentValues();
         values.put(FeedItemSQL.COL_UNREAD, 0);
         context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
@@ -124,7 +129,7 @@ public class RssContentProvider extends ContentProvider {
      * @param tag     all feeds with this tag will be marked as read
      */
     public static void MarkItemsAsRead(final Context context,
-            final String tag) {
+                                       final String tag) {
         ContentValues values = new ContentValues();
         values.put(FeedItemSQL.COL_UNREAD, 0);
         context.getContentResolver().update(FeedItemSQL.URI_FEED_ITEMS, values,
@@ -139,7 +144,7 @@ public class RssContentProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
-            String[] selectionArgs, String sortOrder) {
+                        String[] selectionArgs, String sortOrder) {
         final String table;
         Cursor result = null;
 
@@ -173,7 +178,7 @@ public class RssContentProvider extends ContentProvider {
         // negative numbers in the LIMIT clause.
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
         queryBuilder.setTables(table);
-        String query = queryBuilder.buildQuery(projection, selection,null, null, sortOrder, null);
+        String query = queryBuilder.buildQuery(projection, selection, null, null, sortOrder, null);
         query += getLimitString(uri);
 
         result = DatabaseHandler.getInstance(getContext()).getReadableDatabase()
@@ -270,7 +275,7 @@ public class RssContentProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection,
-            String[] selectionArgs) {
+                      String[] selectionArgs) {
         final String table;
         int result = 0;
 
@@ -379,12 +384,18 @@ public class RssContentProvider extends ContentProvider {
             ContentResolver.setIsSyncable(account, RssContentProvider.AUTHORITY, 1);
             // Set sync automatic
             ContentResolver.setSyncAutomatically(account, RssContentProvider.AUTHORITY, true);
-            // Once per hour: mins * secs
-            ContentResolver.addPeriodicSync(account,
-                    RssContentProvider.AUTHORITY,
-                    Bundle.EMPTY,
-                    60L * 60L);
         }
+        Bundle extras = new Bundle();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            extras.putBoolean(SYNC_EXTRAS_REQUIRE_CHARGING,
+                    PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_SYNC_ONLY_CHARGING, false));
+        }
+        // Once per hour: mins * secs
+        ContentResolver.addPeriodicSync(account,
+                RssContentProvider.AUTHORITY,
+                extras,
+                60L * 60L);
+
     }
 
     public static void SetNotify(Context context, long id, boolean on) {
@@ -428,7 +439,6 @@ public class RssContentProvider extends ContentProvider {
     }
 
     /**
-     *
      * @param context
      * @param id
      * @return True if feed has notifications on, false otherwise
@@ -452,8 +462,8 @@ public class RssContentProvider extends ContentProvider {
 
         return result;
     }
+
     /**
-     *
      * @param context
      * @param tag
      * @return True if all items have notifications on, false otherwise

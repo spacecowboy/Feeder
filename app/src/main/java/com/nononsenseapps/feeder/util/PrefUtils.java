@@ -30,6 +30,25 @@ public class PrefUtils {
     public static final String PREF_LAST_FEED_ID = "pref_last_feed_id";
 
     /**
+     * Sync settings
+     */
+    public static final String PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging";
+    public static final String PREF_SYNC_HOTSPOTS = "pref_sync_hotspots";
+    public static final String PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi";
+
+    public static boolean shouldSyncOnlyOnWIfi(final Context context) {
+        return sp(context).getBoolean(PREF_SYNC_ONLY_WIFI, false);
+    }
+
+    public static boolean shouldSyncOnlyWhenCharging(final Context context) {
+        return sp(context).getBoolean(PREF_SYNC_ONLY_CHARGING, false);
+    }
+
+    public static boolean shouldSyncOnHotSpots(final Context context) {
+        return sp(context).getBoolean(PREF_SYNC_HOTSPOTS, false);
+    }
+
+    /**
      * A shorthand method
      */
     private static SharedPreferences sp(final Context context) {
@@ -57,7 +76,7 @@ public class PrefUtils {
     }
 
     public static void setPrefShowOnlyUnread(final Context context,
-            final boolean value) {
+                                             final boolean value) {
         sp(context).edit().putBoolean(PREF_SHOW_ONLY_UNREAD, value).apply();
     }
 
@@ -70,13 +89,14 @@ public class PrefUtils {
      * @param tag
      */
     public static void setLastOpenFeed(final Context context, final long id,
-            final String tag) {
+                                       final String tag) {
         sp(context).edit().putLong(PREF_LAST_FEED_ID, id)
                 .putString(PREF_LAST_FEED_TAG, tag).apply();
     }
 
     /**
      * Get which feed tag was last open. Check id first.
+     *
      * @param context
      * @return last open tag, or null
      */
@@ -86,6 +106,7 @@ public class PrefUtils {
 
     /**
      * Get which feed id was last open. If -1, check tag.
+     *
      * @param context
      * @return last open id, or -1
      */
@@ -95,12 +116,12 @@ public class PrefUtils {
 
 
     public static void registerOnSharedPreferenceChangeListener(final Context context,
-            SharedPreferences.OnSharedPreferenceChangeListener listener) {
+                                                                SharedPreferences.OnSharedPreferenceChangeListener listener) {
         sp(context).registerOnSharedPreferenceChangeListener(listener);
     }
 
     public static void unregisterOnSharedPreferenceChangeListener(final Context context,
-            SharedPreferences.OnSharedPreferenceChangeListener listener) {
+                                                                  SharedPreferences.OnSharedPreferenceChangeListener listener) {
         sp(context).unregisterOnSharedPreferenceChangeListener(listener);
     }
 }
