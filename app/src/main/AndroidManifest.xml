@@ -115,6 +115,10 @@
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
           android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
+      <intent-filter>
+        <action android:name="android.intent.action.MANAGE_NETWORK_USAGE"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+      </intent-filter>
     </activity>
   </application>
 
