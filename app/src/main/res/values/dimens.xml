@@ -1,67 +1,68 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">@dimen/keyline_1</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+  <!-- Default screen margins, per the Android Design guidelines. -->
+  <dimen name="activity_horizontal_margin">@dimen/keyline_1</dimen>
+  <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
-         https://developer.android.com/design/patterns/navigation-drawer.html -->
-    <dimen name="navigation_drawer_width">240dp</dimen>
+  <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+       https://developer.android.com/design/patterns/navigation-drawer.html -->
+  <dimen name="navigation_drawer_width">240dp</dimen>
 
-    <dimen name="keyline_1">16dp</dimen>
-    <dimen name="keyline_1_minus_8dp">8dp</dimen>
-    <dimen name="keyline_content_start">72dp</dimen>
-    <dimen name="keyline_content_start_minus_16dp">56dp</dimen>
-    <dimen name="keyline_content_end_with_fab">32dp</dimen>
+  <dimen name="keyline_1">16dp</dimen>
+  <dimen name="keyline_1_minus_8dp">8dp</dimen>
+  <dimen name="keyline_content_start">72dp</dimen>
+  <dimen name="keyline_content_start_minus_16dp">56dp</dimen>
+  <dimen name="keyline_content_end_with_fab">32dp</dimen>
 
-    <!-- including padding -->
-    <dimen name="floating_add_button_height">72dp</dimen>
-    <dimen name="floating_add_button_height_no_padding">56dp</dimen>
-    <dimen name="fab_elevation">4dp</dimen>
-    <dimen name="fab_press_translation_z">2dp</dimen>
+  <!-- including padding -->
+  <dimen name="floating_add_button_height">72dp</dimen>
+  <dimen name="floating_add_button_height_no_padding">56dp</dimen>
+  <dimen name="fab_elevation">4dp</dimen>
+  <dimen name="fab_press_translation_z">2dp</dimen>
 
-    <!-- Action Bar auto-hide-on-scroll behavior parameters -->
-    <dimen name="action_bar_auto_hide_min_y">56dp</dimen>
-    <dimen name="action_bar_auto_hide_sensivity">12dp</dimen>
+  <!-- Action Bar auto-hide-on-scroll behavior parameters -->
+  <dimen name="action_bar_auto_hide_min_y">56dp</dimen>
+  <dimen name="action_bar_auto_hide_sensivity">12dp</dimen>
 
-    <dimen name="headerbar_elevation">2dp</dimen>
+  <dimen name="headerbar_elevation">2dp</dimen>
 
-    <dimen name="navdrawer_width">300dp</dimen>
+  <dimen name="navdrawer_width">300dp</dimen>
 
-    <dimen name="navdrawer_unreadcount_textsize">12sp</dimen>
+  <dimen name="navdrawer_unreadcount_textsize">12sp</dimen>
 
-    <dimen name="grid_item_size">200dp</dimen>
+  <dimen name="grid_item_size">200dp</dimen>
 
-    <dimen name="elevation1">2dp</dimen>
+  <dimen name="elevation1">2dp</dimen>
 
 
-    <!-- Edit Feed window size -->
-    <dimen name="session_details_floating_width">300dp</dimen>
-    <dimen name="session_details_floating_height">300dp</dimen>
-    <dimen name="session_details_extra_space_bottom">48dp</dimen>
-    <dimen name="feed_list_padding">0dp</dimen>
+  <!-- Edit Feed window size -->
+  <dimen name="session_details_floating_width">300dp</dimen>
+  <dimen name="session_details_floating_height">300dp</dimen>
+  <dimen name="session_details_extra_space_bottom">48dp</dimen>
+  <dimen name="feed_list_padding">0dp</dimen>
 
-    <!-- text sizes -->
-    <dimen name="reader_title">24sp</dimen>
-    <dimen name="reader_author">14sp</dimen>
-    <dimen name="reader_body">16sp</dimen>
-    <dimen name="listitem_author">12sp</dimen>
-    <dimen name="listitem_body">14sp</dimen>
+  <!-- text sizes -->
+  <dimen name="reader_title">24sp</dimen>
+  <dimen name="reader_author">14sp</dimen>
+  <dimen name="reader_body">16sp</dimen>
+  <dimen name="listitem_author">12sp</dimen>
+  <dimen name="listitem_body">14sp</dimen>
 
-    <!-- snackbar, match_width -->
-    <dimen name="snackbar_min_width">288dp</dimen>
-    <dimen name="snackbar_max_width">568dp</dimen>
-    <dimen name="snackbar_margins">@dimen/keyline_1</dimen>
+  <!-- snackbar, match_width -->
+  <dimen name="snackbar_min_width">288dp</dimen>
+  <dimen name="snackbar_max_width">568dp</dimen>
+  <dimen name="snackbar_margins">@dimen/keyline_1</dimen>
 
-    <dimen name="item_img_def_width">64dp</dimen>
-    <dimen name="item_img_def_height">128dp</dimen>
-    <dimen name="reader_tablet_width">500dp</dimen>
+  <dimen name="item_img_def_width">64dp</dimen>
+  <dimen name="item_img_def_height">128dp</dimen>
+  <dimen name="reader_tablet_width">500dp</dimen>
 
-    <!-- Used for MyQuoteSpan -->
-    <dimen name="reader_quote_gap_width">8dp</dimen>
-    <dimen name="reader_quote_stripe_width">2dp</dimen>
-    <dimen name="switch_padding">4dp</dimen>
-    <!-- 56 dp + 48 dp -->
-    <dimen name="total_toolbar_height">104dp</dimen>
-    <dimen name="toolbar_height">56dp</dimen>
-    <dimen name="subtoolbar_height">48dp</dimen>
+  <!-- Used for MyQuoteSpan -->
+  <dimen name="reader_quote_gap_width">8dp</dimen>
+  <dimen name="reader_quote_stripe_width">2dp</dimen>
+  <dimen name="switch_padding">4dp</dimen>
+  <!-- 56 dp + 48 dp -->
+  <dimen name="total_toolbar_height">104dp</dimen>
+  <dimen name="toolbar_height">56dp</dimen>
+  <dimen name="subtoolbar_height">48dp</dimen>
+  <dimen name="keyline_2">72dp</dimen>
 </resources>

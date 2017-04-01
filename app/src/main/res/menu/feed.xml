@@ -1,32 +1,38 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.FeedActivity">
-    <item
-        android:id="@+id/action_add"
-        android:icon="@drawable/ic_action_add"
-        android:orderInCategory="100"
-        android:title="@string/add_feed"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_sync"
-        android:icon="@drawable/ic_action_sync"
-        android:orderInCategory="900"
-        android:title="@string/sync"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_opml_export"
-        android:orderInCategory="1001"
-        android:title="@string/export_feeds_to_opml"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_opml_import"
-        android:orderInCategory="1002"
-        android:title="@string/import_feeds_from_opml"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_debug_log"
-        android:orderInCategory="999"
-        android:title="@string/view_debug_log"
-        app:showAsAction="never" />
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".ui.FeedActivity">
+  <item
+      android:id="@+id/action_add"
+      android:icon="@drawable/ic_action_add"
+      android:orderInCategory="100"
+      android:title="@string/add_feed"
+      app:showAsAction="ifRoom"/>
+  <item
+      android:id="@+id/action_sync"
+      android:icon="@drawable/ic_action_sync"
+      android:orderInCategory="900"
+      android:title="@string/sync"
+      app:showAsAction="ifRoom"/>
+  <item
+      android:id="@+id/action_opml_export"
+      android:orderInCategory="1001"
+      android:title="@string/export_feeds_to_opml"
+      app:showAsAction="never"/>
+  <item
+      android:id="@+id/action_opml_import"
+      android:orderInCategory="1002"
+      android:title="@string/import_feeds_from_opml"
+      app:showAsAction="never"/>
+  <item
+      android:id="@+id/action_debug_log"
+      android:orderInCategory="999"
+      android:title="@string/view_debug_log"
+      app:showAsAction="never"/>
+  <item
+      android:id="@+id/action_settings"
+      android:orderInCategory="990"
+      android:title="@string/action_settings"
+      android:icon="@drawable/ic_action_settings"
+      app:showAsAction="ifRoom"/>
 </menu>

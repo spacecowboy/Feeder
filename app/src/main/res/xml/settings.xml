@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <PreferenceCategory
+      android:title="Synchronization">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="pref_sync_only_wifi" android:title="Only on WiFi"/>
+    <SwitchPreference
+        android:defaultValue="false"
+        android:title="Include mobile hotspots" android:key="pref_sync_hotspots"
+        android:summary="May result in mobile data charges."/>
+    <SwitchPreference
+        android:defaultValue="false"
+        android:title="Only when charging" android:key="pref_sync_only_charging"/>
+  </PreferenceCategory>
+</PreferenceScreen>

@@ -1,68 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Feeder</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">Example action</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_story">StoryActivity</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_fullscreen">FullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-    <string name="add_feed">Add feed</string>
-    <string name="title_activity_edit_feed">Subscribe to feed</string>
-    <string name="url">URL</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="tag">Tag</string>
-    <string name="add_feed_search_hint">URL to feed</string>
-    <string name="select_account">Select account</string>
-    <string name="title">Title</string>
+  <string name="app_name">Feeder</string>
+  <string name="title_section1">Section 1</string>
+  <string name="title_section2">Section 2</string>
+  <string name="title_section3">Section 3</string>
+  <string name="navigation_drawer_open">Open navigation drawer</string>
+  <string name="navigation_drawer_close">Close navigation drawer</string>
+  <string name="action_example">Example action</string>
+  <string name="action_settings">Settings</string>
+  <string name="title_activity_story">StoryActivity</string>
+  <string name="hello_world">Hello world!</string>
+  <string name="title_activity_fullscreen">FullscreenActivity</string>
+  <string name="dummy_button">Dummy Button</string>
+  <string name="dummy_content">DUMMY\nCONTENT</string>
+  <string name="add_feed">Add feed</string>
+  <string name="title_activity_edit_feed">Subscribe to feed</string>
+  <string name="url">URL</string>
+  <string name="hello_blank_fragment">Hello blank fragment</string>
+  <string name="tag">Tag</string>
+  <string name="add_feed_search_hint">URL to feed</string>
+  <string name="select_account">Select account</string>
+  <string name="title">Title</string>
 
-    <string name="by_author_on_date">by %1$s, %2$s</string>
-    <string name="on_date">%1$s</string>
-    <string name="save">Save</string>
-    <string name="empty_feed_top">Nothing to read here. Would you like to…</string>
-    <string name="empty_feed_open">
-        <![CDATA[<font color="#607D8B">Open</font> another feed?]]></string>
-    <string name="empty_feed_add">
-        <![CDATA[<font color="#607D8B">Add</font> more feeds?]]></string>
-    <string name="empty_no_feeds_top">Nothing to read yet.\nGet started
-        by</string>
-    <string name="empty_no_feeds_login">
-        <![CDATA[<font color="#607D8B">Logging in</font> to the
+  <string name="by_author_on_date">by %1$s, %2$s</string>
+  <string name="on_date">%1$s</string>
+  <string name="save">Save</string>
+  <string name="empty_feed_top">Nothing to read here. Would you like to…</string>
+  <string name="empty_feed_open">
+    <![CDATA[<font color="#607D8B">Open</font> another feed?]]></string>
+  <string name="empty_feed_add">
+    <![CDATA[<font color="#607D8B">Add</font> more feeds?]]></string>
+  <string name="empty_no_feeds_top">Nothing to read yet.\nGet started
+    by
+  </string>
+  <string name="empty_no_feeds_login">
+    <![CDATA[<font color="#607D8B">Logging in</font> to the
         server and…]]></string>
-    <string  name="empty_no_feeds_add">
-        <![CDATA[<font color="#607D8B">Adding</font> some feeds]]></string>
-    <string name="no_feeds_found">Couldn\'t find any relevant feeds. Try to search for a single word.</string>
-    <string name="search_feed_empty_hint">Enter a feed address</string>
-    <string name="mark_all_as_read">Mark all as read</string>
-    <string name="edit_feed">Edit feed</string>
-    <string name="delete_feed">Delete feed</string>
-    <string name="show_all_items">Show all items</string>
-    <string name="show_unread_items">Show unread items</string>
-    <string name="new_items_available">New items available</string>
-    <string name="view">View</string>
-    <string name="no_tag">No tag</string>
-    <string name="username">Username</string>
-    <string name="server_address">Server address</string>
-    <string name="night_mode">Night mode</string>
-    <string name="notify_for_new_items">Notify for new items</string>
-    <string name="toggle_read_status">Toggle read status</string>
-    <string name="open_link_in_browser">Open link in browser</string>
-    <string name="open_enclosed_media">Open enclosed media</string>
-    <string name="sync">Sync</string>
-    <string name="export_feeds_to_opml">Export feeds to OPML</string>
-    <string name="import_feeds_from_opml">Import feeds from OPML</string>
-    <string name="view_debug_log">View debug log</string>
-    <string name="new_based_on_this">New based on this</string>
-    <string name="indicator_for_mark_as_read">Indicator for mark as read</string>
-    <string name="share">Share</string>
-    <string name="no_such_feed">No such feed could be found. Try using https maybe.</string>
-    <string name="nothing_to_display">Nothing to display!</string>
+  <string name="empty_no_feeds_add">
+    <![CDATA[<font color="#607D8B">Adding</font> some feeds]]></string>
+  <string name="no_feeds_found">Couldn\'t find any relevant feeds. Try to search for a single word.</string>
+  <string name="search_feed_empty_hint">Enter a feed address</string>
+  <string name="mark_all_as_read">Mark all as read</string>
+  <string name="edit_feed">Edit feed</string>
+  <string name="delete_feed">Delete feed</string>
+  <string name="show_all_items">Show all items</string>
+  <string name="show_unread_items">Show unread items</string>
+  <string name="new_items_available">New items available</string>
+  <string name="view">View</string>
+  <string name="no_tag">No tag</string>
+  <string name="username">Username</string>
+  <string name="server_address">Server address</string>
+  <string name="night_mode">Night mode</string>
+  <string name="notify_for_new_items">Notify for new items</string>
+  <string name="toggle_read_status">Toggle read status</string>
+  <string name="open_link_in_browser">Open link in browser</string>
+  <string name="open_enclosed_media">Open enclosed media</string>
+  <string name="sync">Sync</string>
+  <string name="export_feeds_to_opml">Export feeds to OPML</string>
+  <string name="import_feeds_from_opml">Import feeds from OPML</string>
+  <string name="view_debug_log">View debug log</string>
+  <string name="new_based_on_this">New based on this</string>
+  <string name="indicator_for_mark_as_read">Indicator for mark as read</string>
+  <string name="share">Share</string>
+  <string name="no_such_feed">No such feed could be found. Try using https maybe.</string>
+  <string name="nothing_to_display">Nothing to display!</string>
+  <string name="title_activity_settings">Settings</string>
+
+  <!-- Strings related to Settings -->
+
+  <!-- Example General settings -->
+  <string name="pref_header_general">General</string>
+
+  <string name="pref_title_social_recommendations">Enable social recommendations</string>
+  <string name="pref_description_social_recommendations">Recommendations for people to contact based on your message
+    history
+  </string>
+
+  <string name="pref_title_display_name">Display name</string>
+  <string name="pref_default_display_name">John Smith</string>
+
+  <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+  <string-array name="pref_example_list_titles">
+    <item>Always</item>
+    <item>When possible</item>
+    <item>Never</item>
+  </string-array>
+  <string-array name="pref_example_list_values">
+    <item>1</item>
+    <item>0</item>
+    <item>-1</item>
+  </string-array>
+
+  <!-- Example settings for Data & Sync -->
+  <string name="pref_header_data_sync">Data &amp; sync</string>
+
+  <string name="pref_title_sync_frequency">Sync frequency</string>
+  <string-array name="pref_sync_frequency_titles">
+    <item>15 minutes</item>
+    <item>30 minutes</item>
+    <item>1 hour</item>
+    <item>3 hours</item>
+    <item>6 hours</item>
+    <item>Never</item>
+  </string-array>
+  <string-array name="pref_sync_frequency_values">
+    <item>15</item>
+    <item>30</item>
+    <item>60</item>
+    <item>180</item>
+    <item>360</item>
+    <item>-1</item>
+  </string-array>
+
+  <string-array name="list_preference_entries">
+    <item>Entry 1</item>
+    <item>Entry 2</item>
+    <item>Entry 3</item>
+  </string-array>
+
+  <string-array name="list_preference_entry_values">
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+  </string-array>
+
+  <string-array name="multi_select_list_preference_default_value"/>
+
+  <string name="pref_title_system_sync_settings">System sync settings</string>
+
+  <!-- Example settings for Notifications -->
+  <string name="pref_header_notifications">Notifications</string>
+
+  <string name="pref_title_new_message_notifications">New message notifications</string>
+
+  <string name="pref_title_ringtone">Ringtone</string>
+  <string name="pref_ringtone_silent">Silent</string>
+
+  <string name="pref_title_vibrate">Vibrate</string>
 
 </resources>

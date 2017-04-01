@@ -212,6 +212,8 @@ public class FeedActivity extends BaseActivity {
         } else if (R.id.action_debug_log == id) {
             startActivity(new Intent(this, DebugLogActivity.class));
             return true;
+        } else if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
