@@ -21,5 +21,9 @@
     <SwitchPreference
         android:defaultValue="false"
         android:title="@string/only_on_wifi" android:key="pref_img_only_wifi"/>
+    <SwitchPreference
+        android:defaultValue="false"
+        android:title="Include mobile hotspots" android:key="pref_img_hotspots"
+        android:summary="@string/may_result_data_charges"/>
   </PreferenceCategory>
 </PreferenceScreen>

@@ -9,16 +9,18 @@ public class ImageTextLoader extends AsyncTaskLoader<Spanned> {
 
     private final String text;
     private final Point maxSize;
+    private final boolean allowDownload;
 
-    public ImageTextLoader(Context context, String text, Point maxSize) {
+    public ImageTextLoader(Context context, String text, Point maxSize, boolean allowDownload) {
         super(context);
         this.text = text;
         this.maxSize = maxSize;
+        this.allowDownload = allowDownload;
     }
 
     @Override
     public Spanned loadInBackground() {
-        return HtmlConverter.toSpannedWithImages(text, getContext(), maxSize);
+        return HtmlConverter.toSpannedWithImages(text, getContext(), maxSize, allowDownload);
     }
 
     @Override

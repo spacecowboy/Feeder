@@ -20,7 +20,7 @@ public class HtmlConverter {
 
     private HtmlConverter() {}
 
-    public static Spanned toSpannedWithImages(String source, Context context, Point maxSize) {
+    public static Spanned toSpannedWithImages(String source, Context context, Point maxSize, boolean allowDownload) {
         Parser parser = new Parser();
         try {
             parser.setProperty(Parser.schemaProperty, HtmlParser.schema);
@@ -29,7 +29,7 @@ public class HtmlConverter {
             throw new RuntimeException(e);
         }
 
-        GlideConverter converter = new GlideConverter(source, parser, context, maxSize);
+        GlideConverter converter = new GlideConverter(source, parser, context, maxSize, allowDownload);
         return converter.convert();
     }
 

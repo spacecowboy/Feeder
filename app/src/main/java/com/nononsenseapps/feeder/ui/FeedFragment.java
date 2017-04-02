@@ -54,12 +54,6 @@ import android.view.ViewTreeObserver;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.bumptech.glide.DrawableRequestBuilder;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.data.DataFetcher;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.model.stream.StreamModelLoader;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
@@ -69,16 +63,16 @@ import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
-import com.nononsenseapps.feeder.util.SystemUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
+
+import static com.nononsenseapps.feeder.util.GlideUtils.glide;
+import static com.nononsenseapps.feeder.util.PrefUtils.shouldLoadImages;
 
 
 public class FeedFragment extends Fragment
@@ -1079,7 +1073,7 @@ public class FeedFragment extends Fragment
             public boolean onPreDraw() {
                 if (!isDetached() && getActivity() != null) {
                     try {
-                        glide(rssItem.imageurl)
+                        glide(getActivity(), rssItem.imageurl, shouldLoadImages(getActivity()))
                                 .centerCrop()
                                 .into(imageView);
                     } catch (IllegalArgumentException e) {
@@ -1093,48 +1087,6 @@ public class FeedFragment extends Fragment
                 return true;
             }
         }
-    }
-
-    private DrawableRequestBuilder<String> glide(String imgUrl) {
-        if (shouldLoadImages(getActivity())) {
-            return Glide.with(this)
-                    .load(imgUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL);
-        } else {
-            return Glide.with(this)
-                    .using(new StreamModelLoader<String>() {
-                        @Override
-                        public DataFetcher<InputStream> getResourceFetcher(final String s, int i, int i1) {
-                            return new DataFetcher<InputStream>() {
-                                @Override
-                                public InputStream loadData(Priority priority) throws Exception {
-                                    throw new IOException("Download not allowed");
-                                }
-
-                                @Override
-                                public void cleanup() {
-
-                                }
-
-                                @Override
-                                public String getId() {
-                                    return s;
-                                }
-
-                                @Override
-                                public void cancel() {
-
-                                }
-                            };
-                        }
-                    })
-                    .load(imgUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL);
-        }
-    }
-
-    private static boolean shouldLoadImages(Context context) {
-        return SystemUtils.currentlyOnWifi(context) || !PrefUtils.shouldLoadImagesOnlyOnWIfi(context);
     }
 
     public class HeaderHolder extends RecyclerView.ViewHolder {

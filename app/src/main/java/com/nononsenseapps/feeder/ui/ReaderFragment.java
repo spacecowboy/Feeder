@@ -35,17 +35,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
+import com.nononsenseapps.feeder.ui.text.HtmlConverter;
 import com.nononsenseapps.feeder.ui.text.ImageTextLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
-import com.nononsenseapps.feeder.util.SystemUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
-import com.nononsenseapps.feeder.ui.text.HtmlConverter;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -285,23 +282,17 @@ public class ReaderFragment extends Fragment
 
     @Override
     public Loader<Spanned> onCreateLoader(final int id, final Bundle args) {
-        if (PrefUtils.shouldLoadImagesOnlyOnWIfi(getActivity()) && !SystemUtils.currentlyOnWifi(getActivity())) {
-            return new NothingLoader(getActivity());
-        }
-
         Point size = new Point();
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
         // Using twice window height since we do scroll vertically
         if (TabletUtils.isTablet(getActivity())) {
             // Tablet has fixed width
             return new ImageTextLoader(getActivity(), mRssItem.description,
-                    new Point(Math.round(getResources().getDimension(R.dimen.reader_tablet_width)),
-                            2 * size.y));
+                    new Point(Math.round(getResources().getDimension(R.dimen.reader_tablet_width)), 2 * size.y), PrefUtils.shouldLoadImages(getActivity()));
         } else {
             // Base it on window size
             return new ImageTextLoader(getActivity(), mRssItem.description,
-                    new Point(size.x - 2 * Math.round(getResources().getDimension(R.dimen.keyline_1)),
-                            2 * size.y));
+                    new Point(size.x - 2 * Math.round(getResources().getDimension(R.dimen.keyline_1)), 2 * size.y), PrefUtils.shouldLoadImages(getActivity()));
         }
     }
 

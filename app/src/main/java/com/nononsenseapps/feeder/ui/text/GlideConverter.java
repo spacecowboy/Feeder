@@ -14,9 +14,9 @@ import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
 import android.text.style.StyleSpan;
 import android.util.Log;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.BitmapRequestBuilder;
 import com.nononsenseapps.feeder.R;
+import com.nononsenseapps.feeder.util.GlideUtils;
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
 
@@ -25,19 +25,18 @@ import java.util.concurrent.ExecutionException;
 public class GlideConverter extends HtmlToSpannedConverter {
 
     private final Context context;
+    private final boolean allowDownload;
 
     private final float densityScale;
     private final Point maxSize;
 
-    private final RequestManager g;
-
-    public GlideConverter(final String source, final Parser parser, final Context context, final Point maxSize) {
+    public GlideConverter(final String source, final Parser parser, final Context context, final Point maxSize, boolean allowDownload) {
         super(source, parser, context);
         this.context = context.getApplicationContext();
+        this.allowDownload = allowDownload;
         // Get screen density
         densityScale = this.context.getResources().getDisplayMetrics().density;
         this.maxSize = maxSize;
-        g = Glide.with(this.context);
     }
 
     @Override
@@ -152,12 +151,13 @@ public class GlideConverter extends HtmlToSpannedConverter {
             }
 
             final Bitmap b;
+            BitmapRequestBuilder<String, Bitmap> g = GlideUtils.glideAsBitmap(context, source, allowDownload);
             if (shrunk || hasSize) {
-                b = g.load(source).asBitmap().fitCenter().into(w, h).get();
+                b = g.fitCenter().into(w, h).get();
             } else if (hasPercentSize) {
-                b = g.load(source).asBitmap().fitCenter().into(maxSize.x, maxSize.y).get();
+                b = g.fitCenter().into(maxSize.x, maxSize.y).get();
             } else {
-                b = g.load(source).asBitmap().fitCenter().into(maxSize.x, maxSize.y).get();
+                b = g.fitCenter().into(maxSize.x, maxSize.y).get();
             }
 
             if (w == -1) {
@@ -208,8 +208,8 @@ public class GlideConverter extends HtmlToSpannedConverter {
 
         int w1, h1;
         try {
-            //final Bitmap b = p.load(video.imageurl).tag(ImageTextLoader.this).get();
-            final Bitmap b = g.load(video.imageurl).asBitmap().fitCenter().into(maxSize.x, maxSize.y).get();
+            final Bitmap b = GlideUtils.glideAsBitmap(context, video.imageurl, allowDownload)
+                    .load(video.imageurl).fitCenter().into(maxSize.x, maxSize.y).get();
             //final Point newSize = scaleImage(b.getWidth(), b.getHeight());
             w1 = b.getWidth();
             h1 = b.getHeight();
