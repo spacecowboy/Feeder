@@ -1,9 +1,9 @@
-package com.nononsenseapps.text;
+package com.nononsenseapps.feeder.ui.text;
 
 
 import android.content.Context;
+import android.graphics.Point;
 import android.text.Spanned;
-
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
 
@@ -18,7 +18,20 @@ import org.ccil.cowan.tagsoup.Parser;
  */
 public class HtmlConverter {
 
-    public HtmlConverter() {}
+    private HtmlConverter() {}
+
+    public static Spanned toSpannedWithImages(String source, Context context, Point maxSize) {
+        Parser parser = new Parser();
+        try {
+            parser.setProperty(Parser.schemaProperty, HtmlParser.schema);
+        } catch (org.xml.sax.SAXNotRecognizedException | org.xml.sax.SAXNotSupportedException e) {
+            // Should not happen.
+            throw new RuntimeException(e);
+        }
+
+        GlideConverter converter = new GlideConverter(source, parser, context, maxSize);
+        return converter.convert();
+    }
 
     /**
      * Returns displayable styled text from the provided HTML string.
@@ -30,20 +43,16 @@ public class HtmlConverter {
      * <p>This uses TagSoup to handle real HTML, including all of the brokenness
      * found in the wild.
      */
-    public Spanned toSpanned(String source, Context context) {
+    public static Spanned toSpannedWithNoImages(String source, Context context) {
         Parser parser = new Parser();
         try {
             parser.setProperty(Parser.schemaProperty, HtmlParser.schema);
-        } catch (org.xml.sax.SAXNotRecognizedException e) {
-            // Should not happen.
-            throw new RuntimeException(e);
-        } catch (org.xml.sax.SAXNotSupportedException e) {
+        } catch (org.xml.sax.SAXNotRecognizedException | org.xml.sax.SAXNotSupportedException e) {
             // Should not happen.
             throw new RuntimeException(e);
         }
 
-        HtmlToSpannedConverter converter = getSpanConverter(source, parser, context);
-
+        HtmlToSpannedConverter converter = new HtmlToSpannedConverter(source, parser, context);
         return converter.convert();
     }
 
@@ -56,11 +65,6 @@ public class HtmlConverter {
 
     private HtmlToPlainTextConverter getPlainTextConverter(String source) {
         return new HtmlToPlainTextConverter(source);
-    }
-
-    public HtmlToSpannedConverter getSpanConverter(String source,
-                                                   Parser parser, Context context) {
-        return new HtmlToSpannedConverter(source, parser, context);
     }
 
     /**

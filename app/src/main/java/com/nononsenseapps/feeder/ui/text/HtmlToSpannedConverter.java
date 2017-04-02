@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.nononsenseapps.text;
+package com.nononsenseapps.feeder.ui.text;
 
 import android.content.Context;
 import android.content.res.ColorStateList;

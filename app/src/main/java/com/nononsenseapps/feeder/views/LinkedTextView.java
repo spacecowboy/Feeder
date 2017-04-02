@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
-import com.nononsenseapps.feeder.model.ClickableImageSpan;
+import com.nononsenseapps.feeder.ui.text.ClickableImageSpan;
 
 /**
  * A textview containing clickable links.

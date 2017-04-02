@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import com.nononsenseapps.text.HtmlToPlainTextConverter;
+import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter;
 import com.rometools.modules.mediarss.MediaEntryModule;
 import com.rometools.modules.mediarss.MediaModule;
 import com.rometools.modules.mediarss.types.MediaContent;

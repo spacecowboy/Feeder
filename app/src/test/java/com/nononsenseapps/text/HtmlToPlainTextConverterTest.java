@@ -1,5 +1,6 @@
 package com.nononsenseapps.text;
 
+import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

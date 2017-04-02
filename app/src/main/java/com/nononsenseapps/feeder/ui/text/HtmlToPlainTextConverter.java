@@ -1,4 +1,4 @@
-package com.nononsenseapps.text;
+package com.nononsenseapps.feeder.ui.text;
 
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;

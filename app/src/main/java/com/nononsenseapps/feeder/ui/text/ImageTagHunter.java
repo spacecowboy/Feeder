@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.model;
+package com.nononsenseapps.feeder.ui.text;
 
 import android.util.Log;
 import org.jsoup.nodes.Document;
