@@ -35,17 +35,18 @@ public class SystemUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Network net = connManager.getActiveNetwork();
             NetworkInfo netInfo = connManager.getNetworkInfo(net);
-            return netInfo.isConnected() && netInfo.getType() == ConnectivityManager.TYPE_WIFI;
-        } else {
-            for (Network net : connManager.getAllNetworks()) {
-                NetworkInfo netInfo = connManager.getNetworkInfo(net);
-
-                if (netInfo.isConnected() && netInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-                    return true;
-                }
+            if (netInfo != null) {
+                return netInfo.isConnected() && netInfo.getType() == ConnectivityManager.TYPE_WIFI;
             }
-            return false;
         }
+        for (Network net : connManager.getAllNetworks()) {
+            NetworkInfo netInfo = connManager.getNetworkInfo(net);
+
+            if (netInfo != null && netInfo.isConnected() && netInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean currentlyConnected(Context context) {
