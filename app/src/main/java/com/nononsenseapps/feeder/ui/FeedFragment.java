@@ -1075,6 +1075,7 @@ public class FeedFragment extends Fragment
                     try {
                         glide(getActivity(), rssItem.imageurl, shouldLoadImages(getActivity()))
                                 .centerCrop()
+                                .error(R.drawable.ic_signal_wifi_off_white_24dp)
                                 .into(imageView);
                     } catch (IllegalArgumentException e) {
                         // Could still happen if we have a race-condition?
