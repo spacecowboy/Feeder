@@ -40,6 +40,8 @@ import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.ui.text.ImageTextLoader;
+import com.nononsenseapps.feeder.util.PrefUtils;
+import com.nononsenseapps.feeder.util.SystemUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
 import com.nononsenseapps.feeder.ui.text.HtmlConverter;
@@ -281,16 +283,12 @@ public class ReaderFragment extends Fragment
         }
     }
 
-
-    /**
-     * Instantiate and return a new Loader for the given ID.
-     *
-     * @param id   The ID whose loader is to be created.
-     * @param args Any arguments supplied by the caller.
-     * @return Return a new Loader instance that is ready to start loading.
-     */
     @Override
     public Loader<Spanned> onCreateLoader(final int id, final Bundle args) {
+        if (PrefUtils.shouldLoadImagesOnlyOnWIfi(getActivity()) && !SystemUtils.currentlyOnWifi(getActivity())) {
+            return new NothingLoader(getActivity());
+        }
+
         Point size = new Point();
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
         // Using twice window height since we do scroll vertically

@@ -36,6 +36,15 @@ public class PrefUtils {
     public static final String PREF_SYNC_HOTSPOTS = "pref_sync_hotspots";
     public static final String PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi";
 
+    /**
+     * Image settings
+     */
+    public static final String PREF_IMG_ONLY_WIFI = "pref_img_only_wifi";
+
+    public static boolean shouldLoadImagesOnlyOnWIfi(final Context context) {
+        return sp(context).getBoolean(PREF_IMG_ONLY_WIFI, false);
+    }
+
     public static boolean shouldSyncOnlyOnWIfi(final Context context) {
         return sp(context).getBoolean(PREF_SYNC_ONLY_WIFI, false);
     }

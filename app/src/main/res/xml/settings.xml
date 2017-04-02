@@ -2,17 +2,24 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
   <PreferenceCategory
-      android:title="Synchronization">
+      android:title="@string/synchronization">
 
     <SwitchPreference
         android:defaultValue="false"
-        android:key="pref_sync_only_wifi" android:title="Only on WiFi"/>
+        android:key="pref_sync_only_wifi" android:title="@string/only_on_wifi"/>
     <SwitchPreference
         android:defaultValue="false"
         android:title="Include mobile hotspots" android:key="pref_sync_hotspots"
-        android:summary="May result in mobile data charges."/>
+        android:summary="@string/may_result_data_charges"/>
     <SwitchPreference
         android:defaultValue="false"
-        android:title="Only when charging" android:key="pref_sync_only_charging"/>
+        android:title="@string/only_when_charging" android:key="pref_sync_only_charging"/>
+  </PreferenceCategory>
+  <PreferenceCategory
+      android:title="@string/image_loading">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:title="@string/only_on_wifi" android:key="pref_img_only_wifi"/>
   </PreferenceCategory>
 </PreferenceScreen>
