@@ -54,7 +54,12 @@ import android.view.ViewTreeObserver;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.data.DataFetcher;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.stream.StreamModelLoader;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
@@ -64,11 +69,14 @@ import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
+import com.nononsenseapps.feeder.util.SystemUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -841,7 +849,6 @@ public class FeedFragment extends Fragment
 
             if (item.imageurl == null || item.imageurl.isEmpty()) {
                 holder.imageView.setVisibility(View.GONE);
-                //holder.textGroup.setBackground(null);
             } else {
                 // Take up width
                 holder.imageView.setVisibility(View.INVISIBLE);
@@ -1071,67 +1078,64 @@ public class FeedFragment extends Fragment
             @Override
             public boolean onPreDraw() {
                 imageView.setVisibility(View.VISIBLE);
-                // Width is fixed
-                int w = defImgWidth;
-
-                // Use the parent's height
-                int h = itemView.getHeight();
-                //Log.d("JONAS3", "iv:" + imageView.getHeight() + ", item:" + h);
-
                 if (!isDetached() && getActivity() != null) {
                     try {
-                        Glide.with(FeedFragment.this).load(rssItem.imageurl).centerCrop().into(imageView);
+                        glide(rssItem.imageurl)
+                                .centerCrop()
+                                .into(imageView);
                     } catch (IllegalArgumentException e) {
                         // Could still happen if we have a race-condition?
                         Log.d(TAG, e.getLocalizedMessage());
                     }
                 }
-                //Picasso.with(getActivity()).load(rssItem.imageurl).resize(w, h).centerCrop().noFade()
-                //        .tag(FeedFragment.this)
-                //        .into(imageView);
-
-//                if (isGrid) {
-//                    textGroup.setBackground(bgProtection);
-//                }
 
                 // Remove as listener
                 itemView.getViewTreeObserver().removeOnPreDrawListener(this);
-
                 return true;
             }
-
-                /*
-                Intent story = new Intent(getActivity(), StoryActivity.class);
-                story.putExtra("title", titleTextView.getText());
-                story.putExtra("body", bodyTextView.getText());
-
-                Bundle activityOptions = null;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.L) {
-                    ActivityOptions options = ActivityOptions
-                            .makeSceneTransitionAnimation(getActivity(),
-                                    new Pair<View, String>(titleTextView,
-                                            "title"),
-                                    new Pair<View, String>(bodyTextView,
-                                            "body"),
-                                    new Pair<View, String>(imageView, "image"));
-
-                    getActivity().setExitSharedElementListener(new SharedElementListener() {
-                                @Override
-                                public void remapSharedElements(List<String> names,
-                                        Map<String, View> sharedElements) {
-                                    super.remapSharedElements(names,
-                                            sharedElements);
-                                    sharedElements.put("title", titleTextView);
-                                    sharedElements.put("body", bodyTextView);
-                                    sharedElements.put("image", imageView);
-                                }
-                            });
-                    activityOptions = options.toBundle();
-                }
-
-                startActivity(story, activityOptions);*/
-            //            }
         }
+    }
+
+    private DrawableRequestBuilder<String> glide(String imgUrl) {
+        if (shouldLoadImages(getActivity())) {
+            return Glide.with(this)
+                    .load(imgUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL);
+        } else {
+            return Glide.with(this)
+                    .using(new StreamModelLoader<String>() {
+                        @Override
+                        public DataFetcher<InputStream> getResourceFetcher(final String s, int i, int i1) {
+                            return new DataFetcher<InputStream>() {
+                                @Override
+                                public InputStream loadData(Priority priority) throws Exception {
+                                    throw new IOException("Download not allowed");
+                                }
+
+                                @Override
+                                public void cleanup() {
+
+                                }
+
+                                @Override
+                                public String getId() {
+                                    return s;
+                                }
+
+                                @Override
+                                public void cancel() {
+
+                                }
+                            };
+                        }
+                    })
+                    .load(imgUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL);
+        }
+    }
+
+    private static boolean shouldLoadImages(Context context) {
+        return SystemUtils.currentlyOnWifi(context) || !PrefUtils.shouldLoadImagesOnlyOnWIfi(context);
     }
 
     public class HeaderHolder extends RecyclerView.ViewHolder {
