@@ -851,7 +851,7 @@ public class FeedFragment extends Fragment
                 holder.imageView.setVisibility(View.GONE);
             } else {
                 // Take up width
-                holder.imageView.setVisibility(View.INVISIBLE);
+                holder.imageView.setVisibility(View.VISIBLE);
                 // Load image when item has been measured
                 holder.itemView.getViewTreeObserver().addOnPreDrawListener(holder);
             }
@@ -1077,7 +1077,6 @@ public class FeedFragment extends Fragment
              */
             @Override
             public boolean onPreDraw() {
-                imageView.setVisibility(View.VISIBLE);
                 if (!isDetached() && getActivity() != null) {
                     try {
                         glide(rssItem.imageurl)
