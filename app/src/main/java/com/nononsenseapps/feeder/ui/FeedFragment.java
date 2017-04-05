@@ -54,7 +54,6 @@ import android.view.ViewTreeObserver;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.bumptech.glide.Glide;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
@@ -71,6 +70,9 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.HashMap;
 import java.util.Locale;
+
+import static com.nononsenseapps.feeder.util.GlideUtils.glide;
+import static com.nononsenseapps.feeder.util.PrefUtils.shouldLoadImages;
 
 
 public class FeedFragment extends Fragment
@@ -841,10 +843,9 @@ public class FeedFragment extends Fragment
 
             if (item.imageurl == null || item.imageurl.isEmpty()) {
                 holder.imageView.setVisibility(View.GONE);
-                //holder.textGroup.setBackground(null);
             } else {
                 // Take up width
-                holder.imageView.setVisibility(View.INVISIBLE);
+                holder.imageView.setVisibility(View.VISIBLE);
                 // Load image when item has been measured
                 holder.itemView.getViewTreeObserver().addOnPreDrawListener(holder);
             }
@@ -1070,67 +1071,22 @@ public class FeedFragment extends Fragment
              */
             @Override
             public boolean onPreDraw() {
-                imageView.setVisibility(View.VISIBLE);
-                // Width is fixed
-                int w = defImgWidth;
-
-                // Use the parent's height
-                int h = itemView.getHeight();
-                //Log.d("JONAS3", "iv:" + imageView.getHeight() + ", item:" + h);
-
                 if (!isDetached() && getActivity() != null) {
                     try {
-                        Glide.with(FeedFragment.this).load(rssItem.imageurl).centerCrop().into(imageView);
+                        glide(getActivity(), rssItem.imageurl, shouldLoadImages(getActivity()))
+                                .centerCrop()
+                                .error(R.drawable.ic_signal_wifi_off_white_24dp)
+                                .into(imageView);
                     } catch (IllegalArgumentException e) {
                         // Could still happen if we have a race-condition?
                         Log.d(TAG, e.getLocalizedMessage());
                     }
                 }
-                //Picasso.with(getActivity()).load(rssItem.imageurl).resize(w, h).centerCrop().noFade()
-                //        .tag(FeedFragment.this)
-                //        .into(imageView);
-
-//                if (isGrid) {
-//                    textGroup.setBackground(bgProtection);
-//                }
 
                 // Remove as listener
                 itemView.getViewTreeObserver().removeOnPreDrawListener(this);
-
                 return true;
             }
-
-                /*
-                Intent story = new Intent(getActivity(), StoryActivity.class);
-                story.putExtra("title", titleTextView.getText());
-                story.putExtra("body", bodyTextView.getText());
-
-                Bundle activityOptions = null;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.L) {
-                    ActivityOptions options = ActivityOptions
-                            .makeSceneTransitionAnimation(getActivity(),
-                                    new Pair<View, String>(titleTextView,
-                                            "title"),
-                                    new Pair<View, String>(bodyTextView,
-                                            "body"),
-                                    new Pair<View, String>(imageView, "image"));
-
-                    getActivity().setExitSharedElementListener(new SharedElementListener() {
-                                @Override
-                                public void remapSharedElements(List<String> names,
-                                        Map<String, View> sharedElements) {
-                                    super.remapSharedElements(names,
-                                            sharedElements);
-                                    sharedElements.put("title", titleTextView);
-                                    sharedElements.put("body", bodyTextView);
-                                    sharedElements.put("image", imageView);
-                                }
-                            });
-                    activityOptions = options.toBundle();
-                }
-
-                startActivity(story, activityOptions);*/
-            //            }
         }
     }
 

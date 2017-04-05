@@ -36,6 +36,20 @@ public class PrefUtils {
     public static final String PREF_SYNC_HOTSPOTS = "pref_sync_hotspots";
     public static final String PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi";
 
+    /**
+     * Image settings
+     */
+    public static final String PREF_IMG_ONLY_WIFI = "pref_img_only_wifi";
+    public static final String PREF_IMG_HOTSPOTS = "pref_img_hotspots";
+
+    public static boolean shouldLoadImagesOnlyOnWIfi(final Context context) {
+        return sp(context).getBoolean(PREF_IMG_ONLY_WIFI, false);
+    }
+
+    public static boolean shouldLoadImagesOnHotSpots(final Context context) {
+        return sp(context).getBoolean(PREF_IMG_HOTSPOTS, false);
+    }
+
     public static boolean shouldSyncOnlyOnWIfi(final Context context) {
         return sp(context).getBoolean(PREF_SYNC_ONLY_WIFI, false);
     }
@@ -123,5 +137,12 @@ public class PrefUtils {
     public static void unregisterOnSharedPreferenceChangeListener(final Context context,
                                                                   SharedPreferences.OnSharedPreferenceChangeListener listener) {
         sp(context).unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    public static boolean shouldLoadImages(Context context) {
+        if (SystemUtils.currentlyOnWifi(context)) {
+            return !SystemUtils.currentlyMetered(context) || shouldLoadImagesOnHotSpots(context);
+        }
+        return !shouldLoadImagesOnlyOnWIfi(context);
     }
 }

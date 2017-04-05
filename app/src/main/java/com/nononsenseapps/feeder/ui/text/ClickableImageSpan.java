@@ -1,10 +1,7 @@
-package com.nononsenseapps.feeder.model;
+package com.nononsenseapps.feeder.ui.text;
 
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.text.style.ImageSpan;
-import android.util.Log;
 
 
 /**

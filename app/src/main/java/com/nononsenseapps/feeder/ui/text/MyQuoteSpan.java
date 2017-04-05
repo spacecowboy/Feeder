@@ -1,4 +1,4 @@
-package com.nononsenseapps.text;
+package com.nononsenseapps.feeder.ui.text;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;

@@ -23,17 +23,18 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SyncResult;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkInfo;
-import android.os.BatteryManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.util.PrefUtils;
+
+import static com.nononsenseapps.feeder.util.PrefUtils.shouldSyncOnHotSpots;
+import static com.nononsenseapps.feeder.util.PrefUtils.shouldSyncOnlyOnWIfi;
+import static com.nononsenseapps.feeder.util.PrefUtils.shouldSyncOnlyWhenCharging;
+import static com.nononsenseapps.feeder.util.SystemUtils.currentlyCharging;
+import static com.nononsenseapps.feeder.util.SystemUtils.currentlyConnected;
+import static com.nononsenseapps.feeder.util.SystemUtils.currentlyMetered;
+import static com.nononsenseapps.feeder.util.SystemUtils.currentlyOnWifi;
 
 
 public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
@@ -129,7 +130,7 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
      * @return true if sync pre-requisites are true
      */
     private boolean shouldSync(Bundle extras) {
-        if (!currentlyConnected()) {
+        if (!currentlyConnected(getContext())) {
             return false;
         }
 
@@ -138,75 +139,18 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             return true;
         }
 
-        if (PrefUtils.shouldSyncOnlyWhenCharging(getContext()) && !currentlyCharging()) {
+        if (shouldSyncOnlyWhenCharging(getContext()) && !currentlyCharging(getContext())) {
             return false;
         }
 
-        if (currentlyOnWifi()) {
-            return PrefUtils.shouldSyncOnHotSpots(getContext()) || !currentlyMetered();
-        } else if (PrefUtils.shouldSyncOnlyOnWIfi(getContext())) {
+        if (currentlyOnWifi(getContext())) {
+            return shouldSyncOnHotSpots(getContext()) || !currentlyMetered(getContext());
+        } else if (shouldSyncOnlyOnWIfi(getContext())) {
             return false;
         }
 
         // Mobile connection but nothing indicates we should avoid that
         return true;
-    }
-
-    private boolean currentlyMetered() {
-        ConnectivityManager connManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        return connManager.isActiveNetworkMetered();
-    }
-
-    private boolean currentlyCharging() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            BatteryManager batteryManager = (BatteryManager) getContext().getSystemService(Context.BATTERY_SERVICE);
-            return batteryManager.isCharging();
-        } else {
-            // Sticky intent
-            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-            Intent batteryStatus = getContext().registerReceiver(null, ifilter);
-            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-            return status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                    status == BatteryManager.BATTERY_STATUS_FULL;
-        }
-    }
-
-    private boolean currentlyOnWifi() {
-        ConnectivityManager connManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            Network net = connManager.getActiveNetwork();
-            NetworkInfo netInfo = connManager.getNetworkInfo(net);
-            return netInfo.isConnected() && netInfo.getType() == ConnectivityManager.TYPE_WIFI;
-        } else {
-            for (Network net : connManager.getAllNetworks()) {
-                NetworkInfo netInfo = connManager.getNetworkInfo(net);
-
-                if (netInfo.isConnected() && netInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    private boolean currentlyConnected() {
-        ConnectivityManager connManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            Network net = connManager.getActiveNetwork();
-            NetworkInfo netInfo = connManager.getNetworkInfo(net);
-            return netInfo.isConnected();
-        } else {
-            for (Network net : connManager.getAllNetworks()) {
-                NetworkInfo netInfo = connManager.getNetworkInfo(net);
-
-                if (netInfo.isConnected()) {
-                    return true;
-                }
-            }
-            return false;
-        }
     }
 
     private static boolean isManualSync(Bundle extras) {

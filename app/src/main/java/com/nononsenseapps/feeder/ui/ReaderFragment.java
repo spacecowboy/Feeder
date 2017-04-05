@@ -35,15 +35,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.RssContentProvider;
-import com.nononsenseapps.feeder.model.ImageTextLoader;
+import com.nononsenseapps.feeder.ui.text.HtmlConverter;
+import com.nononsenseapps.feeder.ui.text.ImageTextLoader;
+import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
-import com.nononsenseapps.text.HtmlConverter;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -74,17 +73,11 @@ public class ReaderFragment extends Fragment
     private long _id = -1;
     // All content contained in RssItem
     private FeedItemSQL mRssItem;
-    private TextView mTitleTextView;
     private TextView mBodyTextView;
     private ObservableScrollView mScrollView;
-    private TextView mAuthorTextView;
-    private TextView mFeedTitleTextView;
-
-    private final HtmlConverter htmlformatter;
 
 
     public ReaderFragment() {
-        htmlformatter = new HtmlConverter();
     }
 
     /**
@@ -176,25 +169,22 @@ public class ReaderFragment extends Fragment
 
         mScrollView =
                 (ObservableScrollView) rootView.findViewById(R.id.scroll_view);
-        mTitleTextView = (TextView) rootView.findViewById(R.id.story_title);
+        TextView mTitleTextView = (TextView) rootView.findViewById(R.id.story_title);
         mBodyTextView = (TextView) rootView.findViewById(R.id.story_body);
-        mAuthorTextView = (TextView) rootView.findViewById(R.id.story_author);
-        mFeedTitleTextView = (TextView) rootView.findViewById(R.id
+        TextView mAuthorTextView = (TextView) rootView.findViewById(R.id.story_author);
+        TextView mFeedTitleTextView = (TextView) rootView.findViewById(R.id
                 .story_feedtitle);
 
         if (mRssItem.title == null) {
             mTitleTextView.setText(R.string.nothing_to_display);
         } else {
-            mTitleTextView
-                    .setText(htmlformatter.toSpanned(mRssItem.title, getActivity()));
+            mTitleTextView.setText(HtmlConverter.toSpannedWithNoImages(mRssItem.title, getActivity()));
         }
         if (mRssItem.description == null) {
             mBodyTextView.setText(R.string.nothing_to_display);
         } else {
-            //Log.d("JONAS", "Text is:\n" + mRssItem.description);
             // Set without images as a place holder
-            mBodyTextView.setText(
-                    htmlformatter.toSpanned(mRssItem.description, getActivity()));
+            mBodyTextView.setText(HtmlConverter.toSpannedWithNoImages(mRssItem.description, getActivity()));
         }
 
         if (mRssItem.feedtitle == null) {
@@ -290,14 +280,6 @@ public class ReaderFragment extends Fragment
         }
     }
 
-
-    /**
-     * Instantiate and return a new Loader for the given ID.
-     *
-     * @param id   The ID whose loader is to be created.
-     * @param args Any arguments supplied by the caller.
-     * @return Return a new Loader instance that is ready to start loading.
-     */
     @Override
     public Loader<Spanned> onCreateLoader(final int id, final Bundle args) {
         Point size = new Point();
@@ -306,13 +288,11 @@ public class ReaderFragment extends Fragment
         if (TabletUtils.isTablet(getActivity())) {
             // Tablet has fixed width
             return new ImageTextLoader(getActivity(), mRssItem.description,
-                    new Point(Math.round(getResources().getDimension(R.dimen.reader_tablet_width)),
-                            2 * size.y));
+                    new Point(Math.round(getResources().getDimension(R.dimen.reader_tablet_width)), 2 * size.y), PrefUtils.shouldLoadImages(getActivity()));
         } else {
             // Base it on window size
             return new ImageTextLoader(getActivity(), mRssItem.description,
-                    new Point(size.x - 2 * Math.round(getResources().getDimension(R.dimen.keyline_1)),
-                            2 * size.y));
+                    new Point(size.x - 2 * Math.round(getResources().getDimension(R.dimen.keyline_1)), 2 * size.y), PrefUtils.shouldLoadImages(getActivity()));
         }
     }
 
@@ -320,7 +300,9 @@ public class ReaderFragment extends Fragment
     @Override
     public void onLoadFinished(final Loader<Spanned> loader,
                                final Spanned data) {
-        mBodyTextView.setText(data);
+        if (data != null) {
+            mBodyTextView.setText(data);
+        }
     }
 
     @Override

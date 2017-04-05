@@ -138,5 +138,10 @@
   <string name="pref_ringtone_silent">Silent</string>
 
   <string name="pref_title_vibrate">Vibrate</string>
+  <string name="synchronization">Synchronization</string>
+  <string name="only_on_wifi">Only on WiFi</string>
+  <string name="may_result_data_charges">May result in mobile data charges.</string>
+  <string name="only_when_charging">Only when charging</string>
+  <string name="image_loading">Image loading</string>
 
 </resources>
