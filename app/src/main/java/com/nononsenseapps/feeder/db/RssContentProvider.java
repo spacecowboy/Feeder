@@ -26,6 +26,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
+import android.content.PeriodicSync;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -35,6 +36,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import com.nononsenseapps.feeder.util.PrefUtils;
 
 import java.util.ArrayList;
 
@@ -390,12 +392,17 @@ public class RssContentProvider extends ContentProvider {
             extras.putBoolean(SYNC_EXTRAS_REQUIRE_CHARGING,
                     PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PREF_SYNC_ONLY_CHARGING, false));
         }
-        // Once per hour: mins * secs
-        ContentResolver.addPeriodicSync(account,
-                RssContentProvider.AUTHORITY,
-                extras,
-                60L * 60L);
-
+        if (PrefUtils.shouldSync(context)) {
+            // Once per hour: mins * secs
+            ContentResolver.addPeriodicSync(account,
+                    RssContentProvider.AUTHORITY,
+                    extras,
+                    60L * 60L * PrefUtils.synchronizationFrequency(context));
+        } else {
+            for (PeriodicSync ps: ContentResolver.getPeriodicSyncs(account, RssContentProvider.AUTHORITY)) {
+                ContentResolver.removePeriodicSync(ps.account, ps.authority, ps.extras);
+            }
+        }
     }
 
     public static void SetNotify(Context context, long id, boolean on) {
