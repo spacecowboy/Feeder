@@ -4,6 +4,10 @@
   <PreferenceCategory
       android:title="@string/synchronization">
 
+    <ListPreference
+        android:defaultValue="1"
+        android:title="Check for updates" android:entries="@array/pref_sync_frequency_titles"
+        android:entryValues="@array/pref_sync_frequency_values" android:key="pref_sync_freq"/>
     <SwitchPreference
         android:defaultValue="false"
         android:key="pref_sync_only_wifi" android:title="@string/only_on_wifi"/>

@@ -2,7 +2,10 @@ package com.nononsenseapps.feeder.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
 /**
  * Utilities and constants related to app preferences.
@@ -35,6 +38,7 @@ public class PrefUtils {
     public static final String PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging";
     public static final String PREF_SYNC_HOTSPOTS = "pref_sync_hotspots";
     public static final String PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi";
+    public static final String PREF_SYNC_FREQ = "pref_sync_freq";
 
     /**
      * Image settings
@@ -60,6 +64,20 @@ public class PrefUtils {
 
     public static boolean shouldSyncOnHotSpots(final Context context) {
         return sp(context).getBoolean(PREF_SYNC_HOTSPOTS, false);
+    }
+
+    /**
+     * @return true if automatic syncing is enabled, false otherwise
+     */
+    public static boolean shouldSync(final Context context) {
+        return synchronizationFrequency(context) > 0;
+    }
+
+    /**
+     * @return number of minutes between syncs, or zero if none should be performed
+     */
+    public static long synchronizationFrequency(final Context context) {
+        return Long.parseLong(sp(context).getString(PREF_SYNC_FREQ, "60"));
     }
 
     /**
@@ -145,4 +163,29 @@ public class PrefUtils {
         }
         return !shouldLoadImagesOnlyOnWIfi(context);
     }
+
+    /**
+     * A preference value change listener that updates the preference's summary
+     * to reflect its new value. Handles ringtone preferences and list preferences
+     * specially.
+     */
+    public static final Preference.OnPreferenceChangeListener summaryUpdater = new Preference.OnPreferenceChangeListener() {
+        @Override
+        public boolean onPreferenceChange(@NonNull Preference preference, @NonNull Object value) {
+            String stringValue = value.toString();
+            if (preference instanceof ListPreference) {
+                // For list preferences, look up the correct display value in
+                // the preference's 'entries' list.
+                ListPreference listPreference = (ListPreference) preference;
+                int index = listPreference.findIndexOfValue(stringValue);
+                // Set the summary to reflect the new value.
+                preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
+            } else {
+                // For all other preferences, set the summary to the value's
+                // simple string representation.
+                preference.setSummary(stringValue);
+            }
+            return true;
+        }
+    };
 }
