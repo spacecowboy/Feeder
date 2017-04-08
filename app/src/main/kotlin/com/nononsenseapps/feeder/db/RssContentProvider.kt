@@ -6,18 +6,18 @@ import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
 import com.nononsenseapps.feeder.util.inTransaction
 
-val AUTHORITY = "com.nononsenseapps.feeder.provider"
-val SCHEME = "content://"
+const val AUTHORITY = "com.nononsenseapps.feeder.provider"
+const val SCHEME = "content://"
 
+const val QUERY_PARAM_LIMIT = "QUERY_PARAM_LIMIT"
+const val QUERY_PARAM_SKIP = "QUERY_PARAM_SKIP"
 
-class MyContentProvider : ContentProvider() {
+class RssContentProvider : ContentProvider() {
 
     val uriMatcher = uriMatcher {
         FeedSQL.addMatcherUris(this)
         FeedItemSQL.addMatcherUris(this)
     }
-    val query_param_limit = "QUERY_PARAM_LIMIT"
-    val query_param_skip = "QUERY_PARAM_SKIP"
 
     override fun onCreate(): Boolean {
         return true
@@ -193,8 +193,8 @@ class MyContentProvider : ContentProvider() {
      * respectively.
      */
     private fun getLimitString(uri: Uri): String {
-        val offset: String = uri.getQueryParameter(query_param_skip) ?: "-1"
-        val limit: String = uri.getQueryParameter(query_param_limit) ?: "-1"
+        val offset: String = uri.getQueryParameter(QUERY_PARAM_SKIP) ?: "-1"
+        val limit: String = uri.getQueryParameter(QUERY_PARAM_LIMIT) ?: "-1"
 
         return " LIMIT $offset,$limit"
     }

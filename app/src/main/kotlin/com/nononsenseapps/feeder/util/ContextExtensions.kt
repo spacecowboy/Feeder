@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import com.nononsenseapps.feeder.db.AUTHORITY
 import com.nononsenseapps.feeder.db.AccountService
-import com.nononsenseapps.feeder.db.RssContentProvider
 import com.nononsenseapps.feeder.util.PrefUtils.PREF_SYNC_ONLY_CHARGING
 
 fun Context.setupSync(): Unit {
@@ -31,11 +30,11 @@ fun Context.setupSync(): Unit {
     if (PrefUtils.shouldSync(this)) {
         // Once per hour: mins * secs
         ContentResolver.addPeriodicSync(account,
-                RssContentProvider.AUTHORITY,
+                AUTHORITY,
                 extras,
                 60L * 60L * PrefUtils.synchronizationFrequency(this))
     } else {
-        ContentResolver.getPeriodicSyncs(account, RssContentProvider.AUTHORITY).map {
+        ContentResolver.getPeriodicSyncs(account, AUTHORITY).map {
             ContentResolver.removePeriodicSync(it.account, it.authority, it.extras)
         }
     }

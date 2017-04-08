@@ -10,8 +10,8 @@ import android.util.Pair;
 import com.nononsenseapps.feeder.db.Cleanup;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.util.Consumer;
+import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
 import com.nononsenseapps.feeder.util.FileLog;
 import com.nononsenseapps.feeder.util.Optional;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.nononsenseapps.feeder.db.RssContentProviderKt.AUTHORITY;
 import static com.nononsenseapps.feeder.db.Util.LongsToStringArray;
 import static com.nononsenseapps.feeder.db.Util.ToStringArray;
 import static com.nononsenseapps.feeder.db.Util.WHEREIDIS;
@@ -93,7 +94,7 @@ public class RssLocalSync {
                     ops.size()));
 
             // Notify that we've updated
-            RssContentProvider.notifyAllUris(context);
+            ContentResolverExtensionsKt.notifyAllUris(context.getContentResolver());
             // Send notifications for configured feeds
             RssNotifications.notify(context);
         } catch (Throwable e) {
@@ -129,7 +130,7 @@ public class RssLocalSync {
             throws RemoteException, OperationApplicationException {
         if (!operations.isEmpty()) {
             context.getContentResolver()
-                   .applyBatch(RssContentProvider.AUTHORITY, new ArrayList<>(operations));
+                   .applyBatch(AUTHORITY, new ArrayList<>(operations));
         }
     }
 

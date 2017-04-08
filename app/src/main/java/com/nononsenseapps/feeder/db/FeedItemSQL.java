@@ -25,6 +25,9 @@ import android.util.Log;
 import org.joda.time.DateTime;
 import org.json.JSONObject;
 
+import static com.nononsenseapps.feeder.db.RssContentProviderKt.AUTHORITY;
+import static com.nononsenseapps.feeder.db.RssContentProviderKt.SCHEME;
+
 /**
  * SQL which handles items belonging to a Feed
  */
@@ -33,7 +36,7 @@ public class FeedItemSQL {
     public static final String TABLE_NAME = "FeedItem";
     // URIs
     public static final Uri URI_FEED_ITEMS = Uri.withAppendedPath(
-            Uri.parse(RssContentProvider.SCHEME + RssContentProvider.AUTHORITY),
+            Uri.parse(SCHEME + AUTHORITY),
             TABLE_NAME);
     // URI codes, must be unique
     public static final int URICODE = 201;
@@ -43,9 +46,9 @@ public class FeedItemSQL {
 
     public static void addMatcherUris(UriMatcher sURIMatcher) {
         sURIMatcher
-                .addURI(RssContentProvider.AUTHORITY, URI_FEED_ITEMS.getPath(),
+                .addURI(AUTHORITY, URI_FEED_ITEMS.getPath(),
                         URICODE);
-        sURIMatcher.addURI(RssContentProvider.AUTHORITY,
+        sURIMatcher.addURI(AUTHORITY,
                 URI_FEED_ITEMS.getPath() + "/#", ITEMCODE);
     }
 

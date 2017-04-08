@@ -8,6 +8,9 @@ import android.net.Uri;
 
 import java.util.ArrayList;
 
+import static com.nononsenseapps.feeder.db.RssContentProviderKt.AUTHORITY;
+import static com.nononsenseapps.feeder.db.RssContentProviderKt.SCHEME;
+
 /**
  * SQL which handles the feeds
  */
@@ -16,7 +19,7 @@ public class FeedSQL {
     public static final String TABLE_NAME = "Feed";
     // URIs
     public static final Uri URI_FEEDS = Uri.withAppendedPath(
-            Uri.parse(RssContentProvider.SCHEME + RssContentProvider.AUTHORITY),
+            Uri.parse(SCHEME + AUTHORITY),
             TABLE_NAME);
     // A view which also reports 'unreadcount'
     public static final String VIEWCOUNT_NAME = "WithUnreadCount";
@@ -156,13 +159,13 @@ public class FeedSQL {
     }
 
     public static void addMatcherUris(UriMatcher sURIMatcher) {
-        sURIMatcher.addURI(RssContentProvider.AUTHORITY, URI_FEEDS.getPath(),
+        sURIMatcher.addURI(AUTHORITY, URI_FEEDS.getPath(),
                 URICODE);
-        sURIMatcher.addURI(RssContentProvider.AUTHORITY,
+        sURIMatcher.addURI(AUTHORITY,
                 URI_FEEDS.getPath() + "/#", ITEMCODE);
-        sURIMatcher.addURI(RssContentProvider.AUTHORITY,
+        sURIMatcher.addURI(AUTHORITY,
                 URI_FEEDSWITHCOUNTS.getPath(), VIEWCOUNTCODE);
-        sURIMatcher.addURI(RssContentProvider.AUTHORITY,
+        sURIMatcher.addURI(AUTHORITY,
                 URI_TAGSWITHCOUNTS.getPath(), VIEWTAGSCODE);
     }
 

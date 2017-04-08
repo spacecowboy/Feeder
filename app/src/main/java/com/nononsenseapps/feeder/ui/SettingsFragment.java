@@ -7,7 +7,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import com.nononsenseapps.feeder.R;
-import com.nononsenseapps.feeder.db.RssContentProvider;
+import com.nononsenseapps.feeder.util.ContextExtensionsKt;
 import com.nononsenseapps.feeder.util.PrefUtils;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -35,7 +35,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             case PrefUtils.PREF_SYNC_HOTSPOTS:
             case PrefUtils.PREF_SYNC_ONLY_WIFI:;
             case PrefUtils.PREF_SYNC_FREQ:
-                RssContentProvider.SetupSync(getActivity());
+                ContextExtensionsKt.setupSync(getActivity());
                 break;
         }
     }

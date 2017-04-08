@@ -12,7 +12,6 @@ import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.OPMLContenProvider;
 import com.nononsenseapps.feeder.model.OPMLParser;
-import com.nononsenseapps.feeder.model.OPMLWriter;
 import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;

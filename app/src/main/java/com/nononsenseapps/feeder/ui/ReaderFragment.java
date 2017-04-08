@@ -37,9 +37,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
-import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.ui.text.HtmlConverter;
 import com.nononsenseapps.feeder.ui.text.ImageTextLoader;
+import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
@@ -149,7 +149,7 @@ public class ReaderFragment extends Fragment
         }
 
         if (_id > 0) {
-            RssContentProvider.MarkItemAsRead(getActivity(), _id);
+            ContentResolverExtensionsKt.markItemAsRead(getActivity().getContentResolver(), _id, true);
         }
 
         setHasOptionsMenu(true);

@@ -32,9 +32,9 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.FeedParseLoader;
+import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
 import com.nononsenseapps.feeder.util.LoaderResult;
 import com.nononsenseapps.feeder.views.FloatLabelLayout;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -156,8 +156,8 @@ public class EditFeedActivity extends Activity
                                     Long.toString(id)), values, null,
                                     null);
                         }
-                        RssContentProvider.notifyAllUris(EditFeedActivity.this);
-                        RssContentProvider.RequestSync(id);
+                        ContentResolverExtensionsKt.notifyAllUris(getContentResolver());
+                        ContentResolverExtensionsKt.requestFeedSync(getContentResolver(), id);
 
                         finish();
                         if (mShouldFinishBack) {

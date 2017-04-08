@@ -3,9 +3,11 @@ package com.nononsenseapps.feeder.util
 import android.content.ContentResolver
 import android.content.ContentResolver.*
 import android.content.ContentValues
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import com.nononsenseapps.feeder.db.FeedItemSQL.*
+import com.nononsenseapps.feeder.db.FeedSQL
 import com.nononsenseapps.feeder.db.FeedSQL.COL_NOTIFY
 import com.nononsenseapps.feeder.db.FeedSQL.URI_FEEDS
 
@@ -123,14 +125,14 @@ inline fun ContentResolver.updateFeed(id: Long, init: ContentValues.() -> Unit):
 /**
  * Update feeds which have a certain column value
  */
-inline fun ContentResolver.updateFeeds(where: String? = null, params: ArrayList<Any>? = null, init: ContentValues.() -> Unit): Int {
+inline fun ContentResolver.updateFeeds(where: String? = null, params: List<Any>? = null, init: ContentValues.() -> Unit): Int {
     return updateItems(URI_FEEDS, where, params, init)
 }
 
 /**
  * Update feed items which have a certain column value
  */
-inline fun ContentResolver.updateFeedItems(where: String? = null, params: ArrayList<Any>? = null, init: ContentValues.() -> Unit): Int {
+inline fun ContentResolver.updateFeedItems(where: String? = null, params: List<Any>? = null, init: ContentValues.() -> Unit): Int {
     return updateItems(URI_FEED_ITEMS, where, params, init)
 }
 
@@ -138,11 +140,29 @@ inline fun ContentResolver.updateFeedItems(where: String? = null, params: ArrayL
  * Update items which have a certain column value
  */
 
-inline fun ContentResolver.updateItems(uri: Uri, where: String? = null, params: ArrayList<Any>? = null, init: ContentValues.() -> Unit): Int {
+inline fun ContentResolver.updateItems(uri: Uri, where: String? = null, params: List<Any>? = null, init: ContentValues.() -> Unit): Int {
     val result = update(uri,
             contentValues(init),
             where,
             params?.map(Any::toString)?.toTypedArray())
     notifyAllUris()
     return result
+}
+
+fun ContentResolver.queryTagsWithCounts(columns: List<String> = FeedSQL.FIELDS.asList(),
+                               where: String? = null, params: List<Any>? = null, order: String? = null,
+                               reader: (Cursor) -> Unit) {
+    queryItems(FeedSQL.URI_TAGSWITHCOUNTS, columns, where, params, order, reader)
+}
+
+fun ContentResolver.queryFeeds(columns: List<String> = FeedSQL.FIELDS.asList(),
+                               where: String? = null, params: List<Any>? = null, order: String? = null,
+                               reader: (Cursor) -> Unit) {
+    queryItems(FeedSQL.URI_FEEDS, columns, where, params, order, reader)
+}
+
+inline fun ContentResolver.queryItems(uri: Uri, columns: List<String>, where: String? = null,
+                                      params: List<Any>? = null, order: String? = null,
+                                      reader: (Cursor) -> Unit) {
+    query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order).use(reader)
 }
