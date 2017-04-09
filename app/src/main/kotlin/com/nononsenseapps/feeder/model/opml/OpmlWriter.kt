@@ -1,46 +1,47 @@
 package com.nononsenseapps.feeder.model.opml
 
-import com.nononsenseapps.feeder.db.FeedSQL
+import com.nononsenseapps.feeder.db.DbFeed
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
 fun writeFile(path: String,
               tags: Iterable<String?>,
-              feedsWithTag: (String?) -> Iterable<FeedSQL>) {
+              feedsWithTag: (String?) -> Iterable<DbFeed>) {
     writeOutputStream(FileOutputStream(path), tags, feedsWithTag)
 }
 
 fun writeOutputStream(os: OutputStream,
                       tags: Iterable<String?>,
-                      feedsWithTag: (String?) -> Iterable<FeedSQL>) {
+                      feedsWithTag: (String?) -> Iterable<DbFeed>) {
     try {
         os.bufferedWriter().use {
             it.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
-            opml {
-                head {
-                    title { +"Feeder" }
-                }
-                body {
-                    tags.forEach {
-                        if (it.isNullOrEmpty()) {
-                            feedsWithTag(it).forEach {
-                                outline(title = escape(it.customTitle),
-                                        type = "rss",
-                                        xmlUrl = it.url) {}
-                            }
-                        } else {
-                            outline(title = it!!) {
-                                feedsWithTag(it).forEach {
-                                    outline(title = escape(it.customTitle),
-                                            type = "rss",
-                                            xmlUrl = it.url) {}
+            it.write(
+                    opml {
+                        head {
+                            title { +"Feeder" }
+                        }
+                        body {
+                            tags.forEach {
+                                if (it.isNullOrEmpty()) {
+                                    feedsWithTag(it).forEach {
+                                        outline(title = escape(it.customTitle),
+                                                type = "rss",
+                                                xmlUrl = escape(it.url)) {}
+                                    }
+                                } else {
+                                    outline(title = escape(it!!)) {
+                                        feedsWithTag(it).forEach {
+                                            outline(title = escape(it.customTitle),
+                                                    type = "rss",
+                                                    xmlUrl = escape(it.url)) {}
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                }
-            }
+                    }.toString())
         }
     } catch (e: IOException) {
         // TODO Log.e(TAG, e.getLocalizedMessage());
@@ -99,7 +100,7 @@ annotation class OpmlTagMarker
 @OpmlTagMarker
 abstract class Tag(val name: String) : Element {
     val children = arrayListOf<Element>()
-    val attributes = hashMapOf<String, String>()
+    val attributes = linkedMapOf<String, String>()
 
     protected fun <T : Element> initTag(tag: T, init: T.() -> Unit): T {
         tag.init()

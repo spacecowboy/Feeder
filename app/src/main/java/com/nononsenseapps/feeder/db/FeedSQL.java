@@ -14,7 +14,7 @@ import static com.nononsenseapps.feeder.db.RssContentProviderKt.SCHEME;
 /**
  * SQL which handles the feeds
  */
-public class FeedSQL {
+public class FeedSQL implements DbFeed {
     // SQL convention says Table name should be "singular"
     public static final String TABLE_NAME = "Feed";
     // URIs
@@ -252,6 +252,41 @@ public class FeedSQL {
         }
 
         return obj instanceof FeedSQL && Long.valueOf(id).equals(((FeedSQL) obj).id);
-
     }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public int getNotify() {
+        return notify;
+    }
+
+    @Override
+    public String getTag() {
+        return tag;
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public String getCustomTitle() {
+        return customTitle;
+    }
+
+    @Override
+    public int getUnreadCount() {
+        return unreadCount;
+    }
+
+    @Override
+    public String getUrl() {
+        return url;
+    }
+
 }
