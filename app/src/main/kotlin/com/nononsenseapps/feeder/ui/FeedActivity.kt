@@ -17,7 +17,6 @@ import android.widget.TextView
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.FeedSQL
 import com.nononsenseapps.feeder.db.Util
-import com.nononsenseapps.feeder.db.getStringOrNull
 import com.nononsenseapps.feeder.model.OPMLContenProvider
 import com.nononsenseapps.feeder.model.OPMLParser
 import com.nononsenseapps.feeder.model.RssSyncAdapter
@@ -236,7 +235,7 @@ class FeedActivity : BaseActivity() {
 
         contentResolver.queryTagsWithCounts(columns = listOf(FeedSQL.COL_TAG)) {
             while (it.moveToNext()) {
-                tags.add(it.getStringOrNull(FeedSQL.COL_TAG))
+                tags.add(it.getString(FeedSQL.COL_TAG))
             }
         }
 
