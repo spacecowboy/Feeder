@@ -1,12 +1,12 @@
 package com.nononsenseapps.feeder.db
 
 import android.content.Context
-import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.nononsenseapps.feeder.model.OPMLDatabaseHandler
 import com.nononsenseapps.feeder.model.OPMLParser
 import com.nononsenseapps.feeder.model.opml.writeFile
+import com.nononsenseapps.feeder.util.getString
 import java.io.File
 
 private val DATABASE_VERSION = 4
@@ -87,7 +87,7 @@ class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(co
 
         db.query(FeedSQL.VIEWTAGS_NAME, arrayOf(FeedSQL.COL_TAG), null, null, null, null, null).use {
             while (it.moveToNext()) {
-                tags.add(it.getStringOrNull(FeedSQL.COL_TAG))
+                tags.add(it.getString(FeedSQL.COL_TAG))
             }
         }
 
@@ -110,11 +110,3 @@ class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(co
     }
 }
 
-fun Cursor.getStringOrNull(column: String): String? {
-    val index = getColumnIndexOrThrow(column)
-    return if (isNull(index)) null else getString(index)
-}
-
-fun Cursor.getString(column: String): String {
-    return getStringOrNull(column)!!
-}
