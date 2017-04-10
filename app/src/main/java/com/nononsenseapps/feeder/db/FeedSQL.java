@@ -8,15 +8,18 @@ import android.net.Uri;
 
 import java.util.ArrayList;
 
+import static com.nononsenseapps.feeder.db.RssContentProviderKt.AUTHORITY;
+import static com.nononsenseapps.feeder.db.RssContentProviderKt.SCHEME;
+
 /**
  * SQL which handles the feeds
  */
-public class FeedSQL {
+public class FeedSQL implements DbFeed {
     // SQL convention says Table name should be "singular"
     public static final String TABLE_NAME = "Feed";
     // URIs
     public static final Uri URI_FEEDS = Uri.withAppendedPath(
-            Uri.parse(RssContentProvider.SCHEME + RssContentProvider.AUTHORITY),
+            Uri.parse(SCHEME + AUTHORITY),
             TABLE_NAME);
     // A view which also reports 'unreadcount'
     public static final String VIEWCOUNT_NAME = "WithUnreadCount";
@@ -156,13 +159,13 @@ public class FeedSQL {
     }
 
     public static void addMatcherUris(UriMatcher sURIMatcher) {
-        sURIMatcher.addURI(RssContentProvider.AUTHORITY, URI_FEEDS.getPath(),
+        sURIMatcher.addURI(AUTHORITY, URI_FEEDS.getPath(),
                 URICODE);
-        sURIMatcher.addURI(RssContentProvider.AUTHORITY,
+        sURIMatcher.addURI(AUTHORITY,
                 URI_FEEDS.getPath() + "/#", ITEMCODE);
-        sURIMatcher.addURI(RssContentProvider.AUTHORITY,
+        sURIMatcher.addURI(AUTHORITY,
                 URI_FEEDSWITHCOUNTS.getPath(), VIEWCOUNTCODE);
-        sURIMatcher.addURI(RssContentProvider.AUTHORITY,
+        sURIMatcher.addURI(AUTHORITY,
                 URI_TAGSWITHCOUNTS.getPath(), VIEWTAGSCODE);
     }
 
@@ -249,6 +252,41 @@ public class FeedSQL {
         }
 
         return obj instanceof FeedSQL && Long.valueOf(id).equals(((FeedSQL) obj).id);
-
     }
+
+    @Override
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public int getNotify() {
+        return notify;
+    }
+
+    @Override
+    public String getTag() {
+        return tag;
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public String getCustomTitle() {
+        return customTitle;
+    }
+
+    @Override
+    public int getUnreadCount() {
+        return unreadCount;
+    }
+
+    @Override
+    public String getUrl() {
+        return url;
+    }
+
 }

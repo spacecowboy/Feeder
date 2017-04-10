@@ -135,7 +135,7 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         }
     }
 
-    static String repeated(String string, int count) {
+    public static String repeated(String string, int count) {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < count; i++) {

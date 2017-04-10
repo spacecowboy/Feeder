@@ -46,9 +46,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.model.ExpandableSortedList;
 import com.nononsenseapps.feeder.model.RssNotifications;
+import com.nononsenseapps.feeder.util.ContextExtensionsKt;
 import com.nononsenseapps.feeder.util.FeedDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.LPreviewUtils;
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase;
@@ -179,7 +179,7 @@ public class BaseActivity extends AppCompatActivity
 
         setNightBackground();
         // Add account and enable sync - if not done before
-        RssContentProvider.SetupSync(this);
+        ContextExtensionsKt.setupSync(this);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class BaseActivity extends AppCompatActivity
         RssNotifications.notify(this);
     }
 
-    protected Toolbar getActionBarToolbar() {
+    protected Toolbar initializeActionBar() {
         if (mActionBarToolbar == null) {
             mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
             if (mActionBarToolbar != null) {

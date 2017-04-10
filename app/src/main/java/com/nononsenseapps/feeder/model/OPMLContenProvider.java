@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.Util;
 
+// WHen Kotlinized you can probably remove a redundant RssContentProvider.NotifyAll call in use of importer in FeedActivity
 public class OPMLContenProvider implements OPMLParserToDatabase {
 
     private final Context context;
