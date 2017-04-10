@@ -117,6 +117,12 @@
         <item name="android:textColor">@color/primary_text_default_material_dark</item>
     </style>
 
+    <style name="TextAppearance.Body">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/tertiary_text_material_dark</item>
+    </style>
+
     <style name="TextAppearance.Subhead"
            parent="TextAppearance.Title">
     </style>
@@ -127,17 +133,26 @@
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
-    <style name="TextAppearance.Body">
-    <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/tertiary_text_material_dark</item>
-    </style>
-
     <style name="TextAppearance.ListItem"/>
     <style name="TextAppearance.ListItem.Author">
         <item name="android:textSize">@dimen/listitem_author</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/tertiary_text_material_dark</item>
+    </style>
+    <style name="TextAppearance.ListItem.Title">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/primary_text_default_material_dark</item>
+    </style>
+    <style name="TextAppearance.ListItem.Title.Read">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/white_54</item>
+    </style>
+    <style name="TextAppearance.ListItem.Body">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/white_38</item>
     </style>
 
     <style name="TextAppearance.NewItems">

@@ -41,6 +41,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
@@ -986,16 +987,20 @@ public class FeedFragment extends Fragment
                             rssItem.plaintitle :
                             rssItem.plaintitle + " \u2014 " + rssItem.plainsnippet + "\u2026";
                     Spannable textSpan = new SpannableString(temps);
-                    // Body is always grey
-                    textSpan.setSpan(new ForegroundColorSpan(readTextColor),
+
+                    textSpan.setSpan(new TextAppearanceSpan(getContext(), R.style.TextAppearance_ListItem_Body),
                             rssItem.plaintitle.length(), temps.length(),
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    // Title depends on status
-                    textSpan.setSpan(new ForegroundColorSpan(rssItem.isUnread() ?
-                                    unreadTextColor :
-                                    readTextColor),
-                            0, rssItem.plaintitle.length(),
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    if (rssItem.isUnread()) {
+                        textSpan.setSpan(new TextAppearanceSpan(getContext(), R.style.TextAppearance_ListItem_Title),
+                                0, rssItem.plaintitle.length(),
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    } else {
+                        textSpan.setSpan(new TextAppearanceSpan(getContext(), R.style.TextAppearance_ListItem_Title_Read),
+                                0, rssItem.plaintitle.length(),
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    }
                     titleTextView.setText(textSpan);
                 }
             }
