@@ -1,0 +1,16 @@
+image: spacecowboy/android-docker-builder:25
+
+before_script:
+  - chmod +x ./gradlew
+
+build:
+  script:
+    - ./gradlew assembleDebug
+  artifacts:
+    paths:
+    - app/build/outputs/
+
+test:
+  script:
+    - ./gradlew check
+  artifacts:
