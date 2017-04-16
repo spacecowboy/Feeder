@@ -5,7 +5,8 @@ android {
 
   lintOptions {
     abortOnError true
-    disable "MissingTranslation"
+    // Should try to remove last two here
+    disable "MissingTranslation", "AppCompatCustomView", "InvalidPackage"
   }
 
   defaultConfig {
