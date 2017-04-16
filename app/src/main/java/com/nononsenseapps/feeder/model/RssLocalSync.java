@@ -38,7 +38,7 @@ public class RssLocalSync {
      * @param tag of feeds to sync, only used if feedId is less than 1. If empty, all feeds are synced.
      */
     public static void syncFeeds(final Context context, long feedId, @NonNull String tag) {
-        FileLog log = FileLog.instance(context);
+        FileLog log = FileLog.singleton.getInstance(context);
         try {
             DateTime start = DateTime.now();
 

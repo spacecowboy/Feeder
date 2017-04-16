@@ -16,7 +16,7 @@ public class DebugLogActivity extends BaseActivity {
 
     @Override
     public void onResume() {
-        FileLog log = FileLog.instance(this);
+        FileLog log = FileLog.singleton.getInstance(this);
 
         ((TextView) findViewById(android.R.id.text1)).setText(log.getLog());
 

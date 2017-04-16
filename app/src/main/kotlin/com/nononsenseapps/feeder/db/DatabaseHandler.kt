@@ -16,6 +16,7 @@ class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(co
     companion object Singleton {
         private var instance: DatabaseHandler? = null
 
+        @Synchronized
         fun getInstance(context: Context): DatabaseHandler {
             if (instance == null) {
                 instance = DatabaseHandler(context)
