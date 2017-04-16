@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.nononsenseapps.feeder">
 
+  <!-- Adding the feeder account, only needed up to sdk23 -->
+  <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
   <!-- Import export feeds -->
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
