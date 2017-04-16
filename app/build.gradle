@@ -4,7 +4,8 @@ android {
   buildToolsVersion '25.0.2'
 
   lintOptions {
-    abortOnError false
+    abortOnError true
+    disable "MissingTranslation"
   }
 
   defaultConfig {
