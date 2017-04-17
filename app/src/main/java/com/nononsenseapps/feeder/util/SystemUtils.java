@@ -39,14 +39,17 @@ public class SystemUtils {
                 return netInfo.isConnected() && netInfo.getType() == ConnectivityManager.TYPE_WIFI;
             }
         }
-        for (Network net : connManager.getAllNetworks()) {
-            NetworkInfo netInfo = connManager.getNetworkInfo(net);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            for (Network net : connManager.getAllNetworks()) {
+                NetworkInfo netInfo = connManager.getNetworkInfo(net);
 
-            if (netInfo != null && netInfo.isConnected() && netInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-                return true;
+                if (netInfo != null) {
+                    return netInfo.isConnected() && netInfo.getType() == ConnectivityManager.TYPE_WIFI;
+                }
             }
         }
-        return false;
+        NetworkInfo wifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return wifi != null && wifi.isConnected();
     }
 
     public static boolean currentlyConnected(Context context) {
@@ -55,8 +58,9 @@ public class SystemUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Network net = connManager.getActiveNetwork();
             NetworkInfo netInfo = connManager.getNetworkInfo(net);
-            return netInfo.isConnected();
-        } else {
+            return netInfo != null && netInfo.isConnected();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             for (Network net : connManager.getAllNetworks()) {
                 NetworkInfo netInfo = connManager.getNetworkInfo(net);
 
@@ -66,5 +70,11 @@ public class SystemUtils {
             }
             return false;
         }
+        for (NetworkInfo netInfo : connManager.getAllNetworkInfo()) {
+            if (netInfo.isConnected()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
