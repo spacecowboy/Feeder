@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.text;
 
+import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.text.style.QuoteSpan;
 /**
  * Configurable properties.
  */
+@SuppressLint("ParcelCreator")
 public class MyQuoteSpan extends QuoteSpan {
 
     protected int mColor;
