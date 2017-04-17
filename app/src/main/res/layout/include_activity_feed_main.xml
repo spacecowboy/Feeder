@@ -23,6 +23,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/empty_feeds_at_all" />
+    </FrameLayout>
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/headerbar"
@@ -30,17 +37,6 @@
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/headerbar"-->
-        <!--style="@style/HeaderBar"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:clickable="true"-->
-        <!--android:orientation="vertical">-->
-
-        <!--<include layout="@layout/toolbar_actionbar" />-->
-        <!--
-            android:background="?attr/colorPrimary"-->
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_actionbar"
             app:layout_scrollFlags="scroll|enterAlways"
@@ -84,13 +80,5 @@
                 android:textColor="@android:color/primary_text_dark" />
         </FrameLayout>
     </android.support.design.widget.AppBarLayout>
-
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <include layout="@layout/empty_feeds_at_all" />
-    </FrameLayout>
-
+    
 </FrameLayout>

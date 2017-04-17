@@ -17,14 +17,13 @@
 
     <LinearLayout
         android:id="@+id/headerbar"
-        style="@style/HeaderBar"
+        app:elevation="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:orientation="vertical">
 
         <include layout="@layout/toolbar_actionbar"/>
-        <!-- placeholder, empty except on L -->
     </LinearLayout>
 
 </com.nononsenseapps.feeder.views.DrawShadowFrameLayout>

@@ -692,7 +692,7 @@ public class FeedFragment extends Fragment
             isGrid = TabletUtils.isTablet(context);
 
             unreadTextColor = context.getResources()
-                    .getColor(R.color.primary_text_default_material_dark);
+                    .getColor(R.color.white_87);
             readTextColor = context.getResources()
                     .getColor(R.color.secondary_text_material_dark);
             linkColor = context.getResources().getColor(R.color

@@ -32,42 +32,9 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
     </style>
     <!-- Final application theme. -->
-    <style name="AppTheme" parent="Theme.IOSched.Base">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowActionModeOverlay">true</item>
         <item name="windowActionModeOverlay">true</item>
-    </style>
-    <style name="AppThemeDialog" parent="Theme.IOSched.BaseDialog">
-    </style>
-
-    <declare-styleable name="DrawShadowFrameLayout">
-        <attr name="shadowDrawable" format="reference" />
-        <attr name="shadowVisible" format="boolean" />
-    </declare-styleable>
-
-    <!-- Immediate parent theme to specify base values for custom attributes -->
-    <style name="Theme" parent="FrameworkRoot.Theme">
-        <!-- Only needed for pre-L -->
-        <item name="android:editTextBackground">@drawable/edit_text</item>
-    </style>
-    <style name="ThemeDialog" parent="FrameworkRoot.ThemeDialog">
-        <!-- Only needed for pre-L -->
-        <item name="android:editTextBackground">@drawable/edit_text</item>
-    </style>
-
-    <style name="FrameworkRoot.Theme" parent="Theme.AppCompat.NoActionBar" />
-    <style name="FrameworkRoot.ThemeDialog" parent="Theme.AppCompat.Dialog" />
-
-    <style name="Theme.IOSched.Base" parent="Theme">
-        <item name="actionBarOverlayTopOffset">?actionBarSize</item>
-        <item name="actionBarInsetStart">?actionBarSize</item>
-        <item name="spinnerBarInsetStart">?actionBarSize</item>
-        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackgroundBorderless</item>
-        <item name="popupItemBackground">?android:selectableItemBackground</item>
-        <item name="photoItemForeground">?android:selectableItemBackground</item>
-
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@color/window_background</item>
-        <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
 
         <item name="itemSwipingBGColor">@color/swiping_item_color</item>
         <item name="nightBGColor">@android:color/black</item>
@@ -78,43 +45,45 @@
         <!--   theme UI controls like checkboxes and text fields -->
         <item name="colorAccent">@color/accent</item>
 
-    </style>
-    <style name="Theme.IOSched.BaseDialog" parent="ThemeDialog">
-        <item name="actionBarOverlayTopOffset">?actionBarSize</item>
-        <item name="actionBarInsetStart">?actionBarSize</item>
-        <item name="spinnerBarInsetStart">?actionBarSize</item>
-        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackgroundBorderless</item>
-        <item name="popupItemBackground">?android:selectableItemBackground</item>
-        <item name="photoItemForeground">?android:selectableItemBackground</item>
-
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@color/dialog_background</item>
+        <item name="android:windowBackground">@color/window_background</item>
         <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
 
+        <!-- Only needed for pre-L -->
+        <item name="android:editTextBackground">@drawable/edit_text</item>
+    </style>
 
+    <style name="AppThemeDialog" parent="Theme.AppCompat.Dialog">
         <item name="colorPrimary">@color/primary</item>
         <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <!--   theme UI controls like checkboxes and text fields -->
         <item name="colorAccent">@color/accent</item>
 
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@color/window_background</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_up</item>
+
+        <!-- Only needed for pre-L -->
+        <item name="android:editTextBackground">@drawable/edit_text</item>
     </style>
 
-    <style name="HeaderBar">
-        <item name="android:elevation">4dp</item>
-    </style>
+    <declare-styleable name="DrawShadowFrameLayout">
+        <attr name="shadowDrawable" format="reference" />
+        <attr name="shadowVisible" format="boolean" />
+    </declare-styleable>
 
     <style name="TextAppearance"/>
     <style name="TextAppearance.BigTitle">
         <item name="android:textSize">24sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/primary_text_default_material_dark</item>
+        <item name="android:textColor">@color/white_87</item>
     </style>
 
     <style name="TextAppearance.Title">
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/primary_text_default_material_dark</item>
+        <item name="android:textColor">@color/white_87</item>
     </style>
 
     <style name="TextAppearance.Body">
@@ -142,7 +111,7 @@
     <style name="TextAppearance.ListItem.Title">
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/primary_text_default_material_dark</item>
+        <item name="android:textColor">@color/white_87</item>
     </style>
     <style name="TextAppearance.ListItem.Title.Read">
         <item name="android:textSize">16sp</item>
@@ -156,7 +125,7 @@
     </style>
 
     <style name="TextAppearance.NewItems">
-        <item name="android:textColor">@color/primary_text_default_material_dark</item>
+        <item name="android:textColor">@color/white_87</item>
         <item name="android:textSize">@dimen/listitem_body</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>

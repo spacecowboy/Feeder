@@ -44,7 +44,7 @@
         android:layout_width="?android:attr/expandableListPreferredItemPaddingLeft"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:background="?android:selectableItemBackgroundBorderless"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/tinted_expand_more" />
 
     <TextView
