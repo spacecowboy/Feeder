@@ -5,7 +5,9 @@ android {
   buildToolsVersion '25.0.2'
 
   lintOptions {
-    abortOnError false
+    abortOnError true
+    // Should try to remove last two here
+    disable "MissingTranslation", "AppCompatCustomView", "InvalidPackage"
   }
 
   defaultConfig {
