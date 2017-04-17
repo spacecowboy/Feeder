@@ -107,7 +107,7 @@ class FeedActivity : BaseActivity() {
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
             when (loader.id) {
                 defaultLoaderId -> {
-                    if (data != null) {
+                    if (data != null && data.moveToFirst()) {
                         val feed = FeedSQL(data)
                         onNavigationDrawerItemSelected(feed.id, feed.title, feed.url, feed.tag)
                     }
