@@ -12,12 +12,18 @@ const val SCHEME = "content://"
 const val QUERY_PARAM_LIMIT = "QUERY_PARAM_LIMIT"
 const val QUERY_PARAM_SKIP = "QUERY_PARAM_SKIP"
 
-class RssContentProvider : ContentProvider() {
+inline fun initUriMatcher(init: (UriMatcher) -> Unit): UriMatcher {
+    val uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
+    init(uriMatcher)
+    return uriMatcher
+}
 
-    val uriMatcher = uriMatcher {
-        FeedSQL.addMatcherUris(this)
-        FeedItemSQL.addMatcherUris(this)
-    }
+private val uriMatcher: UriMatcher = initUriMatcher {
+    FeedSQL.addMatcherUris(it)
+    FeedItemSQL.addMatcherUris(it)
+}
+
+class RssContentProvider : ContentProvider() {
 
     override fun onCreate(): Boolean {
         return true
@@ -88,7 +94,7 @@ class RssContentProvider : ContentProvider() {
                     where = selection
                     params = selectionArgs
                 }
-                else -> throw UnsupportedOperationException("Not yet implemented")
+                else -> throw UnsupportedOperationException("Query URI not supported: " + uri)
             }
             // Must use builder in order to support OFFSET as the regular parser does not allow for
             // negative numbers in the LIMIT clause.
@@ -199,9 +205,5 @@ class RssContentProvider : ContentProvider() {
         return " LIMIT $offset,$limit"
     }
 
-    inline fun uriMatcher(init: UriMatcher.() -> Unit): UriMatcher {
-        val uriMatcher = UriMatcher(UriMatcher.NO_MATCH)
-        uriMatcher.init()
-        return uriMatcher
-    }
+
 }
