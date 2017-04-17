@@ -1,5 +1,6 @@
-Feeder <a href="https://flattr.com/submit/auto?user_id=spacecowboy&url=https%3A%2F%2Fgithub.com%2Fspacecowboy%2FFeeder" target="_blank"><img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
+Feeder
 =====
+[![build status](https://gitlab.com/spacecowboy/Feeder/badges/master/build.svg)](https://gitlab.com/spacecowboy/Feeder/builds)
 
 <a href="https://f-droid.org/repository/browse/?fdid=com.nononsenseapps.feeder" target="_blank">
 <img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"/></a>
