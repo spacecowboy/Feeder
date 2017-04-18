@@ -2,7 +2,7 @@ package com.nononsenseapps.feeder.model;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
-import com.nononsenseapps.feeder.util.FileLog;
+import com.nononsenseapps.feeder.util.FileLogKt;
 import com.nononsenseapps.feeder.util.LoaderResult;
 import com.rometools.rome.feed.synd.SyndFeed;
 
@@ -23,7 +23,7 @@ public class FeedParseLoader extends
         try {
             feed = FeedParser.parseFeed(searchQuery, getContext().getExternalCacheDir());
         } catch (FeedParser.FeedParsingError feedParsingError) {
-            FileLog.d(getContext(), feedParsingError.getLocalizedMessage());
+            FileLogKt.d(getContext(), feedParsingError.getLocalizedMessage());
             msg = feedParsingError.getLocalizedMessage();
         }
 

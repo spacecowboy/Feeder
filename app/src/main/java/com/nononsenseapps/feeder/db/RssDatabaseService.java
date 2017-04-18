@@ -20,6 +20,7 @@ package com.nononsenseapps.feeder.db;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
+import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -98,30 +99,30 @@ public class RssDatabaseService extends IntentService {
                 final long id = intent.getLongExtra(EXTRA_ID, -1);
 
                 if (id > 0) {
-                    RssContentProvider.SetNotify(this, id, notify);
+                    ContentResolverExtensionsKt.setNotify(getContentResolver(), id, notify);
                 } else {
-                    RssContentProvider.SetNotify(this, tag, notify);
+                    ContentResolverExtensionsKt.setNotify(getContentResolver(), tag, notify);
                 }
             } else if (ACTION_MARK_FEED_AS_READ.equals(action)) {
                 final String tag = intent.getStringExtra(EXTRA_TAG);
                 final long id = intent.getLongExtra(EXTRA_ID, -1);
 
                 if (id > 0) {
-                    RssContentProvider.MarkFeedAsRead(this, id);
+                    ContentResolverExtensionsKt.markFeedAsRead(getContentResolver(), id);
                 } else {
-                    RssContentProvider.MarkItemsAsRead(this, tag);
+                    ContentResolverExtensionsKt.markTagAsRead(getContentResolver(), tag);
                 }
             } else if (ACTION_MARK_ITEM_AS_READ.equals(action)) {
                 final long id = intent.getLongExtra(EXTRA_ID, -1);
 
                 if (id > 0) {
-                    RssContentProvider.MarkItemAsRead(this, id);
+                    ContentResolverExtensionsKt.markItemAsRead(getContentResolver(), id, true);
                 }
             } else if (ACTION_MARK_ITEM_AS_UNREAD.equals(action)) {
                 final long id = intent.getLongExtra(EXTRA_ID, -1);
 
                 if (id > 0) {
-                    RssContentProvider.MarkItemAsUnread(this, id);
+                    ContentResolverExtensionsKt.markItemAsUnread(getContentResolver(), id);
                 }
             }
         }

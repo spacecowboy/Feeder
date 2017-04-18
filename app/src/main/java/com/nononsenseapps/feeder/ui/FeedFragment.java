@@ -58,10 +58,10 @@ import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.db.RssContentProvider;
 import com.nononsenseapps.feeder.db.RssDatabaseService;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
+import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
 import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
@@ -72,6 +72,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Locale;
 
+import static com.nononsenseapps.feeder.db.RssContentProviderKt.QUERY_PARAM_LIMIT;
 import static com.nononsenseapps.feeder.util.GlideUtils.glide;
 import static com.nononsenseapps.feeder.util.PrefUtils.shouldLoadImages;
 
@@ -303,11 +304,11 @@ public class FeedFragment extends Fragment
             public void onRefresh() {
                 // Sync this specific feed(s)
                 if (id > 0) {
-                    RssContentProvider.RequestSync(id);
+                    ContentResolverExtensionsKt.requestFeedSync(getActivity().getContentResolver(), id);
                 } else if (tag != null) {
-                    RssContentProvider.RequestSync(tag);
+                    ContentResolverExtensionsKt.requestFeedSync(getActivity().getContentResolver(), tag);
                 } else {
-                    RssContentProvider.RequestSync();
+                    ContentResolverExtensionsKt.requestFeedSync(getActivity().getContentResolver(), -1);
                 }
             }
         });
@@ -442,7 +443,7 @@ public class FeedFragment extends Fragment
         final long id = menuItem.getItemId();
         if (id == R.id.action_sync) {
             // Sync all feeds when menu button pressed
-            RssContentProvider.RequestSync();
+            ContentResolverExtensionsKt.requestFeedSync(getActivity().getContentResolver(), -1);
             return true;
         } else if (id == R.id.action_edit_feed && this.id > 0) {
             Intent i = new Intent(getActivity(), EditFeedActivity.class);
@@ -468,7 +469,7 @@ public class FeedFragment extends Fragment
             getActivity().getContentResolver()
                     .delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
                             Util.LongsToStringArray(this.id));
-            RssContentProvider.notifyAllUris(getActivity());
+            ContentResolverExtensionsKt.notifyAllUris(getActivity().getContentResolver());
 
             // Tell activity to open another fragment
             ((FeedActivity) getActivity()).loadFirstFeedInDB(true);
@@ -538,7 +539,7 @@ public class FeedFragment extends Fragment
         if (ID == FEEDITEMS_LOADER) {
             return new FeedItemDeltaCursorLoader(getActivity(),
                     FeedItemSQL.URI_FEED_ITEMS.buildUpon()
-                            .appendQueryParameter(RssContentProvider.QUERY_PARAM_LIMIT, "50").build(),
+                            .appendQueryParameter(QUERY_PARAM_LIMIT, "50").build(),
                     FeedItemSQL.FIELDS, getLoaderSelection(),
                     getLoaderSelectionArgs(),
                     FeedItemSQL.COL_PUBDATE + " DESC");
@@ -691,7 +692,7 @@ public class FeedFragment extends Fragment
             isGrid = TabletUtils.isTablet(context);
 
             unreadTextColor = context.getResources()
-                    .getColor(R.color.primary_text_default_material_dark);
+                    .getColor(R.color.white_87);
             readTextColor = context.getResources()
                     .getColor(R.color.secondary_text_material_dark);
             linkColor = context.getResources().getColor(R.color

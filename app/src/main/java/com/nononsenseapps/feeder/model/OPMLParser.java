@@ -13,7 +13,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.nononsenseapps.feeder.model.OPMLWriter.unescape;
+import static com.nononsenseapps.feeder.model.opml.OpmlWriterKt.unescape;
+
 
 public class OPMLParser implements ContentHandler {
 

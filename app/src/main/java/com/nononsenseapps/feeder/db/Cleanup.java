@@ -29,6 +29,9 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.nononsenseapps.feeder.db.RssContentProviderKt.AUTHORITY;
+import static com.nononsenseapps.feeder.db.RssContentProviderKt.QUERY_PARAM_SKIP;
+
 /**
  * Handles periodic clean up of the database, such as making sure the database doesn't
  * grow too large.
@@ -59,7 +62,7 @@ public class Cleanup {
         if (!operations.isEmpty()) {
             Log.d(TAG, "Prune " + operations.size() + " feed items.");
             context.getContentResolver()
-                    .applyBatch(RssContentProvider.AUTHORITY, operations);
+                    .applyBatch(AUTHORITY, operations);
         }
     }
 
@@ -83,7 +86,7 @@ public class Cleanup {
 
         try {
             cursor = context.getContentResolver().query(FeedItemSQL.URI_FEED_ITEMS.buildUpon()
-                            .appendQueryParameter(RssContentProvider.QUERY_PARAM_SKIP, "50").build(),
+                            .appendQueryParameter(QUERY_PARAM_SKIP, "50").build(),
                     new String[]{FeedItemSQL.COL_ID},
                     FeedItemSQL.COL_FEED + " IS ? ",
                     new String[]{Long.toString(listId)},
