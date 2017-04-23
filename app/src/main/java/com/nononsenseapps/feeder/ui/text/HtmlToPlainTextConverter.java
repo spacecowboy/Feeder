@@ -18,7 +18,6 @@ public class HtmlToPlainTextConverter implements ContentHandler {
     private final String mSource;
     private final Parser mReader;
     private StringBuilder builder;
-    private String href = "";
     private Stack<HtmlToSpannedConverter.Listing> listings = new Stack<>();
 
     public static String HtmlToPlainText(String html) {
@@ -177,12 +176,9 @@ public class HtmlToPlainTextConverter implements ContentHandler {
     }
 
     private void startA(StringBuilder builder, Attributes attributes) {
-        href = attributes.getValue("", "href");
-        builder.append("[");
     }
 
     private void endA(StringBuilder builder) {
-        builder.append("](").append(href).append(")");
     }
 
     @Override

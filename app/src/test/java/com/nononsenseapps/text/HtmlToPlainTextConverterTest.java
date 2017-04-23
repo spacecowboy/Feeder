@@ -46,6 +46,6 @@ public class HtmlToPlainTextConverterTest {
     @Test
     public void link() throws Exception {
         HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("go to <a href=\"google.com\">Google</a> and see.");
-        assertEquals("go to [Google](google.com) and see.", converter.convert());
+        assertEquals("go to Google and see.", converter.convert());
     }
 }
