@@ -21,6 +21,7 @@ public class HtmlToPlainTextConverter implements ContentHandler {
     private final Parser mReader;
     private StringBuilder builder;
     private Stack<HtmlToSpannedConverter.Listing> listings = new Stack<>();
+    private int ignoreCount = 0;
 
     public static String HtmlToPlainText(String html) {
         return new HtmlToPlainTextConverter(html).convert();
@@ -113,6 +114,8 @@ public class HtmlToPlainTextConverter implements ContentHandler {
             startOl(builder);
         } else if (tag.equalsIgnoreCase("li")) {
             startLi(builder);
+        } else if (tag.equalsIgnoreCase("style")) {
+            ignoreCount++;
         }
     }
 
@@ -222,6 +225,8 @@ public class HtmlToPlainTextConverter implements ContentHandler {
             endOl(builder);
         } else if (tag.equalsIgnoreCase("li")) {
             endLi(builder);
+        } else if (tag.equalsIgnoreCase("style")) {
+            ignoreCount--;
         }
     }
 
@@ -247,11 +252,17 @@ public class HtmlToPlainTextConverter implements ContentHandler {
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
+        if (ignoreCount > 0) {
+            return;
+        }
+
         StringBuilder sb = new StringBuilder();
 
         /*
          * Ignore whitespace that immediately follows other whitespace;
          * newlines count as spaces.
+         *
+         * TODO handle non-breaking space (character 160)
          */
 
         for (int i = 0; i < length; i++) {

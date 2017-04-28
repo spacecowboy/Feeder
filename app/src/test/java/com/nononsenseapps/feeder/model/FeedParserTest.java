@@ -19,6 +19,27 @@ public class FeedParserTest {
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
+    public void noStyles() throws Exception {
+        SyndFeed feed = FeedParser.parseFeed(getResearchRsc());
+        assertNotNull(feed);
+
+        assertEquals("http://research.swtch.com/feed.atom", FeedParser.selfLink(feed));
+
+        assertEquals(17, feed.getEntries().size());
+
+        SyndEntry entry = feed.getEntries().get(9);
+
+        assertNull(FeedParser.thumbnail(entry));
+
+        assertEquals("QArt Codes",
+                FeedParser.plainTitle(entry));
+
+        // Style tags should be ignored
+        assertEquals("QR codes are 2-dimensional bar codes that encode arbitrary text strings. A common use of QR codes is to encode URLs so that people can scan a QR code (for example, on an advertising poster, building r",
+                FeedParser.snippet(entry));
+    }
+
+    @Test
     public void cyklist() throws Exception {
         SyndFeed feed = FeedParser.parseFeed(getCyklistBloggen());
         assertNotNull(feed);
@@ -163,6 +184,10 @@ public class FeedParserTest {
 
     private InputStream getCyklistBloggen() {
         return getClass().getResourceAsStream("rss_cyklistbloggen.xml");
+    }
+
+    private InputStream getResearchRsc() {
+        return getClass().getResourceAsStream("atom_research_rsc.xml");
     }
 
     private InputStream getMorningPaper() {
