@@ -45,7 +45,8 @@ public class HtmlToPlainTextConverter implements ContentHandler {
             throw new RuntimeException(e);
         }
 
-        return builder.toString().trim();
+        // Replace non-breaking space (160) with normal space
+        return builder.toString().replace((char) 160, ' ').trim();
     }
 
     @Override
@@ -234,10 +235,12 @@ public class HtmlToPlainTextConverter implements ContentHandler {
 
     protected void ensureSpace(StringBuilder text) {
         int len = text.length();
-        if (len >= 1 && text.charAt(len - 1) == ' ') {
-            return;
-        }
         if (len != 0) {
+            char c = text.charAt(len - 1);
+            // Non-breaking space (160) is not caught by trim or whitespace identification
+            if (Character.isWhitespace(c) || c == 160) {
+                return;
+            }
             text.append(" ");
         }
     }

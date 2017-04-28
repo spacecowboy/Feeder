@@ -19,6 +19,27 @@ public class FeedParserTest {
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
+    public void cyklist() throws Exception {
+        SyndFeed feed = FeedParser.parseFeed(getCyklistBloggen());
+        assertNotNull(feed);
+
+        assertNull(FeedParser.selfLink(feed));
+
+        assertEquals(10, feed.getEntries().size());
+
+        SyndEntry entry = feed.getEntries().get(0);
+
+        assertNull(FeedParser.thumbnail(entry));
+
+        assertEquals("Ingen ombyggning av Danvikstull",
+                FeedParser.plainTitle(entry));
+
+        // Make sure character 160 (non-breaking space) is trimmed
+        assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: I smalaste passagen är gångdel",
+                FeedParser.snippet(entry));
+    }
+
+    @Test
     public void cowboy() throws Exception {
         SyndFeed feed = FeedParser.parseFeed(getCowboy());
         assertNotNull(feed);
@@ -138,6 +159,10 @@ public class FeedParserTest {
 
     private InputStream getCowboy() {
         return getClass().getResourceAsStream("rss_cowboy.xml");
+    }
+
+    private InputStream getCyklistBloggen() {
+        return getClass().getResourceAsStream("rss_cyklistbloggen.xml");
     }
 
     private InputStream getMorningPaper() {
