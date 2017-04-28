@@ -35,16 +35,13 @@ public class FeedParserTest {
         // Snippet should not contain images
         entry = feed.getEntries().get(4);
         assertEquals("Fixing the up button in Python shell history", entry.getTitle());
-        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library.\n" +
-                        "\n" +
-                        "Ipython is more descr",
+        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library." +
+                        " Ipython is more descri",
                 FeedParser.snippet(entry));
         // Snippet should not contain links
         entry = feed.getEntries().get(1);
         assertEquals("Compress all the images!", entry.getTitle());
-        assertEquals("*Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS)*\n" +
-                        "\n" +
-                        "One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to b",
+        assertEquals("*Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS)* One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to be",
                 FeedParser.snippet(entry));
     }
 

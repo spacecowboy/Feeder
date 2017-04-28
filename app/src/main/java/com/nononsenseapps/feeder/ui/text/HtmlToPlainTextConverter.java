@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Stack;
 
-
+/**
+ * Intended primarily to convert HTML into plaintext snippets, useful for previewing content in list.
+ */
 public class HtmlToPlainTextConverter implements ContentHandler {
 
     private final String mSource;
@@ -43,7 +45,7 @@ public class HtmlToPlainTextConverter implements ContentHandler {
             throw new RuntimeException(e);
         }
 
-        return builder.toString();
+        return builder.toString().trim();
     }
 
     @Override
@@ -81,9 +83,9 @@ public class HtmlToPlainTextConverter implements ContentHandler {
             // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
             // so we can safely emit the linebreaks when we handle the close tag.
         } else if (tag.equalsIgnoreCase("p")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("div")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("strong")) {
             strong(builder);
         } else if (tag.equalsIgnoreCase("b")) {
@@ -97,13 +99,13 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         } else if (tag.equalsIgnoreCase("i")) {
             emphasize(builder);
         } else if (tag.equalsIgnoreCase("blockquote")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("a")) {
             startA(builder, attributes);
         } else if (tag.length() == 2 &&
                 Character.toLowerCase(tag.charAt(0)) == 'h' &&
                 tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("ul")) {
             startUl(builder);
         } else if (tag.equalsIgnoreCase("ol")) {
@@ -188,11 +190,11 @@ public class HtmlToPlainTextConverter implements ContentHandler {
 
     protected void handleEndTag(String tag) {
         if (tag.equalsIgnoreCase("br")) {
-            handleBr(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("p")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("div")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("strong")) {
             strong(builder);
         } else if (tag.equalsIgnoreCase("b")) {
@@ -206,13 +208,13 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         } else if (tag.equalsIgnoreCase("i")) {
             emphasize(builder);
         } else if (tag.equalsIgnoreCase("blockquote")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("a")) {
             endA(builder);
         } else if (tag.length() == 2 &&
                 Character.toLowerCase(tag.charAt(0)) == 'h' &&
                 tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("ul")) {
             endUl(builder);
         } else if (tag.equalsIgnoreCase("ol")) {
@@ -230,31 +232,13 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         builder.append("**");
     }
 
-    protected void handleBr(StringBuilder text) {
+    protected void ensureSpace(StringBuilder text) {
         int len = text.length();
-        if (len >= 1 && text.charAt(len - 1) == '\n') {
+        if (len >= 1 && text.charAt(len - 1) == ' ') {
             return;
         }
         if (len != 0) {
-            text.append("\n");
-        }
-    }
-
-
-    protected void handleP(StringBuilder text) {
-        int len = text.length();
-
-        if (len >= 1 && text.charAt(len - 1) == '\n') {
-            if (len >= 2 && text.charAt(len - 2) == '\n') {
-                return;
-            }
-
-            text.append("\n");
-            return;
-        }
-
-        if (len != 0) {
-            text.append("\n\n");
+            text.append(" ");
         }
     }
 
