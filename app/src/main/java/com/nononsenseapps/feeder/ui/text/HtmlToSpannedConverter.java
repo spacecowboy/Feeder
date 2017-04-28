@@ -67,6 +67,7 @@ public class HtmlToSpannedConverter implements ContentHandler {
     protected int mAccentColor;
     protected int mQuoteGapWidth;
     protected int mQuoteStripeWidth;
+    protected int ignoreCount = 0;
 
     protected String mSource;
     protected XMLReader mReader;
@@ -213,6 +214,8 @@ public class HtmlToSpannedConverter implements ContentHandler {
             startEndTableRow(mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase( "table" )) {
             startEndTable(mSpannableStringBuilder);
+        } else if (tag.equalsIgnoreCase("style")) {
+            ignoreCount++;
         } else {
             startUnknownTag(tag, mSpannableStringBuilder, attributes);
         }
@@ -465,6 +468,8 @@ public class HtmlToSpannedConverter implements ContentHandler {
             startEndTableRow(mSpannableStringBuilder);
         } else if (tag.equalsIgnoreCase( "table" )) {
             startEndTable(mSpannableStringBuilder);
+        } else if (tag.equalsIgnoreCase("style")) {
+            ignoreCount--;
         } else {
             endUnknownTag(tag, mSpannableStringBuilder);
         }
@@ -667,6 +672,9 @@ public class HtmlToSpannedConverter implements ContentHandler {
     @Override
     public void characters(char ch[], int start, int length)
             throws SAXException {
+        if (ignoreCount > 0) {
+            return;
+        }
         StringBuilder sb = new StringBuilder();
 
         /*

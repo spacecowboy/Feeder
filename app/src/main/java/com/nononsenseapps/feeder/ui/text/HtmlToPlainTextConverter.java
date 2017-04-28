@@ -12,13 +12,16 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Stack;
 
-
+/**
+ * Intended primarily to convert HTML into plaintext snippets, useful for previewing content in list.
+ */
 public class HtmlToPlainTextConverter implements ContentHandler {
 
     private final String mSource;
     private final Parser mReader;
     private StringBuilder builder;
     private Stack<HtmlToSpannedConverter.Listing> listings = new Stack<>();
+    private int ignoreCount = 0;
 
     public static String HtmlToPlainText(String html) {
         return new HtmlToPlainTextConverter(html).convert();
@@ -43,7 +46,8 @@ public class HtmlToPlainTextConverter implements ContentHandler {
             throw new RuntimeException(e);
         }
 
-        return builder.toString();
+        // Replace non-breaking space (160) with normal space
+        return builder.toString().replace((char) 160, ' ').trim();
     }
 
     @Override
@@ -81,9 +85,9 @@ public class HtmlToPlainTextConverter implements ContentHandler {
             // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
             // so we can safely emit the linebreaks when we handle the close tag.
         } else if (tag.equalsIgnoreCase("p")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("div")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("strong")) {
             strong(builder);
         } else if (tag.equalsIgnoreCase("b")) {
@@ -97,19 +101,21 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         } else if (tag.equalsIgnoreCase("i")) {
             emphasize(builder);
         } else if (tag.equalsIgnoreCase("blockquote")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("a")) {
             startA(builder, attributes);
         } else if (tag.length() == 2 &&
                 Character.toLowerCase(tag.charAt(0)) == 'h' &&
                 tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("ul")) {
             startUl(builder);
         } else if (tag.equalsIgnoreCase("ol")) {
             startOl(builder);
         } else if (tag.equalsIgnoreCase("li")) {
             startLi(builder);
+        } else if (tag.equalsIgnoreCase("style")) {
+            ignoreCount++;
         }
     }
 
@@ -188,11 +194,11 @@ public class HtmlToPlainTextConverter implements ContentHandler {
 
     protected void handleEndTag(String tag) {
         if (tag.equalsIgnoreCase("br")) {
-            handleBr(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("p")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("div")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("strong")) {
             strong(builder);
         } else if (tag.equalsIgnoreCase("b")) {
@@ -206,19 +212,21 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         } else if (tag.equalsIgnoreCase("i")) {
             emphasize(builder);
         } else if (tag.equalsIgnoreCase("blockquote")) {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("a")) {
             endA(builder);
         } else if (tag.length() == 2 &&
                 Character.toLowerCase(tag.charAt(0)) == 'h' &&
                 tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
-            handleP(builder);
+            ensureSpace(builder);
         } else if (tag.equalsIgnoreCase("ul")) {
             endUl(builder);
         } else if (tag.equalsIgnoreCase("ol")) {
             endOl(builder);
         } else if (tag.equalsIgnoreCase("li")) {
             endLi(builder);
+        } else if (tag.equalsIgnoreCase("style")) {
+            ignoreCount--;
         }
     }
 
@@ -230,41 +238,31 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         builder.append("**");
     }
 
-    protected void handleBr(StringBuilder text) {
+    protected void ensureSpace(StringBuilder text) {
         int len = text.length();
-        if (len >= 1 && text.charAt(len - 1) == '\n') {
-            return;
-        }
         if (len != 0) {
-            text.append("\n");
-        }
-    }
-
-
-    protected void handleP(StringBuilder text) {
-        int len = text.length();
-
-        if (len >= 1 && text.charAt(len - 1) == '\n') {
-            if (len >= 2 && text.charAt(len - 2) == '\n') {
+            char c = text.charAt(len - 1);
+            // Non-breaking space (160) is not caught by trim or whitespace identification
+            if (Character.isWhitespace(c) || c == 160) {
                 return;
             }
-
-            text.append("\n");
-            return;
-        }
-
-        if (len != 0) {
-            text.append("\n\n");
+            text.append(" ");
         }
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
+        if (ignoreCount > 0) {
+            return;
+        }
+
         StringBuilder sb = new StringBuilder();
 
         /*
          * Ignore whitespace that immediately follows other whitespace;
          * newlines count as spaces.
+         *
+         * TODO handle non-breaking space (character 160)
          */
 
         for (int i = 0; i < length; i++) {

@@ -19,6 +19,48 @@ public class FeedParserTest {
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
+    public void noStyles() throws Exception {
+        SyndFeed feed = FeedParser.parseFeed(getResearchRsc());
+        assertNotNull(feed);
+
+        assertEquals("http://research.swtch.com/feed.atom", FeedParser.selfLink(feed));
+
+        assertEquals(17, feed.getEntries().size());
+
+        SyndEntry entry = feed.getEntries().get(9);
+
+        assertNull(FeedParser.thumbnail(entry));
+
+        assertEquals("QArt Codes",
+                FeedParser.plainTitle(entry));
+
+        // Style tags should be ignored
+        assertEquals("QR codes are 2-dimensional bar codes that encode arbitrary text strings. A common use of QR codes is to encode URLs so that people can scan a QR code (for example, on an advertising poster, building r",
+                FeedParser.snippet(entry));
+    }
+
+    @Test
+    public void cyklist() throws Exception {
+        SyndFeed feed = FeedParser.parseFeed(getCyklistBloggen());
+        assertNotNull(feed);
+
+        assertNull(FeedParser.selfLink(feed));
+
+        assertEquals(10, feed.getEntries().size());
+
+        SyndEntry entry = feed.getEntries().get(0);
+
+        assertNull(FeedParser.thumbnail(entry));
+
+        assertEquals("Ingen ombyggning av Danvikstull",
+                FeedParser.plainTitle(entry));
+
+        // Make sure character 160 (non-breaking space) is trimmed
+        assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: I smalaste passagen är gångdel",
+                FeedParser.snippet(entry));
+    }
+
+    @Test
     public void cowboy() throws Exception {
         SyndFeed feed = FeedParser.parseFeed(getCowboy());
         assertNotNull(feed);
@@ -35,16 +77,13 @@ public class FeedParserTest {
         // Snippet should not contain images
         entry = feed.getEntries().get(4);
         assertEquals("Fixing the up button in Python shell history", entry.getTitle());
-        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library.\n" +
-                        "\n" +
-                        "Ipython is more descr",
+        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library." +
+                        " Ipython is more descri",
                 FeedParser.snippet(entry));
         // Snippet should not contain links
         entry = feed.getEntries().get(1);
         assertEquals("Compress all the images!", entry.getTitle());
-        assertEquals("*Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS)*\n" +
-                        "\n" +
-                        "One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to b",
+        assertEquals("*Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS)* One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to be",
                 FeedParser.snippet(entry));
     }
 
@@ -141,6 +180,14 @@ public class FeedParserTest {
 
     private InputStream getCowboy() {
         return getClass().getResourceAsStream("rss_cowboy.xml");
+    }
+
+    private InputStream getCyklistBloggen() {
+        return getClass().getResourceAsStream("rss_cyklistbloggen.xml");
+    }
+
+    private InputStream getResearchRsc() {
+        return getClass().getResourceAsStream("atom_research_rsc.xml");
     }
 
     private InputStream getMorningPaper() {

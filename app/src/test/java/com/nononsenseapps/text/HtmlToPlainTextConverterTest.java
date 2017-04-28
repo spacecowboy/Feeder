@@ -24,14 +24,14 @@ public class HtmlToPlainTextConverterTest {
     public void unorderedList() throws Exception {
         HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("<ul><li>one</li><li>two</li></ul>");
         assertEquals("* one\n" +
-                "* two\n", converter.convert());
+                "* two", converter.convert());
     }
 
     @Test
     public void orderedList() throws Exception {
         HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("<ol><li>one</li><li>two</li></ol>");
         assertEquals("1. one\n" +
-                "2. two\n", converter.convert());
+                "2. two", converter.convert());
     }
 
     @Test
@@ -40,12 +40,18 @@ public class HtmlToPlainTextConverterTest {
         assertEquals("1. sublist:\n" +
                 "  * A\n" +
                 "  * B\n" +
-                "2. two\n", converter.convert());
+                "2. two", converter.convert());
     }
 
     @Test
     public void link() throws Exception {
         HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("go to <a href=\"google.com\">Google</a> and see.");
         assertEquals("go to Google and see.", converter.convert());
+    }
+
+    @Test
+    public void noNewLines() throws Exception {
+        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("<p>one<br>two<p>three");
+        assertEquals("one two three", converter.convert());
     }
 }
