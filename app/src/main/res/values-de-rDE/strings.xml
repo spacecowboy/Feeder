@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <string name="app_name">Feeder</string>
+  <string name="title_section1">Sektion 1</string>
+  <string name="title_section2">Sektion 2</string>
+  <string name="title_section3">Sektion 3</string>
+  <string name="navigation_drawer_open">Öffne die Navigationsleiste</string>
+  <string name="navigation_drawer_close">Schließe die Navigationsleiste</string>
+  <string name="action_example">Beispiel Aktion</string>
+  <string name="action_settings">Einstellungen</string>
+  <string name="title_activity_story">Geschichtsaktivität</string>
+  <string name="hello_world">Hallo Welt!</string>
+  <string name="title_activity_fullscreen">VollbildAktivität</string>
+  <string name="dummy_button">Dummy Knopf</string>
+  <string name="dummy_content">Dummy Inhalt</string>
+  <string name="add_feed">Feed hinzufügen</string>
+  <string name="title_activity_edit_feed">Feed abonieren</string>
+  <string name="url">URL</string>
+  <string name="hello_blank_fragment">Hallo freies Fragment</string>
+  <string name="tag">Gruppe</string>
+  <string name="add_feed_search_hint">Feed URL</string>
+  <string name="select_account">Wähle ein Benutzerkonto</string>
+  <string name="title">Titel</string>
+
+  <string name="by_author_on_date">von %1$s, %2$s</string>
+  <string name="on_date">%1$s</string>
+  <string name="save">Speichern</string>
+  <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würdest du gerne…</string>
+  <string name="empty_feed_open">Einen anderen Feed<font color=\"#607D8B\">öffnen</font>?</string>
+  <string name="empty_feed_add">Mehr Feeds<font color=\"#607D8B\">hinzufügen</font>?</string>
+  <string name="empty_no_feeds_top">Noch nichts zu lesen.\n
+    Leg los indem</string>
+  <string name="empty_no_feeds_login">Beim Server <font color=\"#607D8B\">einloggen</font> und…</string>
+  <string name="empty_no_feeds_add">Einige Feeds<font color=\"#607D8B\">hinzugefügen</font></string>
+  <string name="no_feeds_found">Konnte keine relevanten Feeds finden. Versuche nach einem einzelnen Wort zu suchen.</string>
+  <string name="search_feed_empty_hint">Gebe eine Feed URL ein</string>
+  <string name="mark_all_as_read">Alles als gelesen markieren</string>
+  <string name="edit_feed">Feed bearbeiten</string>
+  <string name="delete_feed">Feed löschen</string>
+  <string name="show_all_items">Zeige alle Artikel</string>
+  <string name="show_unread_items">Zeige ungelesene Artikel</string>
+  <string name="new_items_available">Neue Artikel verfügbar</string>
+  <string name="view">Betrachten</string>
+  <string name="no_tag">Keine Gruppe</string>
+  <string name="username">Benutzername</string>
+  <string name="server_address">Serveradresse</string>
+  <string name="night_mode">Nacht Modus</string>
+  <string name="notify_for_new_items">Benachrichtige für neue Artikel</string>
+  <string name="toggle_read_status">Lesestatus verändern</string>
+  <string name="open_link_in_browser">Link im Browser öffnen</string>
+  <string name="open_enclosed_media">Öffne eingebettete Medien</string>
+  <string name="sync">Aktualisieren</string>
+  <string name="export_feeds_to_opml">Feeds als OPML exportieren</string>
+  <string name="import_feeds_from_opml">Feeds von OPML importieren</string>
+  <string name="view_debug_log">Betrachte den Debug Log</string>
+  <string name="new_based_on_this">Neu darauf basierend</string>
+  <string name="indicator_for_mark_as_read">Indikator für Lesemarkierung</string>
+  <string name="share">Teilen</string>
+  <string name="no_such_feed">Es wurde kein Feed gefunden. Versuche HTTPS zu benutzen.</string>
+  <string name="nothing_to_display">Nichts zu sehen!</string>
+  <string name="title_activity_settings">Einstellungen</string>
+
+  <string-array name="pref_sync_frequency_titles">
+    <item>Manuell</item>
+    <item>Jede Stunde</item>
+    <item>Alle 3 Stunden</item>
+    <item>Alle 6 Stunden</item>
+    <item>Alle 12 Stunden</item>
+  </string-array>
+  <string-array name="pref_sync_frequency_values">
+    <item>0</item>
+    <item>1</item>
+    <item>3</item>
+    <item>6</item>
+    <item>12</item>
+  </string-array>
+
+  <string name="synchronization">Aktualisierung</string>
+  <string name="only_on_wifi">Nur im WiFi</string>
+  <string name="may_result_data_charges">Könnte zu mobiler Datennutzung führen.</string>
+  <string name="only_when_charging">Nur beim Laden</string>
+  <string name="image_loading">Bild wird geladen</string>
+
+</resources>
