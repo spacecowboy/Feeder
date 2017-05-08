@@ -87,5 +87,6 @@
   <string name="may_result_data_charges">May result in mobile data charges.</string>
   <string name="only_when_charging">Only when charging</string>
   <string name="image_loading">Image loading</string>
+  <string name="no_activity_for_link">Couldn\'t find an activity to open that link with</string>
 
 </resources>
