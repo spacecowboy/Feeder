@@ -18,6 +18,7 @@
 package com.nononsenseapps.feeder.ui;
 
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
@@ -35,11 +36,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.ui.text.HtmlConverter;
 import com.nononsenseapps.feeder.ui.text.ImageTextLoader;
 import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
+import com.nononsenseapps.feeder.util.FileLog;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
@@ -264,16 +267,33 @@ public class ReaderFragment extends Fragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
+        Uri uri;
         switch (menuItem.getItemId()) {
             case R.id.action_open_in_browser:
+                uri = Uri.parse(mRssItem.link);
+                if (uri.isRelative()) {
+                    Toast.makeText(getActivity(), "Sorry, can't handle relative links yet.", Toast.LENGTH_SHORT).show();
+                }
                 // Open in browser
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(mRssItem.link)));
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(getActivity(), "Couldn't find an activity to open that link with", Toast.LENGTH_SHORT).show();
+                    FileLog.singleton.getInstance(getActivity()).d("No such activity: " + e);
+                }
                 return true;
             case R.id.action_open_enclosure:
+                uri = Uri.parse(mRssItem.enclosurelink);
+                if (uri.isRelative()) {
+                    Toast.makeText(getActivity(), R.string.no_activity_for_link, Toast.LENGTH_SHORT).show();
+                }
                 // Open enclosure link
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(mRssItem.enclosurelink)));
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(getActivity(), R.string.no_activity_for_link, Toast.LENGTH_SHORT).show();
+                    FileLog.singleton.getInstance(getActivity()).d("No such activity: " + e);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(menuItem);
