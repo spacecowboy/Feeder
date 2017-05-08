@@ -18,10 +18,7 @@ inline fun initUriMatcher(init: (UriMatcher) -> Unit): UriMatcher {
     return uriMatcher
 }
 
-private val uriMatcher: UriMatcher = initUriMatcher {
-    FeedSQL.addMatcherUris(it)
-    FeedItemSQL.addMatcherUris(it)
-}
+private val uriMatcher: UriMatcher = initUriMatcher(::addMatcherUris)
 
 class RssContentProvider : ContentProvider() {
 
@@ -34,13 +31,13 @@ class RssContentProvider : ContentProvider() {
             val result: Uri
             val table: String
             when (uriMatcher.match(uri)) {
-                FeedSQL.URICODE -> {
-                    table = FeedSQL.TABLE_NAME
-                    result = FeedSQL.URI_FEEDS
+                FEED_CODE -> {
+                    table = TABLE_NAME
+                    result = URI_FEEDS
                 }
-                FeedItemSQL.URICODE -> {
+                FEEDITEM_CODE -> {
                     table = FeedItemSQL.TABLE_NAME
-                    result = FeedItemSQL.URI_FEED_ITEMS
+                    result = URI_FEEDITEMS
                 }
                 else -> throw UnsupportedOperationException("Not yet implemented")
             }
@@ -64,32 +61,32 @@ class RssContentProvider : ContentProvider() {
             val params: Array<out String>?
 
             when (uriMatcher.match(uri)) {
-                FeedSQL.ITEMCODE -> {
-                    table = FeedSQL.TABLE_NAME
+                FEED_ELEMENT_CODE -> {
+                    table = TABLE_NAME
                     where = Util.WHEREIDIS
                     params = Util.ToStringArray(uri.lastPathSegment)
                 }
-                FeedSQL.URICODE -> {
-                    table = FeedSQL.TABLE_NAME
+                FEED_CODE -> {
+                    table = TABLE_NAME
                     where = selection
                     params = selectionArgs
                 }
-                FeedSQL.VIEWCOUNTCODE -> {
-                    table = FeedSQL.VIEWCOUNT_NAME
+                FEED_VIEWCOUNT_CODE -> {
+                    table = VIEWCOUNT_NAME
                     where = selection
                     params = selectionArgs
                 }
-                FeedSQL.VIEWTAGSCODE -> {
-                    table = FeedSQL.VIEWTAGS_NAME
+                FEED_VIEWTAGS_CODE -> {
+                    table = VIEWTAGS_NAME
                     where = selection
                     params = selectionArgs
                 }
-                FeedItemSQL.ITEMCODE -> {
+                FEEDITEM_ELEMENT_CODE -> {
                     table = FeedItemSQL.TABLE_NAME
                     where = Util.WHEREIDIS
                     params = Util.ToStringArray(uri.lastPathSegment)
                 }
-                FeedItemSQL.URICODE -> {
+                FEEDITEM_CODE -> {
                     table = FeedItemSQL.TABLE_NAME
                     where = selection
                     params = selectionArgs
@@ -120,22 +117,22 @@ class RssContentProvider : ContentProvider() {
 
         if (uri != null) {
             when (uriMatcher.match(uri)) {
-                FeedSQL.ITEMCODE -> {
-                    table = FeedSQL.TABLE_NAME
+                FEED_ELEMENT_CODE -> {
+                    table = TABLE_NAME
                     where = Util.WHEREIDIS
                     params = Util.ToStringArray(uri.lastPathSegment)
                 }
-                FeedSQL.URICODE -> {
-                    table = FeedSQL.TABLE_NAME
+                FEED_CODE -> {
+                    table = TABLE_NAME
                     where = selection
                     params = selectionArgs
                 }
-                FeedItemSQL.ITEMCODE -> {
+                FEEDITEM_ELEMENT_CODE -> {
                     table = FeedItemSQL.TABLE_NAME
                     where = Util.WHEREIDIS
                     params = Util.ToStringArray(uri.lastPathSegment)
                 }
-                FeedItemSQL.URICODE -> {
+                FEEDITEM_CODE -> {
                     table = FeedItemSQL.TABLE_NAME
                     where = selection
                     params = selectionArgs
@@ -154,14 +151,14 @@ class RssContentProvider : ContentProvider() {
         if (uri != null) {
             val result: Int
             when (uriMatcher.match(uri)) {
-                FeedSQL.ITEMCODE -> result = delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
+                FEED_ELEMENT_CODE -> result = delete(URI_FEEDS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.lastPathSegment))
-                FeedSQL.URICODE -> result = DatabaseHandler.getInstance(context)
+                FEED_CODE -> result = DatabaseHandler.getInstance(context)
                         .writableDatabase
-                        .delete(FeedSQL.TABLE_NAME, selection, selectionArgs)
-                FeedItemSQL.ITEMCODE -> result = delete(FeedItemSQL.URI_FEED_ITEMS, Util.WHEREIDIS,
+                        .delete(TABLE_NAME, selection, selectionArgs)
+                FEEDITEM_ELEMENT_CODE -> result = delete(URI_FEEDITEMS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.lastPathSegment))
-                FeedItemSQL.URICODE -> result = DatabaseHandler.getInstance(context)
+                FEEDITEM_CODE -> result = DatabaseHandler.getInstance(context)
                         .writableDatabase
                         .delete(FeedItemSQL.TABLE_NAME, selection,
                                 selectionArgs)

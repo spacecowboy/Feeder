@@ -2,7 +2,12 @@ package com.nononsenseapps.feeder.ui
 
 import android.app.Activity
 import android.app.LoaderManager
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.CursorLoader
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.Loader
 import android.database.Cursor
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -15,13 +20,23 @@ import android.view.View
 import android.widget.CheckedTextView
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.COL_ID
+import com.nononsenseapps.feeder.db.COL_TAG
+import com.nononsenseapps.feeder.db.FIELDS
 import com.nononsenseapps.feeder.db.FeedSQL
+import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.Util
+import com.nononsenseapps.feeder.db.asFeed
 import com.nononsenseapps.feeder.model.OPMLContenProvider
-import com.nononsenseapps.feeder.model.OPMLParser
 import com.nononsenseapps.feeder.model.RssSyncAdapter
+import com.nononsenseapps.feeder.model.opml.OpmlParser
 import com.nononsenseapps.feeder.model.opml.writeOutputStream
-import com.nononsenseapps.feeder.util.*
+import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.getString
+import com.nononsenseapps.feeder.util.notifyAllUris
+import com.nononsenseapps.feeder.util.queryFeeds
+import com.nononsenseapps.feeder.util.queryTagsWithCounts
+import com.nononsenseapps.feeder.util.requestFeedSync
 
 const private val EXPORT_OPML_CODE = 101
 const private val IMPORT_OPML_CODE = 102
@@ -39,8 +54,8 @@ class FeedActivity : BaseActivity() {
             when (intent.action) {
                 RssSyncAdapter.SYNC_BROADCAST -> loadFirstFeedInDB(false)
                 RssSyncAdapter.FEED_ADDED_BROADCAST -> {
-                    if (fragment == null && intent.getLongExtra(FeedSQL.COL_ID, -1) > 0) {
-                        onNavigationDrawerItemSelected(intent.getLongExtra(FeedSQL.COL_ID, -1), "", "", null)
+                    if (fragment == null && intent.getLongExtra(COL_ID, -1) > 0) {
+                        onNavigationDrawerItemSelected(intent.getLongExtra(COL_ID, -1), "", "", null)
                     }
                 }
             }
@@ -101,14 +116,14 @@ class FeedActivity : BaseActivity() {
 
     val firstFeedLoader = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-            return CursorLoader(this@FeedActivity, FeedSQL.URI_FEEDS, FeedSQL.FIELDS, null, null, null)
+            return CursorLoader(this@FeedActivity, URI_FEEDS, FIELDS, null, null, null)
         }
 
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
             when (loader.id) {
                 defaultLoaderId -> {
                     if (data != null && data.moveToFirst()) {
-                        val feed = FeedSQL(data)
+                        val feed = data.asFeed()
                         onNavigationDrawerItemSelected(feed.id, feed.title, feed.url, feed.tag)
                     }
                     loaderManager.destroyLoader(defaultLoaderId)
@@ -216,7 +231,7 @@ class FeedActivity : BaseActivity() {
                 if (data != null) {
                     val uri = data.data
                     try {
-                        val parser = OPMLParser(OPMLContenProvider(this))
+                        val parser = OpmlParser(OPMLContenProvider(this))
                         contentResolver.openInputStream(uri).use {
                             parser.parseInputStream(it)
                         }
@@ -233,9 +248,9 @@ class FeedActivity : BaseActivity() {
     private fun tags(): Iterable<String?> {
         val tags = ArrayList<String?>()
 
-        contentResolver.queryTagsWithCounts(columns = listOf(FeedSQL.COL_TAG)) {
+        contentResolver.queryTagsWithCounts(columns = listOf(COL_TAG)) {
             while (it.moveToNext()) {
-                tags.add(it.getString(FeedSQL.COL_TAG))
+                tags.add(it.getString(COL_TAG))
             }
         }
 
@@ -246,9 +261,9 @@ class FeedActivity : BaseActivity() {
         return { tag ->
             val feeds = ArrayList<FeedSQL>()
 
-            contentResolver.queryFeeds(where = "${FeedSQL.COL_TAG} IS ?", params = listOf(tag ?: "")) {
+            contentResolver.queryFeeds(where = "$COL_TAG IS ?", params = listOf(tag ?: "")) {
                 while (it.moveToNext()) {
-                    feeds.add(FeedSQL(it))
+                    feeds.add(it.asFeed())
                 }
             }
 

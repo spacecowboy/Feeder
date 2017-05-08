@@ -58,6 +58,7 @@ import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.FeedSQLKt;
 import com.nononsenseapps.feeder.db.RssDatabaseService;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
@@ -72,7 +73,12 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Locale;
 
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_NOTIFY;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.FIELDS;
 import static com.nononsenseapps.feeder.db.RssContentProviderKt.QUERY_PARAM_LIMIT;
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
 import static com.nononsenseapps.feeder.util.GlideUtils.glide;
 import static com.nononsenseapps.feeder.util.PrefUtils.shouldLoadImages;
 
@@ -450,7 +456,8 @@ public class FeedFragment extends Fragment
             // TODO do not animate the back movement here
             i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
             i.putExtra(EditFeedActivity._ID, this.id);
-            i.putExtra(EditFeedActivity.TITLE, customTitle);
+            i.putExtra(EditFeedActivity.CUSTOM_TITLE, customTitle);
+            i.putExtra(EditFeedActivity.FEED_TITLE, title);
             i.putExtra(EditFeedActivity.TAG, tag);
             i.setData(Uri.parse(url));
             startActivity(i);
@@ -460,14 +467,14 @@ public class FeedFragment extends Fragment
             // TODO do not animate the back movement here
             i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
             i.putExtra(EditFeedActivity.TEMPLATE, true);
-            //i.putExtra(EditFeedActivity.TITLE, title);
+            //i.putExtra(EditFeedActivity.CUSTOM_TITLE, title);
             i.putExtra(EditFeedActivity.TAG, tag);
             i.setData(Uri.parse(url));
             startActivity(i);
             return true;
         } else if (id == R.id.action_delete_feed && this.id > 0) {
             getActivity().getContentResolver()
-                    .delete(FeedSQL.URI_FEEDS, Util.WHEREIDIS,
+                    .delete(URI_FEEDS, Util.WHEREIDIS,
                             Util.LongsToStringArray(this.id));
             ContentResolverExtensionsKt.notifyAllUris(getActivity().getContentResolver());
 
@@ -538,15 +545,15 @@ public class FeedFragment extends Fragment
     public Loader onCreateLoader(final int ID, final Bundle bundle) {
         if (ID == FEEDITEMS_LOADER) {
             return new FeedItemDeltaCursorLoader(getActivity(),
-                    FeedItemSQL.URI_FEED_ITEMS.buildUpon()
+                    URI_FEEDITEMS.buildUpon()
                             .appendQueryParameter(QUERY_PARAM_LIMIT, "50").build(),
                     FeedItemSQL.FIELDS, getLoaderSelection(),
                     getLoaderSelectionArgs(),
                     FeedItemSQL.COL_PUBDATE + " DESC");
         } else if (ID == FEED_LOADER) {
             return new CursorLoader(getActivity(),
-                    Uri.withAppendedPath(FeedSQL.URI_FEEDS, Long.toString(id)),
-                    FeedSQL.FIELDS, null, null, null);
+                    Uri.withAppendedPath(URI_FEEDS, Long.toString(id)),
+                    FIELDS, null, null, null);
         } else if (ID == FEED_SETTINGS_LOADER) {
             String where;
             String[] whereArgs;
@@ -554,11 +561,11 @@ public class FeedFragment extends Fragment
                 where = Util.WHEREIDIS;
                 whereArgs = Util.LongsToStringArray(id);
             } else {
-                where = FeedSQL.COL_TAG + " IS ?";
+                where = COL_TAG + " IS ?";
                 whereArgs = Util.ToStringArray(tag);
             }
-            return new CursorLoader(getActivity(), FeedSQL.URI_FEEDS,
-                    Util.ToStringArray("DISTINCT " + FeedSQL.COL_NOTIFY),
+            return new CursorLoader(getActivity(), URI_FEEDS,
+                    Util.ToStringArray("DISTINCT " + COL_NOTIFY),
                     where, whereArgs, null);
         }
         return null;
@@ -576,11 +583,11 @@ public class FeedFragment extends Fragment
         } else if (FEED_LOADER == cursorLoader.getId()) {
             Cursor cursor = (Cursor) result;
             if (cursor.moveToFirst()) {
-                FeedSQL feed = new FeedSQL(cursor);
-                this.title = feed.title;
-                this.customTitle = feed.customTitle;
-                this.url = feed.url;
-                this.notify = feed.notify;
+                FeedSQL feed = FeedSQLKt.asFeed(cursor);
+                this.title = feed.getTitle();
+                this.customTitle = feed.getCustomTitle();
+                this.url = feed.getUrl();
+                this.notify = feed.getNotify() ? 1 : 0;
 
                 ((BaseActivity) getActivity()).getSupportActionBar().setTitle(title);
                 mNotifyCheck.setChecked(this.notify == 1);

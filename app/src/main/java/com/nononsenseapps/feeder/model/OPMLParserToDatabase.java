@@ -1,10 +1,11 @@
 package com.nononsenseapps.feeder.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.nononsenseapps.feeder.db.FeedSQL;
 
 public interface OPMLParserToDatabase {
-    @NonNull
+    @Nullable
     FeedSQL getFeed(@NonNull final String url);
     void saveFeed(@NonNull final FeedSQL feed);
 }

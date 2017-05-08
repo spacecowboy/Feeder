@@ -26,15 +26,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
-
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
-import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.FeedSQLKt;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.ui.FeedActivity;
 import com.nononsenseapps.feeder.ui.ReaderActivity;
 
 import java.util.ArrayList;
+
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
 
 /**
  * Handles notifications
@@ -141,7 +143,7 @@ public class RssNotifications {
             return feedItems;
 
         Cursor c = context.getContentResolver()
-                .query(FeedItemSQL.URI_FEED_ITEMS, FeedItemSQL.FIELDS,
+                .query(URI_FEEDITEMS, FeedItemSQL.FIELDS,
                         FeedItemSQL.COL_FEED + " IN (" + feeds + ") AND " + FeedItemSQL.COL_NOTIFIED + " IS 0 AND " + FeedItemSQL.COL_UNREAD + " IS 1",
                         null, null);
 
@@ -162,8 +164,8 @@ public class RssNotifications {
         String result = null;
 
         Cursor c = context.getContentResolver()
-                .query(FeedSQL.URI_FEEDS, Util.ToStringArray(FeedSQL.COL_ID),
-                        FeedSQL.COL_NOTIFY + " IS 1",
+                .query(URI_FEEDS, Util.ToStringArray(FeedSQLKt.COL_ID),
+                        FeedSQLKt.COL_NOTIFY + " IS 1",
                         null, null);
 
         try {

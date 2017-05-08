@@ -1,6 +1,6 @@
 package com.nononsenseapps.feeder.model.opml
 
-import com.nononsenseapps.feeder.db.DbFeed
+import com.nononsenseapps.feeder.db.FeedSQL
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.ByteArrayOutputStream
@@ -22,36 +22,13 @@ class OpmlWriterKtTest {
     fun shouldEscapeStrings() {
         val bos = ByteArrayOutputStream()
         writeOutputStream(bos, listOf("quoted \"tag\""), { tag ->
-            val result = ArrayList<DbFeed>()
-            val feed = object : DbFeed {
-                override fun getId(): Long {
-                    return 1L
-                }
-
-                override fun getNotify(): Int {
-                    return 0
-                }
-
-                override fun getTag(): String? {
-                    return tag
-                }
-
-                override fun getTitle(): String {
-                    return "A \"feeditem\" with id '9' > 0 & < 10"
-                }
-
-                override fun getCustomTitle(): String {
-                    return "A \"feeditem\" with id '9' > 0 & < 10"
-                }
-
-                override fun getUnreadCount(): Int {
-                    return 2
-                }
-
-                override fun getUrl(): String {
-                    return "http://somedomain.com/rss.xml?format=feed&type=rss"
-                }
-            }
+            val result = ArrayList<FeedSQL>()
+            val feed = FeedSQL(id = 1L,
+                    title = "A \"feeditem\" with id '9' > 0 & < 10",
+                    customTitle = "A \"feeditem\" with id '9' > 0 & < 10",
+                    unreadCount = 2,
+                    url = "http://somedomain.com/rss.xml?format=feed&type=rss",
+                    tag = tag!!)
 
             result.add(feed)
             result

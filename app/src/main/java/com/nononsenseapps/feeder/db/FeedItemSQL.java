@@ -18,15 +18,10 @@
 package com.nononsenseapps.feeder.db;
 
 import android.content.ContentValues;
-import android.content.UriMatcher;
 import android.database.Cursor;
-import android.net.Uri;
 import android.util.Log;
 import org.joda.time.DateTime;
 import org.json.JSONObject;
-
-import static com.nononsenseapps.feeder.db.RssContentProviderKt.AUTHORITY;
-import static com.nononsenseapps.feeder.db.RssContentProviderKt.SCHEME;
 
 /**
  * SQL which handles items belonging to a Feed
@@ -34,23 +29,6 @@ import static com.nononsenseapps.feeder.db.RssContentProviderKt.SCHEME;
 public class FeedItemSQL {
     // SQL convention says Table name should be "singular"
     public static final String TABLE_NAME = "FeedItem";
-    // URIs
-    public static final Uri URI_FEED_ITEMS = Uri.withAppendedPath(
-            Uri.parse(SCHEME + AUTHORITY),
-            TABLE_NAME);
-    // URI codes, must be unique
-    public static final int URICODE = 201;
-    public static final int ITEMCODE = 202;
-    private static final String TAG = "FeedItemSQL";
-
-
-    public static void addMatcherUris(UriMatcher sURIMatcher) {
-        sURIMatcher
-                .addURI(AUTHORITY, URI_FEED_ITEMS.getPath(),
-                        URICODE);
-        sURIMatcher.addURI(AUTHORITY,
-                URI_FEED_ITEMS.getPath() + "/#", ITEMCODE);
-    }
 
     // Naming the id column with an underscore is good to be consistent
     // with other Android things. This is ALWAYS needed
@@ -106,8 +84,8 @@ public class FeedItemSQL {
                     COL_TAG + " TEXT NOT NULL," +
                     COL_FEEDTITLE + " TEXT NOT NULL," +
                     // Handle foreign key stuff
-                    " FOREIGN KEY(" + COL_FEED + ") REFERENCES " + FeedSQL.TABLE_NAME + "(" +
-                    FeedSQL.COL_ID + ") ON DELETE CASCADE," +
+                    " FOREIGN KEY(" + COL_FEED + ") REFERENCES " + FeedSQLKt.TABLE_NAME + "(" +
+                    FeedSQLKt.COL_ID + ") ON DELETE CASCADE," +
                     // Handle unique constraint
                     " UNIQUE(" + COL_GUID + "," + COL_FEED + ") ON CONFLICT " +
                     "IGNORE"
@@ -117,17 +95,17 @@ public class FeedItemSQL {
     public static final String CREATE_TAG_TRIGGER =
             "CREATE TEMP TRIGGER IF NOT EXISTS " + TRIGGER_NAME
             + " AFTER UPDATE OF " +
-            Util.arrayToCommaString(FeedSQL.COL_TAG, FeedSQL.COL_TITLE)
-            + " ON " + FeedSQL.TABLE_NAME
+            Util.arrayToCommaString(FeedSQLKt.COL_TAG, FeedSQLKt.COL_TITLE)
+            + " ON " + FeedSQLKt.TABLE_NAME
             + " WHEN "
-            + "new." + FeedSQL.COL_TAG + " IS NOT old." + FeedSQL.COL_TAG
+            + "new." + FeedSQLKt.COL_TAG + " IS NOT old." + FeedSQLKt.COL_TAG
             + " OR "
-            + "new." + FeedSQL.COL_TITLE + " IS NOT old." + FeedSQL.COL_TITLE
+            + "new." + FeedSQLKt.COL_TITLE + " IS NOT old." + FeedSQLKt.COL_TITLE
             + " BEGIN "
             + " UPDATE " + FeedItemSQL.TABLE_NAME + " SET " + COL_TAG + " = "
-            + " new." + FeedSQL.COL_TAG + ", " + COL_FEEDTITLE + " = "
-            + " new." + FeedSQL.COL_TITLE
-            + " WHERE " + COL_FEED + " IS old." + FeedSQL.COL_ID
+            + " new." + FeedSQLKt.COL_TAG + ", " + COL_FEEDTITLE + " = "
+            + " new." + FeedSQLKt.COL_TITLE
+            + " WHERE " + COL_FEED + " IS old." + FeedSQLKt.COL_ID
             + "; END";
 
     // Fields corresponding to database columns

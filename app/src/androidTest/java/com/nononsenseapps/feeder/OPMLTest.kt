@@ -1,14 +1,20 @@
 package com.nononsenseapps.feeder
 
+import android.content.ContentResolver
 import android.content.Context
 import android.support.test.InstrumentationRegistry.getContext
 import android.support.test.filters.MediumTest
 import android.support.test.filters.SmallTest
 import android.support.test.runner.AndroidJUnit4
+import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.FeedSQL
+import com.nononsenseapps.feeder.db.URI_FEEDS
+import com.nononsenseapps.feeder.db.asFeed
 import com.nononsenseapps.feeder.model.OPMLContenProvider
 import com.nononsenseapps.feeder.model.OPMLParser
+import com.nononsenseapps.feeder.model.opml.OpmlParser
 import com.nononsenseapps.feeder.model.opml.writeFile
+import com.nononsenseapps.feeder.util.getFeeds
 import com.nononsenseapps.feeder.util.queryFeeds
 import com.nononsenseapps.feeder.util.queryTagsWithCounts
 import org.junit.After
@@ -52,7 +58,7 @@ class OPMLTest {
     @Before
     fun setup() {
         // Remove everything in database
-        getContext().contentResolver.delete(FeedSQL.URI_FEEDS, null, null)
+        getContext().contentResolver.delete(URI_FEEDS, null, null)
         // Get internal data dir
         dir = getContext().filesDir
         context = getContext()
@@ -61,7 +67,7 @@ class OPMLTest {
     @After
     fun tearDown() {
         // Remove everything in database
-        getContext().contentResolver.delete(FeedSQL.URI_FEEDS, null, null)
+        getContext().contentResolver.delete(URI_FEEDS, null, null)
     }
 
     @MediumTest
@@ -77,10 +83,10 @@ class OPMLTest {
                 { tag ->
                     val feeds = ArrayList<FeedSQL>()
 
-                    context!!.contentResolver.queryFeeds(where = "${FeedSQL.COL_TAG} IS ?",
+                    context!!.contentResolver.queryFeeds(where = "$COL_TAG IS ?",
                             params = listOf(tag ?: "")) {
                         while (it.moveToNext()) {
-                            feeds.add(FeedSQL(it))
+                            feeds.add(it.asFeed())
                         }
                     }
 
@@ -101,12 +107,12 @@ class OPMLTest {
     fun testRead() {
         val path = writeSampleFile()
 
-        val parser = OPMLParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLContenProvider(context))
         parser.parseFile(path)
 
         // Verify database is correct
         val seen = ArrayList<Int>()
-        val feeds = FeedSQL.getFeeds(context, null, null, null)
+        val feeds = context!!.contentResolver.getFeeds()
         assertFalse("No feeds in DB!", feeds.isEmpty())
         for (feed in feeds) {
             val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))

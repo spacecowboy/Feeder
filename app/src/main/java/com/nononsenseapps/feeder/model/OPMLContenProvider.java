@@ -5,8 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.FeedSQLKt;
 import com.nononsenseapps.feeder.db.Util;
+
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
 
 // WHen Kotlinized you can probably remove a redundant RssContentProvider.NotifyAll call in use of importer in FeedActivity
 public class OPMLContenProvider implements OPMLParserToDatabase {
@@ -17,21 +21,18 @@ public class OPMLContenProvider implements OPMLParserToDatabase {
         this.context = context;
     }
 
-    @NonNull
+    @Nullable
     @Override
     public FeedSQL getFeed(@NonNull String url) {
         FeedSQL result = null;
 
         Cursor c = context.getContentResolver()
-                          .query(FeedSQL.URI_FEEDS, FeedSQL.FIELDS, FeedSQL.COL_URL + " IS ?",
-                                  Util.ToStringArray(url), null);
+                .query(URI_FEEDS, FeedSQLKt.FIELDS, FeedSQLKt.COL_URL + " IS ?",
+                        Util.ToStringArray(url), null);
 
         try {
             if (c.moveToNext()) {
-                result = new FeedSQL(c);
-            } else {
-                result = new FeedSQL();
-                result.url = url;
+                result = FeedSQLKt.asFeed(c);
             }
         } finally {
             if (c != null) {
@@ -44,15 +45,14 @@ public class OPMLContenProvider implements OPMLParserToDatabase {
 
     @Override
     public void saveFeed(@NonNull FeedSQL feed) {
-        ContentValues values = feed.getContent();
-        if (feed.id < 1) {
-            Uri uri = context.getContentResolver()
-                             .insert(FeedSQL.URI_FEEDS, values);
-            feed.id = Long.parseLong(uri.getLastPathSegment());
+        ContentValues values = feed.asContentValues();
+        if (feed.getId() < 1) {
+            context.getContentResolver()
+                    .insert(URI_FEEDS, values);
         } else {
             context.getContentResolver().update(Uri.withAppendedPath(
-                    FeedSQL.URI_FEEDS,
-                    Long.toString(feed.id)), values, null,
+                    URI_FEEDS,
+                    Long.toString(feed.getId())), values, null,
                     null);
         }
     }

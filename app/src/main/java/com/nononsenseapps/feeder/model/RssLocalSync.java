@@ -21,10 +21,17 @@ import org.joda.time.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TITLE;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_URL;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.FIELDS;
 import static com.nononsenseapps.feeder.db.RssContentProviderKt.AUTHORITY;
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
 import static com.nononsenseapps.feeder.db.Util.LongsToStringArray;
 import static com.nononsenseapps.feeder.db.Util.ToStringArray;
 import static com.nononsenseapps.feeder.db.Util.WHEREIDIS;
@@ -106,9 +113,9 @@ public class RssLocalSync {
 
     private static Optional<SyndFeed> syncFeed(final FeedSQL feedSQL, final File cacheDir) {
         try {
-            return Optional.of(FeedParser.parseFeed(feedSQL.url, cacheDir));
+            return Optional.of(FeedParser.parseFeed(feedSQL.getUrl(), cacheDir));
         } catch (Throwable error) {
-            System.err.println("Error when syncing " + feedSQL.url);
+            System.err.println("Error when syncing " + feedSQL.getUrl());
             error.printStackTrace();
         }
         return Optional.empty();
@@ -116,10 +123,10 @@ public class RssLocalSync {
 
     private static ArrayList<ContentProviderOperation> syncAndParseFeed(final FeedSQL feedSQL, final File cacheDir) {
         try {
-            SyndFeed parsedFeed = FeedParser.parseFeed(feedSQL.url, cacheDir);
+            SyndFeed parsedFeed = FeedParser.parseFeed(feedSQL.getUrl(), cacheDir);
             return convertResultToOperations(parsedFeed, feedSQL);
         } catch (Throwable error) {
-            System.err.println("Error when parsing " + feedSQL.url);
+            System.err.println("Error when parsing " + feedSQL.getUrl());
             error.printStackTrace();
         }
         return new ArrayList<>();
@@ -144,33 +151,32 @@ public class RssLocalSync {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         final ContentProviderOperation.Builder feedOp =
-                ContentProviderOperation.newUpdate(Uri.withAppendedPath(FeedSQL.URI_FEEDS,
-                        Long.toString(feedSQL.id)));
+                ContentProviderOperation.newUpdate(Uri.withAppendedPath(URI_FEEDS,
+                        Long.toString(feedSQL.getId())));
 
         // This can be null, in that case do not override existing value
         String selfLink = FeedParser.selfLink(parsedFeed);
 
         // Populate with values
-        feedOp.withValue(FeedSQL.COL_TITLE, parsedFeed.getTitle())
-              .withValue(FeedSQL.COL_TAG, feedSQL.tag == null ? "" : feedSQL.tag)
-              .withValue(FeedSQL.COL_URL, selfLink == null ? feedSQL.url : selfLink);
+        feedOp.withValue(COL_TITLE, parsedFeed.getTitle())
+              .withValue(COL_TAG, feedSQL.getTag())
+              .withValue(COL_URL, selfLink == null ? feedSQL.getUrl() : selfLink);
 
         // Add to list of operations
         operations.add(feedOp.build());
 
         for (SyndEntry entry : parsedFeed.getEntries()) {
             // Always insert, have on conflict clause
-            ContentProviderOperation.Builder itemOp = ContentProviderOperation.newInsert(FeedItemSQL.URI_FEED_ITEMS);
+            ContentProviderOperation.Builder itemOp = ContentProviderOperation.newInsert(URI_FEEDITEMS);
 
             // Use the actual id, because update operation will not return id
-            itemOp.withValue(FeedItemSQL.COL_FEED, feedSQL.id);
+            itemOp.withValue(FeedItemSQL.COL_FEED, feedSQL.getId());
 
             // Next all the other values. Make sure non null
             itemOp.withValue(FeedItemSQL.COL_GUID, entry.getUri())
                   .withValue(FeedItemSQL.COL_LINK, entry.getLink())
-                  .withValue(FeedItemSQL.COL_FEEDTITLE, feedSQL.title)
-                  .withValue(FeedItemSQL.COL_TAG,
-                          feedSQL.tag == null ? "" : feedSQL.tag)
+                  .withValue(FeedItemSQL.COL_FEEDTITLE, feedSQL.getTitle())
+                  .withValue(FeedItemSQL.COL_TAG, feedSQL.getTag())
                   .withValue(FeedItemSQL.COL_IMAGEURL, FeedParser.thumbnail(entry))
                   .withValue(FeedItemSQL.COL_ENCLOSURELINK, FeedParser.firstEnclosure(entry))
                   .withValue(FeedItemSQL.COL_AUTHOR, entry.getAuthor())
@@ -189,18 +195,17 @@ public class RssLocalSync {
     }
 
     public static List<FeedSQL> listFeed(final Context context, final long id) {
-        return FeedSQL.getFeeds(context,
-                WHEREIDIS,
-                LongsToStringArray(id), null);
+        return ContentResolverExtensionsKt.getFeeds(context.getContentResolver(),
+                Arrays.asList(FIELDS), WHEREIDIS, Arrays.asList(LongsToStringArray(id)), null);
     }
 
     public static List<FeedSQL> listFeeds(final Context context, @NonNull final String tag) {
-        return FeedSQL.getFeeds(context,
-                WhereIs(FeedSQL.COL_TAG),
-                ToStringArray(tag), null);
+        return ContentResolverExtensionsKt.getFeeds(context.getContentResolver(),
+                Arrays.asList(FIELDS), WhereIs(COL_TAG), Arrays.asList(ToStringArray(tag)), null);
     }
 
     public static List<FeedSQL> listFeeds(final Context context) {
-        return FeedSQL.getFeeds(context, null, null, null);
+        return ContentResolverExtensionsKt.getFeeds(context.getContentResolver(),
+                Arrays.asList(FIELDS), null, null, null);
     }
 }

@@ -31,7 +31,6 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
-import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.FeedParseLoader;
 import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
@@ -42,12 +41,21 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import java.util.Collections;
 import java.util.List;
 
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_CUSTOM_TITLE;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_ID;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TITLE;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_URL;
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
+import static com.nononsenseapps.feeder.db.UriKt.URI_TAGSWITHCOUNTS;
+
 public class EditFeedActivity extends Activity
         implements LoaderManager.LoaderCallbacks<LoaderResult<SyndFeed>> {
 
     public static final String SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK";
     public static final String _ID = "_id";
-    public static final String TITLE = "title";
+    public static final String CUSTOM_TITLE = "custom_title";
+    public static final String FEED_TITLE = "feed_title";
     public static final String TAG = "tag";
     public static final String TEMPLATE = "template";
     private static final int RSSFINDER = 1;
@@ -139,20 +147,20 @@ public class EditFeedActivity extends Activity
                         // TODO error checking and stuff like that
                         ContentValues values = new ContentValues();
 
-                        values.put(FeedSQL.COL_TITLE,
+                        values.put(COL_TITLE,
                                 mTextTitle.getText().toString().trim());
-                        values.put(FeedSQL.COL_CUSTOM_TITLE, values.getAsString(FeedSQL.COL_TITLE));
-                        values.put(FeedSQL.COL_TAG,
+                        values.put(COL_CUSTOM_TITLE, values.getAsString(COL_TITLE));
+                        values.put(COL_TAG,
                                 mTextTag.getText().toString().trim());
-                        values.put(FeedSQL.COL_URL,
+                        values.put(COL_URL,
                                 mTextUrl.getText().toString().trim());
                         if (id < 1) {
                             Uri uri = getContentResolver()
-                                    .insert(FeedSQL.URI_FEEDS, values);
+                                    .insert(URI_FEEDS, values);
                             id = Long.parseLong(uri.getLastPathSegment());
                         } else {
                             getContentResolver().update(Uri.withAppendedPath(
-                                    FeedSQL.URI_FEEDS,
+                                    URI_FEEDS,
                                     Long.toString(id)), values, null,
                                     null);
                         }
@@ -209,8 +217,11 @@ public class EditFeedActivity extends Activity
             // URL
             mTextUrl.setText(mFeedUrl);
             // Title
-            if (i.hasExtra(TITLE)) {
-                mTextTitle.setText(i.getStringExtra(TITLE));
+            if (i.hasExtra(CUSTOM_TITLE)) {
+                mTextTitle.setText(i.getStringExtra(CUSTOM_TITLE));
+            }
+            if (i.hasExtra(FEED_TITLE) && !i.getStringExtra(FEED_TITLE).isEmpty()) {
+                mTextTitle.setHint(i.getStringExtra(FEED_TITLE));
             }
 
             // Tag
@@ -223,7 +234,7 @@ public class EditFeedActivity extends Activity
         // Create an adapter
         final SimpleCursorAdapter tagsAdapter = new SimpleCursorAdapter(this,
                 android.R.layout.simple_list_item_1,
-                null, Util.ToStringArray(FeedSQL.COL_TAG),
+                null, Util.ToStringArray(COL_TAG),
                 Util.ToIntArray(android.R.id.text1), 0);
 
         // Create a loader manager
@@ -234,14 +245,14 @@ public class EditFeedActivity extends Activity
                                                          final Bundle args) {
                         String filter = null;
                         if (args != null && args.containsKey(TAGSFILTER)) {
-                            filter = FeedSQL.COL_TAG + " LIKE '" + args
+                            filter = COL_TAG + " LIKE '" + args
                                     .getCharSequence(TAGSFILTER, "") + "%'";
                         }
                         return new CursorLoader(EditFeedActivity.this,
-                                FeedSQL.URI_TAGSWITHCOUNTS,
-                                Util.ToStringArray(FeedSQL.COL_ID,
-                                        FeedSQL.COL_TAG), filter, null,
-                                Util.SortAlphabeticNoCase(FeedSQL.COL_TAG));
+                                URI_TAGSWITHCOUNTS,
+                                Util.ToStringArray(COL_ID,
+                                        COL_TAG), filter, null,
+                                Util.SortAlphabeticNoCase(COL_TAG));
                     }
 
                     @Override
