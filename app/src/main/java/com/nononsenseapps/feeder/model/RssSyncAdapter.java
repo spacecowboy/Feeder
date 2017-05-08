@@ -26,8 +26,9 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import com.nononsenseapps.feeder.db.FeedSQL;
 
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_ID;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
 import static com.nononsenseapps.feeder.util.PrefUtils.shouldSyncOnHotSpots;
 import static com.nononsenseapps.feeder.util.PrefUtils.shouldSyncOnlyOnWIfi;
 import static com.nononsenseapps.feeder.util.PrefUtils.shouldSyncOnlyWhenCharging;
@@ -115,7 +116,7 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             // Broadcast start of sync
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast(bcast);
 
-            RssLocalSync.syncFeeds(getContext(), extras.getLong(FeedSQL.COL_ID, -1), extras.getString(FeedSQL.COL_TAG, ""));
+            RssLocalSync.syncFeeds(getContext(), extras.getLong(COL_ID, -1), extras.getString(COL_TAG, ""));
         } else {
             // Delay at least 10 minutes
             syncResult.delayUntil = 60L * 10L;

@@ -29,8 +29,11 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.nononsenseapps.feeder.db.FeedItemSQL.COL_ID;
 import static com.nononsenseapps.feeder.db.RssContentProviderKt.AUTHORITY;
 import static com.nononsenseapps.feeder.db.RssContentProviderKt.QUERY_PARAM_SKIP;
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
 
 /**
  * Handles periodic clean up of the database, such as making sure the database doesn't
@@ -69,7 +72,7 @@ public class Cleanup {
     private static void addDelete(final long itemId, final ArrayList<ContentProviderOperation> operations) {
         operations.add(ContentProviderOperation
                 .newDelete(Uri
-                        .withAppendedPath(FeedItemSQL.URI_FEED_ITEMS, Long.toString(itemId)))
+                        .withAppendedPath(URI_FEEDITEMS, Long.toString(itemId)))
                 .build());
     }
 
@@ -85,9 +88,9 @@ public class Cleanup {
         Cursor cursor = null;
 
         try {
-            cursor = context.getContentResolver().query(FeedItemSQL.URI_FEED_ITEMS.buildUpon()
+            cursor = context.getContentResolver().query(URI_FEEDITEMS.buildUpon()
                             .appendQueryParameter(QUERY_PARAM_SKIP, "50").build(),
-                    new String[]{FeedItemSQL.COL_ID},
+                    new String[]{COL_ID},
                     FeedItemSQL.COL_FEED + " IS ? ",
                     new String[]{Long.toString(listId)},
                     FeedItemSQL.COL_PUBDATE + " DESC");
@@ -113,7 +116,7 @@ public class Cleanup {
         Cursor cursor = null;
 
         try {
-            cursor = context.getContentResolver().query(FeedSQL.URI_FEEDS, new String[]{FeedSQL.COL_ID},
+            cursor = context.getContentResolver().query(URI_FEEDS, new String[]{FeedSQLKt.COL_ID},
                     null, null, null);
 
             while (cursor != null && cursor.moveToNext()) {

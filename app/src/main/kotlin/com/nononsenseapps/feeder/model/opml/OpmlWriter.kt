@@ -1,19 +1,19 @@
 package com.nononsenseapps.feeder.model.opml
 
-import com.nononsenseapps.feeder.db.DbFeed
+import com.nononsenseapps.feeder.db.FeedSQL
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
 fun writeFile(path: String,
               tags: Iterable<String?>,
-              feedsWithTag: (String?) -> Iterable<DbFeed>) {
+              feedsWithTag: (String?) -> Iterable<FeedSQL>) {
     writeOutputStream(FileOutputStream(path), tags, feedsWithTag)
 }
 
 fun writeOutputStream(os: OutputStream,
                       tags: Iterable<String?>,
-                      feedsWithTag: (String?) -> Iterable<DbFeed>) {
+                      feedsWithTag: (String?) -> Iterable<FeedSQL>) {
     try {
         os.bufferedWriter().use {
             it.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")

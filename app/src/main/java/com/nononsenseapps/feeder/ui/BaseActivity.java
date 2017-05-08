@@ -60,6 +60,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import static com.nononsenseapps.feeder.db.FeedSQLKt.FIELDS_VIEWCOUNT;
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDSWITHCOUNTS;
+
 /**
  * Base activity which handles navigation drawer and other bloat common
  * between activities.
@@ -557,8 +560,8 @@ public class BaseActivity extends AppCompatActivity
 
     @Override
     public Loader onCreateLoader(final int id, final Bundle bundle) {
-        return new FeedDeltaCursorLoader(this, FeedSQL.URI_FEEDSWITHCOUNTS,
-                FeedSQL.FIELDS_VIEWCOUNT, null, null, null);
+        return new FeedDeltaCursorLoader(this, URI_FEEDSWITHCOUNTS,
+                FIELDS_VIEWCOUNT, null, null, null);
     }
 
     @Override
@@ -585,7 +588,7 @@ public class BaseActivity extends AppCompatActivity
         }
 
         public FeedWrapper(FeedSQL item) {
-            tag = item.tag;
+            tag = item.getTag();
             this.item = item;
             isTag = false;
         }
@@ -625,7 +628,7 @@ public class BaseActivity extends AppCompatActivity
             if (isTag) {
                 return "Tag: " + tag;
             } else {
-                return "Item: " + item.customTitle + " (" + tag + ")";
+                return "Item: " + item.getCustomTitle() + " (" + tag + ")";
             }
         }
     }
@@ -651,7 +654,7 @@ public class BaseActivity extends AppCompatActivity
                     FeedWrapper.class, new ExpandableSortedList.ExpandableCallback<FeedWrapper>() {
                 @Override
                 public int getItemLevel(FeedWrapper item) {
-                    if (item.isTag || item.item.tag == null || item.item.tag.isEmpty()) {
+                    if (item.isTag || item.item.getTag() == null || item.item.getTag().isEmpty()) {
                         return ExpandableSortedList.TOP_LEVEL;
                     } else {
                         return ExpandableSortedList.TOP_LEVEL + 1;
@@ -670,7 +673,7 @@ public class BaseActivity extends AppCompatActivity
 
                 @Override
                 public FeedWrapper getParentOf(FeedWrapper item) {
-                    if (item.isTag || item.item.tag == null || item.item.tag.isEmpty()) {
+                    if (item.isTag || item.item.getTag() == null || item.item.getTag().isEmpty()) {
                         return null;
                     } else {
                         return new FeedWrapper(item.tag);
@@ -685,7 +688,7 @@ public class BaseActivity extends AppCompatActivity
 
                     int result = 0;
                     for (FeedWrapper wrap : children) {
-                        result += wrap.item.unreadCount;
+                        result += wrap.item.getUnreadCount();
                     }
                     return result;
                 }
@@ -735,7 +738,7 @@ public class BaseActivity extends AppCompatActivity
                         return mCollator.compare(o1.tag, o2.tag);
                     } // Both items here with same parent
                     else {
-                        return mCollator.compare(o1.item.customTitle, o2.item.customTitle);
+                        return mCollator.compare(o1.item.getCustomTitle(), o2.item.getCustomTitle());
                     }
                 }
 
@@ -766,8 +769,8 @@ public class BaseActivity extends AppCompatActivity
                                 mItems.getTagUnreadCount(oldItem) ==
                                         mItems.getTagUnreadCount(newItem);
                     } else if (!oldItem.isTag && !newItem.isTag) {
-                        return oldItem.item.customTitle.equals(newItem.item.customTitle) &&
-                                oldItem.item.unreadCount == newItem.item.unreadCount;
+                        return oldItem.item.getCustomTitle().equals(newItem.item.getCustomTitle()) &&
+                                oldItem.item.getUnreadCount() == newItem.item.getUnreadCount();
                     } else {
                         return false;
                     }
@@ -793,7 +796,7 @@ public class BaseActivity extends AppCompatActivity
             if (item.isTag) {
                 return item.hashCode();
             } else {
-                return item.item.id;
+                return item.item.getId();
             }
         }
 
@@ -818,16 +821,16 @@ public class BaseActivity extends AppCompatActivity
                 if (map.get(item) >= 0) {
                     if (map.get(item) == 0) {
                         // First remove it, tree structure needs to be updated
-                        FeedWrapper oldWrap = oldItemMap.remove(item.id);
+                        FeedWrapper oldWrap = oldItemMap.remove(item.getId());
                         mItems.remove(oldWrap);
                     }
                     mItems.add(wrap);
                     // Add to new map as well
-                    mItemMap.put(item.id, wrap);
+                    mItemMap.put(item.getId(), wrap);
                 } else {
                     mItems.remove(wrap);
                     // And remove from old
-                    oldItemMap.remove(item.id);
+                    oldItemMap.remove(item.getId());
                 }
             }
             // If any items remain in old set, they are not present in current result set,
@@ -874,9 +877,9 @@ public class BaseActivity extends AppCompatActivity
                 case VIEWTYPE_FEED_CHILD:
                     FeedHolder fh = (FeedHolder) holder;
                     fh.item = wrap.item;
-                    fh.title.setText(fh.item.customTitle);
-                    fh.unreadCount.setText(Integer.toString(fh.item.unreadCount));
-                    fh.unreadCount.setVisibility(fh.item.unreadCount > 0 ? View.VISIBLE : View.INVISIBLE);
+                    fh.title.setText(fh.item.getCustomTitle());
+                    fh.unreadCount.setText(Integer.toString(fh.item.getUnreadCount()));
+                    fh.unreadCount.setVisibility(fh.item.getUnreadCount() > 0 ? View.VISIBLE : View.INVISIBLE);
                     break;
                 case VIEWTYPE_TAG:
                     TagHolder th = (TagHolder) holder;
@@ -960,7 +963,7 @@ public class BaseActivity extends AppCompatActivity
                 mDrawerLayout.closeDrawer(GravityCompat.START);
             }
 
-            onNavigationDrawerItemSelected(item.id, item.title, item.url, item.tag);
+            onNavigationDrawerItemSelected(item.getId(), item.getTitle(), item.getUrl(), item.getTag());
         }
     }
 }

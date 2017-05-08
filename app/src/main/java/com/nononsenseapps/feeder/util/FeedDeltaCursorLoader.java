@@ -23,6 +23,7 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.FeedSQLKt;
 
 import java.util.HashMap;
 
@@ -95,14 +96,14 @@ public class FeedDeltaCursorLoader extends DeltaCursorLoader<FeedSQL> {
 
         // Find out which items are currently present
         while (mCursor.moveToNext()) {
-            FeedSQL item = new FeedSQL(mCursor);
+            FeedSQL item = FeedSQLKt.asFeed(mCursor);
 
-            mItems.put(item.id, item);
+            mItems.put(item.getId(), item);
 
-            if (oldItems != null && oldItems.containsKey(item.id)) {
+            if (oldItems != null && oldItems.containsKey(item.getId())) {
                 // 0, already in set
                 result.put(item, 0);
-                oldItems.remove(item.id);
+                oldItems.remove(item.getId());
             } else {
                 // 1, new item
                 result.put(item, 1);
