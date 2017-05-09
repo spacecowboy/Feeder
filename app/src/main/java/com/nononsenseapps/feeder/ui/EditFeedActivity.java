@@ -147,9 +147,8 @@ public class EditFeedActivity extends Activity
                         // TODO error checking and stuff like that
                         ContentValues values = new ContentValues();
 
-                        values.put(COL_TITLE,
-                                mTextTitle.getText().toString().trim());
-                        values.put(COL_CUSTOM_TITLE, values.getAsString(COL_TITLE));
+                        values.put(COL_TITLE, mTextTitle.getHint().toString().trim());
+                        values.put(COL_CUSTOM_TITLE, mTextTitle.getText().toString().trim());
                         values.put(COL_TAG,
                                 mTextTag.getText().toString().trim());
                         values.put(COL_URL,

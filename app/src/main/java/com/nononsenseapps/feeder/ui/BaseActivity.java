@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
@@ -581,13 +582,15 @@ public class BaseActivity extends AppCompatActivity
         public final FeedSQL item;
         public final boolean isTag;
 
-        public FeedWrapper(String tag) {
+        public FeedWrapper(@NonNull String tag) {
+            assert tag != null;
             this.tag = tag;
             item = null;
             isTag = true;
         }
 
-        public FeedWrapper(FeedSQL item) {
+        public FeedWrapper(@NonNull FeedSQL item) {
+            assert item != null;
             tag = item.getTag();
             this.item = item;
             isTag = false;
@@ -877,7 +880,11 @@ public class BaseActivity extends AppCompatActivity
                 case VIEWTYPE_FEED_CHILD:
                     FeedHolder fh = (FeedHolder) holder;
                     fh.item = wrap.item;
-                    fh.title.setText(fh.item.getCustomTitle());
+                    if (fh.item.getCustomTitle().isEmpty()) {
+                        fh.title.setText(fh.item.getTitle());
+                    } else {
+                        fh.title.setText(fh.item.getCustomTitle());
+                    }
                     fh.unreadCount.setText(Integer.toString(fh.item.getUnreadCount()));
                     fh.unreadCount.setVisibility(fh.item.getUnreadCount() > 0 ? View.VISIBLE : View.INVISIBLE);
                     break;
