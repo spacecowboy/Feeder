@@ -214,7 +214,9 @@ fun ContentResolver.getFeeds(columns: List<String> = FIELDS.asList(),
                              where: String? = null, params: List<Any>? = null, order: String? = null): List<FeedSQL> {
     val feeds = ArrayList<FeedSQL>()
     queryFeeds(columns, where, params, order) {
-        feeds.add(it.asFeed())
+        while (it.moveToNext()) {
+            feeds.add(it.asFeed())
+        }
     }
     return feeds
 }
