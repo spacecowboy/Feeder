@@ -84,6 +84,7 @@ data class FeedSQL(val id: Long = -1, val title: String = "", val customTitle: S
 
 fun Cursor.asFeed(): FeedSQL {
     return FeedSQL(id = getLong(COL_ID) ?: -1,
+            tag = getString(COL_TAG) ?: "",
             title = getString(COL_TITLE) ?: "",
             customTitle = getString(COL_CUSTOM_TITLE) ?: "",
             url = getString(COL_URL) ?: "",
