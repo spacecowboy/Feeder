@@ -12,6 +12,7 @@ import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_NOTIFY
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.FIELDS
+import com.nononsenseapps.feeder.db.FIELDS_TAGSWITHCOUNT
 import com.nononsenseapps.feeder.db.FeedItemSQL.COL_FEED
 import com.nononsenseapps.feeder.db.FeedItemSQL.COL_NOTIFIED
 import com.nononsenseapps.feeder.db.FeedItemSQL.COL_UNREAD
@@ -191,7 +192,7 @@ inline fun ContentResolver.updateItems(uri: Uri, where: String? = null, params: 
     return result
 }
 
-fun ContentResolver.queryTagsWithCounts(columns: List<String> = FIELDS.asList(),
+fun ContentResolver.queryTagsWithCounts(columns: List<String> = FIELDS_TAGSWITHCOUNT.asList(),
                                         where: String? = null, params: List<Any>? = null, order: String? = null,
                                         reader: (Cursor) -> Unit) {
     queryItems(URI_TAGSWITHCOUNTS, columns, where, params, order, reader)
