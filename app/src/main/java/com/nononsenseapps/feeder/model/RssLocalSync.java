@@ -6,7 +6,6 @@ import android.content.OperationApplicationException;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
-import android.util.Pair;
 import com.nononsenseapps.feeder.db.Cleanup;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedSQL;
@@ -22,7 +21,6 @@ import org.joda.time.Duration;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
@@ -45,7 +43,7 @@ public class RssLocalSync {
      * @param tag of feeds to sync, only used if feedId is less than 1. If empty, all feeds are synced.
      */
     public static void syncFeeds(final Context context, long feedId, @NonNull String tag) {
-        FileLog log = FileLog.singleton.getInstance(context);
+        final FileLog log = FileLog.singleton.getInstance(context);
         try {
             DateTime start = DateTime.now();
 
@@ -60,30 +58,23 @@ public class RssLocalSync {
             }
             log.d(String.format("Syncing %d feeds: %s", feeds.size(), start.toString()));
 
-            final List<Pair<FeedSQL,SyndFeed>> syndFeeds = Collections.synchronizedList(new ArrayList<Pair<FeedSQL,SyndFeed>>());
             final File cacheDir = context.getExternalCacheDir();
 
             for (final FeedSQL f : feeds) {
                 syncFeed(f, cacheDir).ifPresent(new Consumer<SyndFeed>() {
                     @Override
                     public void accept(@NonNull final SyndFeed sf) {
-                        syndFeeds.add(Pair.create(f, sf));
+                        ArrayList<ContentProviderOperation> ops = convertResultToOperations(sf, f);
+                        try {
+                            storeSyncResults(context, ops);
+                            // Notify that we've updated
+                            ContentResolverExtensionsKt.notifyAllUris(context.getContentResolver());
+                        } catch (RemoteException | OperationApplicationException e) {
+                            log.d(e.getMessage());
+                            e.printStackTrace();
+                        }
                     }
                 });
-            }
-
-            final ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-            synchronized (syndFeeds) {
-                for (Pair<FeedSQL, SyndFeed> pair: syndFeeds) {
-                    ops.addAll(convertResultToOperations(pair.second, pair.first));
-                }
-            }
-
-            try {
-                storeSyncResults(context, ops);
-            } catch (RemoteException | OperationApplicationException e) {
-                log.d(e.getMessage());
-                e.printStackTrace();
             }
 
             // Finally, prune excessive items
@@ -97,8 +88,7 @@ public class RssLocalSync {
             DateTime end = DateTime.now();
 
             Duration duration = Duration.millis(end.getMillis() - start.getMillis());
-            log.d(String.format("Finished sync after %s with %d operations", duration.toString(),
-                    ops.size()));
+            log.d(String.format("Finished sync after %s", duration.toString()));
 
             // Notify that we've updated
             ContentResolverExtensionsKt.notifyAllUris(context.getContentResolver());
