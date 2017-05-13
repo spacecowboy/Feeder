@@ -127,7 +127,15 @@ public class FeedParser {
 
     static SyndFeed parseFeed(InputStream is) throws FeedParsingError {
         try {
-            return new SyndFeedInput().build(new XmlReader(is));
+            SyndFeed feed = new SyndFeedInput().build(new XmlReader(is));
+
+            for (SyndEntry entry: feed.getEntries()) {
+                if (entry.getAuthors().isEmpty()) {
+                    entry.setAuthors(feed.getAuthors());
+                }
+            }
+
+            return feed;
         } catch (Throwable e) {
             throw new FeedParsingError(e);
         }

@@ -40,6 +40,22 @@ public class FeedParserTest {
     }
 
     @Test
+    public void feedAuthorIsUsedAsFallback() throws Exception {
+        SyndFeed feed = FeedParser.parseFeed(getResearchRsc());
+        assertNotNull(feed);
+
+        assertEquals("http://research.swtch.com/feed.atom", FeedParser.selfLink(feed));
+
+        assertEquals(17, feed.getEntries().size());
+
+        SyndEntry entry = feed.getEntries().get(9);
+
+        assertEquals("Russ Cox", feed.getAuthors().get(0).getName());
+        assertEquals(feed.getAuthors(), entry.getAuthors());
+        assertEquals(feed.getAuthors().get(0).getName(), entry.getAuthor());
+    }
+
+    @Test
     public void cyklist() throws Exception {
         SyndFeed feed = FeedParser.parseFeed(getCyklistBloggen());
         assertNotNull(feed);

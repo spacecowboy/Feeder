@@ -7,7 +7,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
-class FeedParserTest {
+class FeedParserTest2 {
     @Rule
     @JvmField
     var tempFolder = TemporaryFolder()
