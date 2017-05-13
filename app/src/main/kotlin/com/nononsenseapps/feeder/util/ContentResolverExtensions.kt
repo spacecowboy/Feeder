@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.FIELDS
 import com.nononsenseapps.feeder.db.FIELDS_TAGSWITHCOUNT
 import com.nononsenseapps.feeder.db.FeedItemSQL.COL_FEED
+import com.nononsenseapps.feeder.db.FeedItemSQL.COL_GUID
 import com.nononsenseapps.feeder.db.FeedItemSQL.COL_NOTIFIED
 import com.nononsenseapps.feeder.db.FeedItemSQL.COL_UNREAD
 import com.nononsenseapps.feeder.db.FeedSQL
@@ -219,4 +220,16 @@ fun ContentResolver.getFeeds(columns: List<String> = FIELDS.asList(),
         }
     }
     return feeds
+}
+
+fun ContentResolver.getIdForFeedItem(guid: String, feedId: Long): Long {
+    queryItems(URI_FEEDITEMS,
+            columns = listOf(COL_ID),
+            where = "$COL_GUID IS ? AND $COL_FEED IS ?",
+            params = listOf(guid, feedId)) {
+                if (it.moveToNext()) {
+                    return it.getLong(COL_ID) ?: -1L
+                }
+            }
+    return -1L
 }

@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.model;
 
 import android.content.ContentProviderOperation;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.net.Uri;
@@ -38,9 +39,8 @@ import static com.nononsenseapps.feeder.db.Util.WhereIs;
 public class RssLocalSync {
 
     /**
-     *
      * @param feedId if less than '1' then all feeds are synchronized
-     * @param tag of feeds to sync, only used if feedId is less than 1. If empty, all feeds are synced.
+     * @param tag    of feeds to sync, only used if feedId is less than 1. If empty, all feeds are synced.
      */
     public static void syncFeeds(final Context context, long feedId, @NonNull String tag) {
         final FileLog log = FileLog.singleton.getInstance(context);
@@ -64,7 +64,7 @@ public class RssLocalSync {
                 syncFeed(f, cacheDir).ifPresent(new Consumer<SyndFeed>() {
                     @Override
                     public void accept(@NonNull final SyndFeed sf) {
-                        ArrayList<ContentProviderOperation> ops = convertResultToOperations(sf, f);
+                        ArrayList<ContentProviderOperation> ops = convertResultToOperations(sf, f, context.getContentResolver());
                         try {
                             storeSyncResults(context, ops);
                             // Notify that we've updated
@@ -111,23 +111,12 @@ public class RssLocalSync {
         return Optional.empty();
     }
 
-    private static ArrayList<ContentProviderOperation> syncAndParseFeed(final FeedSQL feedSQL, final File cacheDir) {
-        try {
-            SyndFeed parsedFeed = FeedParser.parseFeed(feedSQL.getUrl(), cacheDir);
-            return convertResultToOperations(parsedFeed, feedSQL);
-        } catch (Throwable error) {
-            System.err.println("Error when parsing " + feedSQL.getUrl());
-            error.printStackTrace();
-        }
-        return new ArrayList<>();
-    }
-
     private static synchronized void storeSyncResults(final Context context,
                                                       final List<ContentProviderOperation> operations)
             throws RemoteException, OperationApplicationException {
         if (!operations.isEmpty()) {
             context.getContentResolver()
-                   .applyBatch(AUTHORITY, new ArrayList<>(operations));
+                    .applyBatch(AUTHORITY, new ArrayList<>(operations));
         }
     }
 
@@ -137,7 +126,8 @@ public class RssLocalSync {
      * @return A list of Operations containing no back references
      */
     private static ArrayList<ContentProviderOperation> convertResultToOperations(final SyndFeed parsedFeed,
-                                                                                 final FeedSQL feedSQL) {
+                                                                                 final FeedSQL feedSQL,
+                                                                                 final ContentResolver resolver) {
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         final ContentProviderOperation.Builder feedOp =
@@ -149,33 +139,39 @@ public class RssLocalSync {
 
         // Populate with values
         feedOp.withValue(COL_TITLE, parsedFeed.getTitle())
-              .withValue(COL_TAG, feedSQL.getTag())
-              .withValue(COL_URL, selfLink == null ? feedSQL.getUrl() : selfLink);
+                .withValue(COL_TAG, feedSQL.getTag())
+                .withValue(COL_URL, selfLink == null ? feedSQL.getUrl() : selfLink);
 
         // Add to list of operations
         operations.add(feedOp.build());
 
         for (SyndEntry entry : parsedFeed.getEntries()) {
-            // Always insert, have on conflict clause
-            ContentProviderOperation.Builder itemOp = ContentProviderOperation.newInsert(URI_FEEDITEMS);
+            final ContentProviderOperation.Builder itemOp;
+
+            final long itemId = ContentResolverExtensionsKt.getIdForFeedItem(resolver, entry.getUri(), feedSQL.getId());
+            if (itemId < 1) {
+                itemOp = ContentProviderOperation.newInsert(URI_FEEDITEMS);
+            } else {
+                itemOp = ContentProviderOperation.newUpdate(Uri.withAppendedPath(URI_FEEDITEMS, Long.toString(itemId)));
+            }
 
             // Use the actual id, because update operation will not return id
             itemOp.withValue(FeedItemSQL.COL_FEED, feedSQL.getId());
 
             // Next all the other values. Make sure non null
             itemOp.withValue(FeedItemSQL.COL_GUID, entry.getUri())
-                  .withValue(FeedItemSQL.COL_LINK, entry.getLink())
-                  .withValue(FeedItemSQL.COL_FEEDTITLE, feedSQL.getTitle())
-                  .withValue(FeedItemSQL.COL_TAG, feedSQL.getTag())
-                  .withValue(FeedItemSQL.COL_IMAGEURL, FeedParser.thumbnail(entry))
-                  .withValue(FeedItemSQL.COL_ENCLOSURELINK, FeedParser.firstEnclosure(entry))
-                  .withValue(FeedItemSQL.COL_AUTHOR, entry.getAuthor())
-                  .withValue(FeedItemSQL.COL_PUBDATE, FeedParser.publishDate(entry))
-                  // Make sure these are non-null
-                  .withValue(FeedItemSQL.COL_TITLE, FeedParser.title(entry))
-                  .withValue(FeedItemSQL.COL_DESCRIPTION, FeedParser.description(entry))
-                  .withValue(FeedItemSQL.COL_PLAINTITLE, FeedParser.plainTitle(entry))
-                  .withValue(FeedItemSQL.COL_PLAINSNIPPET, FeedParser.snippet(entry));
+                    .withValue(FeedItemSQL.COL_LINK, entry.getLink())
+                    .withValue(FeedItemSQL.COL_FEEDTITLE, feedSQL.getTitle())
+                    .withValue(FeedItemSQL.COL_TAG, feedSQL.getTag())
+                    .withValue(FeedItemSQL.COL_IMAGEURL, FeedParser.thumbnail(entry))
+                    .withValue(FeedItemSQL.COL_ENCLOSURELINK, FeedParser.firstEnclosure(entry))
+                    .withValue(FeedItemSQL.COL_AUTHOR, entry.getAuthor())
+                    .withValue(FeedItemSQL.COL_PUBDATE, FeedParser.publishDate(entry))
+                    // Make sure these are non-null
+                    .withValue(FeedItemSQL.COL_TITLE, FeedParser.title(entry))
+                    .withValue(FeedItemSQL.COL_DESCRIPTION, FeedParser.description(entry))
+                    .withValue(FeedItemSQL.COL_PLAINTITLE, FeedParser.plainTitle(entry))
+                    .withValue(FeedItemSQL.COL_PLAINSNIPPET, FeedParser.snippet(entry));
 
             // Add to list of operations
             operations.add(itemOp.build());
