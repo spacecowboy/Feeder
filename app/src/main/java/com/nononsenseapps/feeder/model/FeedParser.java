@@ -158,6 +158,10 @@ public class FeedParser {
         if (entry.getPublishedDate() != null) {
             return new DateTime(entry.getPublishedDate().getTime()).toDateTimeISO().toString();
         }
+        // This is the required element in atom feeds
+        if (entry.getUpdatedDate() != null) {
+            return new DateTime(entry.getUpdatedDate().getTime()).toDateTimeISO().toString();
+        }
         return null;
     }
 

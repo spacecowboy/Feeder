@@ -78,7 +78,7 @@ public class FeedParserTest {
 
     @Test
     public void cowboy() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getCowboy());
+        SyndFeed feed = FeedParser.parseFeed(getCowboyRss());
         assertNotNull(feed);
 
         assertNull(FeedParser.selfLink(feed));
@@ -152,6 +152,19 @@ public class FeedParserTest {
     }
 
     @Test
+    public void atomCowboy() throws Exception {
+        SyndFeed feed = FeedParser.parseFeed(getCowboyAtom());
+
+        assertEquals(15, feed.getEntries().size());
+        SyndEntry entry = feed.getEntries().get(1);
+
+        assertEquals("dummy-id-to-distinguis-from-alternate-link", entry.getUri());
+        assertTrue("Should take the updated timestamp", FeedParser.publishDate(entry).contains("2016"));
+        assertEquals("http://localhost:1313/images/zopfli_all_the_things.jpg",
+                FeedParser.thumbnail(entry));
+    }
+
+    @Test
     public void morningPaper() throws Exception {
         SyndFeed feed = FeedParser.parseFeed(getMorningPaper());
 
@@ -194,8 +207,12 @@ public class FeedParserTest {
         return getClass().getResourceAsStream("rss_cornucopia.xml");
     }
 
-    private InputStream getCowboy() {
+    private InputStream getCowboyRss() {
         return getClass().getResourceAsStream("rss_cowboy.xml");
+    }
+
+    private InputStream getCowboyAtom() {
+        return getClass().getResourceAsStream("atom_cowboy.xml");
     }
 
     private InputStream getCyklistBloggen() {
