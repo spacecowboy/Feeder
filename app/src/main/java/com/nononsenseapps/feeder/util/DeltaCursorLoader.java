@@ -26,7 +26,7 @@ import android.util.Log;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Static library support version of the framework's {@link android.content.CursorLoader}.
@@ -35,7 +35,7 @@ import java.util.HashMap;
  * to switch to the framework's implementation.  See the framework SDK
  * documentation for a class overview.
  */
-public abstract class DeltaCursorLoader<T> extends AsyncTaskLoader<HashMap<T, Integer>> {
+public abstract class DeltaCursorLoader<T> extends AsyncTaskLoader<Map<T, Integer>> {
     private static final String TAG = "DeltaCursorLoader";
     // This will call ForceLoad() when data changes
     final ForceLoadContentObserver mObserver;
@@ -48,15 +48,15 @@ public abstract class DeltaCursorLoader<T> extends AsyncTaskLoader<HashMap<T, In
 
     Cursor mCursor;
 
-    private HashMap<T, Integer> mLastResult = null;
+    private Map<T, Integer> mLastResult = null;
 
     /* Runs on a worker thread */
     @Override
-    public abstract HashMap<T, Integer> loadInBackground();
+    public abstract Map<T, Integer> loadInBackground();
 
     /* Runs on the UI thread */
     @Override
-    public void deliverResult(HashMap<T, Integer> result) {
+    public void deliverResult(Map<T, Integer> result) {
         if (isReset()) {
             // An async query came in while the loader is stopped
 //            if (mCursor != null) {
@@ -128,7 +128,7 @@ public abstract class DeltaCursorLoader<T> extends AsyncTaskLoader<HashMap<T, In
     }
 
     @Override
-    public void onCanceled(HashMap<T, Integer> map) {
+    public void onCanceled(Map<T, Integer> map) {
         if (mCursor != null && !mCursor.isClosed()) {
             mCursor.close();
         }
