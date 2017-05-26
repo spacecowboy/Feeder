@@ -69,7 +69,8 @@ val CREATE_TAGS_VIEW = """
 
 
 data class FeedSQL(val id: Long = -1, val title: String = "", val customTitle: String = "", val url: String = "",
-                   val tag: String = "", val notify: Boolean = false, val unreadCount: Int = 0) {
+                   val tag: String = "", val notify: Boolean = false, val unreadCount: Int = 0,
+                   val displayTitle: String = (if (customTitle.isBlank()) title else customTitle) ) {
 
     fun asContentValues() =
             com.nononsenseapps.feeder.util.contentValues {

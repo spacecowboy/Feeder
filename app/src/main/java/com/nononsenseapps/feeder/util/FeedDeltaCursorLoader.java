@@ -21,11 +21,11 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-
+import android.support.v4.util.ArrayMap;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.FeedSQLKt;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Static library support version of the framework's {@link android.content.CursorLoader}.
@@ -35,7 +35,7 @@ import java.util.HashMap;
  * documentation for a class overview.
  */
 public class FeedDeltaCursorLoader extends DeltaCursorLoader<FeedSQL> {
-    HashMap<Long, FeedSQL> mItems = null;
+    ArrayMap<Long, FeedSQL> mItems = null;
 
     /**
      * Creates an empty unspecified CursorLoader.  You must follow this with
@@ -67,7 +67,7 @@ public class FeedDeltaCursorLoader extends DeltaCursorLoader<FeedSQL> {
 
     /* Runs on a worker thread */
     @Override
-    public HashMap<FeedSQL, Integer> loadInBackground() {
+    public Map<FeedSQL, Integer> loadInBackground() {
         Cursor cursor = getContext().getContentResolver().query(mUri, mProjection, mSelection,
                 mSelectionArgs, mSortOrder);
         if (cursor != null) {
@@ -90,9 +90,9 @@ public class FeedDeltaCursorLoader extends DeltaCursorLoader<FeedSQL> {
             return null;
         }
 
-        HashMap<FeedSQL, Integer> result = new HashMap<>();
-        HashMap<Long, FeedSQL> oldItems = mItems;
-        mItems = new HashMap<>();
+        ArrayMap<FeedSQL, Integer> result = new ArrayMap<>();
+        ArrayMap<Long, FeedSQL> oldItems = mItems;
+        mItems = new ArrayMap<>();
 
         // Find out which items are currently present
         while (mCursor.moveToNext()) {

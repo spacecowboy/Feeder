@@ -30,6 +30,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.util.ArrayMap;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -58,7 +59,6 @@ import com.nononsenseapps.feeder.views.ObservableScrollView;
 
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.nononsenseapps.feeder.db.FeedSQLKt.FIELDS_VIEWCOUNT;
@@ -568,7 +568,7 @@ public class BaseActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(final Loader Loader,
                                final Object obj) {
-        mNavAdapter.updateData((HashMap<FeedSQL, Integer>) obj);
+        mNavAdapter.updateData((ArrayMap<FeedSQL, Integer>) obj);
     }
 
     @Override
@@ -645,19 +645,19 @@ public class BaseActivity extends AppCompatActivity
         private final String TAG = FeedsAdapter.class.getSimpleName();
         private final ExpandableSortedList<FeedWrapper> mItems;
         private final Collator mCollator;
-        private HashMap<Long, FeedWrapper> mItemMap;
+        private ArrayMap<Long, FeedWrapper> mItemMap;
 
         public FeedsAdapter() {
             super();
 
             mCollator = Collator.getInstance();
             setHasStableIds(true);
-            mItemMap = new HashMap<>();
+            mItemMap = new ArrayMap<>();
             mItems = new ExpandableSortedList<>(
                     FeedWrapper.class, new ExpandableSortedList.ExpandableCallback<FeedWrapper>() {
                 @Override
                 public int getItemLevel(FeedWrapper item) {
-                    if (item.isTag || item.item.getTag() == null || item.item.getTag().isEmpty()) {
+                    if (item.isTag || item.item.getTag().isEmpty()) {
                         return ExpandableSortedList.TOP_LEVEL;
                     } else {
                         return ExpandableSortedList.TOP_LEVEL + 1;
@@ -676,7 +676,7 @@ public class BaseActivity extends AppCompatActivity
 
                 @Override
                 public FeedWrapper getParentOf(FeedWrapper item) {
-                    if (item.isTag || item.item.getTag() == null || item.item.getTag().isEmpty()) {
+                    if (item.isTag || item.item.getTag().isEmpty()) {
                         return null;
                     } else {
                         return new FeedWrapper(item.tag);
@@ -741,7 +741,7 @@ public class BaseActivity extends AppCompatActivity
                         return mCollator.compare(o1.tag, o2.tag);
                     } // Both items here with same parent
                     else {
-                        return mCollator.compare(o1.item.getCustomTitle(), o2.item.getCustomTitle());
+                        return mCollator.compare(o1.item.getDisplayTitle(), o2.item.getDisplayTitle());
                     }
                 }
 
@@ -772,7 +772,7 @@ public class BaseActivity extends AppCompatActivity
                                 mItems.getTagUnreadCount(oldItem) ==
                                         mItems.getTagUnreadCount(newItem);
                     } else if (!oldItem.isTag && !newItem.isTag) {
-                        return oldItem.item.getCustomTitle().equals(newItem.item.getCustomTitle()) &&
+                        return oldItem.item.getDisplayTitle().equals(newItem.item.getDisplayTitle()) &&
                                 oldItem.item.getUnreadCount() == newItem.item.getUnreadCount();
                     } else {
                         return false;
@@ -815,9 +815,9 @@ public class BaseActivity extends AppCompatActivity
             }
         }
 
-        public void updateData(HashMap<FeedSQL, Integer> map) {
-            HashMap<Long, FeedWrapper> oldItemMap = mItemMap;
-            mItemMap = new HashMap<>();
+        public void updateData(ArrayMap<FeedSQL, Integer> map) {
+            ArrayMap<Long, FeedWrapper> oldItemMap = mItemMap;
+            mItemMap = new ArrayMap<>();
             mItems.beginBatchedUpdates();
             for (FeedSQL item : map.keySet()) {
                 FeedWrapper wrap = new FeedWrapper(item);
