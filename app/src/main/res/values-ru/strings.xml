@@ -44,6 +44,14 @@
   <string name="no_such_feed">Не удалось найти такую ленту. Попробуйте с https.</string>
   <string name="title_activity_settings">Настройки</string>
 
+  <string-array name="pref_sync_frequency_titles">
+    <item>Вручную</item>
+    <item>Каждый час</item>
+    <item>Каждые 3 часа</item>
+    <item>Каждые 6 часов</item>
+    <item>Каждые 12 часов</item>
+  </string-array>
+
   <string name="synchronization">Синхронизация</string>
   <string name="only_on_wifi">Только по Wi-Fi</string>
   <string name="may_result_data_charges">Может привести к расходам на мобильные данные.</string>
