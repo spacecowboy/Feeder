@@ -54,8 +54,7 @@
             android:minHeight="300dp"
             android:layout_marginTop="8dp"
             style="@style/TextAppearance.Reader.Body"
-            android:textIsSelectable="true"
-            android:text="@string/hello_world"/>
+            android:textIsSelectable="true"/>
     </LinearLayout>
 
 
