@@ -88,5 +88,7 @@
   <string name="only_when_charging">Only when charging</string>
   <string name="image_loading">Image loading</string>
   <string name="no_activity_for_link">Couldn\'t find an activity to open that link with</string>
+  <string name="check_for_updates">Check for updates</string>
+  <string name="include_mobile_hotspots">Include mobile hotspots</string>
 
 </resources>
