@@ -8,7 +8,7 @@
   <string name="add_feed">Добавить ленту</string>
   <string name="title_activity_edit_feed">Подписаться на ленту</string>
   <string name="url">URL</string>
-  <string name="tag">Тег</string>
+  <string name="tag">Метка</string>
   <string name="add_feed_search_hint">URL ленты</string>
   <string name="select_account">Выберите учётную запись</string>
   <string name="title">Название</string>
@@ -35,7 +35,7 @@
   <string name="show_unread_items">Показать непрочитанные записи</string>
   <string name="new_items_available">Доступны новые записи</string>
   <string name="view">Вид</string>
-  <string name="no_tag">Без тега</string>
+  <string name="no_tag">Нет метки</string>
   <string name="username">Имя пользователя</string>
   <string name="server_address">Адрес сервера</string>
   <string name="night_mode">Ночной режим</string>
