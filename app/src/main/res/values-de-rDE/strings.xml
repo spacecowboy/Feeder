@@ -2,22 +2,12 @@
 <resources>
 
   <string name="app_name">Feeder</string>
-  <string name="title_section1">Sektion 1</string>
-  <string name="title_section2">Sektion 2</string>
-  <string name="title_section3">Sektion 3</string>
   <string name="navigation_drawer_open">Öffne die Navigationsleiste</string>
   <string name="navigation_drawer_close">Schließe die Navigationsleiste</string>
-  <string name="action_example">Beispiel Aktion</string>
   <string name="action_settings">Einstellungen</string>
-  <string name="title_activity_story">Geschichtsaktivität</string>
-  <string name="hello_world">Hallo Welt!</string>
-  <string name="title_activity_fullscreen">VollbildAktivität</string>
-  <string name="dummy_button">Dummy Knopf</string>
-  <string name="dummy_content">Dummy Inhalt</string>
   <string name="add_feed">Feed hinzufügen</string>
   <string name="title_activity_edit_feed">Feed abonieren</string>
   <string name="url">URL</string>
-  <string name="hello_blank_fragment">Hallo freies Fragment</string>
   <string name="tag">Gruppe</string>
   <string name="add_feed_search_hint">Feed URL</string>
   <string name="select_account">Wähle ein Benutzerkonto</string>
