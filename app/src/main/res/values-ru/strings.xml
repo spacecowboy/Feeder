@@ -2,16 +2,18 @@
 <resources>
 
   <string name="app_name">Feeder</string>
-  <string name="navigation_drawer_open"/>
-  <string name="navigation_drawer_close"/>
+  <string name="navigation_drawer_open">Открыть меню навигации</string>
+  <string name="navigation_drawer_close">Закрыть меню навигации</string>
   <string name="action_settings">Настройки</string>
   <string name="add_feed">Добавить ленту</string>
   <string name="title_activity_edit_feed">Подписаться на ленту</string>
   <string name="url">URL</string>
-  <string name="tag">Тег</string>
+  <string name="tag">Метка</string>
   <string name="add_feed_search_hint">URL ленты</string>
+  <string name="select_account">Выберите учётную запись</string>
   <string name="title">Название</string>
 
+  <string name="by_author_on_date">автор: %1$s, %2$s</string>
   <string name="save">Сохранить</string>
   <string name="empty_feed_top">Здесь нечего читать. Хотите…</string>
   <string name="empty_feed_open">
@@ -24,22 +26,29 @@
  "</string>
   <string name="empty_no_feeds_add">
  &lt;font color=#607D8B&gt;Добавления&lt;/font&gt; каких-нибудь лент</string>
+  <string name="no_feeds_found">Не удалось найти подходящие ленты. Попробуйте поискать по одному слову.</string>
   <string name="search_feed_empty_hint">Введите адрес ленты</string>
+  <string name="mark_all_as_read">Отметить всё как прочитанное</string>
   <string name="edit_feed">Изменить ленту</string>
   <string name="delete_feed">Удалить ленту</string>
   <string name="show_all_items">Показать все записи</string>
   <string name="show_unread_items">Показать непрочитанные записи</string>
   <string name="new_items_available">Доступны новые записи</string>
   <string name="view">Вид</string>
+  <string name="no_tag">Нет метки</string>
   <string name="username">Имя пользователя</string>
   <string name="server_address">Адрес сервера</string>
   <string name="night_mode">Ночной режим</string>
+  <string name="notify_for_new_items">Уведомлять о новом</string>
+  <string name="toggle_read_status">Переключить статус прочитанного</string>
   <string name="open_link_in_browser">Открыть ссылку в браузере</string>
   <string name="open_enclosed_media">Открыть прикреплённый медиафайл</string>
   <string name="sync">Синхронизировать</string>
   <string name="export_feeds_to_opml">Экспорт лент в OPML</string>
   <string name="import_feeds_from_opml">Импорт лент из OPML</string>
   <string name="view_debug_log">Открыть журнал отладки</string>
+  <string name="new_based_on_this">Новая на основе этой</string>
+  <string name="indicator_for_mark_as_read">Индикатор прочитанного</string>
   <string name="share">Поделиться</string>
   <string name="no_such_feed">Не удалось найти такую ленту. Попробуйте с https.</string>
   <string name="title_activity_settings">Настройки</string>
@@ -58,5 +67,7 @@
   <string name="only_when_charging">Только при зарядке</string>
   <string name="image_loading">Загрузка изображений</string>
   <string name="no_activity_for_link">Не удалось найти приложение, чтобы открыть ссылку</string>
+  <string name="check_for_updates">Проверять наличие обновлений</string>
+  <string name="include_mobile_hotspots">Включая мобильные точки доступа</string>
 
 </resources>
