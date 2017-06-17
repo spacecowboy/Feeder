@@ -35,8 +35,8 @@
   <string name="no_tag">Keine Gruppe</string>
   <string name="username">Benutzername</string>
   <string name="server_address">Serveradresse</string>
-  <string name="night_mode">Nacht Modus</string>
-  <string name="notify_for_new_items">Benachrichtige für neue Artikel</string>
+  <string name="night_mode">Nachtmodus</string>
+  <string name="notify_for_new_items">Benachrichtigungen</string>
   <string name="toggle_read_status">Lesestatus verändern</string>
   <string name="open_link_in_browser">Link im Browser öffnen</string>
   <string name="open_enclosed_media">Öffne eingebettete Medien</string>
