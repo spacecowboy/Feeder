@@ -663,22 +663,22 @@ public class FeedFragment extends Fragment
 
                 @Override
                 public void onInserted(int position, int count) {
-                    FeedAdapter.this.notifyItemRangeInserted(1 + position, count);
+                    FeedAdapter.this.notifyItemRangeInserted(position, count);
                 }
 
                 @Override
                 public void onRemoved(int position, int count) {
-                    FeedAdapter.this.notifyItemRangeRemoved(1 + position, count);
+                    FeedAdapter.this.notifyItemRangeRemoved(position, count);
                 }
 
                 @Override
                 public void onMoved(int fromPosition, int toPosition) {
-                    FeedAdapter.this.notifyItemMoved(1 + fromPosition, 1 + toPosition);
+                    FeedAdapter.this.notifyItemMoved(fromPosition, toPosition);
                 }
 
                 @Override
                 public void onChanged(int position, int count) {
-                    FeedAdapter.this.notifyItemRangeChanged(1 + position, count);
+                    FeedAdapter.this.notifyItemRangeChanged(position, count);
                 }
 
                 @Override
@@ -719,17 +719,11 @@ public class FeedFragment extends Fragment
 
 
         @Override
-        public long getItemId(final int hposition) {
-            if (hposition == 0) {
-                // header
-                return -2;
+        public long getItemId(final int position) {
+            if (position >= mItems.size()) {
+                return -3;
             } else {
-                int position = hposition - 1;
-                if (position >= mItems.size()) {
-                    return -3;
-                } else {
-                    return mItems.get(position).id;
-                }
+                return mItems.get(position).id;
             }
         }
 
@@ -763,13 +757,13 @@ public class FeedFragment extends Fragment
         @Override
         public int getItemCount() {
             // header + rest
-            return 2 + mItems.size();
+            return 1 + mItems.size();
         }
 
 
         @Override
         public int getItemViewType(int position) {
-            if (position == 0 || (position - 1) >= mItems.size()) {
+            if (position >= mItems.size()) {
                 return HEADERTYPE;
             } else {
                 return ITEMTYPE;
@@ -801,8 +795,8 @@ public class FeedFragment extends Fragment
 
         @Override
         public void onBindViewHolder(final RecyclerView.ViewHolder vHolder,
-                                     final int hposition) {
-            if (getItemViewType(hposition) == HEADERTYPE) {
+                                     final int position) {
+            if (getItemViewType(position) == HEADERTYPE) {
                 // Nothing to bind for padding
                 return;
             }
@@ -811,9 +805,6 @@ public class FeedFragment extends Fragment
 
             // Make sure view is reset if it was dismissed
             holder.resetView();
-
-            // Compensate for header
-            final int position = hposition - 1;
 
             // Get item
             final FeedItemSQL item = mItems.get(position);
