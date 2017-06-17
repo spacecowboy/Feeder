@@ -82,6 +82,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintVertical_bias="0.0" />
 
             <CheckedTextView
@@ -90,10 +91,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:layout_gravity="end"
+                android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="0dp"
                 android:background="?selectableItemBackground"
                 android:checkMark="@drawable/notification_checkmark"
                 android:clickable="true"
@@ -101,10 +104,11 @@
                 android:singleLine="true"
                 android:text="@string/notify_for_new_items"
                 android:textColor="@android:color/primary_text_dark"
-                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintBaseline_toBaselineOf="@+id/nightcheck"
+                app:layout_constraintHorizontal_bias="0.2"
                 app:layout_constraintLeft_toRightOf="@+id/nightcheck"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintBaseline_toBaselineOf="@+id/nightcheck" />
+                app:layout_constraintTop_toTopOf="parent" />
         </android.support.constraint.ConstraintLayout>
     </android.support.design.widget.AppBarLayout>
 
