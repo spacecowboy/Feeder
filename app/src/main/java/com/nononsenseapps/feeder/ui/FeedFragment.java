@@ -79,6 +79,7 @@ import static com.nononsenseapps.feeder.db.FeedSQLKt.FIELDS;
 import static com.nononsenseapps.feeder.db.RssContentProviderKt.QUERY_PARAM_LIMIT;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
+import static com.nononsenseapps.feeder.ui.FeedFragment.FeedAdapter.HEADER_COUNT;
 import static com.nononsenseapps.feeder.util.GlideUtils.glide;
 import static com.nononsenseapps.feeder.util.PrefUtils.shouldLoadImages;
 
@@ -577,7 +578,7 @@ public class FeedFragment extends Fragment
         if (FEEDITEMS_LOADER == cursorLoader.getId()) {
             HashMap<FeedItemSQL, Integer> map = (HashMap<FeedItemSQL, Integer>) result;
             mAdapter.updateData(map);
-            boolean empty = mAdapter.getItemCount() <= 2;
+            boolean empty = mAdapter.getItemCount() <= HEADER_COUNT;
             mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
             mSwipeRefreshLayout.setVisibility(empty ? View.GONE : View.VISIBLE);
         } else if (FEED_LOADER == cursorLoader.getId()) {
@@ -619,6 +620,7 @@ public class FeedFragment extends Fragment
 
     class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+        public static final int HEADER_COUNT = 1;
         public static final int HEADERTYPE = 0;
         public static final int ITEMTYPE = 1;
 
@@ -663,12 +665,22 @@ public class FeedFragment extends Fragment
 
                 @Override
                 public void onInserted(int position, int count) {
-                    FeedAdapter.this.notifyItemRangeInserted(position, count);
+                    // Since there is a footer some special logic is done when the list is initially populated
+                    if (count == mItems.size()) {
+                        FeedAdapter.this.notifyDataSetChanged();
+                    } else {
+                        FeedAdapter.this.notifyItemRangeInserted(position, count);
+                    }
                 }
 
                 @Override
                 public void onRemoved(int position, int count) {
-                    FeedAdapter.this.notifyItemRangeRemoved(position, count);
+                    // Since there is a footer some special logic is done when the list becomes empty
+                    if (mItems.size() == 0) {
+                        FeedAdapter.this.notifyDataSetChanged();
+                    } else {
+                        FeedAdapter.this.notifyItemRangeRemoved(position, count);
+                    }
                 }
 
                 @Override
@@ -756,8 +768,12 @@ public class FeedFragment extends Fragment
 
         @Override
         public int getItemCount() {
-            // header + rest
-            return 1 + mItems.size();
+            // headers + rest
+            if (mItems.size() > 0) {
+                return HEADER_COUNT + mItems.size();
+            } else {
+                return 0;
+            }
         }
 
 
