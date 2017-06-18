@@ -297,10 +297,6 @@ public class FeedFragment extends Fragment
 
         // Setup swipe refresh
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
-        // Set the offset so it comes out of the correct place
-        final int toolbarHeight = getResources().getDimensionPixelOffset(R.dimen.toolbar_height);
-        final int totalToolbarHeight = getResources().getDimensionPixelOffset(R.dimen.total_toolbar_height);
-        mSwipeRefreshLayout.setProgressViewOffset(false, toolbarHeight, Math.round(1.5f * totalToolbarHeight));
 
         // The arrow will cycle between these colors (in order)
         mSwipeRefreshLayout.setColorSchemeResources(
