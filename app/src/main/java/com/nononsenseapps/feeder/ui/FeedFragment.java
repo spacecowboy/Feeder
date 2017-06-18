@@ -31,6 +31,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.util.ArrayMap;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.util.SortedList;
@@ -72,6 +73,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_NOTIFY;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
@@ -635,7 +637,7 @@ public class FeedFragment extends Fragment
         private final int linkColor;
         private final Drawable bgProtection;
         private final SortedList<FeedItemSQL> mItems;
-        private HashMap<Long, FeedItemSQL> mItemMap;
+        private ArrayMap<Long, FeedItemSQL> mItemMap;
 
         String temps;
 
@@ -644,7 +646,7 @@ public class FeedFragment extends Fragment
 
             setHasStableIds(true);
 
-            mItemMap = new HashMap<>();
+            mItemMap = new ArrayMap<>();
             mItems = new SortedList<>(FeedItemSQL.class, new SortedList.Callback<FeedItemSQL>() {
                 @Override
                 public int compare(FeedItemSQL a, FeedItemSQL b) {
@@ -739,9 +741,9 @@ public class FeedFragment extends Fragment
             }
         }
 
-        public void updateData(HashMap<FeedItemSQL, Integer> map) {
-            HashMap<Long, FeedItemSQL> oldItemMap = mItemMap;
-            mItemMap = new HashMap<>();
+        public void updateData(Map<FeedItemSQL, Integer> map) {
+            ArrayMap<Long, FeedItemSQL> oldItemMap = mItemMap;
+            mItemMap = new ArrayMap<>();
             mItems.beginBatchedUpdates();
             for (FeedItemSQL item : map.keySet()) {
                 if (map.get(item) >= 0) {

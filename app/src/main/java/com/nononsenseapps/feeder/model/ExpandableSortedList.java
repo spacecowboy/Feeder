@@ -17,9 +17,9 @@
 
 package com.nononsenseapps.feeder.model;
 
+import android.support.v4.util.ArrayMap;
 import android.support.v7.util.SortedList;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -33,8 +33,8 @@ public class ExpandableSortedList<T> extends SortedList<T> {
     private static final int EXPANDED = 1;
 
 
-    private final HashMap<T, HashSet<T>> mGroups;
-    private final HashMap<T, Integer> mGroupState;
+    private final ArrayMap<T, HashSet<T>> mGroups;
+    private final ArrayMap<T, Integer> mGroupState;
 
     /**
      * Callback which handles tree structure.
@@ -50,8 +50,8 @@ public class ExpandableSortedList<T> extends SortedList<T> {
     public ExpandableSortedList(Class<T> klass, ExpandableCallback<T> callback) {
         super(klass, callback);
         mCallback = callback;
-        mGroups = new HashMap<>();
-        mGroupState = new HashMap<>();
+        mGroups = new ArrayMap<>();
+        mGroupState = new ArrayMap<>();
     }
 
     /**
@@ -64,8 +64,8 @@ public class ExpandableSortedList<T> extends SortedList<T> {
     public ExpandableSortedList(Class<T> klass, ExpandableCallback<T> callback, int initialCapacity) {
         super(klass, callback, initialCapacity);
         mCallback = callback;
-        mGroups = new HashMap<>();
-        mGroupState = new HashMap<>();
+        mGroups = new ArrayMap<>();
+        mGroupState = new ArrayMap<>();
     }
 
     /**
