@@ -46,6 +46,7 @@
   <dimen name="reader_body">16sp</dimen>
   <dimen name="listitem_author">12sp</dimen>
   <dimen name="listitem_body">14sp</dimen>
+  <dimen name="emptyFeedsTextSize">24sp</dimen>
 
   <!-- snackbar, match_width -->
   <dimen name="snackbar_min_width">288dp</dimen>
