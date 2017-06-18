@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2015 Jonas Kalderstam.
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2017 Jonas Kalderstam.
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -16,8 +15,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -25,37 +23,54 @@
 
     <FrameLayout
         android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerbar"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintTop_creator="1">
 
         <include layout="@layout/empty_feeds_at_all" />
     </FrameLayout>
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/headerbar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_actionbar"
-            app:layout_scrollFlags="scroll|enterAlways"
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"
+            app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <FrameLayout
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/subtoolbar_height"
-            app:layout_scrollFlags="scroll|enterAlways"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <CheckedTextView
                 android:id="@+id/nightcheck"
                 style="@style/TextAppearance.Body"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="32dp"
                 android:layout_gravity="start"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:background="?selectableItemBackground"
                 android:checkMark="@drawable/nightmode_checkmark"
                 android:clickable="true"
@@ -63,22 +78,38 @@
                 android:paddingStart="16dp"
                 android:singleLine="true"
                 android:text="@string/night_mode"
-                android:textColor="@android:color/primary_text_dark" />
+                android:textColor="@android:color/primary_text_dark"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintVertical_bias="0.0" />
 
             <CheckedTextView
                 android:id="@+id/notifycheck"
                 style="@style/TextAppearance.Body"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="32dp"
                 android:layout_gravity="end"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="0dp"
                 android:background="?selectableItemBackground"
                 android:checkMark="@drawable/notification_checkmark"
                 android:clickable="true"
                 android:gravity="center_vertical|end"
                 android:singleLine="true"
                 android:text="@string/notify_for_new_items"
-                android:textColor="@android:color/primary_text_dark" />
-        </FrameLayout>
+                android:textColor="@android:color/primary_text_dark"
+                app:layout_constraintBaseline_toBaselineOf="@+id/nightcheck"
+                app:layout_constraintHorizontal_bias="0.2"
+                app:layout_constraintLeft_toRightOf="@+id/nightcheck"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.constraint.ConstraintLayout>
     </android.support.design.widget.AppBarLayout>
-    
-</FrameLayout>
+
+</android.support.constraint.ConstraintLayout>

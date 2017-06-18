@@ -17,12 +17,12 @@
   <string name="on_date">%1$s</string>
   <string name="save">Speichern</string>
   <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würdest du gerne…</string>
-  <string name="empty_feed_open"><![CDATA[Einen anderen Feed<font color="#607D8B">öffnen</font>?]]></string>
-  <string name="empty_feed_add"><![CDATA[Mehr Feeds<font color="#607D8B">hinzufügen</font>?]]></string>
+  <string name="empty_feed_open"><![CDATA[Einen anderen Feed <font color="#607D8B">öffnen</font>?]]></string>
+  <string name="empty_feed_add"><![CDATA[Mehr Feeds <font color="#607D8B">hinzufügen</font>?]]></string>
   <string name="empty_no_feeds_top">Noch nichts zu lesen.\n
     Leg los indem</string>
   <string name="empty_no_feeds_login"><![CDATA[Beim Server <font color="#607D8B">einloggen</font> und…]]></string>
-  <string name="empty_no_feeds_add"><![CDATA[Einige Feeds<font color="#607D8B">hinzugefügen</font>]]></string>
+  <string name="empty_no_feeds_add"><![CDATA[Einige Feeds <font color="#607D8B">hinzugefügen</font>]]></string>
   <string name="no_feeds_found">Konnte keine relevanten Feeds finden. Versuche nach einem einzelnen Wort zu suchen.</string>
   <string name="search_feed_empty_hint">Gebe eine Feed URL ein</string>
   <string name="mark_all_as_read">Alles als gelesen markieren</string>
@@ -35,8 +35,8 @@
   <string name="no_tag">Keine Gruppe</string>
   <string name="username">Benutzername</string>
   <string name="server_address">Serveradresse</string>
-  <string name="night_mode">Nacht Modus</string>
-  <string name="notify_for_new_items">Benachrichtige für neue Artikel</string>
+  <string name="night_mode">Nachtmodus</string>
+  <string name="notify_for_new_items">Benachrichtigungen</string>
   <string name="toggle_read_status">Lesestatus verändern</string>
   <string name="open_link_in_browser">Link im Browser öffnen</string>
   <string name="open_enclosed_media">Öffne eingebettete Medien</string>

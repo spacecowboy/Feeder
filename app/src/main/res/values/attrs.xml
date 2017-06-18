@@ -4,6 +4,7 @@
         <attr name="isFloatingWindow" format="boolean" />
         <attr name="itemSwipingBGColor" format="color" />
         <attr name="nightBGColor" format="color" />
+        <attr name="emptyFeedsTextSize" format="dimension" />
     </declare-styleable>
     <declare-styleable name="FloatLabelLayout">
         <attr name="floatLabelTextAppearance" format="reference" />

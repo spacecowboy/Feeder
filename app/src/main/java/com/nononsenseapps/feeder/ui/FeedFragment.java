@@ -31,6 +31,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.util.ArrayMap;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.util.SortedList;
@@ -72,6 +73,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_NOTIFY;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
@@ -79,6 +81,7 @@ import static com.nononsenseapps.feeder.db.FeedSQLKt.FIELDS;
 import static com.nononsenseapps.feeder.db.RssContentProviderKt.QUERY_PARAM_LIMIT;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
+import static com.nononsenseapps.feeder.ui.FeedFragment.FeedAdapter.HEADER_COUNT;
 import static com.nononsenseapps.feeder.util.GlideUtils.glide;
 import static com.nononsenseapps.feeder.util.PrefUtils.shouldLoadImages;
 
@@ -294,10 +297,6 @@ public class FeedFragment extends Fragment
 
         // Setup swipe refresh
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swiperefresh);
-        // Set the offset so it comes out of the correct place
-        final int toolbarHeight = getResources().getDimensionPixelOffset(R.dimen.toolbar_height);
-        final int totalToolbarHeight = getResources().getDimensionPixelOffset(R.dimen.total_toolbar_height);
-        mSwipeRefreshLayout.setProgressViewOffset(false, toolbarHeight, Math.round(1.5f * totalToolbarHeight));
 
         // The arrow will cycle between these colors (in order)
         mSwipeRefreshLayout.setColorSchemeResources(
@@ -577,7 +576,7 @@ public class FeedFragment extends Fragment
         if (FEEDITEMS_LOADER == cursorLoader.getId()) {
             HashMap<FeedItemSQL, Integer> map = (HashMap<FeedItemSQL, Integer>) result;
             mAdapter.updateData(map);
-            boolean empty = mAdapter.getItemCount() <= 2;
+            boolean empty = mAdapter.getItemCount() <= HEADER_COUNT;
             mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
             mSwipeRefreshLayout.setVisibility(empty ? View.GONE : View.VISIBLE);
         } else if (FEED_LOADER == cursorLoader.getId()) {
@@ -619,6 +618,7 @@ public class FeedFragment extends Fragment
 
     class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+        public static final int HEADER_COUNT = 1;
         public static final int HEADERTYPE = 0;
         public static final int ITEMTYPE = 1;
 
@@ -633,7 +633,7 @@ public class FeedFragment extends Fragment
         private final int linkColor;
         private final Drawable bgProtection;
         private final SortedList<FeedItemSQL> mItems;
-        private HashMap<Long, FeedItemSQL> mItemMap;
+        private ArrayMap<Long, FeedItemSQL> mItemMap;
 
         String temps;
 
@@ -642,7 +642,7 @@ public class FeedFragment extends Fragment
 
             setHasStableIds(true);
 
-            mItemMap = new HashMap<>();
+            mItemMap = new ArrayMap<>();
             mItems = new SortedList<>(FeedItemSQL.class, new SortedList.Callback<FeedItemSQL>() {
                 @Override
                 public int compare(FeedItemSQL a, FeedItemSQL b) {
@@ -663,22 +663,32 @@ public class FeedFragment extends Fragment
 
                 @Override
                 public void onInserted(int position, int count) {
-                    FeedAdapter.this.notifyItemRangeInserted(1 + position, count);
+                    // Since there is a footer some special logic is done when the list is initially populated
+                    if (count == mItems.size()) {
+                        FeedAdapter.this.notifyDataSetChanged();
+                    } else {
+                        FeedAdapter.this.notifyItemRangeInserted(position, count);
+                    }
                 }
 
                 @Override
                 public void onRemoved(int position, int count) {
-                    FeedAdapter.this.notifyItemRangeRemoved(1 + position, count);
+                    // Since there is a footer some special logic is done when the list becomes empty
+                    if (mItems.size() == 0) {
+                        FeedAdapter.this.notifyDataSetChanged();
+                    } else {
+                        FeedAdapter.this.notifyItemRangeRemoved(position, count);
+                    }
                 }
 
                 @Override
                 public void onMoved(int fromPosition, int toPosition) {
-                    FeedAdapter.this.notifyItemMoved(1 + fromPosition, 1 + toPosition);
+                    FeedAdapter.this.notifyItemMoved(fromPosition, toPosition);
                 }
 
                 @Override
                 public void onChanged(int position, int count) {
-                    FeedAdapter.this.notifyItemRangeChanged(1 + position, count);
+                    FeedAdapter.this.notifyItemRangeChanged(position, count);
                 }
 
                 @Override
@@ -719,23 +729,17 @@ public class FeedFragment extends Fragment
 
 
         @Override
-        public long getItemId(final int hposition) {
-            if (hposition == 0) {
-                // header
-                return -2;
+        public long getItemId(final int position) {
+            if (position >= mItems.size()) {
+                return -3;
             } else {
-                int position = hposition - 1;
-                if (position >= mItems.size()) {
-                    return -3;
-                } else {
-                    return mItems.get(position).id;
-                }
+                return mItems.get(position).id;
             }
         }
 
-        public void updateData(HashMap<FeedItemSQL, Integer> map) {
-            HashMap<Long, FeedItemSQL> oldItemMap = mItemMap;
-            mItemMap = new HashMap<>();
+        public void updateData(Map<FeedItemSQL, Integer> map) {
+            ArrayMap<Long, FeedItemSQL> oldItemMap = mItemMap;
+            mItemMap = new ArrayMap<>();
             mItems.beginBatchedUpdates();
             for (FeedItemSQL item : map.keySet()) {
                 if (map.get(item) >= 0) {
@@ -762,14 +766,18 @@ public class FeedFragment extends Fragment
 
         @Override
         public int getItemCount() {
-            // header + rest
-            return 2 + mItems.size();
+            // headers + rest
+            if (mItems.size() > 0) {
+                return HEADER_COUNT + mItems.size();
+            } else {
+                return 0;
+            }
         }
 
 
         @Override
         public int getItemViewType(int position) {
-            if (position == 0 || (position - 1) >= mItems.size()) {
+            if (position >= mItems.size()) {
                 return HEADERTYPE;
             } else {
                 return ITEMTYPE;
@@ -801,8 +809,8 @@ public class FeedFragment extends Fragment
 
         @Override
         public void onBindViewHolder(final RecyclerView.ViewHolder vHolder,
-                                     final int hposition) {
-            if (getItemViewType(hposition) == HEADERTYPE) {
+                                     final int position) {
+            if (getItemViewType(position) == HEADERTYPE) {
                 // Nothing to bind for padding
                 return;
             }
@@ -811,9 +819,6 @@ public class FeedFragment extends Fragment
 
             // Make sure view is reset if it was dismissed
             holder.resetView();
-
-            // Compensate for header
-            final int position = hposition - 1;
 
             // Get item
             final FeedItemSQL item = mItems.get(position);
