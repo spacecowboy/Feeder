@@ -182,6 +182,23 @@ public class FeedParserTest {
     }
 
     @Test
+    public void londoner() throws Exception {
+        SyndFeed feed = FeedParser.parseFeed(getLondoner());
+
+        assertEquals("http://londonist.com/", feed.getLink());
+        assertNull(FeedParser.selfLink(feed));
+
+        assertEquals(40, feed.getEntries().size());
+        SyndEntry entry = feed.getEntries().get(0);
+
+        assertEquals("Make The Most Of London's Offerings With Chip",
+                FeedParser.plainTitle(entry));
+
+        assertEquals("https://assets.londonist.com/uploads/2017/06/i300x150/chip_2.jpg",
+                FeedParser.thumbnail(entry));
+    }
+
+    @Test
     @Ignore
     public void fz() throws Exception {
         SyndFeed feed = FeedParser.parseFeed(getFz());
@@ -229,5 +246,9 @@ public class FeedParserTest {
 
     private InputStream getFz() {
         return getClass().getResourceAsStream("rss_fz.xml");
+    }
+
+    private InputStream getLondoner() {
+        return getClass().getResourceAsStream("rss_londoner.xml");
     }
 }
