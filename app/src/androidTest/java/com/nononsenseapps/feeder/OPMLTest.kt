@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder
 
-import android.content.ContentResolver
 import android.content.Context
 import android.support.test.InstrumentationRegistry.getContext
 import android.support.test.filters.MediumTest
@@ -11,10 +10,10 @@ import com.nononsenseapps.feeder.db.FeedSQL
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.asFeed
 import com.nononsenseapps.feeder.model.OPMLContenProvider
-import com.nononsenseapps.feeder.model.OPMLParser
 import com.nononsenseapps.feeder.model.opml.OpmlParser
 import com.nononsenseapps.feeder.model.opml.writeFile
 import com.nononsenseapps.feeder.util.getFeeds
+import com.nononsenseapps.feeder.util.insertFeedWith
 import com.nononsenseapps.feeder.util.queryFeeds
 import com.nononsenseapps.feeder.util.queryTagsWithCounts
 import org.junit.After
@@ -60,7 +59,8 @@ class OPMLTest {
         // Remove everything in database
         getContext().contentResolver.delete(URI_FEEDS, null, null)
         // Get internal data dir
-        dir = getContext().filesDir
+        dir = createTempDir()
+        assertTrue("Need to be able to write to data dir $dir", dir!!.canWrite())
         context = getContext()
     }
 
@@ -139,26 +139,27 @@ class OPMLTest {
         val path = writeSampleFile()
 
         // Create something that does not exist
-        val feednew = FeedSQL()
-        feednew.url = "http://somedomain" + 20 + ".com/rss.xml"
-        feednew.title = String.format(fmtTitle, 20)
-        feednew.tag = "kapow"
-        var uri = context!!.contentResolver.insert(FeedSQL.URI_FEEDS, feednew.content)
-        feednew.id = java.lang.Long.parseLong(uri.lastPathSegment)
+        var feednew = FeedSQL(
+                url = "http://somedomain" + 20 + ".com/rss.xml",
+                title = String.format(fmtTitle, 20),
+                tag = "kapow")
+        var id = context!!.contentResolver.insertFeedWith(feednew.asContentValues())
+        feednew = feednew.copy(id = id)
         // Create something that wil exist
-        val feedold = FeedSQL()
-        feedold.url = "http://somedomain" + 0 + ".com/rss.xml"
-        feedold.title = Integer.toString(0)
-        uri = context!!.contentResolver.insert(FeedSQL.URI_FEEDS, feedold.content)
-        feedold.id = java.lang.Long.parseLong(uri.lastPathSegment)
+        var feedold = FeedSQL(
+                url = "http://somedomain" + 0 + ".com/rss.xml",
+                title = Integer.toString(0))
+        id = context!!.contentResolver.insertFeedWith(feedold.asContentValues())
+
+        feedold = feedold.copy(id = id)
 
         // Read file
-        val parser = OPMLParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLContenProvider(context))
         parser.parseFile(path)
 
         // should not kill the existing stuff
         val seen = ArrayList<Int>()
-        val feeds = FeedSQL.getFeeds(context, null, null, null)
+        val feeds = context!!.contentResolver.getFeeds()
         assertFalse("No feeds in DB!", feeds.isEmpty())
         for (feed in feeds) {
             val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
@@ -201,7 +202,7 @@ class OPMLTest {
         }
 
         // Read file
-        val parser = OPMLParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLContenProvider(context))
         parser.parseFile(path.absolutePath)
     }
 
@@ -211,7 +212,7 @@ class OPMLTest {
     fun testReadMissingFile() {
         val path = File(dir, "lsadflibaslsdfa.opml")
         // Read file
-        val parser = OPMLParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLContenProvider(context))
         var raised = false
         try {
             parser.parseFile(path.absolutePath)
@@ -229,30 +230,30 @@ class OPMLTest {
         // Use test write to write the sample file
         testWrite()
         // Then delete all feeds again
-        context!!.contentResolver.delete(FeedSQL.URI_FEEDS, null, null)
+        context!!.contentResolver.delete(URI_FEEDS, null, null)
 
         return path.absolutePath
     }
 
     private fun createSampleFeeds() {
         for (i in 0..9) {
-            val feed = FeedSQL()
-            feed.url = "http://somedomain$i.com/rss.xml"
-            feed.title = "\"$i\""
-            if (i % 3 == 1) {
-                feed.tag = "tag1"
-            } else if (i % 3 == 2) {
-                feed.tag = "tag2"
-            }
+            val feed = FeedSQL(
+                    url = "http://somedomain$i.com/rss.xml",
+                    title = "\"$i\"",
+                    tag = when (i % 3) {
+                        1 -> "tag1"
+                        2 -> "tag2"
+                        else -> ""
+                    })
 
-            context!!.contentResolver.insert(FeedSQL.URI_FEEDS, feed.content)
+            context!!.contentResolver.insertFeedWith(feed.asContentValues())
         }
     }
 
     private fun getTags(): ArrayList<String> {
         val tags = ArrayList<String>()
 
-        context!!.contentResolver.queryTagsWithCounts(columns = listOf(FeedSQL.COL_TAG)) {
+        context!!.contentResolver.queryTagsWithCounts(columns = listOf(COL_TAG)) {
             while (it.moveToNext()) {
                 tags.add(it.getString(0))
             }
