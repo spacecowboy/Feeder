@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Jonas Kalderstam.
+ * Copyright (c) 2017 Jonas Kalderstam.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@ import android.view.ViewTreeObserver;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedItemSQLKt;
@@ -68,6 +69,7 @@ import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
 import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -76,6 +78,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.nononsenseapps.feeder.db.FeedItemSQLKt.FEED_ITEM_FIELDS_FOR_LIST;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_NOTIFY;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.FEED_FIELDS;
@@ -547,7 +550,8 @@ public class FeedFragment extends Fragment
             return new FeedItemDeltaCursorLoader(getActivity(),
                     URI_FEEDITEMS.buildUpon()
                             .appendQueryParameter(QUERY_PARAM_LIMIT, "50").build(),
-                    FeedItemSQLKt.FEED_ITEM_FIELDS, getLoaderSelection(),
+                    FEED_ITEM_FIELDS_FOR_LIST,
+                    getLoaderSelection(),
                     getLoaderSelectionArgs(),
                     FeedItemSQLKt.COL_PUBDATE + " DESC");
         } else if (ID == FEED_LOADER) {
@@ -830,7 +834,7 @@ public class FeedFragment extends Fragment
             SpannableStringBuilder titleText = new SpannableStringBuilder
                     (item.getFeedtitle());
             // If no body, display domain of link to be opened
-            if (holder.rssItem.getDescription().isEmpty()) {
+            if (holder.rssItem.getPlainsnippet().isEmpty()) {
                 titleText.append(" \u2014 ");
 
                 if (holder.rssItem.getEnclosurelink() != null) {
@@ -1028,7 +1032,7 @@ public class FeedFragment extends Fragment
                 }
 
                 // Open item if not empty
-                if (!rssItem.getDescription().isEmpty()) {
+                if (!rssItem.getPlainsnippet().isEmpty()) {
                     Intent i = new Intent(getActivity(), ReaderActivity.class);
                     //i.setData(Uri.parse(link));
                     i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
@@ -1070,7 +1074,7 @@ public class FeedFragment extends Fragment
                     view.setActivated(true);
                 }
 
-                mActionMode.setSubtitle(mSelectedItem.getTitle());
+                mActionMode.setSubtitle(mSelectedItem.getPlaintitle());
                 mActionMode.setTitle(R.string.selected);
 
                 return true;

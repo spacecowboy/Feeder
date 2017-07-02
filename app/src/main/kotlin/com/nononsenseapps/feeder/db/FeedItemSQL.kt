@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.db
 
 import android.database.Cursor
-import android.os.Bundle
 import com.nononsenseapps.feeder.util.*
 import org.joda.time.DateTime
 import java.net.URL
@@ -32,6 +31,13 @@ const val COL_FEEDTITLE = "feedtitle"
 val FEED_ITEM_FIELDS = arrayOf(COL_ID, COL_TITLE, COL_DESCRIPTION, COL_PLAINTITLE, COL_PLAINSNIPPET,
         COL_IMAGEURL, COL_LINK, COL_AUTHOR, COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG,
         COL_ENCLOSURELINK, COL_FEEDTITLE, COL_NOTIFIED, COL_GUID)
+
+// In list avoid loading potentially big description field
+@JvmField
+val FEED_ITEM_FIELDS_FOR_LIST =
+        arrayOf(COL_ID, COL_PLAINTITLE, COL_PLAINSNIPPET, COL_IMAGEURL, COL_LINK, COL_AUTHOR,
+                COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG, COL_ENCLOSURELINK, COL_FEEDTITLE,
+                COL_NOTIFIED, COL_GUID)
 
 val CREATE_FEED_ITEM_TABLE = """
     CREATE TABLE $FEED_ITEM_TABLE_NAME (
@@ -89,7 +95,7 @@ data class FeedItemSQL(val id: Long = -1,
                        val tag: String = "",
                        val feedtitle: String = "",
                        val notified: Boolean = false,
-                       // Variable to stop UI flickering
+        // Variable to stop UI flickering
                        var unread: Boolean = false,
                        val feedid: Long = -1) {
 
@@ -152,7 +158,7 @@ fun Cursor.asFeedItem(): FeedItemSQL {
             tag = getString(COL_TAG) ?: "",
             feedid = getLong(COL_FEED) ?: -1,
             feedtitle = getString(COL_FEEDTITLE) ?: "",
-            notified = when(getInt(COL_NOTIFIED) ?: 0) {
+            notified = when (getInt(COL_NOTIFIED) ?: 0) {
                 1 -> true
                 else -> false
             },
@@ -163,13 +169,14 @@ fun Cursor.asFeedItem(): FeedItemSQL {
             imageurl = getString(COL_IMAGEURL),
             link = getString(COL_LINK),
             author = getString(COL_AUTHOR),
-            pubDate = when(getString(COL_PUBDATE)) {
+            pubDate = when (getString(COL_PUBDATE)) {
                 null -> null
                 else -> {
                     var dt: DateTime? = null
                     try {
                         dt = DateTime.parse(getString(COL_PUBDATE))
-                    } catch(t: Throwable) {}
+                    } catch(t: Throwable) {
+                    }
                     dt
                 }
             },
