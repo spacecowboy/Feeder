@@ -1,11 +1,13 @@
 package com.nononsenseapps.feeder.util
 
 import android.accounts.AccountManager
+import android.app.NotificationManager
 import android.content.ContentResolver
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.v4.app.NotificationManagerCompat
 import com.nononsenseapps.feeder.db.AUTHORITY
 import com.nononsenseapps.feeder.db.AccountService
 import com.nononsenseapps.feeder.util.PrefUtils.PREF_SYNC_ONLY_CHARGING
@@ -39,3 +41,6 @@ fun Context.setupSync(): Unit {
         }
     }
 }
+
+val Context.notificationManager: NotificationManagerCompat
+    get() = NotificationManagerCompat.from(this)

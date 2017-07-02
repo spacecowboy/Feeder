@@ -7,15 +7,18 @@ import android.content.OperationApplicationException;
 import android.net.Uri;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+
 import com.nononsenseapps.feeder.db.Cleanup;
-import com.nononsenseapps.feeder.db.FeedItemSQL;
+import com.nononsenseapps.feeder.db.FeedItemSQLKt;
 import com.nononsenseapps.feeder.db.FeedSQL;
+import com.nononsenseapps.feeder.db.FeedSQLKt;
 import com.nononsenseapps.feeder.util.Consumer;
 import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
 import com.nononsenseapps.feeder.util.FileLog;
 import com.nononsenseapps.feeder.util.Optional;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
+
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
@@ -27,7 +30,7 @@ import java.util.List;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TITLE;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_URL;
-import static com.nononsenseapps.feeder.db.FeedSQLKt.FIELDS;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.FEED_FIELDS;
 import static com.nononsenseapps.feeder.db.RssContentProviderKt.AUTHORITY;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
@@ -93,7 +96,7 @@ public class RssLocalSync {
             // Notify that we've updated
             ContentResolverExtensionsKt.notifyAllUris(context.getContentResolver());
             // Send notifications for configured feeds
-            RssNotifications.notify(context);
+            RssNotificationsKt.notify(context);
         } catch (Throwable e) {
             log.d("Some fatal error during sync: " + e.getMessage());
             e.printStackTrace();
@@ -156,22 +159,22 @@ public class RssLocalSync {
             }
 
             // Use the actual id, because update operation will not return id
-            itemOp.withValue(FeedItemSQL.COL_FEED, feedSQL.getId());
+            itemOp.withValue(FeedItemSQLKt.COL_FEED, feedSQL.getId());
 
             // Next all the other values. Make sure non null
-            itemOp.withValue(FeedItemSQL.COL_GUID, entry.getUri())
-                    .withValue(FeedItemSQL.COL_LINK, entry.getLink())
-                    .withValue(FeedItemSQL.COL_FEEDTITLE, feedSQL.getTitle())
-                    .withValue(FeedItemSQL.COL_TAG, feedSQL.getTag())
-                    .withValue(FeedItemSQL.COL_IMAGEURL, FeedParser.thumbnail(entry))
-                    .withValue(FeedItemSQL.COL_ENCLOSURELINK, FeedParser.firstEnclosure(entry))
-                    .withValue(FeedItemSQL.COL_AUTHOR, entry.getAuthor())
-                    .withValue(FeedItemSQL.COL_PUBDATE, FeedParser.publishDate(entry))
+            itemOp.withValue(FeedItemSQLKt.COL_GUID, entry.getUri())
+                    .withValue(FeedItemSQLKt.COL_LINK, entry.getLink())
+                    .withValue(FeedItemSQLKt.COL_FEEDTITLE, feedSQL.getTitle())
+                    .withValue(FeedSQLKt.COL_TAG, feedSQL.getTag())
+                    .withValue(FeedItemSQLKt.COL_IMAGEURL, FeedParser.thumbnail(entry))
+                    .withValue(FeedItemSQLKt.COL_ENCLOSURELINK, FeedParser.firstEnclosure(entry))
+                    .withValue(FeedItemSQLKt.COL_AUTHOR, entry.getAuthor())
+                    .withValue(FeedItemSQLKt.COL_PUBDATE, FeedParser.publishDate(entry))
                     // Make sure these are non-null
-                    .withValue(FeedItemSQL.COL_TITLE, FeedParser.title(entry))
-                    .withValue(FeedItemSQL.COL_DESCRIPTION, FeedParser.description(entry))
-                    .withValue(FeedItemSQL.COL_PLAINTITLE, FeedParser.plainTitle(entry))
-                    .withValue(FeedItemSQL.COL_PLAINSNIPPET, FeedParser.snippet(entry));
+                    .withValue(FeedSQLKt.COL_TITLE, FeedParser.title(entry))
+                    .withValue(FeedItemSQLKt.COL_DESCRIPTION, FeedParser.description(entry))
+                    .withValue(FeedItemSQLKt.COL_PLAINTITLE, FeedParser.plainTitle(entry))
+                    .withValue(FeedItemSQLKt.COL_PLAINSNIPPET, FeedParser.snippet(entry));
 
             // Add to list of operations
             operations.add(itemOp.build());
@@ -182,16 +185,16 @@ public class RssLocalSync {
 
     public static List<FeedSQL> listFeed(final Context context, final long id) {
         return ContentResolverExtensionsKt.getFeeds(context.getContentResolver(),
-                Arrays.asList(FIELDS), WHEREIDIS, Arrays.asList(LongsToStringArray(id)), null);
+                Arrays.asList(FEED_FIELDS), WHEREIDIS, Arrays.asList(LongsToStringArray(id)), null);
     }
 
     public static List<FeedSQL> listFeeds(final Context context, @NonNull final String tag) {
         return ContentResolverExtensionsKt.getFeeds(context.getContentResolver(),
-                Arrays.asList(FIELDS), WhereIs(COL_TAG), Arrays.asList(ToStringArray(tag)), null);
+                Arrays.asList(FEED_FIELDS), WhereIs(COL_TAG), Arrays.asList(ToStringArray(tag)), null);
     }
 
     public static List<FeedSQL> listFeeds(final Context context) {
         return ContentResolverExtensionsKt.getFeeds(context.getContentResolver(),
-                Arrays.asList(FIELDS), null, null, null);
+                Arrays.asList(FEED_FIELDS), null, null, null);
     }
 }

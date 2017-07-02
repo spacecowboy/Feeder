@@ -41,6 +41,7 @@ import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.ui.text.HtmlConverter;
 import com.nononsenseapps.feeder.ui.text.ImageTextLoader;
+import com.nononsenseapps.feeder.util.BundleExtensionsKt;
 import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
 import com.nononsenseapps.feeder.util.FileLog;
 import com.nononsenseapps.feeder.util.PrefUtils;
@@ -94,7 +95,7 @@ public class ReaderFragment extends Fragment
         ReaderFragment fragment = new ReaderFragment();
         // Save some time on load
         fragment.mRssItem = rssItem;
-        fragment._id = rssItem.id;
+        fragment._id = rssItem.getId();
 
         fragment.setArguments(RssItemToBundle(rssItem, null));
         return fragment;
@@ -112,30 +113,20 @@ public class ReaderFragment extends Fragment
         if (bundle == null) {
             bundle = new Bundle();
         }
-        bundle.putLong(ARG_ID, rssItem.id);
-        bundle.putString(ARG_TITLE, rssItem.title);
-        bundle.putString(ARG_DESCRIPTION, rssItem.description);
-        bundle.putString(ARG_LINK, rssItem.link);
-        bundle.putString(ARG_ENCLOSURE, rssItem.enclosurelink);
-        bundle.putString(ARG_IMAGEURL, rssItem.imageurl);
-        bundle.putString(ARG_FEEDTITLE, rssItem.feedtitle);
-        bundle.putString(ARG_AUTHOR, rssItem.author);
+        bundle.putLong(ARG_ID, rssItem.getId());
+        bundle.putString(ARG_TITLE, rssItem.getTitle());
+        bundle.putString(ARG_DESCRIPTION, rssItem.getDescription());
+        bundle.putString(ARG_LINK, rssItem.getLink());
+        bundle.putString(ARG_ENCLOSURE, rssItem.getEnclosurelink());
+        bundle.putString(ARG_IMAGEURL, rssItem.getImageurl());
+        bundle.putString(ARG_FEEDTITLE, rssItem.getFeedtitle());
+        bundle.putString(ARG_AUTHOR, rssItem.getAuthor());
         bundle.putString(ARG_DATE, rssItem.getPubDateString());
         return bundle;
     }
 
     public static FeedItemSQL RssItemFromBundle(Bundle bundle) {
-        FeedItemSQL rssItem = new FeedItemSQL();
-        rssItem.id = bundle.getLong(ARG_ID, -1);
-        rssItem.title = bundle.getString(ARG_TITLE);
-        rssItem.description = (bundle.getString(ARG_DESCRIPTION));
-        rssItem.link = (bundle.getString(ARG_LINK));
-        rssItem.enclosurelink = (bundle.getString(ARG_ENCLOSURE));
-        rssItem.imageurl = (bundle.getString(ARG_IMAGEURL));
-        rssItem.author = (bundle.getString(ARG_AUTHOR));
-        rssItem.setPubDate(bundle.getString(ARG_DATE));
-        rssItem.feedtitle = (bundle.getString(ARG_FEEDTITLE));
-        return rssItem;
+        return BundleExtensionsKt.asFeedItem(bundle);
     }
 
     @Override
@@ -178,31 +169,31 @@ public class ReaderFragment extends Fragment
         TextView mFeedTitleTextView = (TextView) rootView.findViewById(R.id
                 .story_feedtitle);
 
-        if (mRssItem.title == null) {
+        if (mRssItem.getTitle() == null) {
             mTitleTextView.setText(R.string.nothing_to_display);
         } else {
-            mTitleTextView.setText(HtmlConverter.toSpannedWithNoImages(mRssItem.title, getActivity()));
+            mTitleTextView.setText(HtmlConverter.toSpannedWithNoImages(mRssItem.getTitle(), getActivity()));
         }
-        if (mRssItem.description == null) {
+        if (mRssItem.getDescription() == null) {
             mBodyTextView.setText(R.string.nothing_to_display);
         } else {
             // Set without images as a place holder
-            mBodyTextView.setText(HtmlConverter.toSpannedWithNoImages(mRssItem.description, getActivity()));
+            mBodyTextView.setText(HtmlConverter.toSpannedWithNoImages(mRssItem.getDescription(), getActivity()));
         }
 
-        if (mRssItem.feedtitle == null) {
+        if (mRssItem.getFeedtitle() == null) {
             mFeedTitleTextView.setText(R.string.nothing_to_display);
         } else {
-            mFeedTitleTextView.setText(mRssItem.feedtitle);
+            mFeedTitleTextView.setText(mRssItem.getFeedtitle());
         }
 
-        if (mRssItem.author == null && mRssItem.getPubDate() != null) {
+        if (mRssItem.getAuthor() == null && mRssItem.getPubDate() != null) {
             mAuthorTextView.setText(getString(R.string.on_date,
                     mRssItem.getPubDate().withZone(DateTimeZone.getDefault())
                             .toString(dateTimeFormat)));
         } else if (mRssItem.getPubDate() != null) {
             mAuthorTextView.setText(getString(R.string.by_author_on_date,
-                    mRssItem.author,
+                    mRssItem.getAuthor(),
                     mRssItem.getPubDate().withZone(DateTimeZone.getDefault())
                             .toString(dateTimeFormat)));
         } else {
@@ -248,13 +239,13 @@ public class ReaderFragment extends Fragment
         // Set intent
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, mRssItem.link);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, mRssItem.getLink());
         shareActionProvider.setShareIntent(shareIntent);
 
         // Show/Hide enclosure
-        menu.findItem(R.id.action_open_enclosure).setVisible(mRssItem.enclosurelink != null);
+        menu.findItem(R.id.action_open_enclosure).setVisible(mRssItem.getEnclosurelink() != null);
         // Add filename to tooltip
-        if (mRssItem.enclosurelink != null) {
+        if (mRssItem.getEnclosurelink() != null) {
             String filename = mRssItem.getEnclosureFilename();
             if (filename != null) {
                 menu.findItem(R.id.action_open_enclosure).setTitle(filename);
@@ -270,7 +261,7 @@ public class ReaderFragment extends Fragment
         Uri uri;
         switch (menuItem.getItemId()) {
             case R.id.action_open_in_browser:
-                uri = Uri.parse(mRssItem.link);
+                uri = Uri.parse(mRssItem.getLink());
                 if (uri.isRelative()) {
                     Toast.makeText(getActivity(), "Sorry, can't handle relative links yet.", Toast.LENGTH_SHORT).show();
                 }
@@ -283,7 +274,7 @@ public class ReaderFragment extends Fragment
                 }
                 return true;
             case R.id.action_open_enclosure:
-                uri = Uri.parse(mRssItem.enclosurelink);
+                uri = Uri.parse(mRssItem.getEnclosurelink());
                 if (uri.isRelative()) {
                     Toast.makeText(getActivity(), R.string.no_activity_for_link, Toast.LENGTH_SHORT).show();
                 }
@@ -307,11 +298,11 @@ public class ReaderFragment extends Fragment
         // Using twice window height since we do scroll vertically
         if (TabletUtils.isTablet(getActivity())) {
             // Tablet has fixed width
-            return new ImageTextLoader(getActivity(), mRssItem.description,
+            return new ImageTextLoader(getActivity(), mRssItem.getDescription(),
                     new Point(Math.round(getResources().getDimension(R.dimen.reader_tablet_width)), 2 * size.y), PrefUtils.shouldLoadImages(getActivity()));
         } else {
             // Base it on window size
-            return new ImageTextLoader(getActivity(), mRssItem.description,
+            return new ImageTextLoader(getActivity(), mRssItem.getDescription(),
                     new Point(size.x - 2 * Math.round(getResources().getDimension(R.dimen.keyline_1)), 2 * size.y), PrefUtils.shouldLoadImages(getActivity()));
         }
     }

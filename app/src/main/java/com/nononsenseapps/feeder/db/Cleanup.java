@@ -29,7 +29,9 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.nononsenseapps.feeder.db.FeedItemSQL.COL_ID;
+import static com.nononsenseapps.feeder.db.FeedItemSQLKt.COL_FEED;
+import static com.nononsenseapps.feeder.db.FeedItemSQLKt.COL_PUBDATE;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_ID;
 import static com.nononsenseapps.feeder.db.RssContentProviderKt.AUTHORITY;
 import static com.nononsenseapps.feeder.db.RssContentProviderKt.QUERY_PARAM_SKIP;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
@@ -91,9 +93,9 @@ public class Cleanup {
             cursor = context.getContentResolver().query(URI_FEEDITEMS.buildUpon()
                             .appendQueryParameter(QUERY_PARAM_SKIP, "50").build(),
                     new String[]{COL_ID},
-                    FeedItemSQL.COL_FEED + " IS ? ",
+                    COL_FEED + " IS ? ",
                     new String[]{Long.toString(listId)},
-                    FeedItemSQL.COL_PUBDATE + " DESC");
+                    COL_PUBDATE + " DESC");
 
             while (cursor != null && cursor.moveToNext()) {
                 result.add(cursor.getLong(0));
@@ -116,7 +118,7 @@ public class Cleanup {
         Cursor cursor = null;
 
         try {
-            cursor = context.getContentResolver().query(URI_FEEDS, new String[]{FeedSQLKt.COL_ID},
+            cursor = context.getContentResolver().query(URI_FEEDS, new String[]{COL_ID},
                     null, null, null);
 
             while (cursor != null && cursor.moveToNext()) {

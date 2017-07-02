@@ -22,7 +22,7 @@ import android.widget.TextView
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
-import com.nononsenseapps.feeder.db.FIELDS
+import com.nononsenseapps.feeder.db.FEED_FIELDS
 import com.nononsenseapps.feeder.db.FeedSQL
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.Util
@@ -116,7 +116,7 @@ class FeedActivity : BaseActivity() {
 
     val firstFeedLoader = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-            return CursorLoader(this@FeedActivity, URI_FEEDS, FIELDS, null, null, null)
+            return CursorLoader(this@FeedActivity, URI_FEEDS, FEED_FIELDS, null, null, null)
         }
 
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {

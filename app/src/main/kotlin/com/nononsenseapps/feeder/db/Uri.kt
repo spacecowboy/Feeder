@@ -6,14 +6,14 @@ import android.net.Uri
 // URIs
 // Feed
 @JvmField
-val URI_FEEDS: Uri = Uri.withAppendedPath(Uri.parse(SCHEME + AUTHORITY), TABLE_NAME)
+val URI_FEEDS: Uri = Uri.withAppendedPath(Uri.parse(SCHEME + AUTHORITY), FEED_TABLE_NAME)
 @JvmField
 val URI_FEEDSWITHCOUNTS = Uri.withAppendedPath(URI_FEEDS, VIEWCOUNT_NAME)
 @JvmField
 val URI_TAGSWITHCOUNTS = Uri.withAppendedPath(URI_FEEDS, VIEWTAGS_NAME)
 // Feed item
 @JvmField
-val URI_FEEDITEMS = Uri.withAppendedPath(Uri.parse(SCHEME + AUTHORITY), FeedItemSQL.TABLE_NAME)
+val URI_FEEDITEMS = Uri.withAppendedPath(Uri.parse(SCHEME + AUTHORITY), FEED_ITEM_TABLE_NAME)
 
 // URI codes, must be unique
 // Feed codes

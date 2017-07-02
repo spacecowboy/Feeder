@@ -27,7 +27,7 @@ public class OPMLContenProvider implements OPMLParserToDatabase {
         FeedSQL result = null;
 
         Cursor c = context.getContentResolver()
-                .query(URI_FEEDS, FeedSQLKt.FIELDS, FeedSQLKt.COL_URL + " IS ?",
+                .query(URI_FEEDS, FeedSQLKt.FEED_FIELDS, FeedSQLKt.COL_URL + " IS ?",
                         Util.ToStringArray(url), null);
 
         try {

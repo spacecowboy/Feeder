@@ -29,8 +29,8 @@ class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(co
     private val context = context.applicationContext
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(CREATE_TABLE)
-        db.execSQL(FeedItemSQL.CREATE_TABLE)
+        db.execSQL(CREATE_FEED_TABLE)
+        db.execSQL(CREATE_FEED_ITEM_TABLE)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -67,18 +67,18 @@ class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(co
     }
 
     private fun deleteEverything(db: SQLiteDatabase) {
-        db.execSQL("DROP TRIGGER IF EXISTS " + FeedItemSQL.TRIGGER_NAME)
+        db.execSQL("DROP TRIGGER IF EXISTS " + TRIGGER_NAME)
 
         db.execSQL("DROP VIEW IF EXISTS " + VIEWCOUNT_NAME)
         db.execSQL("DROP VIEW IF EXISTS " + VIEWTAGS_NAME)
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME)
-        db.execSQL("DROP TABLE IF EXISTS " + FeedItemSQL.TABLE_NAME)
+        db.execSQL("DROP TABLE IF EXISTS " + FEED_TABLE_NAME)
+        db.execSQL("DROP TABLE IF EXISTS " + FEED_ITEM_TABLE_NAME)
     }
 
     private fun createViewsAndTriggers(db: SQLiteDatabase) {
         // Create triggers
-        db.execSQL(FeedItemSQL.CREATE_TAG_TRIGGER)
+        db.execSQL(CREATE_TAG_TRIGGER)
         // Create views if not exists
         db.execSQL(CREATE_COUNT_VIEW)
         db.execSQL(CREATE_TAGS_VIEW)
@@ -100,7 +100,7 @@ class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(co
         return { tag ->
             val feeds = ArrayList<FeedSQL>()
 
-            db.query(TABLE_NAME, FIELDS, "$COL_TAG IS ?",
+            db.query(FEED_TABLE_NAME, FEED_FIELDS, "$COL_TAG IS ?",
                     arrayOf(tag ?: ""), null, null, null).use {
                 while (it.moveToNext()) {
                     feeds.add(it.asFeed())
@@ -116,8 +116,8 @@ class OPMLDatabaseHandler(val db: SQLiteDatabase): OPMLParserToDatabase {
     override fun getFeed(url: String): FeedSQL {
         var result: FeedSQL = FeedSQL(url=url)
 
-        db.query(TABLE_NAME,
-                FIELDS, "$COL_URL IS ?",
+        db.query(FEED_TABLE_NAME,
+                FEED_FIELDS, "$COL_URL IS ?",
                 arrayOf(url), null, null, null).use{
             if (it.moveToNext()) {
                 result = it.asFeed()
@@ -129,9 +129,9 @@ class OPMLDatabaseHandler(val db: SQLiteDatabase): OPMLParserToDatabase {
 
     override fun saveFeed(feed: FeedSQL) {
         if (feed.id < 1) {
-            db.insert(TABLE_NAME, null, feed.asContentValues())
+            db.insert(FEED_TABLE_NAME, null, feed.asContentValues())
         } else {
-            db.update(TABLE_NAME, feed.asContentValues(), "$COL_ID IS ?", arrayOf(feed.id.toString()))
+            db.update(FEED_TABLE_NAME, feed.asContentValues(), "$COL_ID IS ?", arrayOf(feed.id.toString()))
         }
     }
 }

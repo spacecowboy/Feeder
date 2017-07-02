@@ -8,7 +8,7 @@ import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setString
 
 // SQL convention says Table name should be "singular"
-const val TABLE_NAME = "Feed"
+const val FEED_TABLE_NAME = "Feed"
 // Naming the id column with an underscore is good to be consistent
 // with other Android things. This is ALWAYS needed
 const val COL_ID = "_id"
@@ -20,10 +20,10 @@ const val COL_TAG = "tag"
 const val COL_NOTIFY = "notify"
 // For database projection so order is consistent
 @JvmField
-val FIELDS = arrayOf(COL_ID, COL_TITLE, COL_URL, COL_TAG, COL_CUSTOM_TITLE, COL_NOTIFY)
+val FEED_FIELDS = arrayOf(COL_ID, COL_TITLE, COL_URL, COL_TAG, COL_CUSTOM_TITLE, COL_NOTIFY)
 
-val CREATE_TABLE = """
-    CREATE TABLE $TABLE_NAME (
+val CREATE_FEED_TABLE = """
+    CREATE TABLE $FEED_TABLE_NAME (
       $COL_ID INTEGER PRIMARY KEY,
       $COL_TITLE TEXT NOT NULL,
       $COL_CUSTOM_TITLE TEXT NOT NULL,
@@ -43,12 +43,12 @@ val FIELDS_VIEWCOUNT = arrayOf(COL_ID, COL_TITLE, COL_URL, COL_TAG, COL_CUSTOM_T
 val CREATE_COUNT_VIEW = """
     CREATE TEMP VIEW IF NOT EXISTS $VIEWCOUNT_NAME
     AS SELECT ${FIELDS_VIEWCOUNT.joinToString()}
-       FROM $TABLE_NAME
-       LEFT JOIN (SELECT COUNT(1) AS $COL_UNREADCOUNT, ${FeedItemSQL.COL_FEED}
-         FROM ${FeedItemSQL.TABLE_NAME}
-         WHERE ${FeedItemSQL.COL_UNREAD} IS 1
-         GROUP BY ${FeedItemSQL.COL_FEED})
-       ON $TABLE_NAME.$COL_ID = ${FeedItemSQL.COL_FEED}"""
+       FROM $FEED_TABLE_NAME
+       LEFT JOIN (SELECT COUNT(1) AS $COL_UNREADCOUNT, $COL_FEED
+         FROM $FEED_ITEM_TABLE_NAME
+         WHERE $COL_UNREAD IS 1
+         GROUP BY $COL_FEED)
+       ON $FEED_TABLE_NAME.$COL_ID = $COL_FEED"""
 
 
 // A view of distinct tags and their unread counts
@@ -59,12 +59,12 @@ val FIELDS_TAGSWITHCOUNT = arrayOf(COL_ID, COL_TAG, COL_UNREADCOUNT)
 val CREATE_TAGS_VIEW = """
     CREATE TEMP VIEW IF NOT EXISTS $VIEWTAGS_NAME
     AS SELECT ${FIELDS_TAGSWITHCOUNT.joinToString()}
-       FROM $TABLE_NAME
-       LEFT JOIN (SELECT COUNT(1) AS $COL_UNREADCOUNT, ${FeedItemSQL.COL_TAG} AS itemtag
-         FROM ${FeedItemSQL.TABLE_NAME}
-         WHERE ${FeedItemSQL.COL_UNREAD} IS 1
+       FROM $FEED_TABLE_NAME
+       LEFT JOIN (SELECT COUNT(1) AS $COL_UNREADCOUNT, $COL_TAG AS itemtag
+         FROM $FEED_ITEM_TABLE_NAME
+         WHERE $COL_UNREAD IS 1
          GROUP BY itemtag)
-       ON $TABLE_NAME.$COL_TAG IS itemtag
+       ON $FEED_TABLE_NAME.$COL_TAG IS itemtag
        GROUP BY $COL_TAG"""
 
 

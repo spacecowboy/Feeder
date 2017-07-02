@@ -30,15 +30,15 @@ public class ReaderActivity extends BaseActivity {
      * @param rssItem to read
      */
     public static void setRssExtras(Intent intent, FeedItemSQL rssItem) {
-        intent.putExtra(ReaderFragment.ARG_ID, rssItem.id);
-        intent.putExtra(ReaderFragment.ARG_TITLE, rssItem.title);
-        intent.putExtra(ReaderFragment.ARG_DESCRIPTION, rssItem.description);
-        intent.putExtra(ReaderFragment.ARG_LINK, rssItem.link);
-        intent.putExtra(ReaderFragment.ARG_ENCLOSURE, rssItem.enclosurelink);
-        intent.putExtra(ReaderFragment.ARG_IMAGEURL, rssItem.imageurl);
+        intent.putExtra(ReaderFragment.ARG_ID, rssItem.getId());
+        intent.putExtra(ReaderFragment.ARG_TITLE, rssItem.getTitle());
+        intent.putExtra(ReaderFragment.ARG_DESCRIPTION, rssItem.getDescription());
+        intent.putExtra(ReaderFragment.ARG_LINK, rssItem.getLink());
+        intent.putExtra(ReaderFragment.ARG_ENCLOSURE, rssItem.getEnclosurelink());
+        intent.putExtra(ReaderFragment.ARG_IMAGEURL, rssItem.getImageurl());
         intent.putExtra(ReaderFragment.ARG_DATE, rssItem.getPubDateString());
-        intent.putExtra(ReaderFragment.ARG_AUTHOR, rssItem.author);
-        intent.putExtra(ReaderFragment.ARG_FEEDTITLE, rssItem.feedtitle);
+        intent.putExtra(ReaderFragment.ARG_AUTHOR, rssItem.getAuthor());
+        intent.putExtra(ReaderFragment.ARG_FEEDTITLE, rssItem.getFeedtitle());
     }
 
     @Override

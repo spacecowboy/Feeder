@@ -58,6 +58,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
+import com.nononsenseapps.feeder.db.FeedItemSQLKt;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.FeedSQLKt;
 import com.nononsenseapps.feeder.db.RssDatabaseService;
@@ -77,7 +78,7 @@ import java.util.Map;
 
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_NOTIFY;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
-import static com.nononsenseapps.feeder.db.FeedSQLKt.FIELDS;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.FEED_FIELDS;
 import static com.nononsenseapps.feeder.db.RssContentProviderKt.QUERY_PARAM_LIMIT;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
@@ -102,7 +103,7 @@ public class FeedFragment extends Fragment
     private static final String ARG_FEED_URL = "feed_url";
     private static final String ARG_FEED_TAG = "feed_tag";
     // Filter for database loader
-    private static final String ONLY_UNREAD = FeedItemSQL.COL_UNREAD + " IS 1 ";
+    private static final String ONLY_UNREAD = FeedItemSQLKt.COL_UNREAD + " IS 1 ";
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
     private static final String TAG = "FeedFragment";
     private FeedAdapter mAdapter;
@@ -135,9 +136,9 @@ public class FeedFragment extends Fragment
             inflater.inflate(R.menu.contextmenu_feedfragment, menu);
 
             // Show/Hide enclosure
-            menu.findItem(R.id.action_open_enclosure).setVisible(mSelectedItem.enclosurelink != null);
+            menu.findItem(R.id.action_open_enclosure).setVisible(mSelectedItem.getEnclosurelink() != null);
             // Add filename to tooltip
-            if (mSelectedItem.enclosurelink != null) {
+            if (mSelectedItem.getEnclosurelink() != null) {
                 String filename = mSelectedItem.getEnclosureFilename();
                 if (filename != null) {
                     menu.findItem(R.id.action_open_enclosure).setTitle(filename);
@@ -161,21 +162,21 @@ public class FeedFragment extends Fragment
                 case R.id.action_open_in_browser:
                     // Open in browser
                     startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(mSelectedItem.link)));
+                            Uri.parse(mSelectedItem.getLink())));
                     mode.finish(); // Action picked, so close the CAB
                     return true;
                 case R.id.action_open_enclosure:
                     // Open enclosure link
                     startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(mSelectedItem.enclosurelink)));
+                            Uri.parse(mSelectedItem.getEnclosurelink())));
                     mode.finish(); // Action picked, so close the CAB
                     return true;
                 case R.id.action_toggle_unread:
                     //
-                    if (mSelectedItem.isUnread()) {
-                        RssDatabaseService.markItemAsRead(getActivity(), mSelectedItem.id);
+                    if (mSelectedItem.getUnread()) {
+                        RssDatabaseService.markItemAsRead(getActivity(), mSelectedItem.getId());
                     } else {
-                        RssDatabaseService.markItemAsUnread(getActivity(), mSelectedItem.id);
+                        RssDatabaseService.markItemAsUnread(getActivity(), mSelectedItem.getId());
                     }
                     mode.finish(); // Action picked, so close the CAB
                     return true;
@@ -511,9 +512,9 @@ public class FeedFragment extends Fragment
     protected String getLoaderSelection() {
         String filter = null;
         if (id > 0) {
-            filter = FeedItemSQL.COL_FEED + " IS ? ";
+            filter = FeedItemSQLKt.COL_FEED + " IS ? ";
         } else if (tag != null) {
-            filter = FeedItemSQL.COL_TAG + " IS ? ";
+            filter = FeedSQLKt.COL_TAG + " IS ? ";
         }
 
         final boolean onlyUnread = PrefUtils.isShowOnlyUnread(getActivity());
@@ -546,13 +547,13 @@ public class FeedFragment extends Fragment
             return new FeedItemDeltaCursorLoader(getActivity(),
                     URI_FEEDITEMS.buildUpon()
                             .appendQueryParameter(QUERY_PARAM_LIMIT, "50").build(),
-                    FeedItemSQL.FIELDS, getLoaderSelection(),
+                    FeedItemSQLKt.FEED_ITEM_FIELDS, getLoaderSelection(),
                     getLoaderSelectionArgs(),
-                    FeedItemSQL.COL_PUBDATE + " DESC");
+                    FeedItemSQLKt.COL_PUBDATE + " DESC");
         } else if (ID == FEED_LOADER) {
             return new CursorLoader(getActivity(),
                     Uri.withAppendedPath(URI_FEEDS, Long.toString(id)),
-                    FIELDS, null, null, null);
+                    FEED_FIELDS, null, null, null);
         } else if (ID == FEED_SETTINGS_LOADER) {
             String where;
             String[] whereArgs;
@@ -693,16 +694,16 @@ public class FeedFragment extends Fragment
 
                 @Override
                 public boolean areContentsTheSame(FeedItemSQL a, FeedItemSQL b) {
-                    return a.isUnread() == b.isUnread() &&
-                            a.feedtitle.compareToIgnoreCase(b.feedtitle) == 0 &&
+                    return a.getUnread() == b.getUnread() &&
+                            a.getFeedtitle().compareToIgnoreCase(b.getFeedtitle()) == 0 &&
                             a.getDomain().compareToIgnoreCase(b.getDomain()) == 0 &&
-                            a.plainsnippet.compareToIgnoreCase(b.plainsnippet) == 0 &&
-                            a.plaintitle.compareToIgnoreCase(b.plaintitle) == 0;
+                            a.getPlainsnippet().compareToIgnoreCase(b.getPlainsnippet()) == 0 &&
+                            a.getPlaintitle().compareToIgnoreCase(b.getPlaintitle()) == 0;
                 }
 
                 @Override
                 public boolean areItemsTheSame(FeedItemSQL item1, FeedItemSQL item2) {
-                    return item1.id == item2.id;
+                    return item1.getId() == item2.getId();
                 }
             });
 
@@ -733,7 +734,7 @@ public class FeedFragment extends Fragment
             if (position >= mItems.size()) {
                 return -3;
             } else {
-                return mItems.get(position).id;
+                return mItems.get(position).getId();
             }
         }
 
@@ -746,13 +747,13 @@ public class FeedFragment extends Fragment
                     // Sorted list handles inserting of existing elements
                     mItems.add(item);
                     // Add to new map as well
-                    mItemMap.put(item.id, item);
+                    mItemMap.put(item.getId(), item);
                     // And remove from old
-                    oldItemMap.remove(item.id);
+                    oldItemMap.remove(item.getId());
                 } else {
                     mItems.remove(item);
                     // And remove from old
-                    oldItemMap.remove(item.id);
+                    oldItemMap.remove(item.getId());
                 }
             }
             // If any items remain in old set, they are not present in current result set,
@@ -827,19 +828,18 @@ public class FeedFragment extends Fragment
 
             // Set the title first
             SpannableStringBuilder titleText = new SpannableStringBuilder
-                    (item.feedtitle);
+                    (item.getFeedtitle());
             // If no body, display domain of link to be opened
-            if (holder.rssItem.description == null ||
-                    holder.rssItem.description.isEmpty()) {
+            if (holder.rssItem.getDescription().isEmpty()) {
                 titleText.append(" \u2014 ");
 
-                if (holder.rssItem.enclosurelink != null) {
+                if (holder.rssItem.getEnclosurelink() != null) {
                     titleText.append(holder.rssItem.getEnclosureFilename());
                 } else {
                     titleText.append(holder.rssItem.getDomain());
                 }
                 titleText.setSpan(new ForegroundColorSpan(linkColor),
-                        item.feedtitle.length() + 3, titleText.length(),
+                        item.getFeedtitle().length() + 3, titleText.length(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             holder.authorTextView.setText(titleText);
@@ -855,7 +855,7 @@ public class FeedFragment extends Fragment
 
             holder.fillTitle();
 
-            if (item.imageurl == null || item.imageurl.isEmpty()) {
+            if (item.getImageurl() == null || item.getImageurl().isEmpty()) {
                 holder.imageView.setVisibility(View.GONE);
             } else {
                 // Take up width
@@ -911,7 +911,7 @@ public class FeedFragment extends Fragment
 
                     @Override
                     public void onDismiss(View view, Object token) {
-                        rssItem.setUnread(!rssItem.isUnread());
+                        rssItem.setUnread(!rssItem.getUnread());
                         // Update the item directly before updating database
                         if (!PrefUtils.isShowOnlyUnread(getActivity())) {
                             // Just update the view state
@@ -922,10 +922,10 @@ public class FeedFragment extends Fragment
                             mItems.remove(rssItem);
                         }
                         // Make database consistent with content
-                        if (rssItem.isUnread()) {
-                            RssDatabaseService.markItemAsUnread(getActivity(), rssItem.id);
+                        if (rssItem.getUnread()) {
+                            RssDatabaseService.markItemAsUnread(getActivity(), rssItem.getId());
                         } else {
-                            RssDatabaseService.markItemAsRead(getActivity(), rssItem.id);
+                            RssDatabaseService.markItemAsRead(getActivity(), rssItem.getId());
                         }
                     }
 
@@ -990,31 +990,27 @@ public class FeedFragment extends Fragment
             }
 
             public void fillTitle() {
-                if (rssItem.plaintitle == null) {
-                    titleTextView.setVisibility(View.GONE);
-                } else {
-                    titleTextView.setVisibility(View.VISIBLE);
-                    // \u2014 is a EM-dash, basically a long version of '-'
-                    temps = (rssItem.plainsnippet == null || rssItem.plainsnippet.isEmpty()) ?
-                            rssItem.plaintitle :
-                            rssItem.plaintitle + " \u2014 " + rssItem.plainsnippet + "\u2026";
-                    Spannable textSpan = new SpannableString(temps);
+                titleTextView.setVisibility(View.VISIBLE);
+                // \u2014 is a EM-dash, basically a long version of '-'
+                temps = rssItem.getPlainsnippet().isEmpty() ?
+                        rssItem.getPlaintitle() :
+                        rssItem.getPlaintitle() + " \u2014 " + rssItem.getPlainsnippet() + "\u2026";
+                Spannable textSpan = new SpannableString(temps);
 
-                    textSpan.setSpan(new TextAppearanceSpan(getContext(), R.style.TextAppearance_ListItem_Body),
-                            rssItem.plaintitle.length(), temps.length(),
+                textSpan.setSpan(new TextAppearanceSpan(getContext(), R.style.TextAppearance_ListItem_Body),
+                        rssItem.getPlaintitle().length(), temps.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                if (rssItem.getUnread()) {
+                    textSpan.setSpan(new TextAppearanceSpan(getContext(), R.style.TextAppearance_ListItem_Title),
+                            0, rssItem.getPlaintitle().length(),
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                    if (rssItem.isUnread()) {
-                        textSpan.setSpan(new TextAppearanceSpan(getContext(), R.style.TextAppearance_ListItem_Title),
-                                0, rssItem.plaintitle.length(),
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    } else {
-                        textSpan.setSpan(new TextAppearanceSpan(getContext(), R.style.TextAppearance_ListItem_Title_Read),
-                                0, rssItem.plaintitle.length(),
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    }
-                    titleTextView.setText(textSpan);
+                } else {
+                    textSpan.setSpan(new TextAppearanceSpan(getContext(), R.style.TextAppearance_ListItem_Title_Read),
+                            0, rssItem.getPlaintitle().length(),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
+                titleTextView.setText(textSpan);
             }
 
             /**
@@ -1032,8 +1028,7 @@ public class FeedFragment extends Fragment
                 }
 
                 // Open item if not empty
-                if (rssItem.description != null &&
-                        !rssItem.description.isEmpty()) {
+                if (!rssItem.getDescription().isEmpty()) {
                     Intent i = new Intent(getActivity(), ReaderActivity.class);
                     //i.setData(Uri.parse(link));
                     i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true);
@@ -1052,14 +1047,14 @@ public class FeedFragment extends Fragment
                     startActivity(i);
                 } else {
                     // Mark as read
-                    RssDatabaseService.markItemAsRead(getActivity(), rssItem.id);
+                    RssDatabaseService.markItemAsRead(getActivity(), rssItem.getId());
                     // Open in browser since no content was posted
 
                     // Use enclosure or link
                     startActivity(new Intent(Intent.ACTION_VIEW,
-                            Uri.parse(rssItem.enclosurelink != null ?
-                                    rssItem.enclosurelink :
-                                    rssItem.link)));
+                            Uri.parse(rssItem.getEnclosurelink() != null ?
+                                    rssItem.getEnclosurelink() :
+                                    rssItem.getLink())));
                 }
             }
 
@@ -1075,8 +1070,8 @@ public class FeedFragment extends Fragment
                     view.setActivated(true);
                 }
 
-                mActionMode.setSubtitle(mSelectedItem.title);
-                mActionMode.setTitle("Selected");
+                mActionMode.setSubtitle(mSelectedItem.getTitle());
+                mActionMode.setTitle(R.string.selected);
 
                 return true;
             }
@@ -1091,7 +1086,7 @@ public class FeedFragment extends Fragment
             public boolean onPreDraw() {
                 if (!isDetached() && getActivity() != null) {
                     try {
-                        glide(getActivity(), rssItem.imageurl, shouldLoadImages(getActivity()))
+                        glide(getActivity(), rssItem.getImageurl(), shouldLoadImages(getActivity()))
                                 .centerCrop()
                                 .error(R.drawable.ic_signal_wifi_off_white_24dp)
                                 .into(imageView);

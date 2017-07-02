@@ -32,11 +32,11 @@ class RssContentProvider : ContentProvider() {
             val table: String
             when (uriMatcher.match(uri)) {
                 FEED_CODE -> {
-                    table = TABLE_NAME
+                    table = FEED_TABLE_NAME
                     result = URI_FEEDS
                 }
                 FEEDITEM_CODE -> {
-                    table = FeedItemSQL.TABLE_NAME
+                    table = FEED_ITEM_TABLE_NAME
                     result = URI_FEEDITEMS
                 }
                 else -> throw UnsupportedOperationException("Not yet implemented")
@@ -62,12 +62,12 @@ class RssContentProvider : ContentProvider() {
 
             when (uriMatcher.match(uri)) {
                 FEED_ELEMENT_CODE -> {
-                    table = TABLE_NAME
+                    table = FEED_TABLE_NAME
                     where = Util.WHEREIDIS
                     params = Util.ToStringArray(uri.lastPathSegment)
                 }
                 FEED_CODE -> {
-                    table = TABLE_NAME
+                    table = FEED_TABLE_NAME
                     where = selection
                     params = selectionArgs
                 }
@@ -82,12 +82,12 @@ class RssContentProvider : ContentProvider() {
                     params = selectionArgs
                 }
                 FEEDITEM_ELEMENT_CODE -> {
-                    table = FeedItemSQL.TABLE_NAME
+                    table = FEED_ITEM_TABLE_NAME
                     where = Util.WHEREIDIS
                     params = Util.ToStringArray(uri.lastPathSegment)
                 }
                 FEEDITEM_CODE -> {
-                    table = FeedItemSQL.TABLE_NAME
+                    table = FEED_ITEM_TABLE_NAME
                     where = selection
                     params = selectionArgs
                 }
@@ -118,22 +118,22 @@ class RssContentProvider : ContentProvider() {
         if (uri != null) {
             when (uriMatcher.match(uri)) {
                 FEED_ELEMENT_CODE -> {
-                    table = TABLE_NAME
+                    table = FEED_TABLE_NAME
                     where = Util.WHEREIDIS
                     params = Util.ToStringArray(uri.lastPathSegment)
                 }
                 FEED_CODE -> {
-                    table = TABLE_NAME
+                    table = FEED_TABLE_NAME
                     where = selection
                     params = selectionArgs
                 }
                 FEEDITEM_ELEMENT_CODE -> {
-                    table = FeedItemSQL.TABLE_NAME
+                    table = FEED_ITEM_TABLE_NAME
                     where = Util.WHEREIDIS
                     params = Util.ToStringArray(uri.lastPathSegment)
                 }
                 FEEDITEM_CODE -> {
-                    table = FeedItemSQL.TABLE_NAME
+                    table = FEED_ITEM_TABLE_NAME
                     where = selection
                     params = selectionArgs
                 }
@@ -155,12 +155,12 @@ class RssContentProvider : ContentProvider() {
                         Util.ToStringArray(uri.lastPathSegment))
                 FEED_CODE -> result = DatabaseHandler.getInstance(context)
                         .writableDatabase
-                        .delete(TABLE_NAME, selection, selectionArgs)
+                        .delete(FEED_TABLE_NAME, selection, selectionArgs)
                 FEEDITEM_ELEMENT_CODE -> result = delete(URI_FEEDITEMS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.lastPathSegment))
                 FEEDITEM_CODE -> result = DatabaseHandler.getInstance(context)
                         .writableDatabase
-                        .delete(FeedItemSQL.TABLE_NAME, selection,
+                        .delete(FEED_ITEM_TABLE_NAME, selection,
                                 selectionArgs)
                 else -> TODO("not implemented")
             }
