@@ -4,7 +4,16 @@ fun android.database.Cursor.getString(column: String): String? {
     val index = getColumnIndex(column)
     return when {
         index < 0 -> null
-        else -> if (isNull(index)) null else getString(index)
+        else -> if (isNull(index)) null else {
+            try {
+                getString(index)
+            } catch (t: Throwable) {
+                // Can happen if too much data stored in database
+                // Cursor can only hold 2MB per window
+                // See https://gitlab.com/spacecowboy/Feeder/issues/48
+                null
+            }
+        }
     }
 }
 
