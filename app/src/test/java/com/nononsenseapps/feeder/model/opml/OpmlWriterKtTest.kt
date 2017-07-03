@@ -49,8 +49,7 @@ class OpmlWriterKtTest {
             "      <outline title=\"A &quot;feeditem&quot; with id &apos;9&apos; &gt; 0 " +
             "&amp; &lt; 10\" text=\"A &quot;feeditem&quot; with id &apos;9&apos; &gt; 0 &amp;" +
             " &lt; 10\" type=\"rss\" " +
-            "xmlUrl=\"http://somedomain.com/rss.xml?format=feed&amp;type=rss\">\n" +
-            "      </outline>\n" +
+            "xmlUrl=\"http://somedomain.com/rss.xml?format=feed&amp;type=rss\"/>\n" +
             "    </outline>\n" +
             "  </body>\n" +
             "</opml>\n"
