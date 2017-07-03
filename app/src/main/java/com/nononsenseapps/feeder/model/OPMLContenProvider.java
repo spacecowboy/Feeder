@@ -6,10 +6,20 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.db.FeedSQLKt;
 import com.nononsenseapps.feeder.db.Util;
+import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
+import com.nononsenseapps.feeder.util.ContextExtensionsKt;
+import com.nononsenseapps.feeder.util.CursorExtensionsKt;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_ID;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_URL;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDS;
 
 // WHen Kotlinized you can probably remove a redundant RssContentProvider.NotifyAll call in use of importer in FeedActivity
@@ -47,12 +57,28 @@ public class OPMLContenProvider implements OPMLParserToDatabase {
     public void saveFeed(@NonNull FeedSQL feed) {
         ContentValues values = feed.asContentValues();
         if (feed.getId() < 1) {
-            context.getContentResolver()
-                    .insert(URI_FEEDS, values);
+            List<FeedSQL> feeds = ContentResolverExtensionsKt.getFeeds(context.getContentResolver(),
+                    Arrays.asList(COL_ID),
+                    COL_URL + " IS ?",
+                    Arrays.asList(feed.getUrl()),
+                    null);
+            if (feeds.isEmpty()) {
+                context.getContentResolver()
+                        .insert(URI_FEEDS, values);
+            } else {
+                context.getContentResolver().update(Uri.withAppendedPath(
+                        URI_FEEDS,
+                        Long.toString(feeds.get(0).getId())),
+                        values,
+                        null,
+                        null);
+            }
         } else {
             context.getContentResolver().update(Uri.withAppendedPath(
                     URI_FEEDS,
-                    Long.toString(feed.getId())), values, null,
+                    Long.toString(feed.getId())),
+                    values,
+                    null,
                     null);
         }
     }
