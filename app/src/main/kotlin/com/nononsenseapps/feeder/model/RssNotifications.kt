@@ -75,7 +75,7 @@ private fun singleNotification(context: Context, item: FeedItemSQL): Notificatio
 
 private fun manyNotification(context: Context, feedItems: List<FeedItemSQL>): Notification {
     val style = NotificationCompat.InboxStyle()
-    val title = context.getString(R.string.new_rss_stories)
+    val title = context.getString(R.string.updated_feeds)
     val text = feedItems.map { "${it.feedtitle} \u2014 ${it.plaintitle}" }.joinToString(separator = "\n")
 
     style.setBigContentTitle(title)
