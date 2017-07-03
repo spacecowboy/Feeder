@@ -20,11 +20,14 @@ package com.nononsenseapps.feeder.ui;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
@@ -37,8 +40,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
+import com.nononsenseapps.feeder.db.FeedItemSQLKt;
+import com.nononsenseapps.feeder.db.FeedSQLKt;
 import com.nononsenseapps.feeder.ui.text.HtmlConverter;
 import com.nononsenseapps.feeder.ui.text.ImageTextLoader;
 import com.nononsenseapps.feeder.util.BundleExtensionsKt;
@@ -47,11 +53,18 @@ import com.nononsenseapps.feeder.util.FileLog;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
+
+import static com.nononsenseapps.feeder.db.FeedItemSQLKt.COL_DESCRIPTION;
+import static com.nononsenseapps.feeder.db.FeedItemSQLKt.FEED_ITEM_FIELDS;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_ID;
+import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TITLE;
+import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -59,7 +72,7 @@ import java.util.Locale;
  * create an instance of this fragment.
  */
 public class ReaderFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Spanned> {
+        implements LoaderManager.LoaderCallbacks {
     public static final String ARG_TITLE = "title";
     public static final String ARG_DESCRIPTION = "body";
     public static final String ARG_LINK = "link";
@@ -73,12 +86,14 @@ public class ReaderFragment extends Fragment
     static final DateTimeFormatter dateTimeFormat =
             DateTimeFormat.mediumDate().withLocale(Locale.getDefault());
     private static final int TEXT_LOADER = 1;
+    private static final int ITEM_LOADER = 2;
     // TODO database id
     private long _id = -1;
     // All content contained in RssItem
     private FeedItemSQL mRssItem;
     private TextView mBodyTextView;
     private ObservableScrollView mScrollView;
+    private TextView mTitleTextView;
 
 
     public ReaderFragment() {
@@ -115,7 +130,6 @@ public class ReaderFragment extends Fragment
         }
         bundle.putLong(ARG_ID, rssItem.getId());
         bundle.putString(ARG_TITLE, rssItem.getTitle());
-        bundle.putString(ARG_DESCRIPTION, rssItem.getDescription());
         bundle.putString(ARG_LINK, rssItem.getLink());
         bundle.putString(ARG_ENCLOSURE, rssItem.getEnclosurelink());
         bundle.putString(ARG_IMAGEURL, rssItem.getImageurl());
@@ -144,6 +158,7 @@ public class ReaderFragment extends Fragment
 
         if (_id > 0) {
             ContentResolverExtensionsKt.markItemAsRead(getActivity().getContentResolver(), _id, true);
+            getLoaderManager().restartLoader(ITEM_LOADER, new Bundle(), this);
         }
 
         setHasOptionsMenu(true);
@@ -163,29 +178,15 @@ public class ReaderFragment extends Fragment
 
         mScrollView =
                 (ObservableScrollView) rootView.findViewById(R.id.scroll_view);
-        TextView mTitleTextView = (TextView) rootView.findViewById(R.id.story_title);
+        mTitleTextView = (TextView) rootView.findViewById(R.id.story_title);
         mBodyTextView = (TextView) rootView.findViewById(R.id.story_body);
         TextView mAuthorTextView = (TextView) rootView.findViewById(R.id.story_author);
         TextView mFeedTitleTextView = (TextView) rootView.findViewById(R.id
                 .story_feedtitle);
 
-        if (mRssItem.getTitle() == null) {
-            mTitleTextView.setText(R.string.nothing_to_display);
-        } else {
-            mTitleTextView.setText(HtmlConverter.toSpannedWithNoImages(mRssItem.getTitle(), getActivity()));
-        }
-        if (mRssItem.getDescription() == null) {
-            mBodyTextView.setText(R.string.nothing_to_display);
-        } else {
-            // Set without images as a place holder
-            mBodyTextView.setText(HtmlConverter.toSpannedWithNoImages(mRssItem.getDescription(), getActivity()));
-        }
+        setViewTitle();
 
-        if (mRssItem.getFeedtitle() == null) {
-            mFeedTitleTextView.setText(R.string.nothing_to_display);
-        } else {
-            mFeedTitleTextView.setText(mRssItem.getFeedtitle());
-        }
+        mFeedTitleTextView.setText(mRssItem.getFeedtitle());
 
         if (mRssItem.getAuthor() == null && mRssItem.getPubDate() != null) {
             mAuthorTextView.setText(getString(R.string.on_date,
@@ -200,10 +201,27 @@ public class ReaderFragment extends Fragment
             mAuthorTextView.setVisibility(View.GONE);
         }
 
-        // Load images in text
-        getLoaderManager().restartLoader(TEXT_LOADER, new Bundle(), this);
+        setViewBody();
 
         return rootView;
+    }
+
+    private void setViewTitle() {
+        if (mRssItem.getTitle().isEmpty()) {
+            mTitleTextView.setText(mRssItem.getPlaintitle());
+        } else {
+            mTitleTextView.setText(HtmlConverter.toSpannedWithNoImages(mRssItem.getTitle(), getActivity()));
+        }
+    }
+
+    private void setViewBody() {
+        if (!mRssItem.getDescription().isEmpty()) {
+            // Set without images as a place holder
+            mBodyTextView.setText(HtmlConverter.toSpannedWithNoImages(mRssItem.getDescription(), getActivity()));
+
+            // Load images in text
+            getLoaderManager().restartLoader(TEXT_LOADER, new Bundle(), this);
+        }
     }
 
     @Override
@@ -292,32 +310,55 @@ public class ReaderFragment extends Fragment
     }
 
     @Override
-    public Loader<Spanned> onCreateLoader(final int id, final Bundle args) {
-        Point size = new Point();
-        getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-        // Using twice window height since we do scroll vertically
-        if (TabletUtils.isTablet(getActivity())) {
-            // Tablet has fixed width
-            return new ImageTextLoader(getActivity(), mRssItem.getDescription(),
-                    new Point(Math.round(getResources().getDimension(R.dimen.reader_tablet_width)), 2 * size.y), PrefUtils.shouldLoadImages(getActivity()));
-        } else {
-            // Base it on window size
-            return new ImageTextLoader(getActivity(), mRssItem.getDescription(),
-                    new Point(size.x - 2 * Math.round(getResources().getDimension(R.dimen.keyline_1)), 2 * size.y), PrefUtils.shouldLoadImages(getActivity()));
+    public Loader onCreateLoader(final int id, final Bundle args) {
+        if (id == ITEM_LOADER) {
+            return new CursorLoader(getContext(), URI_FEEDITEMS,
+                    FEED_ITEM_FIELDS,
+                    COL_ID + " IS ?",
+                    new String[]{Long.toString(mRssItem.getId())},
+                    null);
+        } else if (id == TEXT_LOADER) {
+            Point size = new Point();
+            getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+            // Using twice window height since we do scroll vertically
+            if (TabletUtils.isTablet(getActivity())) {
+                // Tablet has fixed width
+                return new ImageTextLoader(getActivity(), mRssItem.getDescription(),
+                        new Point(Math.round(getResources().getDimension(R.dimen.reader_tablet_width)), 2 * size.y), PrefUtils.shouldLoadImages(getActivity()));
+            } else {
+                // Base it on window size
+                return new ImageTextLoader(getActivity(), mRssItem.getDescription(),
+                        new Point(size.x - 2 * Math.round(getResources().getDimension(R.dimen.keyline_1)), 2 * size.y), PrefUtils.shouldLoadImages(getActivity()));
+            }
         }
+        return null;
     }
 
 
     @Override
-    public void onLoadFinished(final Loader<Spanned> loader,
-                               final Spanned data) {
-        if (data != null) {
-            mBodyTextView.setText(data);
+    public void onLoadFinished(final Loader loader,
+                               final Object data) {
+        if (loader.getId() == ITEM_LOADER) {
+            Cursor cursor = (Cursor) data;
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    mRssItem = FeedItemSQLKt.asFeedItem((Cursor) data);
+                    setViewTitle();
+                    setViewBody();
+                }
+                cursor.close();
+            }
+            loader.reset();
+        } else if (loader.getId() == TEXT_LOADER) {
+            if (data != null) {
+                mBodyTextView.setText((Spanned) data);
+            }
+            loader.reset();
         }
     }
 
     @Override
-    public void onLoaderReset(final Loader<Spanned> loader) {
+    public void onLoaderReset(final Loader loader) {
         // nothing really
     }
 }
