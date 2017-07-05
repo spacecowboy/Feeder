@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.model.opml
 
 import android.content.Context
+import android.net.Uri
 import android.support.test.InstrumentationRegistry.getContext
 import android.support.test.filters.MediumTest
 import android.support.test.filters.SmallTest
@@ -19,6 +20,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 import java.io.IOException
+import java.net.URL
 
 
 private val sampleFile: List<String> = """<?xml version="1.0" encoding="UTF-8"?>
@@ -260,24 +262,109 @@ class OPMLTest {
         parser.parseInputStream(opmlStream)
 
         //then
-        val seen = ArrayList<Int>()
         val feeds = context!!.contentResolver.getFeeds()
-        assertFalse("No feeds in DB!", feeds.isEmpty())
-        for (feed in feeds) {
-            val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
-            seen.add(i)
-            assertEquals("Title doesn't match", "\"$i\"", feed.title)
-            assertEquals("URL doesn't match", "http://somedomain$i.com/rss.xml", feed.url)
-            if (i % 3 == 1) {
-                assertEquals("tag1", feed.tag)
-            } else if (i % 3 == 2) {
-                assertEquals("tag2", feed.tag)
-            } else {
-                assertEquals("", feed.tag)
+        val tags = feeds.map { it.tag }.distinct().toList()
+        assertEquals("Expecting 8 feeds", 8, feeds.size)
+        assertEquals("Expecting 1 tags (incl empty)", 1, tags.size)
+
+        feeds.forEach { feed ->
+            assertEquals("Custom title should be empty", "", feed.customTitle)
+            assertEquals("No tag expected", "", feed.tag)
+            when (feed.url) {
+                "http://aliceisntdead.libsyn.com/rss" -> {
+                    assertEquals("Alice Isn't Dead", feed.title)
+                }
+                "http://feeds.soundcloud.com/users/soundcloud:users:154104768/sounds.rss" -> {
+                    assertEquals("Invisible City", feed.title)
+                }
+                "http://feeds.feedburner.com/PodCastle_Main" -> {
+                    assertEquals("PodCastle", feed.title)
+                }
+                "http://www.artofstorytellingshow.com/podcast/storycast.xml" -> {
+                    assertEquals("The Art of Storytelling with Brother Wolf", feed.title)
+                }
+                "http://feeds.feedburner.com/TheCleansed" -> {
+                    assertEquals("The Cleansed: A Post-Apocalyptic Saga", feed.title)
+                }
+                "http://media.signumuniversity.org/tolkienprof/feed" -> {
+                    assertEquals("The Tolkien Professor", feed.title)
+                }
+                "http://nightvale.libsyn.com/rss" -> {
+                    assertEquals("Welcome to Night Vale", feed.title)
+                }
+                "http://withinthewires.libsyn.com/rss" -> {
+                    assertEquals("Within the Wires", feed.title)
+                }
+                else -> fail("Unexpected URI. Feed: $feed")
             }
         }
-        for (i in 0..9) {
-            assertTrue("Missing " + i, seen.contains(i))
+    }
+
+    @Test
+    @MediumTest
+    fun FlymOPMLImports() {
+        //given
+        val opmlStream = javaClass.getResourceAsStream("Flym_auto_backup.opml")
+
+        //when
+        val parser = OpmlParser(OPMLContenProvider(context))
+        parser.parseInputStream(opmlStream)
+
+        //then
+        val feeds = context!!.contentResolver.getFeeds()
+        val tags = feeds.map { it.tag }.distinct().toList()
+        assertEquals("Expecting 11 feeds", 11, feeds.size)
+        assertEquals("Expecting 4 tags (incl empty)", 4, tags.size)
+
+        feeds.forEach { feed ->
+            assertEquals("Custom title should be empty", "", feed.customTitle)
+            when (feed.url) {
+                "http://www.smbc-comics.com/rss.php" -> {
+                    assertEquals("black humor", feed.tag)
+                    assertEquals("SMBC", feed.title)
+                }
+                "http://www.deathbulge.com/rss.xml" -> {
+                    assertEquals("black humor", feed.tag)
+                    assertEquals("Deathbulge", feed.title)
+                }
+                "http://www.sandraandwoo.com/gaia/feed/" -> {
+                    assertEquals("comics", feed.tag)
+                    assertEquals("Gaia", feed.title)
+                }
+                "http://replaycomic.com/feed/" -> {
+                    assertEquals("comics", feed.tag)
+                    assertEquals("Replay", feed.title)
+                }
+                "http://www.cuttimecomic.com/rss.php" -> {
+                    assertEquals("comics", feed.tag)
+                    assertEquals("Cut Time", feed.title)
+                }
+                "http://www.commitstrip.com/feed/" -> {
+                    assertEquals("comics", feed.tag)
+                    assertEquals("Commit strip", feed.title)
+                }
+                "http://www.sandraandwoo.com/feed/" -> {
+                    assertEquals("comics", feed.tag)
+                    assertEquals("Sandra and Woo", feed.title)
+                }
+                "http://www.awakencomic.com/rss.php" -> {
+                    assertEquals("comics", feed.tag)
+                    assertEquals("Awaken", feed.title)
+                }
+                "http://www.questionablecontent.net/QCRSS.xml" -> {
+                    assertEquals("comics", feed.tag)
+                    assertEquals("Questionable Content", feed.title)
+                }
+                "https://www.archlinux.org/feeds/news/" -> {
+                    assertEquals("Tech", feed.tag)
+                    assertEquals("Arch news", feed.title)
+                }
+                "https://grisebouille.net/feed/" -> {
+                    assertEquals("Political humour", feed.tag)
+                    assertEquals("Grisebouille", feed.title)
+                }
+                else -> fail("Unexpected URI. Feed: $feed")
+            }
         }
     }
 }
