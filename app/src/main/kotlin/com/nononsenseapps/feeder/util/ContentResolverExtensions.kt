@@ -8,21 +8,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import com.nononsenseapps.feeder.db.COL_ID
-import com.nononsenseapps.feeder.db.COL_NOTIFY
-import com.nononsenseapps.feeder.db.COL_TAG
-import com.nononsenseapps.feeder.db.FIELDS
-import com.nononsenseapps.feeder.db.FIELDS_TAGSWITHCOUNT
-import com.nononsenseapps.feeder.db.FeedItemSQL.COL_FEED
-import com.nononsenseapps.feeder.db.FeedItemSQL.COL_GUID
-import com.nononsenseapps.feeder.db.FeedItemSQL.COL_NOTIFIED
-import com.nononsenseapps.feeder.db.FeedItemSQL.COL_UNREAD
-import com.nononsenseapps.feeder.db.FeedSQL
-import com.nononsenseapps.feeder.db.URI_FEEDITEMS
-import com.nononsenseapps.feeder.db.URI_FEEDS
-import com.nononsenseapps.feeder.db.URI_FEEDSWITHCOUNTS
-import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
-import com.nononsenseapps.feeder.db.asFeed
+import com.nononsenseapps.feeder.db.*
 
 /**
  * Inserts or updates a feed. Always returns the id of the item.
@@ -199,11 +185,20 @@ fun ContentResolver.queryTagsWithCounts(columns: List<String> = FIELDS_TAGSWITHC
     queryItems(URI_TAGSWITHCOUNTS, columns, where, params, order, reader)
 }
 
-fun ContentResolver.queryFeeds(columns: List<String> = FIELDS.asList(),
+fun ContentResolver.queryFeeds(columns: List<String> = FEED_FIELDS.asList(),
                                where: String? = null, params: List<Any>? = null, order: String? = null,
                                reader: (Cursor) -> Unit) {
     queryItems(URI_FEEDS, columns, where, params, order, reader)
 }
+
+fun ContentResolver.queryFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asList(),
+                                   where: String? = null,
+                                   params: List<Any>? = null,
+                                   order: String? = null,
+                                   reader: (Cursor) -> Unit) {
+    queryItems(URI_FEEDITEMS, columns, where, params, order, reader)
+}
+
 
 inline fun ContentResolver.queryItems(uri: Uri, columns: List<String>, where: String? = null,
                                       params: List<Any>? = null, order: String? = null,
@@ -211,7 +206,7 @@ inline fun ContentResolver.queryItems(uri: Uri, columns: List<String>, where: St
     query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order).use(reader)
 }
 
-fun ContentResolver.getFeeds(columns: List<String> = FIELDS.asList(),
+fun ContentResolver.getFeeds(columns: List<String> = FEED_FIELDS.asList(),
                              where: String? = null, params: List<Any>? = null, order: String? = null): List<FeedSQL> {
     val feeds = ArrayList<FeedSQL>()
     queryFeeds(columns, where, params, order) {
@@ -222,14 +217,27 @@ fun ContentResolver.getFeeds(columns: List<String> = FIELDS.asList(),
     return feeds
 }
 
+fun ContentResolver.getFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asList(),
+                                 where: String? = null,
+                                 params: List<Any>? = null,
+                                 order: String? = null): List<FeedItemSQL> {
+    val items = ArrayList<FeedItemSQL>()
+    queryFeedItems(columns, where, params, order) {
+        while (it.moveToNext()) {
+            items.add(it.asFeedItem())
+        }
+    }
+    return items
+}
+
 fun ContentResolver.getIdForFeedItem(guid: String, feedId: Long): Long {
     queryItems(URI_FEEDITEMS,
             columns = listOf(COL_ID),
             where = "$COL_GUID IS ? AND $COL_FEED IS ?",
             params = listOf(guid, feedId)) {
-                if (it.moveToNext()) {
-                    return it.getLong(COL_ID) ?: -1L
-                }
-            }
+        if (it.moveToNext()) {
+            return it.getLong(COL_ID) ?: -1L
+        }
+    }
     return -1L
 }

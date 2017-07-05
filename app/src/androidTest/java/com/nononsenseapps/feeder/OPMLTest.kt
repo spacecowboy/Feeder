@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder
 
-import android.content.ContentResolver
 import android.content.Context
 import android.support.test.InstrumentationRegistry.getContext
 import android.support.test.filters.MediumTest
@@ -9,13 +8,11 @@ import android.support.test.runner.AndroidJUnit4
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.FeedSQL
 import com.nononsenseapps.feeder.db.URI_FEEDS
-import com.nononsenseapps.feeder.db.asFeed
 import com.nononsenseapps.feeder.model.OPMLContenProvider
-import com.nononsenseapps.feeder.model.OPMLParser
 import com.nononsenseapps.feeder.model.opml.OpmlParser
 import com.nononsenseapps.feeder.model.opml.writeFile
 import com.nononsenseapps.feeder.util.getFeeds
-import com.nononsenseapps.feeder.util.queryFeeds
+import com.nononsenseapps.feeder.util.insertFeedWith
 import com.nononsenseapps.feeder.util.queryTagsWithCounts
 import org.junit.After
 import org.junit.Assert.*
@@ -26,41 +23,46 @@ import java.io.File
 import java.io.IOException
 
 
-private val sampleFile = arrayOf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-        "<opml version=\"1.1\">",
-        "  <head>",
-        "    <title>Feeder</title>",
-        "  </head>", "  <body>",
-        "    <outline title=\"&quot;0&quot;\" text=\"&quot;0&quot;\" type=\"rss\" xmlUrl=\"http://somedomain0.com/rss.xml\"/>",
-        "    <outline title=\"&quot;3&quot;\" text=\"&quot;3&quot;\" type=\"rss\" xmlUrl=\"http://somedomain3.com/rss.xml\"/>",
-        "    <outline title=\"&quot;6&quot;\" text=\"&quot;6&quot;\" type=\"rss\" xmlUrl=\"http://somedomain6.com/rss.xml\"/>",
-        "    <outline title=\"&quot;9&quot;\" text=\"&quot;9&quot;\" type=\"rss\" xmlUrl=\"http://somedomain9.com/rss.xml\"/>",
-        "    <outline title=\"tag1\" text=\"tag1\">",
-        "      <outline title=\"&quot;1&quot;\" text=\"&quot;1&quot;\" type=\"rss\" xmlUrl=\"http://somedomain1.com/rss.xml\"/>",
-        "      <outline title=\"&quot;4&quot;\" text=\"&quot;4&quot;\" type=\"rss\" xmlUrl=\"http://somedomain4.com/rss.xml\"/>",
-        "      <outline title=\"&quot;7&quot;\" text=\"&quot;7&quot;\" type=\"rss\" xmlUrl=\"http://somedomain7.com/rss.xml\"/>",
-        "    </outline>", "    <outline title=\"tag2\" text=\"tag2\">",
-        "      <outline title=\"&quot;2&quot;\" text=\"&quot;2&quot;\" type=\"rss\" xmlUrl=\"http://somedomain2.com/rss.xml\"/>",
-        "      <outline title=\"&quot;5&quot;\" text=\"&quot;5&quot;\" type=\"rss\" xmlUrl=\"http://somedomain5.com/rss.xml\"/>",
-        "      <outline title=\"&quot;8&quot;\" text=\"&quot;8&quot;\" type=\"rss\" xmlUrl=\"http://somedomain8.com/rss.xml\"/>",
-        "    </outline>",
-        "  </body>",
-        "</opml>")
-
-private val fmtTitle = "\"%d\""
+private val sampleFile: List<String> = """<?xml version="1.0" encoding="UTF-8"?>
+        |<opml version="1.1">
+        |  <head>
+        |    <title>
+        |      Feeder
+        |    </title>
+        |  </head>
+        |  <body>
+        |    <outline title="&quot;0&quot;" text="&quot;0&quot;" type="rss" xmlUrl="http://somedomain0.com/rss.xml"/>
+        |    <outline title="&quot;3&quot;" text="&quot;3&quot;" type="rss" xmlUrl="http://somedomain3.com/rss.xml"/>
+        |    <outline title="&quot;6&quot;" text="&quot;6&quot;" type="rss" xmlUrl="http://somedomain6.com/rss.xml"/>
+        |    <outline title="&quot;9&quot;" text="&quot;9&quot;" type="rss" xmlUrl="http://somedomain9.com/rss.xml"/>
+        |    <outline title="tag1" text="tag1">
+        |      <outline title="&quot;1&quot;" text="&quot;1&quot;" type="rss" xmlUrl="http://somedomain1.com/rss.xml"/>
+        |      <outline title="&quot;4&quot;" text="&quot;4&quot;" type="rss" xmlUrl="http://somedomain4.com/rss.xml"/>
+        |      <outline title="&quot;7&quot;" text="&quot;7&quot;" type="rss" xmlUrl="http://somedomain7.com/rss.xml"/>
+        |    </outline>
+        |    <outline title="tag2" text="tag2">
+        |      <outline title="&quot;2&quot;" text="&quot;2&quot;" type="rss" xmlUrl="http://somedomain2.com/rss.xml"/>
+        |      <outline title="&quot;5&quot;" text="&quot;5&quot;" type="rss" xmlUrl="http://somedomain5.com/rss.xml"/>
+        |      <outline title="&quot;8&quot;" text="&quot;8&quot;" type="rss" xmlUrl="http://somedomain8.com/rss.xml"/>
+        |    </outline>
+        |  </body>
+        |</opml>""".trimMargin().split("\n")
 
 @RunWith(AndroidJUnit4::class)
 class OPMLTest {
     private var context: Context? = null
 
     private var dir: File? = null
+    private var path: File? = null
 
     @Before
     fun setup() {
         // Remove everything in database
         getContext().contentResolver.delete(URI_FEEDS, null, null)
         // Get internal data dir
-        dir = getContext().filesDir
+        dir = createTempDir()
+        path = createTempFile()
+        assertTrue("Need to be able to write to data dir $dir", dir!!.canWrite())
         context = getContext()
     }
 
@@ -76,27 +78,18 @@ class OPMLTest {
     fun testWrite() {
         // Create some feeds
         createSampleFeeds()
-        val path = File(dir, "feeds.opml")
 
-        writeFile(path.absolutePath,
+        writeFile(path!!.absolutePath,
                 getTags(),
                 { tag ->
-                    val feeds = ArrayList<FeedSQL>()
-
-                    context!!.contentResolver.queryFeeds(where = "$COL_TAG IS ?",
-                            params = listOf(tag ?: "")) {
-                        while (it.moveToNext()) {
-                            feeds.add(it.asFeed())
-                        }
-                    }
-
-                    feeds
+                    context!!.contentResolver.getFeeds(where = "$COL_TAG IS ?",
+                            params = listOf(tag ?: ""))
                 })
 
         //check contents of file
-        path.bufferedReader().useLines { lines ->
+        path!!.bufferedReader().useLines { lines ->
             lines.forEachIndexed { i, line ->
-                assertEquals(sampleFile[i], line)
+                assertEquals("line $i differed", sampleFile[i], line)
             }
         }
     }
@@ -105,10 +98,10 @@ class OPMLTest {
     @Test
     @Throws(Exception::class)
     fun testRead() {
-        val path = writeSampleFile()
+        writeSampleFile()
 
         val parser = OpmlParser(OPMLContenProvider(context))
-        parser.parseFile(path)
+        parser.parseFile(path!!.canonicalPath)
 
         // Verify database is correct
         val seen = ArrayList<Int>()
@@ -117,8 +110,8 @@ class OPMLTest {
         for (feed in feeds) {
             val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
             seen.add(i)
-            assertEquals("http://somedomain$i.com/rss.xml", feed.url)
-            assertEquals("\"" + Integer.toString(i) + "\"", feed.title)
+            assertEquals("Title doesn't match", "\"$i\"", feed.title)
+            assertEquals("URL doesn't match", "http://somedomain$i.com/rss.xml", feed.url)
             if (i % 3 == 1) {
                 assertEquals("tag1", feed.tag)
             } else if (i % 3 == 2) {
@@ -136,29 +129,30 @@ class OPMLTest {
     @Test
     @Throws(Exception::class)
     fun testReadExisting() {
-        val path = writeSampleFile()
+        writeSampleFile()
 
         // Create something that does not exist
-        val feednew = FeedSQL()
-        feednew.url = "http://somedomain" + 20 + ".com/rss.xml"
-        feednew.title = String.format(fmtTitle, 20)
-        feednew.tag = "kapow"
-        var uri = context!!.contentResolver.insert(FeedSQL.URI_FEEDS, feednew.content)
-        feednew.id = java.lang.Long.parseLong(uri.lastPathSegment)
-        // Create something that wil exist
-        val feedold = FeedSQL()
-        feedold.url = "http://somedomain" + 0 + ".com/rss.xml"
-        feedold.title = Integer.toString(0)
-        uri = context!!.contentResolver.insert(FeedSQL.URI_FEEDS, feedold.content)
-        feedold.id = java.lang.Long.parseLong(uri.lastPathSegment)
+        var feednew = FeedSQL(
+                url = "http://somedomain20.com/rss.xml",
+                title = "\"20\"",
+                tag = "kapow")
+        var id = context!!.contentResolver.insertFeedWith(feednew.asContentValues())
+        feednew = feednew.copy(id = id)
+        // Create something that will exist
+        var feedold = FeedSQL(
+                url = "http://somedomain0.com/rss.xml",
+                title = "\"0\"")
+        id = context!!.contentResolver.insertFeedWith(feedold.asContentValues())
+
+        feedold = feedold.copy(id = id)
 
         // Read file
-        val parser = OPMLParser(OPMLContenProvider(context))
-        parser.parseFile(path)
+        val parser = OpmlParser(OPMLContenProvider(context))
+        parser.parseFile(path!!.canonicalPath)
 
         // should not kill the existing stuff
         val seen = ArrayList<Int>()
-        val feeds = FeedSQL.getFeeds(context, null, null, null)
+        val feeds = context!!.contentResolver.getFeeds()
         assertFalse("No feeds in DB!", feeds.isEmpty())
         for (feed in feeds) {
             val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
@@ -194,15 +188,15 @@ class OPMLTest {
     @Test
     @Throws(Exception::class)
     fun testReadBadFile() {
-        val path = File(dir, "feeds.opml")
+        //val path = File(dir, "feeds.opml")
 
-        path.bufferedWriter().use {
+        path!!.bufferedWriter().use {
             it.write("This is just some bullshit in the file\n")
         }
 
         // Read file
-        val parser = OPMLParser(OPMLContenProvider(context))
-        parser.parseFile(path.absolutePath)
+        val parser = OpmlParser(OPMLContenProvider(context))
+        parser.parseFile(path!!.absolutePath)
     }
 
     @SmallTest
@@ -211,7 +205,7 @@ class OPMLTest {
     fun testReadMissingFile() {
         val path = File(dir, "lsadflibaslsdfa.opml")
         // Read file
-        val parser = OPMLParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLContenProvider(context))
         var raised = false
         try {
             parser.parseFile(path.absolutePath)
@@ -223,36 +217,32 @@ class OPMLTest {
     }
 
     @Throws(IOException::class)
-    private fun writeSampleFile(): String {
-        val path = File(dir, "feeds.opml")
-
+    private fun writeSampleFile() {
         // Use test write to write the sample file
         testWrite()
         // Then delete all feeds again
-        context!!.contentResolver.delete(FeedSQL.URI_FEEDS, null, null)
-
-        return path.absolutePath
+        context!!.contentResolver.delete(URI_FEEDS, null, null)
     }
 
     private fun createSampleFeeds() {
         for (i in 0..9) {
-            val feed = FeedSQL()
-            feed.url = "http://somedomain$i.com/rss.xml"
-            feed.title = "\"$i\""
-            if (i % 3 == 1) {
-                feed.tag = "tag1"
-            } else if (i % 3 == 2) {
-                feed.tag = "tag2"
-            }
+            val feed = FeedSQL(
+                    url = "http://somedomain$i.com/rss.xml",
+                    title = "\"$i\"",
+                    tag = when (i % 3) {
+                        1 -> "tag1"
+                        2 -> "tag2"
+                        else -> ""
+                    })
 
-            context!!.contentResolver.insert(FeedSQL.URI_FEEDS, feed.content)
+            context!!.contentResolver.insertFeedWith(feed.asContentValues())
         }
     }
 
     private fun getTags(): ArrayList<String> {
         val tags = ArrayList<String>()
 
-        context!!.contentResolver.queryTagsWithCounts(columns = listOf(FeedSQL.COL_TAG)) {
+        context!!.contentResolver.queryTagsWithCounts(columns = listOf(COL_TAG)) {
             while (it.moveToNext()) {
                 tags.add(it.getString(0))
             }

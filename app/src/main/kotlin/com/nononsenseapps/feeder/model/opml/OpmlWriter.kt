@@ -26,14 +26,14 @@ fun writeOutputStream(os: OutputStream,
                             tags.forEach {
                                 if (it.isNullOrEmpty()) {
                                     feedsWithTag(it).forEach {
-                                        outline(title = escape(it.customTitle),
+                                        outline(title = escape(it.displayTitle),
                                                 type = "rss",
                                                 xmlUrl = escape(it.url)) {}
                                     }
                                 } else {
                                     outline(title = escape(it!!)) {
                                         feedsWithTag(it).forEach {
-                                            outline(title = escape(it.customTitle),
+                                            outline(title = escape(it.displayTitle),
                                                     type = "rss",
                                                     xmlUrl = escape(it.url)) {}
                                         }
@@ -109,11 +109,16 @@ abstract class Tag(val name: String) : Element {
     }
 
     override fun render(builder: StringBuilder, indent: String) {
-        builder.append("$indent<$name${renderAttributes()}>\n")
-        for (c in children) {
-            c.render(builder, indent + "  ")
+        builder.append("$indent<$name${renderAttributes()}")
+        if (children.isEmpty()) {
+            builder.append("/>\n")
+        } else {
+            builder.append(">\n")
+            for (c in children) {
+                c.render(builder, indent + "  ")
+            }
+            builder.append("$indent</$name>\n")
         }
-        builder.append("$indent</$name>\n")
     }
 
     private fun renderAttributes(): String {

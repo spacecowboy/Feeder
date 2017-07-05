@@ -49,7 +49,7 @@ import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
 import com.nononsenseapps.feeder.model.ExpandableSortedList;
-import com.nononsenseapps.feeder.model.RssNotifications;
+import com.nononsenseapps.feeder.model.RssNotificationsKt;
 import com.nononsenseapps.feeder.util.ContextExtensionsKt;
 import com.nononsenseapps.feeder.util.FeedDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.LPreviewUtils;
@@ -190,7 +190,7 @@ public class BaseActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
         // Send notifications for configured feeds
-        RssNotifications.notify(this);
+        RssNotificationsKt.notify(this);
     }
 
     protected Toolbar initializeActionBar() {

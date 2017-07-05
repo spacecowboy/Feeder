@@ -11,13 +11,14 @@ import org.xml.sax.SAXException
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.util.*
 
 class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
 
     val parser: Parser = Parser()
-    var mCurrentTag: String? = null
-    var ignoring = 0
+    val tagStack: Stack<String> = Stack()
     var isFeedTag = false
+    var ignoring = 0
 
     init {
         parser.contentHandler = this
@@ -35,14 +36,21 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
 
     @Throws(IOException::class, SAXException::class)
     fun parseInputStream(inputStream: InputStream) {
-        this.mCurrentTag = null
+        tagStack.clear()
+        isFeedTag = false
         ignoring = 0
-        this.isFeedTag = false
 
         parser.parse(InputSource(inputStream))
     }
 
     override fun endElement(uri: String?, localName: String?, qName: String?) {
+        if ("outline" == localName) {
+            when {
+                ignoring > 0 -> ignoring--
+                isFeedTag -> isFeedTag = false
+                else -> tagStack.pop()
+            }
+        }
     }
 
     override fun processingInstruction(target: String?, data: String?) {
@@ -58,45 +66,23 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
     }
 
     override fun endDocument() {
-        // Ignoring, return
-        if (ignoring > 0) {
-            ignoring -= 1
-            return
-        }
-
-        if (isFeedTag) {
-            isFeedTag = false
-        } else {
-            // Must be a tag-tag
-            mCurrentTag = null
-        }
     }
 
     override fun startElement(uri: String?, localName: String?, qName: String?, atts: Attributes?) {
-        // Not allowing nesting below feeds
-        if (ignoring > 0) {
-            ignoring += 1
-            return
-        }
-
         if ("outline" == localName) {
             when {
+            // Nesting not allowed
+                ignoring > 0 || isFeedTag -> ignoring++
                 "rss" == atts?.getValue("type") -> {
                     isFeedTag = true
-                    // Yes, tagsoup seems to make the tags lowercase
-                    val feed = (opmlToDb.getFeed(atts.getValue("xmlurl") ?: "") ?: FeedSQL())
-                            .copy(title = unescape(atts.getValue("title") ?: ""),
-                                    customTitle = unescape(atts.getValue("title") ?: ""),
-                                    tag = mCurrentTag ?: "")
+                    val feed = FeedSQL(
+                            title = unescape(atts.getValue("title") ?: ""),
+                            tag = if (tagStack.isNotEmpty()) tagStack.peek() else "",
+                            url = atts.getValue("xmlurl") ?: "")
 
                     opmlToDb.saveFeed(feed)
                 }
-                mCurrentTag == null -> {
-                    mCurrentTag = unescape(atts?.getValue("title") ?: "")
-                }
-                else -> {
-                    ignoring += 1
-                }
+                else -> tagStack.push(unescape(atts?.getValue("title") ?: ""))
             }
         }
     }
