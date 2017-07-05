@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder
+package com.nononsenseapps.feeder.model.opml
 
 import android.content.Context
 import android.support.test.InstrumentationRegistry.getContext
@@ -9,8 +9,6 @@ import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.FeedSQL
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.model.OPMLContenProvider
-import com.nononsenseapps.feeder.model.opml.OpmlParser
-import com.nononsenseapps.feeder.model.opml.writeFile
 import com.nononsenseapps.feeder.util.getFeeds
 import com.nononsenseapps.feeder.util.insertFeedWith
 import com.nononsenseapps.feeder.util.queryTagsWithCounts
@@ -249,5 +247,37 @@ class OPMLTest {
         }
 
         return tags
+    }
+
+    @Test
+    @MediumTest
+    fun antennaPodOPMLImports() {
+        //given
+        val opmlStream = javaClass.getResourceAsStream("antennapod-feeds.opml")
+
+        //when
+        val parser = OpmlParser(OPMLContenProvider(context))
+        parser.parseInputStream(opmlStream)
+
+        //then
+        val seen = ArrayList<Int>()
+        val feeds = context!!.contentResolver.getFeeds()
+        assertFalse("No feeds in DB!", feeds.isEmpty())
+        for (feed in feeds) {
+            val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
+            seen.add(i)
+            assertEquals("Title doesn't match", "\"$i\"", feed.title)
+            assertEquals("URL doesn't match", "http://somedomain$i.com/rss.xml", feed.url)
+            if (i % 3 == 1) {
+                assertEquals("tag1", feed.tag)
+            } else if (i % 3 == 2) {
+                assertEquals("tag2", feed.tag)
+            } else {
+                assertEquals("", feed.tag)
+            }
+        }
+        for (i in 0..9) {
+            assertTrue("Missing " + i, seen.contains(i))
+        }
     }
 }
