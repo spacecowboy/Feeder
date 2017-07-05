@@ -203,7 +203,7 @@ fun ContentResolver.queryFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asLi
 inline fun ContentResolver.queryItems(uri: Uri, columns: List<String>, where: String? = null,
                                       params: List<Any>? = null, order: String? = null,
                                       reader: (Cursor) -> Unit) {
-    query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order).use(reader)
+    query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order)?.use(reader)
 }
 
 fun ContentResolver.getFeeds(columns: List<String> = FEED_FIELDS.asList(),
