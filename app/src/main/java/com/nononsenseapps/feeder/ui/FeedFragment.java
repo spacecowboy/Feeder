@@ -700,7 +700,7 @@ public class FeedFragment extends Fragment
                 public boolean areContentsTheSame(FeedItemSQL a, FeedItemSQL b) {
                     return a.getUnread() == b.getUnread() &&
                             a.getFeedtitle().compareToIgnoreCase(b.getFeedtitle()) == 0 &&
-                            a.getDomain().compareToIgnoreCase(b.getDomain()) == 0 &&
+                            (a.getDomain() == null && b.getDomain() == null || a.getDomain() != null && a.getDomain().compareToIgnoreCase(b.getDomain()) == 0) &&
                             a.getPlainsnippet().compareToIgnoreCase(b.getPlainsnippet()) == 0 &&
                             a.getPlaintitle().compareToIgnoreCase(b.getPlaintitle()) == 0;
                 }
