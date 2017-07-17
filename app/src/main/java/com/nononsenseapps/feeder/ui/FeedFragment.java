@@ -653,14 +653,14 @@ public class FeedFragment extends Fragment
                 public int compare(FeedItemSQL a, FeedItemSQL b) {
                     final int retval;
                     // Compare pubdates
-                    if (a.getPubDate() == null && b.getPubDate() == null) {
-                        return 0;
+                    if (a.getPubDate() != null && b.getPubDate() != null) {
+                        retval = b.getPubDate().compareTo(a.getPubDate());
                     } else if (a.getPubDate() != null && b.getPubDate() == null) {
                         retval = -1;
-                    } else if (a.getPubDate() == null) {
+                    } else if (a.getPubDate() == null && b.getPubDate() != null) {
                         retval = 1;
                     } else {
-                        retval = b.getPubDate().compareTo(a.getPubDate());
+                        return 0;
                     }
 
                     return retval;
