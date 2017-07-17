@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.db
 import android.database.Cursor
 import com.nononsenseapps.feeder.util.*
 import org.joda.time.DateTime
+import java.net.URI
 import java.net.URL
 
 
@@ -105,8 +106,11 @@ data class FeedItemSQL(val id: Long = -1,
     val enclosureFilename: String?
         get() {
             if (enclosurelink != null) {
-                val fname = URL(enclosurelink).toURI().path.split("/").last()
-                if (fname.isEmpty()) {
+                var fname: String? = null
+                try {
+                    fname = URI(enclosurelink).path.split("/").last()
+                } catch (e: Exception) {}
+                if (fname == null || fname.isEmpty()) {
                     return null
                 } else {
                     return fname

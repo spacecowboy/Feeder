@@ -837,7 +837,8 @@ public class FeedFragment extends Fragment
             if (holder.rssItem.getPlainsnippet().isEmpty()) {
                 titleText.append(" \u2014 ");
 
-                if (holder.rssItem.getEnclosurelink() != null) {
+                if (holder.rssItem.getEnclosurelink() != null &&
+                        holder.rssItem.getEnclosureFilename() != null) {
                     titleText.append(holder.rssItem.getEnclosureFilename());
                 } else {
                     titleText.append(holder.rssItem.getDomain());

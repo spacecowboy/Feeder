@@ -1,12 +1,9 @@
 package com.nononsenseapps.feeder.db
 
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
-import org.junit.Assert.*
-
-/**
- * Created by jonas on 17/07/02.
- */
 class FeedItemSQLTest {
     @Test
     fun getDomain() {
@@ -35,4 +32,9 @@ class FeedItemSQLTest {
         assertEquals(null, fi4.enclosureFilename)
     }
 
+    @Test
+    fun magnetLinkGivesNullFilename() {
+        val fi = FeedItemSQL(enclosurelink = "magnet:?xt=urn:btih:E6F5537982306CF703E5016B2BBD36C9B3E3CDD0&dn=Game+of+Thrones+S07E01+PROPER+WEBRip+x264+RARBG&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.trackerfix.com%3A80%2Fannounce")
+        assertNull(fi.enclosureFilename)
+    }
 }
