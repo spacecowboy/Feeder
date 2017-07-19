@@ -51,6 +51,7 @@
   <string name="indicator_for_mark_as_read">Индикатор прочитанного</string>
   <string name="share">Поделиться</string>
   <string name="no_such_feed">Не удалось найти такую ленту. Попробуйте с https.</string>
+  <string name="nothing_to_display">Здесь ничего нет!</string>
   <string name="title_activity_settings">Настройки</string>
 
   <string-array name="pref_sync_frequency_titles">
@@ -69,5 +70,7 @@
   <string name="no_activity_for_link">Не удалось найти приложение, чтобы открыть ссылку</string>
   <string name="check_for_updates">Проверять наличие обновлений</string>
   <string name="include_mobile_hotspots">Включая мобильные точки доступа</string>
+  <string name="updated_feeds">Обновлённые ленты</string>
+  <string name="selected">Выбрано</string>
 
 </resources>
