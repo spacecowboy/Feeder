@@ -6,8 +6,14 @@ android {
 
   lintOptions {
     abortOnError true
+    explainIssues true
+    ignoreWarnings true
+    textReport true
+    textOutput 'stdout'
     // Should try to remove last two here
     disable "MissingTranslation", "AppCompatCustomView", "InvalidPackage"
+    // I really want some to show as errors
+    error "InlinedApi"
   }
 
   defaultConfig {
