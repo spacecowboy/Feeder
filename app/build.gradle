@@ -55,6 +55,8 @@ dependencies {
   compile 'com.android.support:support-v4:25.4.0'
   compile 'com.android.support:appcompat-v7:25.4.0'
   compile 'com.android.support:design:25.4.0'
+  // To support SDK18
+  compile 'com.nononsenseapps:filepicker:4.1.0'
   // Better times
   compile 'joda-time:joda-time:2.3'
   // HTML parsing
