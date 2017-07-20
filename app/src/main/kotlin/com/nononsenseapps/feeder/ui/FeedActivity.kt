@@ -9,7 +9,9 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.Loader
 import android.database.Cursor
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.PersistableBundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
@@ -31,12 +33,15 @@ import com.nononsenseapps.feeder.model.OPMLContenProvider
 import com.nononsenseapps.feeder.model.RssSyncAdapter
 import com.nononsenseapps.feeder.model.opml.OpmlParser
 import com.nononsenseapps.feeder.model.opml.writeOutputStream
+import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.getString
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.queryFeeds
 import com.nononsenseapps.feeder.util.queryTagsWithCounts
 import com.nononsenseapps.feeder.util.requestFeedSync
+import com.nononsenseapps.filepicker.AbstractFilePickerActivity
+import java.io.File
 
 const private val EXPORT_OPML_CODE = 101
 const private val IMPORT_OPML_CODE = 102
@@ -159,19 +164,34 @@ class FeedActivity : BaseActivity() {
             }
             R.id.action_opml_export -> {
                 // Choose file, then export
-                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                intent.type = "text/opml"
-                intent.putExtra(Intent.EXTRA_TITLE, "feeder.opml")
+                val intent: Intent
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                    intent.type = "text/opml"
+                    intent.putExtra(Intent.EXTRA_TITLE, "feeder.opml")
+                } else {
+                    intent = Intent(this, MyFilePickerActivity::class.java)
+                    intent.putExtra(AbstractFilePickerActivity.EXTRA_MODE, AbstractFilePickerActivity.MODE_NEW_FILE)
+                    intent.putExtra(AbstractFilePickerActivity.EXTRA_ALLOW_EXISTING_FILE, true)
+                    intent.putExtra(AbstractFilePickerActivity.EXTRA_START_PATH,
+                            File(Environment.getExternalStorageDirectory(), "feeder.opml").path)
+                }
                 startActivityForResult(intent, EXPORT_OPML_CODE)
                 true
             }
             R.id.action_opml_import -> {
                 // Choose file
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                intent.addCategory(Intent.CATEGORY_OPENABLE)
-                intent.type = "*/*"
-                intent.putExtra(Intent.EXTRA_MIME_TYPES,
-                        Util.ToStringArray("text/plain", "text/xml", "text/opml", "*/*"))
+                val intent: Intent
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                    intent.addCategory(Intent.CATEGORY_OPENABLE)
+                    intent.type = "*/*"
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                            Util.ToStringArray("text/plain", "text/xml", "text/opml", "*/*"))
+                } else {
+                    intent = Intent(this, MyFilePickerActivity::class.java)
+                    intent.putExtra(AbstractFilePickerActivity.EXTRA_SINGLE_CLICK, true)
+                }
                 startActivityForResult(intent, IMPORT_OPML_CODE)
                 true
             }
