@@ -115,7 +115,7 @@ class FeedActivity : BaseActivity() {
         if (tag != null || id > 0) {
             return FeedFragment.newInstance(id, "", "", tag)
         } else {
-            return null
+            return FeedFragment.newInstance(-10, null, null, null)
         }
     }
 
