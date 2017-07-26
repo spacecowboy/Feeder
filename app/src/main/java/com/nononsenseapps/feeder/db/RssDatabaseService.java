@@ -111,6 +111,8 @@ public class RssDatabaseService extends IntentService {
                     ContentResolverExtensionsKt.markFeedAsRead(getContentResolver(), id);
                 } else if (tag != null) {
                     ContentResolverExtensionsKt.markTagAsRead(getContentResolver(), tag);
+                } else {
+                    ContentResolverExtensionsKt.markAllAsRead(getContentResolver());
                 }
             } else if (ACTION_MARK_ITEM_AS_READ.equals(action)) {
                 final long id = intent.getLongExtra(EXTRA_ID, -1);

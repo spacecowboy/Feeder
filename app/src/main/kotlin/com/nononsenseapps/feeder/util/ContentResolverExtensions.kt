@@ -8,7 +8,24 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import com.nononsenseapps.feeder.db.*
+import com.nononsenseapps.feeder.db.COL_FEED
+import com.nononsenseapps.feeder.db.COL_GUID
+import com.nononsenseapps.feeder.db.COL_ID
+import com.nononsenseapps.feeder.db.COL_NOTIFIED
+import com.nononsenseapps.feeder.db.COL_NOTIFY
+import com.nononsenseapps.feeder.db.COL_TAG
+import com.nononsenseapps.feeder.db.COL_UNREAD
+import com.nononsenseapps.feeder.db.FEED_FIELDS
+import com.nononsenseapps.feeder.db.FEED_ITEM_FIELDS
+import com.nononsenseapps.feeder.db.FIELDS_TAGSWITHCOUNT
+import com.nononsenseapps.feeder.db.FeedItemSQL
+import com.nononsenseapps.feeder.db.FeedSQL
+import com.nononsenseapps.feeder.db.URI_FEEDITEMS
+import com.nononsenseapps.feeder.db.URI_FEEDS
+import com.nononsenseapps.feeder.db.URI_FEEDSWITHCOUNTS
+import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
+import com.nononsenseapps.feeder.db.asFeed
+import com.nononsenseapps.feeder.db.asFeedItem
 
 /**
  * Inserts or updates a feed. Always returns the id of the item.
@@ -59,6 +76,12 @@ fun ContentResolver.markTagAsRead(tag: String): Unit {
     updateItems(URI_FEEDITEMS,
             where = "$COL_TAG IS ?",
             params = arrayListOf(tag)) {
+        setInt(COL_UNREAD to 0)
+    }
+}
+
+fun ContentResolver.markAllAsRead(): Unit {
+    updateItems(URI_FEEDITEMS) {
         setInt(COL_UNREAD to 0)
     }
 }
