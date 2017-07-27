@@ -56,6 +56,7 @@
   <string name="no_such_feed">No such feed could be found. Try using https maybe.</string>
   <string name="nothing_to_display">Nothing to display!</string>
   <string name="title_activity_settings">Settings</string>
+  <string name="all_feeds">All feeds</string>
 
   <string-array name="pref_sync_frequency_titles">
     <item>Manually</item>

@@ -239,7 +239,7 @@ public class FeedFragment extends Fragment
 
             // Special tag
             if (id < 1 && (title == null || title.isEmpty())) {
-                title = getString(R.string.no_tag);
+                title = getString(R.string.all_feeds);
             }
         }
 
@@ -444,6 +444,7 @@ public class FeedFragment extends Fragment
     }
 
     private void markAsRead() {
+        // TODO this actually marks all items as read - whereas UI only displays 50 of them
         RssDatabaseService.markFeedAsRead(getActivity(), this.id, this.tag);
     }
 
@@ -559,6 +560,9 @@ public class FeedFragment extends Fragment
                     Uri.withAppendedPath(URI_FEEDS, Long.toString(id)),
                     FEED_FIELDS, null, null, null);
         } else if (ID == FEED_SETTINGS_LOADER) {
+            if (id < 1 && tag == null) {
+                return null;
+            }
             String where;
             String[] whereArgs;
             if (id > 0) {

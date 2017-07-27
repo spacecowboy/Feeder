@@ -48,7 +48,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedSQL;
-import com.nononsenseapps.feeder.model.ExpandableSortedList;
+import com.nononsenseapps.feeder.model.NestedCallback;
+import com.nononsenseapps.feeder.model.NestedSortedList;
 import com.nononsenseapps.feeder.model.RssNotificationsKt;
 import com.nononsenseapps.feeder.util.ContextExtensionsKt;
 import com.nononsenseapps.feeder.util.FeedDeltaCursorLoader;
@@ -59,7 +60,7 @@ import com.nononsenseapps.feeder.views.ObservableScrollView;
 
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Set;
 
 import static com.nononsenseapps.feeder.db.FeedSQLKt.FIELDS_VIEWCOUNT;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDSWITHCOUNTS;
@@ -581,12 +582,18 @@ public class BaseActivity extends AppCompatActivity
         public final String tag;
         public final FeedSQL item;
         public final boolean isTag;
+        public final boolean isTop;
 
         public FeedWrapper(@NonNull String tag) {
+            this(tag, false);
+        }
+
+        public FeedWrapper(@NonNull String tag, boolean top) {
             assert tag != null;
             this.tag = tag;
             item = null;
             isTag = true;
+            isTop = top;
         }
 
         public FeedWrapper(@NonNull FeedSQL item) {
@@ -594,6 +601,7 @@ public class BaseActivity extends AppCompatActivity
             tag = item.getTag();
             this.item = item;
             isTag = false;
+            isTop = false;
         }
 
         @Override
@@ -639,11 +647,12 @@ public class BaseActivity extends AppCompatActivity
     class FeedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
-        private static final int VIEWTYPE_TAG = 0;
-        private static final int VIEWTYPE_FEED = 1;
-        private static final int VIEWTYPE_FEED_CHILD = 2;
+        private static final int VIEWTYPE_TOP = 0;
+        private static final int VIEWTYPE_TAG = 1;
+        private static final int VIEWTYPE_FEED = 2;
+        private static final int VIEWTYPE_FEED_CHILD = 3;
         private final String TAG = FeedsAdapter.class.getSimpleName();
-        private final ExpandableSortedList<FeedWrapper> mItems;
+        private final NestedSortedList<FeedWrapper> mItems;
         private final Collator mCollator;
         private ArrayMap<Long, FeedWrapper> mItemMap;
 
@@ -653,14 +662,17 @@ public class BaseActivity extends AppCompatActivity
             mCollator = Collator.getInstance();
             setHasStableIds(true);
             mItemMap = new ArrayMap<>();
-            mItems = new ExpandableSortedList<>(
-                    FeedWrapper.class, new ExpandableSortedList.ExpandableCallback<FeedWrapper>() {
+            mItems = new NestedSortedList<>(
+                    FeedWrapper.class, new NestedCallback<FeedWrapper>() {
+
                 @Override
                 public int getItemLevel(FeedWrapper item) {
-                    if (item.isTag || item.item.getTag().isEmpty()) {
-                        return ExpandableSortedList.TOP_LEVEL;
+                    if (item.isTop) {
+                        return 0;
+                    } else if (item.isTag || item.item.getTag().isEmpty()) {
+                        return 1;
                     } else {
-                        return ExpandableSortedList.TOP_LEVEL + 1;
+                        return 2;
                     }
                 }
 
@@ -676,22 +688,24 @@ public class BaseActivity extends AppCompatActivity
 
                 @Override
                 public FeedWrapper getParentOf(FeedWrapper item) {
-                    if (item.isTag || item.item.getTag().isEmpty()) {
+                    if (item.isTop) {
                         return null;
+                    } else if (item.isTag || item.item.getTag().isEmpty()) {
+                        return new FeedWrapper("", true);
                     } else {
                         return new FeedWrapper(item.tag);
                     }
                 }
 
                 @Override
-                public int getParentUnreadCount(FeedWrapper parent, HashSet<FeedWrapper> children) {
-                    if (children == null) {
-                        return 0;
-                    }
-
+                public int getParentUnreadCount(FeedWrapper parent, @NonNull Set<? extends FeedWrapper> children) {
                     int result = 0;
                     for (FeedWrapper wrap : children) {
-                        result += wrap.item.getUnreadCount();
+                        if (wrap.item != null) {
+                            result += wrap.item.getUnreadCount();
+                        } else {
+                            result += mItems.getParentUnreadCount(wrap);
+                        }
                     }
                     return result;
                 }
@@ -769,8 +783,8 @@ public class BaseActivity extends AppCompatActivity
                 public boolean areContentsTheSame(FeedWrapper oldItem, FeedWrapper newItem) {
                     if (oldItem.isTag && newItem.isTag) {
                         return oldItem.tag.equals(newItem.tag) &&
-                                mItems.getTagUnreadCount(oldItem) ==
-                                        mItems.getTagUnreadCount(newItem);
+                                mItems.getParentUnreadCount(oldItem) ==
+                                        mItems.getParentUnreadCount(newItem);
                     } else if (!oldItem.isTag && !newItem.isTag) {
                         return oldItem.item.getDisplayTitle().equals(newItem.item.getDisplayTitle()) &&
                                 oldItem.item.getUnreadCount() == newItem.item.getUnreadCount();
@@ -784,7 +798,7 @@ public class BaseActivity extends AppCompatActivity
                 public boolean areItemsTheSame(FeedWrapper item1, FeedWrapper item2) {
                     return item1.equals(item2);
                 }
-            });
+            }, 10);
         }
 
 
@@ -806,7 +820,9 @@ public class BaseActivity extends AppCompatActivity
         @Override
         public int getItemViewType(int position) {
             FeedWrapper item = mItems.get(position);
-            if (item.isTag) {
+            if (item.isTop) {
+                return VIEWTYPE_TOP;
+            } else if (item.isTag) {
                 return VIEWTYPE_TAG;
             } else if (item.tag == null || item.tag.isEmpty()) {
                 return VIEWTYPE_FEED;
@@ -866,6 +882,8 @@ public class BaseActivity extends AppCompatActivity
                     return new FeedHolder(LayoutInflater.from(BaseActivity.this).inflate(R.layout.view_feed_child, parent, false));
                 case VIEWTYPE_TAG:
                     return new TagHolder(LayoutInflater.from(BaseActivity.this).inflate(R.layout.view_feed_tag, parent, false));
+                case VIEWTYPE_TOP:
+                    return new TopHolder(LayoutInflater.from(BaseActivity.this).inflate(R.layout.view_feed, parent, false));
                 default:
                     return null;
             }
@@ -897,11 +915,45 @@ public class BaseActivity extends AppCompatActivity
                     } else {
                         th.expander.setImageResource(R.drawable.tinted_expand_more);
                     }
-                    int uc = mItems.getTagUnreadCount(wrap);
+                    int uc = mItems.getParentUnreadCount(wrap);
                     th.unreadCount.setText(Integer.toString(uc));
                     th.unreadCount.setVisibility(uc > 0 ? View.VISIBLE : View.INVISIBLE);
                     break;
+                case VIEWTYPE_TOP:
+                    TopHolder tp = (TopHolder) holder;
+                    int ucc = mItems.getParentUnreadCount(wrap);
+                    tp.unreadCount.setText(Integer.toString(ucc));
+                    tp.unreadCount.setVisibility(ucc > 0 ? View.VISIBLE : View.INVISIBLE);
+                    break;
             }
+        }
+    }
+
+    public class TopHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private final TextView title;
+        private final TextView unreadCount;
+
+        public TopHolder(View v) {
+            super(v);
+            title = (TextView) v.findViewById(R.id.feed_name);
+            title.setText(R.string.all_feeds);
+            unreadCount = (TextView) v.findViewById(R.id.feed_unreadcount);
+            v.setOnClickListener(this);
+        }
+
+        /**
+         * Called when a view has been clicked.
+         *
+         * @param v The view that was clicked.
+         */
+        @Override
+        public void onClick(View v) {
+            if (mDrawerLayout != null) {
+                mDrawerLayout.closeDrawers();//GravityCompat.START);
+            }
+
+            onNavigationDrawerItemSelected(-10, null, null, null);
         }
     }
 
