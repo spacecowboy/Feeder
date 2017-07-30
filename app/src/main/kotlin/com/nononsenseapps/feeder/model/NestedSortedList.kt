@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.model
 import android.support.v4.util.ArrayMap
 import android.support.v4.util.ArraySet
 import android.support.v7.util.SortedList
+import com.nononsenseapps.feeder.util.getWithDefault
 
 
 class NestedSortedList<T>(klass: Class<T>, val callback: NestedCallback<T>, initialCapacity: Int = 10) : SortedList<T>(klass, callback, initialCapacity) {
@@ -33,7 +34,7 @@ class NestedSortedList<T>(klass: Class<T>, val callback: NestedCallback<T>, init
     private fun nestedRemove(item: T): Boolean {
         val parent = callback.getParentOf(item)
         if (parent != null) {
-            val siblings = children.getOrDefault(parent, mutableSetOf())
+            val siblings = children.getWithDefault(parent, mutableSetOf())
             if (siblings.size == 1) {
                 return nestedRemove(parent)
             }
@@ -74,7 +75,7 @@ class NestedSortedList<T>(klass: Class<T>, val callback: NestedCallback<T>, init
         }
 
         super.beginBatchedUpdates()
-        for (child in children.getOrDefault(parent, mutableSetOf())) {
+        for (child in children.getWithDefault(parent, mutableSetOf())) {
             super.add(child)
         }
         super.endBatchedUpdates()
@@ -91,7 +92,7 @@ class NestedSortedList<T>(klass: Class<T>, val callback: NestedCallback<T>, init
     }
 
     fun getParentUnreadCount(parent: T): Int {
-        return callback.getParentUnreadCount(parent, children.getOrDefault(parent, mutableSetOf()))
+        return callback.getParentUnreadCount(parent, children.getWithDefault(parent, mutableSetOf()))
     }
 
     /**
@@ -99,7 +100,7 @@ class NestedSortedList<T>(klass: Class<T>, val callback: NestedCallback<T>, init
      */
     private fun nestedContract(parent: T) {
         if (expandedParents.contains(parent)) {
-            for (item in children.getOrDefault(parent, mutableSetOf())) {
+            for (item in children.getWithDefault(parent, mutableSetOf())) {
                 super.remove(item)
                 nestedContract(item)
             }
@@ -136,7 +137,7 @@ class NestedSortedList<T>(klass: Class<T>, val callback: NestedCallback<T>, init
             super.remove(item)
         }
 
-        for (child in children.getOrDefault(item, mutableSetOf())) {
+        for (child in children.getWithDefault(item, mutableSetOf())) {
             removeSubItem(child)
         }
 
@@ -146,7 +147,7 @@ class NestedSortedList<T>(klass: Class<T>, val callback: NestedCallback<T>, init
         val parent = callback.getParentOf(item)
 
         if (parent != null) {
-            val siblings = children.getOrDefault(parent, mutableSetOf())
+            val siblings = children.getWithDefault(parent, mutableSetOf())
             siblings.remove(item)
             callback.onChanged(super.indexOf(parent), 1)
         }

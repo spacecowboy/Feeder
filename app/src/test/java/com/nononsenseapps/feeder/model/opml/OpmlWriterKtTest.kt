@@ -4,6 +4,7 @@ import com.nononsenseapps.feeder.db.FeedSQL
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.ByteArrayOutputStream
+import java.util.ArrayList
 
 class OpmlWriterKtTest {
     @Test

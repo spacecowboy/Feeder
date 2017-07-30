@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.model.opml
 
 import android.content.Context
-import android.net.Uri
 import android.support.test.InstrumentationRegistry.getContext
 import android.support.test.filters.MediumTest
 import android.support.test.filters.SmallTest
@@ -14,13 +13,16 @@ import com.nononsenseapps.feeder.util.getFeeds
 import com.nononsenseapps.feeder.util.insertFeedWith
 import com.nononsenseapps.feeder.util.queryTagsWithCounts
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 import java.io.IOException
-import java.net.URL
+import java.util.*
 
 
 private val sampleFile: List<String> = """<?xml version="1.0" encoding="UTF-8"?>

@@ -7,6 +7,7 @@ import com.nononsenseapps.feeder.model.OPMLParserToDatabase
 import com.nononsenseapps.feeder.model.opml.OpmlParser
 import com.nononsenseapps.feeder.model.opml.writeFile
 import com.nononsenseapps.feeder.util.getString
+import java.util.ArrayList
 import java.io.File
 
 private val DATABASE_VERSION = 4
