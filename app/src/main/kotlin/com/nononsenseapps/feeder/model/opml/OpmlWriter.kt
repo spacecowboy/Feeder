@@ -94,10 +94,6 @@ class TextElement(val text: String) : Element {
     }
 }
 
-@DslMarker
-annotation class OpmlTagMarker
-
-@OpmlTagMarker
 abstract class Tag(val name: String) : Element {
     val children = arrayListOf<Element>()
     val attributes = linkedMapOf<String, String>()

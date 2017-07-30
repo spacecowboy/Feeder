@@ -42,6 +42,7 @@ import com.nononsenseapps.feeder.util.queryTagsWithCounts
 import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import java.io.File
+import java.util.ArrayList
 
 const private val EXPORT_OPML_CODE = 101
 const private val IMPORT_OPML_CODE = 102

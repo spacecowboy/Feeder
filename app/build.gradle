@@ -51,7 +51,26 @@ android {
     // Rome incorrectly bundles stuff in its jar
     pickFirst 'rome-utils-1.7.1.jar'
   }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_7
+    targetCompatibility JavaVersion.VERSION_1_7
+  }
 }
+
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+  sourceCompatibility = JavaVersion.VERSION_1_6
+  targetCompatibility = JavaVersion.VERSION_1_6
+
+  kotlinOptions {
+    jvmTarget = '1.6'
+    // 1.1 introduces JavaPlatform dependent functions and there is currently no way to enforce Java8 methods not to
+    // be used EVER so we enforce 1.0 version of the stdlib to ensure that all methods are compatible with java6
+    apiVersion = '1.0'
+  }
+}
+
 
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"

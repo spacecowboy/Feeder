@@ -26,6 +26,7 @@ import com.nononsenseapps.feeder.db.URI_FEEDSWITHCOUNTS
 import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
 import com.nononsenseapps.feeder.db.asFeed
 import com.nononsenseapps.feeder.db.asFeedItem
+import java.util.ArrayList
 
 /**
  * Inserts or updates a feed. Always returns the id of the item.
