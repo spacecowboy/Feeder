@@ -1,0 +1,98 @@
+#!/bin/bash
+set -euo pipefail
+
+if [ "$#" -ne 1 ]; then
+  echo >&2 "Takes one argument: android sdk number to start emulator for, example: 25"
+  exit 1
+fi
+
+sdk="${1}"
+name="android${sdk}"
+maxtime="607"
+
+start_emulator() {
+  local pkg
+  pkg="system-images;android-${sdk};google_apis;x86"
+
+  echo >&2 "Updating the emulator..."
+  echo y | sdkmanager "emulator"
+  echo >&2 "Updating emulator for android sdk: ${sdk}"
+  echo y | sdkmanager "${pkg}"
+
+  echo >&2 "Deleting existing emulator..."
+  avdmanager delete avd --name "${name}" || true
+  echo >&2 "Creating emulator..."
+  echo no | avdmanager create avd --name "${name}" --package "${pkg}"
+
+  echo >&2 "Starting emulator..."
+  # Bug in emulator script requires current directory
+  local here
+  here="$(pwd)"
+  cd "${ANDROID_HOME}/emulator"
+  ./emulator -avd "${name}" -no-window -no-audio &
+  cd "${here}"
+}
+
+wait_for_emulator() {
+  local timeout
+  local end
+  timeout=360
+  end=$((SECONDS+timeout))
+
+  while [ "${SECONDS}" -lt "${end}" ]; do
+    bootanim="$(adb -e shell getprop init.svc.bootanim 2>&1 || echo "")"
+    if [[ "${bootanim}" =~ "stopped" ]]; then
+      echo "Emulator ready"
+      return
+    fi
+
+    echo >&2 "Waiting: ${bootanim}..."
+    sleep 5
+  done
+
+  echo >&2 "Emulator failed to start within ${timeout} seconds"
+  exit 1
+}
+
+stop_emulator() {
+  # Kill the process instead of using ADB since ADB will fail to kill
+  # the emulator if it is still starting up
+  echo >&2 "Killing emulator..."
+  pkill --full "avd ${name}"
+  #adb devices | grep emulator | cut -f1 | while read -r name; do
+  #  echo >&2 "Stopping ${name}..."
+  #  adb -s "${name}" emu kill
+  #done
+}
+
+teardown() {
+  stop_emulator
+  pkill --full "sleep ${maxtime}"
+}
+
+GRADLE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/gradlew"
+if ! [ -f "${GRADLE}" ]; then
+  echo >&2 "Could not find gradle"
+  exit 1
+fi
+
+# Always stop emulators (runs unless job is cancelled by gitlab)
+trap teardown EXIT
+# Do a sleep which will kill the emulator if it finishes (should only
+# run if job is canceled by gitlab or job takes too long)
+# Fix for this is in this MR: https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/merge_requests/336
+# which improves process killing.
+sleep "${maxtime}" && stop_emulator &
+
+start_emulator
+
+# Might as well build while we are waiting for the emulator
+${GRADLE} assembleDebug assembleAndroidTest
+
+wait_for_emulator
+
+# Unlock screen
+adb shell input keyevent 82
+
+# Test
+${GRADLE} connectedAndroidTest

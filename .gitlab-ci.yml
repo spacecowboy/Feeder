@@ -1,35 +1,41 @@
+stages:
+  - build
+  - test
+
+image: openjdk:8-jdk
+
 variables:
-  ANDROID_HOME: /android
-  ANDROID_SDK_TOOLS: "25.2.5"
+  ANDROID_HOME: /var/lib/gitlab-runner/android
   ANDROID_COMPILE_SDK: "25"
   ANDROID_BUILD_TOOLS: "25.0.2"
 
-before_script:
-  - export PATH="${ANDROID_HOME}/tools/bin/:${ANDROID_HOME}/tools/:${ANDROID_HOME}/platform-tools/:${PATH}"
-  - export LD_LIBRARY_PATH="${ANDROID_HOME}/tools/lib64:${ANDROID_HOME}/tools/lib64/qt/lib:${LD_LIBRARY_PATH}"
-  - apt-get --quiet update --yes
-    && apt-get --quiet install --yes --no-install-recommends wget
-                                                             tar
-                                                             unzip
-                                                             lib32stdc++6
-                                                             lib32z1
-                                                             file
-                                                             mesa-utils
-                                                             pciutils
-    && rm -rf /var/lib/apt/lists/*
-  - mkdir -p ${ANDROID_HOME}
-    && wget --quiet -O ${ANDROID_HOME}/tools.zip https://dl.google.com/android/repository/tools_r${ANDROID_SDK_TOOLS}-linux.zip
-    && unzip -qq ${ANDROID_HOME}/tools.zip -d ${ANDROID_HOME}
-    && rm -f ${ANDROID_HOME}/tools.zip
-    && echo y | sdkmanager --update
-    && echo y | sdkmanager "extras;android;m2repository"
-                           "extras;google;google_play_services"
-                           "extras;google;m2repository"
-    && echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
-                           "platforms;android-${ANDROID_COMPILE_SDK}"
-  - chmod +x ./gradlew
+.sdk_apt: &before_docker
+  before_script:
+    - set -euo pipefail
+    - apt-get --quiet update --yes
+      && apt-get --quiet install --yes --no-install-recommends wget
+                                                               tar
+                                                               unzip
+                                                               lib32stdc++6
+                                                               lib32z1
+                                                               file
+                                                               mesa-utils
+                                                               pciutils
+      && rm -rf /var/lib/apt/lists/*
+    - export PATH="${ANDROID_HOME}/emulator/:${ANDROID_HOME}/tools/bin/:${ANDROID_HOME}/tools/:${ANDROID_HOME}/platform-tools/:${PATH}"
+    - ci/before
+    - chmod +x ./gradlew
+
+.sdk: &before_metal
+  before_script:
+    - set -euo pipefail
+    - export PATH="${ANDROID_HOME}/emulator/:${ANDROID_HOME}/tools/bin/:${ANDROID_HOME}/tools/:${ANDROID_HOME}/platform-tools/:${PATH}"
+    - ci/before
+    - chmod +x ./gradlew
 
 .build: &build_def
+  <<: *before_docker
+  stage: build
   script:
     - ./gradlew assemble
   artifacts:
@@ -37,14 +43,41 @@ before_script:
     - app/build/outputs/
 
 .test: &test_def
+  <<: *before_docker
+  stage: build
   script:
     - ./gradlew check
   artifacts:
 
+.emulator_test: &emulator_def
+  <<: *before_metal
+  tags:
+    - metal
+    - android
+  stage: test
+  script:
+    - ci/emulator-tests ${ANDROID_EMULATOR_SDK}
+  artifacts:
+    paths:
+      - app/build/reports/androidTests/
+
 build:jdk-1.8:
   <<: *build_def
-  image: openjdk:8-jdk
 
-test:jdk-1.8:
+unit-tests:jdk-1.8:
   <<: *test_def
-  image: openjdk:8-jdk
+
+test:emulator-18:
+  <<: *emulator_def
+  variables:
+    ANDROID_EMULATOR_SDK: "18"
+
+test:emulator-25:
+  <<: *emulator_def
+  variables:
+    ANDROID_EMULATOR_SDK: "25"
+
+test:emulator-26:
+  <<: *emulator_def
+  variables:
+    ANDROID_EMULATOR_SDK: "26"
