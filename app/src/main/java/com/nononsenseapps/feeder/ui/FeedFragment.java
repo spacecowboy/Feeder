@@ -560,17 +560,17 @@ public class FeedFragment extends Fragment
                     Uri.withAppendedPath(URI_FEEDS, Long.toString(id)),
                     FEED_FIELDS, null, null, null);
         } else if (ID == FEED_SETTINGS_LOADER) {
-            if (id < 1 && tag == null) {
-                return null;
-            }
             String where;
             String[] whereArgs;
             if (id > 0) {
                 where = Util.WHEREIDIS;
                 whereArgs = Util.LongsToStringArray(id);
-            } else {
+            } else if (tag != null) {
                 where = COL_TAG + " IS ?";
                 whereArgs = Util.ToStringArray(tag);
+            } else {
+                where = null;
+                whereArgs = null;
             }
             return new CursorLoader(getActivity(), URI_FEEDS,
                     Util.ToStringArray("DISTINCT " + COL_NOTIFY),

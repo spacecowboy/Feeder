@@ -148,6 +148,19 @@ fun ContentResolver.setNotify(tag: String, notify: Boolean = true): Unit {
     }
 }
 
+fun ContentResolver.setNotifyOnAllFeeds(notify: Boolean = true): Unit {
+    if (notify) {
+        // First mark all existing as notified so we don't spam
+        updateFeedItems(where = "$COL_NOTIFIED IS 0") {
+            setInt(COL_NOTIFIED to 1)
+        }
+    }
+    // Now toggle notifications
+    updateFeeds {
+        setInt(COL_NOTIFY to if (notify) 1 else 0)
+    }
+}
+
 inline fun ContentResolver.updateFeedItem(id: Long, init: ContentValues.() -> Unit): Int {
     return updateFeedItems(where = "$COL_ID IS ?",
             params = arrayListOf(id),
