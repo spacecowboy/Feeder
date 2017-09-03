@@ -1,3 +1,8 @@
+# 1.3.10
+
+*   Fixed crash when toggling 'Notify for new items' on All Feeds
+    See !55 #56
+
 # 1.3.9
 
 *   Fixed visibility of notify icon on certain devices
