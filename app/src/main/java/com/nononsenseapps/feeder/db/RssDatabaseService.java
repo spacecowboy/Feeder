@@ -44,7 +44,7 @@ public class RssDatabaseService extends IntentService {
     }
 
     /**
-     * If id is valid, use that. Else, use tag.
+     * If id is valid, use that. Else, use tag. Otherwise, set on all.
      *
      * @param context
      * @param notify
@@ -100,8 +100,10 @@ public class RssDatabaseService extends IntentService {
 
                 if (id > 0) {
                     ContentResolverExtensionsKt.setNotify(getContentResolver(), id, notify);
-                } else {
+                } else if (tag != null) {
                     ContentResolverExtensionsKt.setNotify(getContentResolver(), tag, notify);
+                } else {
+                    ContentResolverExtensionsKt.setNotifyOnAllFeeds(getContentResolver(), notify);
                 }
             } else if (ACTION_MARK_FEED_AS_READ.equals(action)) {
                 final String tag = intent.getStringExtra(EXTRA_TAG);
