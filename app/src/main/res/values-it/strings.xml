@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <string name="app_name">Feeder</string>
+  <string name="navigation_drawer_open">Apri navigation drawer</string>
+  <string name="navigation_drawer_close">Chiudi navigation drawer</string>
+  <string name="action_settings">Impostazioni</string>
+  <string name="add_feed">Aggiungi feed</string>
+  <string name="title_activity_edit_feed">Sottoscrivi feed</string>
+  <string name="url">URL</string>
+  <string name="tag">Tag</string>
+  <string name="add_feed_search_hint">URL dei feed</string>
+  <string name="select_account">Seleziona account</string>
+  <string name="title">Titolo</string>
+
+  <string name="by_author_on_date">da %1$s, %2$s</string>
+  <string name="on_date">%1$s</string>
+  <string name="save">Salva</string>
+  <string name="empty_feed_top">Non hai nulla da leggere. Cosa desideri fare...</string>
+  <string name="empty_feed_open"><font color=\"#607D8B\">Apri</font> un altro feed?</string>
+  <string name="empty_feed_add"><font color=\"#607D8B\">Aggiungi</font> altri feed?</string>
+  <string name="empty_no_feeds_top">Non hai ancora niente da leggere. Comincia da</string>
+  <string name="empty_no_feeds_login"><font color=\"#607D8B\">Accedere</font> al server e...</string>
+  <string name="empty_no_feeds_add"><font color=\"#607D8B\">Aggiungi</font> alcuni feed</string>
+  <string name="no_feeds_found">Impossibile trovare feed pertinenti. Provare a cercare una sola parola.</string>
+  <string name="search_feed_empty_hint">Inserisci indirizzo feed</string>
+  <string name="mark_all_as_read">Segna tutti come già letti</string>
+  <string name="edit_feed">Edita feed</string>
+  <string name="delete_feed">Elimina feed</string>
+  <string name="show_all_items">Visualizza tutti gli elementi</string>
+  <string name="show_unread_items">Visualizza elementi non letti</string>
+  <string name="new_items_available">Nuovi elementi disponibili</string>
+  <string name="view">Visualizza</string>
+  <string name="no_tag">Nessun tag</string>
+  <string name="username">Username</string>
+  <string name="server_address">Indirizzo server</string>
+  <string name="night_mode">Modalità notturna</string>
+  <string name="notify_for_new_items">Notifica nuovi elementi</string>
+  <string name="toggle_read_status">Inverti lo stato di lettura</string>
+  <string name="open_link_in_browser">Apri link nel browser</string>
+  <string name="open_enclosed_media">Apri media chiusi</string>
+  <string name="sync">Sincronizza</string>
+  <string name="export_feeds_to_opml">Esporta feed in OPML</string>
+  <string name="import_feeds_from_opml">Importa feed da OPML</string>
+  <string name="view_debug_log">Visualizza log di debug</string>
+  <string name="new_based_on_this">Nuovo basato su questo</string>
+  <string name="indicator_for_mark_as_read">Segna come già letto</string>
+  <string name="share">Condividi</string>
+  <string name="no_such_feed">Nessun feed trovato. Prova ad utilizzare https.</string>
+  <string name="nothing_to_display">Nulla da visualizzare!</string>
+  <string name="title_activity_settings">Impostazioni</string>
+  <string name="all_feeds">Tutti i feed</string>
+
+  <string-array name="pref_sync_frequency_titles">
+    <item>Manualmente</item>
+    <item>Ogni ora</item>
+    <item>Ogni 3 ore</item>
+    <item>Ogni 6 ore</item>
+    <item>Ogni 12 ore</item>
+  </string-array>
+  <string-array name="pref_sync_frequency_values">
+    <item>0</item>
+    <item>1</item>
+    <item>3</item>
+    <item>6</item>
+    <item>12</item>
+  </string-array>
+
+  <string name="synchronization">Sincronizzazione</string>
+  <string name="only_on_wifi">Solo in WiFi</string>
+  <string name="may_result_data_charges">Può implicare costi aggiuntivi.</string>
+  <string name="only_when_charging">Solo durante la ricarica</string>
+  <string name="image_loading">Download immagini</string>
+  <string name="no_activity_for_link">Impossibile trovare una activity per aprire questo collegamento</string>
+  <string name="check_for_updates">Controlla aggiornamenti</string>
+  <string name="include_mobile_hotspots">Includi hotspots mobile</string>
+  <string name="updated_feeds">Feed aggiornati</string>
+  <string name="selected">Selezionato</string>
+
+</resources>
