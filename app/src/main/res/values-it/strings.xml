@@ -17,11 +17,15 @@
   <string name="on_date">%1$s</string>
   <string name="save">Salva</string>
   <string name="empty_feed_top">Non hai nulla da leggere. Cosa desideri fare...</string>
-  <string name="empty_feed_open"><font color=\"#607D8B\">Apri</font> un altro feed?</string>
-  <string name="empty_feed_add"><font color=\"#607D8B\">Aggiungi</font> altri feed?</string>
+  <string name="empty_feed_open">
+	<![CDATA[<font color=\"#607D8B\">Apri</font> un altro feed?]]></string>
+  <string name="empty_feed_add">
+	<![CDATA[<font color=\"#607D8B\">Aggiungi</font> altri feed?]]></string>
   <string name="empty_no_feeds_top">Non hai ancora niente da leggere. Comincia da</string>
-  <string name="empty_no_feeds_login"><font color=\"#607D8B\">Accedere</font> al server e...</string>
-  <string name="empty_no_feeds_add"><font color=\"#607D8B\">Aggiungi</font> alcuni feed</string>
+  <string name="empty_no_feeds_login">
+	<![CDATA[<font color=\"#607D8B\">Accedere</font> al server e...]]></string>
+  <string name="empty_no_feeds_add">
+	<![CDATA[<font color=\"#607D8B\">Aggiungi</font> alcuni feed]]></string>
   <string name="no_feeds_found">Impossibile trovare feed pertinenti. Provare a cercare una sola parola.</string>
   <string name="search_feed_empty_hint">Inserisci indirizzo feed</string>
   <string name="mark_all_as_read">Segna tutti come già letti</string>
