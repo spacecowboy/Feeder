@@ -1,3 +1,8 @@
+# 1.3.11
+
+*   Added Italian translation
+    See !56
+
 # 1.3.10
 
 *   Fixed crash when toggling 'Notify for new items' on All Feeds
