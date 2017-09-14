@@ -26,6 +26,12 @@
 	<![CDATA[<font color=\"#607D8B\">Accedere</font> al server e...]]></string>
   <string name="empty_no_feeds_add">
 	<![CDATA[<font color=\"#607D8B\">Aggiungi</font> alcuni feed]]></string>
+  <string name="empty_feed_top">Non hai nulla da leggere. Cosa desideri fare…</string>
+  <string name="empty_feed_open">&lt;font color=\"#607D8B\"&gt;Apri&lt;/font&gt; un altro feed?</string>
+  <string name="empty_feed_add">&lt;font color=\"#607D8B\"&gt;Aggiungi&lt;/font&gt; altri feed?</string>
+  <string name="empty_no_feeds_top">Non hai ancora niente da leggere. Comincia da</string>
+  <string name="empty_no_feeds_login">&lt;font color=\"#607D8B\"&gt;Accedere&lt;/font&gt; al server e…</string>
+  <string name="empty_no_feeds_add">&lt;font color=\"#607D8B\"&gt;Aggiungi&lt;/font&gt; alcuni feed</string>
   <string name="no_feeds_found">Impossibile trovare feed pertinenti. Provare a cercare una sola parola.</string>
   <string name="search_feed_empty_hint">Inserisci indirizzo feed</string>
   <string name="mark_all_as_read">Segna tutti come già letti</string>
