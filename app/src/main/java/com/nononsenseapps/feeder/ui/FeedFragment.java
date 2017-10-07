@@ -587,7 +587,6 @@ public class FeedFragment extends Fragment
             mAdapter.updateData(map);
             boolean empty = mAdapter.getItemCount() <= HEADER_COUNT;
             mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
-            mSwipeRefreshLayout.setVisibility(empty ? View.GONE : View.VISIBLE);
         } else if (FEED_LOADER == cursorLoader.getId()) {
             Cursor cursor = (Cursor) result;
             if (cursor.moveToFirst()) {
