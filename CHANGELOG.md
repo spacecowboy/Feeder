@@ -1,3 +1,8 @@
+# 1.3.12
+
+*   Changed so that an empty feed can be dragged to be refreshed
+    See !57 #40
+
 # 1.3.11
 
 *   Added Italian translation
