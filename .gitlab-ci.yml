@@ -67,17 +67,17 @@ build:jdk-1.8:
 unit-tests:jdk-1.8:
   <<: *test_def
 
-test:emulator-18:
-  <<: *emulator_def
-  variables:
-    ANDROID_EMULATOR_SDK: "18"
+#test:emulator-18:
+#  <<: *emulator_def
+#  variables:
+#    ANDROID_EMULATOR_SDK: "18"
 
-test:emulator-25:
-  <<: *emulator_def
-  variables:
-    ANDROID_EMULATOR_SDK: "25"
+#test:emulator-25:
+#  <<: *emulator_def
+#  variables:
+#    ANDROID_EMULATOR_SDK: "25"
 
-test:emulator-26:
-  <<: *emulator_def
-  variables:
-    ANDROID_EMULATOR_SDK: "26"
+#test:emulator-26:
+#  <<: *emulator_def
+#  variables:
+#    ANDROID_EMULATOR_SDK: "26"
