@@ -301,7 +301,7 @@ class EditFeedActivity : Activity(),
     }
 
     internal fun useEntry(title: String, url: String) {
-        feedUrl = url.trim { it <= ' ' }
+        feedUrl = url.trim()
         textUrl.setText(feedUrl)
         textTitle.setText(android.text.Html.fromHtml(title).toString())
         detailsFrame.visibility = View.VISIBLE
