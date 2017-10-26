@@ -89,14 +89,14 @@ class FeedActivity : BaseActivity() {
         emptyView = findViewById(android.R.id.empty)
         emptyView.visibility = if (fragment == null) View.VISIBLE else View.GONE
 
-        val emptyAddFeed = findViewById(R.id.empty_add_feed) as TextView
+        val emptyAddFeed = findViewById<TextView>(R.id.empty_add_feed)
         emptyAddFeed.text = fromHtml(getString(R.string.empty_no_feeds_add))
         emptyAddFeed.setOnClickListener {
             startActivity(Intent(this@FeedActivity, EditFeedActivity::class.java))
         }
 
         // Night mode
-        val nightCheck = findViewById(R.id.nightcheck) as CheckedTextView
+        val nightCheck = findViewById<CheckedTextView>(R.id.nightcheck)
         nightCheck.isChecked = PrefUtils.isNightMode(this)
         nightCheck.setOnClickListener {
             // Toggle icon first

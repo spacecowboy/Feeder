@@ -88,17 +88,17 @@ class EditFeedActivity : Activity(),
         setContentView(R.layout.activity_edit_feed)
 
         // Setup views
-        textTitle = findViewById(R.id.feed_title) as EditText
+        textTitle = findViewById(R.id.feed_title)
         titleLabel = textTitle.parent as FloatLabelLayout
-        textUrl = findViewById(R.id.feed_url) as EditText
+        textUrl = findViewById(R.id.feed_url)
         urlLabel = textUrl.parent as FloatLabelLayout
-        textTag = findViewById(R.id.feed_tag) as AutoCompleteTextView
+        textTag = findViewById(R.id.feed_tag)
         tagLabel = textTag.parent as FloatLabelLayout
         detailsFrame = findViewById(R.id.feed_details_frame)
         searchFrame = findViewById(R.id.feed_search_frame)
-        textSearch = findViewById(R.id.search_view) as EditText
-        listResults = findViewById(R.id.results_listview) as ListView
-        emptyText = findViewById(android.R.id.empty) as TextView
+        textSearch = findViewById(R.id.search_view)
+        listResults = findViewById(R.id.results_listview)
+        emptyText = findViewById(android.R.id.empty)
         loadingProgress = findViewById(R.id.loading_progress)
         resultAdapter = ResultsAdapter(this)
         listResults.emptyView = emptyText
@@ -133,7 +133,7 @@ class EditFeedActivity : Activity(),
             false
         })
 
-        val addButton = findViewById(R.id.add_button) as Button
+        val addButton = findViewById<Button>(R.id.add_button) as Button
         addButton
                 .setOnClickListener {
                     // TODO error checking and stuff like that
@@ -500,9 +500,9 @@ class EditFeedActivity : Activity(),
 
     internal inner class ViewHolder(v: View) {
         var entry: SyndFeed? = null
-        var textTitle: TextView = v.findViewById(R.id.feed_title) as TextView
-        var textUrl: TextView = v.findViewById(R.id.feed_url) as TextView
-        var textDescription: TextView = v.findViewById(R.id.feed_description) as TextView
+        var textTitle: TextView = v.findViewById(R.id.feed_title)
+        var textUrl: TextView = v.findViewById(R.id.feed_url)
+        var textDescription: TextView = v.findViewById(R.id.feed_description)
 
     }
 }
