@@ -61,7 +61,7 @@ private const val TAGSFILTER = "TAGSFILTER"
 
 
 class EditFeedActivity : Activity(),
-        LoaderManager.LoaderCallbacks<LoaderResult<SyndFeed>> {
+        LoaderManager.LoaderCallbacks<LoaderResult<SyndFeed?>> {
     private var shouldFinishBack = false
     private var id: Long = -1
     // Views and shit
@@ -356,15 +356,15 @@ class EditFeedActivity : Activity(),
      * @return Return a new Loader instance that is ready to start loading.
      */
     override fun onCreateLoader(id: Int,
-                                args: Bundle): Loader<LoaderResult<SyndFeed>> {
+                                args: Bundle): Loader<LoaderResult<SyndFeed?>> {
         listResults.visibility = View.GONE
         emptyText.visibility = View.GONE
         loadingProgress.visibility = View.VISIBLE
         return FeedParseLoader(this, args.getString(SEARCHQUERY))
     }
 
-    override fun onLoadFinished(loader: Loader<LoaderResult<SyndFeed>>,
-                                data: LoaderResult<SyndFeed>) {
+    override fun onLoadFinished(loader: Loader<LoaderResult<SyndFeed?>>,
+                                data: LoaderResult<SyndFeed?>) {
         emptyText.setText(R.string.no_feeds_found)
         loadingProgress.visibility = View.GONE
         val feed = data.result()
@@ -379,7 +379,7 @@ class EditFeedActivity : Activity(),
         }
     }
 
-    override fun onLoaderReset(loader: Loader<LoaderResult<SyndFeed>>) {
+    override fun onLoaderReset(loader: Loader<LoaderResult<SyndFeed?>>) {
         resultAdapter.entries = null
     }
 
