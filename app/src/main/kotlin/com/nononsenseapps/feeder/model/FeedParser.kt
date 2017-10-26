@@ -14,6 +14,7 @@ import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.joda.time.DateTime
+import org.jsoup.Jsoup
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -83,6 +84,37 @@ object FeedParser {
 
     }
 
+    /**
+     * Finds alternate links in the header of an HTML document pointing to feeds.
+     */
+    fun findFeedLink(html: String,
+                     preferRss: Boolean = false,
+                     preferAtom: Boolean = false): String? {
+        val doc = Jsoup.parse(html.byteInputStream(), "UTF-8", "")
+        val header = doc.head()
+
+        val feedLinks = header.getElementsByAttributeValue("rel", "alternate")
+                .filter { it.hasAttr("href") && it.hasAttr("type") }
+                .filter {
+                    val t = it.attr("type").toLowerCase()
+                    when {
+                        t.contains("application/atom") -> true
+                        t.contains("application/rss") -> true
+                        else -> false
+                    }
+                }
+                .sortedBy {
+                    val t = it.attr("type").toLowerCase()
+                    when {
+                        preferAtom && t.contains("atom") -> "0"
+                        preferRss && t.contains("rss") -> "1"
+                        else -> t
+                    }
+                }
+
+        return feedLinks.firstOrNull()?.attr("href")
+    }
+
     @Throws(FeedParser.FeedParsingError::class)
     fun parseFeed(feedUrl: String, cacheDir: File): SyndFeed {
         var url = feedUrl
@@ -101,10 +133,21 @@ object FeedParser {
                 throw IOException("Unexpected code " + response)
             }
 
-            Log.d("RSSLOCAL", "cache response: " + response.cacheResponse())
-            Log.d("RSSLOCAL", "network response: " + response.networkResponse())
+            response.use {
+                Log.d("RSSLOCAL", "cache response: " + response.cacheResponse())
+                Log.d("RSSLOCAL", "network response: " + response.networkResponse())
 
-            return parseFeed(response.body().source().inputStream())
+                val body = response.body().string()
+
+                val alternateFeedLink = findFeedLink(body,
+                        preferAtom = true)
+
+                return if (alternateFeedLink != null) {
+                    parseFeed(alternateFeedLink, cacheDir)
+                } else {
+                    parseFeed(body)
+                }
+            }
         } catch (e: Throwable) {
             throw FeedParsingError(e)
         }
@@ -112,19 +155,23 @@ object FeedParser {
     }
 
     @Throws(FeedParser.FeedParsingError::class)
+    fun parseFeed(feedXml: String): SyndFeed = parseFeed(feedXml.byteInputStream())
+
+    @Throws(FeedParser.FeedParsingError::class)
     fun parseFeed(`is`: InputStream): SyndFeed {
-        try {
-            val feed = SyndFeedInput().build(XmlReader(`is`))
+        `is`.use {
+            try {
+                val feed = SyndFeedInput().build(XmlReader(`is`))
 
-            feed.entries
-                    .filter { it.authors.isEmpty() }
-                    .forEach { it.authors = feed.authors }
+                feed.entries
+                        .filter { it.authors.isEmpty() }
+                        .forEach { it.authors = feed.authors }
 
-            return feed
-        } catch (e: Throwable) {
-            throw FeedParsingError(e)
+                return feed
+            } catch (e: Throwable) {
+                throw FeedParsingError(e)
+            }
         }
-
     }
 
     fun firstEnclosure(entry: SyndEntry): String? {
