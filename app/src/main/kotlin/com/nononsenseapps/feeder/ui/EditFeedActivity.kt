@@ -367,7 +367,7 @@ class EditFeedActivity : Activity(),
                                 data: LoaderResult<SyndFeed?>) {
         emptyText.setText(R.string.no_feeds_found)
         loadingProgress.visibility = View.GONE
-        val feed = data.result()
+        val feed = data.result
         if (feed != null) {
             detailsFrame.visibility = View.GONE
             searchFrame.visibility = View.VISIBLE

@@ -20,7 +20,7 @@ class FeedParseLoader(context: Context,
             msg = feedParsingError.localizedMessage
         }
 
-        return LoaderResult(feed, msg)
+        return LoaderResult<SyndFeed?>(feed, msg)
     }
 
     /**
