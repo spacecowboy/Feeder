@@ -482,7 +482,7 @@ public class FeedFragment extends Fragment
             ContentResolverExtensionsKt.notifyAllUris(getActivity().getContentResolver());
 
             // Tell activity to open another fragment
-            ((FeedActivity) getActivity()).loadFirstFeedInDB(true);
+            ((FeedActivity) getActivity()).showAllFeeds(true);
             return true;
         }
 //        else if (id == R.id.action_mark_as_read) {

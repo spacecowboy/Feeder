@@ -1,14 +1,10 @@
 package com.nononsenseapps.feeder.ui
 
 import android.app.Activity
-import android.app.LoaderManager
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.CursorLoader
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.Loader
-import android.database.Cursor
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -24,9 +20,7 @@ import android.widget.TextView
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
-import com.nononsenseapps.feeder.db.FEED_FIELDS
 import com.nononsenseapps.feeder.db.FeedSQL
-import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.Util
 import com.nononsenseapps.feeder.db.asFeed
 import com.nononsenseapps.feeder.model.OPMLContenProvider
@@ -58,7 +52,7 @@ class FeedActivity : BaseActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             // Load first feed if nothing is showing (could have been empty and now content has been loaded)
             when (intent.action) {
-                RssSyncAdapter.SYNC_BROADCAST -> loadFirstFeedInDB(false)
+                RssSyncAdapter.SYNC_BROADCAST -> showAllFeeds(false)
                 RssSyncAdapter.FEED_ADDED_BROADCAST -> {
                     if (fragment == null && intent.getLongExtra(COL_ID, -1) > 0) {
                         onNavigationDrawerItemSelected(intent.getLongExtra(COL_ID, -1), "", "", null)
@@ -77,7 +71,7 @@ class FeedActivity : BaseActivity() {
         if (savedInstanceState == null) {
             fragment = defaultFragment()
             if (fragment == null) {
-                loadFirstFeedInDB(false)
+                showAllFeeds(false)
             } else {
                 supportFragmentManager.beginTransaction().add(R.id.container, fragment, fragmentTag).commit()
             }
@@ -120,29 +114,9 @@ class FeedActivity : BaseActivity() {
         }
     }
 
-    val firstFeedLoader = object : LoaderManager.LoaderCallbacks<Cursor> {
-        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-            return CursorLoader(this@FeedActivity, URI_FEEDS, FEED_FIELDS, null, null, null)
-        }
-
-        override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
-            when (loader.id) {
-                defaultLoaderId -> {
-                    if (data != null && data.moveToFirst()) {
-                        val feed = data.asFeed()
-                        onNavigationDrawerItemSelected(feed.id, feed.title, feed.url, feed.tag)
-                    }
-                    loaderManager.destroyLoader(defaultLoaderId)
-                }
-            }
-        }
-
-        override fun onLoaderReset(loader: Loader<Cursor>?) {}
-    }
-
-    fun loadFirstFeedInDB(overrideCurrent: Boolean = false): Unit {
+    fun showAllFeeds(overrideCurrent: Boolean = false): Unit {
         if (fragment == null || overrideCurrent) {
-            loaderManager.restartLoader(defaultLoaderId, Bundle.EMPTY, firstFeedLoader)
+            onNavigationDrawerItemSelected(-10, null, null, null)
         }
     }
 
