@@ -2,17 +2,13 @@ package com.nononsenseapps.feeder.ui
 
 import android.app.Activity
 import android.app.LoaderManager
-import android.content.ContentValues
 import android.content.Context
 import android.content.CursorLoader
 import android.content.Intent
 import android.content.Loader
-import android.content.res.Resources
 import android.database.Cursor
-import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -31,22 +27,24 @@ import android.widget.ListView
 import android.widget.SimpleCursorAdapter
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.Util
-import com.nononsenseapps.feeder.model.FeedParseLoader
-import com.nononsenseapps.feeder.util.*
-import com.nononsenseapps.feeder.util.LoaderResult
-import com.nononsenseapps.feeder.views.FloatLabelLayout
-import com.rometools.rome.feed.synd.SyndFeed
-
-import java.util.Collections
-
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
-import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
+import com.nononsenseapps.feeder.db.Util
+import com.nononsenseapps.feeder.model.FeedParseLoader
+import com.nononsenseapps.feeder.util.LoaderResult
+import com.nononsenseapps.feeder.util.bundle
+import com.nononsenseapps.feeder.util.contentValues
+import com.nononsenseapps.feeder.util.insertFeedWith
+import com.nononsenseapps.feeder.util.notifyAllUris
+import com.nononsenseapps.feeder.util.requestFeedSync
+import com.nononsenseapps.feeder.util.setString
+import com.nononsenseapps.feeder.util.updateFeedWith
+import com.nononsenseapps.feeder.views.FloatLabelLayout
+import com.rometools.rome.feed.synd.SyndFeed
 
 const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
 const val _ID = "_id"
@@ -79,6 +77,8 @@ class EditFeedActivity : Activity(),
     lateinit private var urlLabel: FloatLabelLayout
     lateinit private var titleLabel: FloatLabelLayout
     lateinit private var tagLabel: FloatLabelLayout
+
+    private var feedTitle: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (shouldBeFloatingWindow()) {
@@ -137,9 +137,15 @@ class EditFeedActivity : Activity(),
         addButton
                 .setOnClickListener {
                     // TODO error checking and stuff like that
+                    val title = textTitle.text.toString().trim()
+                    val customTitle = if (title == feedTitle) {
+                        ""
+                    } else {
+                        title
+                    }
                     val values = contentValues {
-                        setString(COL_TITLE to textTitle.hint.toString().trim())
-                        setString(COL_CUSTOM_TITLE to textTitle.text.toString().trim())
+                        setString(COL_TITLE to feedTitle)
+                        setString(COL_CUSTOM_TITLE to customTitle)
                         setString(COL_TAG to textTag.text.toString().trim())
                         setString(COL_URL to textUrl.text.toString().trim())
                     }
@@ -201,11 +207,13 @@ class EditFeedActivity : Activity(),
             // URL
             textUrl.setText(feedUrl)
             // Title
-            if (i.hasExtra(CUSTOM_TITLE)) {
-                textTitle.setText(i.getStringExtra(CUSTOM_TITLE))
+            if (i.hasExtra(FEED_TITLE)) {
+                feedTitle = i.getStringExtra(FEED_TITLE)
             }
-            if (i.hasExtra(FEED_TITLE) && !i.getStringExtra(FEED_TITLE).isEmpty()) {
-                textTitle.hint = i.getStringExtra(FEED_TITLE)
+            if (i.hasExtra(CUSTOM_TITLE) && !i.getStringExtra(CUSTOM_TITLE).isEmpty()) {
+                textTitle.setText(i.getStringExtra(CUSTOM_TITLE))
+            } else {
+                textTitle.setText(feedTitle)
             }
 
             // Tag
@@ -301,9 +309,10 @@ class EditFeedActivity : Activity(),
     }
 
     internal fun useEntry(title: String, url: String) {
+        feedTitle = android.text.Html.fromHtml(title).toString()
         feedUrl = url.trim()
         textUrl.setText(feedUrl)
-        textTitle.setText(android.text.Html.fromHtml(title).toString())
+        textTitle.setText(feedTitle)
         detailsFrame.visibility = View.VISIBLE
         searchFrame.visibility = View.GONE
         // Focus on tag

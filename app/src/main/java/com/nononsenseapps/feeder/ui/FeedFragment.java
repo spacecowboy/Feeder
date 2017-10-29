@@ -595,7 +595,7 @@ public class FeedFragment extends Fragment
                 this.url = feed.getUrl();
                 this.notify = feed.getNotify() ? 1 : 0;
 
-                ((BaseActivity) getActivity()).getSupportActionBar().setTitle(title);
+                ((BaseActivity) getActivity()).getSupportActionBar().setTitle(feed.getDisplayTitle());
                 mNotifyCheck.setChecked(this.notify == 1);
             }
             // Reset loader

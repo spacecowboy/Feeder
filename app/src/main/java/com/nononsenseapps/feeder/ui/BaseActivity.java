@@ -639,7 +639,7 @@ public class BaseActivity extends AppCompatActivity
             if (isTag) {
                 return "Tag: " + tag;
             } else {
-                return "Item: " + item.getCustomTitle() + " (" + tag + ")";
+                return "Item: " + item.getDisplayTitle() + " (" + tag + ")";
             }
         }
     }
@@ -898,11 +898,7 @@ public class BaseActivity extends AppCompatActivity
                 case VIEWTYPE_FEED_CHILD:
                     FeedHolder fh = (FeedHolder) holder;
                     fh.item = wrap.item;
-                    if (fh.item.getCustomTitle().isEmpty()) {
-                        fh.title.setText(fh.item.getTitle());
-                    } else {
-                        fh.title.setText(fh.item.getCustomTitle());
-                    }
+                    fh.title.setText(fh.item.getDisplayTitle());
                     fh.unreadCount.setText(Integer.toString(fh.item.getUnreadCount()));
                     fh.unreadCount.setVisibility(fh.item.getUnreadCount() > 0 ? View.VISIBLE : View.INVISIBLE);
                     break;
@@ -1022,7 +1018,7 @@ public class BaseActivity extends AppCompatActivity
                 mDrawerLayout.closeDrawer(GravityCompat.START);
             }
 
-            onNavigationDrawerItemSelected(item.getId(), item.getTitle(), item.getUrl(), item.getTag());
+            onNavigationDrawerItemSelected(item.getId(), item.getDisplayTitle(), item.getUrl(), item.getTag());
         }
     }
 }

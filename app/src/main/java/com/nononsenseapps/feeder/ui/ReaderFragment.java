@@ -26,7 +26,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
@@ -40,11 +39,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.db.FeedItemSQLKt;
-import com.nononsenseapps.feeder.db.FeedSQLKt;
 import com.nononsenseapps.feeder.ui.text.HtmlConverter;
 import com.nononsenseapps.feeder.ui.text.ImageTextLoader;
 import com.nononsenseapps.feeder.util.BundleExtensionsKt;
@@ -53,17 +50,14 @@ import com.nononsenseapps.feeder.util.FileLog;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
 import com.nononsenseapps.feeder.views.ObservableScrollView;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
 
-import static com.nononsenseapps.feeder.db.FeedItemSQLKt.COL_DESCRIPTION;
 import static com.nononsenseapps.feeder.db.FeedItemSQLKt.FEED_ITEM_FIELDS;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_ID;
-import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TITLE;
 import static com.nononsenseapps.feeder.db.UriKt.URI_FEEDITEMS;
 
 /**
