@@ -31,10 +31,10 @@ import javax.net.ssl.X509TrustManager
 object FeedParser {
 
     // Should reuse same instance to have same cache
-    private var _client: OkHttpClient? = null
+    private var client: OkHttpClient? = null
 
     private fun cachingClient(cacheDirectory: File): OkHttpClient {
-        if (_client == null) {
+        if (client == null) {
 
             val cacheSize = 10 * 1024 * 1024 // 10 MiB
             val cache = Cache(cacheDirectory, cacheSize.toLong())
@@ -46,10 +46,10 @@ object FeedParser {
 
             trustAllCerts(builder)
 
-            _client = builder.build()
+            client = builder.build()
         }
 
-        return _client as OkHttpClient
+        return client as OkHttpClient
     }
 
     private fun trustAllCerts(builder: OkHttpClient.Builder) {
@@ -127,7 +127,9 @@ object FeedParser {
                     .url(url)
                     .build()
 
-            val response = cachingClient(cacheDir).newCall(request).execute()
+            val cacheClient = cachingClient(cacheDir)
+            val call = cacheClient.newCall(request)
+            val response = call.execute()
 
             if (!response.isSuccessful) {
                 throw IOException("Unexpected code " + response)
@@ -137,16 +139,20 @@ object FeedParser {
                 Log.d("RSSLOCAL", "cache response: " + response.cacheResponse())
                 Log.d("RSSLOCAL", "network response: " + response.networkResponse())
 
-                val body = response.body().string()
+                val body = response.body()?.string()
 
-                val alternateFeedLink = findFeedLink(body,
-                        preferAtom = true)
+                if (body != null) {
 
-                return if (alternateFeedLink != null) {
-                    parseFeed(alternateFeedLink, cacheDir)
-                } else {
-                    parseFeed(body)
+                    val alternateFeedLink = findFeedLink(body,
+                            preferAtom = true)
+
+                    return if (alternateFeedLink != null) {
+                        parseFeed(alternateFeedLink, cacheDir)
+                    } else {
+                        parseFeed(body)
+                    }
                 }
+                throw NullPointerException("Response body was null")
             }
         } catch (e: Throwable) {
             throw FeedParsingError(e)
