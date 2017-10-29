@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-  buildToolsVersion '25.0.2'
+  buildToolsVersion '26.0.2'
 
   lintOptions {
     abortOnError true
@@ -20,9 +20,9 @@ android {
     applicationId "com.nononsenseapps.feeder"
     versionCode 19
     versionName "1.3.12"
-    compileSdkVersion 25
+    compileSdkVersion 26
     minSdkVersion 18
-    targetSdkVersion 25
+    targetSdkVersion 26
 
     // For espresso tests
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -71,44 +71,43 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
   }
 }
 
-
 dependencies {
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
-  compile 'com.android.support.constraint:constraint-layout:1.0.2'
-  compile 'com.android.support:recyclerview-v7:25.4.0'
-  compile 'com.android.support:support-v4:25.4.0'
-  compile 'com.android.support:appcompat-v7:25.4.0'
-  compile 'com.android.support:design:25.4.0'
+  implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+  implementation 'com.android.support:recyclerview-v7:26.0.2'
+  implementation 'com.android.support:support-v4:26.0.2'
+  implementation 'com.android.support:appcompat-v7:26.0.2'
+  implementation 'com.android.support:design:26.0.2'
   // To support SDK18
-  compile 'com.nononsenseapps:filepicker:4.1.0'
+  implementation 'com.nononsenseapps:filepicker:4.1.0'
   // Better times
-  compile 'joda-time:joda-time:2.3'
+  implementation 'joda-time:joda-time:2.3'
   // HTML parsing
-  compile 'org.jsoup:jsoup:1.7.3'
-  compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
+  implementation 'org.jsoup:jsoup:1.7.3'
+  implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
   // RSS
-  compile "com.rometools:rome:1.7.1"
-  compile "com.rometools:rome-modules:1.7.1"
+  implementation "com.rometools:rome:1.7.1"
+  implementation "com.rometools:rome-modules:1.7.1"
   // For better fetching
-  compile 'com.squareup.okhttp3:okhttp:3.6.0'
+  implementation 'com.squareup.okhttp3:okhttp:3.6.0'
   // Image loading
-  compile 'com.github.bumptech.glide:glide:3.7.0'
-  compile 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
+  implementation 'com.github.bumptech.glide:glide:3.7.0'
+  implementation 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
   // tests
-  testCompile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-  testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
-  testCompile 'junit:junit:4.12'
-  testCompile 'org.mockito:mockito-core:2.7.11'
+  testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+  testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+  testImplementation 'junit:junit:4.12'
+  testImplementation 'org.mockito:mockito-core:2.7.11'
 
-  androidTestCompile 'com.android.support:recyclerview-v7:25.4.0'
-  androidTestCompile 'com.android.support:support-v4:25.4.0'
-  androidTestCompile 'com.android.support:appcompat-v7:25.4.0'
-  androidTestCompile 'com.android.support:design:25.4.0'
-  androidTestCompile 'junit:junit:4.12'
-  androidTestCompile 'com.android.support.test:runner:0.5'
-  androidTestCompile 'com.android.support.test:rules:0.5'
-  androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-  androidTestCompile 'com.android.support.test.espresso:espresso-contrib:2.2.2'
-  androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
+  androidTestImplementation 'com.android.support:recyclerview-v7:26.0.2'
+  androidTestImplementation 'com.android.support:support-v4:26.0.2'
+  androidTestImplementation 'com.android.support:appcompat-v7:26.0.2'
+  androidTestImplementation 'com.android.support:design:26.0.2'
+  androidTestImplementation 'junit:junit:4.12'
+  androidTestImplementation 'com.android.support.test:runner:0.5'
+  androidTestImplementation 'com.android.support.test:rules:0.5'
+  androidTestImplementation 'com.android.support.test.espresso:espresso-core:2.2.2'
+  androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:2.2.2'
+  androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
 }

@@ -106,7 +106,7 @@ public class RssLocalSync {
 
     private static Optional<SyndFeed> syncFeed(final FeedSQL feedSQL, final File cacheDir) {
         try {
-            return Optional.of(FeedParser.parseFeed(feedSQL.getUrl(), cacheDir));
+            return Optional.of(FeedParser.INSTANCE.parseFeed(feedSQL.getUrl(), cacheDir));
         } catch (Throwable error) {
             System.err.println("Error when syncing " + feedSQL.getUrl());
             error.printStackTrace();
@@ -138,7 +138,7 @@ public class RssLocalSync {
                         Long.toString(feedSQL.getId())));
 
         // This can be null, in that case do not override existing value
-        String selfLink = FeedParser.selfLink(parsedFeed);
+        String selfLink = FeedParser.INSTANCE.selfLink(parsedFeed);
 
         // Populate with values
         feedOp.withValue(COL_TITLE, parsedFeed.getTitle())
@@ -166,15 +166,15 @@ public class RssLocalSync {
                     .withValue(FeedItemSQLKt.COL_LINK, entry.getLink())
                     .withValue(FeedItemSQLKt.COL_FEEDTITLE, feedSQL.getTitle())
                     .withValue(FeedSQLKt.COL_TAG, feedSQL.getTag())
-                    .withValue(FeedItemSQLKt.COL_IMAGEURL, FeedParser.thumbnail(entry))
-                    .withValue(FeedItemSQLKt.COL_ENCLOSURELINK, FeedParser.firstEnclosure(entry))
+                    .withValue(FeedItemSQLKt.COL_IMAGEURL, FeedParser.INSTANCE.thumbnail(entry))
+                    .withValue(FeedItemSQLKt.COL_ENCLOSURELINK, FeedParser.INSTANCE.firstEnclosure(entry))
                     .withValue(FeedItemSQLKt.COL_AUTHOR, entry.getAuthor())
-                    .withValue(FeedItemSQLKt.COL_PUBDATE, FeedParser.publishDate(entry))
+                    .withValue(FeedItemSQLKt.COL_PUBDATE, FeedParser.INSTANCE.publishDate(entry))
                     // Make sure these are non-null
-                    .withValue(FeedSQLKt.COL_TITLE, FeedParser.title(entry))
-                    .withValue(FeedItemSQLKt.COL_DESCRIPTION, FeedParser.description(entry))
-                    .withValue(FeedItemSQLKt.COL_PLAINTITLE, FeedParser.plainTitle(entry))
-                    .withValue(FeedItemSQLKt.COL_PLAINSNIPPET, FeedParser.snippet(entry));
+                    .withValue(FeedSQLKt.COL_TITLE, FeedParser.INSTANCE.title(entry))
+                    .withValue(FeedItemSQLKt.COL_DESCRIPTION, FeedParser.INSTANCE.description(entry))
+                    .withValue(FeedItemSQLKt.COL_PLAINTITLE, FeedParser.INSTANCE.plainTitle(entry))
+                    .withValue(FeedItemSQLKt.COL_PLAINSNIPPET, FeedParser.INSTANCE.snippet(entry));
 
             // Add to list of operations
             operations.add(itemOp.build());

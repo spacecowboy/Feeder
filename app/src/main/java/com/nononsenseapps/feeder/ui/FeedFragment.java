@@ -458,21 +458,20 @@ public class FeedFragment extends Fragment
         } else if (id == R.id.action_edit_feed && this.id > 0) {
             Intent i = new Intent(getActivity(), EditFeedActivity.class);
             // TODO do not animate the back movement here
-            i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
-            i.putExtra(EditFeedActivity._ID, this.id);
-            i.putExtra(EditFeedActivity.CUSTOM_TITLE, customTitle);
-            i.putExtra(EditFeedActivity.FEED_TITLE, title);
-            i.putExtra(EditFeedActivity.TAG, tag);
+            i.putExtra(EditFeedActivityKt.SHOULD_FINISH_BACK, true);
+            i.putExtra(EditFeedActivityKt._ID, this.id);
+            i.putExtra(EditFeedActivityKt.CUSTOM_TITLE, customTitle);
+            i.putExtra(EditFeedActivityKt.FEED_TITLE, title);
+            i.putExtra(EditFeedActivityKt.TAG, tag);
             i.setData(Uri.parse(url));
             startActivity(i);
             return true;
         } else if (id == R.id.action_add_templated && this.id > 0) {
             Intent i = new Intent(getActivity(), EditFeedActivity.class);
             // TODO do not animate the back movement here
-            i.putExtra(EditFeedActivity.SHOULD_FINISH_BACK, true);
-            i.putExtra(EditFeedActivity.TEMPLATE, true);
-            //i.putExtra(EditFeedActivity.CUSTOM_TITLE, title);
-            i.putExtra(EditFeedActivity.TAG, tag);
+            i.putExtra(EditFeedActivityKt.SHOULD_FINISH_BACK, true);
+            i.putExtra(EditFeedActivityKt.TEMPLATE, true);
+            i.putExtra(EditFeedActivityKt.TAG, tag);
             i.setData(Uri.parse(url));
             startActivity(i);
             return true;

@@ -20,31 +20,31 @@ public class FeedParserTest {
 
     @Test
     public void noStyles() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getResearchRsc());
+        SyndFeed feed = FeedParser.INSTANCE.parseFeed(getResearchRsc());
         assertNotNull(feed);
 
-        assertEquals("http://research.swtch.com/feed.atom", FeedParser.selfLink(feed));
+        assertEquals("http://research.swtch.com/feed.atom", FeedParser.INSTANCE.selfLink(feed));
 
         assertEquals(17, feed.getEntries().size());
 
         SyndEntry entry = feed.getEntries().get(9);
 
-        assertNull(FeedParser.thumbnail(entry));
+        assertNull(FeedParser.INSTANCE.thumbnail(entry));
 
         assertEquals("QArt Codes",
-                FeedParser.plainTitle(entry));
+                FeedParser.INSTANCE.plainTitle(entry));
 
         // Style tags should be ignored
         assertEquals("QR codes are 2-dimensional bar codes that encode arbitrary text strings. A common use of QR codes is to encode URLs so that people can scan a QR code (for example, on an advertising poster, building r",
-                FeedParser.snippet(entry));
+                FeedParser.INSTANCE.snippet(entry));
     }
 
     @Test
     public void feedAuthorIsUsedAsFallback() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getResearchRsc());
+        SyndFeed feed = FeedParser.INSTANCE.parseFeed(getResearchRsc());
         assertNotNull(feed);
 
-        assertEquals("http://research.swtch.com/feed.atom", FeedParser.selfLink(feed));
+        assertEquals("http://research.swtch.com/feed.atom", FeedParser.INSTANCE.selfLink(feed));
 
         assertEquals(17, feed.getEntries().size());
 
@@ -57,163 +57,163 @@ public class FeedParserTest {
 
     @Test
     public void cyklist() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getCyklistBloggen());
+        SyndFeed feed = FeedParser.INSTANCE.parseFeed(getCyklistBloggen());
         assertNotNull(feed);
 
-        assertNull(FeedParser.selfLink(feed));
+        assertNull(FeedParser.INSTANCE.selfLink(feed));
 
         assertEquals(10, feed.getEntries().size());
 
         SyndEntry entry = feed.getEntries().get(0);
 
-        assertNull(FeedParser.thumbnail(entry));
+        assertNull(FeedParser.INSTANCE.thumbnail(entry));
 
         assertEquals("Ingen ombyggning av Danvikstull",
-                FeedParser.plainTitle(entry));
+                FeedParser.INSTANCE.plainTitle(entry));
 
         // Make sure character 160 (non-breaking space) is trimmed
         assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: I smalaste passagen är gångdel",
-                FeedParser.snippet(entry));
+                FeedParser.INSTANCE.snippet(entry));
     }
 
     @Test
     public void cowboy() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getCowboyRss());
+        SyndFeed feed = FeedParser.INSTANCE.parseFeed(getCowboyRss());
         assertNotNull(feed);
 
-        assertNull(FeedParser.selfLink(feed));
+        assertNull(FeedParser.INSTANCE.selfLink(feed));
 
         assertEquals(15, feed.getEntries().size());
 
         SyndEntry entry = feed.getEntries().get(1);
 
         assertEquals("https://cowboyprogrammer.org/images/zopfli_all_the_things.jpg",
-                FeedParser.thumbnail(entry));
+                FeedParser.INSTANCE.thumbnail(entry));
 
         // Snippet should not contain images
         entry = feed.getEntries().get(4);
         assertEquals("Fixing the up button in Python shell history", entry.getTitle());
         assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library." +
                         " Ipython is more descri",
-                FeedParser.snippet(entry));
+                FeedParser.INSTANCE.snippet(entry));
         // Snippet should not contain links
         entry = feed.getEntries().get(1);
         assertEquals("Compress all the images!", entry.getTitle());
         assertEquals("*Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS)* One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to be",
-                FeedParser.snippet(entry));
+                FeedParser.INSTANCE.snippet(entry));
     }
 
     @Test
     public void rss() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getRSS());
+        SyndFeed feed = FeedParser.INSTANCE.parseFeed(getRSS());
 
         assertEquals("http://cornucopia.cornubot.se/", feed.getLink());
-        assertNull(FeedParser.selfLink(feed));
+        assertNull(FeedParser.INSTANCE.selfLink(feed));
 
         assertEquals(25, feed.getEntries().size());
         SyndEntry entry = feed.getEntries().get(0);
 
         assertEquals("Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-                FeedParser.plainTitle(entry));
+                FeedParser.INSTANCE.plainTitle(entry));
         assertEquals("Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-                FeedParser.title(entry));
+                FeedParser.INSTANCE.title(entry));
 
         assertEquals("För tredje månaden på raken ligger Konjunkturinsitutets barometerindikator (\"konjunkturbarometern\") kvar i överhettat läge. Det råder alltså en klart och tydligt långsiktig säljsignal i enlighet med k",
-                FeedParser.snippet(entry));
-        assertTrue(FeedParser.description(entry).startsWith("För tredje månaden på raken"));
+                FeedParser.INSTANCE.snippet(entry));
+        assertTrue(FeedParser.INSTANCE.description(entry).startsWith("För tredje månaden på raken"));
         assertEquals("https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s72-c/konj.png",
-                FeedParser.thumbnail(entry));
+                FeedParser.INSTANCE.thumbnail(entry));
 
-        assertEquals(null, FeedParser.firstEnclosure(entry));
+        assertEquals(null, FeedParser.INSTANCE.firstEnclosure(entry));
     }
 
     @Test
     public void atom() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getAtom());
+        SyndFeed feed = FeedParser.INSTANCE.parseFeed(getAtom());
 
         assertEquals("http://cornucopia.cornubot.se/", feed.getLink());
-        assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", FeedParser.selfLink(feed));
+        assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", FeedParser.INSTANCE.selfLink(feed));
 
         assertEquals(25, feed.getEntries().size());
         SyndEntry entry = feed.getEntries().get(0);
 
         assertEquals("Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-                FeedParser.plainTitle(entry));
+                FeedParser.INSTANCE.plainTitle(entry));
         assertEquals("Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-                FeedParser.title(entry));
+                FeedParser.INSTANCE.title(entry));
 
         assertEquals("För tredje månaden på raken ligger Konjunkturinsitutets barometerindikator (\"konjunkturbarometern\") kvar i överhettat läge. Det råder alltså en klart och tydligt långsiktig säljsignal i enlighet med k",
-                FeedParser.snippet(entry));
-        assertTrue(FeedParser.description(entry).startsWith("För tredje månaden på raken"));
+                FeedParser.INSTANCE.snippet(entry));
+        assertTrue(FeedParser.INSTANCE.description(entry).startsWith("För tredje månaden på raken"));
         assertEquals("https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s72-c/konj.png",
-                FeedParser.thumbnail(entry));
+                FeedParser.INSTANCE.thumbnail(entry));
 
-        assertEquals(null, FeedParser.firstEnclosure(entry));
+        assertEquals(null, FeedParser.INSTANCE.firstEnclosure(entry));
     }
 
     @Test
     public void atomCowboy() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getCowboyAtom());
+        SyndFeed feed = FeedParser.INSTANCE.parseFeed(getCowboyAtom());
 
         assertEquals(15, feed.getEntries().size());
         SyndEntry entry = feed.getEntries().get(1);
 
         assertEquals("dummy-id-to-distinguis-from-alternate-link", entry.getUri());
-        assertTrue("Should take the updated timestamp", FeedParser.publishDate(entry).contains("2016"));
+        assertTrue("Should take the updated timestamp", FeedParser.INSTANCE.publishDate(entry).contains("2016"));
         assertEquals("http://localhost:1313/images/zopfli_all_the_things.jpg",
-                FeedParser.thumbnail(entry));
+                FeedParser.INSTANCE.thumbnail(entry));
     }
 
     @Test
     public void morningPaper() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getMorningPaper());
+        SyndFeed feed = FeedParser.INSTANCE.parseFeed(getMorningPaper());
 
         assertEquals("https://blog.acolyer.org", feed.getLink());
-        assertNull(FeedParser.selfLink(feed));
+        assertNull(FeedParser.INSTANCE.selfLink(feed));
 
         assertEquals(10, feed.getEntries().size());
         SyndEntry entry = feed.getEntries().get(0);
 
         assertEquals("Thou shalt not depend on me: analysing the use of outdated JavaScript libraries on the web",
-                FeedParser.plainTitle(entry));
+                FeedParser.INSTANCE.plainTitle(entry));
 
         assertEquals("http://1.gravatar.com/avatar/a795b4f89a6d096f314fc0a2c80479c1?s=96&d=identicon&r=G",
-                FeedParser.thumbnail(entry));
+                FeedParser.INSTANCE.thumbnail(entry));
     }
 
     @Test
     public void londoner() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getLondoner());
+        SyndFeed feed = FeedParser.INSTANCE.parseFeed(getLondoner());
 
         assertEquals("http://londonist.com/", feed.getLink());
-        assertNull(FeedParser.selfLink(feed));
+        assertNull(FeedParser.INSTANCE.selfLink(feed));
 
         assertEquals(40, feed.getEntries().size());
         SyndEntry entry = feed.getEntries().get(0);
 
         assertEquals("Make The Most Of London's Offerings With Chip",
-                FeedParser.plainTitle(entry));
+                FeedParser.INSTANCE.plainTitle(entry));
 
         assertEquals("https://assets.londonist.com/uploads/2017/06/i300x150/chip_2.jpg",
-                FeedParser.thumbnail(entry));
+                FeedParser.INSTANCE.thumbnail(entry));
     }
 
     @Test
     @Ignore
     public void fz() throws Exception {
-        SyndFeed feed = FeedParser.parseFeed(getFz());
+        SyndFeed feed = FeedParser.INSTANCE.parseFeed(getFz());
 
         assertEquals("http://www.fz.se/nyheter/", feed.getLink());
-        assertNull(FeedParser.selfLink(feed));
+        assertNull(FeedParser.INSTANCE.selfLink(feed));
 
         assertEquals(20, feed.getEntries().size());
         SyndEntry entry = feed.getEntries().get(0);
 
         assertEquals("Nier: Automata bjuder på maffig lanseringstrailer",
-                FeedParser.plainTitle(entry));
+                FeedParser.INSTANCE.plainTitle(entry));
 
         assertEquals("http://d2ihp3fq52ho68.cloudfront.net/YTo2OntzOjI6ImlkIjtpOjEzOTI3OTM7czoxOiJ3IjtpOjUwMDtzOjE6ImgiO2k6OTk5OTtzOjE6ImMiO2k6MDtzOjE6InMiO2k6MDtzOjE6ImsiO3M6NDA6IjU5YjA2YjgyZjkyY2IxZjBiMDZjZmI5MmE3NTk5NjMzMjIyMmU4NGMiO30=",
-                FeedParser.thumbnail(entry));
+                FeedParser.INSTANCE.thumbnail(entry));
     }
 
     private InputStream getAtom() {
