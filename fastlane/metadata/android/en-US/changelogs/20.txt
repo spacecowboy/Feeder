@@ -1,0 +1,27 @@
+# 1.3.13
+
+*   Add new feed now finds feed links in web pages
+
+    Makes it possible to input a url to a site, such as
+    `cowboyprogrammer.org`, when adding a new feed.
+
+    Previously, the direct address to the RSS/Atom feed was required
+    (`cowboyprogrammer.org/atom.xml`). This was not ideal because
+
+    - not all sites advertise a link to their feeds
+
+    - the location of the feed is not standardized so it's not easily
+      guessable
+
+    - viewing the source of a web site to find the alternate link is
+      very hard to do on mobile
+
+    Now, the site you enter is parsed and if it contains alternate
+    links to feeds, one of those links are loaded parsed
+    instead. Currently RSS and Atom feeds are identified and Atom is
+    preferred over RSS.
+
+    See !60
+
+*   Target Android 26
+    See !60
