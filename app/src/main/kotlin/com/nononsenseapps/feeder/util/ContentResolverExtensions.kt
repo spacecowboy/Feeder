@@ -18,6 +18,7 @@ import com.nononsenseapps.feeder.db.COL_UNREAD
 import com.nononsenseapps.feeder.db.FEED_FIELDS
 import com.nononsenseapps.feeder.db.FEED_ITEM_FIELDS
 import com.nononsenseapps.feeder.db.FIELDS_TAGSWITHCOUNT
+import com.nononsenseapps.feeder.db.FIELDS_VIEWCOUNT
 import com.nononsenseapps.feeder.db.FeedItemSQL
 import com.nononsenseapps.feeder.db.FeedSQL
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
@@ -26,7 +27,7 @@ import com.nononsenseapps.feeder.db.URI_FEEDSWITHCOUNTS
 import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
 import com.nononsenseapps.feeder.db.asFeed
 import com.nononsenseapps.feeder.db.asFeedItem
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Inserts or updates a feed. Always returns the id of the item.
@@ -228,12 +229,28 @@ fun ContentResolver.queryFeeds(columns: List<String> = FEED_FIELDS.asList(),
     queryItems(URI_FEEDS, columns, where, params, order, reader)
 }
 
+fun ContentResolver.queryFeedsWithCounts(columns: List<String> = FIELDS_VIEWCOUNT.asList(),
+                                        where: String? = null, params: List<Any>? = null, order: String? = null,
+                                        reader: (Cursor) -> Unit) {
+    queryItems(URI_FEEDSWITHCOUNTS, columns, where, params, order, reader)
+}
+
+fun ContentResolver.cursorForFeedsWithCounts(columns: List<String> = FIELDS_VIEWCOUNT.asList(),
+                                         where: String? = null, params: List<Any>? = null, order: String? = null): Cursor? {
+    return cursorFor(URI_FEEDSWITHCOUNTS, columns, where, params, order)
+}
+
 fun ContentResolver.queryFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asList(),
                                    where: String? = null,
                                    params: List<Any>? = null,
                                    order: String? = null,
                                    reader: (Cursor) -> Unit) {
     queryItems(URI_FEEDITEMS, columns, where, params, order, reader)
+}
+
+fun ContentResolver.cursorFor(uri: Uri, columns: List<String>, where: String? = null,
+                                      params: List<Any>? = null, order: String? = null): Cursor? {
+    return query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order)
 }
 
 
