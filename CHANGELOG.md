@@ -1,3 +1,8 @@
+# 1.3.14
+
+*   Fixed loss of scroll position on redraw in left drawer menu
+    See !61 #57
+
 # 1.3.13
 
 *   Add new feed now finds feed links in web pages
