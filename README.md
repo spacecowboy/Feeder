@@ -32,7 +32,6 @@ This is a no-nonsense RSS/Atom feed reader app for Android.
 
 ### Screenshots
 
-<img src="graphics/Screenshot_2014-12-28-00-43-24.png" width=50%/>
-<img src="graphics/Screenshot_2014-12-28-00-43-37.png" width=50%/>
-<img src="graphics/Screenshot_2014-12-28-00-43-46.png" width=50%/>
-<img src="graphics/Screenshot_2014-12-28-00-44-02.png" width=50%/>
+<img src="fastlane/metadata/android/en-US/phoneScreenshots/feed.png" width=50%/>
+<img src="fastlane/metadata/android/en-US/phoneScreenshots/article.png" width=50%/>
+<img src="fastlane/metadata/android/en-US/phoneScreenshots/settings.png" width=50%/>
