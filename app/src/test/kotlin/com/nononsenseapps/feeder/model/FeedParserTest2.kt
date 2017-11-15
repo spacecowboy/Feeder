@@ -50,13 +50,20 @@ class FeedParserTest2 {
 
     @Test
     @Throws(Exception::class)
+    fun findsAlternateLinksPreferJSON() {
+        val rssLink = FeedParser.findFeedLink(getCowboyHtml(), preferJSON = true)
+        assertEquals("https://cowboyprogrammer.org/feed.json", rssLink)
+    }
+
+    @Test
+    @Throws(Exception::class)
     @Ignore
     fun relativeLinksAreMadeAbsoluteAtom() {
 
         val feed = FeedParser.parseFeed(atomRelative.byteInputStream())
         assertNotNull(feed)
 
-        assertEquals("http://cowboyprogrammer.org/feed.atom", FeedParser.selfLink(feed))
+        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
     }
 
     @Test
@@ -67,7 +74,7 @@ class FeedParserTest2 {
         val feed = FeedParser.parseFeed(atomRelativeNoBase.byteInputStream())
         assertNotNull(feed)
 
-        assertEquals("http://cowboyprogrammer.org/feed.atom", FeedParser.selfLink(feed))
+        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
     }
 
     private fun getCowboyHtml(): String =
