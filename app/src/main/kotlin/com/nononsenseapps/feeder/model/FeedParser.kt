@@ -27,16 +27,18 @@ object FeedParser {
     // Should reuse same instance to have same cache
     private var client: OkHttpClient? = null
 
-    private fun cachingClient(cacheDirectory: File): OkHttpClient {
+    private fun cachingClient(cacheDirectory: File?): OkHttpClient {
         if (client == null) {
-
-            val cacheSize = 10 * 1024 * 1024 // 10 MiB
-            val cache = Cache(cacheDirectory, cacheSize.toLong())
-
             val builder = OkHttpClient.Builder()
-                    .cache(cache)
                     .connectTimeout(5, TimeUnit.SECONDS)
                     .readTimeout(5, TimeUnit.SECONDS)
+
+            if (cacheDirectory != null) {
+                val cacheSize = 10 * 1024 * 1024 // 10 MiB
+                val cache = Cache(cacheDirectory, cacheSize.toLong())
+
+                builder.cache(cache)
+            }
 
             trustAllCerts(builder)
 
@@ -113,7 +115,7 @@ object FeedParser {
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    fun parseFeed(feedUrl: String, cacheDir: File): Feed {
+    fun parseFeed(feedUrl: String, cacheDir: File?): Feed {
         var url = feedUrl
         try {
             if (!url.startsWith("http://") && !url.startsWith("https://")) {

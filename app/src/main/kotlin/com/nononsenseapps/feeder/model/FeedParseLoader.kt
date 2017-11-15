@@ -5,6 +5,7 @@ import android.content.Context
 import com.nononsenseapps.feeder.util.LoaderResult
 import com.nononsenseapps.feeder.util.d
 import com.nononsenseapps.jsonfeed.Feed
+import java.io.File
 
 class FeedParseLoader(context: Context,
                       private val searchQuery: String) :
@@ -14,7 +15,12 @@ class FeedParseLoader(context: Context,
         var feed: Feed? = null
         var msg: String? = null
         try {
-            feed = FeedParser.parseFeed(searchQuery, context.externalCacheDir)
+            var cacheDir: File? = context.externalCacheDir
+            // Yes, cacheDir can indeed be null
+            if (cacheDir == null) {
+                cacheDir = context.filesDir
+            }
+            feed = FeedParser.parseFeed(searchQuery, cacheDir)
         } catch (feedParsingError: FeedParser.FeedParsingError) {
             d(context, feedParsingError.localizedMessage)
             msg = feedParsingError.localizedMessage

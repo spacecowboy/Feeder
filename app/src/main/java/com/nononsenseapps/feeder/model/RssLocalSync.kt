@@ -111,7 +111,7 @@ object RssLocalSync {
 
     private fun syncFeed(feedSQL: FeedSQL, cacheDir: File?): Optional<Feed> {
         try {
-            return Optional.of(FeedParser.parseFeed(feedSQL.url, cacheDir!!))
+            return Optional.of(FeedParser.parseFeed(feedSQL.url, cacheDir))
         } catch (error: Throwable) {
             System.err.println("Error when syncing " + feedSQL.url)
             error.printStackTrace()
