@@ -1,13 +1,14 @@
 package com.nononsenseapps.feeder.views;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.text.Layout;
 import android.text.Spanned;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.TextView;
-
 import com.nononsenseapps.feeder.ui.text.ClickableImageSpan;
 
 /**
@@ -49,19 +50,24 @@ public class LinkedTextView extends TextView {
                         buffer.getSpans(off, off, ClickableImageSpan.class);
 
                 // Cant click to the right of a span, if the line ends with the span!
-                if (x > layout.getLineRight(line)) {
-                    // Don't call the span
-                } else if (link.length != 0) {
-                    if (action == MotionEvent.ACTION_UP) {
-                        link[0].onClick(widget);
+                try {
+                    if (x > layout.getLineRight(line)) {
+                        // Don't call the span
+                    } else if (link.length != 0) {
+                        if (action == MotionEvent.ACTION_UP) {
+                            link[0].onClick(widget);
+                        }
+                        return true;
+                    } else if (image.length != 0) {
+                        if (action == MotionEvent.ACTION_UP) {
+                            image[0].onClick();
+                        }
+                        // Don't allow selections on this so always return true
+                        return true;
                     }
-                    return true;
-                } else if (image.length != 0) {
-                    if (action == MotionEvent.ACTION_UP) {
-                        image[0].onClick();
-                    }
-                    // Don't allow selections on this so always return true
-                    return true;
+                } catch(ActivityNotFoundException exception) {
+                    // No such activity
+                    Log.d("LinkedTextView", exception.getLocalizedMessage());
                 }
             }
         }
