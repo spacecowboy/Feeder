@@ -1,84 +1,25 @@
 package com.nononsenseapps.feeder.model
 
-import android.annotation.SuppressLint
 import android.util.Log
 import com.nononsenseapps.feeder.util.asFeed
 import com.nononsenseapps.jsonfeed.Feed
+import com.nononsenseapps.jsonfeed.JsonFeedParser
+import com.nononsenseapps.jsonfeed.cachingHttpClient
+import com.nononsenseapps.jsonfeed.feedAdapter
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
-import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.security.KeyManagementException
-import java.security.NoSuchAlgorithmException
-import java.security.cert.CertificateException
-import java.security.cert.X509Certificate
-import java.util.concurrent.TimeUnit
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 
 object FeedParser {
 
     // Should reuse same instance to have same cache
     private var client: OkHttpClient? = null
-
-    private fun cachingClient(cacheDirectory: File?): OkHttpClient {
-        if (client == null) {
-            val builder = OkHttpClient.Builder()
-                    .connectTimeout(5, TimeUnit.SECONDS)
-                    .readTimeout(5, TimeUnit.SECONDS)
-
-            if (cacheDirectory != null) {
-                val cacheSize = 10 * 1024 * 1024 // 10 MiB
-                val cache = Cache(cacheDirectory, cacheSize.toLong())
-
-                builder.cache(cache)
-            }
-
-            trustAllCerts(builder)
-
-            client = builder.build()
-        }
-
-        return client as OkHttpClient
-    }
-
-    private fun trustAllCerts(builder: OkHttpClient.Builder) {
-        try {
-            val trustManager = object : X509TrustManager {
-                @SuppressLint("TrustAllX509TrustManager")
-                @Throws(CertificateException::class)
-                override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
-                }
-
-                @SuppressLint("TrustAllX509TrustManager")
-                @Throws(CertificateException::class)
-                override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {
-                }
-
-                override fun getAcceptedIssuers(): Array<X509Certificate> {
-                    return emptyArray()
-                }
-            }
-
-            val sslContext = SSLContext.getInstance("TLS")
-            sslContext.init(null, arrayOf<TrustManager>(trustManager), null)
-            val sslSocketFactory = sslContext.socketFactory
-
-            builder.sslSocketFactory(sslSocketFactory, trustManager)
-                    .hostnameVerifier { _, _ -> true }
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
-        } catch (e: KeyManagementException) {
-            e.printStackTrace()
-        }
-
-    }
+    private var jsonFeedParser: JsonFeedParser? = null
 
     /**
      * Finds alternate links in the header of an HTML document pointing to feeds.
@@ -122,12 +63,21 @@ object FeedParser {
                 url = "http://" + url
             }
 
+            if (client == null) {
+                client = cachingHttpClient(cacheDirectory = cacheDir)
+            }
+            if (jsonFeedParser == null) {
+                jsonFeedParser = JsonFeedParser(client!!, feedAdapter())
+            }
+
             val request = Request.Builder()
                     .url(url)
                     .build()
 
-            val cacheClient = cachingClient(cacheDir)
-            val call = cacheClient.newCall(request)
+            val client: OkHttpClient = client!!
+            val jsonFeedParser: JsonFeedParser = jsonFeedParser!!
+
+            val call = client.newCall(request)
             val response = call.execute()
 
             if (!response.isSuccessful) {
@@ -138,17 +88,20 @@ object FeedParser {
                 Log.d("RSSLOCAL", "cache response: " + response.cacheResponse())
                 Log.d("RSSLOCAL", "network response: " + response.networkResponse())
 
+                val isJSON = (response.header("content-type") ?: "").contains("json")
                 val body = response.body()?.string()
 
                 if (body != null) {
-
                     val alternateFeedLink = findFeedLink(body,
                             preferAtom = true)
 
                     return if (alternateFeedLink != null) {
                         parseFeed(alternateFeedLink, cacheDir)
                     } else {
-                        parseFeed(body)
+                        when (isJSON) {
+                            true -> jsonFeedParser.parseJson(body)
+                            false -> parseFeed(body)
+                        }
                     }
                 }
                 throw NullPointerException("Response body was null")

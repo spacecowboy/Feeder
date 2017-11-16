@@ -30,6 +30,7 @@ import com.nononsenseapps.feeder.db.Util.LongsToStringArray
 import com.nononsenseapps.feeder.db.Util.ToStringArray
 import com.nononsenseapps.feeder.db.Util.WHEREIDIS
 import com.nononsenseapps.feeder.db.Util.WhereIs
+import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.FileLog
 import com.nononsenseapps.feeder.util.Optional
 import com.nononsenseapps.feeder.util.getFeeds
@@ -168,6 +169,8 @@ object RssLocalSync {
                 itemOp.withValue(COL_FEED, feedSQL.id)
 
                 // Be careful about nulls.
+                val text = entry.content_html ?: entry.content_text ?: ""
+                val summary = entry.summary ?: HtmlToPlainTextConverter.HtmlToPlainText(text).take(200)
                 itemOp
                         // These can be null
                         .withValue(COL_LINK, entry.url)
@@ -179,10 +182,10 @@ object RssLocalSync {
                         .withValue(COL_GUID, entry.id)
                         .withValue(COL_FEEDTITLE, feedSQL.title)
                         .withValue(COL_TAG, feedSQL.tag)
-                        .withValue(COL_TITLE, entry.title)
-                        .withValue(COL_DESCRIPTION, entry.content_html ?: "")
+                        .withValue(COL_TITLE, entry.title ?: "")
+                        .withValue(COL_DESCRIPTION, text)
                         .withValue(COL_PLAINTITLE, entry.title ?: "")
-                        .withValue(COL_PLAINSNIPPET, entry.summary ?: "")
+                        .withValue(COL_PLAINSNIPPET, summary)
 
                 // Add to list of operations
                 operations.add(itemOp.build())
