@@ -1,4 +1,4 @@
-This is a no-nonsense RSS/Atom feed reader app for Android.
+This is a no-nonsense RSS/Atom/JSON feed reader app for Android.
 
 One of its primary features is that it parses HTML it finds in feeds and
 displays it as regular text. No ridiculous web-views here. But still, images are
