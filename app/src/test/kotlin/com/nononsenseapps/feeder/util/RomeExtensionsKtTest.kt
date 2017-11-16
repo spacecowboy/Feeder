@@ -115,7 +115,7 @@ class RomeExtensionsKtTest {
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
-                                mockSyndContent(value = "PLAIN", type = "text/plain"),
+                                mockSyndContent(value = "PLAIN", type = "text"),
                                 mockSyndContent(value = "<b>html</b>", type = "html"),
                                 mockSyndContent(value = null, type = "xhtml"),
                                 mockSyndContent(value = "bah", type = null)

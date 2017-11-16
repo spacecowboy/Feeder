@@ -70,10 +70,10 @@ fun SyndEntry.contentText(): String {
         var possiblyHtml: String? = null
 
         for (c in contents) {
-            if ("text/plain" == c.type && c.value != null) {
+            if ("text" == c.type && c.value != null) {
                 return c.value
             } else if (null == c.type && c.value != null) {
-                // Suspect it might be text/plain as per the Rome docs
+                // Suspect it might be text as per the Rome docs
                 // https://github.com/ralph-tice/rome/blob/master/src/main/java/com/sun/syndication/feed/synd/SyndContent.java
                 possiblyHtml = c.value
                 break
