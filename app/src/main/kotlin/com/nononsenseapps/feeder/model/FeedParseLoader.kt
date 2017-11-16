@@ -2,25 +2,31 @@ package com.nononsenseapps.feeder.model
 
 import android.content.AsyncTaskLoader
 import android.content.Context
-import com.nononsenseapps.feeder.util.*
 import com.nononsenseapps.feeder.util.LoaderResult
-import com.rometools.rome.feed.synd.SyndFeed
+import com.nononsenseapps.feeder.util.d
+import com.nononsenseapps.jsonfeed.Feed
+import java.io.File
 
 class FeedParseLoader(context: Context,
                       private val searchQuery: String) :
-        AsyncTaskLoader<LoaderResult<SyndFeed?>>(context) {
+        AsyncTaskLoader<LoaderResult<Feed?>>(context) {
 
-    override fun loadInBackground(): LoaderResult<SyndFeed?> {
-        var feed: SyndFeed? = null
+    override fun loadInBackground(): LoaderResult<Feed?> {
+        var feed: Feed? = null
         var msg: String? = null
         try {
-            feed = FeedParser.parseFeed(searchQuery, context.externalCacheDir)
+            var cacheDir: File? = context.externalCacheDir
+            // Yes, cacheDir can indeed be null
+            if (cacheDir == null) {
+                cacheDir = context.filesDir
+            }
+            feed = FeedParser.parseFeed(searchQuery, cacheDir)
         } catch (feedParsingError: FeedParser.FeedParsingError) {
             d(context, feedParsingError.localizedMessage)
             msg = feedParsingError.localizedMessage
         }
 
-        return LoaderResult<SyndFeed?>(feed, msg)
+        return LoaderResult(feed, msg)
     }
 
     /**

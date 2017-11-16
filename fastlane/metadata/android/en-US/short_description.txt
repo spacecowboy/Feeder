@@ -1,1 +1,1 @@
-A no-nonsense RSS/Atom feed reader app
+A no-nonsense RSS/Atom/JSON feed reader app

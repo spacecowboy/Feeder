@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.text;
 
+import android.support.annotation.NonNull;
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
@@ -23,15 +24,16 @@ public class HtmlToPlainTextConverter implements ContentHandler {
     private Stack<HtmlToSpannedConverter.Listing> listings = new Stack<>();
     private int ignoreCount = 0;
 
-    public static String HtmlToPlainText(String html) {
+    public static String HtmlToPlainText(@NonNull String html) {
         return new HtmlToPlainTextConverter(html).convert();
     }
 
-    public HtmlToPlainTextConverter(String source) {
+    public HtmlToPlainTextConverter(@NonNull String source) {
         mSource = source;
         mReader = getParser();
     }
 
+    @NonNull
     public String convert() {
         this.builder = new StringBuilder();
 

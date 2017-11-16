@@ -44,7 +44,7 @@ import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.feeder.util.setString
 import com.nononsenseapps.feeder.util.updateFeedWith
 import com.nononsenseapps.feeder.views.FloatLabelLayout
-import com.rometools.rome.feed.synd.SyndFeed
+import com.nononsenseapps.jsonfeed.Feed
 
 const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
 const val _ID = "_id"
@@ -59,7 +59,7 @@ private const val TAGSFILTER = "TAGSFILTER"
 
 
 class EditFeedActivity : Activity(),
-        LoaderManager.LoaderCallbacks<LoaderResult<SyndFeed?>> {
+        LoaderManager.LoaderCallbacks<LoaderResult<Feed?>> {
     private var shouldFinishBack = false
     private var id: Long = -1
     // Views and shit
@@ -106,7 +106,7 @@ class EditFeedActivity : Activity(),
         listResults.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             val entry = resultAdapter.getItem(position)
             if (entry != null) {
-                useEntry(entry.title, feedUrl ?: "")
+                useEntry(entry.title ?: "untitled", feedUrl ?: "")
             }
         }
 
@@ -365,15 +365,15 @@ class EditFeedActivity : Activity(),
      * @return Return a new Loader instance that is ready to start loading.
      */
     override fun onCreateLoader(id: Int,
-                                args: Bundle): Loader<LoaderResult<SyndFeed?>> {
+                                args: Bundle): Loader<LoaderResult<Feed?>> {
         listResults.visibility = View.GONE
         emptyText.visibility = View.GONE
         loadingProgress.visibility = View.VISIBLE
         return FeedParseLoader(this, args.getString(SEARCHQUERY))
     }
 
-    override fun onLoadFinished(loader: Loader<LoaderResult<SyndFeed?>>,
-                                data: LoaderResult<SyndFeed?>) {
+    override fun onLoadFinished(loader: Loader<LoaderResult<Feed?>>,
+                                data: LoaderResult<Feed?>) {
         emptyText.setText(R.string.no_feeds_found)
         loadingProgress.visibility = View.GONE
         val feed = data.result
@@ -388,7 +388,7 @@ class EditFeedActivity : Activity(),
         }
     }
 
-    override fun onLoaderReset(loader: Loader<LoaderResult<SyndFeed?>>) {
+    override fun onLoaderReset(loader: Loader<LoaderResult<Feed?>>) {
         resultAdapter.entries = null
     }
 
@@ -396,7 +396,7 @@ class EditFeedActivity : Activity(),
      * Display feed search results
      */
     internal inner class ResultsAdapter(private val context: Context) : BaseAdapter() {
-        var entries: List<SyndFeed>? = null
+        var entries: List<Feed>? = null
             set(value) {
                 field = value
                 notifyDataSetChanged()
@@ -421,7 +421,7 @@ class EditFeedActivity : Activity(),
          * *
          * @return The data at the specified position.
          */
-        override fun getItem(position: Int): SyndFeed? =
+        override fun getItem(position: Int): Feed? =
                 entries?.get(position)
 
         /**
@@ -497,7 +497,7 @@ class EditFeedActivity : Activity(),
             vh.textTitle.text = entry.title
             vh.textDescription.text = entry.description
             // Really do want to use the normal link here and not self link
-            vh.textUrl.text = entry.link
+            vh.textUrl.text = entry.home_page_url
 
             return v
         }
@@ -508,7 +508,7 @@ class EditFeedActivity : Activity(),
     }
 
     internal inner class ViewHolder(v: View) {
-        var entry: SyndFeed? = null
+        var entry: Feed? = null
         var textTitle: TextView = v.findViewById(R.id.feed_title)
         var textUrl: TextView = v.findViewById(R.id.feed_url)
         var textDescription: TextView = v.findViewById(R.id.feed_description)

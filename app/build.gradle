@@ -89,6 +89,8 @@ dependencies {
   // RSS
   implementation "com.rometools:rome:1.7.1"
   implementation "com.rometools:rome-modules:1.7.1"
+  // JSONFeed
+  implementation project(":jsonfeed-parser")
   // For better fetching
   implementation 'com.squareup.okhttp3:okhttp:3.9.0'
   // Image loading

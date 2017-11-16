@@ -21,7 +21,7 @@ Then build and install the app to your phone which is connected via USB:
 
 ### More details
 
-This is a no-nonsense RSS/Atom feed reader app for Android.
+This is a no-nonsense RSS/Atom/JSON feed reader app for Android.
 
 ### Features
 
