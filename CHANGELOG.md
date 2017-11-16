@@ -1,3 +1,8 @@
+# 1.3.15
+
+*   Fixed an installation crash on Android 5
+    See !62 #69
+
 # 1.3.14
 
 *   Fixed loss of scroll position on redraw in left drawer menu
