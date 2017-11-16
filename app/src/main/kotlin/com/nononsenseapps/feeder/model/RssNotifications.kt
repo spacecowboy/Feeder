@@ -8,7 +8,12 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.support.v4.app.NotificationCompat
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.*
+import com.nononsenseapps.feeder.db.COL_FEED
+import com.nononsenseapps.feeder.db.COL_ID
+import com.nononsenseapps.feeder.db.COL_NOTIFIED
+import com.nononsenseapps.feeder.db.COL_NOTIFY
+import com.nononsenseapps.feeder.db.COL_UNREAD
+import com.nononsenseapps.feeder.db.FeedItemSQL
 import com.nononsenseapps.feeder.ui.FeedActivity
 import com.nononsenseapps.feeder.ui.ReaderActivity
 import com.nononsenseapps.feeder.util.getFeedItems
@@ -100,7 +105,7 @@ private fun notificationBuilder(context: Context): NotificationCompat.Builder {
     val bm = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
 
     return NotificationCompat.Builder(context)
-            .setSmallIcon(R.drawable.ic_stat_rss)
+            .setSmallIcon(R.drawable.ic_stat_f)
             .setLargeIcon(bm)
             .setAutoCancel(true)
             .setCategory(NotificationCompat.CATEGORY_SOCIAL)
