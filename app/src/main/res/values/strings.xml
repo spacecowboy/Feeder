@@ -64,6 +64,7 @@
     <item>Every 3 hours</item>
     <item>Every 6 hours</item>
     <item>Every 12 hours</item>
+    <item>Every day</item>
   </string-array>
   <string-array name="pref_sync_frequency_values">
     <item>0</item>
@@ -71,6 +72,7 @@
     <item>3</item>
     <item>6</item>
     <item>12</item>
+    <item>24</item>
   </string-array>
 
   <string name="synchronization">Synchronization</string>
