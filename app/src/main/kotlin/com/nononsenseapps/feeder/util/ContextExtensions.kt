@@ -12,7 +12,7 @@ import com.nononsenseapps.feeder.db.AUTHORITY
 import com.nononsenseapps.feeder.db.AccountService
 import com.nononsenseapps.feeder.util.PrefUtils.PREF_SYNC_ONLY_CHARGING
 
-fun Context.setupSync(): Unit {
+fun Context.setupSync() {
     val account = AccountService.Account()
     val accountManager: AccountManager = getSystemService(Context.ACCOUNT_SERVICE) as AccountManager
 

@@ -101,10 +101,10 @@ public class FeedFragment extends Fragment
     private static final int FEED_LOADER = 2;
     private static final int FEED_SETTINGS_LOADER = 3;
 
-    private static final String ARG_FEED_ID = "feed_id";
-    private static final String ARG_FEED_TITLE = "feed_title";
-    private static final String ARG_FEED_URL = "feed_url";
-    private static final String ARG_FEED_TAG = "feed_tag";
+    static final String ARG_FEED_ID = "feed_id";
+    public static final String ARG_FEED_TITLE = "feed_title";
+    static final String ARG_FEED_URL = "feed_url";
+    static final String ARG_FEED_TAG = "feed_tag";
     // Filter for database loader
     private static final String ONLY_UNREAD = FeedItemSQLKt.COL_UNREAD + " IS 1 ";
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
