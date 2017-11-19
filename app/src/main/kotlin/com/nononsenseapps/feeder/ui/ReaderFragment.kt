@@ -275,12 +275,12 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     setViewBody()
                 }
             }
-            loader.reset()
+            loader.cancelLoad()
         } else if (loader?.id == TEXT_LOADER) {
             if (data != null) {
                 bodyTextView?.text = data as Spanned?
             }
-            loader.reset()
+            loader.cancelLoad()
         }
     }
 
