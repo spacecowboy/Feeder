@@ -6,9 +6,11 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.nononsenseapps.feeder.model.OPMLParserToDatabase
 import com.nononsenseapps.feeder.model.opml.OpmlParser
 import com.nononsenseapps.feeder.model.opml.writeFile
+import com.nononsenseapps.feeder.util.firstOrNull
+import com.nononsenseapps.feeder.util.forEach
 import com.nononsenseapps.feeder.util.getString
-import java.util.ArrayList
 import java.io.File
+import java.util.*
 
 private val DATABASE_VERSION = 4
 private val DATABASE_NAME = "rssDatabase"
@@ -88,8 +90,8 @@ class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(co
     private fun tags(db: SQLiteDatabase): List<String?> {
         val tags = ArrayList<String?>()
 
-        db.query(VIEWTAGS_NAME, arrayOf(COL_TAG), null, null, null, null, null).use {
-            while (it.moveToNext()) {
+        db.query(VIEWTAGS_NAME, arrayOf(COL_TAG), null, null, null, null, null).use { cursor ->
+            cursor.forEach {
                 tags.add(it.getString(COL_TAG))
             }
         }
@@ -102,8 +104,8 @@ class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(co
             val feeds = ArrayList<FeedSQL>()
 
             db.query(FEED_TABLE_NAME, FEED_FIELDS, "$COL_TAG IS ?",
-                    arrayOf(tag ?: ""), null, null, null).use {
-                while (it.moveToNext()) {
+                    arrayOf(tag ?: ""), null, null, null).use { cursor ->
+                cursor.forEach {
                     feeds.add(it.asFeed())
                 }
             }
@@ -113,19 +115,13 @@ class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(co
     }
 }
 
-class OPMLDatabaseHandler(val db: SQLiteDatabase): OPMLParserToDatabase {
+class OPMLDatabaseHandler(val db: SQLiteDatabase) : OPMLParserToDatabase {
     override fun getFeed(url: String): FeedSQL {
-        var result: FeedSQL = FeedSQL(url=url)
-
         db.query(FEED_TABLE_NAME,
                 FEED_FIELDS, "$COL_URL IS ?",
-                arrayOf(url), null, null, null).use{
-            if (it.moveToNext()) {
-                result = it.asFeed()
-            }
+                arrayOf(url), null, null, null).use { cursor ->
+            return cursor.firstOrNull()?.asFeed() ?: FeedSQL(url = url)
         }
-
-        return result
     }
 
     override fun saveFeed(feed: FeedSQL) {

@@ -32,19 +32,17 @@ import java.util.*
 /**
  * Inserts or updates a feed. Always returns the id of the item.
  */
-fun ContentResolver.save(feed: FeedSQL): Long {
-    return when {
-        feed.id > 0 -> {
-            updateFeedWith(feed.id, feed.asContentValues())
-            feed.id
-        }
-        else -> {
-            insertFeedWith(feed.asContentValues())
-        }
+fun ContentResolver.save(feed: FeedSQL): Long = when {
+    feed.id > 0 -> {
+        updateFeedWith(feed.id, feed.asContentValues())
+        feed.id
+    }
+    else -> {
+        insertFeedWith(feed.asContentValues())
     }
 }
 
-fun ContentResolver.notifyAllUris(): Unit {
+fun ContentResolver.notifyAllUris() {
     val uris = listOf(URI_FEEDS,
             URI_TAGSWITHCOUNTS,
             URI_FEEDSWITHCOUNTS,
@@ -54,19 +52,19 @@ fun ContentResolver.notifyAllUris(): Unit {
     }
 }
 
-fun ContentResolver.markItemAsRead(itemId: Long, read: Boolean = true): Unit {
+fun ContentResolver.markItemAsRead(itemId: Long, read: Boolean = true) {
     updateFeedItem(itemId) {
         setInt(COL_UNREAD to (if (read) 0 else 1))
     }
 }
 
-fun ContentResolver.markItemAsUnread(itemId: Long): Unit {
+fun ContentResolver.markItemAsUnread(itemId: Long) {
     updateFeedItem(itemId) {
         setInt(COL_UNREAD to 1)
     }
 }
 
-fun ContentResolver.markFeedAsRead(feedId: Long): Unit {
+fun ContentResolver.markFeedAsRead(feedId: Long) {
     updateItems(URI_FEEDITEMS,
             where = "$COL_FEED IS ?",
             params = arrayListOf(feedId)) {
@@ -74,7 +72,7 @@ fun ContentResolver.markFeedAsRead(feedId: Long): Unit {
     }
 }
 
-fun ContentResolver.markTagAsRead(tag: String): Unit {
+fun ContentResolver.markTagAsRead(tag: String) {
     updateItems(URI_FEEDITEMS,
             where = "$COL_TAG IS ?",
             params = arrayListOf(tag)) {
@@ -82,7 +80,7 @@ fun ContentResolver.markTagAsRead(tag: String): Unit {
     }
 }
 
-fun ContentResolver.markAllAsRead(): Unit {
+fun ContentResolver.markAllAsRead() {
     updateItems(URI_FEEDITEMS) {
         setInt(COL_UNREAD to 0)
     }
@@ -91,7 +89,7 @@ fun ContentResolver.markAllAsRead(): Unit {
 /**
  * Request a manual synchronization of one or all (default) feeds
  */
-fun ContentResolver.requestFeedSync(feedId: Long = -1): Unit {
+fun ContentResolver.requestFeedSync(feedId: Long = -1) {
     requestFeedSync {
         if (feedId > 0) {
             putLong(COL_ID, feedId)
@@ -105,7 +103,7 @@ fun ContentResolver.requestFeedSync(feedId: Long = -1): Unit {
 /**
  * Request a manual synchronization of all feeds in tag
  */
-fun ContentResolver.requestFeedSync(tag: String): Unit {
+fun ContentResolver.requestFeedSync(tag: String) {
     requestFeedSync {
         if (tag.isNotEmpty()) {
             putString(COL_TAG, tag)
@@ -116,12 +114,12 @@ fun ContentResolver.requestFeedSync(tag: String): Unit {
     }
 }
 
-inline fun ContentResolver.requestFeedSync(init: Bundle.() -> Unit): Unit {
+inline fun ContentResolver.requestFeedSync(init: Bundle.() -> Unit) {
     val account = com.nononsenseapps.feeder.db.AccountService.Account()
     requestSync(account, com.nononsenseapps.feeder.db.AUTHORITY, bundle(init))
 }
 
-fun ContentResolver.setNotify(feedId: Long, notify: Boolean = true): Unit {
+fun ContentResolver.setNotify(feedId: Long, notify: Boolean = true) {
     if (notify) {
         // First mark all existing as notified so we don't spam
         updateFeedItems(where = "$COL_FEED IS ? AND $COL_NOTIFIED IS 0",
@@ -135,7 +133,7 @@ fun ContentResolver.setNotify(feedId: Long, notify: Boolean = true): Unit {
     }
 }
 
-fun ContentResolver.setNotify(tag: String, notify: Boolean = true): Unit {
+fun ContentResolver.setNotify(tag: String, notify: Boolean = true) {
     if (notify) {
         // First mark all existing as notified so we don't spam
         updateFeedItems(where = "$COL_TAG IS ? AND $COL_NOTIFIED IS 0",
@@ -149,7 +147,7 @@ fun ContentResolver.setNotify(tag: String, notify: Boolean = true): Unit {
     }
 }
 
-fun ContentResolver.setNotifyOnAllFeeds(notify: Boolean = true): Unit {
+fun ContentResolver.setNotifyOnAllFeeds(notify: Boolean = true) {
     if (notify) {
         // First mark all existing as notified so we don't spam
         updateFeedItems(where = "$COL_NOTIFIED IS 0") {
@@ -186,16 +184,14 @@ fun ContentResolver.insertFeedWith(values: ContentValues) =
 /**
  * Update feeds which have a certain column value
  */
-fun ContentResolver.updateFeedsWith(where: String? = null, params: List<Any>? = null, values: ContentValues): Int {
-    return update(URI_FEEDS, values, where, params?.map(Any::toString)?.toTypedArray())
-}
+fun ContentResolver.updateFeedsWith(where: String? = null, params: List<Any>? = null, values: ContentValues): Int =
+        update(URI_FEEDS, values, where, params?.map(Any::toString)?.toTypedArray())
 
 /**
  * Update feeds which have a certain column value
  */
-inline fun ContentResolver.updateFeeds(where: String? = null, params: List<Any>? = null, init: ContentValues.() -> Unit): Int {
-    return updateItems(URI_FEEDS, where, params, init)
-}
+inline fun ContentResolver.updateFeeds(where: String? = null, params: List<Any>? = null, init: ContentValues.() -> Unit): Int =
+        updateItems(URI_FEEDS, where, params, init)
 
 /**
  * Update feed items which have a certain column value
@@ -236,9 +232,8 @@ fun ContentResolver.queryFeedsWithCounts(columns: List<String> = FIELDS_VIEWCOUN
 }
 
 fun ContentResolver.cursorForFeedsWithCounts(columns: List<String> = FIELDS_VIEWCOUNT.asList(),
-                                         where: String? = null, params: List<Any>? = null, order: String? = null): Cursor? {
-    return cursorFor(URI_FEEDSWITHCOUNTS, columns, where, params, order)
-}
+                                         where: String? = null, params: List<Any>? = null, order: String? = null): Cursor? =
+        cursorFor(URI_FEEDSWITHCOUNTS, columns, where, params, order)
 
 fun ContentResolver.queryFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asList(),
                                    where: String? = null,
@@ -249,9 +244,8 @@ fun ContentResolver.queryFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asLi
 }
 
 fun ContentResolver.cursorFor(uri: Uri, columns: List<String>, where: String? = null,
-                                      params: List<Any>? = null, order: String? = null): Cursor? {
-    return query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order)
-}
+                                      params: List<Any>? = null, order: String? = null): Cursor? =
+        query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order)
 
 
 inline fun ContentResolver.queryItems(uri: Uri, columns: List<String>, where: String? = null,
@@ -263,8 +257,8 @@ inline fun ContentResolver.queryItems(uri: Uri, columns: List<String>, where: St
 fun ContentResolver.getFeeds(columns: List<String> = FEED_FIELDS.asList(),
                              where: String? = null, params: List<Any>? = null, order: String? = null): List<FeedSQL> {
     val feeds = ArrayList<FeedSQL>()
-    queryFeeds(columns, where, params, order) {
-        while (it.moveToNext()) {
+    queryFeeds(columns, where, params, order) { cursor ->
+        cursor.forEach {
             feeds.add(it.asFeed())
         }
     }
@@ -276,8 +270,8 @@ fun ContentResolver.getFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asList
                                  params: List<Any>? = null,
                                  order: String? = null): List<FeedItemSQL> {
     val items = ArrayList<FeedItemSQL>()
-    queryFeedItems(columns, where, params, order) {
-        while (it.moveToNext()) {
+    queryFeedItems(columns, where, params, order) { cursor ->
+        cursor.forEach {
             items.add(it.asFeedItem())
         }
     }
@@ -288,8 +282,8 @@ fun ContentResolver.getIdForFeedItem(guid: String, feedId: Long): Long {
     queryItems(URI_FEEDITEMS,
             columns = listOf(COL_ID),
             where = "$COL_GUID IS ? AND $COL_FEED IS ?",
-            params = listOf(guid, feedId)) {
-        if (it.moveToNext()) {
+            params = listOf(guid, feedId)) { cursor ->
+        cursor.forEach {
             return it.getLong(COL_ID) ?: -1L
         }
     }

@@ -9,6 +9,7 @@ import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.FeedSQL
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.model.OPMLContenProvider
+import com.nononsenseapps.feeder.util.forEach
 import com.nononsenseapps.feeder.util.getFeeds
 import com.nononsenseapps.feeder.util.insertFeedWith
 import com.nononsenseapps.feeder.util.queryTagsWithCounts
@@ -244,8 +245,8 @@ class OPMLTest {
     private fun getTags(): ArrayList<String> {
         val tags = ArrayList<String>()
 
-        context!!.contentResolver.queryTagsWithCounts(columns = listOf(COL_TAG)) {
-            while (it.moveToNext()) {
+        context!!.contentResolver.queryTagsWithCounts(columns = listOf(COL_TAG)) { cursor ->
+            cursor.forEach {
                 tags.add(it.getString(0))
             }
         }

@@ -81,7 +81,7 @@ class FeedAsyncTaskLoader(context: Context) : AsyncTaskLoader<List<FeedWrapper>>
             it.count
             it.registerContentObserver(observer)
 
-            while (it.moveToNext()) {
+            it.forEach {
                 val feed = FeedWrapper(item = it.asFeed())
 
                 if (!tags.contains(feed.tag)) {

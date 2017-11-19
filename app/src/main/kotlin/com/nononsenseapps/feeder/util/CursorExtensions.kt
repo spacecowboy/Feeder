@@ -1,6 +1,9 @@
 package com.nononsenseapps.feeder.util
 
-fun android.database.Cursor.getString(column: String): String? {
+import android.database.Cursor
+
+
+fun Cursor.getString(column: String): String? {
     val index = getColumnIndex(column)
     return when {
         index < 0 -> null
@@ -17,7 +20,7 @@ fun android.database.Cursor.getString(column: String): String? {
     }
 }
 
-fun android.database.Cursor.getLong(column: String): Long? {
+fun Cursor.getLong(column: String): Long? {
     val index = getColumnIndex(column)
     return when {
         index < 0 -> null
@@ -25,10 +28,29 @@ fun android.database.Cursor.getLong(column: String): Long? {
     }
 }
 
-fun android.database.Cursor.getInt(column: String): Int? {
+fun Cursor.getInt(column: String): Int? {
     val index = getColumnIndex(column)
     return when {
         index < 0 -> null
         else -> if (isNull(index)) null else getInt(index)
     }
+}
+
+/**
+ * Executes the block of code for each cursor position. Once finished the cursor will be pointing beyond the last item.
+ * Assumes that the cursor is already pointing before the first item.
+ */
+inline fun Cursor.forEach(block: (Cursor) -> Unit) {
+    while (moveToNext()) {
+        block(this)
+    }
+}
+
+/**
+ * Returns the cursor at the first position, or null if the cursor is empty.
+ * Assumes that the cursor is already pointing before the first item.
+ */
+fun Cursor.firstOrNull(): Cursor? = when (moveToNext()) {
+    true -> this
+    false -> null
 }

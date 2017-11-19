@@ -16,8 +16,8 @@ import android.util.Log
 import com.nononsenseapps.feeder.db.AUTHORITY
 import com.nononsenseapps.feeder.db.AccountService
 import com.nononsenseapps.feeder.db.URI_FEEDS
+import com.nononsenseapps.feeder.ui.ARG_FEED_TITLE
 import com.nononsenseapps.feeder.ui.FeedActivity
-import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_TITLE
 import com.nononsenseapps.feeder.util.PrefUtils.PREF_SYNC_ONLY_CHARGING
 
 fun Context.setupSync() {

@@ -27,11 +27,9 @@ import com.nononsenseapps.feeder.model.OPMLContenProvider
 import com.nononsenseapps.feeder.model.RssSyncAdapter
 import com.nononsenseapps.feeder.model.opml.OpmlParser
 import com.nononsenseapps.feeder.model.opml.writeOutputStream
-import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_TAG
-import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_TITLE
-import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_URL
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.forEach
 import com.nononsenseapps.feeder.util.getString
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.queryFeeds
@@ -117,7 +115,7 @@ class FeedActivity : BaseActivity() {
             FeedFragment.newInstance(intentId,
                     intent?.extras?.getString(ARG_FEED_TITLE) ?: "",
                     intent?.extras?.getString(ARG_FEED_URL) ?: "",
-                    lastTag)
+                    intent?.extras?.getString(ARG_FEED_TAG, lastTag) ?: lastTag)
         } else if (lastTag != null || lastId > 0) {
             FeedFragment.newInstance(lastId, "", "", lastTag)
         } else {
@@ -265,8 +263,8 @@ class FeedActivity : BaseActivity() {
     private fun tags(): Iterable<String?> {
         val tags = ArrayList<String?>()
 
-        contentResolver.queryTagsWithCounts(columns = listOf(COL_TAG)) {
-            while (it.moveToNext()) {
+        contentResolver.queryTagsWithCounts(columns = listOf(COL_TAG)) { cursor ->
+            cursor.forEach {
                 tags.add(it.getString(COL_TAG))
             }
         }
@@ -278,8 +276,8 @@ class FeedActivity : BaseActivity() {
         return { tag ->
             val feeds = ArrayList<FeedSQL>()
 
-            contentResolver.queryFeeds(where = "$COL_TAG IS ?", params = listOf(tag ?: "")) {
-                while (it.moveToNext()) {
+            contentResolver.queryFeeds(where = "$COL_TAG IS ?", params = listOf(tag ?: "")) { cursor ->
+                cursor.forEach {
                     feeds.add(it.asFeed())
                 }
             }

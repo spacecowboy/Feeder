@@ -40,3 +40,11 @@ fun Bundle.asFeedItem(): FeedItemSQL {
                 }
             })
 }
+
+fun Bundle.setLong(pair: Pair<String, Long>) {
+    putLong(pair.first, pair.second)
+}
+
+fun Bundle.setString(pair: Pair<String, String?>) {
+    putString(pair.first, pair.second)
+}
