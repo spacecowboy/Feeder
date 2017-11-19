@@ -7,6 +7,7 @@ import android.content.CursorLoader
 import android.content.Intent
 import android.content.Loader
 import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -32,9 +33,13 @@ import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
+import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
 import com.nononsenseapps.feeder.db.Util
 import com.nononsenseapps.feeder.model.FeedParseLoader
+import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_TAG
+import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_TITLE
+import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_URL
 import com.nononsenseapps.feeder.util.LoaderResult
 import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.contentValues
@@ -158,6 +163,12 @@ class EditFeedActivity : Activity(),
                     contentResolver.notifyAllUris()
                     contentResolver.requestFeedSync(id)
 
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$id"))
+                    intent.putExtra(ARG_FEED_TITLE, title)
+                            .putExtra(ARG_FEED_URL, values.getAsString(COL_URL))
+                            .putExtra(ARG_FEED_TAG, values.getAsString(COL_TAG))
+
+                    setResult(RESULT_OK, intent)
                     finish()
                     if (shouldFinishBack) {
                         // Only care about exit transition

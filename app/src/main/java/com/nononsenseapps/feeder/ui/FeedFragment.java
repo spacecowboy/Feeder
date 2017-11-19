@@ -66,6 +66,7 @@ import com.nononsenseapps.feeder.db.RssDatabaseService;
 import com.nononsenseapps.feeder.db.Util;
 import com.nononsenseapps.feeder.model.RssSyncAdapter;
 import com.nononsenseapps.feeder.util.ContentResolverExtensionsKt;
+import com.nononsenseapps.feeder.util.ContextExtensionsKt;
 import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader;
 import com.nononsenseapps.feeder.util.PrefUtils;
 import com.nononsenseapps.feeder.util.TabletUtils;
@@ -101,10 +102,10 @@ public class FeedFragment extends Fragment
     private static final int FEED_LOADER = 2;
     private static final int FEED_SETTINGS_LOADER = 3;
 
-    private static final String ARG_FEED_ID = "feed_id";
-    private static final String ARG_FEED_TITLE = "feed_title";
-    private static final String ARG_FEED_URL = "feed_url";
-    private static final String ARG_FEED_TAG = "feed_tag";
+    static final String ARG_FEED_ID = "feed_id";
+    public static final String ARG_FEED_TITLE = "feed_title";
+    static final String ARG_FEED_URL = "feed_url";
+    static final String ARG_FEED_TAG = "feed_tag";
     // Filter for database loader
     private static final String ONLY_UNREAD = FeedItemSQLKt.COL_UNREAD + " IS 1 ";
     private static final String AND_UNREAD = " AND " + ONLY_UNREAD;
@@ -253,6 +254,13 @@ public class FeedFragment extends Fragment
         } else {
             // Get notification settings at least
             getLoaderManager().restartLoader(FEED_SETTINGS_LOADER, Bundle.EMPTY, this);
+        }
+
+        if (id > 0 && title != null && !title.isEmpty()) {
+            // Else it's done in loader finishing
+            ContextExtensionsKt.addDynamicShortcutToFeed(getActivity(), title, id, null);
+            // Report shortcut usage
+            ContextExtensionsKt.reportShortcutToFeedUsed(getActivity(), id);
         }
     }
 
@@ -481,6 +489,9 @@ public class FeedFragment extends Fragment
                             Util.LongsToStringArray(this.id));
             ContentResolverExtensionsKt.notifyAllUris(getActivity().getContentResolver());
 
+            // Remove from shortcuts
+            ContextExtensionsKt.removeDynamicShortcutToFeed(getActivity(), this.id);
+
             // Tell activity to open another fragment
             ((FeedActivity) getActivity()).showAllFeeds(true);
             return true;
@@ -597,6 +608,11 @@ public class FeedFragment extends Fragment
 
                 ((BaseActivity) getActivity()).getSupportActionBar().setTitle(feed.getDisplayTitle());
                 mNotifyCheck.setChecked(this.notify == 1);
+
+                // Title has been fetched, so add shortcut
+                ContextExtensionsKt.addDynamicShortcutToFeed(getActivity(), feed.getDisplayTitle(), feed.getId(), null);
+                // Report shortcut usage
+                ContextExtensionsKt.reportShortcutToFeedUsed(getActivity(), id);
             }
             // Reset loader
             getLoaderManager().destroyLoader(cursorLoader.getId());

@@ -27,6 +27,9 @@ import com.nononsenseapps.feeder.model.OPMLContenProvider
 import com.nononsenseapps.feeder.model.RssSyncAdapter
 import com.nononsenseapps.feeder.model.opml.OpmlParser
 import com.nononsenseapps.feeder.model.opml.writeOutputStream
+import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_TAG
+import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_TITLE
+import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_URL
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.getString
@@ -36,10 +39,11 @@ import com.nononsenseapps.feeder.util.queryTagsWithCounts
 import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import java.io.File
-import java.util.ArrayList
+import java.util.*
 
 const private val EXPORT_OPML_CODE = 101
 const private val IMPORT_OPML_CODE = 102
+const private val EDIT_FEED_CODE = 103
 
 class FeedActivity : BaseActivity() {
     private val fragmentTag = "single_pane"
@@ -86,7 +90,7 @@ class FeedActivity : BaseActivity() {
         val emptyAddFeed = findViewById<TextView>(R.id.empty_add_feed)
         emptyAddFeed.text = fromHtml(getString(R.string.empty_no_feeds_add))
         emptyAddFeed.setOnClickListener {
-            startActivity(Intent(this@FeedActivity, EditFeedActivity::class.java))
+            startActivityForResult(Intent(this@FeedActivity, EditFeedActivity::class.java), EDIT_FEED_CODE)
         }
 
         // Night mode
@@ -103,18 +107,25 @@ class FeedActivity : BaseActivity() {
     }
 
     private fun defaultFragment(): Fragment? {
-        val tag = PrefUtils.getLastOpenFeedTag(this)
-        val id = PrefUtils.getLastOpenFeedId(this)
+        val lastTag = PrefUtils.getLastOpenFeedTag(this)
+        val lastId = PrefUtils.getLastOpenFeedId(this)
+
+        val intentId: Long? = intent?.data?.lastPathSegment?.toLong()
 
         // Will load title and url in fragment
-        if (tag != null || id > 0) {
-            return FeedFragment.newInstance(id, "", "", tag)
+        return if (intentId != null) {
+            FeedFragment.newInstance(intentId,
+                    intent?.extras?.getString(ARG_FEED_TITLE) ?: "",
+                    intent?.extras?.getString(ARG_FEED_URL) ?: "",
+                    lastTag)
+        } else if (lastTag != null || lastId > 0) {
+            FeedFragment.newInstance(lastId, "", "", lastTag)
         } else {
-            return FeedFragment.newInstance(-10, null, null, null)
+            FeedFragment.newInstance(-10, null, null, null)
         }
     }
 
-    fun showAllFeeds(overrideCurrent: Boolean = false): Unit {
+    fun showAllFeeds(overrideCurrent: Boolean = false) {
         if (fragment == null || overrideCurrent) {
             onNavigationDrawerItemSelected(-10, null, null, null)
         }
@@ -134,7 +145,7 @@ class FeedActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_add -> {
-                startActivity(Intent(this, EditFeedActivity::class.java))
+                startActivityForResult(Intent(this@FeedActivity, EditFeedActivity::class.java), EDIT_FEED_CODE)
                 true
             }
             R.id.action_opml_export -> {
@@ -182,9 +193,7 @@ class FeedActivity : BaseActivity() {
         }
     }
 
-    override fun getSelfNavDrawerItem(): Int {
-        return 0
-    }
+    override fun getSelfNavDrawerItem(): Int = 0
 
     override fun onNavigationDrawerItemSelected(id: Long, title: String?, url: String?, tag: String?) {
         // update the main content by replacing fragments
@@ -235,6 +244,19 @@ class FeedActivity : BaseActivity() {
                     } catch (e: Throwable) {
                         // TODO tell user about error
                     }
+                }
+            }
+            EDIT_FEED_CODE -> {
+                val id = data?.data?.lastPathSegment?.toLong()
+                if (id != null) {
+                    val lastTag = PrefUtils.getLastOpenFeedTag(this)
+
+                    val fragment = FeedFragment.newInstance(id,
+                            data.extras?.getString(ARG_FEED_TITLE) ?: "",
+                            data.extras?.getString(ARG_FEED_URL) ?: "",
+                            data.extras?.getString(ARG_FEED_TAG) ?: lastTag)
+
+                    supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragmentTag).commit()
                 }
             }
         }

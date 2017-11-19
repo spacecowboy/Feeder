@@ -1,6 +1,10 @@
 package com.nononsenseapps.feeder.db
 
-import android.content.*
+import android.content.ContentProvider
+import android.content.ContentProviderOperation
+import android.content.ContentProviderResult
+import android.content.ContentValues
+import android.content.UriMatcher
 import android.database.Cursor
 import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
@@ -22,9 +26,7 @@ private val uriMatcher: UriMatcher = initUriMatcher(::addMatcherUris)
 
 class RssContentProvider : ContentProvider() {
 
-    override fun onCreate(): Boolean {
-        return true
-    }
+    override fun onCreate(): Boolean = true
 
     override fun insert(uri: Uri?, values: ContentValues?): Uri {
         if (uri != null) {
@@ -149,22 +151,20 @@ class RssContentProvider : ContentProvider() {
 
     override fun delete(uri: Uri?, selection: String?, selectionArgs: Array<out String>?): Int {
         if (uri != null) {
-            val result: Int
-            when (uriMatcher.match(uri)) {
-                FEED_ELEMENT_CODE -> result = delete(URI_FEEDS, Util.WHEREIDIS,
+            return when (uriMatcher.match(uri)) {
+                FEED_ELEMENT_CODE -> delete(URI_FEEDS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.lastPathSegment))
-                FEED_CODE -> result = DatabaseHandler.getInstance(context)
+                FEED_CODE -> DatabaseHandler.getInstance(context)
                         .writableDatabase
                         .delete(FEED_TABLE_NAME, selection, selectionArgs)
-                FEEDITEM_ELEMENT_CODE -> result = delete(URI_FEEDITEMS, Util.WHEREIDIS,
+                FEEDITEM_ELEMENT_CODE -> delete(URI_FEEDITEMS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.lastPathSegment))
-                FEEDITEM_CODE -> result = DatabaseHandler.getInstance(context)
+                FEEDITEM_CODE -> DatabaseHandler.getInstance(context)
                         .writableDatabase
                         .delete(FEED_ITEM_TABLE_NAME, selection,
                                 selectionArgs)
                 else -> TODO("not implemented")
             }
-            return result
         } else {
             throw IllegalArgumentException("Uri can't be null")
         }
@@ -177,7 +177,7 @@ class RssContentProvider : ContentProvider() {
 
             val db = DatabaseHandler.getInstance(context).writableDatabase
             db.inTransaction {
-                for (i in 0..numOperations - 1) {
+                for (i in 0 until numOperations) {
                     results[i] = operations[i].apply(this, results, i)
                 }
             }
@@ -187,7 +187,14 @@ class RssContentProvider : ContentProvider() {
     }
 
     override fun getType(uri: Uri?): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (uri != null) {
+            return when (uriMatcher.match(uri)) {
+                FEED_ELEMENT_CODE -> "vnd.android.cursor.item/vnd.nononsenseapps.feed"
+                else -> TODO("not implemented")
+            }
+        } else {
+            throw IllegalArgumentException("Uri can't be null")
+        }
     }
 
     /**
