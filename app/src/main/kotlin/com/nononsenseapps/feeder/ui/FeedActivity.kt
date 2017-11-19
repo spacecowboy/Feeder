@@ -102,6 +102,13 @@ class FeedActivity : BaseActivity() {
             // Change background
             setNightBackground()
         }
+
+        // Database upgrade wipes all items, so request a one-time sync on start up
+        if (PrefUtils.isFirstBootAfterDatabaseUpgrade(this)) {
+            // Sync all feeds
+            contentResolver.requestFeedSync()
+            PrefUtils.markFirstBootAfterDatabaseUpgradeDone(this)
+        }
     }
 
     private fun defaultFragment(): Fragment? {
@@ -254,7 +261,7 @@ class FeedActivity : BaseActivity() {
                             data.extras?.getString(ARG_FEED_URL) ?: "",
                             data.extras?.getString(ARG_FEED_TAG) ?: lastTag)
 
-                    supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragmentTag).commit()
+                    supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragmentTag).commitAllowingStateLoss()
                 }
             }
         }

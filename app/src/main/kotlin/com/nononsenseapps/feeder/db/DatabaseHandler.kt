@@ -12,23 +12,10 @@ import com.nononsenseapps.feeder.util.getString
 import java.io.File
 import java.util.*
 
-private val DATABASE_VERSION = 4
+val DATABASE_VERSION = 5
 private val DATABASE_NAME = "rssDatabase"
 
-class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
-
-    companion object Singleton {
-        private var instance: DatabaseHandler? = null
-
-        @Synchronized
-        fun getInstance(context: Context): DatabaseHandler {
-            if (instance == null) {
-                instance = DatabaseHandler(context)
-            }
-            return instance!!
-        }
-    }
-
+class DatabaseHandler constructor(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     private val context = context.applicationContext
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -38,22 +25,25 @@ class DatabaseHandler private constructor(context: Context): SQLiteOpenHelper(co
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         try {
-            createViewsAndTriggers(db)
-            // Export to OPML
-            val tempFile = File(context.externalCacheDir, "upgrade.opml")
+            // Same for oldVersion < 4
+            if (oldVersion < 5) {
+                createViewsAndTriggers(db)
+                // Export to OPML
+                val tempFile = File(context.externalCacheDir, "upgrade.opml")
 
-            writeFile(tempFile.absolutePath,
-                    tags(db), feedsWithTag(db))
+                writeFile(tempFile.absolutePath,
+                        tags(db), feedsWithTag(db))
 
-            // Delete database
-            deleteEverything(db)
+                // Delete database
+                deleteEverything(db)
 
-            // Create database
-            onCreate(db)
+                // Create database
+                onCreate(db)
 
-            // Import OMPL
-            val parser = OpmlParser(OPMLDatabaseHandler(db))
-            parser.parseFile(tempFile.absolutePath)
+                // Import OMPL
+                val parser = OpmlParser(OPMLDatabaseHandler(db))
+                parser.parseFile(tempFile.absolutePath)
+            }
         } catch (e: Throwable) {
             throw RuntimeException(e)
         }

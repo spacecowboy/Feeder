@@ -50,7 +50,7 @@ inline fun Cursor.forEach(block: (Cursor) -> Unit) {
  * Returns the cursor at the first position, or null if the cursor is empty.
  * Assumes that the cursor is already pointing before the first item.
  */
-fun Cursor.firstOrNull(): Cursor? = when (moveToNext()) {
+fun Cursor.firstOrNull(): Cursor? = when (moveToFirst()) {
     true -> this
     false -> null
 }

@@ -9,6 +9,7 @@ import android.os.RemoteException
 import com.nononsenseapps.feeder.db.AUTHORITY
 import com.nononsenseapps.feeder.db.COL_FEED
 import com.nononsenseapps.feeder.db.COL_FEEDTITLE
+import com.nononsenseapps.feeder.db.COL_FEEDURL
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
@@ -136,12 +137,12 @@ object RssLocalSync {
                 java.lang.Long.toString(feedSQL.id)))
 
         // This can be null, in that case do not override existing value
-        val selfLink = parsedFeed.feed_url
+        val selfLink = parsedFeed.feed_url ?: feedSQL.url
 
         // Populate with values
         feedOp.withValue(COL_TITLE, parsedFeed.title)
                 .withValue(COL_TAG, feedSQL.tag)
-                .withValue(COL_URL, selfLink ?: feedSQL.url)
+                .withValue(COL_URL, selfLink)
 
         // Add to list of operations
         operations.add(feedOp.build())
@@ -159,6 +160,7 @@ object RssLocalSync {
                 // Use the actual id, because update operation will not return id
                 itemOp.withValue(COL_FEED, feedSQL.id)
                         .withValue(COL_FEEDTITLE, feedSQL.displayTitle)
+                        .withValue(COL_FEEDURL, selfLink)
                         .withValue(COL_TAG, feedSQL.tag)
 
                 entry.intoContentProviderOperation(parsedFeed, itemOp)

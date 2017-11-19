@@ -51,6 +51,12 @@ fun relativeLinkIntoAbsolute(base: String, link: String): String = try {
 
         URL(baseUrl, link).toString()
     } catch (_: MalformedURLException) {
-        link
+        try {
+            val baseUrl = URL("http://$base")
+
+            URL(baseUrl, link).toString()
+        } catch (_: MalformedURLException) {
+            link
+        }
     }
 }

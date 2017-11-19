@@ -56,6 +56,8 @@ import org.xml.sax.XMLReader;
 import java.io.IOException;
 import java.io.StringReader;
 
+import static com.nononsenseapps.feeder.util.JsonFeedExtensionsKt.relativeLinkIntoAbsolute;
+
 /**
  * Convert an HTML document into a spannable string.
  */
@@ -70,12 +72,14 @@ public class HtmlToSpannedConverter implements ContentHandler {
     protected int ignoreCount = 0;
 
     protected String mSource;
+    protected String mSiteUrl;
     protected XMLReader mReader;
     protected SpannableStringBuilder mSpannableStringBuilder;
 
-    public HtmlToSpannedConverter(String source, Parser parser, Context context) {
+    public HtmlToSpannedConverter(String source, String siteUrl, Parser parser, Context context) {
         mContext = context;
         mSource = source;
+        mSiteUrl = siteUrl;
         mSpannableStringBuilder = new SpannableStringBuilder();
         mReader = parser;
         mAccentColor = context.getResources().getColor(R.color.accent);
@@ -258,7 +262,9 @@ public class HtmlToSpannedConverter implements ContentHandler {
         int len = text.length();
         text.append("\uFFFC");
 
-        text.setSpan(new ImageSpan(d, src), len, text.length(),
+        String imgLink = relativeLinkIntoAbsolute(mSiteUrl, src);
+
+        text.setSpan(new ImageSpan(d, imgLink), len, text.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         // Add a line break
         text.append("\n");

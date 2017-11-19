@@ -161,7 +161,7 @@ public class BaseActivity extends AppCompatActivity
     protected void setNightBackground() {
         // Change background
         TypedValue typedValue = new TypedValue();
-        if (PrefUtils.isNightMode(this)) {
+        if (PrefUtils.INSTANCE.isNightMode(this)) {
             // Get black
             getTheme().resolveAttribute(R.attr.nightBGColor, typedValue, true);
         } else {
@@ -327,9 +327,9 @@ public class BaseActivity extends AppCompatActivity
 
         // When the user runs the app for the first time, we want to land them with the
         // navigation drawer open. But just the first time.
-        if (!PrefUtils.isWelcomeDone(this)) {
+        if (!PrefUtils.INSTANCE.isWelcomeDone(this)) {
             // first run of the app starts with the nav drawer open
-            PrefUtils.markWelcomeDone(this);
+            PrefUtils.INSTANCE.markWelcomeDone(this);
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
     }

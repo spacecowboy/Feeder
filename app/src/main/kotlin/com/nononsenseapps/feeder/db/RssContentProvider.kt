@@ -26,6 +26,10 @@ private val uriMatcher: UriMatcher = initUriMatcher(::addMatcherUris)
 
 class RssContentProvider : ContentProvider() {
 
+    private val databaseHandler: DatabaseHandler by lazy {
+        DatabaseHandler(context)
+    }
+
     override fun onCreate(): Boolean = true
 
     override fun insert(uri: Uri?, values: ContentValues?): Uri {
@@ -44,12 +48,11 @@ class RssContentProvider : ContentProvider() {
                 else -> throw UnsupportedOperationException("Not yet implemented")
             }
 
-            val id = DatabaseHandler.getInstance(context).writableDatabase
+            val id = databaseHandler.writableDatabase
                     .insert(table, null, values)
-            if (id > 0) {
-                return Uri.withAppendedPath(result, java.lang.Long.toString(id))
-            } else {
-                return result
+            return when {
+                id > 0 -> Uri.withAppendedPath(result, java.lang.Long.toString(id))
+                else -> result
             }
         } else {
             throw IllegalArgumentException("Uri can't be null")
@@ -101,7 +104,7 @@ class RssContentProvider : ContentProvider() {
             queryBuilder.tables = table
             val query = queryBuilder.buildQuery(projection, where, null, null, sortOrder, null) + getLimitString(uri)
 
-            val result = DatabaseHandler.getInstance(context).readableDatabase
+            val result = databaseHandler.readableDatabase
                     .rawQuery(query, params)
 
             // Make sure you don't override another uri here
@@ -142,7 +145,7 @@ class RssContentProvider : ContentProvider() {
                 else -> TODO("not implemented")
             }
 
-            return DatabaseHandler.getInstance(context).writableDatabase
+            return databaseHandler.writableDatabase
                     .update(table, values, where, params)
         } else {
             throw IllegalArgumentException("Uri can't be null")
@@ -154,12 +157,12 @@ class RssContentProvider : ContentProvider() {
             return when (uriMatcher.match(uri)) {
                 FEED_ELEMENT_CODE -> delete(URI_FEEDS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.lastPathSegment))
-                FEED_CODE -> DatabaseHandler.getInstance(context)
+                FEED_CODE -> databaseHandler
                         .writableDatabase
                         .delete(FEED_TABLE_NAME, selection, selectionArgs)
                 FEEDITEM_ELEMENT_CODE -> delete(URI_FEEDITEMS, Util.WHEREIDIS,
                         Util.ToStringArray(uri.lastPathSegment))
-                FEEDITEM_CODE -> DatabaseHandler.getInstance(context)
+                FEEDITEM_CODE -> databaseHandler
                         .writableDatabase
                         .delete(FEED_ITEM_TABLE_NAME, selection,
                                 selectionArgs)
@@ -175,7 +178,7 @@ class RssContentProvider : ContentProvider() {
             val numOperations = operations.size
             val results = arrayOfNulls<ContentProviderResult>(numOperations)
 
-            val db = DatabaseHandler.getInstance(context).writableDatabase
+            val db = databaseHandler.writableDatabase
             db.inTransaction {
                 for (i in 0 until numOperations) {
                     results[i] = operations[i].apply(this, results, i)

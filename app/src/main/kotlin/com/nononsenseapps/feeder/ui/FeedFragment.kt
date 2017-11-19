@@ -186,7 +186,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 filter = COL_TAG + " IS ? "
             }
 
-            val onlyUnread = PrefUtils.isShowOnlyUnread(activity)
+            val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
             if (onlyUnread && filter != null) {
                 filter += AND_UNREAD
             } else if (onlyUnread) {
@@ -397,7 +397,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
 
         // Set toggleable state
         val menuItem = menu!!.findItem(R.id.action_only_unread)
-        val onlyUnread = PrefUtils.isShowOnlyUnread(activity)
+        val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
         menuItem.isChecked = onlyUnread
         menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)
         if (onlyUnread) {
@@ -423,7 +423,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         val id = menuItem!!.itemId.toLong()
         if (id == R.id.action_sync.toLong()) {
             // Sync all feeds when menu button pressed
-            activity!!.contentResolver.requestFeedSync(-1)
+            activity!!.contentResolver.requestFeedSync()
             return true
         } else if (id == R.id.action_edit_feed.toLong() && this.id > 0) {
             val i = Intent(activity, EditFeedActivity::class.java)
@@ -459,7 +459,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
             return true
         } else if (id == R.id.action_only_unread.toLong()) {
             val onlyUnread = !menuItem.isChecked
-            PrefUtils.setPrefShowOnlyUnread(activity, onlyUnread)
+            PrefUtils.setPrefShowOnlyUnread(activity!!, onlyUnread)
             menuItem.isChecked = onlyUnread
             if (onlyUnread) {
                 menuItem.setIcon(R.drawable.ic_action_visibility_off)

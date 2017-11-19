@@ -41,12 +41,12 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
         view.setOnLongClickListener(this)
         // Swipe handler
         view.setOnTouchListener(SwipeDismissTouchListener(view, null, object : SwipeDismissTouchListener.DismissCallbacks {
-            override fun canDismiss(token: Any): Boolean = rssItem != null
+            override fun canDismiss(token: Any?): Boolean = rssItem != null
 
-            override fun onDismiss(view: View, token: Any) {
+            override fun onDismiss(view: View, token: Any?) {
                 rssItem!!.unread = !rssItem!!.unread
                 // Update the item directly before updating database
-                if (!PrefUtils.isShowOnlyUnread(feedAdapter.feedFragment.activity)) {
+                if (!PrefUtils.isShowOnlyUnread(feedAdapter.feedFragment.activity!!)) {
                     // Just update the view state
                     fillTitle()
                     resetView()
@@ -72,7 +72,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                 feedAdapter.feedFragment.swipeRefreshLayout!!.isEnabled = false
 
                 val typedValue = TypedValue()
-                if (PrefUtils.isNightMode(feedAdapter.feedFragment.activity)) {
+                if (PrefUtils.isNightMode(feedAdapter.feedFragment.activity!!)) {
                     feedAdapter.feedFragment.activity?.theme?.resolveAttribute(R.attr.nightBGColor,
                             typedValue, true)
                 } else {
@@ -162,18 +162,18 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
 
         // Open item if not empty
         if (rssItem?.plainsnippet?.isNotEmpty() == true) {
+            val i = Intent(feedAdapter.feedFragment.activity, ReaderActivity::class.java)
+            i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true)
+            ReaderActivity.setRssExtras(i, rssItem)
+
+            feedAdapter.feedFragment.startActivity(i)
+        } else {
             // Mark as read
             RssDatabaseService.markItemAsRead(feedAdapter.feedFragment.activity, rssItem!!.id)
             // Open in browser since no content was posted
             // Use enclosure or link
             feedAdapter.feedFragment.startActivity(Intent(Intent.ACTION_VIEW,
                     Uri.parse(rssItem!!.enclosurelink ?: rssItem!!.link)))
-        } else {
-            val i = Intent(feedAdapter.feedFragment.activity, ReaderActivity::class.java)
-            i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true)
-            ReaderActivity.setRssExtras(i, rssItem)
-
-            feedAdapter.feedFragment.startActivity(i)
         }
     }
 
@@ -205,7 +205,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
         if (!feedAdapter.feedFragment.isDetached && feedAdapter.feedFragment.activity != null) {
             try {
                 GlideUtils.glide(feedAdapter.feedFragment.activity, rssItem!!.imageurl,
-                        PrefUtils.shouldLoadImages(feedAdapter.feedFragment.activity))
+                        PrefUtils.shouldLoadImages(feedAdapter.feedFragment.activity!!))
                         .centerCrop()
                         .error(R.drawable.ic_signal_wifi_off_white_24dp)
                         .into(imageView)
