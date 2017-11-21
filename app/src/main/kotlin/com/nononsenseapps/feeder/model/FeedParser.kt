@@ -18,8 +18,8 @@ import java.io.InputStream
 object FeedParser {
 
     // Should reuse same instance to have same cache
-    private var client: OkHttpClient? = null
-    private var jsonFeedParser: JsonFeedParser? = null
+    @Volatile private var client: OkHttpClient? = null
+    @Volatile private var jsonFeedParser: JsonFeedParser? = null
 
     /**
      * Finds alternate links in the header of an HTML document pointing to feeds.
@@ -57,6 +57,7 @@ object FeedParser {
 
     @Throws(FeedParser.FeedParsingError::class)
     fun parseFeed(feedUrl: String, cacheDir: File?): Feed {
+        Log.d("RxFeedParser", "parseFeed: $feedUrl")
         var url = feedUrl
         try {
             if (!url.startsWith("http://") && !url.startsWith("https://")) {
@@ -85,8 +86,8 @@ object FeedParser {
             }
 
             response.use {
-                Log.d("RSSLOCAL", "cache response: " + response.cacheResponse())
-                Log.d("RSSLOCAL", "network response: " + response.networkResponse())
+                Log.d("RxRSSLOCAL", "cache response: " + response.cacheResponse())
+                Log.d("RxRSSLOCAL", "network response: " + response.networkResponse())
 
                 val isJSON = (response.header("content-type") ?: "").contains("json")
                 val body = response.body()?.string()

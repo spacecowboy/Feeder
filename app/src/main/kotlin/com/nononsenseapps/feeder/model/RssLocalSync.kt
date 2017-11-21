@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.OperationApplicationException
 import android.net.Uri
 import android.os.RemoteException
+import android.util.Log
 import com.nononsenseapps.feeder.db.AUTHORITY
 import com.nononsenseapps.feeder.db.COL_FEED
 import com.nononsenseapps.feeder.db.COL_FEEDTITLE
@@ -29,6 +30,8 @@ import com.nononsenseapps.feeder.util.getIdForFeedItem
 import com.nononsenseapps.feeder.util.intoContentProviderOperation
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.jsonfeed.Feed
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import java.io.File
@@ -58,20 +61,27 @@ object RssLocalSync {
 
             val cacheDir = context.externalCacheDir
 
-            for (f in feeds) {
-                syncFeed(f, cacheDir).ifPresent { sf ->
-                    val ops = convertResultToOperations(sf, f, context.contentResolver)
-                    try {
-                        storeSyncResults(context, ops)
-                        // Notify that we've updated
-                        context.contentResolver.notifyAllUris()
-                    } catch (e: RemoteException) {
-                        log.d("Error during sync: ${e.message}")
-                        e.printStackTrace()
-                    } catch (e: OperationApplicationException) {
-                        log.d("Error during sync: ${e.message}")
-                        e.printStackTrace()
-                    }
+            Observable.fromIterable(feeds).flatMap {
+                Observable.just(it).subscribeOn(Schedulers.io()).map {
+                    Log.d("RxRssLocalSync", "Syncing on Thread: ${Thread.currentThread().name}")
+                    syncFeed(it, cacheDir) to it
+                }.filter {
+                    it.first.isPresent
+                }
+            }.map {
+                convertResultToOperations(it.first.get(), it.second, context.contentResolver)
+            }.blockingForEach {
+                try {
+                    Log.d("RxRssLocalSync", "Storing ${it.size} results on Thread ${Thread.currentThread().name}")
+                    storeSyncResults(context, it)
+                    // Notify that we've updated
+                    context.contentResolver.notifyAllUris()
+                } catch (e: RemoteException) {
+                    log.d("Error during sync: ${e.message}")
+                    e.printStackTrace()
+                } catch (e: OperationApplicationException) {
+                    log.d("Error during sync: ${e.message}")
+                    e.printStackTrace()
                 }
             }
 
