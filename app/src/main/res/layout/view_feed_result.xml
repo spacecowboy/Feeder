@@ -1,48 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:minHeight="?android:attr/listPreferredItemHeightSmall"
-    android:background="?android:selectableItemBackground"
-              android:paddingBottom="6dp"
-              android:paddingTop="6dp"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content">
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="?android:selectableItemBackground"
+  android:minHeight="?android:attr/listPreferredItemHeightSmall"
+  android:orientation="vertical"
+  android:paddingBottom="6dp"
+  android:paddingTop="6dp">
 
-    <TextView
-        android:id="@+id/feed_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:singleLine="true"
-        android:paddingBottom="2dp"
-        android:paddingTop="2dp"
-        android:textSize="14sp"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"/>
+  <TextView
+    android:id="@+id/feed_title"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingBottom="2dp"
+    android:paddingTop="2dp"
+    android:singleLine="true"
+    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+    android:textSize="14sp" />
 
-    <TextView
-        android:id="@+id/feed_url"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:singleLine="true"
-        android:paddingBottom="2dp"
-        android:paddingTop="2dp"
-        android:textSize="14sp"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
-        android:textColor="@color/secondary_text_material_dark"
-        />
+  <TextView
+    android:id="@+id/feed_url"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ellipsize="middle"
+    android:gravity="center_vertical"
+    android:paddingBottom="2dp"
+    android:paddingTop="2dp"
+    android:singleLine="true"
+    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+    android:textColor="@color/secondary_text_material_dark"
+    android:textSize="14sp" />
 
-    <TextView
-        android:id="@+id/feed_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:singleLine="true"
-        android:paddingBottom="2dp"
-        android:paddingTop="2dp"
-        android:textSize="14sp"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
-        android:textColor="@color/secondary_text_material_dark"
-        />
+  <TextView
+    android:id="@+id/feed_description"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingBottom="2dp"
+    android:paddingTop="2dp"
+    android:singleLine="true"
+    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+    android:textColor="@color/secondary_text_material_dark"
+    android:textSize="14sp" />
 </LinearLayout>

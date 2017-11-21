@@ -15,6 +15,33 @@ class FeedParserTest2 {
 
     @Test
     @Throws(Exception::class)
+    fun getAlternateFeedLinksDoesNotReturnRelativeLinks() {
+        javaClass.getResourceAsStream("fz.html")
+                .bufferedReader()
+                .use {
+                    val alts: List<Pair<String, String>> = FeedParser.getAlternateFeedLinksInHtml(it.readText())
+                    assertEquals(emptyList<Pair<String, String>>(), alts)
+                }
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun getAlternateFeedLinksResolvesRelativeLinksGivenBaseUrl() {
+        javaClass.getResourceAsStream("fz.html")
+                .bufferedReader()
+                .use {
+                    val alts: List<Pair<String, String>> =
+                            FeedParser.getAlternateFeedLinksInHtml(it.readText(),
+                                    baseUrl = "https://www.fz.se/index.html")
+                    assertEquals(listOf(
+                            "https://www.fz.se/feeds/nyheter" to "application/rss+xml",
+                            "https://www.fz.se/feeds/forum" to "application/rss+xml"
+                    ), alts)
+                }
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun findsAlternateLinksReturnsNullIfNoLink() {
         val rssLink = FeedParser.findFeedLink(atomRelative)
         assertNull(rssLink)

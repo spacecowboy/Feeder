@@ -2,6 +2,8 @@ package com.nononsenseapps.feeder.model
 
 import android.util.Log
 import com.nononsenseapps.feeder.util.asFeed
+import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
+import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.JsonFeedParser
 import com.nononsenseapps.jsonfeed.cachingHttpClient
@@ -10,10 +12,13 @@ import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import org.jsoup.Jsoup
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.net.MalformedURLException
+import java.net.URL
 
 object FeedParser {
 
@@ -22,16 +27,51 @@ object FeedParser {
     @Volatile private var jsonFeedParser: JsonFeedParser? = null
 
     /**
-     * Finds alternate links in the header of an HTML document pointing to feeds.
+     * Finds the preferred alternate link in the header of an HTML/XML document pointing to feeds.
      */
     fun findFeedLink(html: String,
                      preferRss: Boolean = false,
                      preferAtom: Boolean = false,
                      preferJSON: Boolean = false): String? {
+
+        val feedLinks = getAlternateFeedLinksInHtml(html)
+                .sortedBy {
+                    val t = it.second.toLowerCase()
+                    when {
+                        preferAtom && t.contains("atom") -> "0"
+                        preferRss && t.contains("rss") -> "1"
+                        preferJSON && t.contains("json") -> "2"
+                        else -> t
+                    }
+                }
+
+        return feedLinks.firstOrNull()?.first
+    }
+
+    /**
+     * Returns all alternate links in the header of an HTML/XML document pointing to feeds.
+     */
+    fun getAlternateFeedLinksAtUrl(url: String,
+                                   httpClient: OkHttpClient? = null,
+                                   cacheDir: File? = null): List<Pair<String, String>> {
+        @Suppress("NAME_SHADOWING")
+        val url = relativeLinkIntoAbsolute(base = url)
+
+        val html = getUrl(url, httpClient = httpClient, cacheDir = cacheDir)
+        return when {
+            html != null -> getAlternateFeedLinksInHtml(html, baseUrl = url)
+            else -> emptyList()
+        }
+    }
+
+    /**
+     * Returns all alternate links in the header of an HTML/XML document pointing to feeds.
+     */
+    fun getAlternateFeedLinksInHtml(html: String, baseUrl: String? = null): List<Pair<String, String>> {
         val doc = Jsoup.parse(html.byteInputStream(), "UTF-8", "")
         val header = doc.head()
 
-        val feedLinks = header.getElementsByAttributeValue("rel", "alternate")
+        return header.getElementsByAttributeValue("rel", "alternate")
                 .filter { it.hasAttr("href") && it.hasAttr("type") }
                 .filter {
                     val t = it.attr("type").toLowerCase()
@@ -42,27 +82,32 @@ object FeedParser {
                         else -> false
                     }
                 }
-                .sortedBy {
-                    val t = it.attr("type").toLowerCase()
-                    when {
-                        preferAtom && t.contains("atom") -> "0"
-                        preferRss && t.contains("rss") -> "1"
-                        preferJSON && t.contains("json") -> "2"
-                        else -> t
+                .filter {
+                    val l = it.attr("href").toLowerCase()
+                    try {
+                        if (baseUrl != null) {
+                            relativeLinkIntoAbsoluteOrThrow(base = baseUrl, link = l)
+                        } else {
+                            URL(l)
+                        }
+                        true
+                    } catch (_: MalformedURLException) {
+                        false
                     }
                 }
-
-        return feedLinks.firstOrNull()?.attr("href")
+                .map {
+                    when {
+                        baseUrl != null -> relativeLinkIntoAbsolute(base = baseUrl, link = it.attr("href")) to it.attr("type")
+                        else -> relativeLinkIntoAbsolute(base = it.attr("href")) to it.attr("type")
+                    }
+                }
     }
 
     @Throws(FeedParser.FeedParsingError::class)
     fun parseFeed(feedUrl: String, cacheDir: File?): Feed {
         Log.d("RxFeedParser", "parseFeed: $feedUrl")
-        var url = feedUrl
+        val url = relativeLinkIntoAbsolute(base = feedUrl)
         try {
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "http://" + url
-            }
 
             if (client == null) {
                 client = cachingHttpClient(cacheDirectory = cacheDir)
@@ -71,32 +116,21 @@ object FeedParser {
                 jsonFeedParser = JsonFeedParser(client!!, feedAdapter())
             }
 
-            val request = Request.Builder()
-                    .url(url)
-                    .build()
-
-            val client: OkHttpClient = client!!
             val jsonFeedParser: JsonFeedParser = jsonFeedParser!!
 
-            val call = client.newCall(request)
-            val response = call.execute()
+            var result: Feed? = null
+            getUrlAndDo(url = url, httpClient = client) {
+                Log.d("RxRSSLOCAL", "cache response: " + cacheResponse())
+                Log.d("RxRSSLOCAL", "network response: " + networkResponse())
 
-            if (!response.isSuccessful) {
-                throw IOException("Unexpected code " + response)
-            }
-
-            response.use {
-                Log.d("RxRSSLOCAL", "cache response: " + response.cacheResponse())
-                Log.d("RxRSSLOCAL", "network response: " + response.networkResponse())
-
-                val isJSON = (response.header("content-type") ?: "").contains("json")
-                val body = response.body()?.string()
+                val isJSON = (header("content-type") ?: "").contains("json")
+                val body = body()?.string()
 
                 if (body != null) {
                     val alternateFeedLink = findFeedLink(body,
                             preferAtom = true)
 
-                    return if (alternateFeedLink != null) {
+                    val feed = if (alternateFeedLink != null) {
                         parseFeed(alternateFeedLink, cacheDir)
                     } else {
                         when (isJSON) {
@@ -104,9 +138,19 @@ object FeedParser {
                             false -> parseFeed(body)
                         }
                     }
+
+                    result = if (feed.feed_url == null) {
+                        // Nice to return non-null value here
+                        feed.copy(feed_url = feedUrl)
+                    } else {
+                        feed
+                    }
+                } else {
+                    throw NullPointerException("Response body was null")
                 }
-                throw NullPointerException("Response body was null")
             }
+
+            return result!!
         } catch (e: Throwable) {
             throw FeedParsingError(e)
         }
@@ -129,4 +173,44 @@ object FeedParser {
     }
 
     class FeedParsingError(e: Throwable) : Exception(e)
+}
+
+
+fun getUrlAndDo(url: String,
+                httpClient: OkHttpClient? = null,
+                cacheDir: File? = null,
+                block: (Response.() -> Unit)? = null) {
+    val address = relativeLinkIntoAbsolute(base = url)
+
+    val request = Request.Builder()
+            .url(address)
+            .build()
+
+    val client: OkHttpClient = when {
+        httpClient != null -> httpClient
+        else -> cachingHttpClient(cacheDirectory = cacheDir)
+    }
+
+    val call = client.newCall(request)
+    val response = call.execute()
+
+    if (!response.isSuccessful) {
+        throw IOException("Unexpected code " + response)
+    }
+
+    response.use {
+        if (block != null) {
+            it.block()
+        }
+    }
+}
+
+fun getUrl(url: String,
+           httpClient: OkHttpClient? = null,
+           cacheDir: File? = null): String? {
+    var result: String? = null
+    getUrlAndDo(url = url, httpClient = httpClient, cacheDir = cacheDir) {
+        result = body()?.string()
+    }
+    return result
 }

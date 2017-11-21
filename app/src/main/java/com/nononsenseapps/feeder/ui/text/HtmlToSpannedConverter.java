@@ -56,7 +56,7 @@ import org.xml.sax.XMLReader;
 import java.io.IOException;
 import java.io.StringReader;
 
-import static com.nononsenseapps.feeder.util.JsonFeedExtensionsKt.relativeLinkIntoAbsolute;
+import static com.nononsenseapps.feeder.util.LinkUtilsKt.relativeLinkIntoAbsolute;
 
 /**
  * Convert an HTML document into a spannable string.

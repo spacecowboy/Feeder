@@ -14,8 +14,6 @@ import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
-import java.net.MalformedURLException
-import java.net.URL
 
 fun Item.intoContentProviderOperation(feed: Feed, builder: ContentProviderOperation.Builder) {
     // Be careful about nulls.
@@ -42,21 +40,3 @@ fun Item.intoContentProviderOperation(feed: Feed, builder: ContentProviderOperat
             .withValue(COL_PLAINSNIPPET, summary)
 }
 
-fun relativeLinkIntoAbsolute(base: String, link: String): String = try {
-    // If no exception, it's valid
-    URL(link).toString()
-} catch (_: MalformedURLException) {
-    try {
-        val baseUrl = URL(base)
-
-        URL(baseUrl, link).toString()
-    } catch (_: MalformedURLException) {
-        try {
-            val baseUrl = URL("http://$base")
-
-            URL(baseUrl, link).toString()
-        } catch (_: MalformedURLException) {
-            link
-        }
-    }
-}
