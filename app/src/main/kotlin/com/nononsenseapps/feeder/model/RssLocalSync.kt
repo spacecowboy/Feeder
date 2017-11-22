@@ -31,6 +31,7 @@ import com.nononsenseapps.feeder.util.intoContentProviderOperation
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.jsonfeed.Feed
 import io.reactivex.Observable
+import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import org.joda.time.DateTime
 import org.joda.time.Duration
@@ -60,6 +61,10 @@ object RssLocalSync {
             log.d(String.format("Syncing %d feeds: %s", feeds.size, start.toString()))
 
             val cacheDir = context.externalCacheDir
+
+            RxJavaPlugins.setErrorHandler {
+                Log.e("RxRSSLocalSync", "Error: $it")
+            }
 
             Observable.fromIterable(feeds).flatMap {
                 Observable.just(it).subscribeOn(Schedulers.io()).map {
