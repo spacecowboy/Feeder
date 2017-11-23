@@ -64,6 +64,7 @@ import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.bundle
+import com.nononsenseapps.feeder.util.firstOrNull
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
@@ -486,7 +487,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 loaderSelectionArgs,
                 COL_PUBDATE + " DESC") as Loader<Any>
         FEED_LOADER -> CursorLoader(activity!!,
-                Uri.withAppendedPath(URI_FEEDS, java.lang.Long.toString(this.id)),
+                Uri.withAppendedPath(URI_FEEDS, "${this.id}"),
                 FEED_FIELDS, null, null, null) as Loader<Any>
         FEED_SETTINGS_LOADER -> {
             val where: String?
@@ -523,8 +524,8 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 }
                 FEED_LOADER == cursorLoader.id -> {
                     val cursor = result as Cursor
-                    if (cursor.moveToFirst()) {
-                        val (id1, title1, customTitle1, url1, _, notify1, _, displayTitle) = cursor.asFeed()
+                    cursor.firstOrNull()?.let {
+                        val (id1, title1, customTitle1, url1, _, notify1, _, displayTitle) = it.asFeed()
                         this.title = title1
                         this.customTitle = customTitle1
                         this.url = url1
