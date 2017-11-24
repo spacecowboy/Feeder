@@ -9,6 +9,7 @@ import com.nononsenseapps.feeder.model.opml.writeFile
 import com.nononsenseapps.feeder.util.firstOrNull
 import com.nononsenseapps.feeder.util.forEach
 import com.nononsenseapps.feeder.util.getString
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import java.io.File
 import java.util.*
 
@@ -110,7 +111,7 @@ class OPMLDatabaseHandler(val db: SQLiteDatabase) : OPMLParserToDatabase {
         db.query(FEED_TABLE_NAME,
                 FEED_FIELDS, "$COL_URL IS ?",
                 arrayOf(url), null, null, null).use { cursor ->
-            return cursor.firstOrNull()?.asFeed() ?: FeedSQL(url = url)
+            return cursor.firstOrNull()?.asFeed() ?: FeedSQL(url = sloppyLinkToStrictURL(url))
         }
     }
 

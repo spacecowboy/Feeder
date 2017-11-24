@@ -43,12 +43,14 @@ import com.nononsenseapps.feeder.util.insertFeedWith
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.feeder.util.setString
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.updateFeedWith
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import java.net.URL
 import java.util.*
 
 const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
@@ -121,7 +123,7 @@ class EditFeedActivity : Activity() {
                 }
 
                 // Issue search
-                val url = textSearch.text.toString().trim()
+                val url: URL = sloppyLinkToStrictURL(textSearch.text.toString().trim())
 
                 listResults.visibility = View.GONE
                 emptyText.visibility = View.GONE
@@ -133,7 +135,7 @@ class EditFeedActivity : Activity() {
                             try {
                                 val alts = feedParser.getAlternateFeedLinksAtUrl(it)
                                 if (alts.isNotEmpty()) {
-                                    Observable.fromIterable(alts)
+                                    Observable.fromIterable(alts.map { sloppyLinkToStrictURL(it.first) to it.second })
                                 } else {
                                     throw IllegalArgumentException("No alternate feeds found")
                                 }

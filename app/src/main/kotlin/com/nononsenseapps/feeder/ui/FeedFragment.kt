@@ -528,7 +528,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                         val feed = it.asFeed()
                         this.title = feed.title
                         this.customTitle = feed.customTitle
-                        this.url = feed.url
+                        this.url = feed.url.toString()
                         this.notify = if (feed.notify) 1 else 0
 
                         (activity as BaseActivity).supportActionBar?.title = feed.displayTitle

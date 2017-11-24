@@ -6,6 +6,7 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import java.net.URL
 import kotlin.test.assertNull
 
 class FeedParserTest2 {
@@ -32,7 +33,7 @@ class FeedParserTest2 {
                 .use {
                     val alts: List<Pair<String, String>> =
                             FeedParser.getAlternateFeedLinksInHtml(it.readText(),
-                                    baseUrl = "https://www.fz.se/index.html")
+                                    baseUrl = URL("https://www.fz.se/index.html"))
                     assertEquals(listOf(
                             "https://www.fz.se/feeds/nyheter" to "application/rss+xml",
                             "https://www.fz.se/feeds/forum" to "application/rss+xml"
@@ -43,43 +44,43 @@ class FeedParserTest2 {
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksReturnsNullIfNoLink() {
-        val rssLink = FeedParser.findFeedLink(atomRelative)
+        val rssLink = FeedParser.findFeedUrl(atomRelative)
         assertNull(rssLink)
     }
 
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksReturnsNullForFeedsWithAlternateLinks() {
-        val rssLink = FeedParser.findFeedLink(atomWithAlternateLinks)
+        val rssLink = FeedParser.findFeedUrl(atomWithAlternateLinks)
         assertNull(rssLink)
     }
 
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksPrefersAtomByDefault() {
-        val rssLink = FeedParser.findFeedLink(getCowboyHtml())
-        assertEquals("https://cowboyprogrammer.org/atom.xml", rssLink)
+        val rssLink = FeedParser.findFeedUrl(getCowboyHtml())
+        assertEquals(URL("https://cowboyprogrammer.org/atom.xml"), rssLink)
     }
 
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksPreferAtom() {
-        val rssLink = FeedParser.findFeedLink(getCowboyHtml(), preferAtom = true)
-        assertEquals("https://cowboyprogrammer.org/atom.xml", rssLink)
+        val rssLink = FeedParser.findFeedUrl(getCowboyHtml(), preferAtom = true)
+        assertEquals(URL("https://cowboyprogrammer.org/atom.xml"), rssLink)
     }
 
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksPreferRss() {
-        val rssLink = FeedParser.findFeedLink(getCowboyHtml(), preferRss = true)
-        assertEquals("https://cowboyprogrammer.org/index.xml", rssLink)
+        val rssLink = FeedParser.findFeedUrl(getCowboyHtml(), preferRss = true)
+        assertEquals(URL("https://cowboyprogrammer.org/index.xml"), rssLink)
     }
 
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksPreferJSON() {
-        val rssLink = FeedParser.findFeedLink(getCowboyHtml(), preferJSON = true)
-        assertEquals("https://cowboyprogrammer.org/feed.json", rssLink)
+        val rssLink = FeedParser.findFeedUrl(getCowboyHtml(), preferJSON = true)
+        assertEquals(URL("https://cowboyprogrammer.org/feed.json"), rssLink)
     }
 
     @Test
@@ -90,7 +91,7 @@ class FeedParserTest2 {
         val feed = FeedParser.parseFeedInputStream(atomRelative.byteInputStream())
         assertNotNull(feed)
 
-        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
+        assertEquals(URL("http://cowboyprogrammer.org/feed.atom"), feed.feed_url)
     }
 
     @Test
@@ -101,7 +102,7 @@ class FeedParserTest2 {
         val feed = FeedParser.parseFeedInputStream(atomRelativeNoBase.byteInputStream())
         assertNotNull(feed)
 
-        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
+        assertEquals(URL("http://cowboyprogrammer.org/feed.atom"), feed.feed_url)
     }
 
     private fun getCowboyHtml(): String =

@@ -41,7 +41,7 @@ public class ReaderActivity extends BaseActivity {
         intent.putExtra(ReaderFragmentKt.ARG_DATE, rssItem.getPubDateString());
         intent.putExtra(ReaderFragmentKt.ARG_AUTHOR, rssItem.getAuthor());
         intent.putExtra(ReaderFragmentKt.ARG_FEEDTITLE, rssItem.getFeedtitle());
-        intent.putExtra(ARG_FEED_URL, rssItem.getFeedUrl());
+        intent.putExtra(ARG_FEED_URL, rssItem.getFeedUrl().toString());
     }
 
     @Override

@@ -14,4 +14,9 @@ class LinkUtilsKtTest {
     fun testSloppyToStrictWithAlreadyValidLink() {
         assertEquals(URL("https://google.com"), sloppyLinkToStrictURL("https://google.com"))
     }
+
+    @Test
+    fun testSloppyToStrictWithEmptyString() {
+        assertEquals(URL("http://"), sloppyLinkToStrictURL(""))
+    }
 }

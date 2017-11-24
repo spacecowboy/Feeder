@@ -40,10 +40,10 @@ object FeedParser {
     /**
      * Finds the preferred alternate link in the header of an HTML/XML document pointing to feeds.
      */
-    fun findFeedLink(html: String,
-                     preferRss: Boolean = false,
-                     preferAtom: Boolean = false,
-                     preferJSON: Boolean = false): String? {
+    fun findFeedUrl(html: String,
+                    preferRss: Boolean = false,
+                    preferAtom: Boolean = false,
+                    preferJSON: Boolean = false): URL? {
 
         val feedLinks = getAlternateFeedLinksInHtml(html)
                 .sortedBy {
@@ -55,6 +55,9 @@ object FeedParser {
                         else -> t
                     }
                 }
+                .map {
+                    sloppyLinkToStrictURL(it.first) to it.second
+                }
 
         return feedLinks.firstOrNull()?.first
     }
@@ -62,10 +65,7 @@ object FeedParser {
     /**
      * Returns all alternate links in the header of an HTML/XML document pointing to feeds.
      */
-    fun getAlternateFeedLinksAtUrl(url: String): List<Pair<String, String>> {
-        @Suppress("NAME_SHADOWING")
-        val url = sloppyLinkToStrictURL(url).toString()
-
+    fun getAlternateFeedLinksAtUrl(url: URL): List<Pair<String, String>> {
         val html = curl(url)
         return when {
             html != null -> getAlternateFeedLinksInHtml(html, baseUrl = url)
@@ -76,7 +76,7 @@ object FeedParser {
     /**
      * Returns all alternate links in the header of an HTML/XML document pointing to feeds.
      */
-    fun getAlternateFeedLinksInHtml(html: String, baseUrl: String? = null): List<Pair<String, String>> {
+    fun getAlternateFeedLinksInHtml(html: String, baseUrl: URL? = null): List<Pair<String, String>> {
         val doc = Jsoup.parse(html.byteInputStream(), "UTF-8", "")
         val header = doc.head()
 
@@ -112,7 +112,7 @@ object FeedParser {
                 }
     }
 
-    fun curl(url: String): String? {
+    fun curl(url: URL): String? {
         var result: String? = null
         curlAndOnResponse(url) {
             result = body()?.string()
@@ -120,9 +120,9 @@ object FeedParser {
         return result
     }
 
-    fun curlAndOnResponse(url: String, block: (Response.() -> Unit)) {
+    fun curlAndOnResponse(url: URL, block: (Response.() -> Unit)) {
         val request = Request.Builder()
-                .url(sloppyLinkToStrictURL(url))
+                .url(url)
                 .build()
 
         val call = client.newCall(request)
@@ -138,9 +138,8 @@ object FeedParser {
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    fun parseFeedUrl(feedUrl: String): Feed {
-        Log.d("RxFeedParser", "parseFeed: $feedUrl")
-        val url = sloppyLinkToStrictURL(feedUrl).toString()
+    fun parseFeedUrl(url: URL): Feed {
+        Log.d("RxFeedParser", "parseFeed: $url")
         try {
 
             var result: Feed? = null
@@ -152,8 +151,7 @@ object FeedParser {
                 val body = body()?.string()
 
                 if (body != null) {
-                    val alternateFeedLink = findFeedLink(body,
-                            preferAtom = true)
+                    val alternateFeedLink = findFeedUrl(body, preferAtom = true)
 
                     val feed = if (alternateFeedLink != null) {
                         parseFeedUrl(alternateFeedLink)
@@ -166,7 +164,7 @@ object FeedParser {
 
                     result = if (feed.feed_url == null) {
                         // Nice to return non-null value here
-                        feed.copy(feed_url = feedUrl)
+                        feed.copy(feed_url = url.toString())
                     } else {
                         feed
                     }

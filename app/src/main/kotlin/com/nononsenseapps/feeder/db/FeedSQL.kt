@@ -6,6 +6,9 @@ import com.nononsenseapps.feeder.util.getLong
 import com.nononsenseapps.feeder.util.getString
 import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setString
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
+import java.net.URL
 
 // SQL convention says Table name should be "singular"
 const val FEED_TABLE_NAME = "Feed"
@@ -68,15 +71,20 @@ val CREATE_TAGS_VIEW = """
        GROUP BY $COL_TAG"""
 
 
-data class FeedSQL(val id: Long = -1, val title: String = "", val customTitle: String = "", val url: String = "",
-                   val tag: String = "", val notify: Boolean = false, val unreadCount: Int = 0,
+data class FeedSQL(val id: Long = -1,
+                   val title: String = "",
+                   val customTitle: String = "",
+                   val url: URL = sloppyLinkToStrictURL(""),
+                   val tag: String = "",
+                   val notify: Boolean = false,
+                   val unreadCount: Int = 0,
                    val displayTitle: String = (if (customTitle.isBlank()) title else customTitle) ) {
 
     fun asContentValues() =
             com.nononsenseapps.feeder.util.contentValues {
                 setString(COL_TITLE to title)
                 setString(COL_CUSTOM_TITLE to customTitle)
-                setString(COL_URL to url)
+                setString(COL_URL to url.toString())
                 setString(COL_TAG to tag)
                 setInt(COL_NOTIFY to if (notify) 1 else 0)
             }
@@ -88,7 +96,7 @@ fun Cursor.asFeed(): FeedSQL {
             tag = getString(COL_TAG) ?: "",
             title = getString(COL_TITLE) ?: "",
             customTitle = getString(COL_CUSTOM_TITLE) ?: "",
-            url = getString(COL_URL) ?: "",
+            url = sloppyLinkToStrictURLNoThrows(getString(COL_URL) ?: ""),
             notify = when (getInt(COL_NOTIFY)) {
                 1 -> true
                 else -> false

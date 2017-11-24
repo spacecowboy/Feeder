@@ -55,6 +55,7 @@ import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URL;
 
 import static com.nononsenseapps.feeder.util.LinkUtilsKt.relativeLinkIntoAbsolute;
 
@@ -72,11 +73,11 @@ public class HtmlToSpannedConverter implements ContentHandler {
     protected int ignoreCount = 0;
 
     protected String mSource;
-    protected String mSiteUrl;
+    protected URL mSiteUrl;
     protected XMLReader mReader;
     protected SpannableStringBuilder mSpannableStringBuilder;
 
-    public HtmlToSpannedConverter(String source, String siteUrl, Parser parser, Context context) {
+    public HtmlToSpannedConverter(String source, URL siteUrl, Parser parser, Context context) {
         mContext = context;
         mSource = source;
         mSiteUrl = siteUrl;

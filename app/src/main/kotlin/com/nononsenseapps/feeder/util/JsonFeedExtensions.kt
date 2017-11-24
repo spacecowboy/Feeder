@@ -21,7 +21,7 @@ fun Item.intoContentProviderOperation(feed: Feed, builder: ContentProviderOperat
     val summary = summary ?: content_text?.take(200) ?: HtmlToPlainTextConverter.HtmlToPlainText(text).take(200)
 
     val absoluteImage = when {
-        feed.feed_url != null && image != null -> relativeLinkIntoAbsolute(feed.feed_url!!, image!!)
+        feed.feed_url != null && image != null -> relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url!!), image!!)
         else -> image
     }
 

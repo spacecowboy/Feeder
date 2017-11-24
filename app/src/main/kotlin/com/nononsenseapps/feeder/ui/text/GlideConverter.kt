@@ -19,11 +19,12 @@ import com.nononsenseapps.feeder.util.GlideUtils
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import org.ccil.cowan.tagsoup.Parser
 import org.xml.sax.Attributes
+import java.net.URL
 import java.util.concurrent.ExecutionException
 
 class GlideConverter(context: Context,
                      source: String,
-                     private val siteUrl: String,
+                     private val siteUrl: URL,
                      parser: Parser,
                      private val maxSize: Point,
                      private val allowDownload: Boolean) :

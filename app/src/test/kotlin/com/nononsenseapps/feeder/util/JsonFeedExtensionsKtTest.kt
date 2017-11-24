@@ -11,7 +11,6 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
-import kotlin.test.assertEquals
 
 class JsonFeedExtensionsKtTest {
     @Test
@@ -64,11 +63,5 @@ class JsonFeedExtensionsKtTest {
         item.intoContentProviderOperation(feed, builder)
 
         verify(builder).withValue(COL_IMAGEURL, "http://site.com/b.png")
-    }
-
-    @Test
-    fun relativeToAbsoluteHandlesNoProtocolInBase() {
-        assertEquals("http://cowboyprogrammer.org/images/b.png",
-                relativeLinkIntoAbsolute("cowboyprogrammer.org/index.xml", "/images/b.png"))
     }
 }

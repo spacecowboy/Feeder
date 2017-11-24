@@ -23,6 +23,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 import java.io.IOException
+import java.net.URL
 import java.util.*
 
 
@@ -114,7 +115,7 @@ class OPMLTest {
             val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
             seen.add(i)
             assertEquals("Title doesn't match", "\"$i\"", feed.title)
-            assertEquals("URL doesn't match", "http://somedomain$i.com/rss.xml", feed.url)
+            assertEquals("URL doesn't match", URL("http://somedomain$i.com/rss.xml"), feed.url)
             if (i % 3 == 1) {
                 assertEquals("tag1", feed.tag)
             } else if (i % 3 == 2) {
@@ -136,14 +137,14 @@ class OPMLTest {
 
         // Create something that does not exist
         var feednew = FeedSQL(
-                url = "http://somedomain20.com/rss.xml",
+                url = URL("http://somedomain20.com/rss.xml"),
                 title = "\"20\"",
                 tag = "kapow")
         var id = context!!.contentResolver.insertFeedWith(feednew.asContentValues())
         feednew = feednew.copy(id = id)
         // Create something that will exist
         var feedold = FeedSQL(
-                url = "http://somedomain0.com/rss.xml",
+                url = URL("http://somedomain0.com/rss.xml"),
                 title = "\"0\"")
         id = context!!.contentResolver.insertFeedWith(feedold.asContentValues())
 
@@ -160,7 +161,7 @@ class OPMLTest {
         for (feed in feeds) {
             val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
             seen.add(i)
-            assertEquals("http://somedomain$i.com/rss.xml", feed.url)
+            assertEquals(URL("http://somedomain$i.com/rss.xml"), feed.url)
             assertEquals("\"" + Integer.toString(i) + "\"", feed.title)
 
             if (i == 20) {
@@ -230,7 +231,7 @@ class OPMLTest {
     private fun createSampleFeeds() {
         for (i in 0..9) {
             val feed = FeedSQL(
-                    url = "http://somedomain$i.com/rss.xml",
+                    url = URL("http://somedomain$i.com/rss.xml"),
                     title = "\"$i\"",
                     tag = when (i % 3) {
                         1 -> "tag1"
@@ -274,28 +275,28 @@ class OPMLTest {
             assertEquals("Custom title should be empty", "", feed.customTitle)
             assertEquals("No tag expected", "", feed.tag)
             when (feed.url) {
-                "http://aliceisntdead.libsyn.com/rss" -> {
+                URL("http://aliceisntdead.libsyn.com/rss") -> {
                     assertEquals("Alice Isn't Dead", feed.title)
                 }
-                "http://feeds.soundcloud.com/users/soundcloud:users:154104768/sounds.rss" -> {
+                URL("http://feeds.soundcloud.com/users/soundcloud:users:154104768/sounds.rss") -> {
                     assertEquals("Invisible City", feed.title)
                 }
-                "http://feeds.feedburner.com/PodCastle_Main" -> {
+                URL("http://feeds.feedburner.com/PodCastle_Main") -> {
                     assertEquals("PodCastle", feed.title)
                 }
-                "http://www.artofstorytellingshow.com/podcast/storycast.xml" -> {
+                URL("http://www.artofstorytellingshow.com/podcast/storycast.xml") -> {
                     assertEquals("The Art of Storytelling with Brother Wolf", feed.title)
                 }
-                "http://feeds.feedburner.com/TheCleansed" -> {
+                URL("http://feeds.feedburner.com/TheCleansed") -> {
                     assertEquals("The Cleansed: A Post-Apocalyptic Saga", feed.title)
                 }
-                "http://media.signumuniversity.org/tolkienprof/feed" -> {
+                URL("http://media.signumuniversity.org/tolkienprof/feed") -> {
                     assertEquals("The Tolkien Professor", feed.title)
                 }
-                "http://nightvale.libsyn.com/rss" -> {
+                URL("http://nightvale.libsyn.com/rss") -> {
                     assertEquals("Welcome to Night Vale", feed.title)
                 }
-                "http://withinthewires.libsyn.com/rss" -> {
+                URL("http://withinthewires.libsyn.com/rss") -> {
                     assertEquals("Within the Wires", feed.title)
                 }
                 else -> fail("Unexpected URI. Feed: $feed")
@@ -322,47 +323,47 @@ class OPMLTest {
         feeds.forEach { feed ->
             assertEquals("Custom title should be empty", "", feed.customTitle)
             when (feed.url) {
-                "http://www.smbc-comics.com/rss.php" -> {
+                URL("http://www.smbc-comics.com/rss.php") -> {
                     assertEquals("black humor", feed.tag)
                     assertEquals("SMBC", feed.title)
                 }
-                "http://www.deathbulge.com/rss.xml" -> {
+                URL("http://www.deathbulge.com/rss.xml") -> {
                     assertEquals("black humor", feed.tag)
                     assertEquals("Deathbulge", feed.title)
                 }
-                "http://www.sandraandwoo.com/gaia/feed/" -> {
+                URL("http://www.sandraandwoo.com/gaia/feed/") -> {
                     assertEquals("comics", feed.tag)
                     assertEquals("Gaia", feed.title)
                 }
-                "http://replaycomic.com/feed/" -> {
+                URL("http://replaycomic.com/feed/") -> {
                     assertEquals("comics", feed.tag)
                     assertEquals("Replay", feed.title)
                 }
-                "http://www.cuttimecomic.com/rss.php" -> {
+                URL("http://www.cuttimecomic.com/rss.php") -> {
                     assertEquals("comics", feed.tag)
                     assertEquals("Cut Time", feed.title)
                 }
-                "http://www.commitstrip.com/feed/" -> {
+                URL("http://www.commitstrip.com/feed/") -> {
                     assertEquals("comics", feed.tag)
                     assertEquals("Commit strip", feed.title)
                 }
-                "http://www.sandraandwoo.com/feed/" -> {
+                URL("http://www.sandraandwoo.com/feed/") -> {
                     assertEquals("comics", feed.tag)
                     assertEquals("Sandra and Woo", feed.title)
                 }
-                "http://www.awakencomic.com/rss.php" -> {
+                URL("http://www.awakencomic.com/rss.php") -> {
                     assertEquals("comics", feed.tag)
                     assertEquals("Awaken", feed.title)
                 }
-                "http://www.questionablecontent.net/QCRSS.xml" -> {
+                URL("http://www.questionablecontent.net/QCRSS.xml") -> {
                     assertEquals("comics", feed.tag)
                     assertEquals("Questionable Content", feed.title)
                 }
-                "https://www.archlinux.org/feeds/news/" -> {
+                URL("https://www.archlinux.org/feeds/news/") -> {
                     assertEquals("Tech", feed.tag)
                     assertEquals("Arch news", feed.title)
                 }
-                "https://grisebouille.net/feed/" -> {
+                URL("https://grisebouille.net/feed/") -> {
                     assertEquals("Political humour", feed.tag)
                     assertEquals("Grisebouille", feed.title)
                 }
