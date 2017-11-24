@@ -87,7 +87,7 @@ class FeedParserTest2 {
     @Ignore
     fun relativeLinksAreMadeAbsoluteAtom() {
 
-        val feed = FeedParser.parseFeed(atomRelative.byteInputStream())
+        val feed = FeedParser.parseFeedInputStream(atomRelative.byteInputStream())
         assertNotNull(feed)
 
         assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
@@ -98,7 +98,7 @@ class FeedParserTest2 {
     @Ignore
     fun relativeLinksAreMadeAbsoluteAtomNoBase() {
 
-        val feed = FeedParser.parseFeed(atomRelativeNoBase.byteInputStream())
+        val feed = FeedParser.parseFeedInputStream(atomRelativeNoBase.byteInputStream())
         assertNotNull(feed)
 
         assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)

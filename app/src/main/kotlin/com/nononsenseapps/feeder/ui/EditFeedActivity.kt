@@ -36,9 +36,9 @@ import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
 import com.nononsenseapps.feeder.db.Util
-import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.util.Optional
 import com.nononsenseapps.feeder.util.contentValues
+import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.insertFeedWith
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.requestFeedSync
@@ -49,7 +49,6 @@ import com.nononsenseapps.jsonfeed.Feed
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.io.File
 import java.util.*
 
 const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
@@ -122,9 +121,6 @@ class EditFeedActivity : Activity() {
                 }
 
                 // Issue search
-
-                // Yes, cacheDir can indeed be null
-                val cacheDir: File = externalCacheDir ?: filesDir
                 val url = textSearch.text.toString().trim()
 
                 listResults.visibility = View.GONE
@@ -135,7 +131,7 @@ class EditFeedActivity : Activity() {
                         .subscribeOn(Schedulers.io())
                         .flatMap {
                             try {
-                                val alts = FeedParser.getAlternateFeedLinksAtUrl(it, cacheDir = cacheDir)
+                                val alts = feedParser.getAlternateFeedLinksAtUrl(it)
                                 if (alts.isNotEmpty()) {
                                     Observable.fromIterable(alts)
                                 } else {
@@ -151,7 +147,8 @@ class EditFeedActivity : Activity() {
                                     .map {
                                         try {
                                             Log.d("JONAS", "Fetching feed on ${Thread.currentThread().name}")
-                                            Optional.of(FeedParser.parseFeed(it.first, cacheDir = cacheDir) to it.second)
+                                            // TODO FIX
+                                            Optional.of(feedParser.parseFeedUrl(it.first) to it.second)
                                         } catch (t: Throwable) {
                                             Log.d("Parsing feed:", t.localizedMessage)
                                             Optional.empty<Pair<Feed, String>>()
