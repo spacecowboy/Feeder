@@ -525,19 +525,19 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 FEED_LOADER == cursorLoader.id -> {
                     val cursor = result as Cursor
                     cursor.firstOrNull()?.let {
-                        val (id1, title1, customTitle1, url1, _, notify1, _, displayTitle) = it.asFeed()
-                        this.title = title1
-                        this.customTitle = customTitle1
-                        this.url = url1
-                        this.notify = if (notify1) 1 else 0
+                        val feed = it.asFeed()
+                        this.title = feed.title
+                        this.customTitle = feed.customTitle
+                        this.url = feed.url
+                        this.notify = if (feed.notify) 1 else 0
 
-                        (activity as BaseActivity).supportActionBar?.title = displayTitle
+                        (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
                         notifyCheck!!.isChecked = this.notify == 1
 
                         // Title has been fetched, so add shortcut
-                        activity?.addDynamicShortcutToFeed(displayTitle, id1, null)
+                        activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
                         // Report shortcut usage
-                        activity?.reportShortcutToFeedUsed(id)
+                        activity?.reportShortcutToFeedUsed(feed.id)
                     }
                     // Reset loader
                     loaderManager.destroyLoader(cursorLoader.id)
