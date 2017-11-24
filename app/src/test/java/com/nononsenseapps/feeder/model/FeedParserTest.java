@@ -30,7 +30,7 @@ public class FeedParserTest {
 
         Item entry = feed.getItems().get(9);
 
-        assertNull(entry.getImage());
+        assertEquals("http://research.swtch.com/qr-bbc.png", entry.getImage());
 
         assertEquals("QArt Codes",
                 entry.getTitle());
@@ -66,13 +66,13 @@ public class FeedParserTest {
 
         Item entry = feed.getItems().get(0);
 
-        assertNull(entry.getImage());
+        assertEquals("http://www.cyklistbloggen.se/wp-content/uploads/2014/01/Danviksklippan-skyltad.jpg", entry.getImage());
 
         assertEquals("Ingen ombyggning av Danvikstull",
                 entry.getTitle());
 
         // Make sure character 160 (non-breaking space) is trimmed
-        assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: I smalaste passagen är gångdel",
+        assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: <image: > I smalaste passagen ",
                 entry.getSummary());
     }
 
@@ -93,8 +93,7 @@ public class FeedParserTest {
         // Snippet should not contain images
         entry = feed.getItems().get(4);
         assertEquals("Fixing the up button in Python shell history", entry.getTitle());
-        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library." +
-                        " Ipython is more descri",
+        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library. <image: Python shell w",
                 entry.getSummary());
         // Snippet should not contain links
         entry = feed.getItems().get(1);

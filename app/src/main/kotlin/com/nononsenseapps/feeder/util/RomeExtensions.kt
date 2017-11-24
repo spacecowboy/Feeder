@@ -32,7 +32,7 @@ fun SyndEntry.asItem(feedAuthor: Author? = null): Item {
     val contentText = this.contentText()
     return Item(
             id = this.uri,
-            url = this.links?.firstOrNull{ "self" == it.rel }?.href ?: this.link,
+            url = this.feedUrl(),
             title = this.title,
             content_text = contentText,
             content_html = this.contentHtml(),
@@ -44,6 +44,9 @@ fun SyndEntry.asItem(feedAuthor: Author? = null): Item {
             attachments = this.enclosures?.map { it.asAttachment() }
     )
 }
+
+fun SyndEntry.feedUrl(): String? =
+    this.links?.firstOrNull{ "self" == it.rel }?.href ?: this.link
 
 fun SyndEnclosure.asAttachment(): Attachment {
     return Attachment(
@@ -64,31 +67,40 @@ fun SyndPerson.asAuthor(): Author {
 }
 
 fun SyndEntry.contentText(): String {
-    // Atom
-    if (contents != null && !contents.isEmpty()) {
-        val contents = contents
-        var possiblyHtml: String? = null
+    val possiblyHtml = when {
+        contents != null && !contents.isEmpty() -> { // Atom
+            val contents = contents
+            var possiblyHtml: String? = null
 
-        for (c in contents) {
-            if ("text" == c.type && c.value != null) {
-                return c.value
-            } else if (null == c.type && c.value != null) {
-                // Suspect it might be text as per the Rome docs
-                // https://github.com/ralph-tice/rome/blob/master/src/main/java/com/sun/syndication/feed/synd/SyndContent.java
-                possiblyHtml = c.value
-                break
-            } else if (("html" == c.type || "xhtml" == c.type) && c.value != null) {
-                possiblyHtml = c.value
-            } else if (possiblyHtml == null && c.value != null) {
-                possiblyHtml = c.value
+            for (c in contents) {
+                if ("text" == c.type && c.value != null) {
+                    return c.value
+                } else if (null == c.type && c.value != null) {
+                    // Suspect it might be text as per the Rome docs
+                    // https://github.com/ralph-tice/rome/blob/master/src/main/java/com/sun/syndication/feed/synd/SyndContent.java
+                    possiblyHtml = c.value
+                    break
+                } else if (("html" == c.type || "xhtml" == c.type) && c.value != null) {
+                    possiblyHtml = c.value
+                } else if (possiblyHtml == null && c.value != null) {
+                    possiblyHtml = c.value
+                }
             }
-        }
 
-        return HtmlToPlainTextConverter.HtmlToPlainText(possiblyHtml ?: "")
+            possiblyHtml
+        }
+        else -> // Rss
+            description?.value
     }
 
-    // Rss
-    return HtmlToPlainTextConverter.HtmlToPlainText(description?.value ?: "")
+    val result = HtmlToPlainTextConverter.HtmlToPlainText(possiblyHtml ?: "")
+
+    // Description consists of at least one image, avoid opening browser for this item
+    return when {
+        result.isBlank() && possiblyHtml?.contains("img") == true ->
+            "<image>"
+        else -> result
+    }
 }
 
 fun SyndEntry.contentHtml(): String? {
@@ -126,7 +138,16 @@ fun SyndEntry.thumbnail(): String? {
             contents?.firstOrNull { "image" == it.medium }
                     ?.reference?.toString()
         }
-        else -> null
+        else -> {
+            val imgLink: String? = naiveFindImageLink(this.contentHtml())
+            val feedUrl: String? = this.feedUrl()
+
+            when {
+                feedUrl != null && imgLink != null -> relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feedUrl), imgLink)
+                imgLink != null -> sloppyLinkToStrictURL(imgLink).toString()
+                else -> null
+            }
+        }
     }
 }
 

@@ -268,6 +268,9 @@ public class HtmlToSpannedConverter implements ContentHandler {
         int len = text.length();
         text.append("\uFFFC");
 
+        if (src == null) {
+            src = "";
+        }
         String imgLink = relativeLinkIntoAbsolute(mSiteUrl, src);
 
         text.setSpan(new ImageSpan(d, imgLink), len, text.length(),
