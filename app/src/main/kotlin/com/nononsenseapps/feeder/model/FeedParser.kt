@@ -120,11 +120,6 @@ object FeedParser {
         `is`.use {
             try {
                 val feed = SyndFeedInput().build(XmlReader(`is`))
-
-                feed.entries
-                        .filter { it.authors.isEmpty() }
-                        .forEach { it.authors = feed.authors }
-
                 return feed.asFeed()
             } catch (e: Throwable) {
                 throw FeedParsingError(e)

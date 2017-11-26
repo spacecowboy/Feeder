@@ -37,9 +37,6 @@ import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
 import com.nononsenseapps.feeder.db.Util
 import com.nononsenseapps.feeder.model.FeedParseLoader
-import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_TAG
-import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_TITLE
-import com.nononsenseapps.feeder.ui.FeedFragment.ARG_FEED_URL
 import com.nononsenseapps.feeder.util.LoaderResult
 import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.contentValues
@@ -55,7 +52,6 @@ const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
 const val _ID = "_id"
 const val CUSTOM_TITLE = "custom_title"
 const val FEED_TITLE = "feed_title"
-const val TAG = "tag"
 const val TEMPLATE = "template"
 private const val RSSFINDER = 1
 private const val SEARCHQUERY = "searchquery"
@@ -65,6 +61,8 @@ private const val TAGSFILTER = "TAGSFILTER"
 
 class EditFeedActivity : Activity(),
         LoaderManager.LoaderCallbacks<LoaderResult<Feed?>> {
+    private val TAG = "tag"
+
     private var shouldFinishBack = false
     private var id: Long = -1
     // Views and shit

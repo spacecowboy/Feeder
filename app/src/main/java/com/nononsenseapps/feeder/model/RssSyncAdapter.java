@@ -26,12 +26,10 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import com.nononsenseapps.feeder.util.PrefUtils;
 
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_ID;
 import static com.nononsenseapps.feeder.db.FeedSQLKt.COL_TAG;
-import static com.nononsenseapps.feeder.util.PrefUtils.shouldSyncOnHotSpots;
-import static com.nononsenseapps.feeder.util.PrefUtils.shouldSyncOnlyOnWIfi;
-import static com.nononsenseapps.feeder.util.PrefUtils.shouldSyncOnlyWhenCharging;
 import static com.nononsenseapps.feeder.util.SystemUtils.currentlyCharging;
 import static com.nononsenseapps.feeder.util.SystemUtils.currentlyConnected;
 import static com.nononsenseapps.feeder.util.SystemUtils.currentlyMetered;
@@ -140,13 +138,13 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             return true;
         }
 
-        if (shouldSyncOnlyWhenCharging(getContext()) && !currentlyCharging(getContext())) {
+        if (PrefUtils.INSTANCE.shouldSyncOnlyWhenCharging(getContext()) && !currentlyCharging(getContext())) {
             return false;
         }
 
         if (currentlyOnWifi(getContext())) {
-            return shouldSyncOnHotSpots(getContext()) || !currentlyMetered(getContext());
-        } else if (shouldSyncOnlyOnWIfi(getContext())) {
+            return PrefUtils.INSTANCE.shouldSyncOnHotSpots(getContext()) || !currentlyMetered(getContext());
+        } else if (PrefUtils.INSTANCE.shouldSyncOnlyOnWIfi(getContext())) {
             return false;
         }
 

@@ -7,17 +7,9 @@ import android.content.OperationApplicationException
 import android.net.Uri
 import android.os.RemoteException
 import com.nononsenseapps.feeder.db.AUTHORITY
-import com.nononsenseapps.feeder.db.COL_AUTHOR
-import com.nononsenseapps.feeder.db.COL_DESCRIPTION
-import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
 import com.nononsenseapps.feeder.db.COL_FEED
 import com.nononsenseapps.feeder.db.COL_FEEDTITLE
-import com.nononsenseapps.feeder.db.COL_GUID
-import com.nononsenseapps.feeder.db.COL_IMAGEURL
-import com.nononsenseapps.feeder.db.COL_LINK
-import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
-import com.nononsenseapps.feeder.db.COL_PLAINTITLE
-import com.nononsenseapps.feeder.db.COL_PUBDATE
+import com.nononsenseapps.feeder.db.COL_FEEDURL
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
@@ -30,11 +22,11 @@ import com.nononsenseapps.feeder.db.Util.LongsToStringArray
 import com.nononsenseapps.feeder.db.Util.ToStringArray
 import com.nononsenseapps.feeder.db.Util.WHEREIDIS
 import com.nononsenseapps.feeder.db.Util.WhereIs
-import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.FileLog
 import com.nononsenseapps.feeder.util.Optional
 import com.nononsenseapps.feeder.util.getFeeds
 import com.nononsenseapps.feeder.util.getIdForFeedItem
+import com.nononsenseapps.feeder.util.intoContentProviderOperation
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.jsonfeed.Feed
 import org.joda.time.DateTime
@@ -145,12 +137,12 @@ object RssLocalSync {
                 java.lang.Long.toString(feedSQL.id)))
 
         // This can be null, in that case do not override existing value
-        val selfLink = parsedFeed.feed_url
+        val selfLink = parsedFeed.feed_url ?: feedSQL.url
 
         // Populate with values
         feedOp.withValue(COL_TITLE, parsedFeed.title)
                 .withValue(COL_TAG, feedSQL.tag)
-                .withValue(COL_URL, selfLink ?: feedSQL.url)
+                .withValue(COL_URL, selfLink)
 
         // Add to list of operations
         operations.add(feedOp.build())
@@ -167,25 +159,11 @@ object RssLocalSync {
 
                 // Use the actual id, because update operation will not return id
                 itemOp.withValue(COL_FEED, feedSQL.id)
-
-                // Be careful about nulls.
-                val text = entry.content_html ?: entry.content_text ?: ""
-                val summary = entry.summary ?: HtmlToPlainTextConverter.HtmlToPlainText(text).take(200)
-                itemOp
-                        // These can be null
-                        .withValue(COL_LINK, entry.url)
-                        .withValue(COL_IMAGEURL, entry.image)
-                        .withValue(COL_ENCLOSURELINK, entry.attachments?.firstOrNull()?.url)
-                        .withValue(COL_AUTHOR, entry.author?.name)
-                        .withValue(COL_PUBDATE, entry.date_published)
-                        // Make sure these are non-null
-                        .withValue(COL_GUID, entry.id)
-                        .withValue(COL_FEEDTITLE, feedSQL.title)
+                        .withValue(COL_FEEDTITLE, feedSQL.displayTitle)
+                        .withValue(COL_FEEDURL, selfLink)
                         .withValue(COL_TAG, feedSQL.tag)
-                        .withValue(COL_TITLE, entry.title ?: "")
-                        .withValue(COL_DESCRIPTION, text)
-                        .withValue(COL_PLAINTITLE, entry.title ?: "")
-                        .withValue(COL_PLAINSNIPPET, summary)
+
+                entry.intoContentProviderOperation(parsedFeed, itemOp)
 
                 // Add to list of operations
                 operations.add(itemOp.build())

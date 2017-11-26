@@ -10,6 +10,8 @@ import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.db.FeedItemSQL;
 import com.nononsenseapps.feeder.views.DrawShadowFrameLayout;
 
+import static com.nononsenseapps.feeder.ui.FeedFragmentKt.ARG_FEED_URL;
+
 /**
  * Displays feed items suitable for consumption.
  */
@@ -30,15 +32,16 @@ public class ReaderActivity extends BaseActivity {
      * @param rssItem to read
      */
     public static void setRssExtras(Intent intent, FeedItemSQL rssItem) {
-        intent.putExtra(ReaderFragment.ARG_ID, rssItem.getId());
-        intent.putExtra(ReaderFragment.ARG_TITLE, rssItem.getTitle());
-        intent.putExtra(ReaderFragment.ARG_DESCRIPTION, rssItem.getDescription());
-        intent.putExtra(ReaderFragment.ARG_LINK, rssItem.getLink());
-        intent.putExtra(ReaderFragment.ARG_ENCLOSURE, rssItem.getEnclosurelink());
-        intent.putExtra(ReaderFragment.ARG_IMAGEURL, rssItem.getImageurl());
-        intent.putExtra(ReaderFragment.ARG_DATE, rssItem.getPubDateString());
-        intent.putExtra(ReaderFragment.ARG_AUTHOR, rssItem.getAuthor());
-        intent.putExtra(ReaderFragment.ARG_FEEDTITLE, rssItem.getFeedtitle());
+        intent.putExtra(ReaderFragmentKt.ARG_ID, rssItem.getId());
+        intent.putExtra(ReaderFragmentKt.ARG_TITLE, rssItem.getTitle());
+        intent.putExtra(ReaderFragmentKt.ARG_DESCRIPTION, rssItem.getDescription());
+        intent.putExtra(ReaderFragmentKt.ARG_LINK, rssItem.getLink());
+        intent.putExtra(ReaderFragmentKt.ARG_ENCLOSURE, rssItem.getEnclosurelink());
+        intent.putExtra(ReaderFragmentKt.ARG_IMAGEURL, rssItem.getImageurl());
+        intent.putExtra(ReaderFragmentKt.ARG_DATE, rssItem.getPubDateString());
+        intent.putExtra(ReaderFragmentKt.ARG_AUTHOR, rssItem.getAuthor());
+        intent.putExtra(ReaderFragmentKt.ARG_FEEDTITLE, rssItem.getFeedtitle());
+        intent.putExtra(ARG_FEED_URL, rssItem.getFeedUrl());
     }
 
     @Override

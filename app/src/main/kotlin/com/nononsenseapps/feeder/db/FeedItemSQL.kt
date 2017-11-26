@@ -1,7 +1,25 @@
 package com.nononsenseapps.feeder.db
 
 import android.database.Cursor
-import com.nononsenseapps.feeder.util.*
+import android.os.Bundle
+import com.nononsenseapps.feeder.ui.ARG_AUTHOR
+import com.nononsenseapps.feeder.ui.ARG_DATE
+import com.nononsenseapps.feeder.ui.ARG_ENCLOSURE
+import com.nononsenseapps.feeder.ui.ARG_FEEDTITLE
+import com.nononsenseapps.feeder.ui.ARG_FEED_URL
+import com.nononsenseapps.feeder.ui.ARG_ID
+import com.nononsenseapps.feeder.ui.ARG_IMAGEURL
+import com.nononsenseapps.feeder.ui.ARG_LINK
+import com.nononsenseapps.feeder.ui.ARG_TITLE
+import com.nononsenseapps.feeder.util.bundle
+import com.nononsenseapps.feeder.util.contentValues
+import com.nononsenseapps.feeder.util.getInt
+import com.nononsenseapps.feeder.util.getLong
+import com.nononsenseapps.feeder.util.getString
+import com.nononsenseapps.feeder.util.setInt
+import com.nononsenseapps.feeder.util.setLong
+import com.nononsenseapps.feeder.util.setString
+import com.nononsenseapps.feeder.util.setStringMaybe
 import org.joda.time.DateTime
 import java.net.URI
 import java.net.URL
@@ -26,19 +44,20 @@ const val COL_NOTIFIED = "notified"
 // These fields corresponds to columns in Feed table
 const val COL_FEED = "feed"
 const val COL_FEEDTITLE = "feedtitle"
+const val COL_FEEDURL = "feedurl"
 
 // For database projection so order is consistent
 @JvmField
 val FEED_ITEM_FIELDS = arrayOf(COL_ID, COL_TITLE, COL_DESCRIPTION, COL_PLAINTITLE, COL_PLAINSNIPPET,
         COL_IMAGEURL, COL_LINK, COL_AUTHOR, COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG,
-        COL_ENCLOSURELINK, COL_FEEDTITLE, COL_NOTIFIED, COL_GUID)
+        COL_ENCLOSURELINK, COL_FEEDTITLE, COL_NOTIFIED, COL_GUID, COL_FEEDURL)
 
 // In list avoid loading potentially big description field
 @JvmField
 val FEED_ITEM_FIELDS_FOR_LIST =
         arrayOf(COL_ID, COL_PLAINTITLE, COL_PLAINSNIPPET, COL_IMAGEURL, COL_LINK, COL_AUTHOR,
                 COL_PUBDATE, COL_UNREAD, COL_FEED, COL_TAG, COL_ENCLOSURELINK, COL_FEEDTITLE,
-                COL_NOTIFIED, COL_GUID)
+                COL_NOTIFIED, COL_GUID, COL_FEEDURL)
 
 val CREATE_FEED_ITEM_TABLE = """
     CREATE TABLE $FEED_ITEM_TABLE_NAME (
@@ -57,6 +76,7 @@ val CREATE_FEED_ITEM_TABLE = """
       $COL_NOTIFIED INTEGER NOT NULL DEFAULT 0,
       $COL_FEED INTEGER NOT NULL,
       $COL_FEEDTITLE TEXT NOT NULL,
+      $COL_FEEDURL TEXT NOT NULL,
       $COL_TAG TEXT NOT NULL,
       FOREIGN KEY($COL_FEED)
         REFERENCES $FEED_TABLE_NAME($COL_ID)
@@ -95,6 +115,7 @@ data class FeedItemSQL(val id: Long = -1,
                        val link: String? = null,
                        val tag: String = "",
                        val feedtitle: String = "",
+                       val feedUrl: String = "",
                        val notified: Boolean = false,
         // Variable to stop UI flickering
                        var unread: Boolean = false,
@@ -109,7 +130,8 @@ data class FeedItemSQL(val id: Long = -1,
                 var fname: String? = null
                 try {
                     fname = URI(enclosurelink).path.split("/").last()
-                } catch (e: Exception) {}
+                } catch (e: Exception) {
+                }
                 if (fname == null || fname.isEmpty()) {
                     return null
                 } else {
@@ -132,7 +154,7 @@ data class FeedItemSQL(val id: Long = -1,
         }
 
     fun asContentValues() =
-            com.nononsenseapps.feeder.util.contentValues {
+            contentValues {
                 setString(COL_TITLE to title)
                 setString(COL_DESCRIPTION to description)
                 setString(COL_PLAINTITLE to plaintitle)
@@ -140,6 +162,7 @@ data class FeedItemSQL(val id: Long = -1,
                 setLong(COL_FEED to feedid)
                 setInt(COL_UNREAD to if (unread) 1 else 0)
                 setString(COL_FEEDTITLE to feedtitle)
+                setString(COL_FEEDURL to feedUrl)
                 setInt(COL_NOTIFIED to if (notified) 1 else 0)
                 setString(COL_GUID to guid)
                 setString(COL_TAG to tag)
@@ -150,6 +173,28 @@ data class FeedItemSQL(val id: Long = -1,
                 setStringMaybe(COL_PUBDATE to pubDateString)
                 setStringMaybe(COL_ENCLOSURELINK to enclosurelink)
             }
+
+    fun asBundle() =
+            bundle {
+                storeFeedItem()
+            }
+
+    fun storeInBundle(bundle: Bundle): Bundle {
+        bundle.storeFeedItem()
+        return bundle
+    }
+
+    private fun Bundle.storeFeedItem() {
+        setLong(ARG_ID to id)
+        setString(ARG_TITLE to title)
+        setString(ARG_LINK to link)
+        setString(ARG_ENCLOSURE to enclosurelink)
+        setString(ARG_IMAGEURL to imageurl)
+        setString(ARG_FEEDTITLE to feedtitle)
+        setString(ARG_AUTHOR to author)
+        setString(ARG_DATE to pubDateString)
+        setString(ARG_FEED_URL to feedUrl)
+    }
 }
 
 fun Cursor.asFeedItem(): FeedItemSQL {
@@ -162,6 +207,7 @@ fun Cursor.asFeedItem(): FeedItemSQL {
             tag = getString(COL_TAG) ?: "",
             feedid = getLong(COL_FEED) ?: -1,
             feedtitle = getString(COL_FEEDTITLE) ?: "",
+            feedUrl = getString(COL_FEEDURL) ?: "",
             notified = when (getInt(COL_NOTIFIED) ?: 0) {
                 1 -> true
                 else -> false

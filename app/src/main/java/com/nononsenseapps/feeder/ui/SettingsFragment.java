@@ -10,6 +10,11 @@ import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.util.ContextExtensionsKt;
 import com.nononsenseapps.feeder.util.PrefUtils;
 
+import static com.nononsenseapps.feeder.util.PrefUtilsKt.PREF_SYNC_FREQ;
+import static com.nononsenseapps.feeder.util.PrefUtilsKt.PREF_SYNC_HOTSPOTS;
+import static com.nononsenseapps.feeder.util.PrefUtilsKt.PREF_SYNC_ONLY_CHARGING;
+import static com.nononsenseapps.feeder.util.PrefUtilsKt.PREF_SYNC_ONLY_WIFI;
+
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Override
@@ -19,7 +24,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         addPreferencesFromResource(R.xml.settings);
 
         PreferenceManager.getDefaultSharedPreferences(getActivity()).registerOnSharedPreferenceChangeListener(this);
-        bindPreferenceSummaryToValue(PrefUtils.PREF_SYNC_FREQ);
+        bindPreferenceSummaryToValue(PREF_SYNC_FREQ);
     }
 
     @Override
@@ -31,10 +36,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, final String key) {
         switch (key) {
-            case PrefUtils.PREF_SYNC_ONLY_CHARGING:
-            case PrefUtils.PREF_SYNC_HOTSPOTS:
-            case PrefUtils.PREF_SYNC_ONLY_WIFI:;
-            case PrefUtils.PREF_SYNC_FREQ:
+            case PREF_SYNC_ONLY_CHARGING:
+            case PREF_SYNC_HOTSPOTS:
+            case PREF_SYNC_ONLY_WIFI:
+            case PREF_SYNC_FREQ:
                 ContextExtensionsKt.setupSync(getActivity());
                 break;
         }
@@ -44,9 +49,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference preference = findPreference(prefKey);
         if (preference != null) {
             // Set change listener
-            preference.setOnPreferenceChangeListener(PrefUtils.summaryUpdater);
+            preference.setOnPreferenceChangeListener(PrefUtils.INSTANCE.getSummaryUpdater());
             // Trigger the listener immediately with the preference's  current value.
-            PrefUtils.summaryUpdater.onPreferenceChange(preference, PreferenceManager
+            PrefUtils.INSTANCE.getSummaryUpdater().onPreferenceChange(preference, PreferenceManager
                     .getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), ""));
         }
     }
