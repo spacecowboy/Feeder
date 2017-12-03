@@ -34,10 +34,15 @@ import com.nononsenseapps.jsonfeed.Feed
 import io.reactivex.Observable
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.Duration
+import java.net.URL
 import java.util.ArrayList
 import java.util.Arrays
+import java.util.concurrent.TimeUnit
 
 object RssLocalSync {
 
@@ -61,25 +66,39 @@ object RssLocalSync {
             log.d(String.format("Syncing %d feeds: %s", feeds.size, start.toString()))
 
             RxJavaPlugins.setErrorHandler {
-                Log.e("RxRSSLocalSync", "Error: $it")
+                Log.e("RxRSSLocalSync", "ErrorHandler: $it")
             }
 
-            Observable.fromIterable(feeds).flatMap {
-                Observable.just(it).subscribeOn(Schedulers.computation()).map {
-                    Log.d("RxRssLocalSync", "Working ${it.displayTitle} on ${Thread.currentThread().name}")
-                    val feed = context.feedParser.parseFeedUrl(it.url)
-                    val ops = convertResultToOperations(feed, it, context.contentResolver)
+            val timedOutResponse = Response.Builder()
+                    .code(999)
+                    .protocol(Protocol.HTTP_2)
+                    .message("RxJava thread timed out")
+                    .request(Request.Builder().url(URL("http://dummy")).build())
+                    .build()
+
+            Observable.fromIterable(feeds).flatMap { feedSql ->
+                Observable.just(feedSql).subscribeOn(Schedulers.io()).map {
+                    context.feedParser.getResponse(it.url)
+                }.timeout(2L, TimeUnit.SECONDS)
+                        .onErrorReturnItem(timedOutResponse)
+                        .observeOn(Schedulers.computation()).filter {
+                    if (!it.isSuccessful) {
+                        Log.d("RxRssLocalSync", "Response failure for ${feedSql.displayTitle}: ${it.message()}")
+                    }
+
+                    it.isSuccessful && it.body() != null
+                }.map { response ->
+                    Log.d("RxRssLocalSync", "Parsing ${feedSql.displayTitle} response on ${Thread.currentThread().name}")
+                    val feed = context.feedParser.parseFeedResponse(response)
+                    val ops = convertResultToOperations(feed, feedSql, context.contentResolver)
                     storeSyncResults(context, ops)
-                    it
+                    feedSql
                 }
-            }.doFinally {
-                Log.d("RxRssLocalSync", "doFinally1")
-            }.doFinally {
-                Log.d("RxRssLocalSync", "doFinally2")
             }.blockingSubscribe({
-                Log.d("RxRssLocalSync", "BlockingSubscribe feed: ${it?.displayTitle}")
+                Log.d("RxRssLocalSync", "BlockingSubscribe finished: ${it.displayTitle}")
             }, { error ->
                 Log.d("RxRssLocalSync", "BlockingSubscribe error: $error")
+                error.printStackTrace()
             })
 
             Log.d("RxRssLocalSync", "Cleaning up")
@@ -146,7 +165,7 @@ object RssLocalSync {
                 java.lang.Long.toString(feedSQL.id)))
 
         // This can be null, in that case do not override existing value
-        val selfLink = parsedFeed.feed_url ?: feedSQL.url
+        val selfLink: String = parsedFeed.feed_url ?: feedSQL.url.toString()
 
         // Populate with values
         feedOp.withValue(COL_TITLE, parsedFeed.title)

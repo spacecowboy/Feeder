@@ -121,12 +121,7 @@ object FeedParser {
     }
 
     fun curlAndOnResponse(url: URL, block: (Response.() -> Unit)) {
-        val request = Request.Builder()
-                .url(url)
-                .build()
-
-        val call = client.newCall(request)
-        val response = call.execute()
+        val response = getResponse(url)
 
         if (!response.isSuccessful) {
             throw IOException("Unexpected code " + response)
@@ -135,6 +130,15 @@ object FeedParser {
         response.use {
             it.block()
         }
+    }
+
+    fun getResponse(url: URL): Response {
+        val request = Request.Builder()
+                .url(url)
+                .build()
+
+        val call = client.newCall(request)
+        return call.execute()
     }
 
     @Throws(FeedParser.FeedParsingError::class)
@@ -165,6 +169,49 @@ object FeedParser {
                     result = if (feed.feed_url == null) {
                         // Nice to return non-null value here
                         feed.copy(feed_url = url.toString())
+                    } else {
+                        feed
+                    }
+                } else {
+                    throw NullPointerException("Response body was null")
+                }
+            }
+
+            return result!!
+        } catch (e: Throwable) {
+            throw FeedParsingError(e)
+        }
+
+    }
+
+    @Throws(FeedParser.FeedParsingError::class)
+    fun parseFeedResponse(response: Response): Feed {
+        Log.d("RxFeedParser", "parseFeedResponse: ${response.request().url()}")
+        try {
+
+            var result: Feed? = null
+            response.use {
+                Log.d("RxRSSLOCAL", "cache response: " + it.cacheResponse())
+                Log.d("RxRSSLOCAL", "network response: " + it.networkResponse())
+
+                val isJSON = (it.header("content-type") ?: "").contains("json")
+                val body = it.body()?.string()
+
+                if (body != null) {
+                    val alternateFeedLink = findFeedUrl(body, preferAtom = true)
+
+                    val feed = if (alternateFeedLink != null) {
+                        parseFeedUrl(alternateFeedLink)
+                    } else {
+                        when (isJSON) {
+                            true -> jsonFeedParser.parseJson(body)
+                            false -> parseRssAtomBody(body)
+                        }
+                    }
+
+                    result = if (feed.feed_url == null) {
+                        // Nice to return non-null value here
+                        feed.copy(feed_url = it.request().url().toString())
                     } else {
                         feed
                     }
