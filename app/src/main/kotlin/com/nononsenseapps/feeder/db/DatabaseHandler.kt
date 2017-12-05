@@ -13,7 +13,7 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import java.io.File
 import java.util.*
 
-val DATABASE_VERSION = 5
+val DATABASE_VERSION = 6
 private val DATABASE_NAME = "rssDatabase"
 
 class DatabaseHandler constructor(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -27,8 +27,8 @@ class DatabaseHandler constructor(context: Context): SQLiteOpenHelper(context, D
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         try {
             // Same for oldVersion < 4
-            if (oldVersion < 5) {
-                createViewsAndTriggers(db)
+            if (oldVersion < 6) {
+                db.execSQL(CREATE_TAGS_VIEW)
                 // Export to OPML
                 val tempFile = File(context.externalCacheDir, "upgrade.opml")
 
@@ -94,7 +94,10 @@ class DatabaseHandler constructor(context: Context): SQLiteOpenHelper(context, D
         return { tag ->
             val feeds = ArrayList<FeedSQL>()
 
-            db.query(FEED_TABLE_NAME, FEED_FIELDS, "$COL_TAG IS ?",
+            // be wary of changing columns
+            val fields = arrayOf(COL_ID, COL_TITLE, COL_URL, COL_TAG, COL_CUSTOM_TITLE)
+
+            db.query(FEED_TABLE_NAME, fields, "$COL_TAG IS ?",
                     arrayOf(tag ?: ""), null, null, null).use { cursor ->
                 cursor.forEach {
                     feeds.add(it.asFeed())
