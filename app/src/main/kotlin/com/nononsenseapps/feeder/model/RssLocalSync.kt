@@ -94,8 +94,10 @@ object RssLocalSync {
                     storeSyncResults(context, ops)
                     feedSql
                 }
-            }.blockingSubscribe({
-                Log.d("RxRssLocalSync", "BlockingSubscribe finished: ${it.displayTitle}")
+            }.buffer(3L, TimeUnit.SECONDS).blockingSubscribe({
+                // Notify every so often about progress during long syncs
+                context.contentResolver.notifyAllUris()
+                Log.d("RxRssLocalSync", "BlockingSubscribe finished: ${it.map { it.displayTitle }}")
             }, { error ->
                 Log.d("RxRssLocalSync", "BlockingSubscribe error: $error")
                 error.printStackTrace()
