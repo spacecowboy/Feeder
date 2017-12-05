@@ -17,37 +17,42 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/feedchilditem"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="?android:selectableItemBackground"
+  android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
+  tools:ignore="RtlSymmetry">
+
+  <TextView
+    android:id="@+id/feed_unreadcount"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="?android:selectableItemBackground"
-    android:paddingStart="?android:attr/expandableListPreferredChildPaddingLeft"
-    tools:ignore="RtlSymmetry">
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+    android:paddingStart="2dp"
+    android:singleLine="true"
+    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+    android:textColor="@color/secondary_text_material_dark"
+    android:textSize="@dimen/navdrawer_unreadcount_textsize"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/feed_unreadcount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:gravity="center_vertical"
-        android:minHeight="?android:attr/listPreferredItemHeightSmall"
-        android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-        android:paddingStart="2dp"
-        android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
-        android:textColor="@color/secondary_text_material_dark"
-        android:textSize="@dimen/navdrawer_unreadcount_textsize" />
-
-    <TextView
-        android:id="@+id/feed_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@id/feed_unreadcount"
-        android:gravity="center_vertical"
-        android:minHeight="?android:attr/listPreferredItemHeightSmall"
-        android:paddingEnd="2dp"
-        android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall" />
-</RelativeLayout>
+  <TextView
+    android:id="@+id/feed_name"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:paddingEnd="2dp"
+    android:singleLine="true"
+    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+    app:layout_constraintEnd_toStartOf="@+id/feed_unreadcount"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+</android.support.constraint.ConstraintLayout>
