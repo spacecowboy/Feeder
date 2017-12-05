@@ -115,12 +115,12 @@ object FeedParser {
     fun curl(url: URL): String? {
         var result: String? = null
         curlAndOnResponse(url) {
-            result = body()?.string()
+            result = it.body()?.string()
         }
         return result
     }
 
-    fun curlAndOnResponse(url: URL, block: (Response.() -> Unit)) {
+    private fun curlAndOnResponse(url: URL, block: ((Response) -> Unit)) {
         val response = getResponse(url)
 
         if (!response.isSuccessful) {
@@ -128,7 +128,7 @@ object FeedParser {
         }
 
         response.use {
-            it.block()
+            block(it)
         }
     }
 
@@ -148,33 +148,7 @@ object FeedParser {
 
             var result: Feed? = null
             curlAndOnResponse(url) {
-                Log.d("RxRSSLOCAL", "cache response: " + cacheResponse())
-                Log.d("RxRSSLOCAL", "network response: " + networkResponse())
-
-                val isJSON = (header("content-type") ?: "").contains("json")
-                val body = body()?.string()
-
-                if (body != null) {
-                    val alternateFeedLink = findFeedUrl(body, preferAtom = true)
-
-                    val feed = if (alternateFeedLink != null) {
-                        parseFeedUrl(alternateFeedLink)
-                    } else {
-                        when (isJSON) {
-                            true -> jsonFeedParser.parseJson(body)
-                            false -> parseRssAtomBody(body)
-                        }
-                    }
-
-                    result = if (feed.feed_url == null) {
-                        // Nice to return non-null value here
-                        feed.copy(feed_url = url.toString())
-                    } else {
-                        feed
-                    }
-                } else {
-                    throw NullPointerException("Response body was null")
-                }
+                result = parseFeedResponse(it)
             }
 
             return result!!
