@@ -11,6 +11,7 @@ import com.nononsenseapps.feeder.db.AUTHORITY
 import com.nononsenseapps.feeder.db.COL_FEED
 import com.nononsenseapps.feeder.db.COL_FEEDTITLE
 import com.nononsenseapps.feeder.db.COL_FEEDURL
+import com.nononsenseapps.feeder.db.COL_IMAGEURL
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
@@ -173,6 +174,7 @@ object RssLocalSync {
         feedOp.withValue(COL_TITLE, parsedFeed.title)
                 .withValue(COL_TAG, feedSQL.tag)
                 .withValue(COL_URL, selfLink)
+                .withValue(COL_IMAGEURL, parsedFeed.icon)
 
         // Add to list of operations
         operations.add(feedOp.build())

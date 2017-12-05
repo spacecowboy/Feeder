@@ -161,6 +161,8 @@ public class FeedParserTest {
         assertTrue("Should take the updated timestamp", entry.getDate_published().contains("2016"));
         assertEquals("http://localhost:1313/images/zopfli_all_the_things.jpg",
                 entry.getImage());
+
+        assertEquals("http://localhost:1313/css/images/logo.png", feed.getIcon());
     }
 
     @Test
