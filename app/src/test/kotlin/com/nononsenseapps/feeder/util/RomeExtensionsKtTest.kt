@@ -57,7 +57,7 @@ class RomeExtensionsKtTest {
     // Essentially a test for XKCD
     @Test
     fun descriptionWithOnlyImageDoesNotReturnBlankSummaryAndGetsImageSet() {
-        var expectedSummary = "<image: An image>"
+        var expectedSummary = "[An image]"
         val html = "  <img src='http://google.com/image.png' alt='An image'/> "
 
         assertEquals(

@@ -72,7 +72,7 @@ public class FeedParserTest {
                 entry.getTitle());
 
         // Make sure character 160 (non-breaking space) is trimmed
-        assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: <image: > I smalaste passagen ",
+        assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: [IMG] I smalaste passagen är g",
                 entry.getSummary());
     }
 
@@ -93,7 +93,7 @@ public class FeedParserTest {
         // Snippet should not contain images
         entry = feed.getItems().get(4);
         assertEquals("Fixing the up button in Python shell history", entry.getTitle());
-        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library. <image: Python shell w",
+        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library. [Python shell where up",
                 entry.getSummary());
         // Snippet should not contain links
         entry = feed.getItems().get(1);

@@ -126,14 +126,14 @@ public class HtmlToPlainTextConverter implements ContentHandler {
     private void startImg(StringBuilder text, Attributes attributes) {
         String alt = attributes.getValue("", "alt");
 
-        if (alt == null) {
-            alt = "image";
+        if (alt == null || alt.isEmpty()) {
+            alt = "IMG";
         }
 
         // Ensure whitespace
         ensureSpace(text);
 
-        text.append("<image: ").append(alt).append(">").append(" ");
+        text.append("[").append(alt).append("]").append(" ");
     }
 
     private void startOl(StringBuilder text) {
