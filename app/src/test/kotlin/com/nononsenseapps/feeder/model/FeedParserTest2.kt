@@ -2,6 +2,11 @@ package com.nononsenseapps.feeder.model
 
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
+import okhttp3.MediaType
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.ResponseBody
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -85,6 +90,26 @@ class FeedParserTest2 {
 
     @Test
     @Throws(Exception::class)
+    fun encodingIsHandledInAtomRss() {
+        val responseBody: ResponseBody = ResponseBody.create(MediaType.parse("application/xml"), getGolemDe())
+
+        val response: Response = Response.Builder()
+                .body(responseBody)
+                .protocol(Protocol.HTTP_2)
+                .code(200)
+                .message("Test")
+                .request(Request.Builder()
+                        .url("https://rss.golem.de/rss.php?feed=RSS2.0")
+                        .build())
+                .build()
+
+        val feed = FeedParser.parseFeedResponse(response)
+
+        assertEquals(true, feed.items?.get(0)?.content_text?.contains("größte"))
+    }
+
+    @Test
+    @Throws(Exception::class)
     @Ignore
     fun relativeLinksAreMadeAbsoluteAtom() {
 
@@ -111,6 +136,9 @@ class FeedParserTest2 {
                     .use {
                         it.readText()
                     }
+
+    private fun getGolemDe(): ByteArray =
+            javaClass.getResourceAsStream("golem-de.xml").readBytes()
 }
 
 val atomRelative = """

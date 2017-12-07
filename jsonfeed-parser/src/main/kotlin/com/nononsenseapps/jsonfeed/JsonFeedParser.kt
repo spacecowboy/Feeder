@@ -94,6 +94,13 @@ class JsonFeedParser(private val httpClient: OkHttpClient,
     /**
      * Parse a JSONFeed
      */
+    fun parseJsonBytes(json: ByteArray): Feed =
+            json.inputStream().use { return parseJsonStream(Okio.buffer(Okio.source(it))) }
+
+
+    /**
+     * Parse a JSONFeed
+     */
     @Suppress("MemberVisibilityCanPrivate")
     fun parseJsonStream(json: BufferedSource): Feed {
         val result = jsonFeedAdapter.fromJson(json)
