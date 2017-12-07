@@ -1,147 +1,162 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:paddingBottom="@dimen/activity_vertical_margin"
+  android:paddingLeft="@dimen/activity_horizontal_margin"
+  android:paddingRight="@dimen/activity_horizontal_margin"
+  android:paddingTop="@dimen/activity_vertical_margin"
+  tools:context="com.nononsenseapps.feeder.ui.EditFeedActivity">
+
+  <ScrollView
+    android:id="@+id/feed_details_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.nononsenseapps.feeder.ui.EditFeedActivity">
+    android:visibility="gone">
 
-    <ScrollView
-        android:id="@+id/feed_details_frame"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
     <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+
+      <com.nononsenseapps.feeder.views.FloatLabelLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <com.nononsenseapps.feeder.views.FloatLabelLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:floatErrorTextAppearance="@style/TextAppearance.ErrorLabel"
-            app:floatLabelTextAppearance="@style/TextAppearance.FloatLabel">
-
-            <EditText
-                android:id="@+id/feed_url"
-                style="@style/TextAppearance.Title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_marginTop="2dp"
-                android:hint="@string/url"
-                android:imeOptions="actionNext"
-                android:inputType="textUri"
-                android:singleLine="true" />
-        </com.nononsenseapps.feeder.views.FloatLabelLayout>
-
-        <com.nononsenseapps.feeder.views.FloatLabelLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:floatErrorTextAppearance="@style/TextAppearance.ErrorLabel"
-            app:floatLabelTextAppearance="@style/TextAppearance.FloatLabel">
-
-            <EditText
-                android:id="@+id/feed_title"
-                style="@style/TextAppearance.Title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:hint="@string/title"
-                android:imeOptions="actionNext"
-                android:inputType="text|textAutoComplete|textAutoCorrect|textCapSentences"
-                android:singleLine="true" />
-        </com.nononsenseapps.feeder.views.FloatLabelLayout>
-
-        <com.nononsenseapps.feeder.views.FloatLabelLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:floatErrorTextAppearance="@style/TextAppearance.ErrorLabel"
-            app:floatLabelTextAppearance="@style/TextAppearance.FloatLabel">
-
-            <AutoCompleteTextView
-                android:id="@+id/feed_tag"
-                style="@style/TextAppearance.Title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_marginTop="2dp"
-                android:completionThreshold="1"
-                android:hint="@string/tag"
-                android:imeOptions="actionDone"
-                android:inputType="text|textAutoComplete|textAutoCorrect|textCapSentences"
-                android:singleLine="true" />
-        </com.nononsenseapps.feeder.views.FloatLabelLayout>
-
-        <!--<View-->
-        <!--android:layout_height="1dp"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:background="?android:attr/dividerHorizontal"-->
-        <!--android:layout_marginBottom="2dip"-->
-        <!--android:layout_marginTop="2dip"-->
-        <!--/>-->
-
-        <Button
-            android:id="@+id/add_button"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:text="@string/add_feed" />
-
-    </LinearLayout>
-    </ScrollView>
-    <LinearLayout
-        android:id="@+id/feed_search_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_marginTop="8dp"
+        app:floatErrorTextAppearance="@style/TextAppearance.ErrorLabel"
+        app:floatLabelTextAppearance="@style/TextAppearance.FloatLabel">
 
         <EditText
-            android:id="@+id/search_view"
-            style="@style/TextAppearance.Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:hint="@string/add_feed_search_hint"
-            android:imeOptions="actionGo"
-            android:inputType="text|textAutoComplete|textUri"
-            android:singleLine="true" />
+          android:id="@+id/feed_url"
+          style="@style/TextAppearance.Title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="2dp"
+          android:layout_marginTop="2dp"
+          android:hint="@string/url"
+          android:imeOptions="actionNext"
+          android:inputType="textUri"
+          android:singleLine="true" />
+      </com.nononsenseapps.feeder.views.FloatLabelLayout>
 
-        <ListView
-            android:id="@+id/results_listview"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+      <com.nononsenseapps.feeder.views.FloatLabelLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:floatErrorTextAppearance="@style/TextAppearance.ErrorLabel"
+        app:floatLabelTextAppearance="@style/TextAppearance.FloatLabel">
 
-        <TextView
-            android:id="@android:id/empty"
-            style="@style/TextAppearance.EmptyView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:text="@string/search_feed_empty_hint" />
+        <EditText
+          android:id="@+id/feed_title"
+          style="@style/TextAppearance.Title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="2dp"
+          android:hint="@string/title"
+          android:imeOptions="actionNext"
+          android:inputType="text|textAutoComplete|textAutoCorrect|textCapSentences"
+          android:singleLine="true" />
+      </com.nononsenseapps.feeder.views.FloatLabelLayout>
 
-        <ProgressBar
-            android:id="@+id/loading_progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:visibility="gone" />
+      <com.nononsenseapps.feeder.views.FloatLabelLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:floatErrorTextAppearance="@style/TextAppearance.ErrorLabel"
+        app:floatLabelTextAppearance="@style/TextAppearance.FloatLabel">
+
+        <AutoCompleteTextView
+          android:id="@+id/feed_tag"
+          style="@style/TextAppearance.Title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="2dp"
+          android:layout_marginTop="2dp"
+          android:completionThreshold="1"
+          android:hint="@string/tag"
+          android:imeOptions="actionDone"
+          android:inputType="text|textAutoComplete|textAutoCorrect|textCapSentences"
+          android:singleLine="true" />
+      </com.nononsenseapps.feeder.views.FloatLabelLayout>
+
+      <!--<View-->
+      <!--android:layout_height="1dp"-->
+      <!--android:layout_width="match_parent"-->
+      <!--android:background="?android:attr/dividerHorizontal"-->
+      <!--android:layout_marginBottom="2dip"-->
+      <!--android:layout_marginTop="2dip"-->
+      <!--/>-->
+
+      <Button
+        android:id="@+id/add_button"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:text="@string/add_feed" />
 
     </LinearLayout>
+  </ScrollView>
+
+  <android.support.constraint.ConstraintLayout
+    android:id="@+id/feed_search_frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+      android:id="@+id/search_view"
+      style="@style/TextAppearance.Title"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="8dp"
+      android:hint="@string/add_feed_search_hint"
+      android:imeOptions="actionGo"
+      android:inputType="text|textAutoComplete|textUri"
+      android:singleLine="true"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+      android:id="@+id/results_listview"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_marginBottom="8dp"
+      android:layout_marginTop="8dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/search_view" />
+
+    <TextView
+      android:id="@android:id/empty"
+      style="@style/TextAppearance.EmptyView"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:layout_marginTop="16dp"
+      android:gravity="center"
+      android:text="@string/search_feed_empty_hint"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/search_view" />
+
+    <ProgressBar
+      android:id="@+id/loading_progress"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:layout_marginTop="16dp"
+      android:visibility="gone"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/search_view" />
+
+  </android.support.constraint.ConstraintLayout>
 
 </LinearLayout>

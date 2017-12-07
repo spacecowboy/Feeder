@@ -65,7 +65,7 @@ class JsonFeedParser(private val httpClient: OkHttpClient,
             request = Request.Builder()
                     .url(url)
                     .build()
-        } catch (error: IllegalArgumentException) {
+        } catch (error: Throwable) {
             throw IllegalArgumentException("Bad URL. Perhaps it is missing an http:// prefix?", error)
         }
 

@@ -21,7 +21,7 @@ public class FeedParserTest {
 
     @Test
     public void noStyles() throws Exception {
-        Feed feed = FeedParser.INSTANCE.parseFeed(getResearchRsc());
+        Feed feed = FeedParser.INSTANCE.parseFeedInputStream(getResearchRsc());
         assertNotNull(feed);
 
         assertEquals("http://research.swtch.com/feed.atom", feed.getFeed_url());
@@ -30,7 +30,7 @@ public class FeedParserTest {
 
         Item entry = feed.getItems().get(9);
 
-        assertNull(entry.getImage());
+        assertEquals("http://research.swtch.com/qr-bbc.png", entry.getImage());
 
         assertEquals("QArt Codes",
                 entry.getTitle());
@@ -42,7 +42,7 @@ public class FeedParserTest {
 
     @Test
     public void feedAuthorIsUsedAsFallback() throws Exception {
-        Feed feed = FeedParser.INSTANCE.parseFeed(getResearchRsc());
+        Feed feed = FeedParser.INSTANCE.parseFeedInputStream(getResearchRsc());
         assertNotNull(feed);
 
         assertEquals("http://research.swtch.com/feed.atom", feed.getFeed_url());
@@ -57,7 +57,7 @@ public class FeedParserTest {
 
     @Test
     public void cyklist() throws Exception {
-        Feed feed = FeedParser.INSTANCE.parseFeed(getCyklistBloggen());
+        Feed feed = FeedParser.INSTANCE.parseFeedInputStream(getCyklistBloggen());
         assertNotNull(feed);
 
         assertNull(feed.getFeed_url());
@@ -66,19 +66,19 @@ public class FeedParserTest {
 
         Item entry = feed.getItems().get(0);
 
-        assertNull(entry.getImage());
+        assertEquals("http://www.cyklistbloggen.se/wp-content/uploads/2014/01/Danviksklippan-skyltad.jpg", entry.getImage());
 
         assertEquals("Ingen ombyggning av Danvikstull",
                 entry.getTitle());
 
         // Make sure character 160 (non-breaking space) is trimmed
-        assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: I smalaste passagen är gångdel",
+        assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: [IMG] I smalaste passagen är g",
                 entry.getSummary());
     }
 
     @Test
     public void cowboy() throws Exception {
-        Feed feed = FeedParser.INSTANCE.parseFeed(getCowboyRss());
+        Feed feed = FeedParser.INSTANCE.parseFeedInputStream(getCowboyRss());
         assertNotNull(feed);
 
         assertNull(feed.getFeed_url());
@@ -93,8 +93,7 @@ public class FeedParserTest {
         // Snippet should not contain images
         entry = feed.getItems().get(4);
         assertEquals("Fixing the up button in Python shell history", entry.getTitle());
-        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library." +
-                        " Ipython is more descri",
+        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library. [Python shell where up",
                 entry.getSummary());
         // Snippet should not contain links
         entry = feed.getItems().get(1);
@@ -105,7 +104,7 @@ public class FeedParserTest {
 
     @Test
     public void rss() throws Exception {
-        Feed feed = FeedParser.INSTANCE.parseFeed(getRSS());
+        Feed feed = FeedParser.INSTANCE.parseFeedInputStream(getRSS());
 
         assertEquals("http://cornucopia.cornubot.se/", feed.getHome_page_url());
         assertNull(feed.getFeed_url());
@@ -129,7 +128,7 @@ public class FeedParserTest {
 
     @Test
     public void atom() throws Exception {
-        Feed feed = FeedParser.INSTANCE.parseFeed(getAtom());
+        Feed feed = FeedParser.INSTANCE.parseFeedInputStream(getAtom());
 
         assertEquals("http://cornucopia.cornubot.se/", feed.getHome_page_url());
         assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", feed.getFeed_url());
@@ -153,7 +152,7 @@ public class FeedParserTest {
 
     @Test
     public void atomCowboy() throws Exception {
-        Feed feed = FeedParser.INSTANCE.parseFeed(getCowboyAtom());
+        Feed feed = FeedParser.INSTANCE.parseFeedInputStream(getCowboyAtom());
 
         assertEquals(15, feed.getItems().size());
         Item entry = feed.getItems().get(1);
@@ -162,11 +161,13 @@ public class FeedParserTest {
         assertTrue("Should take the updated timestamp", entry.getDate_published().contains("2016"));
         assertEquals("http://localhost:1313/images/zopfli_all_the_things.jpg",
                 entry.getImage());
+
+        assertEquals("http://localhost:1313/css/images/logo.png", feed.getIcon());
     }
 
     @Test
     public void morningPaper() throws Exception {
-        Feed feed = FeedParser.INSTANCE.parseFeed(getMorningPaper());
+        Feed feed = FeedParser.INSTANCE.parseFeedInputStream(getMorningPaper());
 
         assertEquals("https://blog.acolyer.org", feed.getHome_page_url());
         assertNull(feed.getFeed_url());
@@ -183,7 +184,7 @@ public class FeedParserTest {
 
     @Test
     public void londoner() throws Exception {
-        Feed feed = FeedParser.INSTANCE.parseFeed(getLondoner());
+        Feed feed = FeedParser.INSTANCE.parseFeedInputStream(getLondoner());
 
         assertEquals("http://londonist.com/", feed.getHome_page_url());
         assertNull(feed.getFeed_url());
@@ -201,7 +202,7 @@ public class FeedParserTest {
     @Test
     @Ignore
     public void fz() throws Exception {
-        Feed feed = FeedParser.INSTANCE.parseFeed(getFz());
+        Feed feed = FeedParser.INSTANCE.parseFeedInputStream(getFz());
 
         assertEquals("http://www.fz.se/nyheter/", feed.getHome_page_url());
         assertNull(feed.getFeed_url());

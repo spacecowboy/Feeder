@@ -4,7 +4,8 @@ import com.nononsenseapps.feeder.db.FeedSQL
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.ByteArrayOutputStream
-import java.util.ArrayList
+import java.net.URL
+import java.util.*
 
 class OpmlWriterKtTest {
     @Test
@@ -28,7 +29,7 @@ class OpmlWriterKtTest {
                     title = "A \"feeditem\" with id '9' > 0 & < 10",
                     customTitle = "A \"feeditem\" with id '9' > 0 & < 10",
                     unreadCount = 2,
-                    url = "http://somedomain.com/rss.xml?format=feed&type=rss",
+                    url = URL("http://somedomain.com/rss.xml?format=feed&type=rss"),
                     tag = tag!!)
 
             result.add(feed)

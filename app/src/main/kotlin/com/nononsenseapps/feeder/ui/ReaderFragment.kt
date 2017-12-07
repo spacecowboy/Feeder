@@ -54,6 +54,7 @@ import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.asFeedItem
 import com.nononsenseapps.feeder.util.firstOrNull
 import com.nononsenseapps.feeder.util.markItemAsRead
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.views.ObservableScrollView
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
@@ -147,7 +148,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
         if (rssItem!!.title.isEmpty()) {
             titleTextView!!.text = rssItem!!.plaintitle
         } else {
-            titleTextView!!.text = toSpannedWithNoImages(rssItem!!.title,rssItem!!.feedUrl, activity!!)
+            titleTextView!!.text = toSpannedWithNoImages(rssItem!!.title, rssItem!!.feedUrl, activity!!)
         }
     }
 
@@ -254,10 +255,10 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
             // Using twice window height since we do scroll vertically
             when {
                 TabletUtils.isTablet(activity) -> // Tablet has fixed width
-                    ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl ?: "",
+                    ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl ?: sloppyLinkToStrictURL(""),
                             Point(Math.round(resources.getDimension(R.dimen.reader_tablet_width)), 2 * size.y), PrefUtils.shouldLoadImages(activity!!)) as Loader<Any?>
                 else -> // Base it on window size
-                    ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl ?: "",
+                    ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl ?: sloppyLinkToStrictURL(""),
                             Point(size.x - 2 * Math.round(resources.getDimension(R.dimen.keyline_1)), 2 * size.y), PrefUtils.shouldLoadImages(activity!!)) as Loader<Any?>
             }
         }

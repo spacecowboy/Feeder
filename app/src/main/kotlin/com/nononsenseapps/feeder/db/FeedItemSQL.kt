@@ -20,6 +20,8 @@ import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
 import com.nononsenseapps.feeder.util.setStringMaybe
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import org.joda.time.DateTime
 import java.net.URI
 import java.net.URL
@@ -115,7 +117,7 @@ data class FeedItemSQL(val id: Long = -1,
                        val link: String? = null,
                        val tag: String = "",
                        val feedtitle: String = "",
-                       val feedUrl: String = "",
+                       val feedUrl: URL = sloppyLinkToStrictURL(""),
                        val notified: Boolean = false,
         // Variable to stop UI flickering
                        var unread: Boolean = false,
@@ -162,7 +164,7 @@ data class FeedItemSQL(val id: Long = -1,
                 setLong(COL_FEED to feedid)
                 setInt(COL_UNREAD to if (unread) 1 else 0)
                 setString(COL_FEEDTITLE to feedtitle)
-                setString(COL_FEEDURL to feedUrl)
+                setString(COL_FEEDURL to feedUrl.toString())
                 setInt(COL_NOTIFIED to if (notified) 1 else 0)
                 setString(COL_GUID to guid)
                 setString(COL_TAG to tag)
@@ -193,7 +195,7 @@ data class FeedItemSQL(val id: Long = -1,
         setString(ARG_FEEDTITLE to feedtitle)
         setString(ARG_AUTHOR to author)
         setString(ARG_DATE to pubDateString)
-        setString(ARG_FEED_URL to feedUrl)
+        setString(ARG_FEED_URL to feedUrl.toString())
     }
 }
 
@@ -207,7 +209,7 @@ fun Cursor.asFeedItem(): FeedItemSQL {
             tag = getString(COL_TAG) ?: "",
             feedid = getLong(COL_FEED) ?: -1,
             feedtitle = getString(COL_FEEDTITLE) ?: "",
-            feedUrl = getString(COL_FEEDURL) ?: "",
+            feedUrl = sloppyLinkToStrictURLNoThrows(getString(COL_FEEDURL) ?: ""),
             notified = when (getInt(COL_NOTIFIED) ?: 0) {
                 1 -> true
                 else -> false

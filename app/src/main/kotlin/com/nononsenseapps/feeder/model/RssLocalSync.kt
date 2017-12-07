@@ -6,10 +6,12 @@ import android.content.Context
 import android.content.OperationApplicationException
 import android.net.Uri
 import android.os.RemoteException
+import android.util.Log
 import com.nononsenseapps.feeder.db.AUTHORITY
 import com.nononsenseapps.feeder.db.COL_FEED
 import com.nononsenseapps.feeder.db.COL_FEEDTITLE
 import com.nononsenseapps.feeder.db.COL_FEEDURL
+import com.nononsenseapps.feeder.db.COL_IMAGEURL
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
@@ -24,16 +26,24 @@ import com.nononsenseapps.feeder.db.Util.WHEREIDIS
 import com.nononsenseapps.feeder.db.Util.WhereIs
 import com.nononsenseapps.feeder.util.FileLog
 import com.nononsenseapps.feeder.util.Optional
+import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.getFeeds
 import com.nononsenseapps.feeder.util.getIdForFeedItem
 import com.nononsenseapps.feeder.util.intoContentProviderOperation
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.jsonfeed.Feed
+import io.reactivex.Observable
+import io.reactivex.plugins.RxJavaPlugins
+import io.reactivex.schedulers.Schedulers
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.Duration
-import java.io.File
+import java.net.URL
 import java.util.ArrayList
 import java.util.Arrays
+import java.util.concurrent.TimeUnit
 
 object RssLocalSync {
 
@@ -56,24 +66,45 @@ object RssLocalSync {
             }
             log.d(String.format("Syncing %d feeds: %s", feeds.size, start.toString()))
 
-            val cacheDir = context.externalCacheDir
-
-            for (f in feeds) {
-                syncFeed(f, cacheDir).ifPresent { sf ->
-                    val ops = convertResultToOperations(sf, f, context.contentResolver)
-                    try {
-                        storeSyncResults(context, ops)
-                        // Notify that we've updated
-                        context.contentResolver.notifyAllUris()
-                    } catch (e: RemoteException) {
-                        log.d("Error during sync: ${e.message}")
-                        e.printStackTrace()
-                    } catch (e: OperationApplicationException) {
-                        log.d("Error during sync: ${e.message}")
-                        e.printStackTrace()
-                    }
-                }
+            RxJavaPlugins.setErrorHandler {
+                Log.e("RxRSSLocalSync", "ErrorHandler: $it")
             }
+
+            val timedOutResponse = Response.Builder()
+                    .code(999)
+                    .protocol(Protocol.HTTP_2)
+                    .message("RxJava thread timed out")
+                    .request(Request.Builder().url(URL("http://dummy")).build())
+                    .build()
+
+            Observable.fromIterable(feeds).flatMap { feedSql ->
+                Observable.just(feedSql).subscribeOn(Schedulers.io()).map {
+                    context.feedParser.getResponse(it.url)
+                }.timeout(2L, TimeUnit.SECONDS)
+                        .onErrorReturnItem(timedOutResponse)
+                        .observeOn(Schedulers.computation()).filter {
+                    if (!it.isSuccessful) {
+                        Log.d("RxRssLocalSync", "Response failure for ${feedSql.displayTitle}: ${it.message()}")
+                    }
+
+                    it.isSuccessful && it.body() != null
+                }.map { response ->
+                    Log.d("RxRssLocalSync", "Parsing ${feedSql.displayTitle} response on ${Thread.currentThread().name}")
+                    val feed = context.feedParser.parseFeedResponse(response)
+                    val ops = convertResultToOperations(feed, feedSql, context.contentResolver)
+                    storeSyncResults(context, ops)
+                    feedSql
+                }
+            }.buffer(3L, TimeUnit.SECONDS).blockingSubscribe({
+                // Notify every so often about progress during long syncs
+                context.contentResolver.notifyAllUris()
+                Log.d("RxRssLocalSync", "BlockingSubscribe finished: ${it.map { it.displayTitle }}")
+            }, { error ->
+                Log.d("RxRssLocalSync", "BlockingSubscribe error: $error")
+                error.printStackTrace()
+            })
+
+            Log.d("RxRssLocalSync", "Cleaning up")
 
             // Finally, prune excessive items
             try {
@@ -102,9 +133,9 @@ object RssLocalSync {
 
     }
 
-    private fun syncFeed(feedSQL: FeedSQL, cacheDir: File?): Optional<Feed> {
+    private fun syncFeed(feedSQL: FeedSQL): Optional<Feed> {
         try {
-            return Optional.of(FeedParser.parseFeed(feedSQL.url, cacheDir))
+            return Optional.of(FeedParser.parseFeedUrl(feedSQL.url))
         } catch (error: Throwable) {
             System.err.println("Error when syncing " + feedSQL.url)
             error.printStackTrace()
@@ -137,12 +168,13 @@ object RssLocalSync {
                 java.lang.Long.toString(feedSQL.id)))
 
         // This can be null, in that case do not override existing value
-        val selfLink = parsedFeed.feed_url ?: feedSQL.url
+        val selfLink: String = parsedFeed.feed_url ?: feedSQL.url.toString()
 
         // Populate with values
         feedOp.withValue(COL_TITLE, parsedFeed.title)
                 .withValue(COL_TAG, feedSQL.tag)
                 .withValue(COL_URL, selfLink)
+                .withValue(COL_IMAGEURL, parsedFeed.icon)
 
         // Add to list of operations
         operations.add(feedOp.build())

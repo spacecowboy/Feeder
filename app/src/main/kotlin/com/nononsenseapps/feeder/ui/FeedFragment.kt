@@ -64,6 +64,7 @@ import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.bundle
+import com.nononsenseapps.feeder.util.firstOrNull
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
@@ -486,7 +487,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 loaderSelectionArgs,
                 COL_PUBDATE + " DESC") as Loader<Any>
         FEED_LOADER -> CursorLoader(activity!!,
-                Uri.withAppendedPath(URI_FEEDS, java.lang.Long.toString(this.id)),
+                Uri.withAppendedPath(URI_FEEDS, "${this.id}"),
                 FEED_FIELDS, null, null, null) as Loader<Any>
         FEED_SETTINGS_LOADER -> {
             val where: String?
@@ -523,20 +524,20 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 }
                 FEED_LOADER == cursorLoader.id -> {
                     val cursor = result as Cursor
-                    if (cursor.moveToFirst()) {
-                        val (id1, title1, customTitle1, url1, _, notify1, _, displayTitle) = cursor.asFeed()
-                        this.title = title1
-                        this.customTitle = customTitle1
-                        this.url = url1
-                        this.notify = if (notify1) 1 else 0
+                    cursor.firstOrNull()?.let {
+                        val feed = it.asFeed()
+                        this.title = feed.title
+                        this.customTitle = feed.customTitle
+                        this.url = feed.url.toString()
+                        this.notify = if (feed.notify) 1 else 0
 
-                        (activity as BaseActivity).supportActionBar?.title = displayTitle
+                        (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
                         notifyCheck!!.isChecked = this.notify == 1
 
                         // Title has been fetched, so add shortcut
-                        activity?.addDynamicShortcutToFeed(displayTitle, id1, null)
+                        activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
                         // Report shortcut usage
-                        activity?.reportShortcutToFeedUsed(id)
+                        activity?.reportShortcutToFeedUsed(feed.id)
                     }
                     // Reset loader
                     loaderManager.destroyLoader(cursorLoader.id)

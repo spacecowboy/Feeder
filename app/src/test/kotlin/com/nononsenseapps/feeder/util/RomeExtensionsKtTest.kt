@@ -54,6 +54,19 @@ class RomeExtensionsKtTest {
         )
     }
 
+    // Essentially a test for XKCD
+    @Test
+    fun descriptionWithOnlyImageDoesNotReturnBlankSummaryAndGetsImageSet() {
+        var expectedSummary = "[An image]"
+        val html = "  <img src='http://google.com/image.png' alt='An image'/> "
+
+        assertEquals(
+                Item(id = "id", content_text = expectedSummary, summary = expectedSummary,
+                        content_html = html, image = "http://google.com/image.png", attachments = emptyList()),
+                mockSyndEntry(uri = "id", description = mockSyndContent(value = html)).asItem()
+        )
+    }
+
     @Test
     fun itemSummary() {
         val rand = Random()

@@ -16,6 +16,7 @@ import android.util.Log
 import com.nononsenseapps.feeder.db.AUTHORITY
 import com.nononsenseapps.feeder.db.AccountService
 import com.nononsenseapps.feeder.db.URI_FEEDS
+import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.ui.ARG_FEED_TITLE
 import com.nononsenseapps.feeder.ui.FeedActivity
 
@@ -126,3 +127,21 @@ fun Context.removeDynamicShortcutToFeed(id: Any) {
         Log.d("removeDynamicShortcut", "Error during removal of shortcut: ${error.message}")
     }
 }
+
+@Volatile private var _feedParserInitialized = false
+
+/**
+ * Returns the FeedParser singleton with a cache directory set.
+ * Only sets the cache directory once.
+ */
+val Context.feedParser: FeedParser
+    get() {
+        synchronized(this) {
+            if (!_feedParserInitialized) {
+                // Yes, cacheDir can indeed be null
+                FeedParser.setup(cacheDir = externalCacheDir ?: filesDir)
+                _feedParserInitialized = true
+            }
+        }
+        return FeedParser
+    }

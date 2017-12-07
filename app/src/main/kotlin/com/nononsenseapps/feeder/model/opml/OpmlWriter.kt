@@ -28,14 +28,14 @@ fun writeOutputStream(os: OutputStream,
                                     feedsWithTag(it).forEach {
                                         outline(title = escape(it.displayTitle),
                                                 type = "rss",
-                                                xmlUrl = escape(it.url)) {}
+                                                xmlUrl = escape(it.url.toString())) {}
                                     }
                                 } else {
                                     outline(title = escape(it!!)) {
                                         feedsWithTag(it).forEach {
                                             outline(title = escape(it.displayTitle),
                                                     type = "rss",
-                                                    xmlUrl = escape(it.url)) {}
+                                                    xmlUrl = escape(it.url.toString())) {}
                                         }
                                     }
                                 }

@@ -118,7 +118,22 @@ public class HtmlToPlainTextConverter implements ContentHandler {
             startLi(builder);
         } else if (tag.equalsIgnoreCase("style")) {
             ignoreCount++;
+        } else if (tag.equalsIgnoreCase("img")) {
+            startImg(builder, attributes);
         }
+    }
+
+    private void startImg(StringBuilder text, Attributes attributes) {
+        String alt = attributes.getValue("", "alt");
+
+        if (alt == null || alt.isEmpty()) {
+            alt = "IMG";
+        }
+
+        // Ensure whitespace
+        ensureSpace(text);
+
+        text.append("[").append(alt).append("]").append(" ");
     }
 
     private void startOl(StringBuilder text) {

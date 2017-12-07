@@ -9,6 +9,9 @@ import android.content.Loader
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
@@ -18,13 +21,10 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
 import android.widget.AutoCompleteTextView
-import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FilterQueryProvider
-import android.widget.ListView
 import android.widget.SimpleCursorAdapter
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
@@ -36,31 +36,33 @@ import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
 import com.nononsenseapps.feeder.db.Util
-import com.nononsenseapps.feeder.model.FeedParseLoader
-import com.nononsenseapps.feeder.util.LoaderResult
-import com.nononsenseapps.feeder.util.bundle
+import com.nononsenseapps.feeder.util.Optional
 import com.nononsenseapps.feeder.util.contentValues
+import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.insertFeedWith
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.feeder.util.setString
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.updateFeedWith
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import java.net.URL
+import java.util.*
 
 const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
 const val _ID = "_id"
 const val CUSTOM_TITLE = "custom_title"
 const val FEED_TITLE = "feed_title"
 const val TEMPLATE = "template"
-private const val RSSFINDER = 1
-private const val SEARCHQUERY = "searchquery"
 private const val LOADER_TAG_SUGGESTIONS = 1
 private const val TAGSFILTER = "TAGSFILTER"
 
 
-class EditFeedActivity : Activity(),
-        LoaderManager.LoaderCallbacks<LoaderResult<Feed?>> {
+class EditFeedActivity : Activity() {
     private val TAG = "tag"
 
     private var shouldFinishBack = false
@@ -71,7 +73,7 @@ class EditFeedActivity : Activity(),
     lateinit private var textTag: AutoCompleteTextView
     lateinit private var textSearch: EditText
     lateinit private var detailsFrame: View
-    lateinit private var listResults: ListView
+    lateinit private var listResults: RecyclerView
     lateinit private var resultAdapter: ResultsAdapter
     lateinit private var searchFrame: View
     private var feedUrl: String? = null
@@ -103,15 +105,11 @@ class EditFeedActivity : Activity(),
         listResults = findViewById(R.id.results_listview)
         emptyText = findViewById(android.R.id.empty)
         loadingProgress = findViewById(R.id.loading_progress)
-        resultAdapter = ResultsAdapter(this)
-        listResults.emptyView = emptyText
+        resultAdapter = ResultsAdapter()
+        //listResults.emptyView = emptyText
+        listResults.setHasFixedSize(true)
+        listResults.layoutManager = LinearLayoutManager(this)
         listResults.adapter = resultAdapter
-        listResults.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            val entry = resultAdapter.getItem(position)
-            if (entry != null) {
-                useEntry(entry.title ?: "untitled", feedUrl ?: "")
-            }
-        }
 
         textSearch.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
@@ -125,12 +123,66 @@ class EditFeedActivity : Activity(),
                 }
 
                 // Issue search
-                feedUrl = textSearch.text.toString().trim()
-                val args = bundle {
-                    putString(SEARCHQUERY, feedUrl)
-                }
-                loaderManager.restartLoader(RSSFINDER, args,
-                        this@EditFeedActivity)
+                val url: URL = sloppyLinkToStrictURL(textSearch.text.toString().trim())
+
+                listResults.visibility = View.GONE
+                emptyText.visibility = View.GONE
+                loadingProgress.visibility = View.VISIBLE
+
+                Observable.just(url)
+                        .subscribeOn(Schedulers.io())
+                        .flatMap {
+                            try {
+                                val alts = feedParser.getAlternateFeedLinksAtUrl(it)
+                                if (alts.isNotEmpty()) {
+                                    Observable.fromIterable(alts.map { sloppyLinkToStrictURL(it.first) to it.second })
+                                } else {
+                                    throw IllegalArgumentException("No alternate feeds found")
+                                }
+                            } catch (t: Throwable) {
+                                Log.d("Finding alternates: ", t.localizedMessage)
+                                Observable.just(it to "RSS")
+                            }
+                        }
+                        .flatMap {
+                            Observable.just(it).subscribeOn(Schedulers.io())
+                                    .map {
+                                        try {
+                                            Log.d("JONAS", "Fetching feed on ${Thread.currentThread().name}")
+                                            // TODO FIX
+                                            Optional.of(feedParser.parseFeedUrl(it.first) to it.second)
+                                        } catch (t: Throwable) {
+                                            Log.d("Parsing feed:", t.localizedMessage)
+                                            Optional.empty<Pair<Feed, String>>()
+                                        }
+                                    }
+                        }
+                        .filter {
+                            it.isPresent
+                        }
+                        .map {
+                            it.get()
+                        }
+                        .reduce(ArrayList<Pair<Feed, String>>(), { acc, next ->
+                            acc.add(next)
+                            acc
+                        })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe { result ->
+                            Log.d("JONAS", "UPdating UI...")
+                            emptyText.setText(R.string.no_feeds_found)
+                            loadingProgress.visibility = View.GONE
+                            if (result.isNotEmpty()) {
+                                resultAdapter.data = result.map { it.first }
+                                detailsFrame.visibility = View.GONE
+                                searchFrame.visibility = View.VISIBLE
+                                listResults.visibility = View.VISIBLE
+                            } else {
+                                emptyText.text = getString(R.string.no_such_feed)
+                                emptyText.visibility = View.VISIBLE
+                            }
+                        }
+
                 return@OnEditorActionListener true
             }
             false
@@ -317,7 +369,7 @@ class EditFeedActivity : Activity(),
         window.attributes = params
     }
 
-    internal fun useEntry(title: String, url: String) {
+    private fun useEntry(title: String, url: String) {
         feedTitle = android.text.Html.fromHtml(title).toString()
         feedUrl = url.trim()
         textUrl.setText(feedUrl)
@@ -339,11 +391,8 @@ class EditFeedActivity : Activity(),
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.edit_feed, menu);
-        return true
-    }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean =
+            true
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
@@ -362,165 +411,49 @@ class EditFeedActivity : Activity(),
         return super.onOptionsItemSelected(item)
     }
 
-    /**
-     * Instantiate and return a new Loader for the given ID.
+    private inner class FeedResult(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
 
-     * @param id
-     * *         The ID whose loader is to be created.
-     * *
-     * @param args
-     * *         Any arguments supplied by the caller.
-     * *
-     * @return Return a new Loader instance that is ready to start loading.
-     */
-    override fun onCreateLoader(id: Int,
-                                args: Bundle): Loader<LoaderResult<Feed?>> {
-        listResults.visibility = View.GONE
-        emptyText.visibility = View.GONE
-        loadingProgress.visibility = View.VISIBLE
-        return FeedParseLoader(this, args.getString(SEARCHQUERY))
-    }
+        var textTitle: TextView = view.findViewById(R.id.feed_title)
+        var textUrl: TextView = view.findViewById(R.id.feed_url)
+        var textDescription: TextView = view.findViewById(R.id.feed_description)
+        var item: Feed? = null
 
-    override fun onLoadFinished(loader: Loader<LoaderResult<Feed?>>,
-                                data: LoaderResult<Feed?>) {
-        emptyText.setText(R.string.no_feeds_found)
-        loadingProgress.visibility = View.GONE
-        val feed = data.result
-        if (feed != null) {
-            detailsFrame.visibility = View.GONE
-            searchFrame.visibility = View.VISIBLE
-            listResults.visibility = View.VISIBLE
-            resultAdapter.entries = listOf(feed)
-        } else {
-            emptyText.text = getString(R.string.no_such_feed)
-            emptyText.visibility = View.VISIBLE
+        init {
+            view.setOnClickListener(this)
+        }
+
+        override fun onClick(v: View?) {
+            if (item != null) {
+                useEntry(item!!.title ?: "untitled", item!!.feed_url ?: feedUrl ?: "")
+            }
         }
     }
 
-    override fun onLoaderReset(loader: Loader<LoaderResult<Feed?>>) {
-        resultAdapter.entries = null
-    }
+    private inner class ResultsAdapter : RecyclerView.Adapter<FeedResult>() {
 
-    /**
-     * Display feed search results
-     */
-    internal inner class ResultsAdapter(private val context: Context) : BaseAdapter() {
-        var entries: List<Feed>? = null
+        private var items: List<Feed> = emptyList()
+        var data: List<Feed>
+            get() = items
             set(value) {
-                field = value
+                items = value
                 notifyDataSetChanged()
             }
 
-        /**
-         * How many items are in the data set represented by this Adapter.
+        override fun onBindViewHolder(holder: FeedResult, position: Int) {
+            val item = items[position]
 
-         * @return Count of items.
-         */
-        override fun getCount(): Int =
-                entries?.size ?: 0
-
-        /**
-         * Get the data item associated with the specified position in the data
-         * set.
-
-         * @param position
-         * *         Position of the item whose data we want within the
-         * *         adapter's
-         * *         data set.
-         * *
-         * @return The data at the specified position.
-         */
-        override fun getItem(position: Int): Feed? =
-                entries?.get(position)
-
-        /**
-         * Get the row id associated with the specified position in the list.
-
-         * @param position
-         * *         The position of the item within the adapter's data
-         * *         set
-         * *         whose row id we want.
-         * *
-         * @return The id of the item at the specified position.
-         */
-        override fun getItemId(position: Int): Long = position.toLong()
-
-        /**
-         * Get a View that displays the data at the specified position in the
-         * data
-         * set. You can either
-         * create a View manually or inflate it from an XML layout file. When
-         * the
-         * View is inflated, the
-         * parent View (GridView, ListView...) will apply default layout
-         * parameters
-         * unless you use
-         * [android.view.LayoutInflater.inflate]
-         * to specify a root view and to prevent attachment to the root.
-
-         * @param position
-         * *         The position of the item within the adapter's data
-         * *         set
-         * *         of the item whose view
-         * *         we want.
-         * *
-         * @param convertView
-         * *         The old view to reuse, if possible. Note: You
-         * *         should
-         * *         check that this view
-         * *         is non-null and of an appropriate type before
-         * *         using.
-         * *         If it is not possible to convert
-         * *         this view to display the correct data, this method
-         * *         can
-         * *         create a new view.
-         * *         Heterogeneous lists can specify their number of
-         * *         view
-         * *         types, so that this View is
-         * *         always of the right type (see [         ][.getViewTypeCount]
-         * *         and
-         * *         [.getItemViewType]).
-         * *
-         * @param parent
-         * *         The parent that this view will eventually be
-         * *         attached
-         * *         to
-         * *
-         * @return A View corresponding to the data at the specified position.
-         */
-        override fun getView(position: Int, convertView: View?,
-                             parent: ViewGroup?): View {
-
-            var v: View? = convertView
-            if (v == null) {
-                v = LayoutInflater.from(context)
-                        .inflate(R.layout.view_feed_result, parent, false)
-                v.tag = ViewHolder(v)
-            }
-
-            val entry = entries!![position]
-            val vh = v!!.tag as ViewHolder
-
-            vh.entry = entry
-
-            vh.textTitle.text = entry.title
-            vh.textDescription.text = entry.description
-            // Really do want to use the normal link here and not self link
-            vh.textUrl.text = entry.home_page_url
-
-            return v
+            holder.item = item
+            holder.textTitle.text = item.title ?: ""
+            holder.textDescription.text = item.description ?: ""
+            holder.textUrl.text = item.feed_url ?: ""
         }
 
-        override fun hasStableIds(): Boolean {
-            return false
-        }
-    }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedResult =
+                FeedResult(LayoutInflater.from(parent.context)
+                        .inflate(R.layout.view_feed_result, parent, false))
 
-    internal inner class ViewHolder(v: View) {
-        var entry: Feed? = null
-        var textTitle: TextView = v.findViewById(R.id.feed_title)
-        var textUrl: TextView = v.findViewById(R.id.feed_url)
-        var textDescription: TextView = v.findViewById(R.id.feed_description)
+        override fun getItemCount(): Int = items.size
 
     }
+
 }

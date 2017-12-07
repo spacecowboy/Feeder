@@ -6,6 +6,7 @@ import android.graphics.Point
 import android.text.Spanned
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
+import java.net.URL
 
 
 val schema: HTMLSchema by lazy { HTMLSchema() }
@@ -19,7 +20,7 @@ private fun getPlainTextConverter(source: String): HtmlToPlainTextConverter = Ht
 
 fun toSpannedWithImages(context: Context,
                         source: String,
-                        siteUrl: String,
+                        siteUrl: URL,
                         maxSize: Point,
                         allowDownload: Boolean): Spanned {
     val parser = Parser()
@@ -48,7 +49,7 @@ fun toSpannedWithImages(context: Context,
  * This uses TagSoup to handle real HTML, including all of the brokenness
  * found in the wild.
  */
-fun toSpannedWithNoImages(source: String, siteUrl: String, context: Context): Spanned {
+fun toSpannedWithNoImages(source: String, siteUrl: URL, context: Context): Spanned {
     val parser = Parser()
     try {
         parser.setProperty(Parser.schemaProperty, schema)

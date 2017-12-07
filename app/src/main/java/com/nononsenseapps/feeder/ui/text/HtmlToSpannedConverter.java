@@ -55,8 +55,9 @@ import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URL;
 
-import static com.nononsenseapps.feeder.util.JsonFeedExtensionsKt.relativeLinkIntoAbsolute;
+import static com.nononsenseapps.feeder.util.LinkUtilsKt.relativeLinkIntoAbsolute;
 
 /**
  * Convert an HTML document into a spannable string.
@@ -72,11 +73,11 @@ public class HtmlToSpannedConverter implements ContentHandler {
     protected int ignoreCount = 0;
 
     protected String mSource;
-    protected String mSiteUrl;
+    protected URL mSiteUrl;
     protected XMLReader mReader;
     protected SpannableStringBuilder mSpannableStringBuilder;
 
-    public HtmlToSpannedConverter(String source, String siteUrl, Parser parser, Context context) {
+    public HtmlToSpannedConverter(String source, URL siteUrl, Parser parser, Context context) {
         mContext = context;
         mSource = source;
         mSiteUrl = siteUrl;
@@ -247,6 +248,11 @@ public class HtmlToSpannedConverter implements ContentHandler {
                           Attributes attributes) {
         String href = attributes.getValue("", "href");
 
+        if (href != null) {
+            // Yes, this was an observed null pointer exception
+            href = relativeLinkIntoAbsolute(mSiteUrl, href);
+        }
+
         int len = text.length();
         text.setSpan(new Href(href), len, len, Spannable.SPAN_MARK_MARK);
     }
@@ -262,6 +268,9 @@ public class HtmlToSpannedConverter implements ContentHandler {
         int len = text.length();
         text.append("\uFFFC");
 
+        if (src == null) {
+            src = "";
+        }
         String imgLink = relativeLinkIntoAbsolute(mSiteUrl, src);
 
         text.setSpan(new ImageSpan(d, imgLink), len, text.length(),

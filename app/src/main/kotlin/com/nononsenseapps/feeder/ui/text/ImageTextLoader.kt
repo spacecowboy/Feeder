@@ -4,10 +4,11 @@ import android.content.Context
 import android.graphics.Point
 import android.support.v4.content.AsyncTaskLoader
 import android.text.Spanned
+import java.net.URL
 
 class ImageTextLoader(context: Context,
                       private val text: String,
-                      private val siteUrl: String,
+                      private val siteUrl: URL,
                       private val maxSize: Point,
                       private val allowDownload: Boolean) : AsyncTaskLoader<Spanned>(context) {
 
