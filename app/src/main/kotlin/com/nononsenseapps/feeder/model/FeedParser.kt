@@ -169,17 +169,19 @@ object FeedParser {
                 Log.d("RxRSSLOCAL", "network response: " + it.networkResponse())
 
                 val isJSON = (it.header("content-type") ?: "").contains("json")
-                val body = it.body()?.string()
+                // Pass straight bytes from response to parser to properly handle encoding
+                val body = it.body()?.bytes()
 
                 if (body != null) {
-                    val alternateFeedLink = findFeedUrl(body, preferAtom = true)
+                    // Encoding is not an issue for reading HTML (probably)
+                    val alternateFeedLink = findFeedUrl(String(body), preferAtom = true)
 
                     val feed = if (alternateFeedLink != null) {
                         parseFeedUrl(alternateFeedLink)
                     } else {
                         when (isJSON) {
-                            true -> jsonFeedParser.parseJson(body)
-                            false -> parseRssAtomBody(body)
+                            true -> jsonFeedParser.parseJsonBytes(body)
+                            false -> parseRssAtomBytes(body)
                         }
                     }
 
@@ -202,7 +204,9 @@ object FeedParser {
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    fun parseRssAtomBody(feedXml: String): Feed = parseFeedInputStream(feedXml.byteInputStream())
+    private fun parseRssAtomBytes(feedXml: ByteArray): Feed {
+        feedXml.inputStream().use { return parseFeedInputStream(it) }
+    }
 
     @Throws(FeedParser.FeedParsingError::class)
     fun parseFeedInputStream(`is`: InputStream): Feed {
