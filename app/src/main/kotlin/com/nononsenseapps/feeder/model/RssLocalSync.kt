@@ -92,12 +92,11 @@ object RssLocalSync {
                     val feed = context.feedParser.parseFeedResponse(response)
                     val ops = convertResultToOperations(feed, feedSql, context.contentResolver)
                     storeSyncResults(context, ops)
+                    context.contentResolver.notifyAllUris()
                     feedSql
                 }
-            }.buffer(3L, TimeUnit.SECONDS).blockingSubscribe({
-                // Notify every so often about progress during long syncs
-                context.contentResolver.notifyAllUris()
-                Log.d("RxRssLocalSync", "BlockingSubscribe finished: ${it.map { it.displayTitle }}")
+            }.blockingSubscribe({
+                Log.d("RxRssLocalSync", "BlockingSubscribe finished: ${it.displayTitle}")
             }, { error ->
                 Log.d("RxRssLocalSync", "BlockingSubscribe error: $error")
                 error.printStackTrace()
