@@ -34,7 +34,6 @@ import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.jsonfeed.Feed
 import io.reactivex.Observable
 import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
 import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
@@ -78,11 +77,11 @@ object RssLocalSync {
                     .build()
 
             Observable.fromIterable(feeds).flatMap { feedSql ->
-                Observable.just(feedSql).subscribeOn(Schedulers.io()).map {
+                Observable.just(feedSql).map {
                     context.feedParser.getResponse(it.url)
                 }.timeout(2L, TimeUnit.SECONDS)
                         .onErrorReturnItem(timedOutResponse)
-                        .observeOn(Schedulers.computation()).filter {
+                        .filter {
                     if (!it.isSuccessful) {
                         Log.d("RxRssLocalSync", "Response failure for ${feedSql.displayTitle}: ${it.message()}")
                     }
