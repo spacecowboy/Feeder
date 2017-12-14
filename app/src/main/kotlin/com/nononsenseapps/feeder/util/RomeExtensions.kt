@@ -32,7 +32,7 @@ fun SyndEntry.asItem(feedAuthor: Author? = null): Item {
     val contentText = this.contentText()
     return Item(
             id = this.uri,
-            url = this.feedUrl(),
+            url = this.linkToHtml(),
             title = this.title,
             content_text = contentText,
             content_html = this.contentHtml(),
@@ -45,8 +45,25 @@ fun SyndEntry.asItem(feedAuthor: Author? = null): Item {
     )
 }
 
-fun SyndEntry.feedUrl(): String? =
-    this.links?.firstOrNull{ "self" == it.rel }?.href ?: this.link
+fun SyndEntry.linkToHtml(): String? {
+    val alternateHtml = this.links?.firstOrNull{ "alternate" == it.rel && "text/html" == it.type }
+    if (alternateHtml != null) {
+        return alternateHtml.href
+    }
+
+    val selfHtml = this.links?.firstOrNull{ "self" == it.rel && "text/html" == it.type }
+    if (selfHtml != null) {
+        return selfHtml.href
+    }
+
+    val self = this.links?.firstOrNull{ "self" == it.rel }
+    if (self != null) {
+        return self.href
+    }
+
+    return this.link
+}
+
 
 fun SyndEnclosure.asAttachment(): Attachment {
     return Attachment(
@@ -140,10 +157,10 @@ fun SyndEntry.thumbnail(): String? {
         }
         else -> {
             val imgLink: String? = naiveFindImageLink(this.contentHtml())
-            val feedUrl: String? = this.feedUrl()
+            val linkToHtml: String? = this.linkToHtml()
 
             when {
-                feedUrl != null && imgLink != null -> relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feedUrl), imgLink)
+                linkToHtml != null && imgLink != null -> relativeLinkIntoAbsolute(sloppyLinkToStrictURL(linkToHtml), imgLink)
                 imgLink != null -> sloppyLinkToStrictURL(imgLink).toString()
                 else -> null
             }

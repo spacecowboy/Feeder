@@ -204,7 +204,7 @@ object FeedParser {
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    private fun parseRssAtomBytes(feedXml: ByteArray): Feed {
+    internal fun parseRssAtomBytes(feedXml: ByteArray): Feed {
         feedXml.inputStream().use { return parseFeedInputStream(it) }
     }
 

@@ -110,6 +110,15 @@ class FeedParserTest2 {
 
     @Test
     @Throws(Exception::class)
+    fun correctAlternateLinkInAtomIsUsedForUrl() {
+        val feed = FeedParser.parseRssAtomBytes(getAtomUtdelningsSeglaren())
+
+        assertEquals("http://utdelningsseglaren.blogspot.com/2017/12/tips-pa-6-podcasts.html",
+                feed.items?.get(0)?.url)
+    }
+
+    @Test
+    @Throws(Exception::class)
     @Ignore
     fun relativeLinksAreMadeAbsoluteAtom() {
 
@@ -139,6 +148,9 @@ class FeedParserTest2 {
 
     private fun getGolemDe(): ByteArray =
             javaClass.getResourceAsStream("golem-de.xml").readBytes()
+
+    private fun getAtomUtdelningsSeglaren(): ByteArray =
+            javaClass.getResourceAsStream("atom_utdelningsseglaren.xml").readBytes()
 }
 
 val atomRelative = """
