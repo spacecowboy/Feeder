@@ -77,4 +77,29 @@ class FeedWrapperTest {
         assertTrue(f < f2, "$f should < $f2" )
         assertTrue(f2 > f, "$f2 should > $f" )
     }
+
+    @Test
+    fun feedsSortIgnoresCase() {
+        val fa = FeedWrapper(item = FeedSQL(title = "a", tag = "a"))
+        val fa2 = FeedWrapper(item = FeedSQL(title = "B", tag = "a"))
+        val fz = FeedWrapper(item = FeedSQL(tag = "Z"))
+        val f = FeedWrapper(item = FeedSQL(title = "bob"))
+
+        assertTrue(fa < fa2, "$fa should < $fa2" )
+        assertTrue(fa2 > fa, "$fa2 should > $fa" )
+
+        assertTrue(fa < fz, "$fa should < $fz" )
+        assertTrue(fz > fa, "$fz should > $fa" )
+
+        assertTrue(fa < f, "$fa should < $f" )
+        assertTrue(f > fa, "$f should > $fa" )
+
+        assertTrue(fz < f, "$fz should < $f" )
+        assertTrue(f > fz, "$f should > $fz" )
+
+        val f2 = FeedWrapper(item = FeedSQL(title = "Zod"))
+
+        assertTrue(f < f2, "$f should < $f2" )
+        assertTrue(f2 > f, "$f2 should > $f" )
+    }
 }

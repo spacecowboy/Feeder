@@ -30,9 +30,9 @@ class FeedWrapper(val item: FeedSQL?, val tag: String, val isTop: Boolean) {
             !isTag && !other.isTag && tag.isNotEmpty() && other.tag.isEmpty() -> -1
             !isTag && !other.isTag && tag.isEmpty() && other.tag.isNotEmpty() -> 1
             // Feeds with identical tags compare by title
-            item != null && other.item != null && tag == other.tag -> item.displayTitle.compareTo(other.item.displayTitle)
+            item != null && other.item != null && tag == other.tag -> item.displayTitle.compareTo(other.item.displayTitle, ignoreCase = true)
             // In other cases it's just a matter of comparing tags
-            else -> tag.compareTo(other.tag)
+            else -> tag.compareTo(other.tag, ignoreCase = true)
         }
     }
 
