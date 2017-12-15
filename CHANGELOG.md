@@ -1,3 +1,43 @@
+# 1.4.0
+
+This version changes the database tables slighly which means your
+read-status will be gone. Apologies for the inconvenience.
+
+*   Feeds are now sorted case-insensitively
+    See !71 #77
+
+*   Feeds are now displayed using correct encoding
+    See !68 #76
+
+*   Articles are parsed to find cover images
+    See !67
+
+*   Relative links are now resolved
+    See !67
+
+*   Adding feeds will now parse the page in case it's not a feed and try
+    to find alternate links to feeds. All results are displayed in the
+    dialog.
+    See !67
+
+*   Maintain scroll position in articles when switching between apps
+    See !66 #71
+
+*   Images with relative URLs are now displayed
+    See !66 #37 #54
+
+*   Added app shortcuts for the latest 3 feeds
+    See !65 #60
+
+*   Added option to sync once per day
+    See !64
+
+*   New icons
+    See !63
+
+*   Added support for JSONFeed
+    See !41
+
 # 1.3.15
 
 *   Fixed an installation crash on Android 5
