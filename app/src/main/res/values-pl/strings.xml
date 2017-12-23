@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">Ustawienia</string>
+    <string name="add_feed">Dodaj kanał</string>
+    <string name="add_feed_search_hint">URL kanału</string>
+    <string name="all_feeds">Wszystkie kanały</string>
+    <string name="app_name">Feeder</string>
+    <string name="by_author_on_date">przez %1$s, %2$s</string>
+    <string name="check_for_updates">Wyszukaj aktualizacje</string>
+    <string name="delete_feed">Usuń kanał</string>
+    <string name="edit_feed">Edytuj kanał</string>
+    <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Dodać</font> więcej kanałów?]]></string>
+    <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Otworzyć</font> inny kanał?]]></string>
+    <string name="empty_feed_top">Wszystko przeczytane. Czy chcesz…</string>
+    <string name="empty_no_feeds_add"><![CDATA[<font color="#607D8B">Dodania</font> paru kanałów]]></string>
+    <string name="empty_no_feeds_login"><![CDATA[<font color="#607D8B">Zalogowania</font> na serwer i…]]></string>
+    <string name="empty_no_feeds_top">Nie ma nic do czytania. Zacznij od</string>
+    <string name="export_feeds_to_opml">Eksportuj do OPML</string>
+    <string name="image_loading">Wczytywanie obrazków</string>
+    <string name="import_feeds_from_opml">Importuj z OPML</string>
+    <string name="include_mobile_hotspots">Uwzględnij mobilne punkty dostępu</string>
+    <string name="indicator_for_mark_as_read">Wskaźnik oznaczenia jako przeczytane</string>
+    <string name="mark_all_as_read">Oznacz wszystkie jako przeczytane</string>
+    <string name="may_result_data_charges">Może spowodować opłaty za transmisję danych w sieci komórkowej</string>
+    <string name="navigation_drawer_close">Zamknij menu nawigacyjne</string>
+    <string name="navigation_drawer_open">Otwórz menu nawigacyjne</string>
+    <string name="new_based_on_this">Dodaj nowy kanał na podstawie tego</string>
+    <string name="new_items_available">Nowe artykuły są dostępne</string>
+    <string name="night_mode">Tryb nocny</string>
+    <string name="no_activity_for_link">Nie udało się znaleźć aktywności mogącej otworzyć link</string>
+    <string name="no_feeds_found">Nie udało się znaleźć pasujących kanałów. Spróbuj wyszukać pojedynczym słowem.</string>
+    <string name="no_such_feed">Nie udało się znaleźć kanału. Spróbuj użyć HTTPS.</string>
+    <string name="no_tag">Bez grupy</string>
+    <string name="nothing_to_display">Nie ma nic do wyświetlenia!</string>
+    <string name="notify_for_new_items">Powiadamiaj o nowych artykułach</string>
+    <string name="on_date">%1$s</string>
+    <string name="only_on_wifi">Tylko przez WiFi</string>
+    <string name="only_when_charging">Tylko podczas ładowania</string>
+    <string name="open_enclosed_media">Otwórz zawarte multimedia</string>
+    <string name="open_link_in_browser">Otwórz w przeglądarce</string>
+    <string name="save">Zapisz</string>
+    <string name="search_feed_empty_hint">Podaj adres kanału</string>
+    <string name="select_account">Wybierz konto</string>
+    <string name="selected">Wybrane</string>
+    <string name="server_address">Adres serwera</string>
+    <string name="share">Udostępnij</string>
+    <string name="show_all_items">Pokaż wszystkie artykuły</string>
+    <string name="show_unread_items">Pokaż nieprzeczytane artykuły</string>
+    <string name="sync">Synchronizuj</string>
+    <string name="synchronization">Synchronizacja</string>
+    <string name="tag">Grupa</string>
+    <string name="title">Tytuł</string>
+    <string name="title_activity_edit_feed">Subskrybuj kanał</string>
+    <string name="title_activity_settings">Ustawienia</string>
+    <string name="toggle_read_status">Przełącz status przeczytania</string>
+    <string name="updated_feeds">Zaktualizowane kanały</string>
+    <string name="url">URL</string>
+    <string name="username">Nazwa użytkownika</string>
+    <string name="view">Widok</string>
+    <string name="view_debug_log">Pokaż dziennik diagnostyczny</string>
+
+    <string-array name="pref_sync_frequency_titles">
+        <item>Ręcznie</item>
+        <item>Co godzinę</item>
+        <item>Co 3 godziny</item>
+        <item>Co 6 godzin</item>
+        <item>Co 12 godzin</item>
+        <item>Raz dziennie</item>
+    </string-array>
+</resources>
