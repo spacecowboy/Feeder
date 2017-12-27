@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="pref_sync_frequency_titles">
+    <item>@string/sync_option_manually</item>
+    <item>@string/sync_option_every_hour</item>
+    <item>@string/sync_option_every_3_hours</item>
+    <item>@string/sync_option_every_6_hours</item>
+    <item>@string/sync_option_every_12_hours</item>
+    <item>@string/sync_option_every_day</item>
+  </string-array>
+  <string-array name="pref_sync_frequency_values">
+    <item>0</item>
+    <item>1</item>
+    <item>3</item>
+    <item>6</item>
+    <item>12</item>
+    <item>24</item>
+  </string-array>
+</resources>

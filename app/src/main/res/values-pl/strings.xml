@@ -59,12 +59,11 @@
     <string name="view">Widok</string>
     <string name="view_debug_log">Pokaż dziennik diagnostyczny</string>
 
-    <string-array name="pref_sync_frequency_titles">
-        <item>Ręcznie</item>
-        <item>Co godzinę</item>
-        <item>Co 3 godziny</item>
-        <item>Co 6 godzin</item>
-        <item>Co 12 godzin</item>
-        <item>Raz dziennie</item>
-    </string-array>
+    <string name="sync_option_manually">Ręcznie</string>
+    <string name="sync_option_every_hour">Co godzinę</string>
+    <string name="sync_option_every_3_hours">Co 3 godziny</string>
+    <string name="sync_option_every_6_hours">Co 6 godzin</string>
+    <string name="sync_option_every_12_hours">Co 12 godzin</string>
+    <string name="sync_option_every_day">Raz dziennie</string>
+
 </resources>

@@ -51,20 +51,12 @@
   <string name="title_activity_settings">Impostazioni</string>
   <string name="all_feeds">Tutti i feed</string>
 
-  <string-array name="pref_sync_frequency_titles">
-    <item>Manualmente</item>
-    <item>Ogni ora</item>
-    <item>Ogni 3 ore</item>
-    <item>Ogni 6 ore</item>
-    <item>Ogni 12 ore</item>
-  </string-array>
-  <string-array name="pref_sync_frequency_values">
-    <item>0</item>
-    <item>1</item>
-    <item>3</item>
-    <item>6</item>
-    <item>12</item>
-  </string-array>
+  <string name="sync_option_manually">Manualmente</string>
+  <string name="sync_option_every_hour">Ogni ora</string>
+  <string name="sync_option_every_3_hours">Ogni 3 ore</string>
+  <string name="sync_option_every_6_hours">Ogni 6 ore</string>
+  <string name="sync_option_every_12_hours">Ogni 12 ore</string>
+  <string name="sync_option_every_day">Ogni giorno</string>
 
   <string name="synchronization">Sincronizzazione</string>
   <string name="only_on_wifi">Solo in WiFi</string>

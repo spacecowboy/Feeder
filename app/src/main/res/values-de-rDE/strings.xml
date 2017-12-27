@@ -51,20 +51,12 @@
   <string name="nothing_to_display">Nichts zu sehen!</string>
   <string name="title_activity_settings">Einstellungen</string>
 
-  <string-array name="pref_sync_frequency_titles">
-    <item>Manuell</item>
-    <item>Jede Stunde</item>
-    <item>Alle 3 Stunden</item>
-    <item>Alle 6 Stunden</item>
-    <item>Alle 12 Stunden</item>
-  </string-array>
-  <string-array name="pref_sync_frequency_values">
-    <item>0</item>
-    <item>1</item>
-    <item>3</item>
-    <item>6</item>
-    <item>12</item>
-  </string-array>
+  <string name="sync_option_manually">Manuell</string>
+  <string name="sync_option_every_hour">Jede Stunde</string>
+  <string name="sync_option_every_3_hours">Alle 3 Stunden</string>
+  <string name="sync_option_every_6_hours">Alle 6 Stunden</string>
+  <string name="sync_option_every_12_hours">Alle 12 Stunden</string>
+  <string name="sync_option_every_day">Jeden Tag</string>
 
   <string name="synchronization">Aktualisierung</string>
   <string name="only_on_wifi">Nur im WiFi</string>

@@ -54,13 +54,12 @@
   <string name="nothing_to_display">Здесь ничего нет!</string>
   <string name="title_activity_settings">Настройки</string>
 
-  <string-array name="pref_sync_frequency_titles">
-    <item>Вручную</item>
-    <item>Каждый час</item>
-    <item>Каждые 3 часа</item>
-    <item>Каждые 6 часов</item>
-    <item>Каждые 12 часов</item>
-  </string-array>
+  <string name="sync_option_manually">Вручную</string>
+  <string name="sync_option_every_hour">Каждый час</string>
+  <string name="sync_option_every_3_hours">Каждые 3 часа</string>
+  <string name="sync_option_every_6_hours">Каждые 6 часов</string>
+  <string name="sync_option_every_12_hours">Каждые 12 часов</string>
+  <string name="sync_option_every_day">каждый день</string>
 
   <string name="synchronization">Синхронизация</string>
   <string name="only_on_wifi">Только по Wi-Fi</string>
