@@ -10,7 +10,6 @@
   <string name="url">URL</string>
   <string name="tag">Tag</string>
   <string name="add_feed_search_hint">URL to feed</string>
-  <string name="select_account">Select account</string>
   <string name="title">Title</string>
 
   <string name="by_author_on_date">by %1$s, %2$s</string>
@@ -24,12 +23,8 @@
   <string name="empty_no_feeds_top">Nothing to read yet.\nGet started
     by
   </string>
-  <string name="empty_no_feeds_login">
-    <![CDATA[<font color="#607D8B">Logging in</font> to the
-        server and…]]></string>
   <string name="empty_no_feeds_add">
     <![CDATA[<font color="#607D8B">Adding</font> some feeds]]></string>
-  <string name="no_feeds_found">Couldn\'t find any relevant feeds. Try to search for a single word.</string>
   <string name="search_feed_empty_hint">Enter a feed address</string>
   <string name="mark_all_as_read">Mark all as read</string>
   <string name="edit_feed">Edit feed</string>
@@ -39,8 +34,6 @@
   <string name="new_items_available">New items available</string>
   <string name="view">View</string>
   <string name="no_tag">No tag</string>
-  <string name="username">Username</string>
-  <string name="server_address">Server address</string>
   <string name="night_mode">Night mode</string>
   <string name="notify_for_new_items">Notify for new items</string>
   <string name="toggle_read_status">Toggle read status</string>

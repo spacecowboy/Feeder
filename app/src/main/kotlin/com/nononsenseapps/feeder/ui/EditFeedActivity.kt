@@ -170,7 +170,6 @@ class EditFeedActivity : Activity() {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe { result ->
                             Log.d("JONAS", "UPdating UI...")
-                            emptyText.setText(R.string.no_feeds_found)
                             loadingProgress.visibility = View.GONE
                             if (result.isNotEmpty()) {
                                 resultAdapter.data = result.map { it.first }
