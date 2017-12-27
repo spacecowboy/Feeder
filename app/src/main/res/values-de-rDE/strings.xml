@@ -10,7 +10,6 @@
   <string name="url">URL</string>
   <string name="tag">Gruppe</string>
   <string name="add_feed_search_hint">Feed URL</string>
-  <string name="select_account">Wähle ein Benutzerkonto</string>
   <string name="title">Titel</string>
 
   <string name="by_author_on_date">von %1$s, %2$s</string>
@@ -21,9 +20,7 @@
   <string name="empty_feed_add"><![CDATA[Mehr Feeds <font color="#607D8B">hinzufügen</font>?]]></string>
   <string name="empty_no_feeds_top">Noch nichts zu lesen.\n
     Leg los indem</string>
-  <string name="empty_no_feeds_login"><![CDATA[Beim Server <font color="#607D8B">einloggen</font> und…]]></string>
   <string name="empty_no_feeds_add"><![CDATA[Einige Feeds <font color="#607D8B">hinzugefügen</font>]]></string>
-  <string name="no_feeds_found">Konnte keine relevanten Feeds finden. Versuche nach einem einzelnen Wort zu suchen.</string>
   <string name="search_feed_empty_hint">Gebe eine Feed URL ein</string>
   <string name="mark_all_as_read">Alles als gelesen markieren</string>
   <string name="edit_feed">Feed bearbeiten</string>
@@ -33,8 +30,6 @@
   <string name="new_items_available">Neue Artikel verfügbar</string>
   <string name="view">Betrachten</string>
   <string name="no_tag">Keine Gruppe</string>
-  <string name="username">Benutzername</string>
-  <string name="server_address">Serveradresse</string>
   <string name="night_mode">Nachtmodus</string>
   <string name="notify_for_new_items">Benachrichtigungen</string>
   <string name="toggle_read_status">Lesestatus verändern</string>

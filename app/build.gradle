@@ -13,7 +13,7 @@ android {
     // Should try to remove last two here
     disable "MissingTranslation", "AppCompatCustomView", "InvalidPackage"
     // I really want some to show as errors
-    error "InlinedApi"
+    error "InlinedApi", "StringEscaping"
   }
 
   defaultConfig {
