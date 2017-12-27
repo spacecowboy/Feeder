@@ -10,7 +10,6 @@
   <string name="url">URL</string>
   <string name="tag">タグ</string>
   <string name="add_feed_search_hint">フィードの URL</string>
-  <string name="select_account">アカウントの選択</string>
   <string name="title">タイトル</string>
 
   <string name="by_author_on_date">作者 %1$s, %2$s</string>
@@ -23,12 +22,8 @@
         <![CDATA[フィードを <font color="#607D8B">追加</font>?]]></string>
   <string name="empty_no_feeds_top">まだ読むものはありません。\n始めましょう
         </string>
-  <string name="empty_no_feeds_login">
-        <![CDATA[サーバーに <font color="#607D8B">ログイン中</font>
-        …]]></string>
   <string name="empty_no_feeds_add">
         <![CDATA[フィードの <font color="#607D8B">追加中</font>]]></string>
-  <string name="no_feeds_found">関連するフィードは見つかりませんでした。 単語一つで検索してみてください。</string>
   <string name="search_feed_empty_hint">フィードのアドレスを入力</string>
   <string name="mark_all_as_read">すべて既読にする</string>
   <string name="edit_feed">フィードを編集</string>
@@ -38,8 +33,6 @@
   <string name="new_items_available">新しいアイテムが利用可能です</string>
   <string name="view">表示</string>
   <string name="no_tag">タグなし</string>
-  <string name="username">ユーザー名</string>
-  <string name="server_address">サーバーアドレス</string>
   <string name="night_mode">夜間モード</string>
   <string name="notify_for_new_items">新しいアイテムの通知</string>
   <string name="toggle_read_status">既読/未読の切り替え</string>
