@@ -15,7 +15,7 @@
   <string name="by_author_on_date">par %1$s, le %2$s</string>
   <string name="on_date">%1$s</string>
   <string name="save">Enregistrer</string>
-  <string name="empty_feed_top">Rien à lire ici. Souhaitez-vous...</string>
+  <string name="empty_feed_top">Rien à lire ici. Souhaitez-vous…</string>
   <string name="empty_feed_open">
     <![CDATA[<font color="#607D8B">Ouvrir</font> un autre flux ?]]></string>
   <string name="empty_feed_add">
