@@ -1,3 +1,11 @@
+# 1.4.1
+*   Fixed some translation issues which could cause crashes
+    See !74
+*   Added French translation
+    See !73
+*   Added Polish translation
+    See !72
+
 # 1.4.0
 
 This version changes the database tables slighly which means your
