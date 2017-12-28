@@ -62,8 +62,7 @@ for mc in $(git rev-list --min-parents=2 "^${CURRENT_VERSION}" "${TARGET}"); do
     # Transform newlines to spaces by echoing with no quotes
     issues="$(echo ${issues})"
 
-    CL="${CL}
-*   $(git show --no-patch --format=%s "${cc}")"
+    CL="${CL}*   $(git show --no-patch --format=%s "${cc}")"
 
     if ! [[ -z "${issues// }" ]] || ! [[ -z "${mr// }" ]]; then
       CL="${CL}
