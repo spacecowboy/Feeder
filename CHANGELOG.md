@@ -2,8 +2,10 @@
 *   Fixed some translation issues which could cause crashes  
     See !74
 *   Added French translation  
+    Thanks to Jef Roelandt  
     See !73
 *   Added Polish translation  
+    Thanks to Grzegorz Szymaszek  
     See !72
 
 # 1.4.0
@@ -78,6 +80,7 @@ read-status will be gone. Apologies for the inconvenience.
 
 # 1.3.11
 *   Added Italian translation  
+    Thanks to Marco  
     See !56
 
 # 1.3.10
@@ -100,6 +103,7 @@ read-status will be gone. Apologies for the inconvenience.
 *   Fixed crash when importing/exporting OPML on Android18  
     See !49 #51
 *   Updated russian translation  
+    Thanks to Anton Shestakov  
     See !48
 
 # 1.3.5
@@ -128,6 +132,7 @@ read-status will be gone. Apologies for the inconvenience.
 *   Removed translations of dummy strings  
     See !43 #44
 *   Added russian translation  
+    Thanks to Anton Shestakov  
     See !42
 *   Fixed sorting of feeds to be alphabetical  
     See !38 #41
