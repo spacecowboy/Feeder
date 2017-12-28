@@ -58,11 +58,16 @@ for mc in $(git rev-list --min-parents=2 "^${CURRENT_VERSION}" "${TARGET}"); do
       continue
     fi
     issues="$(git show --no-patch --format=%B "${cc}" | grep --only-matching "#[[:digit:]]\+")"
+    author="$(git show --no-patch --format=%an "${cc}")"
 
     # Transform newlines to spaces by echoing with no quotes
     issues="$(echo ${issues})"
 
     CL="${CL}*   $(git show --no-patch --format=%s "${cc}")"
+
+    # Trailing whitespace to force linebreak
+    CL="${CL}  
+    Thanks to ${author}"
 
     if ! [[ -z "${issues// }" ]] || ! [[ -z "${mr// }" ]]; then
       # Two trailing whitespace to force linebreak
