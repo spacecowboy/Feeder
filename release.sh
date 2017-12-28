@@ -65,7 +65,8 @@ for mc in $(git rev-list --min-parents=2 "^${CURRENT_VERSION}" "${TARGET}"); do
     CL="${CL}*   $(git show --no-patch --format=%s "${cc}")"
 
     if ! [[ -z "${issues// }" ]] || ! [[ -z "${mr// }" ]]; then
-      CL="${CL}
+      # Two trailing whitespace to force linebreak
+      CL="${CL}  
     See"
     fi
 
