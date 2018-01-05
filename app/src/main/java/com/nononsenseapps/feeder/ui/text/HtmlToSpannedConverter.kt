@@ -67,6 +67,8 @@ open class HtmlToSpannedConverter(protected var mSource: String,
     protected var ignoreCount = 0
     protected var mReader: XMLReader
 
+    private val ignoredTags = listOf("style", "script")
+
     init {
         mReader = parser
         mAccentColor = mContext.resources.getColor(R.color.accent)
@@ -203,7 +205,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
             startEndTableRow(spannableStringBuilder)
         } else if (tag.equals("table", ignoreCase = true)) {
             startEndTable(spannableStringBuilder)
-        } else if (tag.equals("style", ignoreCase = true)) {
+        } else if (tag.toLowerCase() in ignoredTags) {
             ignoreCount++
         } else {
             startUnknownTag(tag, spannableStringBuilder, attributes)
@@ -453,7 +455,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
             startEndTableRow(spannableStringBuilder)
         } else if (tag.equals("table", ignoreCase = true)) {
             startEndTable(spannableStringBuilder)
-        } else if (tag.equals("style", ignoreCase = true)) {
+        } else if (tag.toLowerCase() in ignoredTags) {
             ignoreCount--
         } else {
             endUnknownTag(tag, spannableStringBuilder)
