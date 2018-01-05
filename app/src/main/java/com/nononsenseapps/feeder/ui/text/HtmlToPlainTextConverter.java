@@ -151,7 +151,8 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         builder.append(repeated("  ", listings.size() - 1));
         if (isOrderedList()) {
             HtmlToSpannedConverter.Listing listing = listings.peek();
-            builder.append("" + listing.mNumber++).append(". ");
+            builder.append("").append(listing.getNumber()).append(". ");
+            listing.setNumber(listing.getNumber() + 1);
         } else {
             builder.append("* ");
         }
@@ -195,7 +196,7 @@ public class HtmlToPlainTextConverter implements ContentHandler {
     }
 
     private boolean isOrderedList() {
-        return !listings.isEmpty() && listings.peek().mOrdered;
+        return !listings.isEmpty() && listings.peek().getOrdered();
     }
 
     private void startA(StringBuilder builder, Attributes attributes) {

@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui.text
 
 import android.content.Context
 import android.graphics.Point
+import android.text.SpannableStringBuilder
 import android.text.Spanned
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
@@ -49,7 +50,8 @@ fun toSpannedWithImages(context: Context,
  * This uses TagSoup to handle real HTML, including all of the brokenness
  * found in the wild.
  */
-fun toSpannedWithNoImages(source: String, siteUrl: URL, context: Context): Spanned {
+fun toSpannedWithNoImages(source: String, siteUrl: URL, context: Context,
+                          spannableStringBuilder: SpannableStringBuilder = SpannableStringBuilder()): Spanned {
     val parser = Parser()
     try {
         parser.setProperty(Parser.schemaProperty, schema)
@@ -60,6 +62,6 @@ fun toSpannedWithNoImages(source: String, siteUrl: URL, context: Context): Spann
         throw RuntimeException(e)
     }
 
-    val converter = HtmlToSpannedConverter(source, siteUrl, parser, context)
+    val converter = HtmlToSpannedConverter(source, siteUrl, parser, context, spannableStringBuilder)
     return converter.convert()
 }
