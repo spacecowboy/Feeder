@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui.text
 
 import android.content.Context
 import android.content.res.Resources
-import android.text.SpannableStringBuilder
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -10,6 +9,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import java.net.URL
+import java.util.*
 
 class SpannedConverterTest {
 
@@ -75,15 +75,45 @@ class SpannedConverterTest {
 
         assertEquals("r1c1\nr1c2\nr2c1\nr2c2\n\n", builder.toString())
     }
+
+    @Test
+    @Throws(Exception::class)
+    fun preFormattedTextIsNotDestroyedTest() {
+        val builder = FakeBuilder()
+        val text = """
+            first  line
+            second        line here
+            don't
+            break
+            me
+            """.trimMargin()
+        toSpannedWithNoImages(
+                """
+                    <pre>$text</pre>
+                    """,
+                URL("http://foo.bar"),
+                mockContext,
+                builder
+        )
+
+        assertEquals(text, builder.toString())
+    }
 }
 
-class FakeBuilder: SpannableStringBuilder() {
+class FakeBuilder : SensibleSpannableStringBuilder() {
     private val builder: StringBuilder = StringBuilder()
+    private val spans: ArrayList<Any?> = ArrayList()
 
-    override fun append(text: CharSequence?): SpannableStringBuilder {
+    override fun append(text: CharSequence?): SensibleSpannableStringBuilder {
         builder.append(text)
         return this
     }
+
+    override fun setSpan(what: Any?, start: Int, end: Int, flags: Int) {
+        spans.add(what)
+    }
+
+    override fun getAllSpans(): List<Any?> = spans
 
     override fun get(where: Int): Char {
         return builder[where]
