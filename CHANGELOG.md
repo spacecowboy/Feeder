@@ -1,3 +1,7 @@
+# 1.4.2
+*   Stopped rendering script tags
+    See !75 #85
+
 # 1.4.1
 *   Fixed some translation issues which could cause crashes  
     See !74
