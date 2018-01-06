@@ -81,11 +81,11 @@ class SpannedConverterTest {
     fun preFormattedTextIsNotDestroyedTest() {
         val builder = FakeBuilder()
         val text = """
-            first  line
-            second        line here
-            don't
-            break
-            me
+            |first  line
+            |second        line here
+            |don't
+            |break
+            |me
             """.trimMargin()
         toSpannedWithNoImages(
                 """
@@ -96,7 +96,7 @@ class SpannedConverterTest {
                 builder
         )
 
-        assertEquals(text, builder.toString())
+        assertEquals(text, builder.toString().trimEnd { it == '\n' })
     }
 }
 

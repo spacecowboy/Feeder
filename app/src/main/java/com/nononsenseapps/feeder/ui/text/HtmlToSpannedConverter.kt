@@ -65,7 +65,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
     protected var mQuoteGapWidth: Int = 0
     protected var mQuoteStripeWidth: Int = 0
     protected var ignoreCount = 0
-    var respectFormatting = false
+    var respectFormatting: Int = 0
     protected var mReader: XMLReader
 
     private val ignoredTags = listOf("style", "script")
@@ -287,6 +287,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
 
     protected fun startPre(text: SpannableStringBuilder,
                            attributes: Attributes) {
+        respectFormatting++
         ensureDoubleNewline(text)
         start(text, Pre())
     }
@@ -567,6 +568,12 @@ open class HtmlToSpannedConverter(protected var mSource: String,
                     .ALIGN_NORMAL), where, len,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
+
+        respectFormatting--
+
+        if (respectFormatting < 0) {
+            respectFormatting = 0
+        }
     }
 
     protected fun endCode(text: SpannableStringBuilder) {
@@ -613,7 +620,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
                 .asSequence()
                 .map { ch[it + start] }
                 .forEach {
-                    if (it.isWhitespace()) {
+                    if (respectFormatting < 1 && it.isWhitespace()) {
                         val prev: Char = if (sb.isEmpty()) {
                             val len = spannableStringBuilder.length
 
