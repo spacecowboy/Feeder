@@ -60,11 +60,12 @@ open class HtmlToSpannedConverter(protected var mSource: String,
                                   protected var mSiteUrl: URL,
                                   parser: Parser,
                                   private val mContext: Context,
-                                  private val spannableStringBuilder: SpannableStringBuilder = SpannableStringBuilder()) : ContentHandler {
+                                  private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()) : ContentHandler {
     protected var mAccentColor: Int = 0
     protected var mQuoteGapWidth: Int = 0
     protected var mQuoteStripeWidth: Int = 0
     protected var ignoreCount = 0
+    var respectFormatting = false
     protected var mReader: XMLReader
 
     private val ignoredTags = listOf("style", "script")
@@ -90,29 +91,25 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
 
         // Fix flags and range for paragraph-type markup.
-        val obj = spannableStringBuilder
-                .getSpans(0, spannableStringBuilder.length,
-                        ParagraphStyle::class.java)
-        if (obj != null) {
-            for (anObj in obj) {
-                val start = spannableStringBuilder.getSpanStart(anObj)
-                var end = spannableStringBuilder.getSpanEnd(anObj)
+        val obj = spannableStringBuilder.getAllSpansWithType<ParagraphStyle>()
+        for (anObj in obj) {
+            val start = spannableStringBuilder.getSpanStart(anObj)
+            var end = spannableStringBuilder.getSpanEnd(anObj)
 
-                // If the last line of the range is blank, back off by one.
-                if (end - 2 >= 0) {
-                    if (spannableStringBuilder[end - 1] == '\n' && spannableStringBuilder[end - 2] == '\n') {
-                        end--
-                    }
+            // If the last line of the range is blank, back off by one.
+            if (end - 2 >= 0) {
+                if (spannableStringBuilder[end - 1] == '\n' && spannableStringBuilder[end - 2] == '\n') {
+                    end--
                 }
-
-                if (end == start) {
-                    spannableStringBuilder.removeSpan(anObj)
-                }
-                //            else {
-                //                spannableStringBuilder
-                //                        .setSpan(obj[i], start, end, Spannable.SPAN_PARAGRAPH);
-                //            }
             }
+
+            if (end == start) {
+                spannableStringBuilder.removeSpan(anObj)
+            }
+            //            else {
+            //                spannableStringBuilder
+            //                        .setSpan(obj[i], start, end, Spannable.SPAN_PARAGRAPH);
+            //            }
         }
 
         return spannableStringBuilder
@@ -314,13 +311,9 @@ open class HtmlToSpannedConverter(protected var mSource: String,
          * This knows that the last returned object from getSpans()
          * will be the most recently added.
          */
-        val objs = text.getSpans(0, text.length, kind)
+        val objects = text.getSpans(0, text.length, kind)
 
-        return if (objs.isEmpty()) {
-            null
-        } else {
-            objs[objs.size - 1]
-        }
+        return objects?.last()
     }
 
     protected fun end(text: SpannableStringBuilder, kind: Class<*>,
