@@ -144,71 +144,51 @@ open class HtmlToSpannedConverter(protected var mSource: String,
 
     protected fun handleStartTag(tag: String, attributes: Attributes) {
 
-        if (tag.equals("br", ignoreCase = true)) {
-            // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
-            // so we can safely emit the linebreaks when we handle the close tag.
-        } else if (tag.equals("p", ignoreCase = true)) {
-            handleP(spannableStringBuilder)
-        } else if (tag.equals("div", ignoreCase = true)) {
-            handleP(spannableStringBuilder)
-        } else if (tag.equals("strong", ignoreCase = true)) {
-            start(spannableStringBuilder, Bold())
-        } else if (tag.equals("b", ignoreCase = true)) {
-            start(spannableStringBuilder, Bold())
-        } else if (tag.equals("em", ignoreCase = true)) {
-            start(spannableStringBuilder, Italic())
-        } else if (tag.equals("cite", ignoreCase = true)) {
-            start(spannableStringBuilder, Italic())
-        } else if (tag.equals("dfn", ignoreCase = true)) {
-            start(spannableStringBuilder, Italic())
-        } else if (tag.equals("i", ignoreCase = true)) {
-            start(spannableStringBuilder, Italic())
-        } else if (tag.equals("big", ignoreCase = true)) {
-            start(spannableStringBuilder, Big())
-        } else if (tag.equals("small", ignoreCase = true)) {
-            start(spannableStringBuilder, Small())
-        } else if (tag.equals("font", ignoreCase = true)) {
-            startFont(spannableStringBuilder, attributes)
-        } else if (tag.equals("blockquote", ignoreCase = true)) {
-            handleP(spannableStringBuilder)
-            start(spannableStringBuilder, Blockquote())
-        } else if (tag.equals("tt", ignoreCase = true)) {
-            start(spannableStringBuilder, Monospace())
-        } else if (tag.equals("a", ignoreCase = true)) {
-            startA(spannableStringBuilder, attributes)
-        } else if (tag.equals("u", ignoreCase = true)) {
-            start(spannableStringBuilder, Underline())
-        } else if (tag.equals("sup", ignoreCase = true)) {
-            start(spannableStringBuilder, Super())
-        } else if (tag.equals("sub", ignoreCase = true)) {
-            start(spannableStringBuilder, Sub())
-        } else if (tag.length == 2 &&
-                Character.toLowerCase(tag[0]) == 'h' &&
-                tag[1] >= '1' && tag[1] <= '6') {
-            handleP(spannableStringBuilder)
-            start(spannableStringBuilder, Header(tag[1] - '1'))
-        } else if (tag.equals("img", ignoreCase = true)) {
-            startImg(spannableStringBuilder, attributes)
-        } else if (tag.equals("ul", ignoreCase = true)) {
-            startUl(spannableStringBuilder, attributes)
-        } else if (tag.equals("ol", ignoreCase = true)) {
-            startOl(spannableStringBuilder, attributes)
-        } else if (tag.equals("li", ignoreCase = true)) {
-            startLi(spannableStringBuilder, attributes)
-        } else if (tag.equals("pre", ignoreCase = true)) {
-            startPre(spannableStringBuilder, attributes)
-        } else if (tag.equals("code", ignoreCase = true)) {
-            startCode(spannableStringBuilder, attributes)
-        } else if (tag.equals("iframe", ignoreCase = true)) {
-            startIframe(spannableStringBuilder, attributes)
-        } else if (tag.equals("tr", ignoreCase = true)) {
-            startEndTableRow(spannableStringBuilder)
-        } else if (tag.equals("table", ignoreCase = true)) {
-            startEndTable(spannableStringBuilder)
-        } else if (tag.toLowerCase() in ignoredTags) {
-            ignoreCount++
-        } else {
-            startUnknownTag(tag, spannableStringBuilder, attributes)
+        when {
+            tag.equals("br", ignoreCase = true) -> {
+                // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
+                // so we can safely emit the linebreaks when we handle the close tag.
+            }
+            tag.equals("p", ignoreCase = true) -> handleP(spannableStringBuilder)
+            tag.equals("div", ignoreCase = true) -> handleP(spannableStringBuilder)
+            tag.equals("strong", ignoreCase = true) -> start(spannableStringBuilder, Bold())
+            tag.equals("b", ignoreCase = true) -> start(spannableStringBuilder, Bold())
+            tag.equals("em", ignoreCase = true) -> start(spannableStringBuilder, Italic())
+            tag.equals("cite", ignoreCase = true) -> start(spannableStringBuilder, Italic())
+            tag.equals("dfn", ignoreCase = true) -> start(spannableStringBuilder, Italic())
+            tag.equals("i", ignoreCase = true) -> start(spannableStringBuilder, Italic())
+            tag.equals("big", ignoreCase = true) -> start(spannableStringBuilder, Big())
+            tag.equals("small", ignoreCase = true) -> start(spannableStringBuilder, Small())
+            tag.equals("font", ignoreCase = true) -> startFont(spannableStringBuilder, attributes)
+            tag.equals("blockquote", ignoreCase = true) -> {
+                handleP(spannableStringBuilder)
+                start(spannableStringBuilder, Blockquote())
+            }
+            tag.equals("tt", ignoreCase = true) -> start(spannableStringBuilder, Monospace())
+            tag.equals("a", ignoreCase = true) -> startA(spannableStringBuilder, attributes)
+            tag.equals("u", ignoreCase = true) -> start(spannableStringBuilder, Underline())
+            tag.equals("sup", ignoreCase = true) -> start(spannableStringBuilder, Super())
+            tag.equals("sub", ignoreCase = true) -> start(spannableStringBuilder, Sub())
+            tag.length == 2 &&
+                    Character.toLowerCase(tag[0]) == 'h' &&
+                    tag[1] >= '1' && tag[1] <= '6' -> {
+                handleP(spannableStringBuilder)
+                start(spannableStringBuilder, Header(tag[1] - '1'))
+            }
+            tag.equals("img", ignoreCase = true) -> startImg(spannableStringBuilder, attributes)
+            tag.equals("ul", ignoreCase = true) -> startUl(spannableStringBuilder, attributes)
+            tag.equals("ol", ignoreCase = true) -> startOl(spannableStringBuilder, attributes)
+            tag.equals("li", ignoreCase = true) -> startLi(spannableStringBuilder, attributes)
+            tag.equals("pre", ignoreCase = true) -> startPre(spannableStringBuilder, attributes)
+            tag.equals("code", ignoreCase = true) -> startCode(spannableStringBuilder, attributes)
+            tag.equals("iframe", ignoreCase = true) -> startIframe(spannableStringBuilder, attributes)
+            tag.equals("td", ignoreCase = true) || tag.equals("th", ignoreCase = true) -> {
+                startTableCol(spannableStringBuilder)
+            }
+            tag.equals("tr", ignoreCase = true) -> startEndTableRow(spannableStringBuilder)
+            tag.equals("table", ignoreCase = true) -> startEndTable(spannableStringBuilder)
+            tag.toLowerCase() in ignoredTags -> ignoreCount++
+            else -> startUnknownTag(tag, spannableStringBuilder, attributes)
         }
     }
 
@@ -336,7 +316,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
          */
         val objs = text.getSpans(0, text.length, kind)
 
-        return if (objs.size == 0) {
+        return if (objs.isEmpty()) {
             null
         } else {
             objs[objs.size - 1]
@@ -386,79 +366,54 @@ open class HtmlToSpannedConverter(protected var mSource: String,
     }
 
     protected fun handleEndTag(tag: String) {
-        if (tag.equals("br", ignoreCase = true)) {
-            handleBr(spannableStringBuilder)
-        } else if (tag.equals("p", ignoreCase = true)) {
-            handleP(spannableStringBuilder)
-        } else if (tag.equals("div", ignoreCase = true)) {
-            handleP(spannableStringBuilder)
-        } else if (tag.equals("strong", ignoreCase = true)) {
-            end(spannableStringBuilder, Bold::class.java,
+        when {
+            tag.equals("br", ignoreCase = true) -> handleBr(spannableStringBuilder)
+            tag.equals("p", ignoreCase = true) -> handleP(spannableStringBuilder)
+            tag.equals("div", ignoreCase = true) -> handleP(spannableStringBuilder)
+            tag.equals("strong", ignoreCase = true) -> end(spannableStringBuilder, Bold::class.java,
                     StyleSpan(Typeface.BOLD))
-        } else if (tag.equals("b", ignoreCase = true)) {
-            end(spannableStringBuilder, Bold::class.java,
+            tag.equals("b", ignoreCase = true) -> end(spannableStringBuilder, Bold::class.java,
                     StyleSpan(Typeface.BOLD))
-        } else if (tag.equals("em", ignoreCase = true)) {
-            end(spannableStringBuilder, Italic::class.java,
+            tag.equals("em", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
                     StyleSpan(Typeface.ITALIC))
-        } else if (tag.equals("cite", ignoreCase = true)) {
-            end(spannableStringBuilder, Italic::class.java,
+            tag.equals("cite", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
                     StyleSpan(Typeface.ITALIC))
-        } else if (tag.equals("dfn", ignoreCase = true)) {
-            end(spannableStringBuilder, Italic::class.java,
+            tag.equals("dfn", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
                     StyleSpan(Typeface.ITALIC))
-        } else if (tag.equals("i", ignoreCase = true)) {
-            end(spannableStringBuilder, Italic::class.java,
+            tag.equals("i", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
                     StyleSpan(Typeface.ITALIC))
-        } else if (tag.equals("big", ignoreCase = true)) {
-            end(spannableStringBuilder, Big::class.java,
+            tag.equals("big", ignoreCase = true) -> end(spannableStringBuilder, Big::class.java,
                     RelativeSizeSpan(1.25f))
-        } else if (tag.equals("small", ignoreCase = true)) {
-            end(spannableStringBuilder, Small::class.java,
+            tag.equals("small", ignoreCase = true) -> end(spannableStringBuilder, Small::class.java,
                     RelativeSizeSpan(0.8f))
-        } else if (tag.equals("font", ignoreCase = true)) {
-            endFont(spannableStringBuilder)
-        } else if (tag.equals("blockquote", ignoreCase = true)) {
-            endQuote(spannableStringBuilder)
-            handleP(spannableStringBuilder)
-        } else if (tag.equals("tt", ignoreCase = true)) {
-            end(spannableStringBuilder, Monospace::class.java,
+            tag.equals("font", ignoreCase = true) -> endFont(spannableStringBuilder)
+            tag.equals("blockquote", ignoreCase = true) -> {
+                endQuote(spannableStringBuilder)
+                handleP(spannableStringBuilder)
+            }
+            tag.equals("tt", ignoreCase = true) -> end(spannableStringBuilder, Monospace::class.java,
                     TypefaceSpan("monospace"))
-        } else if (tag.equals("a", ignoreCase = true)) {
-            endA(spannableStringBuilder)
-        } else if (tag.equals("u", ignoreCase = true)) {
-            end(spannableStringBuilder, Underline::class.java, UnderlineSpan())
-        } else if (tag.equals("sup", ignoreCase = true)) {
-            end(spannableStringBuilder, Super::class.java, SuperscriptSpan())
-        } else if (tag.equals("sub", ignoreCase = true)) {
-            end(spannableStringBuilder, Sub::class.java, SubscriptSpan())
-        } else if (tag.length == 2 &&
-                Character.toLowerCase(tag[0]) == 'h' &&
-                tag[1] >= '1' && tag[1] <= '6') {
-            handleP(spannableStringBuilder)
-            endHeader(spannableStringBuilder)
-        } else if (tag.equals("img", ignoreCase = true)) {
-            endImg(spannableStringBuilder)
-        } else if (tag.equals("ul", ignoreCase = true)) {
-            endUl(spannableStringBuilder)
-        } else if (tag.equals("ol", ignoreCase = true)) {
-            endOl(spannableStringBuilder)
-        } else if (tag.equals("li", ignoreCase = true)) {
-            endLi(spannableStringBuilder)
-        } else if (tag.equals("pre", ignoreCase = true)) {
-            endPre(spannableStringBuilder)
-        } else if (tag.equals("code", ignoreCase = true)) {
-            endCode(spannableStringBuilder)
-        } else if (tag.equals("iframe", ignoreCase = true)) {
-            endIframe(spannableStringBuilder)
-        } else if (tag.equals("tr", ignoreCase = true)) {
-            startEndTableRow(spannableStringBuilder)
-        } else if (tag.equals("table", ignoreCase = true)) {
-            startEndTable(spannableStringBuilder)
-        } else if (tag.toLowerCase() in ignoredTags) {
-            ignoreCount--
-        } else {
-            endUnknownTag(tag, spannableStringBuilder)
+            tag.equals("a", ignoreCase = true) -> endA(spannableStringBuilder)
+            tag.equals("u", ignoreCase = true) -> end(spannableStringBuilder, Underline::class.java, UnderlineSpan())
+            tag.equals("sup", ignoreCase = true) -> end(spannableStringBuilder, Super::class.java, SuperscriptSpan())
+            tag.equals("sub", ignoreCase = true) -> end(spannableStringBuilder, Sub::class.java, SubscriptSpan())
+            tag.length == 2 &&
+                    Character.toLowerCase(tag[0]) == 'h' &&
+                    tag[1] >= '1' && tag[1] <= '6' -> {
+                handleP(spannableStringBuilder)
+                endHeader(spannableStringBuilder)
+            }
+            tag.equals("img", ignoreCase = true) -> endImg(spannableStringBuilder)
+            tag.equals("ul", ignoreCase = true) -> endUl(spannableStringBuilder)
+            tag.equals("ol", ignoreCase = true) -> endOl(spannableStringBuilder)
+            tag.equals("li", ignoreCase = true) -> endLi(spannableStringBuilder)
+            tag.equals("pre", ignoreCase = true) -> endPre(spannableStringBuilder)
+            tag.equals("code", ignoreCase = true) -> endCode(spannableStringBuilder)
+            tag.equals("iframe", ignoreCase = true) -> endIframe(spannableStringBuilder)
+            tag.equals("tr", ignoreCase = true) -> startEndTableRow(spannableStringBuilder)
+            tag.equals("table", ignoreCase = true) -> startEndTable(spannableStringBuilder)
+            tag.toLowerCase() in ignoredTags -> ignoreCount--
+            else -> endUnknownTag(tag, spannableStringBuilder)
         }
     }
 
@@ -554,6 +509,10 @@ open class HtmlToSpannedConverter(protected var mSource: String,
     }
 
     protected fun startEndTableRow(text: SpannableStringBuilder) {
+        ensureSingleNewline(text)
+    }
+
+    protected fun startTableCol(text: SpannableStringBuilder) {
         ensureSingleNewline(text)
     }
 
@@ -657,32 +616,30 @@ open class HtmlToSpannedConverter(protected var mSource: String,
          * newlines count as spaces.
          */
 
-        for (i in 0 until length) {
-            val c = ch[i + start]
+        (0 until length)
+                .asSequence()
+                .map { ch[it + start] }
+                .forEach {
+                    if (it.isWhitespace()) {
+                        val prev: Char = if (sb.isEmpty()) {
+                            val len = spannableStringBuilder.length
 
-            if (c == ' ' || c == '\n') {
-                val pred: Char
-                var len = sb.length
+                            if (len == 0) {
+                                '\n'
+                            } else {
+                                spannableStringBuilder[len - 1]
+                            }
+                        } else {
+                            sb.last()
+                        }
 
-                if (len == 0) {
-                    len = spannableStringBuilder.length
-
-                    if (len == 0) {
-                        pred = '\n'
+                        if (!prev.isWhitespace()) {
+                            sb.append(' ')
+                        }
                     } else {
-                        pred = spannableStringBuilder[len - 1]
+                        sb.append(it)
                     }
-                } else {
-                    pred = sb[len - 1]
                 }
-
-                if (pred != ' ' && pred != '\n') {
-                    sb.append(' ')
-                }
-            } else {
-                sb.append(c)
-            }
-        }
 
         spannableStringBuilder.append(sb)
     }
@@ -762,6 +719,13 @@ open class HtmlToSpannedConverter(protected var mSource: String,
             }
             if (len != 0) {
                 text.append("\n")
+            }
+        }
+
+        private fun ensureSingleSpace(text: SpannableStringBuilder) {
+            if (text.isNotEmpty() &&
+                    !text.last().isWhitespace()) {
+                text.append(" ")
             }
         }
     }

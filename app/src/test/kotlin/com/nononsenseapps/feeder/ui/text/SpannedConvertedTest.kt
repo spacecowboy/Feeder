@@ -15,7 +15,6 @@ class SpannedConverterTest {
 
     private val mockContext: Context = mock(Context::class.java)
     private val mockResources: Resources = mock(Resources::class.java)
-    private val mockBuilder: SpannableStringBuilder = mock(SpannableStringBuilder::class.java)
 
     @Before
     fun setup() {
@@ -50,6 +49,31 @@ class SpannedConverterTest {
         )
 
         assertEquals("foo\n\nbar\n\n", builder.toString())
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun tableColumnsSeparatedNewLinesTest() {
+        val builder = FakeBuilder()
+        toSpannedWithNoImages(
+                """
+                    <table>
+                    <tr>
+                        <th>r1c1</th>
+                        <th>r1c2</th>
+                      </tr>
+                      <tr>
+                        <td>r2c1</td>
+                        <td>r2c2</td>
+                      </tr>
+                    </table>
+                    """,
+                URL("http://foo.bar"),
+                mockContext,
+                builder
+        )
+
+        assertEquals("r1c1\nr1c2\nr2c1\nr2c2\n\n", builder.toString())
     }
 }
 
