@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.ui.text
 
 import android.content.Context
 import android.graphics.Point
-import android.text.SpannableStringBuilder
 import android.text.Spanned
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
@@ -51,7 +50,7 @@ fun toSpannedWithImages(context: Context,
  * found in the wild.
  */
 fun toSpannedWithNoImages(source: String, siteUrl: URL, context: Context,
-                          spannableStringBuilder: SpannableStringBuilder = SpannableStringBuilder()): Spanned {
+                          spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()): Spanned {
     val parser = Parser()
     try {
         parser.setProperty(Parser.schemaProperty, schema)
