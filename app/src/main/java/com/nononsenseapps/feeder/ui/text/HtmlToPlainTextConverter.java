@@ -11,6 +11,8 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -23,6 +25,7 @@ public class HtmlToPlainTextConverter implements ContentHandler {
     private StringBuilder builder;
     private Stack<HtmlToSpannedConverter.Listing> listings = new Stack<>();
     private int ignoreCount = 0;
+    private List<String> ignoredTags = Arrays.asList("style", "script");
 
     public static String HtmlToPlainText(@NonNull String html) {
         return new HtmlToPlainTextConverter(html).convert();
@@ -116,7 +119,7 @@ public class HtmlToPlainTextConverter implements ContentHandler {
             startOl(builder);
         } else if (tag.equalsIgnoreCase("li")) {
             startLi(builder);
-        } else if (tag.equalsIgnoreCase("style")) {
+        } else if (ignoredTags.contains(tag.toLowerCase())) {
             ignoreCount++;
         } else if (tag.equalsIgnoreCase("img")) {
             startImg(builder, attributes);
@@ -151,7 +154,8 @@ public class HtmlToPlainTextConverter implements ContentHandler {
         builder.append(repeated("  ", listings.size() - 1));
         if (isOrderedList()) {
             HtmlToSpannedConverter.Listing listing = listings.peek();
-            builder.append("" + listing.mNumber++).append(". ");
+            builder.append("").append(listing.getNumber()).append(". ");
+            listing.setNumber(listing.getNumber() + 1);
         } else {
             builder.append("* ");
         }
@@ -195,7 +199,7 @@ public class HtmlToPlainTextConverter implements ContentHandler {
     }
 
     private boolean isOrderedList() {
-        return !listings.isEmpty() && listings.peek().mOrdered;
+        return !listings.isEmpty() && listings.peek().getOrdered();
     }
 
     private void startA(StringBuilder builder, Attributes attributes) {
@@ -242,7 +246,7 @@ public class HtmlToPlainTextConverter implements ContentHandler {
             endOl(builder);
         } else if (tag.equalsIgnoreCase("li")) {
             endLi(builder);
-        } else if (tag.equalsIgnoreCase("style")) {
+        } else if (ignoredTags.contains(tag.toLowerCase())) {
             ignoreCount--;
         }
     }

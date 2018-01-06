@@ -54,4 +54,16 @@ public class HtmlToPlainTextConverterTest {
         HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("<p>one<br>two<p>three");
         assertEquals("one two three", converter.convert());
     }
+
+    @Test
+    public void noScripts() throws Exception {
+        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("foo <script>script</script> bar");
+        assertEquals("foo bar", converter.convert());
+    }
+
+    @Test
+    public void noStyles() throws Exception {
+        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("foo <style>style</style> bar");
+        assertEquals("foo bar", converter.convert());
+    }
 }
