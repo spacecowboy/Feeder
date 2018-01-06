@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.text.Spannable
-import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.text.style.StyleSpan
 import android.util.Log
@@ -39,7 +38,7 @@ class GlideConverter(context: Context,
         densityScale = this.context.resources.displayMetrics.density
     }
 
-    override fun startImg(text: SpannableStringBuilder,
+    override fun startImg(text: SensibleSpannableStringBuilder,
                           attributes: Attributes) {
         // Get drawable
         val d = getImgDrawable(attributes)
@@ -71,7 +70,7 @@ class GlideConverter(context: Context,
         }
     }
 
-    override fun startIframe(text: SpannableStringBuilder,
+    override fun startIframe(text: SensibleSpannableStringBuilder,
                              attributes: Attributes) {
         // Parse information
         val video = VideoTagHunter
