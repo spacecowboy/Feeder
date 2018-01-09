@@ -14,7 +14,8 @@ LOG="${LOGDIR}/sdkmanager.log"
 mkdir -p "${LOGDIR}"
 
 echo y | sdkmanager --update >>"${LOG}"
-echo y | sdkmanager "tools" "platform-tools" >>"${LOG}"
-echo y | sdkmanager "extras;android;m2repository" "extras;google;google_play_services" "extras;google;m2repository" >>"${LOG}"
-echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >>"${LOG}"
-echo y | sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" >>"${LOG}"
+echo y | sdkmanager \
+           "tools" \
+           "platform-tools" \
+           "build-tools;${ANDROID_BUILD_TOOLS}" \
+           "platforms;android-${ANDROID_COMPILE_SDK}" >>"${LOG}"
