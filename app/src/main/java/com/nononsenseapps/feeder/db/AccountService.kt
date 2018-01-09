@@ -67,7 +67,7 @@ class AccountService : Service() {
         override fun getAccountRemovalAllowed(response: AccountAuthenticatorResponse, account: Account): Bundle {
             Log.d(TAG, "getAccountRemovalAllowed")
             return bundle {
-                setBoolean(AccountManager.KEY_BOOLEAN_RESULT to false)
+                setBoolean(AccountManager.KEY_BOOLEAN_RESULT to true)
             }
         }
 
