@@ -9,8 +9,12 @@ if ! [ -d "${ANDROID_HOME}/tools" ]; then
 fi
 rm -f ${ANDROID_HOME}/tools.zip
 
-echo y | sdkmanager --update
-echo y | sdkmanager "tools" "platform-tools"
-echo y | sdkmanager "extras;android;m2repository" "extras;google;google_play_services" "extras;google;m2repository"
-echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
-echo y | sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
+LOGDIR="build/logs"
+LOG="${LOGDIR}/sdkmanager.log"
+mkdir -p "${LOGDIR}"
+
+echo y | sdkmanager --update >>"${LOG}"
+echo y | sdkmanager "tools" "platform-tools" >>"${LOG}"
+echo y | sdkmanager "extras;android;m2repository" "extras;google;google_play_services" "extras;google;m2repository" >>"${LOG}"
+echo y | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >>"${LOG}"
+echo y | sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" >>"${LOG}"

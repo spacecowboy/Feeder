@@ -41,6 +41,7 @@ variables:
   artifacts:
     paths:
     - app/build/outputs/
+    - build/logs/
 
 .test: &test_def
   <<: *before_docker
@@ -60,6 +61,7 @@ variables:
   artifacts:
     paths:
       - app/build/reports/androidTests/
+      - build/logs/
 
 build:jdk-1.8:
   <<: *build_def
