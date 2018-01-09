@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.db
 import android.accounts.AbstractAccountAuthenticator
 import android.accounts.Account
 import android.accounts.AccountAuthenticatorResponse
+import android.accounts.AccountManager
 import android.accounts.NetworkErrorException
 import android.app.Service
 import android.content.Context
@@ -10,6 +11,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import com.nononsenseapps.feeder.util.bundle
+import com.nononsenseapps.feeder.util.setBoolean
+import com.nononsenseapps.feeder.util.setLong
+import com.nononsenseapps.feeder.util.setString
+import com.nononsenseapps.feeder.util.setupSync
+
+private const val TAG = "FEEDERACCOUNT"
 
 class AccountService : Service() {
     private var authenticator: Authenticator? = null
@@ -23,59 +31,81 @@ class AccountService : Service() {
         return authenticator!!.iBinder
     }
 
-    inner class Authenticator(context: Context) : AbstractAccountAuthenticator(context) {
+    inner class Authenticator(val context: Context) : AbstractAccountAuthenticator(context) {
 
-        override fun editProperties(accountAuthenticatorResponse: AccountAuthenticatorResponse,
-                                    s: String): Bundle {
+        override fun editProperties(response: AccountAuthenticatorResponse,
+                                    accountType: String): Bundle {
+            Log.d(TAG, "editProperties")
             throw UnsupportedOperationException()
         }
 
         @Throws(NetworkErrorException::class)
-        override fun addAccount(accountAuthenticatorResponse: AccountAuthenticatorResponse,
-                                s: String, s2: String, strings: Array<String>, bundle: Bundle): Bundle? {
-            Log.d("JONAS", "addAccount")
-            // TODO
-            // accountManager.addAccountExplicitly(account, null, null)
-            // return bundle with type and name
-            return null
+        override fun addAccount(response: AccountAuthenticatorResponse,
+                                accountType: String,
+                                authTokenType: String?,
+                                requiredFeatures: Array<String>?,
+                                options: Bundle): Bundle {
+            Log.d(TAG, "addAccount")
+            context.setupSync()
+            return bundle {
+                setString(AccountManager.KEY_ACCOUNT_NAME to ACCOUNT_NAME)
+                setString(AccountManager.KEY_ACCOUNT_TYPE to ACCOUNT_TYPE)
+            }
         }
 
         @Throws(NetworkErrorException::class)
-        override fun confirmCredentials(accountAuthenticatorResponse: AccountAuthenticatorResponse,
-                                        account: Account, bundle: Bundle): Bundle? {
-            // TODO return KEY_BOOLEAN_RESULT with true
-            return null
+        override fun confirmCredentials(response: AccountAuthenticatorResponse,
+                                        account: Account,
+                                        options: Bundle): Bundle? {
+            Log.d(TAG, "confirmCredentials")
+            return bundle {
+                setBoolean(AccountManager.KEY_BOOLEAN_RESULT to true)
+            }
         }
 
         @Throws(NetworkErrorException::class)
         override fun getAccountRemovalAllowed(response: AccountAuthenticatorResponse, account: Account): Bundle {
-            // TODO return KEY_BOOLEAN_RESULT false
-            return super.getAccountRemovalAllowed(response, account)
+            Log.d(TAG, "getAccountRemovalAllowed")
+            return bundle {
+                setBoolean(AccountManager.KEY_BOOLEAN_RESULT to false)
+            }
         }
 
         @Throws(NetworkErrorException::class)
         override fun getAuthToken(accountAuthenticatorResponse: AccountAuthenticatorResponse,
-                                  account: Account, s: String, bundle: Bundle): Bundle {
-            // TODO return error
-            throw UnsupportedOperationException()
+                                  account: Account, accountType: String, options: Bundle): Bundle {
+            Log.d(TAG, "getAuthToken")
+            return bundle {
+                setLong(AccountManager.KEY_ERROR_CODE to 99L)
+                setString(AccountManager.KEY_ERROR_MESSAGE to "Auth token not supported")
+            }
         }
 
         override fun getAuthTokenLabel(s: String): String? {
+            Log.d(TAG, "getAuthTokenLabel")
             return null
         }
 
         @Throws(NetworkErrorException::class)
-        override fun updateCredentials(accountAuthenticatorResponse: AccountAuthenticatorResponse,
-                                       account: Account, s: String, bundle: Bundle): Bundle {
-            // TODO return type and name
-            throw UnsupportedOperationException()
+        override fun updateCredentials(response: AccountAuthenticatorResponse,
+                                       account: Account,
+                                       authTokenType: String?,
+                                       options: Bundle?): Bundle {
+            Log.d(TAG, "updateCredentials")
+            return bundle {
+                setString(AccountManager.KEY_ACCOUNT_NAME to ACCOUNT_NAME)
+                setString(AccountManager.KEY_ACCOUNT_TYPE to ACCOUNT_TYPE)
+            }
         }
 
         @Throws(NetworkErrorException::class)
-        override fun hasFeatures(accountAuthenticatorResponse: AccountAuthenticatorResponse,
-                                 account: Account, strings: Array<String>): Bundle {
-            // TODO check features and respond accordingly
-            throw UnsupportedOperationException()
+        override fun hasFeatures(response: AccountAuthenticatorResponse,
+                                 account: Account,
+                                 features: Array<String>): Bundle {
+            Log.d(TAG, "hasFeatures")
+            return bundle {
+                setBoolean(AccountManager.KEY_BOOLEAN_RESULT to false)
+            }
         }
     }
 

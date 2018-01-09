@@ -50,3 +50,7 @@ fun Bundle.setLong(pair: Pair<String, Long>) {
 fun Bundle.setString(pair: Pair<String, String?>) {
     putString(pair.first, pair.second)
 }
+
+fun Bundle.setBoolean(pair: Pair<String, Boolean>) {
+    putBoolean(pair.first, pair.second)
+}
