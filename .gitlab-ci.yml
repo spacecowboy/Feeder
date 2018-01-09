@@ -11,7 +11,6 @@ variables:
 cache:
   paths:
      - .gradle/
-     - .androidhome/
 
 .sdk_apt: &before_docker
   before_script:
