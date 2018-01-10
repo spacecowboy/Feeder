@@ -5,9 +5,12 @@ stages:
 image: openjdk:8-jdk
 
 variables:
-  ANDROID_HOME: /var/lib/gitlab-runner/android
-  ANDROID_COMPILE_SDK: "25"
-  ANDROID_BUILD_TOOLS: "25.0.2"
+  ANDROID_COMPILE_SDK: "27"
+  ANDROID_BUILD_TOOLS: "27.0.1"
+
+cache:
+  paths:
+     - .gradle/
 
 .sdk_apt: &before_docker
   before_script:
@@ -22,6 +25,8 @@ variables:
                                                                mesa-utils
                                                                pciutils
       && rm -rf /var/lib/apt/lists/*
+    - export GRADLE_USER_HOME="$(pwd)/.gradle"
+    - export ANDROID_HOME="$(pwd)/.androidhome"
     - export PATH="${ANDROID_HOME}/emulator/:${ANDROID_HOME}/tools/bin/:${ANDROID_HOME}/tools/:${ANDROID_HOME}/platform-tools/:${PATH}"
     - ci/before
     - chmod +x ./gradlew
@@ -29,6 +34,8 @@ variables:
 .sdk: &before_metal
   before_script:
     - set -euo pipefail
+    - export GRADLE_USER_HOME="$(pwd)/.gradle"
+    - export ANDROID_HOME="$(pwd)/.androidhome"
     - export PATH="${ANDROID_HOME}/emulator/:${ANDROID_HOME}/tools/bin/:${ANDROID_HOME}/tools/:${ANDROID_HOME}/platform-tools/:${PATH}"
     - ci/before
     - chmod +x ./gradlew
@@ -41,6 +48,7 @@ variables:
   artifacts:
     paths:
     - app/build/outputs/
+    - build/logs/
 
 .test: &test_def
   <<: *before_docker
@@ -60,6 +68,7 @@ variables:
   artifacts:
     paths:
       - app/build/reports/androidTests/
+      - build/logs/
 
 build:jdk-1.8:
   <<: *build_def
