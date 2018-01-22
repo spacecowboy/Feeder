@@ -33,7 +33,6 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu
@@ -44,10 +43,13 @@ import android.view.ViewGroup
 import android.widget.CheckedTextView
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_FEED
+import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_NOTIFY
 import com.nononsenseapps.feeder.db.COL_PUBDATE
 import com.nononsenseapps.feeder.db.COL_TAG
+import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_UNREAD
 import com.nononsenseapps.feeder.db.FEED_FIELDS
 import com.nononsenseapps.feeder.db.FEED_ITEM_FIELDS_FOR_LIST
@@ -87,8 +89,6 @@ const val ONLY_UNREAD = COL_UNREAD + " IS 1 "
 const val AND_UNREAD = " AND " + ONLY_UNREAD
 
 class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
-
-    private val TAG = "FeedFragment"
 
     private var adapter: FeedAdapter? = null
     private var recyclerView: RecyclerView? = null
@@ -430,10 +430,10 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
             val i = Intent(activity, EditFeedActivity::class.java)
             // TODO do not animate the back movement here
             i.putExtra(SHOULD_FINISH_BACK, true)
-            i.putExtra(_ID, this.id)
-            i.putExtra(CUSTOM_TITLE, customTitle)
-            i.putExtra(FEED_TITLE, title)
-            i.putExtra(TAG, feedTag)
+            i.putExtra(COL_ID, this.id)
+            i.putExtra(COL_CUSTOM_TITLE, customTitle)
+            i.putExtra(COL_TITLE, title)
+            i.putExtra(COL_TAG, feedTag)
             i.data = Uri.parse(url)
             startActivity(i)
             return true
@@ -442,7 +442,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
             // TODO do not animate the back movement here
             i.putExtra(SHOULD_FINISH_BACK, true)
             i.putExtra(TEMPLATE, true)
-            i.putExtra(TAG, feedTag)
+            i.putExtra(COL_TAG, feedTag)
             i.data = Uri.parse(url)
             startActivity(i)
             return true
@@ -530,6 +530,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                         this.customTitle = feed.customTitle
                         this.url = feed.url.toString()
                         this.notify = if (feed.notify) 1 else 0
+                        this.feedTag = feed.tag
 
                         (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
                         notifyCheck!!.isChecked = this.notify == 1
@@ -560,9 +561,6 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
     }
 
     override fun onLoaderReset(cursorLoader: Loader<Any?>?) {
-        if (FEEDITEMS_LOADER == cursorLoader?.id) {
-            Log.d(TAG, "onLoaderReset FeedItem")
-        }
     }
 
     inner class HeaderHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
