@@ -103,6 +103,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
     private var title: String? = ""
     private var url: String? = ""
     private var feedTag: String? = ""
+    private var firstFeedLoad: Boolean = true
     private var customTitle = ""
     private var layoutManager: LinearLayoutManager? = null
     private var checkAllButton: View? = null
@@ -246,19 +247,12 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
 
         // Load some RSS
         loaderManager.restartLoader(FEEDITEMS_LOADER, Bundle.EMPTY, this)
-        // Load feed itself if missing info
-        if (id > 0 && (title == null || title!!.isEmpty())) {
-            loaderManager.restartLoader(FEED_LOADER, Bundle.EMPTY, this)
-        } else {
-            // Get notification settings at least
-            loaderManager.restartLoader(FEED_SETTINGS_LOADER, Bundle.EMPTY, this)
-        }
 
-        if (id > 0 && title?.isNotEmpty() == true) {
-            // Else it's done in loader finishing
-            activity?.addDynamicShortcutToFeed(title!!, id, null)
-            // Report shortcut usage
-            activity?.reportShortcutToFeedUsed(id)
+        when (id > 0) {
+            true -> // Load feed if feed
+                loaderManager.restartLoader(FEED_LOADER, Bundle.EMPTY, this)
+            false -> // Load notification settings for tag
+                loaderManager.restartLoader(FEED_SETTINGS_LOADER, Bundle.EMPTY, this)
         }
     }
 
@@ -363,7 +357,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         super.onActivityCreated(bundle)
 
         val ab = (activity as BaseActivity).supportActionBar
-        ab?.setTitle(title)
+        ab?.title = title
         (activity as BaseActivity).enableActionBarAutoHide(recyclerView)
     }
 
@@ -383,8 +377,10 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         super.onPause()
     }
 
-    override fun onDetach() {
-        super.onDetach()
+    override fun onStop() {
+        loaderManager.destroyLoader(FEED_LOADER)
+        loaderManager.destroyLoader(FEEDITEMS_LOADER)
+        super.onStop()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -401,11 +397,13 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
         menuItem.isChecked = onlyUnread
         menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)
-        if (onlyUnread) {
-            menuItem.setIcon(R.drawable.ic_action_visibility_off)
-        } else {
-            menuItem.setIcon(R.drawable.ic_action_visibility)
-        }
+
+        menuItem.setIcon(
+                when (onlyUnread) {
+                    true -> R.drawable.ic_action_visibility_off
+                    false -> R.drawable.ic_action_visibility
+                }
+        )
 
         // Don't forget super call here
         super.onCreateOptionsMenu(menu, inflater)
@@ -422,59 +420,64 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
 
     override fun onOptionsItemSelected(menuItem: MenuItem?): Boolean {
         val id = menuItem!!.itemId.toLong()
-        if (id == R.id.action_sync.toLong()) {
-            // Sync all feeds when menu button pressed
-            activity!!.contentResolver.requestFeedSync()
-            return true
-        } else if (id == R.id.action_edit_feed.toLong() && this.id > 0) {
-            val i = Intent(activity, EditFeedActivity::class.java)
-            // TODO do not animate the back movement here
-            i.putExtra(SHOULD_FINISH_BACK, true)
-            i.putExtra(COL_ID, this.id)
-            i.putExtra(COL_CUSTOM_TITLE, customTitle)
-            i.putExtra(COL_TITLE, title)
-            i.putExtra(COL_TAG, feedTag)
-            i.data = Uri.parse(url)
-            startActivity(i)
-            return true
-        } else if (id == R.id.action_add_templated.toLong() && this.id > 0) {
-            val i = Intent(activity, EditFeedActivity::class.java)
-            // TODO do not animate the back movement here
-            i.putExtra(SHOULD_FINISH_BACK, true)
-            i.putExtra(TEMPLATE, true)
-            i.putExtra(COL_TAG, feedTag)
-            i.data = Uri.parse(url)
-            startActivity(i)
-            return true
-        } else if (id == R.id.action_delete_feed.toLong() && this.id > 0) {
-            activity!!.contentResolver
-                    .delete(URI_FEEDS, Util.WHEREIDIS,
-                            Util.LongsToStringArray(this.id))
-            activity!!.contentResolver.notifyAllUris()
-
-            // Remove from shortcuts
-            activity?.removeDynamicShortcutToFeed(this.id)
-
-            // Tell activity to open another fragment
-            (activity as FeedActivity).showAllFeeds(true)
-            return true
-        } else if (id == R.id.action_only_unread.toLong()) {
-            val onlyUnread = !menuItem.isChecked
-            PrefUtils.setPrefShowOnlyUnread(activity!!, onlyUnread)
-            menuItem.isChecked = onlyUnread
-            if (onlyUnread) {
-                menuItem.setIcon(R.drawable.ic_action_visibility_off)
-            } else {
-                menuItem.setIcon(R.drawable.ic_action_visibility)
+        return when {
+            id == R.id.action_sync.toLong() -> {
+                // Sync all feeds when menu button pressed
+                activity!!.contentResolver.requestFeedSync()
+                true
             }
+            id == R.id.action_edit_feed.toLong() && this.id > 0 -> {
+                val i = Intent(activity, EditFeedActivity::class.java)
+                // TODO do not animate the back movement here
+                i.putExtra(SHOULD_FINISH_BACK, true)
+                i.putExtra(COL_ID, this.id)
+                i.putExtra(COL_CUSTOM_TITLE, customTitle)
+                i.putExtra(COL_TITLE, title)
+                i.putExtra(COL_TAG, feedTag)
+                i.data = Uri.parse(url)
+                startActivity(i)
+                true
+            }
+            id == R.id.action_add_templated.toLong() && this.id > 0 -> {
+                val i = Intent(activity, EditFeedActivity::class.java)
+                // TODO do not animate the back movement here
+                i.putExtra(SHOULD_FINISH_BACK, true)
+                i.putExtra(TEMPLATE, true)
+                i.putExtra(COL_TAG, feedTag)
+                i.data = Uri.parse(url)
+                startActivity(i)
+                true
+            }
+            id == R.id.action_delete_feed.toLong() && this.id > 0 -> {
+                activity!!.contentResolver
+                        .delete(URI_FEEDS, Util.WHEREIDIS,
+                                Util.LongsToStringArray(this.id))
+                activity!!.contentResolver.notifyAllUris()
 
-            menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)
-            //getActivity().invalidateOptionsMenu();
-            // Restart loader
-            loaderManager.restartLoader(FEEDITEMS_LOADER, Bundle(), this)
-            return true
-        } else {
-            return super.onOptionsItemSelected(menuItem)
+                // Remove from shortcuts
+                activity?.removeDynamicShortcutToFeed(this.id)
+
+                // Tell activity to open another fragment
+                (activity as FeedActivity).showAllFeeds(true)
+                true
+            }
+            id == R.id.action_only_unread.toLong() -> {
+                val onlyUnread = !menuItem.isChecked
+                PrefUtils.setPrefShowOnlyUnread(activity!!, onlyUnread)
+                menuItem.isChecked = onlyUnread
+                if (onlyUnread) {
+                    menuItem.setIcon(R.drawable.ic_action_visibility_off)
+                } else {
+                    menuItem.setIcon(R.drawable.ic_action_visibility)
+                }
+
+                menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)
+                //getActivity().invalidateOptionsMenu();
+                // Restart loader
+                loaderManager.restartLoader(FEEDITEMS_LOADER, Bundle(), this)
+                true
+            }
+            else -> super.onOptionsItemSelected(menuItem)
         }
     }
 
@@ -535,13 +538,17 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                         (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
                         notifyCheck!!.isChecked = this.notify == 1
 
-                        // Title has been fetched, so add shortcut
-                        activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
-                        // Report shortcut usage
-                        activity?.reportShortcutToFeedUsed(feed.id)
+                        // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
+                        // extra statistics on opening the feed.
+                        if (firstFeedLoad) {
+                            // Title has been fetched, so add shortcut
+                            activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
+                            // Report shortcut usage
+                            activity?.reportShortcutToFeedUsed(feed.id)
+                        }
+                        firstFeedLoad = false
                     }
-                    // Reset loader
-                    loaderManager.destroyLoader(cursorLoader.id)
+                    // Don't destroy feed loader since we want to load user edits
                 }
                 FEED_SETTINGS_LOADER == cursorLoader.id -> {
                     val cursor = result as Cursor
