@@ -55,16 +55,12 @@ import java.net.URL
 import java.util.*
 
 const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
-const val _ID = "_id"
-const val CUSTOM_TITLE = "custom_title"
-const val FEED_TITLE = "feed_title"
 const val TEMPLATE = "template"
 private const val LOADER_TAG_SUGGESTIONS = 1
 private const val TAGSFILTER = "TAGSFILTER"
 
 
 class EditFeedActivity : Activity() {
-    private val TAG = "tag"
 
     private var shouldFinishBack = false
     private var id: Long = -1
@@ -233,7 +229,7 @@ class EditFeedActivity : Activity() {
         if (i != null) {
             shouldFinishBack = i.getBooleanExtra(SHOULD_FINISH_BACK, false)
             // Existing id
-            id = i.getLongExtra(_ID, -1)
+            id = i.getLongExtra(COL_ID, -1)
             // Edit like existing, but it's really new
             val template = i.getBooleanExtra(TEMPLATE, false)
 
@@ -268,20 +264,21 @@ class EditFeedActivity : Activity() {
             }
             // URL
             textUrl.setText(feedUrl)
+
             // Title
-            if (i.hasExtra(FEED_TITLE)) {
-                feedTitle = i.getStringExtra(FEED_TITLE)
+            i.getStringExtra(COL_TITLE)?.let {
+                feedTitle = it
             }
-            if (i.hasExtra(CUSTOM_TITLE) && !i.getStringExtra(CUSTOM_TITLE).isEmpty()) {
-                textTitle.setText(i.getStringExtra(CUSTOM_TITLE))
+            if (i.hasExtra(COL_CUSTOM_TITLE) && !i.getStringExtra(COL_CUSTOM_TITLE).isBlank()) {
+                textTitle.setText(i.getStringExtra(COL_CUSTOM_TITLE))
             } else {
                 textTitle.setText(feedTitle)
             }
 
             // Tag
-            if (i.hasExtra(TAG)) {
+            i.getStringExtra(COL_TAG)?.let {
                 // Use append instead of setText to make sure cursor is at end
-                textTag.append(i.getStringExtra(TAG))
+                textTag.append(it)
             }
         }
 
