@@ -245,10 +245,14 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Any?>? = when (id) {
-        ITEM_LOADER -> CursorLoader(context!!, URI_FEEDITEMS,
-                FEED_ITEM_FIELDS,
-                COL_ID + " IS ?",
-                arrayOf(java.lang.Long.toString(rssItem!!.id)), null) as Loader<Any?>
+        ITEM_LOADER -> {
+            val cl = CursorLoader(context!!, URI_FEEDITEMS,
+                    FEED_ITEM_FIELDS,
+                    COL_ID + " IS ?",
+                    arrayOf(java.lang.Long.toString(rssItem!!.id)), null)
+            cl.setUpdateThrottle(500)
+            cl as Loader<Any?>
+        }
         TEXT_LOADER -> {
             val size = Point()
             activity!!.windowManager.defaultDisplay.getSize(size)

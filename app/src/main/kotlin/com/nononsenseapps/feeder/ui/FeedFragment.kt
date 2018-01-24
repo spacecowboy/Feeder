@@ -26,6 +26,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.LoaderManager
+import android.support.v4.content.AsyncTaskLoader
 import android.support.v4.content.CursorLoader
 import android.support.v4.content.Loader
 import android.support.v4.content.LocalBroadcastManager
@@ -475,39 +476,46 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         }
     }
 
-    override fun onCreateLoader(ID: Int, args: Bundle?): Loader<Any>? = when (ID) {
-        FEEDITEMS_LOADER -> FeedItemDeltaCursorLoader(activity!!,
-                URI_FEEDITEMS.buildUpon()
-                        .appendQueryParameter(QUERY_PARAM_LIMIT, "50").build(),
-                FEED_ITEM_FIELDS_FOR_LIST,
-                loaderSelection,
-                loaderSelectionArgs,
-                COL_PUBDATE + " DESC") as Loader<Any>
-        FEED_LOADER -> CursorLoader(activity!!,
-                Uri.withAppendedPath(URI_FEEDS, "${this.id}"),
-                FEED_FIELDS, null, null, null) as Loader<Any>
-        FEED_SETTINGS_LOADER -> {
-            val where: String?
-            val whereArgs: Array<String>?
-            when {
-                this.id > 0 -> {
-                    where = Util.WHEREIDIS
-                    whereArgs = Util.LongsToStringArray(this.id)
-                }
-                feedTag != null -> {
-                    where = COL_TAG + " IS ?"
-                    whereArgs = Util.ToStringArray(feedTag)
-                }
-                else -> {
-                    where = null
-                    whereArgs = null
-                }
+    override fun onCreateLoader(ID: Int, args: Bundle?): Loader<Any>? {
+        val loader: AsyncTaskLoader<Any>? = when (ID) {
+            FEEDITEMS_LOADER -> FeedItemDeltaCursorLoader(activity!!,
+                    URI_FEEDITEMS.buildUpon()
+                            .appendQueryParameter(QUERY_PARAM_LIMIT, "50").build(),
+                    FEED_ITEM_FIELDS_FOR_LIST,
+                    loaderSelection,
+                    loaderSelectionArgs,
+                    COL_PUBDATE + " DESC") as AsyncTaskLoader<Any>
+            FEED_LOADER -> {
+                CursorLoader(activity!!,
+                        Uri.withAppendedPath(URI_FEEDS, "${this.id}"),
+                        FEED_FIELDS, null, null, null) as AsyncTaskLoader<Any>
             }
-            CursorLoader(activity!!, URI_FEEDS,
-                    Util.ToStringArray("DISTINCT " + COL_NOTIFY),
-                    where, whereArgs, null) as Loader<Any>
+            FEED_SETTINGS_LOADER -> {
+                val where: String?
+                val whereArgs: Array<String>?
+                when {
+                    this.id > 0 -> {
+                        where = Util.WHEREIDIS
+                        whereArgs = Util.LongsToStringArray(this.id)
+                    }
+                    feedTag != null -> {
+                        where = COL_TAG + " IS ?"
+                        whereArgs = Util.ToStringArray(feedTag)
+                    }
+                    else -> {
+                        where = null
+                        whereArgs = null
+                    }
+                }
+                CursorLoader(activity!!, URI_FEEDS,
+                        Util.ToStringArray("DISTINCT " + COL_NOTIFY),
+                        where, whereArgs, null) as AsyncTaskLoader<Any>
+            }
+            else -> null
         }
-        else -> null
+
+        loader?.setUpdateThrottle(2000)
+        return loader
     }
 
     override fun onLoadFinished(cursorLoader: Loader<Any?>?, result: Any?) {

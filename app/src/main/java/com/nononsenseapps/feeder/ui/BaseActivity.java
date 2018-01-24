@@ -565,7 +565,9 @@ public class BaseActivity extends AppCompatActivity
 
     @Override
     public Loader onCreateLoader(final int id, final Bundle bundle) {
-        return new FeedAsyncTaskLoader(this);
+        FeedAsyncTaskLoader loader = new FeedAsyncTaskLoader(this);
+        loader.setUpdateThrottle(2000);
+        return loader;
     }
 
     @Override
