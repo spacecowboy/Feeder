@@ -377,12 +377,6 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         super.onPause()
     }
 
-    override fun onStop() {
-        loaderManager.destroyLoader(FEED_LOADER)
-        loaderManager.destroyLoader(FEEDITEMS_LOADER)
-        super.onStop()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater!!.inflate(R.menu.feed_fragment, menu)
 
@@ -559,9 +553,6 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                         this.notify = 0
                     }
                     notifyCheck!!.isChecked = this.notify == 1
-
-                    // Reset loader
-                    loaderManager.destroyLoader(cursorLoader.id)
                 }
             }
         }
