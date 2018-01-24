@@ -296,11 +296,13 @@ class EditFeedActivity : Activity() {
                     filter = COL_TAG + " LIKE '" + args
                             .getCharSequence(TAGSFILTER, "") + "%'"
                 }
-                return CursorLoader(this@EditFeedActivity,
+                val cl = CursorLoader(this@EditFeedActivity,
                         URI_TAGSWITHCOUNTS,
                         Util.ToStringArray(COL_ID,
                                 COL_TAG), filter, null,
                         Util.SortAlphabeticNoCase(COL_TAG))
+                cl.setUpdateThrottle(500)
+                return cl
             }
 
             override fun onLoadFinished(loader: Loader<Cursor>,
