@@ -250,7 +250,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     FEED_ITEM_FIELDS,
                     COL_ID + " IS ?",
                     arrayOf(java.lang.Long.toString(rssItem!!.id)), null)
-            cl.setUpdateThrottle(500)
+            cl.setUpdateThrottle(100)
             cl as Loader<Any?>
         }
         TEXT_LOADER -> {

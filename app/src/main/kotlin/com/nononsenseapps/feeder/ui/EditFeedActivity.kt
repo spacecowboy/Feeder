@@ -301,7 +301,7 @@ class EditFeedActivity : Activity() {
                         Util.ToStringArray(COL_ID,
                                 COL_TAG), filter, null,
                         Util.SortAlphabeticNoCase(COL_TAG))
-                cl.setUpdateThrottle(500)
+                cl.setUpdateThrottle(200)
                 return cl
             }
 
