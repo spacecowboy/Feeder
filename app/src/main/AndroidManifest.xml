@@ -45,7 +45,7 @@
         android:label="@string/app_name"
         android:parentActivityName=".ui.FeedActivity"
         android:theme="@style/AppTheme">
-      >
+
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
           android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
@@ -55,7 +55,7 @@
         android:label="@string/app_name"
         android:parentActivityName=".ui.FeedActivity"
         android:theme="@style/ReaderTheme">
-      >
+
       <meta-data
           android:name="android.support.PARENT_ACTIVITY"
           android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
