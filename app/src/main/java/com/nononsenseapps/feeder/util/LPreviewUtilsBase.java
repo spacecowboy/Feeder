@@ -70,7 +70,7 @@ public class LPreviewUtilsBase {
                 drawerListener.onDrawerSlide(drawerView, slideOffset);
             }
         };
-        drawerLayout.setDrawerListener(mDrawerToggle);
+        drawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggleWrapper = new ActionBarDrawerToggleWrapper();
         return mDrawerToggleWrapper;
     }

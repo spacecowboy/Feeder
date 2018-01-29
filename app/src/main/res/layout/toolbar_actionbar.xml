@@ -1,8 +1,6 @@
-
 <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/toolbar_actionbar"
-    android:background="?attr/colorPrimary"
-    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    android:layout_width="match_parent"
-    android:layout_height="?actionBarSize" />
+  android:id="@+id/toolbar_actionbar"
+  android:background="?attr/colorPrimary"
+  android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+  android:layout_width="match_parent"
+  android:layout_height="?actionBarSize" />
