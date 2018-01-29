@@ -114,7 +114,7 @@ public class RssSyncAdapter extends AbstractThreadedSyncAdapter {
             // Broadcast start of sync
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast(bcast);
 
-            RssLocalSync.INSTANCE.syncFeeds(getContext(), extras.getLong(COL_ID, -1), extras.getString(COL_TAG, ""));
+            RssLocalSyncKt.syncFeeds(getContext(), extras.getLong(COL_ID, -1), extras.getString(COL_TAG, ""));
         } else {
             // Delay at least 10 minutes
             syncResult.delayUntil = 60L * 10L;

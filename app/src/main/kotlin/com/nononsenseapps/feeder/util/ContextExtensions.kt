@@ -13,12 +13,17 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.app.NotificationManagerCompat
 import android.util.Log
+import android.widget.Toast
 import com.nononsenseapps.feeder.db.AUTHORITY
 import com.nononsenseapps.feeder.db.AccountService
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.ui.ARG_FEED_TITLE
 import com.nononsenseapps.feeder.ui.FeedActivity
+
+fun Context.makeToast(text: String) {
+    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+}
 
 fun Context.setupSync() {
     val account = AccountService.Account()

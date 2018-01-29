@@ -143,7 +143,7 @@ object FeedParser {
 
     @Throws(FeedParser.FeedParsingError::class)
     fun parseFeedUrl(url: URL): Feed {
-        Log.d("RxFeedParser", "parseFeed: $url")
+        Log.d("FeedParser", "parseFeed: $url")
         try {
 
             var result: Feed? = null
@@ -160,13 +160,13 @@ object FeedParser {
 
     @Throws(FeedParser.FeedParsingError::class)
     fun parseFeedResponse(response: Response): Feed {
-        Log.d("RxFeedParser", "parseFeedResponse: ${response.request().url()}")
+        Log.d("FeedParser", "parseFeedResponse: ${response.request().url()}")
         try {
 
             var result: Feed? = null
             response.use {
-                Log.d("RxRSSLOCAL", "cache response: " + it.cacheResponse())
-                Log.d("RxRSSLOCAL", "network response: " + it.networkResponse())
+                Log.d("FeedParser", "cache response: " + it.cacheResponse())
+                Log.d("FeedParser", "network response: " + it.networkResponse())
 
                 val isJSON = (it.header("content-type") ?: "").contains("json")
                 // Pass straight bytes from response to parser to properly handle encoding
