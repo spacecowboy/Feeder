@@ -78,31 +78,32 @@ class GlideConverter(context: Context,
                         attributes.getValue("", "width"),
                         attributes.getValue("", "height"))
 
-        if (video.src.toLowerCase().contains("youtube")) {
+        if ((video.src ?: "").toLowerCase().contains("youtube")) {
             try {
-                val span = object : ClickableImageSpan(getYoutubeThumb(video)) {
-                    override fun onClick() {
-                        val i = Intent(Intent.ACTION_VIEW, Uri
-                                .parse(video.link))
-                        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(i)
+                video.imageurl?.let { imageUrl ->
+                    val span = object : ClickableImageSpan(getYoutubeThumb(imageUrl)) {
+                        override fun onClick() {
+                            val i = Intent(Intent.ACTION_VIEW, Uri
+                                    .parse(video.link))
+                            i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(i)
+                        }
                     }
+                    val len = text.length
+                    text.append("\uFFFC")
+                    text.setSpan(span, len, text.length,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    // Add newline also
+                    text.append("\n")
+                    val from = text.length
+                    text.append("Touch to play video")
+                    text.setSpan(StyleSpan(Typeface.ITALIC), from,
+                            text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    text.append("\n\n")
                 }
-                val len = text.length
-                text.append("\uFFFC")
-                text.setSpan(span, len, text.length,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                // Add newline also
-                text.append("\n")
-                val from = text.length
-                text.append("Touch to play video")
-                text.setSpan(StyleSpan(Typeface.ITALIC), from,
-                        text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                text.append("\n\n")
             } catch (e: NullPointerException) {
                 // Error is already logged..
             }
-
         }
     }
 
@@ -206,13 +207,13 @@ class GlideConverter(context: Context,
     /**
      * @return a Drawable with a youtube logo in the center
      */
-    private fun getYoutubeThumb(video: VideoTagHunter.Video): Drawable {
+    private fun getYoutubeThumb(imageurl: String): Drawable {
         val layers = arrayOfNulls<Drawable>(2)
 
         val w1: Int
         val h1: Int
         try {
-            val imgLink = relativeLinkIntoAbsolute(siteUrl, video.imageurl)
+            val imgLink = relativeLinkIntoAbsolute(siteUrl, imageurl)
             val b = GlideUtils.glideAsBitmap(context, imgLink, allowDownload)
                     .fitCenter().into(maxSize.x, maxSize.y).get()
             //final Point newSize = scaleImage(b.getWidth(), b.getHeight());

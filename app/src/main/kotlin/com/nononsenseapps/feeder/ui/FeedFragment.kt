@@ -477,6 +477,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
     }
 
     override fun onCreateLoader(ID: Int, args: Bundle?): Loader<Any>? {
+        @Suppress("UNCHECKED_CAST")
         val loader: AsyncTaskLoader<Any>? = when (ID) {
             FEEDITEMS_LOADER -> FeedItemDeltaCursorLoader(activity!!,
                     URI_FEEDITEMS.buildUpon()
