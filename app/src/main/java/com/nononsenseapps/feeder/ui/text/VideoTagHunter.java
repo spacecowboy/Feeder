@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.text;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.regex.Matcher;
@@ -35,11 +36,16 @@ public class VideoTagHunter {
     }
 
     public static class Video {
+        @Nullable
         public String src = null;
+        @Nullable
         public String width = null;
+        @Nullable
         public String height = null;
+        @Nullable
         public String imageurl = null;
         // Youtube needs a different link than embed links
+        @Nullable
         public String link = null;
 
         public int getIntWidth() {
