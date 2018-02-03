@@ -1,3 +1,17 @@
+# 1.4.3
+*   Fixed crash for missing video urls  
+    See !84 #90
+*   Improved UI responsiveness but throttling database loaders
+    See !81
+*   Fixed existing tag not being shown in edit feed dialog  
+    See !80 #82
+*   Improved rendering of <pre> tags  
+    See !77
+*   Added newline between table columns  
+    See !77
+*   Handle ENTER press in add feed dialog  
+    See !77
+
 # 1.4.2
 *   Stopped rendering script tags
     See !75 #85
