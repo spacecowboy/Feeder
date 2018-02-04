@@ -45,6 +45,7 @@ cache:
   stage: build
   script:
     - ./gradlew assemble -PdisablePreDex
+    - ./gradlew assembleAndroidTest -PdisablePreDex
   artifacts:
     paths:
     - app/build/outputs/
