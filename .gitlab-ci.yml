@@ -44,7 +44,7 @@ cache:
   <<: *before_docker
   stage: build
   script:
-    - ./gradlew assemble
+    - ./gradlew assemble -PdisablePreDex
   artifacts:
     paths:
     - app/build/outputs/
@@ -54,7 +54,7 @@ cache:
   <<: *before_docker
   stage: build
   script:
-    - ./gradlew check
+    - ./gradlew check -PdisablePreDex
   artifacts:
 
 .emulator_test: &emulator_def
