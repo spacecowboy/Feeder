@@ -66,6 +66,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
     protected var ignoreCount = 0
     var respectFormatting: Int = 0
     protected var mReader: XMLReader
+    protected var ignoredImage = false
 
     private val ignoredTags = listOf("style", "script")
 
@@ -222,6 +223,35 @@ open class HtmlToSpannedConverter(protected var mSource: String,
     protected open fun startImg(text: SensibleSpannableStringBuilder,
                                 attributes: Attributes) {
         // Override me
+        val width: String? = attributes.getValue("", "width")
+        val height: String? = attributes.getValue("", "height")
+
+        var shouldIgnore = false
+
+        if (width != null) {
+            try {
+                if (width.toInt() < 2) {
+                    shouldIgnore = true
+                }
+            } catch (_: NumberFormatException) {
+                shouldIgnore = true
+            }
+        }
+        if (height != null) {
+            try {
+                if (height.toInt() < 2) {
+                    shouldIgnore = true
+                }
+            } catch (_: NumberFormatException) {
+                shouldIgnore = true
+            }
+        }
+
+        if (shouldIgnore) {
+            ignoredImage = true
+            return
+        }
+
         var src: String? = attributes.getValue("", "src")
         val d = mContext.resources.getDrawable(R.drawable.unknown_image)
         d.setBounds(0, 0, d.intrinsicWidth, d.intrinsicHeight)
@@ -504,6 +534,10 @@ open class HtmlToSpannedConverter(protected var mSource: String,
     }
 
     protected fun endImg(text: SensibleSpannableStringBuilder) {
+        if (ignoredImage) {
+            ignoredImage = false
+            return
+        }
         ensureDoubleNewline(text)
     }
 

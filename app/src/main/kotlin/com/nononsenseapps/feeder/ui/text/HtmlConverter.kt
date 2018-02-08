@@ -22,7 +22,8 @@ fun toSpannedWithImages(context: Context,
                         source: String,
                         siteUrl: URL,
                         maxSize: Point,
-                        allowDownload: Boolean): Spanned {
+                        allowDownload: Boolean,
+                        spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()): Spanned {
     val parser = Parser()
     try {
         parser.setProperty(Parser.schemaProperty, schema)
@@ -33,7 +34,7 @@ fun toSpannedWithImages(context: Context,
         throw RuntimeException(e)
     }
 
-    val converter = GlideConverter(context, source, siteUrl, parser, maxSize, allowDownload)
+    val converter = GlideConverter(context, source, siteUrl, parser, maxSize, allowDownload, spannableStringBuilder)
     return converter.convert()
 }
 
@@ -49,7 +50,7 @@ fun toSpannedWithImages(context: Context,
  * This uses TagSoup to handle real HTML, including all of the brokenness
  * found in the wild.
  */
-fun toSpannedWithNoImages(source: String, siteUrl: URL, context: Context,
+fun toSpannedWithNoImages(context: Context, source: String, siteUrl: URL,
                           spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()): Spanned {
     val parser = Parser()
     try {

@@ -26,8 +26,9 @@ class GlideConverter(context: Context,
                      private val siteUrl: URL,
                      parser: Parser,
                      private val maxSize: Point,
-                     private val allowDownload: Boolean) :
-        HtmlToSpannedConverter(source, siteUrl, parser, context) {
+                     private val allowDownload: Boolean,
+                     spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()) :
+        HtmlToSpannedConverter(source, siteUrl, parser, context, spannableStringBuilder) {
 
     private val context: Context = context.applicationContext
 
@@ -40,6 +41,35 @@ class GlideConverter(context: Context,
 
     override fun startImg(text: SensibleSpannableStringBuilder,
                           attributes: Attributes) {
+        val width: String? = attributes.getValue("", "width")
+        val height: String? = attributes.getValue("", "height")
+
+        var shouldIgnore = false
+
+        if (width != null) {
+            try {
+                if (width.toInt() < 2) {
+                    shouldIgnore = true
+                }
+            } catch (_: NumberFormatException) {
+                shouldIgnore = true
+            }
+        }
+        if (height != null) {
+            try {
+                if (height.toInt() < 2) {
+                    shouldIgnore = true
+                }
+            } catch (_: NumberFormatException) {
+                shouldIgnore = true
+            }
+        }
+
+        if (shouldIgnore) {
+            super.startImg(text, attributes)
+            return
+        }
+
         // Get drawable
         val d = getImgDrawable(attributes)
         if (d == null) {

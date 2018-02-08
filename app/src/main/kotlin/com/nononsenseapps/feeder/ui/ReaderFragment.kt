@@ -148,14 +148,14 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
         if (rssItem!!.title.isEmpty()) {
             titleTextView!!.text = rssItem!!.plaintitle
         } else {
-            titleTextView!!.text = toSpannedWithNoImages(rssItem!!.title, rssItem!!.feedUrl, activity!!)
+            titleTextView!!.text = toSpannedWithNoImages(activity!!, rssItem!!.title, rssItem!!.feedUrl)
         }
     }
 
     private fun setViewBody() {
         if (!rssItem!!.description.isEmpty()) {
             // Set without images as a place holder
-            bodyTextView!!.text = toSpannedWithNoImages(rssItem!!.description, rssItem!!.feedUrl, activity!!)
+            bodyTextView!!.text = toSpannedWithNoImages(activity!!, rssItem!!.description, rssItem!!.feedUrl)
 
             // Load images in text
             loaderManager.restartLoader(TEXT_LOADER, Bundle(), this)

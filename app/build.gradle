@@ -104,7 +104,8 @@ dependencies {
   testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
   testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
   testImplementation 'junit:junit:4.12'
-  testImplementation 'org.mockito:mockito-core:2.7.11'
+  testImplementation 'org.mockito:mockito-core:2.13.0'
+  testImplementation 'io.mockk:mockk:1.7.2'
 
   androidTestImplementation 'com.android.support:recyclerview-v7:27.0.2'
   androidTestImplementation 'com.android.support:support-v4:27.0.2'

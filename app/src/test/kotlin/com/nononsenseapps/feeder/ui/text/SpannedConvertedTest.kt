@@ -2,25 +2,57 @@ package com.nononsenseapps.feeder.ui.text
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Point
+import android.text.style.ImageSpan
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
 import java.net.URL
 import java.util.*
 
 class SpannedConverterTest {
 
-    private val mockContext: Context = mock(Context::class.java)
-    private val mockResources: Resources = mock(Resources::class.java)
+    private val mockResources: Resources = mockk(relaxed = true)
+    private val mockContext: Context = mockk(relaxed = true)
 
     @Before
     fun setup() {
-        `when`(mockResources.getColor(ArgumentMatchers.anyInt())).thenReturn(0)
-        `when`(mockResources.getDimension(ArgumentMatchers.anyInt())).thenReturn(10.0f)
-        `when`(mockContext.resources).thenReturn(mockResources)
+        every { mockResources.getColor(any()) } returns 0
+        every { mockResources.getColor(any(), any()) } returns 0
+        every { mockContext.resources } returns mockResources
+        every { mockContext.applicationContext } returns mockContext
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testOnePixelImagesAreNotRenderedWithBase() {
+        val builder = FakeBuilder()
+        toSpannedWithNoImages(
+                mockContext,
+                "<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">",
+                URL("http://foo.com"),
+                builder
+        )
+
+        assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<ImageSpan>())
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testOnePixelImagesAreNotRenderedWithGlide() {
+        val builder = FakeBuilder()
+        toSpannedWithImages(
+                mockContext,
+                "<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">",
+                URL("http://foo.com"),
+                Point(100, 100),
+                true,
+                builder
+        )
+
+        assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<ImageSpan>())
     }
 
     @Test
@@ -28,9 +60,9 @@ class SpannedConverterTest {
     fun testNotRenderScriptTag() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
+                mockContext,
                 "<p>foo</p><script>script</script><p>bar</p>",
                 URL("http://foo.bar"),
-                mockContext,
                 builder
         )
 
@@ -42,9 +74,9 @@ class SpannedConverterTest {
     fun testNotRenderStyleTag() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
+                mockContext,
                 "<p>foo</p><style>style</style><p>bar</p>",
                 URL("http://foo.bar"),
-                mockContext,
                 builder
         )
 
@@ -56,6 +88,7 @@ class SpannedConverterTest {
     fun tableColumnsSeparatedNewLinesTest() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
+                mockContext,
                 """
                     <table>
                     <tr>
@@ -69,7 +102,6 @@ class SpannedConverterTest {
                     </table>
                     """,
                 URL("http://foo.bar"),
-                mockContext,
                 builder
         )
 
@@ -88,11 +120,11 @@ class SpannedConverterTest {
             |me
             """.trimMargin()
         toSpannedWithNoImages(
+                mockContext,
                 """
                     <pre>$text</pre>
                     """,
                 URL("http://foo.bar"),
-                mockContext,
                 builder
         )
 
