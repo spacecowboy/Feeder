@@ -22,6 +22,7 @@ import com.nononsenseapps.feeder.util.notificationManager
 
 
 const val notificationId = 73583
+const val channelId = "feederNotifications"
 
 fun notify(context: Context) {
     val feedItems = getItemsToNotify(context)
@@ -104,7 +105,7 @@ private fun manyNotification(context: Context, feedItems: List<FeedItemSQL>): No
 private fun notificationBuilder(context: Context): NotificationCompat.Builder {
     val bm = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
 
-    return NotificationCompat.Builder(context)
+    return NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_stat_f)
             .setLargeIcon(bm)
             .setAutoCancel(true)

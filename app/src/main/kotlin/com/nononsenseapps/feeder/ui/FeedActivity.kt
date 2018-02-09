@@ -39,16 +39,15 @@ import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import java.io.File
 import java.util.*
 
-const private val EXPORT_OPML_CODE = 101
-const private val IMPORT_OPML_CODE = 102
-const private val EDIT_FEED_CODE = 103
+private const val EXPORT_OPML_CODE = 101
+private const val IMPORT_OPML_CODE = 102
+private const val EDIT_FEED_CODE = 103
 
 class FeedActivity : BaseActivity() {
     private val fragmentTag = "single_pane"
-    private val defaultLoaderId = 2523
 
     private var fragment: Fragment? = null
-    lateinit private var emptyView: View
+    private lateinit var emptyView: View
 
     private val syncReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -86,6 +85,7 @@ class FeedActivity : BaseActivity() {
         emptyView.visibility = if (fragment == null) View.VISIBLE else View.GONE
 
         val emptyAddFeed = findViewById<TextView>(R.id.empty_add_feed)
+        @Suppress("DEPRECATION")
         emptyAddFeed.text = fromHtml(getString(R.string.empty_no_feeds_add))
         emptyAddFeed.setOnClickListener {
             startActivityForResult(Intent(this@FeedActivity, EditFeedActivity::class.java), EDIT_FEED_CODE)

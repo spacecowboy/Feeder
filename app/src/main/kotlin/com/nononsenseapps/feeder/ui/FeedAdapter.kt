@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.Context
 import android.graphics.Point
-import android.graphics.drawable.Drawable
 import android.support.v4.util.ArrayMap
 import android.support.v7.util.SortedList
 import android.support.v7.widget.RecyclerView
@@ -31,12 +30,8 @@ class FeedAdapter(context: Context,
 
     private val isGrid: Boolean = TabletUtils.isTablet(context)
 
-    private val unreadTextColor: Int = context.resources
-            .getColor(R.color.white_87)
-    private val readTextColor: Int = context.resources
-            .getColor(R.color.secondary_text_material_dark)
+    @Suppress("DEPRECATION")
     private val linkColor: Int = context.resources.getColor(R.color.accent)
-    private val bgProtection: Drawable = context.resources.getDrawable(R.drawable.bg_protect)
     private var itemMap: ArrayMap<Long, FeedItemSQL> = ArrayMap()
 
     var temps: String = ""
@@ -122,7 +117,7 @@ class FeedAdapter(context: Context,
                 // Sorted list handles inserting of existing elements
                 items.add(item)
                 // Add to new map as well
-                itemMap.put(item.id, item)
+                itemMap[item.id] = item
                 // And remove from old
                 oldItemMap.remove(item.id)
             } else {

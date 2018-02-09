@@ -1,20 +1,3 @@
-/*
- * Copyright (c) 2015 Jonas Kalderstam.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.nononsenseapps.feeder.ui;
 
 import android.animation.ArgbEvaluator;
@@ -28,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -43,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+
 import com.nononsenseapps.feeder.R;
 import com.nononsenseapps.feeder.model.RssNotificationsKt;
 import com.nononsenseapps.feeder.util.ContextExtensionsKt;
@@ -68,12 +53,6 @@ public class BaseActivity extends AppCompatActivity
     public static final int HEADER_HIDE_ANIM_DURATION = 300;
     // Special Navdrawer items
     protected static final int NAVDRAWER_ITEM_INVALID = -1;
-    // delay to launch nav drawer item, to allow close animation to play
-    private static final int NAVDRAWER_LAUNCH_DELAY = 250;
-    // fade in and fade out durations for the main content when switching between
-    // different Activities of the app through the Nav Drawer
-    private static final int MAIN_CONTENT_FADEOUT_DURATION = 150;
-    private static final int MAIN_CONTENT_FADEIN_DURATION = 250;
     private static final TypeEvaluator ARGB_EVALUATOR = new ArgbEvaluator();
     // Positive numbers reserved for children
     private static final int NAV_TAGS_LOADER = -2;
@@ -86,8 +65,8 @@ public class BaseActivity extends AppCompatActivity
     // When set, these components will be shown/hidden in sync with the action bar
     // to implement the "quick recall" effect (the Action Bar and the header views disappear
     // when you scroll down a list, and reappear quickly when you scroll up).
-    private ArrayList<View> mHideableHeaderViews = new ArrayList<View>();
-    private ArrayList<View> mHideableFooterViews = new ArrayList<View>();
+    private final ArrayList<View> mHideableHeaderViews = new ArrayList<>();
+    private final ArrayList<View> mHideableFooterViews = new ArrayList<>();
     // variables that control the Action Bar auto hide behavior (aka "quick recall")
     private boolean mActionBarAutoHideEnabled = false;
     private int mActionBarAutoHideSensivity = 0;
@@ -123,26 +102,6 @@ public class BaseActivity extends AppCompatActivity
 
         return arguments;
     }
-
-    /**
-     * Converts a fragment arguments bundle into an intent.
-     */
-    public static Intent fragmentArgumentsToIntent(Bundle arguments) {
-        Intent intent = new Intent();
-        if (arguments == null) {
-            return intent;
-        }
-
-        final Uri data = arguments.getParcelable("_uri");
-        if (data != null) {
-            intent.setData(data);
-        }
-
-        intent.putExtras(arguments);
-        intent.removeExtra("_uri");
-        return intent;
-    }
-
 
     @Nullable
     public DrawerLayout getDrawerLayout() {
@@ -199,7 +158,7 @@ public class BaseActivity extends AppCompatActivity
 
     protected Toolbar initializeActionBar() {
         if (mActionBarToolbar == null) {
-            mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+            mActionBarToolbar = findViewById(R.id.toolbar_actionbar);
             if (mActionBarToolbar != null) {
                 setSupportActionBar(mActionBarToolbar);
             }
@@ -262,7 +221,7 @@ public class BaseActivity extends AppCompatActivity
         // What nav drawer item should be selected?
         int selfItem = getSelfNavDrawerItem();
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         if (mDrawerLayout == null) {
             return;
         }
@@ -280,7 +239,7 @@ public class BaseActivity extends AppCompatActivity
         mDrawerToggle = mLPreviewUtils.setupDrawerToggle(mDrawerLayout,
                 new DrawerLayout.DrawerListener() {
                     @Override
-                    public void onDrawerClosed(View drawerView) {
+                    public void onDrawerClosed(@NonNull View drawerView) {
                         // run deferred action, if we have one
                         if (mDeferredOnDrawerClosedRunnable != null) {
                             mDeferredOnDrawerClosedRunnable.run();
@@ -288,25 +247,25 @@ public class BaseActivity extends AppCompatActivity
                         }
                         invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
                         updateStatusBarForNavDrawerSlide(0f);
-                        onNavDrawerStateChanged(false, false);
+                        onNavDrawerStateChanged(false);
                     }
 
                     @Override
-                    public void onDrawerOpened(View drawerView) {
+                    public void onDrawerOpened(@NonNull View drawerView) {
                         invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
                         updateStatusBarForNavDrawerSlide(1f);
-                        onNavDrawerStateChanged(true, false);
+                        onNavDrawerStateChanged(true);
                     }
 
                     @Override
                     public void onDrawerStateChanged(int newState) {
                         invalidateOptionsMenu();
-                        onNavDrawerStateChanged(isNavDrawerOpen(),
-                                newState != DrawerLayout.STATE_IDLE);
+                        onNavDrawerStateChanged(isNavDrawerOpen()
+                        );
                     }
 
                     @Override
-                    public void onDrawerSlide(View drawerView,
+                    public void onDrawerSlide(@NonNull View drawerView,
                                               float slideOffset) {
                         updateStatusBarForNavDrawerSlide(slideOffset);
                         onNavDrawerSlide(slideOffset);
@@ -316,7 +275,7 @@ public class BaseActivity extends AppCompatActivity
         mDrawerToggle.syncState();
 
         // Recycler view stuff
-        RecyclerView mRecyclerView = (RecyclerView) mDrawerLayout.findViewById(R.id.navdrawer_list);
+        RecyclerView mRecyclerView = mDrawerLayout.findViewById(R.id.navdrawer_list);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -363,13 +322,13 @@ public class BaseActivity extends AppCompatActivity
             return;
         }
 
+        //noinspection unchecked
         mLPreviewUtils.setStatusBarColor((Integer) ARGB_EVALUATOR
                 .evaluate(slideOffset, mThemedStatusBarColor, Color.BLACK));
     }
 
     // Subclasses can override this for custom behavior
-    protected void onNavDrawerStateChanged(boolean isOpen,
-                                           boolean isAnimating) {
+    protected void onNavDrawerStateChanged(boolean isOpen) {
         if (mActionBarAutoHideEnabled && isOpen) {
             autoShowOrHideActionBar(true);
         }
@@ -380,7 +339,7 @@ public class BaseActivity extends AppCompatActivity
                 mDrawerLayout.isDrawerOpen(GravityCompat.START);
     }
 
-    protected void onNavDrawerSlide(float offset) {
+    protected void onNavDrawerSlide(@SuppressWarnings("unused") float offset) {
     }
 
     // Subclasses can override to decide what happens on nav item selection
@@ -545,18 +504,21 @@ public class BaseActivity extends AppCompatActivity
         }
     }
 
+    @SuppressWarnings("unused")
     protected void deregisterHideableHeaderView(View hideableHeaderView) {
         if (mHideableHeaderViews.contains(hideableHeaderView)) {
             mHideableHeaderViews.remove(hideableHeaderView);
         }
     }
 
+    @SuppressWarnings("unused")
     protected void registerHideableFooterView(View hideableFooterView) {
         if (!mHideableFooterViews.contains(hideableFooterView)) {
             mHideableFooterViews.add(hideableFooterView);
         }
     }
 
+    @SuppressWarnings("unused")
     protected void deregisterHideableFooterView(View hideableFooterView) {
         if (mHideableFooterViews.contains(hideableFooterView)) {
             mHideableFooterViews.remove(hideableFooterView);
@@ -570,6 +532,7 @@ public class BaseActivity extends AppCompatActivity
         return loader;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onLoadFinished(final Loader Loader,
                                final Object obj) {

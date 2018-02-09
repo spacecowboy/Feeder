@@ -1,20 +1,3 @@
-/*
- * Copyright (c) 2014 Jonas Kalderstam.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.nononsenseapps.feeder.ui.text
 
 import android.content.Context
@@ -55,23 +38,24 @@ import java.net.URL
 /**
  * Convert an HTML document into a spannable string.
  */
-open class HtmlToSpannedConverter(protected var mSource: String,
-                                  protected var mSiteUrl: URL,
+@Suppress("UNUSED_PARAMETER")
+open class HtmlToSpannedConverter(private var mSource: String,
+                                  private var mSiteUrl: URL,
                                   parser: Parser,
                                   private val mContext: Context,
                                   private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()) : ContentHandler {
-    protected var mAccentColor: Int = 0
-    protected var mQuoteGapWidth: Int = 0
-    protected var mQuoteStripeWidth: Int = 0
-    protected var ignoreCount = 0
-    var respectFormatting: Int = 0
-    protected var mReader: XMLReader
-    protected var ignoredImage = false
+    private var mAccentColor: Int = 0
+    private var mQuoteGapWidth: Int = 0
+    private var mQuoteStripeWidth: Int = 0
+    private var ignoreCount = 0
+    private var respectFormatting: Int = 0
+    private var mReader: XMLReader = parser
+    private var ignoredImage = false
 
     private val ignoredTags = listOf("style", "script")
 
     init {
-        mReader = parser
+        @Suppress("DEPRECATION")
         mAccentColor = mContext.resources.getColor(R.color.accent)
         mQuoteGapWidth = Math.round(mContext.resources.getDimension(R.dimen.reader_quote_gap_width))
         mQuoteStripeWidth = Math.round(mContext.resources.getDimension(R.dimen.reader_quote_stripe_width))
@@ -139,7 +123,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         handleStartTag(localName, attributes)
     }
 
-    protected fun handleStartTag(tag: String, attributes: Attributes) {
+    private fun handleStartTag(tag: String, attributes: Attributes) {
 
         when {
             tag.equals("br", ignoreCase = true) -> {
@@ -189,7 +173,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
     }
 
-    protected fun handleP(text: SensibleSpannableStringBuilder) {
+    private fun handleP(text: SensibleSpannableStringBuilder) {
         ensureDoubleNewline(text)
     }
 
@@ -198,8 +182,8 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         text.setSpan(mark, len, len, Spannable.SPAN_MARK_MARK)
     }
 
-    protected fun startFont(text: SensibleSpannableStringBuilder,
-                            attributes: Attributes) {
+    private fun startFont(text: SensibleSpannableStringBuilder,
+                          attributes: Attributes) {
         val color = attributes.getValue("", "color")
         val face = attributes.getValue("", "face")
 
@@ -207,8 +191,8 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         text.setSpan(Font(color, face), len, len, Spannable.SPAN_MARK_MARK)
     }
 
-    protected fun startA(text: SensibleSpannableStringBuilder,
-                         attributes: Attributes) {
+    private fun startA(text: SensibleSpannableStringBuilder,
+                       attributes: Attributes) {
         var href: String? = attributes.getValue("", "href")
 
         if (href != null) {
@@ -253,6 +237,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
 
         var src: String? = attributes.getValue("", "src")
+        @Suppress("DEPRECATION")
         val d = mContext.resources.getDrawable(R.drawable.unknown_image)
         d.setBounds(0, 0, d.intrinsicWidth, d.intrinsicHeight)
 
@@ -271,8 +256,8 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         text.append("\n")
     }
 
-    protected fun startUl(text: SensibleSpannableStringBuilder,
-                          attributes: Attributes) {
+    private fun startUl(text: SensibleSpannableStringBuilder,
+                        attributes: Attributes) {
         // Start lists with linebreak
         val len = text.length
         if (len < 1 || text[len - 1] != '\n') {
@@ -283,8 +268,8 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         start(text, Listing(false))
     }
 
-    protected fun startOl(text: SensibleSpannableStringBuilder,
-                          attributes: Attributes) {
+    private fun startOl(text: SensibleSpannableStringBuilder,
+                        attributes: Attributes) {
         // Start lists with linebreak
         val len = text.length
         if (len < 1 || text[len - 1] != '\n') {
@@ -295,10 +280,10 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         start(text, Listing(true))
     }
 
-    protected fun startLi(text: SensibleSpannableStringBuilder,
-                          attributes: Attributes) {
+    private fun startLi(text: SensibleSpannableStringBuilder,
+                        attributes: Attributes) {
         // Get type of list
-        val list = getLast(text, Listing::class.java) as Listing?
+        val list: Listing? = getLast(text, Listing::class.java)
 
         if (list!!.ordered) {
             // Numbered
@@ -314,15 +299,15 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
     }
 
-    protected fun startPre(text: SensibleSpannableStringBuilder,
-                           attributes: Attributes) {
+    private fun startPre(text: SensibleSpannableStringBuilder,
+                         attributes: Attributes) {
         respectFormatting++
         ensureDoubleNewline(text)
         start(text, Pre())
     }
 
-    protected fun startCode(text: SensibleSpannableStringBuilder,
-                            attributes: Attributes) {
+    private fun startCode(text: SensibleSpannableStringBuilder,
+                          attributes: Attributes) {
         start(text, Code())
     }
 
@@ -331,12 +316,12 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         // Override me
     }
 
-    protected fun startUnknownTag(tag: String, text: SensibleSpannableStringBuilder,
-                                  attr: Attributes) {
+    private fun startUnknownTag(tag: String, text: SensibleSpannableStringBuilder,
+                                attr: Attributes) {
         // Override me
     }
 
-    @Suppress("UNUSED_PARAMETER")
+    @Suppress("UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
     inline fun <reified T> getLast(text: SensibleSpannableStringBuilder, kind: Class<T>): T? =
             text.getAllSpansWithType<T>().lastOrNull()
 
@@ -354,7 +339,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
     }
 
-    protected fun endQuote(text: SensibleSpannableStringBuilder) {
+    private fun endQuote(text: SensibleSpannableStringBuilder) {
         // Don't want end newlines inside block
         removeLastNewlines(text)
 
@@ -382,7 +367,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         handleEndTag(localName)
     }
 
-    protected fun handleEndTag(tag: String) {
+    private fun handleEndTag(tag: String) {
         when {
             tag.equals("br", ignoreCase = true) -> handleBr(spannableStringBuilder)
             tag.equals("p", ignoreCase = true) -> handleP(spannableStringBuilder)
@@ -447,11 +432,11 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
     }
 
-    protected fun handleBr(text: SensibleSpannableStringBuilder) {
+    private fun handleBr(text: SensibleSpannableStringBuilder) {
         ensureSingleNewline(text)
     }
 
-    protected fun endFont(text: SensibleSpannableStringBuilder) {
+    private fun endFont(text: SensibleSpannableStringBuilder) {
         val len = text.length
         val obj = getLast(text, Font::class.java)
         val where = text.getSpanStart(obj)
@@ -459,7 +444,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         text.removeSpan(obj)
 
         if (where != len) {
-            val f = obj as Font?
+            val f: Font? = obj
 
             if (!TextUtils.isEmpty(f!!.mColor)) {
                 if (f.mColor.startsWith("@")) {
@@ -467,6 +452,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
                     val name = f.mColor.substring(1)
                     val colorRes = res.getIdentifier(name, "color", "android")
                     if (colorRes != 0) {
+                        @Suppress("DEPRECATION")
                         val colors = res.getColorStateList(colorRes)
                         text.setSpan(TextAppearanceSpan(null, 0, 0, colors, null), where, len,
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -481,7 +467,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
     }
 
-    protected fun endA(text: SensibleSpannableStringBuilder) {
+    private fun endA(text: SensibleSpannableStringBuilder) {
         val len = text.length
         val obj = getLast(text, Href::class.java)
         val where = text.getSpanStart(obj)
@@ -489,7 +475,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         text.removeSpan(obj)
 
         if (where != len) {
-            val h = obj as Href?
+            val h: Href? = obj
 
             if (h!!.mHref != null) {
                 text.setSpan(URLSpan(h.mHref), where, len,
@@ -498,7 +484,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
     }
 
-    protected fun endHeader(text: SensibleSpannableStringBuilder) {
+    private fun endHeader(text: SensibleSpannableStringBuilder) {
         var len = text.length
         val obj = getLast(text, Header::class.java)
 
@@ -512,7 +498,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
 
         if (where != len) {
-            val h = obj as Header?
+            val h: Header? = obj
 
             text.setSpan(RelativeSizeSpan(HEADER_SIZES[h!!.mLevel]), where,
                     len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -521,19 +507,19 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
     }
 
-    protected fun startEndTable(text: SensibleSpannableStringBuilder) {
+    private fun startEndTable(text: SensibleSpannableStringBuilder) {
         ensureDoubleNewline(text)
     }
 
-    protected fun startEndTableRow(text: SensibleSpannableStringBuilder) {
+    private fun startEndTableRow(text: SensibleSpannableStringBuilder) {
         ensureSingleNewline(text)
     }
 
-    protected fun startTableCol(text: SensibleSpannableStringBuilder) {
+    private fun startTableCol(text: SensibleSpannableStringBuilder) {
         ensureSingleNewline(text)
     }
 
-    protected fun endImg(text: SensibleSpannableStringBuilder) {
+    private fun endImg(text: SensibleSpannableStringBuilder) {
         if (ignoredImage) {
             ignoredImage = false
             return
@@ -541,17 +527,17 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         ensureDoubleNewline(text)
     }
 
-    protected fun endUl(text: SensibleSpannableStringBuilder) {
+    private fun endUl(text: SensibleSpannableStringBuilder) {
         val obj = getLast(text, Listing::class.java)
         text.removeSpan(obj)
     }
 
-    protected fun endOl(text: SensibleSpannableStringBuilder) {
+    private fun endOl(text: SensibleSpannableStringBuilder) {
         val obj = getLast(text, Listing::class.java)
         text.removeSpan(obj)
     }
 
-    protected fun endLi(text: SensibleSpannableStringBuilder) {
+    private fun endLi(text: SensibleSpannableStringBuilder) {
         val len = text.length
         val obj = getLast(text, Bullet::class.java)
         val where = text.getSpanStart(obj)
@@ -559,16 +545,13 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         text.removeSpan(obj)
 
         if (where != len) {
-
-            val span: Any
-
             val offset = 60
-            if (obj is CountBullet) {
+            val span: Any = if (obj is CountBullet) {
                 // Numbered
-                span = LeadingMarginSpan.Standard(offset, offset)
+                LeadingMarginSpan.Standard(offset, offset)
             } else {
                 // Bullet points
-                span = BulletSpan(offset, Color.GRAY)
+                BulletSpan(offset, Color.GRAY)
             }
 
             text.setSpan(span, where, len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -577,7 +560,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         text.append("\n")
     }
 
-    protected fun endPre(text: SensibleSpannableStringBuilder) {
+    private fun endPre(text: SensibleSpannableStringBuilder) {
         // yes, take len before appending
         val len = text.length
         ensureDoubleNewline(text)
@@ -603,7 +586,7 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
     }
 
-    protected fun endCode(text: SensibleSpannableStringBuilder) {
+    private fun endCode(text: SensibleSpannableStringBuilder) {
         val len = text.length
         val obj = getLast(text, Code::class.java)
         val where = text.getSpanStart(obj)
@@ -623,11 +606,11 @@ open class HtmlToSpannedConverter(protected var mSource: String,
         }
     }
 
-    protected fun endIframe(text: SensibleSpannableStringBuilder) {
+    private fun endIframe(text: SensibleSpannableStringBuilder) {
 
     }
 
-    protected fun endUnknownTag(tag: String, text: SensibleSpannableStringBuilder) {
+    private fun endUnknownTag(tag: String, text: SensibleSpannableStringBuilder) {
         // Override me
     }
 
@@ -746,13 +729,6 @@ open class HtmlToSpannedConverter(protected var mSource: String,
             }
             if (len != 0) {
                 text.append("\n")
-            }
-        }
-
-        private fun ensureSingleSpace(text: SensibleSpannableStringBuilder) {
-            if (text.isNotEmpty() &&
-                    !text.last().isWhitespace()) {
-                text.append(" ")
             }
         }
     }

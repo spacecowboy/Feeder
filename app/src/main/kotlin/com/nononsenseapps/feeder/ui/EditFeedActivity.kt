@@ -370,6 +370,7 @@ class EditFeedActivity : Activity() {
     }
 
     private fun useEntry(title: String, url: String) {
+        @Suppress("DEPRECATION")
         feedTitle = android.text.Html.fromHtml(title).toString()
         feedUrl = url.trim()
         textUrl.setText(feedUrl)

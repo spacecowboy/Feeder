@@ -316,8 +316,10 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         // Set up the empty view
         emptyView = rootView.findViewById(android.R.id.empty)
         emptyAddFeed = emptyView!!.findViewById(R.id.empty_add_feed)
+        @Suppress("DEPRECATION")
         (emptyAddFeed as TextView).text = android.text.Html.fromHtml(getString(R.string.empty_feed_add))
         emptyOpenFeeds = emptyView!!.findViewById(R.id.empty_open_feeds)
+        @Suppress("DEPRECATION")
         (emptyOpenFeeds as TextView).text = android.text.Html.fromHtml(getString(R.string.empty_feed_open))
 
         emptyAddFeed!!.setOnClickListener {
@@ -519,6 +521,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         return loader
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onLoadFinished(cursorLoader: Loader<Any?>?, result: Any?) {
         if (cursorLoader != null) {
             when {

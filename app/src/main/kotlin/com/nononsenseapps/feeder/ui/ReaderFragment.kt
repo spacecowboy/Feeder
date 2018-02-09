@@ -244,6 +244,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Any?>? = when (id) {
         ITEM_LOADER -> {
             val cl = CursorLoader(context!!, URI_FEEDITEMS,
