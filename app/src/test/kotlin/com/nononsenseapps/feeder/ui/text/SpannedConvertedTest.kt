@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Point
 import android.text.style.ImageSpan
+import android.text.style.TextAppearanceSpan
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
@@ -23,6 +24,21 @@ class SpannedConverterTest {
         every { mockResources.getColor(any(), any()) } returns 0
         every { mockContext.resources } returns mockResources
         every { mockContext.applicationContext } returns mockContext
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun testFontWithNoColorDoesntCrash() {
+        val builder = FakeBuilder()
+        toSpannedWithNoImages(
+                mockContext,
+                "<font>No color</font>",
+                URL("http://foo.com"),
+                builder
+        )
+
+        assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<TextAppearanceSpan>())
+        assertEquals("No color", builder.toString())
     }
 
     @Test

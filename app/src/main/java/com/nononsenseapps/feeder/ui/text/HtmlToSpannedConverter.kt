@@ -184,11 +184,12 @@ open class HtmlToSpannedConverter(private var mSource: String,
 
     private fun startFont(text: SensibleSpannableStringBuilder,
                           attributes: Attributes) {
-        val color = attributes.getValue("", "color")
-        val face = attributes.getValue("", "face")
+        val color: String? = attributes.getValue("", "color")
+        val face: String? = attributes.getValue("", "face")
 
         val len = text.length
-        text.setSpan(Font(color, face), len, len, Spannable.SPAN_MARK_MARK)
+        // Use empty string to prevent null pointer errors. empty string will be ignored in endFont.
+        text.setSpan(Font(color ?: "", face), len, len, Spannable.SPAN_MARK_MARK)
     }
 
     private fun startA(text: SensibleSpannableStringBuilder,
