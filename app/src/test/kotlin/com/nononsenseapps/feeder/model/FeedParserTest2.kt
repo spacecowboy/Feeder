@@ -1,7 +1,5 @@
 package com.nononsenseapps.feeder.model
 
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertNotNull
 import okhttp3.MediaType
 import okhttp3.Protocol
 import okhttp3.Request
@@ -12,12 +10,27 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.net.URL
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class FeedParserTest2 {
     @Rule
     @JvmField
     var tempFolder = TemporaryFolder()
+
+    @Test
+    @Throws(Exception::class)
+    fun enclosedImageIsUsedAsThumbnail() {
+        javaClass.getResourceAsStream("rss_lemonde.xml")
+                .use {
+                    val feed = FeedParser.parseFeedInputStream(it)
+
+                    val item = feed.items!![0]
+                    assertEquals("http://s1.lemde.fr/image/2018/02/11/644x322/5255112_3_a8dc_martin-fourcade_02be61d126b2da39d977b2e1902c819a.jpg",
+                            item.image)
+                }
+    }
 
     @Test
     @Throws(Exception::class)
@@ -125,7 +138,7 @@ class FeedParserTest2 {
         val feed = FeedParser.parseFeedInputStream(atomRelative.byteInputStream())
         assertNotNull(feed)
 
-        assertEquals(URL("http://cowboyprogrammer.org/feed.atom"), feed.feed_url)
+        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
     }
 
     @Test
@@ -136,7 +149,7 @@ class FeedParserTest2 {
         val feed = FeedParser.parseFeedInputStream(atomRelativeNoBase.byteInputStream())
         assertNotNull(feed)
 
-        assertEquals(URL("http://cowboyprogrammer.org/feed.atom"), feed.feed_url)
+        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
     }
 
     private fun getCowboyHtml(): String =
