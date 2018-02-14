@@ -18,6 +18,7 @@ class SpannedConverterTest {
     private val mockResources: Resources = mockk(relaxed = true)
     private val mockContext: Context = mockk(relaxed = true)
 
+    @Suppress("DEPRECATION")
     @Before
     fun setup() {
         every { mockResources.getColor(any()) } returns 0

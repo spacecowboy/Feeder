@@ -1,7 +1,5 @@
 package com.nononsenseapps.feeder.model
 
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertNotNull
 import okhttp3.MediaType
 import okhttp3.Protocol
 import okhttp3.Request
@@ -12,6 +10,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.net.URL
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class FeedParserTest2 {
@@ -125,7 +125,7 @@ class FeedParserTest2 {
         val feed = FeedParser.parseFeedInputStream(atomRelative.byteInputStream())
         assertNotNull(feed)
 
-        assertEquals(URL("http://cowboyprogrammer.org/feed.atom"), feed.feed_url)
+        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
     }
 
     @Test
@@ -136,7 +136,7 @@ class FeedParserTest2 {
         val feed = FeedParser.parseFeedInputStream(atomRelativeNoBase.byteInputStream())
         assertNotNull(feed)
 
-        assertEquals(URL("http://cowboyprogrammer.org/feed.atom"), feed.feed_url)
+        assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
     }
 
     private fun getCowboyHtml(): String =
