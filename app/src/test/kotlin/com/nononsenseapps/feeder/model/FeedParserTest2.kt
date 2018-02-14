@@ -21,6 +21,19 @@ class FeedParserTest2 {
 
     @Test
     @Throws(Exception::class)
+    fun enclosedImageIsUsedAsThumbnail() {
+        javaClass.getResourceAsStream("rss_lemonde.xml")
+                .use {
+                    val feed = FeedParser.parseFeedInputStream(it)
+
+                    val item = feed.items!![0]
+                    assertEquals("http://s1.lemde.fr/image/2018/02/11/644x322/5255112_3_a8dc_martin-fourcade_02be61d126b2da39d977b2e1902c819a.jpg",
+                            item.image)
+                }
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun getAlternateFeedLinksDoesNotReturnRelativeLinks() {
         javaClass.getResourceAsStream("fz.html")
                 .bufferedReader()

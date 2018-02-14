@@ -144,10 +144,24 @@ fun SyndEntry.contentHtml(): String? {
     return possiblyHtml ?: ""
 }
 
+fun findImageLinkInEnclosures(enclosures: List<SyndEnclosure?>?): String? {
+    if (enclosures != null) {
+        for (enclosure in enclosures) {
+            if (enclosure != null) {
+                if (enclosure.type != null && enclosure.url != null && enclosure.type.startsWith("image/")) {
+                    return enclosure.url
+                }
+            }
+        }
+    }
+    return null
+}
+
 fun SyndEntry.thumbnail(): String? {
     val media = this.getModule(MediaModule.URI) as MediaEntryModule?
     val thumbnails = media?.metadata?.thumbnail
     val contents = media?.mediaContents
+    val enclosures: List<SyndEnclosure?>? = this.enclosures
 
     return when {
         thumbnails?.isNotEmpty() ?: false -> thumbnails?.firstOrNull()?.url?.toString()
@@ -156,7 +170,7 @@ fun SyndEntry.thumbnail(): String? {
                     ?.reference?.toString()
         }
         else -> {
-            val imgLink: String? = naiveFindImageLink(this.contentHtml())
+            val imgLink: String? = findImageLinkInEnclosures(enclosures) ?: naiveFindImageLink(this.contentHtml())
             val linkToHtml: String? = this.linkToHtml()
 
             when {
