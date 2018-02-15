@@ -685,7 +685,7 @@ open class HtmlToSpannedConverter(private var mSource: String,
 
     protected class Sub
 
-    protected class Listing(var ordered: Boolean) {
+    class Listing(var ordered: Boolean) {
         var number: Int = 0
 
         init {

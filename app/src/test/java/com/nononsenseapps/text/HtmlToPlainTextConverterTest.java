@@ -1,6 +1,7 @@
 package com.nononsenseapps.text;
 
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter;
+import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverterKt;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -8,62 +9,58 @@ import static org.junit.Assert.assertEquals;
 public class HtmlToPlainTextConverterTest {
     @Test
     public void repeated() throws Exception {
-        assertEquals("", HtmlToPlainTextConverter.repeated("*", 0));
-        assertEquals("", HtmlToPlainTextConverter.repeated("*", -1));
-        assertEquals("*", HtmlToPlainTextConverter.repeated("*", 1));
-        assertEquals("****", HtmlToPlainTextConverter.repeated("*", 4));
+        assertEquals("", HtmlToPlainTextConverterKt.repeated("*", 0));
+        assertEquals("", HtmlToPlainTextConverterKt.repeated("*", -1));
+        assertEquals("*", HtmlToPlainTextConverterKt.repeated("*", 1));
+        assertEquals("****", HtmlToPlainTextConverterKt.repeated("*", 4));
     }
 
     @Test
     public void empty() throws Exception {
-        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("");
-        assertEquals("", converter.convert());
+        assertEquals("", HtmlToPlainTextConverter.INSTANCE.convert(""));
     }
 
     @Test
     public void unorderedList() throws Exception {
-        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("<ul><li>one</li><li>two</li></ul>");
         assertEquals("* one\n" +
-                "* two", converter.convert());
+                "* two", HtmlToPlainTextConverter.INSTANCE.convert("<ul><li>one</li><li>two</li></ul>"));
     }
 
     @Test
     public void orderedList() throws Exception {
-        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("<ol><li>one</li><li>two</li></ol>");
         assertEquals("1. one\n" +
-                "2. two", converter.convert());
+                "2. two", HtmlToPlainTextConverter.INSTANCE.convert("<ol><li>one</li><li>two</li></ol>"));
     }
 
     @Test
     public void nestedList() throws Exception {
-        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("<ol><li>sublist:<ul><li>A</li><li>B</li></ul></li><li>two</li></ol>");
         assertEquals("1. sublist:\n" +
                 "  * A\n" +
                 "  * B\n" +
-                "2. two", converter.convert());
+                "2. two",
+                HtmlToPlainTextConverter.INSTANCE.convert("<ol><li>sublist:<ul><li>A</li><li>B</li></ul></li><li>two</li></ol>"));
     }
 
     @Test
     public void link() throws Exception {
-        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("go to <a href=\"google.com\">Google</a> and see.");
-        assertEquals("go to Google and see.", converter.convert());
+        assertEquals("go to Google and see.",
+                HtmlToPlainTextConverter.INSTANCE.convert("go to <a href=\"google.com\">Google</a> and see."));
     }
 
     @Test
     public void noNewLines() throws Exception {
-        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("<p>one<br>two<p>three");
-        assertEquals("one two three", converter.convert());
+        assertEquals("one two three", HtmlToPlainTextConverter.INSTANCE.convert("<p>one<br>two<p>three"));
     }
 
     @Test
     public void noScripts() throws Exception {
-        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("foo <script>script</script> bar");
-        assertEquals("foo bar", converter.convert());
+        assertEquals("foo bar",
+                HtmlToPlainTextConverter.INSTANCE.convert("foo <script>script</script> bar"));
     }
 
     @Test
     public void noStyles() throws Exception {
-        HtmlToPlainTextConverter converter = new HtmlToPlainTextConverter("foo <style>style</style> bar");
-        assertEquals("foo bar", converter.convert());
+        assertEquals("foo bar",
+                HtmlToPlainTextConverter.INSTANCE.convert("foo <style>style</style> bar"));
     }
 }

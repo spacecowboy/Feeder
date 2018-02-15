@@ -11,13 +11,6 @@ import java.net.URL
 
 val schema: HTMLSchema by lazy { HTMLSchema() }
 
-/**
- * Returns plain text representation of the provided HTML string.
- */
-fun toPlainText(source: String): String = getPlainTextConverter(source).convert()
-
-private fun getPlainTextConverter(source: String): HtmlToPlainTextConverter = HtmlToPlainTextConverter(source)
-
 fun toSpannedWithImages(context: Context,
                         source: String,
                         siteUrl: URL,
