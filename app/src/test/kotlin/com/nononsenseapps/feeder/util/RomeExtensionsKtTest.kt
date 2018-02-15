@@ -32,13 +32,13 @@ class RomeExtensionsKtTest {
 
     @Test
     fun feedLinkButNoLinks() {
-        assertEquals(Feed(home_page_url = "homepage", title = null, items = emptyList()),
+        assertEquals(Feed(home_page_url = "homepage", title = "", items = emptyList()),
                 mockSyndFeed(link = "homepage").asFeed())
     }
 
     @Test
     fun feedLinks() {
-        assertEquals(Feed(home_page_url = "homepage", title = null, items = emptyList()),
+        assertEquals(Feed(home_page_url = "homepage", title = "", items = emptyList()),
                 mockSyndFeed(links = listOf(mockSyndLink(href = "homepage",
                         rel = "alternate", type = "text/html"))).asFeed())
     }
@@ -46,9 +46,9 @@ class RomeExtensionsKtTest {
     @Test
     fun itemFallsBackToFeedAuthor() {
         assertEquals(
-                Feed(author = Author(name = "bob"), title = null,
+                Feed(author = Author(name = "bob"), title = "",
                         items = listOf(Item(id = "id", author = Author(name = "bob"), content_text = "",
-                                summary = "", content_html = "", attachments = emptyList()))),
+                                summary = "", title = "", content_html = "", attachments = emptyList()))),
                 mockSyndFeed(author = mockSyndPerson(name = "bob"),
                         entries = listOf(mockSyndEntry(uri = "id"))).asFeed()
         )
@@ -61,7 +61,7 @@ class RomeExtensionsKtTest {
         val html = "  <img src='http://google.com/image.png' alt='An image'/> "
 
         assertEquals(
-                Item(id = "id", content_text = expectedSummary, summary = expectedSummary,
+                Item(id = "id", title = "", content_text = expectedSummary, summary = expectedSummary,
                         content_html = html, image = "http://google.com/image.png", attachments = emptyList()),
                 mockSyndEntry(uri = "id", description = mockSyndContent(value = html)).asItem()
         )
@@ -77,7 +77,7 @@ class RomeExtensionsKtTest {
         val longText = "$expectedSummary and some additional text"
 
         assertEquals(
-                Item(id = "id", content_text = longText, summary = expectedSummary,
+                Item(id = "id", title = "", content_text = longText, summary = expectedSummary,
                         content_html = longText, attachments = emptyList()),
                 mockSyndEntry(uri = "id", description = mockSyndContent(value = longText)).asItem()
         )
@@ -86,7 +86,7 @@ class RomeExtensionsKtTest {
     @Test
     fun itemShortTextShouldNotBeIndexOutOfBounds() {
         assertEquals(
-                Item(id = "id", content_text = "abc", summary = "abc",
+                Item(id = "id", content_text = "abc", summary = "abc", title = "",
                         content_html = "abc", attachments = emptyList()),
                 mockSyndEntry(uri = "id", description = mockSyndContent(value = "abc")).asItem()
         )
@@ -95,7 +95,7 @@ class RomeExtensionsKtTest {
     @Test
     fun itemLinkButNoLinks() {
         assertEquals(
-                Item(id = "id", content_text = "", summary = "",
+                Item(id = "id", content_text = "", summary = "", title = "",
                         content_html = "", attachments = emptyList(), url = "abc"),
                 mockSyndEntry(uri = "id", description = mockSyndContent(value = ""),
                         link = "abc").asItem()
@@ -105,7 +105,7 @@ class RomeExtensionsKtTest {
     @Test
     fun itemLinks() {
         assertEquals(
-                Item(id = "id", content_text = "", summary = "",
+                Item(id = "id", content_text = "", summary = "", title = "",
                         content_html = "", attachments = emptyList(), url = "abc"),
                 mockSyndEntry(uri = "id", description = mockSyndContent(value = ""),
                         links = listOf(mockSyndLink(href = "abc", rel = "self"),
@@ -124,7 +124,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentTextWithPlainAndOthers() {
         assertEquals(
-                Item(id = "id", content_text = "PLAIN", summary = "PLAIN",
+                Item(id = "id", content_text = "PLAIN", summary = "PLAIN", title = "",
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
@@ -139,7 +139,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentTextWithNullAndOthers() {
         assertEquals(
-                Item(id = "id", content_text = "bah", summary = "bah",
+                Item(id = "id", content_text = "bah", summary = "bah", title = "",
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
@@ -153,7 +153,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentTextWithOthers() {
         assertEquals(
-                Item(id = "id", content_text = "**html**", summary = "**html**",
+                Item(id = "id", content_text = "**html**", summary = "**html**", title = "",
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
@@ -166,7 +166,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentHtmlAtomWithOnlyUnknown() {
         assertEquals(
-                Item(id = "id", content_text = "foo", summary = "foo",
+                Item(id = "id", title = "", content_text = "foo", summary = "foo",
                         content_html = "foo", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
@@ -176,9 +176,42 @@ class RomeExtensionsKtTest {
     }
 
     @Test
+    fun titleHtmlAtom() {
+        assertEquals(
+                Item(id = "id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
+                        content_html = "", attachments = emptyList()),
+                mockSyndEntry(uri = "id",
+                        titleEx = mockSyndContent(value = "600 &amp;#8211; Email is your electronic memory", type = "html")
+                        ).asItem()
+        )
+    }
+
+    @Test
+    fun titleXHtmlAtom() {
+        assertEquals(
+                Item(id = "id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
+                        content_html = "", attachments = emptyList()),
+                mockSyndEntry(uri = "id",
+                        titleEx = mockSyndContent(value = "600 &#8211; Email is your electronic memory", type = "xhtml")
+                ).asItem()
+        )
+    }
+
+    @Test
+    fun titlePlainAtomRss() {
+        assertEquals(
+                Item(id = "id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
+                        content_html = "", attachments = emptyList()),
+                mockSyndEntry(uri = "id",
+                        title = "600 &#8211; Email is your electronic memory"
+                ).asItem()
+        )
+    }
+
+    @Test
     fun contentHtmlRss() {
         assertEquals(
-                Item(id = "id", content_text = "**html**", summary = "**html**",
+                Item(id = "id", content_text = "**html**", summary = "**html**", title = "",
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         description = mockSyndContent(value = "<b>html</b>")
@@ -189,7 +222,7 @@ class RomeExtensionsKtTest {
     @Test
     fun thumbnailWithThumbnail() {
         assertEquals(
-                Item(id = "id", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                Item(id = "id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         image = "img"),
                 mockSyndEntry(uri = "id",
                         thumbnails = arrayOf(mockThumbnail(url = URI.create("img")))
@@ -200,7 +233,7 @@ class RomeExtensionsKtTest {
     @Test
     fun thumbnailWithContent() {
         assertEquals(
-                Item(id = "id", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                Item(id = "id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         image = "img"),
                 mockSyndEntry(uri = "id",
                         mediaContents = arrayOf(mockMediaContent(url = "img", medium = "image"))
@@ -214,7 +247,7 @@ class RomeExtensionsKtTest {
         val romeDate = DateTime.parse("2017-11-15T22:36:36+00:00").toDate()
         val dateTime = DateTime(romeDate.time)
         assertEquals(
-                Item(id = "id", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                Item(id = "id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         date_published = dateTime.toDateTimeISO().toString()),
                 mockSyndEntry(uri = "id",
                         publishedDate = romeDate
@@ -228,7 +261,7 @@ class RomeExtensionsKtTest {
         val romeDate = DateTime.parse("2017-11-15T22:36:36+00:00").toDate()
         val dateTime = DateTime(romeDate.time)
         assertEquals(
-                Item(id = "id", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                Item(id = "id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         date_modified = dateTime.toDateTimeISO().toString(),
                         date_published = dateTime.toDateTimeISO().toString()),
                 mockSyndEntry(uri = "id",
@@ -245,7 +278,7 @@ class RomeExtensionsKtTest {
         val pubDate = DateTime(romePubDate.time)
         val modDate = DateTime(romeModDate.time)
         assertEquals(
-                Item(id = "id", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                Item(id = "id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         date_modified = modDate.toDateTimeISO().toString(),
                         date_published = pubDate.toDateTimeISO().toString()),
                 mockSyndEntry(uri = "id",
@@ -303,7 +336,9 @@ class RomeExtensionsKtTest {
                               updatedDate: Date? = null,
                               contents: List<SyndContent>? = null,
                               thumbnails: Array<Thumbnail>? = null,
-                              mediaContents: Array<MediaContent>? = null): SyndEntry {
+                              mediaContents: Array<MediaContent>? = null,
+                              title: String? = null,
+                              titleEx: SyndContent? = null): SyndEntry {
         val mock = mock(SyndEntry::class.java)
 
         `when`(mock.uri).thenReturn(uri)
@@ -324,6 +359,8 @@ class RomeExtensionsKtTest {
         `when`(mockMedia.metadata).thenReturn(mockMetadata)
         `when`(mockMedia.mediaContents).thenReturn(mediaContents)
         `when`(mockMetadata.thumbnail).thenReturn(thumbnails)
+        `when`(mock.title).thenReturn(title)
+        `when`(mock.titleEx).thenReturn(titleEx)
 
         return mock
     }
