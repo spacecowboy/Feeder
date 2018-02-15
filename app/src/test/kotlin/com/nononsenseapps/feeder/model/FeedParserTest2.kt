@@ -21,6 +21,23 @@ class FeedParserTest2 {
 
     @Test
     @Throws(Exception::class)
+    fun htmlAtomContentGetsUnescaped() {
+        javaClass.getResourceAsStream("atom_hnapp.xml")
+                .use {
+                    val feed = FeedParser.parseFeedInputStream(it)
+
+                    val item = feed.items!![0]
+                    assertEquals("37 – Spectre Mitigations in Microsoft's C/C++ Compiler",
+                            item.title)
+                    assertEquals("37 points, 1 comment",
+                            item.content_text)
+                    assertEquals("<p>37 points, <a href=\"https://news.ycombinator.com/item?id=16381978\">1 comment</a></p>",
+                            item.content_html)
+                }
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun enclosedImageIsUsedAsThumbnail() {
         javaClass.getResourceAsStream("rss_lemonde.xml")
                 .use {

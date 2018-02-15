@@ -7,20 +7,22 @@ import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
 import com.rometools.modules.mediarss.MediaEntryModule
 import com.rometools.modules.mediarss.MediaModule
+import com.rometools.rome.feed.synd.SyndContent
 import com.rometools.rome.feed.synd.SyndEnclosure
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.feed.synd.SyndPerson
 import org.joda.time.DateTime
+import org.jsoup.parser.Parser.unescapeEntities
 
 fun SyndFeed.asFeed(): Feed {
     val feedAuthor: Author? = this.authors?.firstOrNull()?.asAuthor()
     return Feed(
-            title = this.title,
+            title = plainTitle(),
             home_page_url = this.links?.firstOrNull {
                 "alternate" == it.rel && "text/html" == it.type
             }?.href ?: this.link,
-            feed_url = this.links?.firstOrNull{ "self" == it.rel }?.href,
+            feed_url = this.links?.firstOrNull { "self" == it.rel }?.href,
             description = this.description,
             icon = this.image?.url,
             author = feedAuthor,
@@ -33,7 +35,7 @@ fun SyndEntry.asItem(feedAuthor: Author? = null): Item {
     return Item(
             id = this.uri,
             url = this.linkToHtml(),
-            title = this.title,
+            title = plainTitle(),
             content_text = contentText,
             content_html = this.contentHtml(),
             summary = contentText.take(200),
@@ -46,17 +48,17 @@ fun SyndEntry.asItem(feedAuthor: Author? = null): Item {
 }
 
 fun SyndEntry.linkToHtml(): String? {
-    val alternateHtml = this.links?.firstOrNull{ "alternate" == it.rel && "text/html" == it.type }
+    val alternateHtml = this.links?.firstOrNull { "alternate" == it.rel && "text/html" == it.type }
     if (alternateHtml != null) {
         return alternateHtml.href
     }
 
-    val selfHtml = this.links?.firstOrNull{ "self" == it.rel && "text/html" == it.type }
+    val selfHtml = this.links?.firstOrNull { "self" == it.rel && "text/html" == it.type }
     if (selfHtml != null) {
         return selfHtml.href
     }
 
-    val self = this.links?.firstOrNull{ "self" == it.rel }
+    val self = this.links?.firstOrNull { "self" == it.rel }
     if (self != null) {
         return self.href
     }
@@ -110,7 +112,7 @@ fun SyndEntry.contentText(): String {
             description?.value
     }
 
-    val result = HtmlToPlainTextConverter.HtmlToPlainText(possiblyHtml ?: "")
+    val result = HtmlToPlainTextConverter.convert(possiblyHtml ?: "")
 
     // Description consists of at least one image, avoid opening browser for this item
     return when {
@@ -120,23 +122,36 @@ fun SyndEntry.contentText(): String {
     }
 }
 
-fun SyndEntry.contentHtml(): String? {
-    var possiblyHtml: String? = null
+private fun convertAtomContentToPlainText(content: SyndContent?, fallback: String?): String {
+    return HtmlToPlainTextConverter.convert(possiblyHtmlFromContent(content, fallback))
+}
 
-    // Atom
-    if (contents != null && !contents.isEmpty()) {
-        for (c in contents) {
-            if ("html" == c.type || "xhtml" == c.type) {
-                if (c.value != null) {
-                    possiblyHtml = c.value
-                }
-            } else if (possiblyHtml == null) {
-                possiblyHtml = c.value
-            }
+private fun possiblyHtmlFromContent(content: SyndContent?, fallback: String?): String =
+        when (content?.type == "html") {
+            true -> unescapeEntities(content!!.value, true)
+            false -> content?.value ?: fallback
+        } ?: ""
+
+fun SyndFeed.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
+fun SyndEntry.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
+
+fun SyndEntry.contentHtml(): String? {
+    var possiblyHtml: String? = contents?.filter {
+        when (it.type) {
+            "xhtml", "html" -> true
+            else -> false
         }
+    }?.take(1)?.map {
+                when (it.type) {
+                    "html" -> unescapeEntities(it.value, true)
+                    else -> it.value
+                }
+            }?.firstOrNull()
+
+    if (possiblyHtml == null) {
+        possiblyHtml = contents?.firstOrNull()?.value
     }
 
-    // Rss
     if (possiblyHtml == null) {
         possiblyHtml = description?.value
     }

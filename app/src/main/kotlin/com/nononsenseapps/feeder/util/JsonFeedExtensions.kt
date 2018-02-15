@@ -18,8 +18,7 @@ import com.nononsenseapps.jsonfeed.Item
 fun Item.intoContentProviderOperation(feed: Feed, builder: ContentProviderOperation.Builder) {
     // Be careful about nulls.
     val text = content_html ?: content_text ?: ""
-    val summary = summary ?: content_text?.take(200) ?: HtmlToPlainTextConverter.HtmlToPlainText(text).take(200)
-
+    val summary: String? = summary ?: content_text?.take(200) ?: HtmlToPlainTextConverter.convert(text).take(200)
     val absoluteImage = when {
         feed.feed_url != null && image != null -> relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url!!), image!!)
         else -> image
