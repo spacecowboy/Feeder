@@ -15,6 +15,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -22,6 +23,7 @@ import java.net.MalformedURLException
 import java.net.URL
 
 object FeedParser {
+    private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
     // Should reuse same instance to have same cache
     @Volatile private var client: OkHttpClient = cachingHttpClient()
@@ -78,20 +80,20 @@ object FeedParser {
      */
     fun getAlternateFeedLinksInHtml(html: String, baseUrl: URL? = null): List<Pair<String, String>> {
         val doc = Jsoup.parse(html.byteInputStream(), "UTF-8", "")
-        val header = doc.head()
 
-        return header.getElementsByAttributeValue("rel", "alternate")
-                .filter { it.hasAttr("href") && it.hasAttr("type") }
-                .filter {
+        val feeds = doc.head()?.getElementsByAttributeValue("rel", "alternate")
+                ?.filter { it.hasAttr("href") && it.hasAttr("type") }
+                ?.filter {
                     val t = it.attr("type").toLowerCase()
                     when {
                         t.contains("application/atom") -> true
                         t.contains("application/rss") -> true
-                        t.contains("application/json") -> true
+                        // Youtube for example has alternate links with application/json+oembed type.
+                        t == "application/json" -> true
                         else -> false
                     }
                 }
-                .filter {
+                ?.filter {
                     val l = it.attr("href").toLowerCase()
                     try {
                         if (baseUrl != null) {
@@ -104,12 +106,29 @@ object FeedParser {
                         false
                     }
                 }
-                .map {
+                ?.map {
                     when {
                         baseUrl != null -> relativeLinkIntoAbsolute(base = baseUrl, link = it.attr("href")) to it.attr("type")
                         else -> sloppyLinkToStrictURL(it.attr("href")).toString() to it.attr("type")
                     }
-                }
+                } ?: emptyList()
+
+        return when {
+            feeds.isNotEmpty() -> feeds
+            baseUrl?.host == "www.youtube.com" || baseUrl?.host == "youtube.com" -> findFeedLinksForYoutube(doc)
+            else -> emptyList()
+        }
+    }
+
+    private fun findFeedLinksForYoutube(doc: Document): List<Pair<String, String>> {
+       val channelId: String? =  doc.body()?.getElementsByAttribute(YOUTUBE_CHANNEL_ID_ATTR)
+                ?.firstOrNull()
+                ?.attr(YOUTUBE_CHANNEL_ID_ATTR)
+
+        return when (channelId) {
+            null -> emptyList()
+            else -> listOf("https://www.youtube.com/feeds/videos.xml?channel_id=$channelId" to "atom")
+        }
     }
 
     fun curl(url: URL): String? {
