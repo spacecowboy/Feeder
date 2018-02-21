@@ -29,6 +29,7 @@ import android.widget.FilterQueryProvider
 import android.widget.SimpleCursorAdapter
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
@@ -48,6 +49,9 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.updateFeedWith
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import java.net.URL
 
 const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
@@ -171,25 +175,33 @@ class EditFeedActivity : Activity() {
                         setString(COL_URL to textUrl.text.toString().trim())
                     }
 
-                    if (id < 1) {
-                        id = contentResolver.insertFeedWith(values)
-                    } else {
-                        contentResolver.updateFeedWith(id, values)
-                    }
-                    contentResolver.notifyAllUris()
-                    contentResolver.requestFeedSync(id)
+                    launch(UI) {
+                        val feedId: Long = async(Background) {
+                            if (id < 1) {
+                                contentResolver.insertFeedWith(values)
+                            } else {
+                                contentResolver.updateFeedWith(id, values)
+                                id
+                            }
+                        }.await()
 
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$id"))
-                    intent.putExtra(ARG_FEED_TITLE, title)
-                            .putExtra(ARG_FEED_URL, values.getAsString(COL_URL))
-                            .putExtra(ARG_FEED_TAG, values.getAsString(COL_TAG))
+                        launch(Background) {
+                            contentResolver.notifyAllUris()
+                            contentResolver.requestFeedSync(feedId)
+                        }
 
-                    setResult(RESULT_OK, intent)
-                    finish()
-                    if (shouldFinishBack) {
-                        // Only care about exit transition
-                        overridePendingTransition(R.anim.to_bottom_right,
-                                R.anim.to_bottom_right)
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId"))
+                        intent.putExtra(ARG_FEED_TITLE, title)
+                                .putExtra(ARG_FEED_URL, values.getAsString(COL_URL))
+                                .putExtra(ARG_FEED_TAG, values.getAsString(COL_TAG))
+
+                        setResult(RESULT_OK, intent)
+                        finish()
+                        if (shouldFinishBack) {
+                            // Only care about exit transition
+                            overridePendingTransition(R.anim.to_bottom_right,
+                                    R.anim.to_bottom_right)
+                        }
                     }
                 }
 

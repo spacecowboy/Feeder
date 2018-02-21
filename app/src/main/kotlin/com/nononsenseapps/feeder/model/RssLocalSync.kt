@@ -60,7 +60,7 @@ fun syncFeeds(context: Context, feedId: Long, tag: String) {
                     e.printStackTrace()
                 }
                 // Send notifications for configured feeds
-                notify(context)
+                notifyInBackground(context)
             }
             Log.d("CoroutineSync", "Completed in $time ms")
         }
