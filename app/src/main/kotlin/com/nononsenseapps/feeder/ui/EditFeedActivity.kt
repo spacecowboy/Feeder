@@ -29,6 +29,7 @@ import android.widget.FilterQueryProvider
 import android.widget.SimpleCursorAdapter
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
@@ -37,7 +38,7 @@ import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
 import com.nononsenseapps.feeder.db.Util
-import com.nononsenseapps.feeder.util.Optional
+import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.util.contentValues
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.insertFeedWith
@@ -48,11 +49,10 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.updateFeedWith
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import java.net.URL
-import java.util.*
 
 const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
 const val TEMPLATE = "template"
@@ -65,22 +65,28 @@ class EditFeedActivity : Activity() {
     private var shouldFinishBack = false
     private var id: Long = -1
     // Views and shit
-    lateinit private var textTitle: EditText
-    lateinit private var textUrl: EditText
-    lateinit private var textTag: AutoCompleteTextView
-    lateinit private var textSearch: EditText
-    lateinit private var detailsFrame: View
-    lateinit private var listResults: RecyclerView
-    lateinit private var resultAdapter: ResultsAdapter
-    lateinit private var searchFrame: View
+    private lateinit var textTitle: EditText
+    private lateinit var textUrl: EditText
+    private lateinit var textTag: AutoCompleteTextView
+    private lateinit var textSearch: EditText
+    private lateinit var detailsFrame: View
+    private lateinit var listResults: RecyclerView
+    private lateinit var resultAdapter: ResultsAdapter
+    private lateinit var searchFrame: View
     private var feedUrl: String? = null
-    lateinit private var emptyText: TextView
-    lateinit private var loadingProgress: View
-    lateinit private var urlLabel: FloatLabelLayout
-    lateinit private var titleLabel: FloatLabelLayout
-    lateinit private var tagLabel: FloatLabelLayout
+    private lateinit var emptyText: TextView
+    private lateinit var loadingProgress: View
+    private lateinit var urlLabel: FloatLabelLayout
+    private lateinit var titleLabel: FloatLabelLayout
+    private lateinit var tagLabel: FloatLabelLayout
 
     private var feedTitle: String = ""
+
+    private var searchTask: SearchTask? = null
+        set(value) {
+            field?.cancel(true)
+            field = value
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (shouldBeFloatingWindow()) {
@@ -127,65 +133,32 @@ class EditFeedActivity : Activity() {
                 emptyText.visibility = View.GONE
                 loadingProgress.visibility = View.VISIBLE
 
-                Observable.just(url)
-                        .subscribeOn(Schedulers.io())
-                        .flatMap {
-                            try {
-                                val alts = feedParser.getAlternateFeedLinksAtUrl(it)
-                                if (alts.isNotEmpty()) {
-                                    Observable.fromIterable(alts.map { sloppyLinkToStrictURL(it.first) to it.second })
-                                } else {
-                                    throw IllegalArgumentException("No alternate feeds found")
-                                }
-                            } catch (t: Throwable) {
-                                Log.d("Finding alternates: ", t.localizedMessage)
-                                Observable.just(it to "RSS")
-                            }
-                        }
-                        .flatMap {
-                            Observable.just(it).subscribeOn(Schedulers.io())
-                                    .map {
-                                        try {
-                                            Log.d("JONAS", "Fetching feed on ${Thread.currentThread().name}")
-                                            // TODO FIX
-                                            Optional.of(feedParser.parseFeedUrl(it.first) to it.second)
-                                        } catch (t: Throwable) {
-                                            Log.d("Parsing feed:", t.localizedMessage)
-                                            Optional.empty<Pair<Feed, String>>()
-                                        }
-                                    }
-                        }
-                        .filter {
-                            it.isPresent
-                        }
-                        .map {
-                            it.get()
-                        }
-                        .reduce(ArrayList<Pair<Feed, String>>(), { acc, next ->
-                            acc.add(next)
-                            acc
-                        })
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { result ->
-                            Log.d("JONAS", "UPdating UI...")
-                            loadingProgress.visibility = View.GONE
-                            if (result.isNotEmpty()) {
-                                resultAdapter.data = result.map { it.first }
+                val inProgressData = mutableListOf<Feed>()
+                searchTask = SearchTask(feedParser,
+                        { feed ->
+                            inProgressData.add(feed)
+                            resultAdapter.data = inProgressData
+                            if (inProgressData.isNotEmpty()) {
                                 detailsFrame.visibility = View.GONE
                                 searchFrame.visibility = View.VISIBLE
                                 listResults.visibility = View.VISIBLE
-                            } else {
+                            }
+                        },
+                        {
+                            loadingProgress.visibility = View.GONE
+                            if (resultAdapter.data.isEmpty()) {
                                 emptyText.text = getString(R.string.no_such_feed)
                                 emptyText.visibility = View.VISIBLE
                             }
-                        }
+                        })
+                searchTask?.execute(url)
 
                 return@OnEditorActionListener true
             }
             false
         })
 
-        val addButton = findViewById<Button>(R.id.add_button) as Button
+        val addButton = findViewById<Button>(R.id.add_button)
         addButton
                 .setOnClickListener {
                     // TODO error checking and stuff like that
@@ -202,25 +175,33 @@ class EditFeedActivity : Activity() {
                         setString(COL_URL to textUrl.text.toString().trim())
                     }
 
-                    if (id < 1) {
-                        id = contentResolver.insertFeedWith(values)
-                    } else {
-                        contentResolver.updateFeedWith(id, values)
-                    }
-                    contentResolver.notifyAllUris()
-                    contentResolver.requestFeedSync(id)
+                    launch(UI) {
+                        val feedId: Long = async(Background) {
+                            if (id < 1) {
+                                contentResolver.insertFeedWith(values)
+                            } else {
+                                contentResolver.updateFeedWith(id, values)
+                                id
+                            }
+                        }.await()
 
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$id"))
-                    intent.putExtra(ARG_FEED_TITLE, title)
-                            .putExtra(ARG_FEED_URL, values.getAsString(COL_URL))
-                            .putExtra(ARG_FEED_TAG, values.getAsString(COL_TAG))
+                        launch(Background) {
+                            contentResolver.notifyAllUris()
+                            contentResolver.requestFeedSync(feedId)
+                        }
 
-                    setResult(RESULT_OK, intent)
-                    finish()
-                    if (shouldFinishBack) {
-                        // Only care about exit transition
-                        overridePendingTransition(R.anim.to_bottom_right,
-                                R.anim.to_bottom_right)
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId"))
+                        intent.putExtra(ARG_FEED_TITLE, title)
+                                .putExtra(ARG_FEED_URL, values.getAsString(COL_URL))
+                                .putExtra(ARG_FEED_TAG, values.getAsString(COL_TAG))
+
+                        setResult(RESULT_OK, intent)
+                        finish()
+                        if (shouldFinishBack) {
+                            // Only care about exit transition
+                            overridePendingTransition(R.anim.to_bottom_right,
+                                    R.anim.to_bottom_right)
+                        }
                     }
                 }
 
@@ -349,7 +330,7 @@ class EditFeedActivity : Activity() {
         val theme = theme
         val floatingWindowFlag = TypedValue()
         if (theme == null || !theme.resolveAttribute(R.attr.isFloatingWindow, floatingWindowFlag,
-                true)) {
+                        true)) {
             // isFloatingWindow flag is not defined in theme
             return false
         }
@@ -390,6 +371,11 @@ class EditFeedActivity : Activity() {
             // Only care about exit transition
             overridePendingTransition(0, R.anim.to_bottom_right)
         }
+    }
+
+    override fun onDestroy() {
+        searchTask?.cancel(true)
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean =
@@ -457,4 +443,36 @@ class EditFeedActivity : Activity() {
 
     }
 
+}
+
+class SearchTask(private val feedParser: FeedParser,
+                 onProgress: ((Feed) -> Unit)?,
+                 onPost: ((Void?) -> Unit)?) : LeakHandlingAsyncTask<URL, Feed, Void>(onProgress, onPost) {
+
+    override fun doInBackground(vararg urls: URL): Void? {
+        val url = urls.firstOrNull() ?: return null
+        val alts = feedParser.getAlternateFeedLinksAtUrl(url)
+        val urlsToParse = when (alts.isNotEmpty()) {
+            true -> alts.map { sloppyLinkToStrictURL(it.first) }
+            false -> listOf(url)
+        }
+        if (isCancelled) {
+            return null
+        }
+        urlsToParse.mapNotNull {
+            try {
+                if (isCancelled) {
+                    return null
+                }
+                Log.d("SearchTask", "Parsing $it")
+                val feed = feedParser.parseFeedUrl(it)
+                publishProgress(feed)
+                feed
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                null
+            }
+        }
+        return null
+    }
 }

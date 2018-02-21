@@ -8,6 +8,8 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
+import android.util.Log
 import com.nononsenseapps.feeder.db.COL_FEED
 import com.nononsenseapps.feeder.db.COL_GUID
 import com.nononsenseapps.feeder.db.COL_ID
@@ -43,6 +45,7 @@ fun ContentResolver.save(feed: FeedSQL): Long = when {
 }
 
 fun ContentResolver.notifyAllUris() {
+    panicIfOnUiThread()
     val uris = listOf(URI_FEEDS,
             URI_TAGSWITHCOUNTS,
             URI_FEEDSWITHCOUNTS,
@@ -53,18 +56,21 @@ fun ContentResolver.notifyAllUris() {
 }
 
 fun ContentResolver.markItemAsRead(itemId: Long, read: Boolean = true) {
+    panicIfOnUiThread()
     updateFeedItem(itemId) {
         setInt(COL_UNREAD to (if (read) 0 else 1))
     }
 }
 
 fun ContentResolver.markItemAsUnread(itemId: Long) {
+    panicIfOnUiThread()
     updateFeedItem(itemId) {
         setInt(COL_UNREAD to 1)
     }
 }
 
 fun ContentResolver.markFeedAsRead(feedId: Long) {
+    panicIfOnUiThread()
     updateItems(URI_FEEDITEMS,
             where = "$COL_FEED IS ?",
             params = arrayListOf(feedId)) {
@@ -73,6 +79,7 @@ fun ContentResolver.markFeedAsRead(feedId: Long) {
 }
 
 fun ContentResolver.markTagAsRead(tag: String) {
+    panicIfOnUiThread()
     updateItems(URI_FEEDITEMS,
             where = "$COL_TAG IS ?",
             params = arrayListOf(tag)) {
@@ -81,6 +88,7 @@ fun ContentResolver.markTagAsRead(tag: String) {
 }
 
 fun ContentResolver.markAllAsRead() {
+    panicIfOnUiThread()
     updateItems(URI_FEEDITEMS) {
         setInt(COL_UNREAD to 0)
     }
@@ -114,12 +122,14 @@ fun ContentResolver.requestFeedSync(tag: String) {
     }
 }
 
+@Suppress("unused")
 inline fun ContentResolver.requestFeedSync(init: Bundle.() -> Unit) {
     val account = com.nononsenseapps.feeder.db.AccountService.Account()
     requestSync(account, com.nononsenseapps.feeder.db.AUTHORITY, bundle(init))
 }
 
 fun ContentResolver.setNotify(feedId: Long, notify: Boolean = true) {
+    panicIfOnUiThread()
     if (notify) {
         // First mark all existing as notified so we don't spam
         updateFeedItems(where = "$COL_FEED IS ? AND $COL_NOTIFIED IS 0",
@@ -134,6 +144,7 @@ fun ContentResolver.setNotify(feedId: Long, notify: Boolean = true) {
 }
 
 fun ContentResolver.setNotify(tag: String, notify: Boolean = true) {
+    panicIfOnUiThread()
     if (notify) {
         // First mark all existing as notified so we don't spam
         updateFeedItems(where = "$COL_TAG IS ? AND $COL_NOTIFIED IS 0",
@@ -148,6 +159,7 @@ fun ContentResolver.setNotify(tag: String, notify: Boolean = true) {
 }
 
 fun ContentResolver.setNotifyOnAllFeeds(notify: Boolean = true) {
+    panicIfOnUiThread()
     if (notify) {
         // First mark all existing as notified so we don't spam
         updateFeedItems(where = "$COL_NOTIFIED IS 0") {
@@ -173,13 +185,16 @@ inline fun ContentResolver.updateFeed(id: Long, init: ContentValues.() -> Unit):
 }
 
 fun ContentResolver.updateFeedWith(id: Long, values: ContentValues): Int {
+    panicIfOnUiThread()
     return updateFeedsWith(where = "$COL_ID IS ?",
             params = arrayListOf(id),
             values = values)
 }
 
-fun ContentResolver.insertFeedWith(values: ContentValues) =
-        insert(URI_FEEDS, values).lastPathSegment.toLong()
+fun ContentResolver.insertFeedWith(values: ContentValues): Long {
+    panicIfOnUiThread()
+    return insert(URI_FEEDS, values).lastPathSegment.toLong()
+}
 
 /**
  * Update feeds which have a certain column value
@@ -216,23 +231,19 @@ inline fun ContentResolver.updateItems(uri: Uri, where: String? = null, params: 
 fun ContentResolver.queryTagsWithCounts(columns: List<String> = FIELDS_TAGSWITHCOUNT.asList(),
                                         where: String? = null, params: List<Any>? = null, order: String? = null,
                                         reader: (Cursor) -> Unit) {
+    panicIfOnUiThread()
     queryItems(URI_TAGSWITHCOUNTS, columns, where, params, order, reader)
 }
 
 fun ContentResolver.queryFeeds(columns: List<String> = FEED_FIELDS.asList(),
                                where: String? = null, params: List<Any>? = null, order: String? = null,
                                reader: (Cursor) -> Unit) {
+    panicIfOnUiThread()
     queryItems(URI_FEEDS, columns, where, params, order, reader)
 }
 
-fun ContentResolver.queryFeedsWithCounts(columns: List<String> = FIELDS_VIEWCOUNT.asList(),
-                                        where: String? = null, params: List<Any>? = null, order: String? = null,
-                                        reader: (Cursor) -> Unit) {
-    queryItems(URI_FEEDSWITHCOUNTS, columns, where, params, order, reader)
-}
-
 fun ContentResolver.cursorForFeedsWithCounts(columns: List<String> = FIELDS_VIEWCOUNT.asList(),
-                                         where: String? = null, params: List<Any>? = null, order: String? = null): Cursor? =
+                                             where: String? = null, params: List<Any>? = null, order: String? = null): Cursor? =
         cursorFor(URI_FEEDSWITHCOUNTS, columns, where, params, order)
 
 fun ContentResolver.queryFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asList(),
@@ -240,13 +251,15 @@ fun ContentResolver.queryFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asLi
                                    params: List<Any>? = null,
                                    order: String? = null,
                                    reader: (Cursor) -> Unit) {
+    panicIfOnUiThread()
     queryItems(URI_FEEDITEMS, columns, where, params, order, reader)
 }
 
 fun ContentResolver.cursorFor(uri: Uri, columns: List<String>, where: String? = null,
-                                      params: List<Any>? = null, order: String? = null): Cursor? =
-        query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order)
-
+                              params: List<Any>? = null, order: String? = null): Cursor? {
+    panicIfOnUiThread()
+    return query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order)
+}
 
 inline fun ContentResolver.queryItems(uri: Uri, columns: List<String>, where: String? = null,
                                       params: List<Any>? = null, order: String? = null,
@@ -256,6 +269,7 @@ inline fun ContentResolver.queryItems(uri: Uri, columns: List<String>, where: St
 
 fun ContentResolver.getFeeds(columns: List<String> = FEED_FIELDS.asList(),
                              where: String? = null, params: List<Any>? = null, order: String? = null): List<FeedSQL> {
+    panicIfOnUiThread()
     val feeds = ArrayList<FeedSQL>()
     queryFeeds(columns, where, params, order) { cursor ->
         cursor.forEach {
@@ -269,6 +283,7 @@ fun ContentResolver.getFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asList
                                  where: String? = null,
                                  params: List<Any>? = null,
                                  order: String? = null): List<FeedItemSQL> {
+    panicIfOnUiThread()
     val items = ArrayList<FeedItemSQL>()
     queryFeedItems(columns, where, params, order) { cursor ->
         cursor.forEach {
@@ -279,6 +294,7 @@ fun ContentResolver.getFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asList
 }
 
 fun ContentResolver.getIdForFeedItem(guid: String, feedId: Long): Long {
+    panicIfOnUiThread()
     queryItems(URI_FEEDITEMS,
             columns = listOf(COL_ID),
             where = "$COL_GUID IS ? AND $COL_FEED IS ?",
@@ -289,3 +305,16 @@ fun ContentResolver.getIdForFeedItem(guid: String, feedId: Long): Long {
     }
     return -1L
 }
+
+/**
+ * @throws DatabaseOnMainThreadException if on the Main Thread
+ */
+private fun panicIfOnUiThread() {
+    if (Looper.getMainLooper().thread == Thread.currentThread()) {
+        Log.e("SHIT", "Thread name: ${Thread.currentThread().name}")
+        throw DatabaseOnMainThreadException()
+    }
+}
+
+class DatabaseOnMainThreadException : Exception("Database operation was performed on the Main thread. " +
+        "Please offload that work using a coroutine and the Background context.")

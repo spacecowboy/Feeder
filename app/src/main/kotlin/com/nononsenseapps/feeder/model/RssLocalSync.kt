@@ -24,197 +24,186 @@ import com.nononsenseapps.feeder.db.Util.LongsToStringArray
 import com.nononsenseapps.feeder.db.Util.ToStringArray
 import com.nononsenseapps.feeder.db.Util.WHEREIDIS
 import com.nononsenseapps.feeder.db.Util.WhereIs
-import com.nononsenseapps.feeder.util.FileLog
-import com.nononsenseapps.feeder.util.Optional
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.getFeeds
 import com.nononsenseapps.feeder.util.getIdForFeedItem
 import com.nononsenseapps.feeder.util.intoContentProviderOperation
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.jsonfeed.Feed
-import io.reactivex.Observable
-import io.reactivex.plugins.RxJavaPlugins
-import okhttp3.Protocol
-import okhttp3.Request
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.experimental.withTimeoutOrNull
 import okhttp3.Response
-import org.joda.time.DateTime
-import org.joda.time.Duration
-import java.net.URL
-import java.util.ArrayList
-import java.util.Arrays
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.system.measureTimeMillis
 
-object RssLocalSync {
 
-    /**
-     * @param feedId if less than '1' then all feeds are synchronized
-     * @param tag    of feeds to sync, only used if feedId is less than 1. If empty, all feeds are synced.
-     */
-    fun syncFeeds(context: Context, feedId: Long, tag: String) {
-        val log = FileLog.getInstance(context)
-        try {
-            val start = DateTime.now()
-
-            // Get all stored feeds
-            val feeds: List<FeedSQL> = if (feedId > 0) {
-                listFeed(context, feedId)
-            } else if (!tag.isEmpty()) {
-                listFeeds(context, tag)
-            } else {
-                listFeeds(context)
+fun syncFeeds(context: Context, feedId: Long, tag: String) {
+    try {
+        runBlocking {
+            val time = measureTimeMillis {
+                val feedsToFetch = feedsToSync(context, feedId, tag)
+                feedsToFetch
+                        .map { launch(coroutineContext) { syncFeed(it, context) } }
+                        .forEach {
+                            Log.d("CoroutineSync", "Joining a job")
+                            // Await completion of asynchronous operation
+                            it.join()
+                        }
+                // Finally, prune excessive items
+                try {
+                    Cleanup.prune(context)
+                } catch (e: RemoteException) {
+                    e.printStackTrace()
+                } catch (e: OperationApplicationException) {
+                    e.printStackTrace()
+                }
+                // Send notifications for configured feeds
+                notifyInBackground(context)
             }
-            log.d(String.format("Syncing %d feeds: %s", feeds.size, start.toString()))
+            Log.d("CoroutineSync", "Completed in $time ms")
+        }
+    } catch (e: Throwable) {
+        e.printStackTrace()
+    }
+}
 
-            RxJavaPlugins.setErrorHandler {
-                Log.e("RxRSSLocalSync", "ErrorHandler: $it")
-            }
+private suspend fun syncFeed(feedSql: FeedSQL, context: Context) {
+    Log.d("CoroutineSync", "Launching sync of ${feedSql.displayTitle} on ${Thread.currentThread().name}")
+    try {
+        val response: Response? =
+                try {
+                    fetchFeed(context, feedSql)
+                } catch (t: Throwable) {
+                    Log.e("CoroutineSync", "Shit hit the fan: $t")
+                    null
+                }
 
-            val timedOutResponse = Response.Builder()
-                    .code(999)
-                    .protocol(Protocol.HTTP_2)
-                    .message("RxJava thread timed out")
-                    .request(Request.Builder().url(URL("http://dummy")).build())
-                    .build()
-
-            Observable.fromIterable(feeds).flatMap { feedSql ->
-                Observable.just(feedSql).map {
-                    context.feedParser.getResponse(it.url)
-                }.timeout(2L, TimeUnit.SECONDS)
-                        .onErrorReturnItem(timedOutResponse)
-                        .filter {
-                    if (!it.isSuccessful) {
-                        Log.d("RxRssLocalSync", "Response failure for ${feedSql.displayTitle}: ${it.message()}")
+        val feed: Feed? =
+                response?.let {
+                    try {
+                        Log.d("CoroutineSync", "Parsing ${feedSql.displayTitle} on ${Thread.currentThread().name}")
+                        context.feedParser.parseFeedResponse(it)
+                    } catch (t: Throwable) {
+                        Log.e("CoroutineSync", "Shit hit the fan: $t")
+                        null
                     }
-
-                    it.isSuccessful && it.body() != null
-                }.map { response ->
-                    Log.d("RxRssLocalSync", "Parsing ${feedSql.displayTitle} response on ${Thread.currentThread().name}")
-                    val feed = context.feedParser.parseFeedResponse(response)
-                    val ops = convertResultToOperations(feed, feedSql, context.contentResolver)
-                    storeSyncResults(context, ops)
-                    context.contentResolver.notifyAllUris()
-                    feedSql
                 }
-            }.blockingSubscribe({
-                Log.d("RxRssLocalSync", "BlockingSubscribe finished: ${it.displayTitle}")
-            }, { error ->
-                Log.d("RxRssLocalSync", "BlockingSubscribe error: $error")
-                error.printStackTrace()
-            })
 
-            Log.d("RxRssLocalSync", "Cleaning up")
+        val ops: ArrayList<ContentProviderOperation>? =
+                feed?.let {
+                    try {
+                        Log.d("CoroutineSync", "Converting ${feedSql.displayTitle} on ${Thread.currentThread().name}")
+                        convertResultToOperations(it, feedSql, context.contentResolver)
+                    } catch (t: Throwable) {
+                        Log.e("CoroutineSync", "Shit hit the fan: $t")
+                        null
+                    }
+                }
 
-            // Finally, prune excessive items
+        ops?.let {
             try {
-                Cleanup.prune(context)
-            } catch (e: RemoteException) {
-                log.d("Error during cleanup: ${e.message}")
-                e.printStackTrace()
-            } catch (e: OperationApplicationException) {
-                log.d("Error during cleanup: ${e.message}")
-                e.printStackTrace()
-            }
-
-            val end = DateTime.now()
-
-            val duration = Duration.millis(end.millis - start.millis)
-            log.d(String.format("Finished sync after %s", duration.toString()))
-
-            // Notify that we've updated
-            context.contentResolver.notifyAllUris()
-            // Send notifications for configured feeds
-            notify(context)
-        } catch (e: Throwable) {
-            log.d("Some fatal error during sync: " + e.message)
-            e.printStackTrace()
-        }
-
-    }
-
-    private fun syncFeed(feedSQL: FeedSQL): Optional<Feed> {
-        try {
-            return Optional.of(FeedParser.parseFeedUrl(feedSQL.url))
-        } catch (error: Throwable) {
-            System.err.println("Error when syncing " + feedSQL.url)
-            error.printStackTrace()
-        }
-
-        return Optional.empty()
-    }
-
-    @Synchronized
-    @Throws(RemoteException::class, OperationApplicationException::class)
-    private fun storeSyncResults(context: Context,
-                                 operations: List<ContentProviderOperation>) {
-        if (!operations.isEmpty()) {
-            context.contentResolver
-                    .applyBatch(AUTHORITY, ArrayList(operations))
-        }
-    }
-
-    /**
-     * @param parsedFeed
-     * @param feedSQL
-     * @return A list of Operations containing no back references
-     */
-    private fun convertResultToOperations(parsedFeed: Feed,
-                                          feedSQL: FeedSQL,
-                                          resolver: ContentResolver): ArrayList<ContentProviderOperation> {
-        val operations = ArrayList<ContentProviderOperation>()
-
-        val feedOp = ContentProviderOperation.newUpdate(Uri.withAppendedPath(URI_FEEDS,
-                java.lang.Long.toString(feedSQL.id)))
-
-        // This can be null, in that case do not override existing value
-        val selfLink: String = parsedFeed.feed_url ?: feedSQL.url.toString()
-
-        // Populate with values
-        feedOp.withValue(COL_TITLE, parsedFeed.title)
-                .withValue(COL_TAG, feedSQL.tag)
-                .withValue(COL_URL, selfLink)
-                .withValue(COL_IMAGEURL, parsedFeed.icon)
-
-        // Add to list of operations
-        operations.add(feedOp.build())
-
-        parsedFeed.items?.forEach { entry ->
-            if (entry.id != null) {
-                val itemId = resolver.getIdForFeedItem(entry.id!!, feedSQL.id)
-                val itemOp: ContentProviderOperation.Builder = if (itemId < 1) {
-                    ContentProviderOperation.newInsert(URI_FEEDITEMS)
-                } else {
-                    ContentProviderOperation.newUpdate(Uri.withAppendedPath(URI_FEEDITEMS,
-                            itemId.toString()))
-                }
-
-                // Use the actual id, because update operation will not return id
-                itemOp.withValue(COL_FEED, feedSQL.id)
-                        .withValue(COL_FEEDTITLE, feedSQL.displayTitle)
-                        .withValue(COL_FEEDURL, selfLink)
-                        .withValue(COL_TAG, feedSQL.tag)
-
-                entry.intoContentProviderOperation(parsedFeed, itemOp)
-
-                // Add to list of operations
-                operations.add(itemOp.build())
+                Log.d("CoroutineSync", "Storing ${feedSql.displayTitle} on ${Thread.currentThread().name}")
+                storeSyncResults(context, it)
+                context.contentResolver.notifyAllUris()
+            } catch (t: Throwable) {
+                Log.e("CoroutineSync", "Shit hit the fan: $t")
+                null
             }
         }
+    } catch (t: Throwable) {
+        Log.e("CoroutineSync", "Something went wrong: $t")
+    }
+}
 
-        return operations
+private suspend fun fetchFeed(context: Context, feedSql: FeedSQL,
+                              timeout: Long = 2L, timeUnit: TimeUnit = TimeUnit.SECONDS): Response? {
+    return withTimeoutOrNull(timeout, timeUnit) {
+        Log.d("CoroutineSync", "Fetching ${feedSql.displayTitle} on ${Thread.currentThread().name}")
+        context.feedParser.getResponse(feedSql.url)
+    }
+}
+
+private fun feedsToSync(context: Context, feedId: Long, tag: String): List<FeedSQL> {
+    return when {
+        feedId > 0 -> listFeed(context, feedId)
+        !tag.isEmpty() -> listFeeds(context, tag)
+        else -> listFeeds(context)
+    }
+}
+
+private fun listFeed(context: Context, id: Long): List<FeedSQL> {
+    return context.contentResolver.getFeeds(
+            FEED_FIELDS.asList(), WHEREIDIS, Arrays.asList(*LongsToStringArray(id)), null)
+}
+
+private fun listFeeds(context: Context, tag: String): List<FeedSQL> {
+    return context.contentResolver.getFeeds(
+            FEED_FIELDS.asList(), WhereIs(COL_TAG), Arrays.asList(*ToStringArray(tag)), null)
+}
+
+private fun listFeeds(context: Context): List<FeedSQL> {
+    return context.contentResolver.getFeeds(
+            FEED_FIELDS.asList(), null, null, null)
+}
+
+/**
+ * @param parsedFeed
+ * @param feedSQL
+ * @return A list of Operations containing no back references
+ */
+private fun convertResultToOperations(parsedFeed: Feed,
+                                      feedSQL: FeedSQL,
+                                      resolver: ContentResolver): ArrayList<ContentProviderOperation> {
+    val operations = ArrayList<ContentProviderOperation>()
+
+    val feedOp = ContentProviderOperation.newUpdate(Uri.withAppendedPath(URI_FEEDS,
+            java.lang.Long.toString(feedSQL.id)))
+
+    // This can be null, in that case do not override existing value
+    val selfLink: String = parsedFeed.feed_url ?: feedSQL.url.toString()
+
+    // Populate with values
+    feedOp.withValue(COL_TITLE, parsedFeed.title)
+            .withValue(COL_TAG, feedSQL.tag)
+            .withValue(COL_URL, selfLink)
+            .withValue(COL_IMAGEURL, parsedFeed.icon)
+
+    // Add to list of operations
+    operations.add(feedOp.build())
+
+    parsedFeed.items?.forEach { entry ->
+        if (entry.id != null) {
+            val itemId = resolver.getIdForFeedItem(entry.id!!, feedSQL.id)
+            val itemOp: ContentProviderOperation.Builder = if (itemId < 1) {
+                ContentProviderOperation.newInsert(URI_FEEDITEMS)
+            } else {
+                ContentProviderOperation.newUpdate(Uri.withAppendedPath(URI_FEEDITEMS,
+                        itemId.toString()))
+            }
+
+            // Use the actual id, because update operation will not return id
+            itemOp.withValue(COL_FEED, feedSQL.id)
+                    .withValue(COL_FEEDTITLE, feedSQL.displayTitle)
+                    .withValue(COL_FEEDURL, selfLink)
+                    .withValue(COL_TAG, feedSQL.tag)
+
+            entry.intoContentProviderOperation(parsedFeed, itemOp)
+
+            // Add to list of operations
+            operations.add(itemOp.build())
+        }
     }
 
-    private fun listFeed(context: Context, id: Long): List<FeedSQL> {
-        return context.contentResolver.getFeeds(
-                FEED_FIELDS.asList(), WHEREIDIS, Arrays.asList(*LongsToStringArray(id)), null)
-    }
+    return operations
+}
 
-    private fun listFeeds(context: Context, tag: String): List<FeedSQL> {
-        return context.contentResolver.getFeeds(
-                FEED_FIELDS.asList(), WhereIs(COL_TAG), Arrays.asList(*ToStringArray(tag)), null)
-    }
-
-    private fun listFeeds(context: Context): List<FeedSQL> {
-        return context.contentResolver.getFeeds(
-                FEED_FIELDS.asList(), null, null, null)
+@Throws(RemoteException::class, OperationApplicationException::class)
+private fun storeSyncResults(context: Context,
+                             operations: List<ContentProviderOperation>) {
+    if (!operations.isEmpty()) {
+        context.contentResolver
+                .applyBatch(AUTHORITY, ArrayList(operations))
     }
 }

@@ -153,7 +153,7 @@ public class BaseActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
         // Send notifications for configured feeds
-        RssNotificationsKt.notify(this);
+        RssNotificationsKt.notifyInBackground(this);
     }
 
     protected Toolbar initializeActionBar() {

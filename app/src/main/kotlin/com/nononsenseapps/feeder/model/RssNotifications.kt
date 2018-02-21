@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.support.v4.app.NotificationCompat
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.COL_FEED
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_NOTIFIED
@@ -19,24 +20,28 @@ import com.nononsenseapps.feeder.ui.ReaderActivity
 import com.nononsenseapps.feeder.util.getFeedItems
 import com.nononsenseapps.feeder.util.getFeeds
 import com.nononsenseapps.feeder.util.notificationManager
+import kotlinx.coroutines.experimental.launch
 
 
 const val notificationId = 73583
 const val channelId = "feederNotifications"
 
-fun notify(context: Context) {
-    val feedItems = getItemsToNotify(context)
+fun notifyInBackground(context: Context) {
+    val appContext = context.applicationContext
+    launch(Background) {
+        val feedItems = getItemsToNotify(appContext)
 
-    val notification: Notification? = when (feedItems.size) {
-        0 -> null
-        1 -> singleNotification(context, feedItems.first())
-        else -> manyNotification(context, feedItems)
-    }
+        val notification: Notification? = when (feedItems.size) {
+            0 -> null
+            1 -> singleNotification(appContext, feedItems.first())
+            else -> manyNotification(appContext, feedItems)
+        }
 
-    val nm = context.notificationManager
-    when (notification) {
-        null -> nm.cancel(notificationId)
-        else -> nm.notify(notificationId, notification)
+        val nm = appContext.notificationManager
+        when (notification) {
+            null -> nm.cancel(notificationId)
+            else -> nm.notify(notificationId, notification)
+        }
     }
 }
 

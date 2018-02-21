@@ -41,6 +41,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.FEED_ITEM_FIELDS
 import com.nononsenseapps.feeder.db.FeedItemSQL
@@ -56,6 +57,7 @@ import com.nononsenseapps.feeder.util.firstOrNull
 import com.nononsenseapps.feeder.util.markItemAsRead
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.views.ObservableScrollView
+import kotlinx.coroutines.experimental.launch
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 import java.util.*
@@ -97,7 +99,13 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
         }
 
         if (_id > 0) {
-            activity!!.contentResolver.markItemAsRead(_id, true)
+            val itemId = _id
+            val contentResolver = context?.contentResolver
+            if (contentResolver != null) {
+                launch(Background) {
+                    contentResolver.markItemAsRead(itemId)
+                }
+            }
             loaderManager.restartLoader(ITEM_LOADER, Bundle(), this)
         }
 
@@ -260,10 +268,12 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
             // Using twice window height since we do scroll vertically
             when {
                 TabletUtils.isTablet(activity) -> // Tablet has fixed width
-                    ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl ?: sloppyLinkToStrictURL(""),
+                    ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl
+                            ?: sloppyLinkToStrictURL(""),
                             Point(Math.round(resources.getDimension(R.dimen.reader_tablet_width)), 2 * size.y), PrefUtils.shouldLoadImages(activity!!)) as Loader<Any?>
                 else -> // Base it on window size
-                    ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl ?: sloppyLinkToStrictURL(""),
+                    ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl
+                            ?: sloppyLinkToStrictURL(""),
                             Point(size.x - 2 * Math.round(resources.getDimension(R.dimen.keyline_1)), 2 * size.y), PrefUtils.shouldLoadImages(activity!!)) as Loader<Any?>
             }
         }

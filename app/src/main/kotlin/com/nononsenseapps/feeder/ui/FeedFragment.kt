@@ -44,6 +44,7 @@ import android.view.ViewGroup
 import android.widget.CheckedTextView
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_FEED
 import com.nononsenseapps.feeder.db.COL_ID
@@ -56,7 +57,6 @@ import com.nononsenseapps.feeder.db.FEED_FIELDS
 import com.nononsenseapps.feeder.db.FEED_ITEM_FIELDS_FOR_LIST
 import com.nononsenseapps.feeder.db.FeedItemSQL
 import com.nononsenseapps.feeder.db.QUERY_PARAM_LIMIT
-import com.nononsenseapps.feeder.db.RssDatabaseService
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.Util
@@ -68,12 +68,19 @@ import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.firstOrNull
+import com.nononsenseapps.feeder.util.markAllAsRead
+import com.nononsenseapps.feeder.util.markFeedAsRead
+import com.nononsenseapps.feeder.util.markItemAsRead
+import com.nononsenseapps.feeder.util.markTagAsRead
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.feeder.util.setLong
+import com.nononsenseapps.feeder.util.setNotify
+import com.nononsenseapps.feeder.util.setNotifyOnAllFeeds
 import com.nononsenseapps.feeder.util.setString
+import kotlinx.coroutines.experimental.launch
 import org.joda.time.format.DateTimeFormat
 import java.util.*
 
@@ -157,11 +164,14 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                     return true
                 }
                 R.id.action_toggle_unread -> {
-                    //
-                    if (selectedItem!!.unread) {
-                        RssDatabaseService.markItemAsRead(activity, selectedItem!!.id)
-                    } else {
-                        RssDatabaseService.markItemAsUnread(activity, selectedItem!!.id)
+                    // toggle read state
+                    val contentResolver = context?.contentResolver
+                    val itemId = selectedItem?.id
+                    val unread = selectedItem?.unread
+                    if (contentResolver != null && itemId != null && unread != null && itemId > 0) {
+                        launch(Background) {
+                            contentResolver.markItemAsRead(itemId, unread)
+                        }
                     }
                     mode.finish() // Action picked, so close the CAB
                     return true
@@ -407,12 +417,34 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
     }
 
     private fun setNotifications(on: Boolean) {
-        RssDatabaseService.setNotify(activity, on, this.id, this.feedTag)
+        val contentResolver = context?.contentResolver
+        val feedId = this.id
+        val feedTag = this.feedTag
+        if (contentResolver != null) {
+            launch(Background) {
+                when {
+                    feedId > 0 -> contentResolver.setNotify(feedId, on)
+                    feedTag != null -> contentResolver.setNotify(feedTag, on)
+                    else -> contentResolver.setNotifyOnAllFeeds(on)
+                }
+            }
+        }
     }
 
     private fun markAsRead() {
         // TODO this actually marks all items as read - whereas UI only displays 50 of them
-        RssDatabaseService.markFeedAsRead(activity, this.id, this.feedTag)
+        val contentResolver = context?.contentResolver
+        val feedId = this.id
+        val feedTag = this.feedTag
+        if (contentResolver != null) {
+            launch(Background) {
+                when {
+                    feedId > 0 -> contentResolver.markFeedAsRead(feedId)
+                    feedTag != null -> contentResolver.markTagAsRead(feedTag)
+                    else -> contentResolver.markAllAsRead()
+                }
+            }
+        }
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem?): Boolean {
