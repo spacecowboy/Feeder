@@ -13,10 +13,13 @@ import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.FeedItemSQL
-import com.nononsenseapps.feeder.db.RssDatabaseService
 import com.nononsenseapps.feeder.util.GlideUtils
 import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.markItemAsRead
+import com.nononsenseapps.feeder.util.markItemAsUnread
+import kotlinx.coroutines.experimental.launch
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
@@ -55,10 +58,16 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                     feedAdapter.items.remove(rssItem)
                 }
                 // Make database consistent with content
-                if (rssItem!!.unread) {
-                    RssDatabaseService.markItemAsUnread(feedAdapter.feedFragment.activity, rssItem!!.id)
-                } else {
-                    RssDatabaseService.markItemAsRead(feedAdapter.feedFragment.activity, rssItem!!.id)
+                val contentResolver = feedAdapter.feedFragment.context?.contentResolver
+                val itemId = rssItem!!.id
+                val unread = rssItem!!.unread
+                if (contentResolver != null) {
+                    launch(Background) {
+                        when (unread) {
+                            true -> contentResolver.markItemAsUnread(itemId)
+                            false -> contentResolver.markItemAsRead(itemId)
+                        }
+                    }
                 }
             }
 
@@ -169,7 +178,13 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
             feedAdapter.feedFragment.startActivity(i)
         } else {
             // Mark as read
-            RssDatabaseService.markItemAsRead(feedAdapter.feedFragment.activity, rssItem!!.id)
+            val contentResolver = feedAdapter.feedFragment.context?.contentResolver
+            if (contentResolver != null) {
+                val itemId = rssItem!!.id
+                launch(Background) {
+                    contentResolver.markItemAsRead(itemId)
+                }
+            }
             // Open in browser since no content was posted
             // Use enclosure or link
             feedAdapter.feedFragment.startActivity(Intent(Intent.ACTION_VIEW,

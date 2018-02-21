@@ -108,9 +108,6 @@
           android:resource="@xml/syncadapter"/>
     </service>
     <service
-        android:name=".db.RssDatabaseService"
-        android:exported="false"/>
-    <service
         android:name=".db.AccountService"
         android:enabled="true"
         android:exported="true">
