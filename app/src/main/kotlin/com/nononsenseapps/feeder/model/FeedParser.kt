@@ -66,10 +66,15 @@ object FeedParser {
      * Returns all alternate links in the header of an HTML/XML document pointing to feeds.
      */
     fun getAlternateFeedLinksAtUrl(url: URL): List<Pair<String, String>> {
-        val html = curl(url)
-        return when {
-            html != null -> getAlternateFeedLinksInHtml(html, baseUrl = url)
-            else -> emptyList()
+        return try {
+            val html = curl(url)
+            when {
+                html != null -> getAlternateFeedLinksInHtml(html, baseUrl = url)
+                else -> emptyList()
+            }
+        } catch (t: Throwable) {
+            Log.e("FeedParser", "Error when fetching alternate links: $t")
+            emptyList()
         }
     }
 
@@ -112,7 +117,10 @@ object FeedParser {
                 }
     }
 
-    fun curl(url: URL): String? {
+    /**
+     * @throws IOException if request fails due to network issue for example
+     */
+    private fun curl(url: URL): String? {
         var result: String? = null
         curlAndOnResponse(url) {
             result = it.body()?.string()
@@ -120,6 +128,9 @@ object FeedParser {
         return result
     }
 
+    /**
+     * @throws IOException if request fails due to network issue for example
+     */
     private fun curlAndOnResponse(url: URL, block: ((Response) -> Unit)) {
         val response = getResponse(url)
 
@@ -132,6 +143,9 @@ object FeedParser {
         }
     }
 
+    /**
+     * @throws IOException if call fails due to network issue for example
+     */
     fun getResponse(url: URL): Response {
         val request = Request.Builder()
                 .url(url)
