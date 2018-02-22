@@ -26,6 +26,8 @@ class FeedHolder(private val activity: BaseActivity, v: View) : RecyclerView.Vie
             activity.drawerLayout!!.closeDrawer(GravityCompat.START)
         }
 
-        activity.onNavigationDrawerItemSelected(item!!.id, item!!.displayTitle, item!!.url.toString(), item!!.tag)
+        item?.let {
+            activity.onNavigationDrawerItemSelected(it.id, it.displayTitle, it.url.toString(), it.tag)
+        }
     }
 }

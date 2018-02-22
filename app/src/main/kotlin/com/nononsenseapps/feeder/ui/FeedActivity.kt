@@ -189,8 +189,6 @@ class FeedActivity : BaseActivity() {
         }
     }
 
-    override fun getSelfNavDrawerItem(): Int = 0
-
     override fun onNavigationDrawerItemSelected(id: Long, title: String?, url: String?, tag: String?) {
         // update the main content by replacing fragments
         emptyView.visibility = View.GONE

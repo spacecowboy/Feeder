@@ -371,7 +371,9 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
 
         val ab = (activity as BaseActivity).supportActionBar
         ab?.title = title
-        (activity as BaseActivity).enableActionBarAutoHide(recyclerView)
+        recyclerView?.let {
+            (activity as BaseActivity).enableActionBarAutoHide(it)
+        }
     }
 
     override fun onResume() {

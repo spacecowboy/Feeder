@@ -173,7 +173,9 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
         if (rssItem?.plainsnippet?.isNotEmpty() == true) {
             val i = Intent(feedAdapter.feedFragment.activity, ReaderActivity::class.java)
             i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true)
-            ReaderActivity.setRssExtras(i, rssItem)
+            rssItem?.let {
+                ReaderActivity.setRssExtras(i, it)
+            }
 
             feedAdapter.feedFragment.startActivity(i)
         } else {

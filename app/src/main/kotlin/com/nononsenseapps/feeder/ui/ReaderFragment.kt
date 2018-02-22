@@ -172,8 +172,9 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
 
     override fun onActivityCreated(bundle: Bundle?) {
         super.onActivityCreated(bundle)
-        // TODO set for scrollview
-        (activity as BaseActivity).enableActionBarAutoHide(scrollView)
+        scrollView?.let {
+            (activity as BaseActivity).enableActionBarAutoHide(it)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
