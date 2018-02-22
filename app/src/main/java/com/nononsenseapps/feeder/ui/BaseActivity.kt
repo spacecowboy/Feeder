@@ -30,6 +30,8 @@ import com.nononsenseapps.feeder.util.setupSync
 import com.nononsenseapps.feeder.views.ObservableScrollView
 import java.util.*
 
+const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
+
 /**
  * Base activity which handles navigation drawer and other bloat common
  * between activities.
@@ -433,7 +435,7 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Lis
 
     companion object {
 
-        val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
+
         // Durations for certain animations we use:
         val HEADER_HIDE_ANIM_DURATION = 300
         // Special Navdrawer items

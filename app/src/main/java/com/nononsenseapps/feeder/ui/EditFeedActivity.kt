@@ -54,7 +54,6 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import java.net.URL
 
-const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
 const val TEMPLATE = "template"
 private const val LOADER_TAG_SUGGESTIONS = 1
 private const val TAGSFILTER = "TAGSFILTER"

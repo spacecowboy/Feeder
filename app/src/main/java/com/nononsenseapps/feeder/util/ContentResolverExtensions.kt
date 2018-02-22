@@ -55,6 +55,21 @@ fun ContentResolver.notifyAllUris() {
     }
 }
 
+fun ContentResolver.markItemsAsNotified(ids: LongArray, notified: Boolean = true) {
+    panicIfOnUiThread()
+    updateFeedItems(ids) {
+        setInt(COL_NOTIFIED to (if (notified) 1 else 0))
+    }
+}
+
+fun ContentResolver.markItemAsReadAndNotified(id: Long, read: Boolean = true, notified: Boolean = true) {
+    panicIfOnUiThread()
+    updateFeedItem(id) {
+        setInt(COL_UNREAD to (if (read) 0 else 1))
+        setInt(COL_NOTIFIED to (if (notified) 1 else 0))
+    }
+}
+
 fun ContentResolver.markItemAsRead(itemId: Long, read: Boolean = true) {
     panicIfOnUiThread()
     updateFeedItem(itemId) {
@@ -170,6 +185,14 @@ fun ContentResolver.setNotifyOnAllFeeds(notify: Boolean = true) {
     updateFeeds {
         setInt(COL_NOTIFY to if (notify) 1 else 0)
     }
+}
+
+inline fun ContentResolver.updateFeedItems(ids: LongArray, init: ContentValues.() -> Unit): Int {
+    if (ids.isEmpty()) {
+        return 0
+    }
+    return updateFeedItems(where = "$COL_ID IN (${ids.joinToString(separator = ", ")})",
+            init = init)
 }
 
 inline fun ContentResolver.updateFeedItem(id: Long, init: ContentValues.() -> Unit): Int {

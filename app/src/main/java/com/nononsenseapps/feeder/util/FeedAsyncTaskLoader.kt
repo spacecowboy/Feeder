@@ -46,6 +46,7 @@ class FeedAsyncTaskLoader(context: Context) : AsyncTaskLoader<List<FeedWrapper>>
      * if the task threw [OperationCanceledException].
      */
     override fun onCanceled(data: List<FeedWrapper>?) {
+        cursor?.unregisterContentObserver(observer)
         if (cursor?.isClosed != true) {
             cursor?.close()
         }
@@ -82,21 +83,23 @@ class FeedAsyncTaskLoader(context: Context) : AsyncTaskLoader<List<FeedWrapper>>
             it.registerContentObserver(observer)
 
             it.forEach {
-                val feed = FeedWrapper(item = it.asFeed())
+                if (!it.isClosed) {
+                    val feed = FeedWrapper(item = it.asFeed())
 
-                if (!tags.contains(feed.tag)) {
-                    val tag = FeedWrapper(tag = feed.tag)
-                    data.add(tag)
-                    tags.put(feed.tag, tag)
+                    if (!tags.contains(feed.tag)) {
+                        val tag = FeedWrapper(tag = feed.tag)
+                        data.add(tag)
+                        tags.put(feed.tag, tag)
+                    }
+
+                    topTag.unreadCount += feed.unreadCount
+                    // Avoid adding twice for top tag
+                    if (feed.tag.isNotEmpty()) {
+                        tags[feed.tag]!!.unreadCount += feed.unreadCount
+                    }
+
+                    data.add(feed)
                 }
-
-                topTag.unreadCount += feed.unreadCount
-                // Avoid adding twice for top tag
-                if (feed.tag.isNotEmpty()) {
-                    tags[feed.tag]!!.unreadCount += feed.unreadCount
-                }
-
-                data.add(feed)
             }
         }
 

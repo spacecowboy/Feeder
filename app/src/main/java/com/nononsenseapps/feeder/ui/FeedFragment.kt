@@ -61,6 +61,7 @@ import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.Util
 import com.nononsenseapps.feeder.db.asFeed
 import com.nononsenseapps.feeder.model.RssSyncAdapter
+import com.nononsenseapps.feeder.model.cancelNotificationInBackground
 import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
@@ -365,15 +366,19 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
 
     private fun markAsRead() {
         // TODO this actually marks all items as read - whereas UI only displays 50 of them
-        val contentResolver = context?.contentResolver
+        val appContext = context?.applicationContext
         val feedId = this.id
         val feedTag = this.feedTag
-        if (contentResolver != null) {
+        if (appContext != null) {
+            // TODO cancel notifications for tags and such once we handle the specific items
             launch(Background) {
                 when {
-                    feedId > 0 -> contentResolver.markFeedAsRead(feedId)
-                    feedTag != null -> contentResolver.markTagAsRead(feedTag)
-                    else -> contentResolver.markAllAsRead()
+                    feedId > 0 -> {
+                        appContext.contentResolver.markFeedAsRead(feedId)
+                        cancelNotificationInBackground(appContext, feedId)
+                    }
+                    feedTag != null -> appContext.contentResolver.markTagAsRead(feedTag)
+                    else -> appContext.contentResolver.markAllAsRead()
                 }
             }
         }

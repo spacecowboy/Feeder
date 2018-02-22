@@ -15,6 +15,7 @@ import android.widget.TextView
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.FeedItemSQL
+import com.nononsenseapps.feeder.model.cancelNotificationInBackground
 import com.nononsenseapps.feeder.util.GlideUtils
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.markItemAsRead
@@ -56,14 +57,17 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                     feedAdapter.items.remove(rssItem)
                 }
                 // Make database consistent with content
-                val contentResolver = feedAdapter.feedFragment.context?.contentResolver
+                val appContext = feedAdapter.feedFragment.context?.applicationContext
                 val itemId = rssItem!!.id
                 val unread = rssItem!!.unread
-                if (contentResolver != null) {
+                if (appContext != null) {
                     launch(Background) {
                         when (unread) {
-                            true -> contentResolver.markItemAsUnread(itemId)
-                            false -> contentResolver.markItemAsRead(itemId)
+                            true -> appContext.contentResolver.markItemAsUnread(itemId)
+                            false -> {
+                                appContext.contentResolver.markItemAsRead(itemId)
+                                cancelNotificationInBackground(appContext, itemId)
+                            }
                         }
                     }
                 }
@@ -166,7 +170,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
         // Open item if not empty
         if (rssItem?.plainsnippet?.isNotEmpty() == true) {
             val i = Intent(feedAdapter.feedFragment.activity, ReaderActivity::class.java)
-            i.putExtra(BaseActivity.SHOULD_FINISH_BACK, true)
+            i.putExtra(SHOULD_FINISH_BACK, true)
             rssItem?.let {
                 ReaderActivity.setRssExtras(i, it)
             }
