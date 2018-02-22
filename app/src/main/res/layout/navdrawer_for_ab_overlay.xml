@@ -15,28 +15,23 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/navdrawer"
-    android:layout_width="@dimen/navdrawer_width"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/navdrawer"
+  android:layout_width="@dimen/navdrawer_width"
+  android:layout_height="match_parent"
+  android:layout_gravity="start"
+  android:background="@color/navdrawer_background"
+  android:clipToPadding="false"
+  android:orientation="vertical"
+  android:theme="@style/NavbarTheme">
+
+  <android.support.v7.widget.RecyclerView
+    android:id="@+id/navdrawer_list"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="start"
-    android:background="@color/navdrawer_background"
-    android:clipToPadding="false"
-    android:theme="@style/NavbarTheme"
-    android:orientation="vertical">
-
-    <!--<View-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="1dp"-->
-        <!--android:background="@color/navdrawer_account_textcolor"/>-->
-
-    <!--
-        android:groupIndicator="@drawable/feed_group_indicator" -->
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/navdrawer_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+    android:scrollbars="vertical"
+    tools:layoutManager="LinearLayoutManager"
+    tools:listitem="@layout/view_feed_tag" />
 
 
 </LinearLayout>
