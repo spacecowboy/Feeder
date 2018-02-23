@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.app.LoaderManager
 import android.support.v4.content.Loader
+import android.support.v4.util.ArrayMap
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
@@ -22,22 +23,29 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.util.FeedAsyncTaskLoader
+import com.nononsenseapps.feeder.db.FIELDS_VIEWCOUNT
+import com.nononsenseapps.feeder.db.URI_FEEDSWITHCOUNTS
+import com.nononsenseapps.feeder.db.asFeed
+import com.nononsenseapps.feeder.util.ConvertedCursorLoader
 import com.nononsenseapps.feeder.util.LPreviewUtils
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase
 import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Result
+import com.nononsenseapps.feeder.util.forEach
 import com.nononsenseapps.feeder.util.setupSync
 import com.nononsenseapps.feeder.views.ObservableScrollView
 import java.util.*
 
 const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
 
+typealias SortedFields = Result<List<FeedWrapper>>
+
 /**
  * Base activity which handles navigation drawer and other bloat common
  * between activities.
  */
 @SuppressLint("Registered")
-open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<List<FeedWrapper>> {
+open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<SortedFields> {
     protected var mActionBarShown = true
     // If pressing home should finish or start new activity
     protected var mShouldFinishBack = false
@@ -418,18 +426,48 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Lis
         }
     }
 
-    override fun onCreateLoader(id: Int, bundle: Bundle): Loader<List<FeedWrapper>> {
-        val loader = FeedAsyncTaskLoader(this)
+    override fun onCreateLoader(id: Int, bundle: Bundle): Loader<SortedFields> {
+        val loader = ConvertedCursorLoader<List<FeedWrapper>>(
+                context = this,
+                uri = URI_FEEDSWITHCOUNTS,
+                projection = FIELDS_VIEWCOUNT
+        ) { cursor ->
+            val topTag = FeedWrapper(tag = "", isTop = true)
+            val tags: MutableMap<String, FeedWrapper> = ArrayMap()
+            tags[""] = topTag
+            val data: MutableList<FeedWrapper> = mutableListOf(topTag)
+
+            cursor?.forEach {
+                val feed = FeedWrapper(item = it.asFeed())
+
+                if (!tags.contains(feed.tag)) {
+                    val tag = FeedWrapper(tag = feed.tag)
+                    data.add(tag)
+                    tags[feed.tag] = tag
+                }
+
+                topTag.unreadCount += feed.unreadCount
+                // Avoid adding twice for top tag
+                if (feed.tag.isNotEmpty()) {
+                    tags[feed.tag]!!.unreadCount += feed.unreadCount
+                }
+
+                data.add(feed)
+            }
+
+            data.sortWith(Comparator { a, b -> a.compareTo(b) })
+            data
+        }
         loader.setUpdateThrottle(200)
         return loader
     }
 
-    override fun onLoadFinished(Loader: Loader<List<FeedWrapper>>,
-                                items: List<FeedWrapper>?) {
-        navAdapter?.updateData(items ?: emptyList())
+    override fun onLoadFinished(Loader: Loader<SortedFields>,
+                                result: SortedFields?) {
+        navAdapter?.updateData(result?.data ?: emptyList())
     }
 
-    override fun onLoaderReset(loader: Loader<List<FeedWrapper>>) {
+    override fun onLoaderReset(loader: Loader<SortedFields>) {
         // ..
     }
 
