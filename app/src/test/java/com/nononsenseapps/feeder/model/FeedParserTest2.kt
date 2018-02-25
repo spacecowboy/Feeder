@@ -21,6 +21,16 @@ class FeedParserTest2 {
 
     @Test
     @Throws(Exception::class)
+    fun getAlternateLinksHandlesYoutube() {
+        // I want this to be an Online test to make sure that I notice if/when Youtube changes something which breaks it
+        val feeds: List<Pair<String, String>> =
+                FeedParser.getAlternateFeedLinksAtUrl(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A"))
+        assertEquals(listOf("https://www.youtube.com/feeds/videos.xml?channel_id=UCG1h-Wqjtwz7uUANw6gazRw" to "atom"),
+                feeds)
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun htmlAtomContentGetsUnescaped() {
         javaClass.getResourceAsStream("atom_hnapp.xml")
                 .use {
