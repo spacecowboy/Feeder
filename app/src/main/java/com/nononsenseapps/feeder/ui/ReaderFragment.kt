@@ -264,21 +264,26 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
             cl as Loader<Any?>
         }
         TEXT_LOADER -> {
-            val size = Point()
-            activity!!.windowManager.defaultDisplay.getSize(size)
-            // Using twice window height since we do scroll vertically
-            when {
-                TabletUtils.isTablet(activity) -> // Tablet has fixed width
-                    ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl
-                            ?: sloppyLinkToStrictURL(""),
-                            Point(Math.round(resources.getDimension(R.dimen.reader_tablet_width)), 2 * size.y), PrefUtils.shouldLoadImages(activity!!)) as Loader<Any?>
-                else -> // Base it on window size
-                    ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl
-                            ?: sloppyLinkToStrictURL(""),
-                            Point(size.x - 2 * Math.round(resources.getDimension(R.dimen.keyline_1)), 2 * size.y), PrefUtils.shouldLoadImages(activity!!)) as Loader<Any?>
-            }
+            ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl
+                    ?: sloppyLinkToStrictURL(""),
+                    maxImageSize(), PrefUtils.shouldLoadImages(activity!!)) as Loader<Any?>
         }
         else -> null
+    }
+
+    private fun maxImageSize(): Point {
+        val size = Point()
+        activity?.let{
+            it.windowManager?.defaultDisplay?.getSize(size)
+            if (TabletUtils.isTablet(it)) {
+                // Using twice window height since we do scroll vertically
+                size.set(Math.round(resources.getDimension(R.dimen.reader_tablet_width)), 2 * size.y)
+            } else {
+                // Base it on window size
+                size.set(size.x - 2 * Math.round(resources.getDimension(R.dimen.keyline_1)), 2 * size.y)
+            }
+        }
+        return size
     }
 
     override fun onLoadFinished(loader: Loader<Any?>?,

@@ -1,44 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context="com.nononsenseapps.feeder.ui.FeedActivity">
+
+  <android.support.v4.widget.SwipeRefreshLayout
+    android:id="@+id/swiperefresh"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.nononsenseapps.feeder.ui.FeedActivity">
+    android:layout_height="match_parent">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swiperefresh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <android.support.v7.widget.RecyclerView
+      android:id="@android:id/list"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:paddingLeft="@dimen/feed_list_padding"
+      android:paddingRight="@dimen/feed_list_padding"
+      android:scrollbarStyle="outsideOverlay"
+      android:scrollbars="vertical"
+      tools:layoutManager="LinearLayoutManager"
+      tools:listitem="@layout/list_story_item" />
+  </android.support.v4.widget.SwipeRefreshLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@android:id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingLeft="@dimen/feed_list_padding"
-            android:paddingRight="@dimen/feed_list_padding"
-            android:scrollbarStyle="outsideOverlay"
-            android:scrollbars="vertical" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+  <android.support.design.widget.FloatingActionButton
+    android:id="@+id/checkall_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|end"
+    android:layout_marginBottom="16dp"
+    android:layout_marginEnd="@dimen/keyline_1"
+    android:clickable="true"
+    android:scaleType="center"
+    android:src="@drawable/ic_action_done_all"
+    app:borderWidth="0dp"
+    app:elevation="5dp"
+    app:fabSize="normal"
+    app:pressedTranslationZ="7dp" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/checkall_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:scaleType="center"
-        android:layout_marginEnd="@dimen/keyline_1"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        app:borderWidth="0dp"
-        app:fabSize="normal"
-        app:elevation="5dp"
-        app:pressedTranslationZ="7dp"
-        android:src="@drawable/ic_action_done_all"/>
-
-    <include
-        layout="@layout/empty_feed"
-        android:visibility="gone" />
+  <include
+    layout="@layout/empty_feed"
+    android:visibility="gone" />
 
 </FrameLayout>

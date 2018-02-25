@@ -239,7 +239,7 @@ open class HtmlToSpannedConverter(private var mSource: String,
 
         var src: String? = attributes.getValue("", "src")
         @Suppress("DEPRECATION")
-        val d = mContext.resources.getDrawable(R.drawable.unknown_image)
+        val d = mContext.resources.getDrawable(R.drawable.placeholder_image_article)
         d.setBounds(0, 0, d.intrinsicWidth, d.intrinsicHeight)
 
 

@@ -224,7 +224,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                 GlideUtils.glide(feedAdapter.feedFragment.activity, rssItem!!.imageurl,
                         PrefUtils.shouldLoadImages(feedAdapter.feedFragment.activity!!))
                         .centerCrop()
-                        .error(R.drawable.ic_signal_wifi_off_white_24dp)
+                        .error(R.drawable.placeholder_image_list)
                         .into(imageView)
             } catch (e: IllegalArgumentException) {
                 // Could still happen if we have a race-condition?
