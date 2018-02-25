@@ -25,8 +25,7 @@ import kotlinx.coroutines.experimental.launch
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
 class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
-        RecyclerView.ViewHolder(view), View.OnClickListener,
-        View.OnLongClickListener, ViewTreeObserver.OnPreDrawListener {
+        RecyclerView.ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener {
     private val TAG = "FeedItemHolder"
     private val titleTextView: TextView = view.findViewById<View>(R.id.story_snippet) as TextView
     val dateTextView: TextView = view.findViewById<View>(R.id.story_date) as TextView
@@ -41,7 +40,6 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
 
     init {
         view.setOnClickListener(this)
-        view.setOnLongClickListener(this)
         // Swipe handler
         view.setOnTouchListener(SwipeDismissTouchListener(view, null, object : SwipeDismissTouchListener.DismissCallbacks {
             override fun canDismiss(token: Any?): Boolean = rssItem != null
@@ -165,10 +163,6 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
      * @param view
      */
     override fun onClick(view: View) {
-        if (feedAdapter.feedFragment.actionMode != null) {
-            feedAdapter.feedFragment.actionMode!!.finish()
-        }
-
         // Open item if not empty
         if (rssItem?.plainsnippet?.isNotEmpty() == true) {
             val i = Intent(feedAdapter.feedFragment.activity, ReaderActivity::class.java)
@@ -193,25 +187,6 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                     Uri.parse(rssItem!!.enclosurelink ?: rssItem!!.link)))
         }
     }
-
-    // Called when the user long-clicks on someView
-    override fun onLongClick(view: View): Boolean {
-        // Remember which item
-        feedAdapter.feedFragment.selectedItem = this.rssItem
-        if (feedAdapter.feedFragment.actionMode == null) {
-            // Start the CAB using the ActionMode.Callback defined above
-            feedAdapter.feedFragment.actionMode =
-                    feedAdapter.feedFragment.activity!!.startActionMode(feedAdapter.feedFragment.actionModeCallback)
-            //view.setSelected(true);
-            view.isActivated = true
-        }
-
-        feedAdapter.feedFragment.actionMode!!.subtitle = feedAdapter.feedFragment.selectedItem!!.plaintitle
-        feedAdapter.feedFragment.actionMode!!.setTitle(R.string.selected)
-
-        return true
-    }
-
 
     /**
      * Called when item has been measured, it is now the time to insert the image.

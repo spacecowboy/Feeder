@@ -34,7 +34,6 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -70,7 +69,6 @@ import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.firstOrNull
 import com.nononsenseapps.feeder.util.markAllAsRead
 import com.nononsenseapps.feeder.util.markFeedAsRead
-import com.nononsenseapps.feeder.util.markItemAsRead
 import com.nononsenseapps.feeder.util.markTagAsRead
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
@@ -117,75 +115,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
     private var checkAllButton: View? = null
     private var notify = 0
     private var notifyCheck: CheckedTextView? = null
-    internal var actionMode: ActionMode? = null
     internal var selectedItem: FeedItemSQL? = null
-    internal val actionModeCallback = object : ActionMode.Callback {
-
-        // Called when the action mode is created; startActionMode() was called
-        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-            // Inflate a menu resource providing context menu items
-            val inflater = mode.menuInflater
-            inflater.inflate(R.menu.contextmenu_feedfragment, menu)
-
-            // Show/Hide enclosure
-            menu.findItem(R.id.action_open_enclosure).isVisible = selectedItem!!.enclosurelink != null
-            // Add filename to tooltip
-            if (selectedItem!!.enclosurelink != null) {
-                val filename = selectedItem!!.enclosureFilename
-                if (filename != null) {
-                    menu.findItem(R.id.action_open_enclosure).title = filename
-                }
-            }
-
-            return true
-        }
-
-        // Called each time the action mode is shown. Always called after onCreateActionMode, but
-        // may be called multiple times if the mode is invalidated.
-        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            return false // Return false if nothing is done
-        }
-
-        // Called when the user selects a contextual menu item
-        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            when (item.itemId) {
-                R.id.action_open_in_browser -> {
-                    // Open in browser
-                    startActivity(Intent(Intent.ACTION_VIEW,
-                            Uri.parse(selectedItem!!.link)))
-                    mode.finish() // Action picked, so close the CAB
-                    return true
-                }
-                R.id.action_open_enclosure -> {
-                    // Open enclosure link
-                    startActivity(Intent(Intent.ACTION_VIEW,
-                            Uri.parse(selectedItem!!.enclosurelink)))
-                    mode.finish() // Action picked, so close the CAB
-                    return true
-                }
-                R.id.action_toggle_unread -> {
-                    // toggle read state
-                    val contentResolver = context?.contentResolver
-                    val itemId = selectedItem?.id
-                    val unread = selectedItem?.unread
-                    if (contentResolver != null && itemId != null && unread != null && itemId > 0) {
-                        launch(Background) {
-                            contentResolver.markItemAsRead(itemId, unread)
-                        }
-                    }
-                    mode.finish() // Action picked, so close the CAB
-                    return true
-                }
-                else -> return false
-            }
-        }
-
-        // Called when the user exits the action mode
-        override fun onDestroyActionMode(mode: ActionMode) {
-            actionMode = null
-            selectedItem = null
-        }
-    }
 
     /**
      * @return SQL selection
