@@ -54,6 +54,7 @@
         android:name=".ui.ReaderActivity"
         android:label="@string/app_name"
         android:parentActivityName=".ui.FeedActivity"
+      android:allowTaskReparenting="true"
         android:theme="@style/ReaderTheme">
 
       <meta-data
@@ -119,6 +120,8 @@
           android:name="android.accounts.AccountAuthenticator"
           android:resource="@xml/authenticator"/>
     </service>
+    <!-- Receiver for notification cancellations and such -->
+    <receiver android:name=".model.RssNotificationBroadcastReceiver" />
 
     <activity
         android:name=".ui.SettingsActivity"

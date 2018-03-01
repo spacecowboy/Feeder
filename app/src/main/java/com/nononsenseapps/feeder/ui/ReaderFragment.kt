@@ -47,6 +47,7 @@ import com.nononsenseapps.feeder.db.FEED_ITEM_FIELDS
 import com.nononsenseapps.feeder.db.FeedItemSQL
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.asFeedItem
+import com.nononsenseapps.feeder.model.cancelNotificationInBackground
 import com.nononsenseapps.feeder.ui.text.ImageTextLoader
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.FileLog
@@ -54,7 +55,7 @@ import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.asFeedItem
 import com.nononsenseapps.feeder.util.firstOrNull
-import com.nononsenseapps.feeder.util.markItemAsRead
+import com.nononsenseapps.feeder.util.markItemAsReadAndNotified
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.views.ObservableScrollView
 import kotlinx.coroutines.experimental.launch
@@ -100,10 +101,11 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
 
         if (_id > 0) {
             val itemId = _id
-            val contentResolver = context?.contentResolver
-            if (contentResolver != null) {
+            val appContext = context?.applicationContext
+            appContext?.let {
                 launch(Background) {
-                    contentResolver.markItemAsRead(itemId)
+                    it.contentResolver.markItemAsReadAndNotified(itemId)
+                    cancelNotificationInBackground(it, itemId)
                 }
             }
             loaderManager.restartLoader(ITEM_LOADER, Bundle(), this)

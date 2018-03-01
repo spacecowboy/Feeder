@@ -19,6 +19,7 @@ import android.view.View
 import android.widget.CheckedTextView
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.Util
 import com.nononsenseapps.feeder.model.RssSyncAdapter
@@ -26,13 +27,17 @@ import com.nononsenseapps.feeder.model.opml.exportOpmlInBackground
 import com.nononsenseapps.feeder.model.opml.importOpmlInBackground
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.markItemsAsNotified
 import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
+import kotlinx.coroutines.experimental.launch
 import java.io.File
 
 private const val EXPORT_OPML_CODE = 101
 private const val IMPORT_OPML_CODE = 102
 private const val EDIT_FEED_CODE = 103
+
+const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
 class FeedActivity : BaseActivity() {
     private val fragmentTag = "single_pane"
@@ -59,6 +64,8 @@ class FeedActivity : BaseActivity() {
         setContentView(R.layout.activity_feed)
         initializeActionBar()
         overridePendingTransition(0, 0)
+
+        doFromNotificationActions()
 
         if (savedInstanceState == null) {
             fragment = defaultFragment()
@@ -99,6 +106,16 @@ class FeedActivity : BaseActivity() {
             // Sync all feeds
             contentResolver.requestFeedSync()
             PrefUtils.markFirstBootAfterDatabaseUpgradeDone(this)
+        }
+    }
+
+    private fun doFromNotificationActions() {
+        val itemIdsToMarkAsNotified = intent?.getLongArrayExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)
+        val contentResolver = contentResolver
+        if (itemIdsToMarkAsNotified != null && contentResolver != null) {
+            launch(Background) {
+                contentResolver.markItemsAsNotified(itemIdsToMarkAsNotified)
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.os.CancellationSignal
 import android.os.Looper
 import android.util.Log
 import com.nononsenseapps.feeder.db.COL_FEED
@@ -52,6 +53,21 @@ fun ContentResolver.notifyAllUris() {
             URI_FEEDITEMS)
     uris.map {
         notifyChange(it, null, false)
+    }
+}
+
+fun ContentResolver.markItemsAsNotified(ids: LongArray, notified: Boolean = true) {
+    panicIfOnUiThread()
+    updateFeedItems(ids) {
+        setInt(COL_NOTIFIED to (if (notified) 1 else 0))
+    }
+}
+
+fun ContentResolver.markItemAsReadAndNotified(id: Long, read: Boolean = true, notified: Boolean = true) {
+    panicIfOnUiThread()
+    updateFeedItem(id) {
+        setInt(COL_UNREAD to (if (read) 0 else 1))
+        setInt(COL_NOTIFIED to (if (notified) 1 else 0))
     }
 }
 
@@ -172,6 +188,14 @@ fun ContentResolver.setNotifyOnAllFeeds(notify: Boolean = true) {
     }
 }
 
+inline fun ContentResolver.updateFeedItems(ids: LongArray, init: ContentValues.() -> Unit): Int {
+    if (ids.isEmpty()) {
+        return 0
+    }
+    return updateFeedItems(where = "$COL_ID IN (${ids.joinToString(separator = ", ")})",
+            init = init)
+}
+
 inline fun ContentResolver.updateFeedItem(id: Long, init: ContentValues.() -> Unit): Int {
     return updateFeedItems(where = "$COL_ID IS ?",
             params = arrayListOf(id),
@@ -243,8 +267,9 @@ fun ContentResolver.queryFeeds(columns: List<String> = FEED_FIELDS.asList(),
 }
 
 fun ContentResolver.cursorForFeedsWithCounts(columns: List<String> = FIELDS_VIEWCOUNT.asList(),
-                                             where: String? = null, params: List<Any>? = null, order: String? = null): Cursor? =
-        cursorFor(URI_FEEDSWITHCOUNTS, columns, where, params, order)
+                                             where: String? = null, params: List<Any>? = null, order: String? = null,
+                                             cancellationSignal: CancellationSignal? = null): Cursor? =
+        cursorFor(URI_FEEDSWITHCOUNTS, columns, where, params, order, cancellationSignal)
 
 fun ContentResolver.queryFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asList(),
                                    where: String? = null,
@@ -256,9 +281,10 @@ fun ContentResolver.queryFeedItems(columns: List<String> = FEED_ITEM_FIELDS.asLi
 }
 
 fun ContentResolver.cursorFor(uri: Uri, columns: List<String>, where: String? = null,
-                              params: List<Any>? = null, order: String? = null): Cursor? {
+                              params: List<Any>? = null, order: String? = null,
+                              cancellationSignal: CancellationSignal? = null): Cursor? {
     panicIfOnUiThread()
-    return query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order)
+    return query(uri, columns.toTypedArray(), where, params?.map(Any::toString)?.toTypedArray(), order, cancellationSignal)
 }
 
 inline fun ContentResolver.queryItems(uri: Uri, columns: List<String>, where: String? = null,
