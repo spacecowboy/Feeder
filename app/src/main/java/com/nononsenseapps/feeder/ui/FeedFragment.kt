@@ -384,8 +384,8 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         }
     }
 
-    override fun onOptionsItemSelected(menuItem: MenuItem?): Boolean {
-        val id = menuItem!!.itemId.toLong()
+    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+        val id = menuItem.itemId.toLong()
         return when {
             id == R.id.action_sync.toLong() -> {
                 // Sync all feeds when menu button pressed
@@ -415,13 +415,19 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 true
             }
             id == R.id.action_delete_feed.toLong() && this.id > 0 -> {
-                activity!!.contentResolver
-                        .delete(URI_FEEDS, Util.WHEREIDIS,
-                                Util.LongsToStringArray(this.id))
-                activity!!.contentResolver.notifyAllUris()
+                val feedId = this.id
+                val appContext = activity?.applicationContext
+                if (appContext != null) {
+                    launch(Background) {
+                        appContext.contentResolver
+                                .delete(URI_FEEDS, Util.WHEREIDIS,
+                                        Util.LongsToStringArray(feedId))
+                        appContext.contentResolver.notifyAllUris()
 
-                // Remove from shortcuts
-                activity?.removeDynamicShortcutToFeed(this.id)
+                        // Remove from shortcuts
+                        appContext.removeDynamicShortcutToFeed(feedId)
+                    }
+                }
 
                 // Tell activity to open another fragment
                 (activity as FeedActivity).showAllFeeds(true)
