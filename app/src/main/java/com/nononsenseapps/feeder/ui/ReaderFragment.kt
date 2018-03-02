@@ -32,6 +32,7 @@ import android.support.v4.content.Loader
 import android.support.v4.view.MenuItemCompat
 import android.support.v7.widget.ShareActionProvider
 import android.text.Spanned
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -50,7 +51,6 @@ import com.nononsenseapps.feeder.db.asFeedItem
 import com.nononsenseapps.feeder.model.cancelNotificationInBackground
 import com.nononsenseapps.feeder.ui.text.ImageTextLoader
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
-import com.nononsenseapps.feeder.util.FileLog
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.asFeedItem
@@ -231,7 +231,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     startActivity(Intent(Intent.ACTION_VIEW, uri))
                 } catch (e: ActivityNotFoundException) {
                     Toast.makeText(activity, "Couldn't find an activity to open that link with", Toast.LENGTH_SHORT).show()
-                    FileLog.getInstance(activity!!).d("No such activity: " + e)
+                    Log.d("ReaderFragment", "No such activity: $e")
                 }
 
                 return true
@@ -246,7 +246,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     startActivity(Intent(Intent.ACTION_VIEW, uri))
                 } catch (e: ActivityNotFoundException) {
                     Toast.makeText(activity, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
-                    FileLog.getInstance(activity!!).d("No such activity: " + e)
+                    Log.d("ReaderFragment", "No such activity: $e")
                 }
 
                 return true

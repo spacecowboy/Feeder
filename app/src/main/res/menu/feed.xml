@@ -25,11 +25,6 @@
       android:title="@string/import_feeds_from_opml"
       app:showAsAction="never"/>
   <item
-      android:id="@+id/action_debug_log"
-      android:orderInCategory="999"
-      android:title="@string/view_debug_log"
-      app:showAsAction="never"/>
-  <item
       android:id="@+id/action_settings"
       android:orderInCategory="990"
       android:title="@string/action_settings"

@@ -27,6 +27,7 @@ import com.nononsenseapps.feeder.model.opml.exportOpmlInBackground
 import com.nononsenseapps.feeder.model.opml.importOpmlInBackground
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.ensureDebugLogDeletedInBackground
 import com.nononsenseapps.feeder.util.markItemsAsNotified
 import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
@@ -66,6 +67,9 @@ class FeedActivity : BaseActivity() {
         overridePendingTransition(0, 0)
 
         doFromNotificationActions()
+
+        // Migration thing, make sure file is deleted for all users
+        ensureDebugLogDeletedInBackground(this.applicationContext)
 
         if (savedInstanceState == null) {
             fragment = defaultFragment()
@@ -192,10 +196,6 @@ class FeedActivity : BaseActivity() {
                     intent.putExtra(AbstractFilePickerActivity.EXTRA_SINGLE_CLICK, true)
                 }
                 startActivityForResult(intent, IMPORT_OPML_CODE)
-                true
-            }
-            R.id.action_debug_log -> {
-                startActivity(Intent(this, DebugLogActivity::class.java))
                 true
             }
             R.id.action_settings -> {
