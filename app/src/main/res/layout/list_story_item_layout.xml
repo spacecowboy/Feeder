@@ -9,8 +9,8 @@
     android:id="@+id/story_image"
     android:layout_width="@dimen/item_img_def_width"
     android:layout_height="@dimen/item_img_def_width"
-    tools:src="@drawable/placeholder_image_list"
-    android:visibility="visible" />
+    android:visibility="visible"
+    tools:src="@drawable/placeholder_image_list" />
 
   <TextView
     android:id="@+id/story_date"
@@ -23,8 +23,8 @@
     android:layout_marginStart="2dp"
     android:layout_marginTop="4dp"
     android:singleLine="true"
-    tools:text="@tools:sample/date/mmddyy"
-    android:visibility="visible" />
+    android:visibility="visible"
+    tools:text="@tools:sample/date/mmddyy" />
 
   <TextView
     android:id="@+id/story_author"
@@ -38,8 +38,8 @@
     android:layout_toStartOf="@id/story_date"
     android:ellipsize="middle"
     android:singleLine="true"
-    tools:text="@tools:sample/full_names"
-    android:visibility="visible" />
+    android:visibility="visible"
+    tools:text="@tools:sample/full_names" />
 
   <TextView
     android:id="@+id/story_snippet"
@@ -50,7 +50,6 @@
     android:layout_marginEnd="4dp"
     android:layout_marginTop="2dp"
     android:maxLines="5"
-    android:text="A long text that is supposed to touch the end of the line"
     android:transitionName="title"
     tools:text="@tools:sample/lorem/random" />
 </merge>

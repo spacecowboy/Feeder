@@ -1,61 +1,62 @@
 <com.nononsenseapps.feeder.views.ObservableScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/scroll_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context="com.nononsenseapps.feeder.ui.ReaderFragment">
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/scroll_view"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context="com.nononsenseapps.feeder.ui.ReaderFragment">
 
-    <!-- Action bar is overlayed, so add some padding -->
-    <LinearLayout
-        android:layout_width="@dimen/reader_tablet_width"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:paddingTop="?actionBarSize"
-        android:paddingStart="@dimen/keyline_1"
-        android:paddingEnd="@dimen/keyline_1"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:orientation="vertical">
+  <!-- Action bar is overlayed, so add some padding -->
+  <LinearLayout
+    android:layout_width="@dimen/reader_tablet_width"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingEnd="@dimen/keyline_1"
+    android:paddingStart="@dimen/keyline_1"
+    android:paddingTop="?actionBarSize">
 
 
-        <TextView
-            android:id="@+id/story_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/TextAppearance.Reader.Title"
-            android:layout_marginBottom="6dp"
-            android:textIsSelectable="true"
-            android:transitionName="title"
-            android:text="@string/title"/>
+    <TextView
+      android:id="@+id/story_title"
+      style="@style/TextAppearance.Reader.Title"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="6dp"
+      android:textIsSelectable="true"
+      android:transitionName="title"
+      tools:text="@tools:sample/cities" />
 
-        <TextView
-            android:id="@+id/story_feedtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/TextAppearance.Reader.Author"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="2dp"
-            android:textIsSelectable="true"
-            android:text="CowboyProgrammer"/>
+    <TextView
+      android:id="@+id/story_feedtitle"
+      style="@style/TextAppearance.Reader.Author"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="2dp"
+      android:layout_marginTop="2dp"
+      android:textIsSelectable="true"
+      tools:text="CowboyProgrammer" />
 
-        <TextView
-            android:id="@+id/story_author"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/TextAppearance.Reader.Author"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="8dp"
-            android:textIsSelectable="true"
-            android:text="by Jonas, Sep 14 2015"/>
+    <TextView
+      android:id="@+id/story_author"
+      style="@style/TextAppearance.Reader.Author"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="8dp"
+      android:layout_marginTop="2dp"
+      android:textIsSelectable="true"
+      tools:text="by Jonas, Sep 14 2015" />
 
-        <com.nononsenseapps.feeder.views.LinkedTextView
-            android:id="@+id/story_body"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="300dp"
-            android:layout_marginTop="8dp"
-            style="@style/TextAppearance.Reader.Body"
-            android:textIsSelectable="true"/>
-    </LinearLayout>
+    <com.nononsenseapps.feeder.views.LinkedTextView
+      android:id="@+id/story_body"
+      style="@style/TextAppearance.Reader.Body"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="8dp"
+      android:minHeight="300dp"
+      android:textIsSelectable="true"
+      tools:text="@tools:sample/lorem/random" />
+  </LinearLayout>
 
 
 </com.nononsenseapps.feeder.views.ObservableScrollView>
