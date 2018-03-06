@@ -32,6 +32,7 @@
     android:layout_marginBottom="16dp"
     android:layout_marginEnd="@dimen/keyline_1"
     android:clickable="true"
+    android:focusable="true"
     android:scaleType="center"
     android:src="@drawable/ic_action_done_all"
     app:borderWidth="0dp"

@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.nononsenseapps.feeder.views.DrawShadowFrameLayout
-    android:id="@+id/main_content"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<com.nononsenseapps.feeder.views.DrawShadowFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/main_content"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:clipChildren="false"
+  app:shadowDrawable="@drawable/header_shadow">
+  <!-- As the main content view, the view below consumes the entire
+       space available using match_parent in both dimensions. -->
+  <FrameLayout
+    android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:clipChildren="false"
-    app:shadowDrawable="@drawable/header_shadow">
-    <!-- As the main content view, the view below consumes the entire
-         space available using match_parent in both dimensions. -->
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    android:layout_height="match_parent" />
 
-    <LinearLayout
-        android:id="@+id/headerbar"
-        app:elevation="4dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:orientation="vertical">
+  <LinearLayout
+    android:id="@+id/headerbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    app:elevation="4dp">
 
-        <include layout="@layout/toolbar_actionbar"/>
-    </LinearLayout>
+    <include layout="@layout/toolbar_actionbar" />
+  </LinearLayout>
 
 </com.nononsenseapps.feeder.views.DrawShadowFrameLayout>
