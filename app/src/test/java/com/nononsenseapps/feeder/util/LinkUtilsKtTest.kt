@@ -19,4 +19,10 @@ class LinkUtilsKtTest {
     fun testSloppyToStrictWithEmptyString() {
         assertEquals(URL("http://"), sloppyLinkToStrictURL(""))
     }
+
+    @Test
+    fun testRelativeToAbsoluteWithFeedLinkAsBase() {
+        assertEquals(URL("http://cowboy.com/bob.jpg"),
+                relativeLinkIntoAbsoluteOrThrow(URL("http://cowboy.com/feed.xml"), "/bob.jpg"))
+    }
 }
