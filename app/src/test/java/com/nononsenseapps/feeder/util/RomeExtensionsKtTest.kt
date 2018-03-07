@@ -20,6 +20,7 @@ import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import java.net.URI
+import java.net.URL
 import java.util.*
 import kotlin.test.assertEquals
 
@@ -32,25 +33,25 @@ class RomeExtensionsKtTest {
 
     @Test
     fun feedLinkButNoLinks() {
-        assertEquals(Feed(home_page_url = "homepage", title = "", items = emptyList()),
-                mockSyndFeed(link = "homepage").asFeed())
+        assertEquals(Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
+                mockSyndFeed(link = "homepage").asFeed(baseUrl))
     }
 
     @Test
     fun feedLinks() {
-        assertEquals(Feed(home_page_url = "homepage", title = "", items = emptyList()),
+        assertEquals(Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
                 mockSyndFeed(links = listOf(mockSyndLink(href = "homepage",
-                        rel = "alternate", type = "text/html"))).asFeed())
+                        rel = "alternate", type = "text/html"))).asFeed(baseUrl))
     }
 
     @Test
     fun itemFallsBackToFeedAuthor() {
         assertEquals(
                 Feed(author = Author(name = "bob"), title = "",
-                        items = listOf(Item(id = "id", author = Author(name = "bob"), content_text = "",
+                        items = listOf(Item(id = "$baseUrl/id", author = Author(name = "bob"), content_text = "",
                                 summary = "", title = "", content_html = "", attachments = emptyList()))),
                 mockSyndFeed(author = mockSyndPerson(name = "bob"),
-                        entries = listOf(mockSyndEntry(uri = "id"))).asFeed()
+                        entries = listOf(mockSyndEntry(uri = "id"))).asFeed(baseUrl)
         )
     }
 
@@ -61,9 +62,9 @@ class RomeExtensionsKtTest {
         val html = "  <img src='http://google.com/image.png' alt='An image'/> "
 
         assertEquals(
-                Item(id = "id", title = "", content_text = expectedSummary, summary = expectedSummary,
+                Item(id = "$baseUrl/id", title = "", content_text = expectedSummary, summary = expectedSummary,
                         content_html = html, image = "http://google.com/image.png", attachments = emptyList()),
-                mockSyndEntry(uri = "id", description = mockSyndContent(value = html)).asItem()
+                mockSyndEntry(uri = "id", description = mockSyndContent(value = html)).asItem(baseUrl)
         )
     }
 
@@ -77,54 +78,54 @@ class RomeExtensionsKtTest {
         val longText = "$expectedSummary and some additional text"
 
         assertEquals(
-                Item(id = "id", title = "", content_text = longText, summary = expectedSummary,
+                Item(id = "$baseUrl/id", title = "", content_text = longText, summary = expectedSummary,
                         content_html = longText, attachments = emptyList()),
-                mockSyndEntry(uri = "id", description = mockSyndContent(value = longText)).asItem()
+                mockSyndEntry(uri = "id", description = mockSyndContent(value = longText)).asItem(baseUrl)
         )
     }
 
     @Test
     fun itemShortTextShouldNotBeIndexOutOfBounds() {
         assertEquals(
-                Item(id = "id", content_text = "abc", summary = "abc", title = "",
+                Item(id = "$baseUrl/id", content_text = "abc", summary = "abc", title = "",
                         content_html = "abc", attachments = emptyList()),
-                mockSyndEntry(uri = "id", description = mockSyndContent(value = "abc")).asItem()
+                mockSyndEntry(uri = "id", description = mockSyndContent(value = "abc")).asItem(baseUrl)
         )
     }
 
     @Test
     fun itemLinkButNoLinks() {
         assertEquals(
-                Item(id = "id", content_text = "", summary = "", title = "",
-                        content_html = "", attachments = emptyList(), url = "abc"),
+                Item(id = "$baseUrl/id", content_text = "", summary = "", title = "",
+                        content_html = "", attachments = emptyList(), url = "$baseUrl/abc"),
                 mockSyndEntry(uri = "id", description = mockSyndContent(value = ""),
-                        link = "abc").asItem()
+                        link = "abc").asItem(baseUrl)
         )
     }
 
     @Test
     fun itemLinks() {
         assertEquals(
-                Item(id = "id", content_text = "", summary = "", title = "",
-                        content_html = "", attachments = emptyList(), url = "abc"),
+                Item(id = "$baseUrl/id", content_text = "", summary = "", title = "",
+                        content_html = "", attachments = emptyList(), url = "$baseUrl/abc"),
                 mockSyndEntry(uri = "id", description = mockSyndContent(value = ""),
                         links = listOf(mockSyndLink(href = "abc", rel = "self"),
-                                mockSyndLink(href = "bcd"))).asItem()
+                                mockSyndLink(href = "bcd"))).asItem(baseUrl)
         )
     }
 
     @Test
     fun asAttachment() {
         assertEquals(
-                Attachment(url = "uurl", mime_type = "text/html", size_in_bytes = 5),
-                mockSyndEnclosure(url = "uurl", type = "text/html", length = 5).asAttachment()
+                Attachment(url = "$baseUrl/uurl", mime_type = "text/html", size_in_bytes = 5),
+                mockSyndEnclosure(url = "uurl", type = "text/html", length = 5).asAttachment(baseUrl)
         )
     }
 
     @Test
     fun contentTextWithPlainAndOthers() {
         assertEquals(
-                Item(id = "id", content_text = "PLAIN", summary = "PLAIN", title = "",
+                Item(id = "$baseUrl/id", content_text = "PLAIN", summary = "PLAIN", title = "",
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
@@ -132,112 +133,112 @@ class RomeExtensionsKtTest {
                                 mockSyndContent(value = "<b>html</b>", type = "html"),
                                 mockSyndContent(value = null, type = "xhtml"),
                                 mockSyndContent(value = "bah", type = null)
-                        )).asItem()
+                        )).asItem(baseUrl)
         )
     }
 
     @Test
     fun contentTextWithNullAndOthers() {
         assertEquals(
-                Item(id = "id", content_text = "bah", summary = "bah", title = "",
+                Item(id = "$baseUrl/id", content_text = "bah", summary = "bah", title = "",
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
                                 mockSyndContent(value = "<b>html</b>", type = "html"),
                                 mockSyndContent(value = null, type = "xhtml"),
                                 mockSyndContent(value = "bah", type = null)
-                        )).asItem()
+                        )).asItem(baseUrl)
         )
     }
 
     @Test
     fun contentTextWithOthers() {
         assertEquals(
-                Item(id = "id", content_text = "**html**", summary = "**html**", title = "",
+                Item(id = "$baseUrl/id", content_text = "**html**", summary = "**html**", title = "",
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
                                 mockSyndContent(value = "<b>html</b>", type = "html"),
                                 mockSyndContent(value = null, type = "xhtml")
-                        )).asItem()
+                        )).asItem(baseUrl)
         )
     }
 
     @Test
     fun contentHtmlAtomWithOnlyUnknown() {
         assertEquals(
-                Item(id = "id", title = "", content_text = "foo", summary = "foo",
+                Item(id = "$baseUrl/id", title = "", content_text = "foo", summary = "foo",
                         content_html = "foo", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
                                 mockSyndContent(value = "foo")
-                        )).asItem()
+                        )).asItem(baseUrl)
         )
     }
 
     @Test
     fun titleHtmlAtom() {
         assertEquals(
-                Item(id = "id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
+                Item(id = "$baseUrl/id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
                         content_html = "", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         titleEx = mockSyndContent(value = "600 &amp;#8211; Email is your electronic memory", type = "html")
-                        ).asItem()
+                ).asItem(baseUrl)
         )
     }
 
     @Test
     fun titleXHtmlAtom() {
         assertEquals(
-                Item(id = "id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
+                Item(id = "$baseUrl/id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
                         content_html = "", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         titleEx = mockSyndContent(value = "600 &#8211; Email is your electronic memory", type = "xhtml")
-                ).asItem()
+                ).asItem(baseUrl)
         )
     }
 
     @Test
     fun titlePlainAtomRss() {
         assertEquals(
-                Item(id = "id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
+                Item(id = "$baseUrl/id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
                         content_html = "", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         title = "600 &#8211; Email is your electronic memory"
-                ).asItem()
+                ).asItem(baseUrl)
         )
     }
 
     @Test
     fun contentHtmlRss() {
         assertEquals(
-                Item(id = "id", content_text = "**html**", summary = "**html**", title = "",
+                Item(id = "$baseUrl/id", content_text = "**html**", summary = "**html**", title = "",
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         description = mockSyndContent(value = "<b>html</b>")
-                        ).asItem()
+                ).asItem(baseUrl)
         )
     }
 
     @Test
     fun thumbnailWithThumbnail() {
         assertEquals(
-                Item(id = "id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        image = "img"),
+                Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                        image = "$baseUrl/img"),
                 mockSyndEntry(uri = "id",
                         thumbnails = arrayOf(mockThumbnail(url = URI.create("img")))
-                ).asItem()
+                ).asItem(baseUrl)
         )
     }
 
     @Test
     fun thumbnailWithContent() {
         assertEquals(
-                Item(id = "id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        image = "img"),
+                Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                        image = "$baseUrl/img"),
                 mockSyndEntry(uri = "id",
                         mediaContents = arrayOf(mockMediaContent(url = "img", medium = "image"))
-                ).asItem()
+                ).asItem(baseUrl)
         )
     }
 
@@ -247,11 +248,11 @@ class RomeExtensionsKtTest {
         val romeDate = DateTime.parse("2017-11-15T22:36:36+00:00").toDate()
         val dateTime = DateTime(romeDate.time)
         assertEquals(
-                Item(id = "id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         date_published = dateTime.toDateTimeISO().toString()),
                 mockSyndEntry(uri = "id",
                         publishedDate = romeDate
-                ).asItem()
+                ).asItem(baseUrl)
         )
     }
 
@@ -261,12 +262,12 @@ class RomeExtensionsKtTest {
         val romeDate = DateTime.parse("2017-11-15T22:36:36+00:00").toDate()
         val dateTime = DateTime(romeDate.time)
         assertEquals(
-                Item(id = "id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         date_modified = dateTime.toDateTimeISO().toString(),
                         date_published = dateTime.toDateTimeISO().toString()),
                 mockSyndEntry(uri = "id",
                         updatedDate = romeDate
-                ).asItem()
+                ).asItem(baseUrl)
         )
     }
 
@@ -278,13 +279,13 @@ class RomeExtensionsKtTest {
         val pubDate = DateTime(romePubDate.time)
         val modDate = DateTime(romeModDate.time)
         assertEquals(
-                Item(id = "id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         date_modified = modDate.toDateTimeISO().toString(),
                         date_published = pubDate.toDateTimeISO().toString()),
                 mockSyndEntry(uri = "id",
                         updatedDate = romeModDate,
                         publishedDate = romePubDate
-                ).asItem()
+                ).asItem(baseUrl)
         )
     }
 
@@ -408,4 +409,6 @@ class RomeExtensionsKtTest {
 
         return mock
     }
+
+    private val baseUrl = URL("http://test.com")
 }

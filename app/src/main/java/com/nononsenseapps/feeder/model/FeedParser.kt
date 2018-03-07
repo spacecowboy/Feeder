@@ -26,13 +26,16 @@ object FeedParser {
     private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
     // Should reuse same instance to have same cache
-    @Volatile private var client: OkHttpClient = cachingHttpClient()
-    @Volatile private var jsonFeedParser: JsonFeedParser = JsonFeedParser(client, feedAdapter())
+    @Volatile
+    private var client: OkHttpClient = cachingHttpClient()
+    @Volatile
+    private var jsonFeedParser: JsonFeedParser = JsonFeedParser(client, feedAdapter())
 
     /**
      * To enable caching, you need to call this method explicitly with a suitable cache directory.
      */
-    @Synchronized fun setup(cacheDir: File?): FeedParser {
+    @Synchronized
+    fun setup(cacheDir: File?): FeedParser {
         this.client = cachingHttpClient(cacheDir)
         jsonFeedParser = JsonFeedParser(client, feedAdapter())
 
@@ -93,7 +96,7 @@ object FeedParser {
                     when {
                         t.contains("application/atom") -> true
                         t.contains("application/rss") -> true
-                        // Youtube for example has alternate links with application/json+oembed type.
+                    // Youtube for example has alternate links with application/json+oembed type.
                         t == "application/json" -> true
                         else -> false
                     }
@@ -126,7 +129,7 @@ object FeedParser {
     }
 
     private fun findFeedLinksForYoutube(doc: Document): List<Pair<String, String>> {
-       val channelId: String? =  doc.body()?.getElementsByAttribute(YOUTUBE_CHANNEL_ID_ATTR)
+        val channelId: String? = doc.body()?.getElementsByAttribute(YOUTUBE_CHANNEL_ID_ATTR)
                 ?.firstOrNull()
                 ?.attr(YOUTUBE_CHANNEL_ID_ATTR)
 
@@ -214,7 +217,7 @@ object FeedParser {
                     } else {
                         when (isJSON) {
                             true -> jsonFeedParser.parseJsonBytes(body)
-                            false -> parseRssAtomBytes(body)
+                            false -> parseRssAtomBytes(response.request().url().url()!!, body)
                         }
                     }
 
@@ -237,16 +240,16 @@ object FeedParser {
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    internal fun parseRssAtomBytes(feedXml: ByteArray): Feed {
-        feedXml.inputStream().use { return parseFeedInputStream(it) }
+    internal fun parseRssAtomBytes(baseUrl: URL, feedXml: ByteArray): Feed {
+        feedXml.inputStream().use { return parseFeedInputStream(baseUrl, it) }
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    fun parseFeedInputStream(`is`: InputStream): Feed {
+    fun parseFeedInputStream(baseUrl: URL, `is`: InputStream): Feed {
         `is`.use {
             try {
                 val feed = SyndFeedInput().build(XmlReader(`is`))
-                return feed.asFeed()
+                return feed.asFeed(baseUrl = baseUrl)
             } catch (e: Throwable) {
                 throw FeedParsingError(e)
             }

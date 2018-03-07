@@ -14,62 +14,76 @@ import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.feed.synd.SyndPerson
 import org.joda.time.DateTime
 import org.jsoup.parser.Parser.unescapeEntities
+import java.net.URL
 
-fun SyndFeed.asFeed(): Feed {
+fun SyndFeed.asFeed(baseUrl: URL): Feed {
     val feedAuthor: Author? = this.authors?.firstOrNull()?.asAuthor()
+
     return Feed(
             title = plainTitle(),
-            home_page_url = this.links?.firstOrNull {
-                "alternate" == it.rel && "text/html" == it.type
-            }?.href ?: this.link,
-            feed_url = this.links?.firstOrNull { "self" == it.rel }?.href,
+            home_page_url = relativeLinkIntoAbsoluteOrNull(
+                    baseUrl,
+                    this.links?.firstOrNull {
+                        "alternate" == it.rel && "text/html" == it.type
+                    }?.href ?: this.link
+            ),
+            feed_url = relativeLinkIntoAbsoluteOrNull(
+                    baseUrl,
+                    this.links?.firstOrNull { "self" == it.rel }?.href
+            ),
             description = this.description,
             icon = this.image?.url,
             author = feedAuthor,
-            items = this.entries?.map { it.asItem(feedAuthor = feedAuthor) }
+            items = this.entries?.map { it.asItem(baseUrl = baseUrl, feedAuthor = feedAuthor) }
     )
 }
 
-fun SyndEntry.asItem(feedAuthor: Author? = null): Item {
+fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
     val contentText = this.contentText()
     return Item(
-            id = this.uri,
-            url = this.linkToHtml(),
+            id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
+            url = this.linkToHtml(baseUrl),
             title = plainTitle(),
             content_text = contentText,
             content_html = this.contentHtml(),
             summary = contentText.take(200),
-            image = this.thumbnail(),
+            image = this.thumbnail(baseUrl),
             date_published = this.publishedRFC3339Date(),
             date_modified = this.modifiedRFC3339Date(),
             author = this.authors?.firstOrNull()?.asAuthor() ?: feedAuthor,
-            attachments = this.enclosures?.map { it.asAttachment() }
+            attachments = this.enclosures?.map { it.asAttachment(baseUrl = baseUrl) }
     )
 }
 
-fun SyndEntry.linkToHtml(): String? {
+/**
+ * Returns an absolute link, or null
+ */
+fun SyndEntry.linkToHtml(feedBaseUrl: URL): String? {
     val alternateHtml = this.links?.firstOrNull { "alternate" == it.rel && "text/html" == it.type }
     if (alternateHtml != null) {
-        return alternateHtml.href
+        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, alternateHtml.href)
     }
 
     val selfHtml = this.links?.firstOrNull { "self" == it.rel && "text/html" == it.type }
     if (selfHtml != null) {
-        return selfHtml.href
+        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, selfHtml.href)
     }
 
     val self = this.links?.firstOrNull { "self" == it.rel }
     if (self != null) {
-        return self.href
+        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, self.href)
     }
 
-    return this.link
+    return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, this.link)
 }
 
 
-fun SyndEnclosure.asAttachment(): Attachment {
+fun SyndEnclosure.asAttachment(baseUrl: URL): Attachment {
     return Attachment(
-            url = this.url,
+            url = relativeLinkIntoAbsoluteOrNull(
+                    baseUrl,
+                    this.url
+            ),
             mime_type = this.type,
             size_in_bytes = this.length
     )
@@ -142,11 +156,11 @@ fun SyndEntry.contentHtml(): String? {
             else -> false
         }
     }?.take(1)?.map {
-                when (it.type) {
-                    "html" -> unescapeEntities(it.value, true)
-                    else -> it.value
-                }
-            }?.firstOrNull()
+        when (it.type) {
+            "html" -> unescapeEntities(it.value, true)
+            else -> it.value
+        }
+    }?.firstOrNull()
 
     if (possiblyHtml == null) {
         possiblyHtml = contents?.firstOrNull()?.value
@@ -172,25 +186,30 @@ fun findImageLinkInEnclosures(enclosures: List<SyndEnclosure?>?): String? {
     return null
 }
 
-fun SyndEntry.thumbnail(): String? {
+/**
+ * Returns an absolute link, or null
+ */
+fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     val media = this.getModule(MediaModule.URI) as MediaEntryModule?
     val thumbnails = media?.metadata?.thumbnail
     val contents = media?.mediaContents
     val enclosures: List<SyndEnclosure?>? = this.enclosures
 
     return when {
-        thumbnails?.isNotEmpty() ?: false -> thumbnails?.firstOrNull()?.url?.toString()
+        thumbnails?.isNotEmpty()
+                ?: false -> relativeLinkIntoAbsoluteOrNull(feedBaseUrl, thumbnails?.firstOrNull()?.url?.toString())
         contents?.isNotEmpty() ?: false -> {
-            contents?.firstOrNull { "image" == it.medium }
-                    ?.reference?.toString()
+            relativeLinkIntoAbsoluteOrNull(feedBaseUrl, contents?.firstOrNull { "image" == it.medium }
+                    ?.reference?.toString())
         }
         else -> {
             val imgLink: String? = findImageLinkInEnclosures(enclosures) ?: naiveFindImageLink(this.contentHtml())
-            val linkToHtml: String? = this.linkToHtml()
+            // Now we are resolving against original, not the feed
+            val siteBaseUrl: String? = this.linkToHtml(feedBaseUrl)
 
             when {
-                linkToHtml != null && imgLink != null -> relativeLinkIntoAbsolute(sloppyLinkToStrictURL(linkToHtml), imgLink)
-                imgLink != null -> sloppyLinkToStrictURL(imgLink).toString()
+                siteBaseUrl != null && imgLink != null -> relativeLinkIntoAbsoluteOrNull(URL(siteBaseUrl), imgLink)
+                imgLink != null -> relativeLinkIntoAbsoluteOrNull(feedBaseUrl, imgLink)
                 else -> null
             }
         }
