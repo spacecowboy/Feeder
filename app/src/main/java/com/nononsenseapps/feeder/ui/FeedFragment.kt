@@ -392,7 +392,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         return when {
             id == R.id.action_sync.toLong() -> {
                 // Sync all feeds when menu button pressed
-                activity!!.contentResolver.requestFeedSync()
+                activity?.contentResolver?.requestFeedSync()
                 true
             }
             id == R.id.action_edit_feed.toLong() && this.id > 0 -> {
@@ -505,9 +505,9 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
             when {
                 FEEDITEMS_LOADER == cursorLoader.id -> {
                     val map = result as Map<FeedItemSQL, Int>
-                    adapter!!.updateData(map)
+                    adapter?.updateData(map)
                     val empty = adapter!!.itemCount <= HEADER_COUNT
-                    emptyView!!.visibility = if (empty) View.VISIBLE else View.GONE
+                    emptyView?.visibility = if (empty) View.VISIBLE else View.GONE
                 }
                 FEED_LOADER == cursorLoader.id -> {
                     val cursor = result as Cursor
@@ -520,7 +520,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                         this.feedTag = feed.tag
 
                         (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
-                        notifyCheck!!.isChecked = this.notify == 1
+                        notifyCheck?.isChecked = this.notify == 1
 
                         // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
                         // extra statistics on opening the feed.
@@ -542,7 +542,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                     } else {
                         this.notify = 0
                     }
-                    notifyCheck!!.isChecked = this.notify == 1
+                    notifyCheck?.isChecked = this.notify == 1
                 }
             }
         }
