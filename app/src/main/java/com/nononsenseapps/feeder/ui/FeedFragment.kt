@@ -365,12 +365,15 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
     }
 
     private fun markAsRead() {
-        // TODO this actually marks all items as read - whereas UI only displays 50 of them
+        // Remove items from UI and show the empty view
+        adapter?.items?.clear()
+        emptyView?.visibility = View.VISIBLE
+        // Remove items from DB
         val appContext = context?.applicationContext
         val feedId = this.id
         val feedTag = this.feedTag
         if (appContext != null) {
-            // TODO cancel notifications for tags and such once we handle the specific items
+            // TODO cancel notifications for tags and such
             launch(Background) {
                 when {
                     feedId > 0 -> {
