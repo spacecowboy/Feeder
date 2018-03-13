@@ -311,17 +311,4 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
     override fun onLoaderReset(loader: Loader<Any?>?) {
         // nothing really
     }
-
-    companion object {
-
-        fun newInstance(rssItem: FeedItemSQL): ReaderFragment {
-            val fragment = ReaderFragment()
-            // Save some time on load
-            fragment.rssItem = rssItem
-            fragment._id = rssItem.id
-
-            fragment.arguments = rssItem.asBundle()
-            return fragment
-        }
-    }
 }

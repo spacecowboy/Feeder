@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.views;
 
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.text.Layout;
@@ -19,6 +20,7 @@ public class LinkedTextView extends TextView {
         super(context, attrs);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         TextView widget = this;
@@ -67,7 +69,7 @@ public class LinkedTextView extends TextView {
                     }
                 } catch(ActivityNotFoundException exception) {
                     // No such activity
-                    Log.d("LinkedTextView", exception.getLocalizedMessage());
+                    Log.e("LinkedTextView", exception.getLocalizedMessage());
                 }
             }
         }

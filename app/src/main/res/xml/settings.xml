@@ -30,4 +30,26 @@
         android:title="@string/include_mobile_hotspots" android:key="pref_img_hotspots"
         android:summary="@string/may_result_data_charges"/>
   </PreferenceCategory>
+  <PreferenceCategory
+    android:title="@string/reader_settings" >
+
+    <ListPreference
+      android:defaultValue="0"
+      android:entries="@array/array_open_article_options"
+      android:entryValues="@array/array_open_article_values"
+      android:key="pref_default_open_item_with"
+      android:title="@string/open_item_by_default_with" />
+    <ListPreference
+      android:defaultValue="1"
+      android:entries="@array/array_open_empty_article_options"
+      android:entryValues="@array/array_open_empty_article_values"
+      android:key="pref_open_empty_item_with"
+      android:title="@string/open_empty_items_with" />
+    <ListPreference
+      android:defaultValue="1"
+      android:entries="@array/array_open_links_options"
+      android:entryValues="@array/array_open_links_values"
+      android:key="pref_open_links_with"
+      android:title="@string/open_links_with" />
+  </PreferenceCategory>
 </PreferenceScreen>

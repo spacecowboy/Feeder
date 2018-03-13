@@ -16,4 +16,34 @@
     <item>12</item>
     <item>24</item>
   </string-array>
+
+  <string-array name="array_open_article_options">
+    <item>@string/open_in_app</item>
+    <item>@string/open_in_webview</item>
+    <item>@string/open_in_default_browser</item>
+  </string-array>
+  <string-array name="array_open_article_values">
+    <item>0</item>
+    <item>1</item>
+    <item>2</item>
+  </string-array>
+
+  <!-- Note that these arrays share semantic value between values -->
+  <string-array name="array_open_links_options">
+    <item>@string/open_in_webview</item>
+    <item>@string/open_in_default_browser</item>
+  </string-array>
+  <string-array name="array_open_links_values">
+    <item>1</item>
+    <item>2</item>
+  </string-array>
+
+  <string-array name="array_open_empty_article_options">
+    <item>@string/open_in_webview</item>
+    <item>@string/open_in_default_browser</item>
+  </string-array>
+  <string-array name="array_open_empty_article_values">
+    <item>1</item>
+    <item>2</item>
+  </string-array>
 </resources>

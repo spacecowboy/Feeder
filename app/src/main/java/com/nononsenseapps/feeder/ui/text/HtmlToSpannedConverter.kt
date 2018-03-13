@@ -1,9 +1,13 @@
 package com.nononsenseapps.feeder.ui.text
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
+import android.provider.Browser.EXTRA_APPLICATION_ID
 import android.text.Layout
 import android.text.Spannable
 import android.text.Spanned
@@ -20,9 +24,14 @@ import android.text.style.SubscriptSpan
 import android.text.style.SuperscriptSpan
 import android.text.style.TextAppearanceSpan
 import android.text.style.TypefaceSpan
-import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
+import android.util.Log
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.ARG_URL
+import com.nononsenseapps.feeder.ui.ReaderWebViewActivity
+import com.nononsenseapps.feeder.ui.SHOULD_FINISH_BACK
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
+import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import org.ccil.cowan.tagsoup.Parser
 import org.xml.sax.Attributes
@@ -53,6 +62,26 @@ open class HtmlToSpannedConverter(private var mSource: String,
     private var ignoredImage = false
 
     private val ignoredTags = listOf("style", "script")
+
+    private val urlClickListener: ((String, Context) -> Unit) = { link, context ->
+        when (shouldOpenLinkWith(context)) {
+            PREF_VAL_OPEN_WITH_WEBVIEW -> {
+                val intent = Intent(context, ReaderWebViewActivity::class.java)
+                intent.putExtra(SHOULD_FINISH_BACK, true)
+                intent.putExtra(ARG_URL, link)
+                context.startActivity(intent)
+            }
+            else -> {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                intent.putExtra(EXTRA_APPLICATION_ID, context.packageName)
+                try {
+                    context.startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    Log.e("HtmlToSpannedConverter", "Activity was not found for intent, " + intent.toString())
+                }
+            }
+        }
+    }
 
     init {
         @Suppress("DEPRECATION")
@@ -478,8 +507,8 @@ open class HtmlToSpannedConverter(private var mSource: String,
         if (where != len) {
             val h: Href? = obj
 
-            if (h!!.mHref != null) {
-                text.setSpan(URLSpan(h.mHref), where, len,
+            h?.mHref?.let { link ->
+                text.setSpan(URLSpanWithListener(link, urlClickListener), where, len,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }

@@ -53,6 +53,17 @@
           android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
     </activity>
     <activity
+      android:name=".ui.ReaderWebViewActivity"
+      android:label="@string/app_name"
+      android:parentActivityName=".ui.FeedActivity"
+      android:allowTaskReparenting="true"
+      android:theme="@style/ReaderTheme">
+
+      <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
+    </activity>
+    <activity
         android:name=".ui.EditFeedActivity"
         android:label="@string/title_activity_edit_feed"
         android:parentActivityName=".ui.FeedActivity"
