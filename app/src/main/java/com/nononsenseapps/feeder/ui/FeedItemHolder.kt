@@ -202,10 +202,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                     val intent = when (openItemWith) {
                         PREF_VAL_OPEN_WITH_BROWSER -> {
                             // Open in browser since no content was posted
-                            // Use enclosure or link
-                            // TODO different handling of enclosure when description empty
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(rssItem!!.enclosurelink
-                                    ?: rssItem!!.link))
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(rssItem!!.link))
                             intent.putExtra(EXTRA_APPLICATION_ID, context.packageName)
                             intent
                         }
@@ -214,6 +211,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                             intent.putExtra(SHOULD_FINISH_BACK, true)
                             rssItem?.let {
                                 intent.putExtra(ARG_URL, it.link)
+                                intent.putExtra(ARG_ENCLOSURE, it.enclosurelink)
                             }
                             intent
                         }
