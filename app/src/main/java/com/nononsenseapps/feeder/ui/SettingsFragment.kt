@@ -6,7 +6,6 @@ import android.preference.PreferenceFragment
 import android.preference.PreferenceManager
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.util.PREF_DEFAULT_OPEN_ITEM_WITH
-import com.nononsenseapps.feeder.util.PREF_OPEN_EMPTY_ITEM_WITH
 import com.nononsenseapps.feeder.util.PREF_OPEN_LINKS_WITH
 import com.nononsenseapps.feeder.util.PREF_SYNC_FREQ
 import com.nononsenseapps.feeder.util.PREF_SYNC_HOTSPOTS
@@ -25,7 +24,6 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
         PreferenceManager.getDefaultSharedPreferences(activity).registerOnSharedPreferenceChangeListener(this)
         bindPreferenceSummaryToValue(PREF_SYNC_FREQ)
         bindPreferenceSummaryToValue(PREF_DEFAULT_OPEN_ITEM_WITH)
-        bindPreferenceSummaryToValue(PREF_OPEN_EMPTY_ITEM_WITH)
         bindPreferenceSummaryToValue(PREF_OPEN_LINKS_WITH)
     }
 

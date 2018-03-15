@@ -23,8 +23,8 @@ import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
 import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenEmptyItemWith
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
+import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.markItemAsRead
 import com.nononsenseapps.feeder.util.markItemAsUnread
 import kotlinx.coroutines.experimental.launch
@@ -183,7 +183,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                     if (rssItem?.plainsnippet?.isNotEmpty() == true) {
                         defaultOpenItemWith
                     } else {
-                        shouldOpenEmptyItemWith(context)
+                        shouldOpenLinkWith(context)
                     }
                 }
                 else -> defaultOpenItemWith

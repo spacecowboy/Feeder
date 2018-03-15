@@ -48,7 +48,6 @@ const val PREF_LAST_DATABASE_VERSION = "pref_last_database_version"
  * Reader settings
  */
 const val PREF_DEFAULT_OPEN_ITEM_WITH = "pref_default_open_item_with"
-const val PREF_OPEN_EMPTY_ITEM_WITH = "pref_open_empty_item_with"
 const val PREF_OPEN_LINKS_WITH = "pref_open_links_with"
 
 const val PREF_VAL_OPEN_WITH_READER = "0"
@@ -110,9 +109,6 @@ object PrefUtils {
 
     fun shouldOpenItemWith(context: Context): String =
             sp(context).getString(PREF_DEFAULT_OPEN_ITEM_WITH, PREF_VAL_OPEN_WITH_READER)
-
-    fun shouldOpenEmptyItemWith(context: Context): String =
-            sp(context).getString(PREF_OPEN_EMPTY_ITEM_WITH, PREF_VAL_OPEN_WITH_BROWSER)
 
     fun shouldOpenLinkWith(context: Context): String =
             sp(context).getString(PREF_OPEN_LINKS_WITH, PREF_VAL_OPEN_WITH_BROWSER)
