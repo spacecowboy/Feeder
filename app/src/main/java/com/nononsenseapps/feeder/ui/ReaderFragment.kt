@@ -219,7 +219,22 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem?): Boolean {
-        when (menuItem!!.itemId) {
+        return when (menuItem!!.itemId) {
+            R.id.action_open_in_webview -> {
+                // Open in web view
+                rssItem?.let { rssItem ->
+                    rssItem.link?.let { link ->
+                        context?.let { context ->
+                            val intent = Intent(context, ReaderWebViewActivity::class.java)
+                            intent.putExtra(ARG_URL, link)
+                            intent.putExtra(ARG_ENCLOSURE, rssItem.enclosurelink)
+                            startActivity(intent)
+                            activity?.finish()
+                        }
+                    }
+                }
+                true
+            }
             R.id.action_open_in_browser -> {
                 val uri = Uri.parse(rssItem!!.link)
                 // Open in browser
@@ -230,7 +245,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     Log.d("ReaderFragment", "No such activity: $e")
                 }
 
-                return true
+                true
             }
             R.id.action_open_enclosure -> {
                 val uri = Uri.parse(rssItem!!.enclosurelink)
@@ -242,9 +257,9 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     Log.d("ReaderFragment", "No such activity: $e")
                 }
 
-                return true
+                true
             }
-            else -> return super.onOptionsItemSelected(menuItem)
+            else -> super.onOptionsItemSelected(menuItem)
         }
     }
 

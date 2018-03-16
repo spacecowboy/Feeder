@@ -76,5 +76,6 @@
   <string name="open_item_by_default_with">Open items by default with</string>
   <string name="open_links_with">Open links with</string>
   <string name="reader_settings">Reader</string>
+  <string name="open_link_in_web_view">Open link in Web view</string>
 
 </resources>
