@@ -70,7 +70,7 @@
   <string name="selected">Selected</string>
   <string name="notification_channel_name">Unread feeds</string>
   <string name="notification_channel_description">Notifications are only shown for unread items in configured feeds</string>
-  <string name="open_in_app">App</string>
+  <string name="open_in_reader">Reader</string>
   <string name="open_in_webview">Web view</string>
   <string name="open_in_default_browser">Default browser</string>
   <string name="open_item_by_default_with">Open items by default with</string>

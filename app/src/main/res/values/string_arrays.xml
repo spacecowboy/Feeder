@@ -18,7 +18,7 @@
   </string-array>
 
   <string-array name="array_open_article_options">
-    <item>@string/open_in_app</item>
+    <item>@string/open_in_reader</item>
     <item>@string/open_in_webview</item>
     <item>@string/open_in_default_browser</item>
   </string-array>
