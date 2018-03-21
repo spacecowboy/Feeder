@@ -1,7 +1,9 @@
 package com.nononsenseapps.feeder.ui
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import android.provider.Browser.EXTRA_APPLICATION_ID
 import android.support.v7.widget.RecyclerView
 import android.text.Spannable
 import android.text.SpannableString
@@ -17,7 +19,12 @@ import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.FeedItemSQL
 import com.nononsenseapps.feeder.model.cancelNotificationInBackground
 import com.nononsenseapps.feeder.util.GlideUtils
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
 import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
+import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.markItemAsRead
 import com.nononsenseapps.feeder.util.markItemAsUnread
 import kotlinx.coroutines.experimental.launch
@@ -167,28 +174,64 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
      * @param view
      */
     override fun onClick(view: View) {
-        // Open item if not empty
-        if (rssItem?.plainsnippet?.isNotEmpty() == true) {
-            val i = Intent(feedAdapter.feedFragment.activity, ReaderActivity::class.java)
-            i.putExtra(SHOULD_FINISH_BACK, true)
-            rssItem?.let {
-                ReaderActivity.setRssExtras(i, it)
+        val context = feedAdapter.feedFragment.context
+        if (context != null) {
+            val defaultOpenItemWith = shouldOpenItemWith(context)
+
+            val openItemWith = when (defaultOpenItemWith) {
+                PREF_VAL_OPEN_WITH_READER -> {
+                    if (rssItem?.plainsnippet?.isNotEmpty() == true) {
+                        defaultOpenItemWith
+                    } else {
+                        shouldOpenLinkWith(context)
+                    }
+                }
+                else -> defaultOpenItemWith
             }
 
-            feedAdapter.feedFragment.startActivity(i)
-        } else {
-            // Mark as read
-            val contentResolver = feedAdapter.feedFragment.context?.contentResolver
-            if (contentResolver != null) {
-                val itemId = rssItem!!.id
-                launch(Background) {
-                    contentResolver.markItemAsRead(itemId)
+            when (openItemWith) {
+                PREF_VAL_OPEN_WITH_BROWSER, PREF_VAL_OPEN_WITH_WEBVIEW -> {
+                    // Mark as read
+                    val contentResolver = feedAdapter.feedFragment.context?.contentResolver
+                    if (contentResolver != null) {
+                        val itemId = rssItem!!.id
+                        launch(Background) {
+                            contentResolver.markItemAsRead(itemId)
+                        }
+                    }
+                    val intent = when (openItemWith) {
+                        PREF_VAL_OPEN_WITH_BROWSER -> {
+                            // Open in browser since no content was posted
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(rssItem!!.link))
+                            intent.putExtra(EXTRA_APPLICATION_ID, context.packageName)
+                            intent
+                        }
+                        else -> {
+                            val intent = Intent(feedAdapter.feedFragment.activity, ReaderWebViewActivity::class.java)
+                            intent.putExtra(SHOULD_FINISH_BACK, true)
+                            rssItem?.let {
+                                intent.putExtra(ARG_URL, it.link)
+                                intent.putExtra(ARG_ENCLOSURE, it.enclosurelink)
+                            }
+                            intent
+                        }
+                    }
+                    try {
+                        feedAdapter.feedFragment.startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        Log.e("FeedItemHolder", "Activity was not found for intent, " + intent.toString())
+                    }
+                }
+                else -> {
+                    val i = Intent(feedAdapter.feedFragment.activity, ReaderActivity::class.java)
+                    i.putExtra(SHOULD_FINISH_BACK, true)
+                    rssItem?.let {
+                        ReaderActivity.setRssExtras(i, it)
+                    }
+
+                    feedAdapter.feedFragment.startActivity(i)
                 }
             }
-            // Open in browser since no content was posted
-            // Use enclosure or link
-            feedAdapter.feedFragment.startActivity(Intent(Intent.ACTION_VIEW,
-                    Uri.parse(rssItem!!.enclosurelink ?: rssItem!!.link)))
         }
     }
 

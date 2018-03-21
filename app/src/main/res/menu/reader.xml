@@ -18,23 +18,27 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.ReaderActivity">
-    <item
-        android:id="@+id/action_open_enclosure"
-        app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_av_play_circle_outline"
-        android:title="@string/open_enclosed_media" />
-    <item
-        android:id="@+id/action_open_in_browser"
-        app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_location_web_site"
-        android:title="@string/open_link_in_browser" />
-    <item
-        android:id="@+id/action_share"
-        app:showAsAction="ifRoom"
-        app:actionProviderClass=
-        "android.support.v7.widget.ShareActionProvider"
-        android:title="@string/share" />
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  tools:context=".ui.ReaderActivity">
+  <item
+    android:id="@+id/action_open_enclosure"
+    android:icon="@drawable/ic_action_av_play_circle_outline"
+    android:title="@string/open_enclosed_media"
+    app:showAsAction="ifRoom" />
+  <item
+    android:id="@+id/action_open_in_webview"
+    android:icon="@drawable/ic_action_webview"
+    android:title="@string/open_link_in_web_view"
+    app:showAsAction="ifRoom" />
+  <item
+    android:id="@+id/action_open_in_browser"
+    android:icon="@drawable/ic_action_location_web_site"
+    android:title="@string/open_link_in_browser"
+    app:showAsAction="ifRoom" />
+  <item
+    android:id="@+id/action_share"
+    android:title="@string/share"
+    app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+    app:showAsAction="ifRoom" />
 </menu>

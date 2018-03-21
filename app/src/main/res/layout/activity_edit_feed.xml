@@ -14,7 +14,7 @@
     android:id="@+id/feed_details_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:visibility="gone">
+    android:visibility="visible">
 
     <LinearLayout
       android:layout_width="match_parent"
@@ -106,7 +106,8 @@
   <android.support.constraint.ConstraintLayout
     android:id="@+id/feed_search_frame"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:visibility="gone">
 
     <EditText
       android:id="@+id/search_view"

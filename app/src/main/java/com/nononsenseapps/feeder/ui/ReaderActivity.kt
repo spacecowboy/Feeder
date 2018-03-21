@@ -13,10 +13,6 @@ import com.nononsenseapps.feeder.views.DrawShadowFrameLayout
  * Displays feed items suitable for consumption.
  */
 class ReaderActivity : BaseActivity() {
-    /**
-     * Used to store the last screen title.
-     */
-    private var mTitle: CharSequence? = null
     private var mFragment: Fragment? = null
     private var mDrawShadowFrameLayout: DrawShadowFrameLayout? = null
 
@@ -43,8 +39,6 @@ class ReaderActivity : BaseActivity() {
             ab.setHomeButtonEnabled(true)
             ab.setDisplayShowTitleEnabled(false)
         }
-
-        mTitle = title
 
         if (savedInstanceState == null) {
             mFragment = fragment

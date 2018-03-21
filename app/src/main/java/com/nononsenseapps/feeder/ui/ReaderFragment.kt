@@ -219,28 +219,36 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem?): Boolean {
-        val uri: Uri
-        when (menuItem!!.itemId) {
-            R.id.action_open_in_browser -> {
-                uri = Uri.parse(rssItem!!.link)
-                if (uri.isRelative) {
-                    Toast.makeText(activity, "Sorry, can't handle relative links yet.", Toast.LENGTH_SHORT).show()
+        return when (menuItem!!.itemId) {
+            R.id.action_open_in_webview -> {
+                // Open in web view
+                rssItem?.let { rssItem ->
+                    rssItem.link?.let { link ->
+                        context?.let { context ->
+                            val intent = Intent(context, ReaderWebViewActivity::class.java)
+                            intent.putExtra(ARG_URL, link)
+                            intent.putExtra(ARG_ENCLOSURE, rssItem.enclosurelink)
+                            startActivity(intent)
+                            activity?.finish()
+                        }
+                    }
                 }
+                true
+            }
+            R.id.action_open_in_browser -> {
+                val uri = Uri.parse(rssItem!!.link)
                 // Open in browser
                 try {
                     startActivity(Intent(Intent.ACTION_VIEW, uri))
                 } catch (e: ActivityNotFoundException) {
-                    Toast.makeText(activity, "Couldn't find an activity to open that link with", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
                     Log.d("ReaderFragment", "No such activity: $e")
                 }
 
-                return true
+                true
             }
             R.id.action_open_enclosure -> {
-                uri = Uri.parse(rssItem!!.enclosurelink)
-                if (uri.isRelative) {
-                    Toast.makeText(activity, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
-                }
+                val uri = Uri.parse(rssItem!!.enclosurelink)
                 // Open enclosure link
                 try {
                     startActivity(Intent(Intent.ACTION_VIEW, uri))
@@ -249,9 +257,9 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     Log.d("ReaderFragment", "No such activity: $e")
                 }
 
-                return true
+                true
             }
-            else -> return super.onOptionsItemSelected(menuItem)
+            else -> super.onOptionsItemSelected(menuItem)
         }
     }
 
@@ -310,18 +318,5 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
 
     override fun onLoaderReset(loader: Loader<Any?>?) {
         // nothing really
-    }
-
-    companion object {
-
-        fun newInstance(rssItem: FeedItemSQL): ReaderFragment {
-            val fragment = ReaderFragment()
-            // Save some time on load
-            fragment.rssItem = rssItem
-            fragment._id = rssItem.id
-
-            fragment.arguments = rssItem.asBundle()
-            return fragment
-        }
     }
 }
