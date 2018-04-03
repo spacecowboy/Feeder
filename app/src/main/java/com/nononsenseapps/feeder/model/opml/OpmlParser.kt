@@ -74,19 +74,22 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
             when {
             // Nesting not allowed
                 ignoring > 0 || isFeedTag -> ignoring++
-                "rss" == atts?.getValue("type") -> {
+                outlineIsFeed(atts) -> {
                     isFeedTag = true
                     val feed = FeedSQL(
-                            title = unescape(atts.getValue("title") ?: ""),
+                            title = unescape(atts?.getValue("title") ?: atts?.getValue("text") ?: ""),
                             tag = if (tagStack.isNotEmpty()) tagStack.peek() else "",
-                            url = sloppyLinkToStrictURL(atts.getValue("xmlurl") ?: ""))
+                            url = sloppyLinkToStrictURL(atts?.getValue("xmlurl") ?: ""))
 
                     opmlToDb.saveFeed(feed)
                 }
-                else -> tagStack.push(unescape(atts?.getValue("title") ?: ""))
+                else -> tagStack.push(unescape(atts?.getValue("title") ?: atts?.getValue("text") ?: ""))
             }
         }
     }
+
+    private fun outlineIsFeed(atts: Attributes?): Boolean =
+            atts?.getValue("xmlurl") != null
 
     override fun skippedEntity(name: String?) {
     }

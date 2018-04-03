@@ -306,7 +306,7 @@ class OPMLTest {
 
     @Test
     @MediumTest
-    fun FlymOPMLImports() {
+    fun flymOPMLImports() {
         //given
         val opmlStream = javaClass.getResourceAsStream("Flym_auto_backup.opml")
 
@@ -368,6 +368,108 @@ class OPMLTest {
                     assertEquals("Grisebouille", feed.title)
                 }
                 else -> fail("Unexpected URI. Feed: $feed")
+            }
+        }
+    }
+
+    @Test
+    @MediumTest
+    fun rssGuardOPMLImports1() {
+        //given
+        val opmlStream = javaClass.getResourceAsStream("rssguard_1.opml")
+
+        //when
+        val parser = OpmlParser(OPMLContenProvider(context))
+        parser.parseInputStream(opmlStream)
+
+        //then
+        val feeds = context!!.contentResolver.getFeeds()
+        val tags = feeds.map { it.tag }.distinct().toList()
+        assertEquals("Expecting 30 feeds", 30, feeds.size)
+        assertEquals("Expecting 6 tags (incl empty)", 6, tags.size)
+
+        feeds.forEach { feed ->
+            assertEquals("Custom title should be empty", "", feed.customTitle)
+            when (feed.url) {
+                URL("http://www.les-trois-sagesses.org/rss-articles.xml") -> {
+                    assertEquals("Religion", feed.tag)
+                    assertEquals("Les trois sagesses", feed.title)
+                }
+                URL("http://www.avrildeperthuis.com/feed/") -> {
+                    assertEquals("Amis", feed.tag)
+                    assertEquals("avril de perthuis", feed.title)
+                }
+                URL("http://www.fashioningtech.com/profiles/blog/feed?xn_auth=no") -> {
+                    assertEquals("Actu Geek", feed.tag)
+                    assertEquals("Everyone's Blog Posts - Fashioning Technology", feed.title)
+                }
+                URL("http://feeds2.feedburner.com/ChartPorn") -> {
+                    assertEquals("Graphs", feed.tag)
+                    assertEquals("Chart Porn", feed.title)
+                }
+                URL("http://www.mosqueedeparis.net/index.php?format=feed&amp;type=atom") -> {
+                    assertEquals("Religion", feed.tag)
+                    assertEquals("Mosquee de Paris", feed.title)
+                }
+                URL("http://sourceforge.net/projects/stuntrally/rss") -> {
+                    assertEquals("Mainstream update", feed.tag)
+                    assertEquals("Stunt Rally", feed.title)
+                }
+                URL("http://www.mairie6.lyon.fr/cs/Satellite?Thematique=&TypeContenu=Actualite&pagename=RSSFeed&site=Mairie6") -> {
+                    assertEquals("", feed.tag)
+                    assertEquals("Actualités", feed.title)
+                }
+            }
+        }
+    }
+
+    @Test
+    @MediumTest
+    fun rssGuardOPMLImports2() {
+        //given
+        val opmlStream = javaClass.getResourceAsStream("rssguard_2.opml")
+
+        //when
+        val parser = OpmlParser(OPMLContenProvider(context))
+        parser.parseInputStream(opmlStream)
+
+        //then
+        val feeds = context!!.contentResolver.getFeeds()
+        val tags = feeds.map { it.tag }.distinct().toList()
+        assertEquals("Expecting 30 feeds", 30, feeds.size)
+        assertEquals("Expecting 6 tags (incl empty)", 6, tags.size)
+
+        feeds.forEach { feed ->
+            assertEquals("Custom title should be empty", "", feed.customTitle)
+            when (feed.url) {
+                URL("http://www.les-trois-sagesses.org/rss-articles.xml") -> {
+                    assertEquals("Religion", feed.tag)
+                    assertEquals("Les trois sagesses", feed.title)
+                }
+                URL("http://www.avrildeperthuis.com/feed/") -> {
+                    assertEquals("Amis", feed.tag)
+                    assertEquals("avril de perthuis", feed.title)
+                }
+                URL("http://www.fashioningtech.com/profiles/blog/feed?xn_auth=no") -> {
+                    assertEquals("Actu Geek", feed.tag)
+                    assertEquals("Everyone's Blog Posts - Fashioning Technology", feed.title)
+                }
+                URL("http://feeds2.feedburner.com/ChartPorn") -> {
+                    assertEquals("Graphs", feed.tag)
+                    assertEquals("Chart Porn", feed.title)
+                }
+                URL("http://www.mosqueedeparis.net/index.php?format=feed&amp;type=atom") -> {
+                    assertEquals("Religion", feed.tag)
+                    assertEquals("Mosquee de Paris", feed.title)
+                }
+                URL("http://sourceforge.net/projects/stuntrally/rss") -> {
+                    assertEquals("Mainstream update", feed.tag)
+                    assertEquals("Stunt Rally", feed.title)
+                }
+                URL("http://www.mairie6.lyon.fr/cs/Satellite?Thematique=&TypeContenu=Actualite&pagename=RSSFeed&site=Mairie6") -> {
+                    assertEquals("", feed.tag)
+                    assertEquals("Actualités", feed.title)
+                }
             }
         }
     }
