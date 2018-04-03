@@ -1,3 +1,7 @@
+# 1.6.1
+*   Fixed parsing of some OPML formats  
+    See !94 #111
+
 # 1.6.0
 *   Added option of how to open articles.
     One of Reader, WebView or Browser.
