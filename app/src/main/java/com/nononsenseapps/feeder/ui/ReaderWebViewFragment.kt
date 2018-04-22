@@ -16,6 +16,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -52,6 +53,7 @@ class ReaderWebViewFragment : Fragment() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mWebView?.destroy()
+        CookieManager.getInstance().setAcceptCookie(false)
         mWebView = WebView(context)
         mWebView?.settings?.javaScriptEnabled = true
         mWebView?.settings?.builtInZoomControls = true
