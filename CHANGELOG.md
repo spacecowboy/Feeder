@@ -1,3 +1,7 @@
+# 1.6.2
+*   Block cookies from webview  
+    See !95
+
 # 1.6.1
 *   Fixed parsing of some OPML formats  
     See !94 #111
