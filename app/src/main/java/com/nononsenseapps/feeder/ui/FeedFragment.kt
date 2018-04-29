@@ -196,6 +196,14 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
             false -> // Load notification settings for tag
                 loaderManager.restartLoader(FEED_SETTINGS_LOADER, Bundle.EMPTY, this)
         }
+
+        // Remember choice in future
+        val appContext = context?.applicationContext
+        launch(Background) {
+            if (appContext != null) {
+                PrefUtils.setLastOpenFeed(appContext, id, feedTag)
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
