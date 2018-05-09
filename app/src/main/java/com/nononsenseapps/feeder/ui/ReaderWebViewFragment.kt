@@ -1,15 +1,12 @@
 package com.nononsenseapps.feeder.ui
 
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.MenuItemCompat
 import android.support.v7.widget.ShareActionProvider
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -20,8 +17,8 @@ import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.util.openLinkInBrowser
 
 const val ARG_URL = "url"
 
@@ -142,26 +139,17 @@ class ReaderWebViewFragment : Fragment() {
         when (menuItem.itemId) {
             R.id.action_open_in_browser -> {
                 // Use the currently visible page as the url
-                val uri = Uri.parse(webView?.url ?: url)
-                // Open in browser
-                try {
-                    startActivity(Intent(Intent.ACTION_VIEW, uri))
-                } catch (e: ActivityNotFoundException) {
-                    Toast.makeText(activity, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
-                    Log.d("ReaderFragment", "No such activity: $e")
+                val link = webView?.url ?: url
+                context?.let { context ->
+                    openLinkInBrowser(context, link)
                 }
 
                 return true
             }
             R.id.action_open_enclosure -> {
-                enclosureUrl?.let { enclosureUrl ->
-                    val uri = Uri.parse(enclosureUrl)
-                    // Open enclosure link
-                    try {
-                        startActivity(Intent(Intent.ACTION_VIEW, uri))
-                    } catch (e: ActivityNotFoundException) {
-                        Toast.makeText(activity, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
-                        Log.d("ReaderFragment", "No such activity: $e")
+                enclosureUrl?.let { link ->
+                    context?.let { context ->
+                        openLinkInBrowser(context, link)
                     }
                 }
 
