@@ -211,8 +211,6 @@ class FeedActivity : BaseActivity() {
         emptyView.visibility = View.GONE
         fragment = FeedFragment.newInstance(id, title, url, tag)
         supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragmentTag).commit()
-        // Remember choice in future
-        PrefUtils.setLastOpenFeed(this, id, tag)
     }
 
     override fun onResume() {
