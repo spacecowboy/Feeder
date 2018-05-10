@@ -12,6 +12,7 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.provider.Browser.EXTRA_CREATE_NEW_TAB
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.TaskStackBuilder
@@ -150,15 +151,18 @@ private fun singleNotification(context: Context, item: FeedItemSQL): Notificatio
             .setNumber(1)
 
     if (item.enclosurelink != null) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.enclosurelink))
+        intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
         builder.addAction(R.drawable.ic_action_av_play_circle_outline,
-                context.getString(R.string.open_enclosed_media), PendingIntent.getActivity(context, item.id.toInt(), Intent(Intent.ACTION_VIEW,
-                Uri.parse(item.enclosurelink)), PendingIntent.FLAG_UPDATE_CURRENT))
+                context.getString(R.string.open_enclosed_media), PendingIntent.getActivity(context, item.id.toInt(), intent,
+                PendingIntent.FLAG_UPDATE_CURRENT))
     }
 
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.link))
+    intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
     builder.addAction(R.drawable.ic_action_location_web_site,
             context.getString(R.string.open_link_in_browser),
-            PendingIntent.getActivity(context, item.id.toInt(), Intent(Intent.ACTION_VIEW,
-                    Uri.parse(item.link)), PendingIntent.FLAG_UPDATE_CURRENT))
+            PendingIntent.getActivity(context, item.id.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT))
 
     style.setBuilder(builder)
     return style.build()

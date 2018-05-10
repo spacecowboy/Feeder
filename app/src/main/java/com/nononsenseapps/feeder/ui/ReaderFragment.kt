@@ -18,11 +18,9 @@
 package com.nononsenseapps.feeder.ui
 
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Point
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
@@ -32,7 +30,6 @@ import android.support.v4.content.Loader
 import android.support.v4.view.MenuItemCompat
 import android.support.v7.widget.ShareActionProvider
 import android.text.Spanned
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -40,7 +37,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.COL_ID
@@ -56,6 +52,7 @@ import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.asFeedItem
 import com.nononsenseapps.feeder.util.firstOrNull
 import com.nononsenseapps.feeder.util.markItemAsReadAndNotified
+import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.views.ObservableScrollView
 import kotlinx.coroutines.experimental.launch
@@ -236,25 +233,21 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                 true
             }
             R.id.action_open_in_browser -> {
-                val uri = Uri.parse(rssItem!!.link)
-                // Open in browser
-                try {
-                    startActivity(Intent(Intent.ACTION_VIEW, uri))
-                } catch (e: ActivityNotFoundException) {
-                    Toast.makeText(activity, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
-                    Log.d("ReaderFragment", "No such activity: $e")
+                val link = rssItem?.link
+                if (link != null) {
+                    context?.let { context ->
+                        openLinkInBrowser(context, link)
+                    }
                 }
 
                 true
             }
             R.id.action_open_enclosure -> {
-                val uri = Uri.parse(rssItem!!.enclosurelink)
-                // Open enclosure link
-                try {
-                    startActivity(Intent(Intent.ACTION_VIEW, uri))
-                } catch (e: ActivityNotFoundException) {
-                    Toast.makeText(activity, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
-                    Log.d("ReaderFragment", "No such activity: $e")
+                val link = rssItem?.enclosurelink
+                if (link != null) {
+                    context?.let { context ->
+                        openLinkInBrowser(context, link)
+                    }
                 }
 
                 true

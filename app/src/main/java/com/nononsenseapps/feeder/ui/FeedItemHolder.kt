@@ -1,9 +1,6 @@
 package com.nononsenseapps.feeder.ui
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
-import android.provider.Browser.EXTRA_APPLICATION_ID
 import android.support.v7.widget.RecyclerView
 import android.text.Spannable
 import android.text.SpannableString
@@ -27,6 +24,7 @@ import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.markItemAsRead
 import com.nononsenseapps.feeder.util.markItemAsUnread
+import com.nononsenseapps.feeder.util.openLinkInBrowser
 import kotlinx.coroutines.experimental.launch
 
 // Provide a reference to the views for each data item
@@ -199,12 +197,12 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                             contentResolver.markItemAsRead(itemId)
                         }
                     }
-                    val intent = when (openItemWith) {
+                    when (openItemWith) {
                         PREF_VAL_OPEN_WITH_BROWSER -> {
                             // Open in browser since no content was posted
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(rssItem!!.link))
-                            intent.putExtra(EXTRA_APPLICATION_ID, context.packageName)
-                            intent
+                            rssItem?.link?.let { link ->
+                                openLinkInBrowser(context, link)
+                            }
                         }
                         else -> {
                             val intent = Intent(feedAdapter.feedFragment.activity, ReaderWebViewActivity::class.java)
@@ -213,13 +211,8 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                                 intent.putExtra(ARG_URL, it.link)
                                 intent.putExtra(ARG_ENCLOSURE, it.enclosurelink)
                             }
-                            intent
+                            feedAdapter.feedFragment.startActivity(intent)
                         }
-                    }
-                    try {
-                        feedAdapter.feedFragment.startActivity(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        Log.e("FeedItemHolder", "Activity was not found for intent, " + intent.toString())
                     }
                 }
                 else -> {
