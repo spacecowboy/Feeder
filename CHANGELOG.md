@@ -1,3 +1,9 @@
+# 1.6.3
+*   Now all links are explicitly opened in new browser tabs
+    See !97 #117
+*   Fixed buggy back stack
+    See !96
+
 # 1.6.2
 *   Block cookies from webview  
     See !95
