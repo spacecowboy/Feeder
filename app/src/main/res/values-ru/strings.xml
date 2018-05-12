@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <string name="app_name">Feeder</string>
   <string name="navigation_drawer_open">Открыть меню навигации</string>
   <string name="navigation_drawer_close">Закрыть меню навигации</string>
   <string name="action_settings">Настройки</string>
