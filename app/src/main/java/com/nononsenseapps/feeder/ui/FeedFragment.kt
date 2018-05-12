@@ -473,7 +473,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                     FEED_ITEM_FIELDS_FOR_LIST,
                     loaderSelection,
                     loaderSelectionArgs,
-                    COL_PUBDATE + " DESC") as AsyncTaskLoader<Any>
+                    "$COL_PUBDATE DESC") as AsyncTaskLoader<Any>
             FEED_LOADER -> {
                 CursorLoader(activity!!,
                         Uri.withAppendedPath(URI_FEEDS, "${this.id}"),
@@ -488,7 +488,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                         whereArgs = Util.LongsToStringArray(this.id)
                     }
                     feedTag != null -> {
-                        where = COL_TAG + " IS ?"
+                        where = "$COL_TAG IS ?"
                         whereArgs = Util.ToStringArray(feedTag)
                     }
                     else -> {
@@ -497,7 +497,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                     }
                 }
                 CursorLoader(activity!!, URI_FEEDS,
-                        Util.ToStringArray("DISTINCT " + COL_NOTIFY),
+                        Util.ToStringArray("DISTINCT $COL_NOTIFY"),
                         where, whereArgs, null) as AsyncTaskLoader<Any>
             }
             else -> null

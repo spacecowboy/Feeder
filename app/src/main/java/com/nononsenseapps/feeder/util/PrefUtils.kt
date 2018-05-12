@@ -55,6 +55,11 @@ const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
 const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 
 /**
+ * Database settings
+ */
+const val PREF_MAX_ITEM_COUNT_PER_FEED = "pref_max_item_count_per_feed"
+
+/**
  * Utilities and constants related to app preferences.
  */
 object PrefUtils {
@@ -95,6 +100,9 @@ object PrefUtils {
     fun shouldSyncOnlyWhenCharging(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_ONLY_CHARGING, false)
 
     fun shouldSyncOnHotSpots(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_HOTSPOTS, false)
+
+    fun maximumItemCountPerFeed(context: Context): Int =
+            sp(context).getString(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt()
 
     /**
      * @return true if automatic syncing is enabled, false otherwise

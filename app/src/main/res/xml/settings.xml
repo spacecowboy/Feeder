@@ -18,6 +18,12 @@
     <SwitchPreference
         android:defaultValue="false"
         android:title="@string/only_when_charging" android:key="pref_sync_only_charging"/>
+    <ListPreference
+      android:defaultValue="100"
+      android:entries="@array/array_max_items_per_feed_options"
+      android:entryValues="@array/array_max_items_per_feed_options"
+      android:key="pref_max_item_count_per_feed"
+      android:title="@string/max_feed_items" />
   </PreferenceCategory>
   <PreferenceCategory
       android:title="@string/image_loading">

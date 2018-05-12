@@ -6,6 +6,7 @@ import android.preference.PreferenceFragment
 import android.preference.PreferenceManager
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.util.PREF_DEFAULT_OPEN_ITEM_WITH
+import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.nononsenseapps.feeder.util.PREF_OPEN_LINKS_WITH
 import com.nononsenseapps.feeder.util.PREF_SYNC_FREQ
 import com.nononsenseapps.feeder.util.PREF_SYNC_HOTSPOTS
@@ -25,6 +26,7 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
         bindPreferenceSummaryToValue(PREF_SYNC_FREQ)
         bindPreferenceSummaryToValue(PREF_DEFAULT_OPEN_ITEM_WITH)
         bindPreferenceSummaryToValue(PREF_OPEN_LINKS_WITH)
+        bindPreferenceSummaryToValue(PREF_MAX_ITEM_COUNT_PER_FEED)
     }
 
     override fun onDestroy() {
