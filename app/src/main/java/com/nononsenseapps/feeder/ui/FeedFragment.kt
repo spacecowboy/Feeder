@@ -56,6 +56,7 @@ import com.nononsenseapps.feeder.db.FEED_FIELDS
 import com.nononsenseapps.feeder.db.FEED_ITEM_FIELDS_FOR_LIST
 import com.nononsenseapps.feeder.db.FeedItemSQL
 import com.nononsenseapps.feeder.db.QUERY_PARAM_LIMIT
+import com.nononsenseapps.feeder.db.QUERY_PARAM_SKIP
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.Util
@@ -464,12 +465,17 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         }
     }
 
+    fun updateFirstVisiblePage() {
+        loaderManager.restartLoader(FEEDITEMS_LOADER, Bundle.EMPTY, this)
+    }
+
     override fun onCreateLoader(ID: Int, args: Bundle?): Loader<Any>? {
         @Suppress("UNCHECKED_CAST")
         val loader: AsyncTaskLoader<Any>? = when (ID) {
             FEEDITEMS_LOADER -> FeedItemDeltaCursorLoader(activity!!,
                     URI_FEEDITEMS.buildUpon()
-                            .appendQueryParameter(QUERY_PARAM_LIMIT, "50").build(),
+                            .appendQueryParameter(QUERY_PARAM_SKIP, "${adapter?.skipCount() ?: 0}")
+                            .appendQueryParameter(QUERY_PARAM_LIMIT, "${PAGE_COUNT * PAGE_SIZE}").build(),
                     FEED_ITEM_FIELDS_FOR_LIST,
                     loaderSelection,
                     loaderSelectionArgs,
