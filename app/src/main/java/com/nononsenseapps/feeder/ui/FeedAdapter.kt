@@ -20,6 +20,9 @@ const val HEADER_COUNT = 1
 const val HEADERTYPE = 0
 const val ITEMTYPE = 1
 
+const val PAGE_COUNT = 4
+const val PAGE_SIZE = 25
+
 class FeedAdapter(context: Context,
                   internal val feedFragment: FeedFragment) :
         RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -35,6 +38,8 @@ class FeedAdapter(context: Context,
     private var itemMap: ArrayMap<Long, FeedItemSQL> = ArrayMap()
 
     var temps: String = ""
+
+    var currentPage = 0
 
     private val sortedCallBack: SortedList.Callback<FeedItemSQL> = object : SortedList.Callback<FeedItemSQL>() {
         override fun compare(a: FeedItemSQL, b: FeedItemSQL): Int {
@@ -166,6 +171,17 @@ class FeedAdapter(context: Context,
 
     override fun onBindViewHolder(vHolder: RecyclerView.ViewHolder,
                                   position: Int) {
+        val newPage = if (position == PAGE_SIZE * (PAGE_COUNT - 1)) {
+            currentPage + 1
+        } else if (position == PAGE_SIZE) {
+            if (currentPage > 0) currentPage - 1 else currentPage
+        } else currentPage
+
+        if (newPage != currentPage) {
+            currentPage = newPage
+            feedFragment.updateFirstVisiblePage()
+        }
+
         if (getItemViewType(position) == HEADERTYPE) {
             // Nothing to bind for padding
             return
@@ -218,4 +234,5 @@ class FeedAdapter(context: Context,
         }
     }
 
+    fun skipCount(): Int = currentPage * PAGE_SIZE
 }
