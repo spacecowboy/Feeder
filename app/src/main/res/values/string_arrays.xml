@@ -46,4 +46,12 @@
     <item>1</item>
     <item>2</item>
   </string-array>
+
+  <string-array name="array_max_items_per_feed_options">
+    <item>50</item>
+    <item>100</item>
+    <item>200</item>
+    <item>500</item>
+    <item>1000</item>
+  </string-array>
 </resources>

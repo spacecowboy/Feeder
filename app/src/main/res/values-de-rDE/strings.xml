@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <string name="app_name">Feeder</string>
   <string name="navigation_drawer_open">Öffne die Navigationsleiste</string>
   <string name="navigation_drawer_close">Schließe die Navigationsleiste</string>
   <string name="action_settings">Einstellungen</string>

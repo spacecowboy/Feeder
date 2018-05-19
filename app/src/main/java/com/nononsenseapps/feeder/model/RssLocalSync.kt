@@ -15,7 +15,6 @@ import com.nononsenseapps.feeder.db.COL_IMAGEURL
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
-import com.nononsenseapps.feeder.db.Cleanup
 import com.nononsenseapps.feeder.db.FEED_FIELDS
 import com.nononsenseapps.feeder.db.FeedSQL
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
@@ -24,6 +23,7 @@ import com.nononsenseapps.feeder.db.Util.LongsToStringArray
 import com.nononsenseapps.feeder.db.Util.ToStringArray
 import com.nononsenseapps.feeder.db.Util.WHEREIDIS
 import com.nononsenseapps.feeder.db.Util.WhereIs
+import com.nononsenseapps.feeder.db.prune
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.getFeeds
 import com.nononsenseapps.feeder.util.getIdForFeedItem
@@ -53,7 +53,7 @@ fun syncFeeds(context: Context, feedId: Long, tag: String) {
                         }
                 // Finally, prune excessive items
                 try {
-                    Cleanup.prune(context)
+                    prune(context)
                 } catch (e: RemoteException) {
                     e.printStackTrace()
                 } catch (e: OperationApplicationException) {
