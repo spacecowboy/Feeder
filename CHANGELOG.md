@@ -1,3 +1,9 @@
+# 1.6.4
+*   Added paging to lists
+    See !99
+*   Added option for maximum number of items per feed
+    See !98 #126
+
 # 1.6.3
 *   Now all links are explicitly opened in new browser tabs
     See !97 #117
