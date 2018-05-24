@@ -11,6 +11,7 @@ import com.nononsenseapps.jsonfeed.cachingHttpClient
 import com.nononsenseapps.jsonfeed.feedAdapter
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
+import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -157,7 +158,7 @@ object FeedParser {
         val response = getResponse(url)
 
         if (!response.isSuccessful) {
-            throw IOException("Unexpected code " + response)
+            throw IOException("Unexpected code $response")
         }
 
         response.use {
@@ -173,13 +174,41 @@ object FeedParser {
                 .url(url)
                 .build()
 
-        val call = client.newCall(request)
-        return call.execute()
+        return if (url.userInfo?.isNotBlank() == true) {
+            val (user, pass) = url.userInfo.split(':', limit = 2)
+            val credentials = Credentials.basic(user, pass)
+            client.newBuilder()
+                    .authenticator({ _, response ->
+                        when {
+                            response.request()?.header("Authorization") != null -> {
+                                null
+                            }
+                            else -> {
+                                response.request()?.newBuilder()
+                                        ?.header("Authorization", credentials)
+                                        ?.build()
+                            }
+                        }
+                    })
+                    .proxyAuthenticator({ _, response ->
+                        when {
+                            response.request()?.header("Proxy-Authorization") != null -> {
+                                null
+                            }
+                            else -> {
+                                response.request()?.newBuilder()
+                                        ?.header("Proxy-Authorization", credentials)
+                                        ?.build()
+                            }
+                        }
+                    }).build()
+        } else {
+            client
+        }.newCall(request).execute()
     }
 
     @Throws(FeedParser.FeedParsingError::class)
     fun parseFeedUrl(url: URL): Feed {
-        Log.d("FeedParser", "parseFeed: $url")
         try {
 
             var result: Feed? = null
@@ -196,7 +225,6 @@ object FeedParser {
 
     @Throws(FeedParser.FeedParsingError::class)
     fun parseFeedResponse(response: Response): Feed {
-        Log.d("FeedParser", "parseFeedResponse: ${response.request().url()}")
         try {
 
             var result: Feed? = null
