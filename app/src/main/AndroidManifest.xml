@@ -18,6 +18,7 @@
 
   <application
       android:allowBackup="true"
+      android:name=".FeederApplication"
       android:icon="@mipmap/ic_launcher_round"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:label="@string/app_name"
