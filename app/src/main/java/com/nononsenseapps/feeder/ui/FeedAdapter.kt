@@ -201,16 +201,17 @@ class FeedAdapter(context: Context,
         val titleText = SpannableStringBuilder(item.feedtitle)
         // If no body, display domain of link to be opened
         if (holder.rssItem!!.plainsnippet.isEmpty()) {
-            titleText.append(" \u2014 ")
-
             if (holder.rssItem!!.enclosurelink != null && holder.rssItem!!.enclosureFilename != null) {
-                titleText.append(holder.rssItem!!.enclosureFilename)
-            } else {
-                titleText.append(holder.rssItem!!.domain)
+                titleText.append(" \u2014 ${holder.rssItem!!.enclosureFilename}")
+            } else if (holder.rssItem?.domain != null) {
+                titleText.append(" \u2014 ${holder.rssItem!!.domain}")
             }
-            titleText.setSpan(ForegroundColorSpan(linkColor),
-                    item.feedtitle.length + 3, titleText.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            if (titleText.length > item.feedtitle.length) {
+                titleText.setSpan(ForegroundColorSpan(linkColor),
+                        item.feedtitle.length + 3, titleText.length,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
         holder.authorTextView.text = titleText
 
