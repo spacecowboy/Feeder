@@ -3,7 +3,7 @@ apply plugin: 'java-library'
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    api 'com.squareup.okhttp3:okhttp:3.9.0'
+    api 'com.squareup.okhttp3:okhttp:3.10.0'
     api 'com.squareup.moshi:moshi:1.5.0'
 
     // tests
