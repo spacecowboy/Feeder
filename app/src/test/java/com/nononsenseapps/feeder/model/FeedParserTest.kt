@@ -384,6 +384,13 @@ class FeedParserTest {
     }
 
     @Test
+    @Throws(Exception::class)
+    fun cowboyHttps() {
+        val feed = FeedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
+        assertEquals("Cowboy Programmer", feed.title)
+    }
+
+    @Test
     @Ignore
     @Throws(Exception::class)
     fun fz() {
