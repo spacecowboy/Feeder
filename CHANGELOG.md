@@ -1,3 +1,11 @@
+# 1.6.5
+*   Added support for username/password in URLs
+    See !100 #128
+*   Fixed https compatibility on older versions of Android
+    See !102 #113
+*   Fixed crash for HorribleSubs.info
+    See !103 #131
+
 # 1.6.4
 *   Added paging to lists
     See !99
