@@ -183,6 +183,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
 
     override fun onDetach() {
         loaderManager.destroyLoader(TEXT_LOADER)
+        loaderManager.destroyLoader(ITEM_LOADER)
         super.onDetach()
     }
 
@@ -261,7 +262,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
         ITEM_LOADER -> {
             val cl = CursorLoader(context!!, URI_FEEDITEMS,
                     FEED_ITEM_FIELDS,
-                    COL_ID + " IS ?",
+                    "$COL_ID IS ?",
                     arrayOf(java.lang.Long.toString(rssItem!!.id)), null)
             cl.setUpdateThrottle(100)
             cl as Loader<Any?>
@@ -276,7 +277,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
 
     private fun maxImageSize(): Point {
         val size = Point()
-        activity?.let{
+        activity?.let {
             it.windowManager?.defaultDisplay?.getSize(size)
             if (TabletUtils.isTablet(it)) {
                 // Using twice window height since we do scroll vertically
@@ -300,13 +301,12 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     setViewBody()
                 }
             }
-            loader.cancelLoad()
         } else if (loader?.id == TEXT_LOADER) {
             if (data != null) {
                 bodyTextView?.text = data as Spanned?
             }
-            loader.cancelLoad()
         }
+        loaderManager.destroyLoader(loader.id)
     }
 
     override fun onLoaderReset(loader: Loader<Any?>?) {
