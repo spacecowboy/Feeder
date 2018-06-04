@@ -306,7 +306,9 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                 bodyTextView?.text = data as Spanned?
             }
         }
-        loaderManager.destroyLoader(loader.id)
+        loader?.id?.let {
+            loaderManager.destroyLoader(it)
+        }
     }
 
     override fun onLoaderReset(loader: Loader<Any?>?) {
