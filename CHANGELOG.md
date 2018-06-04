@@ -1,3 +1,7 @@
+# 1.6.6
+
+- Fixed a crash in Reader
+
 # 1.6.5
 *   Added support for username/password in URLs
     See !100 #128
