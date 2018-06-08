@@ -7,7 +7,7 @@ dependencies {
     api 'com.squareup.moshi:moshi:1.5.0'
 
     // tests
-    testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     testImplementation 'junit:junit:4.12'
 }

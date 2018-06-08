@@ -75,45 +75,47 @@ kotlin {
 dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-  implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-  implementation 'com.android.support:recyclerview-v7:27.0.2'
-  implementation 'com.android.support:support-v4:27.0.2'
-  implementation 'com.android.support:appcompat-v7:27.0.2'
-  implementation 'com.android.support:design:27.0.2'
+  def supportLibraryVersion = '27.1.1'
+
+  implementation "com.android.support.constraint:constraint-layout:1.1.1"
+  implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
+  implementation "com.android.support:support-v4:$supportLibraryVersion"
+  implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+  implementation "com.android.support:design:$supportLibraryVersion"
   // To support SDK18
-  implementation 'com.nononsenseapps:filepicker:4.1.0'
+  implementation "com.nononsenseapps:filepicker:4.1.0"
   // Better times
-  implementation 'joda-time:joda-time:2.3'
+  implementation "joda-time:joda-time:2.3"
   // HTML parsing
-  implementation 'org.jsoup:jsoup:1.7.3'
-  implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
+  implementation "org.jsoup:jsoup:1.7.3"
+  implementation "org.ccil.cowan.tagsoup:tagsoup:1.2.1"
   // RSS
   implementation "com.rometools:rome:1.7.1"
   implementation "com.rometools:rome-modules:1.7.1"
   // JSONFeed
   implementation project(":jsonfeed-parser")
   // For better fetching
-  implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+  implementation "com.squareup.okhttp3:okhttp:3.10.0"
   // For supporting missing cyphers on older platforms
-  implementation 'org.conscrypt:conscrypt-android:1.1.2'
+  implementation "org.conscrypt:conscrypt-android:1.1.2"
   // Image loading
-  implementation 'com.github.bumptech.glide:glide:3.7.0'
-  implementation 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
+  implementation "com.github.bumptech.glide:glide:3.7.0"
+  implementation "com.github.bumptech.glide:okhttp3-integration:1.4.0@aar"
   // Coroutines
-  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22'
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22"
   // For doing coroutines on UI thread
-  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.22'
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.22"
   // tests
   testImplementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
   testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
-  testImplementation 'junit:junit:4.12'
-  testImplementation 'org.mockito:mockito-core:2.13.0'
-  testImplementation 'io.mockk:mockk:1.7.2'
+  testImplementation "junit:junit:4.12"
+  testImplementation "org.mockito:mockito-core:2.13.0"
+  testImplementation "io.mockk:mockk:1.7.2"
 
-  androidTestImplementation 'com.android.support:recyclerview-v7:27.0.2'
-  androidTestImplementation 'com.android.support:support-v4:27.0.2'
-  androidTestImplementation 'com.android.support:appcompat-v7:27.0.2'
-  androidTestImplementation 'com.android.support:design:27.0.2'
-  androidTestImplementation 'junit:junit:4.12'
-  androidTestImplementation 'com.android.support.test:runner:1.0.1'
+  androidTestImplementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
+  androidTestImplementation "com.android.support:support-v4:$supportLibraryVersion"
+  androidTestImplementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+  androidTestImplementation "com.android.support:design:$supportLibraryVersion"
+  androidTestImplementation "junit:junit:4.12"
+  androidTestImplementation "com.android.support.test:runner:1.0.2"
 }
