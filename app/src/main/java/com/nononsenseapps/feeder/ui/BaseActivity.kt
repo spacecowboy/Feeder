@@ -426,7 +426,7 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Sor
         }
     }
 
-    override fun onCreateLoader(id: Int, bundle: Bundle): Loader<SortedFields> {
+    override fun onCreateLoader(id: Int, bundle: Bundle?): Loader<SortedFields> {
         val loader = ConvertedCursorLoader<List<FeedWrapper>>(
                 context = this,
                 uri = URI_FEEDSWITHCOUNTS,

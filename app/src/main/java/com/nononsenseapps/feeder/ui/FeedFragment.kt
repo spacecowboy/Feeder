@@ -469,9 +469,9 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         loaderManager.restartLoader(FEEDITEMS_LOADER, Bundle.EMPTY, this)
     }
 
-    override fun onCreateLoader(ID: Int, args: Bundle?): Loader<Any>? {
+    override fun onCreateLoader(ID: Int, args: Bundle?): Loader<Any> {
         @Suppress("UNCHECKED_CAST")
-        val loader: AsyncTaskLoader<Any>? = when (ID) {
+        val loader: AsyncTaskLoader<Any> = when (ID) {
             FEEDITEMS_LOADER -> FeedItemDeltaCursorLoader(activity!!,
                     URI_FEEDITEMS.buildUpon()
                             .appendQueryParameter(QUERY_PARAM_SKIP, "${adapter?.skipCount() ?: 0}")
@@ -485,7 +485,8 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                         Uri.withAppendedPath(URI_FEEDS, "${this.id}"),
                         FEED_FIELDS, null, null, null) as AsyncTaskLoader<Any>
             }
-            FEED_SETTINGS_LOADER -> {
+            // FEED_SETTINGS_LOADER
+            else -> {
                 val where: String?
                 val whereArgs: Array<String>?
                 when {
@@ -506,63 +507,60 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                         Util.ToStringArray("DISTINCT $COL_NOTIFY"),
                         where, whereArgs, null) as AsyncTaskLoader<Any>
             }
-            else -> null
         }
 
-        loader?.setUpdateThrottle(2000)
+        loader.setUpdateThrottle(2000)
         return loader
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun onLoadFinished(cursorLoader: Loader<Any?>?, result: Any?) {
-        if (cursorLoader != null) {
-            when {
-                FEEDITEMS_LOADER == cursorLoader.id -> {
-                    val map = result as Map<FeedItemSQL, Int>
-                    adapter?.updateData(map)
-                    val empty = adapter!!.itemCount <= HEADER_COUNT
-                    emptyView?.visibility = if (empty) View.VISIBLE else View.GONE
-                }
-                FEED_LOADER == cursorLoader.id -> {
-                    val cursor = result as Cursor
-                    cursor.firstOrNull()?.let {
-                        val feed = it.asFeed()
-                        this.title = feed.title
-                        this.customTitle = feed.customTitle
-                        this.url = feed.url.toString()
-                        this.notify = if (feed.notify) 1 else 0
-                        this.feedTag = feed.tag
+    override fun onLoadFinished(cursorLoader: Loader<Any?>, result: Any?) {
+        when {
+            FEEDITEMS_LOADER == cursorLoader.id -> {
+                val map = result as Map<FeedItemSQL, Int>
+                adapter?.updateData(map)
+                val empty = adapter!!.itemCount <= HEADER_COUNT
+                emptyView?.visibility = if (empty) View.VISIBLE else View.GONE
+            }
+            FEED_LOADER == cursorLoader.id -> {
+                val cursor = result as Cursor
+                cursor.firstOrNull()?.let {
+                    val feed = it.asFeed()
+                    this.title = feed.title
+                    this.customTitle = feed.customTitle
+                    this.url = feed.url.toString()
+                    this.notify = if (feed.notify) 1 else 0
+                    this.feedTag = feed.tag
 
-                        (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
-                        notifyCheck?.isChecked = this.notify == 1
-
-                        // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
-                        // extra statistics on opening the feed.
-                        if (firstFeedLoad) {
-                            // Title has been fetched, so add shortcut
-                            activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
-                            // Report shortcut usage
-                            activity?.reportShortcutToFeedUsed(feed.id)
-                        }
-                        firstFeedLoad = false
-                    }
-                    // Don't destroy feed loader since we want to load user edits
-                }
-                FEED_SETTINGS_LOADER == cursorLoader.id -> {
-                    val cursor = result as Cursor
-                    if (cursor.count == 1 && cursor.moveToFirst()) {
-                        // Conclusive results
-                        this.notify = cursor.getInt(0)
-                    } else {
-                        this.notify = 0
-                    }
+                    (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
                     notifyCheck?.isChecked = this.notify == 1
+
+                    // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
+                    // extra statistics on opening the feed.
+                    if (firstFeedLoad) {
+                        // Title has been fetched, so add shortcut
+                        activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
+                        // Report shortcut usage
+                        activity?.reportShortcutToFeedUsed(feed.id)
+                    }
+                    firstFeedLoad = false
                 }
+                // Don't destroy feed loader since we want to load user edits
+            }
+            FEED_SETTINGS_LOADER == cursorLoader.id -> {
+                val cursor = result as Cursor
+                if (cursor.count == 1 && cursor.moveToFirst()) {
+                    // Conclusive results
+                    this.notify = cursor.getInt(0)
+                } else {
+                    this.notify = 0
+                }
+                notifyCheck?.isChecked = this.notify == 1
             }
         }
     }
 
-    override fun onLoaderReset(cursorLoader: Loader<Any?>?) {
+    override fun onLoaderReset(cursorLoader: Loader<Any?>) {
     }
 
     inner class HeaderHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

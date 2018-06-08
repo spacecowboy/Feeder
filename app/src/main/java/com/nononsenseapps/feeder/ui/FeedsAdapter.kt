@@ -110,13 +110,13 @@ internal class FeedsAdapter(private val activity: BaseActivity) : RecyclerView.A
         return expandedTags.contains(item.tag)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder? {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEWTYPE_FEED -> FeedHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed, parent, false))
             VIEWTYPE_FEED_CHILD -> FeedHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed_child, parent, false))
             VIEWTYPE_TAG -> TagHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed_tag, parent, false))
             VIEWTYPE_TOP -> TopHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed, parent, false))
-            else -> null
+            // VIEWTYPE_FEED
+            else -> FeedHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed, parent, false))
         }
     }
 

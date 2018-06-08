@@ -258,7 +258,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Any?>? = when (id) {
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Any?> = when (id) {
         ITEM_LOADER -> {
             val cl = CursorLoader(context!!, URI_FEEDITEMS,
                     FEED_ITEM_FIELDS,
@@ -267,12 +267,12 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
             cl.setUpdateThrottle(100)
             cl as Loader<Any?>
         }
-        TEXT_LOADER -> {
+        // TEXT_LOADER
+        else -> {
             ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl
                     ?: sloppyLinkToStrictURL(""),
                     maxImageSize(), PrefUtils.shouldLoadImages(activity!!)) as Loader<Any?>
         }
-        else -> null
     }
 
     private fun maxImageSize(): Point {
@@ -290,9 +290,9 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
         return size
     }
 
-    override fun onLoadFinished(loader: Loader<Any?>?,
+    override fun onLoadFinished(loader: Loader<Any?>,
                                 data: Any?) {
-        if (loader?.id == ITEM_LOADER) {
+        if (loader.id == ITEM_LOADER) {
             val cursor = data as Cursor?
             cursor?.use { c ->
                 c.firstOrNull()?.asFeedItem()?.let {
@@ -301,17 +301,15 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     setViewBody()
                 }
             }
-        } else if (loader?.id == TEXT_LOADER) {
+        } else if (loader.id == TEXT_LOADER) {
             if (data != null) {
                 bodyTextView?.text = data as Spanned?
             }
         }
-        loader?.id?.let {
-            loaderManager.destroyLoader(it)
-        }
+        loaderManager.destroyLoader(loader.id)
     }
 
-    override fun onLoaderReset(loader: Loader<Any?>?) {
+    override fun onLoaderReset(loader: Loader<Any?>) {
         // nothing really
     }
 }
