@@ -11,6 +11,10 @@ import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
+// 10 mins
+const val MIN_MAXAGE = 600
+val MAX_AGE_PATTERN = """max-age=(\d+)""".toRegex()
+
 fun cachingHttpClient(cacheDirectory: File? = null,
                       cacheSize: Long = 10L * 1024L * 1024L,
                       trustAllCerts: Boolean = true,
@@ -20,6 +24,33 @@ fun cachingHttpClient(cacheDirectory: File? = null,
 
     if (cacheDirectory != null) {
         builder.cache(Cache(cacheDirectory, cacheSize))
+    }
+
+    // Not all web servers have good cache settings defined, so overwrite feeds to allow caching
+    // for 20 mins if whatever it says is bad
+    builder.addNetworkInterceptor {
+        val response = it.proceed(it.request())
+
+        try {
+            val cacheHeaders = response.headers("Cache-Control") ?: emptyList()
+
+            var maxAge = -1
+
+            for (header in cacheHeaders) {
+                MAX_AGE_PATTERN.find(header)?.let {
+                    maxAge = it.groupValues.last().toInt()
+                }
+            }
+
+            maxAge = maxOf(maxAge, MIN_MAXAGE)
+
+            response.newBuilder()
+                    .header("Cache-Control", "public, max-age=$maxAge")
+                    .build()
+
+        } catch (ignored: Throwable) {
+            response
+        }
     }
 
     builder.connectTimeout(connectTimeoutSecs, TimeUnit.SECONDS)

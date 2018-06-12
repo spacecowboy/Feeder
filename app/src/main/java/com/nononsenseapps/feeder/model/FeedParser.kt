@@ -11,6 +11,7 @@ import com.nononsenseapps.jsonfeed.cachingHttpClient
 import com.nononsenseapps.jsonfeed.feedAdapter
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
+import okhttp3.CacheControl
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -22,6 +23,10 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
+import java.util.concurrent.TimeUnit
+
+// 1 hours
+const val MAX_FEED_AGE = 3600
 
 object FeedParser {
     private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
@@ -172,6 +177,10 @@ object FeedParser {
     fun getResponse(url: URL): Response {
         val request = Request.Builder()
                 .url(url)
+                .cacheControl(CacheControl.Builder()
+                        .maxAge(MAX_FEED_AGE, TimeUnit.SECONDS)
+                        .maxStale(MAX_FEED_AGE, TimeUnit.SECONDS)
+                        .build())
                 .build()
 
         return if (url.userInfo?.isNotBlank() == true) {
@@ -229,8 +238,14 @@ object FeedParser {
 
             var result: Feed? = null
             response.use {
-                Log.d("FeedParser", "cache response: " + it.cacheResponse())
-                Log.d("FeedParser", "network response: " + it.networkResponse())
+                Log.d("FeedParser", """Feed Response:
+                    |cache response: ${it.cacheResponse()}
+                    |cache max age: ${it.cacheResponse()?.cacheControl()?.maxAgeSeconds()}
+                    |cache max stale: ${it.cacheResponse()?.cacheControl()?.maxStaleSeconds()}
+                    |network response: ${it.networkResponse()}
+                    |network max age: ${it.networkResponse()?.cacheControl()?.maxAgeSeconds()}
+                    |network max stale: ${it.networkResponse()?.cacheControl()?.maxStaleSeconds()}
+                    """.trimMargin())
 
                 val isJSON = (it.header("content-type") ?: "").contains("json")
                 // Pass straight bytes from response to parser to properly handle encoding
