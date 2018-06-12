@@ -44,6 +44,7 @@
   <string name="no_such_feed">Es wurde kein Feed gefunden. Versuche HTTPS zu benutzen.</string>
   <string name="nothing_to_display">Nichts zu sehen!</string>
   <string name="title_activity_settings">Einstellungen</string>
+  <string name="all_feeds">Alle Feeds</string>
 
   <string name="sync_option_manually">Manuell</string>
   <string name="sync_option_every_hour">Jede Stunde</string>
@@ -53,9 +54,16 @@
   <string name="sync_option_every_day">Jeden Tag</string>
 
   <string name="synchronization">Aktualisierung</string>
-  <string name="only_on_wifi">Nur im WiFi</string>
+  <string name="only_on_wifi">Nur im WLAN</string>
   <string name="may_result_data_charges">Könnte zu mobiler Datennutzung führen.</string>
   <string name="only_when_charging">Nur beim Laden</string>
   <string name="image_loading">Bild wird geladen</string>
+  <string name="check_for_updates">Suche nach Aktualisierungen</string>
+  <string name="include_mobile_hotspots">Mobile Hotspots verwenden</string>
+  <string name="updated_feeds">Feeds aktualisiert</string>
+  <string name="open_item_by_default_with">Öffne Artikel standartmäßig mit</string>
+  <string name="open_links_with">Öffne Links mit</string>
+  <string name="open_link_in_web_view">Öffne Link mit Web view</string>
+  <string name="max_feed_items">Maximale Anzahl an Artikeln pro Feed</string>
 
 </resources>
