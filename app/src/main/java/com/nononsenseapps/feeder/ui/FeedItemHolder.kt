@@ -137,7 +137,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
         bgFrame.background = null
     }
 
-    fun fillTitle() {
+    fun fillTitle(forceRead: Boolean = false) {
         titleTextView.visibility = View.VISIBLE
         // \u2014 is a EM-dash, basically a long version of '-'
         feedAdapter.temps = if (rssItem!!.plainsnippet.isEmpty())
@@ -150,7 +150,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                 rssItem!!.plaintitle.length, feedAdapter.temps.length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        if (rssItem!!.unread) {
+        if (rssItem!!.unread && !forceRead) {
             textSpan.setSpan(TextAppearanceSpan(feedAdapter.feedFragment.context, R.style.TextAppearance_ListItem_Title),
                     0, rssItem!!.plaintitle.length,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)

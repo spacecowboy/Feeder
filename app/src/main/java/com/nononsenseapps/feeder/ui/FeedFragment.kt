@@ -375,21 +375,35 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
     }
 
     private fun markAsRead() {
-        // Remove items from UI and show the empty view
-        adapter?.items?.clear()
-        emptyView?.visibility = View.VISIBLE
-        // Remove items from DB
         val appContext = context?.applicationContext
         val feedId = this.id
         val feedTag = this.feedTag
         if (appContext != null) {
-            // TODO cancel notifications for tags and such
+            if (PrefUtils.isShowOnlyUnread(appContext)) {
+                // Remove items from UI and show the empty view
+                adapter?.items?.clear()
+                emptyView?.visibility = View.VISIBLE
+            } else {
+                for (childIndex in 0 until (recyclerView?.childCount ?: 0)) {
+                    recyclerView?.getChildAt(childIndex)?.let { childView ->
+                        recyclerView?.getChildViewHolder(childView)?.let { holder ->
+                            if (holder is FeedItemHolder) {
+                                holder.fillTitle(forceRead = true)
+                            }
+                        }
+                    }
+                }
+                adapter?.setAllAsRead()
+                adapter?.notifyDataSetChanged()
+            }
+
             launch(BackgroundUI) {
                 when {
                     feedId > 0 -> {
                         appContext.contentResolver.markFeedAsRead(feedId)
                         cancelNotificationInBackground(appContext, feedId)
                     }
+                // TODO cancel notifications for tags and such
                     feedTag != null -> appContext.contentResolver.markTagAsRead(feedTag)
                     else -> appContext.contentResolver.markAllAsRead()
                 }
@@ -486,7 +500,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                         Uri.withAppendedPath(URI_FEEDS, "${this.id}"),
                         FEED_FIELDS, null, null, null) as AsyncTaskLoader<Any>
             }
-            // FEED_SETTINGS_LOADER
+        // FEED_SETTINGS_LOADER
             else -> {
                 val where: String?
                 val whereArgs: Array<String>?
