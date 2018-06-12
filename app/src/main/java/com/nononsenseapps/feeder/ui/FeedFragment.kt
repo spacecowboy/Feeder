@@ -44,6 +44,7 @@ import android.widget.CheckedTextView
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
+import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_FEED
 import com.nononsenseapps.feeder.db.COL_ID
@@ -383,7 +384,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         val feedTag = this.feedTag
         if (appContext != null) {
             // TODO cancel notifications for tags and such
-            launch(Background) {
+            launch(BackgroundUI) {
                 when {
                     feedId > 0 -> {
                         appContext.contentResolver.markFeedAsRead(feedId)
@@ -430,7 +431,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 val feedId = this.id
                 val appContext = activity?.applicationContext
                 if (appContext != null) {
-                    launch(Background) {
+                    launch(BackgroundUI) {
                         appContext.contentResolver
                                 .delete(URI_FEEDS, Util.WHEREIDIS,
                                         Util.LongsToStringArray(feedId))

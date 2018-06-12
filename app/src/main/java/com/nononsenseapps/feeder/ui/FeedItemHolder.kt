@@ -12,7 +12,7 @@ import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.Background
+import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.FeedItemSQL
 import com.nononsenseapps.feeder.model.cancelNotificationInBackground
 import com.nononsenseapps.feeder.util.GlideUtils
@@ -66,7 +66,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                 val itemId = rssItem!!.id
                 val unread = rssItem!!.unread
                 if (appContext != null) {
-                    launch(Background) {
+                    launch(BackgroundUI) {
                         when (unread) {
                             true -> appContext.contentResolver.markItemAsUnread(itemId)
                             false -> {
@@ -193,7 +193,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                     val contentResolver = feedAdapter.feedFragment.context?.contentResolver
                     if (contentResolver != null) {
                         val itemId = rssItem!!.id
-                        launch(Background) {
+                        launch(BackgroundUI) {
                             contentResolver.markItemAsRead(itemId)
                         }
                     }

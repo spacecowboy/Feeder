@@ -29,7 +29,7 @@ import android.widget.FilterQueryProvider
 import android.widget.SimpleCursorAdapter
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.Background
+import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
@@ -175,7 +175,7 @@ class EditFeedActivity : Activity() {
                     }
 
                     launch(UI) {
-                        val feedId: Long = async(Background) {
+                        val feedId: Long = async(BackgroundUI) {
                             if (id < 1) {
                                 contentResolver.insertFeedWith(values)
                             } else {
@@ -184,7 +184,7 @@ class EditFeedActivity : Activity() {
                             }
                         }.await()
 
-                        launch(Background) {
+                        launch(BackgroundUI) {
                             contentResolver.notifyAllUris()
                             contentResolver.requestFeedSync(feedId)
                         }

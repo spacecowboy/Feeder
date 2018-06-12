@@ -39,6 +39,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
+import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.FEED_ITEM_FIELDS
 import com.nononsenseapps.feeder.db.FeedItemSQL
@@ -100,7 +101,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
             val itemId = _id
             val appContext = context?.applicationContext
             appContext?.let {
-                launch(Background) {
+                launch(BackgroundUI) {
                     it.contentResolver.markItemAsReadAndNotified(itemId)
                     cancelNotificationInBackground(it, itemId)
                 }
