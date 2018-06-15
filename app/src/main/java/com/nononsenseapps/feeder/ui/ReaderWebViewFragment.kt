@@ -50,8 +50,9 @@ class ReaderWebViewFragment : Fragment() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mWebView?.destroy()
-        CookieManager.getInstance().setAcceptCookie(false)
         mWebView = WebView(context)
+        // Important to create webview before setting cookie policy on Android18
+        CookieManager.getInstance().setAcceptCookie(false)
         mWebView?.settings?.javaScriptEnabled = true
         mWebView?.settings?.builtInZoomControls = true
         mWebView?.webViewClient = WebViewClientHandler

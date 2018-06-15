@@ -238,14 +238,6 @@ object FeedParser {
 
             var result: Feed? = null
             response.use {
-                Log.d("FeedParser", """Feed Response:
-                    |cache response: ${it.cacheResponse()}
-                    |cache max age: ${it.cacheResponse()?.cacheControl()?.maxAgeSeconds()}
-                    |cache max stale: ${it.cacheResponse()?.cacheControl()?.maxStaleSeconds()}
-                    |network response: ${it.networkResponse()}
-                    |network max age: ${it.networkResponse()?.cacheControl()?.maxAgeSeconds()}
-                    |network max stale: ${it.networkResponse()?.cacheControl()?.maxStaleSeconds()}
-                    """.trimMargin())
 
                 val isJSON = (it.header("content-type") ?: "").contains("json")
                 // Pass straight bytes from response to parser to properly handle encoding
