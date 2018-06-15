@@ -12,7 +12,7 @@ import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.Background
+import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.FeedItemSQL
 import com.nononsenseapps.feeder.model.cancelNotificationInBackground
 import com.nononsenseapps.feeder.util.GlideUtils
@@ -66,7 +66,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                 val itemId = rssItem!!.id
                 val unread = rssItem!!.unread
                 if (appContext != null) {
-                    launch(Background) {
+                    launch(BackgroundUI) {
                         when (unread) {
                             true -> appContext.contentResolver.markItemAsUnread(itemId)
                             false -> {
@@ -137,7 +137,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
         bgFrame.background = null
     }
 
-    fun fillTitle() {
+    fun fillTitle(forceRead: Boolean = false) {
         titleTextView.visibility = View.VISIBLE
         // \u2014 is a EM-dash, basically a long version of '-'
         feedAdapter.temps = if (rssItem!!.plainsnippet.isEmpty())
@@ -150,7 +150,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                 rssItem!!.plaintitle.length, feedAdapter.temps.length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        if (rssItem!!.unread) {
+        if (rssItem!!.unread && !forceRead) {
             textSpan.setSpan(TextAppearanceSpan(feedAdapter.feedFragment.context, R.style.TextAppearance_ListItem_Title),
                     0, rssItem!!.plaintitle.length,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -193,7 +193,7 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                     val contentResolver = feedAdapter.feedFragment.context?.contentResolver
                     if (contentResolver != null) {
                         val itemId = rssItem!!.id
-                        launch(Background) {
+                        launch(BackgroundUI) {
                             contentResolver.markItemAsRead(itemId)
                         }
                     }

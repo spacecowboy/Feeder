@@ -113,6 +113,15 @@ class FeedAdapter(context: Context,
         else -> items.get(position).id
     }
 
+    fun setAllAsRead() {
+        for (i in 0 until items.size()) {
+            val item = items.get(i)
+            if (item.unread) {
+                item.unread = false
+            }
+        }
+    }
+
     fun updateData(map: Map<FeedItemSQL, Int>) {
         val oldItemMap = itemMap
         itemMap = ArrayMap()
