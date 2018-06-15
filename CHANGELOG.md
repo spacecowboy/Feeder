@@ -1,3 +1,14 @@
+# 1.6.7
+*   Fixed crash on older Android versions when opening a web view
+    See !108
+*   Fixed update of views when pressing 'mark all as read' button
+    See !107
+*   Improved network caching
+    See !105
+*   German translations updated and added
+    Thanks to Chris
+    See !106
+
 # 1.6.6
 
 - Fixed a crash in Reader
