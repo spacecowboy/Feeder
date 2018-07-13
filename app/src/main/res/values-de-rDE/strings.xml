@@ -61,7 +61,7 @@
   <string name="check_for_updates">Suche nach Aktualisierungen</string>
   <string name="include_mobile_hotspots">Mobile Hotspots verwenden</string>
   <string name="updated_feeds">Feeds aktualisiert</string>
-  <string name="open_item_by_default_with">Öffne Artikel standartmäßig mit</string>
+  <string name="open_item_by_default_with">Öffne Artikel standardmäßig mit</string>
   <string name="open_links_with">Öffne Links mit</string>
   <string name="open_link_in_web_view">Öffne Link mit Web view</string>
   <string name="max_feed_items">Maximale Anzahl an Artikeln pro Feed</string>
