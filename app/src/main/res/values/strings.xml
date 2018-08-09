@@ -78,5 +78,6 @@
   <string name="reader_settings">Reader</string>
   <string name="open_link_in_web_view">Open link in Web view</string>
   <string name="max_feed_items">Maximum number of items per feed</string>
+  <string name="could_not_load_url">Could not load URL</string>
 
 </resources>
