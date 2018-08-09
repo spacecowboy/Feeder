@@ -28,6 +28,7 @@ import android.widget.EditText
 import android.widget.FilterQueryProvider
 import android.widget.SimpleCursorAdapter
 import android.widget.TextView
+import android.widget.Toast
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
@@ -125,32 +126,38 @@ class EditFeedActivity : Activity() {
                             0)
                 }
 
-                // Issue search
-                val url: URL = sloppyLinkToStrictURL(textSearch.text.toString().trim())
+                try {
+                    // Issue search
+                    val url: URL = sloppyLinkToStrictURL(textSearch.text.toString().trim())
 
-                listResults.visibility = View.GONE
-                emptyText.visibility = View.GONE
-                loadingProgress.visibility = View.VISIBLE
+                    listResults.visibility = View.GONE
+                    emptyText.visibility = View.GONE
+                    loadingProgress.visibility = View.VISIBLE
 
-                val inProgressData = mutableListOf<Feed>()
-                searchTask = SearchTask(feedParser,
-                        { feed ->
-                            inProgressData.add(feed)
-                            resultAdapter.data = inProgressData
-                            if (inProgressData.isNotEmpty()) {
-                                detailsFrame.visibility = View.GONE
-                                searchFrame.visibility = View.VISIBLE
-                                listResults.visibility = View.VISIBLE
-                            }
-                        },
-                        {
-                            loadingProgress.visibility = View.GONE
-                            if (resultAdapter.data.isEmpty()) {
-                                emptyText.text = getString(R.string.no_such_feed)
-                                emptyText.visibility = View.VISIBLE
-                            }
-                        })
-                searchTask?.execute(url)
+                    val inProgressData = mutableListOf<Feed>()
+                    searchTask = SearchTask(feedParser,
+                            { feed ->
+                                inProgressData.add(feed)
+                                resultAdapter.data = inProgressData
+                                if (inProgressData.isNotEmpty()) {
+                                    detailsFrame.visibility = View.GONE
+                                    searchFrame.visibility = View.VISIBLE
+                                    listResults.visibility = View.VISIBLE
+                                }
+                            },
+                            {
+                                loadingProgress.visibility = View.GONE
+                                if (resultAdapter.data.isEmpty()) {
+                                    emptyText.text = getString(R.string.no_such_feed)
+                                    emptyText.visibility = View.VISIBLE
+                                }
+                            })
+                    searchTask?.execute(url)
+                } catch (exc: Exception) {
+                    Toast.makeText(this@EditFeedActivity,
+                            R.string.could_not_load_url,
+                            Toast.LENGTH_SHORT).show()
+                }
 
                 return@OnEditorActionListener true
             }
