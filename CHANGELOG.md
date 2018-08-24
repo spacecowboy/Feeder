@@ -1,3 +1,10 @@
+# 1.6.8
+*   Fixed crash when supplying bad URL to add feed dialog
+    See !110 #137
+*   Fix typo in German translation
+    Thanks to Swen Krüger
+    See !109
+
 # 1.6.7
 *   Fixed crash on older Android versions when opening a web view
     See !108
