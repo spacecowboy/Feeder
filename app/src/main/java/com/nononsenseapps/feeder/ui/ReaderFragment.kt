@@ -38,7 +38,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.FEED_ITEM_FIELDS
@@ -53,6 +52,7 @@ import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.asFeedItem
 import com.nononsenseapps.feeder.util.firstOrNull
 import com.nononsenseapps.feeder.util.markItemAsReadAndNotified
+import com.nononsenseapps.feeder.util.markItemAsUnread
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.views.ObservableScrollView
@@ -252,6 +252,13 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     }
                 }
 
+                true
+            }
+            R.id.action_mark_as_unread -> {
+                val appContext = context?.applicationContext
+                launch(BackgroundUI) {
+                    appContext?.contentResolver?.markItemAsUnread(_id)
+                }
                 true
             }
             else -> super.onOptionsItemSelected(menuItem)

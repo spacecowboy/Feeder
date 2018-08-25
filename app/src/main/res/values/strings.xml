@@ -26,6 +26,8 @@
   <string name="empty_no_feeds_add">
     <![CDATA[<font color="#607D8B">Adding</font> some feeds]]></string>
   <string name="search_feed_empty_hint">Enter a feed address</string>
+  <string name="mark_as_read">Mark as read</string>
+  <string name="mark_as_unread">Mark as unread</string>
   <string name="mark_all_as_read">Mark all as read</string>
   <string name="edit_feed">Edit feed</string>
   <string name="delete_feed">Delete feed</string>
