@@ -20,9 +20,9 @@ android {
     applicationId "com.nononsenseapps.feeder"
     versionCode 36
     versionName "1.6.8"
-    compileSdkVersion 27
+    compileSdkVersion 28
     minSdkVersion 18
-    targetSdkVersion 27
+    targetSdkVersion 28
 
     // For espresso tests
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
