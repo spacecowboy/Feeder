@@ -113,7 +113,7 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Sor
         setNightBackground()
 
         // Enable periodic sync
-        configurePeriodicSync(applicationContext)
+        configurePeriodicSync(applicationContext, forceReplace = false)
     }
 
     public override fun onResume() {

@@ -72,7 +72,7 @@ fun requestFeedSync(feedId: Long = -1, feedTag: String = "") {
     WorkManager.getInstance().enqueue(workRequest.build())
 }
 
-fun configurePeriodicSync(context: Context) {
+fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
     val shouldSync = PrefUtils.shouldSync(context)
 
     if (shouldSync) {
@@ -101,9 +101,15 @@ fun configurePeriodicSync(context: Context) {
                 .addTag("periodic_sync")
                 .build()
 
+        val existingWorkPolicy = if (forceReplace) {
+            ExistingPeriodicWorkPolicy.REPLACE
+        } else {
+            ExistingPeriodicWorkPolicy.KEEP
+        }
+
         WorkManager.getInstance()
                 .enqueueUniquePeriodicWork(UNIQUE_PERIODIC_NAME,
-                        ExistingPeriodicWorkPolicy.REPLACE,
+                        existingWorkPolicy,
                         syncWork)
     } else {
         WorkManager.getInstance()
