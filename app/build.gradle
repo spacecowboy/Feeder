@@ -77,6 +77,8 @@ dependencies {
 
   def supportLibraryVersion = '27.1.1'
 
+  implementation "android.arch.work:work-runtime-ktx:$work_version"
+
   implementation "com.android.support.constraint:constraint-layout:1.1.1"
   implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
   implementation "com.android.support:support-v4:$supportLibraryVersion"

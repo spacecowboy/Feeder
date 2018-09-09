@@ -4,15 +4,11 @@
   android:installLocation="internalOnly"
   package="com.nononsenseapps.feeder">
 
-  <!-- Adding the feeder account, only needed up to sdk23 -->
-  <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
   <!-- Import export feeds -->
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
   <!-- For syncing -->
   <uses-permission android:name="android.permission.INTERNET"/>
-  <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
-  <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
   <!-- To limit syncing to only WiFi -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
@@ -101,30 +97,6 @@
         android:exported="false"
         android:label="@string/app_name"/>
 
-    <service
-        android:name=".model.RssSyncAdapterService"
-        android:enabled="true"
-        android:exported="true">
-      <intent-filter>
-        <action android:name="android.content.SyncAdapter"/>
-      </intent-filter>
-
-      <meta-data
-          android:name="android.content.SyncAdapter"
-          android:resource="@xml/syncadapter"/>
-    </service>
-    <service
-        android:name=".db.AccountService"
-        android:enabled="true"
-        android:exported="true">
-      <intent-filter>
-        <action android:name="android.accounts.AccountAuthenticator"/>
-      </intent-filter>
-
-      <meta-data
-          android:name="android.accounts.AccountAuthenticator"
-          android:resource="@xml/authenticator"/>
-    </service>
     <!-- Receiver for notification cancellations and such -->
     <receiver android:name=".model.RssNotificationBroadcastReceiver" />
 

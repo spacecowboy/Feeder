@@ -40,11 +40,11 @@ import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.URI_TAGSWITHCOUNTS
 import com.nononsenseapps.feeder.db.Util
 import com.nononsenseapps.feeder.model.FeedParser
+import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.contentValues
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.insertFeedWith
 import com.nononsenseapps.feeder.util.notifyAllUris
-import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.feeder.util.setString
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.updateFeedWith
@@ -193,7 +193,7 @@ class EditFeedActivity : Activity() {
 
                         launch(BackgroundUI) {
                             contentResolver.notifyAllUris()
-                            contentResolver.requestFeedSync(feedId)
+                            requestFeedSync(feedId)
                         }
 
                         val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId"))

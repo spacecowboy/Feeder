@@ -9,13 +9,13 @@ import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.FeedSQL
 import com.nononsenseapps.feeder.db.asFeed
 import com.nononsenseapps.feeder.model.OPMLContenProvider
+import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.forEach
 import com.nononsenseapps.feeder.util.getString
 import com.nononsenseapps.feeder.util.makeToast
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.queryFeeds
 import com.nononsenseapps.feeder.util.queryTagsWithCounts
-import com.nononsenseapps.feeder.util.requestFeedSync
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.util.*
@@ -55,7 +55,7 @@ fun importOpmlInBackground(context: Context, uri: Uri) = launch(Background) {
                 parser.parseInputStream(it)
             }
             appContext.contentResolver.notifyAllUris()
-            appContext.contentResolver.requestFeedSync()
+            requestFeedSync()
         }
         Log.d("OPML", "Imported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {

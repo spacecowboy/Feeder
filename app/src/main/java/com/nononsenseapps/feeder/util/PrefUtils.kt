@@ -115,6 +115,9 @@ object PrefUtils {
     fun synchronizationFrequency(context: Context): Long =
             sp(context).getString(PREF_SYNC_FREQ, "60").toLong()
 
+    fun setSynchronizationFrequency(context: Context, value: Long) =
+            sp(context).edit().putString(PREF_SYNC_FREQ, "$value").apply()
+
     fun shouldOpenItemWith(context: Context): String =
             sp(context).getString(PREF_DEFAULT_OPEN_ITEM_WITH, PREF_VAL_OPEN_WITH_READER)
 

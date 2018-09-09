@@ -39,7 +39,8 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
 
-fun syncFeeds(context: Context, feedId: Long, tag: String) {
+fun syncFeeds(context: Context, feedId: Long, tag: String): Boolean {
+    var result = false
     try {
         runBlocking {
             val time = measureTimeMillis {
@@ -54,6 +55,7 @@ fun syncFeeds(context: Context, feedId: Long, tag: String) {
                 // Finally, prune excessive items
                 try {
                     prune(context)
+                    result = true
                 } catch (e: RemoteException) {
                     e.printStackTrace()
                 } catch (e: OperationApplicationException) {
@@ -67,6 +69,7 @@ fun syncFeeds(context: Context, feedId: Long, tag: String) {
     } catch (e: Throwable) {
         e.printStackTrace()
     }
+    return result
 }
 
 private suspend fun syncFeed(feedSql: FeedSQL, context: Context) {
