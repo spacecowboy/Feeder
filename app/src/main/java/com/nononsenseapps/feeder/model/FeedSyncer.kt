@@ -18,6 +18,8 @@ import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.SystemUtils.currentlyOnWifi
 import java.util.concurrent.TimeUnit
 
+const val ARG_FORCE_NETWORK = "force_network"
+
 const val LOG_TAG = "FEED_SYNC"
 const val UNIQUE_PERIODIC_NAME = "feeder_periodic"
 const val IS_MANUAL_SYNC = "is_manual_sync"
@@ -45,8 +47,9 @@ class FeedSyncer : Worker() {
 
             val feedId = inputData.getLong(ARG_FEED_ID, -1)
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
+            val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
 
-            success = syncFeeds(applicationContext, feedId, feedTag)
+            success = syncFeeds(applicationContext, feedId, feedTag, forceNetwork = forceNetwork)
         } else {
             Log.d(LOG_TAG, "Skipping sync work because wifistatus not OK")
         }
@@ -65,7 +68,8 @@ fun requestFeedSync(feedId: Long = -1, feedTag: String = "") {
     val workRequest = OneTimeWorkRequestBuilder<FeedSyncer>()
 
     val data = workDataOf(ARG_FEED_ID to feedId,
-            ARG_FEED_TAG to feedTag)
+            ARG_FEED_TAG to feedTag,
+            ARG_FORCE_NETWORK to true)
 
     workRequest.setInputData(data)
 
