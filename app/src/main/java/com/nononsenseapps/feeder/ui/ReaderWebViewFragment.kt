@@ -4,9 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.view.MenuItemCompat
-import android.support.v7.widget.ShareActionProvider
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -17,6 +14,8 @@ import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.appcompat.widget.ShareActionProvider
+import androidx.core.view.MenuItemCompat
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 
@@ -25,7 +24,7 @@ const val ARG_URL = "url"
 /**
  * Copy of WebViewFragment in later versions of Android, plus menu
  */
-class ReaderWebViewFragment : Fragment() {
+class ReaderWebViewFragment : androidx.fragment.app.Fragment() {
     var url: String = ""
     private var enclosureUrl: String? = null
     private var shareActionProvider: ShareActionProvider? = null
@@ -37,7 +36,7 @@ class ReaderWebViewFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.let { arguments ->
-            url = arguments.getString(ARG_URL)
+            url = arguments.getString(ARG_URL, null) ?: ""
             enclosureUrl = arguments.getString(ARG_ENCLOSURE, null)
         }
 

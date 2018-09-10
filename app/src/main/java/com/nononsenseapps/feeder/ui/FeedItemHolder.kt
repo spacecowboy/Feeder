@@ -1,7 +1,7 @@
 package com.nononsenseapps.feeder.ui
 
 import android.content.Intent
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.TextAppearanceSpan
@@ -31,7 +31,7 @@ import kotlinx.coroutines.experimental.launch
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
 class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
-        RecyclerView.ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener {
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener {
     private val TAG = "FeedItemHolder"
     private val titleTextView: TextView = view.findViewById<View>(R.id.story_snippet) as TextView
     val dateTextView: TextView = view.findViewById<View>(R.id.story_date) as TextView

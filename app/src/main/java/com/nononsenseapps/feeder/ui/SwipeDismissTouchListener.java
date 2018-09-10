@@ -19,7 +19,7 @@ package com.nononsenseapps.feeder.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.support.v4.view.animation.FastOutLinearInInterpolator;
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;

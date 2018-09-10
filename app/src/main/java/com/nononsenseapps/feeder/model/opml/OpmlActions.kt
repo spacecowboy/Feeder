@@ -29,9 +29,11 @@ fun exportOpmlInBackground(context: Context, uri: Uri) = launch(Background) {
     val appContext = context.applicationContext
     try {
         val time = measureTimeMillis {
-            writeOutputStream(appContext.contentResolver.openOutputStream(uri),
-                    tags(appContext.contentResolver),
-                    feedsWithTags(appContext.contentResolver))
+            appContext.contentResolver.openOutputStream(uri)?.let {
+                writeOutputStream(it,
+                        tags(appContext.contentResolver),
+                        feedsWithTags(appContext.contentResolver))
+            }
         }
         Log.d("OPML", "Exported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
@@ -51,7 +53,7 @@ fun importOpmlInBackground(context: Context, uri: Uri) = launch(Background) {
     try {
         val time = measureTimeMillis {
             val parser = OpmlParser(OPMLContenProvider(appContext))
-            appContext.contentResolver.openInputStream(uri).use {
+            appContext.contentResolver.openInputStream(uri)?.use {
                 parser.parseInputStream(it)
             }
             appContext.contentResolver.notifyAllUris()

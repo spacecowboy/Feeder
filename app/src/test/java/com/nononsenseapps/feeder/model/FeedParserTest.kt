@@ -34,7 +34,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun htmlAtomContentGetsUnescaped() {
-        javaClass.getResourceAsStream("atom_hnapp.xml")
+        javaClass.getResourceAsStream("atom_hnapp.xml")!!
                 .use {
                     val feed = FeedParser.parseFeedInputStream(URL("http://hnapp.com/rss?q=type%3Astory%20score%3E36%20-bitcoin%20-ethereum%20-cryptocurrency%20-blockchain%20-snowden%20-hiring%20-ask"), it)
 
@@ -51,7 +51,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun enclosedImageIsUsedAsThumbnail() {
-        javaClass.getResourceAsStream("rss_lemonde.xml")
+        javaClass.getResourceAsStream("rss_lemonde.xml")!!
                 .use {
                     val feed = FeedParser.parseFeedInputStream(URL("http://www.lemonde.fr/rss/une.xml"), it)
 
@@ -64,18 +64,18 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun getAlternateFeedLinksDoesNotReturnRelativeLinks() {
-        javaClass.getResourceAsStream("fz.html")
+        javaClass.getResourceAsStream("fz.html")!!
                 .bufferedReader()
                 .use {
                     val alts: List<Pair<String, String>> = FeedParser.getAlternateFeedLinksInHtml(it.readText())
-                    assertEquals(emptyList<Pair<String, String>>(), alts)
+                    assertEquals(emptyList(), alts)
                 }
     }
 
     @Test
     @Throws(Exception::class)
     fun getAlternateFeedLinksResolvesRelativeLinksGivenBaseUrl() {
-        javaClass.getResourceAsStream("fz.html")
+        javaClass.getResourceAsStream("fz.html")!!
                 .bufferedReader()
                 .use {
                     val alts: List<Pair<String, String>> =
@@ -410,47 +410,47 @@ class FeedParserTest {
     }
 
     private fun getCowboyHtml(): String =
-            javaClass.getResourceAsStream("cowboyprogrammer.html")
+            javaClass.getResourceAsStream("cowboyprogrammer.html")!!
                     .bufferedReader()
                     .use {
                         it.readText()
                     }
 
     private val golemDe: ByteArray
-        get() = javaClass.getResourceAsStream("golem-de.xml").readBytes()
+        get() = javaClass.getResourceAsStream("golem-de.xml")!!.readBytes()
 
     private val utdelningsSeglarenAtom: ByteArray
-        get() = javaClass.getResourceAsStream("atom_utdelningsseglaren.xml").readBytes()
+        get() = javaClass.getResourceAsStream("atom_utdelningsseglaren.xml")!!.readBytes()
 
     private val lineageosRss: ByteArray
-        get() = javaClass.getResourceAsStream("rss_lineageos.xml").readBytes()
+        get() = javaClass.getResourceAsStream("rss_lineageos.xml")!!.readBytes()
 
     private val cornucopiaAtom: InputStream
-        get() = javaClass.getResourceAsStream("atom_cornucopia.xml")
+        get() = javaClass.getResourceAsStream("atom_cornucopia.xml")!!
 
     private val cornucopiaRss: InputStream
-        get() = javaClass.getResourceAsStream("rss_cornucopia.xml")
+        get() = javaClass.getResourceAsStream("rss_cornucopia.xml")!!
 
     private val cowboyRss: InputStream
-        get() = javaClass.getResourceAsStream("rss_cowboy.xml")
+        get() = javaClass.getResourceAsStream("rss_cowboy.xml")!!
 
     private val cowboyAtom: InputStream
-        get() = javaClass.getResourceAsStream("atom_cowboy.xml")
+        get() = javaClass.getResourceAsStream("atom_cowboy.xml")!!
 
     private val cyklistBloggen: InputStream
-        get() = javaClass.getResourceAsStream("rss_cyklistbloggen.xml")
+        get() = javaClass.getResourceAsStream("rss_cyklistbloggen.xml")!!
 
     private val researchRsc: InputStream
-        get() = javaClass.getResourceAsStream("atom_research_rsc.xml")
+        get() = javaClass.getResourceAsStream("atom_research_rsc.xml")!!
 
     private val morningPaper: InputStream
-        get() = javaClass.getResourceAsStream("rss_morningpaper.xml")
+        get() = javaClass.getResourceAsStream("rss_morningpaper.xml")!!
 
     private val fz: InputStream
-        get() = javaClass.getResourceAsStream("rss_fz.xml")
+        get() = javaClass.getResourceAsStream("rss_fz.xml")!!
 
     private val londoner: InputStream
-        get() = javaClass.getResourceAsStream("rss_londoner.xml")
+        get() = javaClass.getResourceAsStream("rss_londoner.xml")!!
 }
 
 val atomRelative = """

@@ -2,7 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.content.Intent
-import android.support.v4.content.LocalBroadcastManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -43,7 +43,7 @@ class FeedSyncer : Worker() {
         var success = false
 
         if (wifiStatusOK) {
-            LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast)
+            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast)
 
             val feedId = inputData.getLong(ARG_FEED_ID, -1)
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
@@ -54,7 +54,7 @@ class FeedSyncer : Worker() {
             Log.d(LOG_TAG, "Skipping sync work because wifistatus not OK")
         }
 
-        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false))
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false))
 
         return if (success) {
             Result.SUCCESS

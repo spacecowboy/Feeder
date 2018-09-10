@@ -2,8 +2,8 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceFragment
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.configurePeriodicSync
 import com.nononsenseapps.feeder.util.PREF_DEFAULT_OPEN_ITEM_WITH
@@ -15,10 +15,8 @@ import com.nononsenseapps.feeder.util.PREF_SYNC_ONLY_CHARGING
 import com.nononsenseapps.feeder.util.PREF_SYNC_ONLY_WIFI
 import com.nononsenseapps.feeder.util.PrefUtils
 
-class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         // Fill in default values
         addPreferencesFromResource(R.xml.settings)
 
@@ -35,8 +33,10 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        when (key) {
-            PREF_SYNC_ONLY_CHARGING, PREF_SYNC_HOTSPOTS, PREF_SYNC_ONLY_WIFI, PREF_SYNC_FREQ -> configurePeriodicSync(activity, forceReplace = true)
+        context?.let { context ->
+            when (key) {
+                PREF_SYNC_ONLY_CHARGING, PREF_SYNC_HOTSPOTS, PREF_SYNC_ONLY_WIFI, PREF_SYNC_FREQ -> configurePeriodicSync(context, forceReplace = true)
+            }
         }
     }
 

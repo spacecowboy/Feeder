@@ -10,14 +10,13 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.PersistableBundle
-import android.support.v4.app.Fragment
-import android.support.v4.content.LocalBroadcastManager
 import android.text.Html.fromHtml
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.CheckedTextView
 import android.widget.TextView
+import androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.COL_ID
@@ -44,7 +43,7 @@ const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notifi
 class FeedActivity : BaseActivity() {
     private val fragmentTag = "single_pane"
 
-    private var fragment: Fragment? = null
+    private var fragment: androidx.fragment.app.Fragment? = null
     private lateinit var emptyView: View
 
     private val syncReceiver = object : BroadcastReceiver() {
@@ -77,7 +76,7 @@ class FeedActivity : BaseActivity() {
             if (fragment == null) {
                 showAllFeeds(false)
             } else {
-                supportFragmentManager.beginTransaction().add(R.id.container, fragment, fragmentTag).commit()
+                supportFragmentManager.beginTransaction().add(R.id.container, fragment!!, fragmentTag).commit()
             }
         } else {
             fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
@@ -124,7 +123,7 @@ class FeedActivity : BaseActivity() {
         }
     }
 
-    private fun defaultFragment(): Fragment? {
+    private fun defaultFragment(): androidx.fragment.app.Fragment? {
         val lastTag = PrefUtils.getLastOpenFeedTag(this)
         val lastId = PrefUtils.getLastOpenFeedId(this)
 
@@ -211,16 +210,16 @@ class FeedActivity : BaseActivity() {
         // update the main content by replacing fragments
         emptyView.visibility = View.GONE
         fragment = FeedFragment.newInstance(id, title, url, tag)
-        supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragmentTag).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.container, fragment as FeedFragment, fragmentTag).commit()
     }
 
     override fun onResume() {
         super.onResume()
-        LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver, IntentFilter(SYNC_BROADCAST))
+        getInstance(this).registerReceiver(syncReceiver, IntentFilter(SYNC_BROADCAST))
     }
 
     override fun onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(syncReceiver)
+        getInstance(this).unregisterReceiver(syncReceiver)
         super.onPause()
     }
 
@@ -233,7 +232,7 @@ class FeedActivity : BaseActivity() {
             EXPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    exportOpmlInBackground(this, data.data)
+                    exportOpmlInBackground(this, uri)
                 }
             }
             IMPORT_OPML_CODE -> {

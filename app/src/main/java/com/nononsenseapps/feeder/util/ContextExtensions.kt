@@ -7,7 +7,7 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
-import android.support.v4.app.NotificationManagerCompat
+import androidx.core.app.NotificationManagerCompat
 import android.util.Log
 import android.widget.Toast
 import com.nononsenseapps.feeder.db.URI_FEEDS

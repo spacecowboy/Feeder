@@ -22,13 +22,6 @@ import android.content.Intent
 import android.database.Cursor
 import android.graphics.Point
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
-import android.support.v4.app.LoaderManager
-import android.support.v4.content.CursorLoader
-import android.support.v4.content.Loader
-import android.support.v4.view.MenuItemCompat
-import android.support.v7.widget.ShareActionProvider
 import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.Menu
@@ -37,6 +30,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.ShareActionProvider
+import androidx.core.view.MenuItemCompat
+import androidx.fragment.app.Fragment
+import androidx.loader.app.LoaderManager
+import androidx.loader.app.LoaderManager.LoaderCallbacks
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.COL_ID
@@ -74,16 +72,16 @@ const val ARG_DATE = "date"
 private const val TEXT_LOADER = 1
 private const val ITEM_LOADER = 2
 
-class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
+class ReaderFragment : Fragment(), LoaderCallbacks<Any?> {
 
     private val dateTimeFormat = DateTimeFormat.mediumDate().withLocale(Locale.getDefault())
 
     private var _id: Long = -1
     // All content contained in RssItem
     private var rssItem: FeedItemSQL? = null
-    private var bodyTextView: TextView? = null
-    private var scrollView: ObservableScrollView? = null
-    private var titleTextView: TextView? = null
+    private lateinit var bodyTextView: TextView
+    private lateinit var scrollView: ObservableScrollView
+    private lateinit var titleTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,7 +104,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
                     cancelNotificationInBackground(it, itemId)
                 }
             }
-            loaderManager.restartLoader(ITEM_LOADER, Bundle(), this)
+            LoaderManager.getInstance(this).restartLoader(ITEM_LOADER, Bundle(), this)
         }
 
         setHasOptionsMenu(true)
@@ -115,11 +113,10 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        val theLayout: Int
-        if (TabletUtils.isTablet(activity)) {
-            theLayout = R.layout.fragment_reader_tablet
+        val theLayout = if (TabletUtils.isTablet(activity)) {
+            R.layout.fragment_reader_tablet
         } else {
-            theLayout = R.layout.fragment_reader
+            R.layout.fragment_reader
         }
         val rootView = inflater.inflate(theLayout, container, false)
 
@@ -130,49 +127,55 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
         val mFeedTitleTextView = rootView.findViewById<View>(R.id
                 .story_feedtitle) as TextView
 
-        setViewTitle()
+        rssItem?.let { rssItem ->
+            setViewTitle()
 
-        mFeedTitleTextView.text = rssItem!!.feedtitle
+            mFeedTitleTextView.text = rssItem.feedtitle
 
-        if (rssItem!!.author == null && rssItem!!.pubDate != null) {
-            mAuthorTextView.text = getString(R.string.on_date,
-                    rssItem!!.pubDate!!.withZone(DateTimeZone.getDefault())
-                            .toString(dateTimeFormat))
-        } else if (rssItem!!.pubDate != null) {
-            mAuthorTextView.text = getString(R.string.by_author_on_date,
-                    rssItem!!.author,
-                    rssItem!!.pubDate!!.withZone(DateTimeZone.getDefault())
-                            .toString(dateTimeFormat))
-        } else {
-            mAuthorTextView.visibility = View.GONE
+            if (rssItem.author == null && rssItem.pubDate != null) {
+                mAuthorTextView.text = getString(R.string.on_date,
+                        rssItem.pubDate.withZone(DateTimeZone.getDefault())
+                                .toString(dateTimeFormat))
+            } else if (rssItem.pubDate != null) {
+                mAuthorTextView.text = getString(R.string.by_author_on_date,
+                        rssItem.author,
+                        rssItem.pubDate.withZone(DateTimeZone.getDefault())
+                                .toString(dateTimeFormat))
+            } else {
+                mAuthorTextView.visibility = View.GONE
+            }
+
+            setViewBody()
         }
-
-        setViewBody()
 
         return rootView
     }
 
     private fun setViewTitle() {
-        if (rssItem!!.title.isEmpty()) {
-            titleTextView!!.text = rssItem!!.plaintitle
-        } else {
-            titleTextView!!.text = toSpannedWithNoImages(activity!!, rssItem!!.title, rssItem!!.feedUrl)
+        rssItem?.let { rssItem ->
+            if (rssItem.title.isEmpty()) {
+                titleTextView.text = rssItem.plaintitle
+            } else {
+                titleTextView.text = toSpannedWithNoImages(activity!!, rssItem.title, rssItem.feedUrl)
+            }
         }
     }
 
     private fun setViewBody() {
-        if (!rssItem!!.description.isEmpty()) {
-            // Set without images as a place holder
-            bodyTextView!!.text = toSpannedWithNoImages(activity!!, rssItem!!.description, rssItem!!.feedUrl)
+        rssItem?.let { rssItem ->
+            if (!rssItem.description.isEmpty()) {
+                // Set without images as a place holder
+                bodyTextView.text = toSpannedWithNoImages(activity!!, rssItem.description, rssItem.feedUrl)
 
-            // Load images in text
-            loaderManager.restartLoader(TEXT_LOADER, Bundle(), this)
+                // Load images in text
+                LoaderManager.getInstance(this).restartLoader(TEXT_LOADER, Bundle(), this)
+            }
         }
     }
 
     override fun onActivityCreated(bundle: Bundle?) {
         super.onActivityCreated(bundle)
-        scrollView?.let {
+        scrollView.let {
             (activity as BaseActivity).enableActionBarAutoHide(it)
         }
     }
@@ -183,8 +186,10 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
     }
 
     override fun onDetach() {
-        loaderManager.destroyLoader(TEXT_LOADER)
-        loaderManager.destroyLoader(ITEM_LOADER)
+        LoaderManager.getInstance(this).let {
+            it.destroyLoader(TEXT_LOADER)
+            it.destroyLoader(ITEM_LOADER)
+        }
         super.onDetach()
     }
 
@@ -198,19 +203,22 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
         val shareActionProvider = MenuItemCompat.getActionProvider(shareItem) as ShareActionProvider
 
         // Set intent
-        val shareIntent = Intent(Intent.ACTION_SEND)
-        shareIntent.type = "text/plain"
-        shareIntent.putExtra(Intent.EXTRA_TEXT, rssItem!!.link)
-        shareActionProvider.setShareIntent(shareIntent)
+        rssItem?.let { rssItem ->
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT, rssItem.link)
+            shareActionProvider.setShareIntent(shareIntent)
 
-        // Show/Hide enclosure
-        menu.findItem(R.id.action_open_enclosure).isVisible = rssItem!!.enclosurelink != null
-        // Add filename to tooltip
-        if (rssItem!!.enclosurelink != null) {
-            val filename = rssItem!!.enclosureFilename
-            if (filename != null) {
-                menu.findItem(R.id.action_open_enclosure).title = filename
+            // Show/Hide enclosure
+            menu.findItem(R.id.action_open_enclosure).isVisible = rssItem.enclosurelink != null
+            // Add filename to tooltip
+            if (rssItem.enclosurelink != null) {
+                val filename = rssItem.enclosureFilename
+                if (filename != null) {
+                    menu.findItem(R.id.action_open_enclosure).title = filename
+                }
             }
+
         }
 
         // Don't forget super call here
@@ -266,20 +274,20 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Any?> = when (id) {
+    override fun onCreateLoader(id: Int, args: Bundle?): androidx.loader.content.Loader<Any?> = when (id) {
         ITEM_LOADER -> {
-            val cl = CursorLoader(context!!, URI_FEEDITEMS,
+            val cl = androidx.loader.content.CursorLoader(context!!, URI_FEEDITEMS,
                     FEED_ITEM_FIELDS,
                     "$COL_ID IS ?",
                     arrayOf(java.lang.Long.toString(rssItem!!.id)), null)
             cl.setUpdateThrottle(100)
-            cl as Loader<Any?>
+            cl as androidx.loader.content.Loader<Any?>
         }
         // TEXT_LOADER
         else -> {
-            ImageTextLoader(activity as FragmentActivity, rssItem!!.description, rssItem?.feedUrl
+            ImageTextLoader(activity as androidx.fragment.app.FragmentActivity, rssItem!!.description, rssItem?.feedUrl
                     ?: sloppyLinkToStrictURL(""),
-                    maxImageSize(), PrefUtils.shouldLoadImages(activity!!)) as Loader<Any?>
+                    maxImageSize(), PrefUtils.shouldLoadImages(activity!!)) as androidx.loader.content.Loader<Any?>
         }
     }
 
@@ -298,7 +306,7 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
         return size
     }
 
-    override fun onLoadFinished(loader: Loader<Any?>,
+    override fun onLoadFinished(loader: androidx.loader.content.Loader<Any?>,
                                 data: Any?) {
         if (loader.id == ITEM_LOADER) {
             val cursor = data as Cursor?
@@ -311,13 +319,13 @@ class ReaderFragment : Fragment(), LoaderManager.LoaderCallbacks<Any?> {
             }
         } else if (loader.id == TEXT_LOADER) {
             if (data != null) {
-                bodyTextView?.text = data as Spanned?
+                bodyTextView.text = data as Spanned?
             }
         }
-        loaderManager.destroyLoader(loader.id)
+        LoaderManager.getInstance(this).destroyLoader(loader.id)
     }
 
-    override fun onLoaderReset(loader: Loader<Any?>) {
+    override fun onLoaderReset(loader: androidx.loader.content.Loader<Any?>) {
         // nothing really
     }
 }

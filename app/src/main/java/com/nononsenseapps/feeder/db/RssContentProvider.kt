@@ -27,7 +27,7 @@ private val uriMatcher: UriMatcher = initUriMatcher(::addMatcherUris)
 class RssContentProvider : ContentProvider() {
 
     private val databaseHandler: DatabaseHandler by lazy {
-        DatabaseHandler(context)
+        DatabaseHandler(context!!)
     }
 
     override fun onCreate(): Boolean = true
@@ -108,7 +108,9 @@ class RssContentProvider : ContentProvider() {
                     .rawQuery(query, params)
 
             // Make sure you don't override another uri here
-            result?.setNotificationUri(context.contentResolver, uri)
+            context?.contentResolver?.let { contentResolver ->
+                result?.setNotificationUri(contentResolver, uri)
+            }
             return result
         } else {
             throw IllegalArgumentException("Uri can't be null")

@@ -2,9 +2,22 @@
 
 buildscript {
   ext {
-    kotlin_version = '1.2.60'
+    kotlin_version = '1.2.70'
+    gradle_build_version = "3.2.0-rc03"
+    build_tools_version = "28.0.2"
 
+    androidx_version = "1.0.0"
     work_version = '1.0.0-alpha08'
+    constraintlayout_version = "2.0.0-alpha2"
+    recyclerview_version = "$androidx_version"
+    legacy_support_version = "$androidx_version"
+    appcompat_version = "$androidx_version"
+    material_version = "$androidx_version"
+    preference_version = "$androidx_version"
+    test_runner_version = "1.1.0-alpha4"
+    test_rules_version = "1.1.0-alpha4"
+
+    rome_version = "1.7.1"
   }
 
 
@@ -14,7 +27,7 @@ buildscript {
     google()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.1.4'
+    classpath "com.android.tools.build:gradle:$gradle_build_version"
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
     // NOTE: Do not place your application dependencies here; they belong
