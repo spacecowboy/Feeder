@@ -2,13 +2,11 @@ package com.nononsenseapps.feeder.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.nononsenseapps.feeder.R;
 
 /**
@@ -32,10 +30,10 @@ public class ListStoryItem extends FrameLayout {
 
         LayoutInflater.from(context).inflate(R.layout.list_story_item_layout, this, true);
 
-        mStoryImage = (ImageView) findViewById(R.id.story_image);
-        mStoryDate = (TextView) findViewById(R.id.story_date);
-        mStoryAuthor = (TextView) findViewById(R.id.story_author);
-        mStorySnippet = (TextView) findViewById(R.id.story_snippet);
+        mStoryImage = findViewById(R.id.story_image);
+        mStoryDate = findViewById(R.id.story_date);
+        mStoryAuthor = findViewById(R.id.story_author);
+        mStorySnippet = findViewById(R.id.story_snippet);
     }
 
     private void layoutView(View view, int left, int top, int width, int height) {

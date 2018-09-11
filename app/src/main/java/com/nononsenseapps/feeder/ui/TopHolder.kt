@@ -1,9 +1,9 @@
 package com.nononsenseapps.feeder.ui
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 
 class TopHolder(private val activity: BaseActivity, v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v), View.OnClickListener {
     val title: TextView = v.findViewById(R.id.feed_name)
@@ -24,6 +24,6 @@ class TopHolder(private val activity: BaseActivity, v: View) : androidx.recycler
             activity.drawerLayout!!.closeDrawers()//GravityCompat.START);
         }
 
-        activity.onNavigationDrawerItemSelected(-10, null, null, null)
+        activity.onNavigationDrawerItemSelected(ID_ALL_FEEDS, null, null, null)
     }
 }

@@ -1,6 +1,6 @@
 package com.nononsenseapps.feeder.model.opml
 
-import com.nononsenseapps.feeder.db.FeedSQL
+import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.OPMLParserToDatabase
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import org.ccil.cowan.tagsoup.Parser
@@ -76,7 +76,7 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
                 ignoring > 0 || isFeedTag -> ignoring++
                 outlineIsFeed(atts) -> {
                     isFeedTag = true
-                    val feed = FeedSQL(
+                    val feed = Feed(
                             title = unescape(atts?.getValue("title") ?: atts?.getValue("text") ?: ""),
                             tag = if (tagStack.isNotEmpty()) tagStack.peek() else "",
                             url = sloppyLinkToStrictURL(atts?.getValue("xmlurl") ?: ""))

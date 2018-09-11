@@ -13,6 +13,7 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
 import com.nononsenseapps.feeder.util.PrefUtils
@@ -46,7 +47,7 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
         if (wifiStatusOK) {
             LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast)
 
-            val feedId = inputData.getLong(ARG_FEED_ID, -1)
+            val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
             val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
 
@@ -66,7 +67,7 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
     }
 }
 
-fun requestFeedSync(feedId: Long = -1, feedTag: String = "") {
+fun requestFeedSync(feedId: Long = ID_UNSET, feedTag: String = "") {
     val workRequest = OneTimeWorkRequestBuilder<FeedSyncer>()
 
     val data = workDataOf(ARG_FEED_ID to feedId,

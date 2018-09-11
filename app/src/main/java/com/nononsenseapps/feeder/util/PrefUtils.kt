@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.DATABASE_VERSION
 
 /**
  * Boolean indicating whether we performed the (one-time) welcome flow.
@@ -87,12 +87,6 @@ object PrefUtils {
         true
     }
 
-    fun isFirstBootAfterDatabaseUpgrade(context: Context): Boolean =
-            sp(context).getInt(PREF_LAST_DATABASE_VERSION, -1) != DATABASE_VERSION
-
-    fun markFirstBootAfterDatabaseUpgradeDone(context: Context) =
-            sp(context).edit().putInt(PREF_LAST_DATABASE_VERSION, DATABASE_VERSION).apply()
-
     fun shouldLoadImagesOnlyOnWIfi(context: Context): Boolean = sp(context).getBoolean(PREF_IMG_ONLY_WIFI, false)
 
     fun shouldLoadImagesOnHotSpots(context: Context): Boolean = sp(context).getBoolean(PREF_IMG_HOTSPOTS, false)
@@ -165,6 +159,11 @@ object PrefUtils {
                 .putString(PREF_LAST_FEED_TAG, tag).apply()
     }
 
+    fun clearLastOpenFeed(context: Context) {
+        sp(context).edit().remove(PREF_LAST_FEED_ID)
+                .remove(PREF_LAST_FEED_TAG).apply()
+    }
+
     /**
      * Get which feed tag was last open. Check id first.
      *
@@ -179,7 +178,7 @@ object PrefUtils {
      * @param context
      * @return last open id, or -1
      */
-    fun getLastOpenFeedId(context: Context): Long = sp(context).getLong(PREF_LAST_FEED_ID, -1)
+    fun getLastOpenFeedId(context: Context): Long = sp(context).getLong(PREF_LAST_FEED_ID, ID_UNSET)
 
 
     fun registerOnSharedPreferenceChangeListener(context: Context,

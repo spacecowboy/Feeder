@@ -1,16 +1,17 @@
 package com.nononsenseapps.feeder.ui
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FeedUnreadCount
 
 class TagHolder(private val activity: BaseActivity, v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v), View.OnClickListener {
     val title: TextView = v.findViewById(R.id.tag_name)
     val unreadCount: TextView = v.findViewById(R.id.tag_unreadcount)
     val expander: ImageView = v.findViewById(R.id.tag_expander)
-    var wrap: FeedWrapper? = null
+    var wrap: FeedUnreadCount? = null
 
     init {
         // expander clicker
@@ -34,6 +35,6 @@ class TagHolder(private val activity: BaseActivity, v: View) : androidx.recycler
             activity.drawerLayout!!.closeDrawers()//GravityCompat.START);
         }
 
-        activity.onNavigationDrawerItemSelected(-1, wrap?.tag, null, wrap?.tag)
+        activity.onNavigationDrawerItemSelected(ID_UNSET, wrap?.tag, null, wrap?.tag)
     }
 }

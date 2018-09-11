@@ -19,17 +19,16 @@ import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
-import com.nononsenseapps.feeder.db.COL_ID
-import com.nononsenseapps.feeder.db.Util
+import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FEED_ADDED_BROADCAST
 import com.nononsenseapps.feeder.model.SYNC_BROADCAST
 import com.nononsenseapps.feeder.model.opml.exportOpmlInBackground
 import com.nononsenseapps.feeder.model.opml.importOpmlInBackground
-import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.ensureDebugLogDeletedInBackground
-import com.nononsenseapps.feeder.util.markItemsAsNotified
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.experimental.launch
 import java.io.File
@@ -52,8 +51,8 @@ class FeedActivity : BaseActivity() {
             when (intent.action) {
                 SYNC_BROADCAST -> showAllFeeds(false)
                 FEED_ADDED_BROADCAST -> {
-                    if (fragment == null && intent.getLongExtra(COL_ID, -1) > 0) {
-                        onNavigationDrawerItemSelected(intent.getLongExtra(COL_ID, -1), "", "", null)
+                    if (fragment == null && intent.getLongExtra(ARG_ID, ID_UNSET) > 0) {
+                        onNavigationDrawerItemSelected(intent.getLongExtra(ARG_ID, ID_UNSET), "", "", null)
                     }
                 }
             }
@@ -92,21 +91,14 @@ class FeedActivity : BaseActivity() {
         emptyAddFeed.setOnClickListener {
             startActivityForResult(Intent(this@FeedActivity, EditFeedActivity::class.java), EDIT_FEED_CODE)
         }
-
-        // Database upgrade wipes all items, so request a one-time sync on start up
-        if (PrefUtils.isFirstBootAfterDatabaseUpgrade(this)) {
-            // Sync all feeds
-            requestFeedSync()
-            PrefUtils.markFirstBootAfterDatabaseUpgradeDone(this)
-        }
     }
 
     private fun doFromNotificationActions() {
         val itemIdsToMarkAsNotified = intent?.getLongArrayExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)
-        val contentResolver = contentResolver
-        if (itemIdsToMarkAsNotified != null && contentResolver != null) {
+        val db = AppDatabase.getInstance(this)
+        if (itemIdsToMarkAsNotified != null) {
             launch(Background) {
-                contentResolver.markItemsAsNotified(itemIdsToMarkAsNotified)
+                db.feedItemDao().markAsNotified(itemIdsToMarkAsNotified.toList())
             }
         }
     }
@@ -126,13 +118,13 @@ class FeedActivity : BaseActivity() {
         } else if (lastTag != null || lastId > 0) {
             FeedFragment.newInstance(lastId, "", "", lastTag)
         } else {
-            FeedFragment.newInstance(-10, null, null, null)
+            FeedFragment.newInstance(ID_ALL_FEEDS, null, null, null)
         }
     }
 
     fun showAllFeeds(overrideCurrent: Boolean = false) {
         if (fragment == null || overrideCurrent) {
-            onNavigationDrawerItemSelected(-10, null, null, null)
+            onNavigationDrawerItemSelected(ID_ALL_FEEDS, null, null, null)
         }
     }
 
@@ -178,7 +170,7 @@ class FeedActivity : BaseActivity() {
                     intent.addCategory(Intent.CATEGORY_OPENABLE)
                     intent.type = "*/*"
                     intent.putExtra(Intent.EXTRA_MIME_TYPES,
-                            Util.ToStringArray("text/plain", "text/xml", "text/opml", "*/*"))
+                            arrayOf("text/plain", "text/xml", "text/opml", "*/*"))
                 } else {
                     intent = Intent(this, MyFilePickerActivity::class.java)
                     intent.putExtra(AbstractFilePickerActivity.EXTRA_SINGLE_CLICK, true)

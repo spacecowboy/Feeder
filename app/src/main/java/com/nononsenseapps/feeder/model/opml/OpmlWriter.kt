@@ -1,19 +1,19 @@
 package com.nononsenseapps.feeder.model.opml
 
-import com.nononsenseapps.feeder.db.FeedSQL
+import com.nononsenseapps.feeder.db.room.Feed
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
 fun writeFile(path: String,
-              tags: Iterable<String?>,
-              feedsWithTag: (String?) -> Iterable<FeedSQL>) {
+              tags: Iterable<String>,
+              feedsWithTag: (String) -> Iterable<Feed>) {
     writeOutputStream(FileOutputStream(path), tags, feedsWithTag)
 }
 
 fun writeOutputStream(os: OutputStream,
-                      tags: Iterable<String?>,
-                      feedsWithTag: (String?) -> Iterable<FeedSQL>) {
+                      tags: Iterable<String>,
+                      feedsWithTag: (String) -> Iterable<Feed>) {
     try {
         os.bufferedWriter().use {
             it.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
@@ -31,7 +31,7 @@ fun writeOutputStream(os: OutputStream,
                                                 xmlUrl = escape(it.url.toString())) {}
                                     }
                                 } else {
-                                    outline(title = escape(it!!)) {
+                                    outline(title = escape(it)) {
                                         feedsWithTag(it).forEach {
                                             outline(title = escape(it.displayTitle),
                                                     type = "rss",

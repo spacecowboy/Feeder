@@ -1,7 +1,8 @@
 package com.nononsenseapps.feeder.util
 
 import android.os.Bundle
-import com.nononsenseapps.feeder.db.FeedItemSQL
+import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_URL
 import org.joda.time.DateTime
 
@@ -15,21 +16,21 @@ const val ARG_TITLE = "title"
 const val ARG_DESCRIPTION = "body"
 const val ARG_LINK = "link"
 const val ARG_ENCLOSURE = "enclosure"
-const val ARG_IMAGEURL = "imageurl"
+const val ARG_IMAGEURL = "imageUrl"
 const val ARG_ID = "dbid"
 const val ARG_FEEDTITLE = "feedtitle"
 const val ARG_AUTHOR = "author"
 const val ARG_DATE = "date"
 
-fun Bundle.asFeedItem(): FeedItemSQL {
-    return FeedItemSQL(id = getLong(ARG_ID, -1),
+fun Bundle.asFeedItemFoo(): FeedItemWithFeed {
+    return FeedItemWithFeed(id = getLong(ARG_ID, ID_UNSET),
             title = getString(ARG_TITLE, ""),
             description = getString(ARG_DESCRIPTION, ""),
             link = getString(ARG_LINK),
-            enclosurelink = getString(ARG_ENCLOSURE),
-            imageurl = getString(ARG_IMAGEURL),
+            enclosureLink = getString(ARG_ENCLOSURE),
+            imageUrl = getString(ARG_IMAGEURL),
             author = getString(ARG_AUTHOR),
-            feedtitle = getString(ARG_FEEDTITLE, ""),
+            feedTitle = getString(ARG_FEEDTITLE, ""),
             feedUrl = sloppyLinkToStrictURL(getString(ARG_FEED_URL, "")),
             pubDate = when(getString(ARG_DATE)) {
                 null -> null

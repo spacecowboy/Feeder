@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
   buildToolsVersion "$build_tools_version"
@@ -28,6 +30,19 @@ android {
 
     // For espresso tests
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    // Export Room schemas
+    javaCompileOptions {
+      annotationProcessorOptions {
+        arguments = ["room.schemaLocation":
+                         "$projectDir/schemas".toString()]
+      }
+    }
+  }
+
+  sourceSets {
+    // To test Room we need to include the schema dir in resources
+    androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
   }
 
   buildTypes {
@@ -62,6 +77,8 @@ kotlin {
 }
 
 dependencies {
+  kapt "androidx.room:room-compiler:$room_version"
+  implementation "androidx.room:room-runtime:$room_version"
 
   implementation "android.arch.work:work-runtime-ktx:$work_version"
 
@@ -71,6 +88,9 @@ dependencies {
   implementation "androidx.appcompat:appcompat:$appcompat_version"
   implementation "androidx.preference:preference:$preference_version"
   implementation "com.google.android.material:material:$material_version"
+
+  // ViewModel and LiveData
+  implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
 
   // To support SDK18
   implementation "com.nononsenseapps:filepicker:4.1.0"
@@ -112,4 +132,5 @@ dependencies {
   androidTestImplementation "junit:junit:4.12"
   androidTestImplementation "androidx.test:runner:$test_runner_version"
   androidTestImplementation "androidx.test:rules:$test_rules_version"
+  androidTestImplementation "androidx.room:room-testing:$room_version"
 }

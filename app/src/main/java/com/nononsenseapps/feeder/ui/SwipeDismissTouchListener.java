@@ -19,13 +19,11 @@ package com.nononsenseapps.feeder.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
-
-import com.nononsenseapps.feeder.R;
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
 
 /**
  * A {@link View.OnTouchListener} that makes any {@link View} dismissable when the

@@ -1,16 +1,15 @@
 package com.nononsenseapps.feeder.ui
 
-import androidx.core.view.GravityCompat
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.GravityCompat
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.FeedSQL
+import com.nononsenseapps.feeder.model.FeedUnreadCount
 
 class FeedHolder(private val activity: BaseActivity, v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v), View.OnClickListener {
     val unreadCount: TextView = v.findViewById(R.id.feed_unreadcount)
     val title: TextView = v.findViewById(R.id.feed_name)
-    var item: FeedSQL? = null
+    var item: FeedUnreadCount? = null
 
     init {
         v.setOnClickListener(this)
