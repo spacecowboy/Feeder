@@ -59,7 +59,7 @@ class FeedSyncer : Worker() {
         return if (success) {
             Result.SUCCESS
         } else {
-            Result.RETRY
+            Result.FAILURE
         }
     }
 }
