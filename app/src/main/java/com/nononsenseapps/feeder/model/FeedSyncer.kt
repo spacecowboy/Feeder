@@ -98,7 +98,9 @@ fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
             PrefUtils.setSynchronizationFrequency(context, timeInterval)
         }
 
-        val workRequestBuilder = PeriodicWorkRequestBuilder<FeedSyncer>(timeInterval, TimeUnit.MINUTES)
+        val workRequestBuilder = PeriodicWorkRequestBuilder<FeedSyncer>(
+                timeInterval, TimeUnit.MINUTES,
+                timeInterval, TimeUnit.MINUTES)
 
         val syncWork = workRequestBuilder
                 .setConstraints(constraints.build())
