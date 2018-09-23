@@ -62,8 +62,10 @@ import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.Util
 import com.nononsenseapps.feeder.db.asFeed
-import com.nononsenseapps.feeder.model.RssSyncAdapter
+import com.nononsenseapps.feeder.model.SYNC_BROADCAST
+import com.nononsenseapps.feeder.model.SYNC_BROADCAST_IS_ACTIVE
 import com.nononsenseapps.feeder.model.cancelNotificationInBackground
+import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
@@ -76,7 +78,6 @@ import com.nononsenseapps.feeder.util.markTagAsRead
 import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
-import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setNotify
 import com.nononsenseapps.feeder.util.setNotifyOnAllFeeds
@@ -161,8 +162,8 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         // Listens on sync broadcasts
         syncReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                if (RssSyncAdapter.SYNC_BROADCAST == intent.action) {
-                    onSyncBroadcast(intent.getBooleanExtra(RssSyncAdapter.SYNC_BROADCAST_IS_ACTIVE, false))
+                if (SYNC_BROADCAST == intent.action) {
+                    onSyncBroadcast(intent.getBooleanExtra(SYNC_BROADCAST_IS_ACTIVE, false))
                 }
             }
         }
@@ -257,11 +258,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
 
         swipeRefreshLayout!!.setOnRefreshListener {
             // Sync this specific feed(s)
-            when {
-                id > 0 -> activity!!.contentResolver.requestFeedSync(id)
-                feedTag != null -> activity!!.contentResolver.requestFeedSync(feedTag!!)
-                else -> activity!!.contentResolver.requestFeedSync(-1)
-            }
+            requestFeedSync(id, feedTag ?: "")
         }
 
         // Set up the empty view
@@ -323,7 +320,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         (activity as BaseActivity).showActionBar()
         // Listen on broadcasts
         LocalBroadcastManager.getInstance(activity!!).registerReceiver(syncReceiver,
-                IntentFilter(RssSyncAdapter.SYNC_BROADCAST))
+                IntentFilter(SYNC_BROADCAST))
     }
 
     override fun onPause() {
@@ -416,7 +413,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         return when {
             id == R.id.action_sync.toLong() -> {
                 // Sync all feeds when menu button pressed
-                activity?.contentResolver?.requestFeedSync()
+                requestFeedSync()
                 true
             }
             id == R.id.action_edit_feed.toLong() && this.id > 0 -> {

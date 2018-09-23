@@ -22,14 +22,15 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.Util
-import com.nononsenseapps.feeder.model.RssSyncAdapter
+import com.nononsenseapps.feeder.model.FEED_ADDED_BROADCAST
+import com.nononsenseapps.feeder.model.SYNC_BROADCAST
 import com.nononsenseapps.feeder.model.opml.exportOpmlInBackground
 import com.nononsenseapps.feeder.model.opml.importOpmlInBackground
+import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.ensureDebugLogDeletedInBackground
 import com.nononsenseapps.feeder.util.markItemsAsNotified
-import com.nononsenseapps.feeder.util.requestFeedSync
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.experimental.launch
 import java.io.File
@@ -50,8 +51,8 @@ class FeedActivity : BaseActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             // Load first feed if nothing is showing (could have been empty and now content has been loaded)
             when (intent.action) {
-                RssSyncAdapter.SYNC_BROADCAST -> showAllFeeds(false)
-                RssSyncAdapter.FEED_ADDED_BROADCAST -> {
+                SYNC_BROADCAST -> showAllFeeds(false)
+                FEED_ADDED_BROADCAST -> {
                     if (fragment == null && intent.getLongExtra(COL_ID, -1) > 0) {
                         onNavigationDrawerItemSelected(intent.getLongExtra(COL_ID, -1), "", "", null)
                     }
@@ -108,7 +109,7 @@ class FeedActivity : BaseActivity() {
         // Database upgrade wipes all items, so request a one-time sync on start up
         if (PrefUtils.isFirstBootAfterDatabaseUpgrade(this)) {
             // Sync all feeds
-            contentResolver.requestFeedSync()
+            requestFeedSync()
             PrefUtils.markFirstBootAfterDatabaseUpgradeDone(this)
         }
     }
@@ -215,7 +216,7 @@ class FeedActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver, IntentFilter(RssSyncAdapter.SYNC_BROADCAST))
+        LocalBroadcastManager.getInstance(this).registerReceiver(syncReceiver, IntentFilter(SYNC_BROADCAST))
     }
 
     override fun onPause() {

@@ -110,40 +110,6 @@ fun ContentResolver.markAllAsRead() {
     }
 }
 
-/**
- * Request a manual synchronization of one or all (default) feeds
- */
-fun ContentResolver.requestFeedSync(feedId: Long = -1) {
-    requestFeedSync {
-        if (feedId > 0) {
-            putLong(COL_ID, feedId)
-        }
-        // sync manually NOW
-        putBoolean(SYNC_EXTRAS_MANUAL, true)
-        putBoolean(SYNC_EXTRAS_EXPEDITED, true)
-    }
-}
-
-/**
- * Request a manual synchronization of all feeds in tag
- */
-fun ContentResolver.requestFeedSync(tag: String) {
-    requestFeedSync {
-        if (tag.isNotEmpty()) {
-            putString(COL_TAG, tag)
-        }
-        // sync manually NOW
-        putBoolean(SYNC_EXTRAS_MANUAL, true)
-        putBoolean(SYNC_EXTRAS_EXPEDITED, true)
-    }
-}
-
-@Suppress("unused")
-inline fun ContentResolver.requestFeedSync(init: Bundle.() -> Unit) {
-    val account = com.nononsenseapps.feeder.db.AccountService.Account()
-    requestSync(account, com.nononsenseapps.feeder.db.AUTHORITY, bundle(init))
-}
-
 fun ContentResolver.setNotify(feedId: Long, notify: Boolean = true) {
     panicIfOnUiThread()
     if (notify) {

@@ -174,12 +174,12 @@ object FeedParser {
     /**
      * @throws IOException if call fails due to network issue for example
      */
-    fun getResponse(url: URL): Response {
+    fun getResponse(url: URL, maxAgeSecs: Int = MAX_FEED_AGE): Response {
         val request = Request.Builder()
                 .url(url)
                 .cacheControl(CacheControl.Builder()
-                        .maxAge(MAX_FEED_AGE, TimeUnit.SECONDS)
-                        .maxStale(MAX_FEED_AGE, TimeUnit.SECONDS)
+                        .maxAge(maxAgeSecs, TimeUnit.SECONDS)
+                        .maxStale(maxAgeSecs, TimeUnit.SECONDS)
                         .build())
                 .build()
 

@@ -20,9 +20,9 @@ android {
     applicationId "com.nononsenseapps.feeder"
     versionCode 36
     versionName "1.6.8"
-    compileSdkVersion 27
+    compileSdkVersion 28
     minSdkVersion 18
-    targetSdkVersion 27
+    targetSdkVersion 28
 
     // For espresso tests
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -76,6 +76,8 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
   def supportLibraryVersion = '27.1.1'
+
+  implementation "android.arch.work:work-runtime-ktx:$work_version"
 
   implementation "com.android.support.constraint:constraint-layout:1.1.1"
   implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"

@@ -26,13 +26,13 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.FIELDS_VIEWCOUNT
 import com.nononsenseapps.feeder.db.URI_FEEDSWITHCOUNTS
 import com.nononsenseapps.feeder.db.asFeed
+import com.nononsenseapps.feeder.model.configurePeriodicSync
 import com.nononsenseapps.feeder.util.ConvertedCursorLoader
 import com.nononsenseapps.feeder.util.LPreviewUtils
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.Result
 import com.nononsenseapps.feeder.util.forEach
-import com.nononsenseapps.feeder.util.setupSync
 import com.nononsenseapps.feeder.views.ObservableScrollView
 import java.util.*
 
@@ -111,8 +111,9 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Sor
         }
 
         setNightBackground()
-        // Add account and enable sync - if not done before
-        this.setupSync()
+
+        // Enable periodic sync
+        configurePeriodicSync(applicationContext, forceReplace = false)
     }
 
     public override fun onResume() {

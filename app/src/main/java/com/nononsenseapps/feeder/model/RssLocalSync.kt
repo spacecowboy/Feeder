@@ -39,13 +39,14 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
 
-fun syncFeeds(context: Context, feedId: Long, tag: String) {
+fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork: Boolean = false): Boolean {
+    var result = false
     try {
         runBlocking {
             val time = measureTimeMillis {
                 val feedsToFetch = feedsToSync(context, feedId, tag)
                 feedsToFetch
-                        .map { launch(coroutineContext) { syncFeed(it, context) } }
+                        .map { launch(coroutineContext) { syncFeed(it, context, forceNetwork = forceNetwork) } }
                         .forEach {
                             Log.d("CoroutineSync", "Joining a job")
                             // Await completion of asynchronous operation
@@ -54,6 +55,7 @@ fun syncFeeds(context: Context, feedId: Long, tag: String) {
                 // Finally, prune excessive items
                 try {
                     prune(context)
+                    result = true
                 } catch (e: RemoteException) {
                     e.printStackTrace()
                 } catch (e: OperationApplicationException) {
@@ -67,14 +69,15 @@ fun syncFeeds(context: Context, feedId: Long, tag: String) {
     } catch (e: Throwable) {
         e.printStackTrace()
     }
+    return result
 }
 
-private suspend fun syncFeed(feedSql: FeedSQL, context: Context) {
+private suspend fun syncFeed(feedSql: FeedSQL, context: Context, forceNetwork: Boolean = false) {
     Log.d("CoroutineSync", "Launching sync of ${feedSql.displayTitle} on ${Thread.currentThread().name}")
     try {
         val response: Response? =
                 try {
-                    fetchFeed(context, feedSql)
+                    fetchFeed(context, feedSql, forceNetwork = forceNetwork)
                 } catch (t: Throwable) {
                     Log.e("CoroutineSync", "Shit hit the fan: $t")
                     null
@@ -118,10 +121,16 @@ private suspend fun syncFeed(feedSql: FeedSQL, context: Context) {
 }
 
 private suspend fun fetchFeed(context: Context, feedSql: FeedSQL,
-                              timeout: Long = 2L, timeUnit: TimeUnit = TimeUnit.SECONDS): Response? {
+                              timeout: Long = 2L, timeUnit: TimeUnit = TimeUnit.SECONDS,
+                              forceNetwork: Boolean = false): Response? {
     return withTimeoutOrNull(timeout, timeUnit) {
         Log.d("CoroutineSync", "Fetching ${feedSql.displayTitle} on ${Thread.currentThread().name}")
-        context.feedParser.getResponse(feedSql.url)
+        context.feedParser.getResponse(feedSql.url,
+                maxAgeSecs = if (forceNetwork) {
+                    1
+                } else {
+                    MAX_FEED_AGE
+                })
     }
 }
 
