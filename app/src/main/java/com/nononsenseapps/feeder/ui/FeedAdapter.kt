@@ -2,9 +2,9 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.Context
 import android.graphics.Point
-import android.support.v4.util.ArrayMap
-import android.support.v7.util.SortedList
-import android.support.v7.widget.RecyclerView
+import androidx.collection.ArrayMap
+import androidx.recyclerview.widget.SortedList
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -25,7 +25,7 @@ const val PAGE_SIZE = 25
 
 class FeedAdapter(context: Context,
                   internal val feedFragment: FeedFragment) :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
 
     // 64dp at xhdpi is 128 pixels
     private val defImgWidth: Int
@@ -35,7 +35,7 @@ class FeedAdapter(context: Context,
 
     @Suppress("DEPRECATION")
     private val linkColor: Int = context.resources.getColor(R.color.accent)
-    private var itemMap: ArrayMap<Long, FeedItemSQL> = ArrayMap()
+    private var itemMap: androidx.collection.ArrayMap<Long, FeedItemSQL> = androidx.collection.ArrayMap()
 
     var temps: String = ""
 
@@ -124,7 +124,7 @@ class FeedAdapter(context: Context,
 
     fun updateData(map: Map<FeedItemSQL, Int>) {
         val oldItemMap = itemMap
-        itemMap = ArrayMap()
+        itemMap = androidx.collection.ArrayMap()
         items.beginBatchedUpdates()
         for (item in map.keys) {
             if ((map[item] ?: -1) >= 0) {
@@ -161,7 +161,7 @@ class FeedAdapter(context: Context,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): RecyclerView.ViewHolder = when (viewType) {
+                                    viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder = when (viewType) {
         HEADERTYPE -> {
             // Header
             val v = LayoutInflater.from(parent.context)
@@ -178,7 +178,7 @@ class FeedAdapter(context: Context,
         }
     }
 
-    override fun onBindViewHolder(vHolder: RecyclerView.ViewHolder,
+    override fun onBindViewHolder(vHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
                                   position: Int) {
         val newPage = if (position == PAGE_SIZE * (PAGE_COUNT - 1)) {
             currentPage + 1

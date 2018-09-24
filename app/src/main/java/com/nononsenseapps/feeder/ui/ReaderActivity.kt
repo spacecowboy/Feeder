@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.MenuItem
 import android.view.View
 import com.nononsenseapps.feeder.R
@@ -13,7 +12,7 @@ import com.nononsenseapps.feeder.views.DrawShadowFrameLayout
  * Displays feed items suitable for consumption.
  */
 class ReaderActivity : BaseActivity() {
-    private var mFragment: Fragment? = null
+    private var mFragment: androidx.fragment.app.Fragment? = null
     private var mDrawShadowFrameLayout: DrawShadowFrameLayout? = null
 
     /**
@@ -21,7 +20,7 @@ class ReaderActivity : BaseActivity() {
      *
      * @return ReaderFragment
      */
-    private val fragment: Fragment
+    private val fragment: androidx.fragment.app.Fragment
         get() {
             val i = intent
             val fragment = ReaderFragment()
@@ -43,7 +42,7 @@ class ReaderActivity : BaseActivity() {
         if (savedInstanceState == null) {
             mFragment = fragment
             supportFragmentManager.beginTransaction()
-                    .add(R.id.container, mFragment, "single_pane").commit()
+                    .add(R.id.container, mFragment!!, "single_pane").commit()
         } else {
             mFragment = supportFragmentManager.findFragmentByTag("single_pane")
         }

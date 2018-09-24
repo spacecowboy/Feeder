@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.model
 
+import android.annotation.TargetApi
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -13,9 +14,9 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.Browser.EXTRA_CREATE_NEW_TAB
-import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.TaskStackBuilder
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.app.TaskStackBuilder
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.COL_FEED
@@ -93,6 +94,7 @@ fun cancelNotificationInBackground(context: Context, feedItemId: Long) {
 /**
  * This is an update operation if channel already exists so it's safe to call multiple times
  */
+@TargetApi(Build.VERSION_CODES.O)
 @RequiresApi(Build.VERSION_CODES.O)
 fun createNotificationChannel(context: Context) {
     val name = context.getString(R.string.notification_channel_name)

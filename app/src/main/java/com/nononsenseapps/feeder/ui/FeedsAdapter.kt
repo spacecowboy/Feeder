@@ -1,15 +1,15 @@
 package com.nononsenseapps.feeder.ui
 
-import android.support.v4.util.ArraySet
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
+import androidx.collection.ArraySet
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.nononsenseapps.feeder.R
 
-internal class FeedsAdapter(private val activity: BaseActivity) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val expandedTags: MutableSet<String> = ArraySet(setOf(""))
+internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+    private val expandedTags: MutableSet<String> = androidx.collection.ArraySet(setOf(""))
     private var allItems: List<FeedWrapper> = emptyList()
     private var visibleItems: List<FeedWrapper> = emptyList()
 
@@ -110,7 +110,7 @@ internal class FeedsAdapter(private val activity: BaseActivity) : RecyclerView.A
         return expandedTags.contains(item.tag)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         return when (viewType) {
             VIEWTYPE_FEED_CHILD -> FeedHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed_child, parent, false))
             VIEWTYPE_TAG -> TagHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed_tag, parent, false))
@@ -121,7 +121,7 @@ internal class FeedsAdapter(private val activity: BaseActivity) : RecyclerView.A
     }
 
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
         val wrap = visibleItems[position]
         when (getItemViewType(position)) {
             VIEWTYPE_FEED, VIEWTYPE_FEED_CHILD -> {

@@ -2,9 +2,9 @@ package com.nononsenseapps.feeder.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.ListPreference
-import android.preference.Preference
-import android.preference.PreferenceManager
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceManager
 import com.nononsenseapps.feeder.db.DATABASE_VERSION
 
 /**
@@ -102,7 +102,7 @@ object PrefUtils {
     fun shouldSyncOnHotSpots(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_HOTSPOTS, false)
 
     fun maximumItemCountPerFeed(context: Context): Int =
-            sp(context).getString(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt()
+            sp(context).getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt()
 
     /**
      * @return true if automatic syncing is enabled, false otherwise
@@ -113,16 +113,16 @@ object PrefUtils {
      * @return number of minutes between syncs, or zero if none should be performed
      */
     fun synchronizationFrequency(context: Context): Long =
-            sp(context).getString(PREF_SYNC_FREQ, "60").toLong()
+            sp(context).getStringNonNull(PREF_SYNC_FREQ, "60").toLong()
 
     fun setSynchronizationFrequency(context: Context, value: Long) =
             sp(context).edit().putString(PREF_SYNC_FREQ, "$value").apply()
 
     fun shouldOpenItemWith(context: Context): String =
-            sp(context).getString(PREF_DEFAULT_OPEN_ITEM_WITH, PREF_VAL_OPEN_WITH_READER)
+            sp(context).getStringNonNull(PREF_DEFAULT_OPEN_ITEM_WITH, PREF_VAL_OPEN_WITH_READER)
 
     fun shouldOpenLinkWith(context: Context): String =
-            sp(context).getString(PREF_OPEN_LINKS_WITH, PREF_VAL_OPEN_WITH_BROWSER)
+            sp(context).getStringNonNull(PREF_OPEN_LINKS_WITH, PREF_VAL_OPEN_WITH_BROWSER)
 
     /**
      * A shorthand method
@@ -195,3 +195,6 @@ object PrefUtils {
         } else !shouldLoadImagesOnlyOnWIfi(context)
     }
 }
+
+fun SharedPreferences.getStringNonNull(key: String, defaultValue: String): String =
+        getString(key, defaultValue) ?: defaultValue

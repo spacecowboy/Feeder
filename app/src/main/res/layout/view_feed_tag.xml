@@ -17,7 +17,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:id="@+id/feedtagitem"
@@ -64,4 +64,4 @@
     app:layout_constraintEnd_toStartOf="@+id/tag_unreadcount"
     app:layout_constraintStart_toEndOf="@+id/tag_expander"
     app:layout_constraintTop_toTopOf="parent" />
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,13 +1,9 @@
 package com.nononsenseapps.feeder.util
 
 import android.content.ContentResolver
-import android.content.ContentResolver.SYNC_EXTRAS_EXPEDITED
-import android.content.ContentResolver.SYNC_EXTRAS_MANUAL
-import android.content.ContentResolver.requestSync
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import android.os.Bundle
 import android.os.CancellationSignal
 import android.os.Looper
 import android.util.Log
@@ -183,7 +179,7 @@ fun ContentResolver.updateFeedWith(id: Long, values: ContentValues): Int {
 
 fun ContentResolver.insertFeedWith(values: ContentValues): Long {
     panicIfOnUiThread()
-    return insert(URI_FEEDS, values).lastPathSegment.toLong()
+    return insert(URI_FEEDS, values)?.lastPathSegment?.toLong() ?: -1L
 }
 
 /**

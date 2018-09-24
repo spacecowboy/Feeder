@@ -4,8 +4,7 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.os.CancellationSignal
-import android.support.v4.content.AsyncTaskLoader
-import android.support.v4.os.OperationCanceledException
+import androidx.core.os.OperationCanceledException
 
 
 class ConvertedCursorLoader<T>(context: Context,
@@ -14,7 +13,7 @@ class ConvertedCursorLoader<T>(context: Context,
                                val selection: String? = null,
                                val selectionArgs: Array<String>? = null,
                                val sortOrder: String? = null,
-                               val cursorConverter: ((Cursor?) -> T?)) : AsyncTaskLoader<Result<T>>(context) {
+                               val cursorConverter: ((Cursor?) -> T?)) : androidx.loader.content.AsyncTaskLoader<Result<T>>(context) {
     private val observer: ForceLoadContentObserver = ForceLoadContentObserver()
     private var lastResult: Result<T>? = null
     private var cancellationSignal: CancellationSignal? = null
@@ -43,7 +42,7 @@ class ConvertedCursorLoader<T>(context: Context,
             try {
                 return Result(cursor, cursorConverter(cursor))
             } catch (ex: RuntimeException) {
-                cursor.close()
+                cursor?.close()
                 throw ex
             }
         } finally {

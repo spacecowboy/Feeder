@@ -115,7 +115,7 @@
 
     <!-- Note that the name of this provider is hard coded into the app, so remember to change both places -->
     <provider
-        android:name="android.support.v4.content.FileProvider"
+        android:name="androidx.core.content.FileProvider"
         android:authorities="${applicationId}.filepicker_provider"
         android:exported="false"
         android:grantUriPermissions="true">

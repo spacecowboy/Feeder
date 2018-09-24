@@ -103,7 +103,7 @@
     </LinearLayout>
   </ScrollView>
 
-  <android.support.constraint.ConstraintLayout
+  <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/feed_search_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -123,7 +123,7 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/results_listview"
       android:layout_width="match_parent"
       android:layout_height="0dp"
@@ -158,6 +158,6 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/search_view" />
 
-  </android.support.constraint.ConstraintLayout>
+  </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

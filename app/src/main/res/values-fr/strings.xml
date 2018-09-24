@@ -18,7 +18,7 @@
   <string name="empty_feed_open">
     <![CDATA[<font color="#607D8B">Ouvrir</font> un autre flux ?]]></string>
   <string name="empty_feed_add">
-    <![CDATA[<font color="#607D8B">Ajouter</font> d'autres flux ?]]></string>
+    <![CDATA[<font color="#607D8B">Ajouter</font> d\'autres flux ?]]></string>
   <string name="empty_no_feeds_top">Rien à lire pour l\'instant.\nCommencer en</string>
   <string name="empty_no_feeds_add">
     <![CDATA[<font color="#607D8B">Ajoutant</font> des flux]]></string>

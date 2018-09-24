@@ -40,7 +40,7 @@ class ReaderWebViewActivity : BaseActivity() {
         if (savedInstanceState == null) {
             mFragment = fragment
             supportFragmentManager.beginTransaction()
-                    .add(R.id.container, mFragment, "webview").commit()
+                    .add(R.id.container, mFragment!!, "webview").commit()
         } else {
             mFragment = supportFragmentManager.findFragmentByTag("webview") as ReaderWebViewFragment?
         }

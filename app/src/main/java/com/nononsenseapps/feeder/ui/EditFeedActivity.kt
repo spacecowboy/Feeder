@@ -1,16 +1,10 @@
 package com.nononsenseapps.feeder.ui
 
-import android.app.Activity
-import android.app.LoaderManager
 import android.content.Context
-import android.content.CursorLoader
 import android.content.Intent
-import android.content.Loader
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
@@ -29,6 +23,10 @@ import android.widget.FilterQueryProvider
 import android.widget.SimpleCursorAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.CursorLoader
+import androidx.loader.content.Loader
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
@@ -51,8 +49,8 @@ import com.nononsenseapps.feeder.util.updateFeedWith
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import java.net.URL
 
 const val TEMPLATE = "template"
@@ -60,8 +58,7 @@ private const val LOADER_TAG_SUGGESTIONS = 1
 private const val TAGSFILTER = "TAGSFILTER"
 
 
-class EditFeedActivity : Activity() {
-
+class EditFeedActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> {
     private var shouldFinishBack = false
     private var id: Long = -1
     // Views and shit
@@ -70,7 +67,7 @@ class EditFeedActivity : Activity() {
     private lateinit var textTag: AutoCompleteTextView
     private lateinit var textSearch: EditText
     private lateinit var detailsFrame: View
-    private lateinit var listResults: RecyclerView
+    private lateinit var listResults: androidx.recyclerview.widget.RecyclerView
     private lateinit var resultAdapter: ResultsAdapter
     private lateinit var searchFrame: View
     private var feedUrl: String? = null
@@ -79,6 +76,8 @@ class EditFeedActivity : Activity() {
     private lateinit var urlLabel: FloatLabelLayout
     private lateinit var titleLabel: FloatLabelLayout
     private lateinit var tagLabel: FloatLabelLayout
+
+    private lateinit var tagsAdapter: SimpleCursorAdapter
 
     private var feedTitle: String = ""
 
@@ -111,7 +110,7 @@ class EditFeedActivity : Activity() {
         resultAdapter = ResultsAdapter()
         //listResults.emptyView = emptyText
         listResults.setHasFixedSize(true)
-        listResults.layoutManager = LinearLayoutManager(this)
+        listResults.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         listResults.adapter = resultAdapter
 
         textSearch.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, event ->
@@ -182,14 +181,14 @@ class EditFeedActivity : Activity() {
                     }
 
                     launch(UI) {
-                        val feedId: Long = async(BackgroundUI) {
+                        val feedId: Long = withContext(BackgroundUI) {
                             if (id < 1) {
                                 contentResolver.insertFeedWith(values)
                             } else {
                                 contentResolver.updateFeedWith(id, values)
                                 id
                             }
-                        }.await()
+                        }
 
                         launch(BackgroundUI) {
                             contentResolver.notifyAllUris()
@@ -242,13 +241,8 @@ class EditFeedActivity : Activity() {
             }
 
             // Link
-            if (i.dataString != null) {
-                feedUrl = i.dataString.trim()
-                textSearch.setText(feedUrl)
-            } else if (i.hasExtra(Intent.EXTRA_TEXT)) {
-                feedUrl = i.getStringExtra(Intent.EXTRA_TEXT).trim()
-                textSearch.setText(feedUrl)
-            }
+            feedUrl = (i.dataString ?: i.getStringExtra(Intent.EXTRA_TEXT) ?: "").trim()
+            textSearch.setText(feedUrl)
             // URL
             textUrl.setText(feedUrl)
 
@@ -270,37 +264,9 @@ class EditFeedActivity : Activity() {
         }
 
         // Create an adapter
-        val tagsAdapter = SimpleCursorAdapter(this,
+        tagsAdapter = SimpleCursorAdapter(this,
                 android.R.layout.simple_list_item_1, null, Util.ToStringArray(COL_TAG),
                 Util.ToIntArray(android.R.id.text1), 0)
-
-        // Create a loader manager
-        val loaderCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
-            override fun onCreateLoader(id: Int,
-                                        args: Bundle?): Loader<Cursor> {
-                var filter: String? = null
-                if (args != null && args.containsKey(TAGSFILTER)) {
-                    filter = COL_TAG + " LIKE '" + args
-                            .getCharSequence(TAGSFILTER, "") + "%'"
-                }
-                val cl = CursorLoader(this@EditFeedActivity,
-                        URI_TAGSWITHCOUNTS,
-                        Util.ToStringArray(COL_ID,
-                                COL_TAG), filter, null,
-                        Util.SortAlphabeticNoCase(COL_TAG))
-                cl.setUpdateThrottle(200)
-                return cl
-            }
-
-            override fun onLoadFinished(loader: Loader<Cursor>,
-                                        data: Cursor) {
-                tagsAdapter.swapCursor(data)
-            }
-
-            override fun onLoaderReset(loader: Loader<Cursor>) {
-                tagsAdapter.swapCursor(null)
-            }
-        }
 
         // Tell adapter how to return result
         tagsAdapter.cursorToStringConverter = SimpleCursorAdapter.CursorToStringConverter { cursor ->
@@ -316,8 +282,8 @@ class EditFeedActivity : Activity() {
             // Restart loader with filter
             val filter = Bundle()
             filter.putCharSequence(TAGSFILTER, constraint)
-            loaderManager.restartLoader(LOADER_TAG_SUGGESTIONS,
-                    filter, loaderCallbacks)
+            LoaderManager.getInstance(this).restartLoader(LOADER_TAG_SUGGESTIONS,
+                    filter, this)
             // Return null since existing cursor is going to be closed
             null
         }
@@ -328,8 +294,7 @@ class EditFeedActivity : Activity() {
         // Start suggestions loader
         val args = Bundle()
         args.putCharSequence(TAGSFILTER, textTag.text)
-        loaderManager.restartLoader(LOADER_TAG_SUGGESTIONS,
-                args, loaderCallbacks)
+        LoaderManager.getInstance(this).restartLoader(LOADER_TAG_SUGGESTIONS, args, this)
     }
 
     private fun shouldBeFloatingWindow(): Boolean {
@@ -404,7 +369,30 @@ class EditFeedActivity : Activity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private inner class FeedResult(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+        var filter: String? = null
+        if (args != null && args.containsKey(TAGSFILTER)) {
+            filter = "$COL_TAG LIKE '" + args
+                    .getCharSequence(TAGSFILTER, "") + "%'"
+        }
+        val cl = CursorLoader(this@EditFeedActivity,
+                URI_TAGSWITHCOUNTS,
+                Util.ToStringArray(COL_ID,
+                        COL_TAG), filter, null,
+                Util.SortAlphabeticNoCase(COL_TAG))
+        cl.setUpdateThrottle(200)
+        return cl
+    }
+
+    override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
+        tagsAdapter.swapCursor(data)
+    }
+
+    override fun onLoaderReset(loader: Loader<Cursor>) {
+        tagsAdapter.swapCursor(null)
+    }
+
+    private inner class FeedResult(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view), View.OnClickListener {
 
         var textTitle: TextView = view.findViewById(R.id.feed_title)
         var textUrl: TextView = view.findViewById(R.id.feed_url)
@@ -422,7 +410,7 @@ class EditFeedActivity : Activity() {
         }
     }
 
-    private inner class ResultsAdapter : RecyclerView.Adapter<FeedResult>() {
+    private inner class ResultsAdapter : androidx.recyclerview.widget.RecyclerView.Adapter<FeedResult>() {
 
         private var items: List<Feed> = emptyList()
         var data: List<Feed>

@@ -9,19 +9,15 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.v4.app.LoaderManager
-import android.support.v4.content.Loader
-import android.support.v4.util.ArrayMap
-import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
+import androidx.loader.app.LoaderManager
+import androidx.loader.app.LoaderManager.LoaderCallbacks
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.FIELDS_VIEWCOUNT
 import com.nononsenseapps.feeder.db.URI_FEEDSWITHCOUNTS
@@ -45,7 +41,7 @@ typealias SortedFields = Result<List<FeedWrapper>>
  * between activities.
  */
 @SuppressLint("Registered")
-open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<SortedFields> {
+open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
     protected var mActionBarShown = true
     // If pressing home should finish or start new activity
     protected var mShouldFinishBack = false
@@ -64,7 +60,7 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Sor
     private var mActionBarAutoHideSignal = 0
     private var mThemedStatusBarColor: Int = 0
     private lateinit var mLPreviewUtils: LPreviewUtilsBase
-    var drawerLayout: DrawerLayout? = null
+    var drawerLayout: androidx.drawerlayout.widget.DrawerLayout? = null
         private set
     private var mDrawerToggle: LPreviewUtilsBase.ActionBarDrawerToggleWrapper? = null
     // A Runnable that we should execute when the navigation drawer finishes its closing animation
@@ -179,7 +175,7 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Sor
         }
 
         mDrawerToggle = mLPreviewUtils.setupDrawerToggle(drawerLayout,
-                object : DrawerLayout.DrawerListener {
+                object : androidx.drawerlayout.widget.DrawerLayout.DrawerListener {
                     override fun onDrawerClosed(drawerView: View) {
                         // run deferred action, if we have one
                         if (mDeferredOnDrawerClosedRunnable != null) {
@@ -213,9 +209,9 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Sor
         mDrawerToggle!!.syncState()
 
         // Recycler view stuff
-        val mRecyclerView = drawerLayout!!.findViewById<RecyclerView>(R.id.navdrawer_list)
+        val mRecyclerView = drawerLayout!!.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.navdrawer_list)
         mRecyclerView.setHasFixedSize(true)
-        mRecyclerView.layoutManager = LinearLayoutManager(this)
+        mRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
 
         navAdapter = FeedsAdapter(this)
         mRecyclerView.adapter = navAdapter
@@ -269,7 +265,7 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Sor
     }
 
     private fun populateNavDrawer() {
-        supportLoaderManager.restartLoader(NAV_TAGS_LOADER, Bundle(), this)
+        LoaderManager.getInstance(this).restartLoader(NAV_TAGS_LOADER, Bundle(), this)
     }
 
     fun showActionBar() {
@@ -316,24 +312,24 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Sor
         }
     }
 
-    fun enableActionBarAutoHide(listView: RecyclerView) {
+    fun enableActionBarAutoHide(listView: androidx.recyclerview.widget.RecyclerView) {
         initActionBarAutoHide()
-        val layoutManager = listView.layoutManager as LinearLayoutManager
+        val layoutManager = listView.layoutManager as androidx.recyclerview.widget.LinearLayoutManager
         mActionBarAutoHideSignal = 0
-        listView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        listView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             internal val ITEMS_THRESHOLD = 0
             internal var lastFvi = 0
 
-            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
             }
 
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 var force = false
                 val firstVisibleItem = layoutManager.findFirstVisibleItemPosition()
-                if (recyclerView!!.adapter != null) {
-                    val lastPos = recyclerView.adapter.itemCount - 1
+                if (recyclerView.adapter != null) {
+                    val lastPos = recyclerView.adapter!!.itemCount - 1
                     if (layoutManager.findLastVisibleItemPosition() == lastPos) {
                         // Show when last item is visible
                         force = true
@@ -427,14 +423,14 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Sor
         }
     }
 
-    override fun onCreateLoader(id: Int, bundle: Bundle?): Loader<SortedFields> {
+    override fun onCreateLoader(id: Int, bundle: Bundle?): androidx.loader.content.Loader<SortedFields> {
         val loader = ConvertedCursorLoader<List<FeedWrapper>>(
                 context = this,
                 uri = URI_FEEDSWITHCOUNTS,
                 projection = FIELDS_VIEWCOUNT
         ) { cursor ->
             val topTag = FeedWrapper(tag = "", isTop = true)
-            val tags: MutableMap<String, FeedWrapper> = ArrayMap()
+            val tags: MutableMap<String, FeedWrapper> = androidx.collection.ArrayMap()
             tags[""] = topTag
             val data: MutableList<FeedWrapper> = mutableListOf(topTag)
 
@@ -463,12 +459,12 @@ open class BaseActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Sor
         return loader
     }
 
-    override fun onLoadFinished(Loader: Loader<SortedFields>,
+    override fun onLoadFinished(Loader: androidx.loader.content.Loader<SortedFields>,
                                 result: SortedFields?) {
         navAdapter?.updateData(result?.data ?: emptyList())
     }
 
-    override fun onLoaderReset(loader: Loader<SortedFields>) {
+    override fun onLoaderReset(loader: androidx.loader.content.Loader<SortedFields>) {
         // ..
     }
 

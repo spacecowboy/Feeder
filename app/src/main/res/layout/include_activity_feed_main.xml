@@ -15,7 +15,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
@@ -37,7 +37,7 @@
     <include layout="@layout/empty_feeds_at_all" />
   </FrameLayout>
 
-  <android.support.design.widget.AppBarLayout
+  <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/headerbar"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
@@ -48,14 +48,14 @@
     tools:layout_constraintLeft_creator="1"
     tools:layout_constraintRight_creator="1">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
       android:id="@+id/toolbar_actionbar"
       android:layout_width="match_parent"
       android:layout_height="@dimen/toolbar_height"
       app:layout_scrollFlags="scroll|enterAlways"
       app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="@dimen/subtoolbar_height"
       android:orientation="horizontal"
@@ -107,7 +107,7 @@
         app:layout_constraintLeft_toRightOf="@+id/nightcheck"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    </android.support.constraint.ConstraintLayout>
-  </android.support.design.widget.AppBarLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </com.google.android.material.appbar.AppBarLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

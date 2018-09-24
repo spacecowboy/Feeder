@@ -2,7 +2,7 @@ package com.nononsenseapps.feeder.ui.text
 
 import android.content.Context
 import android.graphics.Point
-import android.support.v4.content.AsyncTaskLoader
+import androidx.loader.content.AsyncTaskLoader
 import android.text.Spanned
 import android.util.Log
 import java.net.URL
@@ -11,7 +11,7 @@ class ImageTextLoader(context: Context,
                       private val text: String,
                       private val siteUrl: URL,
                       private val maxSize: Point,
-                      private val allowDownload: Boolean) : AsyncTaskLoader<Spanned>(context) {
+                      private val allowDownload: Boolean) : androidx.loader.content.AsyncTaskLoader<Spanned>(context) {
 
     override fun loadInBackground(): Spanned? =
             try {

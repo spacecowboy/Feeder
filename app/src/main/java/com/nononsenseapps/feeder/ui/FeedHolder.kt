@@ -1,13 +1,13 @@
 package com.nononsenseapps.feeder.ui
 
-import android.support.v4.view.GravityCompat
-import android.support.v7.widget.RecyclerView
+import androidx.core.view.GravityCompat
+import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.FeedSQL
 
-class FeedHolder(private val activity: BaseActivity, v: View) : RecyclerView.ViewHolder(v), View.OnClickListener {
+class FeedHolder(private val activity: BaseActivity, v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v), View.OnClickListener {
     val unreadCount: TextView = v.findViewById(R.id.feed_unreadcount)
     val title: TextView = v.findViewById(R.id.feed_name)
     var item: FeedSQL? = null

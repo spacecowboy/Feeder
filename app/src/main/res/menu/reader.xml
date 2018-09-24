@@ -39,7 +39,7 @@
   <item
     android:id="@+id/action_share"
     android:title="@string/share"
-    app:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+    app:actionProviderClass="androidx.appcompat.widget.ShareActionProvider"
     app:showAsAction="ifRoom" />
   <item
     android:id="@+id/action_mark_as_unread"
