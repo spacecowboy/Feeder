@@ -10,6 +10,9 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.paging.DataSource
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemDao
@@ -18,32 +21,39 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.withContext
 
+private val PAGE_SIZE = 50
+
 class FeedItemsViewModel(application: Application, val feedId: Long, val tag: String, onlyUnread: Boolean = true) : AndroidViewModel(application) {
 
     private val dao: FeedItemDao = AppDatabase.getInstance(application).feedItemDao()
     private val liveOnlyUnread = MutableLiveData<Boolean>()
-    private val liveDbPreviews: LiveData<List<PreviewItem>> = Transformations.switchMap(liveOnlyUnread) { onlyUnread ->
-        when {
-            feedId > ID_UNSET -> if (onlyUnread) dao.loadLiveUnreadPreviews(feedId = feedId) else dao.loadLivePreviews(feedId = feedId)
-            feedId == ID_ALL_FEEDS -> if (onlyUnread) dao.loadLiveUnreadPreviews() else dao.loadLivePreviews()
-            tag.isNotEmpty() -> if (onlyUnread) dao.loadLiveUnreadPreviews(tag = tag) else dao.loadLivePreviews(tag = tag)
-            else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
+
+    private val livePagedAll = LivePagedListBuilder(
+            when {
+                feedId > ID_UNSET -> dao.loadLivePreviews(feedId = feedId)
+                feedId == ID_ALL_FEEDS -> dao.loadLivePreviews()
+                tag.isNotEmpty() -> dao.loadLivePreviews(tag = tag)
+                else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
+            }, PAGE_SIZE).build()
+
+    private val livePagedUnread = LivePagedListBuilder(
+            when {
+                feedId > ID_UNSET -> dao.loadLiveUnreadPreviews(feedId = feedId)
+                feedId == ID_ALL_FEEDS -> dao.loadLiveUnreadPreviews()
+                tag.isNotEmpty() -> dao.loadLiveUnreadPreviews(tag = tag)
+                else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
+            }, PAGE_SIZE).build()
+
+    val liveDbPreviews: LiveData<PagedList<PreviewItem>> = Transformations.switchMap(liveOnlyUnread) { onlyUnread ->
+        if (onlyUnread) {
+            livePagedUnread
+        } else {
+            livePagedAll
         }
     }
 
-    // Used to update view directly
-    private val tempItems = MutableLiveData<List<PreviewItem>>()
-
-    val livePreviews: MediatorLiveData<List<PreviewItem>> = MediatorLiveData()
-
     init {
         liveOnlyUnread.value = onlyUnread
-        livePreviews.addSource(liveDbPreviews) {
-            livePreviews.value = it
-        }
-        livePreviews.addSource(tempItems) {
-            livePreviews.value = it
-        }
     }
 
     fun setOnlyUnread(onlyUnread: Boolean) {
@@ -52,42 +62,18 @@ class FeedItemsViewModel(application: Application, val feedId: Long, val tag: St
 
     fun markAllAsRead() {
         launch(BackgroundUI) {
-            if (liveOnlyUnread.value == true) {
-                tempItems.postValue(emptyList())
-            } else {
-                tempItems.postValue(livePreviews.value?.map {
-                    if (it.unread) {
-                        it.copy(unread = false)
-                    } else {
-                        it
-                    }
-                })
-            }
-
             when {
                 feedId > ID_UNSET -> dao.markAllAsRead(feedId)
                 feedId == ID_ALL_FEEDS -> dao.markAllAsRead()
                 tag.isNotEmpty() -> dao.markAllAsRead(tag)
             }
+
         }
     }
 
     fun toggleReadState(feedItem: PreviewItem) {
         launch(BackgroundUI) {
-            val toggledItem = feedItem.copy(unread = !feedItem.unread)
-            if (liveOnlyUnread.value == true) {
-                tempItems.postValue(livePreviews.value?.filter { it.id != feedItem.id })
-            } else {
-                tempItems.postValue(livePreviews.value?.map {
-                    if (it.id == feedItem.id) {
-                        toggledItem
-                    } else {
-                        it
-                    }
-                })
-            }
-
-            dao.markAsRead(toggledItem.id, unread = toggledItem.unread)
+            dao.markAsRead(feedItem.id, unread = !feedItem.unread)
             cancelNotificationInBackground(getApplication(), feedItem.id)
         }
     }

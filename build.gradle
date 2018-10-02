@@ -17,6 +17,7 @@ buildscript {
     test_runner_version = "1.1.0-alpha4"
     test_rules_version = "1.1.0-alpha4"
     room_version = '2.0.0-beta01'
+    paging_version = '2.0.0-beta01'
     lifecycle_version = "2.0.0"
 
     rome_version = "1.7.1"

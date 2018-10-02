@@ -91,6 +91,7 @@ dependencies {
 
   // ViewModel and LiveData
   implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+  implementation "androidx.paging:paging-runtime:$paging_version"
 
   // To support SDK18
   implementation "com.nononsenseapps:filepicker:4.1.0"

@@ -52,7 +52,7 @@ const val ARG_FEED_TAG = "feed_tag"
 
 class FeedFragment : Fragment() {
 
-    private var adapter: FeedItemListAdapter? = null
+    private var adapter: FeedItemPagedListAdapter? = null
     private var recyclerView: RecyclerView? = null
     internal var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var emptyView: View? = null
@@ -112,7 +112,7 @@ class FeedFragment : Fragment() {
         feedItemsViewModel = getFeedItemsViewModel(feedId = id, tag = feedTag
                 ?: "", onlyUnread = onlyUnread)
 
-        feedItemsViewModel?.livePreviews?.observe(this, Observer {
+        feedItemsViewModel?.liveDbPreviews?.observe(this, Observer {
             adapter?.submitList(it)
             emptyView?.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
         })
@@ -233,7 +233,7 @@ class FeedFragment : Fragment() {
         emptyOpenFeeds!!.setOnClickListener { (activity as BaseActivity).openNavDrawer() }
 
         // specify an adapter
-        adapter = FeedItemListAdapter(activity!!, object : DismissedListener {
+        adapter = FeedItemPagedListAdapter(activity!!, object : DismissedListener {
             override fun onDismiss(item: PreviewItem?) {
                 item?.let {
                     feedItemsViewModel?.toggleReadState(it)
@@ -352,7 +352,7 @@ class FeedFragment : Fragment() {
     private fun markAsRead() {
         // Cancel any notifications
         context?.applicationContext?.let { appContext ->
-            feedItemsViewModel?.livePreviews?.value?.forEach {
+            feedItemsViewModel?.liveDbPreviews?.value?.forEach{
                 launch(Background) {
                     cancelNotification(appContext, it.id)
                 }

@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.db.room
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -56,7 +57,7 @@ interface FeedItemDao {
         WHERE feed_id IS :feedId
         ORDER BY pub_date DESC
         """)
-    fun loadLivePreviews(feedId: Long): LiveData<List<PreviewItem>>
+    fun loadLivePreviews(feedId: Long): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $previewColumns
@@ -65,7 +66,7 @@ interface FeedItemDao {
         WHERE tag IS :tag
         ORDER BY pub_date DESC
         """)
-    fun loadLivePreviews(tag: String): LiveData<List<PreviewItem>>
+    fun loadLivePreviews(tag: String): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $previewColumns
@@ -73,7 +74,7 @@ interface FeedItemDao {
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         ORDER BY pub_date DESC
         """)
-    fun loadLivePreviews(): LiveData<List<PreviewItem>>
+    fun loadLivePreviews(): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $previewColumns
@@ -82,7 +83,7 @@ interface FeedItemDao {
         WHERE feed_id IS :feedId AND unread IS :unread
         ORDER BY pub_date DESC
         """)
-    fun loadLiveUnreadPreviews(feedId: Long?, unread: Boolean = true): LiveData<List<PreviewItem>>
+    fun loadLiveUnreadPreviews(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $previewColumns
@@ -91,7 +92,7 @@ interface FeedItemDao {
         WHERE tag IS :tag AND unread IS :unread
         ORDER BY pub_date DESC
         """)
-    fun loadLiveUnreadPreviews(tag: String, unread: Boolean = true): LiveData<List<PreviewItem>>
+    fun loadLiveUnreadPreviews(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $previewColumns
@@ -100,7 +101,7 @@ interface FeedItemDao {
         WHERE unread IS :unread
         ORDER BY pub_date DESC
         """)
-    fun loadLiveUnreadPreviews(unread: Boolean = true): LiveData<List<PreviewItem>>
+    fun loadLiveUnreadPreviews(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $feedItemColumnsWithFeed
