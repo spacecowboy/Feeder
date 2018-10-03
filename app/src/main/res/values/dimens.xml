@@ -33,6 +33,8 @@
 
   <dimen name="elevation1">2dp</dimen>
 
+  <dimen name="bottom_space_size">64dp</dimen>
+
 
   <!-- Edit Feed window size -->
   <dimen name="session_details_floating_width">300dp</dimen>

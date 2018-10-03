@@ -77,6 +77,7 @@ import com.nononsenseapps.feeder.util.setString
 import kotlinx.coroutines.experimental.launch
 import org.joda.time.format.DateTimeFormat
 import java.util.*
+import kotlin.math.roundToInt
 
 const val FEEDITEMS_LOADER = 1
 const val FEED_LOADER = 2
@@ -215,16 +216,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
             // use a grid layout
             layoutManager = androidx.recyclerview.widget.GridLayoutManager(activity,
                     cols)
-            // I want the padding header to span the entire width
-            (layoutManager as androidx.recyclerview.widget.GridLayoutManager).spanSizeLookup = object : androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int {
-                    return if (HEADERTYPE == adapter!!.getItemViewType(position)) {
-                        cols
-                    } else {
-                        1
-                    }
-                }
-            }
+
             // TODO, use better dividers such as simple padding
             // I want some dividers
             recyclerView!!.addItemDecoration(DividerColor(activity, DividerColor.VERTICAL_LIST, 0, cols))
@@ -233,9 +225,9 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         } else {
             // use a linear layout manager
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
-            // I want some dividers
-            //            recyclerView.addItemDecoration(new DividerColor
-            //                    (getActivity(), DividerColor.VERTICAL_LIST, 0, 1));
+
+            // add bottom space to list so FAB doesn't cover last item
+            recyclerView?.addItemDecoration(BottomListSpace(resources.getDimension(R.dimen.bottom_space_size).roundToInt()))
         }
         recyclerView!!.layoutManager = layoutManager
 
@@ -523,7 +515,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
             FEEDITEMS_LOADER == cursorLoader.id -> {
                 val map = result as Map<FeedItemSQL, Int>
                 adapter?.updateData(map)
-                val empty = adapter!!.itemCount <= HEADER_COUNT
+                val empty = adapter!!.itemCount == 0
                 emptyView?.visibility = if (empty) View.VISIBLE else View.GONE
             }
             FEED_LOADER == cursorLoader.id -> {
