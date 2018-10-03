@@ -2,23 +2,17 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.Context
 import android.graphics.Point
-import androidx.collection.ArrayMap
-import androidx.recyclerview.widget.SortedList
-import androidx.recyclerview.widget.RecyclerView
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.SortedList
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.FeedItemSQL
 import com.nononsenseapps.feeder.util.TabletUtils
 import org.joda.time.DateTimeZone
-
-const val HEADER_COUNT = 1
-const val HEADERTYPE = 0
-const val ITEMTYPE = 1
 
 const val PAGE_COUNT = 4
 const val PAGE_SIZE = 25
@@ -149,34 +143,14 @@ class FeedAdapter(context: Context,
         items.endBatchedUpdates()
     }
 
-    override fun getItemCount(): Int = when {
-        items.size() > 0 -> HEADER_COUNT + items.size()
-        else -> 0
-    }
-
-
-    override fun getItemViewType(position: Int): Int = when {
-        position >= items.size() -> HEADERTYPE
-        else -> ITEMTYPE
-    }
+    override fun getItemCount(): Int = items.size()
 
     override fun onCreateViewHolder(parent: ViewGroup,
-                                    viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder = when (viewType) {
-        HEADERTYPE -> {
-            // Header
-            val v = LayoutInflater.from(parent.context)
-                    .inflate(
-                            R.layout.padding_header_item, parent, false)
-            feedFragment.HeaderHolder(v)
-        }
-        else -> {
-            // normal item
+                                    viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder =
             FeedItemHolder(
                     LayoutInflater.from(parent.context).inflate(
                             R.layout.list_story_item, parent, false),
                     this@FeedAdapter)
-        }
-    }
 
     override fun onBindViewHolder(vHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
                                   position: Int) {
@@ -189,11 +163,6 @@ class FeedAdapter(context: Context,
         if (newPage != currentPage) {
             currentPage = newPage
             feedFragment.updateFirstVisiblePage()
-        }
-
-        if (getItemViewType(position) == HEADERTYPE) {
-            // Nothing to bind for padding
-            return
         }
 
         val holder = vHolder as FeedItemHolder
