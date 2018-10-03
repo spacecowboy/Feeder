@@ -150,6 +150,28 @@ class FeedParserTest {
         assertEquals(true, feed.items?.get(0)?.content_text?.contains("größte"))
     }
 
+    // Bug in Rome which I am working around, this will crash if not worked around
+    @Test
+    @Throws(Exception::class)
+    fun emptySlashCommentsDontCrashParsingAndEncodingIsStillRespected() {
+        val responseBody: ResponseBody = ResponseBody.create(MediaType.parse("application/xml"), emptySlashComment)
+
+        val response: Response = Response.Builder()
+                .body(responseBody)
+                .protocol(Protocol.HTTP_2)
+                .code(200)
+                .message("Test")
+                .request(Request.Builder()
+                        .url("https://rss.golem.de/rss.php?feed=RSS2.0")
+                        .build())
+                .build()
+
+        val feed = FeedParser.parseFeedResponse(response)
+
+        assertEquals(1, feed.items?.size)
+        assertEquals(true, feed.items?.get(0)?.content_text?.contains("größte"))
+    }
+
     @Test
     @Throws(Exception::class)
     fun correctAlternateLinkInAtomIsUsedForUrl() {
@@ -415,6 +437,9 @@ class FeedParserTest {
                     .use {
                         it.readText()
                     }
+
+    private val emptySlashComment: ByteArray
+        get() = javaClass.getResourceAsStream("empty_slash_comment.xml")!!.readBytes()
 
     private val golemDe: ByteArray
         get() = javaClass.getResourceAsStream("golem-de.xml")!!.readBytes()
