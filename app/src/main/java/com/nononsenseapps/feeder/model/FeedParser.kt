@@ -21,8 +21,10 @@ import org.jsoup.nodes.Document
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.lang.NumberFormatException
 import java.net.MalformedURLException
 import java.net.URL
+import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
 
 // 1 hours
@@ -276,16 +278,37 @@ object FeedParser {
 
     @Throws(FeedParser.FeedParsingError::class)
     internal fun parseRssAtomBytes(baseUrl: URL, feedXml: ByteArray): Feed {
+        try {
         feedXml.inputStream().use { return parseFeedInputStream(baseUrl, it) }
+        } catch (e: NumberFormatException) {
+            try {
+                // Try to work around bug in Rome
+                var encoding: String? = null
+                val xml: String = feedXml.inputStream().use {
+                    XmlReader(it).use {
+                        encoding = it.encoding
+                        it.readText()
+                    }
+                }.replace("<slash:comments/>", "")
+                xml.byteInputStream(Charset.forName(encoding ?: "UTF-8")).use {
+                    return parseFeedInputStream(baseUrl, it)
+                }
+            } catch (e: Throwable) {
+                throw FeedParsingError(e)
+            }
+        }
     }
 
     @Throws(FeedParser.FeedParsingError::class)
     fun parseFeedInputStream(baseUrl: URL, `is`: InputStream): Feed {
         `is`.use {
             try {
-                val feed = SyndFeedInput().build(XmlReader(`is`))
+                val feed = XmlReader(`is`).use { SyndFeedInput().build(it) }
                 return feed.asFeed(baseUrl = baseUrl)
-            } catch (e: Throwable) {
+            } catch (e: NumberFormatException) {
+                throw e
+            }
+            catch (e: Throwable) {
                 throw FeedParsingError(e)
             }
         }
