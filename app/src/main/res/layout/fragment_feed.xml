@@ -34,11 +34,11 @@
     android:clickable="true"
     android:focusable="true"
     android:scaleType="center"
-    android:src="@drawable/ic_action_done_all"
     app:borderWidth="0dp"
     app:elevation="5dp"
     app:fabSize="normal"
-    app:pressedTranslationZ="7dp" />
+    app:pressedTranslationZ="7dp"
+    app:srcCompat="@drawable/ic_done_all_white_24dp" />
 
   <include
     layout="@layout/empty_feed"
