@@ -24,6 +24,8 @@ android {
     minSdkVersion 18
     targetSdkVersion 28
 
+    vectorDrawables.useSupportLibrary = true
+
     // For espresso tests
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
