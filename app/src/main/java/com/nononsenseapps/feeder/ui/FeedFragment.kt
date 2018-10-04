@@ -331,8 +331,8 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
 
         menuItem.setIcon(
                 when (onlyUnread) {
-                    true -> R.drawable.ic_action_visibility_off
-                    false -> R.drawable.ic_action_visibility
+                    true -> R.drawable.ic_visibility_off_white_24dp
+                    false -> R.drawable.ic_visibility_white_24dp
                 }
         )
 
@@ -446,9 +446,9 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 PrefUtils.setPrefShowOnlyUnread(activity!!, onlyUnread)
                 menuItem.isChecked = onlyUnread
                 if (onlyUnread) {
-                    menuItem.setIcon(R.drawable.ic_action_visibility_off)
+                    menuItem.setIcon(R.drawable.ic_visibility_off_white_24dp)
                 } else {
-                    menuItem.setIcon(R.drawable.ic_action_visibility)
+                    menuItem.setIcon(R.drawable.ic_visibility_white_24dp)
                 }
 
                 menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)

@@ -118,7 +118,6 @@ private fun singleNotification(context: Context, item: FeedItemSQL): Notificatio
 
     val contentIntent = when (item.description.isBlank()) {
         true -> {
-            // TODO make use of ArticleTextExtractor here when available
             val i = Intent(context, FeedActivity::class.java)
             i.data = Uri.withAppendedPath(URI_FEEDS, "${item.feedid}")
             i.flags = FLAG_ACTIVITY_CLEAR_TASK or FLAG_ACTIVITY_NEW_TASK
@@ -152,17 +151,19 @@ private fun singleNotification(context: Context, item: FeedItemSQL): Notificatio
             .setDeleteIntent(getDeleteIntent(context, item))
             .setNumber(1)
 
+    // Note that notifications must use PNG resources, because there is no compatibility for vector drawables here
+
     if (item.enclosurelink != null) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.enclosurelink))
         intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
-        builder.addAction(R.drawable.ic_action_av_play_circle_outline,
+        builder.addAction(R.drawable.notification_play_circle_outline,
                 context.getString(R.string.open_enclosed_media), PendingIntent.getActivity(context, item.id.toInt(), intent,
                 PendingIntent.FLAG_UPDATE_CURRENT))
     }
 
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.link))
     intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
-    builder.addAction(R.drawable.ic_action_location_web_site,
+    builder.addAction(R.drawable.notification_open_in_browser,
             context.getString(R.string.open_link_in_browser),
             PendingIntent.getActivity(context, item.id.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT))
 
@@ -184,7 +185,7 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemSQL>): N
     }
 
     val intent = Intent(context, FeedActivity::class.java)
-    intent.putExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED, LongArray(feedItems.size, { i -> feedItems[i].id }))
+    intent.putExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED, LongArray(feedItems.size) { i -> feedItems[i].id })
 
     // We can be a little bit smart - if all items are from the same feed then go to that feed
     // Otherwise we should go to All feeds
@@ -212,7 +213,7 @@ private fun getDeleteIntent(context: Context, feedItems: List<FeedItemSQL>): Pen
     val intent = Intent(context, RssNotificationBroadcastReceiver::class.java)
     intent.action = ACTION_MARK_AS_NOTIFIED
 
-    val ids = LongArray(feedItems.size, { i -> feedItems[i].id })
+    val ids = LongArray(feedItems.size) { i -> feedItems[i].id }
     intent.putExtra(EXTRA_FEEDITEM_ID_ARRAY, ids)
 
     return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)

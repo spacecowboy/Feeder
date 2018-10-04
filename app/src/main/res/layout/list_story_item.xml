@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="?android:listPreferredItemHeight">
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:minHeight="?android:listPreferredItemHeight">
 <FrameLayout
     android:id="@+id/check_bg"
     android:layout_width="match_parent"
@@ -17,7 +18,7 @@
         android:layout_gravity="start|center_vertical"
         android:layout_marginStart="8dp"
         android:visibility="invisible"
-        android:src="@drawable/ic_action_visibility"
+        app:srcCompat="@drawable/ic_visibility_white_24dp"
         android:contentDescription="@string/indicator_for_mark_as_read" />
 
     <ImageView
@@ -27,7 +28,7 @@
         android:layout_gravity="end|center_vertical"
         android:layout_marginEnd="8dp"
         android:visibility="invisible"
-        android:src="@drawable/ic_action_visibility"
+        app:srcCompat="@drawable/ic_visibility_white_24dp"
         android:contentDescription="@string/indicator_for_mark_as_read" />
 
 </FrameLayout>

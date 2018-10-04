@@ -13,6 +13,7 @@ import android.text.Spannable
 import android.text.style.ImageSpan
 import android.text.style.StyleSpan
 import android.util.Log
+import androidx.appcompat.content.res.AppCompatResources
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.util.GlideUtils
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
@@ -262,7 +263,7 @@ class GlideConverter(context: Context,
 
         // Add layer with play icon
         @Suppress("DEPRECATION")
-        val playicon = context.resources.getDrawable(R.drawable.youtube_icon)
+        val playicon = AppCompatResources.getDrawable(context, R.drawable.youtube_icon)!!
         // 20% size, in middle
         var w2 = playicon.intrinsicWidth
         var h2 = playicon.intrinsicHeight
