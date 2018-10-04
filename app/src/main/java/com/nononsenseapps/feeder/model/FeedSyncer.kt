@@ -11,6 +11,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
@@ -28,7 +29,7 @@ const val FEED_ADDED_BROADCAST = "feeder.nononsenseapps.RSS_FEED_ADDED_BROADCAST
 const val SYNC_BROADCAST = "feeder.nononsenseapps.RSS_SYNC_BROADCAST"
 const val SYNC_BROADCAST_IS_ACTIVE = "IS_ACTIVE"
 
-class FeedSyncer : Worker() {
+class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
     override fun doWork(): Result {
 
         val wifiStatusOK = when {
@@ -43,7 +44,7 @@ class FeedSyncer : Worker() {
         var success = false
 
         if (wifiStatusOK) {
-            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast)
+            LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast)
 
             val feedId = inputData.getLong(ARG_FEED_ID, -1)
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
@@ -54,7 +55,8 @@ class FeedSyncer : Worker() {
             Log.d(LOG_TAG, "Skipping sync work because wifistatus not OK")
         }
 
-        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false))
+        LocalBroadcastManager.getInstance(applicationContext)
+                .sendBroadcast(bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false))
 
         return if (success) {
             Result.SUCCESS
