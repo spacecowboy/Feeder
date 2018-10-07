@@ -22,6 +22,7 @@ import android.text.style.SuperscriptSpan
 import android.text.style.TextAppearanceSpan
 import android.text.style.TypefaceSpan
 import android.text.style.UnderlineSpan
+import androidx.appcompat.content.res.AppCompatResources
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.ARG_URL
 import com.nononsenseapps.feeder.ui.ReaderWebViewActivity
@@ -258,10 +259,10 @@ open class HtmlToSpannedConverter(private var mSource: String,
         }
 
         var src: String? = attributes.getValue("", "src")
-        @Suppress("DEPRECATION")
-        val d = mContext.resources.getDrawable(R.drawable.placeholder_image_article)
-        d.setBounds(0, 0, d.intrinsicWidth, d.intrinsicHeight)
-
+        val d = AppCompatResources.getDrawable(mContext, R.drawable.placeholder_image_article)
+        d?.let { d ->
+            d.setBounds(0, 0, d.intrinsicWidth, d.intrinsicHeight)
+        }
 
         val len = text.length
         text.append("\uFFFC")

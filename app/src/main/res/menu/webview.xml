@@ -24,12 +24,12 @@
     <item
         android:id="@+id/action_open_enclosure"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_av_play_circle_outline"
+        android:icon="@drawable/ic_play_circle_outline_white_24dp"
         android:title="@string/open_enclosed_media" />
     <item
         android:id="@+id/action_open_in_browser"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_location_web_site"
+        android:icon="@drawable/ic_open_in_browser_white_24dp"
         android:title="@string/open_link_in_browser" />
     <item
         android:id="@+id/action_share"

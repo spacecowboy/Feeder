@@ -4,13 +4,13 @@
       tools:context=".ui.FeedActivity">
   <item
       android:id="@+id/action_add"
-      android:icon="@drawable/ic_action_add"
+      android:icon="@drawable/ic_add_white_24dp"
       android:orderInCategory="100"
       android:title="@string/add_feed"
       app:showAsAction="ifRoom"/>
   <item
       android:id="@+id/action_sync"
-      android:icon="@drawable/ic_action_sync"
+      android:icon="@drawable/ic_sync_white_24dp"
       android:orderInCategory="900"
       android:title="@string/sync"
       app:showAsAction="ifRoom"/>
@@ -28,6 +28,6 @@
       android:id="@+id/action_settings"
       android:orderInCategory="990"
       android:title="@string/action_settings"
-      android:icon="@drawable/ic_action_settings"
+      android:icon="@drawable/ic_settings_white_24dp"
       app:showAsAction="ifRoom"/>
 </menu>
