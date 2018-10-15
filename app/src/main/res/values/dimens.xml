@@ -18,6 +18,9 @@
   <dimen name="floating_add_button_height_no_padding">56dp</dimen>
   <dimen name="fab_elevation">4dp</dimen>
   <dimen name="fab_press_translation_z">2dp</dimen>
+  <!-- Scrollable content should leave this amount of space so
+       FAB doesn't cover content: 16dp - FAB(56dp) - 16dp -->
+  <dimen name="fab_list_bottom_padding">88dp</dimen>
 
   <!-- Action Bar auto-hide-on-scroll behavior parameters -->
   <dimen name="action_bar_auto_hide_min_y">56dp</dimen>
@@ -32,9 +35,6 @@
   <dimen name="grid_item_size">200dp</dimen>
 
   <dimen name="elevation1">2dp</dimen>
-
-  <dimen name="bottom_space_size">64dp</dimen>
-
 
   <!-- Edit Feed window size -->
   <dimen name="session_details_floating_width">300dp</dimen>

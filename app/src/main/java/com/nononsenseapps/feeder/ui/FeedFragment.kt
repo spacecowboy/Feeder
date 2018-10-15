@@ -77,7 +77,6 @@ import com.nononsenseapps.feeder.util.setString
 import kotlinx.coroutines.experimental.launch
 import org.joda.time.format.DateTimeFormat
 import java.util.*
-import kotlin.math.roundToInt
 
 const val FEEDITEMS_LOADER = 1
 const val FEED_LOADER = 2
@@ -225,9 +224,6 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         } else {
             // use a linear layout manager
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
-
-            // add bottom space to list so FAB doesn't cover last item
-            recyclerView?.addItemDecoration(BottomListSpace(resources.getDimension(R.dimen.bottom_space_size).roundToInt()))
         }
         recyclerView!!.layoutManager = layoutManager
 
