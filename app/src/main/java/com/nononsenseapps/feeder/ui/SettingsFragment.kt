@@ -2,6 +2,8 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.nononsenseapps.feeder.R
@@ -13,6 +15,7 @@ import com.nononsenseapps.feeder.util.PREF_SYNC_FREQ
 import com.nononsenseapps.feeder.util.PREF_SYNC_HOTSPOTS
 import com.nononsenseapps.feeder.util.PREF_SYNC_ONLY_CHARGING
 import com.nononsenseapps.feeder.util.PREF_SYNC_ONLY_WIFI
+import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.PrefUtils
 
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -21,6 +24,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         addPreferencesFromResource(R.xml.settings)
 
         PreferenceManager.getDefaultSharedPreferences(activity).registerOnSharedPreferenceChangeListener(this)
+        bindPreferenceSummaryToValue(PREF_THEME)
         bindPreferenceSummaryToValue(PREF_SYNC_FREQ)
         bindPreferenceSummaryToValue(PREF_DEFAULT_OPEN_ITEM_WITH)
         bindPreferenceSummaryToValue(PREF_OPEN_LINKS_WITH)
@@ -36,6 +40,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         context?.let { context ->
             when (key) {
                 PREF_SYNC_ONLY_CHARGING, PREF_SYNC_HOTSPOTS, PREF_SYNC_ONLY_WIFI, PREF_SYNC_FREQ -> configurePeriodicSync(context, forceReplace = true)
+                PREF_THEME -> activity?.handleThemeSetting()
+                else -> {}
             }
         }
     }

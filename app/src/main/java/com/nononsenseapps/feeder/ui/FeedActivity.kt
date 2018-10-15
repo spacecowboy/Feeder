@@ -93,18 +93,6 @@ class FeedActivity : BaseActivity() {
             startActivityForResult(Intent(this@FeedActivity, EditFeedActivity::class.java), EDIT_FEED_CODE)
         }
 
-        // Night mode
-        val nightCheck = findViewById<CheckedTextView>(R.id.nightcheck)
-        nightCheck.isChecked = PrefUtils.isNightMode(this)
-        nightCheck.setOnClickListener {
-            // Toggle icon first
-            nightCheck.toggle()
-            // Toggle prefs second
-            PrefUtils.setNightMode(this@FeedActivity, nightCheck.isChecked)
-            // Change background
-            setNightBackground()
-        }
-
         // Database upgrade wipes all items, so request a one-time sync on start up
         if (PrefUtils.isFirstBootAfterDatabaseUpgrade(this)) {
             // Sync all feeds

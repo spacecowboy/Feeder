@@ -2,20 +2,17 @@ package com.nononsenseapps.feeder.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.DATABASE_VERSION
 
 /**
  * Boolean indicating whether we performed the (one-time) welcome flow.
  */
 const val PREF_WELCOME_DONE = "pref_welcome_done"
-
-/**
- * Boolean indicating if night mode should be engaged.
- */
-const val PREF_NIGHT_MODE = "pref_night_mode"
 
 /**
  * Boolean indicating if only unread items should be shown
@@ -27,6 +24,11 @@ const val PREF_SHOW_ONLY_UNREAD = "pref_show_only_unread"
  */
 const val PREF_LAST_FEED_TAG = "pref_last_feed_tag"
 const val PREF_LAST_FEED_ID = "pref_last_feed_id"
+
+/**
+ * Theme settings
+ */
+const val PREF_THEME = "pref_theme"
 
 /**
  * Sync settings
@@ -135,11 +137,12 @@ object PrefUtils {
         sp(context).edit().putBoolean(PREF_WELCOME_DONE, true).apply()
     }
 
-    fun isNightMode(context: Context): Boolean = sp(context).getBoolean(PREF_NIGHT_MODE, false)
-
-    fun setNightMode(context: Context, value: Boolean) {
-        sp(context).edit().putBoolean(PREF_NIGHT_MODE, value).apply()
-    }
+    fun getNightMode(context: Context): Int =
+            when (sp(context).getString(PREF_THEME, context.getString(R.string.pref_theme_value_default))) {
+                context.getString(R.string.pref_theme_value_day) -> AppCompatDelegate.MODE_NIGHT_NO
+                context.getString(R.string.pref_theme_value_night) -> AppCompatDelegate.MODE_NIGHT_YES
+                else -> AppCompatDelegate.MODE_NIGHT_AUTO
+            }
 
     fun isShowOnlyUnread(context: Context): Boolean = sp(context).getBoolean(PREF_SHOW_ONLY_UNREAD, true)
 

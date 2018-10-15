@@ -31,7 +31,6 @@
   <string name="new_items_available">Nouveaux articles disponibles</string>
   <string name="view">Voir</string>
   <string name="no_tag">Pas de tag</string>
-  <string name="night_mode">Mode nuit</string>
   <string name="notify_for_new_items">Recevoir des notifications</string>
   <string name="toggle_read_status">Marquer comme lu/non-lu</string>
   <string name="open_link_in_browser">Ouvrir le lien dans un navigateur</string>

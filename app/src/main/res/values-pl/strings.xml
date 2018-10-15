@@ -24,7 +24,6 @@
   <string name="navigation_drawer_open">Otwórz menu nawigacyjne</string>
   <string name="new_based_on_this">Dodaj nowy kanał na podstawie tego</string>
   <string name="new_items_available">Nowe artykuły są dostępne</string>
-  <string name="night_mode">Tryb nocny</string>
   <string name="no_activity_for_link">Nie udało się znaleźć aktywności mogącej otworzyć link</string>
   <string name="no_such_feed">Nie udało się znaleźć kanału. Spróbuj użyć HTTPS.</string>
   <string name="no_tag">Bez grupy</string>

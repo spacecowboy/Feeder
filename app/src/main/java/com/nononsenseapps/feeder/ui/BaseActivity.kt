@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -73,21 +74,6 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
         get() = drawerLayout != null && drawerLayout!!.isDrawerOpen(GravityCompat.START)
 
 
-    /**
-     * Set the background depending on user preferences
-     */
-    protected fun setNightBackground() {
-        // Change background
-        val mode =
-                if (PrefUtils.isNightMode(this)) {
-                    AppCompatDelegate.MODE_NIGHT_YES
-                } else {
-                    AppCompatDelegate.MODE_NIGHT_NO
-                }
-        AppCompatDelegate.setDefaultNightMode(mode)
-        delegate.setLocalNightMode(mode)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -107,7 +93,7 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
             resources.getColor(R.color.primary_dark)
         }
 
-        setNightBackground()
+        handleThemeSetting()
 
         // Enable periodic sync
         configurePeriodicSync(applicationContext, forceReplace = false)
@@ -504,4 +490,12 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
         }
     }
 
+}
+
+fun Activity.handleThemeSetting() {
+    val mode = PrefUtils.getNightMode(this)
+    AppCompatDelegate.setDefaultNightMode(mode)
+    if (this is AppCompatActivity) {
+        delegate.setLocalNightMode(mode)
+    }
 }

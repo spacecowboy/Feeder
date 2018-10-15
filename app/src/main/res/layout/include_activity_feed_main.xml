@@ -46,29 +46,6 @@
       app:layout_scrollFlags="scroll|enterAlways">
 
       <CheckedTextView
-        android:id="@+id/nightcheck"
-        style="@style/TextAppearance.Body"
-        android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:layout_gravity="start"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="?selectableItemBackground"
-        android:checkMark="@drawable/nightmode_checkmark"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical|start"
-        android:maxLines="1"
-        android:text="@string/night_mode"
-        android:textColor="@android:color/primary_text_dark"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-      <CheckedTextView
         android:id="@+id/notifycheck"
         style="@style/TextAppearance.Body"
         android:layout_width="wrap_content"
@@ -86,11 +63,11 @@
         android:maxLines="1"
         android:text="@string/notify_for_new_items"
         android:textColor="@android:color/primary_text_dark"
-        app:layout_constraintBaseline_toBaselineOf="@+id/nightcheck"
-        app:layout_constraintHorizontal_bias="0.2"
-        app:layout_constraintLeft_toRightOf="@+id/nightcheck"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
     </androidx.constraintlayout.widget.ConstraintLayout>
   </com.google.android.material.appbar.AppBarLayout>
 

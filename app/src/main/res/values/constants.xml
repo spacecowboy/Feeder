@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="pref_theme_value_default">@string/pref_theme_value_auto</string>
+  <string name="pref_theme_value_auto">auto</string>
+  <string name="pref_theme_value_day">day</string>
+  <string name="pref_theme_value_night">night</string>
+</resources>
