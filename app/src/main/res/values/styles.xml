@@ -13,7 +13,7 @@
         <!-- Need to set this also to style create folder dialog -->
         <item name="alertDialogTheme">@style/FilePickerAlertDialogTheme</item>
     </style>
-    <style name="FilePickerAlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+    <style name="FilePickerAlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
@@ -50,7 +50,7 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
     </style>
     <!-- Final application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowActionModeOverlay">true</item>
         <item name="windowActionModeOverlay">true</item>
 
@@ -70,7 +70,7 @@
         <item name="android:editTextBackground">@drawable/edit_text</item>
     </style>
 
-    <style name="AppThemeDialog" parent="Theme.AppCompat.Dialog">
+    <style name="AppThemeDialog" parent="Theme.AppCompat.DayNight.Dialog">
         <item name="colorPrimary">@color/primary</item>
         <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
         <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -93,19 +93,19 @@
     <style name="TextAppearance.BigTitle">
         <item name="android:textSize">24sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/white_87</item>
+        <item name="android:textColor">@color/title_text_color</item>
     </style>
 
     <style name="TextAppearance.Title">
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/white_87</item>
+        <item name="android:textColor">@color/title_text_color</item>
     </style>
 
     <style name="TextAppearance.Body">
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/tertiary_text_material_dark</item>
+        <item name="android:textColor">@color/tertiary_text_color</item>
     </style>
 
     <style name="TextAppearance.Subhead"
@@ -113,7 +113,7 @@
     </style>
 
     <style name="TextAppearance.EmptyView">
-        <item name="android:textColor">@color/white_54</item>
+        <item name="android:textColor">@color/title_text_read_color</item>
         <item name="android:textSize">@dimen/emptyFeedsTextSize</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
@@ -122,49 +122,49 @@
     <style name="TextAppearance.ListItem.Author">
         <item name="android:textSize">@dimen/listitem_author</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/tertiary_text_material_dark</item>
+        <item name="android:textColor">@color/tertiary_text_color</item>
     </style>
     <style name="TextAppearance.ListItem.Title">
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/white_87</item>
+        <item name="android:textColor">@color/title_text_color</item>
     </style>
     <style name="TextAppearance.ListItem.Title.Read">
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/white_54</item>
+        <item name="android:textColor">@color/title_text_read_color</item>
     </style>
     <style name="TextAppearance.ListItem.Body">
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/white_38</item>
+        <item name="android:textColor">@color/body_text_color</item>
     </style>
 
     <style name="TextAppearance.NewItems">
-        <item name="android:textColor">@color/white_87</item>
+        <item name="android:textColor">@color/title_text_color</item>
         <item name="android:textSize">@dimen/listitem_body</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="TextAppearance.Reader"/>
     <style name="TextAppearance.Reader.Title">
-        <item name="android:textColor">@color/white_54</item>
+        <item name="android:textColor">@color/title_text_read_color</item>
         <item name="android:textSize">@dimen/reader_title</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
     <style name="TextAppearance.Reader.Author">
-        <item name="android:textColor">@color/white_54</item>
+        <item name="android:textColor">@color/title_text_read_color</item>
         <item name="android:textSize">@dimen/reader_author</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
     <style name="TextAppearance.Reader.Body">
-        <item name="android:textColor">@color/white_87</item>
+        <item name="android:textColor">@color/title_text_color</item>
         <item name="android:textSize">@dimen/reader_body</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="TextAppearance.InputField">
-        <item name="android:textColor">@color/white_87</item>
+        <item name="android:textColor">@color/title_text_color</item>
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:paddingStart">0dp</item>

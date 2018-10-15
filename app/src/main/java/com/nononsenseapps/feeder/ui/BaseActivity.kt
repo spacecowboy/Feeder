@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.loader.app.LoaderManager
@@ -77,14 +78,14 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
      */
     protected fun setNightBackground() {
         // Change background
-        val typedValue = TypedValue()
-        if (PrefUtils.isNightMode(this)) {
-            // Get black
-            theme.resolveAttribute(R.attr.nightBGColor, typedValue, true)
-        } else {
-            theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true)
-        }
-        window.setBackgroundDrawable(ColorDrawable(typedValue.data))
+        val mode =
+                if (PrefUtils.isNightMode(this)) {
+                    AppCompatDelegate.MODE_NIGHT_YES
+                } else {
+                    AppCompatDelegate.MODE_NIGHT_NO
+                }
+        AppCompatDelegate.setDefaultNightMode(mode)
+        delegate.setLocalNightMode(mode)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,7 +101,7 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
 
         mLPreviewUtils = LPreviewUtils.getInstance(this)
         mThemedStatusBarColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            resources.getColor(R.color.primary_dark, null)
+            resources.getColor(R.color.primary_dark, theme)
         } else {
             @Suppress("DEPRECATION")
             resources.getColor(R.color.primary_dark)
