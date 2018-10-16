@@ -32,7 +32,6 @@
   <string name="new_items_available">新しいアイテムが利用可能です</string>
   <string name="view">表示</string>
   <string name="no_tag">タグなし</string>
-  <string name="night_mode">夜間モード</string>
   <string name="notify_for_new_items">新しいアイテムの通知</string>
   <string name="toggle_read_status">既読/未読の切り替え</string>
   <string name="open_link_in_browser">リンクをブラウザーで開く</string>

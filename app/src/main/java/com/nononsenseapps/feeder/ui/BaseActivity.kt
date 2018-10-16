@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -14,6 +15,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.loader.app.LoaderManager
@@ -72,21 +74,6 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
         get() = drawerLayout != null && drawerLayout!!.isDrawerOpen(GravityCompat.START)
 
 
-    /**
-     * Set the background depending on user preferences
-     */
-    protected fun setNightBackground() {
-        // Change background
-        val typedValue = TypedValue()
-        if (PrefUtils.isNightMode(this)) {
-            // Get black
-            theme.resolveAttribute(R.attr.nightBGColor, typedValue, true)
-        } else {
-            theme.resolveAttribute(android.R.attr.windowBackground, typedValue, true)
-        }
-        window.setBackgroundDrawable(ColorDrawable(typedValue.data))
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -100,13 +87,13 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
 
         mLPreviewUtils = LPreviewUtils.getInstance(this)
         mThemedStatusBarColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            resources.getColor(R.color.primary_dark, null)
+            resources.getColor(R.color.primary_dark, theme)
         } else {
             @Suppress("DEPRECATION")
             resources.getColor(R.color.primary_dark)
         }
 
-        setNightBackground()
+        handleThemeSetting()
 
         // Enable periodic sync
         configurePeriodicSync(applicationContext, forceReplace = false)
@@ -503,4 +490,12 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
         }
     }
 
+}
+
+fun Activity.handleThemeSetting() {
+    val mode = PrefUtils.getNightMode(this)
+    AppCompatDelegate.setDefaultNightMode(mode)
+    if (this is AppCompatActivity) {
+        delegate.setLocalNightMode(mode)
+    }
 }

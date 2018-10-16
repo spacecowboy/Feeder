@@ -88,13 +88,8 @@ class FeedItemHolder(val view: View, private val feedAdapter: FeedAdapter) :
                 feedAdapter.feedFragment.swipeRefreshLayout!!.isEnabled = false
 
                 val typedValue = TypedValue()
-                if (PrefUtils.isNightMode(feedAdapter.feedFragment.activity!!)) {
-                    feedAdapter.feedFragment.activity?.theme?.resolveAttribute(R.attr.nightBGColor,
-                            typedValue, true)
-                } else {
-                    feedAdapter.feedFragment.activity?.theme?.resolveAttribute(android.R.attr.windowBackground,
-                            typedValue, true)
-                }
+                feedAdapter.feedFragment.activity?.theme?.resolveAttribute(android.R.attr.windowBackground,
+                        typedValue, true)
                 bgFrame.setBackgroundColor(typedValue.data)
                 checkBg.visibility = View.VISIBLE
                 if (goingRight) {

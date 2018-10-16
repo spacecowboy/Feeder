@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.text.Layout
 import android.text.Spannable
 import android.text.Spanned
@@ -22,6 +23,7 @@ import android.text.style.SuperscriptSpan
 import android.text.style.TextAppearanceSpan
 import android.text.style.TypefaceSpan
 import android.text.style.UnderlineSpan
+import androidx.annotation.ColorInt
 import androidx.appcompat.content.res.AppCompatResources
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.ARG_URL
@@ -51,13 +53,14 @@ open class HtmlToSpannedConverter(private var mSource: String,
                                   parser: Parser,
                                   private val mContext: Context,
                                   private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()) : ContentHandler {
-    private var mAccentColor: Int = 0
+    @ColorInt private var mAccentColor: Int = 0
     private var mQuoteGapWidth: Int = 0
     private var mQuoteStripeWidth: Int = 0
     private var ignoreCount = 0
     private var respectFormatting: Int = 0
     private var mReader: XMLReader = parser
     private var ignoredImage = false
+    @ColorInt private var codeTextBgColor: Int = 0
 
     private val ignoredTags = listOf("style", "script")
 
@@ -76,8 +79,15 @@ open class HtmlToSpannedConverter(private var mSource: String,
     }
 
     init {
-        @Suppress("DEPRECATION")
-        mAccentColor = mContext.resources.getColor(R.color.accent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mAccentColor = mContext.resources.getColor(R.color.accent, mContext.theme)
+            codeTextBgColor = mContext.resources.getColor(R.color.code_text_bg, mContext.theme)
+        } else {
+            @Suppress("DEPRECATION")
+            mAccentColor = mContext.resources.getColor(R.color.accent)
+            @Suppress("DEPRECATION")
+            codeTextBgColor = mContext.resources.getColor(R.color.code_text_bg)
+        }
         mQuoteGapWidth = Math.round(mContext.resources.getDimension(R.dimen.reader_quote_gap_width))
         mQuoteStripeWidth = Math.round(mContext.resources.getDimension(R.dimen.reader_quote_stripe_width))
     }
@@ -623,7 +633,7 @@ open class HtmlToSpannedConverter(private var mSource: String,
             text.setSpan(RelativeSizeSpan(0.8f), where, len,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             // And have background color
-            text.setSpan(BackgroundColorSpan(Color.DKGRAY), where, len,
+            text.setSpan(BackgroundColorSpan(codeTextBgColor), where, len,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }
