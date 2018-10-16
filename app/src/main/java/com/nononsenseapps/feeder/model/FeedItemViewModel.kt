@@ -33,7 +33,11 @@ class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point)
     init {
         liveImageText.addSource(liveItem) {
             it?.let {
-                liveImageText.value = toSpannedWithNoImages(application, it.description, it.feedUrl)
+                if (liveImageText.value == null) {
+                    // Only set no image version if value is null (e.g. no load has been done yet)
+                    // This avoid flickering when syncs happen
+                    liveImageText.value = toSpannedWithNoImages(application, it.description, it.feedUrl)
+                }
                 launch(BackgroundUI) {
                     val allowDownload = PrefUtils.shouldLoadImages(application)
                     val spanned = toSpannedWithImages(application, it.description, it.feedUrl, maxImageSize, allowDownload)
