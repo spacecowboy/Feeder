@@ -37,7 +37,7 @@
     android:paddingStart="2dp"
     android:singleLine="true"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
-    android:textColor="@color/secondary_text_material_dark"
+    android:textColor="@color/secondary_text_color"
     android:textSize="@dimen/navdrawer_unreadcount_textsize"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintTop_toTopOf="parent" />

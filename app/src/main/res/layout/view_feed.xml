@@ -37,8 +37,9 @@
     android:paddingStart="2dp"
     android:singleLine="true"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
-    android:textColor="@color/secondary_text_material_dark"
+    android:textColor="@color/secondary_text_color"
     android:textSize="@dimen/navdrawer_unreadcount_textsize"
+    tools:text="99"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
 
@@ -52,6 +53,7 @@
     android:paddingEnd="2dp"
     android:singleLine="true"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
+    tools:text="Feed name"
     app:layout_constraintEnd_toStartOf="@+id/feed_unreadcount"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
