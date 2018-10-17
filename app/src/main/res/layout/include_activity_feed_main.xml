@@ -38,37 +38,6 @@
       android:layout_height="@dimen/toolbar_height"
       app:layout_scrollFlags="scroll|enterAlways"
       app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-      android:layout_width="match_parent"
-      android:layout_height="@dimen/subtoolbar_height"
-      android:orientation="horizontal"
-      app:layout_scrollFlags="scroll|enterAlways">
-
-      <CheckedTextView
-        android:id="@+id/notifycheck"
-        style="@style/TextAppearance.Body"
-        android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:layout_gravity="end"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="0dp"
-        android:background="?selectableItemBackground"
-        android:checkMark="@drawable/notification_checkmark"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center_vertical|end"
-        android:maxLines="1"
-        android:text="@string/notify_for_new_items"
-        android:textColor="@android:color/primary_text_dark"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
   </com.google.android.material.appbar.AppBarLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

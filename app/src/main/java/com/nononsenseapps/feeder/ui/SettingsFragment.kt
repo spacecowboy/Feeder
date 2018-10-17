@@ -2,8 +2,6 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.nononsenseapps.feeder.R
@@ -19,6 +17,7 @@ import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.PrefUtils
 
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         // Fill in default values
         addPreferencesFromResource(R.xml.settings)
@@ -40,7 +39,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         context?.let { context ->
             when (key) {
                 PREF_SYNC_ONLY_CHARGING, PREF_SYNC_HOTSPOTS, PREF_SYNC_ONLY_WIFI, PREF_SYNC_FREQ -> configurePeriodicSync(context, forceReplace = true)
-                PREF_THEME -> activity?.handleThemeSetting()
                 else -> {}
             }
         }

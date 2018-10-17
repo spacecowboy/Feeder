@@ -12,7 +12,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckedTextView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -69,8 +68,7 @@ class FeedFragment : Fragment() {
     private var customTitle = ""
     private var layoutManager: LinearLayoutManager? = null
     private var checkAllButton: View? = null
-    private var notify = 0
-    private var notifyCheck: CheckedTextView? = null
+    private var notify = false
 
     var feedViewModel: FeedViewModel? = null
     var feedItemsViewModel: FeedItemsViewModel? = null
@@ -125,11 +123,13 @@ class FeedFragment : Fragment() {
                         this.title = feed.title
                         this.customTitle = feed.customTitle
                         this.url = feed.url.toString()
-                        this.notify = if (feed.notify) 1 else 0
+                        this.notify = feed.notify
                         this.feedTag = feed.tag
 
                         (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
-                        notifyCheck?.isChecked = this.notify == 1
+
+                        // Update state of notification toggle
+                        activity?.invalidateOptionsMenu()
 
                         // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
                         // extra statistics on opening the feed.
@@ -149,7 +149,9 @@ class FeedFragment : Fragment() {
                         AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
                             it.fold(true) { a, b -> a && b }
                                     .let { notify ->
-                                        notifyCheck?.isChecked = notify
+                                        this.notify = notify
+                                        // Update state of notification toggle
+                                        activity.invalidateOptionsMenu()
                                     }
                         })
                     }
@@ -160,7 +162,9 @@ class FeedFragment : Fragment() {
                     AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify().observe(this, Observer {
                         it.fold(true) { a, b -> a && b }
                                 .let { notify ->
-                                    notifyCheck?.isChecked = notify
+                                    this.notify = notify
+                                    // Update state of notification toggle
+                                    activity.invalidateOptionsMenu()
                                 }
                     })
                 }
@@ -257,15 +261,6 @@ class FeedFragment : Fragment() {
         checkAllButton = rootView.findViewById(R.id.checkall_button)
         checkAllButton!!.setOnClickListener { markAsRead() }
 
-        // So is toolbar buttons
-        notifyCheck = activity!!.findViewById<View>(R.id.notifycheck) as CheckedTextView
-        notifyCheck!!.setOnClickListener {
-            // Remember that we are switching to opposite
-            notify = if (notifyCheck!!.isChecked) 0 else 1
-            notifyCheck!!.isChecked = notify == 1
-            setNotifications(notify == 1)
-        }
-
         return rootView
     }
 
@@ -305,27 +300,47 @@ class FeedFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater!!.inflate(R.menu.feed_fragment, menu)
 
+        // Don't forget super call here
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?) {
         if (id < 1) {
-            menu!!.findItem(R.id.action_edit_feed).isVisible = false
-            menu.findItem(R.id.action_delete_feed).isVisible = false
-            menu.findItem(R.id.action_add_templated).isVisible = false
+            menu?.findItem(R.id.action_edit_feed)?.isVisible = false
+            menu?.findItem(R.id.action_delete_feed)?.isVisible = false
+            menu?.findItem(R.id.action_add_templated)?.isVisible = false
         }
 
         // Set toggleable state
-        val menuItem = menu!!.findItem(R.id.action_only_unread)
-        val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
-        menuItem.isChecked = onlyUnread
-        menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)
+        menu?.findItem(R.id.action_only_unread)?.let { menuItem ->
+            val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
+            menuItem.isChecked = onlyUnread
+            menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)
 
-        menuItem.setIcon(
-                when (onlyUnread) {
-                    true -> R.drawable.ic_visibility_off_white_24dp
-                    false -> R.drawable.ic_visibility_white_24dp
-                }
-        )
+            menuItem.setIcon(
+                    when (onlyUnread) {
+                        true -> R.drawable.ic_visibility_off_white_24dp
+                        false -> R.drawable.ic_visibility_white_24dp
+                    }
+            )
+        }
 
-        // Don't forget super call here
-        super.onCreateOptionsMenu(menu, inflater)
+        menu?.findItem(R.id.action_notify)?.let { menuItem ->
+            setNotifyMenuItemState(menuItem)
+        }
+
+        super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun setNotifyMenuItemState(menuItem: MenuItem) {
+        menuItem.isChecked = notify
+        if (notify) {
+            menuItem.setIcon(R.drawable.ic_notifications_on_white_24dp)
+        } else {
+            menuItem.setIcon(R.drawable.ic_notifications_off_white_24dp)
+        }
+
+        menuItem.setTitle(if (notify) R.string.dont_notify_for_new_items else R.string.notify_for_new_items)
     }
 
     private fun setNotifications(on: Boolean) {
@@ -425,6 +440,13 @@ class FeedFragment : Fragment() {
 
                 feedItemsViewModel?.setOnlyUnread(onlyUnread)
 
+                true
+            }
+            id == R.id.action_notify.toLong() -> {
+                notify = !menuItem.isChecked
+
+                setNotifyMenuItemState(menuItem)
+                setNotifications(notify)
                 true
             }
             else -> super.onOptionsItemSelected(menuItem)

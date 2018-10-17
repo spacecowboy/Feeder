@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string-array name="pref_theme_options">
-    <item>@string/theme_automatic</item>
     <item>@string/theme_day</item>
     <item>@string/theme_night</item>
   </string-array>
   <string-array name="pref_theme_values">
-    <item>@string/pref_theme_value_auto</item>
     <item>@string/pref_theme_value_day</item>
     <item>@string/pref_theme_value_night</item>
   </string-array>

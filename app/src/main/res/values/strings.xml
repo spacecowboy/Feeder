@@ -37,6 +37,7 @@
   <string name="view">View</string>
   <string name="no_tag">No tag</string>
   <string name="notify_for_new_items">Notify for new items</string>
+  <string name="dont_notify_for_new_items">Stop notifications</string>
   <string name="toggle_read_status">Toggle read status</string>
   <string name="open_link_in_browser">Open link in browser</string>
   <string name="open_enclosed_media">Open enclosed media</string>
@@ -83,6 +84,7 @@
   <string name="max_feed_items">Maximum number of items per feed</string>
   <string name="could_not_load_url">Could not load URL</string>
 
+  <string name="theme_system">Follow system</string>
   <string name="theme_automatic">Automatic</string>
   <string name="theme_day">Day</string>
   <string name="theme_night">Night</string>

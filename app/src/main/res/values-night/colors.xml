@@ -15,7 +15,8 @@
   <!-- TODO reference android:color/secondary_text_dark maybe? -->
   <color name="body_text_color">@color/white_38</color>
   <!-- TODO reference android:color/tertiary_text_dark maybe? -->
-  <color name="tertiary_text_color">@color/tertiary_text_material_dark</color>
+  <color name="secondary_text_color">@android:color/secondary_text_dark</color>
+  <color name="tertiary_text_color">@android:color/secondary_text_dark</color>
 
   <color name="code_text_bg">#434343</color>
 </resources>

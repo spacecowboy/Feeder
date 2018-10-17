@@ -3,14 +3,11 @@ package com.nononsenseapps.feeder.ui
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.DecelerateInterpolator
@@ -23,6 +20,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.configurePeriodicSync
 import com.nononsenseapps.feeder.model.getFeedListViewModel
+import com.nononsenseapps.feeder.model.getSettingsViewModel
 import com.nononsenseapps.feeder.util.LPreviewUtils
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase
 import com.nononsenseapps.feeder.util.PrefUtils
@@ -66,6 +64,7 @@ open class BaseActivity : AppCompatActivity() {
     protected val isNavDrawerOpen: Boolean
         get() = drawerLayout?.isDrawerOpen(GravityCompat.START) ?: false
 
+    private val settingsViewModel by lazy { getSettingsViewModel() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,8 +84,12 @@ open class BaseActivity : AppCompatActivity() {
             @Suppress("DEPRECATION")
             resources.getColor(R.color.primary_dark)
         }
+        // Not persisted so set it every time we start
+        AppCompatDelegate.setDefaultNightMode(settingsViewModel.themePreference)
 
-        handleThemeSetting()
+        settingsViewModel.liveThemePreference.observe(this, androidx.lifecycle.Observer {
+            delegate.setLocalNightMode(it)
+        })
 
         // Enable periodic sync
         configurePeriodicSync(applicationContext, forceReplace = false)
@@ -438,14 +441,5 @@ open class BaseActivity : AppCompatActivity() {
 
             return arguments
         }
-    }
-
-}
-
-fun Activity.handleThemeSetting() {
-    val mode = PrefUtils.getNightMode(this)
-    AppCompatDelegate.setDefaultNightMode(mode)
-    if (this is AppCompatActivity) {
-        delegate.setLocalNightMode(mode)
     }
 }
