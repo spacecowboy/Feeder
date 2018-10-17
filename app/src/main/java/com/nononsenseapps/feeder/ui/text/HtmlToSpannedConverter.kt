@@ -30,6 +30,7 @@ import com.nononsenseapps.feeder.ui.ARG_URL
 import com.nononsenseapps.feeder.ui.ReaderWebViewActivity
 import com.nononsenseapps.feeder.ui.SHOULD_FINISH_BACK
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
+import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
@@ -81,12 +82,21 @@ open class HtmlToSpannedConverter(private var mSource: String,
     init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mAccentColor = mContext.resources.getColor(R.color.accent, mContext.theme)
-            codeTextBgColor = mContext.resources.getColor(R.color.code_text_bg, mContext.theme)
+            codeTextBgColor = if (PrefUtils.isNightMode(mContext)) {
+                mContext.resources.getColor(R.color.code_text_bg_night, mContext.theme)
+            } else {
+                mContext.resources.getColor(R.color.code_text_bg_day, mContext.theme)
+            }
         } else {
             @Suppress("DEPRECATION")
             mAccentColor = mContext.resources.getColor(R.color.accent)
-            @Suppress("DEPRECATION")
-            codeTextBgColor = mContext.resources.getColor(R.color.code_text_bg)
+            codeTextBgColor = if (PrefUtils.isNightMode(mContext)) {
+                @Suppress("DEPRECATION")
+                mContext.resources.getColor(R.color.code_text_bg_night)
+            } else {
+                @Suppress("DEPRECATION")
+                mContext.resources.getColor(R.color.code_text_bg_day)
+            }
         }
         mQuoteGapWidth = Math.round(mContext.resources.getDimension(R.dimen.reader_quote_gap_width))
         mQuoteStripeWidth = Math.round(mContext.resources.getDimension(R.dimen.reader_quote_stripe_width))
@@ -270,7 +280,7 @@ open class HtmlToSpannedConverter(private var mSource: String,
 
         var src: String? = attributes.getValue("", "src")
         val d = AppCompatResources.getDrawable(mContext, R.drawable.placeholder_image_article)
-        d?.let { d ->
+        d?.let { _ ->
             d.setBounds(0, 0, d.intrinsicWidth, d.intrinsicHeight)
         }
 
@@ -282,8 +292,10 @@ open class HtmlToSpannedConverter(private var mSource: String,
         }
         val imgLink = relativeLinkIntoAbsolute(mSiteUrl, src)
 
-        text.setSpan(ImageSpan(d, imgLink), len, text.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        d?.let { _ ->
+            text.setSpan(ImageSpan(d, imgLink), len, text.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
         // Add a line break
         text.append("\n")
     }

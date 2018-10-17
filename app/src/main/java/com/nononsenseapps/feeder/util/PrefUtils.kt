@@ -131,11 +131,18 @@ object PrefUtils {
         sp(context).edit().putBoolean(PREF_WELCOME_DONE, true).apply()
     }
 
+    fun isNightMode(context: Context): Boolean =
+            when (sp(context).getString(PREF_THEME, context.getString(R.string.pref_theme_value_default))) {
+                context.getString(R.string.pref_theme_value_night) -> true
+                else -> false
+            }
+
     fun getNightMode(context: Context): Int =
             when (sp(context).getString(PREF_THEME, context.getString(R.string.pref_theme_value_default))) {
                 context.getString(R.string.pref_theme_value_day) -> AppCompatDelegate.MODE_NIGHT_NO
                 context.getString(R.string.pref_theme_value_night) -> AppCompatDelegate.MODE_NIGHT_YES
-                else -> AppCompatDelegate.MODE_NIGHT_AUTO
+                context.getString(R.string.pref_theme_value_auto) -> AppCompatDelegate.MODE_NIGHT_AUTO
+                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             }
 
     fun isShowOnlyUnread(context: Context): Boolean = sp(context).getBoolean(PREF_SHOW_ONLY_UNREAD, true)

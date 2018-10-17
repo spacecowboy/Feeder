@@ -35,7 +35,8 @@
   <color name="secondary_text_color">@android:color/secondary_text_light</color>
   <color name="tertiary_text_color">@android:color/secondary_text_light</color>
 
-  <color name="code_text_bg">#e9e9e9</color>
+  <color name="code_text_bg_day">#e9e9e9</color>
+  <color name="code_text_bg_night">#434343</color>
 
   <color name="dark_grey_800">#424242</color>
   <color name="dark_grey_850">#303030</color>
