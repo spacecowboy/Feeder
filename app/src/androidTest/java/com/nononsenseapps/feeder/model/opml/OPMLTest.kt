@@ -1,18 +1,13 @@
 package com.nononsenseapps.feeder.model.opml
 
 import android.content.Context
+import androidx.room.Room
 import androidx.test.InstrumentationRegistry.getContext
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import androidx.test.runner.AndroidJUnit4
-import com.nononsenseapps.feeder.db.COL_TAG
-import com.nononsenseapps.feeder.db.FeedSQL
-import com.nononsenseapps.feeder.db.URI_FEEDS
-import com.nononsenseapps.feeder.model.OPMLContenProvider
-import com.nononsenseapps.feeder.util.forEach
-import com.nononsenseapps.feeder.util.getFeeds
-import com.nononsenseapps.feeder.util.insertFeedWith
-import com.nononsenseapps.feeder.util.queryTagsWithCounts
+import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.Feed
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -55,25 +50,25 @@ private val sampleFile: List<String> = """<?xml version="1.0" encoding="UTF-8"?>
 @RunWith(AndroidJUnit4::class)
 class OPMLTest {
     private var context: Context? = null
+    lateinit var db: AppDatabase
 
     private var dir: File? = null
     private var path: File? = null
 
     @Before
     fun setup() {
-        // Remove everything in database
-        getContext().contentResolver.delete(URI_FEEDS, null, null)
         // Get internal data dir
         dir = createTempDir()
         path = createTempFile()
         assertTrue("Need to be able to write to data dir $dir", dir!!.canWrite())
         context = getContext()
+
+        db = Room.inMemoryDatabaseBuilder(getContext(), AppDatabase::class.java).build()
     }
 
     @After
     fun tearDown() {
         // Remove everything in database
-        getContext().contentResolver.delete(URI_FEEDS, null, null)
     }
 
     @MediumTest
@@ -84,11 +79,10 @@ class OPMLTest {
         createSampleFeeds()
 
         writeFile(path!!.absolutePath,
-                getTags(),
-                { tag ->
-                    context!!.contentResolver.getFeeds(where = "$COL_TAG IS ?",
-                            params = listOf(tag ?: ""))
-                })
+                getTags()
+        ) { tag ->
+            db.feedDao().loadFeeds(tag = tag)
+        }
 
         //check contents of file
         path!!.bufferedReader().useLines { lines ->
@@ -104,12 +98,12 @@ class OPMLTest {
     fun testRead() {
         writeSampleFile()
 
-        val parser = OpmlParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLToRoom(db))
         parser.parseFile(path!!.canonicalPath)
 
         // Verify database is correct
         val seen = ArrayList<Int>()
-        val feeds = context!!.contentResolver.getFeeds()
+        val feeds = db.feedDao().loadFeeds()
         assertFalse("No feeds in DB!", feeds.isEmpty())
         for (feed in feeds) {
             val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
@@ -136,27 +130,27 @@ class OPMLTest {
         writeSampleFile()
 
         // Create something that does not exist
-        var feednew = FeedSQL(
+        var feednew = Feed(
                 url = URL("http://somedomain20.com/rss.xml"),
                 title = "\"20\"",
                 tag = "kapow")
-        var id = context!!.contentResolver.insertFeedWith(feednew.asContentValues())
+        var id = db.feedDao().insertFeed(feednew)
         feednew = feednew.copy(id = id)
         // Create something that will exist
-        var feedold = FeedSQL(
+        var feedold = Feed(
                 url = URL("http://somedomain0.com/rss.xml"),
                 title = "\"0\"")
-        id = context!!.contentResolver.insertFeedWith(feedold.asContentValues())
+        id = db.feedDao().insertFeed(feedold)
 
         feedold = feedold.copy(id = id)
 
         // Read file
-        val parser = OpmlParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLToRoom(db))
         parser.parseFile(path!!.canonicalPath)
 
         // should not kill the existing stuff
         val seen = ArrayList<Int>()
-        val feeds = context!!.contentResolver.getFeeds()
+        val feeds = db.feedDao().loadFeeds()
         assertFalse("No feeds in DB!", feeds.isEmpty())
         for (feed in feeds) {
             val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
@@ -199,7 +193,7 @@ class OPMLTest {
         }
 
         // Read file
-        val parser = OpmlParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLToRoom(db))
         parser.parseFile(path!!.absolutePath)
     }
 
@@ -209,7 +203,7 @@ class OPMLTest {
     fun testReadMissingFile() {
         val path = File(dir, "lsadflibaslsdfa.opml")
         // Read file
-        val parser = OpmlParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLToRoom(db))
         var raised = false
         try {
             parser.parseFile(path.absolutePath)
@@ -225,12 +219,16 @@ class OPMLTest {
         // Use test write to write the sample file
         testWrite()
         // Then delete all feeds again
-        context!!.contentResolver.delete(URI_FEEDS, null, null)
+        db.runInTransaction {
+            db.feedDao().loadFeeds().forEach {
+                db.feedDao().deleteFeed(it)
+            }
+        }
     }
 
     private fun createSampleFeeds() {
         for (i in 0..9) {
-            val feed = FeedSQL(
+            val feed = Feed(
                     url = URL("http://somedomain$i.com/rss.xml"),
                     title = "\"$i\"",
                     tag = when (i % 3) {
@@ -239,21 +237,12 @@ class OPMLTest {
                         else -> ""
                     })
 
-            context!!.contentResolver.insertFeedWith(feed.asContentValues())
+            db.feedDao().insertFeed(feed)
         }
     }
 
-    private fun getTags(): ArrayList<String> {
-        val tags = ArrayList<String>()
-
-        context!!.contentResolver.queryTagsWithCounts(columns = listOf(COL_TAG)) { cursor ->
-            cursor.forEach {
-                tags.add(it.getString(0))
-            }
-        }
-
-        return tags
-    }
+    private fun getTags(): List<String> =
+            db.feedDao().loadTags()
 
     @Test
     @MediumTest
@@ -262,12 +251,12 @@ class OPMLTest {
         val opmlStream = javaClass.getResourceAsStream("antennapod-feeds.opml")!!
 
         //when
-        val parser = OpmlParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLToRoom(db))
         parser.parseInputStream(opmlStream)
 
         //then
-        val feeds = context!!.contentResolver.getFeeds()
-        val tags = feeds.map { it.tag }.distinct().toList()
+        val feeds = db.feedDao().loadFeeds()
+        val tags = db.feedDao().loadTags()
         assertEquals("Expecting 8 feeds", 8, feeds.size)
         assertEquals("Expecting 1 tags (incl empty)", 1, tags.size)
 
@@ -311,12 +300,12 @@ class OPMLTest {
         val opmlStream = javaClass.getResourceAsStream("Flym_auto_backup.opml")
 
         //when
-        val parser = OpmlParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLToRoom(db))
         parser.parseInputStream(opmlStream)
 
         //then
-        val feeds = context!!.contentResolver.getFeeds()
-        val tags = feeds.map { it.tag }.distinct().toList()
+        val feeds = db.feedDao().loadFeeds()
+        val tags = db.feedDao().loadTags()
         assertEquals("Expecting 11 feeds", 11, feeds.size)
         assertEquals("Expecting 4 tags (incl empty)", 4, tags.size)
 
@@ -379,12 +368,12 @@ class OPMLTest {
         val opmlStream = javaClass.getResourceAsStream("rssguard_1.opml")!!
 
         //when
-        val parser = OpmlParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLToRoom(db))
         parser.parseInputStream(opmlStream)
 
         //then
-        val feeds = context!!.contentResolver.getFeeds()
-        val tags = feeds.map { it.tag }.distinct().toList()
+        val feeds = db.feedDao().loadFeeds()
+        val tags = db.feedDao().loadTags()
         assertEquals("Expecting 30 feeds", 30, feeds.size)
         assertEquals("Expecting 6 tags (incl empty)", 6, tags.size)
 
@@ -430,12 +419,12 @@ class OPMLTest {
         val opmlStream = javaClass.getResourceAsStream("rssguard_2.opml")
 
         //when
-        val parser = OpmlParser(OPMLContenProvider(context))
+        val parser = OpmlParser(OPMLToRoom(db))
         parser.parseInputStream(opmlStream)
 
         //then
-        val feeds = context!!.contentResolver.getFeeds()
-        val tags = feeds.map { it.tag }.distinct().toList()
+        val feeds = db.feedDao().loadFeeds()
+        val tags = db.feedDao().loadTags()
         assertEquals("Expecting 30 feeds", 30, feeds.size)
         assertEquals("Expecting 6 tags (incl empty)", 6, tags.size)
 

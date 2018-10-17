@@ -1,25 +1,34 @@
-package com.nononsenseapps.feeder.ui
+package com.nononsenseapps.feeder.model
 
-import com.nononsenseapps.feeder.db.FeedSQL
+import androidx.room.ColumnInfo
+import androidx.room.Ignore
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
+import java.net.URL
 
-class FeedWrapper(val item: FeedSQL?, val tag: String, val isTop: Boolean) {
+data class FeedUnreadCount @Ignore constructor(
+        var id: Long = ID_UNSET,
+        var title: String = "",
+        var url: URL = sloppyLinkToStrictURLNoThrows(""),
+        var tag: String = "",
+        @ColumnInfo(name = "custom_title") var customTitle: String = "",
+        var notify: Boolean = false,
+        @ColumnInfo(name = "image_url") var imageUrl: URL? = null,
+        @ColumnInfo(name = "unread_count") var unreadCount: Int = 0
+) {
+    constructor() : this(id = ID_UNSET)
+    
+    val displayTitle: String
+        get() = (if (customTitle.isBlank()) title else customTitle)
 
-    @JvmOverloads
-    constructor(tag: String, isTop: Boolean = false): this(item = null, tag = tag, isTop = isTop)
-
-    constructor(item: FeedSQL): this(item = item, tag = item.tag, isTop = false)
+    val isTop: Boolean
+        get() = id == ID_ALL_FEEDS
 
     val isTag: Boolean
-        get() = item == null
+        get() = id < 1 && tag.isNotEmpty()
 
-    private var _unreadCount: Int = 0
-    var unreadCount: Int
-        get() = item?.unreadCount ?: _unreadCount
-        set(value) {
-            _unreadCount = value
-        }
-
-    operator fun compareTo(other: FeedWrapper): Int {
+    operator fun compareTo(other: FeedUnreadCount): Int {
         return when {
             // Top tag is always at the top (implies empty tags)
             isTop -> -1
@@ -30,7 +39,7 @@ class FeedWrapper(val item: FeedSQL?, val tag: String, val isTop: Boolean) {
             !isTag && !other.isTag && tag.isNotEmpty() && other.tag.isEmpty() -> -1
             !isTag && !other.isTag && tag.isEmpty() && other.tag.isNotEmpty() -> 1
             // Feeds with identical tags compare by title
-            item != null && other.item != null && tag == other.tag -> item.displayTitle.compareTo(other.item.displayTitle, ignoreCase = true)
+            tag == other.tag -> displayTitle.compareTo(other.displayTitle, ignoreCase = true)
             // In other cases it's just a matter of comparing tags
             else -> tag.compareTo(other.tag, ignoreCase = true)
         }
@@ -39,14 +48,14 @@ class FeedWrapper(val item: FeedSQL?, val tag: String, val isTop: Boolean) {
     override fun equals(other: Any?): Boolean {
         return when (other) {
             null -> false
-            is FeedWrapper -> {
+            is FeedUnreadCount -> {
                 //val f = other as FeedWrapper?
                 if (isTag && other.isTag) {
                     // Compare tags
                     tag == other.tag
                 } else {
                     // Compare items
-                    !isTag && !other.isTag && item == other.item
+                    !isTag && !other.isTag && id == other.id
                 }
             }
             else -> false
@@ -59,15 +68,7 @@ class FeedWrapper(val item: FeedSQL?, val tag: String, val isTop: Boolean) {
             tag.hashCode()
         } else {
             // Item
-            item!!.hashCode()
-        }
-    }
-
-    override fun toString(): String {
-        return if (isTag) {
-            "Tag: " + tag
-        } else {
-            "Item: " + item!!.displayTitle + " (" + tag + ")"
+            id.hashCode()
         }
     }
 }

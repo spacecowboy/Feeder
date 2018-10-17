@@ -90,13 +90,6 @@
       </intent-filter>
     </activity>
 
-    <provider
-        android:name=".db.RssContentProvider"
-        android:authorities="com.nononsenseapps.feeder.provider"
-        android:enabled="true"
-        android:exported="false"
-        android:label="@string/app_name"/>
-
     <!-- Receiver for notification cancellations and such -->
     <receiver android:name=".model.RssNotificationBroadcastReceiver" />
 

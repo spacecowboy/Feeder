@@ -260,6 +260,6 @@ public final class FloatLabelLayout extends FrameLayout {
     }
 
     public interface Validator {
-        public String afterTextChanged(Editable s);
+        String afterTextChanged(Editable s);
     }
 }

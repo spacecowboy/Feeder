@@ -18,13 +18,12 @@ class ReaderWebViewActivity : BaseActivity() {
      *
      * @return ReaderFragment
      */
-    private val fragment: ReaderWebViewFragment
-        get() {
-            val i = intent
-            val fragment = ReaderWebViewFragment()
-            fragment.arguments = i.extras
-            return fragment
-        }
+    private fun fragmentFromIntent(): ReaderWebViewFragment {
+        val i = intent
+        val fragment = ReaderWebViewFragment()
+        fragment.arguments = i.extras
+        return fragment
+    }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,12 +36,13 @@ class ReaderWebViewActivity : BaseActivity() {
             ab.setDisplayShowTitleEnabled(false)
         }
 
-        if (savedInstanceState == null) {
-            mFragment = fragment
-            supportFragmentManager.beginTransaction()
-                    .add(R.id.container, mFragment!!, "webview").commit()
+        mFragment = if (savedInstanceState == null) {
+            fragmentFromIntent().also {
+                supportFragmentManager.beginTransaction()
+                        .add(R.id.container, it, "webview").commit()
+            }
         } else {
-            mFragment = supportFragmentManager.findFragmentByTag("webview") as ReaderWebViewFragment?
+            supportFragmentManager.findFragmentByTag("webview") as ReaderWebViewFragment?
         }
 
         mDrawShadowFrameLayout = findViewById(R.id.main_content)
@@ -64,7 +64,7 @@ class ReaderWebViewActivity : BaseActivity() {
 
     override fun onActionBarAutoShowOrHide(shown: Boolean) {
         super.onActionBarAutoShowOrHide(shown)
-        mDrawShadowFrameLayout!!.setShadowVisible(shown, shown)
+        mDrawShadowFrameLayout?.setShadowVisible(shown, shown)
     }
 
     override fun onBackPressed() {

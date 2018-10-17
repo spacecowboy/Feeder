@@ -19,23 +19,18 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
-import com.nononsenseapps.feeder.db.COL_FEED
-import com.nononsenseapps.feeder.db.COL_ID
-import com.nononsenseapps.feeder.db.COL_NOTIFIED
-import com.nononsenseapps.feeder.db.COL_NOTIFY
-import com.nononsenseapps.feeder.db.COL_UNREAD
-import com.nononsenseapps.feeder.db.FeedItemSQL
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.URI_FEEDS
+import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.ui.ARG_FEED_URL
 import com.nononsenseapps.feeder.ui.EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED
 import com.nononsenseapps.feeder.ui.FeedActivity
 import com.nononsenseapps.feeder.ui.ReaderActivity
 import com.nononsenseapps.feeder.util.ARG_FEEDTITLE
-import com.nononsenseapps.feeder.util.getFeedItems
-import com.nononsenseapps.feeder.util.getFeeds
 import com.nononsenseapps.feeder.util.notificationManager
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 
 
 const val notificationId = 73583
@@ -82,11 +77,17 @@ fun notifyInBackground(context: Context) {
 fun cancelNotificationInBackground(context: Context, feedItemId: Long) {
     val appContext = context.applicationContext
     launch(Background) {
-        val nm = appContext.notificationManager
+        cancelNotification(appContext, feedItemId)
+    }
+}
+
+suspend fun cancelNotification(context: Context, feedItemId: Long) {
+    withContext(Background) {
+        val nm = context.notificationManager
         nm.cancel(feedItemId.toInt())
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            notifyInBackground(appContext)
+            notifyInBackground(context)
         }
     }
 }
@@ -108,10 +109,10 @@ fun createNotificationChannel(context: Context) {
     notificationManager.createNotificationChannel(channel)
 }
 
-private fun singleNotification(context: Context, item: FeedItemSQL): Notification {
+private fun singleNotification(context: Context, item: FeedItemWithFeed): Notification {
     val style = NotificationCompat.BigTextStyle()
-    val title = item.plaintitle
-    val text = item.feedtitle
+    val title = item.plainTitle
+    val text = item.feedTitle
 
     style.bigText(text)
     style.setBigContentTitle(title)
@@ -119,7 +120,7 @@ private fun singleNotification(context: Context, item: FeedItemSQL): Notificatio
     val contentIntent = when (item.description.isBlank()) {
         true -> {
             val i = Intent(context, FeedActivity::class.java)
-            i.data = Uri.withAppendedPath(URI_FEEDS, "${item.feedid}")
+            i.data = Uri.withAppendedPath(URI_FEEDS, "${item.feedId}")
             i.flags = FLAG_ACTIVITY_CLEAR_TASK or FLAG_ACTIVITY_NEW_TASK
             PendingIntent.getActivity(context, item.id.toInt(), i,
                     PendingIntent.FLAG_UPDATE_CURRENT)
@@ -135,8 +136,8 @@ private fun singleNotification(context: Context, item: FeedItemSQL): Notificatio
             // Now, modify the parent intent so that it navigates to the appropriate feed
             val parentIntent = stackBuilder.editIntentAt(0)
             if (parentIntent != null) {
-                parentIntent.data = Uri.withAppendedPath(URI_FEEDS, "${item.feedid}")
-                parentIntent.putExtra(ARG_FEEDTITLE, item.feedtitle)
+                parentIntent.data = Uri.withAppendedPath(URI_FEEDS, "${item.feedId}")
+                parentIntent.putExtra(ARG_FEEDTITLE, item.feedTitle)
                 parentIntent.putExtra(ARG_FEED_URL, item.feedUrl)
             }
             stackBuilder.getPendingIntent(item.id.toInt(), PendingIntent.FLAG_UPDATE_CURRENT)
@@ -153,8 +154,8 @@ private fun singleNotification(context: Context, item: FeedItemSQL): Notificatio
 
     // Note that notifications must use PNG resources, because there is no compatibility for vector drawables here
 
-    if (item.enclosurelink != null) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.enclosurelink))
+    if (item.enclosureLink != null) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.enclosureLink))
         intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
         builder.addAction(R.drawable.notification_play_circle_outline,
                 context.getString(R.string.open_enclosed_media), PendingIntent.getActivity(context, item.id.toInt(), intent,
@@ -174,14 +175,14 @@ private fun singleNotification(context: Context, item: FeedItemSQL): Notificatio
 /**
  * Use this on platforms older than 24 to bundle notifications together
  */
-private fun inboxNotification(context: Context, feedItems: List<FeedItemSQL>): Notification {
+private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed>): Notification {
     val style = NotificationCompat.InboxStyle()
     val title = context.getString(R.string.updated_feeds)
-    val text = feedItems.map { it.feedtitle }.toSet().joinToString(separator = ", ")
+    val text = feedItems.map { it.feedTitle }.toSet().joinToString(separator = ", ")
 
     style.setBigContentTitle(title)
     feedItems.forEach {
-        style.addLine("${it.feedtitle} \u2014 ${it.plaintitle}")
+        style.addLine("${it.feedTitle} \u2014 ${it.plainTitle}")
     }
 
     val intent = Intent(context, FeedActivity::class.java)
@@ -189,7 +190,7 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemSQL>): N
 
     // We can be a little bit smart - if all items are from the same feed then go to that feed
     // Otherwise we should go to All feeds
-    val feedIds = feedItems.map { it.feedid }.toSet()
+    val feedIds = feedItems.map { it.feedId }.toSet()
     intent.data = if (feedIds.toSet().size == 1) {
         Uri.withAppendedPath(URI_FEEDS, "${feedIds.first()}")
     } else {
@@ -209,7 +210,7 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemSQL>): N
     return style.build()
 }
 
-private fun getDeleteIntent(context: Context, feedItems: List<FeedItemSQL>): PendingIntent {
+private fun getDeleteIntent(context: Context, feedItems: List<FeedItemWithFeed>): PendingIntent {
     val intent = Intent(context, RssNotificationBroadcastReceiver::class.java)
     intent.action = ACTION_MARK_AS_NOTIFIED
 
@@ -219,7 +220,7 @@ private fun getDeleteIntent(context: Context, feedItems: List<FeedItemSQL>): Pen
     return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 }
 
-private fun getDeleteIntent(context: Context, feedItem: FeedItemSQL): PendingIntent {
+private fun getDeleteIntent(context: Context, feedItem: FeedItemWithFeed): PendingIntent {
     val intent = Intent(context, RssNotificationBroadcastReceiver::class.java)
     intent.action = ACTION_MARK_AS_NOTIFIED
     intent.data = Uri.withAppendedPath(URI_FEEDITEMS, "$feedItem.id")
@@ -240,16 +241,14 @@ private fun notificationBuilder(context: Context): NotificationCompat.Builder {
             .setPriority(NotificationCompat.PRIORITY_LOW)
 }
 
-private fun getItemsToNotify(context: Context): List<FeedItemSQL> {
+private fun getItemsToNotify(context: Context): List<FeedItemWithFeed> {
     val feeds = getFeedIdsToNotify(context)
 
     return when (feeds.isEmpty()) {
         true -> emptyList()
-        false -> context.contentResolver.getFeedItems(
-                where = "$COL_FEED IN (${feeds.joinToString(separator = ",")}) AND $COL_NOTIFIED IS 0 AND $COL_UNREAD IS 1")
+        false -> AppDatabase.getInstance(context).feedItemDao().loadItemsToNotify(feeds)
     }
 }
 
 private fun getFeedIdsToNotify(context: Context): List<Long> =
-        context.contentResolver.getFeeds(columns = listOf(COL_ID),
-                where = "$COL_NOTIFY IS 1").map { it.id }
+        AppDatabase.getInstance(context).feedDao().loadFeedIdsToNotify()

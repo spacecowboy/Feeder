@@ -1,17 +1,21 @@
 package com.nononsenseapps.feeder.ui
 
-import androidx.collection.ArraySet
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.model.FeedUnreadCount
+
+private const val VIEWTYPE_TOP = 0
+private const val VIEWTYPE_TAG = 1
+private const val VIEWTYPE_FEED = 2
+private const val VIEWTYPE_FEED_CHILD = 3
 
 internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
     private val expandedTags: MutableSet<String> = androidx.collection.ArraySet(setOf(""))
-    private var allItems: List<FeedWrapper> = emptyList()
-    private var visibleItems: List<FeedWrapper> = emptyList()
+    private var allItems: List<FeedUnreadCount> = emptyList()
+    private var visibleItems: List<FeedUnreadCount> = emptyList()
 
     init {
         setHasStableIds(true)
@@ -22,10 +26,10 @@ internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyc
 
     override fun getItemId(position: Int): Long {
         val item = visibleItems[position]
-        return if (item.item != null) {
-            item.item.id
+        return if (item.isTop || !item.isTag) {
+            item.id
         } else {
-            item.hashCode().toLong()
+            item.tag.hashCode().toLong()
         }
     }
 
@@ -39,7 +43,7 @@ internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyc
         }
     }
 
-    fun updateData(items: List<FeedWrapper>) {
+    fun submitList(items: List<FeedUnreadCount>) {
         allItems = items
         updateView()
     }
@@ -56,12 +60,12 @@ internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyc
 
         val diffResult = DiffUtil.calculateDiff(object: DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val oldItem: FeedWrapper = oldVisibleItems[oldItemPosition]
-                val newItem: FeedWrapper = visibleItems[newItemPosition]
+                val oldItem: FeedUnreadCount = oldVisibleItems[oldItemPosition]
+                val newItem: FeedUnreadCount = visibleItems[newItemPosition]
 
                 return when {
                     oldItem.isTag && newItem.isTag -> oldItem.tag == newItem.tag
-                    !oldItem.isTag && !newItem.isTag -> oldItem.item?.id == newItem.item?.id
+                    !oldItem.isTag && !newItem.isTag -> oldItem.id == newItem.id
                     else -> false
                 }
             }
@@ -71,15 +75,15 @@ internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyc
             override fun getNewListSize(): Int = visibleItems.size
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val oldItem: FeedWrapper = oldVisibleItems[oldItemPosition]
-                val newItem: FeedWrapper = visibleItems[newItemPosition]
+                val oldItem: FeedUnreadCount = oldVisibleItems[oldItemPosition]
+                val newItem: FeedUnreadCount = visibleItems[newItemPosition]
 
                 return when {
                     oldItem.isTag && newItem.isTag -> {
                                 oldItem.unreadCount == newItem.unreadCount
                     }
                     !oldItem.isTag && !newItem.isTag -> {
-                        oldItem.item?.displayTitle == newItem.item?.displayTitle &&
+                        oldItem.displayTitle == newItem.displayTitle &&
                                 oldItem.unreadCount == newItem.unreadCount
                     }
                     else -> false
@@ -94,7 +98,7 @@ internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyc
      * @param tag
      * @return true if tag is expanded after this call, false otherwise
      */
-    fun toggleExpansion(item: FeedWrapper): Boolean {
+    fun toggleExpansion(item: FeedUnreadCount): Boolean {
         val result = if (expandedTags.contains(item.tag)) {
             expandedTags.remove(item.tag)
             false
@@ -106,7 +110,7 @@ internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyc
         return result
     }
 
-    private fun isExpanded(item: FeedWrapper): Boolean {
+    private fun isExpanded(item: FeedUnreadCount): Boolean {
         return expandedTags.contains(item.tag)
     }
 
@@ -126,8 +130,8 @@ internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyc
         when (getItemViewType(position)) {
             VIEWTYPE_FEED, VIEWTYPE_FEED_CHILD -> {
                 val fh = holder as FeedHolder
-                fh.item = wrap.item
-                fh.title.text = fh.item!!.displayTitle
+                fh.item = wrap
+                fh.title.text = wrap.displayTitle
                 fh.unreadCount.text = "${wrap.unreadCount}"
                 fh.unreadCount.visibility = if (wrap.unreadCount > 0) View.VISIBLE else View.INVISIBLE
             }
@@ -149,14 +153,5 @@ internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyc
                 tp.unreadCount.visibility = if (wrap.unreadCount > 0) View.VISIBLE else View.INVISIBLE
             }
         }
-    }
-
-    companion object {
-
-
-        private val VIEWTYPE_TOP = 0
-        private val VIEWTYPE_TAG = 1
-        private val VIEWTYPE_FEED = 2
-        private val VIEWTYPE_FEED_CHILD = 3
     }
 }

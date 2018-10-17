@@ -18,32 +18,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
-import androidx.loader.app.LoaderManager
-import androidx.loader.app.LoaderManager.LoaderCallbacks
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.FIELDS_VIEWCOUNT
-import com.nononsenseapps.feeder.db.URI_FEEDSWITHCOUNTS
-import com.nononsenseapps.feeder.db.asFeed
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.configurePeriodicSync
-import com.nononsenseapps.feeder.util.ConvertedCursorLoader
+import com.nononsenseapps.feeder.model.getFeedListViewModel
 import com.nononsenseapps.feeder.util.LPreviewUtils
 import com.nononsenseapps.feeder.util.LPreviewUtilsBase
 import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.Result
-import com.nononsenseapps.feeder.util.forEach
 import com.nononsenseapps.feeder.views.ObservableScrollView
 import java.util.*
 
 const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
-
-typealias SortedFields = Result<List<FeedWrapper>>
 
 /**
  * Base activity which handles navigation drawer and other bloat common
  * between activities.
  */
 @SuppressLint("Registered")
-open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
+open class BaseActivity : AppCompatActivity() {
     protected var mActionBarShown = true
     // If pressing home should finish or start new activity
     protected var mShouldFinishBack = false
@@ -71,7 +64,7 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
         private set
 
     protected val isNavDrawerOpen: Boolean
-        get() = drawerLayout != null && drawerLayout!!.isDrawerOpen(GravityCompat.START)
+        get() = drawerLayout?.isDrawerOpen(GravityCompat.START) ?: false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -247,12 +240,16 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
 
     // Subclasses can override to decide what happens on nav item selection
     open fun onNavigationDrawerItemSelected(id: Long, title: String?,
-                                                      url: String?, tag: String?) {
+                                            url: String?, tag: String?) {
         // TODO add default start activity with arguments
     }
 
     private fun populateNavDrawer() {
-        LoaderManager.getInstance(this).restartLoader(NAV_TAGS_LOADER, Bundle(), this)
+        val viewModel = getFeedListViewModel()
+
+        viewModel.liveFeedsAndTagsWithUnreadCounts.observe(this, androidx.lifecycle.Observer<List<FeedUnreadCount>> {
+            navAdapter?.submitList(it)
+        })
     }
 
     fun showActionBar() {
@@ -410,61 +407,14 @@ open class BaseActivity : AppCompatActivity(), LoaderCallbacks<SortedFields> {
         }
     }
 
-    override fun onCreateLoader(id: Int, bundle: Bundle?): androidx.loader.content.Loader<SortedFields> {
-        val loader = ConvertedCursorLoader<List<FeedWrapper>>(
-                context = this,
-                uri = URI_FEEDSWITHCOUNTS,
-                projection = FIELDS_VIEWCOUNT
-        ) { cursor ->
-            val topTag = FeedWrapper(tag = "", isTop = true)
-            val tags: MutableMap<String, FeedWrapper> = androidx.collection.ArrayMap()
-            tags[""] = topTag
-            val data: MutableList<FeedWrapper> = mutableListOf(topTag)
-
-            cursor?.forEach {
-                val feed = FeedWrapper(item = it.asFeed())
-
-                if (!tags.contains(feed.tag)) {
-                    val tag = FeedWrapper(tag = feed.tag)
-                    data.add(tag)
-                    tags[feed.tag] = tag
-                }
-
-                topTag.unreadCount += feed.unreadCount
-                // Avoid adding twice for top tag
-                if (feed.tag.isNotEmpty()) {
-                    tags[feed.tag]!!.unreadCount += feed.unreadCount
-                }
-
-                data.add(feed)
-            }
-
-            data.sortWith(Comparator { a, b -> a.compareTo(b) })
-            data
-        }
-        loader.setUpdateThrottle(200)
-        return loader
-    }
-
-    override fun onLoadFinished(Loader: androidx.loader.content.Loader<SortedFields>,
-                                result: SortedFields?) {
-        navAdapter?.updateData(result?.data ?: emptyList())
-    }
-
-    override fun onLoaderReset(loader: androidx.loader.content.Loader<SortedFields>) {
-        // ..
-    }
-
     companion object {
 
 
         // Durations for certain animations we use:
         val HEADER_HIDE_ANIM_DURATION = 300
         // Special Navdrawer items
-        protected val NAVDRAWER_ITEM_INVALID = -1
+        protected val NAVDRAWER_ITEM_INVALID = ID_UNSET
         private val ARGB_EVALUATOR = ArgbEvaluator()
-        // Positive numbers reserved for children
-        private val NAV_TAGS_LOADER = -2
 
         /**
          * Converts an intent into a [Bundle] suitable for use as fragment

@@ -1,27 +1,9 @@
-/*
- * Copyright (c) 2017 Jonas Kalderstam.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.nononsenseapps.feeder.ui
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -33,122 +15,65 @@ import android.view.ViewGroup
 import android.widget.CheckedTextView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.loader.app.LoaderManager
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
-import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
-import com.nononsenseapps.feeder.db.COL_FEED
-import com.nononsenseapps.feeder.db.COL_ID
-import com.nononsenseapps.feeder.db.COL_NOTIFY
-import com.nononsenseapps.feeder.db.COL_PUBDATE
-import com.nononsenseapps.feeder.db.COL_TAG
-import com.nononsenseapps.feeder.db.COL_TITLE
-import com.nononsenseapps.feeder.db.COL_UNREAD
-import com.nononsenseapps.feeder.db.FEED_FIELDS
-import com.nononsenseapps.feeder.db.FEED_ITEM_FIELDS_FOR_LIST
-import com.nononsenseapps.feeder.db.FeedItemSQL
-import com.nononsenseapps.feeder.db.QUERY_PARAM_LIMIT
-import com.nononsenseapps.feeder.db.QUERY_PARAM_SKIP
-import com.nononsenseapps.feeder.db.URI_FEEDITEMS
-import com.nononsenseapps.feeder.db.URI_FEEDS
-import com.nononsenseapps.feeder.db.Util
-import com.nononsenseapps.feeder.db.asFeed
+import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FeedItemsViewModel
+import com.nononsenseapps.feeder.model.FeedViewModel
+import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.SYNC_BROADCAST
 import com.nononsenseapps.feeder.model.SYNC_BROADCAST_IS_ACTIVE
-import com.nononsenseapps.feeder.model.cancelNotificationInBackground
+import com.nononsenseapps.feeder.model.cancelNotification
+import com.nononsenseapps.feeder.model.getFeedItemsViewModel
+import com.nononsenseapps.feeder.model.getFeedViewModel
 import com.nononsenseapps.feeder.model.requestFeedSync
-import com.nononsenseapps.feeder.util.FeedItemDeltaCursorLoader
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.bundle
-import com.nononsenseapps.feeder.util.firstOrNull
-import com.nononsenseapps.feeder.util.markAllAsRead
-import com.nononsenseapps.feeder.util.markFeedAsRead
-import com.nononsenseapps.feeder.util.markTagAsRead
-import com.nononsenseapps.feeder.util.notifyAllUris
 import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import com.nononsenseapps.feeder.util.setLong
-import com.nononsenseapps.feeder.util.setNotify
-import com.nononsenseapps.feeder.util.setNotifyOnAllFeeds
 import com.nononsenseapps.feeder.util.setString
 import kotlinx.coroutines.experimental.launch
-import org.joda.time.format.DateTimeFormat
-import java.util.*
-
-const val FEEDITEMS_LOADER = 1
-const val FEED_LOADER = 2
-const val FEED_SETTINGS_LOADER = 3
 
 const val ARG_FEED_ID = "feed_id"
 const val ARG_FEED_TITLE = "feed_title"
 const val ARG_FEED_URL = "feed_url"
 const val ARG_FEED_TAG = "feed_tag"
-// Filter for database loader
-const val ONLY_UNREAD = COL_UNREAD + " IS 1 "
-const val AND_UNREAD = " AND " + ONLY_UNREAD
 
-class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
+class FeedFragment : Fragment() {
 
-    private var adapter: FeedAdapter? = null
-    private var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
-    internal var swipeRefreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout? = null
+    private var adapter: FeedItemPagedListAdapter? = null
+    private var recyclerView: RecyclerView? = null
+    internal var swipeRefreshLayout: SwipeRefreshLayout? = null
     private var emptyView: View? = null
     private var emptyAddFeed: View? = null
     private var emptyOpenFeeds: View? = null
 
     private val syncReceiver: BroadcastReceiver
 
-    private var id: Long = -1
+    private var id: Long = ID_UNSET
     private var title: String? = ""
     private var url: String? = ""
     private var feedTag: String? = ""
     private var firstFeedLoad: Boolean = true
     private var customTitle = ""
-    private var layoutManager: androidx.recyclerview.widget.LinearLayoutManager? = null
+    private var layoutManager: LinearLayoutManager? = null
     private var checkAllButton: View? = null
     private var notify = 0
     private var notifyCheck: CheckedTextView? = null
-    internal var selectedItem: FeedItemSQL? = null
 
-    /**
-     * @return SQL selection
-     */
-    protected val loaderSelection: String?
-        get() {
-            var filter: String? = null
-            if (id > 0) {
-                filter = COL_FEED + " IS ? "
-            } else if (feedTag != null) {
-                filter = COL_TAG + " IS ? "
-            }
-
-            val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
-            if (onlyUnread && filter != null) {
-                filter += AND_UNREAD
-            } else if (onlyUnread) {
-                filter = ONLY_UNREAD
-            }
-
-            return filter
-        }
-
-    /**
-     * @return args that match getLoaderSelection
-     */
-    protected val loaderSelectionArgs: Array<String>?
-        get() {
-            var args: Array<String>? = null
-            if (id > 0) {
-                args = Util.LongsToStringArray(this.id)
-            } else if (feedTag != null) {
-                args = Util.ToStringArray(this.feedTag)
-            }
-
-            return args
-        }
+    var feedViewModel: FeedViewModel? = null
+    var feedItemsViewModel: FeedItemsViewModel? = null
 
     init {
         // Listens on sync broadcasts
@@ -163,19 +88,19 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (arguments != null) {
-            id = arguments!!.getLong(ARG_FEED_ID, -1)
-            title = arguments!!.getString(ARG_FEED_TITLE)
-            url = arguments!!.getString(ARG_FEED_URL)
-            feedTag = arguments!!.getString(ARG_FEED_TAG)
+        arguments?.let { arguments ->
+            id = arguments.getLong(ARG_FEED_ID, ID_UNSET)
+            title = arguments.getString(ARG_FEED_TITLE)
+            url = arguments.getString(ARG_FEED_URL)
+            feedTag = arguments.getString(ARG_FEED_TAG)
 
             // It's a feedTag, use as title
-            if (id < 1) {
+            if (id == ID_UNSET) {
                 title = feedTag
             }
 
             // Special feedTag
-            if (id < 1 && (title == null || title!!.isEmpty())) {
+            if (id == ID_ALL_FEEDS) {
                 title = getString(R.string.all_feeds)
             }
         }
@@ -183,13 +108,63 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         setHasOptionsMenu(true)
 
         // Load some RSS
-        LoaderManager.getInstance(this).restartLoader(FEEDITEMS_LOADER, Bundle.EMPTY, this)
+        val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
+        feedItemsViewModel = getFeedItemsViewModel(feedId = id, tag = feedTag
+                ?: "", onlyUnread = onlyUnread)
 
-        when (id > 0) {
-            true -> // Load feed if feed
-                LoaderManager.getInstance(this).restartLoader(FEED_LOADER, Bundle.EMPTY, this)
-            false -> // Load notification settings for tag
-                LoaderManager.getInstance(this).restartLoader(FEED_SETTINGS_LOADER, Bundle.EMPTY, this)
+        feedItemsViewModel?.liveDbPreviews?.observe(this, Observer {
+            adapter?.submitList(it)
+            emptyView?.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+        })
+
+        when {
+            id > ID_UNSET -> { // Load feed if feed
+                feedViewModel = getFeedViewModel(id)
+                feedViewModel?.liveFeed?.observe(this, Observer {
+                    it?.let { feed ->
+                        this.title = feed.title
+                        this.customTitle = feed.customTitle
+                        this.url = feed.url.toString()
+                        this.notify = if (feed.notify) 1 else 0
+                        this.feedTag = feed.tag
+
+                        (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
+                        notifyCheck?.isChecked = this.notify == 1
+
+                        // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
+                        // extra statistics on opening the feed.
+                        if (firstFeedLoad) {
+                            // Title has been fetched, so add shortcut
+                            activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
+                            // Report shortcut usage
+                            activity?.reportShortcutToFeedUsed(feed.id)
+                        }
+                        firstFeedLoad = false
+                    }
+                })
+            }
+            id == ID_UNSET -> { // Load notification settings for tag
+                activity?.let { activity ->
+                    feedTag?.let { feedTag ->
+                        AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
+                            it.fold(true) { a, b -> a && b }
+                                    .let { notify ->
+                                        notifyCheck?.isChecked = notify
+                                    }
+                        })
+                    }
+                }
+            }
+            else -> { // Load notification settings for all
+                activity?.let { activity ->
+                    AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify().observe(this, Observer {
+                        it.fold(true) { a, b -> a && b }
+                                .let { notify ->
+                                    notifyCheck?.isChecked = notify
+                                }
+                    })
+                }
+            }
         }
 
         // Remember choice in future
@@ -204,7 +179,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_feed, container, false)
-        recyclerView = rootView.findViewById<View>(android.R.id.list) as androidx.recyclerview.widget.RecyclerView
+        recyclerView = rootView.findViewById<View>(android.R.id.list) as RecyclerView
 
         // improve performance if you know that changes in content
         // do not change the size of the RecyclerView
@@ -213,7 +188,7 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         if (TabletUtils.isTablet(activity)) {
             val cols = TabletUtils.numberOfFeedColumns(activity)
             // use a grid layout
-            layoutManager = androidx.recyclerview.widget.GridLayoutManager(activity,
+            layoutManager = GridLayoutManager(activity,
                     cols)
 
             // TODO, use better dividers such as simple padding
@@ -223,12 +198,12 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
             recyclerView!!.addItemDecoration(DividerColor(activity, DividerColor.HORIZONTAL_LIST))
         } else {
             // use a linear layout manager
-            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
+            layoutManager = LinearLayoutManager(activity)
         }
         recyclerView!!.layoutManager = layoutManager
 
         // Setup swipe refresh
-        swipeRefreshLayout = rootView.findViewById<View>(R.id.swiperefresh) as androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        swipeRefreshLayout = rootView.findViewById<View>(R.id.swiperefresh) as SwipeRefreshLayout
 
         // The arrow will cycle between these colors (in order)
         swipeRefreshLayout!!.setColorSchemeResources(
@@ -258,7 +233,24 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
         emptyOpenFeeds!!.setOnClickListener { (activity as BaseActivity).openNavDrawer() }
 
         // specify an adapter
-        adapter = FeedAdapter(activity!!, this)
+        adapter = FeedItemPagedListAdapter(activity!!, object : DismissedListener {
+            override fun onDismiss(item: PreviewItem?) {
+                item?.let {
+                    feedItemsViewModel?.toggleReadState(it)
+                }
+            }
+
+            override fun onSwipeStarted() {
+                // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
+                swipeRefreshLayout?.isEnabled = false
+            }
+
+            override fun onSwipeCancelled() {
+                // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
+                swipeRefreshLayout?.isEnabled = true
+            }
+
+        })
         recyclerView!!.adapter = adapter
 
         // check all button
@@ -337,55 +329,37 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
     }
 
     private fun setNotifications(on: Boolean) {
-        val contentResolver = context?.contentResolver
         val feedId = this.id
         val feedTag = this.feedTag
-        if (contentResolver != null) {
+        val appContext = context?.applicationContext
+        if (appContext != null) {
             launch(Background) {
+                // Set as notified so we don't spam
+                feedItemsViewModel?.markAsNotified()
+                val dao = AppDatabase.getInstance(appContext).feedDao()
                 when {
-                    feedId > 0 -> contentResolver.setNotify(feedId, on)
-                    feedTag != null -> contentResolver.setNotify(feedTag, on)
-                    else -> contentResolver.setNotifyOnAllFeeds(on)
+                    feedId > ID_UNSET -> dao.setNotify(feedId, on)
+                    feedId == ID_ALL_FEEDS -> dao.setAllNotify(on)
+                    feedTag?.isNotEmpty() == true -> dao.setNotify(feedTag, on)
                 }
             }
         }
     }
 
+    /**
+     * Mark all items as read in the list
+     */
     private fun markAsRead() {
-        val appContext = context?.applicationContext
-        val feedId = this.id
-        val feedTag = this.feedTag
-        if (appContext != null) {
-            if (PrefUtils.isShowOnlyUnread(appContext)) {
-                // Remove items from UI and show the empty view
-                adapter?.items?.clear()
-                emptyView?.visibility = View.VISIBLE
-            } else {
-                for (childIndex in 0 until (recyclerView?.childCount ?: 0)) {
-                    recyclerView?.getChildAt(childIndex)?.let { childView ->
-                        recyclerView?.getChildViewHolder(childView)?.let { holder ->
-                            if (holder is FeedItemHolder) {
-                                holder.fillTitle(forceRead = true)
-                            }
-                        }
-                    }
-                }
-                adapter?.setAllAsRead()
-                adapter?.notifyDataSetChanged()
-            }
-
-            launch(BackgroundUI) {
-                when {
-                    feedId > 0 -> {
-                        appContext.contentResolver.markFeedAsRead(feedId)
-                        cancelNotificationInBackground(appContext, feedId)
-                    }
-                // TODO cancel notifications for tags and such
-                    feedTag != null -> appContext.contentResolver.markTagAsRead(feedTag)
-                    else -> appContext.contentResolver.markAllAsRead()
+        // Cancel any notifications
+        context?.applicationContext?.let { appContext ->
+            feedItemsViewModel?.liveDbPreviews?.value?.forEach{
+                launch(Background) {
+                    cancelNotification(appContext, it.id)
                 }
             }
         }
+        // Then mark as read
+        feedItemsViewModel?.markAllAsRead()
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
@@ -396,37 +370,37 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 requestFeedSync()
                 true
             }
-            id == R.id.action_edit_feed.toLong() && this.id > 0 -> {
-                val i = Intent(activity, EditFeedActivity::class.java)
-                // TODO do not animate the back movement here
-                i.putExtra(SHOULD_FINISH_BACK, true)
-                i.putExtra(COL_ID, this.id)
-                i.putExtra(COL_CUSTOM_TITLE, customTitle)
-                i.putExtra(COL_TITLE, title)
-                i.putExtra(COL_TAG, feedTag)
-                i.data = Uri.parse(url)
-                startActivity(i)
+            id == R.id.action_edit_feed.toLong() && this.id > ID_UNSET -> {
+                this.id.let { feedId ->
+                    val i = Intent(activity, EditFeedActivity::class.java)
+                    // TODO do not animate the back movement here
+                    i.putExtra(SHOULD_FINISH_BACK, true)
+                    i.putExtra(ARG_ID, feedId)
+                    i.putExtra(ARG_CUSTOMTITLE, customTitle)
+                    i.putExtra(ARG_TITLE, title)
+                    i.putExtra(ARG_FEED_TAG, feedTag)
+                    i.data = Uri.parse(url)
+                    startActivity(i)
+                }
+
                 true
             }
-            id == R.id.action_add_templated.toLong() && this.id > 0 -> {
+            id == R.id.action_add_templated.toLong() && this.id > ID_UNSET -> {
                 val i = Intent(activity, EditFeedActivity::class.java)
                 // TODO do not animate the back movement here
                 i.putExtra(SHOULD_FINISH_BACK, true)
                 i.putExtra(TEMPLATE, true)
-                i.putExtra(COL_TAG, feedTag)
+                i.putExtra(ARG_FEED_TAG, feedTag)
                 i.data = Uri.parse(url)
                 startActivity(i)
                 true
             }
-            id == R.id.action_delete_feed.toLong() && this.id > 0 -> {
+            id == R.id.action_delete_feed.toLong() && this.id > ID_UNSET -> {
                 val feedId = this.id
                 val appContext = activity?.applicationContext
                 if (appContext != null) {
                     launch(BackgroundUI) {
-                        appContext.contentResolver
-                                .delete(URI_FEEDS, Util.WHEREIDIS,
-                                        Util.LongsToStringArray(feedId))
-                        appContext.contentResolver.notifyAllUris()
+                        feedViewModel?.deleteFeed()
 
                         // Remove from shortcuts
                         appContext.removeDynamicShortcutToFeed(feedId)
@@ -448,119 +422,16 @@ class FeedFragment : Fragment(), LoaderManager.LoaderCallbacks<Any> {
                 }
 
                 menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)
-                //getActivity().invalidateOptionsMenu();
-                // Restart loader
-                LoaderManager.getInstance(this).restartLoader(FEEDITEMS_LOADER, Bundle(), this)
+
+                feedItemsViewModel?.setOnlyUnread(onlyUnread)
+
                 true
             }
             else -> super.onOptionsItemSelected(menuItem)
         }
     }
 
-    fun updateFirstVisiblePage() {
-        LoaderManager.getInstance(this).restartLoader(FEEDITEMS_LOADER, Bundle.EMPTY, this)
-    }
-
-    override fun onCreateLoader(ID: Int, args: Bundle?): androidx.loader.content.Loader<Any> {
-        @Suppress("UNCHECKED_CAST")
-        val loader: androidx.loader.content.AsyncTaskLoader<Any> = when (ID) {
-            FEEDITEMS_LOADER -> FeedItemDeltaCursorLoader(activity!!,
-                    URI_FEEDITEMS.buildUpon()
-                            .appendQueryParameter(QUERY_PARAM_SKIP, "${adapter?.skipCount() ?: 0}")
-                            .appendQueryParameter(QUERY_PARAM_LIMIT, "${PAGE_COUNT * PAGE_SIZE}").build(),
-                    FEED_ITEM_FIELDS_FOR_LIST,
-                    loaderSelection,
-                    loaderSelectionArgs,
-                    "$COL_PUBDATE DESC") as androidx.loader.content.AsyncTaskLoader<Any>
-            FEED_LOADER -> {
-                androidx.loader.content.CursorLoader(activity!!,
-                        Uri.withAppendedPath(URI_FEEDS, "${this.id}"),
-                        FEED_FIELDS, null, null, null) as androidx.loader.content.AsyncTaskLoader<Any>
-            }
-        // FEED_SETTINGS_LOADER
-            else -> {
-                val where: String?
-                val whereArgs: Array<String>?
-                when {
-                    this.id > 0 -> {
-                        where = Util.WHEREIDIS
-                        whereArgs = Util.LongsToStringArray(this.id)
-                    }
-                    feedTag != null -> {
-                        where = "$COL_TAG IS ?"
-                        whereArgs = Util.ToStringArray(feedTag)
-                    }
-                    else -> {
-                        where = null
-                        whereArgs = null
-                    }
-                }
-                androidx.loader.content.CursorLoader(activity!!, URI_FEEDS,
-                        Util.ToStringArray("DISTINCT $COL_NOTIFY"),
-                        where, whereArgs, null) as androidx.loader.content.AsyncTaskLoader<Any>
-            }
-        }
-
-        loader.setUpdateThrottle(2000)
-        return loader
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun onLoadFinished(cursorLoader: androidx.loader.content.Loader<Any?>, result: Any?) {
-        when {
-            FEEDITEMS_LOADER == cursorLoader.id -> {
-                val map = result as Map<FeedItemSQL, Int>
-                adapter?.updateData(map)
-                val empty = adapter!!.itemCount == 0
-                emptyView?.visibility = if (empty) View.VISIBLE else View.GONE
-            }
-            FEED_LOADER == cursorLoader.id -> {
-                val cursor = result as Cursor
-                cursor.firstOrNull()?.let {
-                    val feed = it.asFeed()
-                    this.title = feed.title
-                    this.customTitle = feed.customTitle
-                    this.url = feed.url.toString()
-                    this.notify = if (feed.notify) 1 else 0
-                    this.feedTag = feed.tag
-
-                    (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
-                    notifyCheck?.isChecked = this.notify == 1
-
-                    // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
-                    // extra statistics on opening the feed.
-                    if (firstFeedLoad) {
-                        // Title has been fetched, so add shortcut
-                        activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
-                        // Report shortcut usage
-                        activity?.reportShortcutToFeedUsed(feed.id)
-                    }
-                    firstFeedLoad = false
-                }
-                // Don't destroy feed loader since we want to load user edits
-            }
-            FEED_SETTINGS_LOADER == cursorLoader.id -> {
-                val cursor = result as Cursor
-                if (cursor.count == 1 && cursor.moveToFirst()) {
-                    // Conclusive results
-                    this.notify = cursor.getInt(0)
-                } else {
-                    this.notify = 0
-                }
-                notifyCheck?.isChecked = this.notify == 1
-            }
-        }
-    }
-
-    override fun onLoaderReset(cursorLoader: androidx.loader.content.Loader<Any?>) {
-    }
-
-    inner class HeaderHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView)
-
     companion object {
-
-        // TODO change format possibly
-        internal val shortDateTimeFormat = DateTimeFormat.mediumDate().withLocale(Locale.getDefault())
 
         /**
          * Returns a new instance of this fragment

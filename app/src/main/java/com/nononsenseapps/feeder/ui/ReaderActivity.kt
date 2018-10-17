@@ -4,15 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.fragment.app.Fragment
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.FeedItemSQL
+import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
+import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.views.DrawShadowFrameLayout
 
 /**
  * Displays feed items suitable for consumption.
  */
 class ReaderActivity : BaseActivity() {
-    private var mFragment: androidx.fragment.app.Fragment? = null
+    private var fragment: Fragment? = null
     private var mDrawShadowFrameLayout: DrawShadowFrameLayout? = null
 
     /**
@@ -20,8 +22,7 @@ class ReaderActivity : BaseActivity() {
      *
      * @return ReaderFragment
      */
-    private val fragment: androidx.fragment.app.Fragment
-        get() {
+    private fun fragmentFromIntent(): ReaderFragment {
             val i = intent
             val fragment = ReaderFragment()
             fragment.arguments = i.extras
@@ -39,12 +40,13 @@ class ReaderActivity : BaseActivity() {
             ab.setDisplayShowTitleEnabled(false)
         }
 
-        if (savedInstanceState == null) {
-            mFragment = fragment
-            supportFragmentManager.beginTransaction()
-                    .add(R.id.container, mFragment!!, "single_pane").commit()
+        fragment = if (savedInstanceState == null) {
+            fragmentFromIntent().also {
+                supportFragmentManager.beginTransaction()
+                        .add(R.id.container, it, "single_pane").commit()
+            }
         } else {
-            mFragment = supportFragmentManager.findFragmentByTag("single_pane")
+            supportFragmentManager.findFragmentByTag("single_pane")
         }
 
         mDrawShadowFrameLayout = findViewById(R.id.main_content)
@@ -73,7 +75,7 @@ class ReaderActivity : BaseActivity() {
 
     override fun onActionBarAutoShowOrHide(shown: Boolean) {
         super.onActionBarAutoShowOrHide(shown)
-        mDrawShadowFrameLayout!!.setShadowVisible(shown, shown)
+        mDrawShadowFrameLayout?.setShadowVisible(shown, shown)
     }
 
     override fun onBackPressed() {
@@ -92,16 +94,29 @@ class ReaderActivity : BaseActivity() {
          * @param intent  to fill extras in
          * @param rssItem to read
          */
-        fun setRssExtras(intent: Intent, rssItem: FeedItemSQL) {
+        fun setRssExtras(intent: Intent, rssItem: PreviewItem) {
             intent.putExtra(ARG_ID, rssItem.id)
-            intent.putExtra(ARG_TITLE, rssItem.title)
-            intent.putExtra(ARG_DESCRIPTION, rssItem.description)
+            intent.putExtra(ARG_TITLE, rssItem.plainTitle)
+            intent.putExtra(ARG_DESCRIPTION, rssItem.plainSnippet)
             intent.putExtra(ARG_LINK, rssItem.link)
-            intent.putExtra(ARG_ENCLOSURE, rssItem.enclosurelink)
-            intent.putExtra(ARG_IMAGEURL, rssItem.imageurl)
+            intent.putExtra(ARG_ENCLOSURE, rssItem.enclosureLink)
+            intent.putExtra(ARG_IMAGEURL, rssItem.imageUrl)
             intent.putExtra(ARG_DATE, rssItem.pubDateString)
             intent.putExtra(ARG_AUTHOR, rssItem.author)
-            intent.putExtra(ARG_FEEDTITLE, rssItem.feedtitle)
+            intent.putExtra(ARG_FEEDTITLE, rssItem.feedTitle)
+            intent.putExtra(ARG_FEED_URL, rssItem.feedUrl.toString())
+        }
+
+        fun setRssExtras(intent: Intent, rssItem: FeedItemWithFeed) {
+            intent.putExtra(ARG_ID, rssItem.id)
+            intent.putExtra(ARG_TITLE, rssItem.plainTitle)
+            intent.putExtra(ARG_DESCRIPTION, rssItem.plainSnippet)
+            intent.putExtra(ARG_LINK, rssItem.link)
+            intent.putExtra(ARG_ENCLOSURE, rssItem.enclosureLink)
+            intent.putExtra(ARG_IMAGEURL, rssItem.imageUrl)
+            intent.putExtra(ARG_DATE, rssItem.pubDateString)
+            intent.putExtra(ARG_AUTHOR, rssItem.author)
+            intent.putExtra(ARG_FEEDTITLE, rssItem.feedTitle)
             intent.putExtra(ARG_FEED_URL, rssItem.feedUrl.toString())
         }
     }
