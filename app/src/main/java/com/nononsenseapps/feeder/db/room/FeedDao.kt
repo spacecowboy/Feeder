@@ -31,8 +31,18 @@ interface FeedDao {
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
     fun loadFeed(feedId: Long): Feed?
 
+    @Query("""
+       SELECT * FROM feeds
+       WHERE id is :feedId
+       AND last_sync < :staleTime
+    """)
+    fun loadFeedIfStale(feedId: Long, staleTime: Long): Feed?
+
     @Query("SELECT * FROM feeds WHERE tag IS :tag")
     fun loadFeeds(tag: String): List<Feed>
+
+    @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime")
+    fun loadFeedsIfStale(tag: String, staleTime: Long): List<Feed>
 
     @Query("SELECT notify FROM feeds WHERE tag IS :tag")
     fun loadLiveFeedsNotify(tag: String): LiveData<List<Boolean>>
@@ -42,6 +52,9 @@ interface FeedDao {
 
     @Query("SELECT * FROM feeds")
     fun loadFeeds(): List<Feed>
+
+    @Query("SELECT * FROM feeds WHERE last_sync < :staleTime")
+    fun loadFeedsIfStale(staleTime: Long): List<Feed>
 
     @Query("SELECT * FROM feeds WHERE url IS :url")
     fun loadFeedWithUrl(url: URL): Feed?

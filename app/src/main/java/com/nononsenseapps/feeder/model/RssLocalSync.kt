@@ -15,6 +15,8 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import kotlinx.coroutines.experimental.withTimeoutOrNull
 import okhttp3.Response
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
@@ -25,7 +27,14 @@ fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork: Boolean
     try {
         runBlocking {
             val time = measureTimeMillis {
-                val feedsToFetch = feedsToSync(db, feedId, tag)
+                val staleTime: Long = if (forceNetwork) {
+                    DateTime.now(DateTimeZone.UTC).millis
+                } else {
+                    DateTime.now(DateTimeZone.UTC)
+                            .minusMinutes(PrefUtils.synchronizationFrequency(context).toInt())
+                            .millis
+                }
+                val feedsToFetch = feedsToSync(db, feedId, tag, staleTime = staleTime)
                 feedsToFetch
                         .map { launch(coroutineContext) { syncFeed(it, context, forceNetwork = forceNetwork) } }
                         .forEach {
@@ -80,6 +89,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
         try {
             feed?.let { _ ->
                 feedSql.updateFromParsedFeed(feed)
+                feedSql.lastSync = DateTime.now(DateTimeZone.UTC).millis
 
                 feedSql.id = db.feedDao().upsertFeed(feedSql)
 
@@ -122,18 +132,18 @@ private suspend fun fetchFeed(context: Context, feedSql: com.nononsenseapps.feed
     }
 }
 
-private fun feedsToSync(db: AppDatabase, feedId: Long, tag: String): List<com.nononsenseapps.feeder.db.room.Feed> {
+internal fun feedsToSync(db: AppDatabase, feedId: Long, tag: String, staleTime: Long = -1L): List<com.nononsenseapps.feeder.db.room.Feed> {
     return when {
         feedId > 0 -> {
-            val feed = db.feedDao().loadFeed(feedId)
+            val feed = if (staleTime > 0) db.feedDao().loadFeedIfStale(feedId, staleTime = staleTime) else db.feedDao().loadFeed(feedId)
             if (feed != null) {
                 listOf(feed)
             } else {
                 emptyList()
             }
         }
-        !tag.isEmpty() -> db.feedDao().loadFeeds(tag)
-        else -> db.feedDao().loadFeeds()
+        !tag.isEmpty() -> if (staleTime > 0) db.feedDao().loadFeedsIfStale(tag = tag, staleTime = staleTime) else db.feedDao().loadFeeds(tag)
+        else -> if (staleTime > 0) db.feedDao().loadFeedsIfStale(staleTime) else db.feedDao().loadFeeds()
     }
 }
 

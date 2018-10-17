@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.db.legacy.COL_FEED
 import com.nononsenseapps.feeder.db.legacy.COL_FEEDTITLE
 import com.nononsenseapps.feeder.db.legacy.COL_FEEDURL
 import com.nononsenseapps.feeder.db.legacy.COL_GUID
+import com.nononsenseapps.feeder.db.legacy.COL_ID
 import com.nononsenseapps.feeder.db.legacy.COL_IMAGEURL
 import com.nononsenseapps.feeder.db.legacy.COL_LINK
 import com.nononsenseapps.feeder.db.legacy.COL_NOTIFIED
@@ -26,11 +27,11 @@ import com.nononsenseapps.feeder.db.legacy.COL_TITLE
 import com.nononsenseapps.feeder.db.legacy.COL_UNREAD
 import com.nononsenseapps.feeder.db.legacy.COL_URL
 import com.nononsenseapps.feeder.db.legacy.CREATE_FEED_ITEM_TABLE
-import com.nononsenseapps.feeder.db.legacy.CREATE_FEED_TABLE
+import com.nononsenseapps.feeder.db.legacy.CREATE_TAGS_VIEW
+import com.nononsenseapps.feeder.db.legacy.CREATE_TAG_TRIGGER
 import com.nononsenseapps.feeder.db.legacy.FEED_ITEM_TABLE_NAME
 import com.nononsenseapps.feeder.db.legacy.FEED_TABLE_NAME
 import com.nononsenseapps.feeder.db.legacy.LegacyDatabaseHandler
-import com.nononsenseapps.feeder.db.legacy.createViewsAndTriggers
 import com.nononsenseapps.feeder.util.contentValues
 import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setLong
@@ -49,7 +50,7 @@ import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MigrationFromLegacy6ToRoom7 {
+class MigrationFromLegacy5ToLatest {
 
     @Rule
     @JvmField
@@ -63,21 +64,41 @@ class MigrationFromLegacy6ToRoom7 {
     private val legacyDb: LegacyDatabaseHandler
         get() = LegacyDatabaseHandler(context = InstrumentationRegistry.getTargetContext(),
                 name = testDbName,
-                version = 6)
+                version = 5)
 
     private val roomDb: AppDatabase
         get() =
             Room.databaseBuilder(InstrumentationRegistry.getTargetContext(),
                     AppDatabase::class.java,
                     testDbName)
+                    .addMigrations(MIGRATION_5_7, MIGRATION_6_7, MIGRATION_7_8)
                     .build().also { testHelper.closeWhenFinished(it) }
 
     @Before
     fun setup() {
         legacyDb.writableDatabase.use { db ->
-            db.execSQL(CREATE_FEED_TABLE)
+            db.execSQL("""
+                CREATE TABLE $FEED_TABLE_NAME (
+                  $COL_ID INTEGER PRIMARY KEY,
+                  $COL_TITLE TEXT NOT NULL,
+                  $COL_CUSTOM_TITLE TEXT NOT NULL,
+                  $COL_URL TEXT NOT NULL,
+                  $COL_TAG TEXT NOT NULL DEFAULT '',
+                  $COL_NOTIFY INTEGER NOT NULL DEFAULT 0,
+                  UNIQUE($COL_URL) ON CONFLICT REPLACE
+                )""")
             db.execSQL(CREATE_FEED_ITEM_TABLE)
-            createViewsAndTriggers(db)
+            db.execSQL(CREATE_TAG_TRIGGER)
+            db.execSQL("""
+                CREATE TEMP VIEW IF NOT EXISTS WithUnreadCount
+                AS SELECT $COL_ID, $COL_TITLE, $COL_URL, $COL_TAG, $COL_CUSTOM_TITLE, $COL_NOTIFY, "unreadcount"
+                   FROM $FEED_TABLE_NAME
+                   LEFT JOIN (SELECT COUNT(1) AS ${"unreadcount"}, $COL_FEED
+                     FROM $FEED_ITEM_TABLE_NAME
+                     WHERE $COL_UNREAD IS 1
+                     GROUP BY $COL_FEED)
+                   ON $FEED_TABLE_NAME.$COL_ID = $COL_FEED""")
+            db.execSQL(CREATE_TAGS_VIEW)
 
             // Bare minimum non-null feeds
             val idA = db.insert(FEED_TABLE_NAME, null, contentValues {
@@ -93,7 +114,6 @@ class MigrationFromLegacy6ToRoom7 {
                 setString(COL_CUSTOM_TITLE to "feedBCustom")
                 setString(COL_URL to "https://feedB")
                 setString(COL_TAG to "tag")
-                setString(COL_IMAGEURL to "https://image")
                 setInt(COL_NOTIFY to 1)
             })
 
@@ -140,7 +160,7 @@ class MigrationFromLegacy6ToRoom7 {
     @Test
     fun legacyMigrationTo7MinimalFeed() {
         testHelper.runMigrationsAndValidate(testDbName, 7, true,
-                MIGRATION_6_7)
+                MIGRATION_5_7, MIGRATION_7_8)
 
         roomDb.let { db ->
             val feeds = db.feedDao().loadFeeds()
@@ -153,6 +173,7 @@ class MigrationFromLegacy6ToRoom7 {
             assertEquals("feedACustom", feedA.customTitle)
             assertEquals(URL("https://feedA"), feedA.url)
             assertEquals("", feedA.tag)
+            assertEquals(0, feedA.lastSync)
             assertFalse(feedA.notify)
             assertNull(feedA.imageUrl)
         }
@@ -161,7 +182,7 @@ class MigrationFromLegacy6ToRoom7 {
     @Test
     fun legacyMigrationTo7CompleteFeed() {
         testHelper.runMigrationsAndValidate(testDbName, 7, true,
-                MIGRATION_6_7)
+                MIGRATION_5_7, MIGRATION_7_8)
 
         roomDb.let { db ->
             val feeds = db.feedDao().loadFeeds()
@@ -174,15 +195,16 @@ class MigrationFromLegacy6ToRoom7 {
             assertEquals("feedBCustom", feedB.customTitle)
             assertEquals(URL("https://feedB"), feedB.url)
             assertEquals("tag", feedB.tag)
+            assertEquals(0, feedB.lastSync)
             assertTrue(feedB.notify)
-            assertEquals(URL("https://image"), feedB.imageUrl)
+            assertNull(feedB.imageUrl)
         }
     }
 
     @Test
     fun legacyMigrationTo7MinimalFeedItem() {
         testHelper.runMigrationsAndValidate(testDbName, 7, true,
-                MIGRATION_6_7)
+                MIGRATION_5_7, MIGRATION_7_8)
 
         roomDb.let { db ->
             val feed = db.feedDao().loadFeeds()[0]
@@ -212,7 +234,7 @@ class MigrationFromLegacy6ToRoom7 {
     @Test
     fun legacyMigrationTo7CompleteFeedItem() {
         testHelper.runMigrationsAndValidate(testDbName, 7, true,
-                MIGRATION_6_7)
+                MIGRATION_5_7, MIGRATION_7_8)
 
         roomDb.let { db ->
             val feed = db.feedDao().loadFeeds()[1]

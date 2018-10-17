@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
+import com.nononsenseapps.feeder.db.COL_LASTSYNC
 import com.nononsenseapps.feeder.db.COL_NOTIFY
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
@@ -29,7 +30,8 @@ data class Feed @Ignore constructor(
         @ColumnInfo(name = COL_URL) var url: URL = sloppyLinkToStrictURL(""),
         @ColumnInfo(name = COL_TAG) var tag: String = "",
         @ColumnInfo(name = COL_NOTIFY) var notify: Boolean = false,
-        @ColumnInfo(name = COL_IMAGEURL) var imageUrl: URL? = null
+        @ColumnInfo(name = COL_IMAGEURL) var imageUrl: URL? = null,
+        @ColumnInfo(name = COL_LASTSYNC) var lastSync: Long = 0
 ) {
     constructor() : this(id = ID_UNSET)
 
