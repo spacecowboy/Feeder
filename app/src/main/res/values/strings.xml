@@ -83,6 +83,7 @@
   <string name="max_feed_items">Maximum number of items per feed</string>
   <string name="could_not_load_url">Could not load URL</string>
 
+  <string name="theme_system">Follow system</string>
   <string name="theme_automatic">Automatic</string>
   <string name="theme_day">Day</string>
   <string name="theme_night">Night</string>

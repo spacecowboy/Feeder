@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
-import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 
 /**
  * Boolean indicating whether we performed the (one-time) welcome flow.
