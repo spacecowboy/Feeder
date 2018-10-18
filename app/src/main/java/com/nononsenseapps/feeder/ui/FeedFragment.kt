@@ -315,7 +315,7 @@ class FeedFragment : Fragment() {
         menu?.findItem(R.id.action_only_unread)?.let { menuItem ->
             val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
             menuItem.isChecked = onlyUnread
-            menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)
+            menuItem.setTitle(if (onlyUnread) R.string.show_all_items else R.string.show_unread_items)
 
             menuItem.setIcon(
                     when (onlyUnread) {
