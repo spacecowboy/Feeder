@@ -1,3 +1,9 @@
+# 1.7.1
+*   Fixed possible crash when marking all items as read
+    See !127 #145
+*   Fixed text for show unread toggle
+    See !125
+
 # 1.7.0
 *   Moved notification toggle to options menu
     See !123 #125 #66
