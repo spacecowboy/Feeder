@@ -71,7 +71,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                 try {
                     fetchFeed(context, feedSql, forceNetwork = forceNetwork)
                 } catch (t: Throwable) {
-                    Log.e("CoroutineSync", "Shit hit the fan: $t")
+                    Log.e("CoroutineSync", "Shit hit the fan1: $t")
                     null
                 }
 
@@ -81,7 +81,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                         Log.d("CoroutineSync", "Parsing ${feedSql.displayTitle} on ${Thread.currentThread().name}")
                         context.feedParser.parseFeedResponse(it)
                     } catch (t: Throwable) {
-                        Log.e("CoroutineSync", "Shit hit the fan: $t")
+                        Log.e("CoroutineSync", "Shit hit the fan2: ${feedSql.displayTitle}, $t")
                         null
                     }
                 }
@@ -111,7 +111,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                 }
             }
         } catch (t: Throwable) {
-            Log.e("CoroutineSync", "Shit hit the fan: $t")
+            Log.e("CoroutineSync", "Shit hit the fan3: ${feedSql.displayTitle}, $t")
         }
     } catch (t: Throwable) {
         Log.e("CoroutineSync", "Something went wrong: $t")

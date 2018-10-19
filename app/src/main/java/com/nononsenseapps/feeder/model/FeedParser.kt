@@ -23,7 +23,6 @@ import org.jsoup.nodes.Document
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.lang.NumberFormatException
 import java.net.MalformedURLException
 import java.net.URL
 import java.nio.charset.Charset
@@ -219,7 +218,10 @@ object FeedParser {
             client
         }
 
-        return withContext(IO) { clientToUse.newCall(request).execute() }
+        return withContext(IO) {
+            Log.d("CoroutineSync", "Fetching response on ${Thread.currentThread().name}")
+            clientToUse.newCall(request).execute()
+        }
     }
 
     @Throws(FeedParser.FeedParsingError::class)
@@ -283,7 +285,7 @@ object FeedParser {
     @Throws(FeedParser.FeedParsingError::class)
     internal fun parseRssAtomBytes(baseUrl: URL, feedXml: ByteArray): Feed {
         try {
-        feedXml.inputStream().use { return parseFeedInputStream(baseUrl, it) }
+            feedXml.inputStream().use { return parseFeedInputStream(baseUrl, it) }
         } catch (e: NumberFormatException) {
             try {
                 // Try to work around bug in Rome
