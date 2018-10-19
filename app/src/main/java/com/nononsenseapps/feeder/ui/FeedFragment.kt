@@ -368,8 +368,11 @@ class FeedFragment : Fragment() {
         // Cancel any notifications
         context?.applicationContext?.let { appContext ->
             feedItemsViewModel?.liveDbPreviews?.value?.forEach{
-                launch(Background) {
-                    cancelNotification(appContext, it.id)
+                // Can be null in case of placeholder values
+                it?.id?.let { id ->
+                    launch(Background) {
+                        cancelNotification(appContext, id)
+                    }
                 }
             }
         }
