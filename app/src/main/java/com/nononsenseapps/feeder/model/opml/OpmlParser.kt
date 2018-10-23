@@ -76,8 +76,10 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
                 ignoring > 0 || isFeedTag -> ignoring++
                 outlineIsFeed(atts) -> {
                     isFeedTag = true
+                    val feedTitle = unescape(atts?.getValue("title") ?: atts?.getValue("text") ?: "")
                     val feed = Feed(
-                            title = unescape(atts?.getValue("title") ?: atts?.getValue("text") ?: ""),
+                            title = feedTitle,
+                            customTitle = feedTitle,
                             tag = if (tagStack.isNotEmpty()) tagStack.peek() else "",
                             url = sloppyLinkToStrictURL(atts?.getValue("xmlurl") ?: ""))
 

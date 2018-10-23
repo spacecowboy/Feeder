@@ -31,18 +31,18 @@ private val sampleFile: List<String> = """<?xml version="1.0" encoding="UTF-8"?>
         |  </head>
         |  <body>
         |    <outline title="&quot;0&quot;" text="&quot;0&quot;" type="rss" xmlUrl="http://somedomain0.com/rss.xml"/>
-        |    <outline title="&quot;3&quot;" text="&quot;3&quot;" type="rss" xmlUrl="http://somedomain3.com/rss.xml"/>
-        |    <outline title="&quot;6&quot;" text="&quot;6&quot;" type="rss" xmlUrl="http://somedomain6.com/rss.xml"/>
-        |    <outline title="&quot;9&quot;" text="&quot;9&quot;" type="rss" xmlUrl="http://somedomain9.com/rss.xml"/>
+        |    <outline title="custom &quot;3&quot;" text="custom &quot;3&quot;" type="rss" xmlUrl="http://somedomain3.com/rss.xml"/>
+        |    <outline title="custom &quot;6&quot;" text="custom &quot;6&quot;" type="rss" xmlUrl="http://somedomain6.com/rss.xml"/>
+        |    <outline title="custom &quot;9&quot;" text="custom &quot;9&quot;" type="rss" xmlUrl="http://somedomain9.com/rss.xml"/>
         |    <outline title="tag1" text="tag1">
-        |      <outline title="&quot;1&quot;" text="&quot;1&quot;" type="rss" xmlUrl="http://somedomain1.com/rss.xml"/>
-        |      <outline title="&quot;4&quot;" text="&quot;4&quot;" type="rss" xmlUrl="http://somedomain4.com/rss.xml"/>
-        |      <outline title="&quot;7&quot;" text="&quot;7&quot;" type="rss" xmlUrl="http://somedomain7.com/rss.xml"/>
+        |      <outline title="custom &quot;1&quot;" text="custom &quot;1&quot;" type="rss" xmlUrl="http://somedomain1.com/rss.xml"/>
+        |      <outline title="custom &quot;4&quot;" text="custom &quot;4&quot;" type="rss" xmlUrl="http://somedomain4.com/rss.xml"/>
+        |      <outline title="custom &quot;7&quot;" text="custom &quot;7&quot;" type="rss" xmlUrl="http://somedomain7.com/rss.xml"/>
         |    </outline>
         |    <outline title="tag2" text="tag2">
-        |      <outline title="&quot;2&quot;" text="&quot;2&quot;" type="rss" xmlUrl="http://somedomain2.com/rss.xml"/>
-        |      <outline title="&quot;5&quot;" text="&quot;5&quot;" type="rss" xmlUrl="http://somedomain5.com/rss.xml"/>
-        |      <outline title="&quot;8&quot;" text="&quot;8&quot;" type="rss" xmlUrl="http://somedomain8.com/rss.xml"/>
+        |      <outline title="custom &quot;2&quot;" text="custom &quot;2&quot;" type="rss" xmlUrl="http://somedomain2.com/rss.xml"/>
+        |      <outline title="custom &quot;5&quot;" text="custom &quot;5&quot;" type="rss" xmlUrl="http://somedomain5.com/rss.xml"/>
+        |      <outline title="custom &quot;8&quot;" text="custom &quot;8&quot;" type="rss" xmlUrl="http://somedomain8.com/rss.xml"/>
         |    </outline>
         |  </body>
         |</opml>""".trimMargin().split("\n")
@@ -106,20 +106,29 @@ class OPMLTest {
         val feeds = db.feedDao().loadFeeds()
         assertFalse("No feeds in DB!", feeds.isEmpty())
         for (feed in feeds) {
-            val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
+            val i = Integer.parseInt(feed.title.replace("[custom \"]".toRegex(), ""))
             seen.add(i)
-            assertEquals("Title doesn't match", "\"$i\"", feed.title)
             assertEquals("URL doesn't match", URL("http://somedomain$i.com/rss.xml"), feed.url)
-            if (i % 3 == 1) {
-                assertEquals("tag1", feed.tag)
-            } else if (i % 3 == 2) {
-                assertEquals("tag2", feed.tag)
-            } else {
-                assertEquals("", feed.tag)
+
+            when (i) {
+                0 -> {
+                    assertEquals("title should be the same", "\"$i\"", feed.title)
+                    assertEquals("custom title should have been set to title", "\"$i\"", feed.customTitle)
+                }
+                else -> {
+                    assertEquals("custom title should have overridden title", "custom \"$i\"", feed.title)
+                    assertEquals("title and custom title should match", feed.customTitle, feed.title)
+                }
+            }
+
+            when {
+                i % 3 == 1 -> assertEquals("tag1", feed.tag)
+                i % 3 == 2 -> assertEquals("tag2", feed.tag)
+                else -> assertEquals("", feed.tag)
             }
         }
         for (i in 0..9) {
-            assertTrue("Missing " + i, seen.contains(i))
+            assertTrue("Missing $i", seen.contains(i))
         }
     }
 
@@ -153,22 +162,35 @@ class OPMLTest {
         val feeds = db.feedDao().loadFeeds()
         assertFalse("No feeds in DB!", feeds.isEmpty())
         for (feed in feeds) {
-            val i = Integer.parseInt(feed.title.replace("\"".toRegex(), ""))
+            val i = Integer.parseInt(feed.title.replace("[custom \"]".toRegex(), ""))
             seen.add(i)
             assertEquals(URL("http://somedomain$i.com/rss.xml"), feed.url)
-            assertEquals("\"" + Integer.toString(i) + "\"", feed.title)
 
-            if (i == 20) {
-                assertEquals("Should not have changed", feednew.id, feed.id)
-                assertEquals("Should not have changed", feednew.title, feed.title)
-                assertEquals("Should not have changed", feednew.url, feed.url)
-                assertEquals("Should not have changed", feednew.tag, feed.tag)
-            } else if (i % 3 == 1) {
-                assertEquals("tag1", feed.tag)
-            } else if (i % 3 == 2) {
-                assertEquals("tag2", feed.tag)
-            } else {
-                assertEquals("", feed.tag)
+            when {
+                i == 20 -> {
+                    assertEquals("Should not have changed", feednew.id, feed.id)
+                    assertEquals("Should not have changed", feednew.url, feed.url)
+                    assertEquals("Should not have changed", feednew.tag, feed.tag)
+                }
+                i % 3 == 1 -> assertEquals("tag1", feed.tag)
+                i % 3 == 2 -> assertEquals("tag2", feed.tag)
+                else -> assertEquals("", feed.tag)
+            }
+
+            // Ensure titles are correct
+            when (i) {
+                0 -> {
+                    assertEquals("title should be the same", feedold.title, feed.title)
+                    assertEquals("custom title should have been set to title", feedold.title, feed.customTitle)
+                }
+                20 -> {
+                    assertEquals("feed not present in OPML should not have changed", feednew.title, feed.title)
+                    assertEquals("feed not present in OPML should not have changed", feednew.customTitle, feednew.customTitle)
+                }
+                else -> {
+                    assertEquals("custom title should have overridden title", "custom \"$i\"", feed.title)
+                    assertEquals("title and custom title should match", feed.customTitle, feed.title)
+                }
             }
 
             if (i == 0) {
@@ -178,7 +200,7 @@ class OPMLTest {
         }
         assertTrue("Missing 20", seen.contains(20))
         for (i in 0..9) {
-            assertTrue("Missing " + i, seen.contains(i))
+            assertTrue("Missing $i", seen.contains(i))
         }
     }
 
@@ -231,6 +253,7 @@ class OPMLTest {
             val feed = Feed(
                     url = URL("http://somedomain$i.com/rss.xml"),
                     title = "\"$i\"",
+                    customTitle = if (i == 0) "" else "custom \"$i\"",
                     tag = when (i % 3) {
                         1 -> "tag1"
                         2 -> "tag2"
@@ -261,7 +284,6 @@ class OPMLTest {
         assertEquals("Expecting 1 tags (incl empty)", 1, tags.size)
 
         feeds.forEach { feed ->
-            assertEquals("Custom title should be empty", "", feed.customTitle)
             assertEquals("No tag expected", "", feed.tag)
             when (feed.url) {
                 URL("http://aliceisntdead.libsyn.com/rss") -> {
@@ -297,7 +319,7 @@ class OPMLTest {
     @MediumTest
     fun flymOPMLImports() {
         //given
-        val opmlStream = javaClass.getResourceAsStream("Flym_auto_backup.opml")
+        val opmlStream = javaClass.getResourceAsStream("Flym_auto_backup.opml")!!
 
         //when
         val parser = OpmlParser(OPMLToRoom(db))
@@ -310,51 +332,50 @@ class OPMLTest {
         assertEquals("Expecting 4 tags (incl empty)", 4, tags.size)
 
         feeds.forEach { feed ->
-            assertEquals("Custom title should be empty", "", feed.customTitle)
             when (feed.url) {
                 URL("http://www.smbc-comics.com/rss.php") -> {
                     assertEquals("black humor", feed.tag)
-                    assertEquals("SMBC", feed.title)
+                    assertEquals("SMBC", feed.customTitle)
                 }
                 URL("http://www.deathbulge.com/rss.xml") -> {
                     assertEquals("black humor", feed.tag)
-                    assertEquals("Deathbulge", feed.title)
+                    assertEquals("Deathbulge", feed.customTitle)
                 }
                 URL("http://www.sandraandwoo.com/gaia/feed/") -> {
                     assertEquals("comics", feed.tag)
-                    assertEquals("Gaia", feed.title)
+                    assertEquals("Gaia", feed.customTitle)
                 }
                 URL("http://replaycomic.com/feed/") -> {
                     assertEquals("comics", feed.tag)
-                    assertEquals("Replay", feed.title)
+                    assertEquals("Replay", feed.customTitle)
                 }
                 URL("http://www.cuttimecomic.com/rss.php") -> {
                     assertEquals("comics", feed.tag)
-                    assertEquals("Cut Time", feed.title)
+                    assertEquals("Cut Time", feed.customTitle)
                 }
                 URL("http://www.commitstrip.com/feed/") -> {
                     assertEquals("comics", feed.tag)
-                    assertEquals("Commit strip", feed.title)
+                    assertEquals("Commit strip", feed.customTitle)
                 }
                 URL("http://www.sandraandwoo.com/feed/") -> {
                     assertEquals("comics", feed.tag)
-                    assertEquals("Sandra and Woo", feed.title)
+                    assertEquals("Sandra and Woo", feed.customTitle)
                 }
                 URL("http://www.awakencomic.com/rss.php") -> {
                     assertEquals("comics", feed.tag)
-                    assertEquals("Awaken", feed.title)
+                    assertEquals("Awaken", feed.customTitle)
                 }
                 URL("http://www.questionablecontent.net/QCRSS.xml") -> {
                     assertEquals("comics", feed.tag)
-                    assertEquals("Questionable Content", feed.title)
+                    assertEquals("Questionable Content", feed.customTitle)
                 }
                 URL("https://www.archlinux.org/feeds/news/") -> {
                     assertEquals("Tech", feed.tag)
-                    assertEquals("Arch news", feed.title)
+                    assertEquals("Arch news", feed.customTitle)
                 }
                 URL("https://grisebouille.net/feed/") -> {
                     assertEquals("Political humour", feed.tag)
-                    assertEquals("Grisebouille", feed.title)
+                    assertEquals("Grisebouille", feed.customTitle)
                 }
                 else -> fail("Unexpected URI. Feed: $feed")
             }
@@ -378,35 +399,34 @@ class OPMLTest {
         assertEquals("Expecting 6 tags (incl empty)", 6, tags.size)
 
         feeds.forEach { feed ->
-            assertEquals("Custom title should be empty", "", feed.customTitle)
             when (feed.url) {
                 URL("http://www.les-trois-sagesses.org/rss-articles.xml") -> {
                     assertEquals("Religion", feed.tag)
-                    assertEquals("Les trois sagesses", feed.title)
+                    assertEquals("Les trois sagesses", feed.customTitle)
                 }
                 URL("http://www.avrildeperthuis.com/feed/") -> {
                     assertEquals("Amis", feed.tag)
-                    assertEquals("avril de perthuis", feed.title)
+                    assertEquals("avril de perthuis", feed.customTitle)
                 }
                 URL("http://www.fashioningtech.com/profiles/blog/feed?xn_auth=no") -> {
                     assertEquals("Actu Geek", feed.tag)
-                    assertEquals("Everyone's Blog Posts - Fashioning Technology", feed.title)
+                    assertEquals("Everyone's Blog Posts - Fashioning Technology", feed.customTitle)
                 }
                 URL("http://feeds2.feedburner.com/ChartPorn") -> {
                     assertEquals("Graphs", feed.tag)
-                    assertEquals("Chart Porn", feed.title)
+                    assertEquals("Chart Porn", feed.customTitle)
                 }
                 URL("http://www.mosqueedeparis.net/index.php?format=feed&amp;type=atom") -> {
                     assertEquals("Religion", feed.tag)
-                    assertEquals("Mosquee de Paris", feed.title)
+                    assertEquals("Mosquee de Paris", feed.customTitle)
                 }
                 URL("http://sourceforge.net/projects/stuntrally/rss") -> {
                     assertEquals("Mainstream update", feed.tag)
-                    assertEquals("Stunt Rally", feed.title)
+                    assertEquals("Stunt Rally", feed.customTitle)
                 }
                 URL("http://www.mairie6.lyon.fr/cs/Satellite?Thematique=&TypeContenu=Actualite&pagename=RSSFeed&site=Mairie6") -> {
                     assertEquals("", feed.tag)
-                    assertEquals("Actualités", feed.title)
+                    assertEquals("Actualités", feed.customTitle)
                 }
             }
         }
@@ -416,7 +436,7 @@ class OPMLTest {
     @MediumTest
     fun rssGuardOPMLImports2() {
         //given
-        val opmlStream = javaClass.getResourceAsStream("rssguard_2.opml")
+        val opmlStream = javaClass.getResourceAsStream("rssguard_2.opml")!!
 
         //when
         val parser = OpmlParser(OPMLToRoom(db))
@@ -429,35 +449,34 @@ class OPMLTest {
         assertEquals("Expecting 6 tags (incl empty)", 6, tags.size)
 
         feeds.forEach { feed ->
-            assertEquals("Custom title should be empty", "", feed.customTitle)
             when (feed.url) {
                 URL("http://www.les-trois-sagesses.org/rss-articles.xml") -> {
                     assertEquals("Religion", feed.tag)
-                    assertEquals("Les trois sagesses", feed.title)
+                    assertEquals("Les trois sagesses", feed.customTitle)
                 }
                 URL("http://www.avrildeperthuis.com/feed/") -> {
                     assertEquals("Amis", feed.tag)
-                    assertEquals("avril de perthuis", feed.title)
+                    assertEquals("avril de perthuis", feed.customTitle)
                 }
                 URL("http://www.fashioningtech.com/profiles/blog/feed?xn_auth=no") -> {
                     assertEquals("Actu Geek", feed.tag)
-                    assertEquals("Everyone's Blog Posts - Fashioning Technology", feed.title)
+                    assertEquals("Everyone's Blog Posts - Fashioning Technology", feed.customTitle)
                 }
                 URL("http://feeds2.feedburner.com/ChartPorn") -> {
                     assertEquals("Graphs", feed.tag)
-                    assertEquals("Chart Porn", feed.title)
+                    assertEquals("Chart Porn", feed.customTitle)
                 }
                 URL("http://www.mosqueedeparis.net/index.php?format=feed&amp;type=atom") -> {
                     assertEquals("Religion", feed.tag)
-                    assertEquals("Mosquee de Paris", feed.title)
+                    assertEquals("Mosquee de Paris", feed.customTitle)
                 }
                 URL("http://sourceforge.net/projects/stuntrally/rss") -> {
                     assertEquals("Mainstream update", feed.tag)
-                    assertEquals("Stunt Rally", feed.title)
+                    assertEquals("Stunt Rally", feed.customTitle)
                 }
                 URL("http://www.mairie6.lyon.fr/cs/Satellite?Thematique=&TypeContenu=Actualite&pagename=RSSFeed&site=Mairie6") -> {
                     assertEquals("", feed.tag)
-                    assertEquals("Actualités", feed.title)
+                    assertEquals("Actualités", feed.customTitle)
                 }
             }
         }
