@@ -179,7 +179,7 @@ class EditFeedActivity : AppCompatActivity() {
 
                 val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId"))
                 intent.putExtra(ARG_FEED_TITLE, title)
-                        .putExtra(ARG_FEED_URL, feed.url)
+                        .putExtra(ARG_FEED_URL, feed.url.toString())
                         .putExtra(ARG_FEED_TAG, feed.tag)
 
                 setResult(RESULT_OK, intent)

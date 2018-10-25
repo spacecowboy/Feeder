@@ -138,7 +138,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
             if (parentIntent != null) {
                 parentIntent.data = Uri.withAppendedPath(URI_FEEDS, "${item.feedId}")
                 parentIntent.putExtra(ARG_FEEDTITLE, item.feedTitle)
-                parentIntent.putExtra(ARG_FEED_URL, item.feedUrl)
+                parentIntent.putExtra(ARG_FEED_URL, item.feedUrl.toString())
             }
             stackBuilder.getPendingIntent(item.id.toInt(), PendingIntent.FLAG_UPDATE_CURRENT)
         }
