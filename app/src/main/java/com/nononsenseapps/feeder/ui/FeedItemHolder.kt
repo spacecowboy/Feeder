@@ -23,7 +23,8 @@ import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.openLinkInBrowser
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
@@ -161,7 +162,7 @@ class FeedItemHolder(val view: View, private val dismissListener: DismissedListe
                     // Mark as read
                     val db = AppDatabase.getInstance(context)
                     rssItem?.id?.let {
-                        launch(BackgroundUI) {
+                        GlobalScope.launch(BackgroundUI) {
                             db.feedItemDao().markAsRead(it)
                         }
                     }

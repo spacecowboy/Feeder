@@ -3,11 +3,12 @@ package com.nononsenseapps.feeder.util
 import android.content.Context
 import android.util.Log
 import com.nononsenseapps.feeder.coroutines.Background
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 
 
-fun ensureDebugLogDeletedInBackground(context: Context) = launch(Background) {
+fun ensureDebugLogDeletedInBackground(context: Context) = GlobalScope.launch(Background) {
     try {
         val logFile = File(context.filesDir, "feeder.log")
         if (logFile.exists()) {

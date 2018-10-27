@@ -42,7 +42,8 @@ import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 const val ARG_FEED_ID = "feed_id"
 const val ARG_FEED_TITLE = "feed_title"
@@ -173,7 +174,7 @@ class FeedFragment : Fragment() {
 
         // Remember choice in future
         val appContext = context?.applicationContext
-        launch(Background) {
+        GlobalScope.launch(Background) {
             if (appContext != null) {
                 PrefUtils.setLastOpenFeed(appContext, id, feedTag)
             }
@@ -348,7 +349,7 @@ class FeedFragment : Fragment() {
         val feedTag = this.feedTag
         val appContext = context?.applicationContext
         if (appContext != null) {
-            launch(Background) {
+            GlobalScope.launch(Background) {
                 // Set as notified so we don't spam
                 feedItemsViewModel?.markAsNotified()
                 val dao = AppDatabase.getInstance(appContext).feedDao()
@@ -370,7 +371,7 @@ class FeedFragment : Fragment() {
             feedItemsViewModel?.liveDbPreviews?.value?.forEach{
                 // Can be null in case of placeholder values
                 it?.id?.let { id ->
-                    launch(Background) {
+                    GlobalScope.launch(Background) {
                         cancelNotification(appContext, id)
                     }
                 }
@@ -417,7 +418,7 @@ class FeedFragment : Fragment() {
                 val feedId = this.id
                 val appContext = activity?.applicationContext
                 if (appContext != null) {
-                    launch(BackgroundUI) {
+                    GlobalScope.launch(BackgroundUI) {
                         feedViewModel?.deleteFeed()
 
                         // Remove from shortcuts

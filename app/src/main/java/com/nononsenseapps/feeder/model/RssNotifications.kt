@@ -29,8 +29,9 @@ import com.nononsenseapps.feeder.ui.FeedActivity
 import com.nononsenseapps.feeder.ui.ReaderActivity
 import com.nononsenseapps.feeder.util.ARG_FEEDTITLE
 import com.nononsenseapps.feeder.util.notificationManager
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 const val notificationId = 73583
@@ -38,7 +39,7 @@ const val channelId = "feederNotifications"
 
 fun notifyInBackground(context: Context) {
     val appContext = context.applicationContext
-    launch(Background) {
+    GlobalScope.launch(Background) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(appContext)
         }
@@ -76,7 +77,7 @@ fun notifyInBackground(context: Context) {
 
 fun cancelNotificationInBackground(context: Context, feedItemId: Long) {
     val appContext = context.applicationContext
-    launch(Background) {
+    GlobalScope.launch(Background) {
         cancelNotification(appContext, feedItemId)
     }
 }

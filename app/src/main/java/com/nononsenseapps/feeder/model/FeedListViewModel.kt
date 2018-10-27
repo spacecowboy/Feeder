@@ -9,9 +9,10 @@ import androidx.lifecycle.ViewModelProviders
 import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FeedListViewModel(application: Application): AndroidViewModel(application) {
     private val dao = AppDatabase.getInstance(application).feedDao()
@@ -21,7 +22,7 @@ class FeedListViewModel(application: Application): AndroidViewModel(application)
 
     init {
         liveFeedsAndTagsWithUnreadCounts.addSource(liveFeedsWithUnreadCounts) { feeds ->
-            launch(Background) {
+            GlobalScope.launch(Background) {
                 val topTag = FeedUnreadCount(id = ID_ALL_FEEDS)
                 val tags: MutableMap<String, FeedUnreadCount> = ArrayMap()
                 val data: MutableList<FeedUnreadCount> = mutableListOf(topTag)
@@ -46,7 +47,7 @@ class FeedListViewModel(application: Application): AndroidViewModel(application)
 
                 data.sortWith(Comparator {a, b -> a.compareTo(b)})
 
-                withContext(UI) {
+                withContext(Dispatchers.Main) {
                     liveFeedsAndTagsWithUnreadCounts.value = data
                 }
             }

@@ -18,8 +18,9 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private val PAGE_SIZE = 50
 
@@ -61,7 +62,7 @@ class FeedItemsViewModel(application: Application, val feedId: Long, val tag: St
     }
 
     fun markAllAsRead() {
-        launch(BackgroundUI) {
+        GlobalScope.launch(BackgroundUI) {
             when {
                 feedId > ID_UNSET -> dao.markAllAsRead(feedId)
                 feedId == ID_ALL_FEEDS -> dao.markAllAsRead()
@@ -72,7 +73,7 @@ class FeedItemsViewModel(application: Application, val feedId: Long, val tag: St
     }
 
     fun toggleReadState(feedItem: PreviewItem) {
-        launch(BackgroundUI) {
+        GlobalScope.launch(BackgroundUI) {
             dao.markAsRead(feedItem.id, unread = !feedItem.unread)
             cancelNotificationInBackground(getApplication(), feedItem.id)
         }

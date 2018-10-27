@@ -23,7 +23,8 @@ import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.asFeedItemFoo
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.views.ObservableScrollView
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 import java.util.*
@@ -71,7 +72,7 @@ class ReaderFragment : androidx.fragment.app.Fragment() {
             val appContext = context?.applicationContext
             appContext?.let {
                 val db = AppDatabase.getInstance(appContext)
-                launch(BackgroundUI) {
+                GlobalScope.launch(BackgroundUI) {
                     db.feedItemDao().markAsReadAndNotified(itemId)
                     cancelNotificationInBackground(it, itemId)
                 }
@@ -228,7 +229,7 @@ class ReaderFragment : androidx.fragment.app.Fragment() {
             R.id.action_mark_as_unread -> {
                 context?.applicationContext?.let {
                     val db = AppDatabase.getInstance(it)
-                    launch(BackgroundUI) {
+                    GlobalScope.launch(BackgroundUI) {
                         db.feedItemDao().markAsRead(_id, unread = true)
                     }
                 }

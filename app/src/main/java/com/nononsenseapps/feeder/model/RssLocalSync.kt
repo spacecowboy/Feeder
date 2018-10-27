@@ -11,9 +11,9 @@ import com.nononsenseapps.feeder.db.room.upsertFeedItem
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.jsonfeed.Feed
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
-import kotlinx.coroutines.experimental.withTimeoutOrNull
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -121,7 +121,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
 private suspend fun fetchFeed(context: Context, feedSql: com.nononsenseapps.feeder.db.room.Feed,
                               timeout: Long = 2L, timeUnit: TimeUnit = TimeUnit.SECONDS,
                               forceNetwork: Boolean = false): Response? {
-    return withTimeoutOrNull(timeout, timeUnit) {
+    return withTimeoutOrNull(timeUnit.toMicros(timeout)) {
         Log.d("CoroutineSync", "Fetching ${feedSql.displayTitle} on ${Thread.currentThread().name}")
         context.feedParser.getResponse(feedSql.url,
                 maxAgeSecs = if (forceNetwork) {

@@ -8,14 +8,16 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.makeToast
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
 
 /**
  * Exports OPML on a background thread
  */
-fun exportOpmlInBackground(context: Context, uri: Uri) = launch(Background) {
+fun exportOpmlInBackground(context: Context, uri: Uri) = GlobalScope.launch(Background) {
 
     val appContext = context.applicationContext
     try {
@@ -30,7 +32,7 @@ fun exportOpmlInBackground(context: Context, uri: Uri) = launch(Background) {
     } catch (e: Throwable) {
         e.printStackTrace()
         Log.e("OMPL", "Failed to export OMPL: $e")
-        launch(UI) {
+        withContext(Dispatchers.Main) {
             appContext.makeToast("Failed to export OMPL")
         }
     }
@@ -39,7 +41,7 @@ fun exportOpmlInBackground(context: Context, uri: Uri) = launch(Background) {
 /**
  * Imports OPML on a background thread
  */
-fun importOpmlInBackground(context: Context, uri: Uri) = launch(Background) {
+fun importOpmlInBackground(context: Context, uri: Uri) = GlobalScope.launch(Background) {
     val appContext = context.applicationContext
     val db = AppDatabase.getInstance(context)
     try {
@@ -55,7 +57,7 @@ fun importOpmlInBackground(context: Context, uri: Uri) = launch(Background) {
         Log.d("OPML", "Imported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
         Log.e("OMPL", "Failed to import OMPL: $e")
-        launch(UI) {
+        withContext(Dispatchers.Main) {
             appContext.makeToast("Failed to import OMPL")
         }
     }

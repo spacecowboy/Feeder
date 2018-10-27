@@ -1,6 +1,6 @@
 package com.nononsenseapps.feeder.model
 
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
 import okhttp3.Protocol
 import okhttp3.Request

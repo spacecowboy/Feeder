@@ -3,7 +3,8 @@ package com.nononsenseapps.feeder.coroutines
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Process
-import kotlinx.coroutines.experimental.android.HandlerContext
+import kotlinx.coroutines.android.HandlerDispatcher
+import kotlinx.coroutines.android.asCoroutineDispatcher
 
 private val backgroundHandlerThread: HandlerThread by lazy {
     HandlerThread("BackgroundThread", Process.THREAD_PRIORITY_BACKGROUND)
@@ -14,9 +15,9 @@ private val backgroundHandlerThread: HandlerThread by lazy {
  *
  * Use this for real background work
  */
-val Background: HandlerContext by lazy {
+val Background: HandlerDispatcher by lazy {
     backgroundHandlerThread.start()
-    HandlerContext(Handler(backgroundHandlerThread.looper), backgroundHandlerThread.name)
+    Handler(backgroundHandlerThread.looper).asCoroutineDispatcher(name = backgroundHandlerThread.name)
 }
 
 private val backgroundUIHandlerThread: HandlerThread by lazy {
@@ -28,7 +29,7 @@ private val backgroundUIHandlerThread: HandlerThread by lazy {
  *
  * Use this to run UI related things not on the UI thread.
  */
-val BackgroundUI: HandlerContext by lazy {
+val BackgroundUI: HandlerDispatcher by lazy {
     backgroundUIHandlerThread.start()
-    HandlerContext(Handler(backgroundUIHandlerThread.looper), backgroundUIHandlerThread.name)
+    Handler(backgroundUIHandlerThread.looper).asCoroutineDispatcher(name = backgroundUIHandlerThread.name)
 }

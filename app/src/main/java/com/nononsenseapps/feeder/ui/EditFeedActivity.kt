@@ -35,10 +35,11 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.net.URL
 
 const val TEMPLATE = "template"
@@ -167,7 +168,7 @@ class EditFeedActivity : AppCompatActivity() {
                     url = sloppyLinkToStrictURLNoThrows(textUrl.text.toString().trim())
             )
 
-            launch(BackgroundUI) {
+            GlobalScope.launch(BackgroundUI) {
                 val feedId: Long? = dao.upsertFeed(feed)
 
                 feedId?.let {
@@ -179,7 +180,7 @@ class EditFeedActivity : AppCompatActivity() {
                         .putExtra(ARG_FEED_URL, feed.url)
                         .putExtra(ARG_FEED_TAG, feed.tag)
 
-                withContext(UI) {
+                withContext(Dispatchers.Main) {
                     setResult(RESULT_OK, intent)
                     finish()
                     if (shouldFinishBack) {
@@ -245,7 +246,7 @@ class EditFeedActivity : AppCompatActivity() {
         }
 
         // Create an adapter
-        launch(BackgroundUI) {
+        GlobalScope.launch(BackgroundUI) {
             val data = dao.loadTags()
 
             val tagsAdapter = ArrayAdapter<String>(this@EditFeedActivity,
@@ -253,7 +254,7 @@ class EditFeedActivity : AppCompatActivity() {
                     android.R.id.text1,
                     data)
 
-            withContext(UI) {
+            withContext(Dispatchers.Main) {
                 // Set the adapter
                 textTag.setAdapter(tagsAdapter)
             }

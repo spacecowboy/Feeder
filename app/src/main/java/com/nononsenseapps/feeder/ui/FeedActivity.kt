@@ -30,7 +30,8 @@ import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.ensureDebugLogDeletedInBackground
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 
 private const val EXPORT_OPML_CODE = 101
@@ -97,7 +98,7 @@ class FeedActivity : BaseActivity() {
         val itemIdsToMarkAsNotified = intent?.getLongArrayExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)
         val db = AppDatabase.getInstance(this)
         if (itemIdsToMarkAsNotified != null) {
-            launch(Background) {
+            GlobalScope.launch(Background) {
                 db.feedItemDao().markAsNotified(itemIdsToMarkAsNotified.toList())
             }
         }

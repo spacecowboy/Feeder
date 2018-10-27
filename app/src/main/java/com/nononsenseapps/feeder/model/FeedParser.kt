@@ -11,8 +11,8 @@ import com.nononsenseapps.jsonfeed.cachingHttpClient
 import com.nononsenseapps.jsonfeed.feedAdapter
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
-import kotlinx.coroutines.experimental.IO
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
