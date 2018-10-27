@@ -20,7 +20,7 @@ class HtmlToPlainTextConverter : ContentHandler {
     private var builder: StringBuilder? = null
     private val listings = Stack<HtmlToSpannedConverter.Listing>()
     private var ignoreCount = 0
-    private val ignoredTags = Arrays.asList("style", "script")
+    private val ignoredTags = listOf("style", "script")
 
     private val isOrderedList: Boolean
         get() = !listings.isEmpty() && listings.peek().ordered
