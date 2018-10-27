@@ -82,7 +82,12 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
         val feed: Feed? =
                 response?.let {
                     try {
-                        context.feedParser.parseFeedResponse(it)
+                        if (response.isSuccessful) {
+                            context.feedParser.parseFeedResponse(it)
+                        } else {
+                            Log.e("CoroutineSync", "Response fail for ${feedSql.displayTitle}: ${response.code()}")
+                            null
+                        }
                     } catch (t: Throwable) {
                         Log.e("CoroutineSync", "Shit hit the fan2: ${feedSql.displayTitle}, $t")
                         null
