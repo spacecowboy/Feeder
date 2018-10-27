@@ -13,17 +13,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
+import com.nononsenseapps.feeder.coroutines.CoroutineScopedViewModel
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.ui.text.toSpannedWithImages
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point) : AndroidViewModel(application) {
+class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point) : CoroutineScopedViewModel(application) {
     val dao = AppDatabase.getInstance(application).feedItemDao()
 
     val liveItem: LiveData<FeedItemWithFeed> = dao.loadLiveFeedItem(id)
@@ -38,12 +40,11 @@ class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point)
                     // This avoid flickering when syncs happen
                     liveImageText.value = toSpannedWithNoImages(application, it.description, it.feedUrl)
                 }
+
                 launch(BackgroundUI) {
                     val allowDownload = PrefUtils.shouldLoadImages(application)
                     val spanned = toSpannedWithImages(application, it.description, it.feedUrl, maxImageSize, allowDownload)
-                    withContext(UI) {
-                        liveImageText.value = spanned
-                    }
+                    liveImageText.postValue(spanned)
                 }
             }
         }

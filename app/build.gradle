@@ -70,12 +70,6 @@ android {
   }
 }
 
-kotlin {
-  experimental {
-    coroutines "enable"
-  }
-}
-
 dependencies {
   kapt "androidx.room:room-compiler:$room_version"
   implementation "androidx.room:room-runtime:$room_version"
@@ -116,9 +110,9 @@ dependencies {
 
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   // Coroutines
-  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
   // For doing coroutines on UI thread
-  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.22"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
   // tests
   testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"

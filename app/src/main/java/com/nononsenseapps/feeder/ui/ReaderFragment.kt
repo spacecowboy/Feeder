@@ -13,17 +13,18 @@ import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.view.MenuItemCompat
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
+import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.cancelNotificationInBackground
+import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.getFeedItemViewModel
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.asFeedItemFoo
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.views.ObservableScrollView
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.launch
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 import java.util.*
@@ -39,7 +40,7 @@ const val ARG_FEEDTITLE = "feedtitle"
 const val ARG_AUTHOR = "author"
 const val ARG_DATE = "date"
 
-class ReaderFragment : androidx.fragment.app.Fragment() {
+class ReaderFragment : CoroutineScopedFragment() {
 
     private val dateTimeFormat = DateTimeFormat.mediumDate().withLocale(Locale.getDefault())
 
@@ -73,7 +74,7 @@ class ReaderFragment : androidx.fragment.app.Fragment() {
                 val db = AppDatabase.getInstance(appContext)
                 launch(BackgroundUI) {
                     db.feedItemDao().markAsReadAndNotified(itemId)
-                    cancelNotificationInBackground(it, itemId)
+                    cancelNotification(it, itemId)
                 }
             }
         }

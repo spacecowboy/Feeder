@@ -11,6 +11,8 @@ import com.nononsenseapps.jsonfeed.cachingHttpClient
 import com.nononsenseapps.jsonfeed.feedAdapter
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
@@ -21,7 +23,6 @@ import org.jsoup.nodes.Document
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.lang.NumberFormatException
 import java.net.MalformedURLException
 import java.net.URL
 import java.nio.charset.Charset
@@ -78,7 +79,7 @@ object FeedParser {
     /**
      * Returns all alternate links in the header of an HTML/XML document pointing to feeds.
      */
-    fun getAlternateFeedLinksAtUrl(url: URL): List<Pair<String, String>> {
+    suspend fun getAlternateFeedLinksAtUrl(url: URL): List<Pair<String, String>> {
         return try {
             val html = curl(url)
             when {
@@ -150,7 +151,7 @@ object FeedParser {
     /**
      * @throws IOException if request fails due to network issue for example
      */
-    private fun curl(url: URL): String? {
+    private suspend fun curl(url: URL): String? {
         var result: String? = null
         curlAndOnResponse(url) {
             result = it.body()?.string()
@@ -161,7 +162,7 @@ object FeedParser {
     /**
      * @throws IOException if request fails due to network issue for example
      */
-    private fun curlAndOnResponse(url: URL, block: ((Response) -> Unit)) {
+    private suspend fun curlAndOnResponse(url: URL, block: (suspend (Response) -> Unit)) {
         val response = getResponse(url)
 
         if (!response.isSuccessful) {
@@ -176,7 +177,7 @@ object FeedParser {
     /**
      * @throws IOException if call fails due to network issue for example
      */
-    fun getResponse(url: URL, maxAgeSecs: Int = MAX_FEED_AGE): Response {
+    suspend fun getResponse(url: URL, maxAgeSecs: Int = MAX_FEED_AGE): Response {
         val request = Request.Builder()
                 .url(url)
                 .cacheControl(CacheControl.Builder()
@@ -185,11 +186,11 @@ object FeedParser {
                         .build())
                 .build()
 
-        return if (url.userInfo?.isNotBlank() == true) {
+        val clientToUse = if (url.userInfo?.isNotBlank() == true) {
             val (user, pass) = url.userInfo.split(':', limit = 2)
             val credentials = Credentials.basic(user, pass)
             client.newBuilder()
-                    .authenticator({ _, response ->
+                    .authenticator { _, response ->
                         when {
                             response.request()?.header("Authorization") != null -> {
                                 null
@@ -200,8 +201,8 @@ object FeedParser {
                                         ?.build()
                             }
                         }
-                    })
-                    .proxyAuthenticator({ _, response ->
+                    }
+                    .proxyAuthenticator { _, response ->
                         when {
                             response.request()?.header("Proxy-Authorization") != null -> {
                                 null
@@ -212,14 +213,18 @@ object FeedParser {
                                         ?.build()
                             }
                         }
-                    }).build()
+                    }.build()
         } else {
             client
-        }.newCall(request).execute()
+        }
+
+        return withContext(IO) {
+            clientToUse.newCall(request).execute()
+        }
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    fun parseFeedUrl(url: URL): Feed {
+    suspend fun parseFeedUrl(url: URL): Feed {
         try {
 
             var result: Feed? = null
@@ -235,7 +240,7 @@ object FeedParser {
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    fun parseFeedResponse(response: Response): Feed {
+    suspend fun parseFeedResponse(response: Response): Feed {
         try {
 
             var result: Feed? = null
@@ -279,7 +284,7 @@ object FeedParser {
     @Throws(FeedParser.FeedParsingError::class)
     internal fun parseRssAtomBytes(baseUrl: URL, feedXml: ByteArray): Feed {
         try {
-        feedXml.inputStream().use { return parseFeedInputStream(baseUrl, it) }
+            feedXml.inputStream().use { return parseFeedInputStream(baseUrl, it) }
         } catch (e: NumberFormatException) {
             try {
                 // Try to work around bug in Rome

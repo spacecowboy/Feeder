@@ -57,9 +57,10 @@ data class FeedItem @Ignore constructor(
     constructor() : this(id = ID_UNSET)
 
     fun updateFromParsedEntry(entry: Item, feed: com.nononsenseapps.jsonfeed.Feed) {
+        val converter = HtmlToPlainTextConverter()
         // Be careful about nulls.
         val text = entry.content_html ?: entry.content_text ?: this.description
-        val summary: String? = entry.summary ?: entry.content_text?.take(200) ?: HtmlToPlainTextConverter.convert(text).take(200)
+        val summary: String? = entry.summary ?: entry.content_text?.take(200) ?: converter.convert(text).take(200)
         val absoluteImage = when {
             feed.feed_url != null && entry.image != null -> relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url!!), entry.image!!)
             else -> entry.image
@@ -68,7 +69,7 @@ data class FeedItem @Ignore constructor(
         entry.id?.let { this.guid = it }
         entry.title?.let { this.title = it }
         text.let { this.description = it }
-        entry.title?.let { this.plainTitle = HtmlToPlainTextConverter.convert(it) }
+        entry.title?.let { this.plainTitle = converter.convert(it) }
         summary?.let { this.plainSnippet = it }
 
         this.imageUrl = absoluteImage

@@ -15,7 +15,7 @@ import java.util.*
 /**
  * Intended primarily to convert HTML into plaintext snippets, useful for previewing content in list.
  */
-object HtmlToPlainTextConverter : ContentHandler {
+class HtmlToPlainTextConverter : ContentHandler {
     private val parser: Parser = Parser()
     private var builder: StringBuilder? = null
     private val listings = Stack<HtmlToSpannedConverter.Listing>()

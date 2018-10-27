@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.coroutines.CoroutineScopedActivity
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.configurePeriodicSync
@@ -34,7 +35,7 @@ const val SHOULD_FINISH_BACK = "SHOULD_FINISH_BACK"
  * between activities.
  */
 @SuppressLint("Registered")
-open class BaseActivity : AppCompatActivity() {
+open class BaseActivity : CoroutineScopedActivity() {
     protected var mActionBarShown = true
     // If pressing home should finish or start new activity
     protected var mShouldFinishBack = false

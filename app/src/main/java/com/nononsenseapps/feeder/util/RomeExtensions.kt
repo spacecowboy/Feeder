@@ -126,7 +126,7 @@ fun SyndEntry.contentText(): String {
             description?.value
     }
 
-    val result = HtmlToPlainTextConverter.convert(possiblyHtml ?: "")
+    val result = HtmlToPlainTextConverter().convert(possiblyHtml ?: "")
 
     // Description consists of at least one image, avoid opening browser for this item
     return when {
@@ -137,7 +137,7 @@ fun SyndEntry.contentText(): String {
 }
 
 private fun convertAtomContentToPlainText(content: SyndContent?, fallback: String?): String {
-    return HtmlToPlainTextConverter.convert(possiblyHtmlFromContent(content, fallback))
+    return HtmlToPlainTextConverter().convert(possiblyHtmlFromContent(content, fallback))
 }
 
 private fun possiblyHtmlFromContent(content: SyndContent?, fallback: String?): String =

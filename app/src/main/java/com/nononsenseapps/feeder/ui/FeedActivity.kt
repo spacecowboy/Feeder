@@ -14,7 +14,6 @@ import android.text.Html.fromHtml
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.CheckedTextView
 import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance
 import com.nononsenseapps.feeder.R
@@ -24,13 +23,13 @@ import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FEED_ADDED_BROADCAST
 import com.nononsenseapps.feeder.model.SYNC_BROADCAST
-import com.nononsenseapps.feeder.model.opml.exportOpmlInBackground
-import com.nononsenseapps.feeder.model.opml.importOpmlInBackground
+import com.nononsenseapps.feeder.model.opml.exportOpml
+import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.ensureDebugLogDeletedInBackground
+import com.nononsenseapps.feeder.util.ensureDebugLogDeleted
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.launch
 import java.io.File
 
 private const val EXPORT_OPML_CODE = 101
@@ -68,7 +67,10 @@ class FeedActivity : BaseActivity() {
         doFromNotificationActions()
 
         // Migration thing, make sure file is deleted for all users
-        ensureDebugLogDeletedInBackground(this.applicationContext)
+        val appContext = applicationContext
+        launch(Background) {
+            ensureDebugLogDeleted(appContext)
+        }
 
         if (savedInstanceState == null) {
             fragment = defaultFragment()
@@ -212,13 +214,19 @@ class FeedActivity : BaseActivity() {
             EXPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    exportOpmlInBackground(this, uri)
+                    val appContext = applicationContext
+                    launch(Background) {
+                        exportOpml(appContext, uri)
+                    }
                 }
             }
             IMPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    importOpmlInBackground(this, uri)
+                    val appContext = applicationContext
+                    launch(Background) {
+                        importOpml(appContext, uri)
+                    }
                 }
             }
             EDIT_FEED_CODE -> {

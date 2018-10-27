@@ -17,19 +17,19 @@ public class HtmlToPlainTextConverterTest {
 
     @Test
     public void empty() throws Exception {
-        assertEquals("", HtmlToPlainTextConverter.INSTANCE.convert(""));
+        assertEquals("", new HtmlToPlainTextConverter().convert(""));
     }
 
     @Test
     public void unorderedList() throws Exception {
         assertEquals("* one\n" +
-                "* two", HtmlToPlainTextConverter.INSTANCE.convert("<ul><li>one</li><li>two</li></ul>"));
+                "* two", new HtmlToPlainTextConverter().convert("<ul><li>one</li><li>two</li></ul>"));
     }
 
     @Test
     public void orderedList() throws Exception {
         assertEquals("1. one\n" +
-                "2. two", HtmlToPlainTextConverter.INSTANCE.convert("<ol><li>one</li><li>two</li></ol>"));
+                "2. two", new HtmlToPlainTextConverter().convert("<ol><li>one</li><li>two</li></ol>"));
     }
 
     @Test
@@ -38,29 +38,29 @@ public class HtmlToPlainTextConverterTest {
                 "  * A\n" +
                 "  * B\n" +
                 "2. two",
-                HtmlToPlainTextConverter.INSTANCE.convert("<ol><li>sublist:<ul><li>A</li><li>B</li></ul></li><li>two</li></ol>"));
+                new HtmlToPlainTextConverter().convert("<ol><li>sublist:<ul><li>A</li><li>B</li></ul></li><li>two</li></ol>"));
     }
 
     @Test
     public void link() throws Exception {
         assertEquals("go to Google and see.",
-                HtmlToPlainTextConverter.INSTANCE.convert("go to <a href=\"google.com\">Google</a> and see."));
+                new HtmlToPlainTextConverter().convert("go to <a href=\"google.com\">Google</a> and see."));
     }
 
     @Test
     public void noNewLines() throws Exception {
-        assertEquals("one two three", HtmlToPlainTextConverter.INSTANCE.convert("<p>one<br>two<p>three"));
+        assertEquals("one two three", new HtmlToPlainTextConverter().convert("<p>one<br>two<p>three"));
     }
 
     @Test
     public void noScripts() throws Exception {
         assertEquals("foo bar",
-                HtmlToPlainTextConverter.INSTANCE.convert("foo <script>script</script> bar"));
+                new HtmlToPlainTextConverter().convert("foo <script>script</script> bar"));
     }
 
     @Test
     public void noStyles() throws Exception {
         assertEquals("foo bar",
-                HtmlToPlainTextConverter.INSTANCE.convert("foo <style>style</style> bar"));
+                new HtmlToPlainTextConverter().convert("foo <style>style</style> bar"));
     }
 }

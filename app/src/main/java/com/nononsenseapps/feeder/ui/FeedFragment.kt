@@ -13,7 +13,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +21,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
+import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -42,14 +42,15 @@ import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 const val ARG_FEED_ID = "feed_id"
 const val ARG_FEED_TITLE = "feed_title"
 const val ARG_FEED_URL = "feed_url"
 const val ARG_FEED_TAG = "feed_tag"
 
-class FeedFragment : Fragment() {
+class FeedFragment : CoroutineScopedFragment() {
 
     private var adapter: FeedItemPagedListAdapter? = null
     private var recyclerView: RecyclerView? = null
@@ -237,7 +238,11 @@ class FeedFragment : Fragment() {
         emptyOpenFeeds!!.setOnClickListener { (activity as BaseActivity).openNavDrawer() }
 
         // specify an adapter
-        adapter = FeedItemPagedListAdapter(activity!!, object : DismissedListener {
+        adapter = FeedItemPagedListAdapter(activity!!, object : ActionCallback {
+            override fun coroutineScope(): CoroutineScope {
+                return this@FeedFragment
+            }
+
             override fun onDismiss(item: PreviewItem?) {
                 item?.let {
                     feedItemsViewModel?.toggleReadState(it)
