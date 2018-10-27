@@ -19,7 +19,7 @@ import org.joda.time.format.DateTimeFormatter
 import java.util.*
 
 class FeedItemPagedListAdapter(context: Context, private val actionCallback: ActionCallback) :
-        PagedListAdapter<PreviewItem, RecyclerView.ViewHolder>(Differ) {
+        PagedListAdapter<PreviewItem, RecyclerView.ViewHolder>(PreviewItemDiffer) {
 
     private val shortDateTimeFormat: DateTimeFormatter =
             DateTimeFormat.mediumDate().withLocale(Locale.getDefault())
