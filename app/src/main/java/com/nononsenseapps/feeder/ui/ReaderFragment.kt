@@ -17,7 +17,7 @@ import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.cancelNotificationInBackground
+import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.getFeedItemViewModel
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.TabletUtils
@@ -74,7 +74,7 @@ class ReaderFragment : CoroutineScopedFragment() {
                 val db = AppDatabase.getInstance(appContext)
                 launch(BackgroundUI) {
                     db.feedItemDao().markAsReadAndNotified(itemId)
-                    cancelNotificationInBackground(it, itemId)
+                    cancelNotification(it, itemId)
                 }
             }
         }

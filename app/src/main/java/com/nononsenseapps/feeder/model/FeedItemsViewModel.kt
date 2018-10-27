@@ -68,7 +68,7 @@ class FeedItemsViewModel(application: Application, val feedId: Long, val tag: St
 
     fun toggleReadState(feedItem: PreviewItem) = launch(BackgroundUI) {
         dao.markAsRead(feedItem.id, unread = !feedItem.unread)
-        cancelNotificationInBackground(getApplication(), feedItem.id)
+        cancelNotification(getApplication(), feedItem.id)
     }
 
     /**

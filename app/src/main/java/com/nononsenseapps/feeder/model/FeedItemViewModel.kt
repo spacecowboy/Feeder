@@ -44,9 +44,7 @@ class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point)
                 launch(BackgroundUI) {
                     val allowDownload = PrefUtils.shouldLoadImages(application)
                     val spanned = toSpannedWithImages(application, it.description, it.feedUrl, maxImageSize, allowDownload)
-                    withContext(Dispatchers.Main) {
-                        liveImageText.value = spanned
-                    }
+                    liveImageText.postValue(spanned)
                 }
             }
         }

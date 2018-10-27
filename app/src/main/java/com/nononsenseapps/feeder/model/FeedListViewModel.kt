@@ -44,11 +44,9 @@ class FeedListViewModel(application: Application): CoroutineScopedViewModel(appl
                     data.add(feed)
                 }
 
-                data.sortWith(Comparator {a, b -> a.compareTo(b)})
+                data.sortWith(Comparator { a, b -> a.compareTo(b) })
 
-                withContext(Dispatchers.Main) {
-                    liveFeedsAndTagsWithUnreadCounts.value = data
-                }
+                liveFeedsAndTagsWithUnreadCounts.postValue(data)
             }
         }
     }
