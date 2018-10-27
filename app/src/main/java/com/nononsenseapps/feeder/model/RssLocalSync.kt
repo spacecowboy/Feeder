@@ -36,11 +36,11 @@ fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork: Boolean
                 }
                 val feedsToFetch = feedsToSync(db, feedId, tag, staleTime = staleTime)
                 feedsToFetch
-                        .map { launch { syncFeed(it, context, forceNetwork = forceNetwork) } }
+                        .map { launch { syncFeed(it, context, forceNetwork = forceNetwork) } to it.displayTitle }
                         .forEach {
-                            Log.d("CoroutineSync", "Joining a job")
+                            Log.d("CoroutineSync", "Joining ${it.second}")
                             // Await completion of asynchronous operation
-                            it.join()
+                            it.first.join()
                         }
                 // Finally, prune excessive items
                 try {
@@ -64,7 +64,7 @@ fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork: Boolean
 
 private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                              context: Context, forceNetwork: Boolean = false) {
-    Log.d("CoroutineSync", "Launching sync of ${feedSql.displayTitle} on ${Thread.currentThread().name}")
+    Log.d("CoroutineSync", "Syncing ${feedSql.displayTitle} on ${Thread.currentThread().name}")
     try {
         val db = AppDatabase.getInstance(context)
         val response: Response? =
@@ -75,10 +75,13 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                     null
                 }
 
+        if (response == null) {
+            Log.e("CoroutineSync", "Timed out when fetching ${feedSql.displayTitle}")
+        }
+
         val feed: Feed? =
                 response?.let {
                     try {
-                        Log.d("CoroutineSync", "Parsing ${feedSql.displayTitle} on ${Thread.currentThread().name}")
                         context.feedParser.parseFeedResponse(it)
                     } catch (t: Throwable) {
                         Log.e("CoroutineSync", "Shit hit the fan2: ${feedSql.displayTitle}, $t")
@@ -87,7 +90,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                 }
 
         try {
-            feed?.let { _ ->
+            feed?.let {
                 feedSql.updateFromParsedFeed(feed)
                 feedSql.lastSync = DateTime.now(DateTimeZone.UTC).millis
 
@@ -122,7 +125,6 @@ private suspend fun fetchFeed(context: Context, feedSql: com.nononsenseapps.feed
                               timeout: Long = 2L, timeUnit: TimeUnit = TimeUnit.SECONDS,
                               forceNetwork: Boolean = false): Response? {
     return withTimeoutOrNull(timeUnit.toMicros(timeout)) {
-        Log.d("CoroutineSync", "Fetching ${feedSql.displayTitle} on ${Thread.currentThread().name}")
         context.feedParser.getResponse(feedSql.url,
                 maxAgeSecs = if (forceNetwork) {
                     1

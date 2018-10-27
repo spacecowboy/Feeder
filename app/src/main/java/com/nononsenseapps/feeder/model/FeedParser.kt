@@ -219,7 +219,6 @@ object FeedParser {
         }
 
         return withContext(IO) {
-            Log.d("CoroutineSync", "Fetching response on ${Thread.currentThread().name}")
             clientToUse.newCall(request).execute()
         }
     }
