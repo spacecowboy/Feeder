@@ -9,7 +9,7 @@ buildscript {
     coroutines_version = "1.0.0-RC1"
 
     androidx_version = "1.0.0"
-    work_version = '1.0.0-alpha09'
+    work_version = '1.0.0-alpha10'
     constraintlayout_version = "2.0.0-alpha2"
     recyclerview_version = "$androidx_version"
     legacy_support_version = "$androidx_version"
