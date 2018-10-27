@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.model
 
+import kotlinx.coroutines.experimental.runBlocking
 import okhttp3.MediaType
 import okhttp3.Protocol
 import okhttp3.Request
@@ -25,10 +26,13 @@ class FeedParserTest {
     @Throws(Exception::class)
     fun getAlternateLinksHandlesYoutube() {
         // I want this to be an Online test to make sure that I notice if/when Youtube changes something which breaks it
-        val feeds: List<Pair<String, String>> =
-                FeedParser.getAlternateFeedLinksAtUrl(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A"))
-        assertEquals(listOf("https://www.youtube.com/feeds/videos.xml?channel_id=UCG1h-Wqjtwz7uUANw6gazRw" to "atom"),
-                feeds)
+        runBlocking {
+            val feeds: List<Pair<String, String>> =
+                    FeedParser.getAlternateFeedLinksAtUrl(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A"))
+            assertEquals(listOf("https://www.youtube.com/feeds/videos.xml?channel_id=UCG1h-Wqjtwz7uUANw6gazRw" to "atom"),
+                    feeds)
+        }
+
     }
 
     @Test
@@ -145,9 +149,11 @@ class FeedParserTest {
                         .build())
                 .build()
 
-        val feed = FeedParser.parseFeedResponse(response)
+        runBlocking {
+            val feed = FeedParser.parseFeedResponse(response)
 
-        assertEquals(true, feed.items?.get(0)?.content_text?.contains("größte"))
+            assertEquals(true, feed.items?.get(0)?.content_text?.contains("größte"))
+        }
     }
 
     // Bug in Rome which I am working around, this will crash if not worked around
@@ -166,10 +172,12 @@ class FeedParserTest {
                         .build())
                 .build()
 
-        val feed = FeedParser.parseFeedResponse(response)
+        runBlocking {
+            val feed = FeedParser.parseFeedResponse(response)
 
-        assertEquals(1, feed.items?.size)
-        assertEquals(true, feed.items?.get(0)?.content_text?.contains("größte"))
+            assertEquals(1, feed.items?.size)
+            assertEquals(true, feed.items?.get(0)?.content_text?.contains("größte"))
+        }
     }
 
     @Test
@@ -408,8 +416,10 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun cowboyHttps() {
-        val feed = FeedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
-        assertEquals("Cowboy Programmer", feed.title)
+        runBlocking {
+            val feed = FeedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
+            assertEquals("Cowboy Programmer", feed.title)
+        }
     }
 
     @Test

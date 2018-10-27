@@ -37,6 +37,7 @@ import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 import kotlinx.coroutines.experimental.withContext
 import java.net.URL
 
@@ -166,15 +167,11 @@ class EditFeedActivity : AppCompatActivity() {
                     url = sloppyLinkToStrictURLNoThrows(textUrl.text.toString().trim())
             )
 
-            launch(UI) {
-                val feedId: Long? = withContext(BackgroundUI) {
-                    dao.upsertFeed(feed)
-                }
+            launch(BackgroundUI) {
+                val feedId: Long? = dao.upsertFeed(feed)
 
                 feedId?.let {
-                    launch(BackgroundUI) {
-                        requestFeedSync(feedId)
-                    }
+                    requestFeedSync(feedId)
                 }
 
                 val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId"))
@@ -182,12 +179,14 @@ class EditFeedActivity : AppCompatActivity() {
                         .putExtra(ARG_FEED_URL, feed.url)
                         .putExtra(ARG_FEED_TAG, feed.tag)
 
-                setResult(RESULT_OK, intent)
-                finish()
-                if (shouldFinishBack) {
-                    // Only care about exit transition
-                    overridePendingTransition(R.anim.to_bottom_right,
-                            R.anim.to_bottom_right)
+                withContext(UI) {
+                    setResult(RESULT_OK, intent)
+                    finish()
+                    if (shouldFinishBack) {
+                        // Only care about exit transition
+                        overridePendingTransition(R.anim.to_bottom_right,
+                                R.anim.to_bottom_right)
+                    }
                 }
             }
         }
@@ -246,18 +245,18 @@ class EditFeedActivity : AppCompatActivity() {
         }
 
         // Create an adapter
-        launch(UI) {
-            val data = withContext(BackgroundUI) {
-                dao.loadTags()
-            }
+        launch(BackgroundUI) {
+            val data = dao.loadTags()
 
             val tagsAdapter = ArrayAdapter<String>(this@EditFeedActivity,
                     android.R.layout.simple_list_item_1,
                     android.R.id.text1,
                     data)
 
-            // Set the adapter
-            textTag.setAdapter(tagsAdapter)
+            withContext(UI) {
+                // Set the adapter
+                textTag.setAdapter(tagsAdapter)
+            }
         }
     }
 
@@ -386,26 +385,21 @@ class SearchTask(private val feedParser: FeedParser,
 
     override fun doInBackground(vararg urls: URL): Void? {
         val url = urls.firstOrNull() ?: return null
-        val alts = feedParser.getAlternateFeedLinksAtUrl(url)
-        val urlsToParse = when (alts.isNotEmpty()) {
-            true -> alts.map { sloppyLinkToStrictURL(it.first) }
-            false -> listOf(url)
-        }
-        if (isCancelled) {
-            return null
-        }
-        urlsToParse.mapNotNull {
-            try {
-                if (isCancelled) {
-                    return null
+        runBlocking {
+            val alts = feedParser.getAlternateFeedLinksAtUrl(url)
+            val urlsToParse = when (alts.isNotEmpty()) {
+                true -> alts.map { sloppyLinkToStrictURL(it.first) }
+                false -> listOf(url)
+            }
+            urlsToParse.forEach {
+                try {
+                    if (!isCancelled) {
+                        val feed = feedParser.parseFeedUrl(it)
+                        publishProgress(feed)
+                    }
+                } catch (t: Throwable) {
+                    t.printStackTrace()
                 }
-                Log.d("SearchTask", "Parsing $it")
-                val feed = feedParser.parseFeedUrl(it)
-                publishProgress(feed)
-                feed
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                null
             }
         }
         return null

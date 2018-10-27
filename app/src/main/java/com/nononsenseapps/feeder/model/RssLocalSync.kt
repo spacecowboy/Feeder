@@ -36,7 +36,7 @@ fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork: Boolean
                 }
                 val feedsToFetch = feedsToSync(db, feedId, tag, staleTime = staleTime)
                 feedsToFetch
-                        .map { launch(coroutineContext) { syncFeed(it, context, forceNetwork = forceNetwork) } }
+                        .map { launch { syncFeed(it, context, forceNetwork = forceNetwork) } }
                         .forEach {
                             Log.d("CoroutineSync", "Joining a job")
                             // Await completion of asynchronous operation

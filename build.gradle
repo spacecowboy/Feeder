@@ -6,6 +6,8 @@ buildscript {
     gradle_build_version = "3.2.0"
     build_tools_version = "28.0.2"
 
+    coroutines_version = "0.25.0"
+
     androidx_version = "1.0.0"
     work_version = '1.0.0-alpha09'
     constraintlayout_version = "2.0.0-alpha2"
