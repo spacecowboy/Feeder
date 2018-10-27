@@ -17,9 +17,7 @@ import kotlin.system.measureTimeMillis
 /**
  * Exports OPML on a background thread
  */
-fun exportOpmlInBackground(context: Context, uri: Uri) = GlobalScope.launch(Background) {
-
-    val appContext = context.applicationContext
+suspend fun exportOpml(appContext: Context, uri: Uri) {
     try {
         val time = measureTimeMillis {
             appContext.contentResolver.openOutputStream(uri)?.let {
@@ -41,7 +39,7 @@ fun exportOpmlInBackground(context: Context, uri: Uri) = GlobalScope.launch(Back
 /**
  * Imports OPML on a background thread
  */
-fun importOpmlInBackground(context: Context, uri: Uri) = GlobalScope.launch(Background) {
+suspend fun importOpml(context: Context, uri: Uri) {
     val appContext = context.applicationContext
     val db = AppDatabase.getInstance(context)
     try {

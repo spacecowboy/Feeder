@@ -4,10 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.room.AppDatabase
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 const val ACTION_MARK_AS_NOTIFIED: String = "mark_as_notified"
 
@@ -25,8 +22,6 @@ class RssNotificationBroadcastReceiver : BroadcastReceiver() {
 
 private fun markAsNotified(context: Context, itemIds: LongArray?) {
     if (itemIds != null) {
-        GlobalScope.launch(Background) {
-            AppDatabase.getInstance(context).feedItemDao().markAsNotified(itemIds.toList())
-        }
+        AppDatabase.getInstance(context).feedItemDao().markAsNotified(itemIds.toList())
     }
 }

@@ -23,13 +23,14 @@ import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.openLinkInBrowser
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
-class FeedItemHolder(val view: View, private val dismissListener: DismissedListener) :
+class FeedItemHolder(val view: View, private val actionCallback: ActionCallback) :
         ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener {
     private val TAG = "FeedItemHolder"
     private val titleTextView: TextView = view.findViewById<View>(R.id.story_snippet) as TextView
@@ -50,7 +51,7 @@ class FeedItemHolder(val view: View, private val dismissListener: DismissedListe
             override fun canDismiss(token: Any?): Boolean = rssItem != null
 
             override fun onDismiss(view: View, token: Any?) {
-                dismissListener.onDismiss(rssItem)
+                actionCallback.onDismiss(rssItem)
             }
 
             /**
@@ -59,7 +60,7 @@ class FeedItemHolder(val view: View, private val dismissListener: DismissedListe
              * @param goingRight true if swiping to the right, false if left
              */
             override fun onSwipeStarted(goingRight: Boolean) {
-                dismissListener.onSwipeStarted()
+                actionCallback.onSwipeStarted()
 
                 val typedValue = TypedValue()
                 view.context?.theme?.resolveAttribute(android.R.attr.windowBackground,
@@ -77,7 +78,7 @@ class FeedItemHolder(val view: View, private val dismissListener: DismissedListe
              * Called when user doesn't swipe all the way.
              */
             override fun onSwipeCancelled() {
-                dismissListener.onSwipeCancelled()
+                actionCallback.onSwipeCancelled()
 
                 checkBg.visibility = View.INVISIBLE
                 checkLeft.visibility = View.INVISIBLE
@@ -162,7 +163,7 @@ class FeedItemHolder(val view: View, private val dismissListener: DismissedListe
                     // Mark as read
                     val db = AppDatabase.getInstance(context)
                     rssItem?.id?.let {
-                        GlobalScope.launch(BackgroundUI) {
+                        actionCallback.coroutineScope().launch(BackgroundUI) {
                             db.feedItemDao().markAsRead(it)
                         }
                     }
@@ -226,8 +227,9 @@ class FeedItemHolder(val view: View, private val dismissListener: DismissedListe
     }
 }
 
-interface DismissedListener {
+interface ActionCallback {
     fun onDismiss(item: PreviewItem?)
     fun onSwipeStarted()
     fun onSwipeCancelled()
+    fun coroutineScope(): CoroutineScope
 }

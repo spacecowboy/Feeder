@@ -30,6 +30,7 @@ import com.nononsenseapps.feeder.ui.ReaderActivity
 import com.nononsenseapps.feeder.util.ARG_FEEDTITLE
 import com.nononsenseapps.feeder.util.notificationManager
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -37,49 +38,42 @@ import kotlinx.coroutines.withContext
 const val notificationId = 73583
 const val channelId = "feederNotifications"
 
-fun notifyInBackground(context: Context) {
-    val appContext = context.applicationContext
-    GlobalScope.launch(Background) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel(appContext)
-        }
+fun notify(appContext: Context) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        createNotificationChannel(appContext)
+    }
 
-        val nm = appContext.notificationManager
+    val nm = appContext.notificationManager
 
-        val feedItems = getItemsToNotify(appContext)
+    val feedItems = getItemsToNotify(appContext)
 
-        val notifications: List<Pair<Int, Notification>> = if (feedItems.isEmpty()) {
-            emptyList()
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N || feedItems.size < 4) {
-                // Cancel inbox notification if present
-                nm.cancel(notificationId)
-                // Platform automatically bundles 4 or more notifications
-                feedItems.map {
-                    it.id.toInt() to singleNotification(appContext, it)
-                }
-            } else {
-                // In this case, also cancel any individual notifications
-                feedItems.forEach {
-                    nm.cancel(it.id.toInt())
-                }
-                // Use an inbox style notification to bundle many notifications together
-                listOf(notificationId to inboxNotification(appContext, feedItems))
+    val notifications: List<Pair<Int, Notification>> = if (feedItems.isEmpty()) {
+        emptyList()
+    } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N || feedItems.size < 4) {
+            // Cancel inbox notification if present
+            nm.cancel(notificationId)
+            // Platform automatically bundles 4 or more notifications
+            feedItems.map {
+                it.id.toInt() to singleNotification(appContext, it)
             }
+        } else {
+            // In this case, also cancel any individual notifications
+            feedItems.forEach {
+                nm.cancel(it.id.toInt())
+            }
+            // Use an inbox style notification to bundle many notifications together
+            listOf(notificationId to inboxNotification(appContext, feedItems))
         }
+    }
 
-        notifications.forEach { (id, notification) ->
-            nm.notify(id, notification)
-        }
-
+    notifications.forEach { (id, notification) ->
+        nm.notify(id, notification)
     }
 }
 
-fun cancelNotificationInBackground(context: Context, feedItemId: Long) {
-    val appContext = context.applicationContext
-    GlobalScope.launch(Background) {
-        cancelNotification(appContext, feedItemId)
-    }
+suspend fun cancelNotificationInBackground(context: Context, feedItemId: Long) = withContext(Background) {
+    cancelNotification(context, feedItemId)
 }
 
 suspend fun cancelNotification(context: Context, feedItemId: Long) {
@@ -88,7 +82,7 @@ suspend fun cancelNotification(context: Context, feedItemId: Long) {
         nm.cancel(feedItemId.toInt())
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            notifyInBackground(context)
+            notify(context)
         }
     }
 }

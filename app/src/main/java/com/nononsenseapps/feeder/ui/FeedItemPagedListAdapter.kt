@@ -9,8 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -20,7 +18,7 @@ import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import java.util.*
 
-class FeedItemPagedListAdapter(context: Context, private val dismissedListener: DismissedListener) :
+class FeedItemPagedListAdapter(context: Context, private val actionCallback: ActionCallback) :
         PagedListAdapter<PreviewItem, RecyclerView.ViewHolder>(Differ) {
 
     private val shortDateTimeFormat: DateTimeFormatter =
@@ -44,7 +42,7 @@ class FeedItemPagedListAdapter(context: Context, private val dismissedListener: 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
             FeedItemHolder(
                     LayoutInflater.from(parent.context).inflate(
-                            R.layout.list_story_item, parent, false), dismissedListener)
+                            R.layout.list_story_item, parent, false), actionCallback)
 
     override fun onBindViewHolder(vHolder: RecyclerView.ViewHolder, position: Int) {
         val holder = vHolder as FeedItemHolder

@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 
-fun ensureDebugLogDeletedInBackground(context: Context) = GlobalScope.launch(Background) {
+fun ensureDebugLogDeleted(context: Context)  {
     try {
         val logFile = File(context.filesDir, "feeder.log")
         if (logFile.exists()) {

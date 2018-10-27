@@ -11,6 +11,8 @@ import com.nononsenseapps.feeder.db.room.upsertFeedItem
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.jsonfeed.Feed
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
@@ -21,45 +23,34 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
 
-fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork: Boolean = false): Boolean {
+suspend fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork: Boolean = false): Boolean = coroutineScope {
     var result = false
     val db = AppDatabase.getInstance(context)
     try {
-        runBlocking {
-            val time = measureTimeMillis {
-                val staleTime: Long = if (forceNetwork) {
-                    DateTime.now(DateTimeZone.UTC).millis
-                } else {
-                    DateTime.now(DateTimeZone.UTC)
-                            .minusMinutes(PrefUtils.synchronizationFrequency(context).toInt())
-                            .millis
-                }
-                val feedsToFetch = feedsToSync(db, feedId, tag, staleTime = staleTime)
-                feedsToFetch
-                        .map { launch { syncFeed(it, context, forceNetwork = forceNetwork) } to it.displayTitle }
-                        .forEach {
-                            Log.d("CoroutineSync", "Joining ${it.second}")
-                            // Await completion of asynchronous operation
-                            it.first.join()
-                        }
-                // Finally, prune excessive items
-                try {
-                    prune(context, db)
-                    result = true
-                } catch (e: RemoteException) {
-                    e.printStackTrace()
-                } catch (e: OperationApplicationException) {
-                    e.printStackTrace()
-                }
-                // Send notifications for configured feeds
-                notifyInBackground(context)
+        val time = measureTimeMillis {
+            val staleTime: Long = if (forceNetwork) {
+                DateTime.now(DateTimeZone.UTC).millis
+            } else {
+                DateTime.now(DateTimeZone.UTC)
+                        .minusMinutes(PrefUtils.synchronizationFrequency(context).toInt())
+                        .millis
             }
-            Log.d("CoroutineSync", "Completed in $time ms")
+            val feedsToFetch = feedsToSync(db, feedId, tag, staleTime = staleTime)
+            feedsToFetch.forEach {
+                launch { syncFeed(it, context, forceNetwork = forceNetwork) }
+            }
+            Log.d("CoroutineSync", "Waiting for syncs to complete...")
+            joinAll()
+            result = true
+            // Send notifications for configured feeds
+            notify(context)
         }
+        Log.d("CoroutineSync", "Completed in $time ms")
+
     } catch (e: Throwable) {
         e.printStackTrace()
     }
-    return result
+    result
 }
 
 private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
@@ -117,6 +108,10 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                                 itemDao.upsertFeedItem(feedItemSql)
                             }?.toList()
                 }
+
+                // Finally, prune database of old items
+                val keepCount = PrefUtils.maximumItemCountPerFeed(context)
+                db.feedItemDao().cleanItemsInFeed(feedSql.id, keepCount)
             }
         } catch (t: Throwable) {
             Log.e("CoroutineSync", "Shit hit the fan3: ${feedSql.displayTitle}, $t")

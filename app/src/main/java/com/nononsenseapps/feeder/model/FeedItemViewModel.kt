@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
+import com.nononsenseapps.feeder.coroutines.CoroutineScopedViewModel
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.ui.text.toSpannedWithImages
@@ -24,7 +25,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point) : AndroidViewModel(application) {
+class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point) : CoroutineScopedViewModel(application) {
     val dao = AppDatabase.getInstance(application).feedItemDao()
 
     val liveItem: LiveData<FeedItemWithFeed> = dao.loadLiveFeedItem(id)
@@ -40,7 +41,7 @@ class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point)
                     liveImageText.value = toSpannedWithNoImages(application, it.description, it.feedUrl)
                 }
 
-                GlobalScope.launch(BackgroundUI) {
+                launch(BackgroundUI) {
                     val allowDownload = PrefUtils.shouldLoadImages(application)
                     val spanned = toSpannedWithImages(application, it.description, it.feedUrl, maxImageSize, allowDownload)
                     withContext(Dispatchers.Main) {

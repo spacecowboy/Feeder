@@ -18,7 +18,12 @@ import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.SystemUtils.currentlyOnWifi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
 const val ARG_FORCE_NETWORK = "force_network"
 
@@ -30,8 +35,12 @@ const val FEED_ADDED_BROADCAST = "feeder.nononsenseapps.RSS_FEED_ADDED_BROADCAST
 const val SYNC_BROADCAST = "feeder.nononsenseapps.RSS_SYNC_BROADCAST"
 const val SYNC_BROADCAST_IS_ACTIVE = "IS_ACTIVE"
 
-class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
-    override fun doWork(): Result {
+class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams), CoroutineScope {
+    private val job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Default + job
+
+    override fun doWork(): Result = runBlocking {
 
         val wifiStatusOK = when {
             inputData.getBoolean(IS_MANUAL_SYNC, false) -> true
@@ -59,11 +68,15 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
         LocalBroadcastManager.getInstance(applicationContext)
                 .sendBroadcast(bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false))
 
-        return if (success) {
-            Result.SUCCESS
-        } else {
-            Result.FAILURE
+        when {
+            success -> Result.SUCCESS
+            else -> Result.FAILURE
         }
+    }
+
+    override fun onStopped(cancelled: Boolean) {
+        job.cancel()
+        super.onStopped(cancelled)
     }
 }
 
