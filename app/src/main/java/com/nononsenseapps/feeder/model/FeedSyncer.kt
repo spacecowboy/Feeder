@@ -61,6 +61,8 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
             val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
 
             success = syncFeeds(applicationContext, feedId, feedTag, forceNetwork = forceNetwork)
+            // Send notifications for configured feeds
+            notify(applicationContext)
         } else {
             Log.d(LOG_TAG, "Skipping sync work because wifistatus not OK")
         }
