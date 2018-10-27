@@ -72,6 +72,7 @@ fun requestFeedSync(feedId: Long = ID_UNSET, feedTag: String = "") {
 
     val data = workDataOf(ARG_FEED_ID to feedId,
             ARG_FEED_TAG to feedTag,
+            IS_MANUAL_SYNC to true,
             ARG_FORCE_NETWORK to true)
 
     workRequest.setInputData(data)
