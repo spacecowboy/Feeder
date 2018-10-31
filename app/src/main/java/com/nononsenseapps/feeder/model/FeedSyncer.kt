@@ -2,8 +2,8 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.content.Intent
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.util.Log
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -13,11 +13,13 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.SystemUtils.currentlyOnWifi
+import com.nononsenseapps.feeder.util.feedParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -29,7 +31,7 @@ const val ARG_FORCE_NETWORK = "force_network"
 
 const val LOG_TAG = "FEED_SYNC"
 const val UNIQUE_PERIODIC_NAME = "feeder_periodic"
-const val IS_MANUAL_SYNC = "is_manual_sync"
+const val PARALLEL_SYNC = "parallel_sync"
 
 const val FEED_ADDED_BROADCAST = "feeder.nononsenseapps.RSS_FEED_ADDED_BROADCAST"
 const val SYNC_BROADCAST = "feeder.nononsenseapps.RSS_SYNC_BROADCAST"
@@ -42,10 +44,10 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
 
     override fun doWork(): Result = runBlocking {
 
-        val isManual = inputData.getBoolean(IS_MANUAL_SYNC, false)
+        val goParallel = inputData.getBoolean(PARALLEL_SYNC, false)
 
         val wifiStatusOK = when {
-            isManual -> true
+            goParallel -> true
             currentlyOnWifi(applicationContext) -> true
             else -> !PrefUtils.shouldSyncOnlyOnWIfi(applicationContext)
         }
@@ -63,11 +65,13 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
             val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
 
             success = syncFeeds(
-                    applicationContext,
-                    feedId,
-                    feedTag,
+                    db = AppDatabase.getInstance(applicationContext),
+                    feedParser = applicationContext.feedParser,
+                    feedId = feedId,
+                    tag = feedTag,
+                    maxFeedItemCount = PrefUtils.maximumItemCountPerFeed(applicationContext),
                     forceNetwork = forceNetwork,
-                    parallel = isManual
+                    parallel = goParallel
             )
             // Send notifications for configured feeds
             notify(applicationContext)
@@ -95,7 +99,7 @@ fun requestFeedSync(feedId: Long = ID_UNSET, feedTag: String = "") {
 
     val data = workDataOf(ARG_FEED_ID to feedId,
             ARG_FEED_TAG to feedTag,
-            IS_MANUAL_SYNC to true,
+            PARALLEL_SYNC to true,
             ARG_FORCE_NETWORK to true)
 
     workRequest.setInputData(data)

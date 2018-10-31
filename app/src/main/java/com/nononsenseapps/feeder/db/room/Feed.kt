@@ -40,9 +40,4 @@ data class Feed @Ignore constructor(
     val displayTitle: String
         get() = (if (customTitle.isBlank()) title else customTitle)
 
-    fun updateFromParsedFeed(feed: Feed) {
-        title = feed.title ?: title
-        url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: url
-        imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) } ?: imageUrl
-    }
 }
