@@ -9,6 +9,7 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -79,5 +80,24 @@ class RssLocalSyncKtTest {
                 "Unexpected number of items in feed",
                 15,
                 db.feedItemDao().loadFeedItemsInFeed(cowboyAtomId).size)
+    }
+
+    @Test
+    fun cachedResponsesAreNotParsedUnlessFeedIsNew() {
+        FeedParser.setup(getInstrumentation().targetContext.cacheDir!!)
+        runBlocking {
+            syncFeeds(getInstrumentation().targetContext, cowboyJsonId, "", forceNetwork = true)
+            db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
+                assertTrue("Feed should have been synced", feed.lastSync > 0)
+                // "Long time" ago, but not unset
+                db.feedDao().updateFeed(feed.copy(lastSync = 999L))
+            }
+            syncFeeds(getInstrumentation().context, cowboyJsonId, "", forceNetwork = true)
+        }
+
+        assertEquals(
+                "Cached response should not have updated feed",
+                999L,
+                db.feedDao().loadFeed(cowboyJsonId)!!.lastSync)
     }
 }

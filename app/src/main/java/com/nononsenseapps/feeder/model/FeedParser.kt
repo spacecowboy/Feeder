@@ -28,9 +28,6 @@ import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
 
-// 1 hours
-const val MAX_FEED_AGE = 3600
-
 object FeedParser {
     private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
@@ -177,12 +174,20 @@ object FeedParser {
     /**
      * @throws IOException if call fails due to network issue for example
      */
-    suspend fun getResponse(url: URL, maxAgeSecs: Int = MAX_FEED_AGE): Response {
+    suspend fun getResponse(url: URL, forceNetwork: Boolean = false): Response {
         val request = Request.Builder()
                 .url(url)
                 .cacheControl(CacheControl.Builder()
-                        .maxAge(maxAgeSecs, TimeUnit.SECONDS)
-                        .maxStale(maxAgeSecs, TimeUnit.SECONDS)
+                        .let {
+                            if (forceNetwork) {
+                                // Force network forces a conditional http GET. If the response
+                                // hasn't changed, then the cache is still valid
+                                it.maxAge(1, TimeUnit.MICROSECONDS)
+                                        .maxStale(1, TimeUnit.MICROSECONDS)
+                            } else {
+                                it
+                            }
+                        }
                         .build())
                 .build()
 

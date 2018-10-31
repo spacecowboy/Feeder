@@ -17,6 +17,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
@@ -76,11 +77,23 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
         val feed: Feed? =
                 response?.let {
                     try {
-                        if (response.isSuccessful) {
-                            context.feedParser.parseFeedResponse(it)
-                        } else {
-                            Log.e("CoroutineSync", "Response fail for ${feedSql.displayTitle}: ${response.code()}")
-                            null
+                        /*Log.d("CoroutineSync", "response: $response")
+                        Log.d("CoroutineSync", "cacheResponse: ${response?.cacheResponse()}")
+                        Log.d("CoroutineSync", "networkResponse: ${response?.networkResponse()}")*/
+                        when {
+                            !response.isSuccessful -> {
+                                // fail
+                                Log.e("CoroutineSync", "Response fail for ${feedSql.displayTitle}: ${response.code()}")
+                                null
+                            }
+                            feedSql.lastSync > 0 && response.cacheResponse() != null -> {
+                                // no change
+                                Log.d("CoroutineSync", "No change for ${feedSql.displayTitle}: ${response.networkResponse()?.code()}")
+                                null
+                            }
+                            else -> {
+                                context.feedParser.parseFeedResponse(it)
+                            }
                         }
                     } catch (t: Throwable) {
                         Log.e("CoroutineSync", "Shit hit the fan2: ${feedSql.displayTitle}, $t")
@@ -126,12 +139,7 @@ private suspend fun fetchFeed(context: Context, feedSql: com.nononsenseapps.feed
                               timeout: Long = 2L, timeUnit: TimeUnit = TimeUnit.SECONDS,
                               forceNetwork: Boolean = false): Response? {
     return withTimeoutOrNull(timeUnit.toMicros(timeout)) {
-        context.feedParser.getResponse(feedSql.url,
-                maxAgeSecs = if (forceNetwork) {
-                    1
-                } else {
-                    MAX_FEED_AGE
-                })
+        context.feedParser.getResponse(feedSql.url, forceNetwork = forceNetwork)
     }
 }
 
