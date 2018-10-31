@@ -64,7 +64,7 @@ class EditFeedActivity : CoroutineScopedActivity() {
 
     private var feedTitle: String = ""
 
-    private var searchJob: Job? = null
+    internal var searchJob: Job? = null
         set(value) {
             field?.cancel()
             field = value
@@ -356,48 +356,40 @@ class EditFeedActivity : CoroutineScopedActivity() {
     }
 
     private fun searchForFeeds(url: URL): Job = launch(Dispatchers.Default) {
-        try {
-            val results = mutableListOf<Feed>()
-            val alts = feedParser.getAlternateFeedLinksAtUrl(url)
-            when (alts.isNotEmpty()) {
-                true -> alts.map { sloppyLinkToStrictURL(it.first) }
-                false -> listOf(url)
-            }.map {
-                launch {
-                    try {
-                        feedParser.parseFeedUrl(it)?.let { feed ->
-                            withContext(Dispatchers.Main) {
-                                results.add(feed)
-                                resultAdapter.data = results
-                                // Show results, unless user has clicked on one
-                                if (detailsFrame.visibility == View.GONE) {
-                                    searchFrame.visibility = View.VISIBLE
-                                    listResults.visibility = View.VISIBLE
-                                }
+        val results = mutableListOf<Feed>()
+        val alts = feedParser.getAlternateFeedLinksAtUrl(url)
+        when (alts.isNotEmpty()) {
+            true -> alts.map { sloppyLinkToStrictURL(it.first) }
+            false -> listOf(url)
+        }.map {
+            launch {
+                try {
+                    feedParser.parseFeedUrl(it)?.let { feed ->
+                        withContext(Dispatchers.Main) {
+                            results.add(feed)
+                            resultAdapter.data = results
+                            // Show results, unless user has clicked on one
+                            if (detailsFrame.visibility == View.GONE) {
+                                searchFrame.visibility = View.VISIBLE
+                                listResults.visibility = View.VISIBLE
                             }
                         }
-                    } catch (e: Throwable) {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(this@EditFeedActivity,
-                                    R.string.could_not_load_url,
-                                    Toast.LENGTH_SHORT).show()
-                        }
+                    }
+                } catch (e: Throwable) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@EditFeedActivity,
+                                R.string.could_not_load_url,
+                                Toast.LENGTH_SHORT).show()
                     }
                 }
-            }.toList().joinAll()
-
-            withContext(Dispatchers.Main) {
-                loadingProgress.visibility = View.GONE
-                if (resultAdapter.data.isEmpty()) {
-                    emptyText.text = getString(R.string.no_such_feed)
-                    emptyText.visibility = View.VISIBLE
-                }
             }
-        } catch (e: Throwable) {
-            withContext(Dispatchers.Main) {
-                Toast.makeText(this@EditFeedActivity,
-                        R.string.could_not_load_url,
-                        Toast.LENGTH_SHORT).show()
+        }.toList().joinAll()
+
+        withContext(Dispatchers.Main) {
+            loadingProgress.visibility = View.GONE
+            if (resultAdapter.data.isEmpty()) {
+                emptyText.text = getString(R.string.no_such_feed)
+                emptyText.visibility = View.VISIBLE
             }
         }
     }

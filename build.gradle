@@ -8,6 +8,7 @@ buildscript {
 
     coroutines_version = "1.0.0-RC1"
 
+    okhttp_version = "3.11.0"
     androidx_version = "1.0.0"
     work_version = '1.0.0-alpha10'
     constraintlayout_version = "2.0.0-alpha2"
@@ -23,6 +24,10 @@ buildscript {
     lifecycle_version = "2.0.0"
 
     rome_version = "1.7.1"
+
+    espresso_version = "3.1.0-alpha3"
+    uiautomator_version = "2.2.0-alpha3"
+
   }
 
 
