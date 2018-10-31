@@ -11,13 +11,12 @@ import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import java.net.HttpURLConnection
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
@@ -78,30 +77,36 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
             Log.e("CoroutineSync", "Timed out when fetching ${feedSql.displayTitle}")
         }
 
+        var responseHash = 0
+
         val feed: Feed? =
-                response?.let {
-                    try {
-                        Log.d("CoroutineSync", "response: $response")
-                        Log.d("CoroutineSync", "cacheResponse: ${response?.cacheResponse()}")
-                        Log.d("CoroutineSync", "networkResponse: ${response?.networkResponse()}")
-                        when {
-                            !response.isSuccessful -> {
-                                // fail
-                                Log.e("CoroutineSync", "${Thread.currentThread().name} Response fail for ${feedSql.displayTitle}: ${response.code()}")
-                                null
+                response?.use {
+                    it.body()?.use { responseBody ->
+                        try {
+                            val body = responseBody.bytes()!!
+                            responseHash = Arrays.hashCode(body)
+                            Log.d("CoroutineSync", "response: $response")
+                            Log.d("CoroutineSync", "cacheResponse: ${response.cacheResponse()}")
+                            Log.d("CoroutineSync", "networkResponse: ${response.networkResponse()}")
+                            when {
+                                !response.isSuccessful -> {
+                                    // fail
+                                    Log.e("CoroutineSync", "${Thread.currentThread().name} Response fail for ${feedSql.displayTitle}: ${response.code()}")
+                                    null
+                                }
+                                feedSql.responseHash == responseHash -> {
+                                    // no change
+                                    Log.d("CoroutineSync", "${Thread.currentThread().name} No hash change for ${feedSql.displayTitle}: ${response.networkResponse()?.code()}")
+                                    null
+                                }
+                                else -> {
+                                    context.feedParser.parseFeedResponse(it, body)
+                                }
                             }
-                            feedSql.lastSync > 0 && (response.networkResponse()?.code() ?: 304) == 304 -> {
-                                // no change
-                                Log.d("CoroutineSync", "${Thread.currentThread().name} No change for ${feedSql.displayTitle}: ${response.networkResponse()?.code()}")
-                                null
-                            }
-                            else -> {
-                                context.feedParser.parseFeedResponse(it)
-                            }
+                        } catch (t: Throwable) {
+                            Log.e("CoroutineSync", "Shit hit the fan2: ${feedSql.displayTitle}, $t")
+                            null
                         }
-                    } catch (t: Throwable) {
-                        Log.e("CoroutineSync", "Shit hit the fan2: ${feedSql.displayTitle}, $t")
-                        null
                     }
                 }
 
@@ -110,6 +115,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
             feed?.let {
                 feedSql.updateFromParsedFeed(feed)
                 feedSql.lastSync = DateTime.now(DateTimeZone.UTC).millis
+                feedSql.responseHash = responseHash
 
                 feedSql.id = db.feedDao().upsertFeed(feedSql)
 

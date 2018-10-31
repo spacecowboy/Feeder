@@ -83,12 +83,13 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun cachedResponsesAreNotParsedUnlessFeedIsNew() {
+    fun responsesAreNotParsedUnlessFeedHashHasChanged() {
         FeedParser.setup(getInstrumentation().targetContext.cacheDir!!)
         runBlocking {
             syncFeeds(getInstrumentation().targetContext, cowboyJsonId, "", forceNetwork = true)
             db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
                 assertTrue("Feed should have been synced", feed.lastSync > 0)
+                assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
                 // "Long time" ago, but not unset
                 db.feedDao().updateFeed(feed.copy(lastSync = 999L))
             }
