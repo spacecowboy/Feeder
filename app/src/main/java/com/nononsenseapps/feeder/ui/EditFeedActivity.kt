@@ -363,15 +363,23 @@ class EditFeedActivity : CoroutineScopedActivity() {
             false -> listOf(url)
         }.map {
             launch {
-                feedParser.parseFeedUrl(it)?.let { feed ->
-                    withContext(Dispatchers.Main) {
-                        results.add(feed)
-                        resultAdapter.data = results
-                        // Show results, unless user has clicked on one
-                        if (detailsFrame.visibility == View.GONE) {
-                            searchFrame.visibility = View.VISIBLE
-                            listResults.visibility = View.VISIBLE
+                try {
+                    feedParser.parseFeedUrl(it)?.let { feed ->
+                        withContext(Dispatchers.Main) {
+                            results.add(feed)
+                            resultAdapter.data = results
+                            // Show results, unless user has clicked on one
+                            if (detailsFrame.visibility == View.GONE) {
+                                searchFrame.visibility = View.VISIBLE
+                                listResults.visibility = View.VISIBLE
+                            }
                         }
+                    }
+                } catch (e: Throwable) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@EditFeedActivity,
+                                R.string.could_not_load_url,
+                                Toast.LENGTH_SHORT).show()
                     }
                 }
             }
