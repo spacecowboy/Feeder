@@ -81,18 +81,18 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
         val feed: Feed? =
                 response?.let {
                     try {
-                        /*Log.d("CoroutineSync", "response: $response")
+                        Log.d("CoroutineSync", "response: $response")
                         Log.d("CoroutineSync", "cacheResponse: ${response?.cacheResponse()}")
-                        Log.d("CoroutineSync", "networkResponse: ${response?.networkResponse()}")*/
+                        Log.d("CoroutineSync", "networkResponse: ${response?.networkResponse()}")
                         when {
                             !response.isSuccessful -> {
                                 // fail
-                                Log.e("CoroutineSync", "Response fail for ${feedSql.displayTitle}: ${response.code()}")
+                                Log.e("CoroutineSync", "${Thread.currentThread().name} Response fail for ${feedSql.displayTitle}: ${response.code()}")
                                 null
                             }
-                            feedSql.lastSync > 0 && response.cacheResponse() != null -> {
+                            feedSql.lastSync > 0 && (response.networkResponse()?.code() ?: 304) == 304 -> {
                                 // no change
-                                Log.d("CoroutineSync", "No change for ${feedSql.displayTitle}: ${response.networkResponse()?.code()}")
+                                Log.d("CoroutineSync", "${Thread.currentThread().name} No change for ${feedSql.displayTitle}: ${response.networkResponse()?.code()}")
                                 null
                             }
                             else -> {
