@@ -142,6 +142,7 @@
       android:layout_gravity="center"
       android:layout_marginTop="16dp"
       android:gravity="center"
+      android:visibility="gone"
       android:text="@string/search_feed_empty_hint"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
