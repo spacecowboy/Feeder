@@ -42,8 +42,10 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
 
     override fun doWork(): Result = runBlocking {
 
+        val isManual = inputData.getBoolean(IS_MANUAL_SYNC, false)
+
         val wifiStatusOK = when {
-            inputData.getBoolean(IS_MANUAL_SYNC, false) -> true
+            isManual -> true
             currentlyOnWifi(applicationContext) -> true
             else -> !PrefUtils.shouldSyncOnlyOnWIfi(applicationContext)
         }
@@ -60,7 +62,13 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
             val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
 
-            success = syncFeeds(applicationContext, feedId, feedTag, forceNetwork = forceNetwork)
+            success = syncFeeds(
+                    applicationContext,
+                    feedId,
+                    feedTag,
+                    forceNetwork = forceNetwork,
+                    parallel = isManual
+            )
             // Send notifications for configured feeds
             notify(applicationContext)
         } else {

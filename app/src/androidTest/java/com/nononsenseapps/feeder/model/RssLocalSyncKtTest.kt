@@ -68,7 +68,7 @@ class RssLocalSyncKtTest {
     @Test
     fun syncAllWorks() {
         runBlocking {
-            syncFeeds(getInstrumentation().context, ID_UNSET, "", forceNetwork = false)
+            syncFeeds(getInstrumentation().context, ID_UNSET, "", forceNetwork = false, parallel = true)
         }
 
         assertEquals(

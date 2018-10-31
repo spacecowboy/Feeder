@@ -22,7 +22,8 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
 
-suspend fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork: Boolean = false): Boolean {
+suspend fun syncFeeds(context: Context, feedId: Long, tag: String,
+                      forceNetwork: Boolean = false, parallel: Boolean = false): Boolean {
     var result = false
     val time = measureTimeMillis {
         coroutineScope {
@@ -38,8 +39,11 @@ suspend fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork:
                 val feedsToFetch = feedsToSync(db, feedId, tag, staleTime = staleTime)
 
                 feedsToFetch.map {
-                    launch(Dispatchers.Default) {
-                        syncFeed(it, context, forceNetwork = forceNetwork)
+                    when (parallel) {
+                        true -> launch(Dispatchers.Default) {
+                            syncFeed(it, context, forceNetwork = forceNetwork)
+                        }
+                        false -> syncFeed(it, context, forceNetwork = forceNetwork)
                     }
                 }
 
