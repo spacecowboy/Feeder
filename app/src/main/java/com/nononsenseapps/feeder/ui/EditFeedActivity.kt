@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -21,7 +20,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedActivity
@@ -29,7 +27,6 @@ import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
-import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
@@ -37,9 +34,9 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.net.URL
 
@@ -67,9 +64,9 @@ class EditFeedActivity : CoroutineScopedActivity() {
 
     private var feedTitle: String = ""
 
-    private var searchTask: SearchTask? = null
+    private var searchJob: Job? = null
         set(value) {
-            field?.cancel(true)
+            field?.cancel()
             field = value
         }
 
@@ -119,25 +116,7 @@ class EditFeedActivity : CoroutineScopedActivity() {
                     emptyText.visibility = View.GONE
                     loadingProgress.visibility = View.VISIBLE
 
-                    val inProgressData = mutableListOf<Feed>()
-                    searchTask = SearchTask(feedParser,
-                            { feed ->
-                                inProgressData.add(feed)
-                                resultAdapter.data = inProgressData
-                                if (inProgressData.isNotEmpty()) {
-                                    detailsFrame.visibility = View.GONE
-                                    searchFrame.visibility = View.VISIBLE
-                                    listResults.visibility = View.VISIBLE
-                                }
-                            },
-                            {
-                                loadingProgress.visibility = View.GONE
-                                if (resultAdapter.data.isEmpty()) {
-                                    emptyText.text = getString(R.string.no_such_feed)
-                                    emptyText.visibility = View.VISIBLE
-                                }
-                            })
-                    searchTask?.execute(url)
+                    searchJob = searchForFeeds(url)
                 } catch (exc: Exception) {
                     Toast.makeText(this@EditFeedActivity,
                             R.string.could_not_load_url,
@@ -287,6 +266,8 @@ class EditFeedActivity : CoroutineScopedActivity() {
     }
 
     private fun useEntry(title: String, url: String) {
+        // Cancel search task so it doesn't keep showing results
+        searchJob?.cancel()
         @Suppress("DEPRECATION")
         feedTitle = android.text.Html.fromHtml(title).toString()
         feedUrl = url.trim()
@@ -307,11 +288,6 @@ class EditFeedActivity : CoroutineScopedActivity() {
             // Only care about exit transition
             overridePendingTransition(0, R.anim.to_bottom_right)
         }
-    }
-
-    override fun onDestroy() {
-        searchTask?.cancel(true)
-        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean =
@@ -379,31 +355,34 @@ class EditFeedActivity : CoroutineScopedActivity() {
 
     }
 
-}
-
-class SearchTask(private val feedParser: FeedParser,
-                 onProgress: ((Feed) -> Unit)?,
-                 onPost: ((Void?) -> Unit)?) : LeakHandlingAsyncTask<URL, Feed, Void>(onProgress, onPost) {
-
-    override fun doInBackground(vararg urls: URL): Void? {
-        val url = urls.firstOrNull() ?: return null
-        runBlocking {
-            val alts = feedParser.getAlternateFeedLinksAtUrl(url)
-            val urlsToParse = when (alts.isNotEmpty()) {
-                true -> alts.map { sloppyLinkToStrictURL(it.first) }
-                false -> listOf(url)
-            }
-            urlsToParse.forEach {
-                try {
-                    if (!isCancelled) {
-                        val feed = feedParser.parseFeedUrl(it)
-                        publishProgress(feed)
+    private fun searchForFeeds(url: URL): Job = launch(Dispatchers.Default) {
+        val results = mutableListOf<Feed>()
+        val alts = feedParser.getAlternateFeedLinksAtUrl(url)
+        when (alts.isNotEmpty()) {
+            true -> alts.map { sloppyLinkToStrictURL(it.first) }
+            false -> listOf(url)
+        }.map {
+            launch {
+                feedParser.parseFeedUrl(it)?.let { feed ->
+                    withContext(Dispatchers.Main) {
+                        results.add(feed)
+                        resultAdapter.data = results
+                        // Show results, unless user has clicked on one
+                        if (detailsFrame.visibility == View.GONE) {
+                            searchFrame.visibility = View.VISIBLE
+                            listResults.visibility = View.VISIBLE
+                        }
                     }
-                } catch (t: Throwable) {
-                    t.printStackTrace()
                 }
             }
+        }.toList().joinAll()
+
+        withContext(Dispatchers.Main) {
+            loadingProgress.visibility = View.GONE
+            if (resultAdapter.data.isEmpty()) {
+                emptyText.text = getString(R.string.no_such_feed)
+                emptyText.visibility = View.VISIBLE
+            }
         }
-        return null
     }
 }
