@@ -32,6 +32,7 @@ const val ARG_FORCE_NETWORK = "force_network"
 const val LOG_TAG = "FEED_SYNC"
 const val UNIQUE_PERIODIC_NAME = "feeder_periodic"
 const val PARALLEL_SYNC = "parallel_sync"
+const val IGNORE_CONNECTIVITY_SETTINGS = "ignore_connectivity_settings"
 
 const val FEED_ADDED_BROADCAST = "feeder.nononsenseapps.RSS_FEED_ADDED_BROADCAST"
 const val SYNC_BROADCAST = "feeder.nononsenseapps.RSS_SYNC_BROADCAST"
@@ -45,9 +46,10 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
     override fun doWork(): Result = runBlocking {
 
         val goParallel = inputData.getBoolean(PARALLEL_SYNC, false)
+        val ignoreConnectivitySettings = inputData.getBoolean(IGNORE_CONNECTIVITY_SETTINGS, false)
 
         val wifiStatusOK = when {
-            goParallel -> true
+            ignoreConnectivitySettings -> true
             currentlyOnWifi(applicationContext) -> true
             else -> !PrefUtils.shouldSyncOnlyOnWIfi(applicationContext)
         }
@@ -100,6 +102,7 @@ fun requestFeedSync(feedId: Long = ID_UNSET, feedTag: String = "") {
     val data = workDataOf(ARG_FEED_ID to feedId,
             ARG_FEED_TAG to feedTag,
             PARALLEL_SYNC to true,
+            IGNORE_CONNECTIVITY_SETTINGS to true,
             ARG_FORCE_NETWORK to true)
 
     workRequest.setInputData(data)
