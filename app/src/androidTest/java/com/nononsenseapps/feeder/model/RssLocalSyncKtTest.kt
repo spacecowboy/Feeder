@@ -7,11 +7,15 @@ import androidx.test.runner.AndroidJUnit4
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.ui.MockResponses
 import com.nononsenseapps.feeder.util.feedParser
 import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 import org.joda.time.DateTime
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
@@ -30,6 +34,13 @@ class RssLocalSyncKtTest {
     private var cowboyJsonId: Long = -1
     private var cowboyAtomId: Long = -1
 
+    val server = MockWebServer()
+
+    @After
+    fun stopServer() {
+        server.shutdown()
+    }
+
     @Before
     fun setupTestDb() {
         AppDatabase.setInstance(db)
@@ -45,6 +56,11 @@ class RssLocalSyncKtTest {
                 url = URL("https://cowboyprogrammer.org/atom.xml"),
                 tag = ""
         ))
+    }
+
+    @Before
+    fun setupHttpCache() {
+        FeedParser.setup(getInstrumentation().targetContext.cacheDir!!)
     }
 
     @Test
@@ -90,7 +106,6 @@ class RssLocalSyncKtTest {
 
     @Test
     fun responsesAreNotParsedUnlessFeedHashHasChanged() {
-        FeedParser.setup(getInstrumentation().targetContext.cacheDir!!)
         runBlocking {
             syncFeeds(db = db, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
@@ -115,7 +130,6 @@ class RssLocalSyncKtTest {
     @Test
     fun feedsSyncedWithin15MinAreIgnored() {
         val fourteenMinsAgo = DateTime.now().minusMinutes(14).millis
-        FeedParser.setup(getInstrumentation().targetContext.cacheDir!!)
         runBlocking {
             syncFeeds(db = db, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
@@ -141,7 +155,6 @@ class RssLocalSyncKtTest {
     @Test
     fun feedsSyncedWithin15MinAreNotIgnoredWhenForcingNetwork() {
         val fourteenMinsAgo = DateTime.now().minusMinutes(14).millis
-        FeedParser.setup(getInstrumentation().targetContext.cacheDir!!)
         runBlocking {
             syncFeeds(db = db, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
@@ -162,5 +175,35 @@ class RssLocalSyncKtTest {
                 "Last sync should have changed",
                 fourteenMinsAgo,
                 db.feedDao().loadFeed(cowboyJsonId)!!.lastSync)
+    }
+
+    @Test
+    fun feedShouldNotBeUpdatedIfRequestFails() {
+        val response = MockResponse().also {
+            it.setResponseCode(500)
+        }
+        server.enqueue(response)
+        server.start()
+
+        val url = server.url("/feed.json")
+
+        val failingJsonId = db.feedDao().insertFeed(Feed(
+                title = "failJson",
+                url = URL("$url"),
+                tag = ""
+        ))
+
+        runBlocking {
+            syncFeeds(db = db, feedParser = feedParser, feedId = failingJsonId)
+        }
+
+        assertEquals(
+                "Last sync should not have been updated",
+                0,
+                db.feedDao().loadFeed(failingJsonId)!!.lastSync
+        )
+
+        // Assert the feed was retrieved
+        assertEquals("/feed.json", server.takeRequest().path)
     }
 }

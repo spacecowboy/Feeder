@@ -15,6 +15,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
@@ -73,95 +74,78 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                              feedParser: FeedParser,
                              maxFeedItemCount: Int,
                              forceNetwork: Boolean = false) {
-    Log.d("CoroutineSync", "${Thread.currentThread().name} Fetch ${feedSql.displayTitle}")
     try {
-        val response: Response? =
-                try {
-                    fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
-                } catch (t: Throwable) {
-                    Log.e("CoroutineSync", "Shit hit the fan1: $t")
-                    null
-                }
+        Log.d("CoroutineSync", "${Thread.currentThread().name} Fetch ${feedSql.displayTitle}")
+
+        val response: Response? = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
 
         Log.d("CoroutineSync", "${Thread.currentThread().name} Feed  ${feedSql.displayTitle}")
 
         if (response == null) {
-            Log.e("CoroutineSync", "Timed out when fetching ${feedSql.displayTitle}")
+            throw ResponseFailure("Timed out when fetching ${feedSql.url}")
         }
 
         var responseHash = 0
 
         val feed: Feed? =
-                response?.use {
+                response.use {
                     it.body()?.use { responseBody ->
-                        try {
-                            val body = responseBody.bytes()!!
-                            responseHash = Arrays.hashCode(body)
-                            Log.d("CoroutineSync", "response: $response")
-                            Log.d("CoroutineSync", "cacheResponse: ${response.cacheResponse()}")
-                            Log.d("CoroutineSync", "networkResponse: ${response.networkResponse()}")
-                            when {
-                                !response.isSuccessful -> {
-                                    // fail
-                                    Log.e("CoroutineSync", "${Thread.currentThread().name} Response fail for ${feedSql.displayTitle}: ${response.code()}")
-                                    null
-                                }
-                                feedSql.responseHash == responseHash -> {
-                                    // no change
-                                    Log.d("CoroutineSync", "${Thread.currentThread().name} No hash change for ${feedSql.displayTitle}: ${response.networkResponse()?.code()}")
-                                    null
-                                }
-                                else -> {
-                                    feedParser.parseFeedResponse(it, body)
-                                }
+                        val body = responseBody.bytes()!!
+                        responseHash = Arrays.hashCode(body)
+                        Log.d("CoroutineSync", "response: $response")
+                        Log.d("CoroutineSync", "cacheResponse: ${response.cacheResponse()}")
+                        Log.d("CoroutineSync", "networkResponse: ${response.networkResponse()}")
+                        when {
+                            !response.isSuccessful -> {
+                                throw ResponseFailure("${response.code()} when fetching ${feedSql.url}")
                             }
-                        } catch (t: Throwable) {
-                            Log.e("CoroutineSync", "Shit hit the fan2: ${feedSql.displayTitle}, $t")
-                            null
+                            feedSql.responseHash == responseHash -> {
+                                // no change
+                                Log.d("CoroutineSync", "${Thread.currentThread().name} No hash change for ${feedSql.displayTitle}: ${response.networkResponse()?.code()}")
+                                null
+                            }
+                            else -> {
+                                feedParser.parseFeedResponse(it, body)
+                            }
                         }
                     }
                 }
 
-        try {
-            // Always update the feeds last sync field
-            feedSql.lastSync = DateTime.now(DateTimeZone.UTC).millis
+        // Always update the feeds last sync field
+        feedSql.lastSync = DateTime.now(DateTimeZone.UTC).millis
 
-            if (feed == null) {
-                db.feedDao().upsertFeed(feedSql)
-            } else  {
-                feedSql.responseHash = responseHash
-                parseFeedContent(db, feed, feedSql)
-                // Finally, prune database of old items
-                db.feedItemDao().cleanItemsInFeed(feedSql.id, maxFeedItemCount)
-            }
-        } catch (t: Throwable) {
-            Log.e("CoroutineSync", "Shit hit the fan3: ${feedSql.displayTitle}, $t")
+        if (feed == null) {
+            db.feedDao().upsertFeed(feedSql)
+        } else {
+            val itemDao = db.feedItemDao()
+            feed.items?.asSequence()
+                    ?.filter { it.id != null }
+                    ?.forEach {
+                        val feedItemSql = itemDao.loadFeedItem(guid = it.id!!,
+                                feedId = feedSql.id) ?: FeedItem()
+
+                        feedItemSql.updateFromParsedEntry(it, feed)
+                        feedItemSql.feedId = feedSql.id
+
+                        itemDao.upsertFeedItem(feedItemSql)
+                    }
+
+            // Update feed last so lastsync is only set after all items have been handled
+            // for the rare case that the job is cancelled prematurely
+            feedSql.responseHash = responseHash
+            feedSql.title = feed.title ?: feedSql.title
+            feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
+            feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.imageUrl
+            db.feedDao().upsertFeed(feedSql)
+
+            // Finally, prune database of old items
+            db.feedItemDao().cleanItemsInFeed(feedSql.id, maxFeedItemCount)
         }
+    } catch (e: ResponseFailure) {
+        Log.e("CoroutineSync", "Failed to fetch ${feedSql.displayTitle}: ${e.message}")
     } catch (t: Throwable) {
         Log.e("CoroutineSync", "Something went wrong: $t")
     }
-}
-
-private fun parseFeedContent(db: AppDatabase, feed: Feed, feedSql: com.nononsenseapps.feeder.db.room.Feed) {
-    feedSql.title = feed.title ?: feedSql.title
-    feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
-    feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.imageUrl
-
-    feedSql.id = db.feedDao().upsertFeed(feedSql)
-
-    val itemDao = db.feedItemDao()
-
-    feed.items?.asSequence()
-            ?.filter { it.id != null }
-            ?.forEach {
-                val feedItemSql = itemDao.loadFeedItem(guid = it.id!!,
-                        feedId = feedSql.id) ?: FeedItem()
-
-                feedItemSql.updateFromParsedEntry(it, feed)
-                feedItemSql.feedId = feedSql.id
-
-                itemDao.upsertFeedItem(feedItemSql)
-            }
 }
 
 private suspend fun fetchFeed(feedParser: FeedParser, feedSql: com.nononsenseapps.feeder.db.room.Feed,
@@ -186,3 +170,5 @@ internal fun feedsToSync(db: AppDatabase, feedId: Long, tag: String, staleTime: 
         else -> if (staleTime > 0) db.feedDao().loadFeedsIfStale(staleTime) else db.feedDao().loadFeeds()
     }
 }
+
+class ResponseFailure(message: String?) : Exception(message)
