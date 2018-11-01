@@ -28,6 +28,7 @@ import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.model.syncFeeds
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.SystemUtils
 import com.nononsenseapps.feeder.util.ensureDebugLogDeleted
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
@@ -200,20 +201,39 @@ class FeedActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         getInstance(this).registerReceiver(syncReceiver, IntentFilter(SYNC_BROADCAST))
+        syncFeedsMaybe()
+    }
 
-        launch(Background) {
-            // TODO add settings / respect existing settings in terms of WiFi etc
-            if (PrefUtils.shouldSync(applicationContext)) {
-                syncFeeds(
-                        db = AppDatabase.getInstance(applicationContext),
-                        feedParser = applicationContext.feedParser,
-                        maxFeedItemCount = PrefUtils.maximumItemCountPerFeed(applicationContext),
-                        forceNetwork = false,
-                        parallel = true,
-                        minFeedAgeMinutes = 15
-                )
-            }
+    private fun syncFeedsMaybe() = launch(Background) {
+        if (!PrefUtils.shouldSync(applicationContext)) {
+            return@launch
         }
+
+        val connected = SystemUtils.currentlyConnected(applicationContext)
+        val onWifi = SystemUtils.currentlyOnWifi(applicationContext)
+        val onMetered = SystemUtils.currentlyMetered(applicationContext)
+
+        val connectionOk: Boolean = when {
+            !connected -> false
+            onWifi -> true
+            PrefUtils.shouldSyncOnlyOnWIfi(applicationContext) -> false
+            onMetered && PrefUtils.shouldSyncOnHotSpots(applicationContext) -> true
+            !onMetered -> true
+            else -> false
+        }
+
+        if (!connectionOk) {
+            return@launch
+        }
+
+        syncFeeds(
+                db = AppDatabase.getInstance(applicationContext),
+                feedParser = applicationContext.feedParser,
+                maxFeedItemCount = PrefUtils.maximumItemCountPerFeed(applicationContext),
+                forceNetwork = false,
+                parallel = true,
+                minFeedAgeMinutes = 15
+        )
     }
 
     override fun onPause() {
