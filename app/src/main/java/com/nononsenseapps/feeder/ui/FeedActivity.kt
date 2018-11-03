@@ -205,7 +205,7 @@ class FeedActivity : BaseActivity() {
     }
 
     private fun syncFeedsMaybe() = launch(Background) {
-        if (!PrefUtils.shouldSync(applicationContext)) {
+        if (!PrefUtils.shouldSyncOnResume(applicationContext)) {
             return@launch
         }
 

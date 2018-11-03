@@ -16,6 +16,9 @@
             android:title="@string/check_for_updates" android:entries="@array/pref_sync_frequency_titles"
             android:entryValues="@array/pref_sync_frequency_values" android:key="pref_sync_freq"/>
     <SwitchPreference
+      android:defaultValue="false"
+      android:key="pref_sync_on_resume" android:title="@string/on_startup" />
+    <SwitchPreference
         android:defaultValue="false"
         android:key="pref_sync_only_wifi" android:title="@string/only_on_wifi"/>
     <SwitchPreference

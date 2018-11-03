@@ -37,6 +37,7 @@ const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"
 const val PREF_SYNC_HOTSPOTS = "pref_sync_hotspots"
 const val PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi"
 const val PREF_SYNC_FREQ = "pref_sync_freq"
+const val PREF_SYNC_ON_RESUME = "pref_sync_on_resume"
 
 /**
  * Image settings
@@ -92,6 +93,8 @@ object PrefUtils {
     fun shouldLoadImagesOnHotSpots(context: Context): Boolean = sp(context).getBoolean(PREF_IMG_HOTSPOTS, false)
 
     fun shouldSyncOnlyOnWIfi(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_ONLY_WIFI, false)
+
+    fun shouldSyncOnResume(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_ON_RESUME, false)
 
     fun shouldSyncOnlyWhenCharging(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_ONLY_CHARGING, false)
 
