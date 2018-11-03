@@ -212,6 +212,7 @@ class FeedActivity : BaseActivity() {
         val connected = SystemUtils.currentlyConnected(applicationContext)
         val onWifi = SystemUtils.currentlyOnWifi(applicationContext)
         val onMetered = SystemUtils.currentlyMetered(applicationContext)
+        val charging = SystemUtils.currentlyOnWifi(applicationContext)
 
         val connectionOk: Boolean = when {
             !connected -> false
@@ -223,6 +224,10 @@ class FeedActivity : BaseActivity() {
         }
 
         if (!connectionOk) {
+            return@launch
+        }
+
+        if (PrefUtils.shouldSyncOnlyWhenCharging(applicationContext) && !charging) {
             return@launch
         }
 
