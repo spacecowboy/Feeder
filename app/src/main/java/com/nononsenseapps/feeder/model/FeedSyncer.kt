@@ -13,13 +13,12 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
 import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.SystemUtils.currentlyOnWifi
-import com.nononsenseapps.feeder.util.feedParser
+import com.nononsenseapps.feeder.util.currentlyHotSpot
+import com.nononsenseapps.feeder.util.currentlyOnWifi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -49,6 +48,12 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
         val goParallel = inputData.getBoolean(PARALLEL_SYNC, false)
         val ignoreConnectivitySettings = inputData.getBoolean(IGNORE_CONNECTIVITY_SETTINGS, false)
 
+        val hotspotStatusOk = when {
+            ignoreConnectivitySettings -> true
+            currentlyHotSpot(applicationContext) -> PrefUtils.shouldSyncOnHotSpots(applicationContext)
+            else -> true
+        }
+
         val wifiStatusOK = when {
             ignoreConnectivitySettings -> true
             currentlyOnWifi(applicationContext) -> true
@@ -60,7 +65,7 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
 
         var success = false
 
-        if (wifiStatusOK) {
+        if (hotspotStatusOk && wifiStatusOK) {
             LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast)
 
             val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
@@ -79,7 +84,7 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
             // Send notifications for configured feeds
             notify(applicationContext)
         } else {
-            Log.d(LOG_TAG, "Skipping sync work because wifistatus not OK")
+            Log.d(LOG_TAG, "Skipping sync work because wifiok: $wifiStatusOK and hotspotok: $hotspotStatusOk")
         }
 
         LocalBroadcastManager.getInstance(applicationContext)
@@ -123,10 +128,10 @@ fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
                 .setRequiresBatteryNotLow(true)
                 .setRequiresCharging(PrefUtils.shouldSyncOnlyWhenCharging(context))
 
-        if (PrefUtils.shouldSyncOnHotSpots(context)) {
-            constraints.setRequiredNetworkType(NetworkType.CONNECTED)
-        } else {
+        if (PrefUtils.shouldSyncOnlyOnWIfi(context)) {
             constraints.setRequiredNetworkType(NetworkType.UNMETERED)
+        } else {
+            constraints.setRequiredNetworkType(NetworkType.CONNECTED)
         }
 
         var timeInterval = PrefUtils.synchronizationFrequency(context)

@@ -202,9 +202,13 @@ object PrefUtils {
     }
 
     fun shouldLoadImages(context: Context): Boolean {
-        return if (SystemUtils.currentlyOnWifi(context)) {
-            !SystemUtils.currentlyMetered(context) || shouldLoadImagesOnHotSpots(context)
-        } else !shouldLoadImagesOnlyOnWIfi(context)
+        return if (currentlyHotSpot(context)) {
+            shouldLoadImagesOnHotSpots(context)
+        } else if (shouldLoadImagesOnlyOnWIfi(context)) {
+            currentlyOnWifi(context)
+        } else {
+            true
+        }
     }
 }
 

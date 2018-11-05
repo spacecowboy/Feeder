@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.PersistableBundle
 import android.text.Html.fromHtml
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -28,9 +29,11 @@ import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.model.syncFeeds
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.SystemUtils
+import com.nononsenseapps.feeder.util.currentlyCharging
+import com.nononsenseapps.feeder.util.currentlyConnected
+import com.nononsenseapps.feeder.util.currentlyHotSpot
+import com.nononsenseapps.feeder.util.currentlyOnWifi
 import com.nononsenseapps.feeder.util.ensureDebugLogDeleted
-import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.launch
 import java.io.File
@@ -209,18 +212,16 @@ class FeedActivity : BaseActivity() {
             return@launch
         }
 
-        val connected = SystemUtils.currentlyConnected(applicationContext)
-        val onWifi = SystemUtils.currentlyOnWifi(applicationContext)
-        val onMetered = SystemUtils.currentlyMetered(applicationContext)
-        val charging = SystemUtils.currentlyOnWifi(applicationContext)
+        val onWifi = currentlyOnWifi(applicationContext)
+        val hotspot = currentlyHotSpot(applicationContext)
 
-        val connectionOk: Boolean = when {
-            !connected -> false
-            onMetered && !PrefUtils.shouldSyncOnHotSpots(applicationContext) -> false
-            !onWifi && PrefUtils.shouldSyncOnlyOnWIfi(applicationContext) -> false
-            !charging && PrefUtils.shouldSyncOnlyWhenCharging(applicationContext) -> false
-            else -> true
-        }
+        Log.d("JONAS", "Am I on WIFI? $onWifi")
+
+        val connectionOk = (currentlyConnected(applicationContext).also { Log.d("JONAS", "Connection test: $it") }
+                && (PrefUtils.shouldSyncOnHotSpots(applicationContext) || !hotspot).also { Log.d("JONAS", "Hotspot test: $it") }
+                && (!PrefUtils.shouldSyncOnlyWhenCharging(applicationContext) || currentlyCharging(applicationContext)).also { Log.d("JONAS", "Charging test: $it") }
+                && (!PrefUtils.shouldSyncOnlyOnWIfi(applicationContext) || onWifi).also { Log.d("JONAS", "Wifi test: $it") }
+                )
 
         if (connectionOk) {
             syncFeeds(
