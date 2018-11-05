@@ -139,7 +139,7 @@ fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
 
         val workRequestBuilder = PeriodicWorkRequestBuilder<FeedSyncer>(
                 timeInterval, TimeUnit.MINUTES,
-                timeInterval, TimeUnit.MINUTES)
+                timeInterval / 2, TimeUnit.MINUTES)
 
         val syncWork = workRequestBuilder
                 .setConstraints(constraints.build())
