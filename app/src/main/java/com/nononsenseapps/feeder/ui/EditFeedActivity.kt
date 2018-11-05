@@ -152,7 +152,7 @@ class EditFeedActivity : CoroutineScopedActivity() {
                 val feedId: Long? = dao.upsertFeed(feed)
 
                 feedId?.let {
-                    requestFeedSync(feedId)
+                    requestFeedSync(feedId, ignoreConnectivitySettings = false, forceNetwork = true)
                 }
 
                 val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId"))

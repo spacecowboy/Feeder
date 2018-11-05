@@ -1,11 +1,14 @@
 package com.nononsenseapps.feeder.model
 
+import android.content.Context
 import android.util.Log
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.db.room.upsertFeedItem
+import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.Dispatchers
@@ -20,15 +23,31 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
-
-suspend fun syncFeeds(db: AppDatabase,
-                      feedParser: FeedParser,
+suspend fun syncFeeds(context: Context,
                       feedId: Long = ID_UNSET,
-                      tag: String = "",
-                      maxFeedItemCount: Int = 100,
+                      feedTag: String = "",
                       forceNetwork: Boolean = false,
                       parallel: Boolean = false,
-                      minFeedAgeMinutes: Int = 15): Boolean {
+                      minFeedAgeMinutes: Int = 15): Boolean =
+        syncFeeds(
+                db = AppDatabase.getInstance(context),
+                feedParser = context.feedParser,
+                feedId = feedId,
+                feedTag = feedTag,
+                maxFeedItemCount = PrefUtils.maximumItemCountPerFeed(context),
+                forceNetwork = forceNetwork,
+                parallel = parallel,
+                minFeedAgeMinutes = minFeedAgeMinutes
+        )
+
+internal suspend fun syncFeeds(db: AppDatabase,
+                               feedParser: FeedParser,
+                               feedId: Long = ID_UNSET,
+                               feedTag: String = "",
+                               maxFeedItemCount: Int = 100,
+                               forceNetwork: Boolean = false,
+                               parallel: Boolean = false,
+                               minFeedAgeMinutes: Int = 15): Boolean {
     var result = false
     val time = measureTimeMillis {
         coroutineScope {
@@ -40,7 +59,7 @@ suspend fun syncFeeds(db: AppDatabase,
                             .minusMinutes(minFeedAgeMinutes)
                             .millis
                 }
-                val feedsToFetch = feedsToSync(db, feedId, tag, staleTime = staleTime)
+                val feedsToFetch = feedsToSync(db, feedId, feedTag, staleTime = staleTime)
 
                 val coroutineContext = when (parallel) {
                     true -> Dispatchers.Default

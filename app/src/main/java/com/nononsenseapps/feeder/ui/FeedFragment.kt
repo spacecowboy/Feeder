@@ -217,8 +217,14 @@ class FeedFragment : CoroutineScopedFragment() {
                 R.color.refresh_progress_3)
 
         swipeRefreshLayout!!.setOnRefreshListener {
-            // Sync this specific feed(s)
-            requestFeedSync(id, feedTag ?: "")
+            // Sync this specific feed(s) immediately
+            requestFeedSync(
+                    feedId = id,
+                    feedTag = feedTag ?: "",
+                    ignoreConnectivitySettings = true,
+                    parallell = true,
+                    forceNetwork = true
+            )
         }
 
         // Set up the empty view
@@ -390,7 +396,11 @@ class FeedFragment : CoroutineScopedFragment() {
         return when {
             id == R.id.action_sync.toLong() -> {
                 // Sync all feeds when menu button pressed
-                requestFeedSync()
+                requestFeedSync(
+                        parallell = true,
+                        ignoreConnectivitySettings = true,
+                        forceNetwork = true
+                )
                 true
             }
             id == R.id.action_edit_feed.toLong() && this.id > ID_UNSET -> {

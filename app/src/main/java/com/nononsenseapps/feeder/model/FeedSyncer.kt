@@ -32,6 +32,7 @@ const val ARG_FORCE_NETWORK = "force_network"
 const val LOG_TAG = "FEED_SYNC"
 const val UNIQUE_PERIODIC_NAME = "feeder_periodic"
 const val PARALLEL_SYNC = "parallel_sync"
+const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
 const val IGNORE_CONNECTIVITY_SETTINGS = "ignore_connectivity_settings"
 
 const val FEED_ADDED_BROADCAST = "feeder.nononsenseapps.RSS_FEED_ADDED_BROADCAST"
@@ -65,15 +66,15 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
             val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
             val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
+            val minFeedAgeMinutes = inputData.getInt(MIN_FEED_AGE_MINUTES, 15)
 
             success = syncFeeds(
-                    db = AppDatabase.getInstance(applicationContext),
-                    feedParser = applicationContext.feedParser,
+                    context = applicationContext,
                     feedId = feedId,
-                    tag = feedTag,
-                    maxFeedItemCount = PrefUtils.maximumItemCountPerFeed(applicationContext),
+                    feedTag = feedTag,
                     forceNetwork = forceNetwork,
-                    parallel = goParallel
+                    parallel = goParallel,
+                    minFeedAgeMinutes = minFeedAgeMinutes
             )
             // Send notifications for configured feeds
             notify(applicationContext)
@@ -96,14 +97,18 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
     }
 }
 
-fun requestFeedSync(feedId: Long = ID_UNSET, feedTag: String = "") {
+fun requestFeedSync(feedId: Long = ID_UNSET,
+                    feedTag: String = "",
+                    ignoreConnectivitySettings: Boolean = false,
+                    forceNetwork: Boolean = false,
+                    parallell: Boolean = false) {
     val workRequest = OneTimeWorkRequestBuilder<FeedSyncer>()
 
     val data = workDataOf(ARG_FEED_ID to feedId,
             ARG_FEED_TAG to feedTag,
-            PARALLEL_SYNC to true,
-            IGNORE_CONNECTIVITY_SETTINGS to true,
-            ARG_FORCE_NETWORK to true)
+            PARALLEL_SYNC to parallell,
+            IGNORE_CONNECTIVITY_SETTINGS to ignoreConnectivitySettings,
+            ARG_FORCE_NETWORK to forceNetwork)
 
     workRequest.setInputData(data)
 

@@ -232,9 +232,7 @@ class FeedActivity : BaseActivity() {
         }
 
         syncFeeds(
-                db = AppDatabase.getInstance(applicationContext),
-                feedParser = applicationContext.feedParser,
-                maxFeedItemCount = PrefUtils.maximumItemCountPerFeed(applicationContext),
+                context = applicationContext,
                 forceNetwork = false,
                 parallel = true,
                 minFeedAgeMinutes = 15
