@@ -216,27 +216,20 @@ class FeedActivity : BaseActivity() {
 
         val connectionOk: Boolean = when {
             !connected -> false
-            onWifi -> true
-            PrefUtils.shouldSyncOnlyOnWIfi(applicationContext) -> false
-            onMetered && PrefUtils.shouldSyncOnHotSpots(applicationContext) -> true
-            !onMetered -> true
-            else -> false
+            onMetered && !PrefUtils.shouldSyncOnHotSpots(applicationContext) -> false
+            !onWifi && PrefUtils.shouldSyncOnlyOnWIfi(applicationContext) -> false
+            !charging && PrefUtils.shouldSyncOnlyWhenCharging(applicationContext) -> false
+            else -> true
         }
 
-        if (!connectionOk) {
-            return@launch
+        if (connectionOk) {
+            syncFeeds(
+                    context = applicationContext,
+                    forceNetwork = false,
+                    parallel = true,
+                    minFeedAgeMinutes = 15
+            )
         }
-
-        if (PrefUtils.shouldSyncOnlyWhenCharging(applicationContext) && !charging) {
-            return@launch
-        }
-
-        syncFeeds(
-                context = applicationContext,
-                forceNetwork = false,
-                parallel = true,
-                minFeedAgeMinutes = 15
-        )
     }
 
     override fun onPause() {
