@@ -180,12 +180,11 @@ object FeedParser {
                 .cacheControl(CacheControl.Builder()
                         .let {
                             if (forceNetwork) {
-                                // Force network forces a conditional http GET. If the response
-                                // hasn't changed, then the cache is still valid
-                                it.maxAge(1, TimeUnit.MICROSECONDS)
-                                        .maxStale(1, TimeUnit.MICROSECONDS)
+                                // Force a cache revalidation
+                                it.maxAge(0, TimeUnit.SECONDS)
                             } else {
-                                it
+                                // Do a cache revalidation at most every minute
+                                it.maxAge(1, TimeUnit.MINUTES)
                             }
                         }
                         .build())
