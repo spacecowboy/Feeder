@@ -17,8 +17,9 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
 import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.currentlyHotSpot
-import com.nononsenseapps.feeder.util.currentlyOnWifi
+import com.nononsenseapps.feeder.util.currentlyCharging
+import com.nononsenseapps.feeder.util.currentlyConnected
+import com.nononsenseapps.feeder.util.currentlyUnmetered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -38,7 +39,15 @@ const val FEED_ADDED_BROADCAST = "feeder.nononsenseapps.RSS_FEED_ADDED_BROADCAST
 const val SYNC_BROADCAST = "feeder.nononsenseapps.RSS_SYNC_BROADCAST"
 const val SYNC_BROADCAST_IS_ACTIVE = "IS_ACTIVE"
 
-class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams), CoroutineScope {
+
+fun isOkToSyncAutomatically(context: Context): Boolean =
+        (currentlyConnected(context)
+                && (!PrefUtils.shouldSyncOnlyWhenCharging(context) || currentlyCharging(context))
+                && (!PrefUtils.shouldSyncOnlyOnWIfi(context) || currentlyUnmetered(context))
+                )
+
+
+class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams), CoroutineScope {
     private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + job
@@ -48,24 +57,12 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
         val goParallel = inputData.getBoolean(PARALLEL_SYNC, false)
         val ignoreConnectivitySettings = inputData.getBoolean(IGNORE_CONNECTIVITY_SETTINGS, false)
 
-        val hotspotStatusOk = when {
-            ignoreConnectivitySettings -> true
-            currentlyHotSpot(applicationContext) -> PrefUtils.shouldSyncOnHotSpots(applicationContext)
-            else -> true
-        }
-
-        val wifiStatusOK = when {
-            ignoreConnectivitySettings -> true
-            currentlyOnWifi(applicationContext) -> true
-            else -> !PrefUtils.shouldSyncOnlyOnWIfi(applicationContext)
-        }
-
         val bcast = Intent(SYNC_BROADCAST)
                 .putExtra(SYNC_BROADCAST_IS_ACTIVE, true)
 
         var success = false
 
-        if (hotspotStatusOk && wifiStatusOK) {
+        if (ignoreConnectivitySettings || isOkToSyncAutomatically(context)) {
             LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast)
 
             val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
@@ -84,7 +81,7 @@ class FeedSyncer(context: Context, workerParams: WorkerParameters) : Worker(cont
             // Send notifications for configured feeds
             notify(applicationContext)
         } else {
-            Log.d(LOG_TAG, "Skipping sync work because wifiok: $wifiStatusOK and hotspotok: $hotspotStatusOk")
+            Log.d(LOG_TAG, "Skipping sync work because not OK to sync automatically")
         }
 
         LocalBroadcastManager.getInstance(applicationContext)

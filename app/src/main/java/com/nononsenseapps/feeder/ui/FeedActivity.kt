@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.PersistableBundle
 import android.text.Html.fromHtml
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -24,15 +23,16 @@ import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FEED_ADDED_BROADCAST
 import com.nononsenseapps.feeder.model.SYNC_BROADCAST
+import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
+import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.model.syncFeeds
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.currentlyCharging
 import com.nononsenseapps.feeder.util.currentlyConnected
-import com.nononsenseapps.feeder.util.currentlyHotSpot
-import com.nononsenseapps.feeder.util.currentlyOnWifi
+import com.nononsenseapps.feeder.util.currentlyUnmetered
 import com.nononsenseapps.feeder.util.ensureDebugLogDeleted
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.launch
@@ -212,24 +212,10 @@ class FeedActivity : BaseActivity() {
             return@launch
         }
 
-        val onWifi = currentlyOnWifi(applicationContext)
-        val hotspot = currentlyHotSpot(applicationContext)
-
-        Log.d("JONAS", "Am I on WIFI? $onWifi")
-
-        val connectionOk = (currentlyConnected(applicationContext).also { Log.d("JONAS", "Connection test: $it") }
-                && (PrefUtils.shouldSyncOnHotSpots(applicationContext) || !hotspot).also { Log.d("JONAS", "Hotspot test: $it") }
-                && (!PrefUtils.shouldSyncOnlyWhenCharging(applicationContext) || currentlyCharging(applicationContext)).also { Log.d("JONAS", "Charging test: $it") }
-                && (!PrefUtils.shouldSyncOnlyOnWIfi(applicationContext) || onWifi).also { Log.d("JONAS", "Wifi test: $it") }
-                )
-
-        if (connectionOk) {
-            syncFeeds(
-                    context = applicationContext,
+        if (isOkToSyncAutomatically(applicationContext)) {
+            requestFeedSync(ignoreConnectivitySettings = false,
                     forceNetwork = false,
-                    parallel = true,
-                    minFeedAgeMinutes = 15
-            )
+                    parallell = true)
         }
     }
 

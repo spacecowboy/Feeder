@@ -22,10 +22,6 @@
         android:defaultValue="false"
         android:key="pref_sync_only_wifi" android:title="@string/only_on_wifi"/>
     <SwitchPreference
-            android:defaultValue="false"
-            android:title="@string/include_mobile_hotspots" android:key="pref_sync_hotspots"
-            android:summary="@string/may_result_data_charges"/>
-    <SwitchPreference
         android:defaultValue="false"
         android:title="@string/only_when_charging" android:key="pref_sync_only_charging"/>
     <ListPreference
@@ -41,10 +37,6 @@
     <SwitchPreference
         android:defaultValue="false"
         android:title="@string/only_on_wifi" android:key="pref_img_only_wifi"/>
-    <SwitchPreference
-        android:defaultValue="false"
-        android:title="@string/include_mobile_hotspots" android:key="pref_img_hotspots"
-        android:summary="@string/may_result_data_charges"/>
   </PreferenceCategory>
   <PreferenceCategory
     android:title="@string/reader_settings" >
