@@ -1,3 +1,16 @@
+# 1.8.0
+*   Removed option to sync on Hotspots
+    Fixed automatic synchronization never running on mobile data
+    Added option to sync when app is opened
+    Improved caching so less data traffic will be used during sync
+    Improved sync speed by only parsing feeds with new content
+    See !131
+*   Improved error handling in Add Feed dialog
+    See !132
+*   Simplified Chinese Translation
+    Thanks to linsui
+    See !128
+
 # 1.7.1
 *   Fixed possible crash when marking all items as read
     See !127 #145
