@@ -149,11 +149,9 @@ class FeedParserTest {
                         .build())
                 .build()
 
-        runBlocking {
-            val feed = FeedParser.parseFeedResponse(response)
+        val feed = response.use { FeedParser.parseFeedResponse(response) }
 
-            assertEquals(true, feed.items?.get(0)?.content_text?.contains("größte"))
-        }
+        assertEquals(true, feed?.items?.get(0)?.content_text?.contains("größte"))
     }
 
     // Bug in Rome which I am working around, this will crash if not worked around
@@ -172,12 +170,10 @@ class FeedParserTest {
                         .build())
                 .build()
 
-        runBlocking {
-            val feed = FeedParser.parseFeedResponse(response)
+        val feed = response.use { FeedParser.parseFeedResponse(response) }
 
-            assertEquals(1, feed.items?.size)
-            assertEquals(true, feed.items?.get(0)?.content_text?.contains("größte"))
-        }
+        assertEquals(1, feed?.items?.size)
+        assertEquals(true, feed?.items?.get(0)?.content_text?.contains("größte"))
     }
 
     @Test
@@ -418,7 +414,7 @@ class FeedParserTest {
     fun cowboyHttps() {
         runBlocking {
             val feed = FeedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
-            assertEquals("Cowboy Programmer", feed.title)
+            assertEquals("Cowboy Programmer", feed?.title)
         }
     }
 

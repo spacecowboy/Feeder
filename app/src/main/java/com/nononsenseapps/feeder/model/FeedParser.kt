@@ -28,9 +28,6 @@ import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
 
-// 1 hours
-const val MAX_FEED_AGE = 3600
-
 object FeedParser {
     private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
@@ -177,12 +174,19 @@ object FeedParser {
     /**
      * @throws IOException if call fails due to network issue for example
      */
-    suspend fun getResponse(url: URL, maxAgeSecs: Int = MAX_FEED_AGE): Response {
+    suspend fun getResponse(url: URL, forceNetwork: Boolean = false): Response {
         val request = Request.Builder()
                 .url(url)
                 .cacheControl(CacheControl.Builder()
-                        .maxAge(maxAgeSecs, TimeUnit.SECONDS)
-                        .maxStale(maxAgeSecs, TimeUnit.SECONDS)
+                        .let {
+                            if (forceNetwork) {
+                                // Force a cache revalidation
+                                it.maxAge(0, TimeUnit.SECONDS)
+                            } else {
+                                // Do a cache revalidation at most every minute
+                                it.maxAge(1, TimeUnit.MINUTES)
+                            }
+                        }
                         .build())
                 .build()
 
@@ -224,7 +228,7 @@ object FeedParser {
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    suspend fun parseFeedUrl(url: URL): Feed {
+    suspend fun parseFeedUrl(url: URL): Feed? {
         try {
 
             var result: Feed? = null
@@ -232,7 +236,7 @@ object FeedParser {
                 result = parseFeedResponse(it)
             }
 
-            return result!!
+            return result
         } catch (e: Throwable) {
             throw FeedParsingError(e)
         }
@@ -240,46 +244,52 @@ object FeedParser {
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    suspend fun parseFeedResponse(response: Response): Feed {
-        try {
-
-            var result: Feed? = null
-            response.use {
-
-                val isJSON = (it.header("content-type") ?: "").contains("json")
-                // Pass straight bytes from response to parser to properly handle encoding
-                val body = it.body()?.bytes()
-
-                if (body != null) {
-                    // Encoding is not an issue for reading HTML (probably)
-                    val alternateFeedLink = findFeedUrl(String(body), preferAtom = true)
-
-                    val feed = if (alternateFeedLink != null) {
-                        parseFeedUrl(alternateFeedLink)
-                    } else {
-                        when (isJSON) {
-                            true -> jsonFeedParser.parseJsonBytes(body)
-                            false -> parseRssAtomBytes(response.request().url().url()!!, body)
-                        }
-                    }
-
-                    result = if (feed.feed_url == null) {
-                        // Nice to return non-null value here
-                        feed.copy(feed_url = it.request().url().toString())
-                    } else {
-                        feed
-                    }
-                } else {
-                    throw NullPointerException("Response body was null")
-                }
+    fun parseFeedResponse(response: Response): Feed? =
+            response.body()?.use { body ->
+                parseFeedResponse(response, body.bytes())
             }
 
-            return result!!
+    /**
+     * Takes body as bytes to handle encoding correctly
+     */
+    @Throws(FeedParser.FeedParsingError::class)
+    fun parseFeedResponse(response: Response, body: ByteArray): Feed? {
+        try {
+            val isJSON = (response.header("content-type") ?: "").contains("json")
+
+            val feed = when (isJSON) {
+                true -> jsonFeedParser.parseJsonBytes(body)
+                false -> parseRssAtomBytes(response.request().url().url()!!, body)
+            }
+
+            return if (feed.feed_url == null) {
+                // Nice to return non-null value here
+                feed.copy(feed_url = response.request().url().toString())
+            } else {
+                feed
+            }
         } catch (e: Throwable) {
             throw FeedParsingError(e)
         }
-
     }
+
+    /**
+     * Takes body as bytes to handle encoding correctly
+     */
+    @Throws(FeedParser.FeedParsingError::class)
+    suspend fun parseFeedResponseOrFallbackToAlternateLink(response: Response): Feed? =
+            response.body()?.use { responseBody ->
+                responseBody.bytes()?.let { body ->
+                    // Encoding is not an issue for reading HTML (probably)
+                    val alternateFeedLink = findFeedUrl(String(body), preferAtom = true)
+
+                    return if (alternateFeedLink != null) {
+                        parseFeedUrl(alternateFeedLink)
+                    } else {
+                        parseFeedResponse(response, body)
+                    }
+                }
+            }
 
     @Throws(FeedParser.FeedParsingError::class)
     internal fun parseRssAtomBytes(baseUrl: URL, feedXml: ByteArray): Feed {

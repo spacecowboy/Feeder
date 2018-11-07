@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MigrationFrom7To8 {
+class MigrationFrom8To9 {
     private val dbName = "testDb"
 
     @Rule
@@ -23,20 +23,20 @@ class MigrationFrom7To8 {
             FrameworkSQLiteOpenHelperFactory())
 
     @Test
-    fun migrate7to8() {
-        var db = testHelper.createDatabase(dbName, 7)
+    fun migrate8to9() {
+        var db = testHelper.createDatabase(dbName, 8)
 
         db.use {
             db.execSQL("""
-            INSERT INTO feeds(title, url, custom_title, tag, notify)
-            VALUES('feed', 'http://url', '', '', 0)
+            INSERT INTO feeds(title, url, custom_title, tag, notify, last_sync)
+            VALUES('feed', 'http://url', '', '', 0, 0)
         """.trimIndent())
         }
 
-        db = testHelper.runMigrationsAndValidate(dbName, 8, true, MIGRATION_7_8)
+        db = testHelper.runMigrationsAndValidate(dbName, 9, true, MIGRATION_8_9)
 
         db.query("""
-            SELECT title, url, last_sync FROM feeds
+            SELECT title, url, response_hash FROM feeds
         """.trimIndent())!!.use {
             assert(it.count == 1)
             assert(it.moveToFirst())

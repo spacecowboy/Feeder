@@ -34,17 +34,14 @@ const val PREF_THEME = "pref_theme"
  * Sync settings
  */
 const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"
-const val PREF_SYNC_HOTSPOTS = "pref_sync_hotspots"
 const val PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi"
 const val PREF_SYNC_FREQ = "pref_sync_freq"
+const val PREF_SYNC_ON_RESUME = "pref_sync_on_resume"
 
 /**
  * Image settings
  */
 const val PREF_IMG_ONLY_WIFI = "pref_img_only_wifi"
-const val PREF_IMG_HOTSPOTS = "pref_img_hotspots"
-
-const val PREF_LAST_DATABASE_VERSION = "pref_last_database_version"
 
 /**
  * Reader settings
@@ -89,13 +86,11 @@ object PrefUtils {
 
     fun shouldLoadImagesOnlyOnWIfi(context: Context): Boolean = sp(context).getBoolean(PREF_IMG_ONLY_WIFI, false)
 
-    fun shouldLoadImagesOnHotSpots(context: Context): Boolean = sp(context).getBoolean(PREF_IMG_HOTSPOTS, false)
-
     fun shouldSyncOnlyOnWIfi(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_ONLY_WIFI, false)
 
-    fun shouldSyncOnlyWhenCharging(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_ONLY_CHARGING, false)
+    fun shouldSyncOnResume(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_ON_RESUME, false)
 
-    fun shouldSyncOnHotSpots(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_HOTSPOTS, false)
+    fun shouldSyncOnlyWhenCharging(context: Context): Boolean = sp(context).getBoolean(PREF_SYNC_ONLY_CHARGING, false)
 
     fun maximumItemCountPerFeed(context: Context): Int =
             sp(context).getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt()
@@ -199,9 +194,10 @@ object PrefUtils {
     }
 
     fun shouldLoadImages(context: Context): Boolean {
-        return if (SystemUtils.currentlyOnWifi(context)) {
-            !SystemUtils.currentlyMetered(context) || shouldLoadImagesOnHotSpots(context)
-        } else !shouldLoadImagesOnlyOnWIfi(context)
+        return when {
+            shouldLoadImagesOnlyOnWIfi(context) -> currentlyUnmetered(context)
+            else -> true
+        }
     }
 }
 

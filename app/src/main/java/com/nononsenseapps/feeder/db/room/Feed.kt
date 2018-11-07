@@ -10,6 +10,7 @@ import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
 import com.nononsenseapps.feeder.db.COL_LASTSYNC
 import com.nononsenseapps.feeder.db.COL_NOTIFY
+import com.nononsenseapps.feeder.db.COL_RESPONSEHASH
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
@@ -31,16 +32,12 @@ data class Feed @Ignore constructor(
         @ColumnInfo(name = COL_TAG) var tag: String = "",
         @ColumnInfo(name = COL_NOTIFY) var notify: Boolean = false,
         @ColumnInfo(name = COL_IMAGEURL) var imageUrl: URL? = null,
-        @ColumnInfo(name = COL_LASTSYNC) var lastSync: Long = 0
+        @ColumnInfo(name = COL_LASTSYNC) var lastSync: Long = 0,
+        @ColumnInfo(name = COL_RESPONSEHASH) var responseHash: Int = 0
 ) {
     constructor() : this(id = ID_UNSET)
 
     val displayTitle: String
         get() = (if (customTitle.isBlank()) title else customTitle)
 
-    fun updateFromParsedFeed(feed: Feed) {
-        title = feed.title ?: title
-        url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: url
-        imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) } ?: imageUrl
-    }
 }

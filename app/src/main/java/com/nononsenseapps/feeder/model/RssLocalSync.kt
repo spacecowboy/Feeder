@@ -4,41 +4,76 @@ import android.content.Context
 import android.util.Log
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.db.room.upsertFeedItem
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.feedParser
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
+suspend fun syncFeeds(context: Context,
+                      feedId: Long = ID_UNSET,
+                      feedTag: String = "",
+                      forceNetwork: Boolean = false,
+                      parallel: Boolean = false,
+                      minFeedAgeMinutes: Int = 15): Boolean =
+        syncFeeds(
+                db = AppDatabase.getInstance(context),
+                feedParser = context.feedParser,
+                feedId = feedId,
+                feedTag = feedTag,
+                maxFeedItemCount = PrefUtils.maximumItemCountPerFeed(context),
+                forceNetwork = forceNetwork,
+                parallel = parallel,
+                minFeedAgeMinutes = minFeedAgeMinutes
+        )
 
-suspend fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork: Boolean = false): Boolean {
+internal suspend fun syncFeeds(db: AppDatabase,
+                               feedParser: FeedParser,
+                               feedId: Long = ID_UNSET,
+                               feedTag: String = "",
+                               maxFeedItemCount: Int = 100,
+                               forceNetwork: Boolean = false,
+                               parallel: Boolean = false,
+                               minFeedAgeMinutes: Int = 15): Boolean {
     var result = false
     val time = measureTimeMillis {
         coroutineScope {
-            val db = AppDatabase.getInstance(context)
             try {
                 val staleTime: Long = if (forceNetwork) {
                     DateTime.now(DateTimeZone.UTC).millis
                 } else {
                     DateTime.now(DateTimeZone.UTC)
-                            .minusMinutes(PrefUtils.synchronizationFrequency(context).toInt())
+                            .minusMinutes(minFeedAgeMinutes)
                             .millis
                 }
-                val feedsToFetch = feedsToSync(db, feedId, tag, staleTime = staleTime)
+                val feedsToFetch = feedsToSync(db, feedId, feedTag, staleTime = staleTime)
 
-                feedsToFetch.map {
-                    launch(Dispatchers.Default) {
-                        syncFeed(it, context, forceNetwork = forceNetwork)
+                Log.d("CoroutineSync", "Syncing ${feedsToFetch.size} feeds")
+
+                val coroutineContext = when (parallel) {
+                    true -> Dispatchers.Default
+                    false -> this.coroutineContext
+                }
+
+                feedsToFetch.forEach {
+                    launch(coroutineContext) {
+                        syncFeed(it,
+                                db = db,
+                                feedParser = feedParser,
+                                maxFeedItemCount = maxFeedItemCount,
+                                forceNetwork = forceNetwork)
                     }
                 }
 
@@ -46,8 +81,6 @@ suspend fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork:
             } catch (e: Throwable) {
                 e.printStackTrace()
             }
-
-            Log.d("CoroutineSync", "${Thread.currentThread().name} End of scope waiting for children to complete...")
         }
     }
     Log.d("CoroutineSync", "Completed in $time ms")
@@ -55,83 +88,73 @@ suspend fun syncFeeds(context: Context, feedId: Long, tag: String, forceNetwork:
 }
 
 private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
-                             context: Context, forceNetwork: Boolean = false) {
-    Log.d("CoroutineSync", "${Thread.currentThread().name} Fetch ${feedSql.displayTitle}")
+                             db: AppDatabase,
+                             feedParser: FeedParser,
+                             maxFeedItemCount: Int,
+                             forceNetwork: Boolean = false) {
     try {
-        val db = AppDatabase.getInstance(context)
-        val response: Response? =
-                try {
-                    fetchFeed(context, feedSql, forceNetwork = forceNetwork)
-                } catch (t: Throwable) {
-                    Log.e("CoroutineSync", "Shit hit the fan1: $t")
-                    null
-                }
+        val response: Response = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
+                ?: throw ResponseFailure("Timed out when fetching ${feedSql.url}")
 
-        Log.d("CoroutineSync", "${Thread.currentThread().name} Feed  ${feedSql.displayTitle}")
-
-        if (response == null) {
-            Log.e("CoroutineSync", "Timed out when fetching ${feedSql.displayTitle}")
-        }
+        var responseHash = 0
 
         val feed: Feed? =
-                response?.let {
-                    try {
-                        if (response.isSuccessful) {
-                            context.feedParser.parseFeedResponse(it)
-                        } else {
-                            Log.e("CoroutineSync", "Response fail for ${feedSql.displayTitle}: ${response.code()}")
-                            null
+                response.use {
+                    it.body()?.use { responseBody ->
+                        val body = responseBody.bytes()!!
+                        responseHash = Arrays.hashCode(body)
+                        when {
+                            !response.isSuccessful -> {
+                                throw ResponseFailure("${response.code()} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
+                            }
+                            feedSql.responseHash == responseHash -> null // no change
+                            else -> feedParser.parseFeedResponse(it, body)
                         }
-                    } catch (t: Throwable) {
-                        Log.e("CoroutineSync", "Shit hit the fan2: ${feedSql.displayTitle}, $t")
-                        null
                     }
                 }
 
-        try {
-            @Suppress("NestedLambdaShadowedImplicitParameter")
-            feed?.let {
-                feedSql.updateFromParsedFeed(feed)
-                feedSql.lastSync = DateTime.now(DateTimeZone.UTC).millis
+        // Always update the feeds last sync field
+        feedSql.lastSync = DateTime.now(DateTimeZone.UTC).millis
 
-                feedSql.id = db.feedDao().upsertFeed(feedSql)
+        if (feed == null) {
+            db.feedDao().upsertFeed(feedSql)
+        } else {
+            val itemDao = db.feedItemDao()
+            feed.items?.asSequence()
+                    ?.filter { it.id != null }
+                    ?.forEach {
+                        val feedItemSql = itemDao.loadFeedItem(guid = it.id!!,
+                                feedId = feedSql.id) ?: FeedItem()
 
-                val itemDao = db.feedItemDao()
+                        feedItemSql.updateFromParsedEntry(it, feed)
+                        feedItemSql.feedId = feedSql.id
 
-                feed.items?.asSequence()
-                        ?.filter { it.id != null }
-                        ?.forEach {
-                            val feedItemSql = itemDao.loadFeedItem(guid = it.id!!,
-                                    feedId = feedSql.id) ?: FeedItem()
+                        itemDao.upsertFeedItem(feedItemSql)
+                    }
 
-                            feedItemSql.updateFromParsedEntry(it, feed)
-                            feedItemSql.feedId = feedSql.id
+            // Update feed last so lastsync is only set after all items have been handled
+            // for the rare case that the job is cancelled prematurely
+            feedSql.responseHash = responseHash
+            feedSql.title = feed.title ?: feedSql.title
+            feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
+            feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.imageUrl
+            db.feedDao().upsertFeed(feedSql)
 
-                            itemDao.upsertFeedItem(feedItemSql)
-                        }
-
-                // Finally, prune database of old items
-                val keepCount = PrefUtils.maximumItemCountPerFeed(context)
-                db.feedItemDao().cleanItemsInFeed(feedSql.id, keepCount)
-            }
-        } catch (t: Throwable) {
-            Log.e("CoroutineSync", "Shit hit the fan3: ${feedSql.displayTitle}, $t")
+            // Finally, prune database of old items
+            db.feedItemDao().cleanItemsInFeed(feedSql.id, maxFeedItemCount)
         }
+    } catch (e: ResponseFailure) {
+        Log.e("CoroutineSync", "Failed to fetch ${feedSql.displayTitle}: ${e.message}")
     } catch (t: Throwable) {
         Log.e("CoroutineSync", "Something went wrong: $t")
     }
 }
 
-private suspend fun fetchFeed(context: Context, feedSql: com.nononsenseapps.feeder.db.room.Feed,
+private suspend fun fetchFeed(feedParser: FeedParser, feedSql: com.nononsenseapps.feeder.db.room.Feed,
                               timeout: Long = 2L, timeUnit: TimeUnit = TimeUnit.SECONDS,
                               forceNetwork: Boolean = false): Response? {
     return withTimeoutOrNull(timeUnit.toMicros(timeout)) {
-        context.feedParser.getResponse(feedSql.url,
-                maxAgeSecs = if (forceNetwork) {
-                    1
-                } else {
-                    MAX_FEED_AGE
-                })
+        feedParser.getResponse(feedSql.url, forceNetwork = forceNetwork)
     }
 }
 
@@ -149,3 +172,5 @@ internal fun feedsToSync(db: AppDatabase, feedId: Long, tag: String, staleTime: 
         else -> if (staleTime > 0) db.feedDao().loadFeedsIfStale(staleTime) else db.feedDao().loadFeeds()
     }
 }
+
+class ResponseFailure(message: String?) : Exception(message)

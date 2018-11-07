@@ -23,10 +23,16 @@ import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FEED_ADDED_BROADCAST
 import com.nononsenseapps.feeder.model.SYNC_BROADCAST
+import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
+import com.nononsenseapps.feeder.model.requestFeedSync
+import com.nononsenseapps.feeder.model.syncFeeds
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.currentlyCharging
+import com.nononsenseapps.feeder.util.currentlyConnected
+import com.nononsenseapps.feeder.util.currentlyUnmetered
 import com.nononsenseapps.feeder.util.ensureDebugLogDeleted
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.launch
@@ -198,6 +204,19 @@ class FeedActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         getInstance(this).registerReceiver(syncReceiver, IntentFilter(SYNC_BROADCAST))
+        syncFeedsMaybe()
+    }
+
+    private fun syncFeedsMaybe() = launch(Background) {
+        if (!PrefUtils.shouldSyncOnResume(applicationContext)) {
+            return@launch
+        }
+
+        if (isOkToSyncAutomatically(applicationContext)) {
+            requestFeedSync(ignoreConnectivitySettings = false,
+                    forceNetwork = false,
+                    parallell = true)
+        }
     }
 
     override fun onPause() {

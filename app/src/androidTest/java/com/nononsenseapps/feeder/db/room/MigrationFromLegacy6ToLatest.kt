@@ -70,7 +70,7 @@ class MigrationFromLegacy6ToLatest {
             Room.databaseBuilder(InstrumentationRegistry.getTargetContext(),
                     AppDatabase::class.java,
                     testDbName)
-                    .addMigrations(MIGRATION_5_7, MIGRATION_6_7, MIGRATION_7_8)
+                    .addMigrations(*allMigrations)
                     .build().also { testHelper.closeWhenFinished(it) }
 
     @Before
