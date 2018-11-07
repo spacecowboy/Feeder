@@ -18,7 +18,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
@@ -61,6 +60,8 @@ internal suspend fun syncFeeds(db: AppDatabase,
                 }
                 val feedsToFetch = feedsToSync(db, feedId, feedTag, staleTime = staleTime)
 
+                Log.d("CoroutineSync", "Syncing ${feedsToFetch.size} feeds")
+
                 val coroutineContext = when (parallel) {
                     true -> Dispatchers.Default
                     false -> this.coroutineContext
@@ -80,8 +81,6 @@ internal suspend fun syncFeeds(db: AppDatabase,
             } catch (e: Throwable) {
                 e.printStackTrace()
             }
-
-            Log.d("CoroutineSync", "${Thread.currentThread().name} End of scope waiting for children to complete...")
         }
     }
     Log.d("CoroutineSync", "Completed in $time ms")
@@ -94,15 +93,8 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                              maxFeedItemCount: Int,
                              forceNetwork: Boolean = false) {
     try {
-        Log.d("CoroutineSync", "${Thread.currentThread().name} Fetch ${feedSql.displayTitle}")
-
-        val response: Response? = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
-
-        Log.d("CoroutineSync", "${Thread.currentThread().name} Feed  ${feedSql.displayTitle}")
-
-        if (response == null) {
-            throw ResponseFailure("Timed out when fetching ${feedSql.url}")
-        }
+        val response: Response = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
+                ?: throw ResponseFailure("Timed out when fetching ${feedSql.url}")
 
         var responseHash = 0
 
@@ -111,21 +103,12 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                     it.body()?.use { responseBody ->
                         val body = responseBody.bytes()!!
                         responseHash = Arrays.hashCode(body)
-                        Log.d("CoroutineSync", "response: $response")
-                        Log.d("CoroutineSync", "cacheResponse: ${response.cacheResponse()}")
-                        Log.d("CoroutineSync", "networkResponse: ${response.networkResponse()}")
                         when {
                             !response.isSuccessful -> {
-                                throw ResponseFailure("${response.code()} when fetching ${feedSql.url}")
+                                throw ResponseFailure("${response.code()} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
                             }
-                            feedSql.responseHash == responseHash -> {
-                                // no change
-                                Log.d("CoroutineSync", "${Thread.currentThread().name} No hash change for ${feedSql.displayTitle}: ${response.networkResponse()?.code()}")
-                                null
-                            }
-                            else -> {
-                                feedParser.parseFeedResponse(it, body)
-                            }
+                            feedSql.responseHash == responseHash -> null // no change
+                            else -> feedParser.parseFeedResponse(it, body)
                         }
                     }
                 }

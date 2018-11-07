@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -29,7 +28,6 @@ import kotlin.coroutines.CoroutineContext
 
 const val ARG_FORCE_NETWORK = "force_network"
 
-const val LOG_TAG = "FEED_SYNC"
 const val UNIQUE_PERIODIC_NAME = "feeder_periodic"
 const val PARALLEL_SYNC = "parallel_sync"
 const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
@@ -80,8 +78,6 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Worker(
             )
             // Send notifications for configured feeds
             notify(applicationContext)
-        } else {
-            Log.d(LOG_TAG, "Skipping sync work because not OK to sync automatically")
         }
 
         LocalBroadcastManager.getInstance(applicationContext)
