@@ -32,6 +32,6 @@ This is a no-nonsense RSS/Atom/JSON feed reader app for Android.
 
 ### Screenshots
 
-<img src="fastlane/metadata/android/en-US/phoneScreenshots/feed.png" width=50%/>
-<img src="fastlane/metadata/android/en-US/phoneScreenshots/article.png" width=50%/>
-<img src="fastlane/metadata/android/en-US/phoneScreenshots/settings.png" width=50%/>
+<img src="fastlane/metadata/android/en-US/phoneScreenshots/feed_day.png" width=50%/><img src="fastlane/metadata/android/en-US/phoneScreenshots/feed_night.png" width=50%/>
+<img src="fastlane/metadata/android/en-US/phoneScreenshots/article_day.png" width=50%/><img src="fastlane/metadata/android/en-US/phoneScreenshots/article_night.png" width=50%/>
+<img src="fastlane/metadata/android/en-US/phoneScreenshots/settings_day.png" width=50%/><img src="fastlane/metadata/android/en-US/phoneScreenshots/settings_night.png" width=50%/>
