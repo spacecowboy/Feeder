@@ -7,26 +7,26 @@ buildscript {
     build_tools_version = "28.0.2"
 
     coroutines_version = "1.0.0"
-
     okhttp_version = "3.11.0"
+    rome_version = "1.7.1"
+
     androidx_version = "1.0.0"
-    work_version = '1.0.0-alpha10'
+    work_version = '1.0.0-alpha11'
     constraintlayout_version = "2.0.0-alpha2"
     recyclerview_version = "$androidx_version"
     legacy_support_version = "$androidx_version"
-    appcompat_version = "$androidx_version"
+    appcompat_version = "1.0.2"
     material_version = "$androidx_version"
     preference_version = "$androidx_version"
-    test_runner_version = "1.1.0-alpha4"
-    test_rules_version = "1.1.0-alpha4"
-    room_version = '2.0.0-beta01'
-    paging_version = '2.0.0-beta01'
+    test_runner_version = "1.1.0"
+    test_rules_version = "1.1.0"
+    paging_version = '2.0.0'
     lifecycle_version = "2.0.0"
+    room_version = "2.0.0"
 
-    rome_version = "1.7.1"
-
-    espresso_version = "3.1.0-alpha3"
-    uiautomator_version = "2.2.0-alpha3"
+    espresso_version = "3.1.0"
+    uiautomator_version = "2.2.0"
+    test_ext_junit_version = "1.0.0"
 
   }
 
