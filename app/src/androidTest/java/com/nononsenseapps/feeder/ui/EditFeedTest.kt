@@ -2,7 +2,7 @@ package com.nononsenseapps.feeder.ui
 
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.InstrumentationRegistry.getInstrumentation
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.pressImeActionButton
@@ -11,9 +11,9 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.ui.MockResponses.cowboy_feed_json_body
@@ -147,7 +147,7 @@ class EditFeedTest {
                 delay(50)
             }
         }
-        val db = AppDatabase.getInstance(getInstrumentation().targetContext)
+        val db = AppDatabase.getInstance(getApplicationContext())
 
         val feed = db.feedDao().loadFeedWithUrl(URL("https://cowboyprogrammer.org/feed.json"))!!
         assertEquals(

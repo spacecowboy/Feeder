@@ -1,13 +1,13 @@
 package com.nononsenseapps.feeder.model
 
 import androidx.room.Room
-import androidx.test.InstrumentationRegistry.getInstrumentation
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.test.runner.AndroidJUnit4
+import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.ui.MockResponses
 import com.nononsenseapps.feeder.util.feedParser
 import io.mockk.spyk
 import io.mockk.verify
@@ -28,8 +28,10 @@ import java.net.URL
 @MediumTest
 class RssLocalSyncKtTest {
 
-    private val db = Room.inMemoryDatabaseBuilder(getInstrumentation().context, AppDatabase::class.java).build()
-    private val feedParser = spyk(getInstrumentation().targetContext.feedParser)
+    private val feederApplication: FeederApplication = getApplicationContext()
+
+    private val db = Room.inMemoryDatabaseBuilder(feederApplication, AppDatabase::class.java).build()
+    private val feedParser = spyk(feederApplication.feedParser)
 
     private var cowboyJsonId: Long = -1
     private var cowboyAtomId: Long = -1
@@ -60,7 +62,7 @@ class RssLocalSyncKtTest {
 
     @Before
     fun setupHttpCache() {
-        FeedParser.setup(getInstrumentation().targetContext.cacheDir!!)
+        FeedParser.setup(feederApplication.cacheDir!!)
     }
 
     @Test
