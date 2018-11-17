@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -15,6 +16,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.Background
@@ -27,12 +29,9 @@ import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.model.requestFeedSync
-import com.nononsenseapps.feeder.model.syncFeeds
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.currentlyCharging
-import com.nononsenseapps.feeder.util.currentlyConnected
-import com.nononsenseapps.feeder.util.currentlyUnmetered
+import com.nononsenseapps.feeder.util.emailBugReportIntent
 import com.nononsenseapps.feeder.util.ensureDebugLogDeleted
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.launch
@@ -188,6 +187,14 @@ class FeedActivity : BaseActivity() {
             }
             R.id.action_settings -> {
                 startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
+            R.id.action_reportbug -> {
+                try {
+                    startActivity(emailBugReportIntent())
+                } catch (e: ActivityNotFoundException) {
+                    Toast.makeText(this, R.string.no_email_client, Toast.LENGTH_SHORT).show()
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
