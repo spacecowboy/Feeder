@@ -1,3 +1,13 @@
+# 1.8.1
+*   Fixed crash when clearing notifications
+    See !136 #153
+*   Update Simplified Chinese
+    Thanks to linsui
+    See !134
+*   Fixed screenshots in README
+    Thanks to DJCrashdummy
+    See !135
+
 # 1.8.0
 *   Removed option to sync on Hotspots
     Fixed automatic synchronization never running on mobile data

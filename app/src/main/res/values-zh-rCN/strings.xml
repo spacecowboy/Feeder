@@ -67,6 +67,7 @@
   <string name="image_loading">图片加载</string>
   <string name="no_activity_for_link">无法找到打开该链接的应用</string>
   <string name="check_for_updates">检查更新</string>
+  <string name="on_startup">启动时</string>
   <string name="include_mobile_hotspots">包括移动热点</string>
   <string name="updated_feeds">更新订阅</string>
   <string name="selected">已选</string>

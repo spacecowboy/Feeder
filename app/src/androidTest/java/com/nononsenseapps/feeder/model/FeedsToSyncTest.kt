@@ -1,8 +1,8 @@
 package com.nononsenseapps.feeder.model
 
 import androidx.room.Room
-import androidx.test.InstrumentationRegistry
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -22,7 +22,7 @@ class FeedsToSyncTest {
 
     @Before
     fun initDb() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getContext(),
+        db = Room.inMemoryDatabaseBuilder(getApplicationContext(),
                 AppDatabase::class.java).build()
     }
 
@@ -106,7 +106,7 @@ class FeedsToSyncTest {
         assertEquals(listOf(items[1]), result)
     }
 
-    fun withFeed(lastSync: Long = 0, url: URL = URL("http://url"), tag: String = ""): Feed {
+    private fun withFeed(lastSync: Long = 0, url: URL = URL("http://url"), tag: String = ""): Feed {
         val feed = Feed(
                 lastSync = lastSync,
                 url = url,

@@ -2,10 +2,10 @@ package com.nononsenseapps.feeder.model.opml
 
 import android.content.Context
 import androidx.room.Room
-import androidx.test.InstrumentationRegistry.getContext
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
-import androidx.test.runner.AndroidJUnit4
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import org.junit.After
@@ -49,7 +49,7 @@ private val sampleFile: List<String> = """<?xml version="1.0" encoding="UTF-8"?>
 
 @RunWith(AndroidJUnit4::class)
 class OPMLTest {
-    private var context: Context? = null
+    private val context: Context = getApplicationContext()
     lateinit var db: AppDatabase
 
     private var dir: File? = null
@@ -61,9 +61,8 @@ class OPMLTest {
         dir = createTempDir()
         path = createTempFile()
         assertTrue("Need to be able to write to data dir $dir", dir!!.canWrite())
-        context = getContext()
 
-        db = Room.inMemoryDatabaseBuilder(getContext(), AppDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
     }
 
     @After

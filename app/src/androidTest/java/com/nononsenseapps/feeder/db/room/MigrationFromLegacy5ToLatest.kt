@@ -3,9 +3,11 @@ package com.nononsenseapps.feeder.db.room
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
-import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.legacy.COL_AUTHOR
 import com.nononsenseapps.feeder.db.legacy.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.legacy.COL_DESCRIPTION
@@ -52,6 +54,8 @@ import java.net.URL
 @LargeTest
 class MigrationFromLegacy5ToLatest {
 
+    private val feederApplication: FeederApplication = getApplicationContext()
+
     @Rule
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
@@ -62,13 +66,13 @@ class MigrationFromLegacy5ToLatest {
     private val testDbName = "TestingDatabase"
 
     private val legacyDb: LegacyDatabaseHandler
-        get() = LegacyDatabaseHandler(context = InstrumentationRegistry.getTargetContext(),
+        get() = LegacyDatabaseHandler(context = feederApplication,
                 name = testDbName,
                 version = 5)
 
     private val roomDb: AppDatabase
         get() =
-            Room.databaseBuilder(InstrumentationRegistry.getTargetContext(),
+            Room.databaseBuilder(feederApplication,
                     AppDatabase::class.java,
                     testDbName)
                     .addMigrations(*allMigrations)
@@ -154,7 +158,7 @@ class MigrationFromLegacy5ToLatest {
 
     @After
     fun tearDown() {
-        assertTrue(InstrumentationRegistry.getTargetContext().deleteDatabase(testDbName))
+        assertTrue(feederApplication.deleteDatabase(testDbName))
     }
 
     @Test

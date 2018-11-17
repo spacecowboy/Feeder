@@ -29,16 +29,13 @@ import com.nononsenseapps.feeder.ui.FeedActivity
 import com.nononsenseapps.feeder.ui.ReaderActivity
 import com.nononsenseapps.feeder.util.ARG_FEEDTITLE
 import com.nononsenseapps.feeder.util.notificationManager
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
 const val notificationId = 73583
 const val channelId = "feederNotifications"
 
-fun notify(appContext: Context) {
+suspend fun notify(appContext: Context) = withContext(Background) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         createNotificationChannel(appContext)
     }
@@ -72,7 +69,7 @@ fun notify(appContext: Context) {
     }
 }
 
-fun cancelNotification(context: Context, feedItemId: Long) {
+suspend fun cancelNotification(context: Context, feedItemId: Long) = withContext(Background) {
     val nm = context.notificationManager
     nm.cancel(feedItemId.toInt())
 
@@ -86,7 +83,7 @@ fun cancelNotification(context: Context, feedItemId: Long) {
  */
 @TargetApi(Build.VERSION_CODES.O)
 @RequiresApi(Build.VERSION_CODES.O)
-fun createNotificationChannel(context: Context) {
+private fun createNotificationChannel(context: Context) {
     val name = context.getString(R.string.notification_channel_name)
     val description = context.getString(R.string.notification_channel_description)
 
@@ -138,7 +135,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
     builder.setContentText(text)
             .setContentTitle(title)
             .setContentIntent(contentIntent)
-            .setDeleteIntent(getDeleteIntent(context, item))
+            .setDeleteIntent(getPendingDeleteIntent(context, item))
             .setNumber(1)
 
     // Note that notifications must use PNG resources, because there is no compatibility for vector drawables here
@@ -209,15 +206,19 @@ private fun getDeleteIntent(context: Context, feedItems: List<FeedItemWithFeed>)
     return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 }
 
-private fun getDeleteIntent(context: Context, feedItem: FeedItemWithFeed): PendingIntent {
+internal fun getDeleteIntent(context: Context, feedItem: FeedItemWithFeed): Intent {
     val intent = Intent(context, RssNotificationBroadcastReceiver::class.java)
     intent.action = ACTION_MARK_AS_NOTIFIED
-    intent.data = Uri.withAppendedPath(URI_FEEDITEMS, "$feedItem.id")
+    intent.data = Uri.withAppendedPath(URI_FEEDITEMS, "${feedItem.id}")
     val ids: LongArray = longArrayOf(feedItem.id)
     intent.putExtra(EXTRA_FEEDITEM_ID_ARRAY, ids)
 
-    return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    return intent
 }
+
+private fun getPendingDeleteIntent(context: Context, feedItem: FeedItemWithFeed): PendingIntent =
+        PendingIntent.getBroadcast(context, 0, getDeleteIntent(context, feedItem), PendingIntent.FLAG_UPDATE_CURRENT)
+
 
 private fun notificationBuilder(context: Context): NotificationCompat.Builder {
     val bm = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)

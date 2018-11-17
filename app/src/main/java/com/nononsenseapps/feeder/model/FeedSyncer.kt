@@ -89,9 +89,9 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Worker(
         }
     }
 
-    override fun onStopped(cancelled: Boolean) {
+    override fun onStopped() {
         job.cancel()
-        super.onStopped(cancelled)
+        super.onStopped()
     }
 }
 

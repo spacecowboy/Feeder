@@ -20,8 +20,8 @@ android {
 
   defaultConfig {
     applicationId "com.nononsenseapps.feeder"
-    versionCode 39
-    versionName "1.8.0"
+    versionCode 40
+    versionName "1.8.1"
     compileSdkVersion 28
     minSdkVersion 18
     targetSdkVersion 28
@@ -113,7 +113,7 @@ dependencies {
   // For better fetching
   implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
   // For supporting missing cyphers on older platforms
-  implementation "org.conscrypt:conscrypt-android:1.1.2"
+  implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
   // Image loading
   implementation "com.github.bumptech.glide:glide:3.7.0"
   implementation "com.github.bumptech.glide:okhttp3-integration:1.4.0@aar"
@@ -133,14 +133,17 @@ dependencies {
   testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
 
   androidTestImplementation "io.mockk:mockk-android:1.8.10.kotlin13"
+  androidTestImplementation "junit:junit:4.12"
+  androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
+
+  androidTestImplementation "androidx.test:core:$androidx_version"
+  androidTestImplementation "androidx.test:runner:$test_runner_version"
+  androidTestImplementation "androidx.test:rules:$test_rules_version"
+  androidTestImplementation "androidx.test.ext:junit:$test_ext_junit_version"
   androidTestImplementation "androidx.recyclerview:recyclerview:$recyclerview_version"
   androidTestImplementation "androidx.legacy:legacy-support-v4:$legacy_support_version"
   androidTestImplementation "androidx.appcompat:appcompat:$appcompat_version"
   androidTestImplementation "com.google.android.material:material:$material_version"
-  androidTestImplementation "junit:junit:4.12"
-  androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
-  androidTestImplementation "androidx.test:runner:$test_runner_version"
-  androidTestImplementation "androidx.test:rules:$test_rules_version"
   androidTestImplementation "androidx.room:room-testing:$room_version"
   androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
   androidTestImplementation "androidx.test.espresso:espresso-contrib:$espresso_version"
