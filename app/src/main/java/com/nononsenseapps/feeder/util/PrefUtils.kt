@@ -140,6 +140,14 @@ object PrefUtils {
                 else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             }
 
+    internal fun setNightMode(context: Context, nightMode: Boolean) =
+            sp(context).edit().putString(PREF_THEME,
+                    when (nightMode) {
+                        true -> context.getString(R.string.pref_theme_value_night)
+                        false -> context.getString(R.string.pref_theme_value_day)
+                    }
+            ).apply()
+
     fun isShowOnlyUnread(context: Context): Boolean = sp(context).getBoolean(PREF_SHOW_ONLY_UNREAD, true)
 
     fun setPrefShowOnlyUnread(context: Context,
