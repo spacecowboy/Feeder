@@ -1,3 +1,9 @@
+# 1.8.2
+*   Fixed crash when image could not be loaded on pre Lollipop
+    See !138 #156
+*   Added menu item for sending a bug report via email
+    See !137
+
 # 1.8.1
 *   Fixed crash when clearing notifications
     See !136 #153
