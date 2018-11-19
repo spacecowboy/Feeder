@@ -10,7 +10,7 @@
     android:layout_width="@dimen/item_img_def_width"
     android:layout_height="@dimen/item_img_def_width"
     android:visibility="visible"
-    tools:src="@drawable/placeholder_image_list" />
+    tools:src="@drawable/placeholder_image_list_night_64dp" />
 
   <TextView
     android:id="@+id/story_date"

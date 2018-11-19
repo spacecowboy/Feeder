@@ -30,4 +30,10 @@
       android:title="@string/action_settings"
       android:icon="@drawable/ic_settings_white_24dp"
       app:showAsAction="ifRoom"/>
+  <item
+    android:id="@+id/action_reportbug"
+    android:orderInCategory="3000"
+    android:title="@string/send_bug_report"
+    app:showAsAction="never"/>
+
 </menu>

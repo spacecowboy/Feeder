@@ -24,7 +24,6 @@ import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 // Provide a reference to the views for each data item
@@ -212,7 +211,14 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
                     GlideUtils.glide(context, rssItem.imageUrl,
                             PrefUtils.shouldLoadImages(context))
                             .centerCrop()
-                            .error(R.drawable.placeholder_image_list)
+                            .also {
+                                it.error(
+                                        when (PrefUtils.isNightMode(context)) {
+                                            true -> R.drawable.placeholder_image_list_night_64dp
+                                            false -> R.drawable.placeholder_image_list_day_64dp
+                                        }
+                                )
+                            }
                             .into(imageView)
                 } catch (e: IllegalArgumentException) {
                     // Could still happen if we have a race-condition?
