@@ -267,7 +267,6 @@ class GlideConverter(context: Context,
         }
 
         // Add layer with play icon
-        @Suppress("DEPRECATION")
         val playicon = AppCompatResources.getDrawable(context, R.drawable.youtube_icon)!!
         // 20% size, in middle
         var w2 = playicon.intrinsicWidth
