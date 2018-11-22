@@ -5,13 +5,11 @@ import androidx.collection.ArrayMap
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModelProviders
-import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedViewModel
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class FeedListViewModel(application: Application): CoroutineScopedViewModel(application) {
     private val dao = AppDatabase.getInstance(application).feedDao()
@@ -21,7 +19,7 @@ class FeedListViewModel(application: Application): CoroutineScopedViewModel(appl
 
     init {
         liveFeedsAndTagsWithUnreadCounts.addSource(liveFeedsWithUnreadCounts) { feeds ->
-            launch(Background) {
+            launch(Dispatchers.Default) {
                 val topTag = FeedUnreadCount(id = ID_ALL_FEEDS)
                 val tags: MutableMap<String, FeedUnreadCount> = ArrayMap()
                 val data: MutableList<FeedUnreadCount> = mutableListOf(topTag)

@@ -5,14 +5,12 @@ import android.app.Application
 import android.graphics.Point
 import android.text.Spanned
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedViewModel
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
@@ -21,9 +19,7 @@ import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point) : CoroutineScopedViewModel(application) {
     val dao = AppDatabase.getInstance(application).feedItemDao()
@@ -41,7 +37,7 @@ class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point)
                     liveImageText.value = toSpannedWithNoImages(application, it.description, it.feedUrl)
                 }
 
-                launch(BackgroundUI) {
+                launch(Dispatchers.Default) {
                     val allowDownload = PrefUtils.shouldLoadImages(application)
                     val spanned = toSpannedWithImages(application, it.description, it.feedUrl, maxImageSize, allowDownload)
                     liveImageText.postValue(spanned)

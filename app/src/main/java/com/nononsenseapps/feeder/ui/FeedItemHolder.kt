@@ -12,7 +12,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.util.GlideUtils
@@ -24,6 +23,7 @@ import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 // Provide a reference to the views for each data item
@@ -162,7 +162,7 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
                     // Mark as read
                     val db = AppDatabase.getInstance(context)
                     rssItem?.id?.let {
-                        actionCallback.coroutineScope().launch(BackgroundUI) {
+                        actionCallback.coroutineScope().launch(Dispatchers.Default) {
                             db.feedItemDao().markAsRead(it)
                         }
                     }
