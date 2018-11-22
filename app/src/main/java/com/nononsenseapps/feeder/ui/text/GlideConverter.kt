@@ -142,9 +142,14 @@ class GlideConverter(context: Context,
         var d: Drawable? = null
         try {
             // Source
-            val src = attributes.getValue("", "src")
-            val sWidth = attributes.getValue("", "width")
-            val sHeight = attributes.getValue("", "height")
+            val src: String? = attributes.getValue("", "src")
+            val sWidth: String? = attributes.getValue("", "width")
+            val sHeight: String? = attributes.getValue("", "height")
+
+            if (src == null) {
+                return null
+            }
+
             // Image size
             var shrunk = false
             var hasSize = false
