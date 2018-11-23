@@ -279,7 +279,13 @@ open class HtmlToSpannedConverter(private var mSource: String,
         }
 
         var src: String? = attributes.getValue("", "src")
-        val d = AppCompatResources.getDrawable(mContext, R.drawable.placeholder_image_article)
+
+        val d = AppCompatResources.getDrawable(mContext,
+                when (PrefUtils.isNightMode(mContext)) {
+                    true -> R.drawable.placeholder_image_article_night
+                    false -> R.drawable.placeholder_image_article_day
+                })
+
         d?.let { _ ->
             d.setBounds(0, 0, d.intrinsicWidth, d.intrinsicHeight)
         }
