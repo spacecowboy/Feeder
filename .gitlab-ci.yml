@@ -1,6 +1,6 @@
 stages:
   - build
-  - test
+  - deploy
 
 image: openjdk:8-jdk
 
@@ -31,15 +31,6 @@ cache:
     - ci/before
     - chmod +x ./gradlew
 
-.sdk: &before_metal
-  before_script:
-    - set -euo pipefail
-    - export GRADLE_USER_HOME="$(pwd)/.gradle"
-    - export ANDROID_HOME="$(pwd)/.androidhome"
-    - export PATH="${ANDROID_HOME}/emulator/:${ANDROID_HOME}/tools/bin/:${ANDROID_HOME}/tools/:${ANDROID_HOME}/platform-tools/:${PATH}"
-    - ci/before
-    - chmod +x ./gradlew
-
 .build: &build_def
   <<: *before_docker
   stage: build
@@ -58,36 +49,19 @@ cache:
     - ./gradlew check -PdisablePreDex
   artifacts:
 
-.emulator_test: &emulator_def
-  <<: *before_metal
-  tags:
-    - metal
-    - android
-  stage: test
-  script:
-    - ci/emulator-tests ${ANDROID_EMULATOR_SDK}
-  artifacts:
-    paths:
-      - app/build/reports/androidTests/
-      - build/logs/
-
 build:jdk-1.8:
   <<: *build_def
 
 unit-tests:jdk-1.8:
   <<: *test_def
 
-#test:emulator-18:
-#  <<: *emulator_def
-#  variables:
-#    ANDROID_EMULATOR_SDK: "18"
-
-#test:emulator-25:
-#  <<: *emulator_def
-#  variables:
-#    ANDROID_EMULATOR_SDK: "25"
-
-#test:emulator-26:
-#  <<: *emulator_def
-#  variables:
-#    ANDROID_EMULATOR_SDK: "26"
+deploy_playstore:
+  <<: *before_docker
+  stage: deploy
+  script:
+    - ./deploy_playstore.sh
+  only:
+    - play
+  environment:
+    name: Play
+    url: https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play
