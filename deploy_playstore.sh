@@ -6,6 +6,19 @@ EOF
 
 base64 --ignore-garbage --decode app/creds.b64 > app/creds.json
 
+cat > keystore.b64 <<EOF
+${KEYSTORE}
+EOF
+
+base64 --ignore-garbage --decode keystore.b64 > keystore
+
+cat >> gradle.properties <<EOF
+STORE_FILE=$(pwd)/keystore
+STORE_PASSWORD=${KEYSTOREPASSWORD}
+KEY_ALIAS=${KEYALIAS}
+KEY_PASSWORD=${KEYPASSWORD}
+EOF
+
 VERSION_CODE="$(cat app/build.gradle | grep "versionCode" | sed "s|\s*versionCode\s*\([0-9]\+\)|\\1|")"
 readonly VERSION_CODE
 
