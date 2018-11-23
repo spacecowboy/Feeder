@@ -60,12 +60,14 @@ android {
     }
   }
 
-  signingConfigs {
-    release {
-      storeFile file(STORE_FILE)
-      storePassword STORE_PASSWORD
-      keyAlias KEY_ALIAS
-      keyPassword KEY_PASSWORD
+  if (project.hasProperty('STORE_FILE')) {
+    signingConfigs {
+      release {
+        storeFile file(STORE_FILE)
+        storePassword STORE_PASSWORD
+        keyAlias KEY_ALIAS
+        keyPassword KEY_PASSWORD
+      }
     }
   }
 
@@ -74,9 +76,11 @@ android {
       minifyEnabled false
     }
     release {
-      signingConfig signingConfigs.release
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      if (project.hasProperty('STORE_FILE')) {
+        signingConfig signingConfigs.release
+      }
     }
   }
 
