@@ -2,12 +2,7 @@ package com.nononsenseapps.feeder.db.room
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
 
@@ -17,7 +12,7 @@ interface FeedItemDao {
     fun insertFeedItem(item: FeedItem): Long
 
     @Update
-    fun updateFeedItem(item: FeedItem)
+    fun updateFeedItem(item: FeedItem): Int
 
     @Delete
     fun deleteFeedItem(item: FeedItem)
