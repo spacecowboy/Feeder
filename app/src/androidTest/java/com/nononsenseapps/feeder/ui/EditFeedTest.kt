@@ -3,10 +3,9 @@ package com.nononsenseapps.feeder.ui
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.pressImeActionButton
-import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -139,6 +138,7 @@ class EditFeedTest {
         )
 
         onView(withId(R.id.feed_details_frame)).check(matches(isDisplayed()))
+        Espresso.closeSoftKeyboard()
         onView(withId(R.id.add_button)).perform(click())
 
         runBlocking {
