@@ -22,7 +22,7 @@ EOF
 VERSION_CODE="$(cat app/build.gradle | grep "versionCode" | sed "s|\s*versionCode\s*\([0-9]\+\)|\\1|")"
 readonly VERSION_CODE
 
-FASTLANE_CL="fastlane/metadata/android/en-GB/changelogs/${VERSION_CODE}.txt"
+FASTLANE_CL="fastlane/metadata/android/en-US/changelogs/${VERSION_CODE}.txt"
 readonly FASTLANE_CL
 
 mkdir -p app/src/main/play/release-notes/en-GB/
