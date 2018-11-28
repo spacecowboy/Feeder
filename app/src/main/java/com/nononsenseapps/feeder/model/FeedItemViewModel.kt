@@ -8,7 +8,6 @@ import android.text.style.ImageSpan
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedViewModel
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
@@ -16,6 +15,7 @@ import com.nononsenseapps.feeder.ui.text.toSpannedWithImages
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point) : CoroutineScopedViewModel(application) {
@@ -44,7 +44,7 @@ class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point)
                 // Only load into view if the text is different
                 if (currentHash != updatedHash) {
                     currentHash = updatedHash
-                    launch(BackgroundUI) {
+                    launch(Dispatchers.Default) {
                         val allowDownload = PrefUtils.shouldLoadImages(application)
                         val spanned = toSpannedWithImages(application, it.description, it.feedUrl, maxImageSize, allowDownload)
                         liveImageText.postValue(spanned)

@@ -19,7 +19,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -34,6 +33,7 @@ import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.emailBugReportIntent
 import com.nononsenseapps.feeder.util.ensureDebugLogDeleted
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -73,7 +73,7 @@ class FeedActivity : BaseActivity() {
 
         // Migration thing, make sure file is deleted for all users
         val appContext = applicationContext
-        launch(Background) {
+        launch(Dispatchers.Default) {
             ensureDebugLogDeleted(appContext)
         }
 
@@ -104,7 +104,7 @@ class FeedActivity : BaseActivity() {
         val itemIdsToMarkAsNotified = intent?.getLongArrayExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)
         val db = AppDatabase.getInstance(this)
         if (itemIdsToMarkAsNotified != null) {
-            launch(Background) {
+            launch(Dispatchers.Default) {
                 db.feedItemDao().markAsNotified(itemIdsToMarkAsNotified.toList())
             }
         }
@@ -214,7 +214,7 @@ class FeedActivity : BaseActivity() {
         syncFeedsMaybe()
     }
 
-    private fun syncFeedsMaybe() = launch(Background) {
+    private fun syncFeedsMaybe() = launch(Dispatchers.Default) {
         if (!PrefUtils.shouldSyncOnResume(applicationContext)) {
             return@launch
         }
@@ -241,7 +241,7 @@ class FeedActivity : BaseActivity() {
                 val uri: Uri? = data?.data
                 if (uri != null) {
                     val appContext = applicationContext
-                    launch(Background) {
+                    launch(Dispatchers.Default) {
                         exportOpml(appContext, uri)
                     }
                 }
@@ -250,7 +250,7 @@ class FeedActivity : BaseActivity() {
                 val uri: Uri? = data?.data
                 if (uri != null) {
                     val appContext = applicationContext
-                    launch(Background) {
+                    launch(Dispatchers.Default) {
                         importOpml(appContext, uri)
                     }
                 }

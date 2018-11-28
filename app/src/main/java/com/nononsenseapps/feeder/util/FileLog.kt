@@ -2,9 +2,6 @@ package com.nononsenseapps.feeder.util
 
 import android.content.Context
 import android.util.Log
-import com.nononsenseapps.feeder.coroutines.Background
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.File
 
 

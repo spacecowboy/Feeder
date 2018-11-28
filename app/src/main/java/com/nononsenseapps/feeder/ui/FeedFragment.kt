@@ -19,8 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.Background
-import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
@@ -43,6 +41,7 @@ import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 const val ARG_FEED_ID = "feed_id"
@@ -174,7 +173,7 @@ class FeedFragment : CoroutineScopedFragment() {
 
         // Remember choice in future
         val appContext = context?.applicationContext
-        launch(Background) {
+        launch(Dispatchers.Default) {
             if (appContext != null) {
                 PrefUtils.setLastOpenFeed(appContext, id, feedTag)
             }
@@ -359,7 +358,7 @@ class FeedFragment : CoroutineScopedFragment() {
         val feedTag = this.feedTag
         val appContext = context?.applicationContext
         if (appContext != null) {
-            launch(Background) {
+            launch(Dispatchers.Default) {
                 // Set as notified so we don't spam
                 feedItemsViewModel?.markAsNotified()
                 val dao = AppDatabase.getInstance(appContext).feedDao()
@@ -381,7 +380,7 @@ class FeedFragment : CoroutineScopedFragment() {
             feedItemsViewModel?.liveDbPreviews?.value?.forEach{
                 // Can be null in case of placeholder values
                 it?.id?.let { id ->
-                    launch(Background) {
+                    launch(Dispatchers.Default) {
                         cancelNotification(appContext, id)
                     }
                 }
@@ -432,7 +431,7 @@ class FeedFragment : CoroutineScopedFragment() {
                 val feedId = this.id
                 val appContext = activity?.applicationContext
                 if (appContext != null) {
-                    launch(BackgroundUI) {
+                    launch(Dispatchers.Default) {
                         feedViewModel?.deleteFeed()
 
                         // Remove from shortcuts

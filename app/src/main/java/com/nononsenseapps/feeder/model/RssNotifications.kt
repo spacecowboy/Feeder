@@ -18,7 +18,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.AppDatabase
@@ -29,13 +28,14 @@ import com.nononsenseapps.feeder.ui.FeedActivity
 import com.nononsenseapps.feeder.ui.ReaderActivity
 import com.nononsenseapps.feeder.util.ARG_FEEDTITLE
 import com.nononsenseapps.feeder.util.notificationManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 
 const val notificationId = 73583
 const val channelId = "feederNotifications"
 
-suspend fun notify(appContext: Context) = withContext(Background) {
+suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         createNotificationChannel(appContext)
     }
@@ -69,7 +69,7 @@ suspend fun notify(appContext: Context) = withContext(Background) {
     }
 }
 
-suspend fun cancelNotification(context: Context, feedItemId: Long) = withContext(Background) {
+suspend fun cancelNotification(context: Context, feedItemId: Long) = withContext(Dispatchers.Default) {
     val nm = context.notificationManager
     nm.cancel(feedItemId.toInt())
 
