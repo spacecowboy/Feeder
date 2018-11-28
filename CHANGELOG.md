@@ -1,3 +1,14 @@
+# 1.8.3
+*   Tweaked colors in themes
+    See !144 #159
+*   Fixed crash when loading bad images
+*   Fixed scrolling position getting reset during sync in Reader
+    See !142 #160
+*   Fixed crash when loading bad images
+    See !140
+*   Fixed theme-specific place holder image for articles
+    See !139
+
 # 1.8.2
 *   Fixed crash when image could not be loaded on pre Lollipop
     See !138 #156

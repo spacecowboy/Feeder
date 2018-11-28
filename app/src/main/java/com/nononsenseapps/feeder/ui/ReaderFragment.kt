@@ -12,7 +12,6 @@ import android.widget.TextView
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.view.MenuItemCompat
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
@@ -24,6 +23,7 @@ import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.asFeedItemFoo
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.views.ObservableScrollView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
@@ -72,7 +72,7 @@ class ReaderFragment : CoroutineScopedFragment() {
             val appContext = context?.applicationContext
             appContext?.let {
                 val db = AppDatabase.getInstance(appContext)
-                launch(BackgroundUI) {
+                launch(Dispatchers.Default) {
                     db.feedItemDao().markAsReadAndNotified(itemId)
                     cancelNotification(it, itemId)
                 }
@@ -229,7 +229,7 @@ class ReaderFragment : CoroutineScopedFragment() {
             R.id.action_mark_as_unread -> {
                 context?.applicationContext?.let {
                     val db = AppDatabase.getInstance(it)
-                    launch(BackgroundUI) {
+                    launch(Dispatchers.Default) {
                         db.feedItemDao().markAsRead(_id, unread = true)
                     }
                 }

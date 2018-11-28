@@ -10,12 +10,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedViewModel
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -58,7 +58,7 @@ class FeedItemsViewModel(application: Application, val feedId: Long, val tag: St
         liveOnlyUnread.value = onlyUnread
     }
 
-    fun markAllAsRead() = launch(BackgroundUI) {
+    fun markAllAsRead() = launch(Dispatchers.Default) {
         when {
             feedId > ID_UNSET -> dao.markAllAsRead(feedId)
             feedId == ID_ALL_FEEDS -> dao.markAllAsRead()
@@ -66,7 +66,7 @@ class FeedItemsViewModel(application: Application, val feedId: Long, val tag: St
         }
     }
 
-    fun toggleReadState(feedItem: PreviewItem) = launch(BackgroundUI) {
+    fun toggleReadState(feedItem: PreviewItem) = launch(Dispatchers.Default) {
         dao.markAsRead(feedItem.id, unread = !feedItem.unread)
         cancelNotification(getApplication(), feedItem.id)
     }
@@ -74,7 +74,7 @@ class FeedItemsViewModel(application: Application, val feedId: Long, val tag: St
     /**
      * Already called within a coroutine scope, do not launch another to keep ordering guarantees
      */
-    suspend fun markAsNotified() = withContext(BackgroundUI) {
+    suspend fun markAsNotified() = withContext(Dispatchers.Default) {
         when {
             feedId > ID_UNSET -> dao.markAsNotified(feedId)
             feedId == ID_ALL_FEEDS -> dao.markAllAsNotified()

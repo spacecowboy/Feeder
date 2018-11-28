@@ -21,7 +21,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.BackgroundUI
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedActivity
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.AppDatabase
@@ -148,7 +147,7 @@ class EditFeedActivity : CoroutineScopedActivity() {
                     url = sloppyLinkToStrictURLNoThrows(textUrl.text.toString().trim())
             )
 
-            launch(BackgroundUI) {
+            launch(Dispatchers.Default) {
                 val feedId: Long? = dao.upsertFeed(feed)
 
                 feedId?.let {
@@ -226,7 +225,7 @@ class EditFeedActivity : CoroutineScopedActivity() {
         }
 
         // Create an adapter
-        launch(BackgroundUI) {
+        launch(Dispatchers.Default) {
             val data = dao.loadTags()
 
             val tagsAdapter = ArrayAdapter<String>(this@EditFeedActivity,

@@ -3,14 +3,11 @@ package com.nononsenseapps.feeder.model.opml
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.nononsenseapps.feeder.coroutines.Background
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.makeToast
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
 

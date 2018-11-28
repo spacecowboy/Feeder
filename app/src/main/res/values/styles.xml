@@ -148,17 +148,17 @@
 
     <style name="TextAppearance.Reader"/>
     <style name="TextAppearance.Reader.Title">
-        <item name="android:textColor">@color/title_text_read_color</item>
+        <item name="android:textColor">@color/reader_title_color</item>
         <item name="android:textSize">@dimen/reader_title</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
     <style name="TextAppearance.Reader.Author">
-        <item name="android:textColor">@color/title_text_read_color</item>
+        <item name="android:textColor">@color/reader_author_color</item>
         <item name="android:textSize">@dimen/reader_author</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
     <style name="TextAppearance.Reader.Body">
-        <item name="android:textColor">@color/title_text_color</item>
+        <item name="android:textColor">@color/reader_body_color</item>
         <item name="android:textSize">@dimen/reader_body</item>
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
