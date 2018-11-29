@@ -120,6 +120,9 @@
         android:name=".ui.filepicker.MyFilePickerActivity"
         android:label="@string/app_name"
         android:theme="@style/FilePickerTheme"/>
+    <activity
+        android:name=".ui.OpenInWebBrowserActivity"
+        android:label="@string/open_link_in_browser" />
   </application>
 
 </manifest>
