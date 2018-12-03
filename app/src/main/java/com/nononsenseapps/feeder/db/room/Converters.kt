@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.db.room
 import androidx.room.TypeConverter
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import java.net.URL
 
 class Converters {
@@ -30,4 +31,16 @@ class Converters {
     @TypeConverter
     fun urlFromString(value: String?): URL? =
         value?.let { sloppyLinkToStrictURLNoThrows(it) }
+
+    @TypeConverter
+    fun dateTimeFromLong(value: Long?): DateTime? =
+            try {
+                value?.let { DateTime(it, DateTimeZone.UTC) }
+            } catch (t: Throwable) {
+                null
+            }
+
+    @TypeConverter
+    fun longFromDateTime(value: DateTime?): Long? =
+            value?.millis
 }

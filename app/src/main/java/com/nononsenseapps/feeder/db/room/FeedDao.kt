@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.nononsenseapps.feeder.model.FeedUnreadCount
+import org.joda.time.DateTime
 import java.net.URL
 
 @Dao
@@ -85,6 +86,9 @@ interface FeedDao {
 
     @Query("UPDATE feeds SET notify = :notify")
     fun setAllNotify(notify: Boolean)
+
+    @Query("SELECT last_sync FROM feeds ORDER BY last_sync DESC LIMIT 1")
+    fun getLastSyncTime(): LiveData<DateTime?>
 }
 
 /**

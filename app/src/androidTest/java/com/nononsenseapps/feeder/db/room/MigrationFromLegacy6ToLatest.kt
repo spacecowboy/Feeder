@@ -38,6 +38,7 @@ import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -158,7 +159,7 @@ class MigrationFromLegacy6ToLatest {
             assertEquals("feedACustom", feedA.customTitle)
             assertEquals(URL("https://feedA"), feedA.url)
             assertEquals("", feedA.tag)
-            assertEquals(0, feedA.lastSync)
+            assertEquals(DateTime(0, DateTimeZone.UTC), feedA.lastSync)
             assertFalse(feedA.notify)
             assertNull(feedA.imageUrl)
         }
@@ -180,7 +181,7 @@ class MigrationFromLegacy6ToLatest {
             assertEquals("feedBCustom", feedB.customTitle)
             assertEquals(URL("https://feedB"), feedB.url)
             assertEquals("tag", feedB.tag)
-            assertEquals(0, feedB.lastSync)
+            assertEquals(DateTime(0, DateTimeZone.UTC), feedB.lastSync)
             assertTrue(feedB.notify)
             assertEquals(URL("https://image"), feedB.imageUrl)
         }

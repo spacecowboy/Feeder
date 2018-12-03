@@ -15,6 +15,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -111,10 +112,10 @@ class RssLocalSyncKtTest {
         runBlocking {
             syncFeeds(db = db, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
-                assertTrue("Feed should have been synced", feed.lastSync > 0)
+                assertTrue("Feed should have been synced", feed.lastSync.millis > 0)
                 assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
                 // "Long time" ago, but not unset
-                db.feedDao().updateFeed(feed.copy(lastSync = 999L))
+                db.feedDao().updateFeed(feed.copy(lastSync = DateTime(999L, DateTimeZone.UTC)))
             }
             syncFeeds(db = db, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
         }
@@ -126,16 +127,16 @@ class RssLocalSyncKtTest {
         assertNotEquals(
                 "Cached response should still have updated feed last sync",
                 999L,
-                db.feedDao().loadFeed(cowboyJsonId)!!.lastSync)
+                db.feedDao().loadFeed(cowboyJsonId)!!.lastSync.millis)
     }
 
     @Test
     fun feedsSyncedWithin15MinAreIgnored() {
-        val fourteenMinsAgo = DateTime.now().minusMinutes(14).millis
+        val fourteenMinsAgo = DateTime.now().minusMinutes(14)
         runBlocking {
             syncFeeds(db = db, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
-                assertTrue("Feed should have been synced", feed.lastSync > 0)
+                assertTrue("Feed should have been synced", feed.lastSync.millis > 0)
                 assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
 
                 db.feedDao().updateFeed(feed.copy(lastSync = fourteenMinsAgo))
@@ -156,11 +157,11 @@ class RssLocalSyncKtTest {
 
     @Test
     fun feedsSyncedWithin15MinAreNotIgnoredWhenForcingNetwork() {
-        val fourteenMinsAgo = DateTime.now().minusMinutes(14).millis
+        val fourteenMinsAgo = DateTime.now().minusMinutes(14)
         runBlocking {
             syncFeeds(db = db, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
-                assertTrue("Feed should have been synced", feed.lastSync > 0)
+                assertTrue("Feed should have been synced", feed.lastSync.millis > 0)
                 assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
 
                 db.feedDao().updateFeed(feed.copy(lastSync = fourteenMinsAgo))
@@ -201,7 +202,7 @@ class RssLocalSyncKtTest {
 
         assertEquals(
                 "Last sync should not have been updated",
-                0,
+                DateTime(0, DateTimeZone.UTC),
                 db.feedDao().loadFeed(failingJsonId)!!.lastSync
         )
 
