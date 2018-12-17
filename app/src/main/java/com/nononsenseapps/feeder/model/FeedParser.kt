@@ -13,11 +13,7 @@ import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
-import okhttp3.CacheControl
-import okhttp3.Credentials
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.io.File
@@ -27,6 +23,8 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
+
+val slashPattern = "<\\s*slash:comments\\s*/>".toRegex(RegexOption.IGNORE_CASE)
 
 object FeedParser {
     private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
@@ -299,12 +297,14 @@ object FeedParser {
             try {
                 // Try to work around bug in Rome
                 var encoding: String? = null
-                val xml: String = feedXml.inputStream().use {
-                    XmlReader(it).use {
-                        encoding = it.encoding
-                        it.readText()
-                    }
-                }.replace("<slash:comments/>", "")
+                val xml: String = slashPattern.replace(
+                        feedXml.inputStream().use {
+                            XmlReader(it).use {
+                                encoding = it.encoding
+                                it.readText()
+                            }
+                        }, "")
+
                 xml.byteInputStream(Charset.forName(encoding ?: "UTF-8")).use {
                     return parseFeedInputStream(baseUrl, it)
                 }
@@ -315,7 +315,7 @@ object FeedParser {
     }
 
     @Throws(FeedParser.FeedParsingError::class)
-    fun parseFeedInputStream(baseUrl: URL, `is`: InputStream): Feed {
+    internal fun parseFeedInputStream(baseUrl: URL, `is`: InputStream): Feed {
         `is`.use {
             try {
                 val feed = XmlReader(`is`).use { SyndFeedInput().build(it) }
