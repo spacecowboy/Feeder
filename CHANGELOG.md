@@ -1,3 +1,11 @@
+# 1.8.4
+*   Fixed long blog title overlapping date
+    See !149 #164
+*   Fixed crash when loading certain videos
+    See !148 #163
+*   Fixed opening in browser from notification not marking as read or dismissing
+    See !146 #155
+
 # 1.8.3
 *   Tweaked colors in themes
     See !144 #159

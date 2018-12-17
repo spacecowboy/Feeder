@@ -411,6 +411,14 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
+    fun golem2ShouldBeParsedDespiteEmptySlashComments() {
+        val feed = FeedParser.parseRssAtomBytes(URL("https://rss.golem.de/rss.php?feed=RSS2.0"), golemDe2)
+
+        assertEquals("Golem.de", feed.title)
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun cowboyHttps() {
         runBlocking {
             val feed = FeedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
@@ -449,6 +457,9 @@ class FeedParserTest {
 
     private val golemDe: ByteArray
         get() = javaClass.getResourceAsStream("golem-de.xml")!!.readBytes()
+
+    private val golemDe2: ByteArray
+        get() = javaClass.getResourceAsStream("rss_golem_2.xml")!!.readBytes()
 
     private val utdelningsSeglarenAtom: ByteArray
         get() = javaClass.getResourceAsStream("atom_utdelningsseglaren.xml")!!.readBytes()

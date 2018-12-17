@@ -92,5 +92,6 @@
   <string name="theme">Theme</string>
   <string name="send_bug_report">Send bug report</string>
   <string name="no_email_client">Could not open email client</string>
+  <string name="touch_to_play_video">Touch to play video</string>
 
 </resources>

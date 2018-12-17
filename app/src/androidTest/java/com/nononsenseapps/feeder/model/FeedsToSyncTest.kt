@@ -46,7 +46,7 @@ class FeedsToSyncTest {
     @Test
     fun doesNotReturnFreshFeed() {
         val now = DateTime.now(DateTimeZone.UTC)
-        val feed = withFeed(lastSync = now.minusMinutes(1).millis)
+        val feed = withFeed(lastSync = now.minusMinutes(1))
 
         // when
         val result = feedsToSync(db, feedId = feed.id, tag = "",
@@ -72,8 +72,8 @@ class FeedsToSyncTest {
     fun doesNotReturnAllFreshFeeds() {
         val now = DateTime.now(DateTimeZone.UTC)
         val items = listOf(
-                withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1).millis),
-                withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3).millis)
+                withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1)),
+                withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3))
         )
 
         val result = feedsToSync(db, feedId = ID_UNSET, tag = "", staleTime = now.minusMinutes(2).millis)
@@ -97,8 +97,8 @@ class FeedsToSyncTest {
     fun doesNotReturnTaggedFreshFeeds() {
         val now = DateTime.now(DateTimeZone.UTC)
         val items = listOf(
-                withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1).millis, tag = "tag"),
-                withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3).millis, tag = "tag")
+                withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1), tag = "tag"),
+                withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3), tag = "tag")
         )
 
         val result = feedsToSync(db, feedId = ID_UNSET, tag = "tag", staleTime = now.minusMinutes(2).millis)
@@ -106,7 +106,7 @@ class FeedsToSyncTest {
         assertEquals(listOf(items[1]), result)
     }
 
-    private fun withFeed(lastSync: Long = 0, url: URL = URL("http://url"), tag: String = ""): Feed {
+    private fun withFeed(lastSync: DateTime = DateTime(0, DateTimeZone.UTC), url: URL = URL("http://url"), tag: String = ""): Feed {
         val feed = Feed(
                 lastSync = lastSync,
                 url = url,
