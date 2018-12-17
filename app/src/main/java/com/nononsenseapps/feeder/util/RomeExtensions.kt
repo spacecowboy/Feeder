@@ -7,11 +7,7 @@ import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
 import com.rometools.modules.mediarss.MediaEntryModule
 import com.rometools.modules.mediarss.MediaModule
-import com.rometools.rome.feed.synd.SyndContent
-import com.rometools.rome.feed.synd.SyndEnclosure
-import com.rometools.rome.feed.synd.SyndEntry
-import com.rometools.rome.feed.synd.SyndFeed
-import com.rometools.rome.feed.synd.SyndPerson
+import com.rometools.rome.feed.synd.*
 import org.joda.time.DateTime
 import org.jsoup.parser.Parser.unescapeEntities
 import java.net.URL
@@ -59,22 +55,27 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
  * Returns an absolute link, or null
  */
 fun SyndEntry.linkToHtml(feedBaseUrl: URL): String? {
-    val alternateHtml = this.links?.firstOrNull { "alternate" == it.rel && "text/html" == it.type }
-    if (alternateHtml != null) {
-        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, alternateHtml.href)
+    this.links?.firstOrNull { "alternate" == it.rel && "text/html" == it.type }?.let {
+        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, it.href)
     }
 
-    val selfHtml = this.links?.firstOrNull { "self" == it.rel && "text/html" == it.type }
-    if (selfHtml != null) {
-        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, selfHtml.href)
+    this.links?.firstOrNull { "self" == it.rel && "text/html" == it.type }?.let {
+        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, it.href)
     }
 
-    val self = this.links?.firstOrNull { "self" == it.rel }
-    if (self != null) {
-        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, self.href)
+    this.links?.firstOrNull { "self" == it.rel }?.let {
+        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, it.href)
     }
 
-    return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, this.link)
+    this.link?.let {
+        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, it)
+    }
+
+    this.uri?.let {
+        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, it)
+    }
+
+    return null
 }
 
 
