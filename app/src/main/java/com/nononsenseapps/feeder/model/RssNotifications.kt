@@ -18,14 +18,12 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
-import com.nononsenseapps.feeder.ui.ARG_FEED_URL
-import com.nononsenseapps.feeder.ui.EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED
-import com.nononsenseapps.feeder.ui.FeedActivity
-import com.nononsenseapps.feeder.ui.ReaderActivity
+import com.nononsenseapps.feeder.ui.*
 import com.nononsenseapps.feeder.util.ARG_FEEDTITLE
 import com.nononsenseapps.feeder.util.notificationManager
 import kotlinx.coroutines.Dispatchers
@@ -140,23 +138,33 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
 
     // Note that notifications must use PNG resources, because there is no compatibility for vector drawables here
 
-    if (item.enclosureLink != null) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.enclosureLink))
+    item.enclosureLink?.let { enclosureLink ->
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(enclosureLink))
         intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
         builder.addAction(R.drawable.notification_play_circle_outline,
                 context.getString(R.string.open_enclosed_media), PendingIntent.getActivity(context, item.id.toInt(), intent,
                 PendingIntent.FLAG_UPDATE_CURRENT))
     }
 
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(item.link))
-    intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
-    builder.addAction(R.drawable.notification_open_in_browser,
-            context.getString(R.string.open_link_in_browser),
-            PendingIntent.getActivity(context, item.id.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT))
-
+    item.link?.let { link ->
+        builder.addAction(R.drawable.notification_open_in_browser,
+                context.getString(R.string.open_link_in_browser),
+                PendingIntent.getActivity(context,
+                        item.id.toInt(),
+                        getOpenInBrowserIntent(context, item.id, link),
+                        PendingIntent.FLAG_UPDATE_CURRENT))
+    }
     style.setBuilder(builder)
     return style.build()
 }
+
+internal fun getOpenInBrowserIntent(context: Context, feedItemId: Long, link: String): Intent =
+        Intent(Intent.ACTION_VIEW,
+                Uri.withAppendedPath(URI_FEEDITEMS, "$feedItemId"),
+                context,
+                OpenInWebBrowserActivity::class.java).also {
+            it.putExtra(COL_LINK, link)
+        }
 
 /**
  * Use this on platforms older than 24 to bundle notifications together

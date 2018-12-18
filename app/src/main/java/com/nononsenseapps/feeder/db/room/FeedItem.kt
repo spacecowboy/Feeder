@@ -48,7 +48,7 @@ data class FeedItem @Ignore constructor(
         @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
         @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
         @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
-        @ColumnInfo(name = COL_PUBDATE) var pubDate: DateTime? = null,
+        @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) var pubDate: DateTime? = null,
         @ColumnInfo(name = COL_LINK) var link: String? = null,
         @ColumnInfo(name = COL_UNREAD) var unread: Boolean = true,
         @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,

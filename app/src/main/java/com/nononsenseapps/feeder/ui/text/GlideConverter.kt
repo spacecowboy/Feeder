@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.text
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -13,6 +14,7 @@ import android.text.Spannable
 import android.text.style.ImageSpan
 import android.text.style.StyleSpan
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.util.GlideUtils
@@ -72,7 +74,11 @@ class GlideConverter(context: Context,
         }
 
         // Get drawable
-        val d = getImgDrawable(attributes)
+        val d = getImgDrawable(
+                src = attributes.getValue("", "src"),
+                sWidth = attributes.getValue("", "width"),
+                sHeight = attributes.getValue("", "height")
+        )
         if (d == null) {
             super.startImg(text, attributes)
             return
@@ -104,48 +110,44 @@ class GlideConverter(context: Context,
     override fun startIframe(text: SensibleSpannableStringBuilder,
                              attributes: Attributes) {
         // Parse information
-        val video = VideoTagHunter
-                .getVideo(attributes.getValue("", "src"),
-                        attributes.getValue("", "width"),
-                        attributes.getValue("", "height"))
+        val video: Video? = getVideo(attributes.getValue("", "src"))
 
-        if ((video.src ?: "").toLowerCase().contains("youtube")) {
-            try {
-                video.imageurl?.let { imageUrl ->
-                    val span = object : ClickableImageSpan(getYoutubeThumb(imageUrl)) {
-                        override fun onClick() {
-                            val i = Intent(Intent.ACTION_VIEW, Uri
-                                    .parse(video.link))
-                            i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        try {
+            video?.let {
+                getYoutubeThumb(video)
+            }?.let {
+                val span = object : ClickableImageSpan(it) {
+                    override fun onClick() {
+                        val i = Intent(Intent.ACTION_VIEW, Uri
+                                .parse(video.link))
+                        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        try {
                             context.startActivity(i)
+                        } catch (e: ActivityNotFoundException) {
+                            Toast.makeText(context, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
                         }
                     }
-                    val len = text.length
-                    text.append("\uFFFC")
-                    text.setSpan(span, len, text.length,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    // Add newline also
-                    text.append("\n")
-                    val from = text.length
-                    text.append("Touch to play video")
-                    text.setSpan(StyleSpan(Typeface.ITALIC), from,
-                            text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    text.append("\n\n")
                 }
-            } catch (e: NullPointerException) {
-                // Error is already logged..
+                val len = text.length
+                text.append("\uFFFC")
+                text.setSpan(span, len, text.length,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                // Add newline also
+                text.append("\n")
+                val from = text.length
+                text.append(context.getString(R.string.touch_to_play_video))
+                text.setSpan(StyleSpan(Typeface.ITALIC), from,
+                        text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                text.append("\n\n")
             }
+        } catch (e: Throwable) {
+            Log.e("GlideConverter", "Failed to start iFrame tag")
         }
     }
 
-    private fun getImgDrawable(attributes: Attributes): Drawable? {
+    private fun getImgDrawable(src: String?, sWidth: String?, sHeight: String?): Drawable? {
         var d: Drawable? = null
         try {
-            // Source
-            val src: String? = attributes.getValue("", "src")
-            val sWidth: String? = attributes.getValue("", "width")
-            val sHeight: String? = attributes.getValue("", "height")
-
             if (src == null) {
                 return null
             }
@@ -241,55 +243,65 @@ class GlideConverter(context: Context,
     }
 
     /**
-     * @return a Drawable with a youtube logo in the center
+     * @return a drawable of the video thumbnail with a youtube icon overlayed, or a full size
+     * youtube icon in case the thumbnail could not be loaded
      */
-    private fun getYoutubeThumb(imageurl: String): Drawable {
-        val layers = arrayOfNulls<Drawable>(2)
-
-        val w1: Int
-        val h1: Int
-        try {
-            val imgLink = relativeLinkIntoAbsolute(siteUrl, imageurl)
-            val b = GlideUtils.glideAsBitmap(context, imgLink, allowDownload)
+    private fun getYoutubeThumb(video: Video): Drawable {
+        return try {
+            val imgLink = relativeLinkIntoAbsolute(siteUrl, video.imageUrl)
+            GlideUtils.glideAsBitmap(context, imgLink, allowDownload)
                     .fitCenter().into(maxSize.x, maxSize.y).get()
-            //final Point newSize = scaleImage(b.getWidth(), b.getHeight());
-            w1 = b.width
-            h1 = b.height
-            val d = BitmapDrawable(context.resources, b)
-            // Settings bounds later
-            //d.setBounds(0, 0, w1, h1);
-            // Set in layer
-            layers[0] = d
-        } catch (e: InterruptedException) {
-            throw NullPointerException(e.localizedMessage)
-        } catch (e: ExecutionException) {
-            throw NullPointerException(e.localizedMessage)
+        } catch (e: Throwable) {
+            null
+        }.let { b ->
+            if (b != null) {
+                SizedDrawable(
+                        drawable = BitmapDrawable(context.resources, b),
+                        width = b.width,
+                        height = b.height
+                )
+            } else {
+                null
+            }
+        }.let { sd ->
+            val playIcon = AppCompatResources.getDrawable(context, R.drawable.youtube_icon)!!
+
+            if (sd != null) {
+                // 20% size, in middle
+                var w2 = playIcon.intrinsicWidth
+                var h2 = playIcon.intrinsicHeight
+
+                val ratio = h2.toDouble() / w2.toDouble()
+
+                // Start with width which is known
+                val relSize = 0.2
+                w2 = (relSize * sd.width).toInt()
+                val left = ((sd.width - w2).toDouble() / 2.0).toInt()
+                // Then height is simple
+                h2 = (ratio * w2).toInt()
+                val top = ((sd.height - h2).toDouble() / 2.0).toInt()
+
+                // Create layer drawable
+                LayerDrawable(arrayOf(sd.drawable, playIcon)).also {
+                    // Need to set bounds on outer drawable first as it seems to override
+                    // child bounds
+                    it.setBounds(0, 0, sd.width, sd.height)
+                    // Now set smaller bounds on youtube icon
+                    playIcon.setBounds(left, top, left + w2, top + h2)
+                }
+            } else {
+                // Full size youtube icon
+                playIcon.also {
+                    val scaled = scaleImage(it.intrinsicWidth, it.intrinsicHeight)
+                    it.setBounds(0, 0, scaled.x, scaled.y)
+                }
+            }
         }
-
-        // Add layer with play icon
-        val playicon = AppCompatResources.getDrawable(context, R.drawable.youtube_icon)!!
-        // 20% size, in middle
-        var w2 = playicon.intrinsicWidth
-        var h2 = playicon.intrinsicHeight
-
-        val ratio = h2.toDouble() / w2.toDouble()
-
-        // Start with width which is known
-        val relSize = 0.2
-        w2 = (relSize * w1).toInt()
-        val left = ((w1 - w2).toDouble() / 2.0).toInt()
-        // Then height is simple
-        h2 = (ratio * w2).toInt()
-        val top = ((h1 - h2).toDouble() / 2.0).toInt()
-
-        // And add to layer
-        layers[1] = playicon
-        val ld = LayerDrawable(layers)
-        // Need to set bounds on outer drawable first as it seems to override
-        // child bounds
-        ld.setBounds(0, 0, w1, h1)
-        // Now set smaller bounds on youtube icon
-        playicon.setBounds(left, top, left + w2, top + h2)
-        return ld
     }
 }
+
+data class SizedDrawable(
+        val drawable: Drawable,
+        val width: Int,
+        val height: Int
+)

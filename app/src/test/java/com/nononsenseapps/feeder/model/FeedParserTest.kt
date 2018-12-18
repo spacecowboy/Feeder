@@ -1,11 +1,7 @@
 package com.nononsenseapps.feeder.model
 
 import kotlinx.coroutines.runBlocking
-import okhttp3.MediaType
-import okhttp3.Protocol
-import okhttp3.Request
-import okhttp3.Response
-import okhttp3.ResponseBody
+import okhttp3.*
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -411,6 +407,37 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
+    fun noLinkShouldFallbackToGuid() {
+        val feed = FeedParser.parseFeedInputStream(URL("http://ANON.com/rss"), anon)
+
+        assertEquals("http://ANON.com/sub", feed.home_page_url)
+        assertNull(feed.feed_url)
+        assertEquals("ANON", feed.title)
+        assertEquals("ANON", feed.description)
+
+        assertEquals(1, feed.items!!.size)
+        val item = feed.items!![0]
+
+        assertEquals("http://ANON.com/sub/##", item.url)
+
+        assertEquals("ANON", item.title)
+        assertEquals("http://ANON.com/sub/##", item.id)
+        assertEquals("ANON", item.content_text)
+        assertEquals("ANON", item.content_html)
+        assertEquals("ANON", item.summary)
+
+        /*assertEquals("2018-12-13 00:00:00",
+                item.date_published)*/
+    }
+
+    fun golem2ShouldBeParsedDespiteEmptySlashComments() {
+        val feed = FeedParser.parseRssAtomBytes(URL("https://rss.golem.de/rss.php?feed=RSS2.0"), golemDe2)
+
+        assertEquals("Golem.de", feed.title)
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun cowboyHttps() {
         runBlocking {
             val feed = FeedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
@@ -450,6 +477,9 @@ class FeedParserTest {
     private val golemDe: ByteArray
         get() = javaClass.getResourceAsStream("golem-de.xml")!!.readBytes()
 
+    private val golemDe2: ByteArray
+        get() = javaClass.getResourceAsStream("rss_golem_2.xml")!!.readBytes()
+
     private val utdelningsSeglarenAtom: ByteArray
         get() = javaClass.getResourceAsStream("atom_utdelningsseglaren.xml")!!.readBytes()
 
@@ -482,6 +512,9 @@ class FeedParserTest {
 
     private val londoner: InputStream
         get() = javaClass.getResourceAsStream("rss_londoner.xml")!!
+
+    private val anon: InputStream
+        get() = javaClass.getResourceAsStream("rss_anon.xml")!!
 }
 
 val atomRelative = """

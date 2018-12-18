@@ -29,6 +29,9 @@ interface FeedItemDao {
     @Query("SELECT * FROM feed_items WHERE guid IS :guid AND feed_id IS :feedId")
     fun loadFeedItem(guid: String, feedId: Long?): FeedItem?
 
+    @Query("SELECT * FROM feed_items WHERE id IS :id")
+    fun loadFeedItem(id: Long): FeedItem?
+
     @Query("""
         SELECT *
         FROM feed_items

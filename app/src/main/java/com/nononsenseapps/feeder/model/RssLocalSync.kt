@@ -114,7 +114,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                 }
 
         // Always update the feeds last sync field
-        feedSql.lastSync = DateTime.now(DateTimeZone.UTC).millis
+        feedSql.lastSync = DateTime.now(DateTimeZone.UTC)
 
         if (feed == null) {
             db.feedDao().upsertFeed(feedSql)

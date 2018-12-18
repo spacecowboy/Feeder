@@ -24,8 +24,8 @@ android {
 
   defaultConfig {
     applicationId "com.nononsenseapps.feeder"
-    versionCode 42
-    versionName "1.8.3"
+    versionCode 43
+    versionName "1.8.4"
     compileSdkVersion 28
     minSdkVersion 18
     targetSdkVersion 28
@@ -155,6 +155,9 @@ dependencies {
   testImplementation "io.mockk:mockk:1.8.10.kotlin13"
   testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
 
+
+  androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
   androidTestImplementation "io.mockk:mockk-android:1.8.10.kotlin13"
   androidTestImplementation "junit:junit:4.12"
   androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
