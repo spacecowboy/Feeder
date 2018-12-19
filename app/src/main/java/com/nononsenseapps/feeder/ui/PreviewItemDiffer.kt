@@ -9,7 +9,7 @@ object PreviewItemDiffer : DiffUtil.ItemCallback<PreviewItem>() {
 
     override fun areContentsTheSame(a: PreviewItem, b: PreviewItem): Boolean {
         return a.unread == b.unread &&
-                a.feedTitle.compareTo(b.feedTitle, ignoreCase = true) == 0 &&
+                a.feedDisplayTitle.compareTo(b.feedDisplayTitle, ignoreCase = true) == 0 &&
                 (a.domain == null && b.domain == null || a.domain != null && a.domain!!.compareTo(b.domain!!, ignoreCase = true) == 0) &&
                 a.plainSnippet.compareTo(b.plainSnippet, ignoreCase = true) == 0 &&
                 a.plainTitle.compareTo(b.plainTitle, ignoreCase = true) == 0

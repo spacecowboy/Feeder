@@ -61,7 +61,7 @@ class FeedItemPagedListAdapter(context: Context, private val actionCallback: Act
         }
 
         // Set the title first
-        val titleText = SpannableStringBuilder(item.feedTitle)
+        val titleText = SpannableStringBuilder(item.feedDisplayTitle)
         // If no body, display domain of link to be opened
         if (holder.rssItem!!.plainSnippet.isEmpty()) {
             if (holder.rssItem!!.enclosureLink != null && holder.rssItem!!.enclosureFilename != null) {
@@ -70,9 +70,9 @@ class FeedItemPagedListAdapter(context: Context, private val actionCallback: Act
                 titleText.append(" \u2014 ${holder.rssItem!!.domain}")
             }
 
-            if (titleText.length > item.feedTitle.length) {
+            if (titleText.length > item.feedDisplayTitle.length) {
                 titleText.setSpan(ForegroundColorSpan(linkColor),
-                        item.feedTitle.length + 3, titleText.length,
+                        item.feedDisplayTitle.length + 3, titleText.length,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }

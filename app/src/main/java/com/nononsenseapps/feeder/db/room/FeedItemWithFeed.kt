@@ -4,8 +4,10 @@ import android.os.Bundle
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import com.nononsenseapps.feeder.db.COL_AUTHOR
+import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_DESCRIPTION
 import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
+import com.nononsenseapps.feeder.db.COL_FEEDCUSTOMTITLE
 import com.nononsenseapps.feeder.db.COL_FEEDID
 import com.nononsenseapps.feeder.db.COL_FEEDTITLE
 import com.nononsenseapps.feeder.db.COL_FEEDURL
@@ -41,7 +43,9 @@ import java.net.URL
 const val feedItemColumnsWithFeed = "$FEED_ITEMS_TABLE_NAME.$COL_ID AS $COL_ID, $COL_GUID, $FEED_ITEMS_TABLE_NAME.$COL_TITLE AS $COL_TITLE, " +
         "$COL_DESCRIPTION, $COL_PLAINTITLE, $COL_PLAINSNIPPET, $FEED_ITEMS_TABLE_NAME.$COL_IMAGEURL, $COL_ENCLOSURELINK, " +
         "$COL_AUTHOR, $COL_PUBDATE, $COL_LINK, $COL_UNREAD, $FEEDS_TABLE_NAME.$COL_TAG AS $COL_TAG, $FEEDS_TABLE_NAME.$COL_ID AS $COL_FEEDID, " +
-        "$FEEDS_TABLE_NAME.$COL_TITLE AS $COL_FEEDTITLE, $FEEDS_TABLE_NAME.$COL_URL AS $COL_FEEDURL"
+        "$FEEDS_TABLE_NAME.$COL_TITLE AS $COL_FEEDTITLE, " +
+        "$FEEDS_TABLE_NAME.$COL_CUSTOM_TITLE AS $COL_FEEDCUSTOMTITLE, " +
+        "$FEEDS_TABLE_NAME.$COL_URL AS $COL_FEEDURL"
 
 data class FeedItemWithFeed @Ignore constructor(
         var id: Long = ID_UNSET,
@@ -59,9 +63,13 @@ data class FeedItemWithFeed @Ignore constructor(
         var unread: Boolean = true,
         @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
         @ColumnInfo(name = COL_FEEDTITLE) var feedTitle: String = "",
+        @ColumnInfo(name = COL_FEEDCUSTOMTITLE) var feedCustomTitle: String = "",
         @ColumnInfo(name = COL_FEEDURL) var feedUrl: URL = sloppyLinkToStrictURLNoThrows("")
 ) {
     constructor() : this(id = ID_UNSET)
+
+    val feedDisplayTitle: String
+        get() = if (feedCustomTitle.isBlank()) feedTitle else feedCustomTitle
 
     val enclosureFilename: String?
         get() {
@@ -106,7 +114,7 @@ data class FeedItemWithFeed @Ignore constructor(
         setString(ARG_LINK to link)
         setString(ARG_ENCLOSURE to enclosureLink)
         setString(ARG_IMAGEURL to imageUrl)
-        setString(ARG_FEEDTITLE to feedTitle)
+        setString(ARG_FEEDTITLE to feedDisplayTitle)
         setString(ARG_AUTHOR to author)
         setString(ARG_DATE to pubDateString)
         setString(ARG_FEED_URL to feedUrl.toString())
