@@ -17,9 +17,7 @@ import okhttp3.mockwebserver.MockWebServer
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -121,7 +119,7 @@ class RssLocalSyncKtTest {
         }
 
         verify(exactly = 1) {
-            feedParser.parseFeedResponse( any(), any())
+            feedParser.parseFeedResponse(any(), any())
         }
 
         assertNotEquals(
@@ -132,7 +130,7 @@ class RssLocalSyncKtTest {
 
     @Test
     fun feedsSyncedWithin15MinAreIgnored() {
-        val fourteenMinsAgo = DateTime.now().minusMinutes(14)
+        val fourteenMinsAgo = DateTime.now(DateTimeZone.UTC).minusMinutes(14)
         runBlocking {
             syncFeeds(db = db, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
@@ -146,7 +144,7 @@ class RssLocalSyncKtTest {
         }
 
         verify(exactly = 1) {
-            feedParser.parseFeedResponse( any(), any())
+            feedParser.parseFeedResponse(any(), any())
         }
 
         assertEquals(
@@ -157,7 +155,7 @@ class RssLocalSyncKtTest {
 
     @Test
     fun feedsSyncedWithin15MinAreNotIgnoredWhenForcingNetwork() {
-        val fourteenMinsAgo = DateTime.now().minusMinutes(14)
+        val fourteenMinsAgo = DateTime.now(DateTimeZone.UTC).minusMinutes(14)
         runBlocking {
             syncFeeds(db = db, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
@@ -171,7 +169,7 @@ class RssLocalSyncKtTest {
         }
 
         verify(exactly = 1) {
-            feedParser.parseFeedResponse( any(), any())
+            feedParser.parseFeedResponse(any(), any())
         }
 
         assertNotEquals(
