@@ -96,7 +96,7 @@ private fun createNotificationChannel(context: Context) {
 private fun singleNotification(context: Context, item: FeedItemWithFeed): Notification {
     val style = NotificationCompat.BigTextStyle()
     val title = item.plainTitle
-    val text = item.feedTitle
+    val text = item.feedDisplayTitle
 
     style.bigText(text)
     style.setBigContentTitle(title)
@@ -121,7 +121,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
             val parentIntent = stackBuilder.editIntentAt(0)
             if (parentIntent != null) {
                 parentIntent.data = Uri.withAppendedPath(URI_FEEDS, "${item.feedId}")
-                parentIntent.putExtra(ARG_FEEDTITLE, item.feedTitle)
+                parentIntent.putExtra(ARG_FEEDTITLE, item.feedDisplayTitle)
                 parentIntent.putExtra(ARG_FEED_URL, item.feedUrl.toString())
             }
             stackBuilder.getPendingIntent(item.id.toInt(), PendingIntent.FLAG_UPDATE_CURRENT)
@@ -172,11 +172,11 @@ internal fun getOpenInBrowserIntent(context: Context, feedItemId: Long, link: St
 private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed>): Notification {
     val style = NotificationCompat.InboxStyle()
     val title = context.getString(R.string.updated_feeds)
-    val text = feedItems.map { it.feedTitle }.toSet().joinToString(separator = ", ")
+    val text = feedItems.map { it.feedDisplayTitle }.toSet().joinToString(separator = ", ")
 
     style.setBigContentTitle(title)
     feedItems.forEach {
-        style.addLine("${it.feedTitle} \u2014 ${it.plainTitle}")
+        style.addLine("${it.feedDisplayTitle} \u2014 ${it.plainTitle}")
     }
 
     val intent = Intent(context, FeedActivity::class.java)
