@@ -17,8 +17,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.net.URL
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 @RunWith(AndroidJUnit4::class)
 class LatestSyncQueryTest {
@@ -54,7 +52,7 @@ class LatestSyncQueryTest {
 
     @Test
     fun latestSyncWorksIfFeed() {
-        val dt = DateTime.now()
+        val dt = DateTime.now(DateTimeZone.UTC)
 
         db.feedDao().insertFeed(Feed(
                 title = "foo",
@@ -69,7 +67,7 @@ class LatestSyncQueryTest {
             }
         }
 
-        verify(timeout = 200) {
+        verify(timeout = 500) {
             observer.invoke(dt.toDateTime(DateTimeZone.UTC))
         }
     }
