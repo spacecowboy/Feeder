@@ -4,7 +4,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 
 /**
- * Delays while the factory doesn't provide the correct object
+ * Delays until the factory provides the correct object
  */
 suspend fun <T> whileNotEq(other: Any?,
                            timeoutMillis: Long = 500,
@@ -19,14 +19,13 @@ suspend fun <T> whileNotEq(other: Any?,
             item
         }
 
-
 /**
- * Delays while the factory doesn't provide the something else than the provided
+ * Delays until the factory provides a different object
  */
-suspend fun <T> untilNotEq(other: Any?,
-                           timeoutMillis: Long = 500,
-                           sleepMillis: Long = 50,
-                           body: (() -> T)): T =
+suspend fun <T> whileEq(other: Any?,
+                        timeoutMillis: Long = 500,
+                        sleepMillis: Long = 50,
+                        body: (() -> T)): T =
         withTimeout(timeoutMillis) {
             var item = body.invoke()
             while (item == other) {
@@ -35,3 +34,27 @@ suspend fun <T> untilNotEq(other: Any?,
             }
             item
         }
+
+/**
+ * Delays until the factory provides a different object
+ */
+suspend fun <T> untilNotEq(other: Any?,
+                           timeoutMillis: Long = 500,
+                           sleepMillis: Long = 50,
+                           body: (() -> T)): T =
+        whileEq(other = other,
+                timeoutMillis = timeoutMillis,
+                sleepMillis = sleepMillis,
+                body = body)
+
+/**
+ * Delays until the factory provides the correct object
+ */
+suspend fun <T> untilEq(other: Any?,
+                        timeoutMillis: Long = 500,
+                        sleepMillis: Long = 50,
+                        body: (() -> T)): T =
+        whileNotEq(other = other,
+                timeoutMillis = timeoutMillis,
+                sleepMillis = sleepMillis,
+                body = body)

@@ -60,7 +60,7 @@ class EditFeedTest {
                         pressImeActionButton()
                 )
         runBlocking {
-            whileNotEq(true) {
+            untilEq(true) {
                 activityRule.activity?.searchJob?.isCompleted
             }
         }
@@ -83,7 +83,7 @@ class EditFeedTest {
                         pressImeActionButton()
                 )
         runBlocking {
-            whileNotEq(true) {
+            untilEq(true) {
                 activityRule.activity?.searchJob?.isCompleted
             }
         }
@@ -115,7 +115,7 @@ class EditFeedTest {
 
         runBlocking {
             // Wait for search to be done
-            whileNotEq(true) {
+            untilEq(true) {
                 activityRule.activity?.searchJob?.isCompleted
             }
             // Then wait for recyclerView to update
@@ -141,7 +141,7 @@ class EditFeedTest {
         onView(withId(R.id.add_button)).perform(click())
 
         runBlocking {
-            whileNotEq(true) {
+            untilEq(true) {
                 activityRule.activity?.job?.isCompleted
             }
         }

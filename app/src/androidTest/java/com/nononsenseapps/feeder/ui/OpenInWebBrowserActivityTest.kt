@@ -67,7 +67,7 @@ class OpenInWebBrowserActivityTest {
 
         runBlocking {
             val item = withContext(Dispatchers.Default) {
-                whileNotEq(feedItem) {
+                untilEq(feedItem) {
                     db.feedItemDao().loadFeedItem(feedItem.id)
                 }
             }
@@ -83,7 +83,7 @@ class OpenInWebBrowserActivityTest {
 
         runBlocking {
             val item = withContext(Dispatchers.Default) {
-                whileNotEq(feedItem) {
+                untilEq(feedItem) {
                     db.feedItemDao().loadFeedItem(feedItem.id)
                 }
             }
@@ -104,7 +104,7 @@ class OpenInWebBrowserActivityTest {
 
         runBlocking {
             val item = withContext(Dispatchers.Default) {
-                whileNotEq(expected) {
+                untilEq(expected) {
                     db.feedItemDao().loadFeedItem(feedItem.id)
                 }
             }
