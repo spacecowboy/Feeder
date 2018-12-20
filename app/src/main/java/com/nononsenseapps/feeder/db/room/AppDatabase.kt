@@ -8,11 +8,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.nononsenseapps.feeder.util.contentValues
-import com.nononsenseapps.feeder.util.forEach
-import com.nononsenseapps.feeder.util.setInt
-import com.nononsenseapps.feeder.util.setLong
-import com.nononsenseapps.feeder.util.setString
+import com.nononsenseapps.feeder.util.*
 
 const val DATABASE_NAME = "rssDatabase"
 const val ID_UNSET: Long = 0
@@ -40,7 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
         /**
          * Use this in tests only
          */
-        fun setInstance(db: AppDatabase) {
+        internal fun setInstance(db: AppDatabase) {
             instance = db
         }
 

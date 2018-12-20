@@ -5,15 +5,14 @@ import android.text.Spanned
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
-import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ReaderActivity
+import com.nononsenseapps.feeder.ui.TestDatabaseRule
 import com.nononsenseapps.feeder.util.ARG_ID
 import io.mockk.clearMocks
 import io.mockk.mockk
@@ -21,7 +20,6 @@ import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -34,35 +32,25 @@ import java.net.URL
 class FeedItemViewModelTest {
     @get:Rule
     var activityRule: ActivityTestRule<ReaderActivity> = ActivityTestRule(ReaderActivity::class.java, false, false)
-
-    private lateinit var db: AppDatabase
+    @get:Rule
+    val testDb = TestDatabaseRule(getApplicationContext())
 
     private var feedId: Long = ID_UNSET
     private var itemId: Long = ID_UNSET
 
     @Before
     fun initDb() {
-        db = Room.inMemoryDatabaseBuilder(getApplicationContext(),
-                AppDatabase::class.java).build()
-        // Ensure all classes use test database
-        AppDatabase.setInstance(db)
-
-        feedId = db.feedDao().insertFeed(Feed(
+        feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "foo",
                 url = URL("http://foo")
         ))
-    }
-
-    @After
-    fun closeDb() {
-        db.close()
     }
 
     @Test
     fun databaseLoadCallsOnChangeTwiceWhenImages() {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
-        itemId = db.feedItemDao().insertFeedItem(FeedItem(
+        itemId = testDb.db.feedItemDao().insertFeedItem(FeedItem(
                 feedId = feedId,
                 guid = "foobar",
                 title = "title",
@@ -88,7 +76,7 @@ class FeedItemViewModelTest {
     fun databaseLoadCallsOnChangeOnceWhenNoImages() {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
-        itemId = db.feedItemDao().insertFeedItem(FeedItem(
+        itemId = testDb.db.feedItemDao().insertFeedItem(FeedItem(
                 feedId = feedId,
                 guid = "foobar",
                 title = "title",
@@ -121,7 +109,7 @@ class FeedItemViewModelTest {
                 description = "description <b>bold</b>"
         )
 
-        itemId = db.feedItemDao().insertFeedItem(item)
+        itemId = testDb.db.feedItemDao().insertFeedItem(item)
         item = item.copy(id = itemId)
 
         activityRule.launchActivity(Intent().also {
@@ -139,7 +127,7 @@ class FeedItemViewModelTest {
 
             clearMocks(observer)
 
-            assertEquals(1, db.feedItemDao().updateFeedItem(item.copy(title = "updated title")))
+            assertEquals(1, testDb.db.feedItemDao().updateFeedItem(item.copy(title = "updated title")))
 
             verify(exactly = 0, timeout = 500) {
                 observer.onChanged(any())
@@ -158,7 +146,7 @@ class FeedItemViewModelTest {
                 description = "description <b>bold</b>"
         )
 
-        itemId = db.feedItemDao().insertFeedItem(item)
+        itemId = testDb.db.feedItemDao().insertFeedItem(item)
         item = item.copy(id = itemId)
 
         activityRule.launchActivity(Intent().also {
@@ -176,7 +164,7 @@ class FeedItemViewModelTest {
 
             clearMocks(observer)
 
-            assertEquals(1, db.feedItemDao().updateFeedItem(item.copy(description = "updated body")))
+            assertEquals(1, testDb.db.feedItemDao().updateFeedItem(item.copy(description = "updated body")))
 
             verify(exactly = 1, timeout = 500) {
                 observer.onChanged(any())
@@ -195,7 +183,7 @@ class FeedItemViewModelTest {
                 description = "description <img src='file://img.png' alt='img here'></img>"
         )
 
-        itemId = db.feedItemDao().insertFeedItem(item)
+        itemId = testDb.db.feedItemDao().insertFeedItem(item)
 
         activityRule.launchActivity(Intent().also {
             it.putExtra(ARG_ID, itemId)
@@ -212,7 +200,7 @@ class FeedItemViewModelTest {
 
             clearMocks(observer)
 
-            assertEquals(1, db.feedItemDao().updateFeedItem(item.copy(
+            assertEquals(1, testDb.db.feedItemDao().updateFeedItem(item.copy(
                     id = itemId,
                     description = "updated <img src='file://img.png' alt='img here'></img>")))
 
