@@ -11,7 +11,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import kotlinx.coroutines.delay
@@ -27,8 +26,8 @@ import java.net.URL
 class CustomFeedTitleIsShownInReaderTest {
     @get:Rule
     var activityRule: ActivityTestRule<ReaderActivity> = ActivityTestRule(ReaderActivity::class.java, false, false)
-
-    private val db = AppDatabase.getInstance(getApplicationContext())
+    @get:Rule
+    val testDb = TestDatabaseRule(getApplicationContext())
 
     @Test
     fun feedTitleIsShownIfNoCustomTitle() {
@@ -43,13 +42,13 @@ class CustomFeedTitleIsShownInReaderTest {
     }
 
     private fun insertDataAndLaunch(title: String, customTitle: String) {
-        val feedId = db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = title,
                 customTitle = customTitle,
                 url = URL("http://foo")
         ))
 
-        val feedItemId = db.feedItemDao().insertFeedItem(FeedItem(
+        val feedItemId = testDb.db.feedItemDao().insertFeedItem(FeedItem(
                 guid = "fooitem1",
                 feedId = feedId,
                 title = "fooitem"

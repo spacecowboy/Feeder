@@ -14,7 +14,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.ui.MockResponses.cowboy_feed_json_body
 import com.nononsenseapps.feeder.ui.MockResponses.cowboyprogrammer_feed_json_headers
 import kotlinx.coroutines.runBlocking
@@ -34,9 +33,10 @@ import java.net.URL
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class EditFeedTest {
-    @Rule
-    @JvmField
+    @get:Rule
     var activityRule: ActivityTestRule<EditFeedActivity> = ActivityTestRule(EditFeedActivity::class.java)
+    @get:Rule
+    val testDb = TestDatabaseRule(getApplicationContext())
 
     val server = MockWebServer()
 
@@ -144,13 +144,14 @@ class EditFeedTest {
             untilEq(true) {
                 activityRule.activity?.job?.isCompleted
             }
-        }
-        val db = AppDatabase.getInstance(getApplicationContext())
 
-        val feed = db.feedDao().loadFeedWithUrl(URL("https://cowboyprogrammer.org/feed.json"))!!
-        assertEquals(
-                "Cowboy Programmer",
-                feed.title
-        )
+            val feed = untilNotEq(null) {
+                testDb.db.feedDao().loadFeedWithUrl(URL("https://cowboyprogrammer.org/feed.json"))
+            }
+            assertEquals(
+                    "Cowboy Programmer",
+                    feed?.title
+            )
+        }
     }
 }

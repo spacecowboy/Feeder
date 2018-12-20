@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui
 
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
@@ -15,6 +14,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.net.URL
@@ -22,18 +22,18 @@ import java.net.URL
 @RunWith(AndroidJUnit4::class)
 class NotificationClearingTest {
     private val receiver: RssNotificationBroadcastReceiver = RssNotificationBroadcastReceiver()
-
-    private val db = AppDatabase.getInstance(getApplicationContext())
+    @get:Rule
+    val testDb = TestDatabaseRule(getApplicationContext())
 
     @Test
     fun clearingNotificationMarksAsNotified() {
-        val feedId = db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "testFeed",
                 url = URL("http://testfeed"),
                 tag = "testTag"
         ))
 
-        val item1Id = db.feedItemDao().insertFeedItem(FeedItem(
+        val item1Id = testDb.db.feedItemDao().insertFeedItem(FeedItem(
                 feedId = feedId,
                 guid = "item1",
                 title = "item1",
@@ -51,20 +51,20 @@ class NotificationClearingTest {
 
             delay(50)
 
-            val item = db.feedItemDao().loadFeedItem(guid = "item1", feedId = feedId)
+            val item = testDb.db.feedItemDao().loadFeedItem(guid = "item1", feedId = feedId)
             assertTrue(item!!.notified)
         }
     }
 
     @Test
     fun notifyWorksOnMainThread() {
-        val feedId = db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "testFeed",
                 url = URL("http://testfeed"),
                 tag = "testTag"
         ))
 
-        db.feedItemDao().insertFeedItem(FeedItem(
+        testDb.db.feedItemDao().insertFeedItem(FeedItem(
                 feedId = feedId,
                 guid = "item1",
                 title = "item1",
@@ -80,7 +80,7 @@ class NotificationClearingTest {
             delay(50)
 
             // Only care that the above call didn't crash because we ran on the main thread
-            val item = db.feedItemDao().loadFeedItem(guid = "item1", feedId = feedId)
+            val item = testDb.db.feedItemDao().loadFeedItem(guid = "item1", feedId = feedId)
             assertFalse(item!!.notified)
         }
     }

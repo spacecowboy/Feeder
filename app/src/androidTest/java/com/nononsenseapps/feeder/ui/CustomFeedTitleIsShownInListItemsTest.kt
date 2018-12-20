@@ -13,7 +13,6 @@ import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.URI_FEEDS
-import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.util.PrefUtils
@@ -32,7 +31,8 @@ class CustomFeedTitleIsShownInListItemsTest {
     @get:Rule
     var activityRule: ActivityTestRule<FeedActivity> = ActivityTestRule(FeedActivity::class.java, false, false)
 
-    private val db = AppDatabase.getInstance(getApplicationContext())
+    @get:Rule
+    val testDb = TestDatabaseRule(getApplicationContext())
 
     @Before
     fun keepNavDrawerClosed() {
@@ -52,13 +52,13 @@ class CustomFeedTitleIsShownInListItemsTest {
     }
 
     private fun insertDataAndLaunch(title: String, customTitle: String) {
-        val feedId = db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = title,
                 customTitle = customTitle,
                 url = URL("http://foo")
         ))
 
-        db.feedItemDao().insertFeedItem(FeedItem(
+        testDb.db.feedItemDao().insertFeedItem(FeedItem(
                 guid = "fooitem1",
                 feedId = feedId,
                 title = "fooitem"
@@ -67,7 +67,7 @@ class CustomFeedTitleIsShownInListItemsTest {
         activityRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId")))
     }
 
-    fun assertFeedTitleShownIs(title: String) {
+    private fun assertFeedTitleShownIs(title: String) {
         runBlocking {
             val recyclerView = activityRule.activity.findViewById<RecyclerView>(android.R.id.list)!!
 
