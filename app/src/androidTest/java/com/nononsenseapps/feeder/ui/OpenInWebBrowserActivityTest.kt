@@ -1,17 +1,17 @@
 package com.nononsenseapps.feeder.ui
 
-import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
-import com.nononsenseapps.feeder.db.room.AppDatabase
+import androidx.test.uiautomator.UiDevice
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.model.getOpenInBrowserIntent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,21 +19,20 @@ import org.junit.runner.RunWith
 import java.net.URL
 import kotlin.test.assertEquals
 
+
 @RunWith(AndroidJUnit4::class)
 class OpenInWebBrowserActivityTest {
     @get:Rule
     val activityTestRule = ActivityTestRule(OpenInWebBrowserActivity::class.java, false, false)
 
-    private lateinit var db: AppDatabase
+    @get:Rule
+    val testDb = TestDatabaseRule(getApplicationContext())
 
     private lateinit var feedItem: FeedItem
 
     @Before
     fun setup() {
-        db = Room.inMemoryDatabaseBuilder(getApplicationContext(),
-                AppDatabase::class.java).build()
-        // Ensure all classes use test database
-        AppDatabase.setInstance(db)
+        val db = testDb.db
 
         val feedId = db.feedDao().insertFeed(Feed(
                 title = "foo",
@@ -54,17 +53,22 @@ class OpenInWebBrowserActivityTest {
         feedItem = item.copy(id = feedItemId)
     }
 
+    @After
+    fun pressHome() {
+        UiDevice.getInstance(getInstrumentation()).pressBack()
+    }
+
     @Test
     fun noIntentDoesNothing() {
         activityTestRule.launchActivity(null)
 
-        Espresso.onIdle {
-            runBlocking {
-                val item = withContext(Dispatchers.Default) {
-                    db.feedItemDao().loadFeedItem(feedItem.id)!!
+        runBlocking {
+            val item = withContext(Dispatchers.Default) {
+                untilEq(feedItem) {
+                    testDb.db.feedItemDao().loadFeedItem(feedItem.id)
                 }
-                assertEquals(feedItem, item)
             }
+            assertEquals(feedItem, item)
         }
     }
 
@@ -74,13 +78,13 @@ class OpenInWebBrowserActivityTest {
                 feedItemId = -252,
                 link = "bob"))
 
-        Espresso.onIdle {
-            runBlocking {
-                val item = withContext(Dispatchers.Default) {
-                    db.feedItemDao().loadFeedItem(feedItem.id)!!
+        runBlocking {
+            val item = withContext(Dispatchers.Default) {
+                untilEq(feedItem) {
+                    testDb.db.feedItemDao().loadFeedItem(feedItem.id)
                 }
-                assertEquals(feedItem, item)
             }
+            assertEquals(feedItem, item)
         }
     }
 
@@ -90,17 +94,18 @@ class OpenInWebBrowserActivityTest {
                 feedItemId = feedItem.id,
                 link = feedItem.link!!))
 
-        Espresso.onIdle {
-            runBlocking {
-                val item = withContext(Dispatchers.Default) {
-                    db.feedItemDao().loadFeedItem(feedItem.id)!!
+        val expected = feedItem.copy(
+                unread = false,
+                notified = true
+        )
+
+        runBlocking {
+            val item = withContext(Dispatchers.Default) {
+                untilEq(expected) {
+                    testDb.db.feedItemDao().loadFeedItem(feedItem.id)
                 }
-                assertEquals(
-                        feedItem.copy(
-                                unread = false,
-                                notified = true
-                        ), item)
             }
+            assertEquals(expected, item)
         }
     }
 }

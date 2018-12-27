@@ -9,7 +9,7 @@ import java.net.URI
 import java.net.URL
 
 const val previewColumns = "feed_items.id AS id, guid, plain_title, plain_snippet, feed_items.image_url, enclosure_link, " +
-        "author, pub_date, link, unread, feeds.tag AS tag, feeds.id AS feed_id, feeds.title AS feed_title, feeds.url AS feed_url"
+        "author, pub_date, link, unread, feeds.tag AS tag, feeds.id AS feed_id, feeds.title AS feed_title, feeds.custom_title as feed_customtitle, feeds.url AS feed_url"
 
 data class PreviewItem @Ignore constructor(
         var id: Long = ID_UNSET,
@@ -25,9 +25,13 @@ data class PreviewItem @Ignore constructor(
         var unread: Boolean = true,
         @ColumnInfo(name = "feed_id") var feedId: Long? = null,
         @ColumnInfo(name = "feed_title") var feedTitle: String = "",
+        @ColumnInfo(name = "feed_customtitle") var feedCustomTitle: String = "",
         @ColumnInfo(name = "feed_url") var feedUrl: URL = sloppyLinkToStrictURLNoThrows("")
 ) {
     constructor() : this(id = ID_UNSET)
+
+    val feedDisplayTitle: String
+        get() = if (feedCustomTitle.isBlank()) feedTitle else feedCustomTitle
 
     val enclosureFilename: String?
         get() {

@@ -10,7 +10,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.util.PrefUtils
@@ -30,7 +29,8 @@ class BadImagePlaceHolderArticleTest {
     @get:Rule
     var activityRule: ActivityTestRule<ReaderActivity> = ActivityTestRule(ReaderActivity::class.java, false, false)
 
-    private val db = AppDatabase.getInstance(getApplicationContext())
+    @get:Rule
+    val testDb = TestDatabaseRule(getApplicationContext())
 
     private val server = MockWebServer()
 
@@ -61,12 +61,12 @@ class BadImagePlaceHolderArticleTest {
 
         val imgUrl = server.url("/img.png")
 
-        val feedId = db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "foo",
                 url = URL("http://foo")
         ))
 
-        val itemId = db.feedItemDao().insertFeedItem(FeedItem(
+        val itemId = testDb.db.feedItemDao().insertFeedItem(FeedItem(
                 guid = "bar",
                 feedId = feedId,
                 title = "foo",

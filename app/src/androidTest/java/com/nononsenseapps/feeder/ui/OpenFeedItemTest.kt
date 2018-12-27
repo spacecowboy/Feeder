@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.ui
 import android.content.Intent
 import android.net.Uri
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -15,7 +14,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.URI_FEEDS
-import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.util.PrefUtils
@@ -29,8 +27,8 @@ import java.net.URL
 class OpenFeedItemTest {
     @get:Rule
     val activityRule = ActivityTestRule(FeedActivity::class.java, false, false)
-
-    private lateinit var db: AppDatabase
+    @get:Rule
+    val testDb = TestDatabaseRule(getApplicationContext())
 
     private lateinit var feedItem: FeedItem
 
@@ -41,15 +39,9 @@ class OpenFeedItemTest {
         PrefUtils.markWelcomeDone(getApplicationContext())
     }
 
-
     @Before
     fun setup() {
-        db = Room.inMemoryDatabaseBuilder(getApplicationContext(),
-                AppDatabase::class.java).build()
-        // Ensure all classes use test database
-        AppDatabase.setInstance(db)
-
-        feedId = db.feedDao().insertFeed(Feed(
+        feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "ANON",
                 url = URL("http://ANON.com/sub")
         ))
@@ -63,7 +55,7 @@ class OpenFeedItemTest {
                 plainSnippet = "ANON"
         )
 
-        val feedItemId = db.feedItemDao().insertFeedItem(item)
+        val feedItemId = testDb.db.feedItemDao().insertFeedItem(item)
         feedItem = item.copy(id = feedItemId)
     }
 

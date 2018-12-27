@@ -1,35 +1,22 @@
 package com.nononsenseapps.feeder.model
 
-import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.ui.TestDatabaseRule
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
 class FeedsToSyncTest {
-
-    private lateinit var db: AppDatabase
-
-    @Before
-    fun initDb() {
-        db = Room.inMemoryDatabaseBuilder(getApplicationContext(),
-                AppDatabase::class.java).build()
-    }
-
-    @After
-    fun closeDb() {
-        db.close()
-    }
+    @get:Rule
+    val testDb = TestDatabaseRule(getApplicationContext())
 
     @Test
     fun returnsStaleFeed() {
@@ -37,7 +24,7 @@ class FeedsToSyncTest {
         val feed = withFeed()
 
         // when
-        val result = feedsToSync(db, feedId = feed.id, tag = "")
+        val result = feedsToSync(testDb.db, feedId = feed.id, tag = "")
 
         // then
         assertEquals(listOf(feed), result)
@@ -49,7 +36,7 @@ class FeedsToSyncTest {
         val feed = withFeed(lastSync = now.minusMinutes(1))
 
         // when
-        val result = feedsToSync(db, feedId = feed.id, tag = "",
+        val result = feedsToSync(testDb.db, feedId = feed.id, tag = "",
                 staleTime = now.minusMinutes(2).millis)
 
         // then
@@ -63,7 +50,7 @@ class FeedsToSyncTest {
                 withFeed(url = URL("http://two"))
         )
 
-        val result = feedsToSync(db, feedId = ID_UNSET, tag = "")
+        val result = feedsToSync(testDb.db, feedId = ID_UNSET, tag = "")
 
         assertEquals(items, result)
     }
@@ -76,7 +63,7 @@ class FeedsToSyncTest {
                 withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3))
         )
 
-        val result = feedsToSync(db, feedId = ID_UNSET, tag = "", staleTime = now.minusMinutes(2).millis)
+        val result = feedsToSync(testDb.db, feedId = ID_UNSET, tag = "", staleTime = now.minusMinutes(2).millis)
 
         assertEquals(listOf(items[1]), result)
     }
@@ -88,7 +75,7 @@ class FeedsToSyncTest {
                 withFeed(url = URL("http://two"), tag = "tag")
         )
 
-        val result = feedsToSync(db, feedId = ID_UNSET, tag = "")
+        val result = feedsToSync(testDb.db, feedId = ID_UNSET, tag = "")
 
         assertEquals(items, result)
     }
@@ -101,7 +88,7 @@ class FeedsToSyncTest {
                 withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3), tag = "tag")
         )
 
-        val result = feedsToSync(db, feedId = ID_UNSET, tag = "tag", staleTime = now.minusMinutes(2).millis)
+        val result = feedsToSync(testDb.db, feedId = ID_UNSET, tag = "tag", staleTime = now.minusMinutes(2).millis)
 
         assertEquals(listOf(items[1]), result)
     }
@@ -113,7 +100,7 @@ class FeedsToSyncTest {
                 tag = tag
         )
 
-        val id = db.feedDao().insertFeed(feed)
+        val id = testDb.db.feedDao().insertFeed(feed)
 
         return feed.copy(id = id)
     }
