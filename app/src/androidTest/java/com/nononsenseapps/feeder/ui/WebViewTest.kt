@@ -1,10 +1,8 @@
 package com.nononsenseapps.feeder.ui
 
-import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import com.nononsenseapps.feeder.R
 import org.junit.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
@@ -25,10 +23,14 @@ class WebViewTest {
 
     @Test
     fun webViewHasPaddingToOffsetActionBar() {
-        assertEquals(
-                activityRule.activity.findViewById<View>(R.id.toolbar_actionbar).height ,
+        val actionBarSize = activityRule.activity?.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))?.let { attributes ->
+            attributes.getDimensionPixelSize(0, 0).also {
+                attributes.recycle()
+            }
+        }
+
+        assertEquals(actionBarSize,
                 activityRule.activity.supportFragmentManager.fragments.first().view!!.paddingTop,
-                message = "Web view should have padding top equal to action bar size"
-        )
+                message = "Web view should have padding top equal to action bar size")
     }
 }

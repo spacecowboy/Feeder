@@ -46,7 +46,7 @@ class ReaderWebViewFragment : androidx.fragment.app.Fragment() {
         mWebView?.destroy()
         mWebView = WebView(context).also {
             // Set the top padding to the size of the action bar since it overlays the content
-            inflater.context?.theme?.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))?.let { attributes ->
+            context?.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))?.let { attributes ->
                 it.setPadding(top = attributes.getDimensionPixelSize(0, it.paddingTop))
                 attributes.recycle()
             }
