@@ -120,7 +120,7 @@
         android:label="@string/app_name"
         android:theme="@style/FilePickerTheme"/>
     <activity
-        android:name=".ui.OpenInWebBrowserActivity"
+        android:name=".ui.OpenLinkInDefaultActivity"
         android:label="@string/open_link_in_browser" />
   </application>
 
