@@ -142,8 +142,11 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(enclosureLink))
         intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
         builder.addAction(R.drawable.notification_play_circle_outline,
-                context.getString(R.string.open_enclosed_media), PendingIntent.getActivity(context, item.id.toInt(), intent,
-                PendingIntent.FLAG_UPDATE_CURRENT))
+                context.getString(R.string.open_enclosed_media),
+                PendingIntent.getActivity(context,
+                        item.id.toInt(),
+                        getOpenInDefaultActivityIntent(context, item.id, enclosureLink),
+                        PendingIntent.FLAG_UPDATE_CURRENT))
     }
 
     item.link?.let { link ->
@@ -151,19 +154,29 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
                 context.getString(R.string.open_link_in_browser),
                 PendingIntent.getActivity(context,
                         item.id.toInt(),
-                        getOpenInBrowserIntent(context, item.id, link),
+                        getOpenInDefaultActivityIntent(context, item.id, link),
                         PendingIntent.FLAG_UPDATE_CURRENT))
     }
+
+    builder.addAction(R.drawable.notification_check,
+            context.getString(R.string.mark_as_read),
+            PendingIntent.getActivity(context,
+                    item.id.toInt(),
+                    getOpenInDefaultActivityIntent(context, item.id, link = null),
+                    PendingIntent.FLAG_UPDATE_CURRENT))
+
     style.setBuilder(builder)
     return style.build()
 }
 
-internal fun getOpenInBrowserIntent(context: Context, feedItemId: Long, link: String): Intent =
+internal fun getOpenInDefaultActivityIntent(context: Context, feedItemId: Long, link: String? = null): Intent =
         Intent(Intent.ACTION_VIEW,
                 Uri.withAppendedPath(URI_FEEDITEMS, "$feedItemId"),
                 context,
-                OpenInWebBrowserActivity::class.java).also {
-            it.putExtra(COL_LINK, link)
+                OpenLinkInDefaultActivity::class.java).also {
+            if (link != null) {
+                it.putExtra(COL_LINK, link)
+            }
         }
 
 /**
