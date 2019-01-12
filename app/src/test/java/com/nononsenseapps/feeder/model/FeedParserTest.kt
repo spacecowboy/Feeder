@@ -74,6 +74,18 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
+    fun successfullyParsesAlternateLinkInBodyOfDocument() {
+        javaClass.getResourceAsStream("nixos.html")!!
+                .bufferedReader()
+                .use {
+                    val alts: List<Pair<String, String>> = FeedParser.getAlternateFeedLinksInHtml(it.readText(),
+                            URL("https://nixos.org"))
+                    assertEquals(listOf("https://nixos.org/news-rss.xml" to "application/rss+xml"), alts)
+                }
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun getAlternateFeedLinksResolvesRelativeLinksGivenBaseUrl() {
         javaClass.getResourceAsStream("fz.html")!!
                 .bufferedReader()
@@ -97,9 +109,9 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
-    fun findsAlternateLinksReturnsNullForFeedsWithAlternateLinks() {
+    fun findsAlternateLinksReturnsAlternatesForFeedsWithAlternateLinks() {
         val rssLink = FeedParser.findFeedUrl(atomWithAlternateLinks)
-        assertNull(rssLink)
+        assertEquals(URL("http://localhost:1313/feed.json"), rssLink)
     }
 
     @Test
@@ -252,6 +264,22 @@ class FeedParserTest {
 
         assertEquals("Russ Cox", feed.author!!.name)
         assertEquals(feed.author, author)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun nixos() {
+        val feed = FeedParser.parseFeedInputStream(URL("http://nixos.org/news-rss.xml"), nixosRss)
+        assertNotNull(feed)
+
+        assertNull(feed.feed_url)
+
+        assertEquals(99, feed.items!!.size)
+
+        val (_, _, _, title, _, _, _, image) = feed.items!![0]
+
+        assertEquals("https://nixos.org/logo/nixos-logo-18.09-jellyfish-lores.png", image)
+        assertEquals("NixOS 18.09 released", title)
     }
 
     @Test
@@ -515,6 +543,9 @@ class FeedParserTest {
 
     private val anon: InputStream
         get() = javaClass.getResourceAsStream("rss_anon.xml")!!
+
+    private val nixosRss: InputStream
+        get() = javaClass.getResourceAsStream("rss_nixos.xml")!!
 }
 
 val atomRelative = """
