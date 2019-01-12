@@ -74,6 +74,18 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
+    fun successfullyParsesAlternateLinkInBodyOfDocument() {
+        javaClass.getResourceAsStream("nixos.html")!!
+                .bufferedReader()
+                .use {
+                    val alts: List<Pair<String, String>> = FeedParser.getAlternateFeedLinksInHtml(it.readText(),
+                            URL("https://nixos.org"))
+                    assertEquals(listOf("https://nixos.org/news-rss.xml" to "application/rss+xml"), alts)
+                }
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun getAlternateFeedLinksResolvesRelativeLinksGivenBaseUrl() {
         javaClass.getResourceAsStream("fz.html")!!
                 .bufferedReader()
@@ -97,9 +109,9 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
-    fun findsAlternateLinksReturnsNullForFeedsWithAlternateLinks() {
+    fun findsAlternateLinksReturnsAlternatesForFeedsWithAlternateLinks() {
         val rssLink = FeedParser.findFeedUrl(atomWithAlternateLinks)
-        assertNull(rssLink)
+        assertEquals(URL("http://localhost:1313/feed.json"), rssLink)
     }
 
     @Test

@@ -345,11 +345,10 @@ class EditFeedActivity : CoroutineScopedActivity() {
             resultAdapter.data = emptyList()
         }
         val results = mutableListOf<Feed>()
-        val alts = feedParser.getAlternateFeedLinksAtUrl(url)
-        when (alts.isNotEmpty()) {
-            true -> alts.map { sloppyLinkToStrictURL(it.first) }
-            false -> listOf(url)
-        }.map {
+        val possibleFeeds = feedParser.getAlternateFeedLinksAtUrl(url).map {
+            sloppyLinkToStrictURL(it.first)
+        } + url
+        possibleFeeds.map {
             launch {
                 try {
                     feedParser.parseFeedUrl(it)?.let { feed ->
