@@ -21,6 +21,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.InputStream
 import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
@@ -205,4 +206,41 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/feed.json", server.takeRequest().path)
     }
+
+    @Test
+    fun feedWithNoUniqueLinksGetsSomeGeneratedGUIDsFromTitles() {
+        val response = MockResponse().also {
+            it.setResponseCode(200)
+            it.setBody(String(nixosRss.readBytes()))
+        }
+        server.enqueue(response)
+        server.start()
+
+        val url = server.url("/news-rss.xml")
+
+        val feedId = testDb.db.feedDao().insertFeed(Feed(
+                title = "NixOS",
+                url = URL("$url"),
+                tag = ""
+        ))
+
+        runBlocking {
+            syncFeeds(db = testDb.db, feedParser = feedParser, feedId = feedId)
+        }
+
+        // Assert the feed was retrieved
+        assertEquals("/news-rss.xml", server.takeRequest().path)
+
+        val items = testDb.db.feedItemDao().loadFeedItemsInFeed(feedId)
+        assertEquals("Unique IDs should have been generated for items",
+                99, items.size)
+
+        // Should be unique to item so that it stays the same after updates
+        assertEquals("kaboo",
+                "NixOS 18.09 released-[18.09 Jellyfish logo] NixOS 18.09 “Jellyfish” has been released, the tenth stable release branch. See the release notes for details. You can get NixOS 18.09 ISOs and VirtualBox appliances from the do",
+                items.first().guid)
+    }
+
+    val nixosRss: InputStream
+        get() = javaClass.getResourceAsStream("rss_nixos.xml")!!
 }

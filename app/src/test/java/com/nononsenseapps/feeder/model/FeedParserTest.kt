@@ -268,6 +268,22 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
+    fun nixos() {
+        val feed = FeedParser.parseFeedInputStream(URL("http://nixos.org/news-rss.xml"), nixosRss)
+        assertNotNull(feed)
+
+        assertNull(feed.feed_url)
+
+        assertEquals(99, feed.items!!.size)
+
+        val (_, _, _, title, _, _, _, image) = feed.items!![0]
+
+        assertEquals("https://nixos.org/logo/nixos-logo-18.09-jellyfish-lores.png", image)
+        assertEquals("NixOS 18.09 released", title)
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun cyklist() {
         val feed = FeedParser.parseFeedInputStream(URL("http://www.cyklistbloggen.se/feed/"), cyklistBloggen)
         assertNotNull(feed)
@@ -527,6 +543,9 @@ class FeedParserTest {
 
     private val anon: InputStream
         get() = javaClass.getResourceAsStream("rss_anon.xml")!!
+
+    private val nixosRss: InputStream
+        get() = javaClass.getResourceAsStream("rss_nixos.xml")!!
 }
 
 val atomRelative = """

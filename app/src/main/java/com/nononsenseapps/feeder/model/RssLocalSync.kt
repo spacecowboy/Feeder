@@ -2,11 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.util.Log
-import com.nononsenseapps.feeder.db.room.AppDatabase
-import com.nononsenseapps.feeder.db.room.FeedItem
-import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.db.room.upsertFeed
-import com.nononsenseapps.feeder.db.room.upsertFeedItem
+import com.nononsenseapps.feeder.db.room.*
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
@@ -120,13 +116,25 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
             db.feedDao().upsertFeed(feedSql)
         } else {
             val itemDao = db.feedItemDao()
-            feed.items?.asSequence()
-                    ?.filter { it.id != null }
-                    ?.forEach {
-                        val feedItemSql = itemDao.loadFeedItem(guid = it.id!!,
+            val idCount = feed.items?.map { it.id ?: 0 }?.toSet()?.size
+
+            val itemIds = when (idCount == feed.items?.size) {
+                true -> {
+                    feed.items?.map { it.id ?: "shouldnotbepossible" }
+                }
+                false -> {
+                    feed.items?.mapIndexed { i, it ->
+                        "${it.title}-${it.summary}"
+                    }
+                }
+            } ?: emptyList()
+
+            feed.items?.zip(itemIds)
+                    ?.forEach { (item, id) ->
+                        val feedItemSql = itemDao.loadFeedItem(guid = id,
                                 feedId = feedSql.id) ?: FeedItem()
 
-                        feedItemSql.updateFromParsedEntry(it, feed)
+                        feedItemSql.updateFromParsedEntry(item.copy(id = id), feed)
                         feedItemSql.feedId = feedSql.id
 
                         itemDao.upsertFeedItem(feedItemSql)
