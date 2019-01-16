@@ -4,12 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -49,7 +44,13 @@ class ReaderWebViewFragment : androidx.fragment.app.Fragment() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         mWebView?.destroy()
-        mWebView = WebView(context)
+        mWebView = WebView(context).also {
+            // Set the top padding to the size of the action bar since it overlays the content
+            context?.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))?.let { attributes ->
+                it.setPadding(top = attributes.getDimensionPixelSize(0, it.paddingTop))
+                attributes.recycle()
+            }
+        }
         // Important to create webview before setting cookie policy on Android18
         CookieManager.getInstance().setAcceptCookie(false)
         mWebView?.settings?.javaScriptEnabled = true
@@ -160,7 +161,7 @@ class ReaderWebViewFragment : androidx.fragment.app.Fragment() {
     }
 }
 
-private object WebViewClientHandler: WebViewClient() {
+private object WebViewClientHandler : WebViewClient() {
     var onPageStartedListener: ((String?) -> Unit)? = null
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -177,4 +178,14 @@ private object WebViewClientHandler: WebViewClient() {
         // prevent links from loading in external web browser
         return false
     }
+}
+
+fun View.setPadding(left: Int? = null,
+                    top: Int? = null,
+                    right: Int? = null,
+                    bottom: Int? = null) {
+    this.setPadding(left ?: this.paddingLeft,
+            top ?: this.paddingTop,
+            right ?: this.paddingRight,
+            bottom ?: this.paddingBottom)
 }

@@ -88,12 +88,12 @@ object FeedParser {
     }
 
     /**
-     * Returns all alternate links in the header of an HTML/XML document pointing to feeds.
+     * Returns all alternate links in the HTML/XML document pointing to feeds.
      */
     fun getAlternateFeedLinksInHtml(html: String, baseUrl: URL? = null): List<Pair<String, String>> {
         val doc = Jsoup.parse(html.byteInputStream(), "UTF-8", "")
 
-        val feeds = doc.head()?.getElementsByAttributeValue("rel", "alternate")
+        val feeds = doc.getElementsByAttributeValue("rel", "alternate")
                 ?.filter { it.hasAttr("href") && it.hasAttr("type") }
                 ?.filter {
                     val t = it.attr("type").toLowerCase()

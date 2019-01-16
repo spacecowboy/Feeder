@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 class RssNotificationsKtTest {
     @Test
     fun openInBrowserIntentPointsToActivityWithIdAndLink() {
-        val intent: Intent = getOpenInBrowserIntent(getInstrumentation().context, 99, "http://foo")
+        val intent: Intent = getOpenInDefaultActivityIntent(getInstrumentation().context, 99, "http://foo")
 
         assertEquals("com.nononsenseapps.feeder.ui.OpenInWebBrowserActivity",
                 intent.component?.className)

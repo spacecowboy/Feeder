@@ -3,15 +3,7 @@ package com.nononsenseapps.feeder.model
 import android.content.Context
 import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.Worker
-import androidx.work.WorkerParameters
-import androidx.work.workDataOf
+import androidx.work.*
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
@@ -84,8 +76,8 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Worker(
                 .sendBroadcast(bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false))
 
         when {
-            success -> Result.SUCCESS
-            else -> Result.FAILURE
+            success -> Result.success()
+            else -> Result.failure()
         }
     }
 

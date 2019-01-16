@@ -88,7 +88,7 @@ class ReaderFragment : CoroutineScopedFragment() {
             rssItem?.let { rssItem ->
                 setViewTitle()
 
-                mFeedTitleTextView.text = rssItem.feedTitle
+                mFeedTitleTextView.text = rssItem.feedDisplayTitle
 
                 if (rssItem.author == null && rssItem.pubDate != null) {
                     rssItem.pubDate?.let { pubDate ->

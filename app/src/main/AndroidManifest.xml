@@ -23,7 +23,6 @@
     <activity
         android:name=".ui.FeedActivity"
         android:label="@string/app_name"
-        android:launchMode="singleTask"
         android:theme="@style/FeedsTheme">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -79,6 +78,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
 
         <data android:scheme="http"/>
+        <data android:scheme="https"/>
       </intent-filter>
       <intent-filter>
         <action android:name="android.intent.action.SEND"/>
@@ -87,6 +87,33 @@
         <category android:name="android.intent.category.BROWSABLE"/>
 
         <data android:mimeType="text/*"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
+
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+
+        <data android:scheme="http"/>
+        <data android:scheme="https"/>
+        <data android:host="*"/>
+        <data android:pathPattern=".*\\.xml"/>
+        <data android:pathPattern=".*\\.rss"/>
+        <data android:pathPattern=".*\\.atom"/>
+        <data android:pathPattern=".*\\.json"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
+
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+
+        <data android:scheme="http"/>
+        <data android:scheme="https"/>
+        <data android:host="feeds.feedburner.com"/>
+        <data android:host="feedproxy.google.com"/>
+        <data android:host="feeds2.feedburner.com"/>
+        <data android:host="feedsproxy.google.com"/>
       </intent-filter>
     </activity>
 
@@ -121,7 +148,7 @@
         android:label="@string/app_name"
         android:theme="@style/FilePickerTheme"/>
     <activity
-        android:name=".ui.OpenInWebBrowserActivity"
+        android:name=".ui.OpenLinkInDefaultActivity"
         android:label="@string/open_link_in_browser" />
   </application>
 
