@@ -27,6 +27,7 @@ readonly FASTLANE_CL
 
 mkdir -p app/src/main/play/release-notes/en-GB/
 
-cat "${FASTLANE_CL}" > app/src/main/play/release-notes/en-GB/default.txt
+# Play store (and thus plugin) has a limit of 500 characters
+head --bytes=500 "${FASTLANE_CL}" > app/src/main/play/release-notes/en-GB/default.txt
 
 ./gradlew publishPlayReleaseBundle
