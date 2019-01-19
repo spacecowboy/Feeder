@@ -24,8 +24,8 @@ android {
 
   defaultConfig {
     applicationId "com.nononsenseapps.feeder"
-    versionCode 44
-    versionName "1.8.5"
+    versionCode 45
+    versionName "1.8.6"
     compileSdkVersion 28
     minSdkVersion 18
     targetSdkVersion 28
@@ -74,6 +74,7 @@ android {
   buildTypes {
     debug {
       minifyEnabled false
+      applicationIdSuffix ".debug"
     }
     release {
       minifyEnabled false

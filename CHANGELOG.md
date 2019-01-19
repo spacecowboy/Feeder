@@ -1,3 +1,7 @@
+# 1.8.6
+*   Fixed notification "Open in"-actions not working
+    See !164
+
 # 1.8.5
 *   Fixed parsing of feeds without unique guids or links (NixOS)
     See !162
