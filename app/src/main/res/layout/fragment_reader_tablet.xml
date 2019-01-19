@@ -11,10 +11,10 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingEnd="@dimen/keyline_1"
     android:paddingStart="@dimen/keyline_1"
-    android:paddingTop="?actionBarSize">
+    android:paddingTop="?actionBarSize"
+    android:paddingEnd="@dimen/keyline_1"
+    android:paddingBottom="@dimen/activity_vertical_margin">
 
 
     <TextView
@@ -23,6 +23,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginBottom="6dp"
+      android:textDirection="anyRtl"
       android:textIsSelectable="true"
       android:transitionName="title"
       tools:text="@tools:sample/cities" />
@@ -32,8 +33,9 @@
       style="@style/TextAppearance.Reader.Author"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="2dp"
       android:layout_marginTop="2dp"
+      android:layout_marginBottom="2dp"
+      android:textDirection="anyRtl"
       android:textIsSelectable="true"
       tools:text="CowboyProgrammer" />
 
@@ -42,8 +44,9 @@
       style="@style/TextAppearance.Reader.Author"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="8dp"
       android:layout_marginTop="2dp"
+      android:layout_marginBottom="8dp"
+      android:textDirection="anyRtl"
       android:textIsSelectable="true"
       tools:text="by Jonas, Sep 14 2015" />
 
@@ -54,6 +57,7 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="8dp"
       android:minHeight="300dp"
+      android:textDirection="anyRtl"
       android:textIsSelectable="true"
       tools:text="@tools:sample/lorem/random" />
   </LinearLayout>
