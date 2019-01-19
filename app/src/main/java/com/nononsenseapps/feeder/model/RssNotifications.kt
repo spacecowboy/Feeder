@@ -171,13 +171,14 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
 
 internal fun getOpenInDefaultActivityIntent(context: Context, feedItemId: Long, link: String? = null): Intent =
         Intent(Intent.ACTION_VIEW,
-                Uri.withAppendedPath(URI_FEEDITEMS, "$feedItemId"),
+                // Important to keep the URI different so PendingIntents don't collide
+                URI_FEEDITEMS.buildUpon().appendPath("$feedItemId").also {
+                    if (link != null) {
+                        it.appendQueryParameter(COL_LINK, link)
+                    }
+                }.build(),
                 context,
-                OpenLinkInDefaultActivity::class.java).also {
-            if (link != null) {
-                it.putExtra(COL_LINK, link)
-            }
-        }
+                OpenLinkInDefaultActivity::class.java)
 
 /**
  * Use this on platforms older than 24 to bundle notifications together

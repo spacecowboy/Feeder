@@ -2,12 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import android.app.Application
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedViewModel

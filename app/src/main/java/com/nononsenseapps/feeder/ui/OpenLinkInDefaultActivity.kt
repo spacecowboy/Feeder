@@ -27,7 +27,7 @@ class OpenLinkInDefaultActivity : CoroutineScopedActivity() {
 
         intent?.let { intent ->
             val id: Long = intent.data?.lastPathSegment?.toLong() ?: ID_UNSET
-            val link: String? = intent.getStringExtra(COL_LINK)
+            val link: String? = intent.data?.getQueryParameter(COL_LINK)
 
             launch(Dispatchers.Default) {
                 AppDatabase.getInstance(this@OpenLinkInDefaultActivity).feedItemDao().markAsReadAndNotified(id)
@@ -40,6 +40,7 @@ class OpenLinkInDefaultActivity : CoroutineScopedActivity() {
                         intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
                     })
                 } catch (e: Throwable) {
+                    e.printStackTrace()
                     Toast.makeText(this, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
                     Log.e("FeederOpenInWebBrowser", "Failed to start browser", e)
                 }
