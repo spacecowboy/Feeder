@@ -49,6 +49,7 @@ android {
     debug {
       minifyEnabled false
       applicationIdSuffix ".debug"
+      pseudoLocalesEnabled true
     }
     release {
       minifyEnabled false
