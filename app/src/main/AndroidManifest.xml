@@ -149,7 +149,9 @@
         android:theme="@style/FilePickerTheme"/>
     <activity
         android:name=".ui.OpenLinkInDefaultActivity"
-        android:label="@string/open_link_in_browser" />
+        android:label="@string/open_link_in_browser"
+        android:taskAffinity="${applicationId}.OpenLinkTask"
+        android:launchMode="singleInstance"/>
   </application>
 
 </manifest>
