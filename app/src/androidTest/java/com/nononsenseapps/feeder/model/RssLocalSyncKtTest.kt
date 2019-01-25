@@ -237,7 +237,7 @@ class RssLocalSyncKtTest {
 
         // Should be unique to item so that it stays the same after updates
         assertEquals("kaboo",
-                "NixOS 18.09 released-[18.09 Jellyfish logo] NixOS 18.09 “Jellyfish” has been released, the tenth stable release branch. See the release notes for details. You can get NixOS 18.09 ISOs and VirtualBox appliances from the do",
+                "NixOS 18.09 released-NixOS 18.09 “Jellyfish” has been released, the tenth stable release branch. See the release notes for details. You can get NixOS 18.09 ISOs and VirtualBox appliances from the download page. For inform",
                 items.first().guid)
     }
 
