@@ -18,6 +18,7 @@ import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.getFeedItemViewModel
+import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.asFeedItemFoo
@@ -139,7 +140,7 @@ class ReaderFragment : CoroutineScopedFragment() {
             if (rssItem.title.isEmpty()) {
                 titleTextView.text = rssItem.plainTitle
             } else {
-                titleTextView.text = toSpannedWithNoImages(activity!!, rssItem.title, rssItem.feedUrl)
+                titleTextView.text = toSpannedWithNoImages(activity!!, rssItem.title, rssItem.feedUrl, activity!!.maxImageSize())
             }
         }
     }

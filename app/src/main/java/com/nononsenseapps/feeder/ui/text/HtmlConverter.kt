@@ -44,6 +44,7 @@ fun toSpannedWithImages(context: Context,
  * found in the wild.
  */
 fun toSpannedWithNoImages(context: Context, source: String, siteUrl: URL,
+                          maxSize: Point,
                           spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()): Spanned {
     val parser = Parser()
     try {
@@ -55,6 +56,6 @@ fun toSpannedWithNoImages(context: Context, source: String, siteUrl: URL,
         throw RuntimeException(e)
     }
 
-    val converter = HtmlToSpannedConverter(source, siteUrl, parser, context, spannableStringBuilder)
+    val converter = HtmlToSpannedConverter(source, siteUrl, parser, context, maxSize, spannableStringBuilder)
     return converter.convert()
 }
