@@ -38,10 +38,10 @@
     android:singleLine="true"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
     android:textColor="@color/secondary_text_color"
-    android:textDirection="anyRtl"
     android:textSize="@dimen/navdrawer_unreadcount_textsize"
     app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+    app:layout_constraintTop_toTopOf="parent"
+    tools:text="99" />
 
   <ImageView
     android:id="@+id/tag_expander"
@@ -62,8 +62,9 @@
     android:paddingEnd="2dp"
     android:singleLine="true"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
-    android:textDirection="anyRtl"
+    android:textDirection="locale"
     app:layout_constraintEnd_toStartOf="@+id/tag_unreadcount"
     app:layout_constraintStart_toEndOf="@+id/tag_expander"
-    app:layout_constraintTop_toTopOf="parent" />
+    app:layout_constraintTop_toTopOf="parent"
+    tools:text="Feed name" />
 </androidx.constraintlayout.widget.ConstraintLayout>
