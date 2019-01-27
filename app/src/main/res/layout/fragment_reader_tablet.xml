@@ -35,7 +35,7 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="2dp"
       android:layout_marginBottom="2dp"
-      android:textDirection="anyRtl"
+      android:textDirection="locale"
       android:textIsSelectable="true"
       tools:text="CowboyProgrammer" />
 
@@ -46,9 +46,9 @@
       android:layout_height="wrap_content"
       android:layout_marginTop="2dp"
       android:layout_marginBottom="8dp"
-      android:textDirection="anyRtl"
+      android:textDirection="locale"
       android:textIsSelectable="true"
-      tools:text="by Jonas, Sep 14 2015" />
+      tools:text="Jonas, Sep 14 2015" />
 
     <com.nononsenseapps.feeder.views.LinkedTextView
       android:id="@+id/story_body"
