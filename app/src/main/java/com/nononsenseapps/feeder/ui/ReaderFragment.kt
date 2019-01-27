@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.ui
 
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -10,7 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.ShareActionProvider
+import androidx.core.text.BidiFormatter
 import androidx.core.view.MenuItemCompat
+import androidx.fragment.app.Fragment
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
 import com.nononsenseapps.feeder.db.room.AppDatabase
@@ -18,6 +22,7 @@ import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.getFeedItemViewModel
+import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.asFeedItemFoo
@@ -90,21 +95,23 @@ class ReaderFragment : CoroutineScopedFragment() {
 
                 mFeedTitleTextView.text = rssItem.feedDisplayTitle
 
-                if (rssItem.author == null && rssItem.pubDate != null) {
-                    rssItem.pubDate?.let { pubDate ->
-                        mAuthorTextView.text = getString(R.string.on_date,
-                                pubDate.withZone(DateTimeZone.getDefault())
-                                        .toString(dateTimeFormat))
+                rssItem.pubDate.let { pubDate ->
+                    rssItem.author.let { author ->
+                        when {
+                            author == null && pubDate != null ->
+                                mAuthorTextView.text = getString(R.string.on_date,
+                                        pubDate.withZone(DateTimeZone.getDefault())
+                                                .toString(dateTimeFormat))
+                            author != null && pubDate != null ->
+                                mAuthorTextView.text = getString(R.string.by_author_on_date,
+                                        // Must wrap author in unicode marks to ensure it formats
+                                        // correctly in RTL
+                                        unicodeWrap(author),
+                                        pubDate.withZone(DateTimeZone.getDefault())
+                                                .toString(dateTimeFormat))
+                            else -> mAuthorTextView.visibility = View.GONE
+                        }
                     }
-                } else if (rssItem.pubDate != null) {
-                    rssItem.pubDate?.let { pubDate ->
-                        mAuthorTextView.text = getString(R.string.by_author_on_date,
-                                rssItem.author,
-                                pubDate.withZone(DateTimeZone.getDefault())
-                                        .toString(dateTimeFormat))
-                    }
-                } else {
-                    mAuthorTextView.visibility = View.GONE
                 }
             }
         })
@@ -139,7 +146,7 @@ class ReaderFragment : CoroutineScopedFragment() {
             if (rssItem.title.isEmpty()) {
                 titleTextView.text = rssItem.plainTitle
             } else {
-                titleTextView.text = toSpannedWithNoImages(activity!!, rssItem.title, rssItem.feedUrl)
+                titleTextView.text = toSpannedWithNoImages(activity!!, rssItem.title, rssItem.feedUrl, activity!!.maxImageSize())
             }
         }
     }
@@ -239,3 +246,20 @@ class ReaderFragment : CoroutineScopedFragment() {
         }
     }
 }
+
+fun Fragment.unicodeWrap(text: String): String =
+        BidiFormatter.getInstance(getLocale()).unicodeWrap(text)
+
+fun Fragment.getLocale(): Locale? =
+        context?.getLocale()
+
+fun Context.unicodeWrap(text: String): String =
+        BidiFormatter.getInstance(getLocale()).unicodeWrap(text)
+
+fun Context.getLocale(): Locale =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            resources.configuration.locales[0]
+        } else {
+            @Suppress("DEPRECATION")
+            resources.configuration.locale
+        }

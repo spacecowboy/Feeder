@@ -63,4 +63,10 @@ public class HtmlToPlainTextConverterTest {
         assertEquals("foo bar",
                 new HtmlToPlainTextConverter().convert("foo <style>style</style> bar"));
     }
+
+    @Test
+    public void imgSkipped() throws Exception {
+        assertEquals("foo bar",
+                new HtmlToPlainTextConverter().convert("foo <img src=\"meh\" alt=\"meh\"> bar"));
+    }
 }

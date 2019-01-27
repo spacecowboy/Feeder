@@ -11,7 +11,7 @@
   <string name="add_feed_search_hint">URL to feed</string>
   <string name="title">Title</string>
 
-  <string name="by_author_on_date">by %1$s, %2$s</string>
+  <string name="by_author_on_date">%1$s, %2$s</string>
   <string name="on_date">%1$s</string>
   <string name="save">Save</string>
   <string name="empty_feed_top">Nothing to read here. Would you like to…</string>
