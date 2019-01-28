@@ -284,6 +284,25 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
+    fun nixers() {
+        val feed = FeedParser.parseFeedInputStream(URL("https://newsletter.nixers.net/feed.xml"),
+                nixersRss)
+        assertNotNull(feed)
+
+        assertNull(feed.feed_url)
+
+        assertEquals(111, feed.items!!.size)
+
+        val item = feed.items!![0]
+
+        // Timezone issues - so only verify date
+        assertTrue(message = "Expected a pubdate to have been parsed") {
+            item.date_published!!.startsWith("2019-01-25")
+        }
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun cyklist() {
         val feed = FeedParser.parseFeedInputStream(URL("http://www.cyklistbloggen.se/feed/"), cyklistBloggen)
         assertNotNull(feed)
@@ -546,6 +565,9 @@ class FeedParserTest {
 
     private val nixosRss: InputStream
         get() = javaClass.getResourceAsStream("rss_nixos.xml")!!
+
+    private val nixersRss: InputStream
+        get() = javaClass.getResourceAsStream("rss_nixers_newsletter.xml")!!
 }
 
 val atomRelative = """
