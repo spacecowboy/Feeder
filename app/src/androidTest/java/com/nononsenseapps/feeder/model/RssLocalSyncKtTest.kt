@@ -23,6 +23,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.InputStream
 import java.net.URL
+import java.util.concurrent.TimeUnit
+import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
@@ -236,11 +238,166 @@ class RssLocalSyncKtTest {
                 99, items.size)
 
         // Should be unique to item so that it stays the same after updates
-        assertEquals("kaboo",
+        assertEquals("Unexpected ID",
                 "NixOS 18.09 released-NixOS 18.09 “Jellyfish” has been released, the tenth stable release branch. See the release notes for details. You can get NixOS 18.09 ISOs and VirtualBox appliances from the download page. For inform",
                 items.first().guid)
     }
 
+    @Test
+    fun feedWithNoDatesShouldGetSomeGenerated() {
+        val response = MockResponse().also {
+            it.setResponseCode(200)
+            it.setBody(fooRss(2))
+        }
+        server.enqueue(response)
+        server.start()
+
+        val url = server.url("/rss")
+
+        val feedId = testDb.db.feedDao().insertFeed(Feed(
+                url = URL("$url")
+        ))
+
+        val beforeSyncTime = DateTime.now(DateTimeZone.UTC)
+
+        runBlocking {
+            syncFeeds(db = testDb.db, feedParser = feedParser, feedId = feedId)
+        }
+
+        // Assert the feed was retrieved
+        assertEquals("/rss", server.takeRequest().path)
+
+        val items = testDb.db.feedItemDao().loadFeedItemsInFeed(feedId)
+
+        assertNotNull("Item should have gotten a pubDate generated",
+                items[0].pubDate)
+
+        assertNotEquals("Items should have distinct pubDates",
+                items[0].pubDate, items[1].pubDate)
+
+        assertTrue("The pubDate should be after 'before sync time'",
+                items[0].pubDate!! > beforeSyncTime)
+
+        // Compare ID to compare insertion order (and thus pubdate compared to raw feed)
+        assertTrue("The pubDates' magnitude should match descending iteration order") {
+            items[0].guid == "https://foo.bar/1"
+                    && items[1].guid == "https://foo.bar/2"
+                    && items[0].pubDate!! > items[1].pubDate!!
+        }
+    }
+
+    @Test
+    fun feedWithNoDatesShouldNotGetOverriddenDatesNextSync() {
+        server.enqueue(MockResponse().also {
+            it.setResponseCode(200)
+            it.setBody(fooRss(1))
+        })
+        server.enqueue(MockResponse().also {
+            it.setResponseCode(200)
+            it.setBody(fooRss(2))
+        })
+        server.start()
+
+        val url = server.url("/rss")
+
+        val feedId = testDb.db.feedDao().insertFeed(Feed(
+                url = URL("$url")
+        ))
+
+        // Sync first time
+        runBlocking {
+            syncFeeds(db = testDb.db, feedParser = feedParser, feedId = feedId)
+        }
+
+        // Assert the feed was retrieved
+        assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
+
+        val firstItem = testDb.db.feedItemDao().loadFeedItemsInFeed(feedId).let { items ->
+            assertNotNull("Item should have gotten a pubDate generated",
+                    items[0].pubDate)
+
+            items[0]
+        }
+
+        // Sync second time
+        runBlocking {
+            syncFeeds(db = testDb.db, feedParser = feedParser, feedId = feedId, forceNetwork = true)
+        }
+
+        // Assert the feed was retrieved
+        assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
+
+        testDb.db.feedItemDao().loadFeedItemsInFeed(feedId).let { items ->
+            assertEquals("Should be 2 items in feed",
+                    2, items.size)
+
+            val item = items.last()
+
+            assertEquals("Making sure we are comparing the same item",
+                    firstItem.id, item.id)
+
+            assertEquals("Pubdate should not have changed",
+                    firstItem.pubDate, item.pubDate)
+        }
+    }
+
+    @Test
+    fun feedShouldNotBeCleanedToHaveLessItemsThanActualFeed() {
+        val feedItemCount = 9
+        server.enqueue(MockResponse().also {
+            it.setResponseCode(200)
+            it.setBody(fooRss(feedItemCount))
+        })
+        server.start()
+
+        val url = server.url("/rss")
+
+        val feedId = testDb.db.feedDao().insertFeed(Feed(
+                url = URL("$url")
+        ))
+
+        val maxFeedItemCount = 5
+
+        // Sync first time
+        runBlocking {
+            syncFeeds(db = testDb.db, feedParser = feedParser, feedId = feedId,
+                    maxFeedItemCount = maxFeedItemCount)
+        }
+
+        // Assert the feed was retrieved
+        assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
+
+        testDb.db.feedItemDao().loadFeedItemsInFeed(feedId).let { items ->
+            assertEquals("Feed should have no less items than in the raw feed even if that's more than cleanup count",
+                    feedItemCount, items.size)
+        }
+    }
+
     val nixosRss: InputStream
         get() = javaClass.getResourceAsStream("rss_nixos.xml")!!
+
+    fun fooRss(itemsCount: Int = 1): String {
+        return """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rss version="2.0">
+                <channel>
+                <title>Foo Feed</title>
+                <link>https://foo.bar</link>
+                ${
+        (1..itemsCount).map {
+            """
+                <item>
+                  <title>Foo Item $it</title>
+                  <link>https://foo.bar/$it</link>
+                  <description>Woop woop $it</description>
+                </item>
+            """.trimIndent()
+        }.fold("") { acc, s ->
+            "$acc\n$s"
+        }
+        }
+                </channel>
+                </rss>
+            """.trimIndent()
+    }
 }

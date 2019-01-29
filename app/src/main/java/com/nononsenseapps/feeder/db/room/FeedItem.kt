@@ -1,32 +1,14 @@
 package com.nononsenseapps.feeder.db.room
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
+import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
-import androidx.room.Ignore
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import com.nononsenseapps.feeder.db.COL_AUTHOR
-import com.nononsenseapps.feeder.db.COL_DESCRIPTION
-import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
-import com.nononsenseapps.feeder.db.COL_FEEDID
-import com.nononsenseapps.feeder.db.COL_GUID
-import com.nononsenseapps.feeder.db.COL_ID
-import com.nononsenseapps.feeder.db.COL_IMAGEURL
-import com.nononsenseapps.feeder.db.COL_LINK
-import com.nononsenseapps.feeder.db.COL_NOTIFIED
-import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
-import com.nononsenseapps.feeder.db.COL_PLAINTITLE
-import com.nononsenseapps.feeder.db.COL_PUBDATE
-import com.nononsenseapps.feeder.db.COL_TITLE
-import com.nononsenseapps.feeder.db.COL_UNREAD
-import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
+import com.nononsenseapps.feeder.db.*
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.jsonfeed.Item
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import java.net.URI
 import java.net.URL
 
@@ -77,12 +59,14 @@ data class FeedItem @Ignore constructor(
         this.author = entry.author?.name ?: feed.author?.name
         this.link = entry.url
 
-        var dt: DateTime? = null
-        try {
-            dt = DateTime.parse(entry.date_published)
-        } catch(t: Throwable) {
-        }
-        this.pubDate = dt
+        this.pubDate =
+                try {
+                    // Allow an actual pubdate to be updated
+                    DateTime.parse(entry.date_published)
+                } catch (t: Throwable) {
+                    // If a pubdate is missing, then don't update if one is already set
+                    this.pubDate ?: DateTime.now(DateTimeZone.UTC)
+                }
     }
 
     val pubDateString: String?
