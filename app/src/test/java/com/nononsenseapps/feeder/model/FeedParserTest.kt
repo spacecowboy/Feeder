@@ -346,7 +346,7 @@ class FeedParserTest {
         // Snippet should not contain links
         entry = feed.items!![1]
         assertEquals("Compress all the images!", entry.title)
-        assertEquals("*Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS)* One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to be",
+        assertEquals("Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS) One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to be d",
                 entry.summary)
     }
 

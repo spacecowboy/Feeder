@@ -69,4 +69,19 @@ public class HtmlToPlainTextConverterTest {
         assertEquals("foo bar",
                 new HtmlToPlainTextConverter().convert("foo <img src=\"meh\" alt=\"meh\"> bar"));
     }
+
+    @Test
+    public void noBold() throws Exception {
+        assertEquals("foo", new HtmlToPlainTextConverter().convert("<b>foo</b>"));
+    }
+
+    @Test
+    public void noItalic() throws Exception {
+        assertEquals("foo", new HtmlToPlainTextConverter().convert("<i>foo</i>"));
+    }
+
+    @Test
+    public void noLeadingImages() throws Exception {
+        assertEquals("foo", new HtmlToPlainTextConverter().convert("<img src='bar' alt='heh'> foo"));
+    }
 }
