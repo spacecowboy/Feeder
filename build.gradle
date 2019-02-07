@@ -12,7 +12,7 @@ buildscript {
     conscrypt_version = "1.4.1"
 
     androidx_version = "1.0.0"
-    work_version = '1.0.0-beta01'
+    work_version = '1.0.0-beta05'
     constraintlayout_version = "2.0.0-alpha3"
     recyclerview_version = "$androidx_version"
     legacy_support_version = "$androidx_version"
