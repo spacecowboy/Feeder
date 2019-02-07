@@ -155,7 +155,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentTextWithOthers() {
         assertEquals(
-                Item(id = "$baseUrl/id", content_text = "**html**", summary = "**html**", title = "",
+                Item(id = "$baseUrl/id", content_text = "html", summary = "html", title = "",
                         url = "$baseUrl/id",
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
@@ -218,7 +218,7 @@ class RomeExtensionsKtTest {
     @Test
     fun contentHtmlRss() {
         assertEquals(
-                Item(id = "$baseUrl/id", content_text = "**html**", summary = "**html**", title = "",
+                Item(id = "$baseUrl/id", content_text = "html", summary = "html", title = "",
                         url = "$baseUrl/id",
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",

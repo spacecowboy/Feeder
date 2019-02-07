@@ -204,13 +204,9 @@ class HtmlToPlainTextConverter : ContentHandler {
         }
     }
 
-    private fun emphasize(builder: StringBuilder?) {
-        builder!!.append("*")
-    }
+    private fun emphasize(builder: StringBuilder?) {}
 
-    private fun strong(builder: StringBuilder?) {
-        builder!!.append("**")
-    }
+    private fun strong(builder: StringBuilder?) {}
 
     private fun ensureSpace(text: StringBuilder?) {
         val len = text!!.length

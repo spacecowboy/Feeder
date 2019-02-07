@@ -15,6 +15,8 @@ cache:
 .sdk_apt: &before_docker
   before_script:
     - set -euo pipefail
+    - git submodule sync --recursive
+    - git submodule update --init --recursive
     - apt-get --quiet update --yes
       && apt-get --quiet install --yes --no-install-recommends wget
                                                                tar

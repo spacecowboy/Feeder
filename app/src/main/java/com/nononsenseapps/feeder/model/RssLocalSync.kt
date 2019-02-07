@@ -16,6 +16,7 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
 suspend fun syncFeeds(context: Context,
@@ -123,13 +124,14 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                     feed.items?.map { it.id ?: "shouldnotbepossible" }
                 }
                 false -> {
-                    feed.items?.mapIndexed { i, it ->
+                    feed.items?.map {
                         "${it.title}-${it.summary}"
                     }
                 }
             } ?: emptyList()
 
             feed.items?.zip(itemIds)
+                    ?.reversed()
                     ?.forEach { (item, id) ->
                         val feedItemSql = itemDao.loadFeedItem(guid = id,
                                 feedId = feedSql.id) ?: FeedItem()
@@ -149,7 +151,8 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
             db.feedDao().upsertFeed(feedSql)
 
             // Finally, prune database of old items
-            db.feedItemDao().cleanItemsInFeed(feedSql.id, maxFeedItemCount)
+            db.feedItemDao().cleanItemsInFeed(feedSql.id,
+                    max(maxFeedItemCount, feed.items?.size ?: 0))
         }
     } catch (e: ResponseFailure) {
         Log.e("CoroutineSync", "Failed to fetch ${feedSql.displayTitle}: ${e.message}")
