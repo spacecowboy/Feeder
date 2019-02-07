@@ -1,3 +1,11 @@
+# 1.8.8
+*   Changed plaintext conversion to stop formatting as markdown
+    See !172
+*   Fixed not being able to parse dates in certain feeds
+    See !170
+*   Fixed so feeds without publication dates gets some when synced
+    See !169 #178
+
 # 1.8.7
 *   Added support for RTL
     Some devices might still not render perfectly though
