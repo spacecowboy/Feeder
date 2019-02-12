@@ -364,11 +364,6 @@ class EditFeedActivity : CoroutineScopedActivity() {
                     }
                 } catch (e: Throwable) {
                     e.printStackTrace()
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@EditFeedActivity,
-                                R.string.could_not_load_url,
-                                Toast.LENGTH_SHORT).show()
-                    }
                 }
             }
         }.toList().joinAll()
