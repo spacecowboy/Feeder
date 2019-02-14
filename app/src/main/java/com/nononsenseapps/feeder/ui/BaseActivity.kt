@@ -11,7 +11,6 @@ import android.preference.PreferenceManager
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
@@ -197,10 +196,10 @@ open class BaseActivity : CoroutineScopedActivity() {
         mRecyclerView.setHasFixedSize(true)
         mRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
 
-        navAdapter = FeedsAdapter(this)
+        /*navAdapter = FeedsAdapter(this)
         mRecyclerView.adapter = navAdapter
 
-        populateNavDrawer()
+        populateNavDrawer()*/
 
         // When the user runs the app for the first time, we want to land them with the
         // navigation drawer open. But just the first time.

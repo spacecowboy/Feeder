@@ -36,4 +36,40 @@
     android:title="@string/send_bug_report"
     app:showAsAction="never"/>
 
+  <!-- Overriding these values in fragment -->
+  <item
+      android:id="@+id/action_only_unread"
+      android:checkable="true"
+      android:checked="true"
+      android:icon="@drawable/ic_visibility_white_24dp"
+      android:orderInCategory="1"
+      android:title="@string/show_all_items"
+      app:showAsAction="ifRoom" />
+  <item
+      android:id="@+id/action_notify"
+      android:checkable="true"
+      android:checked="false"
+      android:icon="@drawable/ic_notifications_off_white_24dp"
+      android:orderInCategory="2"
+      android:title="@string/notify_for_new_items"
+      app:showAsAction="ifRoom" />
+  <item
+      android:id="@+id/action_edit_feed"
+      android:icon="@drawable/ic_edit_white_24dp"
+      android:title="@string/edit_feed"
+      android:orderInCategory="101"
+      app:showAsAction="never" />
+  <item
+      android:id="@+id/action_delete_feed"
+      android:icon="@drawable/ic_delete_white_24dp"
+      android:title="@string/delete_feed"
+      android:orderInCategory="102"
+      app:showAsAction="never" />
+  <item
+      android:id="@+id/action_add_templated"
+      android:icon="@drawable/ic_edit_white_24dp"
+      android:title="@string/new_based_on_this"
+      android:orderInCategory="103"
+      app:showAsAction="never" />
+
 </menu>

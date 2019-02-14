@@ -1,216 +1,199 @@
 package com.nononsenseapps.feeder.ui
 
-import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.os.PersistableBundle
-import android.text.Html.fromHtml
+import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.TextView
-import android.widget.Toast
-import androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.*
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.room.AppDatabase
-import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
-import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.FEED_ADDED_BROADCAST
-import com.nononsenseapps.feeder.model.SYNC_BROADCAST
-import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
-import com.nononsenseapps.feeder.model.opml.exportOpml
-import com.nononsenseapps.feeder.model.opml.importOpml
-import com.nononsenseapps.feeder.model.requestFeedSync
-import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
+import com.nononsenseapps.feeder.coroutines.CoroutineScopedActivity
+import com.nononsenseapps.feeder.model.*
 import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.emailBugReportIntent
-import com.nononsenseapps.feeder.util.ensureDebugLogDeleted
-import com.nononsenseapps.filepicker.AbstractFilePickerActivity
+import com.nononsenseapps.feeder.util.bundle
+import kotlinx.android.synthetic.main.activity_navigation.*
+import kotlinx.android.synthetic.main.app_bar_navigation.*
+import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 
-private const val EXPORT_OPML_CODE = 101
-private const val IMPORT_OPML_CODE = 102
-private const val EDIT_FEED_CODE = 103
+const val EXPORT_OPML_CODE = 101
+const val IMPORT_OPML_CODE = 102
+const val EDIT_FEED_CODE = 103
 
 const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
-class FeedActivity : BaseActivity() {
-    private val fragmentTag = "single_pane"
+class FeedActivity : CoroutineScopedActivity() {
 
-    private var fragment: androidx.fragment.app.Fragment? = null
-    private lateinit var emptyView: View
-
-    private val syncReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            // Load first feed if nothing is showing (could have been empty and now content has been loaded)
-            when (intent.action) {
-                SYNC_BROADCAST -> showAllFeeds(false)
-                FEED_ADDED_BROADCAST -> {
-                    if (fragment == null && intent.getLongExtra(ARG_ID, ID_UNSET) > 0) {
-                        onNavigationDrawerItemSelected(intent.getLongExtra(ARG_ID, ID_UNSET), "", "", null)
-                    }
-                }
-            }
-        }
+    private lateinit var navAdapter: FeedsAdapter
+    private val navController: NavController by lazy {
+        findNavController(R.id.nav_host_fragment)
     }
+    private val settingsViewModel by lazy { getSettingsViewModel() }
+    var fabOnClickListener: () -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_feed)
-        initializeActionBar()
-        overridePendingTransition(0, 0)
+        setContentView(R.layout.activity_navigation)
+        setSupportActionBar(toolbar)
 
-        doFromNotificationActions()
+        // Write default setting if method has never been called before
+        PreferenceManager.setDefaultValues(this, R.xml.settings, false)
 
-        // Migration thing, make sure file is deleted for all users
-        val appContext = applicationContext
-        launch(Dispatchers.Default) {
-            ensureDebugLogDeleted(appContext)
+        // Not persisted so set nightmode every time we start
+        AppCompatDelegate.setDefaultNightMode(settingsViewModel.themePreference)
+
+        // Enable periodic sync
+        configurePeriodicSync(applicationContext, forceReplace = false)
+
+        fab.setOnClickListener {
+            fabOnClickListener()
         }
 
-        if (savedInstanceState == null) {
-            fragment = defaultFragment()
-            if (fragment == null) {
-                showAllFeeds(false)
-            } else {
-                supportFragmentManager.beginTransaction().add(R.id.container, fragment!!, fragmentTag).commit()
+        val toggle = ActionBarDrawerToggle(
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        val appBarConfiguration = AppBarConfiguration(navController.graph, drawer_layout)
+        toolbar.setupWithNavController(navController, appBarConfiguration)
+
+        // Drawer stuff
+        navdrawer_list.setHasFixedSize(true)
+        navdrawer_list.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+
+        navAdapter = FeedsAdapter(object : OnNavigationItemClickListener {
+            override fun onNavigationItemClick(id: Long, displayTitle: String?, url: String?, tag: String?) {
+                drawer_layout.closeDrawer(GravityCompat.START)
+
+                if (navController.currentDestination?.id == R.id.feedFragment) {
+                    navController.navigate(R.id.action_feedFragment_self, bundle {
+                        putLong(ARG_FEED_ID, id)
+                        putString(ARG_FEED_TITLE, displayTitle)
+                        putString(ARG_FEED_URL, url)
+                        putString(ARG_FEED_TAG, tag)
+                    })
+                }
             }
-        } else {
-            fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
+        })
+        navdrawer_list.adapter = navAdapter
+
+        // Navigation stuff
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            Log.d("JONAS", "PPEW ${destination.id}: ${destination.label}")
+
+            // Drawer handling
+            when (destination.id) {
+                R.id.feedFragment -> {
+                    drawer_layout.setDrawerLockMode(LOCK_MODE_UNLOCKED)
+                }
+                else -> {
+                    drawer_layout.setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED)
+                }
+            }
+
+            // Fab handling
+            when (destination.id) {
+                R.id.feedFragment -> {
+                    fab.setImageResource(R.drawable.ic_done_all_white_24dp)
+                    fab.show()
+                }
+                else -> {
+                    fab.hide()
+                    fabOnClickListener = {}
+                }
+            }
+
+            // Toolbar hiding
+            when (destination.id) {
+                R.id.feedFragment -> fixedToolbar()
+                R.id.readerFragment -> hideableToolbar()
+                R.id.readerWebViewFragment -> hideableToolbar()
+                else -> fixedToolbar()
+            }
         }
 
-        // Empty view
-        emptyView = findViewById(android.R.id.empty)
-        emptyView.visibility = if (fragment == null) View.VISIBLE else View.GONE
-
-        val emptyAddFeed = findViewById<TextView>(R.id.empty_add_feed)
-        @Suppress("DEPRECATION")
-        emptyAddFeed.text = fromHtml(getString(R.string.empty_no_feeds_add))
-        emptyAddFeed.setOnClickListener {
-            startActivityForResult(Intent(this@FeedActivity, EditFeedActivity::class.java), EDIT_FEED_CODE)
-        }
+        handleSettingIntent()
     }
 
-    private fun doFromNotificationActions() {
-        val itemIdsToMarkAsNotified = intent?.getLongArrayExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)
-        val db = AppDatabase.getInstance(this)
-        if (itemIdsToMarkAsNotified != null) {
-            launch(Dispatchers.Default) {
-                db.feedItemDao().markAsNotified(itemIdsToMarkAsNotified.toList())
+    fun hideableToolbar() {
+        toolbar?.layoutParams = toolbar.layoutParams.also {
+            if (it is AppBarLayout.LayoutParams) {
+                it.scrollFlags = SCROLL_FLAG_SNAP or SCROLL_FLAG_SCROLL or SCROLL_FLAG_ENTER_ALWAYS
             }
         }
     }
 
-    private fun defaultFragment(): androidx.fragment.app.Fragment? {
-        val lastTag = PrefUtils.getLastOpenFeedTag(this)
-        val lastId = PrefUtils.getLastOpenFeedId(this)
+    fun fixedToolbar() {
+        toolbar?.layoutParams = toolbar.layoutParams.also {
+            if (it is AppBarLayout.LayoutParams) {
+                it.scrollFlags = 0
+            }
+        }
+    }
 
-        val intentId: Long? = intent?.data?.lastPathSegment?.toLong()
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
 
-        // Will load title and url in fragment
-        return if (intentId != null) {
-            FeedFragment.newInstance(intentId,
-                    intent?.extras?.getString(ARG_FEED_TITLE) ?: "",
-                    intent?.extras?.getString(ARG_FEED_URL) ?: "",
-                    intent?.extras?.getString(ARG_FEED_TAG, lastTag) ?: lastTag)
-        } else if (lastTag != null || lastId > 0) {
-            FeedFragment.newInstance(lastId, "", "", lastTag)
+        handleSettingIntent()
+    }
+
+    private fun handleSettingIntent() {
+        if (intent?.action == Intent.ACTION_MANAGE_NETWORK_USAGE) {
+            navController.navigate(R.id.settingsFragment)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // Just so app label doesn't flicker in before label is set by feed fragment
+        if (supportActionBar?.title == getString(R.string.app_name)) {
+            supportActionBar?.title = ""
+        }
+
+        settingsViewModel.liveThemePreference.observe(this, androidx.lifecycle.Observer {
+            delegate.setLocalNightMode(it)
+        })
+
+        getFeedListViewModel().liveFeedsAndTagsWithUnreadCounts
+                .observe(this, androidx.lifecycle.Observer<List<FeedUnreadCount>> {
+                    navAdapter.submitList(it)
+                })
+
+        // When the user runs the app for the first time, we want to land them with the
+        // navigation drawer open. But just the first time.
+        if (!PrefUtils.isWelcomeDone(this)) {
+            // first run of the app starts with the nav drawer open
+            PrefUtils.markWelcomeDone(this)
+            openNavDrawer()
+        }
+    }
+
+    override fun onBackPressed() {
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            drawer_layout.closeDrawer(GravityCompat.START)
         } else {
-            FeedFragment.newInstance(ID_ALL_FEEDS, null, null, null)
+            super.onBackPressed()
         }
     }
 
-    fun showAllFeeds(overrideCurrent: Boolean = false) {
-        if (fragment == null || overrideCurrent) {
-            onNavigationDrawerItemSelected(ID_ALL_FEEDS, null, null, null)
-        }
-    }
-
-    override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onPostCreate(savedInstanceState, persistentState)
-        registerHideableHeaderView(findViewById(R.id.headerbar))
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        super.onCreateOptionsMenu(menu)
-        menuInflater.inflate(R.menu.feed, menu)
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_add -> {
-                startActivityForResult(Intent(this@FeedActivity, EditFeedActivity::class.java), EDIT_FEED_CODE)
-                true
-            }
-            R.id.action_opml_export -> {
-                // Choose file, then export
-                val intent: Intent
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                    intent.type = "text/opml"
-                    intent.putExtra(Intent.EXTRA_TITLE, "feeder.opml")
-                } else {
-                    intent = Intent(this, MyFilePickerActivity::class.java)
-                    intent.putExtra(AbstractFilePickerActivity.EXTRA_MODE, AbstractFilePickerActivity.MODE_NEW_FILE)
-                    intent.putExtra(AbstractFilePickerActivity.EXTRA_ALLOW_EXISTING_FILE, true)
-                    intent.putExtra(AbstractFilePickerActivity.EXTRA_START_PATH,
-                            File(Environment.getExternalStorageDirectory(), "feeder.opml").path)
-                }
-                startActivityForResult(intent, EXPORT_OPML_CODE)
-                true
-            }
-            R.id.action_opml_import -> {
-                // Choose file
-                val intent: Intent
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                    intent.addCategory(Intent.CATEGORY_OPENABLE)
-                    intent.type = "*/*"
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES,
-                            arrayOf("text/plain", "text/xml", "text/opml", "*/*"))
-                } else {
-                    intent = Intent(this, MyFilePickerActivity::class.java)
-                    intent.putExtra(AbstractFilePickerActivity.EXTRA_SINGLE_CLICK, true)
-                }
-                startActivityForResult(intent, IMPORT_OPML_CODE)
-                true
-            }
-            R.id.action_settings -> {
-                startActivity(Intent(this, SettingsActivity::class.java))
-                true
-            }
-            R.id.action_reportbug -> {
-                try {
-                    startActivity(emailBugReportIntent())
-                } catch (e: ActivityNotFoundException) {
-                    Toast.makeText(this, R.string.no_email_client, Toast.LENGTH_SHORT).show()
-                }
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onNavigationDrawerItemSelected(id: Long, title: String?, url: String?, tag: String?) {
-        // update the main content by replacing fragments
-        emptyView.visibility = View.GONE
-        fragment = FeedFragment.newInstance(id, title, url, tag)
-        supportFragmentManager.beginTransaction().replace(R.id.container, fragment as FeedFragment, fragmentTag).commit()
     }
 
     override fun onResume() {
         super.onResume()
-        getInstance(this).registerReceiver(syncReceiver, IntentFilter(SYNC_BROADCAST))
         syncFeedsMaybe()
     }
 
@@ -226,48 +209,7 @@ class FeedActivity : BaseActivity() {
         }
     }
 
-    override fun onPause() {
-        getInstance(this).unregisterReceiver(syncReceiver)
-        super.onPause()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode != Activity.RESULT_OK) {
-            return
-        }
-
-        when (requestCode) {
-            EXPORT_OPML_CODE -> {
-                val uri: Uri? = data?.data
-                if (uri != null) {
-                    val appContext = applicationContext
-                    launch(Dispatchers.Default) {
-                        exportOpml(appContext, uri)
-                    }
-                }
-            }
-            IMPORT_OPML_CODE -> {
-                val uri: Uri? = data?.data
-                if (uri != null) {
-                    val appContext = applicationContext
-                    launch(Dispatchers.Default) {
-                        importOpml(appContext, uri)
-                    }
-                }
-            }
-            EDIT_FEED_CODE -> {
-                val id = data?.data?.lastPathSegment?.toLong()
-                if (id != null) {
-                    val lastTag = PrefUtils.getLastOpenFeedTag(this)
-
-                    val fragment = FeedFragment.newInstance(id,
-                            data.extras?.getString(ARG_FEED_TITLE) ?: "",
-                            data.extras?.getString(ARG_FEED_URL) ?: "",
-                            data.extras?.getString(ARG_FEED_TAG) ?: lastTag)
-
-                    supportFragmentManager.beginTransaction().replace(R.id.container, fragment, fragmentTag).commitAllowingStateLoss()
-                }
-            }
-        }
+    fun openNavDrawer() {
+        drawer_layout.openDrawer(GravityCompat.START)
     }
 }

@@ -16,7 +16,8 @@ fun toSpannedWithImages(context: Context,
                         siteUrl: URL,
                         maxSize: Point,
                         allowDownload: Boolean,
-                        spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()): Spanned {
+                        spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
+                        urlClickListener: UrlClickListener?): Spanned {
     val parser = Parser()
     try {
         parser.setProperty(Parser.schemaProperty, schema)
@@ -27,7 +28,7 @@ fun toSpannedWithImages(context: Context,
         throw RuntimeException(e)
     }
 
-    val converter = GlideConverter(context, source, siteUrl, parser, maxSize, allowDownload, spannableStringBuilder)
+    val converter = GlideConverter(context, source, siteUrl, parser, maxSize, allowDownload, spannableStringBuilder,  urlClickListener = urlClickListener)
     return converter.convert()
 }
 
@@ -45,7 +46,8 @@ fun toSpannedWithImages(context: Context,
  */
 fun toSpannedWithNoImages(context: Context, source: String, siteUrl: URL,
                           maxSize: Point,
-                          spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()): Spanned {
+                          spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
+                          urlClickListener: UrlClickListener?): Spanned {
     val parser = Parser()
     try {
         parser.setProperty(Parser.schemaProperty, schema)
@@ -56,6 +58,6 @@ fun toSpannedWithNoImages(context: Context, source: String, siteUrl: URL,
         throw RuntimeException(e)
     }
 
-    val converter = HtmlToSpannedConverter(source, siteUrl, parser, context, maxSize, spannableStringBuilder)
+    val converter = HtmlToSpannedConverter(source, siteUrl, parser, context, maxSize, spannableStringBuilder, urlClickListener = urlClickListener)
     return converter.convert()
 }

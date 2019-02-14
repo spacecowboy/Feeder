@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui
 
-import android.content.Intent
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.TextAppearanceSpan
@@ -10,18 +9,14 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.model.PreviewItem
-import com.nononsenseapps.feeder.util.GlideUtils
-import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
-import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
-import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.*
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
-import com.nononsenseapps.feeder.util.openLinkInBrowser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -175,24 +170,24 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
                             }
                         }
                         else -> {
-                            val intent = Intent(context, ReaderWebViewActivity::class.java)
-                            intent.putExtra(SHOULD_FINISH_BACK, true)
                             rssItem?.let {
-                                intent.putExtra(ARG_URL, it.link)
-                                intent.putExtra(ARG_ENCLOSURE, it.enclosureLink)
+                                view.findNavController().navigate(
+                                        R.id.action_feedFragment_to_readerWebViewFragment,
+                                        bundle {
+                                            putString(ARG_URL, it.link)
+                                            putString(ARG_ENCLOSURE, it.enclosureLink)
+                                        }
+                                )
                             }
-                            context.startActivity(intent)
                         }
                     }
                 }
                 else -> {
-                    val i = Intent(context, ReaderActivity::class.java)
-                    i.putExtra(SHOULD_FINISH_BACK, true)
                     rssItem?.let {
-                        ReaderActivity.setRssExtras(i, it)
+                        view.findNavController().navigate(R.id.action_feedFragment_to_readerFragment, bundle {
+                            putLong(ARG_ID, it.id)
+                        })
                     }
-
-                    context.startActivity(i)
                 }
             }
         }

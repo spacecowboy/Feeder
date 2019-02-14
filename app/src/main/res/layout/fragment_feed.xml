@@ -26,22 +26,6 @@
       tools:listitem="@layout/list_story_item" />
   </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-  <com.google.android.material.floatingactionbutton.FloatingActionButton
-    android:id="@+id/checkall_button"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom|end"
-    android:layout_marginBottom="16dp"
-    android:layout_marginEnd="@dimen/keyline_1"
-    android:clickable="true"
-    android:focusable="true"
-    android:scaleType="center"
-    app:borderWidth="0dp"
-    app:elevation="5dp"
-    app:fabSize="normal"
-    app:pressedTranslationZ="7dp"
-    app:srcCompat="@drawable/ic_done_all_white_24dp" />
-
   <include
     layout="@layout/empty_feed"
     android:visibility="gone" />

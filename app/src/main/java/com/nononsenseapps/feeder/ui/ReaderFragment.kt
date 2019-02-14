@@ -4,17 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import android.widget.TextView
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.text.BidiFormatter
 import androidx.core.view.MenuItemCompat
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
 import com.nononsenseapps.feeder.db.room.AppDatabase
@@ -24,10 +22,11 @@ import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.getFeedItemViewModel
 import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
+import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.TabletUtils
-import com.nononsenseapps.feeder.util.asFeedItemFoo
+import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.openLinkInBrowser
-import com.nononsenseapps.feeder.views.ObservableScrollView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTimeZone
@@ -41,7 +40,6 @@ const val ARG_LINK = "link"
 const val ARG_ENCLOSURE = "enclosure"
 const val ARG_IMAGEURL = "imageUrl"
 const val ARG_ID = "dbid"
-const val ARG_FEEDTITLE = "feedtitle"
 const val ARG_AUTHOR = "author"
 const val ARG_DATE = "date"
 
@@ -53,24 +51,19 @@ class ReaderFragment : CoroutineScopedFragment() {
     // All content contained in RssItem
     private var rssItem: FeedItemWithFeed? = null
     private lateinit var bodyTextView: TextView
-    private lateinit var scrollView: ObservableScrollView
+    private lateinit var scrollView: NestedScrollView
     private lateinit var titleTextView: TextView
     private lateinit var mAuthorTextView: TextView
     private lateinit var mFeedTitleTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState != null) {
-            _id = savedInstanceState.getLong(ARG_ID)
-            rssItem = savedInstanceState.asFeedItemFoo()
 
-        } else if (rssItem == null && arguments != null) {
-            // Construct from arguments
-            arguments?.let { arguments ->
-                _id = arguments.getLong(ARG_ID, ID_UNSET)
-                rssItem = arguments.asFeedItemFoo()
-            }
+        arguments?.let { arguments ->
+            _id = arguments.getLong(ARG_ID, ID_UNSET)
         }
+
+        Log.d("JONAS", "Reader create id ${_id}")
 
         if (_id > ID_UNSET) {
             val itemId = _id
@@ -85,10 +78,37 @@ class ReaderFragment : CoroutineScopedFragment() {
         }
 
         setHasOptionsMenu(true)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        Log.d("JONAS", "Reader onResume ${rssItem?.title}. Blank? ${bodyTextView.text.isBlank()}")
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        Log.d("JONAS", "onCreateView")
+        // Inflate the layout for this fragment
+        val theLayout = if (TabletUtils.isTablet(activity)) {
+            R.layout.fragment_reader_tablet
+        } else {
+            R.layout.fragment_reader
+        }
+        val rootView = inflater.inflate(theLayout, container, false)
+
+        scrollView = rootView.findViewById<View>(R.id.scroll_view) as NestedScrollView
+        titleTextView = rootView.findViewById<View>(R.id.story_title) as TextView
+        bodyTextView = rootView.findViewById<View>(R.id.story_body) as TextView
+        mAuthorTextView = rootView.findViewById<View>(R.id.story_author) as TextView
+        mFeedTitleTextView = rootView.findViewById<View>(R.id
+                .story_feedtitle) as TextView
 
         val viewModel = getFeedItemViewModel(_id)
         viewModel.liveItem.observe(this, androidx.lifecycle.Observer {
             rssItem = it
+
+            Log.d("JONAS", "Reader observer ${it.title}")
 
             rssItem?.let { rssItem ->
                 setViewTitle()
@@ -113,32 +133,29 @@ class ReaderFragment : CoroutineScopedFragment() {
                         }
                     }
                 }
+
+                // Update state of notification toggle
+                activity?.invalidateOptionsMenu()
             }
         })
 
         viewModel.liveImageText.observe(this, androidx.lifecycle.Observer {
             bodyTextView.text = it
         })
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        val theLayout = if (TabletUtils.isTablet(activity)) {
-            R.layout.fragment_reader_tablet
-        } else {
-            R.layout.fragment_reader
-        }
-        val rootView = inflater.inflate(theLayout, container, false)
-
-        scrollView = rootView.findViewById<View>(R.id.scroll_view) as ObservableScrollView
-        titleTextView = rootView.findViewById<View>(R.id.story_title) as TextView
-        bodyTextView = rootView.findViewById<View>(R.id.story_body) as TextView
-        mAuthorTextView = rootView.findViewById<View>(R.id.story_author) as TextView
-        mFeedTitleTextView = rootView.findViewById<View>(R.id
-                .story_feedtitle) as TextView
 
         return rootView
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        Log.d("JONAS", "onActivityCreated")
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        Log.d("JONAS", "onStart")
     }
 
     private fun setViewTitle() {
@@ -146,19 +163,13 @@ class ReaderFragment : CoroutineScopedFragment() {
             if (rssItem.title.isEmpty()) {
                 titleTextView.text = rssItem.plainTitle
             } else {
-                titleTextView.text = toSpannedWithNoImages(activity!!, rssItem.title, rssItem.feedUrl, activity!!.maxImageSize())
+                titleTextView.text = toSpannedWithNoImages(activity!!, rssItem.title, rssItem.feedUrl, activity!!.maxImageSize(), urlClickListener = urlClickListener())
             }
         }
     }
 
-    override fun onActivityCreated(bundle: Bundle?) {
-        super.onActivityCreated(bundle)
-        scrollView.let {
-            (activity as BaseActivity).enableActionBarAutoHide(it)
-        }
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
+        Log.d("JONAS", "Reader onSaveINstanceState")
         rssItem?.storeInBundle(outState)
         super.onSaveInstanceState(outState)
     }
@@ -202,13 +213,13 @@ class ReaderFragment : CoroutineScopedFragment() {
                 // Open in web view
                 rssItem?.let { rssItem ->
                     rssItem.link?.let { link ->
-                        context?.let { context ->
-                            val intent = Intent(context, ReaderWebViewActivity::class.java)
-                            intent.putExtra(ARG_URL, link)
-                            intent.putExtra(ARG_ENCLOSURE, rssItem.enclosureLink)
-                            startActivity(intent)
-                            activity?.finish()
-                        }
+                        findNavController().navigate(
+                                R.id.action_readerFragment_to_readerWebViewFragment,
+                                bundle {
+                                    putString(ARG_URL, link)
+                                    putString(ARG_ENCLOSURE, rssItem.enclosureLink)
+                                }
+                        )
                     }
                 }
                 true
@@ -263,3 +274,18 @@ fun Context.getLocale(): Locale =
             @Suppress("DEPRECATION")
             resources.configuration.locale
         }
+
+fun Fragment.urlClickListener(): (link: String) -> Unit = { link ->
+    context?.let { context ->
+        when (shouldOpenLinkWith(context)) {
+            PREF_VAL_OPEN_WITH_WEBVIEW -> {
+                findNavController().navigate(R.id.action_readerFragment_to_readerWebViewFragment, bundle {
+                    putString(ARG_URL, link)
+                })
+            }
+            else -> {
+                openLinkInBrowser(context, link)
+            }
+        }
+    }
+}

@@ -12,7 +12,7 @@ private const val VIEWTYPE_TAG = 1
 private const val VIEWTYPE_FEED = 2
 private const val VIEWTYPE_FEED_CHILD = 3
 
-internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+class FeedsAdapter(private val onClickListener: OnNavigationItemClickListener) : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
     private val expandedTags: MutableSet<String> = androidx.collection.ArraySet(setOf(""))
     private var allItems: List<FeedUnreadCount> = emptyList()
     private var visibleItems: List<FeedUnreadCount> = emptyList()
@@ -116,11 +116,11 @@ internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyc
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         return when (viewType) {
-            VIEWTYPE_FEED_CHILD -> FeedHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed_child, parent, false))
-            VIEWTYPE_TAG -> TagHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed_tag, parent, false))
-            VIEWTYPE_TOP -> TopHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed, parent, false))
+            VIEWTYPE_FEED_CHILD -> FeedHolder(onClickListener, LayoutInflater.from(parent.context).inflate(R.layout.view_feed_child, parent, false))
+            VIEWTYPE_TAG -> TagHolder(onClickListener, this, LayoutInflater.from(parent.context).inflate(R.layout.view_feed_tag, parent, false))
+            VIEWTYPE_TOP -> TopHolder(onClickListener, LayoutInflater.from(parent.context).inflate(R.layout.view_feed, parent, false))
             // VIEWTYPE_FEED
-            else -> FeedHolder(activity, LayoutInflater.from(activity).inflate(R.layout.view_feed, parent, false))
+            else -> FeedHolder(onClickListener, LayoutInflater.from(parent.context).inflate(R.layout.view_feed, parent, false))
         }
     }
 
@@ -154,4 +154,8 @@ internal class FeedsAdapter(private val activity: BaseActivity) : androidx.recyc
             }
         }
     }
+}
+
+interface OnNavigationItemClickListener {
+    fun onNavigationItemClick(id: Long, displayTitle: String?, url: String?, tag: String?)
 }

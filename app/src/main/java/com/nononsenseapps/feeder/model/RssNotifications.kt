@@ -8,23 +8,24 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.Browser.EXTRA_CREATE_NEW_TAB
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.app.TaskStackBuilder
+import androidx.navigation.NavDeepLinkBuilder
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
-import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
-import com.nononsenseapps.feeder.ui.*
-import com.nononsenseapps.feeder.util.ARG_FEEDTITLE
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.ui.ARG_FEED_ID
+import com.nononsenseapps.feeder.ui.ARG_ID
+import com.nononsenseapps.feeder.ui.EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED
+import com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivity
+import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.notificationManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -103,28 +104,24 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
 
     val contentIntent = when (item.description.isBlank()) {
         true -> {
-            val i = Intent(context, FeedActivity::class.java)
-            i.data = Uri.withAppendedPath(URI_FEEDS, "${item.feedId}")
-            i.flags = FLAG_ACTIVITY_CLEAR_TASK or FLAG_ACTIVITY_NEW_TASK
-            PendingIntent.getActivity(context, item.id.toInt(), i,
-                    PendingIntent.FLAG_UPDATE_CURRENT)
+            NavDeepLinkBuilder(context)
+                    .setGraph(R.navigation.nav_graph)
+                    .setDestination(R.id.feedFragment)
+                    .setArguments(bundle {
+                        item.feedId?.let {
+                            putLong(ARG_FEED_ID, it)
+                        }
+                    })
+                    .createPendingIntent(requestCode = item.id.toInt())
         }
         false -> {
-            val i = Intent(context, ReaderActivity::class.java)
-            ReaderActivity.setRssExtras(i, item)
-            i.data = Uri.withAppendedPath(URI_FEEDITEMS, "${item.id}")
-            val stackBuilder = TaskStackBuilder.create(context)
-            // Add the parent of the specified activity - as stated in the manifest
-            stackBuilder.addParentStack(ReaderActivity::class.java)
-            stackBuilder.addNextIntent(i)
-            // Now, modify the parent intent so that it navigates to the appropriate feed
-            val parentIntent = stackBuilder.editIntentAt(0)
-            if (parentIntent != null) {
-                parentIntent.data = Uri.withAppendedPath(URI_FEEDS, "${item.feedId}")
-                parentIntent.putExtra(ARG_FEEDTITLE, item.feedDisplayTitle)
-                parentIntent.putExtra(ARG_FEED_URL, item.feedUrl.toString())
-            }
-            stackBuilder.getPendingIntent(item.id.toInt(), PendingIntent.FLAG_UPDATE_CURRENT)
+            NavDeepLinkBuilder(context)
+                    .setGraph(R.navigation.nav_graph)
+                    .setDestination(R.id.readerFragment)
+                    .setArguments(bundle {
+                        putLong(ARG_ID, item.id)
+                    })
+                    .createPendingIntent(requestCode = item.id.toInt())
         }
     }
 
@@ -193,24 +190,29 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
         style.addLine("${it.feedDisplayTitle} \u2014 ${it.plainTitle}")
     }
 
-    val intent = Intent(context, FeedActivity::class.java)
-    intent.putExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED, LongArray(feedItems.size) { i -> feedItems[i].id })
-
-    // We can be a little bit smart - if all items are from the same feed then go to that feed
-    // Otherwise we should go to All feeds
-    val feedIds = feedItems.map { it.feedId }.toSet()
-    intent.data = if (feedIds.toSet().size == 1) {
-        Uri.withAppendedPath(URI_FEEDS, "${feedIds.first()}")
-    } else {
-        Uri.withAppendedPath(URI_FEEDS, "-1")
-    }
+    val contentIntent = NavDeepLinkBuilder(context)
+            .setGraph(R.navigation.nav_graph)
+            .setDestination(R.id.feedFragment)
+            .setArguments(bundle {
+                putLongArray(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED, LongArray(feedItems.size) { i -> feedItems[i].id })
+                // We can be a little bit smart - if all items are from the same feed then go to that feed
+                // Otherwise we should go to All feeds
+                val feedIds = feedItems.map { it.feedId }.toSet()
+                if (feedIds.toSet().size == 1) {
+                    feedIds.first()?.let {
+                        putLong(ARG_FEED_ID, it)
+                    }
+                } else {
+                    putLong(ARG_FEED_ID, ID_ALL_FEEDS)
+                }
+            })
+            .createPendingIntent(requestCode = notificationId)
 
     val builder = notificationBuilder(context)
 
     builder.setContentText(text)
             .setContentTitle(title)
-            .setContentIntent(PendingIntent.getActivity(context, notificationId, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT))
+            .setContentIntent(contentIntent)
             .setDeleteIntent(getDeleteIntent(context, feedItems))
             .setNumber(feedItems.size)
 
@@ -264,3 +266,6 @@ private fun getItemsToNotify(context: Context): List<FeedItemWithFeed> {
 
 private fun getFeedIdsToNotify(context: Context): List<Long> =
         AppDatabase.getInstance(context).feedDao().loadFeedIdsToNotify()
+
+fun NavDeepLinkBuilder.createPendingIntent(requestCode: Int): PendingIntent? =
+        this.createTaskStackBuilder().getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT)

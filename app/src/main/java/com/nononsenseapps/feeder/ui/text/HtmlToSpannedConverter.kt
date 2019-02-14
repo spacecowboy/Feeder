@@ -20,19 +20,15 @@ import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.appcompat.content.res.AppCompatResources
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.ui.ARG_URL
-import com.nononsenseapps.feeder.ui.ReaderWebViewActivity
-import com.nononsenseapps.feeder.ui.SHOULD_FINISH_BACK
-import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
 import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
-import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import org.ccil.cowan.tagsoup.Parser
 import org.xml.sax.*
 import java.io.IOException
 import java.io.StringReader
 import java.net.URL
+
+typealias UrlClickListener = ((String) -> Unit)
 
 /**
  * Convert an HTML document into a spannable string.
@@ -43,7 +39,8 @@ open class HtmlToSpannedConverter(private var mSource: String,
                                   parser: Parser,
                                   private val mContext: Context,
                                   val maxSize: Point,
-                                  private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()) : ContentHandler {
+                                  private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
+                                  private var urlClickListener: UrlClickListener?) : ContentHandler {
     @ColorInt
     private var mAccentColor: Int = 0
     private var mQuoteGapWidth: Int = 0
@@ -56,20 +53,6 @@ open class HtmlToSpannedConverter(private var mSource: String,
     private var codeTextBgColor: Int = 0
 
     private val ignoredTags = listOf("style", "script")
-
-    private val urlClickListener: ((String, Context) -> Unit) = { link, context ->
-        when (shouldOpenLinkWith(context)) {
-            PREF_VAL_OPEN_WITH_WEBVIEW -> {
-                val intent = Intent(context, ReaderWebViewActivity::class.java)
-                intent.putExtra(SHOULD_FINISH_BACK, true)
-                intent.putExtra(ARG_URL, link)
-                context.startActivity(intent)
-            }
-            else -> {
-                openLinkInBrowser(context, link)
-            }
-        }
-    }
 
     init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

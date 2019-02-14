@@ -11,14 +11,16 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedViewModel
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
+import com.nononsenseapps.feeder.ui.text.UrlClickListener
 import com.nononsenseapps.feeder.ui.text.toSpannedWithImages
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
+import com.nononsenseapps.feeder.ui.urlClickListener
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.TabletUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point) : CoroutineScopedViewModel(application) {
+class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point, urlClickListener: UrlClickListener?) : CoroutineScopedViewModel(application) {
     val dao = AppDatabase.getInstance(application).feedItemDao()
 
     val liveItem: LiveData<FeedItemWithFeed> = dao.loadLiveFeedItem(id)
@@ -33,7 +35,7 @@ class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point)
                 if (liveImageText.value == null) {
                     // Only set no image version if value is null (e.g. no load has been done yet)
                     // This avoid flickering when syncs happen
-                    liveImageText.value = toSpannedWithNoImages(application, it.description, it.feedUrl, maxImageSize).also {
+                    liveImageText.value = toSpannedWithNoImages(application, it.description, it.feedUrl, maxImageSize, urlClickListener = urlClickListener).also {
                         if (it.getAllImageSpans().isEmpty()) {
                             // If no images in the text, then we are done for now
                             currentHash = updatedHash
@@ -46,7 +48,7 @@ class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point)
                     currentHash = updatedHash
                     launch(Dispatchers.Default) {
                         val allowDownload = PrefUtils.shouldLoadImages(application)
-                        val spanned = toSpannedWithImages(application, it.description, it.feedUrl, maxImageSize, allowDownload)
+                        val spanned = toSpannedWithImages(application, it.description, it.feedUrl, maxImageSize, allowDownload, urlClickListener = urlClickListener)
                         liveImageText.postValue(spanned)
                     }
                 }
@@ -57,15 +59,16 @@ class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point)
 
 class FeedItemViewModelFactory(private val application: Application,
                                private val id: Long,
-                               private val maxImageSize: Point) : ViewModelProvider.NewInstanceFactory() {
+                               private val maxImageSize: Point,
+                               private val urlClickListener: UrlClickListener?) : ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return FeedItemViewModel(application = application, id = id, maxImageSize = maxImageSize) as T
+        return FeedItemViewModel(application = application, id = id, maxImageSize = maxImageSize, urlClickListener = urlClickListener) as T
     }
 }
 
 fun Fragment.getFeedItemViewModel(id: Long): FeedItemViewModel {
-    val factory = FeedItemViewModelFactory(activity!!.application, id, activity!!.maxImageSize())
+    val factory = FeedItemViewModelFactory(activity!!.application, id, activity!!.maxImageSize(), urlClickListener = urlClickListener())
     return ViewModelProviders.of(this, factory).get(FeedItemViewModel::class.java)
 }
 

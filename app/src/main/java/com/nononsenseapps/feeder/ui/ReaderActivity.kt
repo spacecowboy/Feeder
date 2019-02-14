@@ -103,7 +103,7 @@ class ReaderActivity : BaseActivity() {
             intent.putExtra(ARG_IMAGEURL, rssItem.imageUrl)
             intent.putExtra(ARG_DATE, rssItem.pubDateString)
             intent.putExtra(ARG_AUTHOR, rssItem.author)
-            intent.putExtra(ARG_FEEDTITLE, rssItem.feedDisplayTitle)
+            intent.putExtra(ARG_FEED_TITLE, rssItem.feedDisplayTitle)
             intent.putExtra(ARG_FEED_URL, rssItem.feedUrl.toString())
         }
 
@@ -116,7 +116,7 @@ class ReaderActivity : BaseActivity() {
             intent.putExtra(ARG_IMAGEURL, rssItem.imageUrl)
             intent.putExtra(ARG_DATE, rssItem.pubDateString)
             intent.putExtra(ARG_AUTHOR, rssItem.author)
-            intent.putExtra(ARG_FEEDTITLE, rssItem.feedDisplayTitle)
+            intent.putExtra(ARG_FEED_TITLE, rssItem.feedDisplayTitle)
             intent.putExtra(ARG_FEED_URL, rssItem.feedUrl.toString())
         }
     }

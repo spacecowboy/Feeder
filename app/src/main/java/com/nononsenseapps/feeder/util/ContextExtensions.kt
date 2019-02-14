@@ -7,9 +7,9 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
-import androidx.core.app.NotificationManagerCompat
 import android.util.Log
 import android.widget.Toast
+import androidx.core.app.NotificationManagerCompat
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.ui.ARG_FEED_TITLE
@@ -27,10 +27,11 @@ val Context.notificationManager: NotificationManagerCompat
  * Ensures that a maximum number of shortcuts is available at any time with the last used being bumped out of the list
  * first.
  */
-fun Context.addDynamicShortcutToFeed(label: String, id: Any, icon: Icon? = null) {
+fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null) {
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             val shortcutManager = getSystemService(ShortcutManager::class.java)
+
             val intent = Intent(this, FeedActivity::class.java)
             intent.action = Intent.ACTION_VIEW
             intent.data = Uri.withAppendedPath(URI_FEEDS, "$id")
@@ -43,7 +44,8 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Any, icon: Icon? = null)
             val shortcut: ShortcutInfo = ShortcutInfo.Builder(this, "$id")
                     .setShortLabel(label)
                     .setLongLabel(label)
-                    .setIcon(icon ?: Icon.createWithBitmap(getLetterIcon(label, id, radius = shortcutManager.iconMaxHeight)))
+                    .setIcon(icon
+                            ?: Icon.createWithBitmap(getLetterIcon(label, id, radius = shortcutManager.iconMaxHeight)))
                     .setIntent(intent)
                     .setDisabledMessage("Feed deleted")
                     .setRank(0)
@@ -97,7 +99,8 @@ fun Context.removeDynamicShortcutToFeed(id: Any) {
     }
 }
 
-@Volatile private var _feedParserInitialized = false
+@Volatile
+private var _feedParserInitialized = false
 
 /**
  * Returns the FeedParser singleton with a cache directory set.

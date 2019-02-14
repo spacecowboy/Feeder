@@ -115,6 +115,8 @@ dependencies {
   implementation "androidx.appcompat:appcompat:$appcompat_version"
   implementation "androidx.preference:preference:$preference_version"
   implementation "com.google.android.material:material:$material_version"
+  implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+  implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
   // ViewModel and LiveData
   implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
@@ -151,7 +153,7 @@ dependencies {
   testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
   testImplementation "junit:junit:4.12"
   testImplementation "org.mockito:mockito-core:2.13.0"
-  testImplementation "io.mockk:mockk:1.8.10.kotlin13"
+  testImplementation "io.mockk:mockk:$mockk_version"
   testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
 
 

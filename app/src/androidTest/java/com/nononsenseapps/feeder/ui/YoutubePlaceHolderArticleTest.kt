@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.ui
 
 import android.content.Context
-import android.content.Intent
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -28,7 +27,7 @@ import java.net.URL
 @LargeTest
 class YoutubePlaceHolderArticleTest {
     @get:Rule
-    var activityRule: ActivityTestRule<ReaderActivity> = ActivityTestRule(ReaderActivity::class.java, false, false)
+    var activityRule: ActivityTestRule<FeedActivity> = ActivityTestRule(FeedActivity::class.java, false, false)
 
     @get:Rule
     val testDb = TestDatabaseRule(getApplicationContext())
@@ -50,9 +49,7 @@ class YoutubePlaceHolderArticleTest {
             """.trimIndent()
         }
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchReader(itemId)
 
         onView(withId(R.id.story_body))
                 .check(matches(withText(containsString(getApplicationContext<Context>()
@@ -69,9 +66,7 @@ class YoutubePlaceHolderArticleTest {
             """.trimIndent()
         }
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchReader(itemId)
 
         onView(withId(R.id.story_body))
                 .check(matches(withText(not(containsString(getApplicationContext<Context>()
