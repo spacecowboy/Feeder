@@ -18,8 +18,8 @@ val MAX_AGE_PATTERN = """max-age=(\d+)""".toRegex()
 fun cachingHttpClient(cacheDirectory: File? = null,
                       cacheSize: Long = 10L * 1024L * 1024L,
                       trustAllCerts: Boolean = true,
-                      connectTimeoutSecs: Long = 5L,
-                      readTimeoutSecs: Long = 5L): OkHttpClient {
+                      connectTimeoutSecs: Long = 30L,
+                      readTimeoutSecs: Long = 30L): OkHttpClient {
     val builder: OkHttpClient.Builder = OkHttpClient.Builder()
 
     if (cacheDirectory != null) {
