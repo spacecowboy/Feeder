@@ -66,6 +66,11 @@ class FeedItemsViewModel(application: Application, val feedId: Long, val tag: St
         cancelNotification(getApplication(), feedItem.id)
     }
 
+    fun markAsRead(itemId: Long) = launch(Dispatchers.Default) {
+        dao.markAsRead(itemId)
+        cancelNotification(getApplication(), itemId)
+    }
+
     /**
      * Already called within a coroutine scope, do not launch another to keep ordering guarantees
      */
