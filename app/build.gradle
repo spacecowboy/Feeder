@@ -49,17 +49,6 @@ android {
     androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
   }
 
-  flavorDimensions "store"
-  productFlavors {
-    fdroid {
-      dimension "store"
-    }
-    play {
-      dimension "store"
-      applicationIdSuffix ".play"
-    }
-  }
-
   if (project.hasProperty('STORE_FILE')) {
     signingConfigs {
       release {
@@ -78,6 +67,14 @@ android {
       pseudoLocalesEnabled true
     }
     release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      if (project.hasProperty('STORE_FILE')) {
+        signingConfig signingConfigs.release
+      }
+    }
+    play {
+      applicationIdSuffix ".play"
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       if (project.hasProperty('STORE_FILE')) {
