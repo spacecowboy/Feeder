@@ -92,5 +92,7 @@
   <string name="send_bug_report">Send bug report</string>
   <string name="no_email_client">Could not open email client</string>
   <string name="touch_to_play_video">Touch to play video</string>
+  <string name="ui">UI</string>
+  <string name="mark_as_read_when_scrolling">Mark as read when scrolling</string>
 
 </resources>

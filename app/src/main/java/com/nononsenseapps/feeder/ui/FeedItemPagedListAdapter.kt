@@ -101,4 +101,8 @@ class FeedItemPagedListAdapter(private val context: Context, private val actionC
         }
     }
 
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        actionCallback.onScrolledOffScreen(holder.itemId)
+        super.onViewDetachedFromWindow(holder)
+    }
 }
