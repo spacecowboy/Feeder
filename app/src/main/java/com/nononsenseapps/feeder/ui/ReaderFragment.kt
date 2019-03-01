@@ -47,7 +47,7 @@ const val ARG_DATE = "date"
 
 class ReaderFragment : CoroutineScopedFragment() {
 
-    private val dateTimeFormat = DateTimeFormat.mediumDate().withLocale(Locale.getDefault())
+    private val dateTimeFormat = DateTimeFormat.forStyle("FM").withLocale(Locale.getDefault())
 
     private var _id: Long = ID_UNSET
     // All content contained in RssItem

@@ -1,3 +1,9 @@
+# 1.8.9
+*   Increased http timeouts to 30 seconds from 5 seconds
+    See !175
+*   Changed so time of publication (and not just date) is shown in Article
+    See !174 #61
+
 # 1.8.8
 *   Changed plaintext conversion to stop formatting as markdown
     See !172

@@ -393,6 +393,38 @@ class RssLocalSyncKtTest {
         }
     }
 
+    @Test
+    fun slowResponseShouldBeOk() {
+        val url = server.url("/atom.xml").url()
+        val cowboyAtomId = insertFeed("cowboy", url, cowboyAtom, isJson = false)
+        responses[url]!!.throttleBody(1024 * 100, 29, TimeUnit.SECONDS)
+
+        runBlocking {
+            syncFeeds(db = testDb.db, feedParser = feedParser, feedId = cowboyAtomId)
+        }
+
+        assertEquals(
+                "Feed should have been parsed from slow response",
+                15,
+                testDb.db.feedItemDao().loadFeedItemsInFeed(cowboyAtomId).size)
+    }
+
+    @Test
+    fun verySlowResponseShouldBeCancelled() {
+        val url = server.url("/atom.xml").url()
+        val cowboyAtomId = insertFeed("cowboy", url, cowboyAtom, isJson = false)
+        responses[url]!!.throttleBody(1024 * 100, 31, TimeUnit.SECONDS)
+
+        runBlocking {
+            syncFeeds(db = testDb.db, feedParser = feedParser, feedId = cowboyAtomId)
+        }
+
+        assertEquals(
+                "Feed should not have been parsed from extremely slow response",
+                0,
+                testDb.db.feedItemDao().loadFeedItemsInFeed(cowboyAtomId).size)
+    }
+
     val nixosRss: InputStream
         get() = javaClass.getResourceAsStream("rss_nixos.xml")!!
 
