@@ -11,6 +11,7 @@
   <string name="add_feed_search_hint">订阅 URL</string>
   <string name="title">标题</string>
 
+  <string name="by_author_on_date">%1$s, %2$s</string>
   <string name="on_date">%1$s</string>
   <string name="save">保存</string>
   <string name="empty_feed_top">没用可阅读的内容。您是否想要…</string>
@@ -90,5 +91,7 @@
   <string name="send_bug_report">发送错误报告</string>
   <string name="no_email_client">无法打开电子邮件客户端</string>
   <string name="touch_to_play_video">轻触播放视频</string>
+  <string name="ui">用户界面</string>
+  <string name="mark_as_read_when_scrolling">滚动时标记为已读</string>
 
 </resources>
