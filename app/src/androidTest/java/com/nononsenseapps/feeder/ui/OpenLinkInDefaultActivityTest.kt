@@ -7,7 +7,7 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.uiautomator.UiDevice
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
-import com.nononsenseapps.feeder.model.getOpenInBrowserIntent
+import com.nononsenseapps.feeder.model.getOpenInDefaultActivityIntent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -21,9 +21,9 @@ import kotlin.test.assertEquals
 
 
 @RunWith(AndroidJUnit4::class)
-class OpenInWebBrowserActivityTest {
+class OpenLinkInDefaultActivityTest {
     @get:Rule
-    val activityTestRule = ActivityTestRule(OpenInWebBrowserActivity::class.java, false, false)
+    val activityTestRule = ActivityTestRule(OpenLinkInDefaultActivity::class.java, false, false)
 
     @get:Rule
     val testDb = TestDatabaseRule(getApplicationContext())
@@ -74,7 +74,7 @@ class OpenInWebBrowserActivityTest {
 
     @Test
     fun faultyLinkDoesntCrash() {
-        activityTestRule.launchActivity(getOpenInBrowserIntent(getApplicationContext(),
+        activityTestRule.launchActivity(getOpenInDefaultActivityIntent(getApplicationContext(),
                 feedItemId = -252,
                 link = "bob"))
 
@@ -90,9 +90,29 @@ class OpenInWebBrowserActivityTest {
 
     @Test
     fun withIntentItemIsMarkedAsReadAndNotified() {
-        activityTestRule.launchActivity(getOpenInBrowserIntent(getApplicationContext(),
+        activityTestRule.launchActivity(getOpenInDefaultActivityIntent(getApplicationContext(),
                 feedItemId = feedItem.id,
                 link = feedItem.link!!))
+
+        val expected = feedItem.copy(
+                unread = false,
+                notified = true
+        )
+
+        runBlocking {
+            val item = withContext(Dispatchers.Default) {
+                untilEq(expected) {
+                    testDb.db.feedItemDao().loadFeedItem(feedItem.id)
+                }
+            }
+            assertEquals(expected, item)
+        }
+    }
+
+    @Test
+    fun noLinkButItemIsMarkedAsReadAndNotified() {
+        activityTestRule.launchActivity(getOpenInDefaultActivityIntent(getApplicationContext(),
+                feedItemId = feedItem.id))
 
         val expected = feedItem.copy(
                 unread = false,

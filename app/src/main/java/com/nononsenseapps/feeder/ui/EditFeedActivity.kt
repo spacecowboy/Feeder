@@ -5,21 +5,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedActivity
 import com.nononsenseapps.feeder.db.URI_FEEDS
@@ -32,11 +21,7 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.net.URL
 
 const val TEMPLATE = "template"
@@ -117,6 +102,7 @@ class EditFeedActivity : CoroutineScopedActivity() {
 
                     searchJob = searchForFeeds(url)
                 } catch (exc: Exception) {
+                    exc.printStackTrace()
                     Toast.makeText(this@EditFeedActivity,
                             R.string.could_not_load_url,
                             Toast.LENGTH_SHORT).show()
@@ -355,12 +341,14 @@ class EditFeedActivity : CoroutineScopedActivity() {
     }
 
     private fun searchForFeeds(url: URL): Job = launch(Dispatchers.Default) {
+        withContext(Dispatchers.Main) {
+            resultAdapter.data = emptyList()
+        }
         val results = mutableListOf<Feed>()
-        val alts = feedParser.getAlternateFeedLinksAtUrl(url)
-        when (alts.isNotEmpty()) {
-            true -> alts.map { sloppyLinkToStrictURL(it.first) }
-            false -> listOf(url)
-        }.map {
+        val possibleFeeds = feedParser.getAlternateFeedLinksAtUrl(url).map {
+            sloppyLinkToStrictURL(it.first)
+        } + url
+        possibleFeeds.map {
             launch {
                 try {
                     feedParser.parseFeedUrl(it)?.let { feed ->
@@ -375,11 +363,7 @@ class EditFeedActivity : CoroutineScopedActivity() {
                         }
                     }
                 } catch (e: Throwable) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@EditFeedActivity,
-                                R.string.could_not_load_url,
-                                Toast.LENGTH_SHORT).show()
-                    }
+                    e.printStackTrace()
                 }
             }
         }.toList().joinAll()

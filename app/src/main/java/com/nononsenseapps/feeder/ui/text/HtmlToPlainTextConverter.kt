@@ -1,12 +1,10 @@
 package com.nononsenseapps.feeder.ui.text
 
+import android.util.Log
+import androidx.core.text.BidiFormatter
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
-import org.xml.sax.Attributes
-import org.xml.sax.ContentHandler
-import org.xml.sax.InputSource
-import org.xml.sax.Locator
-import org.xml.sax.SAXException
+import org.xml.sax.*
 import java.io.IOException
 import java.io.StringReader
 import java.util.*
@@ -21,6 +19,7 @@ class HtmlToPlainTextConverter : ContentHandler {
     private val listings = Stack<HtmlToSpannedConverter.Listing>()
     private var ignoreCount = 0
     private val ignoredTags = listOf("style", "script")
+    private var lastImageAlt: String? = null
 
     private val isOrderedList: Boolean
         get() = !listings.isEmpty() && listings.peek().ordered
@@ -67,7 +66,12 @@ class HtmlToPlainTextConverter : ContentHandler {
 
     @Throws(SAXException::class)
     override fun endDocument() {
-
+        // See test mentioning XKCD
+        if (builder?.isEmpty() == true) {
+            lastImageAlt?.let {
+                builder?.append("[$lastImageAlt]")
+            }
+        }
     }
 
     @Throws(SAXException::class)
@@ -113,16 +117,10 @@ class HtmlToPlainTextConverter : ContentHandler {
     }
 
     private fun startImg(text: StringBuilder?, attributes: Attributes) {
-        var alt: String? = attributes.getValue("", "alt")
-
-        if (alt == null || alt.isEmpty()) {
-            alt = "IMG"
-        }
-
         // Ensure whitespace
         ensureSpace(text)
 
-        text!!.append("[").append(alt).append("]").append(" ")
+        lastImageAlt = attributes.getValue("", "alt").orEmpty().ifBlank { "IMG" }
     }
 
     private fun startOl(text: StringBuilder?) {
@@ -206,13 +204,9 @@ class HtmlToPlainTextConverter : ContentHandler {
         }
     }
 
-    private fun emphasize(builder: StringBuilder?) {
-        builder!!.append("*")
-    }
+    private fun emphasize(builder: StringBuilder?) {}
 
-    private fun strong(builder: StringBuilder?) {
-        builder!!.append("**")
-    }
+    private fun strong(builder: StringBuilder?) {}
 
     private fun ensureSpace(text: StringBuilder?) {
         val len = text!!.length
@@ -294,4 +288,9 @@ fun repeated(string: String, count: Int): String {
     }
 
     return sb.toString()
+}
+
+fun unicodeWrap(cs: CharSequence): CharSequence {
+    Log.d("JONAS", "Wrapping [$cs]")
+    return BidiFormatter.getInstance().unicodeWrap(cs)
 }

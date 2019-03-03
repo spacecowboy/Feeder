@@ -74,6 +74,18 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
+    fun successfullyParsesAlternateLinkInBodyOfDocument() {
+        javaClass.getResourceAsStream("nixos.html")!!
+                .bufferedReader()
+                .use {
+                    val alts: List<Pair<String, String>> = FeedParser.getAlternateFeedLinksInHtml(it.readText(),
+                            URL("https://nixos.org"))
+                    assertEquals(listOf("https://nixos.org/news-rss.xml" to "application/rss+xml"), alts)
+                }
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun getAlternateFeedLinksResolvesRelativeLinksGivenBaseUrl() {
         javaClass.getResourceAsStream("fz.html")!!
                 .bufferedReader()
@@ -97,9 +109,9 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
-    fun findsAlternateLinksReturnsNullForFeedsWithAlternateLinks() {
+    fun findsAlternateLinksReturnsAlternatesForFeedsWithAlternateLinks() {
         val rssLink = FeedParser.findFeedUrl(atomWithAlternateLinks)
-        assertNull(rssLink)
+        assertEquals(URL("http://localhost:1313/feed.json"), rssLink)
     }
 
     @Test
@@ -256,6 +268,41 @@ class FeedParserTest {
 
     @Test
     @Throws(Exception::class)
+    fun nixos() {
+        val feed = FeedParser.parseFeedInputStream(URL("http://nixos.org/news-rss.xml"), nixosRss)
+        assertNotNull(feed)
+
+        assertNull(feed.feed_url)
+
+        assertEquals(99, feed.items!!.size)
+
+        val (_, _, _, title, _, _, _, image) = feed.items!![0]
+
+        assertEquals("https://nixos.org/logo/nixos-logo-18.09-jellyfish-lores.png", image)
+        assertEquals("NixOS 18.09 released", title)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun nixers() {
+        val feed = FeedParser.parseFeedInputStream(URL("https://newsletter.nixers.net/feed.xml"),
+                nixersRss)
+        assertNotNull(feed)
+
+        assertNull(feed.feed_url)
+
+        assertEquals(111, feed.items!!.size)
+
+        val item = feed.items!![0]
+
+        // Timezone issues - so only verify date
+        assertTrue(message = "Expected a pubdate to have been parsed") {
+            item.date_published!!.startsWith("2019-01-25")
+        }
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun cyklist() {
         val feed = FeedParser.parseFeedInputStream(URL("http://www.cyklistbloggen.se/feed/"), cyklistBloggen)
         assertNotNull(feed)
@@ -272,7 +319,7 @@ class FeedParserTest {
                 title)
 
         // Make sure character 160 (non-breaking space) is trimmed
-        assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: [IMG] I smalaste passagen är g",
+        assertEquals("För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: I smalaste passagen är gångdel",
                 summary)
     }
 
@@ -294,12 +341,12 @@ class FeedParserTest {
         // Snippet should not contain images
         entry = feed.items!![4]
         assertEquals("Fixing the up button in Python shell history", entry.title)
-        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library. [Python shell where up",
+        assertEquals("In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library. Ipython is more descri",
                 entry.summary)
         // Snippet should not contain links
         entry = feed.items!![1]
         assertEquals("Compress all the images!", entry.title)
-        assertEquals("*Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS)* One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to be",
+        assertEquals("Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS) One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to be d",
                 entry.summary)
     }
 
@@ -515,6 +562,12 @@ class FeedParserTest {
 
     private val anon: InputStream
         get() = javaClass.getResourceAsStream("rss_anon.xml")!!
+
+    private val nixosRss: InputStream
+        get() = javaClass.getResourceAsStream("rss_nixos.xml")!!
+
+    private val nixersRss: InputStream
+        get() = javaClass.getResourceAsStream("rss_nixers_newsletter.xml")!!
 }
 
 val atomRelative = """

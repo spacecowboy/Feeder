@@ -18,7 +18,7 @@ import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import java.util.*
 
-class FeedItemPagedListAdapter(context: Context, private val actionCallback: ActionCallback) :
+class FeedItemPagedListAdapter(private val context: Context, private val actionCallback: ActionCallback) :
         PagedListAdapter<PreviewItem, RecyclerView.ViewHolder>(PreviewItemDiffer) {
 
     private val shortDateTimeFormat: DateTimeFormatter =
@@ -60,14 +60,15 @@ class FeedItemPagedListAdapter(context: Context, private val actionCallback: Act
             return
         }
 
-        // Set the title first
-        val titleText = SpannableStringBuilder(item.feedDisplayTitle)
+        // Set the title first - must be wrapped in unicode marks so it displays correctly
+        // with RTL
+        val titleText = SpannableStringBuilder(context.unicodeWrap(item.feedDisplayTitle))
         // If no body, display domain of link to be opened
         if (holder.rssItem!!.plainSnippet.isEmpty()) {
             if (holder.rssItem!!.enclosureLink != null && holder.rssItem!!.enclosureFilename != null) {
-                titleText.append(" \u2014 ${holder.rssItem!!.enclosureFilename}")
+                titleText.append(context.unicodeWrap(" \u2014 ${holder.rssItem!!.enclosureFilename}"))
             } else if (holder.rssItem?.domain != null) {
-                titleText.append(" \u2014 ${holder.rssItem!!.domain}")
+                titleText.append(context.unicodeWrap(" \u2014 ${holder.rssItem!!.domain}"))
             }
 
             if (titleText.length > item.feedDisplayTitle.length) {
@@ -100,4 +101,8 @@ class FeedItemPagedListAdapter(context: Context, private val actionCallback: Act
         }
     }
 
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        actionCallback.onScrolledOffScreen(holder.itemId)
+        super.onViewDetachedFromWindow(holder)
+    }
 }

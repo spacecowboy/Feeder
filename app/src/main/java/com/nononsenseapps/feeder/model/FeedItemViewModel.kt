@@ -33,7 +33,7 @@ class FeedItemViewModel(application: Application, id: Long, maxImageSize: Point)
                 if (liveImageText.value == null) {
                     // Only set no image version if value is null (e.g. no load has been done yet)
                     // This avoid flickering when syncs happen
-                    liveImageText.value = toSpannedWithNoImages(application, it.description, it.feedUrl).also {
+                    liveImageText.value = toSpannedWithNoImages(application, it.description, it.feedUrl, maxImageSize).also {
                         if (it.getAllImageSpans().isEmpty()) {
                             // If no images in the text, then we are done for now
                             currentHash = updatedHash

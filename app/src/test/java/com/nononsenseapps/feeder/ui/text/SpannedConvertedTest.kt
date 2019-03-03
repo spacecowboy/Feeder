@@ -35,8 +35,8 @@ class SpannedConverterTest {
                 mockContext,
                 "<font>No color</font>",
                 URL("http://foo.com"),
-                builder
-        )
+                Point(100, 100),
+                builder)
 
         assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<TextAppearanceSpan>())
         assertEquals("No color", builder.toString())
@@ -50,8 +50,8 @@ class SpannedConverterTest {
                 mockContext,
                 "<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">",
                 URL("http://foo.com"),
-                builder
-        )
+                Point(100, 100),
+                builder)
 
         assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<ImageSpan>())
     }
@@ -80,8 +80,8 @@ class SpannedConverterTest {
                 mockContext,
                 "<p>foo</p><script>script</script><p>bar</p>",
                 URL("http://foo.bar"),
-                builder
-        )
+                Point(100, 100),
+                builder)
 
         assertEquals("foo\n\nbar\n\n", builder.toString())
     }
@@ -94,8 +94,8 @@ class SpannedConverterTest {
                 mockContext,
                 "<p>foo</p><style>style</style><p>bar</p>",
                 URL("http://foo.bar"),
-                builder
-        )
+                Point(100, 100),
+                builder)
 
         assertEquals("foo\n\nbar\n\n", builder.toString())
     }
@@ -119,8 +119,8 @@ class SpannedConverterTest {
                     </table>
                     """,
                 URL("http://foo.bar"),
-                builder
-        )
+                Point(100, 100),
+                builder)
 
         assertEquals("r1c1\nr1c2\nr2c1\nr2c2\n\n", builder.toString())
     }
@@ -142,14 +142,14 @@ class SpannedConverterTest {
                     <pre>$text</pre>
                     """,
                 URL("http://foo.bar"),
-                builder
-        )
+                Point(100, 100),
+                builder)
 
         assertEquals(text, builder.toString().trimEnd { it == '\n' })
     }
 }
 
-class FakeBuilder : SensibleSpannableStringBuilder() {
+private class FakeBuilder : SensibleSpannableStringBuilder() {
     private val builder: StringBuilder = StringBuilder()
     private val spans: ArrayList<Any?> = ArrayList()
 

@@ -17,19 +17,21 @@ import kotlinx.coroutines.launch
 
 /**
  * Proxy activity to mark item as read and notified in database as well as cancelling the
- * notification before opening it in the browser
+ * notification before performing a notification action such as opening in the browser.
+ *
+ * If link is null, then item is only marked as read and notified.
  */
-class OpenInWebBrowserActivity : CoroutineScopedActivity() {
+class OpenLinkInDefaultActivity : CoroutineScopedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         intent?.let { intent ->
             val id: Long = intent.data?.lastPathSegment?.toLong() ?: ID_UNSET
-            val link: String? = intent.getStringExtra(COL_LINK)
+            val link: String? = intent.data?.getQueryParameter(COL_LINK)
 
             launch(Dispatchers.Default) {
-                AppDatabase.getInstance(this@OpenInWebBrowserActivity).feedItemDao().markAsReadAndNotified(id)
-                cancelNotification(this@OpenInWebBrowserActivity, id)
+                AppDatabase.getInstance(this@OpenLinkInDefaultActivity).feedItemDao().markAsReadAndNotified(id)
+                cancelNotification(this@OpenLinkInDefaultActivity, id)
             }
 
             if (link != null) {
@@ -38,6 +40,7 @@ class OpenInWebBrowserActivity : CoroutineScopedActivity() {
                         intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
                     })
                 } catch (e: Throwable) {
+                    e.printStackTrace()
                     Toast.makeText(this, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
                     Log.e("FeederOpenInWebBrowser", "Failed to start browser", e)
                 }

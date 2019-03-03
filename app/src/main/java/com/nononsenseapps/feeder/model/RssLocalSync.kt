@@ -2,11 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.util.Log
-import com.nononsenseapps.feeder.db.room.AppDatabase
-import com.nononsenseapps.feeder.db.room.FeedItem
-import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.db.room.upsertFeed
-import com.nononsenseapps.feeder.db.room.upsertFeedItem
+import com.nononsenseapps.feeder.db.room.*
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
@@ -20,6 +16,7 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
 suspend fun syncFeeds(context: Context,
@@ -94,7 +91,6 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                              forceNetwork: Boolean = false) {
     try {
         val response: Response = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
-                ?: throw ResponseFailure("Timed out when fetching ${feedSql.url}")
 
         var responseHash = 0
 
@@ -120,13 +116,26 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
             db.feedDao().upsertFeed(feedSql)
         } else {
             val itemDao = db.feedItemDao()
-            feed.items?.asSequence()
-                    ?.filter { it.id != null }
-                    ?.forEach {
-                        val feedItemSql = itemDao.loadFeedItem(guid = it.id!!,
+            val idCount = feed.items?.map { it.id ?: 0 }?.toSet()?.size
+
+            val itemIds = when (idCount == feed.items?.size) {
+                true -> {
+                    feed.items?.map { it.id ?: "shouldnotbepossible" }
+                }
+                false -> {
+                    feed.items?.map {
+                        "${it.title}-${it.summary}"
+                    }
+                }
+            } ?: emptyList()
+
+            feed.items?.zip(itemIds)
+                    ?.reversed()
+                    ?.forEach { (item, id) ->
+                        val feedItemSql = itemDao.loadFeedItem(guid = id,
                                 feedId = feedSql.id) ?: FeedItem()
 
-                        feedItemSql.updateFromParsedEntry(it, feed)
+                        feedItemSql.updateFromParsedEntry(item.copy(id = id), feed)
                         feedItemSql.feedId = feedSql.id
 
                         itemDao.upsertFeedItem(feedItemSql)
@@ -141,7 +150,8 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
             db.feedDao().upsertFeed(feedSql)
 
             // Finally, prune database of old items
-            db.feedItemDao().cleanItemsInFeed(feedSql.id, maxFeedItemCount)
+            db.feedItemDao().cleanItemsInFeed(feedSql.id,
+                    max(maxFeedItemCount, feed.items?.size ?: 0))
         }
     } catch (e: ResponseFailure) {
         Log.e("CoroutineSync", "Failed to fetch ${feedSql.displayTitle}: ${e.message}")
@@ -150,13 +160,12 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
     }
 }
 
-private suspend fun fetchFeed(feedParser: FeedParser, feedSql: com.nononsenseapps.feeder.db.room.Feed,
-                              timeout: Long = 2L, timeUnit: TimeUnit = TimeUnit.SECONDS,
-                              forceNetwork: Boolean = false): Response? {
-    return withTimeoutOrNull(timeUnit.toMicros(timeout)) {
+private suspend fun fetchFeed(
+        feedParser: FeedParser,
+        feedSql: com.nononsenseapps.feeder.db.room.Feed,
+        forceNetwork: Boolean = false
+): Response =
         feedParser.getResponse(feedSql.url, forceNetwork = forceNetwork)
-    }
-}
 
 internal fun feedsToSync(db: AppDatabase, feedId: Long, tag: String, staleTime: Long = -1L): List<com.nononsenseapps.feeder.db.room.Feed> {
     return when {

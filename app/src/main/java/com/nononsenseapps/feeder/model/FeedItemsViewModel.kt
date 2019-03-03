@@ -2,12 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import android.app.Application
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedViewModel
@@ -69,6 +64,11 @@ class FeedItemsViewModel(application: Application, val feedId: Long, val tag: St
     fun toggleReadState(feedItem: PreviewItem) = launch(Dispatchers.Default) {
         dao.markAsRead(feedItem.id, unread = !feedItem.unread)
         cancelNotification(getApplication(), feedItem.id)
+    }
+
+    fun markAsRead(itemId: Long) = launch(Dispatchers.Default) {
+        dao.markAsRead(itemId)
+        cancelNotification(getApplication(), itemId)
     }
 
     /**

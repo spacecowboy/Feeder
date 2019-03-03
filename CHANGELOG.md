@@ -1,3 +1,57 @@
+# 1.8.9
+*   Increased http timeouts to 30 seconds from 5 seconds
+    See !175
+*   Changed so time of publication (and not just date) is shown in Article
+    See !174 #61
+
+# 1.8.8
+*   Changed plaintext conversion to stop formatting as markdown
+    See !172
+*   Fixed not being able to parse dates in certain feeds
+    See !170
+*   Fixed so feeds without publication dates gets some when synced
+    See !169 #178
+
+# 1.8.7
+*   Added support for RTL
+    Some devices might still not render perfectly though
+    See !165 #176
+*   Fixed youtube previews not showing
+    See !168
+*   Changed plaintext rendering to not include '[image alt text]' in text
+    See !167
+*   Changed so that notification actions do not open the app after pressing Back
+    See !166
+
+# 1.8.6
+*   Fixed notification "Open in"-actions not working
+    See !164
+
+# 1.8.5
+*   Fixed parsing of feeds without unique guids or links (NixOS)
+    See !162
+*   Changed so feed search finds alternate links in body of documents
+    See !162
+*   Fixed feed results not showing error message on *second* search
+    See !162
+*   Feeder can now be used to *open* links, not just accept *shared* ones
+    See !161 #174
+*   Fixed notifications so that all actions will mark item as read also
+    See !160
+*   Fixed app losing state if in reader and switching to another app and back again
+    See !159
+*   Fixed action bar overlaying web view
+    See !157 #173
+*   Fixed custom feed titles not being displayed
+    See !154 #168 #167
+*   Updated Simplified Chinese Translation
+    Thanks to linsui
+    See !153
+*   Fixed feeds with no link not working
+    See !150 #165
+*   Fixed some parsing errors on feeds with slash-comments
+    See #166
+
 # 1.8.4
 *   Fixed long blog title overlapping date
     See !149 #164

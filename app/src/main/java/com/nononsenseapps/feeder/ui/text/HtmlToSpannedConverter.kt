@@ -1,28 +1,22 @@
 package com.nononsenseapps.feeder.ui.text
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.Point
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.text.Layout
 import android.text.Spannable
 import android.text.Spanned
 import android.text.TextUtils
-import android.text.style.AlignmentSpan
-import android.text.style.BackgroundColorSpan
-import android.text.style.BulletSpan
-import android.text.style.ImageSpan
-import android.text.style.LeadingMarginSpan
-import android.text.style.ParagraphStyle
-import android.text.style.RelativeSizeSpan
-import android.text.style.StyleSpan
-import android.text.style.SubscriptSpan
-import android.text.style.SuperscriptSpan
-import android.text.style.TextAppearanceSpan
-import android.text.style.TypefaceSpan
-import android.text.style.UnderlineSpan
+import android.text.style.*
+import android.util.Log
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.appcompat.content.res.AppCompatResources
 import com.nononsenseapps.feeder.R
@@ -35,12 +29,7 @@ import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import org.ccil.cowan.tagsoup.Parser
-import org.xml.sax.Attributes
-import org.xml.sax.ContentHandler
-import org.xml.sax.InputSource
-import org.xml.sax.Locator
-import org.xml.sax.SAXException
-import org.xml.sax.XMLReader
+import org.xml.sax.*
 import java.io.IOException
 import java.io.StringReader
 import java.net.URL
@@ -53,15 +42,18 @@ open class HtmlToSpannedConverter(private var mSource: String,
                                   private var mSiteUrl: URL,
                                   parser: Parser,
                                   private val mContext: Context,
+                                  val maxSize: Point,
                                   private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()) : ContentHandler {
-    @ColorInt private var mAccentColor: Int = 0
+    @ColorInt
+    private var mAccentColor: Int = 0
     private var mQuoteGapWidth: Int = 0
     private var mQuoteStripeWidth: Int = 0
     private var ignoreCount = 0
     private var respectFormatting: Int = 0
     private var mReader: XMLReader = parser
     private var ignoredImage = false
-    @ColorInt private var codeTextBgColor: Int = 0
+    @ColorInt
+    private var codeTextBgColor: Int = 0
 
     private val ignoredTags = listOf("style", "script")
 
@@ -246,9 +238,21 @@ open class HtmlToSpannedConverter(private var mSource: String,
         text.setSpan(Href(href), len, len, Spannable.SPAN_MARK_MARK)
     }
 
+    protected open fun getImgDrawable(src: String): Drawable? =
+            if (src.isNotBlank()) {
+                AppCompatResources.getDrawable(mContext,
+                        when (PrefUtils.isNightMode(mContext)) {
+                            true -> R.drawable.placeholder_image_article_night
+                            false -> R.drawable.placeholder_image_article_day
+                        })?.also {
+                    it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+                }
+            } else {
+                null
+            }
+
     protected open fun startImg(text: SensibleSpannableStringBuilder,
                                 attributes: Attributes) {
-        // Override me
         val width: String? = attributes.getValue("", "width")
         val height: String? = attributes.getValue("", "height")
 
@@ -278,32 +282,41 @@ open class HtmlToSpannedConverter(private var mSource: String,
             return
         }
 
-        var src: String? = attributes.getValue("", "src")
+        attributes.getValue("", "src")?.let { src ->
+            if (src.isNotBlank()) {
+                src
+            } else {
+                null
+            }
+        }?.let { src ->
+            relativeLinkIntoAbsolute(mSiteUrl, src)
+        }?.let { imgLink ->
+            getImgDrawable(imgLink)?.let {
+                imgLink to it
+            }
+        }?.let { (imgLink, d) ->
+            ensureSingleNewline(text)
+            val len = text.length
+            text.append("\uFFFC")
 
-        val d = AppCompatResources.getDrawable(mContext,
-                when (PrefUtils.isNightMode(mContext)) {
-                    true -> R.drawable.placeholder_image_article_night
-                    false -> R.drawable.placeholder_image_article_day
-                })
-
-        d?.let { _ ->
-            d.setBounds(0, 0, d.intrinsicWidth, d.intrinsicHeight)
-        }
-
-        val len = text.length
-        text.append("\uFFFC")
-
-        if (src == null) {
-            src = ""
-        }
-        val imgLink = relativeLinkIntoAbsolute(mSiteUrl, src)
-
-        d?.let { _ ->
             text.setSpan(ImageSpan(d, imgLink), len, text.length,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            text.append("\n")
+
+            // If there's an alt text, add it in italics
+            val alt = attributes.getValue("", "alt")
+            if (alt?.isNotBlank() == true) {
+                val from = text.length
+                text.append(alt)
+                text.setSpan(StyleSpan(Typeface.ITALIC), from,
+                        text.length,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                text.append("\n")
+            }
         }
-        // Add a line break
-        text.append("\n")
+
+        ensureSingleNewline(text)
     }
 
     private fun startUl(text: SensibleSpannableStringBuilder,
@@ -361,9 +374,67 @@ open class HtmlToSpannedConverter(private var mSource: String,
         start(text, Code())
     }
 
+    protected open fun getYoutubeThumb(video: Video): Drawable =
+    // Full size youtube icon
+            AppCompatResources.getDrawable(mContext, R.drawable.youtube_icon)!!.also {
+                val scaled = scaleImage(it.intrinsicWidth, it.intrinsicHeight)
+                it.setBounds(0, 0, scaled.x, scaled.y)
+            }
+
+    /**
+     * Keeps aspect ratio.
+     *
+     * @param w current width of image
+     * @param h current height of image
+     * @return scaled (width, height) of image to fit the intended maxSize
+     */
+    protected fun scaleImage(w: Int, h: Int): Point {
+        // Which is out of scale the most?
+        val ratio = w.toFloat() / maxSize.x.toFloat()
+        // Calculate new size. Maintains aspect ratio.
+        val newWidth = (w.toFloat() / ratio).toInt()
+        val newHeight = (h.toFloat() / ratio).toInt()
+
+        return Point(newWidth, newHeight)
+    }
+
     protected open fun startIframe(text: SensibleSpannableStringBuilder,
                                    attributes: Attributes) {
-        // Override me
+        // Parse information
+        val video: Video? = getVideo(attributes.getValue("", "src"))
+
+        try {
+            // Only insert images if a video was found in the iframe
+            video?.let {
+                getYoutubeThumb(video)
+            }?.let {
+                val span = object : ClickableImageSpan(it) {
+                    override fun onClick() {
+                        val i = Intent(Intent.ACTION_VIEW,
+                                Uri.parse(video.link))
+                        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        try {
+                            mContext.startActivity(i)
+                        } catch (e: ActivityNotFoundException) {
+                            Toast.makeText(mContext, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                val len = text.length
+                text.append("\uFFFC")
+                text.setSpan(span, len, text.length,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                // Add newline also
+                text.append("\n")
+                val from = text.length
+                text.append(mContext.getString(R.string.touch_to_play_video))
+                text.setSpan(StyleSpan(Typeface.ITALIC), from,
+                        text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                text.append("\n\n")
+            }
+        } catch (e: Throwable) {
+            Log.e("HtmlToSpannedConverter", "Failed to start iFrame tag")
+        }
     }
 
     private fun startUnknownTag(tag: String, text: SensibleSpannableStringBuilder,

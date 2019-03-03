@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="pref_theme_value_default">@string/pref_theme_value_day</string>
-  <string name="pref_theme_value_system">system</string>
-  <string name="pref_theme_value_auto">auto</string>
-  <string name="pref_theme_value_day">day</string>
-  <string name="pref_theme_value_night">night</string>
+  <string name="app_name" translatable="false">Feeder</string>
+
+  <string name="pref_theme_value_default" translatable="false">@string/pref_theme_value_day</string>
+  <string name="pref_theme_value_system" translatable="false">system</string>
+  <string name="pref_theme_value_auto" translatable="false">auto</string>
+  <string name="pref_theme_value_day" translatable="false">day</string>
+  <string name="pref_theme_value_night" translatable="false">night</string>
 </resources>

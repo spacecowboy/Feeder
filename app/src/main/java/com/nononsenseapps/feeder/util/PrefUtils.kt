@@ -53,6 +53,8 @@ const val PREF_VAL_OPEN_WITH_READER = "0"
 const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
 const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 
+const val PREF_MARK_AS_READ_WHEN_SCROLLING = "pref_mark_as_read_when_scrolling"
+
 /**
  * Database settings
  */
@@ -83,6 +85,12 @@ object PrefUtils {
         }
         true
     }
+
+    fun shouldMarkAsReadWhenScrolling(context: Context): Boolean =
+            sp(context).getBoolean(PREF_MARK_AS_READ_WHEN_SCROLLING, true)
+
+    fun setMarkAsReadWhenScrolling(context: Context, value: Boolean) =
+            sp(context).edit().putBoolean(PREF_MARK_AS_READ_WHEN_SCROLLING, value).apply()
 
     fun shouldLoadImagesOnlyOnWIfi(context: Context): Boolean = sp(context).getBoolean(PREF_IMG_ONLY_WIFI, false)
 
