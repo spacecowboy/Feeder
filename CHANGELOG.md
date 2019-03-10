@@ -1,3 +1,9 @@
+# 1.8.10
+*   Update Simplified Chinese Translation
+    Thanks to linsui
+    See !179
+*   Added option to mark items as read as you scroll (defaults to true)
+
 # 1.8.9
 *   Increased http timeouts to 30 seconds from 5 seconds
     See !175
