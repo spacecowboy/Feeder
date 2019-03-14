@@ -1,64 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+  <ListPreference
+    android:defaultValue="@string/pref_theme_value_default"
+    android:entries="@array/pref_theme_options"
+    android:entryValues="@array/pref_theme_values"
+    android:key="pref_theme"
+    android:title="@string/theme" />
+
+  <PreferenceCategory
+      android:title="@string/synchronization">
+
     <ListPreference
-        android:defaultValue="@string/pref_theme_value_default"
-        android:entries="@array/pref_theme_options"
-        android:entryValues="@array/pref_theme_values"
-        android:key="pref_theme"
-        android:title="@string/theme" />
-
-    <PreferenceCategory android:title="@string/synchronization">
-
-        <ListPreference
             android:defaultValue="60"
-            android:entries="@array/pref_sync_frequency_titles"
-            android:entryValues="@array/pref_sync_frequency_values"
-            android:key="pref_sync_freq"
-            android:title="@string/check_for_updates" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="pref_sync_on_resume"
-            android:title="@string/on_startup" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="pref_sync_only_wifi"
-            android:title="@string/only_on_wifi" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="pref_sync_only_charging"
-            android:title="@string/only_when_charging" />
-        <ListPreference
-            android:defaultValue="100"
-            android:entries="@array/array_max_items_per_feed_options"
-            android:entryValues="@array/array_max_items_per_feed_options"
-            android:key="pref_max_item_count_per_feed"
-            android:title="@string/max_feed_items" />
-    </PreferenceCategory>
-    <PreferenceCategory android:title="@string/image_loading">
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="pref_img_only_wifi"
-            android:title="@string/only_on_wifi" />
-    </PreferenceCategory>
-    <PreferenceCategory android:title="@string/ui">
-
-        <ListPreference
-            android:defaultValue="0"
-            android:entries="@array/array_open_article_options"
-            android:entryValues="@array/array_open_article_values"
-            android:key="pref_default_open_item_with"
-            android:title="@string/open_item_by_default_with" />
-        <ListPreference
-            android:defaultValue="1"
-            android:entries="@array/array_open_links_options"
-            android:entryValues="@array/array_open_links_values"
-            android:key="pref_open_links_with"
-            android:title="@string/open_links_with" />
-    </PreferenceCategory>
+            android:title="@string/check_for_updates" android:entries="@array/pref_sync_frequency_titles"
+            android:entryValues="@array/pref_sync_frequency_values" android:key="pref_sync_freq"/>
     <SwitchPreference
-        android:defaultValue="true"
-        android:key="pref_mark_as_read_when_scrolling"
-        android:title="@string/mark_as_read_when_scrolling" />
+      android:defaultValue="false"
+      android:key="pref_sync_on_resume" android:title="@string/on_startup" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="pref_sync_only_wifi" android:title="@string/only_on_wifi"/>
+    <SwitchPreference
+        android:defaultValue="false"
+        android:title="@string/only_when_charging" android:key="pref_sync_only_charging"/>
+    <ListPreference
+      android:defaultValue="100"
+      android:entries="@array/array_max_items_per_feed_options"
+      android:entryValues="@array/array_max_items_per_feed_options"
+      android:key="pref_max_item_count_per_feed"
+      android:title="@string/max_feed_items" />
+  </PreferenceCategory>
+  <PreferenceCategory
+      android:title="@string/image_loading">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:title="@string/only_on_wifi" android:key="pref_img_only_wifi"/>
+  </PreferenceCategory>
+  <PreferenceCategory
+    android:title="@string/reader_settings" >
+
+    <ListPreference
+      android:defaultValue="0"
+      android:entries="@array/array_open_article_options"
+      android:entryValues="@array/array_open_article_values"
+      android:key="pref_default_open_item_with"
+      android:title="@string/open_item_by_default_with" />
+    <ListPreference
+      android:defaultValue="1"
+      android:entries="@array/array_open_links_options"
+      android:entryValues="@array/array_open_links_values"
+      android:key="pref_open_links_with"
+      android:title="@string/open_links_with" />
+  </PreferenceCategory>
 </PreferenceScreen>

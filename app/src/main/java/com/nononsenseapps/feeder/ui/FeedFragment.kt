@@ -6,7 +6,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
@@ -18,8 +23,23 @@ import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.*
-import com.nononsenseapps.feeder.util.*
+import com.nononsenseapps.feeder.model.FeedItemsViewModel
+import com.nononsenseapps.feeder.model.FeedViewModel
+import com.nononsenseapps.feeder.model.PreviewItem
+import com.nononsenseapps.feeder.model.SYNC_BROADCAST
+import com.nononsenseapps.feeder.model.SYNC_BROADCAST_IS_ACTIVE
+import com.nononsenseapps.feeder.model.cancelNotification
+import com.nononsenseapps.feeder.model.getFeedItemsViewModel
+import com.nononsenseapps.feeder.model.getFeedViewModel
+import com.nononsenseapps.feeder.model.requestFeedSync
+import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.TabletUtils
+import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
+import com.nononsenseapps.feeder.util.bundle
+import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
+import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
+import com.nononsenseapps.feeder.util.setLong
+import com.nononsenseapps.feeder.util.setString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -224,16 +244,6 @@ class FeedFragment : CoroutineScopedFragment() {
 
         // specify an adapter
         adapter = FeedItemPagedListAdapter(activity!!, object : ActionCallback {
-            override fun onScrolledOffScreen(itemId: Long) {
-                launch(Dispatchers.Main) {
-                    context?.let { context ->
-                        if (PrefUtils.shouldMarkAsReadWhenScrolling(context)) {
-                            feedItemsViewModel?.markAsRead(itemId)
-                        }
-                    }
-                }
-            }
-
             override fun coroutineScope(): CoroutineScope {
                 return this@FeedFragment
             }

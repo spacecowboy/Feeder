@@ -14,9 +14,14 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.model.PreviewItem
-import com.nononsenseapps.feeder.util.*
+import com.nononsenseapps.feeder.util.GlideUtils
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
+import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
+import com.nononsenseapps.feeder.util.openLinkInBrowser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -233,5 +238,4 @@ interface ActionCallback {
     fun onSwipeStarted()
     fun onSwipeCancelled()
     fun coroutineScope(): CoroutineScope
-    fun onScrolledOffScreen(itemId: Long)
 }
