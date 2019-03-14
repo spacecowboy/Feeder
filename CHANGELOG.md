@@ -1,3 +1,9 @@
+# 1.8.11
+
+Removed "mark as read when scrolling". It had a bug when toggling display of read items, and it was very "surprising" to some users.
+
+Will be back when bug free and off by default.
+
 # 1.8.10
 *   Update Simplified Chinese Translation
     Thanks to linsui
