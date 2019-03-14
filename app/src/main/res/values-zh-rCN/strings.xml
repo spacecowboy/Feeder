@@ -91,7 +91,5 @@
   <string name="send_bug_report">发送错误报告</string>
   <string name="no_email_client">无法打开电子邮件客户端</string>
   <string name="touch_to_play_video">轻触播放视频</string>
-  <string name="ui">用户界面</string>
-  <string name="mark_as_read_when_scrolling">滚动时标记为已读</string>
 
 </resources>
