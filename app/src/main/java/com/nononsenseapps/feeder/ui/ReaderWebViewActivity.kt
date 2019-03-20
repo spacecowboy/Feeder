@@ -1,33 +1,37 @@
 package com.nononsenseapps.feeder.ui
 
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
-import android.view.View
+import android.webkit.CookieManager
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.ShareActionProvider
+import androidx.core.view.MenuItemCompat
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.views.DrawShadowFrameLayout
+import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.openLinkInBrowser
 
-/**
- * Displays feed items suitable for consumption.
- */
+
+const val ARG_URL = "url"
+
 class ReaderWebViewActivity : BaseActivity() {
-    private var mFragment: ReaderWebViewFragment? = null
-    private var mDrawShadowFrameLayout: DrawShadowFrameLayout? = null
+    private var webView: WebView? = null
+    var url: String = ""
+    private var enclosureUrl: String? = null
+    private var shareActionProvider: ShareActionProvider? = null
+    private var isWebViewAvailable: Boolean = false
 
-    /**
-     * Initializes a fragment based on intent information
-     *
-     * @return ReaderFragment
-     */
-    private fun fragmentFromIntent(): ReaderWebViewFragment {
-        val i = intent
-        val fragment = ReaderWebViewFragment()
-        fragment.arguments = i.extras
-        return fragment
-    }
-
+    @SuppressLint("SetJavaScriptEnabled")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_reader)
+
+        setContentView(R.layout.activity_webview)
         initializeActionBar()
         val ab = supportActionBar
         if (ab != null) {
@@ -36,42 +40,113 @@ class ReaderWebViewActivity : BaseActivity() {
             ab.setDisplayShowTitleEnabled(false)
         }
 
-        mFragment = if (savedInstanceState == null) {
-            fragmentFromIntent().also {
-                supportFragmentManager.beginTransaction()
-                        .add(R.id.container, it, "webview").commit()
-            }
-        } else {
-            supportFragmentManager.findFragmentByTag("webview") as ReaderWebViewFragment?
+        webView = findViewById(R.id.webview)
+
+
+        CookieManager.getInstance().setAcceptCookie(false)
+        webView?.settings?.javaScriptEnabled = true
+        webView?.settings?.builtInZoomControls = true
+        webView?.webViewClient = WebViewClientHandler
+
+        // Arguments are set by activity after fragment has been created
+        intent.extras?.let { extras ->
+            url = extras.getString(ARG_URL, null) ?: ""
+            enclosureUrl = extras.getString(ARG_ENCLOSURE, null)
         }
 
-        mDrawShadowFrameLayout = findViewById(R.id.main_content)
-
+        if (url.isNotBlank()) {
+            isWebViewAvailable = true
+            webView?.loadUrl(url)
+        }
     }
 
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.webview, menu)
 
-        registerHideableHeaderView(findViewById<View>(R.id.headerbar))
+        if (menu != null) {
+            // Locate MenuItem with ShareActionProvider
+            val shareItem = menu.findItem(R.id.action_share)
+
+            // Fetch and store ShareActionProvider
+            shareActionProvider = MenuItemCompat.getActionProvider(shareItem) as ShareActionProvider
+
+            // Update share intent everytime a page is loaded
+            WebViewClientHandler.onPageStartedListener = { url: String? ->
+                if (url != null) {
+                    val shareIntent = Intent(Intent.ACTION_SEND)
+                    shareIntent.type = "text/plain"
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, url)
+                    shareActionProvider?.setShareIntent(shareIntent)
+                }
+            }
+            // Invoke it immediately with current url
+            WebViewClientHandler.onPageStartedListener?.invoke(url)
+
+            // Show/Hide enclosure
+            menu.findItem(R.id.action_open_enclosure).isVisible = enclosureUrl != null
+        }
+
+        return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        return if (id == android.R.id.home && mShouldFinishBack) {
-            super.onOptionsItemSelected(item)
-        } else super.onOptionsItemSelected(item)
-    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+            when (item.itemId) {
+                R.id.action_open_in_browser -> {
+                    // Use the currently visible page as the url
+                    val link = webView?.url ?: url
+                    openLinkInBrowser(this, link)
 
-    override fun onActionBarAutoShowOrHide(shown: Boolean) {
-        super.onActionBarAutoShowOrHide(shown)
-        mDrawShadowFrameLayout?.setShadowVisible(shown, shown)
-    }
+                    true
+                }
+                R.id.action_open_enclosure -> {
+                    enclosureUrl?.let { link ->
+                        openLinkInBrowser(this, link)
+                    }
+
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
+            }
 
     override fun onBackPressed() {
-        if (mFragment?.webView?.canGoBack() == true) {
-            mFragment?.webView?.goBack()
+        if (webView?.canGoBack() == true) {
+            webView?.goBack()
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onPause() {
+        webView?.onPause()
+        super.onPause()
+    }
+
+    override fun onResume() {
+        webView?.onResume()
+        super.onResume()
+    }
+
+    override fun onDestroy() {
+        webView?.destroy()
+        super.onDestroy()
+    }
+}
+
+private object WebViewClientHandler : WebViewClient() {
+    var onPageStartedListener: ((String?) -> Unit)? = null
+
+    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+        onPageStartedListener?.invoke(url)
+    }
+
+    @Suppress("OverridingDeprecatedMember")
+    override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+        // prevent links from loading in external web browser
+        return false
+    }
+
+    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+        // prevent links from loading in external web browser
+        return false
     }
 }
