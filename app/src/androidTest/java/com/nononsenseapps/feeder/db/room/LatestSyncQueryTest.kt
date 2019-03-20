@@ -61,7 +61,7 @@ class LatestSyncQueryTest {
         }
 
         verify(timeout = 500) {
-            observer.invoke(dt.toDateTime(DateTimeZone.UTC))
+            observer.invoke(dt)
         }
     }
 
