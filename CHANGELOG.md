@@ -1,3 +1,10 @@
+# 1.8.12
+*   Fixed webview being obscured by the action bar
+    See !182 #179 #173
+*   Added Spanish translation
+    Thanks to Khar Khamal
+    See !180
+
 # 1.8.11
 
 Removed "mark as read when scrolling". It had a bug when toggling display of read items, and it was very "surprising" to some users.
