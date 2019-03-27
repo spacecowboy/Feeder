@@ -252,6 +252,46 @@ class RomeExtensionsKtTest {
     }
 
     @Test
+    fun thumbnailFromHtmlFlaggedContentIsUnescaped() {
+        val description = mockSyndContent(
+                value = """
+                            <![CDATA[
+						<img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&amp;quality=85&amp;format=jpg&amp;resize=1600%2C836&amp;image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&amp;client=a1acac3e1b3290917d92&amp;signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
+				]]>
+                        """.trimIndent(),
+                type = "html")
+
+        val item = mockSyndEntry(uri = "id",
+                contents = listOf(description)
+        ).asItem(baseUrl)
+
+        assertEquals(
+                "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
+                item.image
+        )
+    }
+
+    @Test
+    fun thumbnailFromDescriptionIsUnescaped() {
+        val description = mockSyndContent(
+                value = """
+                            <![CDATA[
+						<img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&amp;quality=85&amp;format=jpg&amp;resize=1600%2C836&amp;image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&amp;client=a1acac3e1b3290917d92&amp;signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
+				]]>
+                        """.trimIndent(),
+                type = "html")
+
+        val item = mockSyndEntry(uri = "id",
+                description = description
+        ).asItem(baseUrl)
+
+        assertEquals(
+                "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
+                item.image
+        )
+    }
+
+    @Test
     fun publishedRFC3339Date() {
         // Need to convert it so timezone is correct for test
         val romeDate = DateTime.parse("2017-11-15T22:36:36+00:00").toDate()
