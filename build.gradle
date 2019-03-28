@@ -2,7 +2,7 @@
 
 buildscript {
   ext {
-    kotlin_version = '1.3.11'
+    kotlin_version = '1.3.21'
     gradle_build_version = "3.2.0"
     build_tools_version = "28.0.2"
 
@@ -12,7 +12,7 @@ buildscript {
     conscrypt_version = "1.4.1"
 
     androidx_version = "1.0.0"
-    work_version = '1.0.0-beta05'
+    work_version = '2.0.0'
     constraintlayout_version = "2.0.0-alpha3"
     recyclerview_version = "$androidx_version"
     legacy_support_version = "$androidx_version"
@@ -21,7 +21,7 @@ buildscript {
     preference_version = "$androidx_version"
     test_runner_version = "1.1.0"
     test_rules_version = "1.1.0"
-    paging_version = '2.0.0'
+    paging_version = '2.1.0'
     lifecycle_version = "2.0.0"
     room_version = "2.0.0"
 
