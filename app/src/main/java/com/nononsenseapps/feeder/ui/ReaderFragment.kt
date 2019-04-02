@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.TextView
 import androidx.appcompat.widget.ShareActionProvider
@@ -63,8 +62,6 @@ class ReaderFragment : CoroutineScopedFragment() {
             _id = arguments.getLong(ARG_ID, ID_UNSET)
         }
 
-        Log.d("JONAS", "Reader create id ${_id}")
-
         if (_id > ID_UNSET) {
             val itemId = _id
             val appContext = context?.applicationContext
@@ -80,15 +77,8 @@ class ReaderFragment : CoroutineScopedFragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        Log.d("JONAS", "Reader onResume ${rssItem?.title}. Blank? ${bodyTextView.text.isBlank()}")
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        Log.d("JONAS", "onCreateView")
         // Inflate the layout for this fragment
         val theLayout = if (TabletUtils.isTablet(activity)) {
             R.layout.fragment_reader_tablet
@@ -107,8 +97,6 @@ class ReaderFragment : CoroutineScopedFragment() {
         val viewModel = getFeedItemViewModel(_id)
         viewModel.liveItem.observe(this, androidx.lifecycle.Observer {
             rssItem = it
-
-            Log.d("JONAS", "Reader observer ${it.title}")
 
             rssItem?.let { rssItem ->
                 setViewTitle()
@@ -146,18 +134,6 @@ class ReaderFragment : CoroutineScopedFragment() {
         return rootView
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        Log.d("JONAS", "onActivityCreated")
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        Log.d("JONAS", "onStart")
-    }
-
     private fun setViewTitle() {
         rssItem?.let { rssItem ->
             if (rssItem.title.isEmpty()) {
@@ -169,7 +145,6 @@ class ReaderFragment : CoroutineScopedFragment() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        Log.d("JONAS", "Reader onSaveINstanceState")
         rssItem?.storeInBundle(outState)
         super.onSaveInstanceState(outState)
     }

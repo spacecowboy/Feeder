@@ -1,7 +1,5 @@
 package com.nononsenseapps.feeder.ui.text
 
-import android.util.Log
-import androidx.core.text.BidiFormatter
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
 import org.xml.sax.*
@@ -290,7 +288,3 @@ fun repeated(string: String, count: Int): String {
     return sb.toString()
 }
 
-fun unicodeWrap(cs: CharSequence): CharSequence {
-    Log.d("JONAS", "Wrapping [$cs]")
-    return BidiFormatter.getInstance().unicodeWrap(cs)
-}

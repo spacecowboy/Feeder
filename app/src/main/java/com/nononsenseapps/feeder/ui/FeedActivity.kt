@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.webkit.WebView
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -96,8 +95,6 @@ class FeedActivity : CoroutineScopedActivity() {
 
         // Navigation stuff
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            Log.d("JONAS", "PPEW ${destination.id}: ${destination.label}")
-
             // Drawer handling
             when (destination.id) {
                 R.id.feedFragment -> {

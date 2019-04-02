@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.*
 import android.widget.TextView
 import android.widget.Toast
@@ -106,7 +105,6 @@ class FeedFragment : CoroutineScopedFragment() {
 
         when {
             id == ID_UNSET && feedTag?.isNotEmpty() == true -> {
-                Log.d("JONAS", "Yup TAG")
                 title = feedTag
             }
             id == ID_UNSET -> {
@@ -117,7 +115,6 @@ class FeedFragment : CoroutineScopedFragment() {
                 title = getString(R.string.all_feeds)
             }
         }
-        Log.d("JONAS", "feedFragment create id $id")
 
         // Set this to equal title in case it's not a feed
         displayTitle = title ?: ""
@@ -135,7 +132,6 @@ class FeedFragment : CoroutineScopedFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        Log.d("JONAS", "feedFragment createView id $id")
         val rootView = inflater.inflate(R.layout.fragment_feed, container, false)
         recyclerView = rootView.findViewById<View>(android.R.id.list) as RecyclerView
 
@@ -235,7 +231,6 @@ class FeedFragment : CoroutineScopedFragment() {
             id > ID_UNSET -> { // Load feed if feed
                 feedViewModel = getFeedViewModel(id)
                 feedViewModel?.liveFeed?.observe(this, Observer {
-                    Log.d("JONAS", "Feed $displayTitle")
                     it?.let { feed ->
                         this.title = feed.title
                         this.customTitle = feed.customTitle
@@ -262,7 +257,6 @@ class FeedFragment : CoroutineScopedFragment() {
                 })
             }
             id == ID_UNSET -> { // Load notification settings for tag
-                Log.d("JONAS", "Tag $displayTitle")
                 (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
                 activity?.let { activity ->
@@ -279,7 +273,6 @@ class FeedFragment : CoroutineScopedFragment() {
                 }
             }
             else -> { // Load notification settings for all
-                Log.d("JONAS", "Else $displayTitle")
                 (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
                 activity?.let { activity ->
