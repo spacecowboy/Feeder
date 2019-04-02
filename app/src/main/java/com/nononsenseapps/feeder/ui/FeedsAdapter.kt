@@ -95,8 +95,7 @@ class FeedsAdapter(private val onClickListener: OnNavigationItemClickListener) :
     }
 
     /**
-     * @param tag
-     * @return true if tag is expanded after this call, false otherwise
+     * true if tag is expanded after this call, false otherwise
      */
     fun toggleExpansion(item: FeedUnreadCount): Boolean {
         val result = if (expandedTags.contains(item.tag)) {
