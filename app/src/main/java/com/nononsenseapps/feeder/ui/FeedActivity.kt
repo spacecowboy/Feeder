@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.webkit.WebView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
@@ -50,6 +51,11 @@ class FeedActivity : CoroutineScopedActivity() {
         // Write default setting if method has never been called before
         PreferenceManager.setDefaultValues(this, R.xml.settings, false)
 
+        // Bug in Android: WebView resets night mode setting
+        // See: https://stackoverflow.com/questions/54191883/android-bug-loading-wrong-colors-in-night-mode
+        WebView(this).also {
+            it.destroy()
+        }
         // Not persisted so set nightmode every time we start
         AppCompatDelegate.setDefaultNightMode(settingsViewModel.themePreference)
 

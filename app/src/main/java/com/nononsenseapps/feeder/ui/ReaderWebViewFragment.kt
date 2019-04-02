@@ -41,13 +41,8 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
     @SuppressLint("SetJavaScriptEnabled", "Recycle")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         webView?.destroy()
-        webView = WebView(context).also {
-            // Set the top padding to the size of the action bar since it overlays the content
-            context?.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))?.let { attributes ->
-                it.setPadding(top = attributes.getDimensionPixelSize(0, it.paddingTop))
-                attributes.recycle()
-            }
-        }
+        webView = WebView(context)
+
         // Important to create webview before setting cookie policy on Android18
         CookieManager.getInstance().setAcceptCookie(false)
         webView?.settings?.javaScriptEnabled = true
