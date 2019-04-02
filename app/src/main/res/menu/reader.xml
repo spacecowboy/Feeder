@@ -20,7 +20,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
-  tools:context=".ui.ReaderActivity">
+  tools:context=".ui.FeedActivity">
   <item
     android:id="@+id/action_open_enclosure"
     android:icon="@drawable/ic_play_circle_outline_white_24dp"

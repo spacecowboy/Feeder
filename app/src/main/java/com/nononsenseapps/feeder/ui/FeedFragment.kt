@@ -428,7 +428,6 @@ class FeedFragment : CoroutineScopedFragment() {
                 this.id.let { feedId ->
                     val i = Intent(activity, EditFeedActivity::class.java)
                     // TODO do not animate the back movement here
-                    i.putExtra(SHOULD_FINISH_BACK, true)
                     i.putExtra(ARG_ID, feedId)
                     i.putExtra(ARG_CUSTOMTITLE, customTitle)
                     i.putExtra(ARG_TITLE, title)
@@ -442,7 +441,6 @@ class FeedFragment : CoroutineScopedFragment() {
             id == R.id.action_add_templated && this.id > ID_UNSET -> {
                 val i = Intent(activity, EditFeedActivity::class.java)
                 // TODO do not animate the back movement here
-                i.putExtra(SHOULD_FINISH_BACK, true)
                 i.putExtra(TEMPLATE, true)
                 i.putExtra(ARG_FEED_TAG, feedTag)
                 i.data = Uri.parse(url)
