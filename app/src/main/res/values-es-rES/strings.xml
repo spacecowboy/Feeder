@@ -14,7 +14,7 @@
   <string name="by_author_on_date">%1$s, %2$s</string>
   <string name="on_date">%1$s</string>
   <string name="save">Guardar</string>
-  <string name="empty_feed_top">No hay nada para leer aqui. ¿le gustaría…</string>
+  <string name="empty_feed_top">No hay nada para leer aquí. ¿le gustaría…</string>
   <string name="empty_feed_open">
     <![CDATA[<font color="#607D8B">Abrir</font> otro canal?]]></string>
   <string name="empty_feed_add">
