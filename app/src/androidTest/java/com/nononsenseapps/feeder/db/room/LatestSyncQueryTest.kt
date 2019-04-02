@@ -45,12 +45,10 @@ class LatestSyncQueryTest {
 
     @Test
     fun latestSyncWorksIfFeed() {
-        val dt = DateTime.now(DateTimeZone.UTC)
-
         testDb.db.feedDao().insertFeed(Feed(
-                title = "foo",
-                url = URL("http://foo"),
-                lastSync = dt
+                title = "bar",
+                url = URL("http://bar"),
+                lastSync = DateTime(999, DateTimeZone.UTC)
         ))
 
         val observer: (t: DateTime?) -> Unit = mockk(relaxed = true)
@@ -60,8 +58,8 @@ class LatestSyncQueryTest {
             }
         }
 
-        verify(timeout = 500) {
-            observer.invoke(dt)
+        verify(timeout = 200) {
+            observer.invoke(DateTime(999, DateTimeZone.UTC))
         }
     }
 

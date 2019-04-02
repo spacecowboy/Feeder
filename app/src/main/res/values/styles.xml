@@ -1,186 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- File picker -->
-    <style name="FilePickerTheme" parent="NNF_BaseTheme">
-        <!-- Set these to match your theme -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
+  <!-- File picker -->
+  <style name="FilePickerTheme" parent="NNF_BaseTheme">
+    <!-- Set these to match your theme -->
+    <item name="colorPrimary">@color/primary</item>
+    <item name="colorPrimaryDark">@color/primary_dark</item>
+    <item name="colorAccent">@color/accent</item>
 
-        <!-- Setting a divider is entirely optional -->
-        <item name="nnf_list_item_divider">?android:attr/listDivider</item>
+    <!-- Setting a divider is entirely optional -->
+    <item name="nnf_list_item_divider">?android:attr/listDivider</item>
 
-        <!-- Need to set this also to style create folder dialog -->
-        <item name="alertDialogTheme">@style/FilePickerAlertDialogTheme</item>
-    </style>
-    <style name="FilePickerAlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-    </style>
-    <!-- Sub themes -->
-    <style name="DarkToolbarThemeOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <!--   theme UI controls like checkboxes and text fields -->
-        <item name="colorAccent">@color/accent</item>
-    </style>
-    <style name="NavbarTheme" parent="AppTheme" >
-        <!-- Background is green, so make touch feedback other color -->
-        <item name="colorAccent">@color/navdrawer_accent</item>
-    </style>
-    <style name="DialogTheme" parent="AppThemeDialog" >
-    </style>
-    <style name="FeedsTheme" parent="AppTheme" >
-    </style>
-    <style name="ReaderTheme" parent="AppTheme" >
-        <!--<item name="android:windowBackground">@android:color/black</item>-->
-    </style>
-    <style name="EditFeedTheme" parent="AppTheme" >
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="isFloatingWindow">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:windowSoftInputMode">stateAlwaysHidden</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
-        <item name="android:windowFrame">@null</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
-    </style>
-    <!-- Final application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="android:windowActionModeOverlay">true</item>
-        <item name="windowActionModeOverlay">true</item>
+    <!-- Need to set this also to style create folder dialog -->
+    <item name="alertDialogTheme">@style/FilePickerAlertDialogTheme</item>
+  </style>
 
-        <item name="itemSwipingBGColor">@color/swiping_item_color</item>
-        <item name="nightBGColor">@android:color/black</item>
+  <style name="FilePickerAlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <item name="colorPrimary">@color/primary</item>
+    <item name="colorPrimaryDark">@color/primary_dark</item>
+    <item name="colorAccent">@color/accent</item>
+  </style>
+  <!-- Sub themes -->
+  <style name="DarkToolbarThemeOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+    <item name="colorPrimary">@color/primary</item>
+    <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
+    <item name="colorPrimaryDark">@color/primary_dark</item>
+    <!--   theme UI controls like checkboxes and text fields -->
+    <item name="colorAccent">@color/accent</item>
+  </style>
 
-        <item name="colorPrimary">@color/primary</item>
-        <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <!--   theme UI controls like checkboxes and text fields -->
-        <item name="colorAccent">@color/accent</item>
+  <style name="NavbarTheme" parent="AppTheme">
+    <!-- Background is green, so make touch feedback other color -->
+    <item name="colorAccent">@color/navdrawer_accent</item>
+  </style>
 
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@color/window_background</item>
+  <style name="DialogTheme" parent="AppThemeDialog"></style>
 
-        <!-- Only needed for pre-L -->
-        <item name="android:editTextBackground">@drawable/edit_text</item>
-    </style>
+  <style name="FeedsTheme" parent="AppTheme"></style>
 
-    <style name="AppThemeDialog" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="colorPrimary">@color/primary</item>
-        <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <!--   theme UI controls like checkboxes and text fields -->
-        <item name="colorAccent">@color/accent</item>
+  <style name="ReaderTheme" parent="AppTheme">
+  </style>
 
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@color/window_background</item>
+  <style name="EditFeedTheme" parent="AppTheme">
+    <item name="android:windowActionBar">false</item>
+    <item name="android:windowNoTitle">true</item>
+    <item name="isFloatingWindow">true</item>
+    <item name="android:windowContentOverlay">@null</item>
+    <item name="android:windowIsFloating">false</item>
+    <item name="android:windowSoftInputMode">stateAlwaysHidden</item>
+    <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowCloseOnTouchOutside">true</item>
+    <item name="android:windowFrame">@null</item>
+    <item name="android:colorBackgroundCacheHint">@null</item>
+  </style>
+  <!-- Final application theme. -->
+  <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <item name="android:windowActionModeOverlay">true</item>
+    <item name="windowActionModeOverlay">true</item>
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
 
-        <!-- Only needed for pre-L -->
-        <item name="android:editTextBackground">@drawable/edit_text</item>
-    </style>
+    <item name="itemSwipingBGColor">@color/swiping_item_color</item>
+    <item name="nightBGColor">@android:color/black</item>
 
-    <declare-styleable name="DrawShadowFrameLayout">
-        <attr name="shadowDrawable" format="reference" />
-        <attr name="shadowVisible" format="boolean" />
-    </declare-styleable>
+    <item name="colorPrimary">@color/primary</item>
+    <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
+    <item name="colorPrimaryDark">@color/primary_dark</item>
+    <!--   theme UI controls like checkboxes and text fields -->
+    <item name="colorAccent">@color/accent</item>
 
-    <style name="TextAppearance"/>
-    <style name="TextAppearance.BigTitle">
-        <item name="android:textSize">24sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/title_text_color</item>
-    </style>
+    <item name="android:windowContentOverlay">@null</item>
+    <item name="android:windowBackground">@color/window_background</item>
 
-    <style name="TextAppearance.Title">
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/title_text_color</item>
-    </style>
+    <!-- Only needed for pre-L -->
+    <item name="android:editTextBackground">@drawable/edit_text</item>
+  </style>
 
-    <style name="TextAppearance.Body">
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/tertiary_text_color</item>
-    </style>
+  <style name="AppThemeDialog" parent="Theme.AppCompat.DayNight.Dialog">
+    <item name="colorPrimary">@color/primary</item>
+    <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
+    <item name="colorPrimaryDark">@color/primary_dark</item>
+    <!--   theme UI controls like checkboxes and text fields -->
+    <item name="colorAccent">@color/accent</item>
 
-    <style name="TextAppearance.Subhead"
-           parent="TextAppearance.Title">
-    </style>
+    <item name="android:windowContentOverlay">@null</item>
+    <item name="android:windowBackground">@color/window_background</item>
 
-    <style name="TextAppearance.EmptyView">
-        <item name="android:textColor">@color/title_text_read_color</item>
-        <item name="android:textSize">@dimen/emptyFeedsTextSize</item>
-        <item name="android:fontFamily">sans-serif-light</item>
-    </style>
+    <!-- Only needed for pre-L -->
+    <item name="android:editTextBackground">@drawable/edit_text</item>
+  </style>
 
-    <style name="TextAppearance.ListItem"/>
-    <style name="TextAppearance.ListItem.Author">
-        <item name="android:textSize">@dimen/listitem_author</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/tertiary_text_color</item>
-    </style>
-    <style name="TextAppearance.ListItem.Title">
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/title_text_color</item>
-    </style>
-    <style name="TextAppearance.ListItem.Title.Read">
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/title_text_read_color</item>
-    </style>
-    <style name="TextAppearance.ListItem.Body">
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textColor">@color/body_text_color</item>
-    </style>
+  <declare-styleable name="DrawShadowFrameLayout">
+    <attr name="shadowDrawable" format="reference" />
+    <attr name="shadowVisible" format="boolean" />
+  </declare-styleable>
 
-    <style name="TextAppearance.NewItems">
-        <item name="android:textColor">@color/title_text_color</item>
-        <item name="android:textSize">@dimen/listitem_body</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
+  <style name="TextAppearance" />
 
-    <style name="TextAppearance.Reader"/>
-    <style name="TextAppearance.Reader.Title">
-        <item name="android:textColor">@color/reader_title_color</item>
-        <item name="android:textSize">@dimen/reader_title</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
-    <style name="TextAppearance.Reader.Author">
-        <item name="android:textColor">@color/reader_author_color</item>
-        <item name="android:textSize">@dimen/reader_author</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
-    <style name="TextAppearance.Reader.Body">
-        <item name="android:textColor">@color/reader_body_color</item>
-        <item name="android:textSize">@dimen/reader_body</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
+  <style name="TextAppearance.BigTitle">
+    <item name="android:textSize">24sp</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:textColor">@color/title_text_color</item>
+  </style>
 
-    <style name="TextAppearance.InputField">
-        <item name="android:textColor">@color/title_text_color</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:paddingStart">0dp</item>
-        <item name="android:paddingEnd">0dp</item>
-        <item name="android:paddingBottom">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-    </style>
-    <style name="TextAppearance.FloatLabel" parent="android:TextAppearance.Small">
-        <item name="android:textColor">@color/accent</item>
-        <item name="android:textSize">11sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-    <style name="TextAppearance.ErrorLabel" parent="android:TextAppearance.Small">
-        <item name="android:textColor">@color/material_red_700</item>
-        <item name="android:textSize">11sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
+  <style name="TextAppearance.Title">
+    <item name="android:textSize">16sp</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:textColor">@color/title_text_color</item>
+  </style>
+
+  <style name="TextAppearance.Body">
+    <item name="android:textSize">14sp</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:textColor">@color/tertiary_text_color</item>
+  </style>
+
+  <style name="TextAppearance.Subhead" parent="TextAppearance.Title"></style>
+
+  <style name="TextAppearance.EmptyView">
+    <item name="android:textColor">@color/title_text_read_color</item>
+    <item name="android:textSize">@dimen/emptyFeedsTextSize</item>
+    <item name="android:fontFamily">sans-serif-light</item>
+  </style>
+
+  <style name="TextAppearance.ListItem" />
+
+  <style name="TextAppearance.ListItem.Author">
+    <item name="android:textSize">@dimen/listitem_author</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:textColor">@color/tertiary_text_color</item>
+  </style>
+
+  <style name="TextAppearance.ListItem.Title">
+    <item name="android:textSize">16sp</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:textColor">@color/title_text_color</item>
+  </style>
+
+  <style name="TextAppearance.ListItem.Title.Read">
+    <item name="android:textSize">16sp</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:textColor">@color/title_text_read_color</item>
+  </style>
+
+  <style name="TextAppearance.ListItem.Body">
+    <item name="android:textSize">16sp</item>
+    <item name="android:fontFamily">sans-serif</item>
+    <item name="android:textColor">@color/body_text_color</item>
+  </style>
+
+  <style name="TextAppearance.NewItems">
+    <item name="android:textColor">@color/title_text_color</item>
+    <item name="android:textSize">@dimen/listitem_body</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+  </style>
+
+  <style name="TextAppearance.Reader" />
+
+  <style name="TextAppearance.Reader.Title">
+    <item name="android:textColor">@color/reader_title_color</item>
+    <item name="android:textSize">@dimen/reader_title</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+  </style>
+
+  <style name="TextAppearance.Reader.Author">
+    <item name="android:textColor">@color/reader_author_color</item>
+    <item name="android:textSize">@dimen/reader_author</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+  </style>
+
+  <style name="TextAppearance.Reader.Body">
+    <item name="android:textColor">@color/reader_body_color</item>
+    <item name="android:textSize">@dimen/reader_body</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+  </style>
+
+  <style name="TextAppearance.InputField">
+    <item name="android:textColor">@color/title_text_color</item>
+    <item name="android:textSize">16sp</item>
+    <item name="android:fontFamily">sans-serif</item>
+    <item name="android:paddingStart">0dp</item>
+    <item name="android:paddingEnd">0dp</item>
+    <item name="android:paddingBottom">8dp</item>
+    <item name="android:layout_marginBottom">8dp</item>
+  </style>
+
+  <style name="TextAppearance.FloatLabel" parent="android:TextAppearance.Small">
+    <item name="android:textColor">@color/accent</item>
+    <item name="android:textSize">11sp</item>
+    <item name="android:textStyle">bold</item>
+  </style>
+
+  <style name="TextAppearance.ErrorLabel" parent="android:TextAppearance.Small">
+    <item name="android:textColor">@color/material_red_700</item>
+    <item name="android:textSize">11sp</item>
+    <item name="android:textStyle">bold</item>
+  </style>
+
+  <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+  <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

@@ -24,10 +24,13 @@ buildscript {
     paging_version = '2.1.0'
     lifecycle_version = "2.0.0"
     room_version = "2.0.0"
+    nav_version = "2.0.0"
 
     espresso_version = "3.1.0"
     uiautomator_version = "2.2.0"
     test_ext_junit_version = "1.0.0"
+
+    mockk_version = "1.9.3"
 
   }
 

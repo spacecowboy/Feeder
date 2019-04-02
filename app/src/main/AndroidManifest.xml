@@ -1,158 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
-  android:installLocation="internalOnly"
-  package="com.nononsenseapps.feeder">
-
+  package="com.nononsenseapps.feeder"
+  android:installLocation="internalOnly">
   <!-- Import export feeds -->
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-  <!-- For syncing -->
-  <uses-permission android:name="android.permission.INTERNET"/>
-  <!-- To limit syncing to only WiFi -->
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- For syncing -->
+  <uses-permission android:name="android.permission.INTERNET" /> <!-- To limit syncing to only WiFi -->
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
   <application
-      android:allowBackup="true"
-      android:name=".FeederApplication"
-      android:icon="@mipmap/ic_launcher_round"
-      android:roundIcon="@mipmap/ic_launcher_round"
-      android:label="@string/app_name"
-      android:supportsRtl="true"
-      android:usesCleartextTraffic="true"
-      android:theme="@style/AppTheme">
+    android:name=".FeederApplication"
+    android:allowBackup="true"
+    android:icon="@mipmap/ic_launcher_round"
+    android:label="@string/app_name"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:supportsRtl="true"
+    android:theme="@style/AppTheme"
+    android:usesCleartextTraffic="true">
     <activity
-        android:name=".ui.FeedActivity"
-        android:label="@string/app_name"
-        android:theme="@style/FeedsTheme">
+      android:name=".ui.FeedActivity"
+      android:label="@string/app_name"
+      android:theme="@style/FeedsTheme">
+
+      <nav-graph android:value="@navigation/nav_graph" />
+
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
 
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
-      <intent-filter tools:ignore="AppLinkUrlError">
-        <action android:name="android.intent.action.VIEW" />
+
+      <intent-filter>
+        <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+
         <category android:name="android.intent.category.DEFAULT" />
-        <data android:mimeType="vnd.android.cursor.item/vnd.nononsenseapps.feed" />
       </intent-filter>
-
       <meta-data
-        android:name="android.app.shortcuts"
-        android:resource="@xml/shortcuts" />
+          android:name="android.app.shortcuts"
+          android:resource="@xml/shortcuts" />
     </activity>
-    <activity
-        android:name=".ui.ReaderActivity"
-        android:label="@string/app_name"
-        android:parentActivityName=".ui.FeedActivity"
-      android:allowTaskReparenting="true"
-        android:theme="@style/ReaderTheme">
 
-      <meta-data
-          android:name="android.support.PARENT_ACTIVITY"
-          android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
-    </activity>
     <activity
-      android:name=".ui.ReaderWebViewActivity"
-      android:label="@string/app_name"
+      android:name=".ui.EditFeedActivity"
+      android:label="@string/title_activity_edit_feed"
       android:parentActivityName=".ui.FeedActivity"
-      android:allowTaskReparenting="true"
-      android:theme="@style/ReaderTheme">
-
+      android:theme="@style/EditFeedTheme"
+      android:windowSoftInputMode="adjustResize|stateVisible">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
-    </activity>
-    <activity
-        android:name=".ui.EditFeedActivity"
-        android:label="@string/title_activity_edit_feed"
-        android:parentActivityName=".ui.FeedActivity"
-        android:theme="@style/EditFeedTheme"
-        android:windowSoftInputMode="adjustResize|stateVisible">
-      <meta-data
-          android:name="android.support.PARENT_ACTIVITY"
-          android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
+        android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
 
       <intent-filter>
-        <action android:name="android.intent.action.SEND"/>
+        <action android:name="android.intent.action.SEND" />
 
-        <category android:name="android.intent.category.DEFAULT"/>
-        <category android:name="android.intent.category.BROWSABLE"/>
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
 
-        <data android:scheme="http"/>
-        <data android:scheme="https"/>
+        <data android:scheme="http" />
+        <data android:scheme="https" />
       </intent-filter>
       <intent-filter>
-        <action android:name="android.intent.action.SEND"/>
+        <action android:name="android.intent.action.SEND" />
 
-        <category android:name="android.intent.category.DEFAULT"/>
-        <category android:name="android.intent.category.BROWSABLE"/>
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
 
-        <data android:mimeType="text/*"/>
+        <data android:mimeType="text/*" />
       </intent-filter>
       <intent-filter>
-        <action android:name="android.intent.action.VIEW"/>
+        <action android:name="android.intent.action.VIEW" />
 
-        <category android:name="android.intent.category.DEFAULT"/>
-        <category android:name="android.intent.category.BROWSABLE"/>
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
 
-        <data android:scheme="http"/>
-        <data android:scheme="https"/>
-        <data android:host="*"/>
-        <data android:pathPattern=".*\\.xml"/>
-        <data android:pathPattern=".*\\.rss"/>
-        <data android:pathPattern=".*\\.atom"/>
-        <data android:pathPattern=".*\\.json"/>
+        <data android:scheme="http" />
+        <data android:scheme="https" />
+        <data android:host="*" />
+        <data android:pathPattern=".*\\.xml" />
+        <data android:pathPattern=".*\\.rss" />
+        <data android:pathPattern=".*\\.atom" />
+        <data android:pathPattern=".*\\.json" />
       </intent-filter>
       <intent-filter>
-        <action android:name="android.intent.action.VIEW"/>
+        <action android:name="android.intent.action.VIEW" />
 
-        <category android:name="android.intent.category.DEFAULT"/>
-        <category android:name="android.intent.category.BROWSABLE"/>
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
 
-        <data android:scheme="http"/>
-        <data android:scheme="https"/>
-        <data android:host="feeds.feedburner.com"/>
-        <data android:host="feedproxy.google.com"/>
-        <data android:host="feeds2.feedburner.com"/>
-        <data android:host="feedsproxy.google.com"/>
+        <data android:scheme="http" />
+        <data android:scheme="https" />
+        <data android:host="feeds.feedburner.com" />
+        <data android:host="feedproxy.google.com" />
+        <data android:host="feeds2.feedburner.com" />
+        <data android:host="feedsproxy.google.com" />
       </intent-filter>
-    </activity>
-
-    <!-- Receiver for notification cancellations and such -->
+    </activity> <!-- Receiver for notification cancellations and such -->
     <receiver android:name=".model.RssNotificationBroadcastReceiver" />
-
-    <activity
-        android:name=".ui.SettingsActivity"
-        android:label="@string/title_activity_settings"
-        android:parentActivityName=".ui.FeedActivity">
-      <meta-data
-          android:name="android.support.PARENT_ACTIVITY"
-          android:value="com.nononsenseapps.feeder.ui.FeedActivity"/>
-      <intent-filter>
-        <action android:name="android.intent.action.MANAGE_NETWORK_USAGE"/>
-        <category android:name="android.intent.category.DEFAULT"/>
-      </intent-filter>
-    </activity>
 
     <!-- Note that the name of this provider is hard coded into the app, so remember to change both places -->
     <provider
-        android:name="androidx.core.content.FileProvider"
-        android:authorities="${applicationId}.filepicker_provider"
-        android:exported="false"
-        android:grantUriPermissions="true">
+      android:name="androidx.core.content.FileProvider"
+      android:authorities="${applicationId}.filepicker_provider"
+      android:exported="false"
+      android:grantUriPermissions="true">
       <meta-data
-          android:name="android.support.FILE_PROVIDER_PATHS"
-          android:resource="@xml/nnf_provider_paths" />
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/nnf_provider_paths" />
     </provider>
+
     <activity
-        android:name=".ui.filepicker.MyFilePickerActivity"
-        android:label="@string/app_name"
-        android:theme="@style/FilePickerTheme"/>
+      android:name=".ui.filepicker.MyFilePickerActivity"
+      android:label="@string/app_name"
+      android:theme="@style/FilePickerTheme" />
     <activity
-        android:name=".ui.OpenLinkInDefaultActivity"
-        android:label="@string/open_link_in_browser"
-        android:taskAffinity="${applicationId}.OpenLinkTask"
-        android:launchMode="singleInstance"/>
+      android:name=".ui.OpenLinkInDefaultActivity"
+      android:label="@string/open_link_in_browser"
+      android:launchMode="singleInstance"
+      android:taskAffinity="${applicationId}.OpenLinkTask" />
   </application>
 
 </manifest>

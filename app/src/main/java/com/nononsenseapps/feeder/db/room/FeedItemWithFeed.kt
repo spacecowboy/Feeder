@@ -3,36 +3,8 @@ package com.nononsenseapps.feeder.db.room
 import android.os.Bundle
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
-import com.nononsenseapps.feeder.db.COL_AUTHOR
-import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
-import com.nononsenseapps.feeder.db.COL_DESCRIPTION
-import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
-import com.nononsenseapps.feeder.db.COL_FEEDCUSTOMTITLE
-import com.nononsenseapps.feeder.db.COL_FEEDID
-import com.nononsenseapps.feeder.db.COL_FEEDTITLE
-import com.nononsenseapps.feeder.db.COL_FEEDURL
-import com.nononsenseapps.feeder.db.COL_GUID
-import com.nononsenseapps.feeder.db.COL_ID
-import com.nononsenseapps.feeder.db.COL_IMAGEURL
-import com.nononsenseapps.feeder.db.COL_LINK
-import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
-import com.nononsenseapps.feeder.db.COL_PLAINTITLE
-import com.nononsenseapps.feeder.db.COL_PUBDATE
-import com.nononsenseapps.feeder.db.COL_TAG
-import com.nononsenseapps.feeder.db.COL_TITLE
-import com.nononsenseapps.feeder.db.COL_UNREAD
-import com.nononsenseapps.feeder.db.COL_URL
-import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
-import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
-import com.nononsenseapps.feeder.ui.ARG_AUTHOR
-import com.nononsenseapps.feeder.ui.ARG_DATE
-import com.nononsenseapps.feeder.ui.ARG_ENCLOSURE
-import com.nononsenseapps.feeder.ui.ARG_FEEDTITLE
-import com.nononsenseapps.feeder.ui.ARG_FEED_URL
-import com.nononsenseapps.feeder.ui.ARG_ID
-import com.nononsenseapps.feeder.ui.ARG_IMAGEURL
-import com.nononsenseapps.feeder.ui.ARG_LINK
-import com.nononsenseapps.feeder.ui.ARG_TITLE
+import com.nononsenseapps.feeder.db.*
+import com.nononsenseapps.feeder.ui.*
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
@@ -114,7 +86,7 @@ data class FeedItemWithFeed @Ignore constructor(
         setString(ARG_LINK to link)
         setString(ARG_ENCLOSURE to enclosureLink)
         setString(ARG_IMAGEURL to imageUrl)
-        setString(ARG_FEEDTITLE to feedDisplayTitle)
+        setString(ARG_FEED_TITLE to feedDisplayTitle)
         setString(ARG_AUTHOR to author)
         setString(ARG_DATE to pubDateString)
         setString(ARG_FEED_URL to feedUrl.toString())

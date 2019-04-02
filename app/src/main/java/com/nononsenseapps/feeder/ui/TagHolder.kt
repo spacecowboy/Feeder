@@ -7,7 +7,9 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 
-class TagHolder(private val activity: BaseActivity, v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v), View.OnClickListener {
+class TagHolder(private val onNavigationItemClickListener: OnNavigationItemClickListener,
+                private val adapter: FeedsAdapter,
+                v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v), View.OnClickListener {
     val title: TextView = v.findViewById(R.id.tag_name)
     val unreadCount: TextView = v.findViewById(R.id.tag_unreadcount)
     val expander: ImageView = v.findViewById(R.id.tag_expander)
@@ -16,7 +18,7 @@ class TagHolder(private val activity: BaseActivity, v: View) : androidx.recycler
     init {
         // expander clicker
         expander.setOnClickListener {
-            if (activity.navAdapter!!.toggleExpansion(wrap!!)) {
+            if (adapter.toggleExpansion(wrap!!)) {
                 expander.setImageResource(R.drawable.tinted_expand_less)
             } else {
                 expander.setImageResource(R.drawable.tinted_expand_more)
@@ -31,10 +33,10 @@ class TagHolder(private val activity: BaseActivity, v: View) : androidx.recycler
      * @param v The view that was clicked.
      */
     override fun onClick(v: View) {
-        if (activity.drawerLayout != null) {
-            activity.drawerLayout!!.closeDrawers()//GravityCompat.START);
+        wrap?.let {
+            onNavigationItemClickListener.onNavigationItemClick(
+                    ID_UNSET, it.tag, null, it.tag
+            )
         }
-
-        activity.onNavigationDrawerItemSelected(ID_UNSET, wrap?.tag, null, wrap?.tag)
     }
 }

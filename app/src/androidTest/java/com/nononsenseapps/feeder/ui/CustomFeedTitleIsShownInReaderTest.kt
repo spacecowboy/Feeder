@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui
 
-import android.content.Intent
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
@@ -25,7 +24,7 @@ import java.net.URL
 @LargeTest
 class CustomFeedTitleIsShownInReaderTest {
     @get:Rule
-    var activityRule: ActivityTestRule<ReaderActivity> = ActivityTestRule(ReaderActivity::class.java, false, false)
+    var activityRule: ActivityTestRule<FeedActivity> = ActivityTestRule(FeedActivity::class.java, false, false)
     @get:Rule
     val testDb = TestDatabaseRule(getApplicationContext())
 
@@ -54,9 +53,7 @@ class CustomFeedTitleIsShownInReaderTest {
                 title = "fooitem"
         ))
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, feedItemId)
-        })
+        activityRule.launchReader(feedItemId)
     }
 
     private fun assertFeedTitleShownIs(title: String) {

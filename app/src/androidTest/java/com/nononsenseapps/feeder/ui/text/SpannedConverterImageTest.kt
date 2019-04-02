@@ -24,7 +24,8 @@ class SpannedConverterImageTest {
                 "<img src=\"https://foo.com/bar.gif\">",
                 URL("http://foo.com"),
                 Point(100, 100),
-                builder
+                builder,
+                null
         )
 
         assertEquals(1, builder.getAllSpansWithType<ImageSpan>().size)
@@ -39,7 +40,8 @@ class SpannedConverterImageTest {
                 "<img src=\"\">",
                 URL("http://foo.com"),
                 Point(100, 100),
-                builder
+                builder,
+                null
         )
 
         assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<ImageSpan>())

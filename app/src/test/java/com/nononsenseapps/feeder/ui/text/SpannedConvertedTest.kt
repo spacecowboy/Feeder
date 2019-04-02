@@ -36,7 +36,8 @@ class SpannedConverterTest {
                 "<font>No color</font>",
                 URL("http://foo.com"),
                 Point(100, 100),
-                builder)
+                builder,
+                null)
 
         assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<TextAppearanceSpan>())
         assertEquals("No color", builder.toString())
@@ -51,7 +52,8 @@ class SpannedConverterTest {
                 "<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">",
                 URL("http://foo.com"),
                 Point(100, 100),
-                builder)
+                builder,
+                null)
 
         assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<ImageSpan>())
     }
@@ -66,7 +68,8 @@ class SpannedConverterTest {
                 URL("http://foo.com"),
                 Point(100, 100),
                 true,
-                builder
+                builder,
+                null
         )
 
         assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<ImageSpan>())
@@ -81,7 +84,8 @@ class SpannedConverterTest {
                 "<p>foo</p><script>script</script><p>bar</p>",
                 URL("http://foo.bar"),
                 Point(100, 100),
-                builder)
+                builder,
+                null)
 
         assertEquals("foo\n\nbar\n\n", builder.toString())
     }
@@ -95,7 +99,8 @@ class SpannedConverterTest {
                 "<p>foo</p><style>style</style><p>bar</p>",
                 URL("http://foo.bar"),
                 Point(100, 100),
-                builder)
+                builder,
+                null)
 
         assertEquals("foo\n\nbar\n\n", builder.toString())
     }
@@ -120,7 +125,8 @@ class SpannedConverterTest {
                     """,
                 URL("http://foo.bar"),
                 Point(100, 100),
-                builder)
+                builder,
+                null)
 
         assertEquals("r1c1\nr1c2\nr2c1\nr2c2\n\n", builder.toString())
     }
@@ -143,7 +149,8 @@ class SpannedConverterTest {
                     """,
                 URL("http://foo.bar"),
                 Point(100, 100),
-                builder)
+                builder,
+                null)
 
         assertEquals(text, builder.toString().trimEnd { it == '\n' })
     }

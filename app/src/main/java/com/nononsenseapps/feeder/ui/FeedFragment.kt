@@ -1,19 +1,19 @@
 package com.nononsenseapps.feeder.ui
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.app.Activity
+import android.content.*
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.os.Environment
+import android.view.*
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,26 +23,16 @@ import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.FeedItemsViewModel
-import com.nononsenseapps.feeder.model.FeedViewModel
-import com.nononsenseapps.feeder.model.PreviewItem
-import com.nononsenseapps.feeder.model.SYNC_BROADCAST
-import com.nononsenseapps.feeder.model.SYNC_BROADCAST_IS_ACTIVE
-import com.nononsenseapps.feeder.model.cancelNotification
-import com.nononsenseapps.feeder.model.getFeedItemsViewModel
-import com.nononsenseapps.feeder.model.getFeedViewModel
-import com.nononsenseapps.feeder.model.requestFeedSync
-import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.TabletUtils
-import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
-import com.nononsenseapps.feeder.util.bundle
-import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
-import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
-import com.nononsenseapps.feeder.util.setLong
-import com.nononsenseapps.feeder.util.setString
+import com.nononsenseapps.feeder.model.*
+import com.nononsenseapps.feeder.model.opml.exportOpml
+import com.nononsenseapps.feeder.model.opml.importOpml
+import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
+import com.nononsenseapps.feeder.util.*
+import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 const val ARG_FEED_ID = "feed_id"
 const val ARG_FEED_TITLE = "feed_title"
@@ -65,9 +55,9 @@ class FeedFragment : CoroutineScopedFragment() {
     private var url: String? = ""
     private var feedTag: String? = ""
     private var firstFeedLoad: Boolean = true
+    private var displayTitle = ""
     private var customTitle = ""
     private var layoutManager: LinearLayoutManager? = null
-    private var checkAllButton: View? = null
     private var notify = false
 
     var feedViewModel: FeedViewModel? = null
@@ -92,84 +82,44 @@ class FeedFragment : CoroutineScopedFragment() {
             url = arguments.getString(ARG_FEED_URL)
             feedTag = arguments.getString(ARG_FEED_TAG)
 
-            // It's a feedTag, use as title
-            if (id == ID_UNSET) {
+            arguments.getLongArray(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)?.let {
+                context?.let { context ->
+                    val db = AppDatabase.getInstance(context)
+                    launch(Dispatchers.Default) {
+                        db.feedItemDao().markAsNotified(it.toList())
+                    }
+                }
+            }
+        }
+
+        if (id == ID_UNSET && feedTag?.isNotEmpty() != true) {
+            context?.let { context ->
+                if (id == ID_UNSET) {
+                    id = PrefUtils.getLastOpenFeedId(context)
+                }
+                if (feedTag?.isNotEmpty() != true) {
+                    feedTag = PrefUtils.getLastOpenFeedTag(context)
+                }
+            }
+        }
+
+        when {
+            id == ID_UNSET && feedTag?.isNotEmpty() == true -> {
                 title = feedTag
             }
-
-            // Special feedTag
-            if (id == ID_ALL_FEEDS) {
+            id == ID_UNSET -> {
+                id = ID_ALL_FEEDS
+                title = getString(R.string.all_feeds)
+            }
+            id == ID_ALL_FEEDS -> {
                 title = getString(R.string.all_feeds)
             }
         }
 
+        // Set this to equal title in case it's not a feed
+        displayTitle = title ?: ""
+
         setHasOptionsMenu(true)
-
-        // Load some RSS
-        val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
-        feedItemsViewModel = getFeedItemsViewModel(feedId = id, tag = feedTag
-                ?: "", onlyUnread = onlyUnread)
-
-        feedItemsViewModel?.liveDbPreviews?.observe(this, Observer {
-            adapter?.submitList(it)
-            emptyView?.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
-        })
-
-        when {
-            id > ID_UNSET -> { // Load feed if feed
-                feedViewModel = getFeedViewModel(id)
-                feedViewModel?.liveFeed?.observe(this, Observer {
-                    it?.let { feed ->
-                        this.title = feed.title
-                        this.customTitle = feed.customTitle
-                        this.url = feed.url.toString()
-                        this.notify = feed.notify
-                        this.feedTag = feed.tag
-
-                        (activity as BaseActivity).supportActionBar?.title = feed.displayTitle
-
-                        // Update state of notification toggle
-                        activity?.invalidateOptionsMenu()
-
-                        // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
-                        // extra statistics on opening the feed.
-                        if (firstFeedLoad) {
-                            // Title has been fetched, so add shortcut
-                            activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
-                            // Report shortcut usage
-                            activity?.reportShortcutToFeedUsed(feed.id)
-                        }
-                        firstFeedLoad = false
-                    }
-                })
-            }
-            id == ID_UNSET -> { // Load notification settings for tag
-                activity?.let { activity ->
-                    feedTag?.let { feedTag ->
-                        AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
-                            it.fold(true) { a, b -> a && b }
-                                    .let { notify ->
-                                        this.notify = notify
-                                        // Update state of notification toggle
-                                        activity.invalidateOptionsMenu()
-                                    }
-                        })
-                    }
-                }
-            }
-            else -> { // Load notification settings for all
-                activity?.let { activity ->
-                    AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify().observe(this, Observer {
-                        it.fold(true) { a, b -> a && b }
-                                .let { notify ->
-                                    this.notify = notify
-                                    // Update state of notification toggle
-                                    activity.invalidateOptionsMenu()
-                                }
-                    })
-                }
-            }
-        }
 
         // Remember choice in future
         val appContext = context?.applicationContext
@@ -187,7 +137,7 @@ class FeedFragment : CoroutineScopedFragment() {
 
         // improve performance if you know that changes in content
         // do not change the size of the RecyclerView
-        recyclerView!!.setHasFixedSize(true)
+        recyclerView?.setHasFixedSize(true)
 
         if (TabletUtils.isTablet(activity)) {
             val cols = TabletUtils.numberOfFeedColumns(activity)
@@ -204,7 +154,7 @@ class FeedFragment : CoroutineScopedFragment() {
             // use a linear layout manager
             layoutManager = LinearLayoutManager(activity)
         }
-        recyclerView!!.layoutManager = layoutManager
+        recyclerView?.layoutManager = layoutManager
 
         // Setup swipe refresh
         swipeRefreshLayout = rootView.findViewById<View>(R.id.swiperefresh) as SwipeRefreshLayout
@@ -228,19 +178,19 @@ class FeedFragment : CoroutineScopedFragment() {
 
         // Set up the empty view
         emptyView = rootView.findViewById(android.R.id.empty)
-        emptyAddFeed = emptyView!!.findViewById(R.id.empty_add_feed)
+        emptyAddFeed = emptyView?.findViewById(R.id.empty_add_feed)
         @Suppress("DEPRECATION")
         (emptyAddFeed as TextView).text = android.text.Html.fromHtml(getString(R.string.empty_feed_add))
-        emptyOpenFeeds = emptyView!!.findViewById(R.id.empty_open_feeds)
+        emptyOpenFeeds = emptyView?.findViewById(R.id.empty_open_feeds)
         @Suppress("DEPRECATION")
         (emptyOpenFeeds as TextView).text = android.text.Html.fromHtml(getString(R.string.empty_feed_open))
 
-        emptyAddFeed!!.setOnClickListener {
+        emptyAddFeed?.setOnClickListener {
             startActivity(Intent(activity,
                     EditFeedActivity::class.java))
         }
 
-        emptyOpenFeeds!!.setOnClickListener { (activity as BaseActivity).openNavDrawer() }
+        emptyOpenFeeds?.setOnClickListener { (activity as FeedActivity).openNavDrawer() }
 
         // specify an adapter
         adapter = FeedItemPagedListAdapter(activity!!, object : ActionCallback {
@@ -265,14 +215,82 @@ class FeedFragment : CoroutineScopedFragment() {
             }
 
         })
-        recyclerView!!.adapter = adapter
+        recyclerView?.adapter = adapter
 
-        // check all button
-        checkAllButton = rootView.findViewById(R.id.checkall_button)
-        checkAllButton!!.setOnClickListener { markAsRead() }
+        // Load some RSS
+        val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
+        feedItemsViewModel = getFeedItemsViewModel(feedId = id, tag = feedTag
+                ?: "", onlyUnread = onlyUnread)
+
+        feedItemsViewModel?.liveDbPreviews?.observe(this, Observer<PagedList<PreviewItem>> {
+            adapter?.submitList(it)
+            emptyView?.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+        })
+
+        when {
+            id > ID_UNSET -> { // Load feed if feed
+                feedViewModel = getFeedViewModel(id)
+                feedViewModel?.liveFeed?.observe(this, Observer {
+                    it?.let { feed ->
+                        this.title = feed.title
+                        this.customTitle = feed.customTitle
+                        this.displayTitle = feed.displayTitle
+                        this.url = feed.url.toString()
+                        this.notify = feed.notify
+                        this.feedTag = feed.tag
+
+                        (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
+
+                        // Update state of notification toggle
+                        activity?.invalidateOptionsMenu()
+
+                        // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
+                        // extra statistics on opening the feed.
+                        if (firstFeedLoad) {
+                            // Title has been fetched, so add shortcut
+                            activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
+                            // Report shortcut usage
+                            activity?.reportShortcutToFeedUsed(feed.id)
+                        }
+                        firstFeedLoad = false
+                    }
+                })
+            }
+            id == ID_UNSET -> { // Load notification settings for tag
+                (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
+
+                activity?.let { activity ->
+                    feedTag?.let { feedTag ->
+                        AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
+                            it.fold(true) { a, b -> a && b }
+                                    .let { notify ->
+                                        this.notify = notify
+                                        // Update state of notification toggle
+                                        activity.invalidateOptionsMenu()
+                                    }
+                        })
+                    }
+                }
+            }
+            else -> { // Load notification settings for all
+                (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
+
+                activity?.let { activity ->
+                    AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify().observe(this, Observer {
+                        it.fold(true) { a, b -> a && b }
+                                .let { notify ->
+                                    this.notify = notify
+                                    // Update state of notification toggle
+                                    activity.invalidateOptionsMenu()
+                                }
+                    })
+                }
+            }
+        }
 
         return rootView
     }
+
 
     private fun onSyncBroadcast(syncing: Boolean) {
         // Background syncs trigger the sync layout
@@ -284,17 +302,14 @@ class FeedFragment : CoroutineScopedFragment() {
     override fun onActivityCreated(bundle: Bundle?) {
         super.onActivityCreated(bundle)
 
-        val ab = (activity as BaseActivity).supportActionBar
-        ab?.title = title
-        recyclerView?.let {
-            (activity as BaseActivity).enableActionBarAutoHide(it)
+        // check all button
+        (activity as FeedActivity).fabOnClickListener = {
+            markAsRead()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        // List might be shorter than screen once item has been read
-        (activity as BaseActivity).showActionBar()
         // Listen on broadcasts
         androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(activity!!).registerReceiver(syncReceiver,
                 IntentFilter(SYNC_BROADCAST))
@@ -308,7 +323,7 @@ class FeedFragment : CoroutineScopedFragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.feed_fragment, menu)
+        inflater!!.inflate(R.menu.feed, menu)
 
         // Don't forget super call here
         super.onCreateOptionsMenu(menu, inflater)
@@ -377,7 +392,7 @@ class FeedFragment : CoroutineScopedFragment() {
     private fun markAsRead() {
         // Cancel any notifications
         context?.applicationContext?.let { appContext ->
-            feedItemsViewModel?.liveDbPreviews?.value?.forEach{
+            feedItemsViewModel?.liveDbPreviews?.value?.forEach {
                 // Can be null in case of placeholder values
                 it?.id?.let { id ->
                     launch(Dispatchers.Default) {
@@ -391,9 +406,9 @@ class FeedFragment : CoroutineScopedFragment() {
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
-        val id = menuItem.itemId.toLong()
+        val id = menuItem.itemId
         return when {
-            id == R.id.action_sync.toLong() -> {
+            id == R.id.action_sync -> {
                 // Sync all feeds when menu button pressed
                 requestFeedSync(
                         parallell = true,
@@ -402,11 +417,10 @@ class FeedFragment : CoroutineScopedFragment() {
                 )
                 true
             }
-            id == R.id.action_edit_feed.toLong() && this.id > ID_UNSET -> {
+            id == R.id.action_edit_feed && this.id > ID_UNSET -> {
                 this.id.let { feedId ->
                     val i = Intent(activity, EditFeedActivity::class.java)
                     // TODO do not animate the back movement here
-                    i.putExtra(SHOULD_FINISH_BACK, true)
                     i.putExtra(ARG_ID, feedId)
                     i.putExtra(ARG_CUSTOMTITLE, customTitle)
                     i.putExtra(ARG_TITLE, title)
@@ -417,17 +431,16 @@ class FeedFragment : CoroutineScopedFragment() {
 
                 true
             }
-            id == R.id.action_add_templated.toLong() && this.id > ID_UNSET -> {
+            id == R.id.action_add_templated && this.id > ID_UNSET -> {
                 val i = Intent(activity, EditFeedActivity::class.java)
                 // TODO do not animate the back movement here
-                i.putExtra(SHOULD_FINISH_BACK, true)
                 i.putExtra(TEMPLATE, true)
                 i.putExtra(ARG_FEED_TAG, feedTag)
                 i.data = Uri.parse(url)
                 startActivity(i)
                 true
             }
-            id == R.id.action_delete_feed.toLong() && this.id > ID_UNSET -> {
+            id == R.id.action_delete_feed && this.id > ID_UNSET -> {
                 val feedId = this.id
                 val appContext = activity?.applicationContext
                 if (appContext != null) {
@@ -440,10 +453,12 @@ class FeedFragment : CoroutineScopedFragment() {
                 }
 
                 // Tell activity to open another fragment
-                (activity as FeedActivity).showAllFeeds(true)
+                findNavController().navigate(R.id.action_feedFragment_self, bundle {
+                    putLong(ARG_FEED_ID, ID_ALL_FEEDS)
+                })
                 true
             }
-            id == R.id.action_only_unread.toLong() -> {
+            id == R.id.action_only_unread -> {
                 val onlyUnread = !menuItem.isChecked
                 PrefUtils.setPrefShowOnlyUnread(activity!!, onlyUnread)
                 menuItem.isChecked = onlyUnread
@@ -459,14 +474,98 @@ class FeedFragment : CoroutineScopedFragment() {
 
                 true
             }
-            id == R.id.action_notify.toLong() -> {
+            id == R.id.action_notify -> {
                 notify = !menuItem.isChecked
 
                 setNotifyMenuItemState(menuItem)
                 setNotifications(notify)
                 true
             }
+            id == R.id.action_add -> {
+                startActivityForResult(Intent(context, EditFeedActivity::class.java), EDIT_FEED_CODE)
+                true
+            }
+            id == R.id.action_opml_export -> {
+                // Choose file, then export
+                val intent: Intent
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                    intent.type = "text/opml"
+                    intent.putExtra(Intent.EXTRA_TITLE, "feeder.opml")
+                } else {
+                    intent = Intent(context, MyFilePickerActivity::class.java)
+                    intent.putExtra(AbstractFilePickerActivity.EXTRA_MODE, AbstractFilePickerActivity.MODE_NEW_FILE)
+                    intent.putExtra(AbstractFilePickerActivity.EXTRA_ALLOW_EXISTING_FILE, true)
+                    intent.putExtra(AbstractFilePickerActivity.EXTRA_START_PATH,
+                            File(Environment.getExternalStorageDirectory(), "feeder.opml").path)
+                }
+                startActivityForResult(intent, EXPORT_OPML_CODE)
+                true
+            }
+            id == R.id.action_opml_import -> {
+                // Choose file
+                val intent: Intent
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                    intent.addCategory(Intent.CATEGORY_OPENABLE)
+                    intent.type = "*/*"
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                            arrayOf("text/plain", "text/xml", "text/opml", "*/*"))
+                } else {
+                    intent = Intent(context, MyFilePickerActivity::class.java)
+                    intent.putExtra(AbstractFilePickerActivity.EXTRA_SINGLE_CLICK, true)
+                }
+                startActivityForResult(intent, IMPORT_OPML_CODE)
+                true
+            }
+            id == R.id.action_settings -> {
+                findNavController().navigate(R.id.action_feedFragment_to_settingsFragment)
+                true
+            }
+            id == R.id.action_reportbug -> {
+                try {
+                    startActivity(emailBugReportIntent())
+                } catch (e: ActivityNotFoundException) {
+                    Toast.makeText(context, R.string.no_email_client, Toast.LENGTH_SHORT).show()
+                }
+                true
+            }
             else -> super.onOptionsItemSelected(menuItem)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
+
+        when (requestCode) {
+            EXPORT_OPML_CODE -> {
+                val uri: Uri? = data?.data
+                if (uri != null) {
+                    val appContext = context!!.applicationContext
+                    launch(Dispatchers.Default) {
+                        exportOpml(appContext, uri)
+                    }
+                }
+            }
+            IMPORT_OPML_CODE -> {
+                val uri: Uri? = data?.data
+                if (uri != null) {
+                    val appContext = context!!.applicationContext
+                    launch(Dispatchers.Default) {
+                        importOpml(appContext, uri)
+                    }
+                }
+            }
+            EDIT_FEED_CODE -> {
+                data?.data?.lastPathSegment?.toLong()?.let { id ->
+                    findNavController().navigate(R.id.action_feedFragment_self, bundle {
+                        putLong(ARG_FEED_ID, id)
+                        putString(ARG_FEED_TAG, data.extras?.getString(ARG_FEED_TAG))
+                    })
+                }
+            }
         }
     }
 
@@ -485,6 +584,18 @@ class FeedFragment : CoroutineScopedFragment() {
                 setString(ARG_FEED_TAG to tag)
             }
             return fragment
+        }
+    }
+}
+
+fun Fragment.setHideableToolbar(hideable: Boolean) {
+    activity?.let { activity ->
+        if (activity is FeedActivity) {
+            if (hideable) {
+                activity.hideableToolbar()
+            } else {
+                activity.fixedToolbar()
+            }
         }
     }
 }

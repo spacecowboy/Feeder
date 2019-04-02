@@ -13,6 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.util.PrefUtils
@@ -34,7 +35,7 @@ import java.net.URL
 @LargeTest
 class BadImagePlaceHolderArticleTest {
     @get:Rule
-    var activityRule: ActivityTestRule<ReaderActivity> = ActivityTestRule(ReaderActivity::class.java, false, false)
+    var activityRule: ActivityTestRule<FeedActivity> = ActivityTestRule(FeedActivity::class.java, false, false)
 
     @get:Rule
     val testDb = TestDatabaseRule(getApplicationContext())
@@ -69,9 +70,7 @@ class BadImagePlaceHolderArticleTest {
                 """.trimIndent()
         }
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchReader(itemId)
 
         runBlocking {
             delay(50)
@@ -96,9 +95,7 @@ class BadImagePlaceHolderArticleTest {
                 """.trimIndent()
         }
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchReader(itemId)
 
         runBlocking {
             delay(50)
@@ -118,9 +115,7 @@ class BadImagePlaceHolderArticleTest {
                 """.trimIndent()
         }
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchReader(itemId)
 
         runBlocking {
             delay(50)
@@ -142,9 +137,7 @@ class BadImagePlaceHolderArticleTest {
                 """.trimIndent()
         }
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchReader(itemId)
 
         runBlocking {
             delay(50)
@@ -166,9 +159,7 @@ class BadImagePlaceHolderArticleTest {
                 """.trimIndent()
         }
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchReader(itemId)
 
         runBlocking {
             delay(50)
@@ -196,3 +187,8 @@ class BadImagePlaceHolderArticleTest {
         ))
     }
 }
+
+fun ActivityTestRule<FeedActivity>.launchReader(itemId: Long) =
+        launchActivity(Intent().also {
+            it.data = URI_FEEDITEMS.buildUpon().appendPath("$itemId").build()
+        })

@@ -11,7 +11,7 @@ import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.ui.ReaderActivity
+import com.nononsenseapps.feeder.ui.FeedActivity
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
 import com.nononsenseapps.feeder.util.ARG_ID
 import io.mockk.clearMocks
@@ -31,7 +31,7 @@ import java.net.URL
 @RunWith(AndroidJUnit4::class)
 class FeedItemViewModelTest {
     @get:Rule
-    var activityRule: ActivityTestRule<ReaderActivity> = ActivityTestRule(ReaderActivity::class.java, false, false)
+    var activityRule: ActivityTestRule<FeedActivity> = ActivityTestRule(FeedActivity::class.java, false, false)
     @get:Rule
     val testDb = TestDatabaseRule(getApplicationContext())
 
@@ -212,6 +212,6 @@ class FeedItemViewModelTest {
 }
 
 fun FragmentActivity.getFeedItemViewModel(id: Long): FeedItemViewModel {
-    val factory = FeedItemViewModelFactory(application, id, maxImageSize())
+    val factory = FeedItemViewModelFactory(application, id, maxImageSize(), null)
     return ViewModelProviders.of(this, factory).get(FeedItemViewModel::class.java)
 }

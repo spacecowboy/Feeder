@@ -28,7 +28,6 @@ const val TEMPLATE = "template"
 
 
 class EditFeedActivity : CoroutineScopedActivity() {
-    private var shouldFinishBack = false
     private var id: Long = ID_UNSET
     // Views and shit
     private lateinit var textTitle: EditText
@@ -148,11 +147,6 @@ class EditFeedActivity : CoroutineScopedActivity() {
                 withContext(Dispatchers.Main) {
                     setResult(RESULT_OK, intent)
                     finish()
-                    if (shouldFinishBack) {
-                        // Only care about exit transition
-                        overridePendingTransition(R.anim.to_bottom_right,
-                                R.anim.to_bottom_right)
-                    }
                 }
             }
         }
@@ -160,7 +154,6 @@ class EditFeedActivity : CoroutineScopedActivity() {
         // Consider start intent
         val i = intent
         if (i != null) {
-            shouldFinishBack = i.getBooleanExtra(SHOULD_FINISH_BACK, false)
             // Existing id
             id = i.getLongExtra(ARG_ID, ID_UNSET)
             // Edit like existing, but it's really new
@@ -265,34 +258,6 @@ class EditFeedActivity : CoroutineScopedActivity() {
         val imm = getSystemService(
                 Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(textTag, 0)
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        if (shouldFinishBack) {
-            // Only care about exit transition
-            overridePendingTransition(0, R.anim.to_bottom_right)
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean =
-            true
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.itemId
-        if (id == android.R.id.home && shouldFinishBack) {
-            // Was launched from inside app, should just go back
-            // Action bar handles other cases.
-            finish()
-            // Only care about exit transition
-            overridePendingTransition(R.anim.to_bottom_right,
-                    R.anim.to_bottom_right)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private inner class FeedResult(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view), View.OnClickListener {

@@ -16,6 +16,7 @@ import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.util.PrefUtils
+import kotlinx.android.synthetic.main.content_navigation.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -69,7 +70,7 @@ class CustomFeedTitleIsShownInListItemsTest {
 
     private fun assertFeedTitleShownIs(title: String) {
         runBlocking {
-            val recyclerView = activityRule.activity.findViewById<RecyclerView>(android.R.id.list)!!
+            val recyclerView = activityRule.activity.nav_host_fragment?.view?.findViewById<RecyclerView>(android.R.id.list)!!
 
             withTimeout(200) {
                 while (recyclerView.findViewHolderForAdapterPosition(0) == null) {

@@ -2,20 +2,24 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.configurePeriodicSync
-import com.nononsenseapps.feeder.util.PREF_DEFAULT_OPEN_ITEM_WITH
-import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
-import com.nononsenseapps.feeder.util.PREF_OPEN_LINKS_WITH
-import com.nononsenseapps.feeder.util.PREF_SYNC_FREQ
-import com.nononsenseapps.feeder.util.PREF_SYNC_ONLY_CHARGING
-import com.nononsenseapps.feeder.util.PREF_SYNC_ONLY_WIFI
-import com.nononsenseapps.feeder.util.PREF_THEME
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.*
 
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        // When switching themes, the view gets recreated by navigation manager doesn't run again to set label
+        (activity as AppCompatActivity?)?.supportActionBar?.title = getString(R.string.action_settings)
+
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         // Fill in default values

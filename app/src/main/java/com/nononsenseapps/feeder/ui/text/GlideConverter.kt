@@ -26,8 +26,9 @@ class GlideConverter(context: Context,
                      parser: Parser,
                      maxSize: Point,
                      private val allowDownload: Boolean,
-                     spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder()) :
-        HtmlToSpannedConverter(source, siteUrl, parser, context, maxSize, spannableStringBuilder) {
+                     spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
+                     urlClickListener: UrlClickListener?) :
+        HtmlToSpannedConverter(source, siteUrl, parser, context, maxSize, spannableStringBuilder, urlClickListener = urlClickListener) {
 
     private val context: Context = context.applicationContext
 
