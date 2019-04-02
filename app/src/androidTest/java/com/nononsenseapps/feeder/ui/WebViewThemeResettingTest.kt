@@ -96,7 +96,7 @@ class WebViewThemeResettingTest {
                     .perform(click())
 
     private fun withTextColorId(@ColorRes colorId: Int): Matcher<View> =
-            withTextColor(activityRule.activity.getColor(colorId))
+            withTextColor(activityRule.activity.resources.getColor(colorId))
 }
 
 fun withTextColor(@ColorInt color: Int): Matcher<View> {
