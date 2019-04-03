@@ -1,15 +1,11 @@
 package com.nononsenseapps.feeder.ui
 
-import android.view.View
-import android.widget.TextView
-import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions
-import androidx.test.espresso.matcher.BoundedMatcher
+import androidx.test.espresso.matcher.ViewMatchers.hasTextColor
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -21,8 +17,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.hamcrest.Description
-import org.hamcrest.Matcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -88,25 +82,10 @@ class WebViewThemeResettingTest {
 
     private fun assertTextColorIsReadableInNightMode() {
         onView(withId(com.nononsenseapps.feeder.R.id.story_body))
-                .check(ViewAssertions.matches(withTextColorId(com.nononsenseapps.feeder.R.color.white_87)))
+                .check(ViewAssertions.matches(hasTextColor(com.nononsenseapps.feeder.R.color.white_87)))
     }
 
     private fun openWebView() =
             onView(withId(com.nononsenseapps.feeder.R.id.action_open_in_webview))
                     .perform(click())
-
-    private fun withTextColorId(@ColorRes colorId: Int): Matcher<View> =
-            withTextColor(activityRule.activity.resources.getColor(colorId))
-}
-
-fun withTextColor(@ColorInt color: Int): Matcher<View> {
-    return object : BoundedMatcher<View, TextView>(TextView::class.java) {
-        public override fun matchesSafely(textView: TextView): Boolean {
-            return color == textView.currentTextColor
-        }
-
-        override fun describeTo(description: Description) {
-            description.appendText("TextView with currentTextColor = $color")
-        }
-    }
 }

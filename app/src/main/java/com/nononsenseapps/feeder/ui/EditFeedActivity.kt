@@ -9,12 +9,14 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.appcompat.app.AppCompatDelegate
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedActivity
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
+import com.nononsenseapps.feeder.model.getSettingsViewModel
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
@@ -53,12 +55,17 @@ class EditFeedActivity : CoroutineScopedActivity() {
             field = value
         }
 
+    private val settingsViewModel by lazy { getSettingsViewModel() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         if (shouldBeFloatingWindow()) {
             setupFloatingWindow()
         }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_feed)
+
+        // Not persisted so set nightmode every time we start
+        AppCompatDelegate.setDefaultNightMode(settingsViewModel.themePreference)
 
         // Setup views
         textTitle = findViewById(R.id.feed_title)
@@ -217,6 +224,14 @@ class EditFeedActivity : CoroutineScopedActivity() {
                 textTag.setAdapter(tagsAdapter)
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        settingsViewModel.liveThemePreference.observe(this, androidx.lifecycle.Observer {
+            delegate.setLocalNightMode(it)
+        })
     }
 
     private fun shouldBeFloatingWindow(): Boolean {
