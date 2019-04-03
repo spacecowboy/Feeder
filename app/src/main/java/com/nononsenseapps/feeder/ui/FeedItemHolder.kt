@@ -1,10 +1,10 @@
 package com.nononsenseapps.feeder.ui
 
+import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.TextAppearanceSpan
 import android.util.Log
-import android.util.TypedValue
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
@@ -56,10 +56,15 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
             override fun onSwipeStarted(goingRight: Boolean) {
                 actionCallback.onSwipeStarted()
 
-                val typedValue = TypedValue()
-                view.context?.theme?.resolveAttribute(android.R.attr.windowBackground,
-                        typedValue, true)
-                bgFrame.setBackgroundColor(typedValue.data)
+                view.context?.let { context ->
+                    val bgColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        context.getColor(R.color.window_background)
+                    } else {
+                        context.resources.getColor(R.color.window_background)
+                    }
+                    bgFrame.setBackgroundColor(bgColor)
+                }
+
                 checkBg.visibility = View.VISIBLE
                 if (goingRight) {
                     checkLeft.visibility = View.VISIBLE
