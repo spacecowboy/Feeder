@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.ui
 
 import android.content.SharedPreferences
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,7 +20,14 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         // When switching themes, the view gets recreated by navigation manager doesn't run again to set label
         (activity as AppCompatActivity?)?.supportActionBar?.title = getString(R.string.action_settings)
 
-        return super.onCreateView(inflater, container, savedInstanceState)
+        return super.onCreateView(inflater, container, savedInstanceState)?.also {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                it.background = ColorDrawable(resources.getColor(R.color.window_background, it.context?.theme))
+            } else {
+                @Suppress("DEPRECATION")
+                it.background = ColorDrawable(resources.getColor(R.color.window_background))
+            }
+        }
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

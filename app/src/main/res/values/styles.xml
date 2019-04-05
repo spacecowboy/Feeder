@@ -69,7 +69,7 @@
     <item name="colorAccent">@color/accent</item>
 
     <item name="android:windowContentOverlay">@null</item>
-    <item name="android:windowBackground">@color/window_background</item>
+    <item name="android:windowBackground">@null</item>
 
     <!-- Only needed for pre-L -->
     <item name="android:editTextBackground">@drawable/edit_text</item>
