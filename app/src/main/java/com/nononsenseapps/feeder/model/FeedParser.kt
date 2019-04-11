@@ -189,7 +189,13 @@ object FeedParser {
                 .build()
 
         val clientToUse = if (url.userInfo?.isNotBlank() == true) {
-            val (user, pass) = url.userInfo.split(':', limit = 2)
+            val parts = url.userInfo.split(':')
+            val user = parts.first()
+            val pass = if (parts.size > 1) {
+                parts[1]
+            } else {
+                ""
+            }
             val credentials = Credentials.basic(user, pass)
             client.newBuilder()
                     .authenticator { _, response ->
