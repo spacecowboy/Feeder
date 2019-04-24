@@ -1,3 +1,9 @@
+# 1.8.14
+*   Fixed crash on tablets
+    See !189 #191
+*   Fixed handling of URLs with only user (such as http://user@...)
+    See !188
+
 # 1.8.13
 *   Fixed edit dialog starting with the wrong theme
     See !187
