@@ -121,7 +121,7 @@ class FeedActivity : CoroutineScopedActivity() {
             when (destination.id) {
                 R.id.feedFragment -> fixedToolbar()
                 R.id.readerFragment -> hideableToolbar()
-                R.id.readerWebViewFragment -> hideableToolbar()
+                R.id.readerWebViewFragment -> fixedToolbar()
                 else -> fixedToolbar()
             }
         }
