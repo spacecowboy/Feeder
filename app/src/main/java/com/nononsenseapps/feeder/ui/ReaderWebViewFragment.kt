@@ -41,7 +41,10 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
     @SuppressLint("SetJavaScriptEnabled", "Recycle")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         webView?.destroy()
-        webView = WebView(context)
+
+        val rootView = inflater.inflate(R.layout.fragment_reader_webview, container, false)
+
+        webView = rootView?.findViewById(R.id.webview)
 
         // Important to create webview before setting cookie policy on Android18
         CookieManager.getInstance().setAcceptCookie(false)
@@ -54,7 +57,7 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
             webView?.loadUrl(url)
         }
 
-        return webView
+        return rootView
     }
 
     /**
@@ -91,14 +94,6 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
         WebViewClientHandler.onPageStartedListener = null
         super.onDestroy()
     }
-
-    /**
-     * Gets the WebView.
-     */
-    /*val webView: WebView?
-        get() {
-            return if (isWebViewAvailable) webView else null*/
-    //}
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.webview, menu)
