@@ -1,0 +1,14 @@
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/scroll_view"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@color/window_background"
+  tools:context="com.nononsenseapps.feeder.ui.ReaderWebViewFragment">
+
+  <WebView
+    android:id="@+id/webview"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+
+</androidx.core.widget.NestedScrollView>

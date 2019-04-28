@@ -18,6 +18,7 @@ import com.nononsenseapps.feeder.util.openLinkInBrowser
 const val ARG_URL = "url"
 
 class ReaderWebViewFragment : CoroutineScopedFragment() {
+    private var rootView: View? = null
     private var webView: WebView? = null
     var url: String = ""
     private var enclosureUrl: String? = null
@@ -41,7 +42,15 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
     @SuppressLint("SetJavaScriptEnabled", "Recycle")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         webView?.destroy()
-        webView = WebView(context)
+
+        rootView = inflater.inflate(R.layout.fragment_reader_webview, container, false)
+
+        webView = rootView?.findViewById(R.id.webview)
+
+        // Once page has finished loading, remove background from nesting view to avoid overdraw
+        WebViewClientHandler.onPageFinishedListener = {
+            rootView?.setBackgroundResource(0)
+        }
 
         // Important to create webview before setting cookie policy on Android18
         CookieManager.getInstance().setAcceptCookie(false)
@@ -54,7 +63,7 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
             webView?.loadUrl(url)
         }
 
-        return webView
+        return rootView
     }
 
     /**
@@ -91,14 +100,6 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
         WebViewClientHandler.onPageStartedListener = null
         super.onDestroy()
     }
-
-    /**
-     * Gets the WebView.
-     */
-    /*val webView: WebView?
-        get() {
-            return if (isWebViewAvailable) webView else null*/
-    //}
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.webview, menu)
@@ -155,9 +156,14 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
 
 private object WebViewClientHandler : WebViewClient() {
     var onPageStartedListener: ((String?) -> Unit)? = null
+    var onPageFinishedListener: (() -> Unit)? = null
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
         onPageStartedListener?.invoke(url)
+    }
+
+    override fun onPageFinished(view: WebView?, url: String?) {
+        onPageFinishedListener?.invoke()
     }
 
     @Suppress("OverridingDeprecatedMember")
