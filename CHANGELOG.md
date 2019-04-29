@@ -1,3 +1,7 @@
+# 1.8.15
+*   Improved webview: cookie dialogs should no longer be off screen
+    See !190
+
 # 1.8.14
 *   Fixed crash on tablets
     See !189 #191
