@@ -2,9 +2,11 @@
 
 buildscript {
   ext {
-    kotlin_version = '1.3.21'
-    gradle_build_version = "3.2.0"
-    build_tools_version = "28.0.2"
+    kotlin_version = '1.3.31'
+    gradle_build_version = "3.4.0"
+    build_tools_version = "28.0.3"
+
+    multi_dex_version = "1.0.3"
 
     coroutines_version = "1.1.1"
     okhttp_version = "3.11.0"
