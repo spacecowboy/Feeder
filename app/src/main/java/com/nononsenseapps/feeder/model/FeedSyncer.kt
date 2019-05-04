@@ -11,12 +11,7 @@ import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.currentlyCharging
 import com.nononsenseapps.feeder.util.currentlyConnected
 import com.nononsenseapps.feeder.util.currentlyUnmetered
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.CoroutineContext
 
 const val ARG_FORCE_NETWORK = "force_network"
 
@@ -37,13 +32,8 @@ fun isOkToSyncAutomatically(context: Context): Boolean =
                 )
 
 
-class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Worker(context, workerParams), CoroutineScope {
-    private val job = Job()
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default + job
-
-    override fun doWork(): Result = runBlocking {
-
+class FeedSyncer(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+    override suspend fun doWork(): Result {
         val goParallel = inputData.getBoolean(PARALLEL_SYNC, false)
         val ignoreConnectivitySettings = inputData.getBoolean(IGNORE_CONNECTIVITY_SETTINGS, false)
 
@@ -75,15 +65,10 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Worker(
         LocalBroadcastManager.getInstance(applicationContext)
                 .sendBroadcast(bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false))
 
-        when {
-            success -> Result.success()
-            else -> Result.failure()
+        return when (success) {
+            true -> Result.success()
+            false -> Result.failure()
         }
-    }
-
-    override fun onStopped() {
-        job.cancel()
-        super.onStopped()
     }
 }
 
