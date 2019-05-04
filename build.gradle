@@ -6,14 +6,14 @@ buildscript {
     gradle_build_version = "3.2.0"
     build_tools_version = "28.0.2"
 
-    coroutines_version = "1.0.0"
+    coroutines_version = "1.1.1"
     okhttp_version = "3.11.0"
     rome_version = "1.7.1"
     conscrypt_version = "1.4.1"
 
     androidx_version = "1.0.0"
-    work_version = '2.0.0'
-    constraintlayout_version = "2.0.0-alpha3"
+    work_version = '2.0.1'
+    constraintlayout_version = "2.0.0-alpha5"
     recyclerview_version = "$androidx_version"
     legacy_support_version = "$androidx_version"
     appcompat_version = "1.0.2"
