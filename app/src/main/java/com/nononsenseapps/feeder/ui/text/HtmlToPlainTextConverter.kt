@@ -26,9 +26,9 @@ class HtmlToPlainTextConverter : ContentHandler {
         try {
             parser.setProperty(Parser.schemaProperty, HTMLSchema())
             parser.contentHandler = this
-        } catch (e: org.xml.sax.SAXNotRecognizedException) {
+        } catch (e: SAXNotRecognizedException) {
             throw RuntimeException(e)
-        } catch (e: org.xml.sax.SAXNotSupportedException) {
+        } catch (e: SAXNotSupportedException) {
             throw RuntimeException(e)
         }
     }

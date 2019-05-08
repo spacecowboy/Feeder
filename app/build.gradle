@@ -29,6 +29,7 @@ android {
     compileSdkVersion 28
     minSdkVersion 18
     targetSdkVersion 28
+    multiDexEnabled true
 
     vectorDrawables.useSupportLibrary = true
 
@@ -62,21 +63,28 @@ android {
 
   buildTypes {
     debug {
-      minifyEnabled false
+      minifyEnabled true
+      shrinkResources true
       applicationIdSuffix ".debug"
       pseudoLocalesEnabled true
+
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
     release {
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      minifyEnabled true
+      shrinkResources true
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
       if (project.hasProperty('STORE_FILE')) {
         signingConfig signingConfigs.release
       }
     }
     play {
       applicationIdSuffix ".play"
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      minifyEnabled true
+      shrinkResources true
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
       if (project.hasProperty('STORE_FILE')) {
         signingConfig signingConfigs.release
       }
@@ -105,6 +113,10 @@ play {
 
 dependencies {
   kapt "androidx.room:room-compiler:$room_version"
+
+  // Needed pre SDK21
+  implementation "com.android.support:multidex:$multi_dex_version"
+
   implementation "androidx.room:room-runtime:$room_version"
 
   implementation "androidx.work:work-runtime-ktx:$work_version"
