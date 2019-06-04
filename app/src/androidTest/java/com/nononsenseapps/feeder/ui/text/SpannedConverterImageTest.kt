@@ -49,7 +49,7 @@ class SpannedConverterImageTest {
 
 }
 
-private class FakeBuilder2 : SensibleSpannableStringBuilder() {
+internal class FakeBuilder2 : SensibleSpannableStringBuilder() {
     private val builder: StringBuilder = StringBuilder()
     private val spans: ArrayList<Any?> = ArrayList()
 
