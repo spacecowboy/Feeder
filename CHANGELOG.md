@@ -1,3 +1,7 @@
+# 1.8.16
+*   Fixed a null pointer crash if bare <li> tag was encountered
+    See !192
+
 # 1.8.15
 *   Improved webview: cookie dialogs should no longer be off screen
     See !190
