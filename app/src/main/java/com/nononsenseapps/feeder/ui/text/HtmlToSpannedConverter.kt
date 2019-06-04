@@ -331,7 +331,7 @@ open class HtmlToSpannedConverter(private var mSource: String,
         // Get type of list
         val list: Listing? = getLast(text, Listing::class.java)
 
-        if (list!!.ordered) {
+        if (list?.ordered == true) {
             // Numbered
             // Add number in bold
             start(text, Bold())
@@ -550,8 +550,8 @@ open class HtmlToSpannedConverter(private var mSource: String,
         if (where != len) {
             val f: Font? = obj
 
-            if (!TextUtils.isEmpty(f!!.mColor)) {
-                if (f.mColor.startsWith("@")) {
+            if (!TextUtils.isEmpty(f?.mColor)) {
+                if (f?.mColor?.startsWith("@") == true) {
                     val res = Resources.getSystem()
                     val name = f.mColor.substring(1)
                     val colorRes = res.getIdentifier(name, "color", "android")
@@ -564,8 +564,8 @@ open class HtmlToSpannedConverter(private var mSource: String,
                 }
             }
 
-            if (f.mFace != null) {
-                text.setSpan(TypefaceSpan(f.mFace), where, len,
+            f?.mFace?.let {
+                text.setSpan(TypefaceSpan(it), where, len,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
@@ -604,8 +604,10 @@ open class HtmlToSpannedConverter(private var mSource: String,
         if (where != len) {
             val h: Header? = obj
 
-            text.setSpan(RelativeSizeSpan(HEADER_SIZES[h!!.mLevel]), where,
-                    len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            h?.mLevel?.let {
+                text.setSpan(RelativeSizeSpan(HEADER_SIZES[it]), where,
+                        len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
             text.setSpan(StyleSpan(Typeface.BOLD), where, len,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
