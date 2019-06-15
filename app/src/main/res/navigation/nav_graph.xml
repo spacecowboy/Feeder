@@ -35,6 +35,7 @@
       app:destination="@id/settingsFragment" />
     <argument
       android:name="items_to_mark_as_notified"
+      app:argType="long[]"
       app:nullable="true" />
     <deepLink
       android:id="@+id/deepLink"
