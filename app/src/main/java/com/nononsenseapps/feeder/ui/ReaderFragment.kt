@@ -101,6 +101,14 @@ class ReaderFragment : CoroutineScopedFragment() {
             rssItem?.let { rssItem ->
                 setViewTitle()
 
+                rssItem.feedId?.let { feedId ->
+                    mFeedTitleTextView.setOnClickListener {
+                        findNavController().navigate(R.id.action_readerFragment_to_feedFragment, bundle {
+                            putLong(ARG_FEED_ID, feedId)
+                        })
+                    }
+                }
+
                 mFeedTitleTextView.text = rssItem.feedDisplayTitle
 
                 rssItem.pubDate.let { pubDate ->

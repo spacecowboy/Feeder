@@ -36,6 +36,7 @@
   <color name="reader_title_color">@android:color/primary_text_light</color>
   <color name="reader_author_color">@android:color/secondary_text_light</color>
   <color name="reader_body_color">@color/black_87</color>
+  <color name="reader_feedtitle_color">@color/accent</color>
 
   <color name="code_text_bg_day">#e9e9e9</color>
   <color name="code_text_bg_night">#434343</color>
