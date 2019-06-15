@@ -54,6 +54,11 @@
     <deepLink
       android:id="@+id/deepLink2"
       app:uri="content://com.nononsenseapps.feeder.provider/feed_items/{dbid}" />
+    <action
+      android:id="@+id/action_readerFragment_to_feedFragment"
+      app:destination="@id/feedFragment"
+      app:launchSingleTop="true"
+      app:popUpTo="@+id/feedFragment" />
   </fragment>
   <fragment
     android:id="@+id/readerWebViewFragment"

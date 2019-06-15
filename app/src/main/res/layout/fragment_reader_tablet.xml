@@ -29,11 +29,14 @@
 
     <TextView
       android:id="@+id/story_feedtitle"
-      style="@style/TextAppearance.Reader.Author"
+      style="@style/TextAppearance.Reader.FeedTitle"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginTop="2dp"
       android:layout_marginBottom="2dp"
+      android:background="?android:attr/selectableItemBackground"
+      android:clickable="true"
+      android:focusable="false"
       android:textDirection="locale"
       android:textIsSelectable="true"
       tools:text="CowboyProgrammer" />

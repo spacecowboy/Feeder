@@ -168,6 +168,12 @@
     <item name="android:fontFamily">sans-serif-medium</item>
   </style>
 
+  <style name="TextAppearance.Reader.FeedTitle">
+    <item name="android:textColor">@color/reader_feedtitle_color</item>
+    <item name="android:textSize">@dimen/reader_author</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+  </style>
+
   <style name="TextAppearance.Reader.Body">
     <item name="android:textColor">@color/reader_body_color</item>
     <item name="android:textSize">@dimen/reader_body</item>
