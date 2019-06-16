@@ -1,3 +1,9 @@
+# 1.8.17
+*   Made feed title clickable in Reader
+    See !194 #205
+*   Fixed crash when notification contained items to be marked as read
+    See !193 #204
+
 # 1.8.16
 *   Fixed a null pointer crash if bare <li> tag was encountered
     See !192
