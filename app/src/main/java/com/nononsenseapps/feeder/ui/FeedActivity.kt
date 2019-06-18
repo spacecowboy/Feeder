@@ -187,7 +187,19 @@ class FeedActivity : CoroutineScopedActivity() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
-            super.onBackPressed()
+            val handled: Boolean = supportFragmentManager
+                    .primaryNavigationFragment
+                    ?.childFragmentManager
+                    ?.primaryNavigationFragment.let {
+                when (it) {
+                    is ReaderWebViewFragment -> it.goBack()
+                    else -> false
+                }
+            }
+
+            if (!handled) {
+                super.onBackPressed()
+            }
         }
     }
 
