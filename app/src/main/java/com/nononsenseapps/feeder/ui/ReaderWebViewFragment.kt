@@ -146,6 +146,19 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
             else -> return super.onOptionsItemSelected(menuItem)
         }
     }
+
+    /**
+     * Returns true if the web view navigated back, false otherwise
+     */
+    fun goBack(): Boolean {
+        webView?.apply {
+            if (canGoBack()) {
+                goBack()
+                return true
+            }
+        }
+        return false
+    }
 }
 
 private object WebViewClientHandler : WebViewClient() {
