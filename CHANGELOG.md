@@ -1,3 +1,10 @@
+# 1.8.18
+*   Indonesian translation
+    Thanks to zmni
+    See !196
+*   Fixed back button handling in web view
+    See !195
+
 # 1.8.17
 *   Made feed title clickable in Reader
     See !194 #205
