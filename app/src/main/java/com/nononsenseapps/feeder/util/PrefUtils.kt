@@ -53,6 +53,8 @@ const val PREF_VAL_OPEN_WITH_READER = "0"
 const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
 const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 
+const val PREF_JAVASCRIPT_ENABLED = "pref_javascript_enabled"
+
 /**
  * Database settings
  */
@@ -118,7 +120,7 @@ object PrefUtils {
     /**
      * A shorthand method
      */
-    private fun sp(context: Context): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    internal fun sp(context: Context): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     fun isWelcomeDone(context: Context): Boolean = sp(context).getBoolean(PREF_WELCOME_DONE, false)
 
@@ -211,3 +213,10 @@ object PrefUtils {
 
 fun SharedPreferences.getStringNonNull(key: String, defaultValue: String): String =
         getString(key, defaultValue) ?: defaultValue
+
+val Context.prefs: SharedPreferences
+        get() = PrefUtils.sp(this)
+
+var SharedPreferences.javascriptEnabled: Boolean
+    get() = this.getBoolean(PREF_JAVASCRIPT_ENABLED, true)
+    set(value) = this.edit().putBoolean(PREF_JAVASCRIPT_ENABLED, value).apply()

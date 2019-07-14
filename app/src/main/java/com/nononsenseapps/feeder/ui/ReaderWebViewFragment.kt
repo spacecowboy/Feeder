@@ -4,7 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -13,7 +18,9 @@ import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.view.MenuItemCompat
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
+import com.nononsenseapps.feeder.util.javascriptEnabled
 import com.nononsenseapps.feeder.util.openLinkInBrowser
+import com.nononsenseapps.feeder.util.prefs
 
 const val ARG_URL = "url"
 
@@ -48,7 +55,7 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
 
         // Important to create webview before setting cookie policy on Android18
         CookieManager.getInstance().setAcceptCookie(false)
-        webView?.settings?.javaScriptEnabled = true
+        webView?.settings?.javaScriptEnabled = context?.prefs?.javascriptEnabled ?: true
         webView?.settings?.builtInZoomControls = true
         webView?.webViewClient = WebViewClientHandler
 
@@ -119,33 +126,49 @@ class ReaderWebViewFragment : CoroutineScopedFragment() {
         // Show/Hide enclosure
         menu.findItem(R.id.action_open_enclosure).isVisible = enclosureUrl != null
 
+        // Set state of javascript
+        menu.findItem(R.id.action_toggle_javascript)?.let { menuItem ->
+            context?.let { context ->
+                menuItem.setChecked(context.prefs.javascriptEnabled)
+            }
+        }
+
         // Don't forget super call here
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
-        when (menuItem.itemId) {
-            R.id.action_open_in_browser -> {
-                // Use the currently visible page as the url
-                val link = webView?.url ?: url
-                context?.let { context ->
-                    openLinkInBrowser(context, link)
+    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean =
+            when (menuItem.itemId) {
+                R.id.action_toggle_javascript -> {
+                    context?.let { context ->
+                        context.prefs.javascriptEnabled = (!context.prefs.javascriptEnabled).also {
+                            menuItem.setChecked(it)
+                            webView?.settings?.javaScriptEnabled = it
+                            webView?.reload()
+                        }
+                    }
+                    true
                 }
-
-                return true
-            }
-            R.id.action_open_enclosure -> {
-                enclosureUrl?.let { link ->
+                R.id.action_open_in_browser -> {
+                    // Use the currently visible page as the url
+                    val link = webView?.url ?: url
                     context?.let { context ->
                         openLinkInBrowser(context, link)
                     }
-                }
 
-                return true
+                    true
+                }
+                R.id.action_open_enclosure -> {
+                    enclosureUrl?.let { link ->
+                        context?.let { context ->
+                            openLinkInBrowser(context, link)
+                        }
+                    }
+
+                    true
+                }
+                else -> super.onOptionsItemSelected(menuItem)
             }
-            else -> return super.onOptionsItemSelected(menuItem)
-        }
-    }
 
     /**
      * Returns true if the web view navigated back, false otherwise
