@@ -1,3 +1,10 @@
+# 1.8.19
+*   Added czech translation
+    Thanks to Tomas
+    See !198
+*   Added option to toggle Javascript in Webview
+    See !197
+
 # 1.8.18
 *   Indonesian translation
     Thanks to zmni
