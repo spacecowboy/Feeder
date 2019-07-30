@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <string name="navigation_drawer_open">Otevření navigační lišty</string>
+  <string name="navigation_drawer_close">Zavření navigační lišty</string>
+  <string name="action_settings">Nastavení</string>
+  <string name="add_feed">Přidat zdroj</string>
+  <string name="title_activity_edit_feed">Přihlášení k odběru zdroje</string>
+  <string name="url">URL</string>
+  <string name="tag">štítek</string>
+  <string name="add_feed_search_hint">URL zdroje</string>
+  <string name="title">Název</string>
+
+  <string name="by_author_on_date">%1$s, %2$s</string>
+  <string name="on_date">%1$s</string>
+  <string name="save">Uložit</string>
+  <string name="empty_feed_top">Nic ke čtení.Chtěli byste…</string>
+  <string name="empty_feed_open">
+    <![CDATA[<font color="#607D8B">Otevřít</font> jiný zdroj?]]></string>
+  <string name="empty_feed_add">
+    <![CDATA[<font color="#607D8B">Přidat</font> více zdrojů?]]></string>
+  <string name="empty_no_feeds_top">Zatím nic ke čtení.\nZačněte s
+  </string>
+  <string name="empty_no_feeds_add">
+    <![CDATA[<font color="#607D8B">Přídávání</font> nějakých zdrojů]]></string>
+  <string name="search_feed_empty_hint">Zadat adresu zdroje</string>
+  <string name="mark_as_read">Označit jako přečtěné</string>
+  <string name="mark_as_unread">Označit jako nepřečtěné</string>
+  <string name="mark_all_as_read">Označit vše jako přečtěné</string>
+  <string name="edit_feed">Editace zdroje</string>
+  <string name="delete_feed">Odstranění zdroje</string>
+  <string name="show_all_items">Zobrazit všechny články</string>
+  <string name="show_unread_items">Zobrazit nepřečtěné články</string>
+  <string name="new_items_available">Nové články jsou k dispozici</string>
+  <string name="view">Náhled</string>
+  <string name="no_tag">Bez štítku</string>
+  <string name="notify_for_new_items">Upozorňovat na nové články</string>
+  <string name="dont_notify_for_new_items">Neupozorňovat na nové články</string>
+  <string name="toggle_read_status">Toggle read status</string>
+  <string name="open_link_in_browser">Otevřít odkaz v prohlížeči</string>
+  <string name="open_enclosed_media">Otevřít připojená média</string>
+  <string name="sync">Synchronizovat</string>
+  <string name="export_feeds_to_opml">Export zdrojů do OPML</string>
+  <string name="import_feeds_from_opml">Import zdrojů do OPML</string>
+  <string name="view_debug_log">Zobrazit protokol ladění</string>
+  <string name="new_based_on_this">Na základě toho</string>
+  <string name="indicator_for_mark_as_read">Indikátor pro označení jako přečtěné</string>
+  <string name="share">Sdílet</string>
+  <string name="no_such_feed">Zdroj nebyl nalezen. Zkuste použít http.</string>
+  <string name="nothing_to_display">Nic k zobrazení!</string>
+  <string name="title_activity_settings">Nastavení</string>
+  <string name="all_feeds">Všechny zdroje</string>
+
+  <string name="sync_option_manually">Manuálně</string>
+  <string name="sync_option_every_15min">Každých 15 minut</string>
+  <string name="sync_option_every_30min">Každých 30 minut</string>
+  <string name="sync_option_every_hour">Každou hodinu</string>
+  <string name="sync_option_every_3_hours">Každé 3 hodiny</string>
+  <string name="sync_option_every_6_hours">Každých šest hodin</string>
+  <string name="sync_option_every_12_hours">Každých 12 hodin</string>
+  <string name="sync_option_every_day">Každý den</string>
+
+  <string name="synchronization">Synchronizace</string>
+  <string name="only_on_wifi">Pouze na WiFi</string>
+  <string name="may_result_data_charges">Může mít za následek dodatečné poplatky za mobilní data.</string>
+  <string name="only_when_charging">Pouze při nabíjední</string>
+  <string name="image_loading">Načítání obrázků</string>
+  <string name="no_activity_for_link">Nebyla nalezena žádná aplikace pro otevření tohoto odkazu</string>
+  <string name="check_for_updates">Zkontrolovat aktualizace</string>
+  <string name="on_startup">Při spuštění</string>
+  <string name="include_mobile_hotspots">Zahrnout mobilní hotspoty</string>
+  <string name="updated_feeds">Aktualizované zdroje</string>
+  <string name="selected">Vybrané</string>
+  <string name="notification_channel_name">Nepřečtěné zdroje</string>
+  <string name="notification_channel_description">Oznámení se zobrazí pouze u nepřečtených položek v nakonfigurovaných zdrojích</string>
+  <string name="open_in_reader">Reader</string>
+  <string name="open_in_webview">WebView</string>
+  <string name="open_in_default_browser">Výchozí prohlížeč</string>
+  <string name="open_item_by_default_with">Ve výchozím nastavení otevřít článek v</string>
+  <string name="open_links_with">Otevřít odkazy </string>
+  <string name="reader_settings">Volby čtení</string>
+  <string name="open_link_in_web_view">Otevřít odkaz ve WebView</string>
+  <string name="max_feed_items">Maximální počet článků pro zdroj</string>
+  <string name="could_not_load_url">Nelze načíst adresu URL</string>
+
+  <string name="theme_system">Dle nastavení systému</string>
+  <string name="theme_automatic">Automaticky</string>
+  <string name="theme_day">Den</string>
+  <string name="theme_night">Noc</string>
+  <string name="theme">Motiv</string>
+  <string name="send_bug_report">Odeslat chybové hlášení</string>
+  <string name="no_email_client">Nelze otevřít e-mailového klienta</string>
+  <string name="touch_to_play_video">Klepnutím přehrajete video</string>
+
+</resources>
