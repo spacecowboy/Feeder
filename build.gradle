@@ -10,7 +10,7 @@ buildscript {
 
     coroutines_version = "1.1.1"
     okhttp_version = "3.11.0"
-    rome_version = "1.7.1"
+    rome_version = "1.7.1-f1"
     conscrypt_version = "1.4.1"
 
     androidx_version = "1.0.0"

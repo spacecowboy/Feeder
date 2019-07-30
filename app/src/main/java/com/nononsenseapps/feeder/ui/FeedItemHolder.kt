@@ -60,6 +60,7 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
                     val bgColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         context.getColor(R.color.window_background)
                     } else {
+                        @Suppress("DEPRECATION")
                         context.resources.getColor(R.color.window_background)
                     }
                     bgFrame.setBackgroundColor(bgColor)
