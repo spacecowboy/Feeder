@@ -56,14 +56,14 @@
   <string name="sync_option_every_30min">Každých 30 minut</string>
   <string name="sync_option_every_hour">Každou hodinu</string>
   <string name="sync_option_every_3_hours">Každé 3 hodiny</string>
-  <string name="sync_option_every_6_hours">Každých šest hodin</string>
+  <string name="sync_option_every_6_hours">Každých 6 hodin</string>
   <string name="sync_option_every_12_hours">Každých 12 hodin</string>
   <string name="sync_option_every_day">Každý den</string>
 
   <string name="synchronization">Synchronizace</string>
   <string name="only_on_wifi">Pouze na WiFi</string>
   <string name="may_result_data_charges">Může mít za následek dodatečné poplatky za mobilní data.</string>
-  <string name="only_when_charging">Pouze při nabíjední</string>
+  <string name="only_when_charging">Pouze při nabíjení</string>
   <string name="image_loading">Načítání obrázků</string>
   <string name="no_activity_for_link">Nebyla nalezena žádná aplikace pro otevření tohoto odkazu</string>
   <string name="check_for_updates">Zkontrolovat aktualizace</string>
