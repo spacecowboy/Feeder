@@ -41,7 +41,7 @@
   <string name="open_enclosed_media">Otevřít připojená média</string>
   <string name="sync">Synchronizovat</string>
   <string name="export_feeds_to_opml">Export zdrojů do OPML</string>
-  <string name="import_feeds_from_opml">Import zdrojů do OPML</string>
+  <string name="import_feeds_from_opml">Import zdrojů z OPML</string>
   <string name="view_debug_log">Zobrazit protokol ladění</string>
   <string name="new_based_on_this">Na základě toho</string>
   <string name="indicator_for_mark_as_read">Indikátor pro označení jako přečtěné</string>
