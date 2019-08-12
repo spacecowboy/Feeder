@@ -26,9 +26,14 @@ if (isTablet) {
 
 internal fun emailReportAddress(): String = "jonas.feederbugs@cowboyprogrammer.org"
 
-fun emailBugReportIntent(context: Context?): Intent = Intent(Intent.ACTION_SENDTO).also {
+fun emailBugReportIntent(context: Context?): Intent = Intent(ACTION_SENDTO).also {
     it.putExtra(EXTRA_SUBJECT, emailSubject())
     it.putExtra(EXTRA_TEXT, emailBody(context?.resources?.getBoolean(R.bool.isTablet) ?: false))
     it.putExtra(EXTRA_EMAIL, emailReportAddress())
     it.data = Uri.parse("mailto:${emailReportAddress()}")
+}
+
+
+fun openGitlabIssues(context: Context?): Intent = Intent(ACTION_VIEW).also {
+    it.data = Uri.parse("https://gitlab.com/spacecowboy/Feeder/issues")
 }
