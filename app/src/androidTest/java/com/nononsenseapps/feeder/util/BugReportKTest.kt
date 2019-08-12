@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.util
 
 import android.content.Context
-import android.content.Intent
 import android.content.Intent.*
 import android.net.Uri
 import android.os.Build
@@ -60,13 +59,21 @@ class BugReportKTest {
     }
 
     @Test
-    fun intentIsCorrect() {
+    fun emailIntentIsCorrect() {
         val intent = emailBugReportIntent(getApplicationContext())
 
-        assertEquals(Intent.ACTION_SENDTO, intent.action)
+        assertEquals(ACTION_SENDTO, intent.action)
         assertEquals(Uri.parse("mailto:${emailReportAddress()}"), intent.data)
         assertEquals(emailSubject(), intent.getStringExtra(EXTRA_SUBJECT))
         assertEquals(emailBody(getApplicationContext<Context>().resources.getBoolean(R.bool.isTablet)), intent.getStringExtra(EXTRA_TEXT))
         assertEquals(emailReportAddress(), intent.getStringExtra(EXTRA_EMAIL))
+    }
+
+    @Test
+    fun issuesIntentIsCorrect() {
+        val intent = openGitlabIssues(getApplicationContext())
+
+        assertEquals(ACTION_VIEW, intent.action)
+        assertEquals(Uri.parse("https://gitlab.com/spacecowboy/Feeder/issues"), intent.data)
     }
 }
