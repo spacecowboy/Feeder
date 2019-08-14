@@ -1,3 +1,10 @@
+# 1.8.20
+*   Changed 'Report bug' to open the Gitlab issues page instead of an email
+    See !201
+*   Updated Czech translation
+    Thanks to Tomáš Tihlařík
+    See !200 !199
+
 # 1.8.19
 *   Added czech translation
     Thanks to Tomas
