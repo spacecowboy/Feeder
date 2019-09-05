@@ -12,27 +12,31 @@ buildscript {
     okhttp_version = "3.11.0"
     rome_version = "1.7.1-f1"
     conscrypt_version = "1.4.1"
+    moshi_version = "1.5.0"
+    joda_version = "2.9.7"
+    jsoup_version = "1.7.3"
 
     androidx_version = "1.0.0"
-    work_version = '2.0.1'
-    constraintlayout_version = "2.0.0-alpha5"
+    workmanager_version = '2.2.0'
+    constraintlayout_version = "2.0.0-beta2"
     recyclerview_version = "$androidx_version"
     legacy_support_version = "$androidx_version"
-    appcompat_version = "1.0.2"
+    appcompat_version = "1.1.0"
     material_version = "$androidx_version"
-    preference_version = "$androidx_version"
+    preference_version = "1.1.0"
     test_runner_version = "1.1.0"
     test_rules_version = "1.1.0"
     paging_version = '2.1.0'
-    lifecycle_version = "2.0.0"
-    room_version = "2.0.0"
-    nav_version = "2.0.0"
+    lifecycle_version = "2.1.0"
+    room_version = "2.1.0"
+    nav_version = "2.1.0"
 
     espresso_version = "3.1.0"
     uiautomator_version = "2.2.0"
     test_ext_junit_version = "1.0.0"
 
     mockk_version = "1.9.3"
+    mockito_version = "2.13.0"
 
   }
 

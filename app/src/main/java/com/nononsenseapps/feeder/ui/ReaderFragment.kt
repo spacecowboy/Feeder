@@ -157,11 +157,11 @@ class ReaderFragment : CoroutineScopedFragment() {
         super.onSaveInstanceState(outState)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.reader, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.reader, menu)
 
         // Locate MenuItem with ShareActionProvider
-        val shareItem = menu!!.findItem(R.id.action_share)
+        val shareItem = menu.findItem(R.id.action_share)
 
         // Fetch and store ShareActionProvider
         val shareActionProvider = MenuItemCompat.getActionProvider(shareItem) as ShareActionProvider
@@ -190,8 +190,8 @@ class ReaderFragment : CoroutineScopedFragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onOptionsItemSelected(menuItem: MenuItem?): Boolean {
-        return when (menuItem!!.itemId) {
+    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+        return when (menuItem.itemId) {
             R.id.action_open_in_webview -> {
                 // Open in web view
                 rssItem?.let { rssItem ->

@@ -104,6 +104,10 @@ android {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
+
+  kotlinOptions {
+    jvmTarget = "1.8"
+  }
 }
 
 play {
@@ -119,7 +123,7 @@ dependencies {
 
   implementation "androidx.room:room-runtime:$room_version"
 
-  implementation "androidx.work:work-runtime-ktx:$work_version"
+  implementation "androidx.work:work-runtime-ktx:$workmanager_version"
 
   implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
   implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
@@ -137,9 +141,9 @@ dependencies {
   // To support SDK18
   implementation "com.nononsenseapps:filepicker:4.1.0"
   // Better times
-  implementation "joda-time:joda-time:2.3"
+  implementation "joda-time:joda-time:$joda_version"
   // HTML parsing
-  implementation "org.jsoup:jsoup:1.7.3"
+  implementation "org.jsoup:jsoup:$jsoup_version"
   implementation "org.ccil.cowan.tagsoup:tagsoup:1.2.1"
   // RSS
   implementation "com.rometools:rome:$rome_version"
@@ -164,7 +168,7 @@ dependencies {
   testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
   testImplementation "junit:junit:4.12"
-  testImplementation "org.mockito:mockito-core:2.13.0"
+  testImplementation "org.mockito:mockito-core:$mockito_version"
   testImplementation "io.mockk:mockk:$mockk_version"
   testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
 

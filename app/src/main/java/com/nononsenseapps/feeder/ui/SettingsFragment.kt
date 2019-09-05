@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.nononsenseapps.feeder.R
@@ -57,7 +58,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
     }
 
     private fun bindPreferenceSummaryToValue(prefKey: String) {
-        val preference = findPreference(prefKey)
+        val preference: Preference? = findPreference(prefKey)
         if (preference != null) {
             // Set change listener
             preference.onPreferenceChangeListener = PrefUtils.summaryUpdater

@@ -10,7 +10,6 @@ import android.view.*
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
@@ -322,22 +321,22 @@ class FeedFragment : CoroutineScopedFragment() {
         super.onPause()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.feed, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.feed, menu)
 
         // Don't forget super call here
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?) {
+    override fun onPrepareOptionsMenu(menu: Menu) {
         if (id < 1) {
-            menu?.findItem(R.id.action_edit_feed)?.isVisible = false
-            menu?.findItem(R.id.action_delete_feed)?.isVisible = false
-            menu?.findItem(R.id.action_add_templated)?.isVisible = false
+            menu.findItem(R.id.action_edit_feed)?.isVisible = false
+            menu.findItem(R.id.action_delete_feed)?.isVisible = false
+            menu.findItem(R.id.action_add_templated)?.isVisible = false
         }
 
         // Set toggleable state
-        menu?.findItem(R.id.action_only_unread)?.let { menuItem ->
+        menu.findItem(R.id.action_only_unread)?.let { menuItem ->
             val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
             menuItem.isChecked = onlyUnread
             menuItem.setTitle(if (onlyUnread) R.string.show_all_items else R.string.show_unread_items)
@@ -350,7 +349,7 @@ class FeedFragment : CoroutineScopedFragment() {
             )
         }
 
-        menu?.findItem(R.id.action_notify)?.let { menuItem ->
+        menu.findItem(R.id.action_notify)?.let { menuItem ->
             setNotifyMenuItemState(menuItem)
         }
 
@@ -565,36 +564,6 @@ class FeedFragment : CoroutineScopedFragment() {
                         putString(ARG_FEED_TAG, data.extras?.getString(ARG_FEED_TAG))
                     })
                 }
-            }
-        }
-    }
-
-    companion object {
-
-        /**
-         * Returns a new instance of this fragment
-         */
-        fun newInstance(id: Long, title: String?, url: String?,
-                        tag: String?): FeedFragment {
-            val fragment = FeedFragment()
-            fragment.arguments = bundle {
-                setLong(ARG_FEED_ID to id)
-                setString(ARG_FEED_TITLE to title)
-                setString(ARG_FEED_URL to url)
-                setString(ARG_FEED_TAG to tag)
-            }
-            return fragment
-        }
-    }
-}
-
-fun Fragment.setHideableToolbar(hideable: Boolean) {
-    activity?.let { activity ->
-        if (activity is FeedActivity) {
-            if (hideable) {
-                activity.hideableToolbar()
-            } else {
-                activity.fixedToolbar()
             }
         }
     }
