@@ -20,13 +20,14 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareActivity
 import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.model.*
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.bundle
 import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.android.synthetic.main.app_bar_navigation.*
 import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.kodein.di.generic.instance
 
 const val EXPORT_OPML_CODE = 101
 const val IMPORT_OPML_CODE = 102
@@ -35,6 +36,7 @@ const val EDIT_FEED_CODE = 103
 const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
 class FeedActivity : CoroutineScopedKodeinAwareActivity() {
+    private val prefs: Prefs by instance()
     private lateinit var navAdapter: FeedsAdapter
     private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)
@@ -180,9 +182,9 @@ class FeedActivity : CoroutineScopedKodeinAwareActivity() {
 
         // When the user runs the app for the first time, we want to land them with the
         // navigation drawer open. But just the first time.
-        if (!PrefUtils.isWelcomeDone(this)) {
+        if (!prefs.welcomeDone) {
             // first run of the app starts with the nav drawer open
-            PrefUtils.markWelcomeDone(this)
+            prefs.welcomeDone = true
             openNavDrawer()
         }
     }
@@ -217,7 +219,7 @@ class FeedActivity : CoroutineScopedKodeinAwareActivity() {
     }
 
     private fun syncFeedsMaybe() = launch(Dispatchers.Default) {
-        if (!PrefUtils.shouldSyncOnResume(applicationContext)) {
+        if (!prefs.syncOnResume) {
             return@launch
         }
 

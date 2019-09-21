@@ -14,23 +14,21 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
+import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
-import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
-import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
-import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
-import com.nononsenseapps.feeder.util.TabletUtils
-import com.nononsenseapps.feeder.util.bundle
-import com.nononsenseapps.feeder.util.openLinkInBrowser
+import com.nononsenseapps.feeder.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
+import org.kodein.di.Kodein
+import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import java.util.*
 
@@ -262,7 +260,10 @@ fun Context.getLocale(): Locale =
 
 fun Fragment.urlClickListener(): (link: String) -> Unit = { link ->
     context?.let { context ->
-        when (shouldOpenLinkWith(context)) {
+        val kodein: Kodein by closestKodein()
+        val prefs: Prefs by kodein.instance()
+
+        when (prefs.openLinksWith) {
             PREF_VAL_OPEN_WITH_WEBVIEW -> {
                 findNavController().navigate(R.id.action_readerFragment_to_readerWebViewFragment, bundle {
                     putString(ARG_URL, link)

@@ -13,9 +13,9 @@ import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.view.MenuItemCompat
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
-import com.nononsenseapps.feeder.util.javascriptEnabled
+import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.openLinkInBrowser
-import com.nononsenseapps.feeder.util.prefs
+import org.kodein.di.generic.instance
 
 const val ARG_URL = "url"
 
@@ -25,6 +25,8 @@ class ReaderWebViewFragment : CoroutineScopedKodeinAwareFragment() {
     private var enclosureUrl: String? = null
     private var shareActionProvider: ShareActionProvider? = null
     private var isWebViewAvailable: Boolean = false
+
+    private val prefs: Prefs by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +52,7 @@ class ReaderWebViewFragment : CoroutineScopedKodeinAwareFragment() {
 
         // Important to create webview before setting cookie policy on Android18
         CookieManager.getInstance().setAcceptCookie(false)
-        webView?.settings?.javaScriptEnabled = context?.prefs?.javascriptEnabled ?: true
+        webView?.settings?.javaScriptEnabled = prefs.javascriptEnabled
         webView?.settings?.builtInZoomControls = true
         webView?.webViewClient = WebViewClientHandler
 
@@ -123,9 +125,7 @@ class ReaderWebViewFragment : CoroutineScopedKodeinAwareFragment() {
 
         // Set state of javascript
         menu.findItem(R.id.action_toggle_javascript)?.let { menuItem ->
-            context?.let { context ->
-                menuItem.setChecked(context.prefs.javascriptEnabled)
-            }
+            menuItem.setChecked(prefs.javascriptEnabled)
         }
 
         // Don't forget super call here
@@ -135,12 +135,10 @@ class ReaderWebViewFragment : CoroutineScopedKodeinAwareFragment() {
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean =
             when (menuItem.itemId) {
                 R.id.action_toggle_javascript -> {
-                    context?.let { context ->
-                        context.prefs.javascriptEnabled = (!context.prefs.javascriptEnabled).also {
-                            menuItem.setChecked(it)
-                            webView?.settings?.javaScriptEnabled = it
-                            webView?.reload()
-                        }
+                    prefs.javascriptEnabled = (!prefs.javascriptEnabled).also {
+                        menuItem.isChecked = it
+                        webView?.settings?.javaScriptEnabled = it
+                        webView?.reload()
                     }
                     true
                 }

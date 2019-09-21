@@ -14,7 +14,7 @@ import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.ui.text.UrlClickListener
 import com.nononsenseapps.feeder.ui.text.toSpannedWithImages
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.TabletUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,6 +24,7 @@ import kotlin.math.roundToInt
 
 class FeedItemViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(kodein) {
     private val dao: FeedItemDao by instance()
+    private val prefs: Prefs by instance()
 
     fun getLiveItem(id: Long): LiveData<FeedItemWithFeed> = dao.loadLiveFeedItem(id)
 
@@ -51,7 +52,7 @@ class FeedItemViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(ko
                 if (currentHash != updatedHash) {
                     currentHash = updatedHash
                     launch(Dispatchers.Default) {
-                        val allowDownload = PrefUtils.shouldLoadImages(application)
+                        val allowDownload = prefs.shouldLoadImages()
                         val spanned = toSpannedWithImages(application, it.description, it.feedUrl, maxImageSize, allowDownload, urlClickListener = urlClickListener)
                         liveImageText.postValue(spanned)
                     }

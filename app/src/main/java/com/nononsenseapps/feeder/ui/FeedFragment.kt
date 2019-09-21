@@ -67,6 +67,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
 
     private val feedDao: FeedDao by instance()
     private val feedItemDao: FeedItemDao by instance()
+    private val prefs: Prefs by instance()
 
     private lateinit var liveDbPreviews: LiveData<PagedList<PreviewItem>>
 
@@ -97,13 +98,11 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
         }
 
         if (id == ID_UNSET && feedTag?.isNotEmpty() != true) {
-            context?.let { context ->
-                if (id == ID_UNSET) {
-                    id = PrefUtils.getLastOpenFeedId(context)
-                }
-                if (feedTag?.isNotEmpty() != true) {
-                    feedTag = PrefUtils.getLastOpenFeedTag(context)
-                }
+            if (id == ID_UNSET) {
+                id = prefs.lastOpenFeedId
+            }
+            if (feedTag?.isNotEmpty() != true) {
+                feedTag = prefs.lastOpenFeedTag
             }
         }
 
@@ -129,7 +128,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
         val appContext = context?.applicationContext
         launch(Dispatchers.Default) {
             if (appContext != null) {
-                PrefUtils.setLastOpenFeed(appContext, id, feedTag)
+                prefs.setLastOpenFeed(id, feedTag)
             }
         }
     }
@@ -223,7 +222,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
         recyclerView?.adapter = adapter
 
         // Load some RSS
-        val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
+        val onlyUnread = prefs.showOnlyUnread
         feedItemsViewModel = getViewModel()
         feedItemsViewModel.setOnlyUnread(onlyUnread)
         liveDbPreviews = feedItemsViewModel.getLiveDbPreviews(
@@ -346,7 +345,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
 
         // Set toggleable state
         menu.findItem(R.id.action_only_unread)?.let { menuItem ->
-            val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
+            val onlyUnread = prefs.showOnlyUnread
             menuItem.isChecked = onlyUnread
             menuItem.setTitle(if (onlyUnread) R.string.show_all_items else R.string.show_unread_items)
 
@@ -471,7 +470,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
             }
             id == R.id.action_only_unread -> {
                 val onlyUnread = !menuItem.isChecked
-                PrefUtils.setPrefShowOnlyUnread(activity!!, onlyUnread)
+                prefs.showOnlyUnread = onlyUnread
                 menuItem.isChecked = onlyUnread
                 if (onlyUnread) {
                     menuItem.setIcon(R.drawable.ic_visibility_off_white_24dp)

@@ -23,7 +23,6 @@ import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
-import com.nononsenseapps.feeder.kodein
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_ID
 import com.nononsenseapps.feeder.ui.EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED
@@ -33,6 +32,7 @@ import com.nononsenseapps.feeder.util.notificationManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.kodein.di.Kodein
+import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
 
@@ -44,7 +44,7 @@ suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
         createNotificationChannel(appContext)
     }
 
-    val kodein = appContext.kodein()
+    val kodein by closestKodein(appContext)
 
     val nm: NotificationManagerCompat by kodein.instance()
 

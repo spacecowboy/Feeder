@@ -20,13 +20,18 @@ import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.appcompat.content.res.AppCompatResources
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import org.ccil.cowan.tagsoup.Parser
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 import org.xml.sax.*
 import java.io.IOException
 import java.io.StringReader
 import java.net.URL
+import kotlin.math.roundToInt
 
 typealias UrlClickListener = ((String) -> Unit)
 
@@ -34,13 +39,13 @@ typealias UrlClickListener = ((String) -> Unit)
  * Convert an HTML document into a spannable string.
  */
 @Suppress("UNUSED_PARAMETER")
-open class HtmlToSpannedConverter(private var mSource: String,
-                                  private var mSiteUrl: URL,
+open class HtmlToSpannedConverter(private var source: String,
+                                  private var siteUrl: URL,
                                   parser: Parser,
-                                  private val mContext: Context,
+                                  private val context: Context,
                                   val maxSize: Point,
                                   private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
-                                  private var urlClickListener: UrlClickListener?) : ContentHandler {
+                                  private var urlClickListener: UrlClickListener?) : ContentHandler, KodeinAware {
     @ColorInt
     private var mAccentColor: Int = 0
     private var mQuoteGapWidth: Int = 0
@@ -54,34 +59,38 @@ open class HtmlToSpannedConverter(private var mSource: String,
 
     private val ignoredTags = listOf("style", "script")
 
+    override val kodein: Kodein by closestKodein(context)
+
+    private val prefs: Prefs by instance()
+
     init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mAccentColor = mContext.resources.getColor(R.color.accent, mContext.theme)
-            codeTextBgColor = if (PrefUtils.isNightMode(mContext)) {
-                mContext.resources.getColor(R.color.code_text_bg_night, mContext.theme)
+            mAccentColor = context.resources.getColor(R.color.accent, context.theme)
+            codeTextBgColor = if (prefs.isNightMode) {
+                context.resources.getColor(R.color.code_text_bg_night, context.theme)
             } else {
-                mContext.resources.getColor(R.color.code_text_bg_day, mContext.theme)
+                context.resources.getColor(R.color.code_text_bg_day, context.theme)
             }
         } else {
             @Suppress("DEPRECATION")
-            mAccentColor = mContext.resources.getColor(R.color.accent)
-            codeTextBgColor = if (PrefUtils.isNightMode(mContext)) {
+            mAccentColor = context.resources.getColor(R.color.accent)
+            codeTextBgColor = if (prefs.isNightMode) {
                 @Suppress("DEPRECATION")
-                mContext.resources.getColor(R.color.code_text_bg_night)
+                context.resources.getColor(R.color.code_text_bg_night)
             } else {
                 @Suppress("DEPRECATION")
-                mContext.resources.getColor(R.color.code_text_bg_day)
+                context.resources.getColor(R.color.code_text_bg_day)
             }
         }
-        mQuoteGapWidth = Math.round(mContext.resources.getDimension(R.dimen.reader_quote_gap_width))
-        mQuoteStripeWidth = Math.round(mContext.resources.getDimension(R.dimen.reader_quote_stripe_width))
+        mQuoteGapWidth = context.resources.getDimension(R.dimen.reader_quote_gap_width).roundToInt()
+        mQuoteStripeWidth = context.resources.getDimension(R.dimen.reader_quote_stripe_width).roundToInt()
     }
 
     fun convert(): Spanned {
 
         mReader.contentHandler = this
         try {
-            mReader.parse(InputSource(StringReader(mSource)))
+            mReader.parse(InputSource(StringReader(source)))
         } catch (e: IOException) {
             // We are reading from a string. There should not be IO problems.
             throw RuntimeException(e)
@@ -214,7 +223,7 @@ open class HtmlToSpannedConverter(private var mSource: String,
 
         if (href != null) {
             // Yes, this was an observed null pointer exception
-            href = relativeLinkIntoAbsolute(mSiteUrl, href)
+            href = relativeLinkIntoAbsolute(siteUrl, href)
         }
 
         val len = text.length
@@ -223,8 +232,8 @@ open class HtmlToSpannedConverter(private var mSource: String,
 
     protected open fun getImgDrawable(src: String): Drawable? =
             if (src.isNotBlank()) {
-                AppCompatResources.getDrawable(mContext,
-                        when (PrefUtils.isNightMode(mContext)) {
+                AppCompatResources.getDrawable(context,
+                        when (prefs.isNightMode) {
                             true -> R.drawable.placeholder_image_article_night
                             false -> R.drawable.placeholder_image_article_day
                         })?.also {
@@ -272,7 +281,7 @@ open class HtmlToSpannedConverter(private var mSource: String,
                 null
             }
         }?.let { src ->
-            relativeLinkIntoAbsolute(mSiteUrl, src)
+            relativeLinkIntoAbsolute(siteUrl, src)
         }?.let { imgLink ->
             getImgDrawable(imgLink)?.let {
                 imgLink to it
@@ -358,8 +367,8 @@ open class HtmlToSpannedConverter(private var mSource: String,
     }
 
     protected open fun getYoutubeThumb(video: Video): Drawable =
-    // Full size youtube icon
-            AppCompatResources.getDrawable(mContext, R.drawable.youtube_icon)!!.also {
+            // Full size youtube icon
+            AppCompatResources.getDrawable(context, R.drawable.youtube_icon)!!.also {
                 val scaled = scaleImage(it.intrinsicWidth, it.intrinsicHeight)
                 it.setBounds(0, 0, scaled.x, scaled.y)
             }
@@ -397,9 +406,9 @@ open class HtmlToSpannedConverter(private var mSource: String,
                                 Uri.parse(video.link))
                         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         try {
-                            mContext.startActivity(i)
+                            context.startActivity(i)
                         } catch (e: ActivityNotFoundException) {
-                            Toast.makeText(mContext, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -410,7 +419,7 @@ open class HtmlToSpannedConverter(private var mSource: String,
                 // Add newline also
                 text.append("\n")
                 val from = text.length
-                text.append(mContext.getString(R.string.touch_to_play_video))
+                text.append(context.getString(R.string.touch_to_play_video))
                 text.setSpan(StyleSpan(Typeface.ITALIC), from,
                         text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 text.append("\n\n")

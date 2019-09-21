@@ -5,20 +5,20 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.preference.PreferenceManager
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareViewModel
 import com.nononsenseapps.feeder.util.PREF_THEME
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 
 class SettingsViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(kodein), SharedPreferences.OnSharedPreferenceChangeListener {
     private val app: Application by instance()
+    private val prefs: Prefs by instance()
+    private val sharedPreferences: SharedPreferences by instance()
     private val prefThemeDefault: String = app.getString(R.string.pref_theme_value_default)
     private val prefThemeDay: String = app.getString(R.string.pref_theme_value_day)
     private val prefThemeNight: String = app.getString(R.string.pref_theme_value_night)
-    private val prefThemeAuto: String = app.getString(R.string.pref_theme_value_auto)
 
     private val liveMutableThemePreference = MutableLiveData<Int>()
 
@@ -33,9 +33,9 @@ class SettingsViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(ko
         }
 
     init {
-        liveMutableThemePreference.value = PrefUtils.getNightMode(app)
+        liveMutableThemePreference.value = prefs.nightMode
 
-        PreferenceManager.getDefaultSharedPreferences(app).registerOnSharedPreferenceChangeListener(this)
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -44,7 +44,6 @@ class SettingsViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(ko
                 PREF_THEME -> themePreference = when (sharedPreferences.getString(PREF_THEME, prefThemeDefault)) {
                     prefThemeDay -> AppCompatDelegate.MODE_NIGHT_NO
                     prefThemeNight -> AppCompatDelegate.MODE_NIGHT_YES
-                    prefThemeAuto -> AppCompatDelegate.MODE_NIGHT_AUTO
                     else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 }
             }
@@ -52,7 +51,7 @@ class SettingsViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(ko
     }
 
     override fun onCleared() {
-        PreferenceManager.getDefaultSharedPreferences(app).unregisterOnSharedPreferenceChangeListener(this)
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onCleared()
     }
 }

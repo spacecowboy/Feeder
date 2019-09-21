@@ -13,16 +13,14 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.FeedItemDao
-import com.nononsenseapps.feeder.kodein
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.util.*
-import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
-import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
+import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
 // Provide a reference to the views for each data item
@@ -42,8 +40,9 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
 
     var rssItem: PreviewItem? = null
 
-    override val kodein: Kodein = view.context.kodein()
+    override val kodein: Kodein by closestKodein(view.context)
     val feedItemDao: FeedItemDao by instance()
+    val prefs: Prefs by instance()
 
     init {
         view.setOnClickListener(this)
@@ -152,14 +151,13 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
     override fun onClick(view: View) {
         val context = view.context
         if (context != null) {
-            val defaultOpenItemWith = shouldOpenItemWith(context)
 
-            val openItemWith = when (defaultOpenItemWith) {
+            val openItemWith = when (val defaultOpenItemWith = prefs.openItemsWith) {
                 PREF_VAL_OPEN_WITH_READER -> {
                     if (rssItem?.plainSnippet?.isNotEmpty() == true) {
                         defaultOpenItemWith
                     } else {
-                        shouldOpenLinkWith(context)
+                        prefs.openLinksWith
                     }
                 }
                 else -> defaultOpenItemWith
@@ -215,12 +213,14 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
         if (context != null) {
             rssItem?.let { rssItem ->
                 try {
-                    GlideUtils.glide(context, rssItem.imageUrl,
-                            PrefUtils.shouldLoadImages(context))
+                    GlideUtils.glide(
+                            context, rssItem.imageUrl,
+                            prefs.shouldLoadImages()
+                    )
                             .centerCrop()
                             .also {
                                 it.error(
-                                        when (PrefUtils.isNightMode(context)) {
+                                        when (prefs.isNightMode) {
                                             true -> R.drawable.placeholder_image_list_night_64dp
                                             false -> R.drawable.placeholder_image_list_day_64dp
                                         }

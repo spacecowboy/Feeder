@@ -2,17 +2,19 @@ package com.nononsenseapps.feeder
 
 import android.app.Application
 import android.content.ContentResolver
-import android.content.Context
+import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.multidex.MultiDexApplication
+import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
+import com.nononsenseapps.feeder.base.KodeinAwareViewModelFactory
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.model.FeedParser
-import com.nononsenseapps.feeder.base.KodeinAwareViewModelFactory
+import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.feedParser
 import org.conscrypt.Conscrypt
@@ -44,6 +46,8 @@ class FeederApplication: MultiDexApplication(), KodeinAware {
         } }
         bind< NotificationManagerCompat>() with singleton { NotificationManagerCompat.from(this@FeederApplication) }
         bind<FeedParser>() with singleton { this@FeederApplication.feedParser }
+        bind<SharedPreferences>() with singleton { PreferenceManager.getDefaultSharedPreferences(this@FeederApplication) }
+        bind<Prefs>() with singleton { Prefs(kodein) }
     }
 
     init {
@@ -51,9 +55,3 @@ class FeederApplication: MultiDexApplication(), KodeinAware {
         Security.insertProviderAt(Conscrypt.newProvider(), 1)
     }
 }
-
-/**
- * Retrieves the kodein object from the application context
- */
-fun Context.kodein() : Kodein =
-        (applicationContext as KodeinAware).kodein

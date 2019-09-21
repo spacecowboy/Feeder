@@ -3,8 +3,7 @@ package com.nononsenseapps.feeder.model
 import android.content.Context
 import android.util.Log
 import com.nononsenseapps.feeder.db.room.*
-import com.nononsenseapps.feeder.kodein
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +12,8 @@ import kotlinx.coroutines.launch
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import org.kodein.di.Kodein
+import org.kodein.di.android.closestKodein
 import org.kodein.di.direct
 import org.kodein.di.generic.instance
 import java.util.*
@@ -25,13 +26,14 @@ suspend fun syncFeeds(context: Context,
                       forceNetwork: Boolean = false,
                       parallel: Boolean = false,
                       minFeedAgeMinutes: Int = 15): Boolean {
-    val kodein = context.kodein()
+    val kodein: Kodein by closestKodein(context)
+    val prefs: Prefs by kodein.instance()
     return syncFeeds(
             db = kodein.direct.instance(),
             feedParser = kodein.direct.instance(),
             feedId = feedId,
             feedTag = feedTag,
-            maxFeedItemCount = PrefUtils.maximumItemCountPerFeed(context),
+            maxFeedItemCount = prefs.maximumCountPerFeed,
             forceNetwork = forceNetwork,
             parallel = parallel,
             minFeedAgeMinutes = minFeedAgeMinutes
@@ -148,7 +150,8 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
             feedSql.responseHash = responseHash
             feedSql.title = feed.title ?: feedSql.title
             feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
-            feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.imageUrl
+            feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) }
+                    ?: feedSql.imageUrl
             db.feedDao().upsertFeed(feedSql)
 
             // Finally, prune database of old items
