@@ -16,6 +16,7 @@ import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.MockResponses.cowboy_feed_json_body
 import com.nononsenseapps.feeder.ui.MockResponses.cowboyprogrammer_feed_json_headers
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -141,8 +142,8 @@ class EditFeedTest {
         onView(withId(R.id.add_button)).perform(click())
 
         runBlocking {
-            untilEq(true) {
-                activityRule.activity?.job?.isCompleted
+            untilEq(false) {
+                activityRule.activity?.isActive
             }
 
             val feed = untilNotEq(null) {

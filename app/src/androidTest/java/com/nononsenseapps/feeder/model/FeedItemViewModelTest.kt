@@ -2,12 +2,13 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Intent
 import android.text.Spanned
-import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareActivity
+import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -63,7 +64,7 @@ class FeedItemViewModelTest {
 
         runBlocking {
             withContext(Dispatchers.Main) {
-                activityRule.activity.getFeedItemViewModel(itemId).liveImageText.observe(activityRule.activity, observer)
+                activityRule.activity.getLiveFeedItemImageText(itemId).observe(activityRule.activity, observer)
             }
 
             verify(exactly = 2, timeout = 500) {
@@ -89,7 +90,7 @@ class FeedItemViewModelTest {
 
         runBlocking {
             withContext(Dispatchers.Main) {
-                activityRule.activity.getFeedItemViewModel(itemId).liveImageText.observe(activityRule.activity, observer)
+                activityRule.activity.getLiveFeedItemImageText(itemId).observe(activityRule.activity, observer)
             }
 
             verify(exactly = 1, timeout = 500) {
@@ -118,7 +119,7 @@ class FeedItemViewModelTest {
 
         runBlocking {
             withContext(Dispatchers.Main) {
-                activityRule.activity.getFeedItemViewModel(itemId).liveImageText.observe(activityRule.activity, observer)
+                activityRule.activity.getLiveFeedItemImageText(itemId).observe(activityRule.activity, observer)
             }
 
             verify(exactly = 1, timeout = 500) {
@@ -155,7 +156,7 @@ class FeedItemViewModelTest {
 
         runBlocking {
             withContext(Dispatchers.Main) {
-                activityRule.activity.getFeedItemViewModel(itemId).liveImageText.observe(activityRule.activity, observer)
+                activityRule.activity.getLiveFeedItemImageText(itemId).observe(activityRule.activity, observer)
             }
 
             verify(exactly = 1, timeout = 500) {
@@ -191,7 +192,7 @@ class FeedItemViewModelTest {
 
         runBlocking {
             withContext(Dispatchers.Main) {
-                activityRule.activity.getFeedItemViewModel(itemId).liveImageText.observe(activityRule.activity, observer)
+                activityRule.activity.getLiveFeedItemImageText(itemId).observe(activityRule.activity, observer)
             }
 
             verify(exactly = 2, timeout = 500) {
@@ -211,7 +212,7 @@ class FeedItemViewModelTest {
     }
 }
 
-fun FragmentActivity.getFeedItemViewModel(id: Long): FeedItemViewModel {
-    val factory = FeedItemViewModelFactory(application, id, maxImageSize(), null)
-    return ViewModelProviders.of(this, factory).get(FeedItemViewModel::class.java)
+fun CoroutineScopedKodeinAwareActivity.getLiveFeedItemImageText(id: Long): MediatorLiveData<Spanned> {
+    val viewModel: FeedItemViewModel = getViewModel()
+    return viewModel.getLiveImageText(id, maxImageSize(), null)
 }

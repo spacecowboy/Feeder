@@ -13,12 +13,13 @@ import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
-import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
+import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
-import com.nononsenseapps.feeder.model.getFeedItemViewModel
+import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
@@ -30,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
+import org.kodein.di.generic.instance
 import java.util.*
 
 const val ARG_TITLE = "title"
@@ -42,8 +44,7 @@ const val ARG_ID = "dbid"
 const val ARG_AUTHOR = "author"
 const val ARG_DATE = "date"
 
-class ReaderFragment : CoroutineScopedFragment() {
-
+class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
     private val dateTimeFormat = DateTimeFormat.forStyle("FM").withLocale(Locale.getDefault())
 
     private var _id: Long = ID_UNSET
@@ -54,6 +55,8 @@ class ReaderFragment : CoroutineScopedFragment() {
     private lateinit var titleTextView: TextView
     private lateinit var mAuthorTextView: TextView
     private lateinit var mFeedTitleTextView: TextView
+
+    private val feedItemDao: FeedItemDao by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,9 +69,8 @@ class ReaderFragment : CoroutineScopedFragment() {
             val itemId = _id
             val appContext = context?.applicationContext
             appContext?.let {
-                val db = AppDatabase.getInstance(appContext)
                 launch(Dispatchers.Default) {
-                    db.feedItemDao().markAsReadAndNotified(itemId)
+                    feedItemDao.markAsReadAndNotified(itemId)
                     cancelNotification(it, itemId)
                 }
             }
@@ -94,8 +96,8 @@ class ReaderFragment : CoroutineScopedFragment() {
         mFeedTitleTextView = rootView.findViewById<View>(R.id
                 .story_feedtitle) as TextView
 
-        val viewModel = getFeedItemViewModel(_id)
-        viewModel.liveItem.observe(this, androidx.lifecycle.Observer {
+        val viewModel: FeedItemViewModel = getViewModel()
+        viewModel.getLiveItem(_id).observe(this, androidx.lifecycle.Observer {
             rssItem = it
 
             rssItem?.let { rssItem ->
@@ -135,9 +137,12 @@ class ReaderFragment : CoroutineScopedFragment() {
             }
         })
 
-        viewModel.liveImageText.observe(this, androidx.lifecycle.Observer {
-            bodyTextView.text = it
-        })
+        viewModel.getLiveImageText(_id, activity!!.maxImageSize(), urlClickListener()).observe(
+                this,
+                androidx.lifecycle.Observer {
+                    bodyTextView.text = it
+                }
+        )
 
         return rootView
     }
@@ -228,11 +233,8 @@ class ReaderFragment : CoroutineScopedFragment() {
                 true
             }
             R.id.action_mark_as_unread -> {
-                context?.applicationContext?.let {
-                    val db = AppDatabase.getInstance(it)
-                    launch(Dispatchers.Default) {
-                        db.feedItemDao().markAsRead(_id, unread = true)
-                    }
+                launch(Dispatchers.Default) {
+                    feedItemDao.markAsRead(_id, unread = true)
                 }
                 true
             }

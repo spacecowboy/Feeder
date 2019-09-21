@@ -164,6 +164,9 @@ dependencies {
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
   // For doing coroutines on UI thread
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+  // Dependency injection
+  implementation "org.kodein.di:kodein-di-generic-jvm:$kodein_version"
+  implementation "org.kodein.di:kodein-di-framework-android-x:$kodein_version"
   // tests
   testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"

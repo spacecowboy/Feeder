@@ -3,19 +3,19 @@ package com.nononsenseapps.feeder.model
 import android.content.Context
 import android.util.Log
 import com.nononsenseapps.feeder.db.room.*
+import com.nononsenseapps.feeder.kodein
 import com.nononsenseapps.feeder.util.PrefUtils
-import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import org.kodein.di.direct
+import org.kodein.di.generic.instance
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
@@ -24,17 +24,19 @@ suspend fun syncFeeds(context: Context,
                       feedTag: String = "",
                       forceNetwork: Boolean = false,
                       parallel: Boolean = false,
-                      minFeedAgeMinutes: Int = 15): Boolean =
-        syncFeeds(
-                db = AppDatabase.getInstance(context),
-                feedParser = context.feedParser,
-                feedId = feedId,
-                feedTag = feedTag,
-                maxFeedItemCount = PrefUtils.maximumItemCountPerFeed(context),
-                forceNetwork = forceNetwork,
-                parallel = parallel,
-                minFeedAgeMinutes = minFeedAgeMinutes
-        )
+                      minFeedAgeMinutes: Int = 15): Boolean {
+    val kodein = context.kodein()
+    return syncFeeds(
+            db = kodein.direct.instance(),
+            feedParser = kodein.direct.instance(),
+            feedId = feedId,
+            feedTag = feedTag,
+            maxFeedItemCount = PrefUtils.maximumItemCountPerFeed(context),
+            forceNetwork = forceNetwork,
+            parallel = parallel,
+            minFeedAgeMinutes = minFeedAgeMinutes
+    )
+}
 
 internal suspend fun syncFeeds(db: AppDatabase,
                                feedParser: FeedParser,
@@ -55,7 +57,7 @@ internal suspend fun syncFeeds(db: AppDatabase,
                             .minusMinutes(minFeedAgeMinutes)
                             .millis
                 }
-                val feedsToFetch = feedsToSync(db, feedId, feedTag, staleTime = staleTime)
+                val feedsToFetch = feedsToSync(db.feedDao(), feedId, feedTag, staleTime = staleTime)
 
                 Log.d("CoroutineSync", "Syncing ${feedsToFetch.size} feeds")
 
@@ -167,18 +169,18 @@ private suspend fun fetchFeed(
 ): Response =
         feedParser.getResponse(feedSql.url, forceNetwork = forceNetwork)
 
-internal fun feedsToSync(db: AppDatabase, feedId: Long, tag: String, staleTime: Long = -1L): List<com.nononsenseapps.feeder.db.room.Feed> {
+internal fun feedsToSync(feedDao: FeedDao, feedId: Long, tag: String, staleTime: Long = -1L): List<com.nononsenseapps.feeder.db.room.Feed> {
     return when {
         feedId > 0 -> {
-            val feed = if (staleTime > 0) db.feedDao().loadFeedIfStale(feedId, staleTime = staleTime) else db.feedDao().loadFeed(feedId)
+            val feed = if (staleTime > 0) feedDao.loadFeedIfStale(feedId, staleTime = staleTime) else feedDao.loadFeed(feedId)
             if (feed != null) {
                 listOf(feed)
             } else {
                 emptyList()
             }
         }
-        !tag.isEmpty() -> if (staleTime > 0) db.feedDao().loadFeedsIfStale(tag = tag, staleTime = staleTime) else db.feedDao().loadFeeds(tag)
-        else -> if (staleTime > 0) db.feedDao().loadFeedsIfStale(staleTime) else db.feedDao().loadFeeds()
+        !tag.isEmpty() -> if (staleTime > 0) feedDao.loadFeedsIfStale(tag = tag, staleTime = staleTime) else feedDao.loadFeeds(tag)
+        else -> if (staleTime > 0) feedDao.loadFeedsIfStale(staleTime) else feedDao.loadFeeds()
     }
 }
 

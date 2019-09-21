@@ -1,12 +1,7 @@
 package com.nononsenseapps.feeder.db.room
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import org.joda.time.DateTime
 import java.net.URL
@@ -22,6 +17,9 @@ interface FeedDao {
 
     @Delete
     fun deleteFeed(feed: Feed)
+
+    @Query("DELETE FROM feeds WHERE id IS :feedId")
+    fun deleteFeedWithId(feedId: Long)
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
     fun loadLiveFeed(feedId: Long): LiveData<Feed>

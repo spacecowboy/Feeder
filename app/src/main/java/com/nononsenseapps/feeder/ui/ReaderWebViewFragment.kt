@@ -4,12 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -17,14 +12,14 @@ import android.webkit.WebViewClient
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.view.MenuItemCompat
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
 import com.nononsenseapps.feeder.util.javascriptEnabled
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.prefs
 
 const val ARG_URL = "url"
 
-class ReaderWebViewFragment : CoroutineScopedFragment() {
+class ReaderWebViewFragment : CoroutineScopedKodeinAwareFragment() {
     private var webView: WebView? = null
     var url: String = ""
     private var enclosureUrl: String? = null

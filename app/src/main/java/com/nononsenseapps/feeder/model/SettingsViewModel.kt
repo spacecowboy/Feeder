@@ -2,22 +2,23 @@ package com.nononsenseapps.feeder.model
 
 import android.app.Application
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareViewModel
 import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.PrefUtils
+import org.kodein.di.Kodein
+import org.kodein.di.generic.instance
 
-class SettingsViewModel(application: Application) : AndroidViewModel(application), SharedPreferences.OnSharedPreferenceChangeListener {
-    private val prefThemeDefault: String = application.getString(R.string.pref_theme_value_default)
-    private val prefThemeDay: String = application.getString(R.string.pref_theme_value_day)
-    private val prefThemeNight: String = application.getString(R.string.pref_theme_value_night)
-    private val prefThemeAuto: String = application.getString(R.string.pref_theme_value_auto)
+class SettingsViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(kodein), SharedPreferences.OnSharedPreferenceChangeListener {
+    private val app: Application by instance()
+    private val prefThemeDefault: String = app.getString(R.string.pref_theme_value_default)
+    private val prefThemeDay: String = app.getString(R.string.pref_theme_value_day)
+    private val prefThemeNight: String = app.getString(R.string.pref_theme_value_night)
+    private val prefThemeAuto: String = app.getString(R.string.pref_theme_value_auto)
 
     private val liveMutableThemePreference = MutableLiveData<Int>()
 
@@ -32,9 +33,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
 
     init {
-        liveMutableThemePreference.value = PrefUtils.getNightMode(application)
+        liveMutableThemePreference.value = PrefUtils.getNightMode(app)
 
-        PreferenceManager.getDefaultSharedPreferences(application).registerOnSharedPreferenceChangeListener(this)
+        PreferenceManager.getDefaultSharedPreferences(app).registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -51,11 +52,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     }
 
     override fun onCleared() {
-        PreferenceManager.getDefaultSharedPreferences(getApplication()).unregisterOnSharedPreferenceChangeListener(this)
+        PreferenceManager.getDefaultSharedPreferences(app).unregisterOnSharedPreferenceChangeListener(this)
         super.onCleared()
     }
-}
-
-fun AppCompatActivity.getSettingsViewModel(): SettingsViewModel {
-    return ViewModelProviders.of(this).get(SettingsViewModel::class.java)
 }

@@ -10,6 +10,7 @@ import android.view.*
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
@@ -18,8 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
-import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
+import com.nononsenseapps.feeder.base.getViewModel
+import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.*
@@ -31,6 +34,7 @@ import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.kodein.di.generic.instance
 import java.io.File
 
 const val ARG_FEED_ID = "feed_id"
@@ -38,8 +42,7 @@ const val ARG_FEED_TITLE = "feed_title"
 const val ARG_FEED_URL = "feed_url"
 const val ARG_FEED_TAG = "feed_tag"
 
-class FeedFragment : CoroutineScopedFragment() {
-
+class FeedFragment : CoroutineScopedKodeinAwareFragment() {
     private var adapter: FeedItemPagedListAdapter? = null
     private var recyclerView: RecyclerView? = null
     internal var swipeRefreshLayout: SwipeRefreshLayout? = null
@@ -59,8 +62,13 @@ class FeedFragment : CoroutineScopedFragment() {
     private var layoutManager: LinearLayoutManager? = null
     private var notify = false
 
-    var feedViewModel: FeedViewModel? = null
-    var feedItemsViewModel: FeedItemsViewModel? = null
+    private lateinit var feedViewModel: FeedViewModel
+    private lateinit var feedItemsViewModel: FeedItemsViewModel
+
+    private val feedDao: FeedDao by instance()
+    private val feedItemDao: FeedItemDao by instance()
+
+    private lateinit var liveDbPreviews: LiveData<PagedList<PreviewItem>>
 
     init {
         // Listens on sync broadcasts
@@ -82,11 +90,8 @@ class FeedFragment : CoroutineScopedFragment() {
             feedTag = arguments.getString(ARG_FEED_TAG)
 
             arguments.getLongArray(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)?.let {
-                context?.let { context ->
-                    val db = AppDatabase.getInstance(context)
-                    launch(Dispatchers.Default) {
-                        db.feedItemDao().markAsNotified(it.toList())
-                    }
+                launch(Dispatchers.Default) {
+                    feedItemDao.markAsNotified(it.toList())
                 }
             }
         }
@@ -167,11 +172,12 @@ class FeedFragment : CoroutineScopedFragment() {
         swipeRefreshLayout!!.setOnRefreshListener {
             // Sync this specific feed(s) immediately
             requestFeedSync(
+                    kodein = kodein,
                     feedId = id,
                     feedTag = feedTag ?: "",
                     ignoreConnectivitySettings = true,
-                    parallell = true,
-                    forceNetwork = true
+                    forceNetwork = true,
+                    parallell = true
             )
         }
 
@@ -199,7 +205,7 @@ class FeedFragment : CoroutineScopedFragment() {
 
             override fun onDismiss(item: PreviewItem?) {
                 item?.let {
-                    feedItemsViewModel?.toggleReadState(it)
+                    launch(Dispatchers.Default) { feedItemsViewModel.toggleReadState(it) }
                 }
             }
 
@@ -218,18 +224,21 @@ class FeedFragment : CoroutineScopedFragment() {
 
         // Load some RSS
         val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
-        feedItemsViewModel = getFeedItemsViewModel(feedId = id, tag = feedTag
-                ?: "", onlyUnread = onlyUnread)
-
-        feedItemsViewModel?.liveDbPreviews?.observe(this, Observer<PagedList<PreviewItem>> {
+        feedItemsViewModel = getViewModel()
+        feedItemsViewModel.setOnlyUnread(onlyUnread)
+        liveDbPreviews = feedItemsViewModel.getLiveDbPreviews(
+                feedId = id,
+                tag = feedTag ?: ""
+        )
+        liveDbPreviews.observe(this, Observer<PagedList<PreviewItem>> {
             adapter?.submitList(it)
             emptyView?.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
         })
 
         when {
             id > ID_UNSET -> { // Load feed if feed
-                feedViewModel = getFeedViewModel(id)
-                feedViewModel?.liveFeed?.observe(this, Observer {
+                feedViewModel = getViewModel()
+                feedViewModel.getLiveFeed(id).observe(this, Observer {
                     it?.let { feed ->
                         this.title = feed.title
                         this.customTitle = feed.customTitle
@@ -260,7 +269,7 @@ class FeedFragment : CoroutineScopedFragment() {
 
                 activity?.let { activity ->
                     feedTag?.let { feedTag ->
-                        AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
+                        feedDao.loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
                             it.fold(true) { a, b -> a && b }
                                     .let { notify ->
                                         this.notify = notify
@@ -275,7 +284,7 @@ class FeedFragment : CoroutineScopedFragment() {
                 (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
                 activity?.let { activity ->
-                    AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify().observe(this, Observer {
+                    feedDao.loadLiveFeedsNotify().observe(this, Observer {
                         it.fold(true) { a, b -> a && b }
                                 .let { notify ->
                                     this.notify = notify
@@ -374,8 +383,8 @@ class FeedFragment : CoroutineScopedFragment() {
         if (appContext != null) {
             launch(Dispatchers.Default) {
                 // Set as notified so we don't spam
-                feedItemsViewModel?.markAsNotified()
-                val dao = AppDatabase.getInstance(appContext).feedDao()
+                feedItemsViewModel.markAsNotified(feedId = feedId, tag = feedTag ?: "")
+                val dao: FeedDao by instance()
                 when {
                     feedId > ID_UNSET -> dao.setNotify(feedId, on)
                     feedId == ID_ALL_FEEDS -> dao.setAllNotify(on)
@@ -391,7 +400,7 @@ class FeedFragment : CoroutineScopedFragment() {
     private fun markAsRead() {
         // Cancel any notifications
         context?.applicationContext?.let { appContext ->
-            feedItemsViewModel?.liveDbPreviews?.value?.forEach {
+            liveDbPreviews.value?.forEach {
                 // Can be null in case of placeholder values
                 it?.id?.let { id ->
                     launch(Dispatchers.Default) {
@@ -401,7 +410,9 @@ class FeedFragment : CoroutineScopedFragment() {
             }
         }
         // Then mark as read
-        feedItemsViewModel?.markAllAsRead()
+        launch(Dispatchers.Default) {
+            feedItemsViewModel.markAllAsRead(feedId = id, tag = feedTag ?: "")
+        }
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
@@ -410,9 +421,10 @@ class FeedFragment : CoroutineScopedFragment() {
             id == R.id.action_sync -> {
                 // Sync all feeds when menu button pressed
                 requestFeedSync(
-                        parallell = true,
+                        kodein = kodein,
                         ignoreConnectivitySettings = true,
-                        forceNetwork = true
+                        forceNetwork = true,
+                        parallell = true
                 )
                 true
             }
@@ -444,7 +456,7 @@ class FeedFragment : CoroutineScopedFragment() {
                 val appContext = activity?.applicationContext
                 if (appContext != null) {
                     launch(Dispatchers.Default) {
-                        feedViewModel?.deleteFeed()
+                        feedViewModel.deleteFeedWithId(feedId)
 
                         // Remove from shortcuts
                         appContext.removeDynamicShortcutToFeed(feedId)
@@ -469,7 +481,7 @@ class FeedFragment : CoroutineScopedFragment() {
 
                 menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)
 
-                feedItemsViewModel?.setOnlyUnread(onlyUnread)
+                feedItemsViewModel.setOnlyUnread(onlyUnread)
 
                 true
             }
@@ -542,18 +554,16 @@ class FeedFragment : CoroutineScopedFragment() {
             EXPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    val appContext = context!!.applicationContext
                     launch(Dispatchers.Default) {
-                        exportOpml(appContext, uri)
+                        exportOpml(kodein, uri)
                     }
                 }
             }
             IMPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    val appContext = context!!.applicationContext
                     launch(Dispatchers.Default) {
-                        importOpml(appContext, uri)
+                        importOpml(kodein, uri)
                     }
                 }
             }

@@ -17,7 +17,8 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.*
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.CoroutineScopedActivity
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareActivity
+import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.model.*
 import com.nononsenseapps.feeder.util.PrefUtils
 import com.nononsenseapps.feeder.util.bundle
@@ -33,13 +34,12 @@ const val EDIT_FEED_CODE = 103
 
 const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
-class FeedActivity : CoroutineScopedActivity() {
-
+class FeedActivity : CoroutineScopedKodeinAwareActivity() {
     private lateinit var navAdapter: FeedsAdapter
     private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)
     }
-    private val settingsViewModel by lazy { getSettingsViewModel() }
+    private val settingsViewModel by lazy { getViewModel<SettingsViewModel>() }
     var fabOnClickListener: () -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -169,10 +169,14 @@ class FeedActivity : CoroutineScopedActivity() {
             delegate.setLocalNightMode(it)
         })
 
-        getFeedListViewModel().liveFeedsAndTagsWithUnreadCounts
-                .observe(this, androidx.lifecycle.Observer<List<FeedUnreadCount>> {
+        val feedListViewModel: FeedListViewModel = getViewModel()
+
+        feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observe(
+                this,
+                androidx.lifecycle.Observer<List<FeedUnreadCount>> {
                     navAdapter.submitList(it)
-                })
+                }
+        )
 
         // When the user runs the app for the first time, we want to land them with the
         // navigation drawer open. But just the first time.
@@ -218,7 +222,8 @@ class FeedActivity : CoroutineScopedActivity() {
         }
 
         if (isOkToSyncAutomatically(applicationContext)) {
-            requestFeedSync(ignoreConnectivitySettings = false,
+            requestFeedSync(kodein = kodein,
+                    ignoreConnectivitySettings = false,
                     forceNetwork = false,
                     parallell = true)
         }

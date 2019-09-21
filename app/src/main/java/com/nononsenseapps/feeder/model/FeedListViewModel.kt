@@ -1,18 +1,17 @@
 package com.nononsenseapps.feeder.model
 
-import android.app.Application
 import androidx.collection.ArrayMap
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.ViewModelProviders
-import com.nononsenseapps.feeder.coroutines.CoroutineScopedViewModel
-import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareViewModel
+import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.kodein.di.Kodein
+import org.kodein.di.generic.instance
 
-class FeedListViewModel(application: Application): CoroutineScopedViewModel(application) {
-    private val dao = AppDatabase.getInstance(application).feedDao()
+class FeedListViewModel(kodein: Kodein): CoroutineScopedKodeinAwareViewModel(kodein) {
+    private val dao: FeedDao by instance()
     private val liveFeedsWithUnreadCounts = dao.loadLiveFeedsWithUnreadCounts()
 
     val liveFeedsAndTagsWithUnreadCounts = MediatorLiveData<List<FeedUnreadCount>>()
@@ -48,8 +47,4 @@ class FeedListViewModel(application: Application): CoroutineScopedViewModel(appl
             }
         }
     }
-}
-
-fun FragmentActivity.getFeedListViewModel(): FeedListViewModel {
-    return ViewModelProviders.of(this).get(FeedListViewModel::class.java)
 }

@@ -24,7 +24,7 @@ class FeedsToSyncTest {
         val feed = withFeed()
 
         // when
-        val result = feedsToSync(testDb.db, feedId = feed.id, tag = "")
+        val result = feedsToSync(testDb.db.feedDao(), feedId = feed.id, tag = "")
 
         // then
         assertEquals(listOf(feed), result)
@@ -36,7 +36,7 @@ class FeedsToSyncTest {
         val feed = withFeed(lastSync = now.minusMinutes(1))
 
         // when
-        val result = feedsToSync(testDb.db, feedId = feed.id, tag = "",
+        val result = feedsToSync(testDb.db.feedDao(), feedId = feed.id, tag = "",
                 staleTime = now.minusMinutes(2).millis)
 
         // then
@@ -50,7 +50,7 @@ class FeedsToSyncTest {
                 withFeed(url = URL("http://two"))
         )
 
-        val result = feedsToSync(testDb.db, feedId = ID_UNSET, tag = "")
+        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "")
 
         assertEquals(items, result)
     }
@@ -63,7 +63,7 @@ class FeedsToSyncTest {
                 withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3))
         )
 
-        val result = feedsToSync(testDb.db, feedId = ID_UNSET, tag = "", staleTime = now.minusMinutes(2).millis)
+        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "", staleTime = now.minusMinutes(2).millis)
 
         assertEquals(listOf(items[1]), result)
     }
@@ -75,7 +75,7 @@ class FeedsToSyncTest {
                 withFeed(url = URL("http://two"), tag = "tag")
         )
 
-        val result = feedsToSync(testDb.db, feedId = ID_UNSET, tag = "")
+        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "")
 
         assertEquals(items, result)
     }
@@ -88,7 +88,7 @@ class FeedsToSyncTest {
                 withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3), tag = "tag")
         )
 
-        val result = feedsToSync(testDb.db, feedId = ID_UNSET, tag = "tag", staleTime = now.minusMinutes(2).millis)
+        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "tag", staleTime = now.minusMinutes(2).millis)
 
         assertEquals(listOf(items[1]), result)
     }

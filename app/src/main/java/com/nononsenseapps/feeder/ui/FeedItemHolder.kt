@@ -12,7 +12,8 @@ import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.kodein
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.util.*
 import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
@@ -20,12 +21,15 @@ import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.generic.instance
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
 class FeedItemHolder(val view: View, private val actionCallback: ActionCallback) :
-        ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener {
+        ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener, KodeinAware {
     private val TAG = "FeedItemHolder"
     private val titleTextView: TextView = view.findViewById<View>(R.id.story_snippet) as TextView
     val dateTextView: TextView = view.findViewById<View>(R.id.story_date) as TextView
@@ -37,6 +41,9 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
     private val checkBg: View = view.findViewById(R.id.check_bg)
 
     var rssItem: PreviewItem? = null
+
+    override val kodein: Kodein = view.context.kodein()
+    val feedItemDao: FeedItemDao by instance()
 
     init {
         view.setOnClickListener(this)
@@ -161,10 +168,9 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
             when (openItemWith) {
                 PREF_VAL_OPEN_WITH_BROWSER, PREF_VAL_OPEN_WITH_WEBVIEW -> {
                     // Mark as read
-                    val db = AppDatabase.getInstance(context)
                     rssItem?.id?.let {
                         actionCallback.coroutineScope().launch(Dispatchers.Default) {
-                            db.feedItemDao().markAsRead(it)
+                            feedItemDao.markAsRead(it)
                         }
                     }
 

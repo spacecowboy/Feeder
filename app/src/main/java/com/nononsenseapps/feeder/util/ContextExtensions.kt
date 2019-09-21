@@ -15,6 +15,10 @@ import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.ui.ARG_FEED_TITLE
 import com.nononsenseapps.feeder.ui.FeedActivity
 
+interface ToastMaker {
+    fun makeToast(text: String)
+}
+
 fun Context.makeToast(text: String) {
     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 }
