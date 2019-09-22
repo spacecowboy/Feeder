@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
@@ -12,7 +13,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -21,6 +22,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 import java.net.URL
 
 
@@ -34,6 +37,9 @@ class WebViewThemeResettingTest {
     val testDb = TestDatabaseRule(getApplicationContext())
 
     private val server = MockWebServer()
+
+    private val kodein by closestKodein(getApplicationContext() as Context)
+    private val prefs by kodein.instance<Prefs>()
 
     @Before
     fun setup() {
@@ -56,7 +62,7 @@ class WebViewThemeResettingTest {
                 link = server.url("/bar.html").url().toString()
         ))
 
-        PrefUtils.setNightMode(getApplicationContext(), true)
+        prefs.isNightMode = true
 
         activityRule.launchReader(feedItemId)
     }
