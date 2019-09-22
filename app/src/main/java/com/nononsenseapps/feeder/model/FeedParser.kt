@@ -24,7 +24,7 @@ import java.net.URL
 import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
 
-val slashPattern = "<\\s*slash:comments\\s*/>".toRegex(RegexOption.IGNORE_CASE)
+val slashPattern = """<\s*slash:comments\s*/>""".toRegex(RegexOption.IGNORE_CASE)
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
 class FeedParser(override val kodein: Kodein) : KodeinAware {
