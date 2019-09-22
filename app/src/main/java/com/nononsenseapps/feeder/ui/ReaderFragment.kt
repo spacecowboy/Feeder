@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
-import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -55,6 +54,7 @@ class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
     private lateinit var mFeedTitleTextView: TextView
 
     private val feedItemDao: FeedItemDao by instance()
+    private val viewModel: FeedItemViewModel by instance(arg = this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,7 +94,6 @@ class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
         mFeedTitleTextView = rootView.findViewById<View>(R.id
                 .story_feedtitle) as TextView
 
-        val viewModel: FeedItemViewModel = getViewModel()
         viewModel.getLiveItem(_id).observe(this, androidx.lifecycle.Observer {
             rssItem = it
 

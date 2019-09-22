@@ -8,7 +8,6 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareActivity
-import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -26,6 +25,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.kodein.di.generic.instance
 import java.net.URL
 
 
@@ -213,6 +213,6 @@ class FeedItemViewModelTest {
 }
 
 fun CoroutineScopedKodeinAwareActivity.getLiveFeedItemImageText(id: Long): MediatorLiveData<Spanned> {
-    val viewModel: FeedItemViewModel = getViewModel()
+    val viewModel: FeedItemViewModel by instance(arg = this)
     return viewModel.getLiveImageText(id, maxImageSize(), null)
 }

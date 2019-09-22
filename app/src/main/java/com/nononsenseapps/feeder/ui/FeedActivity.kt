@@ -18,7 +18,6 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.*
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareActivity
-import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.model.*
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.bundle
@@ -36,12 +35,15 @@ const val EDIT_FEED_CODE = 103
 const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
 class FeedActivity : CoroutineScopedKodeinAwareActivity() {
-    private val prefs: Prefs by instance()
     private lateinit var navAdapter: FeedsAdapter
     private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)
     }
-    private val settingsViewModel by lazy { getViewModel<SettingsViewModel>() }
+
+    private val prefs: Prefs by instance()
+    private val settingsViewModel: SettingsViewModel by instance(arg = this)
+    private val feedListViewModel: FeedListViewModel by instance(arg = this)
+
     var fabOnClickListener: () -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -170,8 +172,6 @@ class FeedActivity : CoroutineScopedKodeinAwareActivity() {
         settingsViewModel.liveThemePreference.observe(this, androidx.lifecycle.Observer {
             delegate.setLocalNightMode(it)
         })
-
-        val feedListViewModel: FeedListViewModel = getViewModel()
 
         feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observe(
                 this,

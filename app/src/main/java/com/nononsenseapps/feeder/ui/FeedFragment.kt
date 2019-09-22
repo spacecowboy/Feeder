@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
-import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
@@ -62,8 +61,8 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
     private var layoutManager: LinearLayoutManager? = null
     private var notify = false
 
-    private lateinit var feedViewModel: FeedViewModel
-    private lateinit var feedItemsViewModel: FeedItemsViewModel
+    private val feedViewModel: FeedViewModel by instance(arg = this)
+    private val feedItemsViewModel: FeedItemsViewModel by instance(arg = this)
 
     private val feedDao: FeedDao by instance()
     private val feedItemDao: FeedItemDao by instance()
@@ -223,7 +222,6 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
 
         // Load some RSS
         val onlyUnread = prefs.showOnlyUnread
-        feedItemsViewModel = getViewModel()
         feedItemsViewModel.setOnlyUnread(onlyUnread)
         liveDbPreviews = feedItemsViewModel.getLiveDbPreviews(
                 feedId = id,
@@ -236,7 +234,6 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
 
         when {
             id > ID_UNSET -> { // Load feed if feed
-                feedViewModel = getViewModel()
                 feedViewModel.getLiveFeed(id).observe(this, Observer {
                     it?.let { feed ->
                         this.title = feed.title

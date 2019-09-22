@@ -17,7 +17,6 @@ import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.model.SettingsViewModel
-import com.nononsenseapps.feeder.base.getViewModel
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
@@ -57,7 +56,7 @@ class EditFeedActivity : CoroutineScopedKodeinAwareActivity() {
             field = value
         }
 
-    private val settingsViewModel by lazy { getViewModel<SettingsViewModel>() }
+    private val settingsViewModel: SettingsViewModel by instance(arg = this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (shouldBeFloatingWindow()) {

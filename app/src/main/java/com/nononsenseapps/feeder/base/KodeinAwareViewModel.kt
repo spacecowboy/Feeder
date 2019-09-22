@@ -1,12 +1,17 @@
 package com.nononsenseapps.feeder.base
 
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
+import org.kodein.di.bindings.Factory
 import org.kodein.di.direct
+import org.kodein.di.generic.bind
+import org.kodein.di.generic.factory
 import org.kodein.di.generic.instance
 import java.lang.reflect.InvocationTargetException
 
@@ -37,12 +42,21 @@ class KodeinAwareViewModelFactory(override val kodein: Kodein)
     }
 }
 
-inline fun<reified T: KodeinAwareViewModel> CoroutineScopedKodeinAwareFragment.getViewModel(): T {
-    val factory: KodeinAwareViewModelFactory by instance()
-    return ViewModelProviders.of(this, factory).get(T::class.java)
+inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.activityViewModelFactory():
+        Factory<C, FragmentActivity, T> {
+    return factory { activity: FragmentActivity ->
+        ViewModelProviders.of(activity, instance<KodeinAwareViewModelFactory>()).get(T::class.java)
+    }
 }
 
-inline fun<reified T: KodeinAwareViewModel> CoroutineScopedKodeinAwareActivity.getViewModel(): T {
-    val factory: KodeinAwareViewModelFactory by instance()
-    return ViewModelProviders.of(this, factory).get(T::class.java)
+inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.fragmentViewModelFactory():
+        Factory<C, Fragment, T> {
+    return factory { fragment: Fragment ->
+        ViewModelProviders.of(fragment, instance<KodeinAwareViewModelFactory>()).get(T::class.java)
+    }
+}
+
+inline fun <reified T : KodeinAwareViewModel> Kodein.Builder.bindWithKodeinAwareViewModelFactory() {
+    bind<T>() with activityViewModelFactory()
+    bind<T>() with fragmentViewModelFactory()
 }
