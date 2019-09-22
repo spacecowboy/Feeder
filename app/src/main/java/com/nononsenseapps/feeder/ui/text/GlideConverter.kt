@@ -1,6 +1,6 @@
 package com.nononsenseapps.feeder.ui.text
 
-import android.content.Context
+import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.Point
 import android.graphics.Typeface
@@ -16,21 +16,24 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.util.GlideUtils
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import org.ccil.cowan.tagsoup.Parser
+import org.kodein.di.Kodein
+import org.kodein.di.generic.instance
 import org.xml.sax.Attributes
 import java.net.URL
 import java.util.concurrent.ExecutionException
 
-class GlideConverter(context: Context,
-                     source: String,
-                     private val siteUrl: URL,
-                     parser: Parser,
-                     maxSize: Point,
-                     private val allowDownload: Boolean,
-                     spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
-                     urlClickListener: UrlClickListener?) :
-        HtmlToSpannedConverter(source, siteUrl, parser, context, maxSize, spannableStringBuilder, urlClickListener = urlClickListener) {
+class GlideConverter(
+        kodein: Kodein,
+        source: String,
+        private val siteUrl: URL,
+        parser: Parser,
+        maxSize: Point,
+        private val allowDownload: Boolean,
+        spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
+        urlClickListener: UrlClickListener?
+) : HtmlToSpannedConverter(source, siteUrl, parser, kodein, maxSize, spannableStringBuilder, urlClickListener = urlClickListener) {
 
-    private val context: Context = context.applicationContext
+    private val context: Application by instance()
 
     private val densityScale: Float
 

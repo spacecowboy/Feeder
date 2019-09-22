@@ -1,23 +1,25 @@
 package com.nononsenseapps.feeder.ui.text
 
 
-import android.content.Context
 import android.graphics.Point
 import android.text.Spanned
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
+import org.kodein.di.Kodein
 import java.net.URL
 
 
 val schema: HTMLSchema by lazy { HTMLSchema() }
 
-fun toSpannedWithImages(context: Context,
-                        source: String,
-                        siteUrl: URL,
-                        maxSize: Point,
-                        allowDownload: Boolean,
-                        spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
-                        urlClickListener: UrlClickListener?): Spanned {
+fun toSpannedWithImages(
+        kodein: Kodein,
+        source: String,
+        siteUrl: URL,
+        maxSize: Point,
+        allowDownload: Boolean,
+        spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
+        urlClickListener: UrlClickListener?
+): Spanned {
     val parser = Parser()
     try {
         parser.setProperty(Parser.schemaProperty, schema)
@@ -28,7 +30,7 @@ fun toSpannedWithImages(context: Context,
         throw RuntimeException(e)
     }
 
-    val converter = GlideConverter(context, source, siteUrl, parser, maxSize, allowDownload, spannableStringBuilder,  urlClickListener = urlClickListener)
+    val converter = GlideConverter(kodein, source, siteUrl, parser, maxSize, allowDownload, spannableStringBuilder, urlClickListener = urlClickListener)
     return converter.convert()
 }
 
@@ -44,10 +46,13 @@ fun toSpannedWithImages(context: Context,
  * This uses TagSoup to handle real HTML, including all of the brokenness
  * found in the wild.
  */
-fun toSpannedWithNoImages(context: Context, source: String, siteUrl: URL,
-                          maxSize: Point,
-                          spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
-                          urlClickListener: UrlClickListener?): Spanned {
+fun toSpannedWithNoImages(
+        kodein: Kodein,
+        source: String,
+        siteUrl: URL,
+        maxSize: Point,
+        spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
+        urlClickListener: UrlClickListener?): Spanned {
     val parser = Parser()
     try {
         parser.setProperty(Parser.schemaProperty, schema)
@@ -58,6 +63,6 @@ fun toSpannedWithNoImages(context: Context, source: String, siteUrl: URL,
         throw RuntimeException(e)
     }
 
-    val converter = HtmlToSpannedConverter(source, siteUrl, parser, context, maxSize, spannableStringBuilder, urlClickListener = urlClickListener)
+    val converter = HtmlToSpannedConverter(source, siteUrl, parser, kodein, maxSize, spannableStringBuilder, urlClickListener = urlClickListener)
     return converter.convert()
 }

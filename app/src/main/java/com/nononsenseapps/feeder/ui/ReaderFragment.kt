@@ -149,7 +149,13 @@ class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
             if (rssItem.title.isEmpty()) {
                 titleTextView.text = rssItem.plainTitle
             } else {
-                titleTextView.text = toSpannedWithNoImages(activity!!, rssItem.title, rssItem.feedUrl, activity!!.maxImageSize(), urlClickListener = urlClickListener())
+                titleTextView.text = toSpannedWithNoImages(
+                        kodein,
+                        rssItem.title,
+                        rssItem.feedUrl,
+                        activity!!.maxImageSize(),
+                        urlClickListener = urlClickListener()
+                )
             }
         }
     }

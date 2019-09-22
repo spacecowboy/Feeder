@@ -1,18 +1,31 @@
 package com.nononsenseapps.feeder.model
 
+import com.nononsenseapps.feeder.di.networkModule
+import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.generic.bind
+import org.kodein.di.generic.instance
+import org.kodein.di.generic.singleton
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class FeedParserClientTest {
+class FeedParserClientTest: KodeinAware {
+    override val kodein by Kodein.lazy {
+        bind<OkHttpClient>() with singleton { cachingHttpClient() }
+        import(networkModule)
+    }
     val server = MockWebServer()
+    private val feedParser: FeedParser by instance()
 
     @After
     fun stopServer() {
@@ -33,6 +46,7 @@ class FeedParserClientTest {
         server.enqueue(MockResponse().apply {
             setResponseCode(200)
             this.setBody("""
+<?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<title>No auth</title>
 </feed>
@@ -46,7 +60,7 @@ class FeedParserClientTest {
         }
 
         runBlocking {
-            val feed = FeedParser.parseFeedUrl(url)
+            val feed = feedParser.parseFeedUrl(url)
             assertEquals("No auth", feed?.title)
         }
         assertNull(server.takeRequest().headers.get("Authorization"),

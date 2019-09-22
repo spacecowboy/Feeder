@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.model
 
 import android.app.Activity
-import android.app.Application
 import android.graphics.Point
 import android.text.Spanned
 import android.text.style.ImageSpan
@@ -31,7 +30,6 @@ class FeedItemViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(ko
     fun getLiveImageText(id: Long, maxImageSize: Point, urlClickListener: UrlClickListener?): MediatorLiveData<Spanned> {
         val liveImageText: MediatorLiveData<Spanned> = MediatorLiveData()
         val liveItem = getLiveItem(id)
-        val application: Application by instance()
         var currentHash = 0
 
         liveImageText.addSource(liveItem) {
@@ -40,7 +38,7 @@ class FeedItemViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(ko
                 if (liveImageText.value == null) {
                     // Only set no image version if value is null (e.g. no load has been done yet)
                     // This avoid flickering when syncs happen
-                    liveImageText.value = toSpannedWithNoImages(application, it.description, it.feedUrl, maxImageSize, urlClickListener = urlClickListener).also {
+                    liveImageText.value = toSpannedWithNoImages(kodein, it.description, it.feedUrl, maxImageSize, urlClickListener = urlClickListener).also {
                         if (it.getAllImageSpans().isEmpty()) {
                             // If no images in the text, then we are done for now
                             currentHash = updatedHash
@@ -53,7 +51,7 @@ class FeedItemViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(ko
                     currentHash = updatedHash
                     launch(Dispatchers.Default) {
                         val allowDownload = prefs.shouldLoadImages()
-                        val spanned = toSpannedWithImages(application, it.description, it.feedUrl, maxImageSize, allowDownload, urlClickListener = urlClickListener)
+                        val spanned = toSpannedWithImages(kodein, it.description, it.feedUrl, maxImageSize, allowDownload, urlClickListener = urlClickListener)
                         liveImageText.postValue(spanned)
                     }
                 }

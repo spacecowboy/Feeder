@@ -1,11 +1,18 @@
 package com.nononsenseapps.feeder.model
 
+import com.nononsenseapps.feeder.di.networkModule
+import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.generic.bind
+import org.kodein.di.generic.instance
+import org.kodein.di.generic.singleton
 import java.io.InputStream
 import java.net.URL
 import kotlin.test.assertEquals
@@ -13,10 +20,17 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class FeedParserTest {
+class feedParserTest: KodeinAware {
     @Rule
     @JvmField
     var tempFolder = TemporaryFolder()
+
+    private val feedParser: FeedParser by instance()
+
+    override val kodein by Kodein.lazy {
+        bind<OkHttpClient>() with singleton { cachingHttpClient() }
+        import(networkModule)
+    }
 
     @Test
     @Throws(Exception::class)
@@ -24,7 +38,7 @@ class FeedParserTest {
         // I want this to be an Online test to make sure that I notice if/when Youtube changes something which breaks it
         runBlocking {
             val feeds: List<Pair<String, String>> =
-                    FeedParser.getAlternateFeedLinksAtUrl(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A"))
+                    feedParser.getAlternateFeedLinksAtUrl(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A"))
             assertEquals(listOf("https://www.youtube.com/feeds/videos.xml?channel_id=UCG1h-Wqjtwz7uUANw6gazRw" to "atom"),
                     feeds)
         }
@@ -36,7 +50,7 @@ class FeedParserTest {
     fun htmlAtomContentGetsUnescaped() {
         javaClass.getResourceAsStream("atom_hnapp.xml")!!
                 .use {
-                    val feed = FeedParser.parseFeedInputStream(URL("http://hnapp.com/rss?q=type%3Astory%20score%3E36%20-bitcoin%20-ethereum%20-cryptocurrency%20-blockchain%20-snowden%20-hiring%20-ask"), it)
+                    val feed = feedParser.parseFeedInputStream(URL("http://hnapp.com/rss?q=type%3Astory%20score%3E36%20-bitcoin%20-ethereum%20-cryptocurrency%20-blockchain%20-snowden%20-hiring%20-ask"), it)
 
                     val item = feed.items!![0]
                     assertEquals("37 – Spectre Mitigations in Microsoft's C/C++ Compiler",
@@ -53,7 +67,7 @@ class FeedParserTest {
     fun enclosedImageIsUsedAsThumbnail() {
         javaClass.getResourceAsStream("rss_lemonde.xml")!!
                 .use {
-                    val feed = FeedParser.parseFeedInputStream(URL("http://www.lemonde.fr/rss/une.xml"), it)
+                    val feed = feedParser.parseFeedInputStream(URL("http://www.lemonde.fr/rss/une.xml"), it)
 
                     val item = feed.items!![0]
                     assertEquals("http://s1.lemde.fr/image/2018/02/11/644x322/5255112_3_a8dc_martin-fourcade_02be61d126b2da39d977b2e1902c819a.jpg",
@@ -67,7 +81,7 @@ class FeedParserTest {
         javaClass.getResourceAsStream("fz.html")!!
                 .bufferedReader()
                 .use {
-                    val alts: List<Pair<String, String>> = FeedParser.getAlternateFeedLinksInHtml(it.readText())
+                    val alts: List<Pair<String, String>> = feedParser.getAlternateFeedLinksInHtml(it.readText())
                     assertEquals(emptyList(), alts)
                 }
     }
@@ -78,7 +92,7 @@ class FeedParserTest {
         javaClass.getResourceAsStream("nixos.html")!!
                 .bufferedReader()
                 .use {
-                    val alts: List<Pair<String, String>> = FeedParser.getAlternateFeedLinksInHtml(it.readText(),
+                    val alts: List<Pair<String, String>> = feedParser.getAlternateFeedLinksInHtml(it.readText(),
                             URL("https://nixos.org"))
                     assertEquals(listOf("https://nixos.org/news-rss.xml" to "application/rss+xml"), alts)
                 }
@@ -91,7 +105,7 @@ class FeedParserTest {
                 .bufferedReader()
                 .use {
                     val alts: List<Pair<String, String>> =
-                            FeedParser.getAlternateFeedLinksInHtml(it.readText(),
+                            feedParser.getAlternateFeedLinksInHtml(it.readText(),
                                     baseUrl = URL("https://www.fz.se/index.html"))
                     assertEquals(listOf(
                             "https://www.fz.se/feeds/nyheter" to "application/rss+xml",
@@ -103,42 +117,42 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksReturnsNullIfNoLink() {
-        val rssLink = FeedParser.findFeedUrl(atomRelative)
+        val rssLink = feedParser.findFeedUrl(atomRelative)
         assertNull(rssLink)
     }
 
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksReturnsAlternatesForFeedsWithAlternateLinks() {
-        val rssLink = FeedParser.findFeedUrl(atomWithAlternateLinks)
+        val rssLink = feedParser.findFeedUrl(atomWithAlternateLinks)
         assertEquals(URL("http://localhost:1313/feed.json"), rssLink)
     }
 
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksPrefersAtomByDefault() {
-        val rssLink = FeedParser.findFeedUrl(getCowboyHtml())
+        val rssLink = feedParser.findFeedUrl(getCowboyHtml())
         assertEquals(URL("https://cowboyprogrammer.org/atom.xml"), rssLink)
     }
 
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksPreferAtom() {
-        val rssLink = FeedParser.findFeedUrl(getCowboyHtml(), preferAtom = true)
+        val rssLink = feedParser.findFeedUrl(getCowboyHtml(), preferAtom = true)
         assertEquals(URL("https://cowboyprogrammer.org/atom.xml"), rssLink)
     }
 
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksPreferRss() {
-        val rssLink = FeedParser.findFeedUrl(getCowboyHtml(), preferRss = true)
+        val rssLink = feedParser.findFeedUrl(getCowboyHtml(), preferRss = true)
         assertEquals(URL("https://cowboyprogrammer.org/index.xml"), rssLink)
     }
 
     @Test
     @Throws(Exception::class)
     fun findsAlternateLinksPreferJSON() {
-        val rssLink = FeedParser.findFeedUrl(getCowboyHtml(), preferJSON = true)
+        val rssLink = feedParser.findFeedUrl(getCowboyHtml(), preferJSON = true)
         assertEquals(URL("https://cowboyprogrammer.org/feed.json"), rssLink)
     }
 
@@ -157,7 +171,7 @@ class FeedParserTest {
                         .build())
                 .build()
 
-        val feed = response.use { FeedParser.parseFeedResponse(response) }
+        val feed = response.use { feedParser.parseFeedResponse(response) }
 
         assertEquals(true, feed?.items?.get(0)?.content_text?.contains("größte"))
     }
@@ -178,7 +192,7 @@ class FeedParserTest {
                         .build())
                 .build()
 
-        val feed = response.use { FeedParser.parseFeedResponse(response) }
+        val feed = response.use { feedParser.parseFeedResponse(response) }
 
         assertEquals(1, feed?.items?.size)
         assertEquals(true, feed?.items?.get(0)?.content_text?.contains("größte"))
@@ -187,7 +201,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun correctAlternateLinkInAtomIsUsedForUrl() {
-        val feed = FeedParser.parseRssAtomBytes(URL("http://utdelningsseglaren.blogspot.com/feeds/posts/default"), utdelningsSeglarenAtom)
+        val feed = feedParser.parseRssAtomBytes(URL("http://utdelningsseglaren.blogspot.com/feeds/posts/default"), utdelningsSeglarenAtom)
 
         assertEquals("http://utdelningsseglaren.blogspot.com/2017/12/tips-pa-6-podcasts.html",
                 feed.items?.get(0)?.url)
@@ -197,7 +211,7 @@ class FeedParserTest {
     @Throws(Exception::class)
     fun relativeLinksAreMadeAbsoluteAtom() {
 
-        val feed = FeedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/feed.atom"), atomRelative.byteInputStream())
+        val feed = feedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/feed.atom"), atomRelative.byteInputStream())
         assertNotNull(feed)
 
         assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
@@ -207,7 +221,7 @@ class FeedParserTest {
     @Throws(Exception::class)
     fun relativeLinksAreMadeAbsoluteAtomNoBase() {
 
-        val feed = FeedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/feed.atom"), atomRelativeNoBase.byteInputStream())
+        val feed = feedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/feed.atom"), atomRelativeNoBase.byteInputStream())
         assertNotNull(feed)
 
         assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
@@ -217,7 +231,7 @@ class FeedParserTest {
     @Throws(Exception::class)
     fun relativeFeedLinkInRssIsMadeAbsolute() {
 
-        val feed = FeedParser.parseRssAtomBytes(URL("https://lineageos.org/feed.xml"), lineageosRss)
+        val feed = feedParser.parseRssAtomBytes(URL("https://lineageos.org/feed.xml"), lineageosRss)
         assertNotNull(feed)
 
         assertEquals("https://lineageos.org/", feed.home_page_url)
@@ -231,7 +245,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun noStyles() {
-        val feed = FeedParser.parseFeedInputStream(URL("http://research.swtch.com/feed.atom"), researchRsc)
+        val feed = feedParser.parseFeedInputStream(URL("http://research.swtch.com/feed.atom"), researchRsc)
         assertNotNull(feed)
 
         assertEquals("http://research.swtch.com/feed.atom", feed.feed_url)
@@ -253,7 +267,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun feedAuthorIsUsedAsFallback() {
-        val feed = FeedParser.parseFeedInputStream(URL("http://research.swtch.com/feed.atom"), researchRsc)
+        val feed = feedParser.parseFeedInputStream(URL("http://research.swtch.com/feed.atom"), researchRsc)
         assertNotNull(feed)
 
         assertEquals("http://research.swtch.com/feed.atom", feed.feed_url)
@@ -269,7 +283,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun nixos() {
-        val feed = FeedParser.parseFeedInputStream(URL("http://nixos.org/news-rss.xml"), nixosRss)
+        val feed = feedParser.parseFeedInputStream(URL("http://nixos.org/news-rss.xml"), nixosRss)
         assertNotNull(feed)
 
         assertNull(feed.feed_url)
@@ -285,7 +299,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun nixers() {
-        val feed = FeedParser.parseFeedInputStream(URL("https://newsletter.nixers.net/feed.xml"),
+        val feed = feedParser.parseFeedInputStream(URL("https://newsletter.nixers.net/feed.xml"),
                 nixersRss)
         assertNotNull(feed)
 
@@ -304,7 +318,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun cyklist() {
-        val feed = FeedParser.parseFeedInputStream(URL("http://www.cyklistbloggen.se/feed/"), cyklistBloggen)
+        val feed = feedParser.parseFeedInputStream(URL("http://www.cyklistbloggen.se/feed/"), cyklistBloggen)
         assertNotNull(feed)
 
         assertNull(feed.feed_url)
@@ -326,7 +340,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun cowboy() {
-        val feed = FeedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/index.xml"), cowboyRss)
+        val feed = feedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/index.xml"), cowboyRss)
         assertNotNull(feed)
 
         assertNull(feed.feed_url)
@@ -353,7 +367,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun rss() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = FeedParser.parseFeedInputStream(URL("https://cornucopia.cornubot.se/feeds/posts/default?alt=rss"), cornucopiaRss)
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("https://cornucopia.cornubot.se/feeds/posts/default?alt=rss"), cornucopiaRss)
 
         assertEquals("http://cornucopia.cornubot.se/", home_page_url)
         assertNull(feed_url)
@@ -378,7 +392,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun atom() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = FeedParser.parseFeedInputStream(URL("https://cornucopia.cornubot.se/feeds/posts/default"), cornucopiaAtom)
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("https://cornucopia.cornubot.se/feeds/posts/default"), cornucopiaAtom)
 
         assertEquals("http://cornucopia.cornubot.se/", home_page_url)
         assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", feed_url)
@@ -403,7 +417,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun atomCowboy() {
-        val (_, _, _, _, _, _, _, icon, _, _, _, _, items) = FeedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/atom.xml"), cowboyAtom)
+        val (_, _, _, _, _, _, _, icon, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/atom.xml"), cowboyAtom)
 
         assertEquals(15, items!!.size)
         val (id, _, _, _, _, _, _, image, _, date_published) = items[1]
@@ -419,7 +433,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun morningPaper() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = FeedParser.parseFeedInputStream(URL("https://blog.acolyer.org/feed/"), morningPaper)
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("https://blog.acolyer.org/feed/"), morningPaper)
 
         assertEquals("https://blog.acolyer.org", home_page_url)
         assertNull(feed_url)
@@ -437,7 +451,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun londoner() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = FeedParser.parseFeedInputStream(URL("http://londonist.com/feed"), londoner)
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("http://londonist.com/feed"), londoner)
 
         assertEquals("http://londonist.com/", home_page_url)
         assertNull(feed_url)
@@ -455,7 +469,7 @@ class FeedParserTest {
     @Test
     @Throws(Exception::class)
     fun noLinkShouldFallbackToGuid() {
-        val feed = FeedParser.parseFeedInputStream(URL("http://ANON.com/rss"), anon)
+        val feed = feedParser.parseFeedInputStream(URL("http://ANON.com/rss"), anon)
 
         assertEquals("http://ANON.com/sub", feed.home_page_url)
         assertNull(feed.feed_url)
@@ -478,7 +492,7 @@ class FeedParserTest {
     }
 
     fun golem2ShouldBeParsedDespiteEmptySlashComments() {
-        val feed = FeedParser.parseRssAtomBytes(URL("https://rss.golem.de/rss.php?feed=RSS2.0"), golemDe2)
+        val feed = feedParser.parseRssAtomBytes(URL("https://rss.golem.de/rss.php?feed=RSS2.0"), golemDe2)
 
         assertEquals("Golem.de", feed.title)
     }
@@ -487,7 +501,7 @@ class FeedParserTest {
     @Throws(Exception::class)
     fun cowboyAuthenticated() {
         runBlocking {
-            val feed = FeedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
+            val feed = feedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
             assertEquals("Cowboy Programmer", feed?.title)
         }
     }
@@ -496,7 +510,7 @@ class FeedParserTest {
     @Ignore
     @Throws(Exception::class)
     fun fz() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = FeedParser.parseFeedInputStream(URL("https://www.fz.se/feeds/nyheter"), fz)
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("https://www.fz.se/feeds/nyheter"), fz)
 
         assertEquals("http://www.fz.se/nyheter/", home_page_url)
         assertNull(feed_url)

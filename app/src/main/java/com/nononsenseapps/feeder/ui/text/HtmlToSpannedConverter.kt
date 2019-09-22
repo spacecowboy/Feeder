@@ -1,7 +1,7 @@
 package com.nononsenseapps.feeder.ui.text
 
+import android.app.Application
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
@@ -25,7 +25,6 @@ import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
-import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 import org.xml.sax.*
 import java.io.IOException
@@ -42,7 +41,7 @@ typealias UrlClickListener = ((String) -> Unit)
 open class HtmlToSpannedConverter(private var source: String,
                                   private var siteUrl: URL,
                                   parser: Parser,
-                                  private val context: Context,
+                                  override val kodein: Kodein,
                                   val maxSize: Point,
                                   private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
                                   private var urlClickListener: UrlClickListener?) : ContentHandler, KodeinAware {
@@ -59,7 +58,7 @@ open class HtmlToSpannedConverter(private var source: String,
 
     private val ignoredTags = listOf("style", "script")
 
-    override val kodein: Kodein by closestKodein(context)
+    private val context: Application by instance()
 
     private val prefs: Prefs by instance()
 
