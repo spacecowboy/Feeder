@@ -531,7 +531,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
             }
             id == R.id.action_reportbug -> {
                 try {
-                    startActivity(openGitlabIssues(context))
+                    startActivity(openGitlabIssues())
                 } catch (e: ActivityNotFoundException) {
                     Toast.makeText(context, R.string.no_email_client, Toast.LENGTH_SHORT).show()
                 }
