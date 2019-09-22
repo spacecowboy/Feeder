@@ -9,26 +9,20 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.multidex.MultiDexApplication
 import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
-import com.nononsenseapps.feeder.base.KodeinAwareViewModelFactory
-import com.nononsenseapps.feeder.base.bindWithKodeinAwareViewModelFactory
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
-import com.nononsenseapps.feeder.model.*
+import com.nononsenseapps.feeder.di.networkModule
+import com.nononsenseapps.feeder.di.viewModelModule
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
-import com.nononsenseapps.jsonfeed.Feed
-import com.nononsenseapps.jsonfeed.JsonFeedParser
 import com.nononsenseapps.jsonfeed.cachingHttpClient
-import com.nononsenseapps.jsonfeed.feedAdapter
-import com.squareup.moshi.JsonAdapter
 import okhttp3.OkHttpClient
 import org.conscrypt.Conscrypt
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
-import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
 import java.security.Security
 
@@ -42,12 +36,7 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
         bind<FeedDao>() with singleton { instance<AppDatabase>().feedDao() }
         bind<FeedItemDao>() with singleton { instance<AppDatabase>().feedItemDao() }
 
-        bind<KodeinAwareViewModelFactory>() with singleton { KodeinAwareViewModelFactory(kodein) }
-        bindWithKodeinAwareViewModelFactory<FeedViewModel>()
-        bindWithKodeinAwareViewModelFactory<FeedItemViewModel>()
-        bindWithKodeinAwareViewModelFactory<FeedItemsViewModel>()
-        bindWithKodeinAwareViewModelFactory<FeedListViewModel>()
-        bindWithKodeinAwareViewModelFactory<SettingsViewModel>()
+        import(viewModelModule)
 
         bind<WorkManager>() with singleton { WorkManager.getInstance(this@FeederApplication) }
         bind<LocalBroadcastManager>() with singleton { LocalBroadcastManager.getInstance(this@FeederApplication) }
@@ -66,10 +55,7 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
         bind<OkHttpClient>() with singleton { cachingHttpClient(
                 cacheDirectory = externalCacheDir ?: filesDir
         ) }
-        // Parsers can carry state so safer to use providers
-        bind<JsonAdapter<Feed>>() with provider { feedAdapter() }
-        bind<JsonFeedParser>() with provider { JsonFeedParser(instance<OkHttpClient>(), instance()) }
-        bind<FeedParser>() with provider { FeedParser(kodein) }
+        import(networkModule)
     }
 
     init {
