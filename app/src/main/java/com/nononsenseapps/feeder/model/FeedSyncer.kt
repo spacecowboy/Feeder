@@ -41,7 +41,6 @@ fun isOkToSyncAutomatically(context: Context): Boolean {
 class FeedSyncer(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), KodeinAware {
     override val kodein: Kodein by closestKodein(context)
     private val localBroadcastManager: LocalBroadcastManager by instance()
-    private val prefs: Prefs by instance()
 
     override suspend fun doWork(): Result {
         val goParallel = inputData.getBoolean(PARALLEL_SYNC, false)

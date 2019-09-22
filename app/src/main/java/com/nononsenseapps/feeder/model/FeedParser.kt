@@ -7,8 +7,6 @@ import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.JsonFeedParser
-import com.nononsenseapps.jsonfeed.cachingHttpClient
-import com.nononsenseapps.jsonfeed.feedAdapter
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import kotlinx.coroutines.Dispatchers.IO
@@ -16,7 +14,9 @@ import kotlinx.coroutines.withContext
 import okhttp3.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.io.File
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.generic.instance
 import java.io.IOException
 import java.io.InputStream
 import java.net.MalformedURLException
@@ -25,26 +25,11 @@ import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
 
 val slashPattern = "<\\s*slash:comments\\s*/>".toRegex(RegexOption.IGNORE_CASE)
+private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
-object FeedParser {
-    private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
-
-    // Should reuse same instance to have same cache
-    @Volatile
-    private var client: OkHttpClient = cachingHttpClient()
-    @Volatile
-    private var jsonFeedParser: JsonFeedParser = JsonFeedParser(client, feedAdapter())
-
-    /**
-     * To enable caching, you need to call this method explicitly with a suitable cache directory.
-     */
-    @Synchronized
-    fun setup(cacheDir: File?): FeedParser {
-        this.client = cachingHttpClient(cacheDir)
-        jsonFeedParser = JsonFeedParser(client, feedAdapter())
-
-        return this
-    }
+class FeedParser(override val kodein: Kodein) : KodeinAware {
+    private val client: OkHttpClient by instance()
+    private val jsonFeedParser: JsonFeedParser by instance()
 
     /**
      * Finds the preferred alternate link in the header of an HTML/XML document pointing to feeds.
@@ -100,7 +85,7 @@ object FeedParser {
                     when {
                         t.contains("application/atom") -> true
                         t.contains("application/rss") -> true
-                    // Youtube for example has alternate links with application/json+oembed type.
+                        // Youtube for example has alternate links with application/json+oembed type.
                         t == "application/json" -> true
                         else -> false
                     }
@@ -259,9 +244,7 @@ object FeedParser {
     @Throws(FeedParser.FeedParsingError::class)
     fun parseFeedResponse(response: Response, body: ByteArray): Feed? {
         try {
-            val isJSON = (response.header("content-type") ?: "").contains("json")
-
-            val feed = when (isJSON) {
+            val feed = when ((response.header("content-type") ?: "").contains("json")) {
                 true -> jsonFeedParser.parseJsonBytes(body)
                 false -> parseRssAtomBytes(response.request().url().url()!!, body)
             }
@@ -328,8 +311,7 @@ object FeedParser {
                 return feed.asFeed(baseUrl = baseUrl)
             } catch (e: NumberFormatException) {
                 throw e
-            }
-            catch (e: Throwable) {
+            } catch (e: Throwable) {
                 throw FeedParsingError(e)
             }
         }

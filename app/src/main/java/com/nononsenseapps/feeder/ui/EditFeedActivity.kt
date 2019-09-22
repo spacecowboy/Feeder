@@ -16,9 +16,9 @@ import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
+import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.requestFeedSync
-import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
@@ -57,6 +57,7 @@ class EditFeedActivity : CoroutineScopedKodeinAwareActivity() {
         }
 
     private val settingsViewModel: SettingsViewModel by instance(arg = this)
+    private val feedParser: FeedParser by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (shouldBeFloatingWindow()) {

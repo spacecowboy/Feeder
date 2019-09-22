@@ -17,12 +17,18 @@ import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.model.*
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
-import com.nononsenseapps.feeder.util.feedParser
+import com.nononsenseapps.jsonfeed.Feed
+import com.nononsenseapps.jsonfeed.JsonFeedParser
+import com.nononsenseapps.jsonfeed.cachingHttpClient
+import com.nononsenseapps.jsonfeed.feedAdapter
+import com.squareup.moshi.JsonAdapter
+import okhttp3.OkHttpClient
 import org.conscrypt.Conscrypt
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
+import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
 import java.security.Security
 
@@ -54,9 +60,16 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
             }
         }
         bind<NotificationManagerCompat>() with singleton { NotificationManagerCompat.from(this@FeederApplication) }
-        bind<FeedParser>() with singleton { this@FeederApplication.feedParser }
         bind<SharedPreferences>() with singleton { PreferenceManager.getDefaultSharedPreferences(this@FeederApplication) }
         bind<Prefs>() with singleton { Prefs(kodein) }
+
+        bind<OkHttpClient>() with singleton { cachingHttpClient(
+                cacheDirectory = externalCacheDir ?: filesDir
+        ) }
+        // Parsers can carry state so safer to use providers
+        bind<JsonAdapter<Feed>>() with provider { feedAdapter() }
+        bind<JsonFeedParser>() with provider { JsonFeedParser(instance<OkHttpClient>(), instance()) }
+        bind<FeedParser>() with provider { FeedParser(kodein) }
     }
 
     init {
