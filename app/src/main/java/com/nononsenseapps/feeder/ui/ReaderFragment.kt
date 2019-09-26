@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.text.BidiFormatter
 import androidx.core.view.MenuItemCompat
-import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
@@ -47,11 +46,7 @@ class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
     private var _id: Long = ID_UNSET
     // All content contained in RssItem
     private var rssItem: FeedItemWithFeed? = null
-    private lateinit var bodyTextView: TextView
-    private lateinit var scrollView: NestedScrollView
     private lateinit var titleTextView: TextView
-    private lateinit var mAuthorTextView: TextView
-    private lateinit var mFeedTitleTextView: TextView
 
     private val feedItemDao: FeedItemDao by instance()
     private val viewModel: FeedItemViewModel by instance(arg = this)
@@ -87,44 +82,42 @@ class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
         }
         val rootView = inflater.inflate(theLayout, container, false)
 
-        scrollView = rootView.findViewById<View>(R.id.scroll_view) as NestedScrollView
-        titleTextView = rootView.findViewById<View>(R.id.story_title) as TextView
-        bodyTextView = rootView.findViewById<View>(R.id.story_body) as TextView
-        mAuthorTextView = rootView.findViewById<View>(R.id.story_author) as TextView
-        mFeedTitleTextView = rootView.findViewById<View>(R.id
-                .story_feedtitle) as TextView
+        titleTextView = rootView.findViewById(R.id.story_title)
+        val bodyTextView = rootView.findViewById<TextView>(R.id.story_body)
+        val authorTextView = rootView.findViewById<TextView>(R.id.story_author)
+        val feedTitleTextView = rootView.findViewById<TextView>(R.id.story_feedtitle)
 
         viewModel.getLiveItem(_id).observe(this, androidx.lifecycle.Observer {
             rssItem = it
 
             rssItem?.let { rssItem ->
-                setViewTitle()
+                setViewTitle(rssItem)
 
                 rssItem.feedId?.let { feedId ->
-                    mFeedTitleTextView.setOnClickListener {
+                    feedTitleTextView.setOnClickListener {
                         findNavController().navigate(R.id.action_readerFragment_to_feedFragment, bundle {
                             putLong(ARG_FEED_ID, feedId)
                         })
                     }
                 }
 
-                mFeedTitleTextView.text = rssItem.feedDisplayTitle
+                feedTitleTextView.text = rssItem.feedDisplayTitle
 
                 rssItem.pubDate.let { pubDate ->
                     rssItem.author.let { author ->
                         when {
                             author == null && pubDate != null ->
-                                mAuthorTextView.text = getString(R.string.on_date,
+                                authorTextView.text = getString(R.string.on_date,
                                         pubDate.withZone(DateTimeZone.getDefault())
                                                 .toString(dateTimeFormat))
                             author != null && pubDate != null ->
-                                mAuthorTextView.text = getString(R.string.by_author_on_date,
+                                authorTextView.text = getString(R.string.by_author_on_date,
                                         // Must wrap author in unicode marks to ensure it formats
                                         // correctly in RTL
                                         unicodeWrap(author),
                                         pubDate.withZone(DateTimeZone.getDefault())
                                                 .toString(dateTimeFormat))
-                            else -> mAuthorTextView.visibility = View.GONE
+                            else -> authorTextView.visibility = View.GONE
                         }
                     }
                 }
@@ -144,19 +137,17 @@ class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
         return rootView
     }
 
-    private fun setViewTitle() {
-        rssItem?.let { rssItem ->
-            if (rssItem.title.isEmpty()) {
-                titleTextView.text = rssItem.plainTitle
-            } else {
-                titleTextView.text = toSpannedWithNoImages(
-                        kodein,
-                        rssItem.title,
-                        rssItem.feedUrl,
-                        activity!!.maxImageSize(),
-                        urlClickListener = urlClickListener()
-                )
-            }
+    private fun setViewTitle(rssItem: FeedItemWithFeed) {
+        if (rssItem.title.isEmpty()) {
+            titleTextView.text = rssItem.plainTitle
+        } else {
+            titleTextView.text = toSpannedWithNoImages(
+                    kodein,
+                    rssItem.title,
+                    rssItem.feedUrl,
+                    activity!!.maxImageSize(),
+                    urlClickListener = urlClickListener()
+            )
         }
     }
 

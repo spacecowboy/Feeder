@@ -29,10 +29,10 @@ import org.kodein.di.generic.instance
 class FeedItemHolder(val view: View, private val actionCallback: ActionCallback) :
         ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener, KodeinAware {
     private val TAG = "FeedItemHolder"
-    private val titleTextView: TextView = view.findViewById<View>(R.id.story_snippet) as TextView
-    val dateTextView: TextView = view.findViewById<View>(R.id.story_date) as TextView
-    val authorTextView: TextView = view.findViewById<View>(R.id.story_author) as TextView
-    val imageView: ImageView = view.findViewById<View>(R.id.story_image) as ImageView
+    private val titleTextView: TextView = view.findViewById(R.id.story_snippet)
+    val dateTextView: TextView = view.findViewById(R.id.story_date)
+    val authorTextView: TextView = view.findViewById(R.id.story_author)
+    val imageView: ImageView = view.findViewById(R.id.story_image)
     private val bgFrame: View = view.findViewById(R.id.swiping_item)
     private val checkLeft: View = view.findViewById(R.id.check_left)
     private val checkRight: View = view.findViewById(R.id.check_right)
