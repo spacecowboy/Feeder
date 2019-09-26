@@ -6,9 +6,10 @@ import com.nononsenseapps.feeder.db.room.*
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -50,8 +51,8 @@ internal suspend fun syncFeeds(db: AppDatabase,
                                minFeedAgeMinutes: Int = 15): Boolean {
     var result = false
     val time = measureTimeMillis {
-        coroutineScope {
-            try {
+        try {
+            supervisorScope {
                 val staleTime: Long = if (forceNetwork) {
                     DateTime.now(DateTimeZone.UTC).millis
                 } else {
@@ -66,6 +67,8 @@ internal suspend fun syncFeeds(db: AppDatabase,
                 val coroutineContext = when (parallel) {
                     true -> Dispatchers.Default
                     false -> this.coroutineContext
+                } + CoroutineExceptionHandler { _, throwable ->
+                    Log.e("CoroutineSync", "Error during sync: ${throwable.message}")
                 }
 
                 feedsToFetch.forEach {
@@ -79,9 +82,9 @@ internal suspend fun syncFeeds(db: AppDatabase,
                 }
 
                 result = true
-            } catch (e: Throwable) {
-                e.printStackTrace()
             }
+        } catch (e: Throwable) {
+            Log.e("CoroutineSync", "Outer error: ${e.message}")
         }
     }
     Log.d("CoroutineSync", "Completed in $time ms")
@@ -93,75 +96,69 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                              feedParser: FeedParser,
                              maxFeedItemCount: Int,
                              forceNetwork: Boolean = false) {
-    try {
-        val response: Response = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
+    val response: Response = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
 
-        var responseHash = 0
+    var responseHash = 0
 
-        val feed: Feed? =
-                response.use {
-                    it.body()?.use { responseBody ->
-                        val body = responseBody.bytes()!!
-                        responseHash = Arrays.hashCode(body)
-                        when {
-                            !response.isSuccessful -> {
-                                throw ResponseFailure("${response.code()} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
-                            }
-                            feedSql.responseHash == responseHash -> null // no change
-                            else -> feedParser.parseFeedResponse(it, body)
+    val feed: Feed? =
+            response.use {
+                it.body()?.use { responseBody ->
+                    val body = responseBody.bytes()!!
+                    responseHash = Arrays.hashCode(body)
+                    when {
+                        !response.isSuccessful -> {
+                            throw ResponseFailure("${response.code()} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
                         }
+                        feedSql.responseHash == responseHash -> null // no change
+                        else -> feedParser.parseFeedResponse(it, body)
                     }
                 }
+            }
 
-        // Always update the feeds last sync field
-        feedSql.lastSync = DateTime.now(DateTimeZone.UTC)
+    // Always update the feeds last sync field
+    feedSql.lastSync = DateTime.now(DateTimeZone.UTC)
 
-        if (feed == null) {
-            db.feedDao().upsertFeed(feedSql)
-        } else {
-            val itemDao = db.feedItemDao()
-            val idCount = feed.items?.map { it.id ?: 0 }?.toSet()?.size
+    if (feed == null) {
+        db.feedDao().upsertFeed(feedSql)
+    } else {
+        val itemDao = db.feedItemDao()
+        val idCount = feed.items?.map { it.id ?: 0 }?.toSet()?.size
 
-            val itemIds = when (idCount == feed.items?.size) {
-                true -> {
-                    feed.items?.map { it.id ?: "shouldnotbepossible" }
+        val itemIds = when (idCount == feed.items?.size) {
+            true -> {
+                feed.items?.map { it.id ?: "shouldnotbepossible" }
+            }
+            false -> {
+                feed.items?.map {
+                    "${it.title}-${it.summary}"
                 }
-                false -> {
-                    feed.items?.map {
-                        "${it.title}-${it.summary}"
-                    }
+            }
+        } ?: emptyList()
+
+        feed.items?.zip(itemIds)
+                ?.reversed()
+                ?.forEach { (item, id) ->
+                    val feedItemSql = itemDao.loadFeedItem(guid = id,
+                            feedId = feedSql.id) ?: FeedItem()
+
+                    feedItemSql.updateFromParsedEntry(item.copy(id = id), feed)
+                    feedItemSql.feedId = feedSql.id
+
+                    itemDao.upsertFeedItem(feedItemSql)
                 }
-            } ?: emptyList()
 
-            feed.items?.zip(itemIds)
-                    ?.reversed()
-                    ?.forEach { (item, id) ->
-                        val feedItemSql = itemDao.loadFeedItem(guid = id,
-                                feedId = feedSql.id) ?: FeedItem()
+        // Update feed last so lastsync is only set after all items have been handled
+        // for the rare case that the job is cancelled prematurely
+        feedSql.responseHash = responseHash
+        feedSql.title = feed.title ?: feedSql.title
+        feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
+        feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) }
+                ?: feedSql.imageUrl
+        db.feedDao().upsertFeed(feedSql)
 
-                        feedItemSql.updateFromParsedEntry(item.copy(id = id), feed)
-                        feedItemSql.feedId = feedSql.id
-
-                        itemDao.upsertFeedItem(feedItemSql)
-                    }
-
-            // Update feed last so lastsync is only set after all items have been handled
-            // for the rare case that the job is cancelled prematurely
-            feedSql.responseHash = responseHash
-            feedSql.title = feed.title ?: feedSql.title
-            feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
-            feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) }
-                    ?: feedSql.imageUrl
-            db.feedDao().upsertFeed(feedSql)
-
-            // Finally, prune database of old items
-            db.feedItemDao().cleanItemsInFeed(feedSql.id,
-                    max(maxFeedItemCount, feed.items?.size ?: 0))
-        }
-    } catch (e: ResponseFailure) {
-        Log.e("CoroutineSync", "Failed to fetch ${feedSql.displayTitle}: ${e.message}")
-    } catch (t: Throwable) {
-        Log.e("CoroutineSync", "Something went wrong: $t")
+        // Finally, prune database of old items
+        db.feedItemDao().cleanItemsInFeed(feedSql.id,
+                max(maxFeedItemCount, feed.items?.size ?: 0))
     }
 }
 
