@@ -125,6 +125,7 @@ dependencies {
 
   implementation "androidx.work:work-runtime-ktx:$workmanager_version"
 
+  implementation "androidx.core:core-ktx:$androidx_core_version"
   implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
   implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
   implementation "androidx.legacy:legacy-support-v4:$legacy_support_version"
@@ -182,7 +183,7 @@ dependencies {
   androidTestImplementation "junit:junit:4.12"
   androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
 
-  androidTestImplementation "androidx.test:core:$androidx_version"
+  androidTestImplementation "androidx.test:core:$androidx_core_version"
   androidTestImplementation "androidx.test:runner:$test_runner_version"
   androidTestImplementation "androidx.test:rules:$test_rules_version"
   androidTestImplementation "androidx.test.ext:junit:$test_ext_junit_version"

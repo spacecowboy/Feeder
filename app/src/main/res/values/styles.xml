@@ -53,7 +53,7 @@
     <item name="android:colorBackgroundCacheHint">@null</item>
   </style>
   <!-- Final application theme. -->
-  <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+  <style name="AppTheme" parent="AppBaseTheme">
     <item name="android:windowActionModeOverlay">true</item>
     <item name="windowActionModeOverlay">true</item>
     <item name="windowActionBar">false</item>
@@ -75,7 +75,7 @@
     <item name="android:editTextBackground">@drawable/edit_text</item>
   </style>
 
-  <style name="AppThemeDialog" parent="Theme.AppCompat.DayNight.Dialog">
+  <style name="AppThemeDialog" parent="AppBaseThemeDialog">
     <item name="colorPrimary">@color/primary</item>
     <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
     <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -88,6 +88,11 @@
     <!-- Only needed for pre-L -->
     <item name="android:editTextBackground">@drawable/edit_text</item>
   </style>
+
+  <!-- Override this per version -->
+  <style name="AppBaseTheme" parent="Theme.AppCompat.DayNight.NoActionBar" />
+
+  <style name="AppBaseThemeDialog" parent="Theme.AppCompat.DayNight.Dialog" />
 
   <declare-styleable name="DrawShadowFrameLayout">
     <attr name="shadowDrawable" format="reference" />

@@ -17,13 +17,13 @@ buildscript {
     joda_version = "2.9.7"
     jsoup_version = "1.7.3"
 
-    androidx_version = "1.0.0"
+    androidx_core_version = "1.2.0-alpha04"
     workmanager_version = '2.2.0'
     constraintlayout_version = "2.0.0-beta2"
-    recyclerview_version = "$androidx_version"
-    legacy_support_version = "$androidx_version"
+    recyclerview_version = "1.0.0"
+    legacy_support_version = "1.0.0"
     appcompat_version = "1.1.0"
-    material_version = "$androidx_version"
+    material_version = "1.0.0"
     preference_version = "1.1.0"
     test_runner_version = "1.1.0"
     test_rules_version = "1.1.0"

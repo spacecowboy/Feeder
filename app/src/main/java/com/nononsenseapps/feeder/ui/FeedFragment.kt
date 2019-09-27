@@ -200,12 +200,12 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
 
             override fun onSwipeStarted() {
                 // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
-                swipeRefreshLayout?.isEnabled = false
+                swipeRefreshLayout.isEnabled = false
             }
 
             override fun onSwipeCancelled() {
                 // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
-                swipeRefreshLayout?.isEnabled = true
+                swipeRefreshLayout.isEnabled = true
             }
 
         })
