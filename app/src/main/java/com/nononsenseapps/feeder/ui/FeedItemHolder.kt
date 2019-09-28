@@ -1,14 +1,19 @@
 package com.nononsenseapps.feeder.ui
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.TextAppearanceSpan
 import android.util.Log
+import android.view.ContextMenu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.navigation.Navigation.findNavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nononsenseapps.feeder.R
@@ -27,7 +32,8 @@ import org.kodein.di.generic.instance
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
 class FeedItemHolder(val view: View, private val actionCallback: ActionCallback) :
-        ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener, KodeinAware {
+        ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener, KodeinAware,
+        View.OnCreateContextMenuListener {
     private val TAG = "FeedItemHolder"
     private val titleTextView: TextView = view.findViewById(R.id.story_snippet)
     val dateTextView: TextView = view.findViewById(R.id.story_date)
@@ -46,6 +52,7 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
 
     init {
         view.setOnClickListener(this)
+        view.setOnCreateContextMenuListener(this)
         // Swipe handler
         view.setOnTouchListener(SwipeDismissTouchListener(view, null, object : SwipeDismissTouchListener.DismissCallbacks {
             override fun canDismiss(token: Any?): Boolean = rssItem != null
@@ -237,6 +244,33 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
         // Remove as listener
         itemView.viewTreeObserver.removeOnPreDrawListener(this)
         return true
+    }
+
+    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+        if (menu != null) {
+            val menuInflater: MenuInflater by instance()
+            menuInflater.inflate(R.menu.feeditem, menu)
+            menu.findItem(R.id.open_feed).setOnMenuItemClickListener {
+                rssItem?.feedId?.let {
+                    findNavController(view).navigate(R.id.action_feedFragment_self, bundle {
+                        putLong(ARG_FEED_ID, it)
+                    })
+                }
+                true
+            }
+            menu.findItem(R.id.edit_feed).setOnMenuItemClickListener {
+                rssItem?.let {
+                    val i = Intent(view.context, EditFeedActivity::class.java)
+                    i.putExtra(ARG_ID, it.feedId)
+                    i.putExtra(ARG_CUSTOMTITLE, it.feedCustomTitle)
+                    i.putExtra(ARG_TITLE, it.feedTitle)
+                    i.putExtra(ARG_FEED_TAG, it.tag)
+                    i.data = Uri.parse(it.feedUrl.toString())
+                    view.context.startActivity(i)
+                }
+                true
+            }
+        }
     }
 }
 
