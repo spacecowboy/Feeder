@@ -208,7 +208,17 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
                 swipeRefreshLayout.isEnabled = true
             }
 
-        })
+        }).also {
+            it.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    // If first item is visible, and new items have been added above
+                    // then scroll to the top
+                    if (positionStart == 0 && recyclerView.firstVisibleItemPosition == 0) {
+                        recyclerView.scrollToPosition(0)
+                    }
+                }
+            })
+        }
         recyclerView.adapter = adapter
 
         // Load some RSS
@@ -288,9 +298,11 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
 
 
     private fun onSyncBroadcast(syncing: Boolean) {
-        // Background syncs trigger the sync layout
-        if (swipeRefreshLayout.isRefreshing != syncing) {
-            swipeRefreshLayout.isRefreshing = syncing
+        // Background syncs will only disable the animation, never start it
+        if (!syncing) {
+            if (swipeRefreshLayout.isRefreshing != syncing) {
+                swipeRefreshLayout.isRefreshing = syncing
+            }
         }
     }
 
@@ -565,3 +577,12 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
         }
     }
 }
+
+val RecyclerView.firstVisibleItemPosition: Int
+    get() = with(layoutManager) {
+        when (this) {
+            is GridLayoutManager -> findFirstVisibleItemPosition()
+            is LinearLayoutManager -> findFirstVisibleItemPosition()
+            else -> -1
+        }
+    }
