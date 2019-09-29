@@ -91,6 +91,9 @@
   <string name="send_bug_report">Enviar informe de error</string>
   <string name="no_email_client">No se puede abrir un cliente de correo</string>
   <string name="touch_to_play_video">Tocar para reproducir vídeo</string>
+  <string name="javascript">Javascript</string>
+  <string name="open_feed">Abrir canal</string>
+  <string name="mark_items_below_as_read">Marcar los elementos de debajo como leídos</string>
 
 
 </resources>
