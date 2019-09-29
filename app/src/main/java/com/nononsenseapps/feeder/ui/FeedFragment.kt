@@ -356,7 +356,6 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
         if (id < 1) {
             menu.findItem(R.id.action_edit_feed)?.isVisible = false
             menu.findItem(R.id.action_delete_feed)?.isVisible = false
-            menu.findItem(R.id.action_add_templated)?.isVisible = false
         }
 
         // Set toggleable state
