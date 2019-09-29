@@ -8,4 +8,7 @@
   <item
     android:id="@+id/edit_feed"
     android:title="@string/edit_feed" />
+  <item
+    android:id="@+id/mark_items_below_as_read"
+    android:title="@string/mark_items_below_as_read" />
 </menu>

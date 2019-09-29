@@ -17,6 +17,7 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
@@ -208,6 +209,21 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
                 swipeRefreshLayout.isEnabled = true
             }
 
+            override fun markBelowAsRead(position: Int) {
+                recyclerView.adapter?.let { adapter ->
+                    launch(Dispatchers.Default) {
+                        if (position > NO_POSITION) {
+                            val ids = ((position + 1) until adapter.itemCount)
+                                    .asSequence()
+                                    .map {
+                                        adapter.getItemId(it)
+                                    }
+                                    .toList()
+                            feedItemDao.markAsRead(ids)
+                        }
+                    }
+                }
+            }
         }).also {
             it.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -583,6 +599,6 @@ val RecyclerView.firstVisibleItemPosition: Int
         when (this) {
             is GridLayoutManager -> findFirstVisibleItemPosition()
             is LinearLayoutManager -> findFirstVisibleItemPosition()
-            else -> -1
+            else -> NO_POSITION
         }
     }

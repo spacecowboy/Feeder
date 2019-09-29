@@ -270,6 +270,10 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
                 }
                 true
             }
+            menu.findItem(R.id.mark_items_below_as_read).setOnMenuItemClickListener {
+                actionCallback.markBelowAsRead(adapterPosition)
+                true
+            }
         }
     }
 }
@@ -278,5 +282,6 @@ interface ActionCallback {
     fun onDismiss(item: PreviewItem?)
     fun onSwipeStarted()
     fun onSwipeCancelled()
+    fun markBelowAsRead(position: Int)
     fun coroutineScope(): CoroutineScope
 }
