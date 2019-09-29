@@ -1,3 +1,9 @@
+# 1.8.21
+*   Long press items to open a context menu with various actions
+    See !202
+*   List will now auto scroll to top when new items are downloaded if list is already at the top
+    See !202
+
 # 1.8.20
 *   Changed 'Report bug' to open the Gitlab issues page instead of an email
     See !201
