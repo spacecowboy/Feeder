@@ -33,29 +33,15 @@ cache:
     - ci/before
     - chmod +x ./gradlew
 
-.build: &build_def
+check:
   <<: *before_docker
   stage: build
   script:
-    - ./gradlew assemble -PdisablePreDex
-    - ./gradlew assembleAndroidTest -PdisablePreDex
+    - ./gradlew assembleDebug check -PdisablePreDex
   artifacts:
     paths:
     - app/build/outputs/
     - build/logs/
-
-.test: &test_def
-  <<: *before_docker
-  stage: build
-  script:
-    - ./gradlew check -PdisablePreDex
-  artifacts:
-
-build:jdk-1.8:
-  <<: *build_def
-
-unit-tests:jdk-1.8:
-  <<: *test_def
 
 deploy_playstore:
   <<: *before_docker
