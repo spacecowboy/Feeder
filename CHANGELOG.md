@@ -1,3 +1,8 @@
+# 1.8.22
+*   Update Spanish translations
+    Thanks to Khar Khamal
+    See !203
+
 # 1.8.21
 *   Long press items to open a context menu with various actions
     See !202
