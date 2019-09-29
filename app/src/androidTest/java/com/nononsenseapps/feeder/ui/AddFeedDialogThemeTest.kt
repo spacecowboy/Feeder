@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions
@@ -9,10 +10,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -20,9 +23,12 @@ class AddFeedDialogThemeTest {
     @get:Rule
     var activityRule: ActivityTestRule<EditFeedActivity> = ActivityTestRule(EditFeedActivity::class.java, false, false)
 
+    private val kodein by closestKodein(getApplicationContext() as Context)
+    private val prefs by kodein.instance<Prefs>()
+
     @Test
     fun startsInDarkModeIfSet() {
-        PrefUtils.setNightMode(getApplicationContext(), true)
+        prefs.isNightMode = true
 
         activityRule.launchActivity(null)
 
@@ -31,7 +37,7 @@ class AddFeedDialogThemeTest {
 
     @Test
     fun startsInLightModeIfSet() {
-        PrefUtils.setNightMode(getApplicationContext(), false)
+        prefs.isNightMode = false
 
         activityRule.launchActivity(null)
 

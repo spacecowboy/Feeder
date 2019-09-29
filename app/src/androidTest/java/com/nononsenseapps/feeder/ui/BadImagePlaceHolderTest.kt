@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.view.View
@@ -20,7 +21,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -30,6 +31,8 @@ import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
@@ -43,6 +46,9 @@ class BadImagePlaceHolderTest {
 
     private val server = MockWebServer()
 
+    private val kodein by closestKodein(getApplicationContext() as Context)
+    private val prefs by kodein.instance<Prefs>()
+
     @After
     fun stopServer() {
         server.shutdown()
@@ -50,14 +56,14 @@ class BadImagePlaceHolderTest {
 
     @Test
     fun placeHolderIsShownOnBadImageNightTheme() {
-        PrefUtils.setNightMode(getApplicationContext(), true)
+        prefs.isNightMode = true
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
         placeHolderIsShownOnBadImage()
     }
 
     @Test
     fun placeHolderIsShownOnBadImageDayTheme() {
-        PrefUtils.setNightMode(getApplicationContext(), false)
+        prefs.isNightMode = false
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
         placeHolderIsShownOnBadImage()
     }

@@ -17,15 +17,16 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.*
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.CoroutineScopedActivity
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareActivity
 import com.nononsenseapps.feeder.model.*
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.bundle
 import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.android.synthetic.main.app_bar_navigation.*
 import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.kodein.di.generic.instance
 
 const val EXPORT_OPML_CODE = 101
 const val IMPORT_OPML_CODE = 102
@@ -33,13 +34,16 @@ const val EDIT_FEED_CODE = 103
 
 const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
-class FeedActivity : CoroutineScopedActivity() {
-
+class FeedActivity : CoroutineScopedKodeinAwareActivity() {
     private lateinit var navAdapter: FeedsAdapter
     private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)
     }
-    private val settingsViewModel by lazy { getSettingsViewModel() }
+
+    private val prefs: Prefs by instance()
+    private val settingsViewModel: SettingsViewModel by instance(arg = this)
+    private val feedListViewModel: FeedListViewModel by instance(arg = this)
+
     var fabOnClickListener: () -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -169,16 +173,18 @@ class FeedActivity : CoroutineScopedActivity() {
             delegate.setLocalNightMode(it)
         })
 
-        getFeedListViewModel().liveFeedsAndTagsWithUnreadCounts
-                .observe(this, androidx.lifecycle.Observer<List<FeedUnreadCount>> {
+        feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observe(
+                this,
+                androidx.lifecycle.Observer<List<FeedUnreadCount>> {
                     navAdapter.submitList(it)
-                })
+                }
+        )
 
         // When the user runs the app for the first time, we want to land them with the
         // navigation drawer open. But just the first time.
-        if (!PrefUtils.isWelcomeDone(this)) {
+        if (!prefs.welcomeDone) {
             // first run of the app starts with the nav drawer open
-            PrefUtils.markWelcomeDone(this)
+            prefs.welcomeDone = true
             openNavDrawer()
         }
     }
@@ -213,12 +219,13 @@ class FeedActivity : CoroutineScopedActivity() {
     }
 
     private fun syncFeedsMaybe() = launch(Dispatchers.Default) {
-        if (!PrefUtils.shouldSyncOnResume(applicationContext)) {
+        if (!prefs.syncOnResume) {
             return@launch
         }
 
         if (isOkToSyncAutomatically(applicationContext)) {
-            requestFeedSync(ignoreConnectivitySettings = false,
+            requestFeedSync(kodein = kodein,
+                    ignoreConnectivitySettings = false,
                     forceNetwork = false,
                     parallell = true)
         }

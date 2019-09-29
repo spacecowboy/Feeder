@@ -9,27 +9,25 @@ import android.widget.TextView
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.text.BidiFormatter
 import androidx.core.view.MenuItemCompat
-import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
-import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
+import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
-import com.nononsenseapps.feeder.model.getFeedItemViewModel
 import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
-import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
-import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
-import com.nononsenseapps.feeder.util.TabletUtils
-import com.nononsenseapps.feeder.util.bundle
-import com.nononsenseapps.feeder.util.openLinkInBrowser
+import com.nononsenseapps.feeder.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
+import org.kodein.di.Kodein
+import org.kodein.di.android.x.closestKodein
+import org.kodein.di.generic.instance
 import java.util.*
 
 const val ARG_TITLE = "title"
@@ -42,18 +40,16 @@ const val ARG_ID = "dbid"
 const val ARG_AUTHOR = "author"
 const val ARG_DATE = "date"
 
-class ReaderFragment : CoroutineScopedFragment() {
-
+class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
     private val dateTimeFormat = DateTimeFormat.forStyle("FM").withLocale(Locale.getDefault())
 
     private var _id: Long = ID_UNSET
     // All content contained in RssItem
     private var rssItem: FeedItemWithFeed? = null
-    private lateinit var bodyTextView: TextView
-    private lateinit var scrollView: NestedScrollView
     private lateinit var titleTextView: TextView
-    private lateinit var mAuthorTextView: TextView
-    private lateinit var mFeedTitleTextView: TextView
+
+    private val feedItemDao: FeedItemDao by instance()
+    private val viewModel: FeedItemViewModel by instance(arg = this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,9 +62,8 @@ class ReaderFragment : CoroutineScopedFragment() {
             val itemId = _id
             val appContext = context?.applicationContext
             appContext?.let {
-                val db = AppDatabase.getInstance(appContext)
                 launch(Dispatchers.Default) {
-                    db.feedItemDao().markAsReadAndNotified(itemId)
+                    feedItemDao.markAsReadAndNotified(itemId)
                     cancelNotification(it, itemId)
                 }
             }
@@ -87,45 +82,42 @@ class ReaderFragment : CoroutineScopedFragment() {
         }
         val rootView = inflater.inflate(theLayout, container, false)
 
-        scrollView = rootView.findViewById<View>(R.id.scroll_view) as NestedScrollView
-        titleTextView = rootView.findViewById<View>(R.id.story_title) as TextView
-        bodyTextView = rootView.findViewById<View>(R.id.story_body) as TextView
-        mAuthorTextView = rootView.findViewById<View>(R.id.story_author) as TextView
-        mFeedTitleTextView = rootView.findViewById<View>(R.id
-                .story_feedtitle) as TextView
+        titleTextView = rootView.findViewById(R.id.story_title)
+        val bodyTextView = rootView.findViewById<TextView>(R.id.story_body)
+        val authorTextView = rootView.findViewById<TextView>(R.id.story_author)
+        val feedTitleTextView = rootView.findViewById<TextView>(R.id.story_feedtitle)
 
-        val viewModel = getFeedItemViewModel(_id)
-        viewModel.liveItem.observe(this, androidx.lifecycle.Observer {
+        viewModel.getLiveItem(_id).observe(this, androidx.lifecycle.Observer {
             rssItem = it
 
             rssItem?.let { rssItem ->
-                setViewTitle()
+                setViewTitle(rssItem)
 
                 rssItem.feedId?.let { feedId ->
-                    mFeedTitleTextView.setOnClickListener {
+                    feedTitleTextView.setOnClickListener {
                         findNavController().navigate(R.id.action_readerFragment_to_feedFragment, bundle {
                             putLong(ARG_FEED_ID, feedId)
                         })
                     }
                 }
 
-                mFeedTitleTextView.text = rssItem.feedDisplayTitle
+                feedTitleTextView.text = rssItem.feedDisplayTitle
 
                 rssItem.pubDate.let { pubDate ->
                     rssItem.author.let { author ->
                         when {
                             author == null && pubDate != null ->
-                                mAuthorTextView.text = getString(R.string.on_date,
+                                authorTextView.text = getString(R.string.on_date,
                                         pubDate.withZone(DateTimeZone.getDefault())
                                                 .toString(dateTimeFormat))
                             author != null && pubDate != null ->
-                                mAuthorTextView.text = getString(R.string.by_author_on_date,
+                                authorTextView.text = getString(R.string.by_author_on_date,
                                         // Must wrap author in unicode marks to ensure it formats
                                         // correctly in RTL
                                         unicodeWrap(author),
                                         pubDate.withZone(DateTimeZone.getDefault())
                                                 .toString(dateTimeFormat))
-                            else -> mAuthorTextView.visibility = View.GONE
+                            else -> authorTextView.visibility = View.GONE
                         }
                     }
                 }
@@ -135,20 +127,27 @@ class ReaderFragment : CoroutineScopedFragment() {
             }
         })
 
-        viewModel.liveImageText.observe(this, androidx.lifecycle.Observer {
-            bodyTextView.text = it
-        })
+        viewModel.getLiveImageText(_id, activity!!.maxImageSize(), urlClickListener()).observe(
+                this,
+                androidx.lifecycle.Observer {
+                    bodyTextView.text = it
+                }
+        )
 
         return rootView
     }
 
-    private fun setViewTitle() {
-        rssItem?.let { rssItem ->
-            if (rssItem.title.isEmpty()) {
-                titleTextView.text = rssItem.plainTitle
-            } else {
-                titleTextView.text = toSpannedWithNoImages(activity!!, rssItem.title, rssItem.feedUrl, activity!!.maxImageSize(), urlClickListener = urlClickListener())
-            }
+    private fun setViewTitle(rssItem: FeedItemWithFeed) {
+        if (rssItem.title.isEmpty()) {
+            titleTextView.text = rssItem.plainTitle
+        } else {
+            titleTextView.text = toSpannedWithNoImages(
+                    kodein,
+                    rssItem.title,
+                    rssItem.feedUrl,
+                    activity!!.maxImageSize(),
+                    urlClickListener = urlClickListener()
+            )
         }
     }
 
@@ -228,11 +227,8 @@ class ReaderFragment : CoroutineScopedFragment() {
                 true
             }
             R.id.action_mark_as_unread -> {
-                context?.applicationContext?.let {
-                    val db = AppDatabase.getInstance(it)
-                    launch(Dispatchers.Default) {
-                        db.feedItemDao().markAsRead(_id, unread = true)
-                    }
+                launch(Dispatchers.Default) {
+                    feedItemDao.markAsRead(_id, unread = true)
                 }
                 true
             }
@@ -260,7 +256,10 @@ fun Context.getLocale(): Locale =
 
 fun Fragment.urlClickListener(): (link: String) -> Unit = { link ->
     context?.let { context ->
-        when (shouldOpenLinkWith(context)) {
+        val kodein: Kodein by closestKodein()
+        val prefs: Prefs by kodein.instance()
+
+        when (prefs.openLinksWith) {
             PREF_VAL_OPEN_WITH_WEBVIEW -> {
                 findNavController().navigate(R.id.action_readerFragment_to_readerWebViewFragment, bundle {
                     putString(ARG_URL, link)

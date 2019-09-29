@@ -11,25 +11,26 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatDelegate
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.CoroutineScopedActivity
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareActivity
 import com.nononsenseapps.feeder.db.URI_FEEDS
-import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
-import com.nononsenseapps.feeder.model.getSettingsViewModel
+import com.nononsenseapps.feeder.model.FeedParser
+import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.requestFeedSync
-import com.nononsenseapps.feeder.util.feedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.*
+import org.kodein.di.generic.instance
 import java.net.URL
 
 const val TEMPLATE = "template"
 
 
-class EditFeedActivity : CoroutineScopedActivity() {
+class EditFeedActivity : CoroutineScopedKodeinAwareActivity() {
     private var id: Long = ID_UNSET
     // Views and shit
     private lateinit var textTitle: EditText
@@ -55,7 +56,8 @@ class EditFeedActivity : CoroutineScopedActivity() {
             field = value
         }
 
-    private val settingsViewModel by lazy { getSettingsViewModel() }
+    private val settingsViewModel: SettingsViewModel by instance(arg = this)
+    private val feedParser: FeedParser by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (shouldBeFloatingWindow()) {
@@ -119,7 +121,7 @@ class EditFeedActivity : CoroutineScopedActivity() {
             false
         })
 
-        val dao = AppDatabase.getInstance(this).feedDao()
+        val dao: FeedDao by instance()
 
         val addButton = findViewById<Button>(R.id.add_button)
         addButton.setOnClickListener { _ ->
@@ -143,7 +145,7 @@ class EditFeedActivity : CoroutineScopedActivity() {
                 val feedId: Long? = dao.upsertFeed(feed)
 
                 feedId?.let {
-                    requestFeedSync(feedId, ignoreConnectivitySettings = false, forceNetwork = true)
+                    requestFeedSync(kodein, feedId, ignoreConnectivitySettings = false, forceNetwork = true)
                 }
 
                 val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId"))

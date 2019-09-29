@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
@@ -14,11 +15,13 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
@@ -32,9 +35,12 @@ class OpenFeedFromTitleTest {
 
     private var feedId: Long? = null
 
+    private val kodein by closestKodein(getApplicationContext() as Context)
+    private val prefs by kodein.instance<Prefs>()
+
     @Before
     fun keepNavDrawerClosed() {
-        PrefUtils.markWelcomeDone(getApplicationContext())
+        prefs.welcomeDone = true
     }
 
     @Before

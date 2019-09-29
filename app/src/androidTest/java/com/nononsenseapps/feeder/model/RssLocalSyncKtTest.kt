@@ -1,13 +1,12 @@
 package com.nononsenseapps.feeder.model
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
-import com.nononsenseapps.feeder.util.feedParser
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -21,6 +20,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 import java.io.InputStream
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -32,8 +33,8 @@ class RssLocalSyncKtTest {
     @get:Rule
     val testDb = TestDatabaseRule(getApplicationContext())
 
-    private val feederApplication: FeederApplication = getApplicationContext()
-    private val feedParser = feederApplication.feedParser
+    private val kodein by closestKodein(getApplicationContext() as Context)
+    private val feedParser: FeedParser by kodein.instance()
 
     val server = MockWebServer()
 
@@ -46,7 +47,6 @@ class RssLocalSyncKtTest {
 
     @Before
     fun setup() {
-        FeedParser.setup(feederApplication.cacheDir!!)
         server.start()
     }
 

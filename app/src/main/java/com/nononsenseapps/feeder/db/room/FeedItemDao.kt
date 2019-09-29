@@ -129,6 +129,9 @@ interface FeedItemDao {
     @Query("UPDATE feed_items SET unread = :unread WHERE id IS :id")
     fun markAsRead(id: Long, unread: Boolean = false)
 
+    @Query("UPDATE feed_items SET unread = :unread WHERE id IN (:ids)")
+    fun markAsRead(ids: List<Long>, unread: Boolean = false)
+
     @Query("UPDATE feed_items SET notified = :notified WHERE id IN (:ids)")
     fun markAsNotified(ids: List<Long>, notified: Boolean = true)
 

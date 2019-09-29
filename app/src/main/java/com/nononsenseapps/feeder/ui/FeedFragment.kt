@@ -10,16 +10,19 @@ import android.view.*
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.coroutines.CoroutineScopedFragment
-import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
+import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.*
@@ -31,6 +34,7 @@ import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.kodein.di.generic.instance
 import java.io.File
 
 const val ARG_FEED_ID = "feed_id"
@@ -38,14 +42,8 @@ const val ARG_FEED_TITLE = "feed_title"
 const val ARG_FEED_URL = "feed_url"
 const val ARG_FEED_TAG = "feed_tag"
 
-class FeedFragment : CoroutineScopedFragment() {
-
-    private var adapter: FeedItemPagedListAdapter? = null
-    private var recyclerView: RecyclerView? = null
-    internal var swipeRefreshLayout: SwipeRefreshLayout? = null
-    private var emptyView: View? = null
-    private var emptyAddFeed: View? = null
-    private var emptyOpenFeeds: View? = null
+class FeedFragment : CoroutineScopedKodeinAwareFragment() {
+    internal lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private val syncReceiver: BroadcastReceiver
 
@@ -56,11 +54,16 @@ class FeedFragment : CoroutineScopedFragment() {
     private var firstFeedLoad: Boolean = true
     private var displayTitle = ""
     private var customTitle = ""
-    private var layoutManager: LinearLayoutManager? = null
     private var notify = false
 
-    var feedViewModel: FeedViewModel? = null
-    var feedItemsViewModel: FeedItemsViewModel? = null
+    private val feedViewModel: FeedViewModel by instance(arg = this)
+    private val feedItemsViewModel: FeedItemsViewModel by instance(arg = this)
+
+    private val feedDao: FeedDao by instance()
+    private val feedItemDao: FeedItemDao by instance()
+    private val prefs: Prefs by instance()
+
+    private lateinit var liveDbPreviews: LiveData<PagedList<PreviewItem>>
 
     init {
         // Listens on sync broadcasts
@@ -82,23 +85,18 @@ class FeedFragment : CoroutineScopedFragment() {
             feedTag = arguments.getString(ARG_FEED_TAG)
 
             arguments.getLongArray(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)?.let {
-                context?.let { context ->
-                    val db = AppDatabase.getInstance(context)
-                    launch(Dispatchers.Default) {
-                        db.feedItemDao().markAsNotified(it.toList())
-                    }
+                launch(Dispatchers.Default) {
+                    feedItemDao.markAsNotified(it.toList())
                 }
             }
         }
 
         if (id == ID_UNSET && feedTag?.isNotEmpty() != true) {
-            context?.let { context ->
-                if (id == ID_UNSET) {
-                    id = PrefUtils.getLastOpenFeedId(context)
-                }
-                if (feedTag?.isNotEmpty() != true) {
-                    feedTag = PrefUtils.getLastOpenFeedTag(context)
-                }
+            if (id == ID_UNSET) {
+                id = prefs.lastOpenFeedId
+            }
+            if (feedTag?.isNotEmpty() != true) {
+                feedTag = prefs.lastOpenFeedTag
             }
         }
 
@@ -121,115 +119,139 @@ class FeedFragment : CoroutineScopedFragment() {
         setHasOptionsMenu(true)
 
         // Remember choice in future
-        val appContext = context?.applicationContext
         launch(Dispatchers.Default) {
-            if (appContext != null) {
-                PrefUtils.setLastOpenFeed(appContext, id, feedTag)
-            }
+            prefs.setLastOpenFeed(id, feedTag)
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_feed, container, false)
-        recyclerView = rootView.findViewById<View>(android.R.id.list) as RecyclerView
+        val recyclerView = rootView.findViewById<RecyclerView>(android.R.id.list)
 
         // improve performance if you know that changes in content
         // do not change the size of the RecyclerView
-        recyclerView?.setHasFixedSize(true)
+        recyclerView.setHasFixedSize(true)
 
-        if (TabletUtils.isTablet(activity)) {
+        recyclerView.layoutManager = if (TabletUtils.isTablet(activity)) {
             val cols = TabletUtils.numberOfFeedColumns(activity)
-            // use a grid layout
-            layoutManager = GridLayoutManager(activity,
-                    cols)
 
             // TODO, use better dividers such as simple padding
             // I want some dividers
-            recyclerView!!.addItemDecoration(DividerColor(activity, DividerColor.VERTICAL_LIST, 0, cols))
+            recyclerView.addItemDecoration(DividerColor(activity, DividerColor.VERTICAL_LIST, 0, cols))
             // I want some dividers
-            recyclerView!!.addItemDecoration(DividerColor(activity, DividerColor.HORIZONTAL_LIST))
+            recyclerView.addItemDecoration(DividerColor(activity, DividerColor.HORIZONTAL_LIST))
+
+            // use a grid layout
+            GridLayoutManager(activity,
+                    cols)
         } else {
             // use a linear layout manager
-            layoutManager = LinearLayoutManager(activity)
+            LinearLayoutManager(activity)
         }
-        recyclerView?.layoutManager = layoutManager
 
         // Setup swipe refresh
-        swipeRefreshLayout = rootView.findViewById<View>(R.id.swiperefresh) as SwipeRefreshLayout
+        swipeRefreshLayout = rootView.findViewById(R.id.swiperefresh)
 
         // The arrow will cycle between these colors (in order)
-        swipeRefreshLayout!!.setColorSchemeResources(
+        swipeRefreshLayout.setColorSchemeResources(
                 R.color.refresh_progress_1,
                 R.color.refresh_progress_2,
                 R.color.refresh_progress_3)
 
-        swipeRefreshLayout!!.setOnRefreshListener {
+        swipeRefreshLayout.setOnRefreshListener {
             // Sync this specific feed(s) immediately
             requestFeedSync(
+                    kodein = kodein,
                     feedId = id,
                     feedTag = feedTag ?: "",
                     ignoreConnectivitySettings = true,
-                    parallell = true,
-                    forceNetwork = true
+                    forceNetwork = true,
+                    parallell = true
             )
         }
 
         // Set up the empty view
-        emptyView = rootView.findViewById(android.R.id.empty)
-        emptyAddFeed = emptyView?.findViewById(R.id.empty_add_feed)
+        val emptyView: View = rootView.findViewById(android.R.id.empty)
+        val emptyAddFeed: TextView = emptyView.findViewById(R.id.empty_add_feed)
         @Suppress("DEPRECATION")
-        (emptyAddFeed as TextView).text = android.text.Html.fromHtml(getString(R.string.empty_feed_add))
-        emptyOpenFeeds = emptyView?.findViewById(R.id.empty_open_feeds)
+        emptyAddFeed.text = android.text.Html.fromHtml(getString(R.string.empty_feed_add))
+        val emptyOpenFeeds: TextView = emptyView.findViewById(R.id.empty_open_feeds)
         @Suppress("DEPRECATION")
-        (emptyOpenFeeds as TextView).text = android.text.Html.fromHtml(getString(R.string.empty_feed_open))
+        emptyOpenFeeds.text = android.text.Html.fromHtml(getString(R.string.empty_feed_open))
 
-        emptyAddFeed?.setOnClickListener {
+        emptyAddFeed.setOnClickListener {
             startActivity(Intent(activity,
                     EditFeedActivity::class.java))
         }
 
-        emptyOpenFeeds?.setOnClickListener { (activity as FeedActivity).openNavDrawer() }
+        emptyOpenFeeds.setOnClickListener { (activity as FeedActivity).openNavDrawer() }
 
         // specify an adapter
-        adapter = FeedItemPagedListAdapter(activity!!, object : ActionCallback {
+        val adapter = FeedItemPagedListAdapter(activity!!, object : ActionCallback {
             override fun coroutineScope(): CoroutineScope {
                 return this@FeedFragment
             }
 
             override fun onDismiss(item: PreviewItem?) {
                 item?.let {
-                    feedItemsViewModel?.toggleReadState(it)
+                    launch(Dispatchers.Default) { feedItemsViewModel.toggleReadState(it) }
                 }
             }
 
             override fun onSwipeStarted() {
                 // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
-                swipeRefreshLayout?.isEnabled = false
+                swipeRefreshLayout.isEnabled = false
             }
 
             override fun onSwipeCancelled() {
                 // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
-                swipeRefreshLayout?.isEnabled = true
+                swipeRefreshLayout.isEnabled = true
             }
 
-        })
-        recyclerView?.adapter = adapter
+            override fun markBelowAsRead(position: Int) {
+                recyclerView.adapter?.let { adapter ->
+                    launch(Dispatchers.Default) {
+                        if (position > NO_POSITION) {
+                            val ids = ((position + 1) until adapter.itemCount)
+                                    .asSequence()
+                                    .map {
+                                        adapter.getItemId(it)
+                                    }
+                                    .toList()
+                            feedItemDao.markAsRead(ids)
+                        }
+                    }
+                }
+            }
+        }).also {
+            it.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    // If first item is visible, and new items have been added above
+                    // then scroll to the top
+                    if (positionStart == 0 && recyclerView.firstVisibleItemPosition == 0) {
+                        recyclerView.scrollToPosition(0)
+                    }
+                }
+            })
+        }
+        recyclerView.adapter = adapter
 
         // Load some RSS
-        val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
-        feedItemsViewModel = getFeedItemsViewModel(feedId = id, tag = feedTag
-                ?: "", onlyUnread = onlyUnread)
-
-        feedItemsViewModel?.liveDbPreviews?.observe(this, Observer<PagedList<PreviewItem>> {
-            adapter?.submitList(it)
-            emptyView?.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+        val onlyUnread = prefs.showOnlyUnread
+        feedItemsViewModel.setOnlyUnread(onlyUnread)
+        liveDbPreviews = feedItemsViewModel.getLiveDbPreviews(
+                feedId = id,
+                tag = feedTag ?: ""
+        )
+        liveDbPreviews.observe(this, Observer<PagedList<PreviewItem>> {
+            adapter.submitList(it)
+            emptyView.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
         })
 
         when {
             id > ID_UNSET -> { // Load feed if feed
-                feedViewModel = getFeedViewModel(id)
-                feedViewModel?.liveFeed?.observe(this, Observer {
+                feedViewModel.getLiveFeed(id).observe(this, Observer {
                     it?.let { feed ->
                         this.title = feed.title
                         this.customTitle = feed.customTitle
@@ -260,7 +282,7 @@ class FeedFragment : CoroutineScopedFragment() {
 
                 activity?.let { activity ->
                     feedTag?.let { feedTag ->
-                        AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
+                        feedDao.loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
                             it.fold(true) { a, b -> a && b }
                                     .let { notify ->
                                         this.notify = notify
@@ -275,7 +297,7 @@ class FeedFragment : CoroutineScopedFragment() {
                 (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
                 activity?.let { activity ->
-                    AppDatabase.getInstance(activity).feedDao().loadLiveFeedsNotify().observe(this, Observer {
+                    feedDao.loadLiveFeedsNotify().observe(this, Observer {
                         it.fold(true) { a, b -> a && b }
                                 .let { notify ->
                                     this.notify = notify
@@ -292,9 +314,11 @@ class FeedFragment : CoroutineScopedFragment() {
 
 
     private fun onSyncBroadcast(syncing: Boolean) {
-        // Background syncs trigger the sync layout
-        if (swipeRefreshLayout!!.isRefreshing != syncing) {
-            swipeRefreshLayout!!.isRefreshing = syncing
+        // Background syncs will only disable the animation, never start it
+        if (!syncing) {
+            if (swipeRefreshLayout.isRefreshing != syncing) {
+                swipeRefreshLayout.isRefreshing = syncing
+            }
         }
     }
 
@@ -317,7 +341,7 @@ class FeedFragment : CoroutineScopedFragment() {
     override fun onPause() {
         // Unregister receiver
         androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(activity!!).unregisterReceiver(syncReceiver)
-        swipeRefreshLayout!!.isRefreshing = false
+        swipeRefreshLayout.isRefreshing = false
         super.onPause()
     }
 
@@ -332,12 +356,11 @@ class FeedFragment : CoroutineScopedFragment() {
         if (id < 1) {
             menu.findItem(R.id.action_edit_feed)?.isVisible = false
             menu.findItem(R.id.action_delete_feed)?.isVisible = false
-            menu.findItem(R.id.action_add_templated)?.isVisible = false
         }
 
         // Set toggleable state
         menu.findItem(R.id.action_only_unread)?.let { menuItem ->
-            val onlyUnread = PrefUtils.isShowOnlyUnread(activity!!)
+            val onlyUnread = prefs.showOnlyUnread
             menuItem.isChecked = onlyUnread
             menuItem.setTitle(if (onlyUnread) R.string.show_all_items else R.string.show_unread_items)
 
@@ -374,8 +397,8 @@ class FeedFragment : CoroutineScopedFragment() {
         if (appContext != null) {
             launch(Dispatchers.Default) {
                 // Set as notified so we don't spam
-                feedItemsViewModel?.markAsNotified()
-                val dao = AppDatabase.getInstance(appContext).feedDao()
+                feedItemsViewModel.markAsNotified(feedId = feedId, tag = feedTag ?: "")
+                val dao: FeedDao by instance()
                 when {
                     feedId > ID_UNSET -> dao.setNotify(feedId, on)
                     feedId == ID_ALL_FEEDS -> dao.setAllNotify(on)
@@ -391,7 +414,7 @@ class FeedFragment : CoroutineScopedFragment() {
     private fun markAsRead() {
         // Cancel any notifications
         context?.applicationContext?.let { appContext ->
-            feedItemsViewModel?.liveDbPreviews?.value?.forEach {
+            liveDbPreviews.value?.forEach {
                 // Can be null in case of placeholder values
                 it?.id?.let { id ->
                     launch(Dispatchers.Default) {
@@ -401,7 +424,9 @@ class FeedFragment : CoroutineScopedFragment() {
             }
         }
         // Then mark as read
-        feedItemsViewModel?.markAllAsRead()
+        launch(Dispatchers.Default) {
+            feedItemsViewModel.markAllAsRead(feedId = id, tag = feedTag ?: "")
+        }
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
@@ -410,9 +435,10 @@ class FeedFragment : CoroutineScopedFragment() {
             id == R.id.action_sync -> {
                 // Sync all feeds when menu button pressed
                 requestFeedSync(
-                        parallell = true,
+                        kodein = kodein,
                         ignoreConnectivitySettings = true,
-                        forceNetwork = true
+                        forceNetwork = true,
+                        parallell = true
                 )
                 true
             }
@@ -444,7 +470,7 @@ class FeedFragment : CoroutineScopedFragment() {
                 val appContext = activity?.applicationContext
                 if (appContext != null) {
                     launch(Dispatchers.Default) {
-                        feedViewModel?.deleteFeed()
+                        feedViewModel.deleteFeedWithId(feedId)
 
                         // Remove from shortcuts
                         appContext.removeDynamicShortcutToFeed(feedId)
@@ -459,7 +485,7 @@ class FeedFragment : CoroutineScopedFragment() {
             }
             id == R.id.action_only_unread -> {
                 val onlyUnread = !menuItem.isChecked
-                PrefUtils.setPrefShowOnlyUnread(activity!!, onlyUnread)
+                prefs.showOnlyUnread = onlyUnread
                 menuItem.isChecked = onlyUnread
                 if (onlyUnread) {
                     menuItem.setIcon(R.drawable.ic_visibility_off_white_24dp)
@@ -469,7 +495,7 @@ class FeedFragment : CoroutineScopedFragment() {
 
                 menuItem.setTitle(if (onlyUnread) R.string.show_unread_items else R.string.show_all_items)
 
-                feedItemsViewModel?.setOnlyUnread(onlyUnread)
+                feedItemsViewModel.setOnlyUnread(onlyUnread)
 
                 true
             }
@@ -523,7 +549,7 @@ class FeedFragment : CoroutineScopedFragment() {
             }
             id == R.id.action_reportbug -> {
                 try {
-                    startActivity(openGitlabIssues(context))
+                    startActivity(openGitlabIssues())
                 } catch (e: ActivityNotFoundException) {
                     Toast.makeText(context, R.string.no_email_client, Toast.LENGTH_SHORT).show()
                 }
@@ -542,18 +568,16 @@ class FeedFragment : CoroutineScopedFragment() {
             EXPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    val appContext = context!!.applicationContext
                     launch(Dispatchers.Default) {
-                        exportOpml(appContext, uri)
+                        exportOpml(kodein, uri)
                     }
                 }
             }
             IMPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    val appContext = context!!.applicationContext
                     launch(Dispatchers.Default) {
-                        importOpml(appContext, uri)
+                        importOpml(kodein, uri)
                     }
                 }
             }
@@ -568,3 +592,12 @@ class FeedFragment : CoroutineScopedFragment() {
         }
     }
 }
+
+val RecyclerView.firstVisibleItemPosition: Int
+    get() = with(layoutManager) {
+        when (this) {
+            is GridLayoutManager -> findFirstVisibleItemPosition()
+            is LinearLayoutManager -> findFirstVisibleItemPosition()
+            else -> NO_POSITION
+        }
+    }

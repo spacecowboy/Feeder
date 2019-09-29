@@ -1,36 +1,44 @@
 package com.nononsenseapps.feeder.ui
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.TextAppearanceSpan
 import android.util.Log
+import android.view.ContextMenu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.navigation.Navigation.findNavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.util.*
-import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenItemWith
-import com.nononsenseapps.feeder.util.PrefUtils.shouldOpenLinkWith
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
 class FeedItemHolder(val view: View, private val actionCallback: ActionCallback) :
-        ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener {
+        ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener, KodeinAware,
+        View.OnCreateContextMenuListener {
     private val TAG = "FeedItemHolder"
-    private val titleTextView: TextView = view.findViewById<View>(R.id.story_snippet) as TextView
-    val dateTextView: TextView = view.findViewById<View>(R.id.story_date) as TextView
-    val authorTextView: TextView = view.findViewById<View>(R.id.story_author) as TextView
-    val imageView: ImageView = view.findViewById<View>(R.id.story_image) as ImageView
+    private val titleTextView: TextView = view.findViewById(R.id.story_snippet)
+    val dateTextView: TextView = view.findViewById(R.id.story_date)
+    val authorTextView: TextView = view.findViewById(R.id.story_author)
+    val imageView: ImageView = view.findViewById(R.id.story_image)
     private val bgFrame: View = view.findViewById(R.id.swiping_item)
     private val checkLeft: View = view.findViewById(R.id.check_left)
     private val checkRight: View = view.findViewById(R.id.check_right)
@@ -38,8 +46,13 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
 
     var rssItem: PreviewItem? = null
 
+    override val kodein: Kodein by closestKodein(view.context)
+    val feedItemDao: FeedItemDao by instance()
+    val prefs: Prefs by instance()
+
     init {
         view.setOnClickListener(this)
+        view.setOnCreateContextMenuListener(this)
         // Swipe handler
         view.setOnTouchListener(SwipeDismissTouchListener(view, null, object : SwipeDismissTouchListener.DismissCallbacks {
             override fun canDismiss(token: Any?): Boolean = rssItem != null
@@ -145,14 +158,13 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
     override fun onClick(view: View) {
         val context = view.context
         if (context != null) {
-            val defaultOpenItemWith = shouldOpenItemWith(context)
 
-            val openItemWith = when (defaultOpenItemWith) {
+            val openItemWith = when (val defaultOpenItemWith = prefs.openItemsWith) {
                 PREF_VAL_OPEN_WITH_READER -> {
                     if (rssItem?.plainSnippet?.isNotEmpty() == true) {
                         defaultOpenItemWith
                     } else {
-                        shouldOpenLinkWith(context)
+                        prefs.openLinksWith
                     }
                 }
                 else -> defaultOpenItemWith
@@ -161,10 +173,9 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
             when (openItemWith) {
                 PREF_VAL_OPEN_WITH_BROWSER, PREF_VAL_OPEN_WITH_WEBVIEW -> {
                     // Mark as read
-                    val db = AppDatabase.getInstance(context)
                     rssItem?.id?.let {
                         actionCallback.coroutineScope().launch(Dispatchers.Default) {
-                            db.feedItemDao().markAsRead(it)
+                            feedItemDao.markAsRead(it)
                         }
                     }
 
@@ -209,12 +220,14 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
         if (context != null) {
             rssItem?.let { rssItem ->
                 try {
-                    GlideUtils.glide(context, rssItem.imageUrl,
-                            PrefUtils.shouldLoadImages(context))
+                    GlideUtils.glide(
+                            context, rssItem.imageUrl,
+                            prefs.shouldLoadImages()
+                    )
                             .centerCrop()
                             .also {
                                 it.error(
-                                        when (PrefUtils.isNightMode(context)) {
+                                        when (prefs.isNightMode) {
                                             true -> R.drawable.placeholder_image_list_night_64dp
                                             false -> R.drawable.placeholder_image_list_day_64dp
                                         }
@@ -232,11 +245,43 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
         itemView.viewTreeObserver.removeOnPreDrawListener(this)
         return true
     }
+
+    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+        if (menu != null) {
+            val menuInflater: MenuInflater by instance()
+            menuInflater.inflate(R.menu.feeditem, menu)
+            menu.findItem(R.id.open_feed).setOnMenuItemClickListener {
+                rssItem?.feedId?.let {
+                    findNavController(view).navigate(R.id.action_feedFragment_self, bundle {
+                        putLong(ARG_FEED_ID, it)
+                    })
+                }
+                true
+            }
+            menu.findItem(R.id.edit_feed).setOnMenuItemClickListener {
+                rssItem?.let {
+                    val i = Intent(view.context, EditFeedActivity::class.java)
+                    i.putExtra(ARG_ID, it.feedId)
+                    i.putExtra(ARG_CUSTOMTITLE, it.feedCustomTitle)
+                    i.putExtra(ARG_TITLE, it.feedTitle)
+                    i.putExtra(ARG_FEED_TAG, it.tag)
+                    i.data = Uri.parse(it.feedUrl.toString())
+                    view.context.startActivity(i)
+                }
+                true
+            }
+            menu.findItem(R.id.mark_items_below_as_read).setOnMenuItemClickListener {
+                actionCallback.markBelowAsRead(adapterPosition)
+                true
+            }
+        }
+    }
 }
 
 interface ActionCallback {
     fun onDismiss(item: PreviewItem?)
     fun onSwipeStarted()
     fun onSwipeCancelled()
+    fun markBelowAsRead(position: Int)
     fun coroutineScope(): CoroutineScope
 }

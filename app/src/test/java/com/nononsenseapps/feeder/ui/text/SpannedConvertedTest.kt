@@ -1,22 +1,33 @@
 package com.nononsenseapps.feeder.ui.text
 
-import android.content.Context
+import android.app.Application
 import android.content.res.Resources
 import android.graphics.Point
 import android.text.style.ImageSpan
 import android.text.style.TextAppearanceSpan
+import com.nononsenseapps.feeder.util.Prefs
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.generic.bind
+import org.kodein.di.generic.singleton
 import java.net.URL
 import java.util.*
 
-class SpannedConverterTest {
-
+class SpannedConverterTest: KodeinAware {
     private val mockResources: Resources = mockk(relaxed = true)
-    private val mockContext: Context = mockk(relaxed = true)
+    //private val mockContext: Context = mockk(relaxed = true)
+    private val mockContext: Application = mockk(relaxed = true)
+    private val mockPrefs: Prefs = mockk(relaxed = true)
+
+    override val kodein by Kodein.lazy {
+        bind<Application>() with singleton { mockContext }
+        bind<Prefs>() with singleton { mockPrefs }
+    }
 
     @Suppress("DEPRECATION")
     @Before
@@ -32,7 +43,7 @@ class SpannedConverterTest {
     fun testFontWithNoColorDoesntCrash() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-                mockContext,
+                kodein,
                 "<font>No color</font>",
                 URL("http://foo.com"),
                 Point(100, 100),
@@ -48,7 +59,7 @@ class SpannedConverterTest {
     fun testOnePixelImagesAreNotRenderedWithBase() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-                mockContext,
+                kodein,
                 "<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">",
                 URL("http://foo.com"),
                 Point(100, 100),
@@ -63,7 +74,7 @@ class SpannedConverterTest {
     fun testOnePixelImagesAreNotRenderedWithGlide() {
         val builder = FakeBuilder()
         toSpannedWithImages(
-                mockContext,
+                kodein,
                 "<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">",
                 URL("http://foo.com"),
                 Point(100, 100),
@@ -80,7 +91,7 @@ class SpannedConverterTest {
     fun testNotRenderScriptTag() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-                mockContext,
+                kodein,
                 "<p>foo</p><script>script</script><p>bar</p>",
                 URL("http://foo.bar"),
                 Point(100, 100),
@@ -95,7 +106,7 @@ class SpannedConverterTest {
     fun testNotRenderStyleTag() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-                mockContext,
+                kodein,
                 "<p>foo</p><style>style</style><p>bar</p>",
                 URL("http://foo.bar"),
                 Point(100, 100),
@@ -110,7 +121,7 @@ class SpannedConverterTest {
     fun tableColumnsSeparatedNewLinesTest() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-                mockContext,
+                kodein,
                 """
                     <table>
                     <tr>
@@ -143,7 +154,7 @@ class SpannedConverterTest {
             |me
             """.trimMargin()
         toSpannedWithNoImages(
-                mockContext,
+                kodein,
                 """
                     <pre>$text</pre>
                     """,

@@ -14,11 +14,13 @@ import android.os.Build
 import android.provider.Browser.EXTRA_CREATE_NEW_TAB
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
-import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
@@ -29,6 +31,9 @@ import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.notificationManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.kodein.di.Kodein
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 
 
 const val notificationId = 73583
@@ -39,9 +44,11 @@ suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
         createNotificationChannel(appContext)
     }
 
-    val nm = appContext.notificationManager
+    val kodein by closestKodein(appContext)
 
-    val feedItems = getItemsToNotify(appContext)
+    val nm: NotificationManagerCompat by kodein.instance()
+
+    val feedItems = getItemsToNotify(kodein)
 
     val notifications: List<Pair<Int, Notification>> = if (feedItems.isEmpty()) {
         emptyList()
@@ -255,17 +262,17 @@ private fun notificationBuilder(context: Context): NotificationCompat.Builder {
             .setPriority(NotificationCompat.PRIORITY_LOW)
 }
 
-private fun getItemsToNotify(context: Context): List<FeedItemWithFeed> {
-    val feeds = getFeedIdsToNotify(context)
+private fun getItemsToNotify(kodein: Kodein): List<FeedItemWithFeed> {
+    val feedDao: FeedDao by kodein.instance()
+    val feedItemDao: FeedItemDao by kodein.instance()
+
+    val feeds = feedDao.loadFeedIdsToNotify()
 
     return when (feeds.isEmpty()) {
         true -> emptyList()
-        false -> AppDatabase.getInstance(context).feedItemDao().loadItemsToNotify(feeds)
+        false -> feedItemDao.loadItemsToNotify(feeds)
     }
 }
-
-private fun getFeedIdsToNotify(context: Context): List<Long> =
-        AppDatabase.getInstance(context).feedDao().loadFeedIdsToNotify()
 
 fun NavDeepLinkBuilder.createPendingIntent(requestCode: Int): PendingIntent? =
         this.createTaskStackBuilder().getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT)

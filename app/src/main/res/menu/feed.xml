@@ -70,6 +70,7 @@
       android:icon="@drawable/ic_edit_white_24dp"
       android:title="@string/new_based_on_this"
       android:orderInCategory="103"
+      android:visible="false"
       app:showAsAction="never" />
 
 </menu>

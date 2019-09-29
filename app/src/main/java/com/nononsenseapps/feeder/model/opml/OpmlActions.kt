@@ -1,26 +1,34 @@
 package com.nononsenseapps.feeder.model.opml
 
-import android.content.Context
+import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
 import com.nononsenseapps.feeder.db.room.AppDatabase
-import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.model.requestFeedSync
-import com.nononsenseapps.feeder.util.makeToast
+import com.nononsenseapps.feeder.util.ToastMaker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.kodein.di.Kodein
+import org.kodein.di.direct
+import org.kodein.di.generic.instance
 import kotlin.system.measureTimeMillis
 
 /**
  * Exports OPML on a background thread
  */
-suspend fun exportOpml(appContext: Context, uri: Uri) {
+suspend fun exportOpml(kodein: Kodein, uri: Uri) {
     try {
         val time = measureTimeMillis {
-            appContext.contentResolver.openOutputStream(uri)?.let {
-                writeOutputStream(it,
-                        tags(appContext),
-                        feedsWithTags(appContext))
+            val contentResolver: ContentResolver by kodein.instance()
+            val feedDao: FeedDao by kodein.instance()
+            contentResolver.openOutputStream(uri)?.let {
+                writeOutputStream(
+                        it,
+                        feedDao.loadTags()
+                ) { tag ->
+                    feedDao.loadFeeds(tag = tag)
+                }
             }
         }
         Log.d("OPML", "Exported OPML in $time ms on ${Thread.currentThread().name}")
@@ -28,7 +36,7 @@ suspend fun exportOpml(appContext: Context, uri: Uri) {
         e.printStackTrace()
         Log.e("OMPL", "Failed to export OMPL: $e")
         withContext(Dispatchers.Main) {
-            appContext.makeToast("Failed to export OMPL")
+            kodein.direct.instance<ToastMaker>().makeToast("Failed to export OMPL")
         }
     }
 }
@@ -36,34 +44,24 @@ suspend fun exportOpml(appContext: Context, uri: Uri) {
 /**
  * Imports OPML on a background thread
  */
-suspend fun importOpml(context: Context, uri: Uri) {
-    val appContext = context.applicationContext
-    val db = AppDatabase.getInstance(context)
+suspend fun importOpml(kodein: Kodein, uri: Uri) {
+    val db: AppDatabase by kodein.instance()
     try {
         val time = measureTimeMillis {
             val parser = OpmlParser(OPMLToRoom(db))
-            appContext.contentResolver.openInputStream(uri).use {
+            val contentResolver: ContentResolver by kodein.instance()
+            contentResolver.openInputStream(uri).use {
                 it?.let { stream ->
                     parser.parseInputStream(stream)
                 }
             }
-            requestFeedSync(parallell = true, ignoreConnectivitySettings = false)
+            requestFeedSync(kodein = kodein, ignoreConnectivitySettings = false, parallell = true)
         }
         Log.d("OPML", "Imported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
         Log.e("OMPL", "Failed to import OMPL: $e")
         withContext(Dispatchers.Main) {
-            appContext.makeToast("Failed to import OMPL")
+            kodein.direct.instance<ToastMaker>().makeToast("Failed to import OMPL")
         }
-    }
-}
-
-private fun tags(context: Context): Iterable<String> =
-        AppDatabase.getInstance(context).feedDao().loadTags()
-
-private fun feedsWithTags(context: Context): (String) -> Iterable<Feed> {
-    val dao = AppDatabase.getInstance(context).feedDao()
-    return { tag ->
-        dao.loadFeeds(tag = tag)
     }
 }

@@ -93,5 +93,7 @@
   <string name="no_email_client">Could not open email client</string>
   <string name="touch_to_play_video">Touch to play video</string>
   <string name="javascript">Javascript</string>
+  <string name="open_feed">Open feed</string>
+  <string name="mark_items_below_as_read">Mark items below as read</string>
 
 </resources>

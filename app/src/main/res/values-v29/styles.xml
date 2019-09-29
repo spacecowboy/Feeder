@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Override this per version -->
+  <style name="AppBaseTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+<!--    <item name="android:navigationBarColor">@android:color/transparent</item>-->
+<!--    <item name="android:statusBarColor">@android:color/transparent</item>-->
+  </style>
+
+  <style name="AppBaseThemeDialog" parent="Theme.AppCompat.DayNight.Dialog">
+<!--    <item name="android:navigationBarColor">@android:color/transparent</item>-->
+<!--    <item name="android:statusBarColor">@android:color/transparent</item>-->
+  </style>
+</resources>

@@ -7,10 +7,14 @@ import androidx.work.*
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
-import com.nononsenseapps.feeder.util.PrefUtils
+import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.currentlyCharging
 import com.nononsenseapps.feeder.util.currentlyConnected
 import com.nononsenseapps.feeder.util.currentlyUnmetered
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.closestKodein
+import org.kodein.di.generic.instance
 import java.util.concurrent.TimeUnit
 
 const val ARG_FORCE_NETWORK = "force_network"
@@ -25,14 +29,19 @@ const val SYNC_BROADCAST = "feeder.nononsenseapps.RSS_SYNC_BROADCAST"
 const val SYNC_BROADCAST_IS_ACTIVE = "IS_ACTIVE"
 
 
-fun isOkToSyncAutomatically(context: Context): Boolean =
-        (currentlyConnected(context)
-                && (!PrefUtils.shouldSyncOnlyWhenCharging(context) || currentlyCharging(context))
-                && (!PrefUtils.shouldSyncOnlyOnWIfi(context) || currentlyUnmetered(context))
-                )
+fun isOkToSyncAutomatically(context: Context): Boolean {
+    val kodein: Kodein by closestKodein(context)
+    val prefs: Prefs by kodein.instance()
+    return (currentlyConnected(context)
+            && (!prefs.onlySyncWhileCharging || currentlyCharging(context))
+            && (!prefs.onlySyncOnWIfi || currentlyUnmetered(context))
+            )
+}
 
+class FeedSyncer(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), KodeinAware {
+    override val kodein: Kodein by closestKodein(context)
+    private val localBroadcastManager: LocalBroadcastManager by instance()
 
-class FeedSyncer(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         val goParallel = inputData.getBoolean(PARALLEL_SYNC, false)
         val ignoreConnectivitySettings = inputData.getBoolean(IGNORE_CONNECTIVITY_SETTINGS, false)
@@ -43,7 +52,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Corouti
         var success = false
 
         if (ignoreConnectivitySettings || isOkToSyncAutomatically(context)) {
-            LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(bcast)
+            localBroadcastManager.sendBroadcast(bcast)
 
             val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
@@ -62,8 +71,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Corouti
             notify(applicationContext)
         }
 
-        LocalBroadcastManager.getInstance(applicationContext)
-                .sendBroadcast(bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false))
+        localBroadcastManager.sendBroadcast(bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false))
 
         return when (success) {
             true -> Result.success()
@@ -72,7 +80,8 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Corouti
     }
 }
 
-fun requestFeedSync(feedId: Long = ID_UNSET,
+fun requestFeedSync(kodein: Kodein,
+                    feedId: Long = ID_UNSET,
                     feedTag: String = "",
                     ignoreConnectivitySettings: Boolean = false,
                     forceNetwork: Boolean = false,
@@ -86,30 +95,33 @@ fun requestFeedSync(feedId: Long = ID_UNSET,
             ARG_FORCE_NETWORK to forceNetwork)
 
     workRequest.setInputData(data)
-
-    WorkManager.getInstance().enqueue(workRequest.build())
+    val workManager by kodein.instance<WorkManager>()
+    workManager.enqueue(workRequest.build())
 }
 
 fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
-    val shouldSync = PrefUtils.shouldSync(context)
+    val kodein by closestKodein(context)
+    val workManager: WorkManager by kodein.instance()
+    val prefs: Prefs by kodein.instance()
+    val shouldSync = prefs.shouldSync()
 
     if (shouldSync) {
         val constraints = Constraints.Builder()
                 .setRequiresBatteryNotLow(true)
-                .setRequiresCharging(PrefUtils.shouldSyncOnlyWhenCharging(context))
+                .setRequiresCharging(prefs.onlySyncWhileCharging)
 
-        if (PrefUtils.shouldSyncOnlyOnWIfi(context)) {
+        if (prefs.onlySyncOnWIfi) {
             constraints.setRequiredNetworkType(NetworkType.UNMETERED)
         } else {
             constraints.setRequiredNetworkType(NetworkType.CONNECTED)
         }
 
-        var timeInterval = PrefUtils.synchronizationFrequency(context)
+        var timeInterval = prefs.synchronizationFrequency
 
         if (timeInterval in 1..12 || timeInterval == 24L) {
             // Old value for periodic sync was in hours, convert it to minutes
             timeInterval *= 60
-            PrefUtils.setSynchronizationFrequency(context, timeInterval)
+            prefs.synchronizationFrequency = timeInterval
         }
 
         val workRequestBuilder = PeriodicWorkRequestBuilder<FeedSyncer>(
@@ -127,12 +139,12 @@ fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
             ExistingPeriodicWorkPolicy.KEEP
         }
 
-        WorkManager.getInstance()
-                .enqueueUniquePeriodicWork(UNIQUE_PERIODIC_NAME,
-                        existingWorkPolicy,
-                        syncWork)
+        workManager.enqueueUniquePeriodicWork(
+                UNIQUE_PERIODIC_NAME,
+                existingWorkPolicy,
+                syncWork
+        )
     } else {
-        WorkManager.getInstance()
-                .cancelUniqueWork(UNIQUE_PERIODIC_NAME)
+        workManager.cancelUniqueWork(UNIQUE_PERIODIC_NAME)
     }
 }
