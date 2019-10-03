@@ -63,6 +63,8 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
     private val feedItemDao: FeedItemDao by instance()
     private val prefs: Prefs by instance()
 
+    private val ephemeralState: EphemeralState by instance()
+
     private lateinit var liveDbPreviews: LiveData<PagedList<PreviewItem>>
 
     init {
@@ -119,6 +121,8 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
         setHasOptionsMenu(true)
 
         // Remember choice in future
+        ephemeralState.lastOpenFeedId = id
+        ephemeralState.lastOpenFeedTag = feedTag ?: ""
         launch(Dispatchers.Default) {
             prefs.setLastOpenFeed(id, feedTag)
         }
@@ -128,6 +132,12 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_feed, container, false)
         val recyclerView = rootView.findViewById<RecyclerView>(android.R.id.list)
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                ephemeralState.firstVisibleListItem = recyclerView.firstVisibleItemPosition
+            }
+        })
 
         // improve performance if you know that changes in content
         // do not change the size of the RecyclerView
@@ -226,12 +236,24 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
             }
         }).also {
             it.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+                var firstInsertion = true
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                    // If first item is visible, and new items have been added above
-                    // then scroll to the top
-                    if (positionStart == 0 && recyclerView.firstVisibleItemPosition == 0) {
-                        recyclerView.scrollToPosition(0)
+                    if (firstInsertion) {
+                        ephemeralState.firstVisibleListItem?.let { pos ->
+                            if (ephemeralState.lastOpenFeedId == this@FeedFragment.id &&
+                                    ephemeralState.lastOpenFeedTag == this@FeedFragment.feedTag ?: "") {
+                                recyclerView.scrollToPosition(pos)
+                            }
+                        }
+                    } else {
+                        // If first item is visible, and new items have been added above
+                        // then scroll to the top
+                        if (positionStart == 0 && recyclerView.firstVisibleItemPosition == 0) {
+                            recyclerView.scrollToPosition(0)
+                        }
                     }
+
+                    firstInsertion = false
                 }
             })
         }
