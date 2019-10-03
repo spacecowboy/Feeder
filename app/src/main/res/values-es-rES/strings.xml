@@ -93,7 +93,7 @@
   <string name="touch_to_play_video">Tocar para reproducir vídeo</string>
   <string name="javascript">Javascript</string>
   <string name="open_feed">Abrir canal</string>
-  <string name="mark_items_below_as_read">Marcar los elementos de debajo como leídos</string>
+  <string name="mark_items_below_as_read">Marcar anteriores como leídos</string>
 
 
 </resources>
