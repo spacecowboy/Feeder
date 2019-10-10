@@ -1,3 +1,10 @@
+# 1.8.23
+*   List should once again remember where you were when you come back
+    See !206 #219
+*   Spanish translation
+    Thanks to Khar Khamal
+    See !205
+
 # 1.8.22
 *   Update Spanish translations
     Thanks to Khar Khamal
