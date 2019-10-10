@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.di
 
 import com.nononsenseapps.feeder.base.KodeinAwareViewModelFactory
+import com.nononsenseapps.feeder.base.activityViewModelProvider
 import com.nononsenseapps.feeder.base.bindWithKodeinAwareViewModelFactory
 import com.nononsenseapps.feeder.model.*
 import org.kodein.di.Kodein
@@ -14,4 +15,5 @@ val viewModelModule = Kodein.Module(name = "view models") {
     bindWithKodeinAwareViewModelFactory<FeedItemsViewModel>()
     bindWithKodeinAwareViewModelFactory<FeedListViewModel>()
     bindWithKodeinAwareViewModelFactory<SettingsViewModel>()
+    bind<EphemeralState>() with activityViewModelProvider()
 }

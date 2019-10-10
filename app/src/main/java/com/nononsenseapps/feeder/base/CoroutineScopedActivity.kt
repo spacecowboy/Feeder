@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.base
 import android.annotation.SuppressLint
 import android.view.MenuInflater
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -10,6 +11,7 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.bind
+import org.kodein.di.generic.instance
 import org.kodein.di.generic.provider
 
 /**
@@ -24,6 +26,7 @@ open class CoroutineScopedKodeinAwareActivity : AppCompatActivity(), KodeinAware
     override val kodein: Kodein by Kodein.lazy {
         extend(parentKodein)
         bind<MenuInflater>() with provider { menuInflater }
+        bind<FragmentActivity>() with instance(this@CoroutineScopedKodeinAwareActivity)
     }
 
     override fun onDestroy() {

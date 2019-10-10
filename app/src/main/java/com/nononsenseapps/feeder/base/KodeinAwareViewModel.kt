@@ -9,10 +9,12 @@ import androidx.lifecycle.ViewModelProviders
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.bindings.Factory
+import org.kodein.di.bindings.Provider
 import org.kodein.di.direct
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.factory
 import org.kodein.di.generic.instance
+import org.kodein.di.generic.provider
 import java.lang.reflect.InvocationTargetException
 
 /**
@@ -39,6 +41,13 @@ class KodeinAwareViewModelFactory(override val kodein: Kodein)
         } else {
             super.create(modelClass)
         }
+    }
+}
+
+inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.activityViewModelProvider():
+        Provider<C, T> {
+    return provider {
+        ViewModelProviders.of(instance<FragmentActivity>(), instance<KodeinAwareViewModelFactory>()).get(T::class.java)
     }
 }
 
