@@ -105,6 +105,7 @@
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintVertical_bias="0"
       tools:text="@tools:sample/full_names" />
+    <!-- useful for RTL testing android:text="مرتضی"-->
 
     <TextView
       android:id="@+id/story_snippet"
@@ -124,6 +125,7 @@
       app:layout_constraintTop_toBottomOf="@id/story_author"
       app:layout_goneMarginEnd="@dimen/keyline_1"
       tools:text="@tools:sample/cities" />
+    <!-- useful for RTL testing android:text="معرفی کتاب: سفر در ارض دیوار برلین"-->
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 
