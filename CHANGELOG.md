@@ -1,3 +1,10 @@
+# 1.8.24
+*   Fixed alignment issue in RTL layout
+    See !208 #224
+*   Update Italian (it) translation
+    Thanks to Emanuele Petriglia
+    See !207
+
 # 1.8.23
 *   List should once again remember where you were when you come back
     See !206 #219
