@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -272,6 +273,19 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
             }
             menu.findItem(R.id.mark_items_below_as_read).setOnMenuItemClickListener {
                 actionCallback.markBelowAsRead(adapterPosition)
+                true
+            }
+            menu.findItem(R.id.action_share).setOnMenuItemClickListener {
+                rssItem?.link?.let { link ->
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, link)
+                    }
+
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    startActivity(view.context, shareIntent, null)
+                }
                 true
             }
         }
