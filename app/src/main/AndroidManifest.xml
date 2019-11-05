@@ -36,9 +36,10 @@
 
         <category android:name="android.intent.category.DEFAULT" />
       </intent-filter>
+
       <meta-data
-          android:name="android.app.shortcuts"
-          android:resource="@xml/shortcuts" />
+        android:name="android.app.shortcuts"
+        android:resource="@xml/shortcuts" />
     </activity>
 
     <activity
@@ -51,23 +52,25 @@
         android:name="android.support.PARENT_ACTIVITY"
         android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
 
+      <!-- URLs with feed mimetype can be opened -->
       <intent-filter>
-        <action android:name="android.intent.action.SEND" />
+        <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
 
         <data android:scheme="http" />
         <data android:scheme="https" />
-      </intent-filter>
-      <intent-filter>
-        <action android:name="android.intent.action.SEND" />
 
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:host="*" />
 
-        <data android:mimeType="text/*" />
+        <data android:mimeType="text/xml" />
+        <data android:mimeType="application/rss+xml" />
+        <data android:mimeType="application/atom+xml" />
+        <data android:mimeType="application/xml" />
+        <data android:mimeType="application/json" />
       </intent-filter>
+      <!-- URLs ending with '.xml' or '.rss' can be opened directly-->
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
 
@@ -82,6 +85,7 @@
         <data android:pathPattern=".*\\.atom" />
         <data android:pathPattern=".*\\.json" />
       </intent-filter>
+      <!-- FeedBurner URLs can be opened directly-->
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
 
@@ -95,7 +99,28 @@
         <data android:host="feeds2.feedburner.com" />
         <data android:host="feedsproxy.google.com" />
       </intent-filter>
-    </activity> <!-- Receiver for notification cancellations and such -->
+      <!-- Any other URL can be shared with the app -->
+      <intent-filter>
+        <action android:name="android.intent.action.SEND" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data android:scheme="http" />
+        <data android:scheme="https" />
+        <data android:host="*" />
+      </intent-filter>
+      <!-- Also possible to share pure text -->
+      <intent-filter>
+        <action android:name="android.intent.action.SEND" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data android:mimeType="text/plain" />
+      </intent-filter>
+    </activity>
+    <!-- Receiver for notification cancellations and such -->
     <receiver android:name=".model.RssNotificationBroadcastReceiver" />
 
     <!-- Note that the name of this provider is hard coded into the app, so remember to change both places -->
