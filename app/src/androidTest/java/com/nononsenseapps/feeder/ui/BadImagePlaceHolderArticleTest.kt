@@ -62,7 +62,7 @@ class BadImagePlaceHolderArticleTest {
     }
 
     @Test
-    fun placeHolderIsShownOnBadImageNightTheme() {
+    fun placeHolderIsShownOnBadImageNightTheme() = runBlocking {
         prefs.isNightMode = true
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
 
@@ -87,7 +87,7 @@ class BadImagePlaceHolderArticleTest {
     }
 
     @Test
-    fun placeHolderIsShownOnBadImageDayTheme() {
+    fun placeHolderIsShownOnBadImageDayTheme() = runBlocking {
         prefs.isNightMode = false
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
 
@@ -112,7 +112,7 @@ class BadImagePlaceHolderArticleTest {
     }
 
     @Test
-    fun imgWithNoSrcIsNotDisplayed() {
+    fun imgWithNoSrcIsNotDisplayed() = runBlocking {
         val itemId = insertData {
             """
                 Image is: <img src="" alt="alt text"></img>
@@ -132,7 +132,7 @@ class BadImagePlaceHolderArticleTest {
     }
 
     @Test
-    fun imgHasAltTextDisplayed() {
+    fun imgHasAltTextDisplayed() = runBlocking {
         val imgUrl = server.url("/img.png")
 
         val itemId = insertData {
@@ -154,7 +154,7 @@ class BadImagePlaceHolderArticleTest {
     }
 
     @Test
-    fun imgAppendsNewLineBeforeAndAfter() {
+    fun imgAppendsNewLineBeforeAndAfter() = runBlocking {
         val imgUrl = server.url("/img.png")
 
         val itemId = insertData {
@@ -177,7 +177,7 @@ class BadImagePlaceHolderArticleTest {
                 .check(matches(withText(containsString("\nalt text\n"))))
     }
 
-    private fun insertData(imgUrl: HttpUrl? = null, description: () -> String): Long {
+    private suspend fun insertData(imgUrl: HttpUrl? = null, description: () -> String): Long {
 
         val feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "foo",

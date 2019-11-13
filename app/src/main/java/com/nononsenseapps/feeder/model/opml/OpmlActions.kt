@@ -17,7 +17,7 @@ import kotlin.system.measureTimeMillis
 /**
  * Exports OPML on a background thread
  */
-suspend fun exportOpml(kodein: Kodein, uri: Uri) {
+suspend fun exportOpml(kodein: Kodein, uri: Uri) = withContext(Dispatchers.IO) {
     try {
         val time = measureTimeMillis {
             val contentResolver: ContentResolver by kodein.instance()
@@ -35,16 +35,14 @@ suspend fun exportOpml(kodein: Kodein, uri: Uri) {
     } catch (e: Throwable) {
         e.printStackTrace()
         Log.e("OMPL", "Failed to export OMPL: $e")
-        withContext(Dispatchers.Main) {
-            kodein.direct.instance<ToastMaker>().makeToast("Failed to export OMPL")
-        }
+        kodein.direct.instance<ToastMaker>().makeToast("Failed to export OMPL")
     }
 }
 
 /**
  * Imports OPML on a background thread
  */
-suspend fun importOpml(kodein: Kodein, uri: Uri) {
+suspend fun importOpml(kodein: Kodein, uri: Uri) = withContext(Dispatchers.IO) {
     val db: AppDatabase by kodein.instance()
     try {
         val time = measureTimeMillis {
@@ -60,8 +58,6 @@ suspend fun importOpml(kodein: Kodein, uri: Uri) {
         Log.d("OPML", "Imported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
         Log.e("OMPL", "Failed to import OMPL: $e")
-        withContext(Dispatchers.Main) {
-            kodein.direct.instance<ToastMaker>().makeToast("Failed to import OMPL")
-        }
+        kodein.direct.instance<ToastMaker>().makeToast("Failed to import OMPL")
     }
 }

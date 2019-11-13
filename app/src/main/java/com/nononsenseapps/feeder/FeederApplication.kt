@@ -17,6 +17,8 @@ import com.nononsenseapps.feeder.di.viewModelModule
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.jsonfeed.cachingHttpClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import org.conscrypt.Conscrypt
 import org.kodein.di.Kodein
@@ -43,7 +45,7 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
         bind<ContentResolver>() with singleton { contentResolver }
         bind<ToastMaker>() with singleton {
             object : ToastMaker {
-                override fun makeToast(text: String) {
+                override suspend fun makeToast(text: String) = withContext(Dispatchers.Main) {
                     Toast.makeText(this@FeederApplication, text, Toast.LENGTH_SHORT).show()
                 }
             }

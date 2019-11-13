@@ -8,11 +8,9 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
+import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -73,7 +71,7 @@ class OPMLTest {
     @MediumTest
     @Test
     @Throws(IOException::class)
-    fun testWrite() {
+    fun testWrite() = runBlocking {
         // Create some feeds
         createSampleFeeds()
 
@@ -94,7 +92,7 @@ class OPMLTest {
     @MediumTest
     @Test
     @Throws(Exception::class)
-    fun testRead() {
+    fun testRead() = runBlocking {
         writeSampleFile()
 
         val parser = OpmlParser(OPMLToRoom(db))
@@ -134,7 +132,7 @@ class OPMLTest {
     @MediumTest
     @Test
     @Throws(Exception::class)
-    fun testReadExisting() {
+    fun testReadExisting() = runBlocking {
         writeSampleFile()
 
         // Create something that does not exist
@@ -206,7 +204,7 @@ class OPMLTest {
     @MediumTest
     @Test
     @Throws(Exception::class)
-    fun testReadBadFile() {
+    fun testReadBadFile() = runBlocking {
         //val path = File(dir, "feeds.opml")
 
         path!!.bufferedWriter().use {
@@ -221,7 +219,7 @@ class OPMLTest {
     @SmallTest
     @Test
     @Throws(Exception::class)
-    fun testReadMissingFile() {
+    fun testReadMissingFile() = runBlocking {
         val path = File(dir, "lsadflibaslsdfa.opml")
         // Read file
         val parser = OpmlParser(OPMLToRoom(db))
@@ -236,18 +234,20 @@ class OPMLTest {
     }
 
     @Throws(IOException::class)
-    private fun writeSampleFile() {
+    private fun writeSampleFile() = runBlocking {
         // Use test write to write the sample file
         testWrite()
         // Then delete all feeds again
         db.runInTransaction {
-            db.feedDao().loadFeeds().forEach {
-                db.feedDao().deleteFeed(it)
+            runBlocking {
+                db.feedDao().loadFeeds().forEach {
+                    db.feedDao().deleteFeed(it)
+                }
             }
         }
     }
 
-    private fun createSampleFeeds() {
+    private suspend fun createSampleFeeds() {
         for (i in 0..9) {
             val feed = Feed(
                     url = URL("http://somedomain$i.com/rss.xml"),
@@ -263,14 +263,14 @@ class OPMLTest {
         }
     }
 
-    private fun getTags(): List<String> =
+    private suspend fun getTags(): List<String> =
             db.feedDao().loadTags()
 
     @Test
     @MediumTest
-    fun antennaPodOPMLImports() {
+    fun antennaPodOPMLImports() = runBlocking {
         //given
-        val opmlStream = javaClass.getResourceAsStream("antennapod-feeds.opml")!!
+        val opmlStream = this@OPMLTest.javaClass.getResourceAsStream("antennapod-feeds.opml")!!
 
         //when
         val parser = OpmlParser(OPMLToRoom(db))
@@ -316,9 +316,9 @@ class OPMLTest {
 
     @Test
     @MediumTest
-    fun flymOPMLImports() {
+    fun flymOPMLImports() = runBlocking {
         //given
-        val opmlStream = javaClass.getResourceAsStream("Flym_auto_backup.opml")!!
+        val opmlStream = this@OPMLTest.javaClass.getResourceAsStream("Flym_auto_backup.opml")!!
 
         //when
         val parser = OpmlParser(OPMLToRoom(db))
@@ -383,9 +383,9 @@ class OPMLTest {
 
     @Test
     @MediumTest
-    fun rssGuardOPMLImports1() {
+    fun rssGuardOPMLImports1() = runBlocking {
         //given
-        val opmlStream = javaClass.getResourceAsStream("rssguard_1.opml")!!
+        val opmlStream = this@OPMLTest.javaClass.getResourceAsStream("rssguard_1.opml")!!
 
         //when
         val parser = OpmlParser(OPMLToRoom(db))
@@ -433,9 +433,9 @@ class OPMLTest {
 
     @Test
     @MediumTest
-    fun rssGuardOPMLImports2() {
+    fun rssGuardOPMLImports2() = runBlocking {
         //given
-        val opmlStream = javaClass.getResourceAsStream("rssguard_2.opml")!!
+        val opmlStream = this@OPMLTest.javaClass.getResourceAsStream("rssguard_2.opml")!!
 
         //when
         val parser = OpmlParser(OPMLToRoom(db))

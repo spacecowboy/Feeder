@@ -29,18 +29,18 @@ class CustomFeedTitleIsShownInReaderTest {
     val testDb = TestDatabaseRule(getApplicationContext())
 
     @Test
-    fun feedTitleIsShownIfNoCustomTitle() {
+    fun feedTitleIsShownIfNoCustomTitle() = runBlocking {
         insertDataAndLaunch("foo", "")
         assertFeedTitleShownIs("foo")
     }
 
     @Test
-    fun customTitleIsShownIfCustomTitle() {
+    fun customTitleIsShownIfCustomTitle() = runBlocking {
         insertDataAndLaunch("foo", "bar")
         assertFeedTitleShownIs("bar")
     }
 
-    private fun insertDataAndLaunch(title: String, customTitle: String) {
+    private suspend fun insertDataAndLaunch(title: String, customTitle: String) {
         val feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = title,
                 customTitle = customTitle,

@@ -12,6 +12,7 @@ import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
+import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -40,7 +41,7 @@ class YoutubePlaceHolderArticleTest {
     }
 
     @Test
-    fun placeHolderIsShownForYoutubeIframes() {
+    fun placeHolderIsShownForYoutubeIframes() = runBlocking {
         val itemId = setup("youtube.com/embed/foo") { imgUrl ->
             """
             Video is: <iframe src="$imgUrl"></iframe>
@@ -57,7 +58,7 @@ class YoutubePlaceHolderArticleTest {
     }
 
     @Test
-    fun placeHolderIsNotShownForBadIframes() {
+    fun placeHolderIsNotShownForBadIframes() = runBlocking {
         val itemId = setup("badsite.com/foo") { imgUrl ->
             """
             Video is: <iframe src="$imgUrl"></iframe>
@@ -73,7 +74,7 @@ class YoutubePlaceHolderArticleTest {
                         .getString(R.string.touch_to_play_video))))))
     }
 
-    private fun setup(urlSuffix: String, description: (HttpUrl) -> String): Long {
+    private suspend fun setup(urlSuffix: String, description: (HttpUrl) -> String): Long {
         server.enqueue(MockResponse().also {
             it.setResponseCode(400)
         })

@@ -121,7 +121,7 @@ dependencies {
   // Needed pre SDK21
   implementation "com.android.support:multidex:$multi_dex_version"
 
-  implementation "androidx.room:room-runtime:$room_version"
+  implementation "androidx.room:room-ktx:$room_version"
 
   implementation "androidx.work:work-runtime-ktx:$workmanager_version"
 

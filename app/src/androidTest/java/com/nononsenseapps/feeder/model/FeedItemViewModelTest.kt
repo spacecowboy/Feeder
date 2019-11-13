@@ -40,7 +40,7 @@ class FeedItemViewModelTest {
     private var itemId: Long = ID_UNSET
 
     @Before
-    fun initDb() {
+    fun initDb() = runBlocking {
         feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "foo",
                 url = URL("http://foo")
@@ -51,12 +51,14 @@ class FeedItemViewModelTest {
     fun databaseLoadCallsOnChangeTwiceWhenImages() {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
-        itemId = testDb.db.feedItemDao().insertFeedItem(FeedItem(
-                feedId = feedId,
-                guid = "foobar",
-                title = "title",
-                description = "description <img src='file://img.png' alt='img here'></img>"
-        ))
+        itemId = runBlocking {
+            testDb.db.feedItemDao().insertFeedItem(FeedItem(
+                    feedId = feedId,
+                    guid = "foobar",
+                    title = "title",
+                    description = "description <img src='file://img.png' alt='img here'></img>"
+            ))
+        }
 
         activityRule.launchActivity(Intent().also {
             it.putExtra(ARG_ID, itemId)
@@ -77,12 +79,14 @@ class FeedItemViewModelTest {
     fun databaseLoadCallsOnChangeOnceWhenNoImages() {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
-        itemId = testDb.db.feedItemDao().insertFeedItem(FeedItem(
-                feedId = feedId,
-                guid = "foobar",
-                title = "title",
-                description = "description <b>bold</b>"
-        ))
+        itemId = runBlocking {
+            testDb.db.feedItemDao().insertFeedItem(FeedItem(
+                    feedId = feedId,
+                    guid = "foobar",
+                    title = "title",
+                    description = "description <b>bold</b>"
+            ))
+        }
 
         activityRule.launchActivity(Intent().also {
             it.putExtra(ARG_ID, itemId)
@@ -110,7 +114,9 @@ class FeedItemViewModelTest {
                 description = "description <b>bold</b>"
         )
 
-        itemId = testDb.db.feedItemDao().insertFeedItem(item)
+        itemId = runBlocking {
+            testDb.db.feedItemDao().insertFeedItem(item)
+        }
         item = item.copy(id = itemId)
 
         activityRule.launchActivity(Intent().also {
@@ -147,7 +153,9 @@ class FeedItemViewModelTest {
                 description = "description <b>bold</b>"
         )
 
-        itemId = testDb.db.feedItemDao().insertFeedItem(item)
+        itemId = runBlocking {
+            testDb.db.feedItemDao().insertFeedItem(item)
+        }
         item = item.copy(id = itemId)
 
         activityRule.launchActivity(Intent().also {
@@ -184,7 +192,9 @@ class FeedItemViewModelTest {
                 description = "description <img src='file://img.png' alt='img here'></img>"
         )
 
-        itemId = testDb.db.feedItemDao().insertFeedItem(item)
+        itemId = runBlocking {
+            testDb.db.feedItemDao().insertFeedItem(item)
+        }
 
         activityRule.launchActivity(Intent().also {
             it.putExtra(ARG_ID, itemId)

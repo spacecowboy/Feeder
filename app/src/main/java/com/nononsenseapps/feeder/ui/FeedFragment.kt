@@ -590,7 +590,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
             EXPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    launch(Dispatchers.Default) {
+                    launch {
                         exportOpml(kodein, uri)
                     }
                 }
@@ -598,7 +598,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
             IMPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    launch(Dispatchers.Default) {
+                    launch {
                         importOpml(kodein, uri)
                     }
                 }

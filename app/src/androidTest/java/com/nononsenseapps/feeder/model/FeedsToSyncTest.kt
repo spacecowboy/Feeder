@@ -5,6 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
+import kotlinx.coroutines.runBlocking
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.Assert.assertEquals
@@ -19,7 +20,7 @@ class FeedsToSyncTest {
     val testDb = TestDatabaseRule(getApplicationContext())
 
     @Test
-    fun returnsStaleFeed() {
+    fun returnsStaleFeed() = runBlocking {
         // with stale feed
         val feed = withFeed()
 
@@ -31,7 +32,7 @@ class FeedsToSyncTest {
     }
 
     @Test
-    fun doesNotReturnFreshFeed() {
+    fun doesNotReturnFreshFeed() = runBlocking {
         val now = DateTime.now(DateTimeZone.UTC)
         val feed = withFeed(lastSync = now.minusMinutes(1))
 
@@ -44,7 +45,7 @@ class FeedsToSyncTest {
     }
 
     @Test
-    fun returnsAllStaleFeeds() {
+    fun returnsAllStaleFeeds() = runBlocking {
         val items = listOf(
                 withFeed(url = URL("http://one")),
                 withFeed(url = URL("http://two"))
@@ -56,7 +57,7 @@ class FeedsToSyncTest {
     }
 
     @Test
-    fun doesNotReturnAllFreshFeeds() {
+    fun doesNotReturnAllFreshFeeds() = runBlocking {
         val now = DateTime.now(DateTimeZone.UTC)
         val items = listOf(
                 withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1)),
@@ -69,7 +70,7 @@ class FeedsToSyncTest {
     }
 
     @Test
-    fun returnsTaggedStaleFeeds() {
+    fun returnsTaggedStaleFeeds() = runBlocking {
         val items = listOf(
                 withFeed(url = URL("http://one"), tag = "tag"),
                 withFeed(url = URL("http://two"), tag = "tag")
@@ -81,7 +82,7 @@ class FeedsToSyncTest {
     }
 
     @Test
-    fun doesNotReturnTaggedFreshFeeds() {
+    fun doesNotReturnTaggedFreshFeeds() = runBlocking {
         val now = DateTime.now(DateTimeZone.UTC)
         val items = listOf(
                 withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1), tag = "tag"),
@@ -93,7 +94,7 @@ class FeedsToSyncTest {
         assertEquals(listOf(items[1]), result)
     }
 
-    private fun withFeed(lastSync: DateTime = DateTime(0, DateTimeZone.UTC), url: URL = URL("http://url"), tag: String = ""): Feed {
+    private suspend fun withFeed(lastSync: DateTime = DateTime(0, DateTimeZone.UTC), url: URL = URL("http://url"), tag: String = ""): Feed {
         val feed = Feed(
                 lastSync = lastSync,
                 url = url,

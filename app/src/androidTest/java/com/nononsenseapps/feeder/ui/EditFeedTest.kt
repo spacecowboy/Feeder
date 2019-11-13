@@ -92,7 +92,7 @@ class EditFeedTest {
     }
 
     @Test
-    fun endToEnd() {
+    fun endToEnd() = runBlocking {
         val response = MockResponse().also {
             it.setBody(cowboy_feed_json_body)
             cowboyprogrammer_feed_json_headers.entries.forEach { entry ->
@@ -114,15 +114,13 @@ class EditFeedTest {
 
         val recyclerView: RecyclerView = activityRule.activity.findViewById(R.id.results_listview)
 
-        runBlocking {
-            // Wait for search to be done
-            untilEq(true) {
-                activityRule.activity?.searchJob?.isCompleted
-            }
-            // Then wait for recyclerView to update
-            untilNotEq(null) {
-                recyclerView.findViewHolderForAdapterPosition(0)
-            }
+        // Wait for search to be done
+        untilEq(true) {
+            activityRule.activity?.searchJob?.isCompleted
+        }
+        // Then wait for recyclerView to update
+        untilNotEq(null) {
+            recyclerView.findViewHolderForAdapterPosition(0)
         }
 
         // Assert the feed was retrieved
@@ -141,18 +139,16 @@ class EditFeedTest {
         Espresso.closeSoftKeyboard()
         onView(withId(R.id.add_button)).perform(click())
 
-        runBlocking {
-            untilEq(false) {
-                activityRule.activity?.isActive
-            }
-
-            val feed = untilNotEq(null) {
-                testDb.db.feedDao().loadFeedWithUrl(URL("https://cowboyprogrammer.org/feed.json"))
-            }
-            assertEquals(
-                    "Cowboy Programmer",
-                    feed?.title
-            )
+        untilEq(false) {
+            activityRule.activity?.isActive
         }
+
+        val feed = untilNotEq(null) {
+            testDb.db.feedDao().loadFeedWithUrl(URL("https://cowboyprogrammer.org/feed.json"))
+        }
+        assertEquals(
+                "Cowboy Programmer",
+                feed?.title
+        )
     }
 }

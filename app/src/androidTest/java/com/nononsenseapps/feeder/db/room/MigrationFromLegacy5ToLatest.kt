@@ -8,43 +8,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nononsenseapps.feeder.FeederApplication
-import com.nononsenseapps.feeder.db.legacy.COL_AUTHOR
-import com.nononsenseapps.feeder.db.legacy.COL_CUSTOM_TITLE
-import com.nononsenseapps.feeder.db.legacy.COL_DESCRIPTION
-import com.nononsenseapps.feeder.db.legacy.COL_ENCLOSURELINK
-import com.nononsenseapps.feeder.db.legacy.COL_FEED
-import com.nononsenseapps.feeder.db.legacy.COL_FEEDTITLE
-import com.nononsenseapps.feeder.db.legacy.COL_FEEDURL
-import com.nononsenseapps.feeder.db.legacy.COL_GUID
-import com.nononsenseapps.feeder.db.legacy.COL_ID
-import com.nononsenseapps.feeder.db.legacy.COL_IMAGEURL
-import com.nononsenseapps.feeder.db.legacy.COL_LINK
-import com.nononsenseapps.feeder.db.legacy.COL_NOTIFIED
-import com.nononsenseapps.feeder.db.legacy.COL_NOTIFY
-import com.nononsenseapps.feeder.db.legacy.COL_PLAINSNIPPET
-import com.nononsenseapps.feeder.db.legacy.COL_PLAINTITLE
-import com.nononsenseapps.feeder.db.legacy.COL_PUBDATE
-import com.nononsenseapps.feeder.db.legacy.COL_TAG
-import com.nononsenseapps.feeder.db.legacy.COL_TITLE
-import com.nononsenseapps.feeder.db.legacy.COL_UNREAD
-import com.nononsenseapps.feeder.db.legacy.COL_URL
-import com.nononsenseapps.feeder.db.legacy.CREATE_FEED_ITEM_TABLE
-import com.nononsenseapps.feeder.db.legacy.CREATE_TAGS_VIEW
-import com.nononsenseapps.feeder.db.legacy.CREATE_TAG_TRIGGER
-import com.nononsenseapps.feeder.db.legacy.FEED_ITEM_TABLE_NAME
-import com.nononsenseapps.feeder.db.legacy.FEED_TABLE_NAME
-import com.nononsenseapps.feeder.db.legacy.LegacyDatabaseHandler
+import com.nononsenseapps.feeder.db.legacy.*
 import com.nononsenseapps.feeder.util.contentValues
 import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
+import kotlinx.coroutines.runBlocking
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -163,7 +136,7 @@ class MigrationFromLegacy5ToLatest {
     }
 
     @Test
-    fun legacyMigrationTo7MinimalFeed() {
+    fun legacyMigrationTo7MinimalFeed() = runBlocking {
         testHelper.runMigrationsAndValidate(testDbName, 7, true,
                 MIGRATION_5_7, MIGRATION_7_8)
 
@@ -185,7 +158,7 @@ class MigrationFromLegacy5ToLatest {
     }
 
     @Test
-    fun legacyMigrationTo7CompleteFeed() {
+    fun legacyMigrationTo7CompleteFeed() = runBlocking {
         testHelper.runMigrationsAndValidate(testDbName, 7, true,
                 MIGRATION_5_7, MIGRATION_7_8)
 
@@ -207,7 +180,7 @@ class MigrationFromLegacy5ToLatest {
     }
 
     @Test
-    fun legacyMigrationTo7MinimalFeedItem() {
+    fun legacyMigrationTo7MinimalFeedItem() = runBlocking {
         testHelper.runMigrationsAndValidate(testDbName, 7, true,
                 MIGRATION_5_7, MIGRATION_7_8)
 
@@ -237,7 +210,7 @@ class MigrationFromLegacy5ToLatest {
     }
 
     @Test
-    fun legacyMigrationTo7CompleteFeedItem() {
+    fun legacyMigrationTo7CompleteFeedItem() = runBlocking {
         testHelper.runMigrationsAndValidate(testDbName, 7, true,
                 MIGRATION_5_7, MIGRATION_7_8)
 

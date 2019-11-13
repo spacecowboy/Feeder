@@ -169,7 +169,7 @@ private suspend fun fetchFeed(
 ): Response =
         feedParser.getResponse(feedSql.url, forceNetwork = forceNetwork)
 
-internal fun feedsToSync(feedDao: FeedDao, feedId: Long, tag: String, staleTime: Long = -1L): List<com.nononsenseapps.feeder.db.room.Feed> {
+internal suspend fun feedsToSync(feedDao: FeedDao, feedId: Long, tag: String, staleTime: Long = -1L): List<com.nononsenseapps.feeder.db.room.Feed> {
     return when {
         feedId > 0 -> {
             val feed = if (staleTime > 0) feedDao.loadFeedIfStale(feedId, staleTime = staleTime) else feedDao.loadFeed(feedId)

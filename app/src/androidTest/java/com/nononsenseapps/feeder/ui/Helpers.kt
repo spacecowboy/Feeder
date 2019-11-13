@@ -9,7 +9,7 @@ import kotlinx.coroutines.withTimeout
 suspend fun <T> whileNotEq(other: Any?,
                            timeoutMillis: Long = 500,
                            sleepMillis: Long = 50,
-                           body: (() -> T)): T =
+                           body: (suspend () -> T)): T =
         withTimeout(timeoutMillis) {
             var item = body.invoke()
             while (item != other) {
@@ -25,7 +25,7 @@ suspend fun <T> whileNotEq(other: Any?,
 suspend fun <T> whileEq(other: Any?,
                         timeoutMillis: Long = 500,
                         sleepMillis: Long = 50,
-                        body: (() -> T)): T =
+                        body: (suspend () -> T)): T =
         withTimeout(timeoutMillis) {
             var item = body.invoke()
             while (item == other) {
@@ -41,7 +41,7 @@ suspend fun <T> whileEq(other: Any?,
 suspend fun <T> untilNotEq(other: Any?,
                            timeoutMillis: Long = 500,
                            sleepMillis: Long = 50,
-                           body: (() -> T)): T =
+                           body: (suspend () -> T)): T =
         whileEq(other = other,
                 timeoutMillis = timeoutMillis,
                 sleepMillis = sleepMillis,
@@ -53,7 +53,7 @@ suspend fun <T> untilNotEq(other: Any?,
 suspend fun <T> untilEq(other: Any?,
                         timeoutMillis: Long = 500,
                         sleepMillis: Long = 50,
-                        body: (() -> T)): T =
+                        body: (suspend () -> T)): T =
         whileNotEq(other = other,
                 timeoutMillis = timeoutMillis,
                 sleepMillis = sleepMillis,

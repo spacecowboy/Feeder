@@ -262,7 +262,7 @@ private fun notificationBuilder(context: Context): NotificationCompat.Builder {
             .setPriority(NotificationCompat.PRIORITY_LOW)
 }
 
-private fun getItemsToNotify(kodein: Kodein): List<FeedItemWithFeed> {
+private suspend fun getItemsToNotify(kodein: Kodein): List<FeedItemWithFeed> {
     val feedDao: FeedDao by kodein.instance()
     val feedItemDao: FeedItemDao by kodein.instance()
 

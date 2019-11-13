@@ -50,7 +50,7 @@ class RssLocalSyncKtTest {
         server.start()
     }
 
-    fun insertFeed(title: String, url: URL, raw: String, isJson: Boolean = true): Long {
+    suspend fun insertFeed(title: String, url: URL, raw: String, isJson: Boolean = true): Long {
         val id = testDb.db.feedDao().insertFeed(Feed(
                 title = title,
                 url = url,
@@ -76,7 +76,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun syncCowboyJsonWorks() {
+    fun syncCowboyJsonWorks() = runBlocking {
         val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
                 cowboyJson)
 
@@ -91,7 +91,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun syncCowboyAtomWorks() {
+    fun syncCowboyAtomWorks() = runBlocking {
         val cowboyAtomId = insertFeed("cowboyatom", server.url("/atom.xml").url(),
                 cowboyAtom, isJson = false)
 
@@ -106,7 +106,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun syncAllWorks() {
+    fun syncAllWorks() = runBlocking {
         val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
                 cowboyJson)
         val cowboyAtomId = insertFeed("cowboyatom", server.url("/atom.xml").url(),
@@ -128,7 +128,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun responsesAreNotParsedUnlessFeedHashHasChanged() {
+    fun responsesAreNotParsedUnlessFeedHashHasChanged() = runBlocking {
         val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
                 cowboyJson)
 
@@ -152,7 +152,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun feedsSyncedWithin15MinAreIgnored() {
+    fun feedsSyncedWithin15MinAreIgnored() = runBlocking {
         val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
                 cowboyJson)
 
@@ -179,7 +179,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun feedsSyncedWithin15MinAreNotIgnoredWhenForcingNetwork() {
+    fun feedsSyncedWithin15MinAreNotIgnoredWhenForcingNetwork() = runBlocking {
         val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
                 cowboyJson)
 
@@ -205,7 +205,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun feedShouldNotBeUpdatedIfRequestFails() {
+    fun feedShouldNotBeUpdatedIfRequestFails() = runBlocking {
         val response = MockResponse().also {
             it.setResponseCode(500)
         }
@@ -234,7 +234,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun feedWithNoUniqueLinksGetsSomeGeneratedGUIDsFromTitles() {
+    fun feedWithNoUniqueLinksGetsSomeGeneratedGUIDsFromTitles() = runBlocking {
         val response = MockResponse().also {
             it.setResponseCode(200)
             it.setBody(String(nixosRss.readBytes()))
@@ -267,7 +267,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun feedWithNoDatesShouldGetSomeGenerated() {
+    fun feedWithNoDatesShouldGetSomeGenerated() = runBlocking {
         val response = MockResponse().also {
             it.setResponseCode(200)
             it.setBody(fooRss(2))
@@ -309,7 +309,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun feedWithNoDatesShouldNotGetOverriddenDatesNextSync() {
+    fun feedWithNoDatesShouldNotGetOverriddenDatesNextSync() = runBlocking {
         server.enqueue(MockResponse().also {
             it.setResponseCode(200)
             it.setBody(fooRss(1))
@@ -363,7 +363,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun feedShouldNotBeCleanedToHaveLessItemsThanActualFeed() {
+    fun feedShouldNotBeCleanedToHaveLessItemsThanActualFeed() = runBlocking {
         val feedItemCount = 9
         server.enqueue(MockResponse().also {
             it.setResponseCode(200)
@@ -394,7 +394,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun slowResponseShouldBeOk() {
+    fun slowResponseShouldBeOk() = runBlocking {
         val url = server.url("/atom.xml").url()
         val cowboyAtomId = insertFeed("cowboy", url, cowboyAtom, isJson = false)
         responses[url]!!.throttleBody(1024 * 100, 29, TimeUnit.SECONDS)
@@ -410,7 +410,7 @@ class RssLocalSyncKtTest {
     }
 
     @Test
-    fun verySlowResponseShouldBeCancelled() {
+    fun verySlowResponseShouldBeCancelled() = runBlocking {
         val url = server.url("/atom.xml").url()
         val cowboyAtomId = insertFeed("cowboy", url, cowboyAtom, isJson = false)
         responses[url]!!.throttleBody(1024 * 100, 31, TimeUnit.SECONDS)

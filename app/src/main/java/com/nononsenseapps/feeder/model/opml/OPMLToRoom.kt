@@ -9,10 +9,10 @@ class OPMLToRoom(db: AppDatabase) : OPMLParserToDatabase {
 
     val dao = db.feedDao()
 
-    override fun getFeed(url: String): Feed? =
+    override suspend fun getFeed(url: String): Feed? =
             dao.loadFeedWithUrl(sloppyLinkToStrictURLNoThrows(url))
 
-    override fun saveFeed(feed: Feed) {
+    override suspend fun saveFeed(feed: Feed) {
         val existing = dao.loadFeedWithUrl(feed.url)
 
         // Don't want to remove existing feed on OPML imports

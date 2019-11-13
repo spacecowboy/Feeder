@@ -31,7 +31,7 @@ class OpenLinkInDefaultActivityTest {
     private lateinit var feedItem: FeedItem
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking {
         val db = testDb.db
 
         val feedId = db.feedDao().insertFeed(Feed(

@@ -5,15 +5,15 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
-fun writeFile(path: String,
+suspend fun writeFile(path: String,
               tags: Iterable<String>,
-              feedsWithTag: (String) -> Iterable<Feed>) {
+              feedsWithTag: suspend (String) -> Iterable<Feed>) {
     writeOutputStream(FileOutputStream(path), tags, feedsWithTag)
 }
 
-fun writeOutputStream(os: OutputStream,
+suspend fun writeOutputStream(os: OutputStream,
                       tags: Iterable<String>,
-                      feedsWithTag: (String) -> Iterable<Feed>) {
+                      feedsWithTag: suspend (String) -> Iterable<Feed>) {
     try {
         os.bufferedWriter().use {
             it.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
@@ -78,7 +78,7 @@ internal fun unescape(s: String): String {
 
 // OPML DSL
 
-fun opml(init: Opml.() -> Unit): Opml {
+suspend fun opml(init: suspend Opml.() -> Unit): Opml {
     val opml = Opml()
     opml.init()
     return opml
@@ -98,7 +98,7 @@ abstract class Tag(val name: String) : Element {
     val children = arrayListOf<Element>()
     val attributes = linkedMapOf<String, String>()
 
-    protected fun <T : Element> initTag(tag: T, init: T.() -> Unit): T {
+    protected suspend fun <T : Element> initTag(tag: T, init: suspend T.() -> Unit): T {
         tag.init()
         children.add(tag)
         return tag
@@ -144,22 +144,22 @@ class Opml : TagWithText("opml") {
         attributes["version"] = "1.1"
     }
 
-    fun head(init: Head.() -> Unit) = initTag(Head(), init)
-    fun body(init: Body.() -> Unit) = initTag(Body(), init)
+    suspend fun head(init: suspend Head.() -> Unit) = initTag(Head(), init)
+    suspend fun body(init: suspend Body.() -> Unit) = initTag(Body(), init)
 }
 
 class Head : TagWithText("head") {
-    fun title(init: Title.() -> Unit) = initTag(Title(), init)
+    suspend fun title(init: suspend Title.() -> Unit) = initTag(Title(), init)
 }
 
 class Title : TagWithText("title")
 
 abstract class BodyTag(name: String) : TagWithText(name) {
-    fun outline(title: String,
+    suspend fun outline(title: String,
                 text: String = title,
                 type: String? = null,
                 xmlUrl: String? = null,
-                init: Outline.() -> Unit) {
+                init: suspend Outline.() -> Unit) {
         val o = initTag(Outline(), init)
         o.title = title
         o.text = text
