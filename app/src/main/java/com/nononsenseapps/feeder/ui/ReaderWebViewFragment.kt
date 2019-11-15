@@ -12,14 +12,14 @@ import android.webkit.WebViewClient
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.view.MenuItemCompat
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
+import com.nononsenseapps.feeder.base.KodeinAwareFragment
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import org.kodein.di.generic.instance
 
 const val ARG_URL = "url"
 
-class ReaderWebViewFragment : CoroutineScopedKodeinAwareFragment() {
+class ReaderWebViewFragment : KodeinAwareFragment() {
     private var webView: WebView? = null
     var url: String = ""
     private var enclosureUrl: String? = null

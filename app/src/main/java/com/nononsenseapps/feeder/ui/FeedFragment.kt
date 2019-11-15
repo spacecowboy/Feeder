@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
@@ -20,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
+import com.nononsenseapps.feeder.base.KodeinAwareFragment
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
@@ -32,7 +33,6 @@ import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.*
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
 import java.io.File
@@ -42,7 +42,7 @@ const val ARG_FEED_TITLE = "feed_title"
 const val ARG_FEED_URL = "feed_url"
 const val ARG_FEED_TAG = "feed_tag"
 
-class FeedFragment : CoroutineScopedKodeinAwareFragment() {
+class FeedFragment : KodeinAwareFragment() {
     internal lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private val syncReceiver: BroadcastReceiver
@@ -87,7 +87,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
             feedTag = arguments.getString(ARG_FEED_TAG)
 
             arguments.getLongArray(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)?.let {
-                launch(Dispatchers.Default) {
+                lifecycleScope.launch {
                     feedItemDao.markAsNotified(it.toList())
                 }
             }
@@ -123,7 +123,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
         // Remember choice in future
         ephemeralState.lastOpenFeedId = id
         ephemeralState.lastOpenFeedTag = feedTag ?: ""
-        launch(Dispatchers.Default) {
+        lifecycleScope.launch {
             prefs.setLastOpenFeed(id, feedTag)
         }
     }
@@ -200,12 +200,12 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
         // specify an adapter
         val adapter = FeedItemPagedListAdapter(activity!!, object : ActionCallback {
             override fun coroutineScope(): CoroutineScope {
-                return this@FeedFragment
+                return lifecycleScope
             }
 
             override fun onDismiss(item: PreviewItem?) {
                 item?.let {
-                    launch(Dispatchers.Default) { feedItemsViewModel.toggleReadState(it) }
+                    lifecycleScope.launch { feedItemsViewModel.toggleReadState(it) }
                 }
             }
 
@@ -221,7 +221,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
 
             override fun markBelowAsRead(position: Int) {
                 recyclerView.adapter?.let { adapter ->
-                    launch(Dispatchers.Default) {
+                    lifecycleScope.launch {
                         if (position > NO_POSITION) {
                             val ids = ((position + 1) until adapter.itemCount)
                                     .asSequence()
@@ -417,7 +417,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
         val feedTag = this.feedTag
         val appContext = context?.applicationContext
         if (appContext != null) {
-            launch(Dispatchers.Default) {
+            lifecycleScope.launch {
                 // Set as notified so we don't spam
                 feedItemsViewModel.markAsNotified(feedId = feedId, tag = feedTag ?: "")
                 val dao: FeedDao by instance()
@@ -439,14 +439,14 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
             liveDbPreviews.value?.forEach {
                 // Can be null in case of placeholder values
                 it?.id?.let { id ->
-                    launch(Dispatchers.Default) {
+                    lifecycleScope.launch {
                         cancelNotification(appContext, id)
                     }
                 }
             }
         }
         // Then mark as read
-        launch(Dispatchers.Default) {
+        lifecycleScope.launch {
             feedItemsViewModel.markAllAsRead(feedId = id, tag = feedTag ?: "")
         }
     }
@@ -491,7 +491,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
                 val feedId = this.id
                 val appContext = activity?.applicationContext
                 if (appContext != null) {
-                    launch(Dispatchers.Default) {
+                    lifecycleScope.launch {
                         feedViewModel.deleteFeedWithId(feedId)
 
                         // Remove from shortcuts
@@ -590,7 +590,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
             EXPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    launch {
+                    lifecycleScope.launch {
                         exportOpml(kodein, uri)
                     }
                 }
@@ -598,7 +598,7 @@ class FeedFragment : CoroutineScopedKodeinAwareFragment() {
             IMPORT_OPML_CODE -> {
                 val uri: Uri? = data?.data
                 if (uri != null) {
-                    launch {
+                    lifecycleScope.launch {
                         importOpml(kodein, uri)
                     }
                 }

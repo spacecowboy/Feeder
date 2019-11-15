@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui
 
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso
@@ -140,7 +141,7 @@ class EditFeedTest {
         onView(withId(R.id.add_button)).perform(click())
 
         untilEq(false) {
-            activityRule.activity?.isActive
+            activityRule.activity?.lifecycleScope?.isActive
         }
 
         val feed = untilNotEq(null) {

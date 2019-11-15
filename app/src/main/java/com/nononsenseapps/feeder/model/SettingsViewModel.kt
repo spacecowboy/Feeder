@@ -6,13 +6,13 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareViewModel
+import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.Prefs
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 
-class SettingsViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(kodein), SharedPreferences.OnSharedPreferenceChangeListener {
+class SettingsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein), SharedPreferences.OnSharedPreferenceChangeListener {
     private val app: Application by instance()
     private val prefs: Prefs by instance()
     private val sharedPreferences: SharedPreferences by instance()

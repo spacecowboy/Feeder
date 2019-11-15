@@ -28,7 +28,7 @@ buildscript {
     test_runner_version = "1.1.0"
     test_rules_version = "1.1.0"
     paging_version = '2.1.0'
-    lifecycle_version = "2.1.0"
+    lifecycle_version = "2.2.0-rc02"
     room_version = "2.2.1"
     nav_version = "2.1.0"
 

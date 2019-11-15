@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -17,15 +18,13 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.*
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareActivity
+import com.nononsenseapps.feeder.base.KodeinAwareActivity
 import com.nononsenseapps.feeder.model.*
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.bundle
 import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.android.synthetic.main.app_bar_navigation.*
 import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
 
 const val EXPORT_OPML_CODE = 101
@@ -34,7 +33,7 @@ const val EDIT_FEED_CODE = 103
 
 const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
-class FeedActivity : CoroutineScopedKodeinAwareActivity() {
+class FeedActivity : KodeinAwareActivity() {
     private lateinit var navAdapter: FeedsAdapter
     private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)
@@ -218,16 +217,14 @@ class FeedActivity : CoroutineScopedKodeinAwareActivity() {
         syncFeedsMaybe()
     }
 
-    private fun syncFeedsMaybe() = launch(Dispatchers.Default) {
-        if (!prefs.syncOnResume) {
-            return@launch
-        }
-
-        if (isOkToSyncAutomatically(applicationContext)) {
-            requestFeedSync(kodein = kodein,
-                    ignoreConnectivitySettings = false,
-                    forceNetwork = false,
-                    parallell = true)
+    private fun syncFeedsMaybe() = lifecycleScope.launchWhenResumed {
+        if (prefs.syncOnResume) {
+            if (isOkToSyncAutomatically(applicationContext)) {
+                requestFeedSync(kodein = kodein,
+                        ignoreConnectivitySettings = false,
+                        forceNetwork = false,
+                        parallell = true)
+            }
         }
     }
 

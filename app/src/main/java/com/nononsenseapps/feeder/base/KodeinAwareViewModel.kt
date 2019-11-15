@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.bindings.Factory
@@ -47,21 +46,21 @@ class KodeinAwareViewModelFactory(override val kodein: Kodein)
 inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.activityViewModelProvider():
         Provider<C, T> {
     return provider {
-        ViewModelProviders.of(instance<FragmentActivity>(), instance<KodeinAwareViewModelFactory>()).get(T::class.java)
+        ViewModelProvider(instance<FragmentActivity>(), instance<KodeinAwareViewModelFactory>()).get(T::class.java)
     }
 }
 
 inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.activityViewModelFactory():
         Factory<C, FragmentActivity, T> {
     return factory { activity: FragmentActivity ->
-        ViewModelProviders.of(activity, instance<KodeinAwareViewModelFactory>()).get(T::class.java)
+        ViewModelProvider(activity, instance<KodeinAwareViewModelFactory>()).get(T::class.java)
     }
 }
 
 inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.fragmentViewModelFactory():
         Factory<C, Fragment, T> {
     return factory { fragment: Fragment ->
-        ViewModelProviders.of(fragment, instance<KodeinAwareViewModelFactory>()).get(T::class.java)
+        ViewModelProvider(fragment, instance<KodeinAwareViewModelFactory>()).get(T::class.java)
     }
 }
 

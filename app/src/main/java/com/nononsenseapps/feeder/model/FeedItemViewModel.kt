@@ -6,8 +6,10 @@ import android.text.Spanned
 import android.text.style.ImageSpan
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareViewModel
+import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.ui.text.UrlClickListener
@@ -21,7 +23,7 @@ import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import kotlin.math.roundToInt
 
-class FeedItemViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(kodein) {
+class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     private val dao: FeedItemDao by instance()
     private val prefs: Prefs by instance()
 

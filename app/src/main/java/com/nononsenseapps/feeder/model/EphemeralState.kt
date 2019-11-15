@@ -1,13 +1,13 @@
 package com.nononsenseapps.feeder.model
 
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareViewModel
+import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import org.kodein.di.Kodein
 
 /**
  * Should only be created with the activity as its lifecycle
  */
-class EphemeralState(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(kodein) {
+class EphemeralState(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     var lastOpenFeedId: Long = ID_UNSET
         set(value) {
             if (value != lastOpenFeedId) {

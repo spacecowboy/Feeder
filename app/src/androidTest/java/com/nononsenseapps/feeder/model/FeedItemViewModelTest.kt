@@ -7,7 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareActivity
+import com.nononsenseapps.feeder.base.KodeinAwareActivity
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -222,7 +222,7 @@ class FeedItemViewModelTest {
     }
 }
 
-fun CoroutineScopedKodeinAwareActivity.getLiveFeedItemImageText(id: Long): MediatorLiveData<Spanned> {
+fun KodeinAwareActivity.getLiveFeedItemImageText(id: Long): LiveData<Spanned> {
     val viewModel: FeedItemViewModel by instance(arg = this)
     return viewModel.getLiveImageText(id, maxImageSize(), null)
 }

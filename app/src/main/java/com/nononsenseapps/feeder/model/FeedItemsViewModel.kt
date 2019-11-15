@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareViewModel
+import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -16,7 +16,7 @@ import org.kodein.di.generic.instance
 
 private val PAGE_SIZE = 50
 
-class FeedItemsViewModel(kodein: Kodein) : CoroutineScopedKodeinAwareViewModel(kodein) {
+class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     private val dao: FeedItemDao by instance()
     private val liveOnlyUnread = MutableLiveData<Boolean>()
 
