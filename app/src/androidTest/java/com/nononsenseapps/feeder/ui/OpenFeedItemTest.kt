@@ -57,7 +57,6 @@ class OpenFeedItemTest {
                 feedId = feedId,
                 guid = "http://ANON.com/sub/##",
                 title = "ANON",
-                description = "ANON",
                 plainTitle = "ANON",
                 plainSnippet = "ANON"
         )

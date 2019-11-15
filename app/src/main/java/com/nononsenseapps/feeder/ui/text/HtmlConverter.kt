@@ -6,6 +6,7 @@ import android.text.Spanned
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.Kodein
+import java.io.Reader
 import java.net.URL
 
 
@@ -13,7 +14,7 @@ val schema: HTMLSchema by lazy { HTMLSchema() }
 
 fun toSpannedWithImages(
         kodein: Kodein,
-        source: String,
+        source: Reader,
         siteUrl: URL,
         maxSize: Point,
         allowDownload: Boolean,
@@ -48,7 +49,7 @@ fun toSpannedWithImages(
  */
 fun toSpannedWithNoImages(
         kodein: Kodein,
-        source: String,
+        source: Reader,
         siteUrl: URL,
         maxSize: Point,
         spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),

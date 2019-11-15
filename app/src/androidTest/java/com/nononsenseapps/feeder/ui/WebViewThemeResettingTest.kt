@@ -58,7 +58,6 @@ class WebViewThemeResettingTest {
                 feedId = feedId,
                 title = "foo",
                 imageUrl = null,
-                description = "bar",
                 link = server.url("/bar.html").url().toString()
         ))
 

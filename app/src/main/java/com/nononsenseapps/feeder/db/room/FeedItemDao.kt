@@ -3,8 +3,11 @@ package com.nononsenseapps.feeder.db.room
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
+import com.nononsenseapps.feeder.db.COL_URL
+import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
+import java.net.URL
 
 @Dao
 interface FeedItemDao {
@@ -18,19 +21,31 @@ interface FeedItemDao {
     suspend fun deleteFeedItem(item: FeedItem)
 
     @Query("""
-        DELETE FROM feed_items WHERE id IN (
-          SELECT id FROM feed_items
-          WHERE feed_id IS :feedId
-          ORDER BY pub_date DESC
-          LIMIT -1 OFFSET :keepCount
-        )""")
-    suspend fun cleanItemsInFeed(feedId: Long, keepCount: Int)
+        DELETE FROM feed_items WHERE id IN (:ids)
+        """)
+    suspend fun deleteFeedItems(ids: List<Long>)
+
+    @Query("""
+        SELECT id FROM feed_items
+        WHERE feed_id IS :feedId
+        ORDER BY pub_date DESC
+        LIMIT -1 OFFSET :keepCount
+        """)
+    suspend fun getItemsToBeCleanedFromFeed(feedId: Long, keepCount: Int): List<Long>
 
     @Query("SELECT * FROM feed_items WHERE guid IS :guid AND feed_id IS :feedId")
     suspend fun loadFeedItem(guid: String, feedId: Long?): FeedItem?
 
     @Query("SELECT * FROM feed_items WHERE id IS :id")
     suspend fun loadFeedItem(id: Long): FeedItem?
+
+    @Query("""
+        SELECT $FEEDS_TABLE_NAME.$COL_URL
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_items.id IS :id
+        """)
+    suspend fun loadFeedUrlOfFeedItem(id: Long): URL?
 
     @Query("""
         SELECT *

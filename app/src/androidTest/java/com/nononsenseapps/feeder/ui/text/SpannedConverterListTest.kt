@@ -10,6 +10,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.kodein.di.android.closestKodein
+import java.io.StringReader
 import java.net.URL
 
 
@@ -24,7 +25,7 @@ class SpannedConverterListTest {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
                 kodein,
-                "Some <li> bullet </li> text",
+                StringReader("Some <li> bullet </li> text"),
                 URL("http://foo.com"),
                 Point(100, 100),
                 builder,

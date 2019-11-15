@@ -109,19 +109,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
     style.bigText(text)
     style.setBigContentTitle(title)
 
-    val contentIntent = when (item.description.isBlank()) {
-        true -> {
-            NavDeepLinkBuilder(context)
-                    .setGraph(R.navigation.nav_graph)
-                    .setDestination(R.id.feedFragment)
-                    .setArguments(bundle {
-                        item.feedId?.let {
-                            putLong(ARG_FEED_ID, it)
-                        }
-                    })
-                    .createPendingIntent(requestCode = item.id.toInt())
-        }
-        false -> {
+    val contentIntent =
             NavDeepLinkBuilder(context)
                     .setGraph(R.navigation.nav_graph)
                     .setDestination(R.id.readerFragment)
@@ -129,8 +117,6 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
                         putLong(ARG_ID, item.id)
                     })
                     .createPendingIntent(requestCode = item.id.toInt())
-        }
-    }
 
     val builder = notificationBuilder(context)
 

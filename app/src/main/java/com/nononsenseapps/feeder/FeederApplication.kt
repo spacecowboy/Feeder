@@ -26,6 +26,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.singleton
+import java.io.File
 import java.security.Security
 
 @Suppress("unused")
@@ -63,5 +64,15 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
     init {
         // Install Conscrypt to handle missing SSL cyphers on older platforms
         Security.insertProviderAt(Conscrypt.newProvider(), 1)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        staticFilesDir = filesDir
+    }
+
+    companion object {
+        // Needed for database migration
+        lateinit var staticFilesDir: File
     }
 }

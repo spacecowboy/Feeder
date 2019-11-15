@@ -15,6 +15,7 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.singleton
+import java.io.StringReader
 import java.net.URL
 import java.util.*
 
@@ -44,7 +45,7 @@ class SpannedConverterTest: KodeinAware {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
                 kodein,
-                "<font>No color</font>",
+                StringReader("<font>No color</font>"),
                 URL("http://foo.com"),
                 Point(100, 100),
                 builder,
@@ -60,7 +61,7 @@ class SpannedConverterTest: KodeinAware {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
                 kodein,
-                "<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">",
+                StringReader("<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">"),
                 URL("http://foo.com"),
                 Point(100, 100),
                 builder,
@@ -75,7 +76,7 @@ class SpannedConverterTest: KodeinAware {
         val builder = FakeBuilder()
         toSpannedWithImages(
                 kodein,
-                "<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">",
+                StringReader("<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">"),
                 URL("http://foo.com"),
                 Point(100, 100),
                 true,
@@ -92,7 +93,7 @@ class SpannedConverterTest: KodeinAware {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
                 kodein,
-                "<p>foo</p><script>script</script><p>bar</p>",
+                StringReader("<p>foo</p><script>script</script><p>bar</p>"),
                 URL("http://foo.bar"),
                 Point(100, 100),
                 builder,
@@ -107,7 +108,7 @@ class SpannedConverterTest: KodeinAware {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
                 kodein,
-                "<p>foo</p><style>style</style><p>bar</p>",
+                StringReader("<p>foo</p><style>style</style><p>bar</p>"),
                 URL("http://foo.bar"),
                 Point(100, 100),
                 builder,
@@ -122,7 +123,7 @@ class SpannedConverterTest: KodeinAware {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
                 kodein,
-                """
+                StringReader("""
                     <table>
                     <tr>
                         <th>r1c1</th>
@@ -133,7 +134,7 @@ class SpannedConverterTest: KodeinAware {
                         <td>r2c2</td>
                       </tr>
                     </table>
-                    """,
+                    """),
                 URL("http://foo.bar"),
                 Point(100, 100),
                 builder,
@@ -155,9 +156,9 @@ class SpannedConverterTest: KodeinAware {
             """.trimMargin()
         toSpannedWithNoImages(
                 kodein,
-                """
+                StringReader("""
                     <pre>$text</pre>
-                    """,
+                    """),
                 URL("http://foo.bar"),
                 Point(100, 100),
                 builder,

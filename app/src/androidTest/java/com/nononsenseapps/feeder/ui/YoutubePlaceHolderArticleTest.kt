@@ -12,6 +12,7 @@ import androidx.test.rule.ActivityTestRule
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.model.insertFeedItemWithBlob
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.MockResponse
@@ -86,13 +87,15 @@ class YoutubePlaceHolderArticleTest {
                 url = URL("http://foo")
         ))
 
-        return testDb.db.feedItemDao().insertFeedItem(FeedItem(
-                guid = "bar",
-                feedId = feedId,
-                title = "foo",
-                imageUrl = "$imgUrl",
+        return testDb.insertFeedItemWithBlob(
+                FeedItem(
+                        guid = "bar",
+                        feedId = feedId,
+                        title = "foo",
+                        imageUrl = "$imgUrl"
+                ),
                 description = description(imgUrl)
-        ))
+        )
     }
 
 }

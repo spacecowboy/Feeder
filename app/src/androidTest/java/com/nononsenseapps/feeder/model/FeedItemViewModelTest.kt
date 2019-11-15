@@ -2,7 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Intent
 import android.text.Spanned
-import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -22,11 +22,13 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.kodein.di.generic.instance
 import java.net.URL
+import kotlin.test.fail
 
 
 @RunWith(AndroidJUnit4::class)
@@ -52,12 +54,40 @@ class FeedItemViewModelTest {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
         itemId = runBlocking {
-            testDb.db.feedItemDao().insertFeedItem(FeedItem(
+            testDb.insertFeedItemWithBlob(FeedItem(
                     feedId = feedId,
                     guid = "foobar",
-                    title = "title",
+                    title = "title"),
                     description = "description <img src='file://img.png' alt='img here'></img>"
-            ))
+            )
+        }
+
+        activityRule.launchActivity(Intent().also {
+            it.putExtra(ARG_ID, itemId)
+        })
+
+        runBlocking {
+            withContext(Dispatchers.Main) {
+                activityRule.activity.getLiveFeedItemImageText(itemId).observe(activityRule.activity, observer)
+            }
+
+            verify(exactly = 3, timeout = 500) {
+                observer.onChanged(any())
+            }
+        }
+    }
+
+    @Test
+    fun databaseLoadCallsOnChangeOnceWhenNoImages() {
+        val observer = mockk<Observer<Spanned>>(relaxed = true)
+
+        itemId = runBlocking {
+            testDb.insertFeedItemWithBlob(FeedItem(
+                    feedId = feedId,
+                    guid = "foobar",
+                    title = "title"),
+                    description = "description <b>bold</b>"
+            )
         }
 
         activityRule.launchActivity(Intent().also {
@@ -76,46 +106,18 @@ class FeedItemViewModelTest {
     }
 
     @Test
-    fun databaseLoadCallsOnChangeOnceWhenNoImages() {
-        val observer = mockk<Observer<Spanned>>(relaxed = true)
-
-        itemId = runBlocking {
-            testDb.db.feedItemDao().insertFeedItem(FeedItem(
-                    feedId = feedId,
-                    guid = "foobar",
-                    title = "title",
-                    description = "description <b>bold</b>"
-            ))
-        }
-
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
-
-        runBlocking {
-            withContext(Dispatchers.Main) {
-                activityRule.activity.getLiveFeedItemImageText(itemId).observe(activityRule.activity, observer)
-            }
-
-            verify(exactly = 1, timeout = 500) {
-                observer.onChanged(any())
-            }
-        }
-    }
-
-    @Test
     fun databaseLoadCallsOnChangeNeverOnSyncAndNoUpdateOnBody() {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
         var item = FeedItem(
                 feedId = feedId,
                 guid = "foobar",
-                title = "title",
-                description = "description <b>bold</b>"
+                title = "title"
         )
+        val description = "description <b>bold</b>"
 
         itemId = runBlocking {
-            testDb.db.feedItemDao().insertFeedItem(item)
+            testDb.insertFeedItemWithBlob(item, description)
         }
         item = item.copy(id = itemId)
 
@@ -128,7 +130,7 @@ class FeedItemViewModelTest {
                 activityRule.activity.getLiveFeedItemImageText(itemId).observe(activityRule.activity, observer)
             }
 
-            verify(exactly = 1, timeout = 500) {
+            verify(exactly = 2, timeout = 500) {
                 observer.onChanged(any())
             }
 
@@ -143,18 +145,18 @@ class FeedItemViewModelTest {
     }
 
     @Test
+    @Ignore("Not monitoring file")
     fun databaseLoadCallsOnChangeOnceOnSyncWithBodyUpdate() {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
         var item = FeedItem(
                 feedId = feedId,
                 guid = "foobar",
-                title = "title",
-                description = "description <b>bold</b>"
-        )
+                title = "title")
+        val description = "description <b>bold</b>"
 
         itemId = runBlocking {
-            testDb.db.feedItemDao().insertFeedItem(item)
+            testDb.insertFeedItemWithBlob(item, description)
         }
         item = item.copy(id = itemId)
 
@@ -167,33 +169,35 @@ class FeedItemViewModelTest {
                 activityRule.activity.getLiveFeedItemImageText(itemId).observe(activityRule.activity, observer)
             }
 
-            verify(exactly = 1, timeout = 500) {
+            verify(exactly = 2, timeout = 500) {
                 observer.onChanged(any())
             }
 
             clearMocks(observer)
 
-            assertEquals(1, testDb.db.feedItemDao().updateFeedItem(item.copy(description = "updated body")))
+            fail("Not monitoring changes to file")
+            //assertEquals(1, testDb.db.feedItemDao().updateFeedItem(item.copy(description = "updated body")))
 
-            verify(exactly = 1, timeout = 500) {
-                observer.onChanged(any())
-            }
+//            verify(exactly = 1, timeout = 500) {
+//                observer.onChanged(any())
+//            }
         }
     }
 
     @Test
+    @Ignore("Not monitoring file")
     fun databaseLoadCallsOnChangeOnceOnSyncWithBodyUpdateWithImage() {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
         val item = FeedItem(
                 feedId = feedId,
                 guid = "foobar",
-                title = "title",
-                description = "description <img src='file://img.png' alt='img here'></img>"
+                title = "title"
         )
+        val description = "description <img src='file://img.png' alt='img here'></img>"
 
         itemId = runBlocking {
-            testDb.db.feedItemDao().insertFeedItem(item)
+            testDb.insertFeedItemWithBlob(item, description)
         }
 
         activityRule.launchActivity(Intent().also {
@@ -211,13 +215,14 @@ class FeedItemViewModelTest {
 
             clearMocks(observer)
 
-            assertEquals(1, testDb.db.feedItemDao().updateFeedItem(item.copy(
+            fail("Not monitoring file")
+            /*assertEquals(1, testDb.db.feedItemDao().updateFeedItem(item.copy(
                     id = itemId,
-                    description = "updated <img src='file://img.png' alt='img here'></img>")))
+                    description = "updated <img src='file://img.png' alt='img here'></img>")))*/
 
-            verify(exactly = 1, timeout = 500) {
-                observer.onChanged(any())
-            }
+//            verify(exactly = 1, timeout = 500) {
+//                observer.onChanged(any())
+//            }
         }
     }
 }

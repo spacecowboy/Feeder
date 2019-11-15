@@ -13,7 +13,6 @@ inline fun bundle(init: Bundle.() -> Unit): Bundle {
 }
 
 const val ARG_TITLE = "title"
-const val ARG_DESCRIPTION = "body"
 const val ARG_LINK = "link"
 const val ARG_ENCLOSURE = "enclosure"
 const val ARG_IMAGEURL = "imageUrl"
@@ -25,7 +24,6 @@ const val ARG_DATE = "date"
 fun Bundle.asFeedItemFoo(): FeedItemWithFeed {
     return FeedItemWithFeed(id = getLong(ARG_ID, ID_UNSET),
             title = getString(ARG_TITLE, ""),
-            description = getString(ARG_DESCRIPTION, ""),
             link = getString(ARG_LINK),
             enclosureLink = getString(ARG_ENCLOSURE),
             imageUrl = getString(ARG_IMAGEURL),

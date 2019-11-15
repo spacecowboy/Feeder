@@ -17,6 +17,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.model.insertFeedItemWithBlob
 import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -184,13 +185,15 @@ class BadImagePlaceHolderArticleTest {
                 url = URL("http://foo")
         ))
 
-        return testDb.db.feedItemDao().insertFeedItem(FeedItem(
-                guid = "bar",
-                feedId = feedId,
-                title = "foo",
-                imageUrl = imgUrl?.let { "$it" },
+        return testDb.insertFeedItemWithBlob(
+                FeedItem(
+                        guid = "bar",
+                        feedId = feedId,
+                        title = "foo",
+                        imageUrl = imgUrl?.let { "$it" }
+                ),
                 description = description()
-        ))
+        )
     }
 }
 

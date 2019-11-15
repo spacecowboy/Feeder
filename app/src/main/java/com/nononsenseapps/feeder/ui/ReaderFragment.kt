@@ -28,11 +28,11 @@ import org.joda.time.format.DateTimeFormat
 import org.kodein.di.Kodein
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import java.io.StringReader
 import java.util.*
 
 const val ARG_TITLE = "title"
 const val ARG_CUSTOMTITLE = "customtitle"
-const val ARG_DESCRIPTION = "body"
 const val ARG_LINK = "link"
 const val ARG_ENCLOSURE = "enclosure"
 const val ARG_IMAGEURL = "imageUrl"
@@ -143,7 +143,7 @@ class ReaderFragment : KodeinAwareFragment() {
         } else {
             titleTextView.text = toSpannedWithNoImages(
                     kodein,
-                    rssItem.title,
+                    StringReader(rssItem.title),
                     rssItem.feedUrl,
                     activity!!.maxImageSize(),
                     urlClickListener = urlClickListener()
