@@ -35,21 +35,29 @@ fun SyndFeed.asFeed(baseUrl: URL): Feed {
 }
 
 fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
-    val contentText = this.contentText()
+    val contentText = contentText().orIfBlank {
+        mediaDescription() ?: ""
+    }
     return Item(
             id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
-            url = this.linkToHtml(baseUrl),
+            url = linkToHtml(baseUrl),
             title = plainTitle(),
             content_text = contentText,
-            content_html = this.contentHtml(),
+            content_html = contentHtml(),
             summary = contentText.take(200),
-            image = this.thumbnail(baseUrl),
-            date_published = this.publishedRFC3339Date(),
-            date_modified = this.modifiedRFC3339Date(),
-            author = this.authors?.firstOrNull()?.asAuthor() ?: feedAuthor,
-            attachments = this.enclosures?.map { it.asAttachment(baseUrl = baseUrl) }
+            image = thumbnail(baseUrl),
+            date_published = publishedRFC3339Date(),
+            date_modified = modifiedRFC3339Date(),
+            author = authors?.firstOrNull()?.asAuthor() ?: feedAuthor,
+            attachments = enclosures?.map { it.asAttachment(baseUrl = baseUrl) }
     )
 }
+
+fun String.orIfBlank(block: () -> String): String =
+        when (this.isBlank()) {
+            true -> block()
+            false -> this
+        }
 
 /**
  * Returns an absolute link, or null
@@ -123,7 +131,7 @@ fun SyndEntry.contentProbablyHtml(): String? {
 
 fun SyndEntry.contentText(): String {
     val possiblyHtml = when {
-        contents != null && !contents.isEmpty() -> { // Atom
+        contents != null && contents.isNotEmpty() -> { // Atom
             val contents = contents
             var possiblyHtml: String? = null
 
@@ -195,17 +203,12 @@ fun SyndEntry.contentHtml(): String? {
     return possiblyHtml ?: ""
 }
 
-fun findImageLinkInEnclosures(enclosures: List<SyndEnclosure?>?): String? {
-    if (enclosures != null) {
-        for (enclosure in enclosures) {
-            if (enclosure != null) {
-                if (enclosure.type != null && enclosure.url != null && enclosure.type.startsWith("image/")) {
-                    return enclosure.url
-                }
-            }
-        }
-    }
-    return null
+fun SyndEntry.mediaDescription(): String? {
+    val media = this.getModule(MediaModule.URI) as MediaEntryModule?
+
+    return media?.metadata?.description
+            ?: media?.mediaContents?.firstOrNull { it.metadata?.description?.isNotBlank() == true }?.metadata?.description
+            ?: media?.mediaGroups?.firstOrNull { it.metadata?.description?.isNotBlank() == true }?.metadata?.description
 }
 
 /**
@@ -213,26 +216,26 @@ fun findImageLinkInEnclosures(enclosures: List<SyndEnclosure?>?): String? {
  */
 fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     val media = this.getModule(MediaModule.URI) as MediaEntryModule?
-    val thumbnails = media?.metadata?.thumbnail
-    val contents = media?.mediaContents
-    val enclosures: List<SyndEnclosure?>? = this.enclosures
+
+    val thumbnail: String? = media?.metadata?.thumbnail?.firstOrNull()?.url?.toString()
+            ?: media?.mediaContents?.firstOrNull { "image" == it.medium }?.reference?.toString()
+            ?: media?.mediaGroups?.mapNotNull { it.metadata?.thumbnail?.firstOrNull() }?.firstOrNull()?.url?.toString()
+            ?: enclosures?.asSequence()
+                    ?.filterNotNull()
+                    ?.filter { it.type?.startsWith("image/") == true }
+                    ?.mapNotNull { it.url }
+                    ?.firstOrNull()
 
     return when {
-        thumbnails?.isNotEmpty()
-                ?: false -> relativeLinkIntoAbsoluteOrNull(feedBaseUrl, thumbnails?.firstOrNull()?.url?.toString())
-        contents?.isNotEmpty() ?: false -> {
-            relativeLinkIntoAbsoluteOrNull(feedBaseUrl, contents?.firstOrNull { "image" == it.medium }
-                    ?.reference?.toString())
-        }
+        thumbnail != null -> relativeLinkIntoAbsolute(feedBaseUrl, thumbnail)
         else -> {
-            val imgLink: String? = findImageLinkInEnclosures(enclosures)
-                    ?: naiveFindImageLink(this.contentProbablyHtml())
+            val imgLink: String? = naiveFindImageLink(this.contentProbablyHtml())
             // Now we are resolving against original, not the feed
             val siteBaseUrl: String? = this.linkToHtml(feedBaseUrl)
 
             when {
-                siteBaseUrl != null && imgLink != null -> relativeLinkIntoAbsoluteOrNull(URL(siteBaseUrl), imgLink)
-                imgLink != null -> relativeLinkIntoAbsoluteOrNull(feedBaseUrl, imgLink)
+                siteBaseUrl != null && imgLink != null -> relativeLinkIntoAbsolute(URL(siteBaseUrl), imgLink)
+                imgLink != null -> relativeLinkIntoAbsolute(feedBaseUrl, imgLink)
                 else -> null
             }
         }

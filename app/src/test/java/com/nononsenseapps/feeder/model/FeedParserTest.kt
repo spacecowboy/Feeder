@@ -76,6 +76,36 @@ class feedParserTest: KodeinAware {
     }
 
     @Test
+    fun parsesYoutubeMediaInfo() {
+        val feed = readResource("atom_youtube.xml") {
+            feedParser.parseFeedInputStream(URL("http://www.youtube.com/feeds/videos.xml"), it)
+        }
+
+        val item = feed.items!!.first()
+
+        assertEquals("Can You Observe a Typical Universe?", item.title)
+        assertEquals("https://i2.ytimg.com/vi/q-6oU3jXAho/hqdefault.jpg", item.image)
+        assertTrue {
+            item.content_text!!.startsWith("Sign Up on Patreon to get access to the Space Time Discord!")
+        }
+    }
+
+    @Test
+    fun parsesPeertubeMediaInfo() {
+        val feed = readResource("rss_peertube.xml") {
+            feedParser.parseFeedInputStream(URL("https://framatube.org/feeds/videos.xml"), it)
+        }
+
+        val item = feed.items!!.first()
+
+        assertEquals("1.4. Et les réseaux sociaux ?", item.title)
+        assertEquals("https://framatube.org/static/thumbnails/ed5c048d-01f3-4ceb-97db-6e278de512b0.jpg", item.image)
+        assertTrue {
+            item.content_text!!.startsWith("MOOC CHATONS#1 - Internet")
+        }
+    }
+
+    @Test
     @Throws(Exception::class)
     fun getAlternateFeedLinksDoesNotReturnRelativeLinks() {
         javaClass.getResourceAsStream("fz.html")!!
@@ -523,6 +553,13 @@ class feedParserTest: KodeinAware {
 
         assertEquals("http://d2ihp3fq52ho68.cloudfront.net/YTo2OntzOjI6ImlkIjtpOjEzOTI3OTM7czoxOiJ3IjtpOjUwMDtzOjE6ImgiO2k6OTk5OTtzOjE6ImMiO2k6MDtzOjE6InMiO2k6MDtzOjE6ImsiO3M6NDA6IjU5YjA2YjgyZjkyY2IxZjBiMDZjZmI5MmE3NTk5NjMzMjIyMmU4NGMiO30=",
                 image)
+    }
+
+    private fun<T> readResource(asdf: String, block: (InputStream) -> T): T {
+        return javaClass.getResourceAsStream(asdf)!!
+                .use {
+                    block(it)
+                }
     }
 
     private fun getCowboyHtml(): String =
