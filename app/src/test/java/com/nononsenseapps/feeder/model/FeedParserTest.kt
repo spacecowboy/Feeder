@@ -20,7 +20,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class feedParserTest: KodeinAware {
+class FeedParserTest: KodeinAware {
     @Rule
     @JvmField
     var tempFolder = TemporaryFolder()
