@@ -24,7 +24,14 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
 import java.net.URL
 
@@ -294,13 +301,9 @@ class EditFeedActivity : KodeinAwareActivity() {
 
     private inner class ResultsAdapter : androidx.recyclerview.widget.RecyclerView.Adapter<FeedResult>() {
 
-        private var items: List<Feed> = emptyList()
-        var data: List<Feed>
+        private var items: MutableList<Feed> = mutableListOf()
+        val data: List<Feed>
             get() = items
-            set(value) {
-                items = value
-                notifyDataSetChanged()
-            }
 
         override fun onBindViewHolder(holder: FeedResult, position: Int) {
             val item = items[position]
@@ -316,44 +319,47 @@ class EditFeedActivity : KodeinAwareActivity() {
                         .inflate(R.layout.view_feed_result, parent, false))
 
         override fun getItemCount(): Int = items.size
+        fun addFeed(feed: Feed) {
+            items.add(feed)
+            notifyItemInserted(items.lastIndex)
+        }
+
+        fun clearData() {
+            items.clear()
+            notifyDataSetChanged()
+        }
 
     }
 
+    @ExperimentalCoroutinesApi
     private fun searchForFeeds(url: URL): Job = lifecycleScope.launchWhenResumed {
-        resultAdapter.data = emptyList()
+        resultAdapter.clearData()
 
-        withContext(Dispatchers.Default) {
-            val results = mutableListOf<Feed>()
-            val possibleFeeds = feedParser.getAlternateFeedLinksAtUrl(url).map {
-                sloppyLinkToStrictURL(it.first)
-            } + url
-            possibleFeeds.map {
-                launch(Dispatchers.Default) {
-                    try {
-                        feedParser.parseFeedUrl(it)?.let { feed ->
-                            withContext(Dispatchers.Main) {
-                                results.add(feed)
-                                resultAdapter.data = results
-                                // Show results, unless user has clicked on one
-                                if (detailsFrame.visibility == View.GONE) {
-                                    searchFrame.visibility = View.VISIBLE
-                                    listResults.visibility = View.VISIBLE
-                                }
-                            }
-                        }
-                    } catch (e: Throwable) {
-                        e.printStackTrace()
-                    }
-                }
-            }.toList().joinAll()
+        flow {
+            emit(url)
+            feedParser.getAlternateFeedLinksAtUrl(url).forEach {
+                emit(sloppyLinkToStrictURL(it.first))
+            }
+        }.mapNotNull {
+            try {
+                feedParser.parseFeedUrl(it)
+            } catch (e: Throwable) {
+                // Will happen for the site url - if it isn't a feed
+                null
+            }
+        }.flowOn(Dispatchers.Default).collect {
+            resultAdapter.addFeed(it)
+            // Show results, unless user has clicked on one
+            if (detailsFrame.visibility == View.GONE) {
+                searchFrame.visibility = View.VISIBLE
+                listResults.visibility = View.VISIBLE
+            }
         }
 
-        withContext(Dispatchers.Main) {
-            loadingProgress.visibility = View.GONE
-            if (resultAdapter.data.isEmpty()) {
-                emptyText.text = getString(R.string.no_such_feed)
-                emptyText.visibility = View.VISIBLE
-            }
+        loadingProgress.visibility = View.GONE
+        if (resultAdapter.data.isEmpty()) {
+            emptyText.text = getString(R.string.no_such_feed)
+            emptyText.visibility = View.VISIBLE
         }
     }
 }
