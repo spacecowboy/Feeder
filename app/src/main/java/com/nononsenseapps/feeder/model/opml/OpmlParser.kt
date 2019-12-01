@@ -3,6 +3,8 @@ package com.nononsenseapps.feeder.model.opml
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.OPMLParserToDatabase
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.ccil.cowan.tagsoup.Parser
 import org.xml.sax.Attributes
 import org.xml.sax.ContentHandler
@@ -20,13 +22,14 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
     val tagStack: Stack<String> = Stack()
     var isFeedTag = false
     var ignoring = 0
+    var feeds: MutableList<Feed> = mutableListOf()
 
     init {
         parser.contentHandler = this
     }
 
     @Throws(IOException::class, SAXException::class)
-    fun parseFile(path: String) {
+    suspend fun parseFile(path: String) {
         // Open file
         val file = File(path)
 
@@ -36,12 +39,17 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
     }
 
     @Throws(IOException::class, SAXException::class)
-    fun parseInputStream(inputStream: InputStream) {
+    suspend fun parseInputStream(inputStream: InputStream) = withContext(Dispatchers.IO) {
+        feeds = mutableListOf()
         tagStack.clear()
         isFeedTag = false
         ignoring = 0
 
         parser.parse(InputSource(inputStream))
+
+        for (feed in feeds) {
+            opmlToDb.saveFeed(feed)
+        }
     }
 
     override fun endElement(uri: String?, localName: String?, qName: String?) {
@@ -72,20 +80,27 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
     override fun startElement(uri: String?, localName: String?, qName: String?, atts: Attributes?) {
         if ("outline" == localName) {
             when {
-            // Nesting not allowed
+                // Nesting not allowed
                 ignoring > 0 || isFeedTag -> ignoring++
                 outlineIsFeed(atts) -> {
                     isFeedTag = true
-                    val feedTitle = unescape(atts?.getValue("title") ?: atts?.getValue("text") ?: "")
+                    val feedTitle = unescape(atts?.getValue("title") ?: atts?.getValue("text")
+                    ?: "")
                     val feed = Feed(
                             title = feedTitle,
                             customTitle = feedTitle,
                             tag = if (tagStack.isNotEmpty()) tagStack.peek() else "",
                             url = sloppyLinkToStrictURL(atts?.getValue("xmlurl") ?: ""))
 
-                    opmlToDb.saveFeed(feed)
+                    feeds.add(feed)
                 }
-                else -> tagStack.push(unescape(atts?.getValue("title") ?: atts?.getValue("text") ?: ""))
+                else -> tagStack.push(
+                        unescape(
+                                atts?.getValue("title")
+                                        ?: atts?.getValue("text")
+                                        ?: ""
+                        )
+                )
             }
         }
     }

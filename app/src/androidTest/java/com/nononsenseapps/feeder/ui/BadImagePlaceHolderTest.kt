@@ -55,20 +55,20 @@ class BadImagePlaceHolderTest {
     }
 
     @Test
-    fun placeHolderIsShownOnBadImageNightTheme() {
+    fun placeHolderIsShownOnBadImageNightTheme() = runBlocking {
         prefs.isNightMode = true
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
         placeHolderIsShownOnBadImage()
     }
 
     @Test
-    fun placeHolderIsShownOnBadImageDayTheme() {
+    fun placeHolderIsShownOnBadImageDayTheme() = runBlocking {
         prefs.isNightMode = false
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
         placeHolderIsShownOnBadImage()
     }
 
-    private fun placeHolderIsShownOnBadImage() {
+    private suspend fun placeHolderIsShownOnBadImage() {
         server.enqueue(MockResponse().also {
             it.setResponseCode(400)
         })

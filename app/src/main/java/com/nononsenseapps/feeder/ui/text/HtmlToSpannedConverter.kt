@@ -28,7 +28,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.generic.instance
 import org.xml.sax.*
 import java.io.IOException
-import java.io.StringReader
+import java.io.Reader
 import java.net.URL
 import kotlin.math.roundToInt
 
@@ -38,7 +38,7 @@ typealias UrlClickListener = ((String) -> Unit)
  * Convert an HTML document into a spannable string.
  */
 @Suppress("UNUSED_PARAMETER")
-open class HtmlToSpannedConverter(private var source: String,
+open class HtmlToSpannedConverter(private var source: Reader,
                                   private var siteUrl: URL,
                                   parser: Parser,
                                   override val kodein: Kodein,
@@ -89,7 +89,7 @@ open class HtmlToSpannedConverter(private var source: String,
 
         mReader.contentHandler = this
         try {
-            mReader.parse(InputSource(StringReader(source)))
+            mReader.parse(InputSource(source))
         } catch (e: IOException) {
             // We are reading from a string. There should not be IO problems.
             throw RuntimeException(e)

@@ -10,6 +10,7 @@ import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.model.getOpenInDefaultActivityIntent
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -32,7 +33,7 @@ class OpenLinkInDefaultActivityTaskTest {
     private lateinit var feedItem: FeedItem
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking {
         val db = testDb.db
 
         val feedId = db.feedDao().insertFeed(Feed(

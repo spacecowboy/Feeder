@@ -26,7 +26,7 @@ class NotificationClearingTest {
     val testDb = TestDatabaseRule(getApplicationContext())
 
     @Test
-    fun clearingNotificationMarksAsNotified() {
+    fun clearingNotificationMarksAsNotified() = runBlocking {
         val feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "testFeed",
                 url = URL("http://testfeed"),
@@ -57,7 +57,7 @@ class NotificationClearingTest {
     }
 
     @Test
-    fun notifyWorksOnMainThread() {
+    fun notifyWorksOnMainThread() = runBlocking {
         val feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "testFeed",
                 url = URL("http://testfeed"),

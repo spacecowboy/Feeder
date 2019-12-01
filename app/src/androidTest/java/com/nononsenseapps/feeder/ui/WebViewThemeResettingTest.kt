@@ -42,7 +42,7 @@ class WebViewThemeResettingTest {
     private val prefs by kodein.instance<Prefs>()
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking {
         server.enqueue(MockResponse().also {
             it.setBody("<html><body>Hello!</body></html>")
         })
@@ -58,7 +58,6 @@ class WebViewThemeResettingTest {
                 feedId = feedId,
                 title = "foo",
                 imageUrl = null,
-                description = "bar",
                 link = server.url("/bar.html").url().toString()
         ))
 

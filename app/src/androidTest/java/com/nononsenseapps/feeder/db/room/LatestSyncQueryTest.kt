@@ -44,7 +44,7 @@ class LatestSyncQueryTest {
     }
 
     @Test
-    fun latestSyncWorksIfFeed() {
+    fun latestSyncWorksIfFeed() = runBlocking {
         testDb.db.feedDao().insertFeed(Feed(
                 title = "bar",
                 url = URL("http://bar"),
@@ -64,7 +64,7 @@ class LatestSyncQueryTest {
     }
 
     @Test
-    fun latestSyncGetsLatestValue() {
+    fun latestSyncGetsLatestValue() = runBlocking {
         testDb.db.feedDao().insertFeed(Feed(
                 title = "foo",
                 url = URL("http://foo"),

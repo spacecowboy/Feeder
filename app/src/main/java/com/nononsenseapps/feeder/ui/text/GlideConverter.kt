@@ -19,12 +19,13 @@ import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import org.xml.sax.Attributes
+import java.io.Reader
 import java.net.URL
 import java.util.concurrent.ExecutionException
 
 class GlideConverter(
         kodein: Kodein,
-        source: String,
+        source: Reader,
         private val siteUrl: URL,
         parser: Parser,
         maxSize: Point,

@@ -12,6 +12,9 @@ import org.joda.time.DateTimeZone
 import java.net.URI
 import java.net.URL
 
+const val MAX_TITLE_LENGTH = 200
+const val MAX_SNIPPET_LENGTH = 200
+
 @Entity(tableName = FEED_ITEMS_TABLE_NAME,
         indices = [Index(value = [COL_GUID, COL_FEEDID], unique = true),
             Index(value = [COL_FEEDID])],
@@ -24,7 +27,6 @@ data class FeedItem @Ignore constructor(
         @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
         @ColumnInfo(name = COL_GUID) var guid: String = "",
         @ColumnInfo(name = COL_TITLE) var title: String = "",
-        @ColumnInfo(name = COL_DESCRIPTION) var description: String = "",
         @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
         @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
         @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
@@ -41,17 +43,16 @@ data class FeedItem @Ignore constructor(
     fun updateFromParsedEntry(entry: Item, feed: com.nononsenseapps.jsonfeed.Feed) {
         val converter = HtmlToPlainTextConverter()
         // Be careful about nulls.
-        val text = entry.content_html ?: entry.content_text ?: this.description
-        val summary: String? = entry.summary ?: entry.content_text?.take(200) ?: converter.convert(text).take(200)
+        val text = entry.content_html ?: entry.content_text ?: ""
+        val summary: String? = (entry.summary ?: entry.content_text ?: converter.convert(text)).take(MAX_SNIPPET_LENGTH)
         val absoluteImage = when {
             feed.feed_url != null && entry.image != null -> relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url!!), entry.image!!)
             else -> entry.image
         }
 
         entry.id?.let { this.guid = it }
-        entry.title?.let { this.title = it }
-        text.let { this.description = it }
-        entry.title?.let { this.plainTitle = converter.convert(it) }
+        entry.title?.let { this.title = it.take(MAX_TITLE_LENGTH) }
+        entry.title?.let { this.plainTitle = converter.convert(it).take(MAX_TITLE_LENGTH) }
         summary?.let { this.plainSnippet = it }
 
         this.imageUrl = absoluteImage
@@ -74,16 +75,16 @@ data class FeedItem @Ignore constructor(
 
     val enclosureFilename: String?
         get() {
-            if (enclosureLink != null) {
+            enclosureLink?.let { enclosureLink ->
                 var fname: String? = null
                 try {
                     fname = URI(enclosureLink).path.split("/").last()
                 } catch (e: Exception) {
                 }
-                if (fname == null || fname.isEmpty()) {
-                    return null
+                return if (fname == null || fname.isEmpty()) {
+                    null
                 } else {
-                    return fname
+                    fname
                 }
             }
             return null

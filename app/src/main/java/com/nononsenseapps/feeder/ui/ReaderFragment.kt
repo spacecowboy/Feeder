@@ -10,9 +10,10 @@ import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.text.BidiFormatter
 import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareFragment
+import com.nononsenseapps.feeder.base.KodeinAwareFragment
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -21,18 +22,17 @@ import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 import org.kodein.di.Kodein
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import java.io.StringReader
 import java.util.*
 
 const val ARG_TITLE = "title"
 const val ARG_CUSTOMTITLE = "customtitle"
-const val ARG_DESCRIPTION = "body"
 const val ARG_LINK = "link"
 const val ARG_ENCLOSURE = "enclosure"
 const val ARG_IMAGEURL = "imageUrl"
@@ -40,7 +40,7 @@ const val ARG_ID = "dbid"
 const val ARG_AUTHOR = "author"
 const val ARG_DATE = "date"
 
-class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
+class ReaderFragment : KodeinAwareFragment() {
     private val dateTimeFormat = DateTimeFormat.forStyle("FM").withLocale(Locale.getDefault())
 
     private var _id: Long = ID_UNSET
@@ -62,7 +62,7 @@ class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
             val itemId = _id
             val appContext = context?.applicationContext
             appContext?.let {
-                launch(Dispatchers.Default) {
+                lifecycleScope.launch {
                     feedItemDao.markAsReadAndNotified(itemId)
                     cancelNotification(it, itemId)
                 }
@@ -143,7 +143,7 @@ class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
         } else {
             titleTextView.text = toSpannedWithNoImages(
                     kodein,
-                    rssItem.title,
+                    StringReader(rssItem.title),
                     rssItem.feedUrl,
                     activity!!.maxImageSize(),
                     urlClickListener = urlClickListener()
@@ -227,7 +227,7 @@ class ReaderFragment : CoroutineScopedKodeinAwareFragment() {
                 true
             }
             R.id.action_mark_as_unread -> {
-                launch(Dispatchers.Default) {
+                lifecycleScope.launch {
                     feedItemDao.markAsRead(_id, unread = true)
                 }
                 true

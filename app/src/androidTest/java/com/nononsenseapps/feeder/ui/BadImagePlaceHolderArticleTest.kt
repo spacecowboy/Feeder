@@ -17,6 +17,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.model.insertFeedItemWithBlob
 import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -62,7 +63,7 @@ class BadImagePlaceHolderArticleTest {
     }
 
     @Test
-    fun placeHolderIsShownOnBadImageNightTheme() {
+    fun placeHolderIsShownOnBadImageNightTheme() = runBlocking {
         prefs.isNightMode = true
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
 
@@ -87,7 +88,7 @@ class BadImagePlaceHolderArticleTest {
     }
 
     @Test
-    fun placeHolderIsShownOnBadImageDayTheme() {
+    fun placeHolderIsShownOnBadImageDayTheme() = runBlocking {
         prefs.isNightMode = false
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
 
@@ -112,7 +113,7 @@ class BadImagePlaceHolderArticleTest {
     }
 
     @Test
-    fun imgWithNoSrcIsNotDisplayed() {
+    fun imgWithNoSrcIsNotDisplayed() = runBlocking {
         val itemId = insertData {
             """
                 Image is: <img src="" alt="alt text"></img>
@@ -132,7 +133,7 @@ class BadImagePlaceHolderArticleTest {
     }
 
     @Test
-    fun imgHasAltTextDisplayed() {
+    fun imgHasAltTextDisplayed() = runBlocking {
         val imgUrl = server.url("/img.png")
 
         val itemId = insertData {
@@ -154,7 +155,7 @@ class BadImagePlaceHolderArticleTest {
     }
 
     @Test
-    fun imgAppendsNewLineBeforeAndAfter() {
+    fun imgAppendsNewLineBeforeAndAfter() = runBlocking {
         val imgUrl = server.url("/img.png")
 
         val itemId = insertData {
@@ -177,20 +178,22 @@ class BadImagePlaceHolderArticleTest {
                 .check(matches(withText(containsString("\nalt text\n"))))
     }
 
-    private fun insertData(imgUrl: HttpUrl? = null, description: () -> String): Long {
+    private suspend fun insertData(imgUrl: HttpUrl? = null, description: () -> String): Long {
 
         val feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "foo",
                 url = URL("http://foo")
         ))
 
-        return testDb.db.feedItemDao().insertFeedItem(FeedItem(
-                guid = "bar",
-                feedId = feedId,
-                title = "foo",
-                imageUrl = imgUrl?.let { "$it" },
+        return testDb.insertFeedItemWithBlob(
+                FeedItem(
+                        guid = "bar",
+                        feedId = feedId,
+                        title = "foo",
+                        imageUrl = imgUrl?.let { "$it" }
+                ),
                 description = description()
-        ))
+        )
     }
 }
 

@@ -10,8 +10,9 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareActivity
+import com.nononsenseapps.feeder.base.KodeinAwareActivity
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -30,7 +31,7 @@ import java.net.URL
 const val TEMPLATE = "template"
 
 
-class EditFeedActivity : CoroutineScopedKodeinAwareActivity() {
+class EditFeedActivity : KodeinAwareActivity() {
     private var id: Long = ID_UNSET
     // Views and shit
     private lateinit var textTitle: EditText
@@ -141,7 +142,7 @@ class EditFeedActivity : CoroutineScopedKodeinAwareActivity() {
                     url = sloppyLinkToStrictURLNoThrows(textUrl.text.toString().trim())
             )
 
-            launch(Dispatchers.Default) {
+            lifecycleScope.launch {
                 val feedId: Long? = dao.upsertFeed(feed)
 
                 feedId?.let {
@@ -153,10 +154,8 @@ class EditFeedActivity : CoroutineScopedKodeinAwareActivity() {
                         .putExtra(ARG_FEED_URL, feed.url.toString())
                         .putExtra(ARG_FEED_TAG, feed.tag)
 
-                withContext(Dispatchers.Main) {
-                    setResult(RESULT_OK, intent)
-                    finish()
-                }
+                setResult(RESULT_OK, intent)
+                finish()
             }
         }
 
@@ -213,7 +212,7 @@ class EditFeedActivity : CoroutineScopedKodeinAwareActivity() {
         }
 
         // Create an adapter
-        launch(Dispatchers.Default) {
+        lifecycleScope.launchWhenCreated {
             val data = dao.loadTags()
 
             val tagsAdapter = ArrayAdapter<String>(this@EditFeedActivity,
@@ -221,10 +220,8 @@ class EditFeedActivity : CoroutineScopedKodeinAwareActivity() {
                     android.R.id.text1,
                     data)
 
-            withContext(Dispatchers.Main) {
-                // Set the adapter
-                textTag.setAdapter(tagsAdapter)
-            }
+            // Set the adapter
+            textTag.setAdapter(tagsAdapter)
         }
     }
 
@@ -322,33 +319,34 @@ class EditFeedActivity : CoroutineScopedKodeinAwareActivity() {
 
     }
 
-    private fun searchForFeeds(url: URL): Job = launch(Dispatchers.Default) {
-        withContext(Dispatchers.Main) {
-            resultAdapter.data = emptyList()
-        }
-        val results = mutableListOf<Feed>()
-        val possibleFeeds = feedParser.getAlternateFeedLinksAtUrl(url).map {
-            sloppyLinkToStrictURL(it.first)
-        } + url
-        possibleFeeds.map {
-            launch {
-                try {
-                    feedParser.parseFeedUrl(it)?.let { feed ->
-                        withContext(Dispatchers.Main) {
-                            results.add(feed)
-                            resultAdapter.data = results
-                            // Show results, unless user has clicked on one
-                            if (detailsFrame.visibility == View.GONE) {
-                                searchFrame.visibility = View.VISIBLE
-                                listResults.visibility = View.VISIBLE
+    private fun searchForFeeds(url: URL): Job = lifecycleScope.launchWhenResumed {
+        resultAdapter.data = emptyList()
+
+        withContext(Dispatchers.Default) {
+            val results = mutableListOf<Feed>()
+            val possibleFeeds = feedParser.getAlternateFeedLinksAtUrl(url).map {
+                sloppyLinkToStrictURL(it.first)
+            } + url
+            possibleFeeds.map {
+                launch(Dispatchers.Default) {
+                    try {
+                        feedParser.parseFeedUrl(it)?.let { feed ->
+                            withContext(Dispatchers.Main) {
+                                results.add(feed)
+                                resultAdapter.data = results
+                                // Show results, unless user has clicked on one
+                                if (detailsFrame.visibility == View.GONE) {
+                                    searchFrame.visibility = View.VISIBLE
+                                    listResults.visibility = View.VISIBLE
+                                }
                             }
                         }
+                    } catch (e: Throwable) {
+                        e.printStackTrace()
                     }
-                } catch (e: Throwable) {
-                    e.printStackTrace()
                 }
-            }
-        }.toList().joinAll()
+            }.toList().joinAll()
+        }
 
         withContext(Dispatchers.Main) {
             loadingProgress.visibility = View.GONE

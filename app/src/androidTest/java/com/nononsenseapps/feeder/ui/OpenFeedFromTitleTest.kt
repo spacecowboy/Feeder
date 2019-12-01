@@ -16,6 +16,7 @@ import com.nononsenseapps.feeder.db.URI_FEEDITEMS
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.util.Prefs
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,7 +45,7 @@ class OpenFeedFromTitleTest {
     }
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking {
         feedId = testDb.db.feedDao().insertFeed(Feed(
                 title = "ANON",
                 url = URL("http://ANON.com/sub")
@@ -54,7 +55,6 @@ class OpenFeedFromTitleTest {
                 feedId = feedId,
                 guid = "http://ANON.com/sub/##",
                 title = "ANON",
-                description = "ANON",
                 plainTitle = "ANON",
                 plainSnippet = "ANON"
         )

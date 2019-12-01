@@ -8,6 +8,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.nononsenseapps.feeder.FeederApplication
+import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.util.*
 
 const val DATABASE_NAME = "rssDatabase"
@@ -22,7 +24,7 @@ const val ID_ALL_FEEDS: Long = -10
  * 7: Migration to Room
  */
 
-@Database(entities = [Feed::class, FeedItem::class], version = 9)
+@Database(entities = [Feed::class, FeedItem::class], version = 10)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun feedDao(): FeedDao
@@ -54,27 +56,85 @@ abstract class AppDatabase : RoomDatabase() {
     }
 }
 
-val allMigrations = arrayOf(MIGRATION_5_7, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
+val allMigrations = arrayOf(
+        MIGRATION_5_7,
+        MIGRATION_6_7,
+        MIGRATION_7_8,
+        MIGRATION_8_9,
+        MIGRATION_9_10
+)
 
 @Suppress("ClassName")
 /**
  * 6 represents legacy database
  * 7 represents new Room database
  */
-object MIGRATION_8_9: Migration(8, 9) {
+object MIGRATION_9_10 : Migration(9, 10) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("""
+            CREATE TABLE IF NOT EXISTS `feed_items_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `guid` TEXT NOT NULL, `title` TEXT NOT NULL, `plain_title` TEXT NOT NULL, `plain_snippet` TEXT NOT NULL, `image_url` TEXT, `enclosure_link` TEXT, `author` TEXT, `pub_date` TEXT, `link` TEXT, `unread` INTEGER NOT NULL, `notified` INTEGER NOT NULL, `feed_id` INTEGER, FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
+        """.trimIndent())
+
+        database.execSQL("""
+            INSERT INTO `feed_items_new` (`id`, `guid`, `title`, `plain_title`, `plain_snippet`, `image_url`, `enclosure_link`, `author`, `pub_date`, `link`, `unread`, `notified`, `feed_id`)
+            SELECT `id`, `guid`, `title`, `plain_title`, `plain_snippet`, `image_url`, `enclosure_link`, `author`, `pub_date`, `link`, `unread`, `notified`, `feed_id` FROM `feed_items`
+        """.trimIndent())
+
+        // Iterate over all items using the minimum query. Also restrict the text field to
+        // 1 MB which should be safe enough considering the window size is 2MB large.
+        database.query("""
+            SELECT id, substr(description,0,1000000) FROM feed_items
+        """.trimIndent())?.use { cursor ->
+            cursor.forEach {
+                val feedItemId = cursor.getLong(0)
+                val description = cursor.getString(1)
+
+                blobOutputStream(feedItemId, FeederApplication.staticFilesDir).bufferedWriter().use {
+                    it.write(description)
+                }
+            }
+        }
+
+        database.execSQL("""
+            DROP TABLE feed_items
+        """.trimIndent())
+
+        database.execSQL("""
+            ALTER TABLE feed_items_new RENAME TO feed_items
+        """.trimIndent())
+
+        database.execSQL("""
+            CREATE UNIQUE INDEX IF NOT EXISTS `index_feed_items_guid_feed_id` ON `feed_items` (`guid`, `feed_id`)
+        """.trimIndent())
+
+        database.execSQL("""
+            CREATE INDEX IF NOT EXISTS `index_feed_items_feed_id` ON `feed_items` (`feed_id`)
+        """.trimIndent())
+
+        // And reset response hash on all feeds to trigger parsing of results next sync so items
+        // are written disk (in case migration substring was too short)
+        database.execSQL("""
+            UPDATE `feeds` SET `response_hash` = 0
+        """.trimIndent())
+    }
+}
+
+object MIGRATION_8_9 : Migration(8, 9) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("""
             ALTER TABLE feeds ADD COLUMN response_hash INTEGER NOT NULL DEFAULT 0
         """.trimIndent())
     }
 }
-object MIGRATION_7_8: Migration(7, 8) {
+
+object MIGRATION_7_8 : Migration(7, 8) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("""
             ALTER TABLE feeds ADD COLUMN last_sync INTEGER NOT NULL DEFAULT 0
         """.trimIndent())
     }
 }
+
 object MIGRATION_6_7 : Migration(6, 7) {
     override fun migrate(database: SupportSQLiteDatabase) {
         legacyMigration(database, 6)
@@ -150,9 +210,9 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
                                     setString("plain_snippet" to cursor.getString(3))
                                     setString("image_url" to cursor.getString(4))
                                     setString("enclosure_link" to cursor.getString(10))
-                                    setString("author" to  cursor.getString(6))
+                                    setString("author" to cursor.getString(6))
                                     setString("pub_date" to cursor.getString(7))
-                                    setString("link" to  cursor.getString(5))
+                                    setString("link" to cursor.getString(5))
                                     setInt("unread" to cursor.getInt(8))
                                     setInt("notified" to cursor.getInt(11))
                                     setLong("feed_id" to newFeedId)

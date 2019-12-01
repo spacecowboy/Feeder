@@ -13,7 +13,7 @@ import java.net.URI
 import java.net.URL
 
 const val feedItemColumnsWithFeed = "$FEED_ITEMS_TABLE_NAME.$COL_ID AS $COL_ID, $COL_GUID, $FEED_ITEMS_TABLE_NAME.$COL_TITLE AS $COL_TITLE, " +
-        "$COL_DESCRIPTION, $COL_PLAINTITLE, $COL_PLAINSNIPPET, $FEED_ITEMS_TABLE_NAME.$COL_IMAGEURL, $COL_ENCLOSURELINK, " +
+        "$COL_PLAINTITLE, $COL_PLAINSNIPPET, $FEED_ITEMS_TABLE_NAME.$COL_IMAGEURL, $COL_ENCLOSURELINK, " +
         "$COL_AUTHOR, $COL_PUBDATE, $COL_LINK, $COL_UNREAD, $FEEDS_TABLE_NAME.$COL_TAG AS $COL_TAG, $FEEDS_TABLE_NAME.$COL_ID AS $COL_FEEDID, " +
         "$FEEDS_TABLE_NAME.$COL_TITLE AS $COL_FEEDTITLE, " +
         "$FEEDS_TABLE_NAME.$COL_CUSTOM_TITLE AS $COL_FEEDCUSTOMTITLE, " +
@@ -23,7 +23,6 @@ data class FeedItemWithFeed @Ignore constructor(
         var id: Long = ID_UNSET,
         var guid: String = "",
         var title: String = "",
-        var description: String = "",
         @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
         @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
         @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
@@ -45,16 +44,16 @@ data class FeedItemWithFeed @Ignore constructor(
 
     val enclosureFilename: String?
         get() {
-            if (enclosureLink != null) {
+            enclosureLink?.let { enclosureLink ->
                 var fname: String? = null
                 try {
                     fname = URI(enclosureLink).path.split("/").last()
                 } catch (e: Exception) {
                 }
-                if (fname == null || fname.isEmpty()) {
-                    return null
+                return if (fname == null || fname.isEmpty()) {
+                    null
                 } else {
-                    return fname
+                    fname
                 }
             }
             return null

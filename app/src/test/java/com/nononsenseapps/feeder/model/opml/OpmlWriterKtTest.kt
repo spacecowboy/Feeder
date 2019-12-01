@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.model.opml
 
 import com.nononsenseapps.feeder.db.room.Feed
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.io.ByteArrayOutputStream
@@ -21,7 +22,7 @@ class OpmlWriterKtTest {
     }
 
     @Test
-    fun shouldEscapeStrings() {
+    fun shouldEscapeStrings() = runBlocking {
         val bos = ByteArrayOutputStream()
         writeOutputStream(bos, listOf("quoted \"tag\"")) { tag ->
             val result = ArrayList<Feed>()

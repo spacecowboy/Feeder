@@ -2,14 +2,13 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.util.Log
+import com.nononsenseapps.feeder.blob.blobFile
+import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.db.room.*
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.*
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -17,7 +16,8 @@ import org.kodein.di.Kodein
 import org.kodein.di.android.closestKodein
 import org.kodein.di.direct
 import org.kodein.di.generic.instance
-import java.util.*
+import java.io.File
+import java.io.IOException
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
@@ -31,6 +31,7 @@ suspend fun syncFeeds(context: Context,
     val prefs: Prefs by kodein.instance()
     return syncFeeds(
             db = kodein.direct.instance(),
+            filesDir = context.filesDir,
             feedParser = kodein.direct.instance(),
             feedId = feedId,
             feedTag = feedTag,
@@ -42,6 +43,7 @@ suspend fun syncFeeds(context: Context,
 }
 
 internal suspend fun syncFeeds(db: AppDatabase,
+                               filesDir: File,
                                feedParser: FeedParser,
                                feedId: Long = ID_UNSET,
                                feedTag: String = "",
@@ -75,6 +77,7 @@ internal suspend fun syncFeeds(db: AppDatabase,
                     launch(coroutineContext) {
                         syncFeed(it,
                                 db = db,
+                                filesDir = filesDir,
                                 feedParser = feedParser,
                                 maxFeedItemCount = maxFeedItemCount,
                                 forceNetwork = forceNetwork)
@@ -93,9 +96,10 @@ internal suspend fun syncFeeds(db: AppDatabase,
 
 private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                              db: AppDatabase,
+                             filesDir: File,
                              feedParser: FeedParser,
                              maxFeedItemCount: Int,
-                             forceNetwork: Boolean = false) {
+                             forceNetwork: Boolean = false) = withContext(Dispatchers.IO) {
     val response: Response = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
 
     var responseHash = 0
@@ -104,7 +108,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
             response.use {
                 it.body()?.use { responseBody ->
                     val body = responseBody.bytes()!!
-                    responseHash = Arrays.hashCode(body)
+                    responseHash = body.contentHashCode()
                     when {
                         !response.isSuccessful -> {
                             throw ResponseFailure("${response.code()} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
@@ -144,7 +148,11 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                     feedItemSql.updateFromParsedEntry(item.copy(id = id), feed)
                     feedItemSql.feedId = feedSql.id
 
-                    itemDao.upsertFeedItem(feedItemSql)
+                    val feedItemId = itemDao.upsertFeedItem(feedItemSql)
+                    val text = item.content_html ?: item.content_text ?: ""
+                    blobOutputStream(feedItemId, filesDir).bufferedWriter().use {
+                        it.write(text)
+                    }
                 }
 
         // Update feed last so lastsync is only set after all items have been handled
@@ -157,8 +165,23 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
         db.feedDao().upsertFeed(feedSql)
 
         // Finally, prune database of old items
-        db.feedItemDao().cleanItemsInFeed(feedSql.id,
-                max(maxFeedItemCount, feed.items?.size ?: 0))
+        val ids = db.feedItemDao().getItemsToBeCleanedFromFeed(
+                feedId = feedSql.id,
+                keepCount = max(maxFeedItemCount, feed.items?.size ?: 0)
+        )
+
+        for (id in ids) {
+            val file = blobFile(itemId = id, filesDir = filesDir)
+            try {
+                if (file.isFile) {
+                    file.delete()
+                }
+            } catch (e: IOException) {
+                Log.e("CoroutineSync", "Failed to delete $file")
+            }
+        }
+
+        db.feedItemDao().deleteFeedItems(ids)
     }
 }
 
@@ -169,7 +192,7 @@ private suspend fun fetchFeed(
 ): Response =
         feedParser.getResponse(feedSql.url, forceNetwork = forceNetwork)
 
-internal fun feedsToSync(feedDao: FeedDao, feedId: Long, tag: String, staleTime: Long = -1L): List<com.nononsenseapps.feeder.db.room.Feed> {
+internal suspend fun feedsToSync(feedDao: FeedDao, feedId: Long, tag: String, staleTime: Long = -1L): List<com.nononsenseapps.feeder.db.room.Feed> {
     return when {
         feedId > 0 -> {
             val feed = if (staleTime > 0) feedDao.loadFeedIfStale(feedId, staleTime = staleTime) else feedDao.loadFeed(feedId)

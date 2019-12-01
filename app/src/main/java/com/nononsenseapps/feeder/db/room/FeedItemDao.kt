@@ -3,34 +3,49 @@ package com.nononsenseapps.feeder.db.room
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
+import com.nononsenseapps.feeder.db.COL_URL
+import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
+import java.net.URL
 
 @Dao
 interface FeedItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertFeedItem(item: FeedItem): Long
+    suspend fun insertFeedItem(item: FeedItem): Long
 
     @Update
-    fun updateFeedItem(item: FeedItem): Int
+    suspend fun updateFeedItem(item: FeedItem): Int
 
     @Delete
-    fun deleteFeedItem(item: FeedItem)
+    suspend fun deleteFeedItem(item: FeedItem)
 
     @Query("""
-        DELETE FROM feed_items WHERE id IN (
-          SELECT id FROM feed_items
-          WHERE feed_id IS :feedId
-          ORDER BY pub_date DESC
-          LIMIT -1 OFFSET :keepCount
-        )""")
-    fun cleanItemsInFeed(feedId: Long, keepCount: Int)
+        DELETE FROM feed_items WHERE id IN (:ids)
+        """)
+    suspend fun deleteFeedItems(ids: List<Long>)
+
+    @Query("""
+        SELECT id FROM feed_items
+        WHERE feed_id IS :feedId
+        ORDER BY pub_date DESC
+        LIMIT -1 OFFSET :keepCount
+        """)
+    suspend fun getItemsToBeCleanedFromFeed(feedId: Long, keepCount: Int): List<Long>
 
     @Query("SELECT * FROM feed_items WHERE guid IS :guid AND feed_id IS :feedId")
-    fun loadFeedItem(guid: String, feedId: Long?): FeedItem?
+    suspend fun loadFeedItem(guid: String, feedId: Long?): FeedItem?
 
     @Query("SELECT * FROM feed_items WHERE id IS :id")
-    fun loadFeedItem(id: Long): FeedItem?
+    suspend fun loadFeedItem(id: Long): FeedItem?
+
+    @Query("""
+        SELECT $FEEDS_TABLE_NAME.$COL_URL
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_items.id IS :id
+        """)
+    suspend fun loadFeedUrlOfFeedItem(id: Long): URL?
 
     @Query("""
         SELECT *
@@ -38,7 +53,7 @@ interface FeedItemDao {
         WHERE feed_items.feed_id = :feedId
         ORDER BY pub_date DESC
         """)
-    fun loadFeedItemsInFeed(feedId: Long): List<FeedItem>
+    suspend fun loadFeedItemsInFeed(feedId: Long): List<FeedItem>
 
     @Query("""
         SELECT $feedItemColumnsWithFeed
@@ -107,13 +122,13 @@ interface FeedItemDao {
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IN (:feedIds) AND notified IS 0 AND unread IS 1
         """)
-    fun loadItemsToNotify(feedIds: List<Long>): List<FeedItemWithFeed>
+    suspend fun loadItemsToNotify(feedIds: List<Long>): List<FeedItemWithFeed>
 
     @Query("UPDATE feed_items SET unread = 0")
-    fun markAllAsRead()
+    suspend fun markAllAsRead()
 
     @Query("UPDATE feed_items SET unread = 0 WHERE feed_id IS :feedId")
-    fun markAllAsRead(feedId: Long?)
+    suspend fun markAllAsRead(feedId: Long?)
 
     @Query("""
         UPDATE feed_items
@@ -124,19 +139,19 @@ interface FeedItemDao {
           LEFT JOIN feeds ON feed_items.feed_id = feeds.id
           WHERE tag IS :tag
         )""")
-    fun markAllAsRead(tag: String)
+    suspend fun markAllAsRead(tag: String)
 
     @Query("UPDATE feed_items SET unread = :unread WHERE id IS :id")
-    fun markAsRead(id: Long, unread: Boolean = false)
+    suspend fun markAsRead(id: Long, unread: Boolean = false)
 
     @Query("UPDATE feed_items SET unread = :unread WHERE id IN (:ids)")
-    fun markAsRead(ids: List<Long>, unread: Boolean = false)
+    suspend fun markAsRead(ids: List<Long>, unread: Boolean = false)
 
     @Query("UPDATE feed_items SET notified = :notified WHERE id IN (:ids)")
-    fun markAsNotified(ids: List<Long>, notified: Boolean = true)
+    suspend fun markAsNotified(ids: List<Long>, notified: Boolean = true)
 
     @Query("UPDATE feed_items SET notified = :notified WHERE id IS :id")
-    fun markAsNotified(id: Long, notified: Boolean = true)
+    suspend fun markAsNotified(id: Long, notified: Boolean = true)
 
     @Query("""
         UPDATE feed_items
@@ -147,16 +162,16 @@ interface FeedItemDao {
           LEFT JOIN feeds ON feed_items.feed_id = feeds.id
           WHERE tag IS :tag
         )""")
-    fun markTagAsNotified(tag: String, notified: Boolean = true)
+    suspend fun markTagAsNotified(tag: String, notified: Boolean = true)
 
     @Query("UPDATE feed_items SET notified = :notified")
-    fun markAllAsNotified(notified: Boolean = true)
+    suspend fun markAllAsNotified(notified: Boolean = true)
 
     @Query("UPDATE feed_items SET unread = 0, notified = 1 WHERE id IS :id")
-    fun markAsReadAndNotified(id: Long)
+    suspend fun markAsReadAndNotified(id: Long)
 }
 
-fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > ID_UNSET) {
+suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > ID_UNSET) {
     true -> {
         updateFeedItem(item)
         item.id

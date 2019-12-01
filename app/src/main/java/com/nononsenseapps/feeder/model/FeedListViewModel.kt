@@ -2,7 +2,8 @@ package com.nononsenseapps.feeder.model
 
 import androidx.collection.ArrayMap
 import androidx.lifecycle.MediatorLiveData
-import com.nononsenseapps.feeder.base.CoroutineScopedKodeinAwareViewModel
+import androidx.lifecycle.viewModelScope
+import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +11,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 
-class FeedListViewModel(kodein: Kodein): CoroutineScopedKodeinAwareViewModel(kodein) {
+class FeedListViewModel(kodein: Kodein): KodeinAwareViewModel(kodein) {
     private val dao: FeedDao by instance()
     private val liveFeedsWithUnreadCounts = dao.loadLiveFeedsWithUnreadCounts()
 
@@ -18,7 +19,7 @@ class FeedListViewModel(kodein: Kodein): CoroutineScopedKodeinAwareViewModel(kod
 
     init {
         liveFeedsAndTagsWithUnreadCounts.addSource(liveFeedsWithUnreadCounts) { feeds ->
-            launch(Dispatchers.Default) {
+            viewModelScope.launch(Dispatchers.Default) {
                 val topTag = FeedUnreadCount(id = ID_ALL_FEEDS)
                 val tags: MutableMap<String, FeedUnreadCount> = ArrayMap()
                 val data: MutableList<FeedUnreadCount> = mutableListOf(topTag)

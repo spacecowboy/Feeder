@@ -10,38 +10,38 @@ import java.net.URL
 interface FeedDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertFeed(feed: Feed): Long
+    suspend fun insertFeed(feed: Feed): Long
 
     @Update
-    fun updateFeed(feed: Feed)
+    suspend fun updateFeed(feed: Feed)
 
     @Delete
-    fun deleteFeed(feed: Feed)
+    suspend fun deleteFeed(feed: Feed)
 
     @Query("DELETE FROM feeds WHERE id IS :feedId")
-    fun deleteFeedWithId(feedId: Long)
+    suspend fun deleteFeedWithId(feedId: Long)
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
     fun loadLiveFeed(feedId: Long): LiveData<Feed>
 
     @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
-    fun loadTags(): List<String>
+    suspend fun loadTags(): List<String>
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
-    fun loadFeed(feedId: Long): Feed?
+    suspend fun loadFeed(feedId: Long): Feed?
 
     @Query("""
        SELECT * FROM feeds
        WHERE id is :feedId
        AND last_sync < :staleTime
     """)
-    fun loadFeedIfStale(feedId: Long, staleTime: Long): Feed?
+    suspend fun loadFeedIfStale(feedId: Long, staleTime: Long): Feed?
 
     @Query("SELECT * FROM feeds WHERE tag IS :tag")
-    fun loadFeeds(tag: String): List<Feed>
+    suspend fun loadFeeds(tag: String): List<Feed>
 
     @Query("SELECT * FROM feeds WHERE tag IS :tag AND last_sync < :staleTime")
-    fun loadFeedsIfStale(tag: String, staleTime: Long): List<Feed>
+    suspend fun loadFeedsIfStale(tag: String, staleTime: Long): List<Feed>
 
     @Query("SELECT notify FROM feeds WHERE tag IS :tag")
     fun loadLiveFeedsNotify(tag: String): LiveData<List<Boolean>>
@@ -50,19 +50,16 @@ interface FeedDao {
     fun loadLiveFeedsNotify(): LiveData<List<Boolean>>
 
     @Query("SELECT * FROM feeds")
-    fun loadFeeds(): List<Feed>
+    suspend fun loadFeeds(): List<Feed>
 
     @Query("SELECT * FROM feeds WHERE last_sync < :staleTime")
-    fun loadFeedsIfStale(staleTime: Long): List<Feed>
+    suspend fun loadFeedsIfStale(staleTime: Long): List<Feed>
 
     @Query("SELECT * FROM feeds WHERE url IS :url")
-    fun loadFeedWithUrl(url: URL): Feed?
-
-    @Query("SELECT id FROM feeds")
-    fun loadFeedIds(): List<Long>
+    suspend fun loadFeedWithUrl(url: URL): Feed?
 
     @Query("SELECT id FROM feeds WHERE notify IS 1")
-    fun loadFeedIdsToNotify(): List<Long>
+    suspend fun loadFeedIdsToNotify(): List<Long>
 
     @Query("""
         SELECT id, title, url, tag, custom_title, notify, image_url, unread_count
@@ -77,13 +74,13 @@ interface FeedDao {
     fun loadLiveFeedsWithUnreadCounts(): LiveData<List<FeedUnreadCount>>
 
     @Query("UPDATE feeds SET notify = :notify WHERE id IS :id")
-    fun setNotify(id: Long, notify: Boolean)
+    suspend fun setNotify(id: Long, notify: Boolean)
 
     @Query("UPDATE feeds SET notify = :notify WHERE tag IS :tag")
-    fun setNotify(tag: String, notify: Boolean)
+    suspend fun setNotify(tag: String, notify: Boolean)
 
     @Query("UPDATE feeds SET notify = :notify")
-    fun setAllNotify(notify: Boolean)
+    suspend fun setAllNotify(notify: Boolean)
 
     @Query("SELECT last_sync FROM feeds ORDER BY last_sync DESC LIMIT 1")
     fun getLastSyncTime(): LiveData<DateTime?>
@@ -92,7 +89,7 @@ interface FeedDao {
 /**
  * Inserts or updates feed depending on if ID is valid. Returns ID.
  */
-fun FeedDao.upsertFeed(feed: Feed): Long = when (feed.id > ID_UNSET) {
+suspend fun FeedDao.upsertFeed(feed: Feed): Long = when (feed.id > ID_UNSET) {
     true -> {
         updateFeed(feed)
         feed.id
