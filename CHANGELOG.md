@@ -1,3 +1,9 @@
+# 1.8.26
+*   Stores feed content primarily in files instead of database
+    See !209 #227
+*   More feeds should now have thumbnails displayed
+    See !210 #231
+
 # 1.8.24
 *   Fixed alignment issue in RTL layout
     See !208 #224
