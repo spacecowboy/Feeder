@@ -5,7 +5,6 @@ import android.content.ContentResolver
 import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.multidex.MultiDexApplication
 import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
@@ -13,6 +12,7 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.di.networkModule
+import com.nononsenseapps.feeder.di.stateModule
 import com.nononsenseapps.feeder.di.viewModelModule
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
@@ -42,7 +42,6 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
         import(viewModelModule)
 
         bind<WorkManager>() with singleton { WorkManager.getInstance(this@FeederApplication) }
-        bind<LocalBroadcastManager>() with singleton { LocalBroadcastManager.getInstance(this@FeederApplication) }
         bind<ContentResolver>() with singleton { contentResolver }
         bind<ToastMaker>() with singleton {
             object : ToastMaker {
@@ -59,6 +58,7 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
                 cacheDirectory = externalCacheDir ?: filesDir
         ) }
         import(networkModule)
+        import(stateModule)
     }
 
     init {

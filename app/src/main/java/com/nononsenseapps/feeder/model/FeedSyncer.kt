@@ -1,16 +1,17 @@
 package com.nononsenseapps.feeder.model
 
 import android.content.Context
-import android.content.Intent
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.*
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.di.CURRENTLY_SYNCING_STATE
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.currentlyCharging
 import com.nononsenseapps.feeder.util.currentlyConnected
 import com.nononsenseapps.feeder.util.currentlyUnmetered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -24,10 +25,6 @@ const val PARALLEL_SYNC = "parallel_sync"
 const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
 const val IGNORE_CONNECTIVITY_SETTINGS = "ignore_connectivity_settings"
 
-const val FEED_ADDED_BROADCAST = "feeder.nononsenseapps.RSS_FEED_ADDED_BROADCAST"
-const val SYNC_BROADCAST = "feeder.nononsenseapps.RSS_SYNC_BROADCAST"
-const val SYNC_BROADCAST_IS_ACTIVE = "IS_ACTIVE"
-
 
 fun isOkToSyncAutomatically(context: Context): Boolean {
     val kodein: Kodein by closestKodein(context)
@@ -38,21 +35,22 @@ fun isOkToSyncAutomatically(context: Context): Boolean {
             )
 }
 
+@ExperimentalCoroutinesApi
 class FeedSyncer(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), KodeinAware {
     override val kodein: Kodein by closestKodein(context)
-    private val localBroadcastManager: LocalBroadcastManager by instance()
+    private val currentlySyncing: ConflatedBroadcastChannel<Boolean> by instance(tag = CURRENTLY_SYNCING_STATE)
 
     override suspend fun doWork(): Result {
         val goParallel = inputData.getBoolean(PARALLEL_SYNC, false)
         val ignoreConnectivitySettings = inputData.getBoolean(IGNORE_CONNECTIVITY_SETTINGS, false)
 
-        val bcast = Intent(SYNC_BROADCAST)
-                .putExtra(SYNC_BROADCAST_IS_ACTIVE, true)
 
         var success = false
 
         if (ignoreConnectivitySettings || isOkToSyncAutomatically(context)) {
-            localBroadcastManager.sendBroadcast(bcast)
+            if (!currentlySyncing.isClosedForSend) {
+                currentlySyncing.offer(true)
+            }
 
             val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
@@ -71,7 +69,9 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Corouti
             notify(applicationContext)
         }
 
-        localBroadcastManager.sendBroadcast(bcast.putExtra(SYNC_BROADCAST_IS_ACTIVE, false))
+        if (!currentlySyncing.isClosedForSend) {
+            currentlySyncing.offer(false)
+        }
 
         return when (success) {
             true -> Result.success()

@@ -1,7 +1,8 @@
 package com.nononsenseapps.feeder.ui
 
 import android.app.Activity
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -26,6 +27,7 @@ import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.di.CURRENTLY_SYNCING_STATE
 import com.nononsenseapps.feeder.model.*
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
@@ -33,6 +35,11 @@ import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
 import com.nononsenseapps.feeder.util.*
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
 import java.io.File
@@ -42,10 +49,10 @@ const val ARG_FEED_TITLE = "feed_title"
 const val ARG_FEED_URL = "feed_url"
 const val ARG_FEED_TAG = "feed_tag"
 
+@FlowPreview
+@ExperimentalCoroutinesApi
 class FeedFragment : KodeinAwareFragment() {
     internal lateinit var swipeRefreshLayout: SwipeRefreshLayout
-
-    private val syncReceiver: BroadcastReceiver
 
     private var id: Long = ID_UNSET
     private var title: String? = ""
@@ -67,13 +74,13 @@ class FeedFragment : KodeinAwareFragment() {
 
     private lateinit var liveDbPreviews: LiveData<PagedList<PreviewItem>>
 
+    private val currentlySyncing: ConflatedBroadcastChannel<Boolean> by instance(tag = CURRENTLY_SYNCING_STATE)
+
     init {
-        // Listens on sync broadcasts
-        syncReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (SYNC_BROADCAST == intent.action) {
-                    onSyncBroadcast(intent.getBooleanExtra(SYNC_BROADCAST_IS_ACTIVE, false))
-                }
+        // Listens on sync state changes
+        lifecycleScope.launchWhenResumed {
+            currentlySyncing.asFlow().collect {
+                onSyncStateChanged(it)
             }
         }
     }
@@ -335,7 +342,7 @@ class FeedFragment : KodeinAwareFragment() {
     }
 
 
-    private fun onSyncBroadcast(syncing: Boolean) {
+    private fun onSyncStateChanged(syncing: Boolean) {
         // Background syncs will only disable the animation, never start it
         if (!syncing) {
             if (swipeRefreshLayout.isRefreshing != syncing) {
@@ -351,20 +358,6 @@ class FeedFragment : KodeinAwareFragment() {
         (activity as FeedActivity).fabOnClickListener = {
             markAsRead()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Listen on broadcasts
-        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(activity!!).registerReceiver(syncReceiver,
-                IntentFilter(SYNC_BROADCAST))
-    }
-
-    override fun onPause() {
-        // Unregister receiver
-        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(activity!!).unregisterReceiver(syncReceiver)
-        swipeRefreshLayout.isRefreshing = false
-        super.onPause()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
