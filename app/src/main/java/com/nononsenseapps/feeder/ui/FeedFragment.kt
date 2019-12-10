@@ -23,8 +23,6 @@ import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareFragment
-import com.nononsenseapps.feeder.db.room.FeedDao
-import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.di.CURRENTLY_SYNCING_STATE
@@ -64,10 +62,9 @@ class FeedFragment : KodeinAwareFragment() {
     private var notify = false
 
     private val feedViewModel: FeedViewModel by instance(arg = this)
+    private val feedItemViewModel: FeedItemViewModel by instance(arg = this)
     private val feedItemsViewModel: FeedItemsViewModel by instance(arg = this)
 
-    private val feedDao: FeedDao by instance()
-    private val feedItemDao: FeedItemDao by instance()
     private val prefs: Prefs by instance()
 
     private val ephemeralState: EphemeralState by instance()
@@ -95,7 +92,7 @@ class FeedFragment : KodeinAwareFragment() {
 
             arguments.getLongArray(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)?.let {
                 lifecycleScope.launch {
-                    feedItemDao.markAsNotified(it.toList())
+                    feedItemsViewModel.markAsNotified(it.toList())
                 }
             }
         }
@@ -205,43 +202,46 @@ class FeedFragment : KodeinAwareFragment() {
         emptyOpenFeeds.setOnClickListener { (activity as FeedActivity).openNavDrawer() }
 
         // specify an adapter
-        val adapter = FeedItemPagedListAdapter(activity!!, object : ActionCallback {
-            override fun coroutineScope(): CoroutineScope {
-                return lifecycleScope
-            }
+        val adapter = FeedItemPagedListAdapter(
+                activity!!,
+                feedItemViewModel,
+                object : ActionCallback {
+                    override fun coroutineScope(): CoroutineScope {
+                        return lifecycleScope
+                    }
 
-            override fun onDismiss(item: PreviewItem?) {
-                item?.let {
-                    lifecycleScope.launch { feedItemsViewModel.toggleReadState(it) }
-                }
-            }
-
-            override fun onSwipeStarted() {
-                // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
-                swipeRefreshLayout.isEnabled = false
-            }
-
-            override fun onSwipeCancelled() {
-                // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
-                swipeRefreshLayout.isEnabled = true
-            }
-
-            override fun markBelowAsRead(position: Int) {
-                recyclerView.adapter?.let { adapter ->
-                    lifecycleScope.launch {
-                        if (position > NO_POSITION) {
-                            val ids = ((position + 1) until adapter.itemCount)
-                                    .asSequence()
-                                    .map {
-                                        adapter.getItemId(it)
-                                    }
-                                    .toList()
-                            feedItemDao.markAsRead(ids)
+                    override fun onDismiss(item: PreviewItem?) {
+                        item?.let {
+                            lifecycleScope.launch { feedItemsViewModel.toggleReadState(it) }
                         }
                     }
-                }
-            }
-        }).also {
+
+                    override fun onSwipeStarted() {
+                        // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
+                        swipeRefreshLayout.isEnabled = false
+                    }
+
+                    override fun onSwipeCancelled() {
+                        // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
+                        swipeRefreshLayout.isEnabled = true
+                    }
+
+                    override fun markBelowAsRead(position: Int) {
+                        recyclerView.adapter?.let { adapter ->
+                            lifecycleScope.launch {
+                                if (position > NO_POSITION) {
+                                    val ids = ((position + 1) until adapter.itemCount)
+                                            .asSequence()
+                                            .map {
+                                                adapter.getItemId(it)
+                                            }
+                                            .toList()
+                                    feedItemsViewModel.markAsRead(ids)
+                                }
+                            }
+                        }
+                    }
+                }).also {
             it.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                 var firstInsertion = true
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -311,7 +311,7 @@ class FeedFragment : KodeinAwareFragment() {
 
                 activity?.let { activity ->
                     feedTag?.let { feedTag ->
-                        feedDao.loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
+                        feedViewModel.loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
                             it.fold(true) { a, b -> a && b }
                                     .let { notify ->
                                         this.notify = notify
@@ -326,7 +326,7 @@ class FeedFragment : KodeinAwareFragment() {
                 (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
                 activity?.let { activity ->
-                    feedDao.loadLiveFeedsNotify().observe(this, Observer {
+                    feedViewModel.loadLiveFeedsNotify().observe(this, Observer {
                         it.fold(true) { a, b -> a && b }
                                 .let { notify ->
                                     this.notify = notify
@@ -413,11 +413,10 @@ class FeedFragment : KodeinAwareFragment() {
             lifecycleScope.launch {
                 // Set as notified so we don't spam
                 feedItemsViewModel.markAsNotified(feedId = feedId, tag = feedTag ?: "")
-                val dao: FeedDao by instance()
                 when {
-                    feedId > ID_UNSET -> dao.setNotify(feedId, on)
-                    feedId == ID_ALL_FEEDS -> dao.setAllNotify(on)
-                    feedTag?.isNotEmpty() == true -> dao.setNotify(feedTag, on)
+                    feedId > ID_UNSET -> feedViewModel.setNotify(feedId, on)
+                    feedId == ID_ALL_FEEDS -> feedViewModel.setAllNotify(on)
+                    feedTag?.isNotEmpty() == true -> feedViewModel.setNotify(feedTag, on)
                 }
             }
         }

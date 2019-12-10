@@ -18,7 +18,7 @@ import androidx.navigation.Navigation.findNavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.util.*
 import kotlinx.coroutines.CoroutineScope
@@ -32,8 +32,11 @@ import org.kodein.di.generic.instance
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
-class FeedItemHolder(val view: View, private val actionCallback: ActionCallback) :
-        ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener, KodeinAware,
+class FeedItemHolder(
+        val view: View,
+        private val feedItemViewModel: FeedItemViewModel,
+        private val actionCallback: ActionCallback
+) : ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener, KodeinAware,
         View.OnCreateContextMenuListener {
     private val TAG = "FeedItemHolder"
     private val titleTextView: TextView = view.findViewById(R.id.story_snippet)
@@ -48,7 +51,6 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
     var rssItem: PreviewItem? = null
 
     override val kodein: Kodein by closestKodein(view.context)
-    val feedItemDao: FeedItemDao by instance()
     val prefs: Prefs by instance()
 
     init {
@@ -176,7 +178,7 @@ class FeedItemHolder(val view: View, private val actionCallback: ActionCallback)
                     // Mark as read
                     rssItem?.id?.let {
                         actionCallback.coroutineScope().launch(Dispatchers.Default) {
-                            feedItemDao.markAsRead(it)
+                            feedItemViewModel.markAsRead(it)
                         }
                     }
 

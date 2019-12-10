@@ -10,8 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareActivity
 import com.nononsenseapps.feeder.db.COL_LINK
-import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
 import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
@@ -23,7 +23,7 @@ import org.kodein.di.generic.instance
  * If link is null, then item is only marked as read and notified.
  */
 class OpenLinkInDefaultActivity : KodeinAwareActivity() {
-    val feedItemDao: FeedItemDao by instance()
+    private val feedItemViewModel: FeedItemViewModel by instance(arg = this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +33,7 @@ class OpenLinkInDefaultActivity : KodeinAwareActivity() {
             val link: String? = intent.data?.getQueryParameter(COL_LINK)
 
             lifecycleScope.launch {
-                feedItemDao.markAsReadAndNotified(id)
+                feedItemViewModel.markAsReadAndNotified(id)
                 cancelNotification(this@OpenLinkInDefaultActivity, id)
             }
 

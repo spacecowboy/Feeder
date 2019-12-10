@@ -39,8 +39,10 @@ android {
     // Export Room schemas
     javaCompileOptions {
       annotationProcessorOptions {
-        arguments = ["room.schemaLocation":
-                         "$projectDir/schemas".toString()]
+        arguments = [
+                "room.schemaLocation": "$projectDir/schemas".toString(),
+                "room.incremental"   : "true"
+        ]
       }
     }
   }
@@ -173,6 +175,7 @@ dependencies {
   // tests
   testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+  testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
   testImplementation "junit:junit:4.12"
   testImplementation "org.mockito:mockito-core:$mockito_version"
   testImplementation "io.mockk:mockk:$mockk_version"
@@ -181,6 +184,7 @@ dependencies {
 
   androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+  androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
   androidTestImplementation "io.mockk:mockk-android:1.8.10.kotlin13"
   androidTestImplementation "junit:junit:4.12"
   androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"

@@ -14,7 +14,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareFragment
-import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
@@ -48,7 +47,6 @@ class ReaderFragment : KodeinAwareFragment() {
     private var rssItem: FeedItemWithFeed? = null
     private lateinit var titleTextView: TextView
 
-    private val feedItemDao: FeedItemDao by instance()
     private val viewModel: FeedItemViewModel by instance(arg = this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +61,7 @@ class ReaderFragment : KodeinAwareFragment() {
             val appContext = context?.applicationContext
             appContext?.let {
                 lifecycleScope.launch {
-                    feedItemDao.markAsReadAndNotified(itemId)
+                    viewModel.markAsReadAndNotified(itemId)
                     cancelNotification(it, itemId)
                 }
             }
@@ -228,7 +226,7 @@ class ReaderFragment : KodeinAwareFragment() {
             }
             R.id.action_mark_as_unread -> {
                 lifecycleScope.launch {
-                    feedItemDao.markAsRead(_id, unread = true)
+                    viewModel.markAsRead(_id, unread = true)
                 }
                 true
             }

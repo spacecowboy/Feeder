@@ -1,9 +1,8 @@
 package com.nononsenseapps.feeder.db.room
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.nononsenseapps.feeder.model.FeedUnreadCount
-import org.joda.time.DateTime
+import kotlinx.coroutines.flow.Flow
 import java.net.URL
 
 @Dao
@@ -22,7 +21,7 @@ interface FeedDao {
     suspend fun deleteFeedWithId(feedId: Long)
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
-    fun loadLiveFeed(feedId: Long): LiveData<Feed>
+    fun loadLiveFeed(feedId: Long): Flow<Feed>
 
     @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
     suspend fun loadTags(): List<String>
@@ -44,10 +43,10 @@ interface FeedDao {
     suspend fun loadFeedsIfStale(tag: String, staleTime: Long): List<Feed>
 
     @Query("SELECT notify FROM feeds WHERE tag IS :tag")
-    fun loadLiveFeedsNotify(tag: String): LiveData<List<Boolean>>
+    fun loadLiveFeedsNotify(tag: String): Flow<List<Boolean>>
 
     @Query("SELECT notify FROM feeds")
-    fun loadLiveFeedsNotify(): LiveData<List<Boolean>>
+    fun loadLiveFeedsNotify(): Flow<List<Boolean>>
 
     @Query("SELECT * FROM feeds")
     suspend fun loadFeeds(): List<Feed>
@@ -71,7 +70,7 @@ interface FeedDao {
         )
         ON feeds.id = feed_id
     """)
-    fun loadLiveFeedsWithUnreadCounts(): LiveData<List<FeedUnreadCount>>
+    fun loadLiveFeedsWithUnreadCounts(): Flow<List<FeedUnreadCount>>
 
     @Query("UPDATE feeds SET notify = :notify WHERE id IS :id")
     suspend fun setNotify(id: Long, notify: Boolean)
@@ -81,9 +80,6 @@ interface FeedDao {
 
     @Query("UPDATE feeds SET notify = :notify")
     suspend fun setAllNotify(notify: Boolean)
-
-    @Query("SELECT last_sync FROM feeds ORDER BY last_sync DESC LIMIT 1")
-    fun getLastSyncTime(): LiveData<DateTime?>
 }
 
 /**

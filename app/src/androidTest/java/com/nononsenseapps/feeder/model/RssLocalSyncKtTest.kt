@@ -8,6 +8,7 @@ import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -28,6 +29,7 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class RssLocalSyncKtTest {

@@ -83,6 +83,9 @@ class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
             emit(SpannableString("Could not read blob for item with id [$id]"))
         }
     }
+
+    suspend fun markAsRead(id: Long, unread: Boolean = false) = dao.markAsRead(id = id, unread = unread)
+    suspend fun markAsReadAndNotified(id: Long) = dao.markAsReadAndNotified(id = id)
 }
 
 internal fun Activity.maxImageSize(): Point {

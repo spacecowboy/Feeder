@@ -14,10 +14,9 @@ import androidx.lifecycle.lifecycleScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareActivity
 import com.nononsenseapps.feeder.db.URI_FEEDS
-import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.model.FeedParser
+import com.nononsenseapps.feeder.model.FeedViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
@@ -66,6 +65,7 @@ class EditFeedActivity : KodeinAwareActivity() {
 
     private val settingsViewModel: SettingsViewModel by instance(arg = this)
     private val feedParser: FeedParser by instance()
+    private val feedViewModel: FeedViewModel by instance(arg = this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (shouldBeFloatingWindow()) {
@@ -129,8 +129,6 @@ class EditFeedActivity : KodeinAwareActivity() {
             false
         })
 
-        val dao: FeedDao by instance()
-
         val addButton = findViewById<Button>(R.id.add_button)
         addButton.setOnClickListener { _ ->
             // TODO error checking and stuff like that
@@ -150,7 +148,7 @@ class EditFeedActivity : KodeinAwareActivity() {
             )
 
             lifecycleScope.launch {
-                val feedId: Long? = dao.upsertFeed(feed)
+                val feedId: Long? = feedViewModel.upsertFeed(feed)
 
                 feedId?.let {
                     requestFeedSync(kodein, feedId, ignoreConnectivitySettings = false, forceNetwork = true)
@@ -220,7 +218,7 @@ class EditFeedActivity : KodeinAwareActivity() {
 
         // Create an adapter
         lifecycleScope.launchWhenCreated {
-            val data = dao.loadTags()
+            val data = feedViewModel.loadTags()
 
             val tagsAdapter = ArrayAdapter<String>(this@EditFeedActivity,
                     android.R.layout.simple_list_item_1,
@@ -236,7 +234,7 @@ class EditFeedActivity : KodeinAwareActivity() {
         super.onStart()
 
         settingsViewModel.liveThemePreference.observe(this, androidx.lifecycle.Observer {
-            delegate.setLocalNightMode(it)
+            delegate.localNightMode = it
         })
     }
 

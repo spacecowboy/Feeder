@@ -1,25 +1,27 @@
 package com.nononsenseapps.feeder.model
 
 import androidx.collection.ArrayMap
-import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
+import kotlin.collections.set
 
-class FeedListViewModel(kodein: Kodein): KodeinAwareViewModel(kodein) {
+@ExperimentalCoroutinesApi
+class FeedListViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     private val dao: FeedDao by instance()
-    private val liveFeedsWithUnreadCounts = dao.loadLiveFeedsWithUnreadCounts()
+    private val feedsWithUnreadCounts = dao.loadLiveFeedsWithUnreadCounts()
 
-    val liveFeedsAndTagsWithUnreadCounts = MediatorLiveData<List<FeedUnreadCount>>()
-
-    init {
-        liveFeedsAndTagsWithUnreadCounts.addSource(liveFeedsWithUnreadCounts) { feeds ->
-            viewModelScope.launch(Dispatchers.Default) {
+    val liveFeedsAndTagsWithUnreadCounts: LiveData<List<FeedUnreadCount>> by lazy {
+        liveData<List<FeedUnreadCount>>(viewModelScope.coroutineContext + Dispatchers.Default, 5000L) {
+            feedsWithUnreadCounts.collectLatest { feeds ->
                 val topTag = FeedUnreadCount(id = ID_ALL_FEEDS)
                 val tags: MutableMap<String, FeedUnreadCount> = ArrayMap()
                 val data: MutableList<FeedUnreadCount> = mutableListOf(topTag)
@@ -44,7 +46,7 @@ class FeedListViewModel(kodein: Kodein): KodeinAwareViewModel(kodein) {
 
                 data.sortWith(Comparator { a, b -> a.compareTo(b) })
 
-                liveFeedsAndTagsWithUnreadCounts.postValue(data)
+                emit(data)
             }
         }
     }
