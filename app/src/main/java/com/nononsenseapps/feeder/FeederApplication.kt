@@ -18,6 +18,7 @@ import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import org.conscrypt.Conscrypt
@@ -29,6 +30,7 @@ import org.kodein.di.generic.singleton
 import java.io.File
 import java.security.Security
 
+@ExperimentalCoroutinesApi
 @Suppress("unused")
 class FeederApplication : MultiDexApplication(), KodeinAware {
     override val kodein by Kodein.lazy {

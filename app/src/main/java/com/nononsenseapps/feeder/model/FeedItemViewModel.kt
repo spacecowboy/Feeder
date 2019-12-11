@@ -7,6 +7,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ImageSpan
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.R
@@ -32,56 +33,72 @@ class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     private val prefs: Prefs by instance()
     val context: Application by kodein.instance()
 
-    fun getLiveItem(id: Long): LiveData<FeedItemWithFeed> = dao.loadLiveFeedItem(id)
+    private lateinit var liveItem: LiveData<FeedItemWithFeed> /*by lazy { dao.loadLiveFeedItem(id) }*/
+
+    fun getLiveItem(id: Long): LiveData<FeedItemWithFeed> {
+        if (!this::liveItem.isInitialized) {
+            liveItem = dao.loadLiveFeedItem(id).asLiveData()
+        }
+        return liveItem
+    }
+
+    private lateinit var liveImageText: LiveData<Spanned>
 
     fun getLiveImageText(
             id: Long,
             maxImageSize: Point,
             urlClickListener: UrlClickListener?
-    ) = liveData(context = viewModelScope.coroutineContext) {
-        // TODO resources
-        emit(SpannableString("Loading..."))
+    ): LiveData<Spanned> {
+        if (!this::liveImageText.isInitialized) {
+            liveImageText = liveData(context = viewModelScope.coroutineContext) {
+                // TODO resources
+                emit(SpannableString("Loading..."))
 
-        try {
-            withContext(Dispatchers.IO) {
-                val allowDownload = prefs.shouldLoadImages()
-                val feedUrl = dao.loadFeedUrlOfFeedItem(id = id) ?: URL("https://missing.feedurl")
+                try {
+                    withContext(Dispatchers.IO) {
+                        val allowDownload = prefs.shouldLoadImages()
+                        val feedUrl = dao.loadFeedUrlOfFeedItem(id = id)
+                                ?: URL("https://missing.feedurl")
 
-                val noImages = blobInputStream(
-                        itemId = id,
-                        filesDir = context.filesDir
-                ).bufferedReader().use { reader ->
-                    toSpannedWithNoImages(
-                            kodein = kodein,
-                            source = reader,
-                            siteUrl = feedUrl,
-                            maxSize = maxImageSize,
-                            urlClickListener = urlClickListener
-                    )
-                }
-                emit(noImages)
+                        val noImages = blobInputStream(
+                                itemId = id,
+                                filesDir = context.filesDir
+                        ).bufferedReader().use { reader ->
+                            toSpannedWithNoImages(
+                                    kodein = kodein,
+                                    source = reader,
+                                    siteUrl = feedUrl,
+                                    maxSize = maxImageSize,
+                                    urlClickListener = urlClickListener
+                            )
+                        }
+                        emit(noImages)
 
-                if (noImages.getAllImageSpans().isNotEmpty()) {
-                    val withImages = blobInputStream(
-                            itemId = id,
-                            filesDir = context.filesDir
-                    ).bufferedReader().use { reader ->
-                        toSpannedWithImages(
-                                kodein = kodein,
-                                source = reader,
-                                siteUrl = feedUrl,
-                                maxSize = maxImageSize,
-                                allowDownload = allowDownload,
-                                urlClickListener = urlClickListener
-                        )
+                        if (noImages.getAllImageSpans().isNotEmpty()) {
+                            val withImages = blobInputStream(
+                                    itemId = id,
+                                    filesDir = context.filesDir
+                            ).bufferedReader().use { reader ->
+                                toSpannedWithImages(
+                                        kodein = kodein,
+                                        source = reader,
+                                        siteUrl = feedUrl,
+                                        maxSize = maxImageSize,
+                                        allowDownload = allowDownload,
+                                        urlClickListener = urlClickListener
+                                )
+                            }
+                            emit(withImages)
+                        }
                     }
-                    emit(withImages)
+                } catch (e: IOException) {
+                    // TODO resources
+                    emit(SpannableString("Could not read blob for item with id [$id]"))
                 }
             }
-        } catch (e: IOException) {
-            // TODO resources
-            emit(SpannableString("Could not read blob for item with id [$id]"))
         }
+
+        return liveImageText
     }
 
     suspend fun markAsRead(id: Long, unread: Boolean = false) = dao.markAsRead(id = id, unread = unread)

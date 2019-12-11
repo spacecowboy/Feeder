@@ -1,12 +1,12 @@
 package com.nononsenseapps.feeder.db.room
 
-import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
+import kotlinx.coroutines.flow.Flow
 import java.net.URL
 
 @Dao
@@ -61,7 +61,7 @@ interface FeedItemDao {
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_items.id IS :id
         """)
-    fun loadLiveFeedItem(id: Long): LiveData<FeedItemWithFeed>
+    fun loadLiveFeedItem(id: Long): Flow<FeedItemWithFeed>
 
     @Query("""
         SELECT $previewColumns

@@ -62,7 +62,6 @@ class FeedFragment : KodeinAwareFragment() {
     private var notify = false
 
     private val feedViewModel: FeedViewModel by instance(arg = this)
-    private val feedItemViewModel: FeedItemViewModel by instance(arg = this)
     private val feedItemsViewModel: FeedItemsViewModel by instance(arg = this)
 
     private val prefs: Prefs by instance()
@@ -91,7 +90,7 @@ class FeedFragment : KodeinAwareFragment() {
             feedTag = arguments.getString(ARG_FEED_TAG)
 
             arguments.getLongArray(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)?.let {
-                lifecycleScope.launch {
+                lifecycleScope.launchWhenCreated {
                     feedItemsViewModel.markAsNotified(it.toList())
                 }
             }
@@ -204,7 +203,7 @@ class FeedFragment : KodeinAwareFragment() {
         // specify an adapter
         val adapter = FeedItemPagedListAdapter(
                 activity!!,
-                feedItemViewModel,
+                feedItemsViewModel,
                 object : ActionCallback {
                     override fun coroutineScope(): CoroutineScope {
                         return lifecycleScope
@@ -306,27 +305,11 @@ class FeedFragment : KodeinAwareFragment() {
                     }
                 })
             }
-            id == ID_UNSET -> { // Load notification settings for tag
-                (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
-
-                activity?.let { activity ->
-                    feedTag?.let { feedTag ->
-                        feedViewModel.loadLiveFeedsNotify(tag = feedTag).observe(this, Observer {
-                            it.fold(true) { a, b -> a && b }
-                                    .let { notify ->
-                                        this.notify = notify
-                                        // Update state of notification toggle
-                                        activity.invalidateOptionsMenu()
-                                    }
-                        })
-                    }
-                }
-            }
             else -> { // Load notification settings for all
                 (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
                 activity?.let { activity ->
-                    feedViewModel.loadLiveFeedsNotify().observe(this, Observer {
+                    feedViewModel.getLiveFeedsNotify(id, feedTag ?: "").observe(this, Observer {
                         it.fold(true) { a, b -> a && b }
                                 .let { notify ->
                                     this.notify = notify
@@ -415,8 +398,8 @@ class FeedFragment : KodeinAwareFragment() {
                 feedItemsViewModel.markAsNotified(feedId = feedId, tag = feedTag ?: "")
                 when {
                     feedId > ID_UNSET -> feedViewModel.setNotify(feedId, on)
-                    feedId == ID_ALL_FEEDS -> feedViewModel.setAllNotify(on)
-                    feedTag?.isNotEmpty() == true -> feedViewModel.setNotify(feedTag, on)
+                    feedId == ID_UNSET && feedTag?.isNotEmpty() == true -> feedViewModel.setNotify(feedTag, on)
+                    else -> feedViewModel.setAllNotify(on)
                 }
             }
         }
@@ -484,8 +467,7 @@ class FeedFragment : KodeinAwareFragment() {
                 val appContext = activity?.applicationContext
                 if (appContext != null) {
                     lifecycleScope.launch {
-                        feedViewModel.deleteFeedWithId(feedId)
-
+                        feedViewModel.deleteFeed(feedId)
                         // Remove from shortcuts
                         appContext.removeDynamicShortcutToFeed(feedId)
                     }

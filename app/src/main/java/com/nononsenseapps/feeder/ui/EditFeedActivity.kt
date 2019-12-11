@@ -14,9 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareActivity
 import com.nononsenseapps.feeder.db.URI_FEEDS
+import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.model.FeedParser
-import com.nononsenseapps.feeder.model.FeedViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
@@ -37,6 +38,7 @@ import java.net.URL
 const val TEMPLATE = "template"
 
 
+@ExperimentalCoroutinesApi
 class EditFeedActivity : KodeinAwareActivity() {
     private var id: Long = ID_UNSET
     // Views and shit
@@ -65,7 +67,7 @@ class EditFeedActivity : KodeinAwareActivity() {
 
     private val settingsViewModel: SettingsViewModel by instance(arg = this)
     private val feedParser: FeedParser by instance()
-    private val feedViewModel: FeedViewModel by instance(arg = this)
+    private val feedDao: FeedDao by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (shouldBeFloatingWindow()) {
@@ -148,7 +150,7 @@ class EditFeedActivity : KodeinAwareActivity() {
             )
 
             lifecycleScope.launch {
-                val feedId: Long? = feedViewModel.upsertFeed(feed)
+                val feedId: Long? = feedDao.upsertFeed(feed)
 
                 feedId?.let {
                     requestFeedSync(kodein, feedId, ignoreConnectivitySettings = false, forceNetwork = true)
@@ -218,7 +220,7 @@ class EditFeedActivity : KodeinAwareActivity() {
 
         // Create an adapter
         lifecycleScope.launchWhenCreated {
-            val data = feedViewModel.loadTags()
+            val data = feedDao.loadTags()
 
             val tagsAdapter = ArrayAdapter<String>(this@EditFeedActivity,
                     android.R.layout.simple_list_item_1,

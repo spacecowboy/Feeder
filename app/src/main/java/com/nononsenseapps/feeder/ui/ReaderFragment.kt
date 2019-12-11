@@ -60,8 +60,8 @@ class ReaderFragment : KodeinAwareFragment() {
             val itemId = _id
             val appContext = context?.applicationContext
             appContext?.let {
-                lifecycleScope.launch {
-                    viewModel.markAsReadAndNotified(itemId)
+                lifecycleScope.launchWhenResumed {
+                    viewModel.markAsReadAndNotified(_id)
                     cancelNotification(it, itemId)
                 }
             }
@@ -85,53 +85,54 @@ class ReaderFragment : KodeinAwareFragment() {
         val authorTextView = rootView.findViewById<TextView>(R.id.story_author)
         val feedTitleTextView = rootView.findViewById<TextView>(R.id.story_feedtitle)
 
-        viewModel.getLiveItem(_id).observe(this, androidx.lifecycle.Observer {
-            rssItem = it
+        lifecycleScope.launchWhenCreated {
+            viewModel.getLiveItem(_id).observe(this@ReaderFragment, androidx.lifecycle.Observer {
+                rssItem = it
 
-            rssItem?.let { rssItem ->
-                setViewTitle(rssItem)
+                rssItem?.let { rssItem ->
+                    setViewTitle(rssItem)
 
-                rssItem.feedId?.let { feedId ->
-                    feedTitleTextView.setOnClickListener {
-                        findNavController().navigate(R.id.action_readerFragment_to_feedFragment, bundle {
-                            putLong(ARG_FEED_ID, feedId)
-                        })
-                    }
-                }
-
-                feedTitleTextView.text = rssItem.feedDisplayTitle
-
-                rssItem.pubDate.let { pubDate ->
-                    rssItem.author.let { author ->
-                        when {
-                            author == null && pubDate != null ->
-                                authorTextView.text = getString(R.string.on_date,
-                                        pubDate.withZone(DateTimeZone.getDefault())
-                                                .toString(dateTimeFormat))
-                            author != null && pubDate != null ->
-                                authorTextView.text = getString(R.string.by_author_on_date,
-                                        // Must wrap author in unicode marks to ensure it formats
-                                        // correctly in RTL
-                                        unicodeWrap(author),
-                                        pubDate.withZone(DateTimeZone.getDefault())
-                                                .toString(dateTimeFormat))
-                            else -> authorTextView.visibility = View.GONE
+                    rssItem.feedId?.let { feedId ->
+                        feedTitleTextView.setOnClickListener {
+                            findNavController().navigate(R.id.action_readerFragment_to_feedFragment, bundle {
+                                putLong(ARG_FEED_ID, feedId)
+                            })
                         }
                     }
+
+                    feedTitleTextView.text = rssItem.feedDisplayTitle
+
+                    rssItem.pubDate.let { pubDate ->
+                        rssItem.author.let { author ->
+                            when {
+                                author == null && pubDate != null ->
+                                    authorTextView.text = getString(R.string.on_date,
+                                            pubDate.withZone(DateTimeZone.getDefault())
+                                                    .toString(dateTimeFormat))
+                                author != null && pubDate != null ->
+                                    authorTextView.text = getString(R.string.by_author_on_date,
+                                            // Must wrap author in unicode marks to ensure it formats
+                                            // correctly in RTL
+                                            unicodeWrap(author),
+                                            pubDate.withZone(DateTimeZone.getDefault())
+                                                    .toString(dateTimeFormat))
+                                else -> authorTextView.visibility = View.GONE
+                            }
+                        }
+                    }
+
+                    // Update state of notification toggle
+                    activity?.invalidateOptionsMenu()
                 }
+            })
 
-                // Update state of notification toggle
-                activity?.invalidateOptionsMenu()
-            }
-        })
-
-        viewModel.getLiveImageText(_id, activity!!.maxImageSize(), urlClickListener()).observe(
-                this,
-                androidx.lifecycle.Observer {
-                    bodyTextView.text = it
-                }
-        )
-
+            viewModel.getLiveImageText(_id, activity!!.maxImageSize(), urlClickListener()).observe(
+                    this@ReaderFragment,
+                    androidx.lifecycle.Observer {
+                        bodyTextView.text = it
+                    }
+            )
+        }
         return rootView
     }
 

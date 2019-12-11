@@ -45,6 +45,9 @@ interface FeedDao {
     @Query("SELECT notify FROM feeds WHERE tag IS :tag")
     fun loadLiveFeedsNotify(tag: String): Flow<List<Boolean>>
 
+    @Query("SELECT notify FROM feeds WHERE id IS :feedId")
+    fun loadLiveFeedsNotify(feedId: Long): Flow<List<Boolean>>
+
     @Query("SELECT notify FROM feeds")
     fun loadLiveFeedsNotify(): Flow<List<Boolean>>
 

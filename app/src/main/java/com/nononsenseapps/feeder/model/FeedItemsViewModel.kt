@@ -22,30 +22,38 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
         liveOnlyUnread.value = true
     }
 
+    private lateinit var livePagedAll: LiveData<PagedList<PreviewItem>>
+    private lateinit var livePagedUnread: LiveData<PagedList<PreviewItem>>
+    private lateinit var livePreviews: LiveData<PagedList<PreviewItem>>
+
     fun getLiveDbPreviews(feedId: Long, tag: String): LiveData<PagedList<PreviewItem>> {
-        val livePagedAll = LivePagedListBuilder(
-                when {
-                    feedId > ID_UNSET -> dao.loadLivePreviews(feedId = feedId)
-                    feedId == ID_ALL_FEEDS -> dao.loadLivePreviews()
-                    tag.isNotEmpty() -> dao.loadLivePreviews(tag = tag)
-                    else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
-                }, PAGE_SIZE).build()
+        if (!this::livePreviews.isInitialized) {
+            livePagedAll = LivePagedListBuilder(
+                    when {
+                        feedId > ID_UNSET -> dao.loadLivePreviews(feedId = feedId)
+                        feedId == ID_ALL_FEEDS -> dao.loadLivePreviews()
+                        tag.isNotEmpty() -> dao.loadLivePreviews(tag = tag)
+                        else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
+                    }, PAGE_SIZE).build()
 
-        val livePagedUnread = LivePagedListBuilder(
-                when {
-                    feedId > ID_UNSET -> dao.loadLiveUnreadPreviews(feedId = feedId)
-                    feedId == ID_ALL_FEEDS -> dao.loadLiveUnreadPreviews()
-                    tag.isNotEmpty() -> dao.loadLiveUnreadPreviews(tag = tag)
-                    else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
-                }, PAGE_SIZE).build()
 
-        return Transformations.switchMap(liveOnlyUnread) { onlyUnread ->
-            if (onlyUnread) {
-                livePagedUnread
-            } else {
-                livePagedAll
+            livePagedUnread = LivePagedListBuilder(
+                    when {
+                        feedId > ID_UNSET -> dao.loadLiveUnreadPreviews(feedId = feedId)
+                        feedId == ID_ALL_FEEDS -> dao.loadLiveUnreadPreviews()
+                        tag.isNotEmpty() -> dao.loadLiveUnreadPreviews(tag = tag)
+                        else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
+                    }, PAGE_SIZE).build()
+
+            livePreviews = Transformations.switchMap(liveOnlyUnread) { onlyUnread ->
+                if (onlyUnread) {
+                    livePagedUnread
+                } else {
+                    livePagedAll
+                }
             }
         }
+        return livePreviews
     }
 
     fun setOnlyUnread(onlyUnread: Boolean) {
@@ -77,4 +85,7 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
 
     suspend fun markAsRead(ids: List<Long>, unread: Boolean = false) =
             dao.markAsRead(ids = ids, unread = unread)
+
+    suspend fun markAsRead(id: Long, unread: Boolean = false) =
+            dao.markAsRead(id = id, unread = unread)
 }

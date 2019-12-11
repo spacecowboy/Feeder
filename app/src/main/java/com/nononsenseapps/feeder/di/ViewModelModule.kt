@@ -12,10 +12,11 @@ import org.kodein.di.generic.singleton
 @ExperimentalCoroutinesApi
 val viewModelModule = Kodein.Module(name = "view models") {
     bind<KodeinAwareViewModelFactory>() with singleton { KodeinAwareViewModelFactory(kodein) }
-    bindWithKodeinAwareViewModelFactory<FeedViewModel>()
-    bindWithKodeinAwareViewModelFactory<FeedItemViewModel>()
     bindWithKodeinAwareViewModelFactory<FeedItemsViewModel>()
     bindWithKodeinAwareViewModelFactory<FeedListViewModel>()
     bindWithKodeinAwareViewModelFactory<SettingsViewModel>()
+    bindWithKodeinAwareViewModelFactory<FeedItemViewModel>()
+    bindWithKodeinAwareViewModelFactory<FeedViewModel>()
+
     bind<EphemeralState>() with activityViewModelProvider()
 }

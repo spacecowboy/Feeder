@@ -25,6 +25,7 @@ import com.nononsenseapps.feeder.util.bundle
 import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.android.synthetic.main.app_bar_navigation.*
 import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.kodein.di.generic.instance
 
 const val EXPORT_OPML_CODE = 101
@@ -33,6 +34,7 @@ const val EDIT_FEED_CODE = 103
 
 const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
+@ExperimentalCoroutinesApi
 class FeedActivity : KodeinAwareActivity() {
     private lateinit var navAdapter: FeedsAdapter
     private val navController: NavController by lazy {

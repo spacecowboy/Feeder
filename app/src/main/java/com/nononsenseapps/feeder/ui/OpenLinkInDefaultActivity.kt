@@ -23,14 +23,14 @@ import org.kodein.di.generic.instance
  * If link is null, then item is only marked as read and notified.
  */
 class OpenLinkInDefaultActivity : KodeinAwareActivity() {
-    private val feedItemViewModel: FeedItemViewModel by instance(arg = this)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         intent?.let { intent ->
             val id: Long = intent.data?.lastPathSegment?.toLong() ?: ID_UNSET
             val link: String? = intent.data?.getQueryParameter(COL_LINK)
+
+            val feedItemViewModel: FeedItemViewModel by instance()
 
             lifecycleScope.launch {
                 feedItemViewModel.markAsReadAndNotified(id)

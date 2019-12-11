@@ -29,7 +29,7 @@ class KodeinAwareViewModelFactory(override val kodein: Kodein)
             try {
                 modelClass.getConstructor(Kodein::class.java).newInstance(kodein)
             } catch (e: NoSuchMethodException) {
-                throw RuntimeException("Cannot create an instance of $modelClass", e)
+                throw RuntimeException("No such constructor $modelClass", e)
             } catch (e: IllegalAccessException) {
                 throw RuntimeException("Cannot create an instance of $modelClass", e)
             } catch (e: InstantiationException) {

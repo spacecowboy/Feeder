@@ -12,7 +12,7 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.FeedItemViewModel
+import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.PreviewItem
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
@@ -21,7 +21,7 @@ import java.util.*
 
 class FeedItemPagedListAdapter(
         private val context: Context,
-        private val feedItemViewModel: FeedItemViewModel,
+        private val feedItemsViewModel: FeedItemsViewModel,
         private val actionCallback: ActionCallback
 ) :
         PagedListAdapter<PreviewItem, RecyclerView.ViewHolder>(PreviewItemDiffer) {
@@ -53,7 +53,7 @@ class FeedItemPagedListAdapter(
                                     parent,
                                     false
                             ),
-                    feedItemViewModel,
+                    feedItemsViewModel,
                     actionCallback
             )
 
