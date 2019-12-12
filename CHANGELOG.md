@@ -1,3 +1,7 @@
+# 1.8.27
+
+Minor bug fixes and tweaks.
+
 # 1.8.26
 *   Stores feed content primarily in files instead of database
     See !209 #227
