@@ -14,11 +14,13 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.PreviewItem
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import java.util.*
 
+@ExperimentalCoroutinesApi
 class FeedItemPagedListAdapter(
         private val context: Context,
         private val feedItemsViewModel: FeedItemsViewModel,

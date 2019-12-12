@@ -11,6 +11,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.util.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 const val DATABASE_NAME = "rssDatabase"
 const val ID_UNSET: Long = 0
@@ -30,6 +31,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun feedDao(): FeedDao
     abstract fun feedItemDao(): FeedItemDao
 
+    @ExperimentalCoroutinesApi
     companion object {
         // For Singleton instantiation
         @Volatile
@@ -56,6 +58,7 @@ abstract class AppDatabase : RoomDatabase() {
     }
 }
 
+@ExperimentalCoroutinesApi
 val allMigrations = arrayOf(
         MIGRATION_5_7,
         MIGRATION_6_7,
@@ -64,6 +67,7 @@ val allMigrations = arrayOf(
         MIGRATION_9_10
 )
 
+@ExperimentalCoroutinesApi
 @Suppress("ClassName")
 /**
  * 6 represents legacy database

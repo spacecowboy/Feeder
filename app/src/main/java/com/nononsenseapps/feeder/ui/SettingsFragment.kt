@@ -13,10 +13,12 @@ import androidx.preference.PreferenceFragmentCompat
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.configurePeriodicSync
 import com.nononsenseapps.feeder.util.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
+@ExperimentalCoroutinesApi
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener, KodeinAware {
     override val kodein by closestKodein()
     private val sharedPreferences: SharedPreferences by instance()

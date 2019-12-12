@@ -13,6 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.ui.ARG_FEED_TITLE
 import com.nononsenseapps.feeder.ui.FeedActivity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 interface ToastMaker {
     suspend fun makeToast(text: String)
@@ -30,10 +31,11 @@ val Context.notificationManager: NotificationManagerCompat
  * Ensures that a maximum number of shortcuts is available at any time with the last used being bumped out of the list
  * first.
  */
+@ExperimentalCoroutinesApi
 fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null) {
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            val shortcutManager = getSystemService(ShortcutManager::class.java)
+            val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
 
             val intent = Intent(this, FeedActivity::class.java)
             intent.action = Intent.ACTION_VIEW
@@ -80,7 +82,7 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null
 fun Context.reportShortcutToFeedUsed(id: Any) {
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            val shortcutManager = getSystemService(ShortcutManager::class.java)
+            val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
             shortcutManager.reportShortcutUsed("$id")
         }
     } catch (error: Throwable) {
@@ -94,7 +96,7 @@ fun Context.reportShortcutToFeedUsed(id: Any) {
 fun Context.removeDynamicShortcutToFeed(id: Any) {
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            val shortcutManager = getSystemService(ShortcutManager::class.java)
+            val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
             shortcutManager.removeDynamicShortcuts(mutableListOf("$id"))
         }
     } catch (error: Throwable) {

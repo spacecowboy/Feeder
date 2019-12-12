@@ -80,6 +80,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Corouti
     }
 }
 
+@ExperimentalCoroutinesApi
 fun requestFeedSync(kodein: Kodein,
                     feedId: Long = ID_UNSET,
                     feedTag: String = "",
@@ -99,6 +100,7 @@ fun requestFeedSync(kodein: Kodein,
     workManager.enqueue(workRequest.build())
 }
 
+@ExperimentalCoroutinesApi
 fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
     val kodein by closestKodein(context)
     val workManager: WorkManager by kodein.instance()

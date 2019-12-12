@@ -23,6 +23,7 @@ import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -32,6 +33,7 @@ import org.kodein.di.generic.instance
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
+@ExperimentalCoroutinesApi
 class FeedItemHolder(
         val view: View,
         private val feedItemsViewModel: FeedItemsViewModel,
