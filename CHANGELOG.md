@@ -1,3 +1,7 @@
+# 1.8.28
+
+* Fixed a crash when clicking on notification
+
 # 1.8.27
 
 Minor bug fixes and tweaks.
