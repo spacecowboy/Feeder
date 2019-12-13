@@ -42,8 +42,8 @@ class FeedActivity : KodeinAwareActivity() {
     }
 
     private val prefs: Prefs by instance()
-    private val settingsViewModel: SettingsViewModel by instance(arg = this)
-    private val feedListViewModel: FeedListViewModel by instance(arg = this)
+    private val settingsViewModel: SettingsViewModel by instance()
+    private val feedListViewModel: FeedListViewModel by instance()
 
     var fabOnClickListener: () -> Unit = {}
 

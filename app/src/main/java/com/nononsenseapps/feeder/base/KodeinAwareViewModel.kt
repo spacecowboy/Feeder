@@ -50,13 +50,6 @@ inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<
     }
 }
 
-inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.activityViewModelFactory():
-        Factory<C, FragmentActivity, T> {
-    return factory { activity: FragmentActivity ->
-        ViewModelProvider(activity, instance<KodeinAwareViewModelFactory>()).get(T::class.java)
-    }
-}
-
 inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.fragmentViewModelFactory():
         Factory<C, Fragment, T> {
     return factory { fragment: Fragment ->
@@ -65,6 +58,6 @@ inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<
 }
 
 inline fun <reified T : KodeinAwareViewModel> Kodein.Builder.bindWithKodeinAwareViewModelFactory() {
-    bind<T>() with activityViewModelFactory()
+    bind<T>() with activityViewModelProvider()
     bind<T>() with fragmentViewModelFactory()
 }

@@ -65,7 +65,7 @@ class EditFeedActivity : KodeinAwareActivity() {
             field = value
         }
 
-    private val settingsViewModel: SettingsViewModel by instance(arg = this)
+    private val settingsViewModel: SettingsViewModel by instance()
     private val feedParser: FeedParser by instance()
     private val feedDao: FeedDao by instance()
 
