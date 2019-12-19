@@ -33,7 +33,7 @@
     android:paddingBottom="2dp"
     android:singleLine="true"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
-    android:textColor="@color/secondary_text_color"
+    android:textColor="?android:attr/textColorSecondary"
     android:textDirection="anyRtl"
     android:textSize="14sp"
     tools:text="https://feed.url/rss.xml" />
@@ -47,7 +47,7 @@
     android:paddingBottom="2dp"
     android:singleLine="true"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
-    android:textColor="@color/secondary_text_color"
+    android:textColor="?android:attr/textColorSecondary"
     android:textDirection="anyRtl"
     android:textSize="14sp"
     tools:text="@tools:sample/lorem/random" />

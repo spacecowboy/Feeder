@@ -3,7 +3,7 @@
   android:id="@+id/scroll_view"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:background="@color/window_background"
+  android:background="?attr/windowBackgroundColor"
   tools:context="com.nononsenseapps.feeder.ui.ReaderFragment">
 
   <LinearLayout

@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.ui
 
 import android.content.Context
-import android.os.Build
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
@@ -14,29 +13,31 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.PreviewItem
+import com.nononsenseapps.feeder.model.SettingsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import java.util.*
 
+
+@FlowPreview
 @ExperimentalCoroutinesApi
 class FeedItemPagedListAdapter(
         private val context: Context,
         private val feedItemsViewModel: FeedItemsViewModel,
+        private val settingsViewModel: SettingsViewModel,
         private val actionCallback: ActionCallback
 ) :
         PagedListAdapter<PreviewItem, RecyclerView.ViewHolder>(PreviewItemDiffer) {
 
     private val shortDateTimeFormat: DateTimeFormatter =
             DateTimeFormat.mediumDate().withLocale(Locale.getDefault())
-    private val linkColor: Int =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                context.resources.getColor(R.color.accent, null)
-            } else {
-                @Suppress("DEPRECATION")
-                context.resources.getColor(R.color.accent)
-            }
+
+    private val linkColor: Int by lazy {
+        settingsViewModel.accentColor
+    }
 
     init {
         setHasStableIds(true)
@@ -56,6 +57,7 @@ class FeedItemPagedListAdapter(
                                     false
                             ),
                     feedItemsViewModel,
+                    settingsViewModel,
                     actionCallback
             )
 

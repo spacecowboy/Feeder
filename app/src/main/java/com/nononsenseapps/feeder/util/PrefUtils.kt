@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.util
 
 import android.app.Application
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.nononsenseapps.feeder.R
@@ -135,30 +134,28 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
         get() = sp.getBoolean(PREF_WELCOME_DONE, false)
         set(value) = sp.edit().putBoolean(PREF_WELCOME_DONE, value).apply()
 
-    var nightMode: Int
+    var currentTheme: CurrentTheme
         get() = when (sp.getString(PREF_THEME, app.getString(R.string.pref_theme_value_default))) {
-            app.getString(R.string.pref_theme_value_day) -> AppCompatDelegate.MODE_NIGHT_NO
-            app.getString(R.string.pref_theme_value_night) -> AppCompatDelegate.MODE_NIGHT_YES
-            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            app.getString(R.string.pref_theme_value_night) -> CurrentTheme.NIGHT
+            else -> CurrentTheme.DAY
         }
         set(value) = sp.edit().putString(
                 PREF_THEME,
                 when (value) {
-                    AppCompatDelegate.MODE_NIGHT_YES -> app.getString(R.string.pref_theme_value_night)
-                    AppCompatDelegate.MODE_NIGHT_NO -> app.getString(R.string.pref_theme_value_day)
-                    else -> app.getString(R.string.pref_theme_value_system)
+                    CurrentTheme.NIGHT -> app.getString(R.string.pref_theme_value_night)
+                    CurrentTheme.DAY -> app.getString(R.string.pref_theme_value_day)
                 }
         ).apply()
 
     var isNightMode: Boolean
-        get() = when (nightMode) {
-            AppCompatDelegate.MODE_NIGHT_YES -> true
+        get() = when (currentTheme) {
+            CurrentTheme.NIGHT -> true
             else -> false
         }
         set(value) {
-            nightMode = when (value) {
-                true -> AppCompatDelegate.MODE_NIGHT_YES
-                false -> AppCompatDelegate.MODE_NIGHT_NO
+            currentTheme = when (value) {
+                true -> CurrentTheme.NIGHT
+                false -> CurrentTheme.DAY
             }
         }
 
@@ -198,4 +195,9 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
             else -> true
         }
     }
+}
+
+enum class CurrentTheme {
+    DAY,
+    NIGHT
 }

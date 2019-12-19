@@ -9,7 +9,6 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareActivity
@@ -18,8 +17,8 @@ import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.model.FeedParser
-import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.requestFeedSync
+import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
@@ -65,19 +64,26 @@ class EditFeedActivity : KodeinAwareActivity() {
             field = value
         }
 
-    private val settingsViewModel: SettingsViewModel by instance()
     private val feedParser: FeedParser by instance()
     private val feedDao: FeedDao by instance()
+    private val prefs: Prefs by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         if (shouldBeFloatingWindow()) {
             setupFloatingWindow()
         }
+        when (prefs.isNightMode) {
+            true -> {
+                R.style.EditFeedThemeNight
+            }
+            false -> {
+                R.style.EditFeedThemeDay
+            }
+        }.let {
+            setTheme(it)
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_feed)
-
-        // Not persisted so set nightmode every time we start
-        AppCompatDelegate.setDefaultNightMode(settingsViewModel.themePreference)
 
         // Setup views
         textTitle = findViewById(R.id.feed_title)
@@ -230,14 +236,6 @@ class EditFeedActivity : KodeinAwareActivity() {
             // Set the adapter
             textTag.setAdapter(tagsAdapter)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        settingsViewModel.liveThemePreference.observe(this, androidx.lifecycle.Observer {
-            delegate.localNightMode = it
-        })
     }
 
     private fun shouldBeFloatingWindow(): Boolean {

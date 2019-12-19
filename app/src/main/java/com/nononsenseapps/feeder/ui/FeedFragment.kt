@@ -63,7 +63,7 @@ class FeedFragment : KodeinAwareFragment() {
 
     private val feedViewModel: FeedViewModel by instance(arg = this)
     private val feedItemsViewModel: FeedItemsViewModel by instance(arg = this)
-
+    private val settingsViewModel: SettingsViewModel by instance()
     private val prefs: Prefs by instance()
 
     private val ephemeralState: EphemeralState by instance()
@@ -71,6 +71,8 @@ class FeedFragment : KodeinAwareFragment() {
     private lateinit var liveDbPreviews: LiveData<PagedList<PreviewItem>>
 
     private val currentlySyncing: ConflatedBroadcastChannel<Boolean> by instance(tag = CURRENTLY_SYNCING_STATE)
+
+    private lateinit var adapter: FeedItemPagedListAdapter
 
     init {
         // Listens on sync state changes
@@ -201,9 +203,10 @@ class FeedFragment : KodeinAwareFragment() {
         emptyOpenFeeds.setOnClickListener { (activity as FeedActivity).openNavDrawer() }
 
         // specify an adapter
-        val adapter = FeedItemPagedListAdapter(
+        adapter = FeedItemPagedListAdapter(
                 activity!!,
                 feedItemsViewModel,
+                settingsViewModel,
                 object : ActionCallback {
                     override fun coroutineScope(): CoroutineScope {
                         return lifecycleScope
