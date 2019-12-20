@@ -53,11 +53,12 @@
     app:layout_constraintTop_toTopOf="parent"
     tools:ignore="RtlSymmetry">
 
+    <!--let the visibility initially be gone to avoid a bug with scrollbar ghosting-->
     <ImageView
       android:id="@+id/story_image"
       android:layout_width="@dimen/item_img_def_width"
       android:layout_height="0dp"
-      android:visibility="visible"
+      android:visibility="gone"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintTop_toTopOf="parent"
