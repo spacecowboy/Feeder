@@ -1,7 +1,9 @@
 package com.nononsenseapps.feeder.util
 
 import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.nononsenseapps.feeder.R
@@ -137,19 +139,22 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
     var currentTheme: CurrentTheme
         get() = when (sp.getString(PREF_THEME, app.getString(R.string.pref_theme_value_default))) {
             app.getString(R.string.pref_theme_value_night) -> CurrentTheme.NIGHT
-            else -> CurrentTheme.DAY
+            app.getString(R.string.pref_theme_value_day) -> CurrentTheme.DAY
+            else -> CurrentTheme.SYSTEM
         }
         set(value) = sp.edit().putString(
                 PREF_THEME,
                 when (value) {
                     CurrentTheme.NIGHT -> app.getString(R.string.pref_theme_value_night)
                     CurrentTheme.DAY -> app.getString(R.string.pref_theme_value_day)
+                    CurrentTheme.SYSTEM -> app.getString(R.string.pref_theme_value_system)
                 }
         ).apply()
 
     var isNightMode: Boolean
         get() = when (currentTheme) {
             CurrentTheme.NIGHT -> true
+            CurrentTheme.SYSTEM -> app.isSystemThemeNight
             else -> false
         }
         set(value) {
@@ -199,5 +204,10 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
 
 enum class CurrentTheme {
     DAY,
-    NIGHT
+    NIGHT,
+    SYSTEM
 }
+
+val Context.isSystemThemeNight: Boolean
+    get() = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+
