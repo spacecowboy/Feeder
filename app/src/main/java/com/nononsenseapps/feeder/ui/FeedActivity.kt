@@ -47,12 +47,15 @@ class FeedActivity : KodeinAwareActivity() {
     private val prefs: Prefs by instance()
     private val settingsViewModel: SettingsViewModel by instance()
     private val feedListViewModel: FeedListViewModel by instance()
+    private var restoredState: Boolean = false
 
     var fabOnClickListener: () -> Unit = {}
 
     init {
         lifecycleScope.launchWhenCreated {
-            handleSettingIntent()
+            if (!restoredState) {
+                handleSettingIntent()
+            }
         }
 
         lifecycleScope.launchWhenStarted {
@@ -90,6 +93,13 @@ class FeedActivity : KodeinAwareActivity() {
                 openNavDrawer()
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        navController.saveState()?.let {
+            outState.putAll(it)
+        }
+        super.onSaveInstanceState(outState)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -179,6 +189,11 @@ class FeedActivity : KodeinAwareActivity() {
                 R.id.readerWebViewFragment -> fixedToolbar()
                 else -> fixedToolbar()
             }
+        }
+
+        savedInstanceState?.let {
+            restoredState = true
+            navController.restoreState(it)
         }
     }
 
