@@ -1,3 +1,7 @@
+# 1.8.29
+*   Added a UserAgent to fix sites blocking requests
+    See !214 #248
+
 # 1.8.28
 
 * Fixed a crash when clicking on notification
