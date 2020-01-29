@@ -40,6 +40,12 @@
     <deepLink
       android:id="@+id/deepLink"
       app:uri="content://com.nononsenseapps.feeder.provider/feeds/{feed_id}" />
+    <deepLink
+      android:id="@+id/deepLink4"
+      app:uri="content://com.nononsenseapps.feeder.provider/tags/{feed_tag}" />
+    <deepLink
+      android:id="@+id/deepLink5"
+      app:uri="content://com.nononsenseapps.feeder.provider/feeds" />
   </fragment>
   <fragment
     android:id="@+id/readerFragment"
@@ -70,6 +76,9 @@
       android:name="enclosure"
       app:argType="string"
       app:nullable="true" />
+    <deepLink
+      android:id="@+id/deepLink3"
+      app:uri="content://com.nononsenseapps.feeder.provider/url/{url}" />
   </fragment>
   <fragment
     android:id="@+id/settingsFragment"

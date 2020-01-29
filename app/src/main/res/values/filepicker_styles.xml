@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- File picker -->
+  <style name="FilePickerTheme" parent="NNF_BaseTheme">
+    <!-- Set these to match your theme -->
+    <item name="colorPrimary">@color/primary</item>
+    <item name="colorPrimaryDark">@color/primary_dark</item>
+    <item name="colorAccent">@color/accentDay</item>
+
+    <!-- Setting a divider is entirely optional -->
+    <item name="nnf_list_item_divider">?android:attr/listDivider</item>
+
+    <!-- Need to set this also to style create folder dialog -->
+    <item name="alertDialogTheme">@style/FilePickerAlertDialogTheme</item>
+  </style>
+
+  <style name="FilePickerAlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <item name="colorPrimary">@color/primary</item>
+    <item name="colorPrimaryDark">@color/primary_dark</item>
+    <item name="colorAccent">@color/accentDay</item>
+  </style>
+</resources>

@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.TextAppearanceSpan
@@ -20,11 +19,9 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.PreviewItem
+import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.util.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -33,15 +30,17 @@ import org.kodein.di.generic.instance
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
+@FlowPreview
 @ExperimentalCoroutinesApi
 class FeedItemHolder(
         val view: View,
         private val feedItemsViewModel: FeedItemsViewModel,
+        private val settingsViewModel: SettingsViewModel,
         private val actionCallback: ActionCallback
 ) : ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener, KodeinAware,
         View.OnCreateContextMenuListener {
     private val TAG = "FeedItemHolder"
-    private val titleTextView: TextView = view.findViewById(R.id.story_snippet)
+    val titleTextView: TextView = view.findViewById(R.id.story_snippet)
     val dateTextView: TextView = view.findViewById(R.id.story_date)
     val authorTextView: TextView = view.findViewById(R.id.story_author)
     val imageView: ImageView = view.findViewById(R.id.story_image)
@@ -74,15 +73,7 @@ class FeedItemHolder(
             override fun onSwipeStarted(goingRight: Boolean) {
                 actionCallback.onSwipeStarted()
 
-                view.context?.let { context ->
-                    val bgColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        context.getColor(R.color.window_background)
-                    } else {
-                        @Suppress("DEPRECATION")
-                        context.resources.getColor(R.color.window_background)
-                    }
-                    bgFrame.setBackgroundColor(bgColor)
-                }
+                bgFrame.setBackgroundColor(settingsViewModel.backgroundColor)
 
                 checkBg.visibility = View.VISIBLE
                 if (goingRight) {

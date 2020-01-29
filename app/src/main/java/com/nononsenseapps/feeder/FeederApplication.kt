@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder
 import android.app.Application
 import android.content.ContentResolver
 import android.content.SharedPreferences
+import android.os.Build
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.multidex.MultiDexApplication
@@ -70,7 +71,9 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
 
     init {
         // Install Conscrypt to handle missing SSL cyphers on older platforms
-        Security.insertProviderAt(Conscrypt.newProvider(), 1)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            Security.insertProviderAt(Conscrypt.newProvider(), 1)
+        }
     }
 
     override fun onCreate() {

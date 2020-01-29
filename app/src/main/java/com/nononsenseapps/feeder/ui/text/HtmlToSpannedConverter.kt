@@ -9,7 +9,6 @@ import android.graphics.Point
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.text.Layout
 import android.text.Spannable
 import android.text.Spanned
@@ -17,11 +16,12 @@ import android.text.TextUtils
 import android.text.style.*
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.ColorInt
 import androidx.appcompat.content.res.AppCompatResources
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.model.getColorCompat
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
+import kotlinx.coroutines.FlowPreview
 import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -37,6 +37,7 @@ typealias UrlClickListener = ((String) -> Unit)
 /**
  * Convert an HTML document into a spannable string.
  */
+@FlowPreview
 @Suppress("UNUSED_PARAMETER")
 open class HtmlToSpannedConverter(private var source: Reader,
                                   private var siteUrl: URL,
@@ -45,45 +46,34 @@ open class HtmlToSpannedConverter(private var source: Reader,
                                   val maxSize: Point,
                                   private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
                                   private var urlClickListener: UrlClickListener?) : ContentHandler, KodeinAware {
-    @ColorInt
-    private var mAccentColor: Int = 0
-    private var mQuoteGapWidth: Int = 0
-    private var mQuoteStripeWidth: Int = 0
+    private val mAccentColor: Int by lazy {
+        when (prefs.isNightMode) {
+            true -> context.getColorCompat(R.color.accentNight)
+            false -> context.getColorCompat(R.color.accentDay)
+        }
+    }
+    private val mQuoteGapWidth: Int by lazy {
+        context.resources.getDimension(R.dimen.reader_quote_gap_width).roundToInt()
+    }
+    private val mQuoteStripeWidth: Int by lazy {
+        context.resources.getDimension(R.dimen.reader_quote_stripe_width).roundToInt()
+    }
     private var ignoreCount = 0
     private var respectFormatting: Int = 0
     private var mReader: XMLReader = parser
     private var ignoredImage = false
-    @ColorInt
-    private var codeTextBgColor: Int = 0
+    private val codeTextBgColor: Int by lazy {
+        when (prefs.isNightMode) {
+            true -> context.getColorCompat(R.color.code_text_bg_night)
+            false -> context.getColorCompat(R.color.code_text_bg_day)
+        }
+    }
 
     private val ignoredTags = listOf("style", "script")
 
     private val context: Application by instance()
 
     private val prefs: Prefs by instance()
-
-    init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mAccentColor = context.resources.getColor(R.color.accent, context.theme)
-            codeTextBgColor = if (prefs.isNightMode) {
-                context.resources.getColor(R.color.code_text_bg_night, context.theme)
-            } else {
-                context.resources.getColor(R.color.code_text_bg_day, context.theme)
-            }
-        } else {
-            @Suppress("DEPRECATION")
-            mAccentColor = context.resources.getColor(R.color.accent)
-            codeTextBgColor = if (prefs.isNightMode) {
-                @Suppress("DEPRECATION")
-                context.resources.getColor(R.color.code_text_bg_night)
-            } else {
-                @Suppress("DEPRECATION")
-                context.resources.getColor(R.color.code_text_bg_day)
-            }
-        }
-        mQuoteGapWidth = context.resources.getDimension(R.dimen.reader_quote_gap_width).roundToInt()
-        mQuoteStripeWidth = context.resources.getDimension(R.dimen.reader_quote_stripe_width).roundToInt()
-    }
 
     fun convert(): Spanned {
 

@@ -12,7 +12,9 @@ private const val VIEWTYPE_TAG = 1
 private const val VIEWTYPE_FEED = 2
 private const val VIEWTYPE_FEED_CHILD = 3
 
-class FeedsAdapter(private val onClickListener: OnNavigationItemClickListener) : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+class FeedsAdapter(
+        private val onClickListener: OnNavigationItemClickListener
+) : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
     private val expandedTags: MutableSet<String> = androidx.collection.ArraySet(setOf(""))
     private var allItems: List<FeedUnreadCount> = emptyList()
     private var visibleItems: List<FeedUnreadCount> = emptyList()

@@ -21,10 +21,10 @@
   android:layout_height="match_parent"
   android:layout_gravity="start"
   android:fitsSystemWindows="true"
-  android:background="@color/navdrawer_background"
+  android:background="?attr/navDrawerBackgroundColor"
   android:clipToPadding="false"
   android:orientation="vertical"
-  android:theme="@style/NavbarTheme">
+  android:theme="?attr/navBarTheme">
 
   <androidx.recyclerview.widget.RecyclerView
     android:id="@+id/navdrawer_list"

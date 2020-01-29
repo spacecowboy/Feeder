@@ -3,14 +3,14 @@ package com.nononsenseapps.feeder.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.webkit.WebView
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -26,6 +26,8 @@ import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.android.synthetic.main.app_bar_navigation.*
 import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
 
 const val EXPORT_OPML_CODE = 101
@@ -34,6 +36,7 @@ const val EDIT_FEED_CODE = 103
 
 const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 class FeedActivity : KodeinAwareActivity() {
     private lateinit var navAdapter: FeedsAdapter
@@ -44,10 +47,73 @@ class FeedActivity : KodeinAwareActivity() {
     private val prefs: Prefs by instance()
     private val settingsViewModel: SettingsViewModel by instance()
     private val feedListViewModel: FeedListViewModel by instance()
+    private var restoredState: Boolean = false
 
     var fabOnClickListener: () -> Unit = {}
 
+    init {
+        lifecycleScope.launchWhenCreated {
+            if (!restoredState) {
+                handleSettingIntent()
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            // Enable periodic sync
+            configurePeriodicSync(applicationContext, forceReplace = false)
+
+            // Just so app label doesn't flicker in before label is set by feed fragment
+            if (supportActionBar?.title == getString(R.string.app_name)) {
+                supportActionBar?.title = ""
+            }
+
+            settingsViewModel.liveThemePreferenceNoInitial.observe(this@FeedActivity) {
+                val intents = NavDeepLinkBuilder(this@FeedActivity)
+                        .setGraph(R.navigation.nav_graph)
+                        .setDestination(R.id.settingsFragment)
+                        .createTaskStackBuilder()
+                        .intents
+
+                finish()
+                startActivities(intents)
+            }
+
+            feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observe(
+                    this@FeedActivity,
+                    androidx.lifecycle.Observer<List<FeedUnreadCount>> {
+                        navAdapter.submitList(it)
+                    }
+            )
+
+            // When the user runs the app for the first time, we want to land them with the
+            // navigation drawer open. But just the first time.
+            if (!prefs.welcomeDone) {
+                // first run of the app starts with the nav drawer open
+                prefs.welcomeDone = true
+                openNavDrawer()
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        navController.saveState()?.let {
+            outState.putAll(it)
+        }
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Set theme here - must be done before super call
+        when (prefs.isNightMode) {
+            true -> {
+                R.style.AppThemeNight
+            }
+            false -> {
+                R.style.AppThemeDay
+            }
+        }.let {
+            setTheme(it)
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
         setSupportActionBar(toolbar)
@@ -55,23 +121,17 @@ class FeedActivity : KodeinAwareActivity() {
         // Write default setting if method has never been called before
         PreferenceManager.setDefaultValues(this, R.xml.settings, false)
 
-        // Bug in Android: WebView resets night mode setting
-        // See: https://stackoverflow.com/questions/54191883/android-bug-loading-wrong-colors-in-night-mode
-        WebView(this).also {
-            it.destroy()
-        }
-        // Not persisted so set nightmode every time we start
-        AppCompatDelegate.setDefaultNightMode(settingsViewModel.themePreference)
-
-        // Enable periodic sync
-        configurePeriodicSync(applicationContext, forceReplace = false)
-
         fab.setOnClickListener {
             fabOnClickListener()
         }
 
         val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+                this,
+                drawer_layout,
+                toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close
+        )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
@@ -131,10 +191,13 @@ class FeedActivity : KodeinAwareActivity() {
             }
         }
 
-        handleSettingIntent()
+        savedInstanceState?.let {
+            restoredState = true
+            navController.restoreState(it)
+        }
     }
 
-    fun hideableToolbar() {
+    private fun hideableToolbar() {
         toolbar?.layoutParams = toolbar.layoutParams.also {
             if (it is AppBarLayout.LayoutParams) {
                 it.scrollFlags = SCROLL_FLAG_SNAP or SCROLL_FLAG_SCROLL or SCROLL_FLAG_ENTER_ALWAYS
@@ -142,7 +205,7 @@ class FeedActivity : KodeinAwareActivity() {
         }
     }
 
-    fun fixedToolbar() {
+    private fun fixedToolbar() {
         toolbar?.layoutParams = toolbar.layoutParams.also {
             if (it is AppBarLayout.LayoutParams) {
                 it.scrollFlags = 0
@@ -159,34 +222,6 @@ class FeedActivity : KodeinAwareActivity() {
     private fun handleSettingIntent() {
         if (intent?.action == Intent.ACTION_MANAGE_NETWORK_USAGE) {
             navController.navigate(R.id.settingsFragment)
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        // Just so app label doesn't flicker in before label is set by feed fragment
-        if (supportActionBar?.title == getString(R.string.app_name)) {
-            supportActionBar?.title = ""
-        }
-
-        settingsViewModel.liveThemePreference.observe(this, androidx.lifecycle.Observer {
-            delegate.setLocalNightMode(it)
-        })
-
-        feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observe(
-                this,
-                androidx.lifecycle.Observer<List<FeedUnreadCount>> {
-                    navAdapter.submitList(it)
-                }
-        )
-
-        // When the user runs the app for the first time, we want to land them with the
-        // navigation drawer open. But just the first time.
-        if (!prefs.welcomeDone) {
-            // first run of the app starts with the nav drawer open
-            prefs.welcomeDone = true
-            openNavDrawer()
         }
     }
 
@@ -219,7 +254,7 @@ class FeedActivity : KodeinAwareActivity() {
         syncFeedsMaybe()
     }
 
-    private fun syncFeedsMaybe() = lifecycleScope.launchWhenResumed {
+    private fun syncFeedsMaybe() = lifecycleScope.launch {
         if (prefs.syncOnResume) {
             if (isOkToSyncAutomatically(applicationContext)) {
                 requestFeedSync(kodein = kodein,

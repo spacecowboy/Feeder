@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
   <color name="primary">@color/material_green_700</color>
   <color name="primary_dark">@color/material_green_900</color>
-  <color name="accent">#0b706e</color>
-  <color name="accent_light">#0b706e</color>
 
-  <color name="window_background">@android:color/white</color>
-  <color name="dialog_background">@android:color/white</color>
+  <color name="accentDay">#0b706e</color>
+  <color name="accentNight">@color/material_dark_teal_A400</color>
+
+  <color name="accentLightDay">#0b706e</color>
+  <color name="accentLightNight">@color/material_dark_teal_A400</color>
+
+  <color name="night_background">@android:color/black</color>
+  <color name="day_background">@android:color/white</color>
 
   <color name="swiping_item_color">#ffff5252</color>
 
   <color name="translucent_actionbar_background">@color/primary</color>
-  <color name="navdrawer_background">@android:color/white</color>
-  <color name="navdrawer_text_color">@color/title_text_color</color>
+
+  <color name="day_navdrawer_background">@color/day_background</color>
+  <color name="night_navdrawer_background">@color/dark_grey_850</color>
+
   <color name="navdrawer_text_color_selected">@color/primary</color>
   <color name="navdrawer_icon_tint">#808080</color>
   <color name="navdrawer_icon_tint_selected">@color/primary</color>
-  <color name="navdrawer_account_textcolor">@color/navdrawer_text_color</color>
-  <color name="navdrawer_accent">@color/accent</color>
   <color name="black_overlay">#66000000</color>
 
   <color name="refresh_progress_1">#ffff1744</color>
   <color name="refresh_progress_2">#ff00e676</color>
   <color name="refresh_progress_3">#ff2979ff</color>
 
-  <color name="ripple_material_dark" tools:override="true">@color/accent</color>
+  <color name="day_title_text_read_color">@color/black_54</color>
+  <color name="night_title_text_read_color">@color/white_54</color>
 
-  <color name="title_text_color">@color/black_87</color>
-  <color name="title_text_read_color">@color/black_54</color>
-  <color name="body_text_color">@color/black_54</color>
-  <color name="secondary_text_color">@android:color/secondary_text_light</color>
-  <color name="tertiary_text_color">@android:color/secondary_text_light</color>
+  <color name="day_body_text_color">@color/black_54</color>
+  <color name="night_body_text_color">@color/white_38</color>
 
-  <color name="reader_title_color">@android:color/primary_text_light</color>
-  <color name="reader_author_color">@android:color/secondary_text_light</color>
-  <color name="reader_body_color">@color/black_87</color>
-  <color name="reader_feedtitle_color">@color/accent</color>
+  <color name="day_reader_body_color">@color/black_87</color>
+  <color name="night_reader_body_color">@color/white_87</color>
 
   <color name="code_text_bg_day">#e9e9e9</color>
   <color name="code_text_bg_night">#434343</color>
