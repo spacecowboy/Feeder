@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.di.stateModule
 import com.nononsenseapps.feeder.di.viewModelModule
+import com.nononsenseapps.feeder.model.UserAgentInterceptor
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.jsonfeed.cachingHttpClient
@@ -57,9 +58,13 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
         bind<SharedPreferences>() with singleton { PreferenceManager.getDefaultSharedPreferences(this@FeederApplication) }
         bind<Prefs>() with singleton { Prefs(kodein) }
 
-        bind<OkHttpClient>() with singleton { cachingHttpClient(
-                cacheDirectory = externalCacheDir ?: filesDir
-        ) }
+        bind<OkHttpClient>() with singleton {
+            cachingHttpClient(
+                    cacheDirectory = externalCacheDir ?: filesDir
+            ).newBuilder()
+                    .addNetworkInterceptor(UserAgentInterceptor)
+                    .build()
+        }
         import(networkModule)
         import(stateModule)
     }
