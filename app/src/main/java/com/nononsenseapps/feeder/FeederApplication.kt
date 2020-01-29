@@ -20,6 +20,7 @@ import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import org.kodein.di.Kodein
@@ -29,6 +30,7 @@ import org.kodein.di.generic.instance
 import org.kodein.di.generic.singleton
 import java.io.File
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 @Suppress("unused")
 class FeederApplication : MultiDexApplication(), KodeinAware {
