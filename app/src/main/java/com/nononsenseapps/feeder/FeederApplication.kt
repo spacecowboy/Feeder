@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder
 import android.app.Application
 import android.content.ContentResolver
 import android.content.SharedPreferences
-import android.os.Build
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.multidex.MultiDexApplication
@@ -23,14 +22,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
-import org.conscrypt.Conscrypt
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.singleton
 import java.io.File
-import java.security.Security
 
 @ExperimentalCoroutinesApi
 @Suppress("unused")
@@ -67,13 +64,6 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
         }
         import(networkModule)
         import(stateModule)
-    }
-
-    init {
-        // Install Conscrypt to handle missing SSL cyphers on older platforms
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            Security.insertProviderAt(Conscrypt.newProvider(), 1)
-        }
     }
 
     override fun onCreate() {
