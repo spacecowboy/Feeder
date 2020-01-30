@@ -18,6 +18,10 @@ environment:
   ANDROID_HOME: "/home/build/.androidhome"
 sources:
   - https://git.sr.ht/~cowboyprogrammer/feeder
+triggers:
+  - action: email
+    condition: always
+    to: jonas.srht@cowboyprogrammer.org
 secrets:
   - d9eb6ad0-7288-447a-954b-74e22ef4d054
   - c492e32e-551e-42e8-b8d5-c252fc20b625
