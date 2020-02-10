@@ -16,8 +16,8 @@ buildscript {
     joda_version = "2.9.7"
     jsoup_version = "1.7.3"
 
-    androidx_core_version = "1.2.0-alpha04"
-    workmanager_version = '2.2.0'
+    androidx_core_version = "1.2.0"
+    workmanager_version = '2.3.1'
     constraintlayout_version = "2.0.0-alpha5"
     recyclerview_version = "1.0.0"
     legacy_support_version = "1.0.0"
@@ -26,9 +26,9 @@ buildscript {
     preference_version = "1.1.0"
     test_runner_version = "1.1.0"
     test_rules_version = "1.1.0"
-    paging_version = '2.1.0'
-    lifecycle_version = "2.2.0-rc02"
-    room_version = "2.2.1"
+    paging_version = '2.1.1'
+    lifecycle_version = "2.2.0"
+    room_version = "2.2.3"
     nav_version = "2.1.0"
 
     espresso_version = "3.1.0"
