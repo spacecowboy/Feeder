@@ -9,6 +9,7 @@ variables:
   ANDROID_BUILD_TOOLS: "27.0.1"
 
 cache:
+  key: "uber"
   paths:
      - .gradle/
 
