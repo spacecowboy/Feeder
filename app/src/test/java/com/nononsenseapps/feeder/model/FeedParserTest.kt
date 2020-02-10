@@ -2,8 +2,10 @@ package com.nononsenseapps.feeder.model
 
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.jsonfeed.cachingHttpClient
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import okhttp3.*
+import org.intellij.lang.annotations.Language
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -20,6 +22,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@FlowPreview
 class FeedParserTest: KodeinAware {
     @Rule
     @JvmField
@@ -621,7 +624,8 @@ class FeedParserTest: KodeinAware {
         get() = javaClass.getResourceAsStream("rss_nixers_newsletter.xml")!!
 }
 
-val atomRelative = """
+@Language("xml")
+const val atomRelative = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns='http://www.w3.org/2005/Atom' xml:base='http://cowboyprogrammer.org'>
   <id>http://cowboyprogrammer.org</id>
@@ -631,7 +635,8 @@ val atomRelative = """
 </feed>
 """
 
-val atomRelativeNoBase = """
+@Language("xml")
+const val atomRelativeNoBase = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns='http://www.w3.org/2005/Atom'>
   <id>http://cowboyprogrammer.org</id>
@@ -641,7 +646,8 @@ val atomRelativeNoBase = """
 </feed>
 """
 
-val atomWithAlternateLinks = """
+@Language("xml")
+const val atomWithAlternateLinks = """
 <?xml version='1.0' encoding='UTF-8'?>
 <feed xmlns='http://www.w3.org/2005/Atom'>
   <id>http://cowboyprogrammer.org</id>

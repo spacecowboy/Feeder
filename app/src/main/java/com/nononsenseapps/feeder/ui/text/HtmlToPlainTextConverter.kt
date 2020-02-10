@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.text
 
+import kotlinx.coroutines.FlowPreview
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
 import org.xml.sax.*
@@ -7,6 +8,7 @@ import java.io.IOException
 import java.io.StringReader
 import java.util.*
 
+@FlowPreview
 @Suppress("UNUSED_PARAMETER")
 /**
  * Intended primarily to convert HTML into plaintext snippets, useful for previewing content in list.

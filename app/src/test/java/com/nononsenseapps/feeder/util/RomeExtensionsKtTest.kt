@@ -10,6 +10,7 @@ import com.rometools.modules.mediarss.types.MediaContent
 import com.rometools.modules.mediarss.types.Reference
 import com.rometools.modules.mediarss.types.Thumbnail
 import com.rometools.rome.feed.synd.*
+import kotlinx.coroutines.FlowPreview
 import org.joda.time.DateTime
 import org.junit.Test
 import org.mockito.Mockito.`when`
@@ -19,6 +20,7 @@ import java.net.URL
 import java.util.*
 import kotlin.test.assertEquals
 
+@FlowPreview
 class RomeExtensionsKtTest {
     @Test
     fun author() {

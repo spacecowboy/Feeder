@@ -23,20 +23,18 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
 import java.net.URL
 
 const val TEMPLATE = "template"
 
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 class EditFeedActivity : KodeinAwareActivity() {
     private var id: Long = ID_UNSET

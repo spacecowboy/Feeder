@@ -9,11 +9,13 @@ import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import kotlinx.coroutines.FlowPreview
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 
 private val PAGE_SIZE = 50
 
+@FlowPreview
 class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     private val dao: FeedItemDao by instance()
     private val liveOnlyUnread = MutableLiveData<Boolean>()

@@ -4,7 +4,9 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.OPMLParserToDatabase
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
+import kotlinx.coroutines.FlowPreview
 
+@FlowPreview
 class OPMLToRoom(db: AppDatabase) : OPMLParserToDatabase {
 
     val dao = db.feedDao()

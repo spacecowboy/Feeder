@@ -21,6 +21,7 @@ import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.TabletUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
@@ -28,6 +29,7 @@ import java.io.IOException
 import java.net.URL
 import kotlin.math.roundToInt
 
+@FlowPreview
 class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     private val dao: FeedItemDao by instance()
     private val prefs: Prefs by instance()

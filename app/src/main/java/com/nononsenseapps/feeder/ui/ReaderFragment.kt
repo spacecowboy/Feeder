@@ -21,6 +21,7 @@ import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.*
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
@@ -39,6 +40,7 @@ const val ARG_ID = "dbid"
 const val ARG_AUTHOR = "author"
 const val ARG_DATE = "date"
 
+@FlowPreview
 class ReaderFragment : KodeinAwareFragment() {
     private val dateTimeFormat = DateTimeFormat.forStyle("FM").withLocale(Locale.getDefault())
 

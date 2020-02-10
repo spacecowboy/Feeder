@@ -21,6 +21,7 @@ import java.io.IOException
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
 
+@FlowPreview
 suspend fun syncFeeds(context: Context,
                       feedId: Long = ID_UNSET,
                       feedTag: String = "",
@@ -42,6 +43,7 @@ suspend fun syncFeeds(context: Context,
     )
 }
 
+@FlowPreview
 internal suspend fun syncFeeds(db: AppDatabase,
                                filesDir: File,
                                feedParser: FeedParser,
@@ -94,6 +96,7 @@ internal suspend fun syncFeeds(db: AppDatabase,
     return result
 }
 
+@FlowPreview
 private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                              db: AppDatabase,
                              filesDir: File,
@@ -185,6 +188,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
     }
 }
 
+@FlowPreview
 private suspend fun fetchFeed(
         feedParser: FeedParser,
         feedSql: com.nononsenseapps.feeder.db.room.Feed,

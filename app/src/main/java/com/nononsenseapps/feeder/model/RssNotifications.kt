@@ -30,6 +30,7 @@ import com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivity
 import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.notificationManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
 import org.kodein.di.Kodein
 import org.kodein.di.android.closestKodein
@@ -39,6 +40,7 @@ import org.kodein.di.generic.instance
 const val notificationId = 73583
 const val channelId = "feederNotifications"
 
+@FlowPreview
 suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         createNotificationChannel(appContext)
@@ -75,6 +77,7 @@ suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
     }
 }
 
+@FlowPreview
 suspend fun cancelNotification(context: Context, feedItemId: Long) = withContext(Dispatchers.Default) {
     val nm = context.notificationManager
     nm.cancel(feedItemId.toInt())
@@ -101,6 +104,7 @@ private fun createNotificationChannel(context: Context) {
     notificationManager.createNotificationChannel(channel)
 }
 
+@FlowPreview
 private fun singleNotification(context: Context, item: FeedItemWithFeed): Notification {
     val style = NotificationCompat.BigTextStyle()
     val title = item.plainTitle
@@ -159,6 +163,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
     return style.build()
 }
 
+@FlowPreview
 internal fun getOpenInDefaultActivityIntent(context: Context, feedItemId: Long, link: String? = null): Intent =
         Intent(Intent.ACTION_VIEW,
                 // Important to keep the URI different so PendingIntents don't collide
@@ -248,6 +253,7 @@ private fun notificationBuilder(context: Context): NotificationCompat.Builder {
             .setPriority(NotificationCompat.PRIORITY_LOW)
 }
 
+@FlowPreview
 private suspend fun getItemsToNotify(kodein: Kodein): List<FeedItemWithFeed> {
     val feedDao: FeedDao by kodein.instance()
     val feedItemDao: FeedItemDao by kodein.instance()

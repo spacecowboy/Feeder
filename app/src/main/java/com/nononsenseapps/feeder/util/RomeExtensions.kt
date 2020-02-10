@@ -8,10 +8,12 @@ import com.nononsenseapps.jsonfeed.Item
 import com.rometools.modules.mediarss.MediaEntryModule
 import com.rometools.modules.mediarss.MediaModule
 import com.rometools.rome.feed.synd.*
+import kotlinx.coroutines.FlowPreview
 import org.joda.time.DateTime
 import org.jsoup.parser.Parser.unescapeEntities
 import java.net.URL
 
+@FlowPreview
 fun SyndFeed.asFeed(baseUrl: URL): Feed {
     val feedAuthor: Author? = this.authors?.firstOrNull()?.asAuthor()
 
@@ -34,6 +36,7 @@ fun SyndFeed.asFeed(baseUrl: URL): Feed {
     )
 }
 
+@FlowPreview
 fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
     val contentText = contentText().orIfBlank {
         mediaDescription() ?: ""
@@ -129,6 +132,7 @@ fun SyndEntry.contentProbablyHtml(): String? {
     return possiblyHtml?.let { unescapeEntities(possiblyHtml, true) }
 }
 
+@FlowPreview
 fun SyndEntry.contentText(): String {
     val possiblyHtml = when {
         contents != null && contents.isNotEmpty() -> { // Atom
@@ -166,6 +170,7 @@ fun SyndEntry.contentText(): String {
     }
 }
 
+@FlowPreview
 private fun convertAtomContentToPlainText(content: SyndContent?, fallback: String?): String {
     return HtmlToPlainTextConverter().convert(possiblyHtmlFromContent(content, fallback))
 }
@@ -176,7 +181,9 @@ private fun possiblyHtmlFromContent(content: SyndContent?, fallback: String?): S
             false -> content?.value ?: fallback
         } ?: ""
 
+@FlowPreview
 fun SyndFeed.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
+@FlowPreview
 fun SyndEntry.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
 
 fun SyndEntry.contentHtml(): String? {

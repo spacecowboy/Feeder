@@ -2,10 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.jsonfeed.cachingHttpClient
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -22,6 +19,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@FlowPreview
 class FeedParserClientTest : KodeinAware {
     override val kodein by Kodein.lazy {
         bind<OkHttpClient>() with singleton {

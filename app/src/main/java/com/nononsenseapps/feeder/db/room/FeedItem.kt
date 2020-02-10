@@ -7,6 +7,7 @@ import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.jsonfeed.Item
+import kotlinx.coroutines.FlowPreview
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import java.net.URI
@@ -15,6 +16,7 @@ import java.net.URL
 const val MAX_TITLE_LENGTH = 200
 const val MAX_SNIPPET_LENGTH = 200
 
+@FlowPreview
 @Entity(tableName = FEED_ITEMS_TABLE_NAME,
         indices = [Index(value = [COL_GUID, COL_FEEDID], unique = true),
             Index(value = [COL_FEEDID])],

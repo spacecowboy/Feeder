@@ -6,9 +6,11 @@ import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import java.net.URL
 
+@FlowPreview
 @Dao
 interface FeedItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -171,6 +173,7 @@ interface FeedItemDao {
     suspend fun markAsReadAndNotified(id: Long)
 }
 
+@FlowPreview
 suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > ID_UNSET) {
     true -> {
         updateFeedItem(item)

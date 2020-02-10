@@ -11,6 +11,7 @@ import com.nononsenseapps.feeder.util.currentlyCharging
 import com.nononsenseapps.feeder.util.currentlyConnected
 import com.nononsenseapps.feeder.util.currentlyUnmetered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -35,6 +36,7 @@ fun isOkToSyncAutomatically(context: Context): Boolean {
             )
 }
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 class FeedSyncer(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), KodeinAware {
     override val kodein: Kodein by closestKodein(context)
@@ -80,6 +82,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Corouti
     }
 }
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 fun requestFeedSync(kodein: Kodein,
                     feedId: Long = ID_UNSET,
@@ -100,6 +103,7 @@ fun requestFeedSync(kodein: Kodein,
     workManager.enqueue(workRequest.build())
 }
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
     val kodein by closestKodein(context)

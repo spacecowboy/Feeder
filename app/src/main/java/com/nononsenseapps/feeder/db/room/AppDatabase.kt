@@ -12,6 +12,7 @@ import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 const val DATABASE_NAME = "rssDatabase"
 const val ID_UNSET: Long = 0
@@ -25,12 +26,14 @@ const val ID_ALL_FEEDS: Long = -10
  * 7: Migration to Room
  */
 
+@FlowPreview
 @Database(entities = [Feed::class, FeedItem::class], version = 10)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun feedDao(): FeedDao
     abstract fun feedItemDao(): FeedItemDao
 
+    @FlowPreview
     @ExperimentalCoroutinesApi
     companion object {
         // For Singleton instantiation
@@ -58,6 +61,7 @@ abstract class AppDatabase : RoomDatabase() {
     }
 }
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 val allMigrations = arrayOf(
         MIGRATION_5_7,
@@ -67,6 +71,7 @@ val allMigrations = arrayOf(
         MIGRATION_9_10
 )
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 @Suppress("ClassName")
 /**

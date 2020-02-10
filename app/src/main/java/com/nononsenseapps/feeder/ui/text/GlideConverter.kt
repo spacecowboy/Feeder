@@ -15,6 +15,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.util.GlideUtils
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
+import kotlinx.coroutines.FlowPreview
 import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
@@ -23,6 +24,7 @@ import java.io.Reader
 import java.net.URL
 import java.util.concurrent.ExecutionException
 
+@FlowPreview
 class GlideConverter(
         kodein: Kodein,
         source: Reader,

@@ -8,6 +8,7 @@ import android.text.style.TextAppearanceSpan
 import com.nononsenseapps.feeder.util.Prefs
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.FlowPreview
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -19,6 +20,7 @@ import java.io.StringReader
 import java.net.URL
 import java.util.*
 
+@FlowPreview
 class SpannedConverterTest: KodeinAware {
     private val mockResources: Resources = mockk(relaxed = true)
     //private val mockContext: Context = mockk(relaxed = true)

@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.ui.ARG_FEED_TITLE
 import com.nononsenseapps.feeder.ui.FeedActivity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 
 interface ToastMaker {
     suspend fun makeToast(text: String)
@@ -31,6 +32,7 @@ val Context.notificationManager: NotificationManagerCompat
  * Ensures that a maximum number of shortcuts is available at any time with the last used being bumped out of the list
  * first.
  */
+@FlowPreview
 @ExperimentalCoroutinesApi
 fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null) {
     try {
