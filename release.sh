@@ -41,52 +41,9 @@ else
   NEXT_CODE="${next_code_in}"
 fi
 
-
 CL="# ${NEXT_VERSION}
+$(git shortlog -w76,2,9 --format='* [%h] %s' ${CURRENT_VERSION}..HEAD)
 "
-
-# Merge commits since last version
-for mc in $(git rev-list --min-parents=2 "^${CURRENT_VERSION}" "${TARGET}"); do
-  # grep --only-matching "\![[:digit:]]\+"
-  # grep --only-matching "#[[:digit:]]\+"
-  mr="$(git show --no-patch --format=%b "${mc}" | grep --only-matching "![[:digit:]]\+")"
-
-  # All commits contained in merge
-  mbase="$(git merge-base "${mc}~" "${mc}")"
-  for cc in $(git rev-list "^${mbase}" "${mc}"); do
-    if [[ "${cc}" == "${mc}" ]]; then
-      continue
-    fi
-    issues="$(git show --no-patch --format=%B "${cc}" | grep --only-matching "#[[:digit:]]\+")"
-    author="$(git show --no-patch --format=%an "${cc}")"
-
-    # Transform newlines to spaces by echoing with no quotes
-    issues="$(echo ${issues})"
-
-    CL="${CL}*   $(git show --no-patch --format=%s "${cc}")"
-
-    # Trailing whitespace to force linebreak
-    CL="${CL}  
-    Thanks to ${author}"
-
-    if ! [[ -z "${issues// }" ]] || ! [[ -z "${mr// }" ]]; then
-      # Two trailing whitespace to force linebreak
-      CL="${CL}  
-    See"
-    fi
-
-    if ! [[ -z "${mr// }" ]]; then
-      CL="${CL} ${mr}"
-    fi
-
-    if ! [[ -z "${issues// }" ]]; then
-      CL="${CL} ${issues}"
-    fi
-
-    CL="${CL}
-"
-  done
-done
 
 tmpfile="$(mktemp)"
 
