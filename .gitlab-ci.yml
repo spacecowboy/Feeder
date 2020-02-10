@@ -11,7 +11,8 @@ variables:
 cache:
   key: "uber"
   paths:
-     - .gradle/
+     - .gradle/caches
+     - .gradle/wrapper
 
 .sdk_apt: &before_docker
   before_script:
