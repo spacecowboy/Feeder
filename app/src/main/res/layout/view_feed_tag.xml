@@ -49,6 +49,7 @@
     android:layout_height="match_parent"
     android:background="?attr/selectableItemBackgroundBorderless"
     android:src="@drawable/tinted_expand_more"
+    android:contentDescription="@string/toggle_tag_expansion"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent" />
 

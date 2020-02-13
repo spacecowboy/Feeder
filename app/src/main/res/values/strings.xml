@@ -95,5 +95,7 @@
   <string name="javascript">Javascript</string>
   <string name="open_feed">Open feed</string>
   <string name="mark_items_below_as_read">Mark items below as read</string>
+  <string name="discovered_feeds_list">Discovered feeds list</string>
+  <string name="toggle_tag_expansion">Toggle tag expansion</string>
 
 </resources>
