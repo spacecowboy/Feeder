@@ -97,11 +97,6 @@ android {
     unitTests.returnDefaultValues = true
   }
 
-  packagingOptions {
-    // Rome incorrectly bundles stuff in its jar
-    pickFirst "rome-utils-${rome_version}.jar"
-  }
-
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
