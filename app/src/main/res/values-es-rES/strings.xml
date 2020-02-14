@@ -94,6 +94,8 @@
   <string name="javascript">Javascript</string>
   <string name="open_feed">Abrir canal</string>
   <string name="mark_items_below_as_read">Marcar anteriores como leídos</string>
+  <string name="discovered_feeds_list">Lista de canales descubiertos</string>
+  <string name="toggle_tag_expansion">Alternar expansión de etiquetas</string>
 
 
 </resources>
