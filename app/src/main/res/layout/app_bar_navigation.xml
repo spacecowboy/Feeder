@@ -8,18 +8,14 @@
 
   <com.google.android.material.appbar.AppBarLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:theme="@style/AppTheme.AppBarOverlay">
+    android:layout_height="wrap_content" >
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
       android:id="@+id/toolbar"
       android:layout_width="match_parent"
       android:layout_height="?attr/actionBarSize"
-      android:background="?attr/colorPrimary"
       android:fitsSystemWindows="true"
-      android:theme="@style/AppTheme.AppBarOverlay"
-      app:layout_scrollFlags="scroll|enterAlways|snap"
-      app:popupTheme="@style/AppTheme.PopupOverlay" />
+      app:layout_scrollFlags="scroll|enterAlways|snap" />
 
   </com.google.android.material.appbar.AppBarLayout>
 

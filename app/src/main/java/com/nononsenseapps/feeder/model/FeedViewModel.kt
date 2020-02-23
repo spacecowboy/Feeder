@@ -5,6 +5,8 @@ import androidx.lifecycle.asLiveData
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedTitle
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
@@ -48,5 +50,24 @@ class FeedViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
 
     suspend fun deleteFeed(id: Long) {
         dao.deleteFeedWithId(feedId = id)
+    }
+
+    suspend fun deleteFeeds(ids: List<Long>) {
+        dao.deleteFeeds(ids)
+    }
+
+    suspend fun getVisibleFeeds(id: Long, feedTag: String?): List<FeedTitle> {
+        return when {
+            id == ID_UNSET && feedTag?.isNotEmpty() == true -> {
+                dao.getFeedTitlesWithTag(feedTag = feedTag)
+            }
+            id == ID_UNSET || id == ID_ALL_FEEDS -> {
+                dao.getAllFeedTitles()
+            }
+            id > ID_UNSET -> {
+                dao.getFeedTitle(id)
+            }
+            else -> emptyList()
+        }
     }
 }
