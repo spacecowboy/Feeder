@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <!-- Sub themes -->
-  <style name="DarkToolbarThemeOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+  <style name="DarkToolbarThemeOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
     <item name="colorPrimary">@color/primary</item>
     <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
     <item name="colorPrimaryDark">@color/primary_dark</item>
     <!--   theme UI controls like checkboxes and text fields -->
     <item name="colorAccent">@color/accentDay</item>
+    <item name="colorSecondary">@color/accentDay</item>
   </style>
 
   <style name="NavbarThemeDay" parent="AppThemeDay">
     <!-- Background is green, so make touch feedback other color -->
     <item name="colorAccent">@color/accentDay</item>
+    <item name="colorSecondary">@color/accentDay</item>
   </style>
+
   <style name="NavbarThemeNight" parent="AppThemeNight">
     <!-- Background is green, so make touch feedback other color -->
     <item name="colorAccent">@color/accentNight</item>
+    <item name="colorSecondary">@color/accentNight</item>
   </style>
 
-  <style name="EditFeedThemeDay" parent="AppThemeDay">
+  <style name="EditFeedThemeDay" parent="DialogThemeDay" />
+  <style name="EditFeedThemeNight" parent="DialogThemeNight" />
+
+  <style name="DialogThemeDay" parent="AppThemeDay">
     <item name="android:windowActionBar">false</item>
     <item name="android:windowNoTitle">true</item>
     <item name="isFloatingWindow">true</item>
@@ -30,7 +37,8 @@
     <item name="android:windowFrame">@null</item>
     <item name="android:colorBackgroundCacheHint">@null</item>
   </style>
-  <style name="EditFeedThemeNight" parent="AppThemeNight">
+
+  <style name="DialogThemeNight" parent="AppThemeNight">
     <item name="android:windowActionBar">false</item>
     <item name="android:windowNoTitle">true</item>
     <item name="isFloatingWindow">true</item>
@@ -79,11 +87,7 @@
     <item name="readerBodyColor">@color/night_reader_body_color</item>
   </style>
 
-  <style name="AppThemeDialogDay" parent="Theme.AppCompat.Light.Dialog" />
-
-  <style name="AppThemeDialogNight" parent="Theme.AppCompat.Dialog" />
-
-  <style name="AppBaseThemeDay" parent="Theme.AppCompat.Light.NoActionBar">
+  <style name="AppBaseThemeDay" parent="Theme.MaterialComponents.Light.NoActionBar">
     <item name="android:windowActionModeOverlay">true</item>
     <item name="windowActionModeOverlay">true</item>
     <item name="windowActionBar">false</item>
@@ -97,15 +101,24 @@
     <item name="colorPrimaryDark">@color/primary_dark</item>
     <!--   theme UI controls like checkboxes and text fields -->
     <item name="colorAccent">@color/accentDay</item>
+    <item name="colorSecondary">@color/accentDay</item>
+
+    <item name="colorOnPrimary">@android:color/white</item>
+    <item name="colorOnSecondary">@android:color/white</item>
 
     <item name="android:windowContentOverlay">@null</item>
     <item name="android:windowBackground">@null</item>
+
+    <!-- color for stuff in action bar -->
+    <item name="colorControlNormal">@android:color/white</item>
+    <item name="titleTextColor">@android:color/white</item>
+    <item name="toolbarStyle">@style/AppTheme.ToolBar</item>
 
     <!-- Only needed for pre-L -->
     <item name="android:editTextBackground">@drawable/edit_text</item>
   </style>
 
-  <style name="AppBaseThemeNight" parent="Theme.AppCompat.NoActionBar">
+  <style name="AppBaseThemeNight" parent="Theme.MaterialComponents.NoActionBar">
     <item name="android:windowActionModeOverlay">true</item>
     <item name="windowActionModeOverlay">true</item>
     <item name="windowActionBar">false</item>
@@ -119,37 +132,18 @@
     <item name="colorPrimaryDark">@color/primary_dark</item>
     <!--   theme UI controls like checkboxes and text fields -->
     <item name="colorAccent">@color/accentNight</item>
+    <item name="colorSecondary">@color/accentNight</item>
+
+    <item name="colorOnPrimary">@android:color/white</item>
+    <item name="colorOnSecondary">@android:color/white</item>
+
+    <!-- color for stuff in action bar -->
+    <item name="colorControlNormal">@android:color/white</item>
+    <item name="titleTextColor">@android:color/white</item>
+    <item name="toolbarStyle">@style/AppTheme.ToolBar</item>
 
     <item name="android:windowContentOverlay">@null</item>
     <item name="android:windowBackground">@null</item>
-
-    <!-- Only needed for pre-L -->
-    <item name="android:editTextBackground">@drawable/edit_text</item>
-  </style>
-
-  <style name="AppBaseThemeDialogDay" parent="Theme.AppCompat.Dialog">
-    <item name="colorPrimary">@color/primary</item>
-    <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
-    <item name="colorPrimaryDark">@color/primary_dark</item>
-    <!--   theme UI controls like checkboxes and text fields -->
-    <item name="colorAccent">@color/accentDay</item>
-
-    <item name="android:windowContentOverlay">@null</item>
-    <item name="android:windowBackground">@color/day_background</item>
-
-    <!-- Only needed for pre-L -->
-    <item name="android:editTextBackground">@drawable/edit_text</item>
-  </style>
-
-  <style name="AppBaseThemeDialogNight" parent="Theme.AppCompat.Light.Dialog">
-    <item name="colorPrimary">@color/primary</item>
-    <!--   darker variant of colorPrimary (for status bar, contextual app bars) -->
-    <item name="colorPrimaryDark">@color/primary_dark</item>
-    <!--   theme UI controls like checkboxes and text fields -->
-    <item name="colorAccent">@color/accentNight</item>
-
-    <item name="android:windowContentOverlay">@null</item>
-    <item name="android:windowBackground">@color/night_background</item>
 
     <!-- Only needed for pre-L -->
     <item name="android:editTextBackground">@drawable/edit_text</item>
@@ -190,17 +184,17 @@
     <item name="android:textColor">?attr/listItemTitleColor</item>
   </style>
 
-<!--  <style name="TextAppearance.ListItem.Title.Day">-->
-<!--    <item name="android:textSize">16sp</item>-->
-<!--    <item name="android:fontFamily">sans-serif-medium</item>-->
-<!--    <item name="android:textColor">@color/day_title_text_color</item>-->
-<!--  </style>-->
+  <!--  <style name="TextAppearance.ListItem.Title.Day">-->
+  <!--    <item name="android:textSize">16sp</item>-->
+  <!--    <item name="android:fontFamily">sans-serif-medium</item>-->
+  <!--    <item name="android:textColor">@color/day_title_text_color</item>-->
+  <!--  </style>-->
 
-<!--  <style name="TextAppearance.ListItem.Title.Night">-->
-<!--    <item name="android:textSize">16sp</item>-->
-<!--    <item name="android:fontFamily">sans-serif-medium</item>-->
-<!--    <item name="android:textColor">@color/night_title_text_color</item>-->
-<!--  </style>-->
+  <!--  <style name="TextAppearance.ListItem.Title.Night">-->
+  <!--    <item name="android:textSize">16sp</item>-->
+  <!--    <item name="android:fontFamily">sans-serif-medium</item>-->
+  <!--    <item name="android:textColor">@color/night_title_text_color</item>-->
+  <!--  </style>-->
 
   <style name="TextAppearance.ListItem.Title.Read">
     <item name="android:textSize">16sp</item>
@@ -208,17 +202,17 @@
     <item name="android:textColor">?attr/listItemTitleReadColor</item>
   </style>
 
-<!--  <style name="TextAppearance.ListItem.Title.Read.Day">-->
-<!--    <item name="android:textSize">16sp</item>-->
-<!--    <item name="android:fontFamily">sans-serif-medium</item>-->
-<!--    <item name="android:textColor">@color/day_title_text_read_color</item>-->
-<!--  </style>-->
+  <!--  <style name="TextAppearance.ListItem.Title.Read.Day">-->
+  <!--    <item name="android:textSize">16sp</item>-->
+  <!--    <item name="android:fontFamily">sans-serif-medium</item>-->
+  <!--    <item name="android:textColor">@color/day_title_text_read_color</item>-->
+  <!--  </style>-->
 
-<!--  <style name="TextAppearance.ListItem.Title.Read.Night">-->
-<!--    <item name="android:textSize">16sp</item>-->
-<!--    <item name="android:fontFamily">sans-serif-medium</item>-->
-<!--    <item name="android:textColor">@color/night_title_text_read_color</item>-->
-<!--  </style>-->
+  <!--  <style name="TextAppearance.ListItem.Title.Read.Night">-->
+  <!--    <item name="android:textSize">16sp</item>-->
+  <!--    <item name="android:fontFamily">sans-serif-medium</item>-->
+  <!--    <item name="android:textColor">@color/night_title_text_read_color</item>-->
+  <!--  </style>-->
 
   <style name="TextAppearance.ListItem.Body">
     <item name="android:textSize">16sp</item>
@@ -226,17 +220,17 @@
     <item name="android:textColor">?attr/listItemBodyColor</item>
   </style>
 
-<!--  <style name="TextAppearance.ListItem.Body.Night">-->
-<!--    <item name="android:textSize">16sp</item>-->
-<!--    <item name="android:fontFamily">sans-serif</item>-->
-<!--    <item name="android:textColor">@color/night_body_text_color</item>-->
-<!--  </style>-->
+  <!--  <style name="TextAppearance.ListItem.Body.Night">-->
+  <!--    <item name="android:textSize">16sp</item>-->
+  <!--    <item name="android:fontFamily">sans-serif</item>-->
+  <!--    <item name="android:textColor">@color/night_body_text_color</item>-->
+  <!--  </style>-->
 
-<!--  <style name="TextAppearance.ListItem.Body.Day">-->
-<!--    <item name="android:textSize">16sp</item>-->
-<!--    <item name="android:fontFamily">sans-serif</item>-->
-<!--    <item name="android:textColor">@color/day_body_text_color</item>-->
-<!--  </style>-->
+  <!--  <style name="TextAppearance.ListItem.Body.Day">-->
+  <!--    <item name="android:textSize">16sp</item>-->
+  <!--    <item name="android:fontFamily">sans-serif</item>-->
+  <!--    <item name="android:textColor">@color/day_body_text_color</item>-->
+  <!--  </style>-->
 
   <style name="TextAppearance.Reader" />
 
@@ -286,8 +280,6 @@
     <item name="android:textStyle">bold</item>
   </style>
 
-  <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-  <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+  <style name="AppTheme.ToolBar" parent="Widget.MaterialComponents.Toolbar.Primary" />
 
 </resources>

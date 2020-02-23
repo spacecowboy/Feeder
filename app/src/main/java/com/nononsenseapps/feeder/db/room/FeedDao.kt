@@ -1,6 +1,9 @@
 package com.nononsenseapps.feeder.db.room
 
 import androidx.room.*
+import com.nononsenseapps.feeder.db.COL_ID
+import com.nononsenseapps.feeder.db.COL_TAG
+import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import kotlinx.coroutines.flow.Flow
 import java.net.URL
@@ -19,6 +22,11 @@ interface FeedDao {
 
     @Query("DELETE FROM feeds WHERE id IS :feedId")
     suspend fun deleteFeedWithId(feedId: Long)
+
+    @Query("""
+        DELETE FROM feeds WHERE id IN (:ids)
+        """)
+    suspend fun deleteFeeds(ids: List<Long>)
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
     fun loadLiveFeed(feedId: Long): Flow<Feed>
@@ -83,6 +91,19 @@ interface FeedDao {
 
     @Query("UPDATE feeds SET notify = :notify")
     suspend fun setAllNotify(notify: Boolean)
+
+    @Query("SELECT $COL_ID, $COL_TITLE FROM feeds WHERE id IS :feedId")
+    suspend fun getFeedTitle(feedId: Long): List<FeedTitle>
+
+    @Query("""
+        SELECT $COL_ID, $COL_TITLE
+        FROM feeds
+        WHERE $COL_TAG IS :feedTag
+        """)
+    suspend fun getFeedTitlesWithTag(feedTag: String): List<FeedTitle>
+
+    @Query("SELECT $COL_ID, $COL_TITLE FROM feeds")
+    suspend fun getAllFeedTitles(): List<FeedTitle>
 }
 
 /**

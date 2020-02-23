@@ -46,6 +46,9 @@
     <deepLink
       android:id="@+id/deepLink5"
       app:uri="content://com.nononsenseapps.feeder.provider/feeds" />
+    <action
+      android:id="@+id/action_feedFragment_to_deleteFeedsDialogFragment"
+      app:destination="@id/deleteFeedsDialogFragment" />
   </fragment>
   <fragment
     android:id="@+id/readerFragment"
@@ -84,4 +87,18 @@
     android:id="@+id/settingsFragment"
     android:name="com.nononsenseapps.feeder.ui.SettingsFragment"
     android:label="@string/action_settings" />
+  <dialog
+    android:id="@+id/deleteFeedsDialogFragment"
+    android:name="com.nononsenseapps.feeder.ui.DeleteFeedsDialogFragment"
+    android:label="DeleteFeedsDialogFragment" >
+    <argument
+      android:name="feed_ids"
+      app:argType="long[]" />
+    <argument
+      android:name="feed_titles"
+      app:argType="string[]" />
+    <action
+      android:id="@+id/action_deleteFeedsDialogFragment_to_feedFragment"
+      app:destination="@id/feedFragment" />
+  </dialog>
 </navigation>

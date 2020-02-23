@@ -22,7 +22,7 @@ buildscript {
     recyclerview_version = "1.0.0"
     legacy_support_version = "1.0.0"
     appcompat_version = "1.1.0"
-    material_version = "1.0.0"
+    material_version = "1.1.0"
     preference_version = "1.1.0"
     test_runner_version = "1.1.0"
     test_rules_version = "1.1.0"

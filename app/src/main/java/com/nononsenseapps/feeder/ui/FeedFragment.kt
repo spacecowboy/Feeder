@@ -11,6 +11,7 @@ import android.view.*
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareFragment
+import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.di.CURRENTLY_SYNCING_STATE
@@ -356,7 +358,6 @@ class FeedFragment : KodeinAwareFragment() {
     override fun onPrepareOptionsMenu(menu: Menu) {
         if (id < 1) {
             menu.findItem(R.id.action_edit_feed)?.isVisible = false
-            menu.findItem(R.id.action_delete_feed)?.isVisible = false
         }
 
         // Set toggleable state
@@ -430,9 +431,9 @@ class FeedFragment : KodeinAwareFragment() {
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
-        val id = menuItem.itemId
+        val itemId = menuItem.itemId
         return when {
-            id == R.id.action_sync -> {
+            itemId == R.id.action_sync -> {
                 // Sync all feeds when menu button pressed
                 requestFeedSync(
                         kodein = kodein,
@@ -442,7 +443,7 @@ class FeedFragment : KodeinAwareFragment() {
                 )
                 true
             }
-            id == R.id.action_edit_feed && this.id > ID_UNSET -> {
+            itemId == R.id.action_edit_feed && this.id > ID_UNSET -> {
                 this.id.let { feedId ->
                     val i = Intent(activity, EditFeedActivity::class.java)
                     // TODO do not animate the back movement here
@@ -456,7 +457,7 @@ class FeedFragment : KodeinAwareFragment() {
 
                 true
             }
-            id == R.id.action_add_templated && this.id > ID_UNSET -> {
+            itemId == R.id.action_add_templated && this.id > ID_UNSET -> {
                 val i = Intent(activity, EditFeedActivity::class.java)
                 // TODO do not animate the back movement here
                 i.putExtra(TEMPLATE, true)
@@ -465,24 +466,21 @@ class FeedFragment : KodeinAwareFragment() {
                 startActivity(i)
                 true
             }
-            id == R.id.action_delete_feed && this.id > ID_UNSET -> {
-                val feedId = this.id
-                val appContext = activity?.applicationContext
-                if (appContext != null) {
-                    lifecycleScope.launch {
-                        feedViewModel.deleteFeed(feedId)
-                        // Remove from shortcuts
-                        appContext.removeDynamicShortcutToFeed(feedId)
-                    }
-                }
+            itemId == R.id.action_delete_feed -> {
+                lifecycleScope.launch {
+                    val feeds: List<FeedTitle> = feedViewModel.getVisibleFeeds(id, feedTag)
 
-                // Tell activity to open another fragment
-                findNavController().navigate(R.id.action_feedFragment_self, bundle {
-                    putLong(ARG_FEED_ID, ID_ALL_FEEDS)
-                })
+                    findNavController().navigate(
+                            R.id.action_feedFragment_to_deleteFeedsDialogFragment,
+                            bundleOf(
+                                    ARG_FEED_IDS to feeds.map { it.id }.toLongArray(),
+                                    ARG_FEED_TITLES to feeds.map { it.title }.toTypedArray()
+                            )
+                    )
+                }
                 true
             }
-            id == R.id.action_only_unread -> {
+            itemId == R.id.action_only_unread -> {
                 val onlyUnread = !menuItem.isChecked
                 prefs.showOnlyUnread = onlyUnread
                 menuItem.isChecked = onlyUnread
@@ -498,18 +496,18 @@ class FeedFragment : KodeinAwareFragment() {
 
                 true
             }
-            id == R.id.action_notify -> {
+            itemId == R.id.action_notify -> {
                 notify = !menuItem.isChecked
 
                 setNotifyMenuItemState(menuItem)
                 setNotifications(notify)
                 true
             }
-            id == R.id.action_add -> {
+            itemId == R.id.action_add -> {
                 startActivityForResult(Intent(context, EditFeedActivity::class.java), EDIT_FEED_CODE)
                 true
             }
-            id == R.id.action_opml_export -> {
+            itemId == R.id.action_opml_export -> {
                 // Choose file, then export
                 val intent: Intent
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -526,7 +524,7 @@ class FeedFragment : KodeinAwareFragment() {
                 startActivityForResult(intent, EXPORT_OPML_CODE)
                 true
             }
-            id == R.id.action_opml_import -> {
+            itemId == R.id.action_opml_import -> {
                 // Choose file
                 val intent: Intent
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -542,11 +540,11 @@ class FeedFragment : KodeinAwareFragment() {
                 startActivityForResult(intent, IMPORT_OPML_CODE)
                 true
             }
-            id == R.id.action_settings -> {
+            itemId == R.id.action_settings -> {
                 findNavController().navigate(R.id.action_feedFragment_to_settingsFragment)
                 true
             }
-            id == R.id.action_reportbug -> {
+            itemId == R.id.action_reportbug -> {
                 try {
                     startActivity(openGitlabIssues())
                 } catch (e: ActivityNotFoundException) {
