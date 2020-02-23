@@ -110,9 +110,9 @@
     <item name="android:windowBackground">@null</item>
 
     <!-- color for stuff in action bar -->
-    <item name="colorControlNormal">@android:color/white</item>
-    <item name="titleTextColor">@android:color/white</item>
-    <item name="toolbarStyle">@style/AppTheme.ToolBar</item>
+    <item name="toolbarStyle">@style/AppTheme.ToolbarStyle</item>
+    <item name="actionOverflowButtonStyle">@style/AppTheme.ToolbarStyle.Overflow</item>
+    <item name="drawerArrowStyle">@style/AppTheme.ToolbarStyle.DrawerIcon</item>
 
     <!-- Only needed for pre-L -->
     <item name="android:editTextBackground">@drawable/edit_text</item>
@@ -138,9 +138,9 @@
     <item name="colorOnSecondary">@android:color/white</item>
 
     <!-- color for stuff in action bar -->
-    <item name="colorControlNormal">@android:color/white</item>
-    <item name="titleTextColor">@android:color/white</item>
-    <item name="toolbarStyle">@style/AppTheme.ToolBar</item>
+    <item name="toolbarStyle">@style/AppTheme.ToolbarStyle</item>
+    <item name="actionOverflowButtonStyle">@style/AppTheme.ToolbarStyle.Overflow</item>
+    <item name="drawerArrowStyle">@style/AppTheme.ToolbarStyle.DrawerIcon</item>
 
     <item name="android:windowContentOverlay">@null</item>
     <item name="android:windowBackground">@null</item>
@@ -280,6 +280,17 @@
     <item name="android:textStyle">bold</item>
   </style>
 
-  <style name="AppTheme.ToolBar" parent="Widget.MaterialComponents.Toolbar.Primary" />
+  <style name="AppTheme.ToolbarStyle" parent="@style/Widget.MaterialComponents.Toolbar">
+    <item name="titleTextColor">@android:color/white</item>
+    <item name="android:background">@color/primary</item>
+  </style>
+
+  <style name="AppTheme.ToolbarStyle.Overflow" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+    <item name="android:tint">@android:color/white</item>
+  </style>
+
+  <style name="AppTheme.ToolbarStyle.DrawerIcon" parent="Widget.AppCompat.DrawerArrowToggle">
+    <item name="color">@android:color/white</item>
+  </style>
 
 </resources>
