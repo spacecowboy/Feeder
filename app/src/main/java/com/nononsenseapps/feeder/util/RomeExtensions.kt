@@ -7,10 +7,16 @@ import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
 import com.rometools.modules.mediarss.MediaEntryModule
 import com.rometools.modules.mediarss.MediaModule
-import com.rometools.rome.feed.synd.*
+import com.rometools.rome.feed.synd.SyndContent
+import com.rometools.rome.feed.synd.SyndEnclosure
+import com.rometools.rome.feed.synd.SyndEntry
+import com.rometools.rome.feed.synd.SyndFeed
+import com.rometools.rome.feed.synd.SyndPerson
 import kotlinx.coroutines.FlowPreview
-import org.joda.time.DateTime
 import org.jsoup.parser.Parser.unescapeEntities
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 import java.net.URL
 
 @FlowPreview
@@ -251,12 +257,12 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
 
 fun SyndEntry.publishedRFC3339Date(): String? =
         when (publishedDate != null) {
-            true -> DateTime(publishedDate.time).toDateTimeISO().toString()
+            true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(publishedDate.time), ZoneOffset.systemDefault()).toString()
             else -> modifiedRFC3339Date() // This is the required element in atom feeds so it is a good fallback
         }
 
 fun SyndEntry.modifiedRFC3339Date(): String? =
         when (updatedDate != null) {
-            true -> DateTime(updatedDate.time).toDateTimeISO().toString()
+            true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(updatedDate.time), ZoneOffset.systemDefault()).toString()
             else -> null
         }

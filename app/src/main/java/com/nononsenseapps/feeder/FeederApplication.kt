@@ -8,6 +8,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.multidex.MultiDexApplication
 import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
+import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
@@ -70,6 +71,7 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
 
     override fun onCreate() {
         super.onCreate()
+        AndroidThreeTen.init(this)
         staticFilesDir = filesDir
     }
 

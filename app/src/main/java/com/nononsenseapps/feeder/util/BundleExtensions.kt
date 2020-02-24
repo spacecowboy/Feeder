@@ -4,7 +4,7 @@ import android.os.Bundle
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_URL
-import org.joda.time.DateTime
+import org.threeten.bp.ZonedDateTime
 
 inline fun bundle(init: Bundle.() -> Unit): Bundle {
     val bundle = Bundle()
@@ -33,9 +33,9 @@ fun Bundle.asFeedItemFoo(): FeedItemWithFeed {
             pubDate = when(getString(ARG_DATE)) {
                 null -> null
                 else -> {
-                    var dt: DateTime? = null
+                    var dt: ZonedDateTime? = null
                     try {
-                        dt = DateTime.parse(getString(ARG_DATE))
+                        dt = ZonedDateTime.parse(getString(ARG_DATE))
                     } catch(t: Throwable) {}
                     dt
                 }

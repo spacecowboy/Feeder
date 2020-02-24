@@ -27,8 +27,9 @@ import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.jsonfeed.Item
 import kotlinx.coroutines.FlowPreview
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 import java.net.URI
 import java.net.URL
 
@@ -53,12 +54,12 @@ data class FeedItem @Ignore constructor(
         @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
         @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
         @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
-        @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) var pubDate: DateTime? = null,
+        @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) var pubDate: ZonedDateTime? = null,
         @ColumnInfo(name = COL_LINK) var link: String? = null,
         @ColumnInfo(name = COL_UNREAD) var unread: Boolean = true,
         @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
         @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
-        @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: DateTime = DateTime(0, DateTimeZone.UTC)) {
+        @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH) {
 
     constructor() : this(id = ID_UNSET)
 
@@ -85,10 +86,10 @@ data class FeedItem @Ignore constructor(
         this.pubDate =
                 try {
                     // Allow an actual pubdate to be updated
-                    DateTime.parse(entry.date_published)
+                    ZonedDateTime.parse(entry.date_published)
                 } catch (t: Throwable) {
                     // If a pubdate is missing, then don't update if one is already set
-                    this.pubDate ?: DateTime.now(DateTimeZone.UTC)
+                    this.pubDate ?: ZonedDateTime.now(ZoneOffset.UTC)
                 }
     }
 

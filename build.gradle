@@ -13,7 +13,8 @@ buildscript {
     okhttp_version = "3.11.0"
     rome_version = "1.7.1-f4"
     moshi_version = "1.5.0"
-    joda_version = "2.9.7"
+    threetentest_version = "1.2.2"
+    threetenabp_version = "1.2.2"
     jsoup_version = "1.7.3"
 
     androidx_core_version = "1.2.0"

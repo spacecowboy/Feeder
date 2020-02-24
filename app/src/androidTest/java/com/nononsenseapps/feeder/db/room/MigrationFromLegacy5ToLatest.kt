@@ -8,20 +8,49 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nononsenseapps.feeder.FeederApplication
-import com.nononsenseapps.feeder.db.legacy.*
+import com.nononsenseapps.feeder.db.legacy.COL_AUTHOR
+import com.nononsenseapps.feeder.db.legacy.COL_CUSTOM_TITLE
+import com.nononsenseapps.feeder.db.legacy.COL_DESCRIPTION
+import com.nononsenseapps.feeder.db.legacy.COL_ENCLOSURELINK
+import com.nononsenseapps.feeder.db.legacy.COL_FEED
+import com.nononsenseapps.feeder.db.legacy.COL_FEEDTITLE
+import com.nononsenseapps.feeder.db.legacy.COL_FEEDURL
+import com.nononsenseapps.feeder.db.legacy.COL_GUID
+import com.nononsenseapps.feeder.db.legacy.COL_ID
+import com.nononsenseapps.feeder.db.legacy.COL_IMAGEURL
+import com.nononsenseapps.feeder.db.legacy.COL_LINK
+import com.nononsenseapps.feeder.db.legacy.COL_NOTIFIED
+import com.nononsenseapps.feeder.db.legacy.COL_NOTIFY
+import com.nononsenseapps.feeder.db.legacy.COL_PLAINSNIPPET
+import com.nononsenseapps.feeder.db.legacy.COL_PLAINTITLE
+import com.nononsenseapps.feeder.db.legacy.COL_PUBDATE
+import com.nononsenseapps.feeder.db.legacy.COL_TAG
+import com.nononsenseapps.feeder.db.legacy.COL_TITLE
+import com.nononsenseapps.feeder.db.legacy.COL_UNREAD
+import com.nononsenseapps.feeder.db.legacy.COL_URL
+import com.nononsenseapps.feeder.db.legacy.CREATE_FEED_ITEM_TABLE
+import com.nononsenseapps.feeder.db.legacy.CREATE_TAGS_VIEW
+import com.nononsenseapps.feeder.db.legacy.CREATE_TAG_TRIGGER
+import com.nononsenseapps.feeder.db.legacy.FEED_ITEM_TABLE_NAME
+import com.nononsenseapps.feeder.db.legacy.FEED_TABLE_NAME
+import com.nononsenseapps.feeder.db.legacy.LegacyDatabaseHandler
 import com.nononsenseapps.feeder.util.contentValues
 import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
 import kotlinx.coroutines.runBlocking
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
@@ -123,7 +152,7 @@ class MigrationFromLegacy5ToLatest {
                     setString(COL_AUTHOR to "author$index")
                     setString(COL_ENCLOSURELINK to "https://enclosure$index")
                     setString(COL_IMAGEURL to "https://image$index")
-                    setString(COL_PUBDATE to DateTime(2018, 2, 3, 4, 5).toString())
+                    setString(COL_PUBDATE to "2018-02-03T04:05:00Z")
                     setString(COL_LINK to "https://link$index")
                 })
             }
@@ -151,7 +180,7 @@ class MigrationFromLegacy5ToLatest {
             assertEquals("feedACustom", feedA.customTitle)
             assertEquals(URL("https://feedA"), feedA.url)
             assertEquals("", feedA.tag)
-            assertEquals(DateTime(0, DateTimeZone.UTC), feedA.lastSync)
+            assertEquals(Instant.EPOCH, feedA.lastSync)
             assertFalse(feedA.notify)
             assertNull(feedA.imageUrl)
         }
@@ -173,7 +202,7 @@ class MigrationFromLegacy5ToLatest {
             assertEquals("feedBCustom", feedB.customTitle)
             assertEquals(URL("https://feedB"), feedB.url)
             assertEquals("tag", feedB.tag)
-            assertEquals(DateTime(0, DateTimeZone.UTC), feedB.lastSync)
+            assertEquals(Instant.EPOCH, feedB.lastSync)
             assertTrue(feedB.notify)
             assertNull(feedB.imageUrl)
         }
@@ -230,7 +259,7 @@ class MigrationFromLegacy5ToLatest {
                 assertEquals("author$index", it.author)
                 assertEquals("https://enclosure$index", it.enclosureLink)
                 assertEquals("https://image$index", it.imageUrl)
-                assertEquals(DateTime(2018, 2, 3, 4, 5).toString(), it.pubDate.toString())
+                assertEquals(ZonedDateTime.of(2018, 2, 3, 4, 5, 0, 0, ZoneOffset.UTC), it.pubDate)
                 assertEquals("https://link$index", it.link)
                 assertTrue(it.notified)
             }

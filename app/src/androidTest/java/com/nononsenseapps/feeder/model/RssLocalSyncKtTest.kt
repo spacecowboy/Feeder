@@ -8,22 +8,25 @@ import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
+import com.nononsenseapps.feeder.util.minusMinutes
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
+import org.threeten.bp.Instant
 import java.io.InputStream
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -140,10 +143,10 @@ class RssLocalSyncKtTest {
         runBlocking {
             syncFeeds(db = testDb.db, filesDir = filesDir, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             testDb.db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
-                assertTrue("Feed should have been synced", feed.lastSync.millis > 0)
+                assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
                 assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
                 // "Long time" ago, but not unset
-                testDb.db.feedDao().updateFeed(feed.copy(lastSync = DateTime(999L, DateTimeZone.UTC)))
+                testDb.db.feedDao().updateFeed(feed.copy(lastSync = Instant.ofEpochMilli(999L)))
             }
             syncFeeds(db = testDb.db, filesDir = filesDir, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
         }
@@ -153,7 +156,7 @@ class RssLocalSyncKtTest {
         assertNotEquals(
                 "Cached response should still have updated feed last sync",
                 999L,
-                testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync.millis)
+                testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync.toEpochMilli())
     }
 
     @Test
@@ -161,11 +164,11 @@ class RssLocalSyncKtTest {
         val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
                 cowboyJson)
 
-        val fourteenMinsAgo = DateTime.now(DateTimeZone.UTC).minusMinutes(14)
+        val fourteenMinsAgo = Instant.now().minusMinutes(14)
         runBlocking {
             syncFeeds(db = testDb.db, filesDir = filesDir, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             testDb.db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
-                assertTrue("Feed should have been synced", feed.lastSync.millis > 0)
+                assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
                 assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
 
                 testDb.db.feedDao().updateFeed(feed.copy(lastSync = fourteenMinsAgo))
@@ -188,11 +191,11 @@ class RssLocalSyncKtTest {
         val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
                 cowboyJson)
 
-        val fourteenMinsAgo = DateTime.now(DateTimeZone.UTC).minusMinutes(14)
+        val fourteenMinsAgo = Instant.now().minusMinutes(14)
         runBlocking {
             syncFeeds(db = testDb.db, filesDir = filesDir, feedParser = feedParser, feedId = cowboyJsonId, forceNetwork = true)
             testDb.db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
-                assertTrue("Feed should have been synced", feed.lastSync.millis > 0)
+                assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
                 assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
 
                 testDb.db.feedDao().updateFeed(feed.copy(lastSync = fourteenMinsAgo))
@@ -230,7 +233,7 @@ class RssLocalSyncKtTest {
 
         assertEquals(
                 "Last sync should not have been updated",
-                DateTime(0, DateTimeZone.UTC),
+                Instant.EPOCH,
                 testDb.db.feedDao().loadFeed(failingJsonId)!!.lastSync
         )
 
@@ -285,7 +288,7 @@ class RssLocalSyncKtTest {
                 url = URL("$url")
         ))
 
-        val beforeSyncTime = DateTime.now(DateTimeZone.UTC)
+        val beforeSyncTime = Instant.now()
 
         runBlocking {
             syncFeeds(db = testDb.db, filesDir = filesDir, feedParser = feedParser, feedId = feedId)
@@ -303,7 +306,7 @@ class RssLocalSyncKtTest {
                 items[0].pubDate, items[1].pubDate)
 
         assertTrue("The pubDate should be after 'before sync time'",
-                items[0].pubDate!! > beforeSyncTime)
+                items[0].pubDate!!.toInstant() > beforeSyncTime)
 
         // Compare ID to compare insertion order (and thus pubdate compared to raw feed)
         assertTrue("The pubDates' magnitude should match descending iteration order") {

@@ -20,12 +20,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import okhttp3.Response
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.kodein.di.Kodein
 import org.kodein.di.android.closestKodein
 import org.kodein.di.direct
 import org.kodein.di.generic.instance
+import org.threeten.bp.Instant
+import org.threeten.bp.temporal.ChronoUnit
 import java.io.File
 import java.io.IOException
 import kotlin.math.max
@@ -65,16 +65,15 @@ internal suspend fun syncFeeds(db: AppDatabase,
                                minFeedAgeMinutes: Int = 15): Boolean {
     var result = false
     // Let all new items share download time
-    val downloadTime = DateTime.now(DateTimeZone.UTC)
+    val downloadTime = Instant.now()
     val time = measureTimeMillis {
         try {
             supervisorScope {
                 val staleTime: Long = if (forceNetwork) {
-                    DateTime.now(DateTimeZone.UTC).millis
+                    Instant.now().toEpochMilli()
                 } else {
-                    DateTime.now(DateTimeZone.UTC)
-                            .minusMinutes(minFeedAgeMinutes)
-                            .millis
+                    Instant.now().minus(minFeedAgeMinutes.toLong(), ChronoUnit.MINUTES)
+                            .toEpochMilli()
                 }
                 val feedsToFetch = feedsToSync(db.feedDao(), feedId, feedTag, staleTime = staleTime)
 
@@ -116,7 +115,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                              feedParser: FeedParser,
                              maxFeedItemCount: Int,
                              forceNetwork: Boolean = false,
-                             downloadTime: DateTime) = withContext(Dispatchers.IO) {
+                             downloadTime: Instant) = withContext(Dispatchers.IO) {
     val response: Response = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
 
     var responseHash = 0
@@ -137,7 +136,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
             }
 
     // Always update the feeds last sync field
-    feedSql.lastSync = DateTime.now(DateTimeZone.UTC)
+    feedSql.lastSync = Instant.now()
 
     if (feed == null) {
         db.feedDao().upsertFeed(feedSql)
