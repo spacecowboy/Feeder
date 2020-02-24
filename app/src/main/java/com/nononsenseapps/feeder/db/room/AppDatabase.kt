@@ -10,7 +10,11 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.blob.blobOutputStream
-import com.nononsenseapps.feeder.util.*
+import com.nononsenseapps.feeder.util.contentValues
+import com.nononsenseapps.feeder.util.forEach
+import com.nononsenseapps.feeder.util.setInt
+import com.nononsenseapps.feeder.util.setLong
+import com.nononsenseapps.feeder.util.setString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 
@@ -27,7 +31,7 @@ const val ID_ALL_FEEDS: Long = -10
  */
 
 @FlowPreview
-@Database(entities = [Feed::class, FeedItem::class], version = 10)
+@Database(entities = [Feed::class, FeedItem::class], version = 11)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun feedDao(): FeedDao
@@ -68,16 +72,30 @@ val allMigrations = arrayOf(
         MIGRATION_6_7,
         MIGRATION_7_8,
         MIGRATION_8_9,
-        MIGRATION_9_10
+        MIGRATION_9_10,
+        MIGRATION_10_11
 )
+
+/*
+ * 6 represents legacy database
+ * 7 represents new Room database
+ */
+
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 @Suppress("ClassName")
-/**
- * 6 represents legacy database
- * 7 represents new Room database
- */
+object MIGRATION_10_11 : Migration(10, 11) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("""
+            ALTER TABLE feed_items ADD COLUMN first_synced_time INTEGER NOT NULL DEFAULT 0
+        """.trimIndent())
+    }
+}
+
+@FlowPreview
+@ExperimentalCoroutinesApi
+@Suppress("ClassName")
 object MIGRATION_9_10 : Migration(9, 10) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("""

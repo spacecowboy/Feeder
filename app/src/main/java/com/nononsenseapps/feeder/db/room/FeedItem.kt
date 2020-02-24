@@ -1,8 +1,27 @@
 package com.nononsenseapps.feeder.db.room
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
-import com.nononsenseapps.feeder.db.*
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.nononsenseapps.feeder.db.COL_AUTHOR
+import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
+import com.nononsenseapps.feeder.db.COL_FEEDID
+import com.nononsenseapps.feeder.db.COL_FIRSTSYNCEDTIME
+import com.nononsenseapps.feeder.db.COL_GUID
+import com.nononsenseapps.feeder.db.COL_ID
+import com.nononsenseapps.feeder.db.COL_IMAGEURL
+import com.nononsenseapps.feeder.db.COL_LINK
+import com.nononsenseapps.feeder.db.COL_NOTIFIED
+import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
+import com.nononsenseapps.feeder.db.COL_PLAINTITLE
+import com.nononsenseapps.feeder.db.COL_PUBDATE
+import com.nononsenseapps.feeder.db.COL_TITLE
+import com.nononsenseapps.feeder.db.COL_UNREAD
+import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
@@ -38,7 +57,8 @@ data class FeedItem @Ignore constructor(
         @ColumnInfo(name = COL_LINK) var link: String? = null,
         @ColumnInfo(name = COL_UNREAD) var unread: Boolean = true,
         @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
-        @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null) {
+        @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
+        @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: DateTime = DateTime(0, DateTimeZone.UTC)) {
 
     constructor() : this(id = ID_UNSET)
 

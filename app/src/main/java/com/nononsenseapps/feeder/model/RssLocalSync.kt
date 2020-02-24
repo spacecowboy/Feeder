@@ -4,11 +4,21 @@ import android.content.Context
 import android.util.Log
 import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobOutputStream
-import com.nononsenseapps.feeder.db.room.*
+import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.upsertFeed
+import com.nononsenseapps.feeder.db.room.upsertFeedItem
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withContext
 import okhttp3.Response
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -54,6 +64,8 @@ internal suspend fun syncFeeds(db: AppDatabase,
                                parallel: Boolean = false,
                                minFeedAgeMinutes: Int = 15): Boolean {
     var result = false
+    // Let all new items share download time
+    val downloadTime = DateTime.now(DateTimeZone.UTC)
     val time = measureTimeMillis {
         try {
             supervisorScope {
@@ -82,7 +94,8 @@ internal suspend fun syncFeeds(db: AppDatabase,
                                 filesDir = filesDir,
                                 feedParser = feedParser,
                                 maxFeedItemCount = maxFeedItemCount,
-                                forceNetwork = forceNetwork)
+                                forceNetwork = forceNetwork,
+                                downloadTime = downloadTime)
                     }
                 }
 
@@ -102,7 +115,8 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                              filesDir: File,
                              feedParser: FeedParser,
                              maxFeedItemCount: Int,
-                             forceNetwork: Boolean = false) = withContext(Dispatchers.IO) {
+                             forceNetwork: Boolean = false,
+                             downloadTime: DateTime) = withContext(Dispatchers.IO) {
     val response: Response = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
 
     var responseHash = 0
@@ -146,7 +160,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                 ?.reversed()
                 ?.forEach { (item, id) ->
                     val feedItemSql = itemDao.loadFeedItem(guid = id,
-                            feedId = feedSql.id) ?: FeedItem()
+                            feedId = feedSql.id) ?: FeedItem(firstSyncedTime = downloadTime)
 
                     feedItemSql.updateFromParsedEntry(item.copy(id = id), feed)
                     feedItemSql.feedId = feedSql.id
