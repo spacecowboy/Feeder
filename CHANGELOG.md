@@ -1,3 +1,12 @@
+# 1.9.0
+Jonas Kalderstam (3):
+  * [ae1338e] Added additional accessibility strings
+  * [25e9602] Added dialog for deleting multiple feeds
+  * [da3089e] Changed sort order to include synchronization time
+
+Khar Khamal (1):
+  * [ff491f1] Updated Spanish translations
+
 # 1.8.30
   * [49e7f76] Replaced day-night theme with manual control over themes
   * [d54ccbc] Fixed scrollbar ghosting

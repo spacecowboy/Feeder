@@ -24,8 +24,8 @@ android {
 
   defaultConfig {
     applicationId "com.nononsenseapps.feeder"
-    versionCode 69
-    versionName "1.8.30"
+    versionCode 70
+    versionName "1.9.0"
     compileSdkVersion 28
     minSdkVersion 18 // 23 was the conscrypt cutoff
     targetSdkVersion 28
