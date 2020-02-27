@@ -1,15 +1,35 @@
 package com.nononsenseapps.feeder.db.room
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
-import com.nononsenseapps.feeder.db.*
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.nononsenseapps.feeder.db.COL_AUTHOR
+import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
+import com.nononsenseapps.feeder.db.COL_FEEDID
+import com.nononsenseapps.feeder.db.COL_FIRSTSYNCEDTIME
+import com.nononsenseapps.feeder.db.COL_GUID
+import com.nononsenseapps.feeder.db.COL_ID
+import com.nononsenseapps.feeder.db.COL_IMAGEURL
+import com.nononsenseapps.feeder.db.COL_LINK
+import com.nononsenseapps.feeder.db.COL_NOTIFIED
+import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
+import com.nononsenseapps.feeder.db.COL_PLAINTITLE
+import com.nononsenseapps.feeder.db.COL_PUBDATE
+import com.nononsenseapps.feeder.db.COL_TITLE
+import com.nononsenseapps.feeder.db.COL_UNREAD
+import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.jsonfeed.Item
 import kotlinx.coroutines.FlowPreview
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 import java.net.URI
 import java.net.URL
 
@@ -34,11 +54,12 @@ data class FeedItem @Ignore constructor(
         @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
         @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
         @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
-        @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) var pubDate: DateTime? = null,
+        @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) var pubDate: ZonedDateTime? = null,
         @ColumnInfo(name = COL_LINK) var link: String? = null,
         @ColumnInfo(name = COL_UNREAD) var unread: Boolean = true,
         @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
-        @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null) {
+        @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
+        @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH) {
 
     constructor() : this(id = ID_UNSET)
 
@@ -65,10 +86,10 @@ data class FeedItem @Ignore constructor(
         this.pubDate =
                 try {
                     // Allow an actual pubdate to be updated
-                    DateTime.parse(entry.date_published)
+                    ZonedDateTime.parse(entry.date_published)
                 } catch (t: Throwable) {
                     // If a pubdate is missing, then don't update if one is already set
-                    this.pubDate ?: DateTime.now(DateTimeZone.UTC)
+                    this.pubDate ?: ZonedDateTime.now(ZoneOffset.UTC)
                 }
     }
 

@@ -16,9 +16,8 @@ import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import org.joda.time.DateTimeZone
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.FormatStyle
 import java.util.*
 
 
@@ -33,7 +32,7 @@ class FeedItemPagedListAdapter(
         PagedListAdapter<PreviewItem, RecyclerView.ViewHolder>(PreviewItemDiffer) {
 
     private val shortDateTimeFormat: DateTimeFormatter =
-            DateTimeFormat.mediumDate().withLocale(Locale.getDefault())
+            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
 
     private val linkColor: Int by lazy {
         settingsViewModel.accentColor
@@ -101,8 +100,7 @@ class FeedItemPagedListAdapter(
                 holder.dateTextView.visibility = View.GONE
             } else {
                 holder.dateTextView.visibility = View.VISIBLE
-                holder.dateTextView.text = it.withZone(DateTimeZone.getDefault())
-                        .toString(shortDateTimeFormat)
+                holder.dateTextView.text = it.toLocalDate().format(shortDateTimeFormat)
             }
         }
 

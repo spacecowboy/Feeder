@@ -2,18 +2,18 @@ package com.nononsenseapps.feeder.db.room
 
 import androidx.room.TypeConverter
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
+import org.threeten.bp.Instant
+import org.threeten.bp.ZonedDateTime
 import java.net.URL
 
 class Converters {
 
     @TypeConverter
-    fun dateTimeFromString(value: String?): DateTime? {
-        var dt: DateTime? = null
+    fun dateTimeFromString(value: String?): ZonedDateTime? {
+        var dt: ZonedDateTime? = null
         if (value != null) {
             try {
-                dt = DateTime.parse(value)
+                dt = ZonedDateTime.parse(value)
             } catch (t: Throwable) {
             }
         }
@@ -21,7 +21,7 @@ class Converters {
     }
 
     @TypeConverter
-    fun stringFromDateTime(value: DateTime?): String? =
+    fun stringFromDateTime(value: ZonedDateTime?): String? =
             value?.toString()
 
     @TypeConverter
@@ -33,14 +33,14 @@ class Converters {
         value?.let { sloppyLinkToStrictURLNoThrows(it) }
 
     @TypeConverter
-    fun dateTimeFromLong(value: Long?): DateTime? =
+    fun instantFromLong(value: Long?): Instant? =
             try {
-                value?.let { DateTime(it, DateTimeZone.UTC) }
+                value?.let { Instant.ofEpochMilli(it) }
             } catch (t: Throwable) {
                 null
             }
 
     @TypeConverter
-    fun longFromDateTime(value: DateTime?): Long? =
-            value?.millis
+    fun longFromInstant(value: Instant?): Long? =
+            value?.toEpochMilli()
 }

@@ -5,13 +5,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
+import com.nononsenseapps.feeder.util.minusMinutes
 import kotlinx.coroutines.runBlocking
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.threeten.bp.Instant
 import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
@@ -33,12 +33,12 @@ class FeedsToSyncTest {
 
     @Test
     fun doesNotReturnFreshFeed() = runBlocking {
-        val now = DateTime.now(DateTimeZone.UTC)
+        val now = Instant.now()
         val feed = withFeed(lastSync = now.minusMinutes(1))
 
         // when
         val result = feedsToSync(testDb.db.feedDao(), feedId = feed.id, tag = "",
-                staleTime = now.minusMinutes(2).millis)
+                staleTime = now.minusMinutes(2).toEpochMilli())
 
         // then
         assertEquals(emptyList<Feed>(), result)
@@ -58,13 +58,13 @@ class FeedsToSyncTest {
 
     @Test
     fun doesNotReturnAllFreshFeeds() = runBlocking {
-        val now = DateTime.now(DateTimeZone.UTC)
+        val now = Instant.now()
         val items = listOf(
                 withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1)),
                 withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3))
         )
 
-        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "", staleTime = now.minusMinutes(2).millis)
+        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "", staleTime = now.minusMinutes(2).toEpochMilli())
 
         assertEquals(listOf(items[1]), result)
     }
@@ -83,18 +83,18 @@ class FeedsToSyncTest {
 
     @Test
     fun doesNotReturnTaggedFreshFeeds() = runBlocking {
-        val now = DateTime.now(DateTimeZone.UTC)
+        val now = Instant.now()
         val items = listOf(
                 withFeed(url = URL("http://one"), lastSync = now.minusMinutes(1), tag = "tag"),
                 withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3), tag = "tag")
         )
 
-        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "tag", staleTime = now.minusMinutes(2).millis)
+        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "tag", staleTime = now.minusMinutes(2).toEpochMilli())
 
         assertEquals(listOf(items[1]), result)
     }
 
-    private suspend fun withFeed(lastSync: DateTime = DateTime(0, DateTimeZone.UTC), url: URL = URL("http://url"), tag: String = ""): Feed {
+    private suspend fun withFeed(lastSync: Instant = Instant.ofEpochMilli(0), url: URL = URL("http://url"), tag: String = ""): Feed {
         val feed = Feed(
                 lastSync = lastSync,
                 url = url,

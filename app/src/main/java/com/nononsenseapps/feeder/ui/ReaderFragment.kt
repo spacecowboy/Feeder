@@ -4,7 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.text.BidiFormatter
@@ -20,14 +25,18 @@ import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
-import com.nononsenseapps.feeder.util.*
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
+import com.nononsenseapps.feeder.util.Prefs
+import com.nononsenseapps.feeder.util.TabletUtils
+import com.nononsenseapps.feeder.util.bundle
+import com.nononsenseapps.feeder.util.openLinkInBrowser
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
-import org.joda.time.DateTimeZone
-import org.joda.time.format.DateTimeFormat
 import org.kodein.di.Kodein
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.FormatStyle
 import java.io.StringReader
 import java.util.*
 
@@ -42,7 +51,9 @@ const val ARG_DATE = "date"
 
 @FlowPreview
 class ReaderFragment : KodeinAwareFragment() {
-    private val dateTimeFormat = DateTimeFormat.forStyle("FM").withLocale(Locale.getDefault())
+    private val dateTimeFormat =
+            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
+                    .withLocale(Locale.getDefault())
 
     private var _id: Long = ID_UNSET
     // All content contained in RssItem
@@ -109,15 +120,13 @@ class ReaderFragment : KodeinAwareFragment() {
                             when {
                                 author == null && pubDate != null ->
                                     authorTextView.text = getString(R.string.on_date,
-                                            pubDate.withZone(DateTimeZone.getDefault())
-                                                    .toString(dateTimeFormat))
+                                            pubDate.format(dateTimeFormat))
                                 author != null && pubDate != null ->
                                     authorTextView.text = getString(R.string.by_author_on_date,
                                             // Must wrap author in unicode marks to ensure it formats
                                             // correctly in RTL
                                             unicodeWrap(author),
-                                            pubDate.withZone(DateTimeZone.getDefault())
-                                                    .toString(dateTimeFormat))
+                                            pubDate.format(dateTimeFormat))
                                 else -> authorTextView.visibility = View.GONE
                             }
                         }

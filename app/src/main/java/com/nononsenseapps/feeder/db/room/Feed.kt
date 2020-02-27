@@ -16,10 +16,7 @@ import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
-import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
-import com.nononsenseapps.jsonfeed.Feed
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
+import org.threeten.bp.Instant
 import java.net.URL
 
 @Entity(tableName = FEEDS_TABLE_NAME,
@@ -34,7 +31,7 @@ data class Feed @Ignore constructor(
         @ColumnInfo(name = COL_TAG) var tag: String = "",
         @ColumnInfo(name = COL_NOTIFY) var notify: Boolean = false,
         @ColumnInfo(name = COL_IMAGEURL) var imageUrl: URL? = null,
-        @ColumnInfo(name = COL_LASTSYNC, typeAffinity = ColumnInfo.INTEGER) var lastSync: DateTime = DateTime(0L, DateTimeZone.UTC),
+        @ColumnInfo(name = COL_LASTSYNC, typeAffinity = ColumnInfo.INTEGER) var lastSync: Instant = Instant.EPOCH,
         @ColumnInfo(name = COL_RESPONSEHASH) var responseHash: Int = 0
 ) {
     constructor() : this(id = ID_UNSET)

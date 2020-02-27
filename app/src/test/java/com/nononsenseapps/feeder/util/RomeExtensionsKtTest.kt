@@ -9,12 +9,19 @@ import com.rometools.modules.mediarss.MediaModule
 import com.rometools.modules.mediarss.types.MediaContent
 import com.rometools.modules.mediarss.types.Reference
 import com.rometools.modules.mediarss.types.Thumbnail
-import com.rometools.rome.feed.synd.*
+import com.rometools.rome.feed.synd.SyndContent
+import com.rometools.rome.feed.synd.SyndEnclosure
+import com.rometools.rome.feed.synd.SyndEntry
+import com.rometools.rome.feed.synd.SyndFeed
+import com.rometools.rome.feed.synd.SyndLink
+import com.rometools.rome.feed.synd.SyndPerson
 import kotlinx.coroutines.FlowPreview
-import org.joda.time.DateTime
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 import java.net.URI
 import java.net.URL
 import java.util.*
@@ -296,12 +303,12 @@ class RomeExtensionsKtTest {
     @Test
     fun publishedRFC3339Date() {
         // Need to convert it so timezone is correct for test
-        val romeDate = DateTime.parse("2017-11-15T22:36:36+00:00").toDate()
-        val dateTime = DateTime(romeDate.time)
+        val romeDate = Date(ZonedDateTime.parse("2017-11-15T22:36:36+00:00").toInstant().toEpochMilli())
+        val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeDate.time), ZoneOffset.systemDefault())
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         url = "$baseUrl/id",
-                        date_published = dateTime.toDateTimeISO().toString()),
+                        date_published = dateTime.toString()),
                 mockSyndEntry(uri = "id",
                         publishedDate = romeDate
                 ).asItem(baseUrl)
@@ -311,13 +318,13 @@ class RomeExtensionsKtTest {
     @Test
     fun publishedRFC3339DateFallsBackToModified() {
         // Need to convert it so timezone is correct for test
-        val romeDate = DateTime.parse("2017-11-15T22:36:36+00:00").toDate()
-        val dateTime = DateTime(romeDate.time)
+        val romeDate = Date(ZonedDateTime.parse("2017-11-15T22:36:36+00:00").toInstant().toEpochMilli())
+        val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeDate.time), ZoneOffset.systemDefault())
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         url = "$baseUrl/id",
-                        date_modified = dateTime.toDateTimeISO().toString(),
-                        date_published = dateTime.toDateTimeISO().toString()),
+                        date_modified = dateTime.toString(),
+                        date_published = dateTime.toString()),
                 mockSyndEntry(uri = "id",
                         updatedDate = romeDate
                 ).asItem(baseUrl)
@@ -327,15 +334,15 @@ class RomeExtensionsKtTest {
     @Test
     fun modifiedRFC3339Date() {
         // Need to convert it so timezone is correct for test
-        val romePubDate = DateTime.parse("2017-11-15T22:36:36+00:00").toDate()
-        val romeModDate = DateTime.parse("2017-11-10T22:36:36+00:00").toDate()
-        val pubDate = DateTime(romePubDate.time)
-        val modDate = DateTime(romeModDate.time)
+        val romePubDate = Date(ZonedDateTime.parse("2017-11-15T22:36:36+00:00").toInstant().toEpochMilli())
+        val romeModDate = Date(ZonedDateTime.parse("2017-11-10T22:36:36+00:00").toInstant().toEpochMilli())
+        val pubDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romePubDate.time), ZoneOffset.systemDefault())
+        val modDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeModDate.time), ZoneOffset.systemDefault())
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
                         url = "$baseUrl/id",
-                        date_modified = modDate.toDateTimeISO().toString(),
-                        date_published = pubDate.toDateTimeISO().toString()),
+                        date_modified = modDate.toString(),
+                        date_published = pubDate.toString()),
                 mockSyndEntry(uri = "id",
                         updatedDate = romeModDate,
                         publishedDate = romePubDate

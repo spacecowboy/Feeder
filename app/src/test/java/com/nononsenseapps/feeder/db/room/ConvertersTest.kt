@@ -1,36 +1,37 @@
 package com.nononsenseapps.feeder.db.room
 
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
+import org.threeten.bp.Instant
+import org.threeten.bp.ZonedDateTime
 
 class ConvertersTest {
     @Test
     fun zeroIs1970() {
-        assertEquals(DateTime(0, DateTimeZone.UTC),
-                Converters().dateTimeFromLong(0))
+        assertEquals(Instant.EPOCH,
+                Converters().instantFromLong(0))
     }
 
     @Test
     fun negativeLongGivesValidDate() {
-        assertEquals(DateTime(-1, DateTimeZone.UTC),
-                Converters().dateTimeFromLong(-1))
+        assertEquals(Instant.ofEpochMilli(-1),
+                Converters().instantFromLong(-1))
     }
 
     @Test
     fun noLongGivesNullDate() {
-        assertNull(Converters().dateTimeFromLong(null))
+        assertNull(Converters().instantFromLong(null))
     }
 
     @Test
     fun noDateTimeGivesNull() {
-        assertNull(Converters().longFromDateTime(null))
+        assertNull(Converters().longFromInstant(null))
     }
 
     @Test
-    fun dateTimeGivesLong() {
+    fun instantGivesLong() {
         assertEquals(1514768461000,
-                Converters().longFromDateTime(DateTime.parse("2018-01-01T01:01:01Z")))
+                Converters().longFromInstant(ZonedDateTime.parse("2018-01-01T01:01:01Z").toInstant()))
     }
 }

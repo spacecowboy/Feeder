@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
-import org.joda.time.DateTime
+import org.threeten.bp.ZonedDateTime
 import java.net.URI
 import java.net.URL
 
@@ -19,7 +19,7 @@ data class PreviewItem @Ignore constructor(
         @ColumnInfo(name = "image_url") var imageUrl: String? = null,
         @ColumnInfo(name = "enclosure_link") var enclosureLink: String? = null,
         var author: String? = null,
-        @ColumnInfo(name = "pub_date") var pubDate: DateTime? = null,
+        @ColumnInfo(name = "pub_date") var pubDate: ZonedDateTime? = null,
         var link: String? = null,
         var tag: String = "",
         var unread: Boolean = true,
