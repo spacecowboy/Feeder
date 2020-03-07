@@ -1,3 +1,6 @@
+# 1.9.1
+  * [72f6d12] Disabled R9 minification to avoid crash on Android Kitkat
+
 # 1.9.0
 Jonas Kalderstam (3):
   * [ae1338e] Added additional accessibility strings
