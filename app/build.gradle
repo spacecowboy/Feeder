@@ -73,8 +73,8 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
     release {
-      minifyEnabled true
-      shrinkResources true
+      minifyEnabled false
+      shrinkResources false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
       if (project.hasProperty('STORE_FILE')) {
@@ -83,8 +83,8 @@ android {
     }
     play {
       applicationIdSuffix ".play"
-      minifyEnabled true
-      shrinkResources true
+      minifyEnabled false
+      shrinkResources false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
       if (project.hasProperty('STORE_FILE')) {
