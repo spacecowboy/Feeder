@@ -7,7 +7,12 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -28,11 +33,22 @@ import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.di.CURRENTLY_SYNCING_STATE
-import com.nononsenseapps.feeder.model.*
+import com.nononsenseapps.feeder.model.EphemeralState
+import com.nononsenseapps.feeder.model.FeedItemsViewModel
+import com.nononsenseapps.feeder.model.FeedViewModel
+import com.nononsenseapps.feeder.model.PreviewItem
+import com.nononsenseapps.feeder.model.SettingsViewModel
+import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
+import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.ui.filepicker.MyFilePickerActivity
-import com.nononsenseapps.feeder.util.*
+import com.nononsenseapps.feeder.util.Prefs
+import com.nononsenseapps.feeder.util.TabletUtils
+import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
+import com.nononsenseapps.feeder.util.bundle
+import com.nononsenseapps.feeder.util.openGitlabIssues
+import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -474,7 +490,7 @@ class FeedFragment : KodeinAwareFragment() {
                             R.id.action_feedFragment_to_deleteFeedsDialogFragment,
                             bundleOf(
                                     ARG_FEED_IDS to feeds.map { it.id }.toLongArray(),
-                                    ARG_FEED_TITLES to feeds.map { it.title }.toTypedArray()
+                                    ARG_FEED_TITLES to feeds.map { it.displayTitle }.toTypedArray()
                             )
                     )
                 }

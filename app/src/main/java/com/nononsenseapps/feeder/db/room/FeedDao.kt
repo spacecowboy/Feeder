@@ -1,6 +1,12 @@
 package com.nononsenseapps.feeder.db.room
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
@@ -92,17 +98,17 @@ interface FeedDao {
     @Query("UPDATE feeds SET notify = :notify")
     suspend fun setAllNotify(notify: Boolean)
 
-    @Query("SELECT $COL_ID, $COL_TITLE FROM feeds WHERE id IS :feedId")
+    @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds WHERE id IS :feedId")
     suspend fun getFeedTitle(feedId: Long): List<FeedTitle>
 
     @Query("""
-        SELECT $COL_ID, $COL_TITLE
+        SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE
         FROM feeds
         WHERE $COL_TAG IS :feedTag
         """)
     suspend fun getFeedTitlesWithTag(feedTag: String): List<FeedTitle>
 
-    @Query("SELECT $COL_ID, $COL_TITLE FROM feeds")
+    @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds")
     suspend fun getAllFeedTitles(): List<FeedTitle>
 }
 
