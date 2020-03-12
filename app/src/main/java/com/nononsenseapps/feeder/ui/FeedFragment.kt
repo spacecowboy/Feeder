@@ -225,6 +225,7 @@ class FeedFragment : KodeinAwareFragment() {
                 activity!!,
                 feedItemsViewModel,
                 settingsViewModel,
+                prefs,
                 object : ActionCallback {
                     override fun coroutineScope(): CoroutineScope {
                         return lifecycleScope

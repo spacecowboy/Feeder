@@ -45,6 +45,7 @@ const val PREF_SYNC_ON_RESUME = "pref_sync_on_resume"
  * Image settings
  */
 const val PREF_IMG_ONLY_WIFI = "pref_img_only_wifi"
+const val PREF_IMG_SHOW_THUMBNAILS = "pref_img_show_thumbnails"
 
 /**
  * Reader settings
@@ -95,6 +96,10 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
     var onlyLoadImagesOnWIfi: Boolean
         get() = sp.getBoolean(PREF_IMG_ONLY_WIFI, false)
         set(value) = sp.edit().putBoolean(PREF_IMG_ONLY_WIFI, value).apply()
+
+    var showThumbnails: Boolean
+        get() = sp.getBoolean(PREF_IMG_SHOW_THUMBNAILS, true)
+        set(value) = sp.edit().putBoolean(PREF_IMG_SHOW_THUMBNAILS, value).apply()
 
     var onlySyncOnWIfi: Boolean
         get() = sp.getBoolean(PREF_SYNC_ONLY_WIFI, false)

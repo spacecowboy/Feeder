@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.SettingsViewModel
+import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.threeten.bp.format.DateTimeFormatter
@@ -27,6 +28,7 @@ class FeedItemPagedListAdapter(
         private val context: Context,
         private val feedItemsViewModel: FeedItemsViewModel,
         private val settingsViewModel: SettingsViewModel,
+        private val prefs: Prefs,
         private val actionCallback: ActionCallback
 ) :
         PagedListAdapter<PreviewItem, RecyclerView.ViewHolder>(PreviewItemDiffer) {
@@ -106,7 +108,7 @@ class FeedItemPagedListAdapter(
 
         holder.fillTitle()
 
-        if (item.imageUrl?.isNotEmpty() == true) {
+        if (item.imageUrl?.isNotEmpty() == true && prefs.showThumbnails) {
             // Take up width
             holder.imageView.visibility = View.VISIBLE
             // Load image when item has been measured
