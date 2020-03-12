@@ -41,6 +41,10 @@
       android:defaultValue="false"
       android:key="pref_img_only_wifi"
       android:title="@string/only_on_wifi" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="pref_img_show_thumbnails"
+        android:title="@string/show_thumbnails" />
   </PreferenceCategory>
   <PreferenceCategory android:title="@string/reader_settings">
 
