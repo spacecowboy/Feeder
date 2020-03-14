@@ -62,6 +62,7 @@
 
   <string name="synchronization">Sincronización</string>
   <string name="only_on_wifi">Solo con WiFi</string>
+  <string name="show_thumbnails">Mostrar miniaturas</string>
   <string name="may_result_data_charges">Puede que se apliquen cargos por consumo de datos.</string>
   <string name="only_when_charging">Solo cuando se está cargando</string>
   <string name="image_loading">Cargando imagen</string>
