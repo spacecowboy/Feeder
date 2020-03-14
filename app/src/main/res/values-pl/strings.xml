@@ -58,5 +58,36 @@
   <string name="sync_option_every_6_hours">Co 6 godzin</string>
   <string name="sync_option_every_12_hours">Co 12 godzin</string>
   <string name="sync_option_every_day">Raz dziennie</string>
+  <string name="mark_as_unread">Oznacz jako nieprzeczytane</string>
+  <string name="mark_as_read">Oznacz jako przeczytane</string>
+  <string name="theme">Motyw</string>
+  <string name="theme_day">Dzienny</string>
+  <string name="theme_night">Nocny</string>
+  <string name="theme_automatic">Automatyczny</string>
+  <string name="sync_option_every_15min">Co 15 minut</string>
+  <string name="sync_option_every_30min">Co 30 minut</string>
+  <string name="open_in_default_browser">Domyślnej przeglądarki</string>
+  <string name="javascript">Javasrcipt</string>
+  <string name="open_in_webview">Web view</string>
+  <string name="show_thumbnails">Pokazuj miniaturki</string>
+  <string name="notification_channel_name">Nieprzeczytane kanały</string>
+  <string name="open_feed">Otwórz kanał</string>
+  <string name="mark_items_below_as_read">Oznacz poniższe elementy jako przeczytane</string>
+  <string name="open_link_in_web_view">Otwórz link  w Web view</string>
+  <string name="on_startup">Przy uruchamianiu</string>
+  <string name="reader_settings">Czytnik</string>
+  <string name="send_bug_report">Wyślij raport o błędach</string>
+  <string name="touch_to_play_video">Dotknij, aby odtworzyć wideo</string>
+  <string name="open_links_with">Otwieraj linki za pomocą</string>
+  <string name="open_item_by_default_with">Otwieraj domyślnie elementy za pomocą</string>
+  <string name="max_feed_items">Maksymalna liczba elementów na kanał</string>
+  <string name="could_not_load_url">Nie można było załadować adresu URL</string>
+  <string name="theme_system">Podążaj zgodnie z systemem</string>
+  <string name="no_email_client">Nie można było otworzyć klienta poczty elektronicznej</string>
+  <string name="dont_notify_for_new_items">Zatrzymaj powiadomienia</string>
+  <string name="notification_channel_description">Powiadomienia są wyświetlane tylko w przypadku nieprzeczytanych elementów w skonfigurowanych kanałach</string>
+  <string name="open_in_reader">Czytnika</string>
+  <string name="discovered_feeds_list">Lista odkrytych kanałów</string>
+  <string name="toggle_tag_expansion">Przełącz rozwinięcie znacznika</string>
 
 </resources>
