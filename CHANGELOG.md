@@ -1,3 +1,16 @@
+# 1.9.2
+Jonas Kalderstam (2):
+  * [d7eeb89] Fixed incorrect titles shown in delete dialog
+
+Karol Kosek (1):
+  * [1d64c7f] Updated Polish translation
+
+Khar Khamal (1):
+  * [3a3df99] Updated Spanish translation
+
+Vadik Sirekanyan (1):
+  * [85fc6d1] Added option for hiding thumbnails
+
 # 1.9.1
   * [72f6d12] Disabled R9 minification to avoid crash on Android Kitkat
 
