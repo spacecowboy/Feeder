@@ -43,7 +43,7 @@
   <string name="export_feeds_to_opml">Export zdrojů do OPML</string>
   <string name="import_feeds_from_opml">Import zdrojů z OPML</string>
   <string name="view_debug_log">Zobrazit protokol ladění</string>
-  <string name="new_based_on_this">Na základě toho</string>
+  <string name="new_based_on_this">Na základě tohoto zdroje</string>
   <string name="indicator_for_mark_as_read">Indikátor pro označení jako přečtěné</string>
   <string name="share">Sdílet</string>
   <string name="no_such_feed">Zdroj nebyl nalezen. Zkuste použít http.</string>
@@ -89,7 +89,12 @@
   <string name="theme_night">Noc</string>
   <string name="theme">Motiv</string>
   <string name="send_bug_report">Odeslat chybové hlášení</string>
-  <string name="no_email_client">Nelze otevřít e-mailového klienta</string>
+  <string name="no_email_client">Nenalezen e-mailový klient</string>
   <string name="touch_to_play_video">Klepnutím přehrajete video</string>
+  <string name="javascript">Javascript</string>
+  <string name="open_feed">Otevřít zdroj</string>
+  <string name="mark_items_below_as_read">Označit níže uvedené články jako přečtené</string>
+  <string name="show_thumbnails">Zobrazit miniatury</string>
+
 
 </resources>
