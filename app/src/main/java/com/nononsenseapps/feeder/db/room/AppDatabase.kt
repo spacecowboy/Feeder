@@ -31,7 +31,7 @@ const val ID_ALL_FEEDS: Long = -10
  */
 
 @FlowPreview
-@Database(entities = [Feed::class, FeedItem::class], version = 11)
+@Database(entities = [Feed::class, FeedItem::class], version = 12)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun feedDao(): FeedDao
@@ -73,7 +73,8 @@ val allMigrations = arrayOf(
         MIGRATION_7_8,
         MIGRATION_8_9,
         MIGRATION_9_10,
-        MIGRATION_10_11
+        MIGRATION_10_11,
+        MIGRATION_11_12
 )
 
 /*
@@ -81,6 +82,16 @@ val allMigrations = arrayOf(
  * 7 represents new Room database
  */
 
+@FlowPreview
+@ExperimentalCoroutinesApi
+@Suppress("ClassName")
+object MIGRATION_11_12 : Migration(11, 12) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("""
+            ALTER TABLE feed_items ADD COLUMN primary_sort_time INTEGER NOT NULL DEFAULT 0
+        """.trimIndent())
+    }
+}
 
 @FlowPreview
 @ExperimentalCoroutinesApi

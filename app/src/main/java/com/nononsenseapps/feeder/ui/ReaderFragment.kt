@@ -11,9 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.widget.ShareActionProvider
 import androidx.core.text.BidiFormatter
-import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -56,6 +54,7 @@ class ReaderFragment : KodeinAwareFragment() {
                     .withLocale(Locale.getDefault())
 
     private var _id: Long = ID_UNSET
+
     // All content contained in RssItem
     private var rssItem: FeedItemWithFeed? = null
     private lateinit var titleTextView: TextView
@@ -169,20 +168,8 @@ class ReaderFragment : KodeinAwareFragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.reader, menu)
 
-        // Locate MenuItem with ShareActionProvider
-        val shareItem = menu.findItem(R.id.action_share)
-
-        // Fetch and store ShareActionProvider
-        val shareActionProvider = MenuItemCompat.getActionProvider(shareItem) as ShareActionProvider
-
         // Set intent
         rssItem?.let { rssItem ->
-
-            val shareIntent = Intent(Intent.ACTION_SEND)
-            shareIntent.type = "text/plain"
-            shareIntent.putExtra(Intent.EXTRA_TEXT, rssItem.link)
-            shareActionProvider.setShareIntent(shareIntent)
-
             // Show/Hide buttons
             menu.findItem(R.id.action_open_enclosure).isVisible = rssItem.enclosureLink != null
             menu.findItem(R.id.action_open_in_webview).isVisible = rssItem.link != null
@@ -241,6 +228,16 @@ class ReaderFragment : KodeinAwareFragment() {
             R.id.action_mark_as_unread -> {
                 lifecycleScope.launch {
                     viewModel.markAsRead(_id, unread = true)
+                }
+                true
+            }
+            R.id.action_share -> {
+                rssItem?.link?.let { link ->
+                    val shareIntent = Intent(Intent.ACTION_SEND)
+                    shareIntent.type = "text/plain"
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, link)
+
+                    startActivity(Intent.createChooser(shareIntent, getString(R.string.share)))
                 }
                 true
             }

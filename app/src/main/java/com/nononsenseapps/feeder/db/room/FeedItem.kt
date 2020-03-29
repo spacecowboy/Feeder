@@ -18,6 +18,7 @@ import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.COL_NOTIFIED
 import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
 import com.nononsenseapps.feeder.db.COL_PLAINTITLE
+import com.nononsenseapps.feeder.db.COL_PRIMARYSORTTIME
 import com.nononsenseapps.feeder.db.COL_PUBDATE
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_UNREAD
@@ -59,7 +60,9 @@ data class FeedItem @Ignore constructor(
         @ColumnInfo(name = COL_UNREAD) var unread: Boolean = true,
         @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
         @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
-        @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH) {
+        @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH,
+        @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) var primarySortTime: Instant = Instant.EPOCH
+) {
 
     constructor() : this(id = ID_UNSET)
 
@@ -91,6 +94,7 @@ data class FeedItem @Ignore constructor(
                     // If a pubdate is missing, then don't update if one is already set
                     this.pubDate ?: ZonedDateTime.now(ZoneOffset.UTC)
                 }
+        primarySortTime = minOf(firstSyncedTime, pubDate?.toInstant() ?: firstSyncedTime)
     }
 
     val pubDateString: String?
