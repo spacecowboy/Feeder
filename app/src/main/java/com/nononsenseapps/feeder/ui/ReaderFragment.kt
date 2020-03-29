@@ -183,8 +183,10 @@ class ReaderFragment : KodeinAwareFragment() {
             shareIntent.putExtra(Intent.EXTRA_TEXT, rssItem.link)
             shareActionProvider.setShareIntent(shareIntent)
 
-            // Show/Hide enclosure
+            // Show/Hide buttons
             menu.findItem(R.id.action_open_enclosure).isVisible = rssItem.enclosureLink != null
+            menu.findItem(R.id.action_open_in_webview).isVisible = rssItem.link != null
+            menu.findItem(R.id.action_open_in_browser).isVisible = rssItem.link != null
             // Add filename to tooltip
             if (rssItem.enclosureLink != null) {
                 val filename = rssItem.enclosureFilename
