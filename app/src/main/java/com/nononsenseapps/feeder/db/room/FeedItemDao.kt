@@ -35,7 +35,7 @@ interface FeedItemDao {
     @Query("""
         SELECT id FROM feed_items
         WHERE feed_id IS :feedId
-        ORDER BY first_synced_time DESC, pub_date DESC
+        ORDER BY primary_sort_time DESC, pub_date DESC
         LIMIT -1 OFFSET :keepCount
         """)
     suspend fun getItemsToBeCleanedFromFeed(feedId: Long, keepCount: Int): List<Long>
@@ -58,7 +58,7 @@ interface FeedItemDao {
         SELECT *
         FROM feed_items
         WHERE feed_items.feed_id = :feedId
-        ORDER BY first_synced_time DESC, pub_date DESC
+        ORDER BY primary_sort_time DESC, pub_date DESC
         """)
     suspend fun loadFeedItemsInFeed(feedId: Long): List<FeedItem>
 
@@ -75,7 +75,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-        ORDER BY first_synced_time DESC, pub_date DESC
+        ORDER BY primary_sort_time DESC, pub_date DESC
         """)
     fun loadLivePreviews(feedId: Long): DataSource.Factory<Int, PreviewItem>
 
@@ -84,7 +84,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
-        ORDER BY first_synced_time DESC, pub_date DESC
+        ORDER BY primary_sort_time DESC, pub_date DESC
         """)
     fun loadLivePreviews(tag: String): DataSource.Factory<Int, PreviewItem>
 
@@ -92,7 +92,7 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        ORDER BY first_synced_time DESC, pub_date DESC
+        ORDER BY primary_sort_time DESC, pub_date DESC
         """)
     fun loadLivePreviews(): DataSource.Factory<Int, PreviewItem>
 
@@ -101,7 +101,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND unread IS :unread
-        ORDER BY first_synced_time DESC, pub_date DESC
+        ORDER BY primary_sort_time DESC, pub_date DESC
         """)
     fun loadLiveUnreadPreviews(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
@@ -110,7 +110,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag AND unread IS :unread
-        ORDER BY first_synced_time DESC, pub_date DESC
+        ORDER BY primary_sort_time DESC, pub_date DESC
         """)
     fun loadLiveUnreadPreviews(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
@@ -119,7 +119,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE unread IS :unread
-        ORDER BY first_synced_time DESC, pub_date DESC
+        ORDER BY primary_sort_time DESC, pub_date DESC
         """)
     fun loadLiveUnreadPreviews(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 

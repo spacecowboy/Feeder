@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 @FlowPreview
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MigrationFrom10To11 {
+class MigrationFrom11To12 {
     private val dbName = "testDb"
 
     @Rule
@@ -27,8 +27,8 @@ class MigrationFrom10To11 {
             FrameworkSQLiteOpenHelperFactory())
 
     @Test
-    fun migrate10to11() {
-        var db = testHelper.createDatabase(dbName, 10)
+    fun migrate11to12() {
+        var db = testHelper.createDatabase(dbName, 11)
 
         db.use {
             db.execSQL("""
@@ -37,15 +37,15 @@ class MigrationFrom10To11 {
         """.trimIndent())
 
             db.execSQL("""
-            INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id)
-            VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1)
+            INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time)
+            VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0)
         """.trimIndent())
         }
 
-        db = testHelper.runMigrationsAndValidate(dbName, 11, true, MIGRATION_10_11)
+        db = testHelper.runMigrationsAndValidate(dbName, 12, true, MIGRATION_11_12)
 
         db.query("""
-            SELECT first_synced_time FROM feed_items
+            SELECT primary_sort_time FROM feed_items
         """.trimIndent())!!.use {
             assert(it.count == 1)
             assert(it.moveToFirst())
