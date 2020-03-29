@@ -4,13 +4,16 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.appcompat.widget.ShareActionProvider
-import androidx.core.view.MenuItemCompat
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareFragment
 import com.nononsenseapps.feeder.util.Prefs
@@ -22,8 +25,8 @@ const val ARG_URL = "url"
 class ReaderWebViewFragment : KodeinAwareFragment() {
     private var webView: WebView? = null
     var url: String = ""
+    private var currentUrl = url
     private var enclosureUrl: String? = null
-    private var shareActionProvider: ShareActionProvider? = null
     private var isWebViewAvailable: Boolean = false
 
     private val prefs: Prefs by instance()
@@ -60,6 +63,14 @@ class ReaderWebViewFragment : KodeinAwareFragment() {
             isWebViewAvailable = true
             webView?.loadUrl(url)
         }
+
+        WebViewClientHandler.onPageStartedListener = { url: String? ->
+            if (url != null) {
+                currentUrl = url
+            }
+        }
+        // Invoke it immediately with current url
+        WebViewClientHandler.onPageStartedListener?.invoke(url)
 
         return rootView
     }
@@ -102,24 +113,6 @@ class ReaderWebViewFragment : KodeinAwareFragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.webview, menu)
 
-        // Locate MenuItem with ShareActionProvider
-        val shareItem = menu.findItem(R.id.action_share)
-
-        // Fetch and store ShareActionProvider
-        shareActionProvider = MenuItemCompat.getActionProvider(shareItem) as ShareActionProvider
-
-        // Update share intent everytime a page is loaded
-        WebViewClientHandler.onPageStartedListener = { url: String? ->
-            if (url != null) {
-                val shareIntent = Intent(Intent.ACTION_SEND)
-                shareIntent.type = "text/plain"
-                shareIntent.putExtra(Intent.EXTRA_TEXT, url)
-                shareActionProvider?.setShareIntent(shareIntent)
-            }
-        }
-        // Invoke it immediately with current url
-        WebViewClientHandler.onPageStartedListener?.invoke(url)
-
         // Show/Hide enclosure
         menu.findItem(R.id.action_open_enclosure).isVisible = enclosureUrl != null
 
@@ -158,6 +151,16 @@ class ReaderWebViewFragment : KodeinAwareFragment() {
                         }
                     }
 
+                    true
+                }
+                R.id.action_share -> {
+                    if (currentUrl.isNotBlank()) {
+                        val shareIntent = Intent(Intent.ACTION_SEND)
+                        shareIntent.type = "text/plain"
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, currentUrl)
+
+                        startActivity(Intent.createChooser(shareIntent, getString(R.string.share)))
+                    }
                     true
                 }
                 else -> super.onOptionsItemSelected(menuItem)
