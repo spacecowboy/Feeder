@@ -54,6 +54,7 @@ class ReaderFragment : KodeinAwareFragment() {
                     .withLocale(Locale.getDefault())
 
     private var _id: Long = ID_UNSET
+
     // All content contained in RssItem
     private var rssItem: FeedItemWithFeed? = null
     private lateinit var titleTextView: TextView
@@ -169,9 +170,10 @@ class ReaderFragment : KodeinAwareFragment() {
 
         // Set intent
         rssItem?.let { rssItem ->
-
-            // Show/Hide enclosure
+            // Show/Hide buttons
             menu.findItem(R.id.action_open_enclosure).isVisible = rssItem.enclosureLink != null
+            menu.findItem(R.id.action_open_in_webview).isVisible = rssItem.link != null
+            menu.findItem(R.id.action_open_in_browser).isVisible = rssItem.link != null
             // Add filename to tooltip
             if (rssItem.enclosureLink != null) {
                 val filename = rssItem.enclosureFilename

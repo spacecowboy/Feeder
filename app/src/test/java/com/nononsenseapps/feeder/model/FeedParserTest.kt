@@ -501,7 +501,7 @@ class FeedParserTest: KodeinAware {
 
     @Test
     @Throws(Exception::class)
-    fun noLinkShouldFallbackToGuid() {
+    fun noLinkShouldBeNull() {
         val feed = feedParser.parseFeedInputStream(URL("http://ANON.com/rss"), anon)
 
         assertEquals("http://ANON.com/sub", feed.home_page_url)
@@ -512,7 +512,7 @@ class FeedParserTest: KodeinAware {
         assertEquals(1, feed.items!!.size)
         val item = feed.items!![0]
 
-        assertEquals("http://ANON.com/sub/##", item.url)
+        assertNull(item.url)
 
         assertEquals("ANON", item.title)
         assertEquals("http://ANON.com/sub/##", item.id)

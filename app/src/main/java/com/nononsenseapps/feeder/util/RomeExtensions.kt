@@ -88,10 +88,6 @@ fun SyndEntry.linkToHtml(feedBaseUrl: URL): String? {
         return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, it)
     }
 
-    this.uri?.let {
-        return relativeLinkIntoAbsoluteOrNull(feedBaseUrl, it)
-    }
-
     return null
 }
 

@@ -53,7 +53,7 @@ class RomeExtensionsKtTest {
         assertEquals(
                 Feed(author = Author(name = "bob"), title = "",
                         items = listOf(Item(id = "$baseUrl/id", author = Author(name = "bob"), content_text = "",
-                                url = "$baseUrl/id",
+                                url = null,
                                 summary = "", title = "", content_html = "", attachments = emptyList()))),
                 mockSyndFeed(author = mockSyndPerson(name = "bob"),
                         entries = listOf(mockSyndEntry(uri = "id"))).asFeed(baseUrl)
@@ -68,7 +68,7 @@ class RomeExtensionsKtTest {
 
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_text = expectedSummary, summary = expectedSummary,
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = html, image = "http://google.com/image.png", attachments = emptyList()),
                 mockSyndEntry(uri = "id", description = mockSyndContent(value = html)).asItem(baseUrl)
         )
@@ -85,7 +85,7 @@ class RomeExtensionsKtTest {
 
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_text = longText, summary = expectedSummary,
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = longText, attachments = emptyList()),
                 mockSyndEntry(uri = "id", description = mockSyndContent(value = longText)).asItem(baseUrl)
         )
@@ -95,7 +95,7 @@ class RomeExtensionsKtTest {
     fun itemShortTextShouldNotBeIndexOutOfBounds() {
         assertEquals(
                 Item(id = "$baseUrl/id", content_text = "abc", summary = "abc", title = "",
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = "abc", attachments = emptyList()),
                 mockSyndEntry(uri = "id", description = mockSyndContent(value = "abc")).asItem(baseUrl)
         )
@@ -134,7 +134,7 @@ class RomeExtensionsKtTest {
     fun contentTextWithPlainAndOthers() {
         assertEquals(
                 Item(id = "$baseUrl/id", content_text = "PLAIN", summary = "PLAIN", title = "",
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
@@ -150,7 +150,7 @@ class RomeExtensionsKtTest {
     fun contentTextWithNullAndOthers() {
         assertEquals(
                 Item(id = "$baseUrl/id", content_text = "bah", summary = "bah", title = "",
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
@@ -165,7 +165,7 @@ class RomeExtensionsKtTest {
     fun contentTextWithOthers() {
         assertEquals(
                 Item(id = "$baseUrl/id", content_text = "html", summary = "html", title = "",
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
@@ -179,7 +179,7 @@ class RomeExtensionsKtTest {
     fun contentHtmlAtomWithOnlyUnknown() {
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_text = "foo", summary = "foo",
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = "foo", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         contents = listOf(
@@ -192,7 +192,7 @@ class RomeExtensionsKtTest {
     fun titleHtmlAtom() {
         assertEquals(
                 Item(id = "$baseUrl/id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = "", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         titleEx = mockSyndContent(value = "600 &amp;#8211; Email is your electronic memory", type = "html")
@@ -204,7 +204,7 @@ class RomeExtensionsKtTest {
     fun titleXHtmlAtom() {
         assertEquals(
                 Item(id = "$baseUrl/id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = "", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         titleEx = mockSyndContent(value = "600 &#8211; Email is your electronic memory", type = "xhtml")
@@ -216,7 +216,7 @@ class RomeExtensionsKtTest {
     fun titlePlainAtomRss() {
         assertEquals(
                 Item(id = "$baseUrl/id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = "", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         title = "600 &#8211; Email is your electronic memory"
@@ -228,7 +228,7 @@ class RomeExtensionsKtTest {
     fun contentHtmlRss() {
         assertEquals(
                 Item(id = "$baseUrl/id", content_text = "html", summary = "html", title = "",
-                        url = "$baseUrl/id",
+                        url = null,
                         content_html = "<b>html</b>", attachments = emptyList()),
                 mockSyndEntry(uri = "id",
                         description = mockSyndContent(value = "<b>html</b>")
@@ -240,7 +240,7 @@ class RomeExtensionsKtTest {
     fun thumbnailWithThumbnail() {
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        url = "$baseUrl/id",
+                        url = null,
                         image = "$baseUrl/img"),
                 mockSyndEntry(uri = "id",
                         thumbnails = arrayOf(mockThumbnail(url = URI.create("img")))
@@ -252,7 +252,7 @@ class RomeExtensionsKtTest {
     fun thumbnailWithContent() {
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        url = "$baseUrl/id",
+                        url = null,
                         image = "$baseUrl/img"),
                 mockSyndEntry(uri = "id",
                         mediaContents = arrayOf(mockMediaContent(url = "img", medium = "image"))
@@ -307,7 +307,7 @@ class RomeExtensionsKtTest {
         val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeDate.time), ZoneOffset.systemDefault())
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        url = "$baseUrl/id",
+                        url = null,
                         date_published = dateTime.toString()),
                 mockSyndEntry(uri = "id",
                         publishedDate = romeDate
@@ -322,7 +322,7 @@ class RomeExtensionsKtTest {
         val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeDate.time), ZoneOffset.systemDefault())
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        url = "$baseUrl/id",
+                        url = null,
                         date_modified = dateTime.toString(),
                         date_published = dateTime.toString()),
                 mockSyndEntry(uri = "id",
@@ -340,7 +340,7 @@ class RomeExtensionsKtTest {
         val modDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeModDate.time), ZoneOffset.systemDefault())
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        url = "$baseUrl/id",
+                        url = null,
                         date_modified = modDate.toString(),
                         date_published = pubDate.toString()),
                 mockSyndEntry(uri = "id",
