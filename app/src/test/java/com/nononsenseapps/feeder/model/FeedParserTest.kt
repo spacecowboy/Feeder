@@ -540,6 +540,25 @@ class FeedParserTest: KodeinAware {
     }
 
     @Test
+    @Throws(Exception::class)
+    fun timesnewroman() {
+        runBlocking {
+            val feed = feedParser.parseFeedUrl(URL("https://www.timesnewroman.ro/?act=rss"))
+            assertEquals("Cowboy Programmer", feed?.title)
+        }
+    }
+
+    @Test
+    fun diskuse() {
+        runBlocking {
+            val feed = feedParser.parseFeedInputStream(URL("https://diskuse.jakpsatweb.cz/rss2.php?topic=173233"), diskuse)
+            val entry = feed.items!!.first()
+
+            assertEquals("Kajman, O této diskusi: test <pre> in <description> and <b>bold</b> in title", entry.title)
+        }
+    }
+
+    @Test
     @Ignore
     @Throws(Exception::class)
     fun fz() {
@@ -622,6 +641,9 @@ class FeedParserTest: KodeinAware {
 
     private val nixersRss: InputStream
         get() = javaClass.getResourceAsStream("rss_nixers_newsletter.xml")!!
+
+    private val diskuse: InputStream
+        get() = javaClass.getResourceAsStream("rss_diskuse.xml")!!
 }
 
 @Language("xml")
