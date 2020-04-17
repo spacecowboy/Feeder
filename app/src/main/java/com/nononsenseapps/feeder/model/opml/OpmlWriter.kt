@@ -24,7 +24,7 @@ suspend fun writeOutputStream(os: OutputStream,
                         }
                         body {
                             tags.forEach {
-                                if (it.isNullOrEmpty()) {
+                                if (it.isEmpty()) {
                                     feedsWithTag(it).forEach {
                                         outline(title = escape(it.displayTitle),
                                                 type = "rss",

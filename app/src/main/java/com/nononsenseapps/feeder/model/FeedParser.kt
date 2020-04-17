@@ -187,25 +187,25 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
             client.newBuilder()
                     .authenticator { _, response ->
                         when {
-                            response.request()?.header("Authorization") != null -> {
+                            response.request().header("Authorization") != null -> {
                                 null
                             }
                             else -> {
-                                response.request()?.newBuilder()
-                                        ?.header("Authorization", credentials)
-                                        ?.build()
+                                response.request().newBuilder()
+                                        .header("Authorization", credentials)
+                                        .build()
                             }
                         }
                     }
                     .proxyAuthenticator { _, response ->
                         when {
-                            response.request()?.header("Proxy-Authorization") != null -> {
+                            response.request().header("Proxy-Authorization") != null -> {
                                 null
                             }
                             else -> {
-                                response.request()?.newBuilder()
-                                        ?.header("Proxy-Authorization", credentials)
-                                        ?.build()
+                                response.request().newBuilder()
+                                        .header("Proxy-Authorization", credentials)
+                                        .build()
                             }
                         }
                     }.build()
@@ -248,7 +248,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
         try {
             val feed = when ((response.header("content-type") ?: "").contains("json")) {
                 true -> jsonFeedParser.parseJsonBytes(body)
-                false -> parseRssAtomBytes(response.request().url().url()!!, body)
+                false -> parseRssAtomBytes(response.request().url().url(), body)
             }
 
             return if (feed.feed_url == null) {
@@ -268,7 +268,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
     @Throws(FeedParser.FeedParsingError::class)
     suspend fun parseFeedResponseOrFallbackToAlternateLink(response: Response): Feed? =
             response.body()?.use { responseBody ->
-                responseBody.bytes()?.let { body ->
+                responseBody.bytes().let { body ->
                     // Encoding is not an issue for reading HTML (probably)
                     val alternateFeedLink = findFeedUrl(String(body), preferAtom = true)
 
