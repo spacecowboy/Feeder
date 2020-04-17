@@ -49,6 +49,7 @@ const val feedItemColumnsWithFeed = "$FEED_ITEMS_TABLE_NAME.$COL_ID AS $COL_ID, 
 data class FeedItemWithFeed @Ignore constructor(
         var id: Long = ID_UNSET,
         var guid: String = "",
+        @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
         var title: String = "",
         @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
         @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
@@ -108,7 +109,7 @@ data class FeedItemWithFeed @Ignore constructor(
 
     private fun Bundle.storeFeedItem() {
         setLong(ARG_ID to id)
-        setString(ARG_TITLE to title)
+        setString(ARG_TITLE to plainTitle)
         setString(ARG_LINK to link)
         setString(ARG_ENCLOSURE to enclosureLink)
         setString(ARG_IMAGEURL to imageUrl)

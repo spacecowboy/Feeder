@@ -22,7 +22,6 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.maxImageSize
-import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.TabletUtils
@@ -35,7 +34,6 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
-import java.io.StringReader
 import java.util.*
 
 const val ARG_TITLE = "title"
@@ -102,7 +100,7 @@ class ReaderFragment : KodeinAwareFragment() {
                 rssItem = it
 
                 rssItem?.let { rssItem ->
-                    setViewTitle(rssItem)
+                    titleTextView.text = rssItem.plainTitle
 
                     rssItem.feedId?.let { feedId ->
                         feedTitleTextView.setOnClickListener {
@@ -144,20 +142,6 @@ class ReaderFragment : KodeinAwareFragment() {
             )
         }
         return rootView
-    }
-
-    private fun setViewTitle(rssItem: FeedItemWithFeed) {
-        if (rssItem.title.isEmpty()) {
-            titleTextView.text = rssItem.plainTitle
-        } else {
-            titleTextView.text = toSpannedWithNoImages(
-                    kodein,
-                    StringReader(rssItem.title),
-                    rssItem.feedUrl,
-                    activity!!.maxImageSize(),
-                    urlClickListener = urlClickListener()
-            )
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

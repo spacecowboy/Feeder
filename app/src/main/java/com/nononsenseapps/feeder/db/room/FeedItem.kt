@@ -49,6 +49,7 @@ data class FeedItem @Ignore constructor(
         @PrimaryKey(autoGenerate = true)
         @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
         @ColumnInfo(name = COL_GUID) var guid: String = "",
+        @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
         @ColumnInfo(name = COL_TITLE) var title: String = "",
         @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
         @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
@@ -77,8 +78,9 @@ data class FeedItem @Ignore constructor(
         }
 
         entry.id?.let { this.guid = it }
-        entry.title?.let { this.title = it.take(MAX_TITLE_LENGTH) }
-        entry.title?.let { this.plainTitle = converter.convert(it).take(MAX_TITLE_LENGTH) }
+        entry.title?.let { this.plainTitle = it.take(MAX_TITLE_LENGTH) }
+        @Suppress("DEPRECATION")
+        this.title = this.plainTitle
         summary?.let { this.plainSnippet = it }
 
         this.imageUrl = absoluteImage
