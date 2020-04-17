@@ -174,14 +174,14 @@ fun SyndEntry.contentText(): String {
 
 @FlowPreview
 private fun convertAtomContentToPlainText(content: SyndContent?, fallback: String?): String {
-    return HtmlToPlainTextConverter().convert(possiblyHtmlFromContent(content, fallback))
+    return HtmlToPlainTextConverter().convert(content?.unescapedHtml() ?: fallback ?: "")
 }
 
-private fun possiblyHtmlFromContent(content: SyndContent?, fallback: String?): String =
-        when (content?.type == "html") {
-            true -> unescapeEntities(content!!.value, true)
-            false -> content?.value ?: fallback
-        } ?: ""
+private fun SyndContent.unescapedHtml(): String? =
+        when  {
+            type == "html" && value != null -> unescapeEntities(value, true)
+            else -> value
+        }
 
 @FlowPreview
 fun SyndFeed.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
