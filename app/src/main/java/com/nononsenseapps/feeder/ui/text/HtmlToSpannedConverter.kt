@@ -675,6 +675,9 @@ open class HtmlToSpannedConverter(private var source: Reader,
         text.removeSpan(obj)
 
         if (where != len) {
+            // Want it to be monospace
+            text.setSpan(TypefaceSpan("monospace"), where, len,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             // TODO
             // Make sure text does not wrap.
             // No easy solution exists for this
