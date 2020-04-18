@@ -6,7 +6,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import okhttp3.*
 import org.intellij.lang.annotations.Language
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -17,6 +16,7 @@ import org.kodein.di.generic.instance
 import org.kodein.di.generic.singleton
 import java.io.InputStream
 import java.net.URL
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -540,7 +540,7 @@ class FeedParserTest: KodeinAware {
     }
 
     @Test
-    @Throws(Exception::class)
+    @Ignore("Error happens in OKHttp")
     fun timesnewroman() {
         runBlocking {
             val feed = feedParser.parseFeedUrl(URL("https://www.timesnewroman.ro/?act=rss"))
