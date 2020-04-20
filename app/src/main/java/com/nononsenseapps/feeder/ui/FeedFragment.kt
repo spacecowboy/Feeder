@@ -375,6 +375,7 @@ class FeedFragment : KodeinAwareFragment() {
     override fun onPrepareOptionsMenu(menu: Menu) {
         if (id < 1) {
             menu.findItem(R.id.action_edit_feed)?.isVisible = false
+            menu.findItem(R.id.action_share)?.isVisible = false
         }
 
         // Set toggleable state
