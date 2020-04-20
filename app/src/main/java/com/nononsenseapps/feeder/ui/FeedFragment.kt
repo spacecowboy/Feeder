@@ -569,6 +569,20 @@ class FeedFragment : KodeinAwareFragment() {
                 }
                 true
             }
+            itemId == R.id.action_share -> {
+                url?.let { url ->
+                    startActivity(
+                            Intent.createChooser(
+                                    Intent(Intent.ACTION_SEND).also { intent ->
+                                        intent.type = "text/plain"
+                                        intent.putExtra(Intent.EXTRA_TEXT, url)
+                                    },
+                                    getString(R.string.share)
+                            )
+                    )
+                }
+                true
+            }
             else -> super.onOptionsItemSelected(menuItem)
         }
     }
