@@ -122,8 +122,8 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
 
     val feed: Feed? =
             response.use {
-                it.body()?.use { responseBody ->
-                    val body = responseBody.bytes()
+                val responseBody = it.safeBody()
+                responseBody?.let { body ->
                     responseHash = body.contentHashCode()
                     when {
                         !response.isSuccessful -> {

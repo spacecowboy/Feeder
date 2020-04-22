@@ -540,11 +540,35 @@ class FeedParserTest: KodeinAware {
     }
 
     @Test
-    @Ignore("Error happens in OKHttp")
     fun timesnewroman() {
+        /**
+         * This actually tests Chunked-response handling (with Gzip)
+         *
+         * Headers:
+        Server: nginx
+        Date: Wed, 22 Apr 2020 12:56:13 GMT
+        Content-Type: text/xml; charset=UTF-8
+        Transfer-Encoding: chunked
+        Connection: keep-alive
+        Set-Cookie: PHPSESSID=9fb67188b757d9e61bf2144d701dacae; path=/
+        Expires: Thu, 19 Nov 1981 08:52:00 GMT
+        Pragma: no-cache
+        Set-Cookie: mobile=false; path=/
+        Set-Cookie: user-agent=2af4f0dda4a2cdd367f5b41adcc59f79; path=/
+        Content-Encoding: gzip
+        Vary: Accept-Encoding
+        Expires: Wed, 22 Apr 2020 13:16:13 GMT
+        Last-Modified: Wed, 22 Apr 2020 12:56:13 GMT
+        Pragma: no-cache
+        X-Cache-Status: BYPASS
+        Strict-Transport-Security: max-age=31536000
+        Cache-Control: public, max-age=1200
+         *
+         */
         runBlocking {
             val feed = feedParser.parseFeedUrl(URL("https://www.timesnewroman.ro/?act=rss"))
-            assertEquals("Cowboy Programmer", feed?.title)
+            assertEquals("Times New Roman", feed?.title)
+            assertEquals(15, feed?.items?.size)
         }
     }
 

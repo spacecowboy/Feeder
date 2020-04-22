@@ -13,11 +13,14 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
 import okhttp3.*
+import okio.Buffer
+import okio.GzipSource
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.instance
+import java.io.EOFException
 import java.io.IOException
 import java.io.InputStream
 import java.net.MalformedURLException
@@ -218,7 +221,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
         }
     }
 
-    @Throws(FeedParser.FeedParsingError::class)
+    @Throws(FeedParsingError::class)
     suspend fun parseFeedUrl(url: URL): Feed? {
         try {
 
@@ -234,16 +237,16 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
 
     }
 
-    @Throws(FeedParser.FeedParsingError::class)
+    @Throws(FeedParsingError::class)
     fun parseFeedResponse(response: Response): Feed? =
-            response.body()?.use { body ->
-                parseFeedResponse(response, body.bytes())
+            response.safeBody()?.let { body ->
+                parseFeedResponse(response, body)
             }
 
     /**
      * Takes body as bytes to handle encoding correctly
      */
-    @Throws(FeedParser.FeedParsingError::class)
+    @Throws(FeedParsingError::class)
     fun parseFeedResponse(response: Response, body: ByteArray): Feed? {
         try {
             val feed = when ((response.header("content-type") ?: "").contains("json")) {
@@ -265,7 +268,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
     /**
      * Takes body as bytes to handle encoding correctly
      */
-    @Throws(FeedParser.FeedParsingError::class)
+    @Throws(FeedParsingError::class)
     suspend fun parseFeedResponseOrFallbackToAlternateLink(response: Response): Feed? =
             response.body()?.use { responseBody ->
                 responseBody.bytes().let { body ->
@@ -280,7 +283,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
                 }
             }
 
-    @Throws(FeedParser.FeedParsingError::class)
+    @Throws(FeedParsingError::class)
     internal fun parseRssAtomBytes(baseUrl: URL, feedXml: ByteArray): Feed {
         try {
             feedXml.inputStream().use { return parseFeedInputStream(baseUrl, it) }
@@ -305,7 +308,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
         }
     }
 
-    @Throws(FeedParser.FeedParsingError::class)
+    @Throws(FeedParsingError::class)
     internal fun parseFeedInputStream(baseUrl: URL, `is`: InputStream): Feed {
         `is`.use {
             try {
@@ -320,4 +323,35 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
     }
 
     class FeedParsingError(e: Throwable) : Exception(e)
+}
+
+fun Response.safeBody(): ByteArray? {
+    return this.body()?.use { body ->
+        if (header("Transfer-Encoding") == "chunked") {
+            val source =
+                    if (header("Content-Encoding") == "gzip") {
+                        GzipSource(body.source())
+                    } else {
+                        body.source()
+                    }
+            val buffer = Buffer()
+            try {
+                var readBytes: Long = 0
+                while (readBytes != -1L) {
+                    readBytes = source.read(buffer, Long.MAX_VALUE)
+                }
+            } catch (e: EOFException) {
+                // This is not always fatal - sometimes the server might have sent the wrong
+                // content-length (I suspect)
+                Log.e(
+                        "FeedParser",
+                        "Encountered EOF exception while parsing response with headers: ${headers()}",
+                        e
+                )
+            }
+            buffer.readByteArray()
+        } else {
+            body.bytes()
+        }
+    }
 }
