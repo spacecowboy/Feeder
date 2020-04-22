@@ -1,3 +1,10 @@
+# 1.9.4
+Jonas Kalderstam (9):
+  * [6003e84c] Fixed monospacing of pre-tags
+  * [fd87f04b] Removed html formatting from titles
+  * [6f6ed5ca] Added share option for feeds
+  * [bfa1a293] Fixed parsing some feeds with bad server responses
+
 # 1.9.3
 Jonas Kalderstam (4):
   * [614597d] Fixed sort order to be the minimum of syncing time and publish date
