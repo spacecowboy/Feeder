@@ -25,6 +25,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
+import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
 
@@ -186,7 +187,9 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
             } else {
                 ""
             }
-            val credentials = Credentials.basic(user, pass)
+            val decodedUser = URLDecoder.decode(user, "UTF-8")
+            val decodedPass = URLDecoder.decode(pass, "UTF-8")
+            val credentials = Credentials.basic(decodedUser, decodedPass)
             client.newBuilder()
                     .authenticator { _, response ->
                         when {
