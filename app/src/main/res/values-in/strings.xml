@@ -16,7 +16,7 @@
   <string name="save">Simpan</string>
   <string name="empty_feed_top">Belum ada feed. Apakah anda ingin…</string>
   <string name="empty_feed_open">
-    <![CDATA[<font color="#607D8B">Membuka</font> feed lainnya?]]></string>
+    <![CDATA[<font color="#607D8B">Membuka</font> feed?]]></string>
   <string name="empty_feed_add">
     <![CDATA[<font color="#607D8B">Menambahkan</font> feed?]]></string>
   <string name="empty_no_feeds_top">Belum ada feed.\nMulai
@@ -39,13 +39,13 @@
   <string name="dont_notify_for_new_items">Hentikan notifikasi</string>
   <string name="toggle_read_status">Aktif/nonaktifkan status baca</string>
   <string name="open_link_in_browser">Buka tautan di peramban</string>
-  <string name="open_enclosed_media">Buka enclosed media</string>
-  <string name="sync">Sinkronisasi</string>
+  <string name="open_enclosed_media">Buka media yang tertutup</string>
+  <string name="sync">Sinkron</string>
   <string name="export_feeds_to_opml">Ekspor feed ke OPML</string>
   <string name="import_feeds_from_opml">Impor feed dari OPML</string>
   <string name="view_debug_log">Tampilkan log debug</string>
   <string name="new_based_on_this">Baru berdasarkan ini</string>
-  <string name="indicator_for_mark_as_read">Indikator untuk tandai sudah dibaca</string>
+  <string name="indicator_for_mark_as_read">Indikator untuk tanda sudah dibaca</string>
   <string name="share">Bagikan</string>
   <string name="no_such_feed">Tidak ada feed yang ditemukan. Coba gunakan https.</string>
   <string name="nothing_to_display">Tidak ada yang bisa ditampilkan!</string>
@@ -63,20 +63,21 @@
 
   <string name="synchronization">Sinkronisasi</string>
   <string name="only_on_wifi">Hanya pada WiFi</string>
-  <string name="may_result_data_charges">Mungkin menambah beban penggunaan data selular.</string>
+  <string name="show_thumbnails">Tampilkan thumbnail</string>
+  <string name="may_result_data_charges">Mungkin menambah penggunaan data seluler.</string>
   <string name="only_when_charging">Hanya saat mengisi daya</string>
   <string name="image_loading">Pemuatan gambar</string>
   <string name="no_activity_for_link">Tidak ada aplikasi untuk membuka tautan</string>
   <string name="check_for_updates">Periksa pembaruan</string>
-  <string name="on_startup">Saat memulai</string>
-  <string name="include_mobile_hotspots">Termasuk hotspot mobile</string>
+  <string name="on_startup">Saat mulai</string>
+  <string name="include_mobile_hotspots">Termasuk hotspot ponsel</string>
   <string name="updated_feeds">Feed diperbarui</string>
-  <string name="selected">Terpilih</string>
+  <string name="selected">Dipilih</string>
   <string name="notification_channel_name">Feed belum dibaca</string>
   <string name="notification_channel_description">Notifikasi hanya ditampilkan untuk item yang belum dibaca</string>
   <string name="open_in_reader">Pembaca</string>
   <string name="open_in_webview">Webview</string>
-  <string name="open_in_default_browser">Peramban bawaan</string>
+  <string name="open_in_default_browser">Peramban</string>
   <string name="open_item_by_default_with">Buka item feed dengan</string>
   <string name="open_links_with">Buka tautan dengan</string>
   <string name="reader_settings">Pembaca</string>
@@ -92,5 +93,10 @@
   <string name="send_bug_report">Kirim laporan bug</string>
   <string name="no_email_client">Tidak bisa membuka aplikasi surel</string>
   <string name="touch_to_play_video">Sentuh untuk memutar video</string>
+  <string name="javascript">Javascript</string>
+  <string name="open_feed">Buka feed</string>
+  <string name="mark_items_below_as_read">Tandai item di bawah sudah dibaca</string>
+  <string name="discovered_feeds_list">Daftar feed yang ditemukan</string>
+  <string name="toggle_tag_expansion">Aktif/Nonaktifkan ekspansi tag</string>
 
 </resources>
