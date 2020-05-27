@@ -1,3 +1,10 @@
+# 1.9.5
+Philipp Hutterer (1):
+  * [9222bf71] Bugfix: decode encoded credentials before request
+
+zmni (1):
+  * [60007125] Update Indonesian translation
+
 # 1.9.4
 Jonas Kalderstam (9):
   * [6003e84c] Fixed monospacing of pre-tags
