@@ -19,7 +19,7 @@
     <![CDATA[<font color="#607D8B">打开</font>另一个订阅？]]></string>
   <string name="empty_feed_add">
     <![CDATA[<font color="#607D8B">添加</font>更多订阅？]]></string>
-  <string name="empty_no_feeds_top">仍然没有可阅读的内容。\n由此开始
+  <string name="empty_no_feeds_top">尚无可阅读的内容。\n由此开始
   </string>
   <string name="empty_no_feeds_add">
     <![CDATA[<font color="#607D8B">添加</font>一些订阅]]></string>
@@ -62,6 +62,7 @@
 
   <string name="synchronization">同步</string>
   <string name="only_on_wifi">仅通过 WiFi</string>
+  <string name="show_thumbnails">显示缩略图</string>
   <string name="may_result_data_charges">可能产生移动数据费用。</string>
   <string name="only_when_charging">仅在充电时</string>
   <string name="image_loading">图片加载</string>
@@ -91,5 +92,10 @@
   <string name="send_bug_report">发送错误报告</string>
   <string name="no_email_client">无法打开电子邮件客户端</string>
   <string name="touch_to_play_video">轻触播放视频</string>
+  <string name="javascript">Javascript</string>
+  <string name="open_feed">打开订阅</string>
+  <string name="mark_items_below_as_read">标记以下项为已读</string>
+  <string name="discovered_feeds_list">已发现订阅列表</string>
+  <string name="toggle_tag_expansion">展开/闭合标签</string>
 
 </resources>
