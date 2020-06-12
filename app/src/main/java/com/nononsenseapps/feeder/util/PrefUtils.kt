@@ -174,6 +174,32 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
             }
         }
 
+    var currentSorting: CurrentSorting
+        get() = when (sp.getString(PREF_SORT, app.getString(R.string.pref_sort_value_default))) {
+            app.getString(R.string.pref_sort_value_old) -> CurrentSorting.OLD
+            else -> CurrentSorting.NEW
+
+        }
+        set(value) = sp.edit().putString(
+                PREF_SORT,
+                when (value) {
+                    CurrentSorting.NEW -> app.getString(R.string.pref_sort_value_new)
+                    CurrentSorting.OLD -> app.getString(R.string.pref_sort_value_old)
+                }
+        ).apply()
+
+    var isNewestFirst: Boolean
+        get() = when (currentSorting) {
+            CurrentSorting.NEW -> true
+            else -> false
+        }
+        set(value) {
+            currentSorting = when (value) {
+                true -> CurrentSorting.NEW
+                false -> CurrentSorting.OLD
+            }
+        }
+
     var showOnlyUnread: Boolean
         get() = sp.getBoolean(PREF_SHOW_ONLY_UNREAD, true)
         set(value) = sp.edit().putBoolean(PREF_SHOW_ONLY_UNREAD, value).apply()
@@ -216,6 +242,11 @@ enum class CurrentTheme {
     DAY,
     NIGHT,
     SYSTEM
+}
+
+enum class CurrentSorting {
+    NEW,
+    OLD
 }
 
 val Context.isSystemThemeNight: Boolean
