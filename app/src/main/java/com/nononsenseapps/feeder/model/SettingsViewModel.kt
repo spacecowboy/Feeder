@@ -10,9 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
-import com.nononsenseapps.feeder.util.CurrentTheme
-import com.nononsenseapps.feeder.util.PREF_THEME
-import com.nononsenseapps.feeder.util.Prefs
+import com.nononsenseapps.feeder.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -39,6 +37,11 @@ class SettingsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein), SharedPr
                     .conflate()
                     .asLiveData()
 
+    val liveSortPreferenceNoInitial: LiveData<CurrentSorting> =
+            keyFlow.filter { it == PREF_SORT }
+                    .map { prefs.currentSorting }
+                    .conflate()
+                    .asLiveData()
 
     val backgroundColor: Int
         get() =
