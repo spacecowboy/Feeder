@@ -34,6 +34,11 @@ const val PREF_LAST_FEED_ID = "pref_last_feed_id"
 const val PREF_THEME = "pref_theme"
 
 /**
+ * Sort settings
+ */
+const val PREF_SORT = "pref_sort"
+
+/**
  * Sync settings
  */
 const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"

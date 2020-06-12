@@ -11,6 +11,15 @@
     <item>@string/pref_theme_value_night</item>
   </string-array>
 
+  <string-array name="pref_sort_options">
+    <item>@string/sort_new</item>
+    <item>@string/sort_old</item>
+  </string-array>
+  <string-array name="pref_sort_values">
+    <item>@string/pref_sort_value_new</item>
+    <item>@string/pref_sort_value_old</item>
+  </string-array>
+
   <string-array name="pref_sync_frequency_titles">
     <item>@string/sync_option_manually</item>
     <item>@string/sync_option_every_15min</item>

@@ -7,4 +7,8 @@
   <string name="pref_theme_value_auto" translatable="false">auto</string>
   <string name="pref_theme_value_day" translatable="false">day</string>
   <string name="pref_theme_value_night" translatable="false">night</string>
+
+  <string name="pref_sort_value_default" translatable="false">@string/pref_sort_value_new</string>
+  <string name="pref_sort_value_new" translatable="false">new</string>
+  <string name="pref_sort_value_old" translatable="false">old</string>
 </resources>

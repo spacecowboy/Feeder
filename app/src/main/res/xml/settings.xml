@@ -8,6 +8,15 @@
     android:key="pref_theme"
     android:title="@string/theme" />
 
+  <ListPreference
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:defaultValue="@string/pref_sort_value_default"
+      android:entries="@array/pref_sort_options"
+      android:entryValues="@array/pref_sort_values"
+      android:key="pref_sort"
+      android:title="@string/sort" />
+
   <PreferenceCategory android:title="@string/synchronization">
 
     <ListPreference
