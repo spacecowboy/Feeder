@@ -12,12 +12,12 @@
   </string-array>
 
   <string-array name="pref_sort_options">
-    <item>@string/sort_new</item>
-    <item>@string/sort_old</item>
+    <item>@string/sort_newest_first</item>
+    <item>@string/sort_oldest_first</item>
   </string-array>
   <string-array name="pref_sort_values">
-    <item>@string/pref_sort_value_new</item>
-    <item>@string/pref_sort_value_old</item>
+    <item>@string/pref_sort_value_newest_first</item>
+    <item>@string/pref_sort_value_oldest_first</item>
   </string-array>
 
   <string-array name="pref_sync_frequency_titles">
