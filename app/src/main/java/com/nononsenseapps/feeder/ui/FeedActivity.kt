@@ -78,6 +78,19 @@ class FeedActivity : KodeinAwareActivity() {
                 startActivities(intents)
             }
 
+            // Forces the the feed to be reloaded when sorting order is changed
+            // Maybe some better way to do this?
+            settingsViewModel.liveSortPreferenceNoInitial.observe(this@FeedActivity) {
+                val intents = NavDeepLinkBuilder(this@FeedActivity)
+                        .setGraph(R.navigation.nav_graph)
+                        .setDestination(R.id.settingsFragment)
+                        .createTaskStackBuilder()
+                        .intents
+
+                finish()
+                startActivities(intents)
+            }
+
             feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observe(
                     this@FeedActivity,
                     androidx.lifecycle.Observer<List<FeedUnreadCount>> {

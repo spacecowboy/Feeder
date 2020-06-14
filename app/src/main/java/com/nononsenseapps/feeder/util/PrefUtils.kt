@@ -34,6 +34,11 @@ const val PREF_LAST_FEED_ID = "pref_last_feed_id"
 const val PREF_THEME = "pref_theme"
 
 /**
+ * Sort settings
+ */
+const val PREF_SORT = "pref_sort"
+
+/**
  * Sync settings
  */
 const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"
@@ -169,6 +174,32 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
             }
         }
 
+    var currentSorting: CurrentSorting
+        get() = when (sp.getString(PREF_SORT, app.getString(R.string.pref_sort_value_default))) {
+            app.getString(R.string.pref_sort_value_oldest_first) -> CurrentSorting.OLDEST_FIRST
+            else -> CurrentSorting.NEWEST_FIRST
+
+        }
+        set(value) = sp.edit().putString(
+                PREF_SORT,
+                when (value) {
+                    CurrentSorting.NEWEST_FIRST -> app.getString(R.string.pref_sort_value_newest_first)
+                    CurrentSorting.OLDEST_FIRST -> app.getString(R.string.pref_sort_value_oldest_first)
+                }
+        ).apply()
+
+    var isNewestFirst: Boolean
+        get() = when (currentSorting) {
+            CurrentSorting.NEWEST_FIRST -> true
+            else -> false
+        }
+        set(value) {
+            currentSorting = when (value) {
+                true -> CurrentSorting.NEWEST_FIRST
+                false -> CurrentSorting.OLDEST_FIRST
+            }
+        }
+
     var showOnlyUnread: Boolean
         get() = sp.getBoolean(PREF_SHOW_ONLY_UNREAD, true)
         set(value) = sp.edit().putBoolean(PREF_SHOW_ONLY_UNREAD, value).apply()
@@ -211,6 +242,11 @@ enum class CurrentTheme {
     DAY,
     NIGHT,
     SYSTEM
+}
+
+enum class CurrentSorting {
+    NEWEST_FIRST,
+    OLDEST_FIRST
 }
 
 val Context.isSystemThemeNight: Boolean

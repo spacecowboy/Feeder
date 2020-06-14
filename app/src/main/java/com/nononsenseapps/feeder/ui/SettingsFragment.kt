@@ -40,6 +40,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         bindPreferenceSummaryToValue(PREF_THEME)
+        bindPreferenceSummaryToValue(PREF_SORT)
         bindPreferenceSummaryToValue(PREF_SYNC_FREQ)
         bindPreferenceSummaryToValue(PREF_DEFAULT_OPEN_ITEM_WITH)
         bindPreferenceSummaryToValue(PREF_OPEN_LINKS_WITH)

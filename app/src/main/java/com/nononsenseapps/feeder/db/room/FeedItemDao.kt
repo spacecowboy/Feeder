@@ -60,7 +60,15 @@ interface FeedItemDao {
         WHERE feed_items.feed_id = :feedId
         ORDER BY primary_sort_time DESC, pub_date DESC
         """)
-    suspend fun loadFeedItemsInFeed(feedId: Long): List<FeedItem>
+    suspend fun loadFeedItemsInFeedDesc(feedId: Long): List<FeedItem>
+
+    @Query("""
+        SELECT *
+        FROM feed_items
+        WHERE feed_items.feed_id = :feedId
+        ORDER BY primary_sort_time ASC, pub_date ASC
+        """)
+    suspend fun loadFeedItemsInFeedAsc(feedId: Long): List<FeedItem>
 
     @Query("""
         SELECT $feedItemColumnsWithFeed
@@ -77,7 +85,16 @@ interface FeedItemDao {
         WHERE feed_id IS :feedId
         ORDER BY primary_sort_time DESC, pub_date DESC
         """)
-    fun loadLivePreviews(feedId: Long): DataSource.Factory<Int, PreviewItem>
+    fun loadLivePreviewsDesc(feedId: Long): DataSource.Factory<Int, PreviewItem>
+
+    @Query("""
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_id IS :feedId
+        ORDER BY primary_sort_time ASC, pub_date ASC
+        """)
+    fun loadLivePreviewsAsc(feedId: Long): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $previewColumns
@@ -86,7 +103,17 @@ interface FeedItemDao {
         WHERE tag IS :tag
         ORDER BY primary_sort_time DESC, pub_date DESC
         """)
-    fun loadLivePreviews(tag: String): DataSource.Factory<Int, PreviewItem>
+    fun loadLivePreviewsDesc(tag: String): DataSource.Factory<Int, PreviewItem>
+
+    @Query("""
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE tag IS :tag
+        ORDER BY primary_sort_time ASC, pub_date ASC
+        """)
+    fun loadLivePreviewsAsc(tag: String): DataSource.Factory<Int, PreviewItem>
+
 
     @Query("""
         SELECT $previewColumns
@@ -94,7 +121,15 @@ interface FeedItemDao {
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         ORDER BY primary_sort_time DESC, pub_date DESC
         """)
-    fun loadLivePreviews(): DataSource.Factory<Int, PreviewItem>
+    fun loadLivePreviewsDesc(): DataSource.Factory<Int, PreviewItem>
+
+    @Query("""
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        ORDER BY primary_sort_time ASC, pub_date ASC
+        """)
+    fun loadLivePreviewsAsc(): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $previewColumns
@@ -103,7 +138,16 @@ interface FeedItemDao {
         WHERE feed_id IS :feedId AND unread IS :unread
         ORDER BY primary_sort_time DESC, pub_date DESC
         """)
-    fun loadLiveUnreadPreviews(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
+    fun loadLiveUnreadPreviewsDesc(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
+
+    @Query("""
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_id IS :feedId AND unread IS :unread
+        ORDER BY primary_sort_time ASC, pub_date ASC
+        """)
+    fun loadLiveUnreadPreviewsAsc(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $previewColumns
@@ -112,7 +156,16 @@ interface FeedItemDao {
         WHERE tag IS :tag AND unread IS :unread
         ORDER BY primary_sort_time DESC, pub_date DESC
         """)
-    fun loadLiveUnreadPreviews(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
+    fun loadLiveUnreadPreviewsDesc(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
+
+    @Query("""
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE tag IS :tag AND unread IS :unread
+        ORDER BY primary_sort_time ASC, pub_date ASC
+        """)
+    fun loadLiveUnreadPreviewsAsc(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $previewColumns
@@ -121,7 +174,16 @@ interface FeedItemDao {
         WHERE unread IS :unread
         ORDER BY primary_sort_time DESC, pub_date DESC
         """)
-    fun loadLiveUnreadPreviews(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
+    fun loadLiveUnreadPreviewsDesc(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
+
+    @Query("""
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE unread IS :unread
+        ORDER BY primary_sort_time ASC, pub_date ASC
+        """)
+    fun loadLiveUnreadPreviewsAsc(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
     @Query("""
         SELECT $feedItemColumnsWithFeed

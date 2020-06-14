@@ -3,12 +3,15 @@ package com.nononsenseapps.feeder.model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
+import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.FlowPreview
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
@@ -19,9 +22,12 @@ private val PAGE_SIZE = 50
 class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     private val dao: FeedItemDao by instance()
     private val liveOnlyUnread = MutableLiveData<Boolean>()
+    private val prefs: Prefs by instance()
+    private val newestFirst: Boolean
 
     init {
         liveOnlyUnread.value = true
+        newestFirst = prefs.isNewestFirst
     }
 
     private lateinit var livePagedAll: LiveData<PagedList<PreviewItem>>
@@ -32,18 +38,18 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
         if (!this::livePreviews.isInitialized) {
             livePagedAll = LivePagedListBuilder(
                     when {
-                        feedId > ID_UNSET -> dao.loadLivePreviews(feedId = feedId)
-                        feedId == ID_ALL_FEEDS -> dao.loadLivePreviews()
-                        tag.isNotEmpty() -> dao.loadLivePreviews(tag = tag)
+                        feedId > ID_UNSET -> loadLivePreviews(feedId = feedId, newestFirst = newestFirst)
+                        feedId == ID_ALL_FEEDS -> loadLivePreviews(newestFirst = newestFirst)
+                        tag.isNotEmpty() -> loadLivePreviews(tag = tag, newestFirst = newestFirst)
                         else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
                     }, PAGE_SIZE).build()
 
 
             livePagedUnread = LivePagedListBuilder(
                     when {
-                        feedId > ID_UNSET -> dao.loadLiveUnreadPreviews(feedId = feedId)
-                        feedId == ID_ALL_FEEDS -> dao.loadLiveUnreadPreviews()
-                        tag.isNotEmpty() -> dao.loadLiveUnreadPreviews(tag = tag)
+                        feedId > ID_UNSET -> loadLiveUnreadPreviews(feedId = feedId, newestFirst = newestFirst)
+                        feedId == ID_ALL_FEEDS -> loadLiveUnreadPreviews(newestFirst = newestFirst)
+                        tag.isNotEmpty() -> loadLiveUnreadPreviews(tag = tag, newestFirst = newestFirst)
                         else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
                     }, PAGE_SIZE).build()
 
@@ -90,4 +96,33 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
 
     suspend fun markAsRead(id: Long, unread: Boolean = false) =
             dao.markAsRead(id = id, unread = unread)
+
+    suspend fun loadFeedItemsInFeed(feedId: Long, newestFirst: Boolean): List<FeedItem> {
+        return if (newestFirst) dao.loadFeedItemsInFeedDesc(feedId) else dao.loadFeedItemsInFeedAsc(feedId)
+    }
+
+    fun loadLivePreviews(feedId: Long, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+        return if (newestFirst) dao.loadLivePreviewsDesc(feedId) else dao.loadLivePreviewsAsc(feedId)
+    }
+
+    fun loadLivePreviews(tag: String, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+        return if (newestFirst) dao.loadLivePreviewsDesc(tag) else dao.loadLivePreviewsAsc(tag)
+    }
+
+    fun loadLivePreviews(newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+        return if (newestFirst) dao.loadLivePreviewsDesc() else dao.loadLivePreviewsAsc()
+    }
+
+    fun loadLiveUnreadPreviews(feedId: Long?, unread: Boolean = true, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+        return if (newestFirst) dao.loadLiveUnreadPreviewsDesc(feedId, unread) else dao.loadLiveUnreadPreviewsAsc(feedId, unread)
+    }
+
+    fun loadLiveUnreadPreviews(tag: String, unread: Boolean = true, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+        return if (newestFirst) dao.loadLiveUnreadPreviewsDesc(tag, unread) else dao.loadLiveUnreadPreviewsAsc(tag, unread)
+    }
+
+    fun loadLiveUnreadPreviews(unread: Boolean = true, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+        return if (newestFirst) dao.loadLiveUnreadPreviewsDesc(unread) else dao.loadLiveUnreadPreviewsAsc(unread)
+    }
+
 }
