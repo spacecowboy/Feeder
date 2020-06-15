@@ -153,8 +153,10 @@ class FeedItemHolder(
      */
     override fun onClick(view: View) {
         val context = view.context
-        if (context != null) {
-
+        if (context == null) {
+            return
+        }
+        try {
             val openItemWith = when (val defaultOpenItemWith = prefs.openItemsWith) {
                 PREF_VAL_OPEN_WITH_READER -> {
                     if (rssItem?.plainSnippet?.isNotEmpty() == true) {
@@ -203,6 +205,10 @@ class FeedItemHolder(
                     }
                 }
             }
+        } catch (e: java.lang.IllegalArgumentException) {
+            // Can happen if you press two feed items at once - then navcontroller will consider
+            // one of the clicks an unknown destination - ignore it
+            Log.e(TAG, "Did user click two at once?", e)
         }
     }
 
