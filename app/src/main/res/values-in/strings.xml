@@ -90,6 +90,9 @@
   <string name="theme_day">Terang</string>
   <string name="theme_night">Gelap</string>
   <string name="theme">Tema</string>
+  <string name="sort_newest_first">Terbaru</string>
+  <string name="sort_oldest_first">Terlama</string>
+  <string name="sort">Urutkan</string>
   <string name="send_bug_report">Kirim laporan bug</string>
   <string name="no_email_client">Tidak bisa membuka aplikasi surel</string>
   <string name="touch_to_play_video">Sentuh untuk memutar video</string>
