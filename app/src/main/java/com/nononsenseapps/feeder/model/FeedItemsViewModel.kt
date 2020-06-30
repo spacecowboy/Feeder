@@ -11,7 +11,6 @@ import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.FlowPreview
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
@@ -22,12 +21,11 @@ private val PAGE_SIZE = 50
 class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     private val dao: FeedItemDao by instance()
     private val liveOnlyUnread = MutableLiveData<Boolean>()
-    private val prefs: Prefs by instance()
-    private val newestFirst: Boolean
+    private val liveNewestFirst = MutableLiveData<Boolean>()
 
     init {
         liveOnlyUnread.value = true
-        newestFirst = prefs.isNewestFirst
+        liveNewestFirst.value = true
     }
 
     private lateinit var livePagedAll: LiveData<PagedList<PreviewItem>>
@@ -36,22 +34,26 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
 
     fun getLiveDbPreviews(feedId: Long, tag: String): LiveData<PagedList<PreviewItem>> {
         if (!this::livePreviews.isInitialized) {
-            livePagedAll = LivePagedListBuilder(
-                    when {
-                        feedId > ID_UNSET -> loadLivePreviews(feedId = feedId, newestFirst = newestFirst)
-                        feedId == ID_ALL_FEEDS -> loadLivePreviews(newestFirst = newestFirst)
-                        tag.isNotEmpty() -> loadLivePreviews(tag = tag, newestFirst = newestFirst)
-                        else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
-                    }, PAGE_SIZE).build()
+            livePagedAll = Transformations.switchMap(liveNewestFirst) { newestFirst ->
+                LivePagedListBuilder(
+                        when {
+                            feedId > ID_UNSET -> loadLivePreviews(feedId = feedId, newestFirst = newestFirst)
+                            feedId == ID_ALL_FEEDS -> loadLivePreviews(newestFirst = newestFirst)
+                            tag.isNotEmpty() -> loadLivePreviews(tag = tag, newestFirst = newestFirst)
+                            else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
+                        }, PAGE_SIZE).build()
+            }
 
 
-            livePagedUnread = LivePagedListBuilder(
-                    when {
-                        feedId > ID_UNSET -> loadLiveUnreadPreviews(feedId = feedId, newestFirst = newestFirst)
-                        feedId == ID_ALL_FEEDS -> loadLiveUnreadPreviews(newestFirst = newestFirst)
-                        tag.isNotEmpty() -> loadLiveUnreadPreviews(tag = tag, newestFirst = newestFirst)
-                        else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
-                    }, PAGE_SIZE).build()
+            livePagedUnread = Transformations.switchMap(liveNewestFirst) { newestFirst ->
+                LivePagedListBuilder(
+                        when {
+                            feedId > ID_UNSET -> loadLiveUnreadPreviews(feedId = feedId, newestFirst = newestFirst)
+                            feedId == ID_ALL_FEEDS -> loadLiveUnreadPreviews(newestFirst = newestFirst)
+                            tag.isNotEmpty() -> loadLiveUnreadPreviews(tag = tag, newestFirst = newestFirst)
+                            else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
+                        }, PAGE_SIZE).build()
+            }
 
             livePreviews = Transformations.switchMap(liveOnlyUnread) { onlyUnread ->
                 if (onlyUnread) {
@@ -66,6 +68,10 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
 
     fun setOnlyUnread(onlyUnread: Boolean) {
         liveOnlyUnread.value = onlyUnread
+    }
+
+    fun setNewestFirst(newestFirst: Boolean) {
+        liveNewestFirst.value = newestFirst
     }
 
     suspend fun markAllAsRead(feedId: Long, tag: String) {

@@ -290,6 +290,8 @@ class FeedFragment : KodeinAwareFragment() {
         // Load some RSS
         val onlyUnread = prefs.showOnlyUnread
         feedItemsViewModel.setOnlyUnread(onlyUnread)
+        val newestFirst = prefs.isNewestFirst
+        feedItemsViewModel.setNewestFirst(newestFirst)
         liveDbPreviews = feedItemsViewModel.getLiveDbPreviews(
                 feedId = id,
                 tag = feedTag ?: ""
