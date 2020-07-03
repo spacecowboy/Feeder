@@ -37,12 +37,6 @@ class SettingsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein), SharedPr
                     .conflate()
                     .asLiveData()
 
-    val liveSortPreferenceNoInitial: LiveData<CurrentSorting> =
-            keyFlow.filter { it == PREF_SORT }
-                    .map { prefs.currentSorting }
-                    .conflate()
-                    .asLiveData()
-
     val backgroundColor: Int
         get() =
             when (prefs.isNightMode) {
