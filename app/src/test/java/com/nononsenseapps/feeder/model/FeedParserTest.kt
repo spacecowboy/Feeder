@@ -36,7 +36,7 @@ class FeedParserTest: KodeinAware {
     }
 
     @Test
-    @Throws(Exception::class)
+    @Ignore
     fun getAlternateLinksHandlesYoutube() {
         // I want this to be an Online test to make sure that I notice if/when Youtube changes something which breaks it
         runBlocking {
