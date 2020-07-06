@@ -1,3 +1,28 @@
+# 1.9.6
+Jonas Kalderstam (2):
+  * [47bc0a5c] Fixed possible crash in case you pressed two feed items at
+         once
+
+Khar Khamal (2):
+  * [8aa6649e] Updated Spanish translation
+  * [2b9180c3] Updated Spanish translation
+
+Ramzan Sheikh (5):
+  * [fd7570e7] Modified FeedItemsViewModel to use LiveData for sorting
+         preference
+  * [d130f0d0] Added reverse sort option to settings menu
+  * [cf70edfe] Added sorting option utilities to PrefUtils.kt
+  * [61128e4f] Modified FeedItemDao and FeedItemsViewModel to allow listing
+         feeds in reverse order
+  * [6f002883] Fixed current feed order not changing when sorting setting
+         changed
+
+linsui (1):
+  * [f9fdb071] Updated Simplified Chinese translation
+
+zmni (1):
+  * [4b67ce48] Updated Indonesian translation
+
 # 1.9.5
 Philipp Hutterer (1):
   * [9222bf71] Bugfix: decode encoded credentials before request
