@@ -14,7 +14,7 @@
   <string name="by_author_on_date">%1$s, %2$s</string>
   <string name="on_date">%1$s</string>
   <string name="save">Uložit</string>
-  <string name="empty_feed_top">Nic ke čtení.Chtěli byste…</string>
+  <string name="empty_feed_top">Nic ke čtení. Chtěli byste…</string>
   <string name="empty_feed_open">
     <![CDATA[<font color="#607D8B">Otevřít</font> jiný zdroj?]]></string>
   <string name="empty_feed_add">
@@ -28,7 +28,7 @@
   <string name="mark_as_unread">Označit jako nepřečtěné</string>
   <string name="mark_all_as_read">Označit vše jako přečtěné</string>
   <string name="edit_feed">Editace zdroje</string>
-  <string name="delete_feed">Odstranění zdroje</string>
+  <string name="delete_feed">Odstranit zdroj</string>
   <string name="show_all_items">Zobrazit všechny články</string>
   <string name="show_unread_items">Zobrazit nepřečtěné články</string>
   <string name="new_items_available">Nové články jsou k dispozici</string>
@@ -88,6 +88,9 @@
   <string name="theme_day">Den</string>
   <string name="theme_night">Noc</string>
   <string name="theme">Motiv</string>
+  <string name="sort_newest_first">Od nejnovějších</string>
+  <string name="sort_oldest_first">Od nejstarších</string>
+  <string name="sort">Seřadit</string>
   <string name="send_bug_report">Odeslat chybové hlášení</string>
   <string name="no_email_client">Nenalezen e-mailový klient</string>
   <string name="touch_to_play_video">Klepnutím přehrajete video</string>
@@ -95,6 +98,8 @@
   <string name="open_feed">Otevřít zdroj</string>
   <string name="mark_items_below_as_read">Označit níže uvedené články jako přečtené</string>
   <string name="show_thumbnails">Zobrazit miniatury</string>
+  <string name="discovered_feeds_list">Seznam objevených zdrojů</string>
+  <string name="toggle_tag_expansion">Přepínač rozšíření štítku</string>
 
 
 </resources>
