@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
   <string name="navigation_drawer_open">Otevření navigační lišty</string>
   <string name="navigation_drawer_close">Zavření navigační lišty</string>
   <string name="action_settings">Nastavení</string>
   <string name="add_feed">Přidat zdroj</string>
-  <string name="title_activity_edit_feed">Přihlášení k odběru zdroje</string>
+  <string name="title_activity_edit_feed">Přihlásit k odběru zdroje</string>
   <string name="url">URL</string>
   <string name="tag">štítek</string>
   <string name="add_feed_search_hint">URL zdroje</string>
@@ -27,7 +27,7 @@
   <string name="mark_as_read">Označit jako přečtěné</string>
   <string name="mark_as_unread">Označit jako nepřečtěné</string>
   <string name="mark_all_as_read">Označit vše jako přečtěné</string>
-  <string name="edit_feed">Editace zdroje</string>
+  <string name="edit_feed">Editovat zdroj</string>
   <string name="delete_feed">Odstranit zdroj</string>
   <string name="show_all_items">Zobrazit všechny články</string>
   <string name="show_unread_items">Zobrazit nepřečtěné články</string>
@@ -46,7 +46,7 @@
   <string name="new_based_on_this">Na základě tohoto zdroje</string>
   <string name="indicator_for_mark_as_read">Indikátor pro označení jako přečtěné</string>
   <string name="share">Sdílet</string>
-  <string name="no_such_feed">Zdroj nebyl nalezen. Zkuste použít http.</string>
+  <string name="no_such_feed">Zdroj nebyl nalezen.</string>
   <string name="nothing_to_display">Nic k zobrazení!</string>
   <string name="title_activity_settings">Nastavení</string>
   <string name="all_feeds">Všechny zdroje</string>
@@ -96,7 +96,7 @@
   <string name="touch_to_play_video">Klepnutím přehrajete video</string>
   <string name="javascript">Javascript</string>
   <string name="open_feed">Otevřít zdroj</string>
-  <string name="mark_items_below_as_read">Označit níže uvedené články jako přečtené</string>
+  <string name="mark_items_below_as_read">Označit články níže za přečtené</string>
   <string name="show_thumbnails">Zobrazit miniatury</string>
   <string name="discovered_feeds_list">Seznam objevených zdrojů</string>
   <string name="toggle_tag_expansion">Přepínač rozšíření štítku</string>
