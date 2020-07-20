@@ -1,3 +1,11 @@
+# 1.9.7
+Tomáš Tihlařík (2):
+  * [251ffe8d] Updated Czech translation
+  * [8d92b9ac] Updated Czech translation
+
+linsui (1):
+  * [a7b65165] Updated Simplified Chinese Translation
+
 # 1.9.6
 Jonas Kalderstam (2):
   * [47bc0a5c] Fixed possible crash in case you pressed two feed items at
