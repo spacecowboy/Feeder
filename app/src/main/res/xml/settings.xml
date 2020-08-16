@@ -17,6 +17,11 @@
       android:key="pref_sort"
       android:title="@string/sort" />
 
+  <SwitchPreference
+      android:defaultValue="true"
+      android:key="pref_show_fab"
+      android:title="@string/show_fab" />
+
   <PreferenceCategory android:title="@string/synchronization">
 
     <ListPreference
