@@ -174,7 +174,11 @@ class FeedActivity : KodeinAwareActivity() {
             when (destination.id) {
                 R.id.feedFragment -> {
                     fab.setImageResource(R.drawable.ic_done_all_white_24dp)
-                    fab.show()
+                    if ( prefs.show_fab ) {
+                        fab.show()
+                    } else {
+                        fab.hide()
+                    }
                 }
                 else -> {
                     fab.hide()

@@ -39,6 +39,11 @@ const val PREF_THEME = "pref_theme"
 const val PREF_SORT = "pref_sort"
 
 /**
+ * Floating action button settings
+ */
+const val PREF_SHOW_FAB = "pref_show_fab"
+
+/**
  * Sync settings
  */
 const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"
@@ -199,6 +204,10 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
                 false -> CurrentSorting.OLDEST_FIRST
             }
         }
+
+    var show_fab: Boolean
+        get() = sp.getBoolean(PREF_SHOW_FAB, true)
+        set(value) = sp.edit().putBoolean(PREF_SHOW_FAB, value).apply()
 
     var showOnlyUnread: Boolean
         get() = sp.getBoolean(PREF_SHOW_ONLY_UNREAD, true)
