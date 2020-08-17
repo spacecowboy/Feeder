@@ -14,7 +14,7 @@
   <string name="by_author_on_date">%1$s, %2$s</string>
   <string name="on_date">%1$s</string>
   <string name="save">保存</string>
-  <string name="empty_feed_top">没用可阅读的内容。您是否想要…</string>
+  <string name="empty_feed_top">没有可阅读的内容。您是否想要…</string>
   <string name="empty_feed_open">
     <![CDATA[<font color="#607D8B">打开</font>另一个订阅？]]></string>
   <string name="empty_feed_add">
