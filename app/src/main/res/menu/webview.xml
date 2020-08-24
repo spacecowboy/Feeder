@@ -25,4 +25,9 @@
     android:icon="@drawable/ic_share_white_24dp"
     android:title="@string/share"
     app:showAsAction="ifRoom" />
+  <item
+    android:id="@+id/action_mark_as_unread"
+    android:title="@string/mark_as_unread"
+    android:visible="false"
+    app:showAsAction="never" />
 </menu>

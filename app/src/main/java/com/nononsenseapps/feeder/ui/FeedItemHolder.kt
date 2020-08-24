@@ -191,6 +191,7 @@ class FeedItemHolder(
                                         bundle {
                                             putString(ARG_URL, it.link)
                                             putString(ARG_ENCLOSURE, it.enclosureLink)
+                                            putLong(ARG_ID, it.id)
                                         }
                                 )
                             }

@@ -82,6 +82,10 @@
     <deepLink
       android:id="@+id/deepLink3"
       app:uri="content://com.nononsenseapps.feeder.provider/url/{url}" />
+    <argument
+      android:name="dbid"
+      app:argType="long"
+      android:defaultValue="0L" />
   </fragment>
   <fragment
     android:id="@+id/settingsFragment"
