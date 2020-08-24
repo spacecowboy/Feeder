@@ -1,3 +1,16 @@
+# 1.9.8
+Jonas Kalderstam (2):
+  * [e3245b9c] Added 'mark as unread' to the webview menu
+
+Khar Khamal (1):
+  * [d8b09639] Updated Spanish translation
+
+Michael Hynes (1):
+  * [7d1e419b] Added an option to disable floating action button.
+
+Sam Clie (1):
+  * [bdedadd5] Fixed typo in Chinese translation
+
 # 1.9.7
 Tomáš Tihlařík (2):
   * [251ffe8d] Updated Czech translation
