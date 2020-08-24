@@ -183,6 +183,7 @@ class ReaderFragment : KodeinAwareFragment() {
                                 bundle {
                                     putString(ARG_URL, link)
                                     putString(ARG_ENCLOSURE, rssItem.enclosureLink)
+                                    putLong(ARG_ID, _id)
                                 }
                         )
                     }

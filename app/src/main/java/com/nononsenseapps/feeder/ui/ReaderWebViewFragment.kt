@@ -14,22 +14,30 @@ import android.webkit.CookieManager
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.lifecycle.lifecycleScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareFragment
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.openLinkInBrowser
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
 
 const val ARG_URL = "url"
 
+@FlowPreview
 class ReaderWebViewFragment : KodeinAwareFragment() {
     private var webView: WebView? = null
     var url: String = ""
     private var currentUrl = url
     private var enclosureUrl: String? = null
     private var isWebViewAvailable: Boolean = false
+    private var _id: Long = ID_UNSET
 
     private val prefs: Prefs by instance()
+    private val viewModel: FeedItemViewModel by instance(arg = this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +45,7 @@ class ReaderWebViewFragment : KodeinAwareFragment() {
         arguments?.let { arguments ->
             url = arguments.getString(ARG_URL, null) ?: ""
             enclosureUrl = arguments.getString(ARG_ENCLOSURE, null)
+            _id = arguments.getLong(ARG_ID, ID_UNSET)
         }
 
         setHasOptionsMenu(true)
@@ -121,6 +130,10 @@ class ReaderWebViewFragment : KodeinAwareFragment() {
             menuItem.setChecked(prefs.javascriptEnabled)
         }
 
+        menu.findItem(R.id.action_mark_as_unread)?.let { menuItem ->
+            menuItem.setVisible(_id != ID_UNSET)
+        }
+
         // Don't forget super call here
         super.onCreateOptionsMenu(menu, inflater)
     }
@@ -160,6 +173,12 @@ class ReaderWebViewFragment : KodeinAwareFragment() {
                         shareIntent.putExtra(Intent.EXTRA_TEXT, currentUrl)
 
                         startActivity(Intent.createChooser(shareIntent, getString(R.string.share)))
+                    }
+                    true
+                }
+                R.id.action_mark_as_unread -> {
+                    lifecycleScope.launch {
+                        viewModel.markAsRead(_id, unread = true)
                     }
                     true
                 }
