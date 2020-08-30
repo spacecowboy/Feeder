@@ -46,12 +46,11 @@ open class HtmlToSpannedConverter(private var source: Reader,
                                   val maxSize: Point,
                                   private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
                                   private var urlClickListener: UrlClickListener?) : ContentHandler, KodeinAware {
-    private val mAccentColor: Int by lazy {
-        when (prefs.isNightMode) {
+    private val mAccentColor: Int
+        get() = when (prefs.isNightMode) {
             true -> context.getColorCompat(R.color.accentNight)
             false -> context.getColorCompat(R.color.accentDay)
         }
-    }
     private val mQuoteGapWidth: Int by lazy {
         context.resources.getDimension(R.dimen.reader_quote_gap_width).roundToInt()
     }
@@ -62,12 +61,11 @@ open class HtmlToSpannedConverter(private var source: Reader,
     private var respectFormatting: Int = 0
     private var mReader: XMLReader = parser
     private var ignoredImage = false
-    private val codeTextBgColor: Int by lazy {
-        when (prefs.isNightMode) {
+    private val codeTextBgColor: Int
+        get() = when (prefs.isNightMode) {
             true -> context.getColorCompat(R.color.code_text_bg_night)
             false -> context.getColorCompat(R.color.code_text_bg_day)
         }
-    }
 
     private val ignoredTags = listOf("style", "script")
 

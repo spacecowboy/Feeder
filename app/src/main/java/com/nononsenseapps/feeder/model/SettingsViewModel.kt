@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
@@ -36,6 +37,8 @@ class SettingsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein), SharedPr
                     .map { prefs.currentTheme }
                     .conflate()
                     .asLiveData()
+
+    val liveIsNightMode: MutableLiveData<Boolean> by lazy { MutableLiveData(prefs.isNightMode) }
 
     val backgroundColor: Int
         get() =

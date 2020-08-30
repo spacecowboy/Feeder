@@ -256,6 +256,7 @@ class FeedActivity : KodeinAwareActivity() {
     override fun onResume() {
         super.onResume()
         syncFeedsMaybe()
+        setNightModeViewModelState()
     }
 
     private fun syncFeedsMaybe() = lifecycleScope.launch {
@@ -271,5 +272,9 @@ class FeedActivity : KodeinAwareActivity() {
 
     fun openNavDrawer() {
         drawer_layout.openDrawer(GravityCompat.START)
+    }
+
+    private fun setNightModeViewModelState() {
+        settingsViewModel.liveIsNightMode.value = prefs.isNightMode
     }
 }

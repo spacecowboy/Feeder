@@ -9,6 +9,7 @@ import android.text.style.ImageSpan
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
@@ -49,57 +50,68 @@ class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     fun getLiveImageText(
             id: Long,
             maxImageSize: Point,
-            urlClickListener: UrlClickListener?
+            urlClickListener: UrlClickListener?,
+            liveIsNightMode: LiveData<Boolean>
     ): LiveData<Spanned> {
         if (!this::liveImageText.isInitialized) {
-            liveImageText = liveData(context = viewModelScope.coroutineContext) {
-                // TODO resources
-                emit(SpannableString("Loading..."))
+            liveImageText = liveIsNightMode.switchMap { _ ->
+                liveData(context = viewModelScope.coroutineContext) {
+                    // TODO resources
+                    emit(
+                            SpannableString("Loading...")
+                    )
 
-                try {
-                    withContext(Dispatchers.IO) {
-                        val allowDownload = prefs.shouldLoadImages()
-                        val feedUrl = dao.loadFeedUrlOfFeedItem(id = id)
-                                ?: URL("https://missing.feedurl")
+                    try {
+                        withContext(Dispatchers.IO) {
+                            val allowDownload = prefs.shouldLoadImages()
+                            val feedUrl = dao.loadFeedUrlOfFeedItem(id = id)
+                                    ?: URL("https://missing.feedurl")
 
-                        val noImages = blobInputStream(
-                                itemId = id,
-                                filesDir = context.filesDir
-                        ).bufferedReader().use { reader ->
-                            toSpannedWithNoImages(
-                                    kodein = kodein,
-                                    source = reader,
-                                    siteUrl = feedUrl,
-                                    maxSize = maxImageSize,
-                                    urlClickListener = urlClickListener
-                            )
-                        }
-                        emit(noImages)
-
-                        if (noImages.getAllImageSpans().isNotEmpty()) {
-                            val withImages = blobInputStream(
+                            lateinit var noImages: Spanned
+                            noImages = blobInputStream(
                                     itemId = id,
                                     filesDir = context.filesDir
                             ).bufferedReader().use { reader ->
-                                toSpannedWithImages(
+                                toSpannedWithNoImages(
                                         kodein = kodein,
                                         source = reader,
                                         siteUrl = feedUrl,
                                         maxSize = maxImageSize,
-                                        allowDownload = allowDownload,
                                         urlClickListener = urlClickListener
                                 )
                             }
-                            emit(withImages)
+                            emit(
+                                    noImages
+                            )
+
+                            if (noImages.getAllImageSpans().isNotEmpty()) {
+                                val withImages = blobInputStream(
+                                        itemId = id,
+                                        filesDir = context.filesDir
+                                ).bufferedReader().use { reader ->
+                                    toSpannedWithImages(
+                                            kodein = kodein,
+                                            source = reader,
+                                            siteUrl = feedUrl,
+                                            maxSize = maxImageSize,
+                                            allowDownload = allowDownload,
+                                            urlClickListener = urlClickListener
+                                    )
+                                }
+                                emit(
+                                        withImages
+                                )
+                            }
                         }
+                    } catch (e: IOException) {
+                        // TODO resources
+                        emit(
+                                SpannableString("Could not read blob for item with id [$id]")
+                        )
                     }
-                } catch (e: IOException) {
-                    // TODO resources
-                    emit(SpannableString("Could not read blob for item with id [$id]"))
                 }
             }
         }
-
         return liveImageText
     }
 

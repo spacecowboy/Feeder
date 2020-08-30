@@ -229,5 +229,6 @@ class FeedItemViewModelTest {
 
 fun KodeinAwareActivity.getLiveFeedItemImageText(id: Long): LiveData<Spanned> {
     val viewModel: FeedItemViewModel by instance()
-    return viewModel.getLiveImageText(id, maxImageSize(), null)
+    val settingsViewModel: SettingsViewModel by instance()
+    return viewModel.getLiveImageText(id, maxImageSize(), null, settingsViewModel.liveIsNightMode)
 }

@@ -20,6 +20,7 @@ import com.nononsenseapps.feeder.base.KodeinAwareFragment
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
+import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
@@ -58,6 +59,8 @@ class ReaderFragment : KodeinAwareFragment() {
     private lateinit var titleTextView: TextView
 
     private val viewModel: FeedItemViewModel by instance(arg = this)
+    // Important to get the activity bound view model here hence no arg specified
+    private val settingsViewModel: SettingsViewModel by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,7 +137,12 @@ class ReaderFragment : KodeinAwareFragment() {
                 }
             })
 
-            viewModel.getLiveImageText(_id, activity!!.maxImageSize(), urlClickListener()).observe(
+            viewModel.getLiveImageText(
+                    _id,
+                    activity!!.maxImageSize(),
+                    urlClickListener(),
+                    settingsViewModel.liveIsNightMode
+            ).observe(
                     this@ReaderFragment,
                     androidx.lifecycle.Observer {
                         bodyTextView.text = it
