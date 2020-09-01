@@ -100,6 +100,7 @@
   <string name="show_thumbnails">Zobrazit miniatury</string>
   <string name="discovered_feeds_list">Seznam objevených zdrojů</string>
   <string name="toggle_tag_expansion">Přepínač rozšíření štítku</string>
+  <string name="show_fab">Zobrazit plovoucí tlačítko akcí</string>
 
 
 </resources>
