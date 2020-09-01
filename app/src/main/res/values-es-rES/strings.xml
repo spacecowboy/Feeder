@@ -69,7 +69,7 @@
   <string name="no_activity_for_link">No se encontró ninguna actividad con la que abrir el enlace</string>
   <string name="check_for_updates">Comprobar actualizaciones</string>
   <string name="on_startup">Al arrancar</string>
-  <string name="show_fab">Mostrar botóón flotante</string>
+  <string name="show_fab">Mostrar botón flotante</string>
   <string name="include_mobile_hotspots">Incluir puntos de acceso móviles</string>
   <string name="updated_feeds">Canales actualizados</string>
   <string name="selected">Seleccionado</string>
