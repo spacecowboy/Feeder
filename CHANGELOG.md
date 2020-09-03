@@ -1,3 +1,16 @@
+# 1.9.9
+Jonas Kalderstam (4):
+  * [b4827aaa] Fixed text formatting not updating with System night mode
+
+Khar Khamal (1):
+  * [37646e21] Fixed typo in Spanish translation
+
+Tomáš Tihlařík (1):
+  * [b2cb4a11] Updated Czech translation
+
+aevw (1):
+  * [a2ac9334] Added Portuguese (Brazil) translation
+
 # 1.9.8
 Jonas Kalderstam (2):
   * [e3245b9c] Added 'mark as unread' to the webview menu
