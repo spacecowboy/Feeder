@@ -70,6 +70,7 @@
   <string name="no_activity_for_link">Tidak ada aplikasi untuk membuka tautan</string>
   <string name="check_for_updates">Periksa pembaruan</string>
   <string name="on_startup">Saat mulai</string>
+  <string name="show_fab">Tampilkan tombol tindakan mengambang</string>
   <string name="include_mobile_hotspots">Termasuk hotspot ponsel</string>
   <string name="updated_feeds">Feed diperbarui</string>
   <string name="selected">Dipilih</string>
@@ -100,6 +101,6 @@
   <string name="open_feed">Buka feed</string>
   <string name="mark_items_below_as_read">Tandai item di bawah sudah dibaca</string>
   <string name="discovered_feeds_list">Daftar feed yang ditemukan</string>
-  <string name="toggle_tag_expansion">Aktif/Nonaktifkan ekspansi tag</string>
+  <string name="toggle_tag_expansion">Aktif/nonaktifkan ekspansi tag</string>
 
 </resources>
