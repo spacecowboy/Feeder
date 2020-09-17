@@ -540,6 +540,7 @@ class FeedParserTest: KodeinAware {
     }
 
     @Test
+    @Ignore("They made this feed invalid")
     fun timesnewroman() {
         /**
          * This actually tests Chunked-response handling (with Gzip)
