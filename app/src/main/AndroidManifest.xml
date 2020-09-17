@@ -18,6 +18,9 @@
     android:supportsRtl="true"
     android:theme="@style/AppThemeDay"
     android:usesCleartextTraffic="true">
+
+    <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true" />
+
     <activity
       android:name=".ui.FeedActivity"
       android:label="@string/app_name">
