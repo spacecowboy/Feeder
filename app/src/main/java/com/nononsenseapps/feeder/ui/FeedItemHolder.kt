@@ -169,7 +169,7 @@ class FeedItemHolder(
             }
 
             when (openItemWith) {
-                PREF_VAL_OPEN_WITH_BROWSER, PREF_VAL_OPEN_WITH_WEBVIEW -> {
+                PREF_VAL_OPEN_WITH_BROWSER, PREF_VAL_OPEN_WITH_WEBVIEW, PREF_VAL_OPEN_WITH_CUSTOM_TAB -> {
                     // Mark as read
                     rssItem?.id?.let {
                         actionCallback.coroutineScope().launch(Dispatchers.Default) {
@@ -182,6 +182,11 @@ class FeedItemHolder(
                             // Open in browser since no content was posted
                             rssItem?.link?.let { link ->
                                 openLinkInBrowser(context, link)
+                            }
+                        }
+                        PREF_VAL_OPEN_WITH_CUSTOM_TAB -> {
+                            rssItem?.link?.let { link ->
+                                openLinkInCustomTab(context, link, rssItem?.id)
                             }
                         }
                         else -> {

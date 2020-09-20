@@ -66,6 +66,7 @@ const val PREF_OPEN_LINKS_WITH = "pref_open_links_with"
 const val PREF_VAL_OPEN_WITH_READER = "0"
 const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
 const val PREF_VAL_OPEN_WITH_BROWSER = "2"
+const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 
 const val PREF_JAVASCRIPT_ENABLED = "pref_javascript_enabled"
 
@@ -144,7 +145,7 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
         set(value) = sp.edit().putString(PREF_DEFAULT_OPEN_ITEM_WITH, value).apply()
 
     var openLinksWith: String
-        get() = sp.getStringNonNull(PREF_OPEN_LINKS_WITH, PREF_VAL_OPEN_WITH_BROWSER)
+        get() = sp.getStringNonNull(PREF_OPEN_LINKS_WITH, PREF_VAL_OPEN_WITH_CUSTOM_TAB)
         set(value) = sp.edit().putString(PREF_OPEN_LINKS_WITH, value).apply()
 
     var welcomeDone: Boolean

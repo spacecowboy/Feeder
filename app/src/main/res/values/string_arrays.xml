@@ -45,30 +45,36 @@
     <item>@string/open_in_reader</item>
     <item>@string/open_in_webview</item>
     <item>@string/open_in_default_browser</item>
+    <item>@string/open_in_custom_tab</item>
   </string-array>
   <string-array name="array_open_article_values">
     <item>0</item>
     <item>1</item>
     <item>2</item>
+    <item>3</item>
   </string-array>
 
   <!-- Note that these arrays share semantic value between values -->
   <string-array name="array_open_links_options">
     <item>@string/open_in_webview</item>
     <item>@string/open_in_default_browser</item>
+    <item>@string/open_in_custom_tab</item>
   </string-array>
   <string-array name="array_open_links_values">
     <item>1</item>
     <item>2</item>
+    <item>3</item>
   </string-array>
 
   <string-array name="array_open_empty_article_options">
     <item>@string/open_in_webview</item>
     <item>@string/open_in_default_browser</item>
+    <item>@string/open_in_custom_tab</item>
   </string-array>
   <string-array name="array_open_empty_article_values">
     <item>1</item>
     <item>2</item>
+    <item>3</item>
   </string-array>
 
   <string-array name="array_max_items_per_feed_options">
