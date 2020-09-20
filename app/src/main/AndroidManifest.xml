@@ -145,6 +145,10 @@
       android:label="@string/open_link_in_browser"
       android:launchMode="singleInstance"
       android:taskAffinity="${applicationId}.OpenLinkTask" />
+
+    <service
+      android:name=".model.FeederService"
+      android:exported="true" />
   </application>
 
 </manifest>

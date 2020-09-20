@@ -23,11 +23,13 @@ import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.maxImageSize
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.openLinkInBrowser
+import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
@@ -61,6 +63,7 @@ class ReaderFragment : KodeinAwareFragment() {
     private val viewModel: FeedItemViewModel by instance(arg = this)
     // Important to get the activity bound view model here hence no arg specified
     private val settingsViewModel: SettingsViewModel by instance()
+    private val prefs: Prefs by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -183,17 +186,26 @@ class ReaderFragment : KodeinAwareFragment() {
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.action_open_in_webview -> {
-                // Open in web view
-                rssItem?.let { rssItem ->
-                    rssItem.link?.let { link ->
-                        findNavController().navigate(
-                                R.id.action_readerFragment_to_readerWebViewFragment,
-                                bundle {
-                                    putString(ARG_URL, link)
-                                    putString(ARG_ENCLOSURE, rssItem.enclosureLink)
-                                    putLong(ARG_ID, _id)
+                // Open in web view or custom tab
+                context?.let { context ->
+                    rssItem?.let { rssItem ->
+                        rssItem.link?.let { link ->
+                            when (prefs.openLinksWith) {
+                                PREF_VAL_OPEN_WITH_CUSTOM_TAB -> {
+                                    openLinkInCustomTab(context, link, rssItem.id)
                                 }
-                        )
+                                else -> {
+                                    findNavController().navigate(
+                                            R.id.action_readerFragment_to_readerWebViewFragment,
+                                            bundle {
+                                                putString(ARG_URL, link)
+                                                putString(ARG_ENCLOSURE, rssItem.enclosureLink)
+                                                putLong(ARG_ID, _id)
+                                            }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
                 true
@@ -262,6 +274,9 @@ fun Fragment.urlClickListener(): (link: String) -> Unit = { link ->
         val prefs: Prefs by kodein.instance()
 
         when (prefs.openLinksWith) {
+            PREF_VAL_OPEN_WITH_CUSTOM_TAB -> {
+                openLinkInCustomTab(context, link, null)
+            }
             PREF_VAL_OPEN_WITH_WEBVIEW -> {
                 findNavController().navigate(R.id.action_readerFragment_to_readerWebViewFragment, bundle {
                     putString(ARG_URL, link)
