@@ -104,4 +104,9 @@
   <string name="discovered_feeds_list">Discovered feeds list</string>
   <string name="toggle_tag_expansion">Toggle tag expansion</string>
 
+  <string name="battery_optimization">Battery optimization</string>
+  <string name="battery_optimization_disabled">Battery optimization disabled</string>
+  <string name="battery_optimization_enabled">Battery optimization enabled</string>
+  <string name="preload_custom_tab">Preload custom tab</string>
+
 </resources>

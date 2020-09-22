@@ -1,11 +1,17 @@
 package com.nononsenseapps.feeder.ui
 
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.getSystemService
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.nononsenseapps.feeder.R
@@ -45,6 +51,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
         bindPreferenceSummaryToValue(PREF_DEFAULT_OPEN_ITEM_WITH)
         bindPreferenceSummaryToValue(PREF_OPEN_LINKS_WITH)
         bindPreferenceSummaryToValue(PREF_MAX_ITEM_COUNT_PER_FEED)
+
+        setupBatteryOptimizationPreference()
     }
 
     override fun onDestroy() {
@@ -73,5 +81,43 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                     sharedPreferences.getString(preference.key, "")
             )
         }
+    }
+
+    private fun setupBatteryOptimizationPreference() {
+        findPreference<Preference>(PREF_BATTERY_OPTIMIZATION)?.let { pref ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                pref.setOnPreferenceClickListener {
+                    context?.startActivity(
+                            Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                    )
+
+                    true
+                }
+            } else {
+                pref.isEnabled = false
+                pref.isVisible = false
+            }
+        }
+    }
+
+    private fun setBatteryOptimizationSummary() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            findPreference<Preference>(PREF_BATTERY_OPTIMIZATION)?.let { pref ->
+                val powerManager = context?.getSystemService<PowerManager>()
+
+                pref.setSummary(
+                        when (powerManager?.isIgnoringBatteryOptimizations(context?.packageName)) {
+                            true -> R.string.battery_optimization_disabled
+                            else -> R.string.battery_optimization_enabled
+                        }
+                )
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        setBatteryOptimizationSummary()
     }
 }

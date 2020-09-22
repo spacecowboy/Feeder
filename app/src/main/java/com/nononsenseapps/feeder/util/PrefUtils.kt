@@ -50,6 +50,7 @@ const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"
 const val PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi"
 const val PREF_SYNC_FREQ = "pref_sync_freq"
 const val PREF_SYNC_ON_RESUME = "pref_sync_on_resume"
+const val PREF_BATTERY_OPTIMIZATION = "pref_battery_optimization"
 
 /**
  * Image settings
@@ -62,6 +63,7 @@ const val PREF_IMG_SHOW_THUMBNAILS = "pref_img_show_thumbnails"
  */
 const val PREF_DEFAULT_OPEN_ITEM_WITH = "pref_default_open_item_with"
 const val PREF_OPEN_LINKS_WITH = "pref_open_links_with"
+const val PREF_PRELOAD_CUSTOM_TAB = "pref_preload_custom_tab"
 
 const val PREF_VAL_OPEN_WITH_READER = "0"
 const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
@@ -147,6 +149,10 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
     var openLinksWith: String
         get() = sp.getStringNonNull(PREF_OPEN_LINKS_WITH, PREF_VAL_OPEN_WITH_CUSTOM_TAB)
         set(value) = sp.edit().putString(PREF_OPEN_LINKS_WITH, value).apply()
+
+    var preloadCustomTab: Boolean
+        get() = sp.getBoolean(PREF_PRELOAD_CUSTOM_TAB, false)
+        set(value) = sp.edit().putBoolean(PREF_PRELOAD_CUSTOM_TAB, value).apply()
 
     var welcomeDone: Boolean
         get() = sp.getBoolean(PREF_WELCOME_DONE, false)
@@ -246,6 +252,9 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
             else -> true
         }
     }
+
+    val shouldPreloadCustomTab: Boolean
+        get() = preloadCustomTab && openLinksWith == PREF_VAL_OPEN_WITH_CUSTOM_TAB
 }
 
 enum class CurrentTheme {

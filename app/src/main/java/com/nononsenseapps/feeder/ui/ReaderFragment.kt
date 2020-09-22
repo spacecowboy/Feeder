@@ -2,8 +2,10 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -64,6 +66,22 @@ class ReaderFragment : KodeinAwareFragment() {
     // Important to get the activity bound view model here hence no arg specified
     private val settingsViewModel: SettingsViewModel by instance()
     private val prefs: Prefs by instance()
+
+    init {
+        lifecycleScope.launchWhenStarted {
+            try {
+                if (prefs.shouldPreloadCustomTab) {
+                    val warmer = CustomTabsWarmer(context)
+                    warmer.preLoad {
+                        rssItem?.link?.let { Uri.parse(it) }
+                    }
+                }
+            } catch (e: Exception) {
+                // Don't let this crash
+                Log.e("ReaderFragment", "Couldn't preload ${rssItem?.link}", e)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
