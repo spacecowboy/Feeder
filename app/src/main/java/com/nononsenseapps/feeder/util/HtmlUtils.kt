@@ -8,6 +8,7 @@ import android.net.Uri
 import android.provider.Browser.EXTRA_CREATE_NEW_TAB
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsSession
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.FeederService
 import com.nononsenseapps.feeder.model.getColorCompat
@@ -44,9 +45,9 @@ fun openLinkInBrowser(context: Context, link: String): Boolean {
     return true
 }
 
-fun openLinkInCustomTab(context: Context, link: String, feedItemId: Long?): Boolean {
+fun openLinkInCustomTab(context: Context, link: String, feedItemId: Long?, session: CustomTabsSession? = null): Boolean {
     try {
-        val intent = CustomTabsIntent.Builder().apply {
+        val intent = CustomTabsIntent.Builder(session).apply {
             setToolbarColor(context.getColorCompat(R.color.primary))
 
             addDefaultShareMenuItem()
