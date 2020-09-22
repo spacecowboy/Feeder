@@ -78,6 +78,7 @@
   <string name="open_in_reader">Lector</string>
   <string name="open_in_webview">Vista Web</string>
   <string name="open_in_default_browser">Navegador por defecto</string>
+  <string name="open_in_custom_tab">Pestaña personalizada</string>
   <string name="open_item_by_default_with">Por defecto abrir elementos con</string>
   <string name="open_links_with">Abrir enlaces con</string>
   <string name="reader_settings">Lector</string>
