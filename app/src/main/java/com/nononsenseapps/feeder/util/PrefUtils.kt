@@ -50,6 +50,7 @@ const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"
 const val PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi"
 const val PREF_SYNC_FREQ = "pref_sync_freq"
 const val PREF_SYNC_ON_RESUME = "pref_sync_on_resume"
+const val PREF_BATTERY_OPTIMIZATION = "pref_battery_optimization"
 
 /**
  * Image settings

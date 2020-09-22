@@ -42,6 +42,9 @@
       android:defaultValue="false"
       android:key="pref_sync_only_charging"
       android:title="@string/only_when_charging" />
+    <Preference
+      android:key="pref_battery_optimization"
+      android:title="@string/battery_optimization" />
     <ListPreference
       android:defaultValue="100"
       android:entries="@array/array_max_items_per_feed_options"
