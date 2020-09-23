@@ -79,6 +79,7 @@
   <string name="open_in_reader">Pembaca</string>
   <string name="open_in_webview">Webview</string>
   <string name="open_in_default_browser">Peramban</string>
+  <string name="open_in_custom_tab">Custom tab</string>
   <string name="open_item_by_default_with">Buka item feed dengan</string>
   <string name="open_links_with">Buka tautan dengan</string>
   <string name="reader_settings">Pembaca</string>
@@ -102,5 +103,10 @@
   <string name="mark_items_below_as_read">Tandai item di bawah sudah dibaca</string>
   <string name="discovered_feeds_list">Daftar feed yang ditemukan</string>
   <string name="toggle_tag_expansion">Aktif/nonaktifkan ekspansi tag</string>
+
+  <string name="battery_optimization">Pengoptimalan baterai</string>
+  <string name="battery_optimization_disabled">Pengoptimalan baterai dinonaktifkan</string>
+  <string name="battery_optimization_enabled">Pengoptimalan baterai diaktifkan</string>
+  <string name="preload_custom_tab">Pramuat custom tab</string>
 
 </resources>
