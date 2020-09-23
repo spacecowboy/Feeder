@@ -76,6 +76,7 @@
   <string name="open_in_reader">Reader</string>
   <string name="open_in_webview">WebView</string>
   <string name="open_in_default_browser">Výchozí prohlížeč</string>
+  <string name="open_in_custom_tab">Vlastní záložka</string>
   <string name="open_item_by_default_with">Ve výchozím nastavení otevřít článek v</string>
   <string name="open_links_with">Otevřít odkazy </string>
   <string name="reader_settings">Volby čtení</string>
@@ -101,6 +102,11 @@
   <string name="discovered_feeds_list">Seznam objevených zdrojů</string>
   <string name="toggle_tag_expansion">Přepínač rozšíření štítku</string>
   <string name="show_fab">Zobrazit plovoucí tlačítko akcí</string>
+
+  <string name="battery_optimization">Optimalizace baterie</string>
+  <string name="battery_optimization_disabled">Optimalizace baterie zakázána</string>
+  <string name="battery_optimization_enabled">Optimalizace baterie povolena</string>
+  <string name="preload_custom_tab">Přenačtění vlastní záložky</string>
 
 
 </resources>
