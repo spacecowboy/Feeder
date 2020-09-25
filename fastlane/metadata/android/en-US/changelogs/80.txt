@@ -1,0 +1,26 @@
+# 1.10.0
+Jonas Kalderstam (5):
+  * [3a3d3689] Added preference for battery optimization
+  * [0d17d374] Fixed custom tab not showing as default option for opening
+         links
+  * [c8b57882] Added option to preload links in custom tab
+
+Khar Khamal (1):
+  * [0fdac915] Update Spanish strings.xml for Custom Tab
+
+Sudeep Duggal (1):
+  * [2c211b53] Feeder now opts out of sending usage metrics of WebView to
+         Google
+
+Tomáš Tihlařík (1):
+  * [1709c2fd] Update Czech strings.xml for Custom Tab & Battery options
+
+emersion (1):
+  * [e0a9d261] Added support for custom tabs
+
+linsui (1):
+  * [751f8665] Update Simplified Chinese translation
+
+zmni (2):
+  * [8be9508a] Update Indonesian translation
+  * [8bc4f4e6] Update Indonesian translation
