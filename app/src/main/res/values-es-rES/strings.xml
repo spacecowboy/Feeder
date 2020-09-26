@@ -103,5 +103,10 @@
   <string name="discovered_feeds_list">Lista de canales descubiertos</string>
   <string name="toggle_tag_expansion">Alternar expansión de etiquetas</string>
 
+  <string name="battery_optimization">Optimización de batería</string>
+  <string name="battery_optimization_disabled">Optimización de batería deshabilitada</string>
+  <string name="battery_optimization_enabled">Optimización de batería habilitada</string>
+  <string name="preload_custom_tab">Precargar pestaña personalizada</string>
+
 
 </resources>
