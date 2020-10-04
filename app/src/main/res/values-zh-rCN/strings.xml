@@ -78,6 +78,7 @@
   <string name="open_in_reader">阅读器</string>
   <string name="open_in_webview">网页视图</string>
   <string name="open_in_default_browser">默认浏览器</string>
+  <string name="open_in_custom_tab">自定义标签页</string>
   <string name="open_item_by_default_with">内容默认打开方式</string>
   <string name="open_links_with">链接打开方式</string>
   <string name="reader_settings">阅读器</string>
@@ -101,5 +102,10 @@
   <string name="mark_items_below_as_read">标记以下项为已读</string>
   <string name="discovered_feeds_list">已发现订阅列表</string>
   <string name="toggle_tag_expansion">展开/闭合标签</string>
+
+  <string name="battery_optimization">电池优化</string>
+  <string name="battery_optimization_disabled">电池优化已禁用</string>
+  <string name="battery_optimization_enabled">电池优化已启用</string>
+  <string name="preload_custom_tab">预加载自定义标签页</string>
 
 </resources>
