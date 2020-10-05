@@ -39,6 +39,7 @@
   <string name="dont_notify_for_new_items">Stop notifications</string>
   <string name="toggle_read_status">Toggle read status</string>
   <string name="open_link_in_browser">Open link in browser</string>
+  <string name="open_in_browser">Open in browser</string>
   <string name="open_enclosed_media">Open enclosed media</string>
   <string name="sync">Sync</string>
   <string name="export_feeds_to_opml">Export feeds to OPML</string>
@@ -84,6 +85,7 @@
   <string name="open_links_with">Open links with</string>
   <string name="reader_settings">Reader</string>
   <string name="open_link_in_web_view">Open link in Web view</string>
+  <string name="open_in_web_view">Open in Web view</string>
   <string name="max_feed_items">Maximum number of items per feed</string>
   <string name="could_not_load_url">Could not load URL</string>
 

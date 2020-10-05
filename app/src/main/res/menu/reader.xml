@@ -29,12 +29,12 @@
   <item
     android:id="@+id/action_open_in_webview"
     android:icon="@drawable/ic_web_white_24dp"
-    android:title="@string/open_link_in_web_view"
+    android:title="@string/open_in_web_view"
     app:showAsAction="ifRoom" />
   <item
     android:id="@+id/action_open_in_browser"
     android:icon="@drawable/ic_open_in_browser_white_24dp"
-    android:title="@string/open_link_in_browser"
+    android:title="@string/open_in_browser"
     app:showAsAction="ifRoom" />
   <item
     android:id="@+id/action_share"
