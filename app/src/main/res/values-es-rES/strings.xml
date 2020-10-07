@@ -38,6 +38,7 @@
   <string name="dont_notify_for_new_items">Detener notificaciones</string>
   <string name="toggle_read_status">Cambiar el estado de lectura</string>
   <string name="open_link_in_browser">Abrir enlace en navegador</string>
+  <string name="open_in_browser">Abrir en navegador</string>
   <string name="open_enclosed_media">Abrir medio adjunto</string>
   <string name="sync">Sincronizar</string>
   <string name="export_feeds_to_opml">Exportar canales a OPML</string>
@@ -83,6 +84,7 @@
   <string name="open_links_with">Abrir enlaces con</string>
   <string name="reader_settings">Lector</string>
   <string name="open_link_in_web_view">Abrir enlace en vista Web</string>
+  <string name="open_in_web_view">Abrir en vista Web</string>
   <string name="max_feed_items">Número máximo de entradas por canal</string>
   <string name="could_not_load_url">No se pudo cargar la URL</string>
 
