@@ -21,8 +21,14 @@ interface FeedItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertFeedItem(item: FeedItem): Long
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertFeedItems(items: List<FeedItem>): List<Long>
+
     @Update
     suspend fun updateFeedItem(item: FeedItem): Int
+
+    @Update
+    suspend fun updateFeedItems(items: List<FeedItem>): Int
 
     @Delete
     suspend fun deleteFeedItem(item: FeedItem)
@@ -247,4 +253,29 @@ suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > I
         item.id
     }
     false -> insertFeedItem(item)
+}
+
+
+@FlowPreview
+suspend fun FeedItemDao.upsertFeedItems(
+        itemsWithText: List<Pair<FeedItem, String>>,
+        block: suspend (Long, String) -> Unit
+) {
+    val updatedItems = itemsWithText.filter { (item, _) ->
+        item.id > ID_UNSET
+    }
+    updateFeedItems(updatedItems.map { (item, _) -> item })
+
+    val insertedItems = itemsWithText.filter { (item, _) ->
+        item.id <= ID_UNSET
+    }
+    val insertedIds = insertFeedItems(insertedItems.map { (item, _) -> item })
+
+    updatedItems.forEach { (item, text) ->
+        block(item.id, text)
+    }
+
+    insertedIds.zip(insertedItems).forEach {
+        block(it.first, it.second.second)
+    }
 }

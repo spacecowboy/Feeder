@@ -67,7 +67,7 @@ data class FeedItem @Ignore constructor(
 
     constructor() : this(id = ID_UNSET)
 
-    fun updateFromParsedEntry(entry: Item, feed: com.nononsenseapps.jsonfeed.Feed) {
+    fun updateFromParsedEntry(entry: Item, entryGuid: String, feed: com.nononsenseapps.jsonfeed.Feed) {
         val converter = HtmlToPlainTextConverter()
         // Be careful about nulls.
         val text = entry.content_html ?: entry.content_text ?: ""
@@ -77,7 +77,7 @@ data class FeedItem @Ignore constructor(
             else -> entry.image
         }
 
-        entry.id?.let { this.guid = it }
+        this.guid = entryGuid
         entry.title?.let { this.plainTitle = it.take(MAX_TITLE_LENGTH) }
         @Suppress("DEPRECATION")
         this.title = this.plainTitle
