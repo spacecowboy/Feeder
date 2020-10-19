@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <string name="navigation_drawer_open">Abrir gaveta de navegação</string>
-  <string name="navigation_drawer_close">Fechar gaveta de navegação</string>
+  <string name="navigation_drawer_open">Abrir a gaveta de navegação</string>
+  <string name="navigation_drawer_close">Fechar a gaveta de navegação</string>
   <string name="action_settings">Configurações</string>
-  <string name="add_feed">Adicionar feed</string>
-  <string name="title_activity_edit_feed">Inscreva-se em feed</string>
+  <string name="add_feed">Adicionar um feed</string>
+  <string name="title_activity_edit_feed">Inscreva-se no feed</string>
   <string name="url">URL</string>
-  <string name="tag">Tag</string>
-  <string name="add_feed_search_hint">URL para feed</string>
+  <string name="tag">Categoria</string>
+  <string name="add_feed_search_hint">URL do feed</string>
   <string name="title">Título</string>
 
   <string name="by_author_on_date">%1$s, %2$s</string>
@@ -16,7 +16,7 @@
   <string name="save">Salvar</string>
   <string name="empty_feed_top">Nada para ler. Você gostaria de…</string>
   <string name="empty_feed_open">
-    <![CDATA[<font color="#607D8B">Abrir</font> outro feed?]]></string>
+    <![CDATA[<font color="#607D8B">Abrir</font> um outro feed?]]></string>
   <string name="empty_feed_add">
     <![CDATA[<font color="#607D8B">Adicionar</font> mais feeds?]]></string>
   <string name="empty_no_feeds_top">Ainda não tem nada para ler.\nPara
@@ -24,31 +24,32 @@
   </string>
   <string name="empty_no_feeds_add">
     <![CDATA[<font color="#607D8B">Adicione</font> alguns feeds]]></string>
-  <string name="search_feed_empty_hint">Digite um endereço do Feed</string>
+  <string name="search_feed_empty_hint">Digite um endereço do feed</string>
   <string name="mark_as_read">Marcar como lido</string>
   <string name="mark_as_unread">Marcar como não lido</string>
   <string name="mark_all_as_read">Marcar tudo como lido</string>
-  <string name="edit_feed">Editar feed</string>
-  <string name="delete_feed">Excluir feed</string>
+  <string name="edit_feed">Editar o feed</string>
+  <string name="delete_feed">Excluir o feed</string>
   <string name="show_all_items">Mostrar todos os itens</string>
   <string name="show_unread_items">Mostrar itens não lidos</string>
   <string name="new_items_available">Novos itens disponíveis</string>
   <string name="view">Ver</string>
-  <string name="no_tag">Nenhum tag</string>
-  <string name="notify_for_new_items">Notificar para novos itens</string>
-  <string name="dont_notify_for_new_items">Parar notificações</string>
-  <string name="toggle_read_status">Alternar o status de leitura</string>
+  <string name="no_tag">Sem categoria</string>
+  <string name="notify_for_new_items">Notificação sobre novos itens</string>
+  <string name="dont_notify_for_new_items">Parar as notificações</string>
+  <string name="toggle_read_status">Alternar o status da leitura</string>
   <string name="open_link_in_browser">Abrir link no navegador</string>
-  <string name="open_enclosed_media">Abrir mídia incluída</string>
-  <string name="sync">Sinc</string>
-  <string name="export_feeds_to_opml">Exportar feeds para OPML</string>
-  <string name="import_feeds_from_opml">Importar feeds de OPML</string>
-  <string name="view_debug_log">Ver registro de depuração</string>
+  <string name="open_in_browser">Abrir no navegador</string>
+  <string name="open_enclosed_media">Exibir a mídia incluída</string>
+  <string name="sync">Sincronizar</string>
+  <string name="export_feeds_to_opml">Exportar os feeds para OPML</string>
+  <string name="import_feeds_from_opml">Importar os feeds de OPML</string>
+  <string name="view_debug_log">Ver o registro de depuração</string>
   <string name="new_based_on_this">Novo baseado neste</string>
-  <string name="indicator_for_mark_as_read">Indicador para Marcar como lido</string>
+  <string name="indicator_for_mark_as_read">Indicador de Marcar como lido</string>
   <string name="share">Compartilhar</string>
-  <string name="no_such_feed">Não foi possível encontrar o Feed. Tente como https.</string>
-  <string name="nothing_to_display">Nada a exibir!</string>
+  <string name="no_such_feed">Não foi possível encontrar o feed. Tente com https.</string>
+  <string name="nothing_to_display">Nada para exibir!</string>
   <string name="title_activity_settings">Configurações</string>
   <string name="all_feeds">Todos os feeds</string>
 
@@ -63,44 +64,52 @@
 
   <string name="synchronization">Sincronização</string>
   <string name="only_on_wifi">Somente no WiFi</string>
-  <string name="show_thumbnails">Mostrar miniaturas</string>
-  <string name="may_result_data_charges">Pode resultar em tarifas de dados móveis.</string>
-  <string name="only_when_charging">Somente ao carregar</string>
-  <string name="image_loading">Obtendo imagem</string>
-  <string name="no_activity_for_link">Não foi possível encontrar um app para abrir este link</string>
-  <string name="check_for_updates">Verificar atualizações</string>
+  <string name="show_thumbnails">Mostrar as miniaturas</string>
+  <string name="may_result_data_charges">A taxa pode ser cobrada</string>
+  <string name="only_when_charging">Enquanto carregar</string>
+  <string name="image_loading">Obtendo a imagem</string>
+  <string name="no_activity_for_link">Não foi possível encontrar um app para abrir o link</string>
+  <string name="check_for_updates">Verificar por atualizações</string>
   <string name="on_startup">Ao iniciar</string>
   <string name="show_fab">Mostrar botão de ação flutuante</string>
-  <string name="include_mobile_hotspots">Incluir hotspots móveis</string>
-  <string name="updated_feeds">Feeds atualizados</string>
+  <string name="include_mobile_hotspots">Incluir os pontos de acesso móveis</string>
+  <string name="updated_feeds">Os feeds estão atualizados</string>
   <string name="selected">Selecionado</string>
-  <string name="notification_channel_name">Feeds não lidos</string>
-  <string name="notification_channel_description">Notificações são mostradas apenas para itens não lidos nos feeds configurados</string>
+  <string name="notification_channel_name">Os feeds não lidos</string>
+  <string name="notification_channel_description">Notificações são exibidas apenas para itens não lidos em feeds configurados</string>
   <string name="open_in_reader">Leitor</string>
   <string name="open_in_webview">Vista Web</string>
   <string name="open_in_default_browser">Navegador padrão</string>
-  <string name="open_item_by_default_with">Por padrão abrir itens com</string>
-  <string name="open_links_with">Abrir links com</string>
+  <string name="open_in_custom_tab">Aba personalizada</string>
+  <string name="open_item_by_default_with">Abrir um item por padrão com</string>
+  <string name="open_links_with">Abrir os links com</string>
   <string name="reader_settings">Leitor</string>
-  <string name="open_link_in_web_view">Abrir  link em vista Web</string>
-  <string name="max_feed_items">Número máximo de itens por feed</string>
-  <string name="could_not_load_url">Não foi possível carregar a URL</string>
+  <string name="open_link_in_web_view">Abrir o link em vista Web</string>
+  <string name="open_in_web_view">Abrir em vista Web</string>
+  <string name="max_feed_items">O número máximo de itens por feed</string>
+  <string name="could_not_load_url">Não foi possível carregar o URL</string>
 
   <string name="theme_system">O mesmo do sistema</string>
   <string name="theme_automatic">Automático</string>
   <string name="theme_day">Dia</string>
   <string name="theme_night">Noite</string>
   <string name="theme">Tema</string>
-  <string name="sort_newest_first">Os Novos primeiros</string>
-  <string name="sort_oldest_first">Os Antigos primeiros</string>
+  <string name="sort_newest_first">Mais novos primeiros</string>
+  <string name="sort_oldest_first">Mais antigos primeiros</string>
   <string name="sort">Ordenar por</string>
   <string name="send_bug_report">Enviar relatório de erros</string>
   <string name="no_email_client">Não foi possível abrir o email</string>
-  <string name="touch_to_play_video">Toque para reproduzir vídeo</string>
+  <string name="touch_to_play_video">Toque para reproduzir o vídeo</string>
   <string name="javascript">Javascript</string>
-  <string name="open_feed">Abrir feed</string>
+  <string name="open_feed">Abrir o feed</string>
   <string name="mark_items_below_as_read">Marque os itens abaixo como lidos</string>
   <string name="discovered_feeds_list">Lista de feeds encontrados</string>
-  <string name="toggle_tag_expansion">Alternar expansão de tag</string>
+  <string name="toggle_tag_expansion">Alternar expansão de categoria</string>
+
+  <string name="battery_optimization">Otimização da bateria</string>
+  <string name="battery_optimization_disabled">Otimização da bateria desativada</string>
+  <string name="battery_optimization_enabled">Otimização da bateria ativada</string>
+  <string name="preload_custom_tab">Pré-carregar a aba personalizada</string>
 
 </resources>
+
