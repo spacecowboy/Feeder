@@ -39,7 +39,7 @@ check:
   <<: *before_docker
   stage: build
   script:
-    - ./gradlew assembleDebug check -PdisablePreDex
+    - ./gradlew assembleDebug packageDebugAndroidTest check -PdisablePreDex
   artifacts:
     paths:
     - app/build/outputs/
