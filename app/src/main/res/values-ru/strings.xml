@@ -12,19 +12,21 @@
   <string name="title">Название</string>
 
   <string name="by_author_on_date">автор: %1$s, %2$s</string>
+  <string name="on_date">%1$s</string>
   <string name="save">Сохранить</string>
-  <string name="empty_feed_top">Здесь нечего читать. Хотите…</string>
+  <string name="empty_feed_top">Здесь нечего читать. Хотите...</string>
   <string name="empty_feed_open">
- &lt;font color=#607D8B&gt;Открыть&lt;/font&gt; другую ленту?</string>
+    <![CDATA[<font color="#607D8B">Открыть</font> другую ленту?]]></string>
   <string name="empty_feed_add">
- &lt;font color=#607D8B&gt;Добавить&lt;/font&gt; ещё ленту?</string>
-  <string name="empty_no_feeds_top">"Пока нечего читать.
-Начните
- с
- "</string>
+    <![CDATA[<font color="#607D8B">Добавить</font> ещё ленту?]]></string>
+  <string name="empty_no_feeds_top">Пока нечего читать.\nНачните
+    с
+  </string>
   <string name="empty_no_feeds_add">
- &lt;font color=#607D8B&gt;Добавления&lt;/font&gt; каких-нибудь лент</string>
+    <![CDATA[<font color="#607D8B">Добавления</font> каких-нибудь лент]]></string>
   <string name="search_feed_empty_hint">Введите адрес ленты</string>
+  <string name="mark_as_read">Отметить как прочитанное</string>
+  <string name="mark_as_unread">Отметить как непрочитанное</string>
   <string name="mark_all_as_read">Отметить всё как прочитанное</string>
   <string name="edit_feed">Изменить ленту</string>
   <string name="delete_feed">Удалить ленту</string>
@@ -34,8 +36,10 @@
   <string name="view">Вид</string>
   <string name="no_tag">Нет метки</string>
   <string name="notify_for_new_items">Уведомлять о новом</string>
+  <string name="dont_notify_for_new_items">Не уведомлять</string>
   <string name="toggle_read_status">Переключить статус прочитанного</string>
   <string name="open_link_in_browser">Открыть ссылку в браузере</string>
+  <string name="open_in_browser">Открыть в браузере</string>
   <string name="open_enclosed_media">Открыть прикреплённый медиафайл</string>
   <string name="sync">Синхронизировать</string>
   <string name="export_feeds_to_opml">Экспорт лент в OPML</string>
@@ -47,23 +51,58 @@
   <string name="no_such_feed">Не удалось найти такую ленту. Попробуйте с https.</string>
   <string name="nothing_to_display">Здесь ничего нет!</string>
   <string name="title_activity_settings">Настройки</string>
+  <string name="all_feeds">Все ленты</string>
 
   <string name="sync_option_manually">Вручную</string>
+  <string name="sync_option_every_15min">Каждые 15 минут</string>
+  <string name="sync_option_every_30min">Каждые 30 минут</string>
   <string name="sync_option_every_hour">Каждый час</string>
   <string name="sync_option_every_3_hours">Каждые 3 часа</string>
   <string name="sync_option_every_6_hours">Каждые 6 часов</string>
   <string name="sync_option_every_12_hours">Каждые 12 часов</string>
-  <string name="sync_option_every_day">каждый день</string>
+  <string name="sync_option_every_day">Каждый день</string>
 
   <string name="synchronization">Синхронизация</string>
   <string name="only_on_wifi">Только по Wi-Fi</string>
+  <string name="show_thumbnails">Показывать миниатюры</string>
   <string name="may_result_data_charges">Может привести к расходам на мобильные данные.</string>
   <string name="only_when_charging">Только при зарядке</string>
   <string name="image_loading">Загрузка изображений</string>
   <string name="no_activity_for_link">Не удалось найти приложение, чтобы открыть ссылку</string>
   <string name="check_for_updates">Проверять наличие обновлений</string>
+  <string name="on_startup">При запуске</string>
+  <string name="show_fab">Показывать плавающую кнопку действия</string>
   <string name="include_mobile_hotspots">Включая мобильные точки доступа</string>
   <string name="updated_feeds">Обновлённые ленты</string>
   <string name="selected">Выбрано</string>
+  <string name="notification_channel_name">Непрочитанные ленты</string>
+  <string name="notification_channel_description">Уведомления показаны только для непрочитанных элементов в настроенных лентах</string>
+  <string name="open_in_default_browser">Браузер по умолчанию</string>
+  <string name="open_item_by_default_with">По умолчанию открывать элементы с помощью</string>
+  <string name="open_links_with">Открывать ссылки с помощью</string>
+  <string name="open_link_in_web_view">Открыть ссылку в Web view</string>
+  <string name="open_in_web_view">Открыть в Web view</string>
+  <string name="max_feed_items">Максимальное число элементов в ленте</string>
+  <string name="could_not_load_url">Не удалось загрузить URL</string>
+
+  <string name="theme_system">Системная</string>
+  <string name="theme_automatic">Автоматическая</string>
+  <string name="theme_day">День</string>
+  <string name="theme_night">Ночь</string>
+  <string name="theme">Тема</string>
+  <string name="sort_newest_first">Новые первыми</string>
+  <string name="sort_oldest_first">Старые первыми</string>
+  <string name="sort">Сортировать</string>
+  <string name="send_bug_report">Отправить отчёт об ошибке</string>
+  <string name="no_email_client">Не удаётся открыть email-клиент</string>
+  <string name="touch_to_play_video">Нажмите для просмотра видео</string>
+  <string name="open_feed">Открыть ленту</string>
+  <string name="mark_items_below_as_read">Отметить прочитанными элементы ниже</string>
+  <string name="discovered_feeds_list">Список обнаруженных лент</string>
+  <string name="toggle_tag_expansion">Переключить расширение меток</string>
+
+  <string name="battery_optimization">Оптимизация использования батареи</string>
+  <string name="battery_optimization_disabled">Оптимизация отключена</string>
+  <string name="battery_optimization_enabled">Оптимизация включена</string>
 
 </resources>
