@@ -95,7 +95,7 @@ class RssLocalSyncKtTest {
         assertEquals(
                 "Unexpected number of items in feed",
                 10,
-                testDb.db.feedItemDao().loadFeedItemsInFeed(cowboyJsonId).size)
+                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size)
     }
 
     @Test
@@ -110,7 +110,7 @@ class RssLocalSyncKtTest {
         assertEquals(
                 "Unexpected number of items in feed",
                 15,
-                testDb.db.feedItemDao().loadFeedItemsInFeed(cowboyAtomId).size)
+                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size)
     }
 
     @Test
@@ -127,12 +127,12 @@ class RssLocalSyncKtTest {
         assertEquals(
                 "Unexpected number of items in feed",
                 10,
-                testDb.db.feedItemDao().loadFeedItemsInFeed(cowboyJsonId).size)
+                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size)
 
         assertEquals(
                 "Unexpected number of items in feed",
                 15,
-                testDb.db.feedItemDao().loadFeedItemsInFeed(cowboyAtomId).size)
+                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size)
     }
 
     @Test
@@ -264,7 +264,7 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/news-rss.xml", server.takeRequest().path)
 
-        val items = testDb.db.feedItemDao().loadFeedItemsInFeed(feedId)
+        val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
         assertEquals("Unique IDs should have been generated for items",
                 99, items.size)
 
@@ -297,7 +297,7 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest().path)
 
-        val items = testDb.db.feedItemDao().loadFeedItemsInFeed(feedId)
+        val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
 
         assertNotNull("Item should have gotten a pubDate generated",
                 items[0].pubDate)
@@ -341,7 +341,7 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
-        val firstItem = testDb.db.feedItemDao().loadFeedItemsInFeed(feedId).let { items ->
+        val firstItem = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
             assertNotNull("Item should have gotten a pubDate generated",
                     items[0].pubDate)
 
@@ -356,7 +356,7 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
-        testDb.db.feedItemDao().loadFeedItemsInFeed(feedId).let { items ->
+        testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
             assertEquals("Should be 2 items in feed",
                     2, items.size)
 
@@ -396,7 +396,7 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
-        testDb.db.feedItemDao().loadFeedItemsInFeed(feedId).let { items ->
+        testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
             assertEquals("Feed should have no less items than in the raw feed even if that's more than cleanup count",
                     feedItemCount, items.size)
         }
@@ -415,7 +415,7 @@ class RssLocalSyncKtTest {
         assertEquals(
                 "Feed should have been parsed from slow response",
                 15,
-                testDb.db.feedItemDao().loadFeedItemsInFeed(cowboyAtomId).size)
+                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size)
     }
 
     @Test
@@ -431,7 +431,7 @@ class RssLocalSyncKtTest {
         assertEquals(
                 "Feed should not have been parsed from extremely slow response",
                 0,
-                testDb.db.feedItemDao().loadFeedItemsInFeed(cowboyAtomId).size)
+                testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size)
     }
 
     val nixosRss: InputStream
