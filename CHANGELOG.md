@@ -1,3 +1,10 @@
+# 1.10.2
+Fëdor T (1):
+  * [e9787dee] Updated Russian translation
+
+Muha Aliss (1):
+  * [2885b218] Turkish translations added
+
 # 1.10.1
 Jonas Kalderstam (2):
   * [b9b3bd76] Reworded tooltip to reduce confusion
