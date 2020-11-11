@@ -146,6 +146,12 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                         else -> feedParser.parseFeedResponse(it, body)
                     }
                 }
+            }?.let {
+                // Double check that icon is not base64
+                when {
+                    it.icon?.startsWith("data") == true -> it.copy(icon = null)
+                    else -> it
+                }
             }
 
     // Always update the feeds last sync field

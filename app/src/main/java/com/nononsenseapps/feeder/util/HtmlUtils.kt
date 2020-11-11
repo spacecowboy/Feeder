@@ -14,20 +14,17 @@ import com.nononsenseapps.feeder.model.FeederService
 import com.nononsenseapps.feeder.model.getColorCompat
 import java.util.regex.Pattern
 
-//val patternImgSrc = Pattern.compile("img\b.*?src=\"(.*?)\"")
-private val patternImgSrc: Pattern = Pattern.compile("img.*?src=[\"'](.*?)[\"']")
 
-fun naiveFindImageLink(text: String?): String? {
+// Using negative lookahead to skip data: urls, being inline base64
+// And capturing original quote to use as ending quote
+private val regexImgSrc = """img.*?src=(["'])((?!data).*?)\1""".toRegex(RegexOption.DOT_MATCHES_ALL)
+
+fun naiveFindImageLink(text: String?): String? =
     if (text != null) {
-        val matcher = patternImgSrc.matcher(text)
-
-        if (matcher?.find() == true) {
-            return matcher.group(1).toString()
-        }
+        regexImgSrc.find(text)?.groupValues?.get(2)
+    } else {
+        null
     }
-
-    return null
-}
 
 /**
  * Opens the specified link in a new tab in the browser, or otherwise suitable application. If no suitable application

@@ -249,6 +249,26 @@ class RomeExtensionsKtTest {
     }
 
     @Test
+    fun asItemDiscardsInlineBase64ImagesAsThumbnails() {
+        assertEquals(
+            Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+                url = null,
+                image = null),
+            mockSyndEntry(uri = "id",
+                thumbnails = arrayOf(
+                    mockThumbnail(
+                        url = URI.create(
+                            "data:image/png;base64,iVBORw0KGgoAAA" +
+                                "ANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4" +
+                                "//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU" +
+                                "5ErkJggg==")
+                    )
+                )
+            ).asItem(baseUrl)
+        )
+    }
+
+    @Test
     fun thumbnailWithContent() {
         assertEquals(
                 Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
