@@ -35,8 +35,7 @@ suspend fun exportOpml(kodein: Kodein, uri: Uri) = withContext(Dispatchers.IO) {
         }
         Log.d("OPML", "Exported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
-        e.printStackTrace()
-        Log.e("OMPL", "Failed to export OMPL: $e")
+        Log.e("OMPL", "Failed to export OMPL", e)
         kodein.direct.instance<ToastMaker>().makeToast("Failed to export OMPL")
     }
 }
@@ -61,7 +60,7 @@ suspend fun importOpml(kodein: Kodein, uri: Uri) = withContext(Dispatchers.IO) {
         }
         Log.d("OPML", "Imported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
-        Log.e("OMPL", "Failed to import OMPL: $e")
+        Log.e("OMPL", "Failed to import OMPL", e)
         kodein.direct.instance<ToastMaker>().makeToast("Failed to import OMPL")
     }
 }

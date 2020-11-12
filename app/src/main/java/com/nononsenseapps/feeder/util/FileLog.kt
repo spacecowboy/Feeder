@@ -12,6 +12,6 @@ fun ensureDebugLogDeleted(context: Context)  {
             logFile.delete()
         }
     } catch (exception: Exception) {
-        Log.e("FileLog", "Failed to delete legacy debug log: $exception")
+        Log.e("FileLog", "Failed to delete legacy debug log", exception)
     }
 }

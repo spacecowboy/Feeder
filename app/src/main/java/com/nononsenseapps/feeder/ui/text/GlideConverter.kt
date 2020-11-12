@@ -181,9 +181,9 @@ class GlideConverter(
             d = BitmapDrawable(context.resources, b)
             d.setBounds(0, 0, w, h)
         } catch (e: InterruptedException) {
-            Log.e("ImageTextLoader", "" + e.message)
+            Log.e("ImageTextLoader", "Failed to show image", e)
         } catch (e: ExecutionException) {
-            Log.e("ImageTextLoader", "" + e.message)
+            Log.e("ImageTextLoader", "Failed to show image", e)
         }
 
         return d

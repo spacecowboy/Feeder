@@ -73,7 +73,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
                 else -> emptyList()
             }
         } catch (t: Throwable) {
-            Log.e("FeedParser", "Error when fetching alternate links: $t")
+            Log.e("FeedParser", "Error when fetching alternate links", t)
             emptyList()
         }
     }

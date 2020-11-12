@@ -33,7 +33,7 @@ public class PasswordUtils {
         try {
             base = (username + ":" + password).getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            Log.e("PasswordUtils", e.getLocalizedMessage());
+            Log.e("PasswordUtils", "Failed to get BasicHeader", e);
             return null;
         }
         return "Basic " + Base64.encodeToString(base, Base64.NO_WRAP);

@@ -412,7 +412,7 @@ open class HtmlToSpannedConverter(private var source: Reader,
                 text.append("\n\n")
             }
         } catch (e: Throwable) {
-            Log.e("HtmlToSpannedConverter", "Failed to start iFrame tag")
+            Log.e("HtmlToSpannedConverter", "Failed to start iFrame tag", e)
         }
     }
 

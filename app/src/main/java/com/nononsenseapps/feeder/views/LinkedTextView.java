@@ -69,7 +69,7 @@ public class LinkedTextView extends TextView {
                     }
                 } catch(ActivityNotFoundException exception) {
                     // No such activity
-                    Log.e("LinkedTextView", exception.getLocalizedMessage());
+                    Log.e("LinkedTextView", "Nothing to handle link", exception);
                 }
             }
         }

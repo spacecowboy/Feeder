@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.model.opml
 
+import android.util.Log
 import com.nononsenseapps.feeder.db.room.Feed
 import java.io.FileOutputStream
 import java.io.IOException
@@ -44,7 +45,7 @@ suspend fun writeOutputStream(os: OutputStream,
                     }.toString())
         }
     } catch (e: IOException) {
-        // TODO Log.e(TAG, e.getLocalizedMessage());
+        Log.e("OmplWriter", "Failed to write stream", e);
     }
 }
 

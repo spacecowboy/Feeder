@@ -95,7 +95,7 @@ internal suspend fun syncFeeds(db: AppDatabase,
                     true -> Dispatchers.Default
                     false -> this.coroutineContext
                 } + CoroutineExceptionHandler { _, throwable ->
-                    Log.e("CoroutineSync", "Error during sync: ${throwable.message}")
+                    Log.e("CoroutineSync", "Error during sync", throwable)
                 }
 
                 feedsToFetch.forEach {
@@ -113,7 +113,7 @@ internal suspend fun syncFeeds(db: AppDatabase,
                 result = true
             }
         } catch (e: Throwable) {
-            Log.e("CoroutineSync", "Outer error: ${e.message}")
+            Log.e("CoroutineSync", "Outer error", e)
         }
     }
     Log.d("CoroutineSync", "Completed in $time ms")
@@ -208,7 +208,7 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
                     file.delete()
                 }
             } catch (e: IOException) {
-                Log.e("CoroutineSync", "Failed to delete $file")
+                Log.e("CoroutineSync", "Failed to delete $file", e)
             }
         }
 
