@@ -1,3 +1,7 @@
+# 1.10.4
+Jonas Kalderstam (1):
+  * [51ef23e6] App is now compiled against Android 11 (SDK-30, R)
+
 # 1.10.3
 Jonas Kalderstam (1):
   * [4827e41c] Fixed crash when base64 encoded images were present in feeds
