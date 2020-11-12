@@ -1,3 +1,7 @@
+# 1.10.3
+Jonas Kalderstam (1):
+  * [4827e41c] Fixed crash when base64 encoded images were present in feeds
+
 # 1.10.2
 Fëdor T (1):
   * [e9787dee] Updated Russian translation
