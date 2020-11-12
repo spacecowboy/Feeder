@@ -23,6 +23,14 @@ import java.net.URL
 fun SyndFeed.asFeed(baseUrl: URL): Feed {
     val feedAuthor: Author? = this.authors?.firstOrNull()?.asAuthor()
 
+    // Base64 encoded images can be quite large - and crash database cursors
+    val icon = image?.url?.let { url ->
+        when {
+            url.startsWith("data:") -> null
+            else -> url
+        }
+    }
+
     return Feed(
             title = plainTitle(),
             home_page_url = relativeLinkIntoAbsoluteOrNull(
@@ -36,7 +44,7 @@ fun SyndFeed.asFeed(baseUrl: URL): Feed {
                     this.links?.firstOrNull { "self" == it.rel }?.href
             ),
             description = this.description,
-            icon = this.image?.url,
+            icon = icon,
             author = feedAuthor,
             items = this.entries?.map { it.asItem(baseUrl = baseUrl, feedAuthor = feedAuthor) }
     )
@@ -47,6 +55,13 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
     val contentText = contentText().orIfBlank {
         mediaDescription() ?: ""
     }
+    // Base64 encoded images can be quite large - and crash database cursors
+    val image = thumbnail(baseUrl)?.let { img ->
+        when {
+            img.startsWith("data:") -> null
+            else -> img
+        }
+    }
     return Item(
             id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
             url = linkToHtml(baseUrl),
@@ -54,7 +69,7 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
             content_text = contentText,
             content_html = contentHtml(),
             summary = contentText.take(200),
-            image = thumbnail(baseUrl),
+            image = image,
             date_published = publishedRFC3339Date(),
             date_modified = modifiedRFC3339Date(),
             author = authors?.firstOrNull()?.asAuthor() ?: feedAuthor,

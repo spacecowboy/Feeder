@@ -72,9 +72,18 @@ data class FeedItem @Ignore constructor(
         // Be careful about nulls.
         val text = entry.content_html ?: entry.content_text ?: ""
         val summary: String? = (entry.summary ?: entry.content_text ?: converter.convert(text)).take(MAX_SNIPPET_LENGTH)
-        val absoluteImage = when {
-            feed.feed_url != null && entry.image != null -> relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url!!), entry.image!!)
+
+        // Make double sure no base64 images are used as thumbnails
+        val safeImage = when {
+            entry.image?.startsWith("data") == true -> null
             else -> entry.image
+        }
+
+        val absoluteImage = when {
+            feed.feed_url != null && safeImage != null -> {
+                relativeLinkIntoAbsolute(sloppyLinkToStrictURL(feed.feed_url!!), safeImage)
+            }
+            else -> safeImage
         }
 
         this.guid = entryGuid
