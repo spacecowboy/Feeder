@@ -209,7 +209,7 @@ class EditFeedActivity : KodeinAwareActivity() {
             i.getStringExtra(ARG_TITLE)?.let {
                 feedTitle = it
             }
-            if (i.hasExtra(ARG_CUSTOMTITLE) && !i.getStringExtra(ARG_CUSTOMTITLE).isBlank()) {
+            if (i.getStringExtra(ARG_CUSTOMTITLE)?.isNotBlank() == true) {
                 textTitle.setText(i.getStringExtra(ARG_CUSTOMTITLE))
             } else {
                 textTitle.setText(feedTitle)
