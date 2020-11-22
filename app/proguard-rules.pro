@@ -16,36 +16,32 @@
 #   public *;
 #}
 
--dontobfuscate
+## The following is necessary to avoid R8, which is used by desugaring
+## lib, from breaking even the debug build
+# Keep kotlin.Metadata annotations to maintain metadata on kept items.
+-keepattributes RuntimeVisibleAnnotations
+-keep class kotlin.Metadata { *; }
 
--printusage build/removed_code.txt
+# Everything in the app is essential
+-keep class com.nononsenseapps.** { *; }
 
--keep class com.nononsenseapps.feeder.** { *; }
--keep class com.nononsenseapps.jsonfeed.** { *; }
-
-# Just keep it all
--keep class com.nononsenseapps.filepicker.** { *; }
-
--keep class org.jsoup.** { *; }
--keep class org.ccil.cowan.tagsoup.** { *; }
--keep class com.rometools.** { *; }
--keep class com.squareup.okhttp3.** { *; }
--keep class org.conscrypt.** { *; }
--keep class com.bumptech.glide.** { *; }
-
--keep class androidx.** { *; }
--keep class androidx.appcompat.app.AppCompatDelegate
--keep interface androidx.** { *; }
-
-# From OKHTTP3
-# JSR 305 annotations are for embedding nullability information.
--dontwarn javax.annotation.**
-
-# A resource is loaded with a relative path so the package of this class must be preserved.
--keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
-
+# For Okio
 # Animal Sniffer compileOnly dependency to ensure APIs are compatible with older versions of Java.
 -dontwarn org.codehaus.mojo.animal_sniffer.*
 
-# OkHttp platform used only on JVM and when Conscrypt dependency is available.
--dontwarn okhttp3.internal.platform.ConscryptPlatform
+# For Glide
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public class * extends com.bumptech.glide.module.AppGlideModule
+-keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
+  **[] $VALUES;
+  public *;
+}
+-keep class com.bumptech.glide.load.data.ParcelFileDescriptorRewinder$InternalRewinder {
+  *** rewind();
+}
+
+# For Jsoup
+-keep class org.jsoup.**  { *; }
+
+# For Rome
+-keep class com.rometools.** { *; }

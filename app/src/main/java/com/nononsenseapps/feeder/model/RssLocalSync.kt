@@ -100,13 +100,23 @@ internal suspend fun syncFeeds(db: AppDatabase,
 
                 feedsToFetch.forEach {
                     launch(coroutineContext) {
-                        syncFeed(it,
+                        try {
+                            syncFeed(
+                                feedSql = it,
                                 db = db,
                                 filesDir = filesDir,
                                 feedParser = feedParser,
                                 maxFeedItemCount = maxFeedItemCount,
                                 forceNetwork = forceNetwork,
-                                downloadTime = downloadTime)
+                                downloadTime = downloadTime
+                            )
+                        } catch (e: Throwable) {
+                            Log.e(
+                                "CoroutineSync",
+                                "Failed to sync ${it.displayTitle}: ${it.url}",
+                                e
+                            )
+                        }
                     }
                 }
 
