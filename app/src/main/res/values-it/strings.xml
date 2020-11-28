@@ -7,7 +7,7 @@
   <string name="add_feed">Aggiungi feed</string>
   <string name="title_activity_edit_feed">Abbonati a un feed</string>
   <string name="url">URL</string>
-  <string name="tag">Etichetta</string>
+  <string name="tag">Categoria</string>
   <string name="add_feed_search_hint">URL del feed</string>
   <string name="title">Titolo</string>
 
@@ -36,7 +36,7 @@
   <string name="notify_for_new_items">Notifica per nuovi elementi</string>
   <string name="dont_notify_for_new_items">Interrompi notifiche</string>
   <string name="toggle_read_status">Inverti lo stato di lettura</string>
-  <string name="open_link_in_browser">Apri il collegamento nel browser</string>
+  <string name="open_link_in_browser">Apri il link nel browser</string>
   <string name="open_enclosed_media">Apri materiale incorporato</string>
   <string name="sync">Sincronizza</string>
   <string name="export_feeds_to_opml">Esporta feed come OPML</string>
@@ -64,7 +64,7 @@
   <string name="may_result_data_charges">Può portare costi aggiuntivi.</string>
   <string name="only_when_charging">Solo durante la ricarica</string>
   <string name="image_loading">Scaricamento delle immagini</string>
-  <string name="no_activity_for_link">Impossibile trovare un\'applicazione per aprire questo collegamento con</string>
+  <string name="no_activity_for_link">Impossibile trovare un\'applicazione per aprire questo link con</string>
   <string name="check_for_updates">Controlla per aggiornamenti</string>
   <string name="on_startup">All\'avvio</string>
   <string name="include_mobile_hotspots">Includi hotspot mobili</string>
@@ -73,13 +73,13 @@
   <string name="notification_channel_name">Feed non letti</string>
   <string name="notification_channel_description">Le notifiche sono visualizzare solo per elementi non letti nei feed configurati</string>
   <string name="open_in_reader">Lettore</string>
-  <string name="open_in_webview">Visualizzazione Web</string>
+  <string name="open_in_webview">Web View</string>
   <string name="open_in_default_browser">Browser predefinito</string>
   <string name="open_item_by_default_with">Apri gli elementi con</string>
-  <string name="open_links_with">Apri i collegamenti con</string>
+  <string name="open_links_with">Apri i link con</string>
   <string name="reader_settings">Lettore</string>
-  <string name="open_link_in_web_view">Apri i collegamenti nella visualizzazione Web</string>
-  <string name="max_feed_items">Numero massimo di elementi per ogni feed</string>
+  <string name="open_link_in_web_view">Apri i link nella Web View</string>
+  <string name="max_feed_items">Numero massimo di elementi per feed</string>
   <string name="could_not_load_url">Impossibile caricare l\'URL</string>
 
   <string name="theme_system">Sistema</string>
@@ -94,4 +94,18 @@
   <string name="open_feed">Apri feed</string>
   <string name="mark_items_below_as_read">Segna gli elementi in basso come letti</string>
 
+  <string name="battery_optimization">Ottimizzazione della batteria</string>
+  <string name="battery_optimization_disabled">Ottimizzazione disabilitata</string>
+  <string name="battery_optimization_enabled">Ottimizzazione abilitata</string>
+  <string name="discovered_feeds_list">Lista dei feed trovati</string>
+  <string name="open_in_browser">Apri nel browser</string>
+  <string name="open_in_custom_tab">Custom Tab</string>
+  <string name="open_in_web_view">Apri in una Web View</string>
+  <string name="preload_custom_tab">Precarica le Custom Tab</string>
+  <string name="show_fab">Mostra a schermo il pulsante \"Segna tutti come letti\"</string>
+  <string name="show_thumbnails">Mostra le thumbnail</string>
+  <string name="sort_newest_first">Dal più recente</string>
+  <string name="sort_oldest_first">Dal più vecchio</string>
+  <string name="sort">Ordina</string>
+  <string name="toggle_tag_expansion">Attiva l\'espansione dei tag</string>
 </resources>
