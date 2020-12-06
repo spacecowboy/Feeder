@@ -279,11 +279,11 @@ class FeedItemHolder(
                 true
             }
             menu.findItem(R.id.mark_items_above_as_read).setOnMenuItemClickListener {
-                actionCallback.markAboveAsRead(adapterPosition)
+                actionCallback.markAsRead(adapterPosition, false)
                 true
             }
             menu.findItem(R.id.mark_items_below_as_read).setOnMenuItemClickListener {
-                actionCallback.markBelowAsRead(adapterPosition)
+                actionCallback.markAsRead(adapterPosition, true)
                 true
             }
             menu.findItem(R.id.action_share).setOnMenuItemClickListener {
@@ -307,7 +307,6 @@ interface ActionCallback {
     fun onDismiss(item: PreviewItem?)
     fun onSwipeStarted()
     fun onSwipeCancelled()
-    fun markAboveAsRead(position: Int)
-    fun markBelowAsRead(position: Int)
+    fun markAsRead(position: Int, markBelow: Boolean)
     fun coroutineScope(): CoroutineScope
 }
