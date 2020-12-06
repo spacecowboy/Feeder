@@ -247,6 +247,22 @@ class FeedFragment : KodeinAwareFragment() {
                         swipeRefreshLayout.isEnabled = true
                     }
 
+                    override fun markAboveAsRead(position: Int) {
+                        recyclerView.adapter?.let { adapter ->
+                            lifecycleScope.launch {
+                                if (position > NO_POSITION) {
+                                    val ids = (0 until position)
+                                            .asSequence()
+                                            .map {
+                                                adapter.getItemId(it)
+                                            }
+                                            .toList()
+                                    feedItemsViewModel.markAsRead(ids)
+                                }
+                            }
+                        }
+                    }
+
                     override fun markBelowAsRead(position: Int) {
                         recyclerView.adapter?.let { adapter ->
                             lifecycleScope.launch {
