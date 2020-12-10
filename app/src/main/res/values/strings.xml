@@ -102,6 +102,7 @@
   <string name="touch_to_play_video">Touch to play video</string>
   <string name="javascript">Javascript</string>
   <string name="open_feed">Open feed</string>
+  <string name="mark_items_above_as_read">Mark items above as read</string>
   <string name="mark_items_below_as_read">Mark items below as read</string>
   <string name="discovered_feeds_list">Discovered feeds list</string>
   <string name="toggle_tag_expansion">Toggle tag expansion</string>
