@@ -101,7 +101,8 @@
   <string name="touch_to_play_video">Tocar para reproducir vídeo</string>
   <string name="javascript">Javascript</string>
   <string name="open_feed">Abrir canal</string>
-  <string name="mark_items_below_as_read">Marcar anteriores como leídos</string>
+  <string name="mark_items_above_as_read">Marcar anteriores como leídos</string>
+  <string name="mark_items_below_as_read">Marcar siguientes como leídos</string>
   <string name="discovered_feeds_list">Lista de canales descubiertos</string>
   <string name="toggle_tag_expansion">Alternar expansión de etiquetas</string>
 
