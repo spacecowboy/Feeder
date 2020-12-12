@@ -67,6 +67,10 @@ class ReaderFragment : KodeinAwareFragment() {
     private val settingsViewModel: SettingsViewModel by instance()
     private val prefs: Prefs by instance()
 
+    // Livedata emits on each resume from background - ignore if data is the same so scroll position
+    // is not screwed up.
+    private val observedTexts: MutableSet<Int> = mutableSetOf()
+
     init {
         lifecycleScope.launchWhenStarted {
             try {
@@ -166,7 +170,10 @@ class ReaderFragment : KodeinAwareFragment() {
             ).observe(
                     this@ReaderFragment,
                     androidx.lifecycle.Observer {
-                        bodyTextView.text = it
+                        if (it.hashCode() !in observedTexts) {
+                            observedTexts.add(it.hashCode())
+                            bodyTextView.text = it
+                        }
                     }
             )
         }
