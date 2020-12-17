@@ -602,6 +602,15 @@ class FeedParserTest: KodeinAware {
                 image)
     }
 
+    @Test
+    fun geekpark() {
+        val feed = feedParser.parseFeedInputStream(URL("http://main_test.geekpark.net/rss.rss"), geekpark)
+
+        assertEquals("极客公园（！）", feed.title)
+
+        assertEquals(30, feed.items?.size)
+    }
+
     private fun<T> readResource(asdf: String, block: (InputStream) -> T): T {
         return javaClass.getResourceAsStream(asdf)!!
                 .use {
@@ -669,6 +678,9 @@ class FeedParserTest: KodeinAware {
 
     private val diskuse: InputStream
         get() = javaClass.getResourceAsStream("rss_diskuse.xml")!!
+
+    private val geekpark: InputStream
+        get() = javaClass.getResourceAsStream("rss_geekpark.xml")!!
 }
 
 @Language("xml")
