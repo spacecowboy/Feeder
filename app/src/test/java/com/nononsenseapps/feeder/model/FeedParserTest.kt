@@ -524,6 +524,7 @@ class FeedParserTest: KodeinAware {
                 item.date_published)*/
     }
 
+    @Test
     fun golem2ShouldBeParsedDespiteEmptySlashComments() {
         val feed = feedParser.parseRssAtomBytes(URL("https://rss.golem.de/rss.php?feed=RSS2.0"), golemDe2)
 
