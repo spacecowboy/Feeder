@@ -129,24 +129,20 @@ fun SyndPerson.asAuthor(): Author {
 }
 
 fun SyndEntry.contentProbablyHtml(): String? {
-    var possiblyHtml: String? = contents?.filter {
+    contents?.sortedBy {
         when (it.type) {
-            "xhtml", "html" -> true
-            else -> false
+            "xhtml", "html" -> 0
+            else -> 1
         }
-    }?.take(1)?.map {
-        it.value
-    }?.firstOrNull()
-
-    if (possiblyHtml == null) {
-        possiblyHtml = contents?.firstOrNull()?.value
     }
+        ?.firstOrNull()
+        ?.let {
+            return it.value
+        }
 
-    if (possiblyHtml == null) {
-        possiblyHtml = description?.value
+    return description?.let {
+        unescapeEntities(it.value, true)
     }
-
-    return possiblyHtml?.let { unescapeEntities(possiblyHtml, true) }
 }
 
 @FlowPreview
@@ -189,14 +185,8 @@ fun SyndEntry.contentText(): String {
 
 @FlowPreview
 private fun convertAtomContentToPlainText(content: SyndContent?, fallback: String?): String {
-    return HtmlToPlainTextConverter().convert(content?.unescapedHtml() ?: fallback ?: "")
+    return HtmlToPlainTextConverter().convert(content?.value ?: fallback ?: "")
 }
-
-private fun SyndContent.unescapedHtml(): String? =
-        when  {
-            type == "html" && value != null -> unescapeEntities(value, true)
-            else -> value
-        }
 
 @FlowPreview
 fun SyndFeed.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
@@ -204,27 +194,18 @@ fun SyndFeed.plainTitle(): String = convertAtomContentToPlainText(titleEx, title
 fun SyndEntry.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
 
 fun SyndEntry.contentHtml(): String? {
-    var possiblyHtml: String? = contents?.filter {
+    contents?.sortedBy {
         when (it.type) {
-            "xhtml", "html" -> true
-            else -> false
+            "xhtml", "html" -> 0
+            else -> 1
         }
-    }?.take(1)?.map {
-        when (it.type) {
-            "html" -> unescapeEntities(it.value, true)
-            else -> it.value
+    }
+        ?.firstOrNull()
+        ?.let {
+            return it.value
         }
-    }?.firstOrNull()
 
-    if (possiblyHtml == null) {
-        possiblyHtml = contents?.firstOrNull()?.value
-    }
-
-    if (possiblyHtml == null) {
-        possiblyHtml = description?.value
-    }
-
-    return possiblyHtml ?: ""
+    return description?.value
 }
 
 fun SyndEntry.mediaDescription(): String? {

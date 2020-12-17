@@ -18,6 +18,7 @@ import java.io.InputStream
 import java.net.URL
 import kotlin.test.Ignore
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -612,6 +613,21 @@ class FeedParserTest: KodeinAware {
         assertEquals(30, feed.items?.size)
     }
 
+    @Test
+    fun contentTypeHtmlIsNotUnescapedTwice() {
+        val feed = feedParser.parseFeedInputStream(URL("http://www.zoocoop.com/contentoob/o1.atom"), contentTypeHtml)
+
+        val item = feed.items!!.single()
+
+        assertFalse(
+            item.content_html!!.contains(" <pre><code class=\"language-R\">obs.lon <- ncvar_get(nc.obs, 'lon')")
+        )
+
+        assertTrue(
+            item.content_html!!.contains(" <pre><code class=\"language-R\">obs.lon &lt;- ncvar_get(nc.obs, 'lon')")
+        )
+    }
+
     private fun<T> readResource(asdf: String, block: (InputStream) -> T): T {
         return javaClass.getResourceAsStream(asdf)!!
                 .use {
@@ -682,6 +698,9 @@ class FeedParserTest: KodeinAware {
 
     private val geekpark: InputStream
         get() = javaClass.getResourceAsStream("rss_geekpark.xml")!!
+
+    private val contentTypeHtml: InputStream
+        get() = javaClass.getResourceAsStream("atom_content_type_html.xml")!!
 }
 
 @Language("xml")
