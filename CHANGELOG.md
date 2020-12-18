@@ -1,3 +1,9 @@
+# 1.10.6
+Jonas Kalderstam (5):
+  * [06f7fb81] Added a scrollbar to the Reader
+  * [05078389] Fixed atom feed html content being unescaped twice
+  * [e8c5470d] Fixed some additional html escaping cases
+
 # 1.10.5
 Armand Lynch (2):
   * [08b6aa7f] Adds 'mark above as read' option
