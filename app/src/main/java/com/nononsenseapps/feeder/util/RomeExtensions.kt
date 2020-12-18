@@ -128,23 +128,6 @@ fun SyndPerson.asAuthor(): Author {
             url = url)
 }
 
-fun SyndEntry.contentProbablyHtml(): String? {
-    contents?.sortedBy {
-        when (it.type) {
-            "xhtml", "html" -> 0
-            else -> 1
-        }
-    }
-        ?.firstOrNull()
-        ?.let {
-            return it.value
-        }
-
-    return description?.let {
-        unescapeEntities(it.value, true)
-    }
-}
-
 @FlowPreview
 fun SyndEntry.contentText(): String {
     val possiblyHtml = when {
@@ -194,16 +177,14 @@ fun SyndFeed.plainTitle(): String = convertAtomContentToPlainText(titleEx, title
 fun SyndEntry.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
 
 fun SyndEntry.contentHtml(): String? {
-    contents?.sortedBy {
+    contents?.minBy {
         when (it.type) {
             "xhtml", "html" -> 0
             else -> 1
         }
+    }?.let {
+        return it.value
     }
-        ?.firstOrNull()
-        ?.let {
-            return it.value
-        }
 
     return description?.value
 }
@@ -234,7 +215,7 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     return when {
         thumbnail != null -> relativeLinkIntoAbsolute(feedBaseUrl, thumbnail)
         else -> {
-            val imgLink: String? = naiveFindImageLink(this.contentProbablyHtml())
+            val imgLink: String? = naiveFindImageLink(this.contentHtml())?.let { unescapeEntities(it, true) }
             // Now we are resolving against original, not the feed
             val siteBaseUrl: String? = this.linkToHtml(feedBaseUrl)
 

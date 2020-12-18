@@ -628,6 +628,56 @@ class FeedParserTest: KodeinAware {
         )
     }
 
+    @Test
+    fun escapedRssDescriptionIsProperlyUnescaped() {
+        val feed = feedParser.parseRssAtomBytes(URL("http://cowboyprogrammer.org"), rssWithHtmlEscapedDescription.toByteArray())
+
+        val item = feed.items!!.single()
+
+        assertEquals(
+            "http://cowboyprogrammer.org/hello.jpg&cached=true",
+            item.image
+        )
+        assertEquals(
+            "<img src=\"hello.jpg&amp;cached=true\">",
+            item.content_html
+        )
+    }
+
+    @Test
+    fun escapedAtomContentIsProperlyUnescaped() {
+        val feed = feedParser.parseRssAtomBytes(URL("http://cowboyprogrammer.org"), atomWithHtmlEscapedContents.toByteArray())
+
+        val text = feed.items!!.first()
+        assertEquals(
+            "http://cowboyprogrammer.org/hello.jpg&cached=true",
+            text.image
+        )
+        assertEquals(
+            "<img src=\"hello.jpg&amp;cached=true\">",
+            text.content_html
+        )
+
+        val html = feed.items!![1]
+        assertEquals(
+            "http://cowboyprogrammer.org/hello.jpg&cached=true",
+            html.image
+        )
+        assertEquals(
+            "<img src=\"hello.jpg&amp;cached=true\">",
+            html.content_html
+        )
+
+        val xhtml = feed.items!![2]
+        assertEquals(
+            "http://cowboyprogrammer.org/hello.jpg&cached=true",
+            xhtml.image
+        )
+        assertTrue("Actual:\n${xhtml.content_html}") {
+            "<img src=\"hello.jpg&amp;cached=true\" />" in xhtml.content_html!!
+        }
+    }
+
     private fun<T> readResource(asdf: String, block: (InputStream) -> T): T {
         return javaClass.getResourceAsStream(asdf)!!
                 .use {
@@ -737,4 +787,63 @@ const val atomWithAlternateLinks = """
   <link rel="alternate" type="application/rss" href="http://localhost:1313/index.xml" />
   <link rel="alternate" type="application/json" href="http://localhost:1313/feed.json" />
 </feed>
+"""
+
+@Language("xml")
+const val atomWithHtmlEscapedContents = """
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns='http://www.w3.org/2005/Atom'>
+  <id>http://cowboyprogrammer.org</id>
+  <title>escaping test</title>
+  <updated>2003-12-13T18:30:02Z</updated>
+  <link rel="self" href="/feed.atom"/>
+  <entry>
+    <id>http://cowboyprogrammer.org/1</id>
+    <title>text</title>
+    <link href="http://cowboyprogrammer.org/1"/>
+    <updated>2020-10-12T21:26:03Z</updated>
+    <content type="text">&lt;img src=&quot;hello.jpg&amp;amp;cached=true&quot;&gt;</content>
+  </entry>
+  <entry>
+    <id>http://cowboyprogrammer.org/2</id>
+    <title>html</title>
+    <link href="http://cowboyprogrammer.org/2"/>
+    <updated>2020-10-12T21:26:03Z</updated>
+    <content type="html">&lt;img src=&quot;hello.jpg&amp;amp;cached=true&quot;&gt;</content>
+  </entry>
+  <entry>
+    <id>http://cowboyprogrammer.org/3</id>
+    <title>xhtml</title>
+    <link href="http://cowboyprogrammer.org/3"/>
+    <updated>2020-10-12T21:26:03Z</updated>
+    <content type="xhtml">
+       <div xmlns="http://www.w3.org/1999/xhtml">
+         <img src="hello.jpg&amp;cached=true"/>
+      </div>
+    </content>
+  </entry>
+</feed>
+"""
+
+@Language("xml")
+const val rssWithHtmlEscapedDescription = """
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<rss version="2.0">
+  <channel>
+    <title>Cowboy Programmer</title>
+    <link>https://cowboyprogrammer.org/</link>
+    <description>Recent content in Cowboy Programmer on Cowboy Programmer</description>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 01 Sep 2019 23:21:00 +0200</lastBuildDate>
+    
+    <item>
+      <title>description</title>
+      <link>http://cowboyprogrammer.org/4</link>
+      <pubDate>Sun, 01 Sep 2019 23:21:00 +0200</pubDate>
+      <author>jonas@cowboyprogrammer.org (Space Cowboy)</author>
+      <guid>http://cowboyprogrammer.org/4</guid>
+      <description>&lt;img src=&quot;hello.jpg&amp;amp;cached=true&quot;&gt;</description>
+    </item>
+  </channel>
+</rss>
 """

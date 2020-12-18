@@ -51,12 +51,25 @@ class RomeExtensionsKtTest {
     @Test
     fun itemFallsBackToFeedAuthor() {
         assertEquals(
-                Feed(author = Author(name = "bob"), title = "",
-                        items = listOf(Item(id = "$baseUrl/id", author = Author(name = "bob"), content_text = "",
-                                url = null,
-                                summary = "", title = "", content_html = "", attachments = emptyList()))),
-                mockSyndFeed(author = mockSyndPerson(name = "bob"),
-                        entries = listOf(mockSyndEntry(uri = "id"))).asFeed(baseUrl)
+                Feed(
+                    author = Author(name = "bob"),
+                    title = "",
+                    items = listOf(
+                        Item(
+                            id = "$baseUrl/id",
+                            author = Author(name = "bob"),
+                            content_text = "",
+                            url = null,
+                            summary = "",
+                            title = "",
+                            attachments = emptyList())
+                    )
+                ),
+                mockSyndFeed(
+                    author = mockSyndPerson(name = "bob"),
+                    entries = listOf(
+                        mockSyndEntry(uri = "id"))
+                ).asFeed(baseUrl)
         )
     }
 
@@ -191,11 +204,16 @@ class RomeExtensionsKtTest {
     @Test
     fun titleHtmlAtom() {
         assertEquals(
-                Item(id = "$baseUrl/id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
-                        url = null,
-                        content_html = "", attachments = emptyList()),
-                mockSyndEntry(uri = "id",
-                        titleEx = mockSyndContent(value = "600 &amp;#8211; Email is your electronic memory", type = "html")
+                Item(
+                    id = "$baseUrl/id",
+                    title = "600 – Email is your electronic memory",
+                    content_text = "",
+                    summary = "",
+                    url = null,
+                    attachments = emptyList()),
+                mockSyndEntry(
+                    uri = "id",
+                    titleEx = mockSyndContent(value = "600 &#8211; Email is your electronic memory", type = "html")
                 ).asItem(baseUrl)
         )
     }
@@ -203,11 +221,17 @@ class RomeExtensionsKtTest {
     @Test
     fun titleXHtmlAtom() {
         assertEquals(
-                Item(id = "$baseUrl/id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
-                        url = null,
-                        content_html = "", attachments = emptyList()),
-                mockSyndEntry(uri = "id",
-                        titleEx = mockSyndContent(value = "600 &#8211; Email is your electronic memory", type = "xhtml")
+                Item(
+                    id = "$baseUrl/id",
+                    title = "600 – Email is your electronic memory",
+                    content_text = "",
+                    summary = "",
+                    url = null,
+                    attachments = emptyList()
+                ),
+                mockSyndEntry(
+                    uri = "id",
+                    titleEx = mockSyndContent(value = "600 &#8211; Email is your electronic memory", type = "xhtml")
                 ).asItem(baseUrl)
         )
     }
@@ -215,11 +239,17 @@ class RomeExtensionsKtTest {
     @Test
     fun titlePlainAtomRss() {
         assertEquals(
-                Item(id = "$baseUrl/id", title = "600 – Email is your electronic memory", content_text = "", summary = "",
-                        url = null,
-                        content_html = "", attachments = emptyList()),
-                mockSyndEntry(uri = "id",
-                        title = "600 &#8211; Email is your electronic memory"
+                Item(
+                    id = "$baseUrl/id",
+                    title = "600 – Email is your electronic memory",
+                    content_text = "",
+                    summary = "",
+                    url = null,
+                    attachments = emptyList()
+                ),
+                mockSyndEntry(
+                    uri = "id",
+                    title = "600 &#8211; Email is your electronic memory"
                 ).asItem(baseUrl)
         )
     }
@@ -239,11 +269,18 @@ class RomeExtensionsKtTest {
     @Test
     fun thumbnailWithThumbnail() {
         assertEquals(
-                Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        url = null,
-                        image = "$baseUrl/img"),
-                mockSyndEntry(uri = "id",
-                        thumbnails = arrayOf(mockThumbnail(url = URI.create("img")))
+                Item(
+                    id = "$baseUrl/id",
+                    title = "",
+                    content_text = "",
+                    summary = "",
+                    attachments = emptyList(),
+                    url = null,
+                    image = "$baseUrl/img"
+                ),
+                mockSyndEntry(
+                    uri = "id",
+                    thumbnails = arrayOf(mockThumbnail(url = URI.create("img")))
                 ).asItem(baseUrl)
         )
     }
@@ -251,17 +288,25 @@ class RomeExtensionsKtTest {
     @Test
     fun asItemDiscardsInlineBase64ImagesAsThumbnails() {
         assertEquals(
-            Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
+            Item(
+                id = "$baseUrl/id",
+                title = "",
+                content_text = "",
+                summary = "",
+                attachments = emptyList(),
                 url = null,
-                image = null),
-            mockSyndEntry(uri = "id",
+                image = null
+            ),
+            mockSyndEntry(
+                uri = "id",
                 thumbnails = arrayOf(
                     mockThumbnail(
                         url = URI.create(
                             "data:image/png;base64,iVBORw0KGgoAAA" +
                                 "ANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4" +
                                 "//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU" +
-                                "5ErkJggg==")
+                                "5ErkJggg=="
+                        )
                     )
                 )
             ).asItem(baseUrl)
@@ -271,27 +316,33 @@ class RomeExtensionsKtTest {
     @Test
     fun thumbnailWithContent() {
         assertEquals(
-                Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        url = null,
-                        image = "$baseUrl/img"),
-                mockSyndEntry(uri = "id",
-                        mediaContents = arrayOf(mockMediaContent(url = "img", medium = "image"))
+                Item(
+                    id = "$baseUrl/id",
+                    title = "",
+                    content_text = "",
+                    summary = "",
+                    attachments = emptyList(),
+                    url = null,
+                    image = "$baseUrl/img"
+                ),
+                mockSyndEntry(
+                    uri = "id",
+                    mediaContents = arrayOf(mockMediaContent(url = "img", medium = "image"))
                 ).asItem(baseUrl)
         )
     }
 
     @Test
-    fun thumbnailFromHtmlFlaggedContentIsUnescaped() {
+    fun thumbnailFromHtmlDescriptionIsUnescaped() {
         val description = mockSyndContent(
                 value = """
-                            <![CDATA[
-						<img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&amp;quality=85&amp;format=jpg&amp;resize=1600%2C836&amp;image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&amp;client=a1acac3e1b3290917d92&amp;signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
-				]]>
-                        """.trimIndent(),
-                type = "html")
+                    <img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
+                """.trimIndent(),
+                type = null)
 
-        val item = mockSyndEntry(uri = "id",
-                contents = listOf(description)
+        val item = mockSyndEntry(
+            uri = "id",
+            description = description
         ).asItem(baseUrl)
 
         assertEquals(
@@ -301,14 +352,12 @@ class RomeExtensionsKtTest {
     }
 
     @Test
-    fun thumbnailFromDescriptionIsUnescaped() {
+    fun thumbnailFromTypeTextIsFound() {
         val description = mockSyndContent(
                 value = """
-                            <![CDATA[
-						<img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&amp;quality=85&amp;format=jpg&amp;resize=1600%2C836&amp;image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&amp;client=a1acac3e1b3290917d92&amp;signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
-				]]>
+						<img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
                         """.trimIndent(),
-                type = "html")
+                type = "text")
 
         val item = mockSyndEntry(uri = "id",
                 description = description
@@ -321,16 +370,41 @@ class RomeExtensionsKtTest {
     }
 
     @Test
+    fun thumbnailFromTypeHtmlIsFound() {
+        val description = mockSyndContent(
+            value = """
+                <img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
+                """.trimIndent(),
+            type = "html")
+
+        val item = mockSyndEntry(uri = "id",
+            description = description
+        ).asItem(baseUrl)
+
+        assertEquals(
+            "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
+            item.image
+        )
+    }
+
+    @Test
     fun publishedRFC3339Date() {
         // Need to convert it so timezone is correct for test
         val romeDate = Date(ZonedDateTime.parse("2017-11-15T22:36:36+00:00").toInstant().toEpochMilli())
         val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeDate.time), ZoneOffset.systemDefault())
         assertEquals(
-                Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        url = null,
-                        date_published = dateTime.toString()),
-                mockSyndEntry(uri = "id",
-                        publishedDate = romeDate
+                Item(
+                    id = "$baseUrl/id",
+                    title = "",
+                    content_text = "",
+                    summary = "",
+                    attachments = emptyList(),
+                    url = null,
+                    date_published = dateTime.toString()
+                ),
+                mockSyndEntry(
+                    uri = "id",
+                    publishedDate = romeDate
                 ).asItem(baseUrl)
         )
     }
@@ -341,10 +415,16 @@ class RomeExtensionsKtTest {
         val romeDate = Date(ZonedDateTime.parse("2017-11-15T22:36:36+00:00").toInstant().toEpochMilli())
         val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeDate.time), ZoneOffset.systemDefault())
         assertEquals(
-                Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        url = null,
-                        date_modified = dateTime.toString(),
-                        date_published = dateTime.toString()),
+            Item(
+                id = "$baseUrl/id",
+                title = "",
+                content_text = "",
+                summary = "",
+                attachments = emptyList(),
+                url = null,
+                date_modified = dateTime.toString(),
+                date_published = dateTime.toString()
+            ),
                 mockSyndEntry(uri = "id",
                         updatedDate = romeDate
                 ).asItem(baseUrl)
@@ -359,13 +439,20 @@ class RomeExtensionsKtTest {
         val pubDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romePubDate.time), ZoneOffset.systemDefault())
         val modDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(romeModDate.time), ZoneOffset.systemDefault())
         assertEquals(
-                Item(id = "$baseUrl/id", title = "", content_html = "", content_text = "", summary = "", attachments = emptyList(),
-                        url = null,
-                        date_modified = modDate.toString(),
-                        date_published = pubDate.toString()),
-                mockSyndEntry(uri = "id",
-                        updatedDate = romeModDate,
-                        publishedDate = romePubDate
+                Item(
+                    id = "$baseUrl/id",
+                    title = "",
+                    content_text = "",
+                    summary = "",
+                    attachments = emptyList(),
+                    url = null,
+                    date_modified = modDate.toString(),
+                    date_published = pubDate.toString()
+                ),
+                mockSyndEntry(
+                    uri = "id",
+                    updatedDate = romeModDate,
+                    publishedDate = romePubDate
                 ).asItem(baseUrl)
         )
     }
