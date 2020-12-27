@@ -1,94 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
   <string name="navigation_drawer_open">Gezinme çekmecesini aç</string>
   <string name="navigation_drawer_close">Gezinme çekmecesini kapat</string>
   <string name="action_settings">Ayarlar</string>
-  <string name="add_feed">Besleme ekle</string>
-  <string name="title_activity_edit_feed">Beslemeye abone ol</string>
+  <string name="add_feed">Yayın ekle</string>
+  <string name="title_activity_edit_feed">Yayına abone ol</string>
   <string name="url">Bağlantı</string>
   <string name="tag">Etiket</string>
-  <string name="add_feed_search_hint">Besleme bağlantısı</string>
+  <string name="add_feed_search_hint">Yayın bağlantısı</string>
   <string name="title">Başlık</string>
-
   <string name="by_author_on_date">%1$s, %2$s</string>
   <string name="on_date">%1$s</string>
   <string name="save">Kaydet</string>
-  <string name="empty_feed_top">Burada okuyacak bir şey yok. Arzu eder misiniz…</string>
-  <string name="empty_feed_open">
-    <![CDATA[Başka bir besleme <font color="#607D8B">aç</font>]]></string>
-  <string name="empty_feed_add">
-    <![CDATA[Daha fazla yayın <font color="#607D8B">ekle</font>]]></string>
-  <string name="empty_no_feeds_top">Nothing to read yet.\nGet started
-    by
-  </string>
-  <string name="empty_no_feeds_add">
-    <![CDATA[<font color="#607D8B">Adding</font> some feeds]]></string>
+  <string name="empty_feed_top">Burada okuyacak bir şey kalmadı. Arzu edersiniz</string>
+  <string name="empty_feed_open"><![CDATA[Başka bir yayını <font color="#607D8B">açabilirsiniz</font>]]></string>
+  <string name="empty_feed_add"><![CDATA[Daha fazla yayın <font color="#607D8B">ekleyebilirsiniz</font>]]></string>
+  <string name="empty_no_feeds_top">Henüz okunabilir birşey yok.\nArzu edersiniz</string>
+  <string name="empty_no_feeds_add"><![CDATA[Daha fazla yayın <font color="#607D8B">ekleyebilirsiniz</font>]]></string>
   <string name="search_feed_empty_hint">Bir yayın adresi girin</string>
   <string name="mark_as_read">Okundu olarak işaretle</string>
-  <string name="mark_as_unread">Okunmamış olarak işaretle</string>
+  <string name="mark_as_unread">Okunmadı olarak işaretle</string>
   <string name="mark_all_as_read">Tümünü okundu olarak işaretle</string>
-  <string name="edit_feed">Beslemeyi düzenle</string>
-  <string name="delete_feed">Beslemeyi sil</string>
+  <string name="edit_feed">Yayını düzenle</string>
+  <string name="delete_feed">Yayını sil</string>
   <string name="show_all_items">Tüm öğeleri göster</string>
   <string name="show_unread_items">Okunmamış öğeleri göster</string>
-  <string name="new_items_available">Yeni öğeler mevcut</string>
+  <string name="new_items_available">Yeni içerikler var</string>
   <string name="view">Görünüm</string>
   <string name="no_tag">Etiket yok</string>
-  <string name="notify_for_new_items">Yeni öğeleri bildir</string>
+  <string name="notify_for_new_items">Yeni içerikleri bildir</string>
   <string name="dont_notify_for_new_items">Bildirimleri durdur</string>
-  <string name="toggle_read_status">Okuma durumunu değiştir</string>
+  <string name="toggle_read_status">Okunma durumunu değiştir</string>
   <string name="open_link_in_browser">Bağlantıyı tarayıcıda aç</string>
   <string name="open_in_browser">Tarayıcıda aç</string>
-  <string name="open_enclosed_media">Open enclosed media</string>
+  <string name="open_enclosed_media">İlişik medya ortamını aç</string>
   <string name="sync">Eşitle</string>
   <string name="export_feeds_to_opml">Beslemeleri OPML olarak aktar</string>
   <string name="import_feeds_from_opml">OPML beslemeleri içe aktar</string>
   <string name="view_debug_log">Hata ayıklama günlüğünü görüntüle</string>
-  <string name="new_based_on_this">New based on this</string>
+  <string name="new_based_on_this">Buna göre yeni</string>
   <string name="indicator_for_mark_as_read">Okundu olarak işaretleme göstergesi</string>
   <string name="share">Paylaş</string>
   <string name="no_such_feed">Böyle bir besleme bulunamadı. Https kullanmayı deneyin.</string>
   <string name="nothing_to_display">Gösterilecek bir şey yok!</string>
   <string name="title_activity_settings">Ayarlar</string>
-  <string name="all_feeds">Tüm beslemeler</string>
-
+  <string name="all_feeds">Tüm yayınlar</string>
   <string name="sync_option_manually">El ile</string>
   <string name="sync_option_every_15min">15 dakikada bir</string>
   <string name="sync_option_every_30min">30 dakikada bir</string>
-  <string name="sync_option_every_hour">Her saat</string>
+  <string name="sync_option_every_hour">Saat başı</string>
   <string name="sync_option_every_3_hours">3 saatte bir</string>
   <string name="sync_option_every_6_hours">6 saatte bir</string>
   <string name="sync_option_every_12_hours">12 saatte bir</string>
-  <string name="sync_option_every_day">Her gün</string>
-
+  <string name="sync_option_every_day">Günde bir</string>
   <string name="synchronization">Senkronizasyon</string>
-  <string name="only_on_wifi">Yalnızca WiFi</string>
+  <string name="only_on_wifi">Yalnızca kablosuz bağlantı</string>
   <string name="show_thumbnails">Küçük resimleri göster</string>
   <string name="may_result_data_charges">Mobil veri ücretlerine neden olabilir.</string>
   <string name="only_when_charging">Sadece şarj olurken</string>
-  <string name="image_loading">Resim yükleniyor</string>
-  <string name="no_activity_for_link">Bu bağlantıyı açacak bir etkinlik bulamadım</string>
+  <string name="image_loading">Görsel yükleniyor</string>
+  <string name="no_activity_for_link">Bu bağlantıyı açacak bir etkinlik bulunamadı</string>
   <string name="check_for_updates">Güncellemeleri kontrol et</string>
   <string name="on_startup">Başlangıçta</string>
   <string name="show_fab">Kayan işlem düğmesini göster</string>
   <string name="include_mobile_hotspots">Mobil etkin noktaları dahil et</string>
   <string name="updated_feeds">Güncellenen beslemeler</string>
   <string name="selected">Seçildi</string>
-  <string name="notification_channel_name">Okunmamış beslemeler</string>
-  <string name="notification_channel_description">Bildirimler yalnızca yapılandırılmış akışlardaki okunmamış öğeler için gösterilir</string>
-  <string name="open_in_reader">Reader</string>
+  <string name="notification_channel_name">Okunmamış yayınlar</string>
+  <string name="notification_channel_description">Bildirimler yalnızca yapılandırılmış yayınlardaki okunmamış öğeler için gösterilir</string>
+  <string name="open_in_reader">Okuyucu içinde</string>
   <string name="open_in_webview">Web görünümünde</string>
-  <string name="open_in_default_browser">Varsayılan tarayıcı</string>
-  <string name="open_in_custom_tab">Özel sekme</string>
+  <string name="open_in_default_browser">Varsayılan tarayıcıda</string>
+  <string name="open_in_custom_tab">Özel sekmede</string>
   <string name="open_item_by_default_with">Öğeleri varsayılan olarak aç</string>
-  <string name="open_links_with">Bağlantıları şununla aç:</string>
-  <string name="reader_settings">Reader</string>
+  <string name="open_links_with">Bağlantıları şununla aç</string>
+  <string name="reader_settings">Okuyucu</string>
   <string name="open_link_in_web_view">Bağlantıyı web görünümünde aç</string>
   <string name="open_in_web_view">Web görünümünde aç</string>
-  <string name="max_feed_items">Besleme başına maksimum öğe sayısı</string>
+  <string name="max_feed_items">Yayın başına maksimum öğe sayısı</string>
   <string name="could_not_load_url">Bağlantı yüklenemedi</string>
-
   <string name="theme_system">Sistemi takip et</string>
   <string name="theme_automatic">Otomatik</string>
   <string name="theme_day">Açık</string>
@@ -98,17 +88,15 @@
   <string name="sort_oldest_first">Önce eskiler</string>
   <string name="sort">Sırala</string>
   <string name="send_bug_report">Hata raporu gönder</string>
-  <string name="no_email_client">E-posta istemcisi açılamadı</string>
-  <string name="touch_to_play_video">Vide oynatmak için dokun</string>
-  <string name="javascript">Javascript</string>
+  <string name="no_email_client">e-Posta istemcisi açılamadı</string>
+  <string name="touch_to_play_video">Videoyu oynatmak için dokun</string>
+  <string name="javascript">JavaScript</string>
   <string name="open_feed">Beslemeyi aç</string>
   <string name="mark_items_below_as_read">Aşağıdaki öğeleri okundu olarak işaretle</string>
   <string name="discovered_feeds_list">Keşfedilen yayın listesi</string>
   <string name="toggle_tag_expansion">Etiket genişletmeyi aç-kapat</string>
-
   <string name="battery_optimization">Pil optimizasyonu</string>
   <string name="battery_optimization_disabled">Pil optimizasyonu devre dışı bırakıldı</string>
   <string name="battery_optimization_enabled">Pil optimizasyonu etkinleştirildi</string>
   <string name="preload_custom_tab">Özel sekmeyi önceden yükle</string>
-
 </resources>
