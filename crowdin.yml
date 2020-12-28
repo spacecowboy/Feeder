@@ -3,6 +3,7 @@
 "base_path": "/"
 "base_url": "https://api.crowdin.com"
 "preserve_hierarchy": true
+"commit_message": "New {languageName} translations from Crowdin"
 
 "files": [
   {
