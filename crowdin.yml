@@ -1,6 +1,6 @@
 "project_id": "433800"
 "api_token": "CROWDIN_PERSONAL_TOKEN"
-"base_path": "/feeder"
+"base_path": "/"
 "base_url": "https://api.crowdin.com"
 "preserve_hierarchy": true
 
