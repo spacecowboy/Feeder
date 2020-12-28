@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
   <string name="navigation_drawer_open">Öffne die Navigationsleiste</string>
   <string name="navigation_drawer_close">Schließe die Navigationsleiste</string>
   <string name="action_settings">Einstellungen</string>
   <string name="add_feed">Feed hinzufügen</string>
   <string name="title_activity_edit_feed">Feed abonieren</string>
-  <string name="url">URL</string>
   <string name="tag">Gruppe</string>
   <string name="add_feed_search_hint">Feed URL</string>
   <string name="title">Titel</string>
-
   <string name="by_author_on_date">von %1$s, %2$s</string>
-  <string name="on_date">%1$s</string>
   <string name="save">Speichern</string>
   <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würdest du gerne…</string>
   <string name="empty_feed_open"><![CDATA[Einen anderen Feed <font color="#607D8B">öffnen</font>?]]></string>
@@ -44,14 +40,12 @@
   <string name="nothing_to_display">Nichts zu sehen!</string>
   <string name="title_activity_settings">Einstellungen</string>
   <string name="all_feeds">Alle Feeds</string>
-
   <string name="sync_option_manually">Manuell</string>
   <string name="sync_option_every_hour">Jede Stunde</string>
   <string name="sync_option_every_3_hours">Alle 3 Stunden</string>
   <string name="sync_option_every_6_hours">Alle 6 Stunden</string>
   <string name="sync_option_every_12_hours">Alle 12 Stunden</string>
   <string name="sync_option_every_day">Jeden Tag</string>
-
   <string name="synchronization">Aktualisierung</string>
   <string name="only_on_wifi">Nur im WLAN</string>
   <string name="may_result_data_charges">Könnte zu mobiler Datennutzung führen.</string>
@@ -64,5 +58,4 @@
   <string name="open_links_with">Öffne Links mit</string>
   <string name="open_link_in_web_view">Öffne Link mit Web view</string>
   <string name="max_feed_items">Maximale Anzahl an Artikeln pro Feed</string>
-
 </resources>

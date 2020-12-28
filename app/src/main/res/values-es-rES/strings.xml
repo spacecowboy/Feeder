@@ -1,28 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
   <string name="navigation_drawer_open">Abrir cajón de navegación</string>
   <string name="navigation_drawer_close">Cerrar cajón de navegación</string>
   <string name="action_settings">Configuraciones</string>
   <string name="add_feed">Añadir canal</string>
   <string name="title_activity_edit_feed">Suscribir a un canal</string>
-  <string name="url">URL</string>
   <string name="tag">Etiqueta</string>
   <string name="add_feed_search_hint">URL del canal</string>
   <string name="title">Título</string>
-
-  <string name="by_author_on_date">%1$s, %2$s</string>
-  <string name="on_date">%1$s</string>
   <string name="save">Guardar</string>
   <string name="empty_feed_top">No hay nada para leer aquí. ¿le gustaría…</string>
-  <string name="empty_feed_open">
-    <![CDATA[<font color="#607D8B">Abrir</font> otro canal?]]></string>
-  <string name="empty_feed_add">
-    <![CDATA[<font color="#607D8B">Añadir</font> más canales?]]></string>
+  <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Abrir</font> otro canal?]]></string>
+  <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Añadir</font> más canales?]]></string>
   <string name="empty_no_feeds_top">Nada para leer todavía.\nEmpiece por
   </string>
-  <string name="empty_no_feeds_add">
-    <![CDATA[<font color="#607D8B">Añadir</font> algunos canales]]></string>
+  <string name="empty_no_feeds_add"><![CDATA[<font color="#607D8B">Añadir</font> algunos canales]]></string>
   <string name="search_feed_empty_hint">Escribir la dirección de un canal</string>
   <string name="mark_as_read">Marcar como leído</string>
   <string name="mark_as_unread">Marcar como no leído</string>
@@ -51,7 +43,6 @@
   <string name="nothing_to_display">¡Nada que mostrar!</string>
   <string name="title_activity_settings">Configuraciones</string>
   <string name="all_feeds">Todos los canales</string>
-
   <string name="sync_option_manually">Manualmente</string>
   <string name="sync_option_every_15min">Cada 15 minutos</string>
   <string name="sync_option_every_30min">Cada 30 minutos</string>
@@ -60,7 +51,6 @@
   <string name="sync_option_every_6_hours">Cada 6 horas</string>
   <string name="sync_option_every_12_hours">Cada 12 horas</string>
   <string name="sync_option_every_day">Cada día</string>
-
   <string name="synchronization">Sincronización</string>
   <string name="only_on_wifi">Solo con WiFi</string>
   <string name="show_thumbnails">Mostrar miniaturas</string>
@@ -87,7 +77,6 @@
   <string name="open_in_web_view">Abrir en vista Web</string>
   <string name="max_feed_items">Número máximo de entradas por canal</string>
   <string name="could_not_load_url">No se pudo cargar la URL</string>
-
   <string name="theme_system">Tema del sistema</string>
   <string name="theme_automatic">Automático</string>
   <string name="theme_day">Día</string>
@@ -99,17 +88,13 @@
   <string name="send_bug_report">Enviar informe de error</string>
   <string name="no_email_client">No se puede abrir un cliente de correo</string>
   <string name="touch_to_play_video">Tocar para reproducir vídeo</string>
-  <string name="javascript">Javascript</string>
   <string name="open_feed">Abrir canal</string>
   <string name="mark_items_above_as_read">Marcar anteriores como leídos</string>
   <string name="mark_items_below_as_read">Marcar siguientes como leídos</string>
   <string name="discovered_feeds_list">Lista de canales descubiertos</string>
   <string name="toggle_tag_expansion">Alternar expansión de etiquetas</string>
-
   <string name="battery_optimization">Optimización de batería</string>
   <string name="battery_optimization_disabled">Optimización de batería deshabilitada</string>
   <string name="battery_optimization_enabled">Optimización de batería habilitada</string>
   <string name="preload_custom_tab">Precargar pestaña personalizada</string>
-
-
 </resources>
