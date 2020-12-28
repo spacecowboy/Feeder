@@ -5,6 +5,8 @@ Feeder
 <a href="https://f-droid.org/repository/browse/?fdid=com.nononsenseapps.feeder" target="_blank">
 <img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"/></a>
 
+[![Crowdin](https://badges.crowdin.net/feeder/localized.svg)](https://crowdin.com/project/feeder)
+
 ### License
 
 **GPLv3**, for more info see *LICENSE*.
