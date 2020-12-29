@@ -5,5 +5,11 @@ files:
   - source: /app/src/main/res/values/strings.xml
     translation: /app/src/main/res/values-%android_code%/%original_file_name%
     update_option: update_without_changes
+    skip_untranslated_strings: true
+    skip_untranslated_files: false
+    export_only_approved: true
   - source: fastlane/metadata/android/en-US/full_description.txt
     translation: fastlane/metadata/android/%locale%/%original_file_name%
+    skip_untranslated_strings: false
+    skip_untranslated_files: true
+    export_only_approved: true
