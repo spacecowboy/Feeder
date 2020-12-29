@@ -8,8 +8,8 @@ files:
     skip_untranslated_strings: true
     skip_untranslated_files: false
     export_only_approved: true
-  - source: fastlane/metadata/android/en-US/full_description.txt
-    translation: fastlane/metadata/android/%locale%/%original_file_name%
+  - source: /fastlane/metadata/android/en-US/full_description.txt
+    translation: /fastlane/metadata/android/%locale%/%original_file_name%
     skip_untranslated_strings: false
     skip_untranslated_files: true
     export_only_approved: true
