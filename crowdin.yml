@@ -13,6 +13,6 @@
   },
   {
     "source": "fastlane/metadata/android/en-US/full_description.txt",
-    "translation": "fastlane/metadata/android/%locale%/$original_file_name%"
+    "translation": "fastlane/metadata/android/%locale%/%original_file_name%"
   }
 ]
