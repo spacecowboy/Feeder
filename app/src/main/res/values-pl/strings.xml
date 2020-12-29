@@ -11,8 +11,6 @@
   <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Dodać</font> więcej kanałów?]]></string>
   <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Otworzyć</font> inny kanał?]]></string>
   <string name="empty_feed_top">Wszystko przeczytane. Czy chcesz…</string>
-  <string name="empty_no_feeds_add"><![CDATA[<font color="#607D8B">Dodania</font> paru kanałów]]></string>
-  <string name="empty_no_feeds_top">Nie ma nic do czytania. Zacznij od</string>
   <string name="export_feeds_to_opml">Eksportuj do OPML</string>
   <string name="image_loading">Wczytywanie obrazków</string>
   <string name="import_feeds_from_opml">Importuj z OPML</string>

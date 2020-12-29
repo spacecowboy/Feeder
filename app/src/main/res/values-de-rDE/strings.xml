@@ -13,9 +13,6 @@
   <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würdest du gerne…</string>
   <string name="empty_feed_open"><![CDATA[Einen anderen Feed <font color="#607D8B">öffnen</font>?]]></string>
   <string name="empty_feed_add"><![CDATA[Mehr Feeds <font color="#607D8B">hinzufügen</font>?]]></string>
-  <string name="empty_no_feeds_top">Noch nichts zu lesen.\n
-    Leg los indem</string>
-  <string name="empty_no_feeds_add"><![CDATA[Einige Feeds <font color="#607D8B">hinzugefügen</font>]]></string>
   <string name="search_feed_empty_hint">Gebe eine Feed URL ein</string>
   <string name="mark_all_as_read">Alles als gelesen markieren</string>
   <string name="edit_feed">Feed bearbeiten</string>

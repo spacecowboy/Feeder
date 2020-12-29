@@ -19,9 +19,7 @@
     <![CDATA[<font color="#607D8B">Aprire</font> un altro feed?]]></string>
   <string name="empty_feed_add">
     <![CDATA[<font color="#607D8B">Aggiungere</font> altri feed?]]></string>
-  <string name="empty_no_feeds_top">Nulla da leggere.\nComincia </string>
-  <string name="empty_no_feeds_add">
-    <![CDATA[<font color="#607D8B">Aggiungendo</font> alcun feed]]></string>
+
   <string name="search_feed_empty_hint">Inserisci indirizzo del feed</string>
   <string name="mark_as_read">Segna come letto</string>
   <string name="mark_as_unread">Segna come non letto</string>

@@ -14,16 +14,13 @@
   <string name="by_author_on_date">автор: %1$s, %2$s</string>
   <string name="on_date">%1$s</string>
   <string name="save">Сохранить</string>
-  <string name="empty_feed_top">Здесь нечего читать. Хотите...</string>
+  <string name="empty_feed_top">Здесь нечего читать. Хотите…</string>
   <string name="empty_feed_open">
     <![CDATA[<font color="#607D8B">Открыть</font> другую ленту?]]></string>
   <string name="empty_feed_add">
     <![CDATA[<font color="#607D8B">Добавить</font> ещё ленту?]]></string>
-  <string name="empty_no_feeds_top">Пока нечего читать.\nНачните
-    с
-  </string>
-  <string name="empty_no_feeds_add">
-    <![CDATA[<font color="#607D8B">Добавления</font> каких-нибудь лент]]></string>
+
+
   <string name="search_feed_empty_hint">Введите адрес ленты</string>
   <string name="mark_as_read">Отметить как прочитанное</string>
   <string name="mark_as_unread">Отметить как непрочитанное</string>

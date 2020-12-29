@@ -19,10 +19,6 @@
     <![CDATA[<font color="#607D8B">Otevřít</font> jiný zdroj?]]></string>
   <string name="empty_feed_add">
     <![CDATA[<font color="#607D8B">Přidat</font> více zdrojů?]]></string>
-  <string name="empty_no_feeds_top">Zatím nic ke čtení.\nZačněte s
-  </string>
-  <string name="empty_no_feeds_add">
-    <![CDATA[<font color="#607D8B">Přídávání</font> nějakých zdrojů]]></string>
   <string name="search_feed_empty_hint">Zadat adresu zdroje</string>
   <string name="mark_as_read">Označit jako přečtěné</string>
   <string name="mark_as_unread">Označit jako nepřečtěné</string>

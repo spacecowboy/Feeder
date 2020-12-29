@@ -15,8 +15,6 @@
   <string name="empty_feed_top">Burada okuyacak bir şey kalmadı. Arzu edersiniz</string>
   <string name="empty_feed_open"><![CDATA[Başka bir yayını <font color="#607D8B">açabilirsiniz</font>]]></string>
   <string name="empty_feed_add"><![CDATA[Daha fazla yayın <font color="#607D8B">ekleyebilirsiniz</font>]]></string>
-  <string name="empty_no_feeds_top">Henüz okunabilir birşey yok.\nArzu edersiniz</string>
-  <string name="empty_no_feeds_add"><![CDATA[Daha fazla yayın <font color="#607D8B">ekleyebilirsiniz</font>]]></string>
   <string name="search_feed_empty_hint">Bir yayın adresi girin</string>
   <string name="mark_as_read">Okundu olarak işaretle</string>
   <string name="mark_as_unread">Okunmadı olarak işaretle</string>

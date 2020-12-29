@@ -19,11 +19,8 @@
     <![CDATA[<font color="#607D8B">Membuka</font> feed?]]></string>
   <string name="empty_feed_add">
     <![CDATA[<font color="#607D8B">Menambahkan</font> feed?]]></string>
-  <string name="empty_no_feeds_top">Belum ada feed.\nMulai
-    dengan
-  </string>
-  <string name="empty_no_feeds_add">
-    <![CDATA[<font color="#607D8B">Menambahkan</font> beberapa feed]]></string>
+
+
   <string name="search_feed_empty_hint">Masukkan alamat feed</string>
   <string name="mark_as_read">Tandai sudah dibaca</string>
   <string name="mark_as_unread">Tandai belum dibaca</string>

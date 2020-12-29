@@ -15,15 +15,8 @@
   <string name="on_date">%1$s</string>
   <string name="save">Save</string>
   <string name="empty_feed_top">Nothing to read here. Would you like to…</string>
-  <string name="empty_feed_open">
-    <![CDATA[<font color="#607D8B">Open</font> another feed?]]></string>
-  <string name="empty_feed_add">
-    <![CDATA[<font color="#607D8B">Add</font> more feeds?]]></string>
-  <string name="empty_no_feeds_top">Nothing to read yet.\nGet started
-    by
-  </string>
-  <string name="empty_no_feeds_add">
-    <![CDATA[<font color="#607D8B">Adding</font> some feeds]]></string>
+  <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Open</font> another feed?]]></string>
+  <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Add</font> more feeds?]]></string>
   <string name="search_feed_empty_hint">Enter a feed address</string>
   <string name="mark_as_read">Mark as read</string>
   <string name="mark_as_unread">Mark as unread</string>

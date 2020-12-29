@@ -19,10 +19,8 @@
         <![CDATA[別のフィードを <font color="#607D8B">開く</font>?]]></string>
   <string name="empty_feed_add">
         <![CDATA[フィードを <font color="#607D8B">追加</font>?]]></string>
-  <string name="empty_no_feeds_top">まだ読むものはありません。\n始めましょう
-        </string>
-  <string name="empty_no_feeds_add">
-        <![CDATA[フィードの <font color="#607D8B">追加中</font>]]></string>
+
+
   <string name="search_feed_empty_hint">フィードのアドレスを入力</string>
   <string name="mark_all_as_read">すべて既読にする</string>
   <string name="edit_feed">フィードを編集</string>
