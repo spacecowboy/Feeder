@@ -4,10 +4,17 @@
 "base_url": "https://api.crowdin.com"
 "preserve_hierarchy": true
 "commit_message": "New {languageName} translations from Crowdin"
+"append_commit_message": false
 
 "files": [
   {
     "source": "/app/src/main/res/values/strings.xml",
-    "translation": "/app/src/main/res/values-%android_code%/%original_file_name%"
+    "translation": "/app/src/main/res/values-%android_code%/%original_file_name%",
+    "update_option": "update_without_changes",
+    "escape_quotes": 2
+  },
+  {
+    "source": "fastlane/metadata/android/en-US/full_description.txt",
+    "translation": "fastlane/metadata/android/%locale%/$original_file_name%"
   }
 ]
