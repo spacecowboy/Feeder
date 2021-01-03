@@ -48,6 +48,10 @@ check:
 deploy_playstore:
   <<: *before_docker
   stage: deploy
+  before_script:
+    - apt update && apt-get install -y ruby-full build-essential
+    - gem install rake
+    - gem install fastlane
   script:
     - ./deploy_playstore.sh
   only:

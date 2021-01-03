@@ -8,3 +8,5 @@ local.properties
 .pybuild
 *.debhelper
 captures
+creds.json
+report.xml
