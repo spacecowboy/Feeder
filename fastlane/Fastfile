@@ -46,8 +46,8 @@ platform :android do
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do
-    #bump_version_code
-    #build_play_bundle
+    bump_version_code
+    build_play_bundle
     upload_to_play_store(
       mapping: "app/build/outputs/mapping/play/mapping.txt",
       json_key: "app/creds.json",
