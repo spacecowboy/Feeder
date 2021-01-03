@@ -11,4 +11,3 @@
     See !77
 *   Handle ENTER press in add feed dialog  
     See !77
-

@@ -12,4 +12,3 @@
     See !89 #91
 *   Changed so more feeds display thumbnail images  
     See !88 #96
-*   Fixed various crashes

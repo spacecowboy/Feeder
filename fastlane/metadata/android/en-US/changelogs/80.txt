@@ -13,14 +13,4 @@ Sudeep Duggal (1):
          Google
 
 Tomáš Tihlařík (1):
-  * [1709c2fd] Update Czech strings.xml for Custom Tab & Battery options
-
-emersion (1):
-  * [e0a9d261] Added support for custom tabs
-
-linsui (1):
-  * [751f8665] Update Simplified Chinese translation
-
-zmni (2):
-  * [8be9508a] Update Indonesian translation
-  * [8bc4f4e6] Update Indonesian translation
+  * [1709c2fd] Update Czech strings.xml for Custom Tab

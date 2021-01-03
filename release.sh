@@ -57,7 +57,8 @@ cat >&2 "${tmpfile}"
 read -r -p "Write changelog? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
 then
-  cat "${tmpfile}" >"fastlane/metadata/android/en-US/changelogs/${NEXT_CODE}.txt"
+  # Playstore has a limit
+  head --bytes=500 "${tmpfile}" >"fastlane/metadata/android/en-US/changelogs/${NEXT_CODE}.txt"
 
   PREV=""
   if [ -f CHANGELOG.md ]; then

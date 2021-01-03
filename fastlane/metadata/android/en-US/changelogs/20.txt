@@ -13,15 +13,4 @@
     - the location of the feed is not standardized so it's not easily
       guessable
 
-    - viewing the source of a web site to find the alternate link is
-      very hard to do on mobile
-
-    Now, the site you enter is parsed and if it contains alternate
-    links to feeds, one of those links are loaded parsed
-    instead. Currently RSS and Atom feeds are identified and Atom is
-    preferred over RSS.
-
-    See !60
-
-*   Target Android 26
-    See !60
+    - viewing the source of a web site to find the al
