@@ -1,0 +1,2 @@
+json_key_file("/home/jonas/.ssh/service.json")
+package_name("com.nononsenseapps.feeder.play")
