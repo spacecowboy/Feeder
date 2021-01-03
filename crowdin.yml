@@ -9,6 +9,14 @@ files:
     skip_untranslated_files: false
     export_only_approved: true
     languages_mapping: {
+      locale: {
+        # Play store does not support in-IN/id-ID
+        "in": "in",
+        "ro": "ro",
+        "sr": "sr",
+        "uk": "uk",
+        "vi": "vi"
+        },
       android_code: {
         "cs": "cs",
         "da": "da",
