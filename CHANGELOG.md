@@ -1,3 +1,18 @@
+# 1.10.7
+Jonas Kalderstam (22):
+  * [27cd9114] Updated translations
+  * [5fa9116f] Enabled minification for play and release builds
+
+Muha Aliss (2):
+  * [45ac6e09] Turkish translation updated
+  * [387db7cd] Turkish translate checked and updated.
+
+mezysinc (4):
+  * [6dd67f76] description in ptbr
+  * [3de13944] full desc. ptbr
+  * [4044ee48] Delete .gitkeep
+  * [589ac044] updated strings ptbr
+
 # 1.10.6
 Jonas Kalderstam (5):
   * [06f7fb81] Added a scrollbar to the Reader
