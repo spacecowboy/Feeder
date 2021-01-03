@@ -16,6 +16,8 @@ EOF
 
 base64 --ignore-garbage --decode app/creds.b64 > app/creds.json
 
+sed -i "s|/home/jonas/.ssh/service.json|$(pwd)/app/creds.json|" fastlane/Appfile
+
 cat > keystore.b64 <<EOF
 ${KEYSTORE}
 EOF
