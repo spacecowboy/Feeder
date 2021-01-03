@@ -8,8 +8,35 @@ files:
     skip_untranslated_strings: true
     skip_untranslated_files: false
     export_only_approved: true
+    languages_mapping: {
+      android_code: {
+        "cs": "cs",
+        "da": "da",
+        "el": "el",
+        "fi": "fi",
+        "fr": "fr",
+        "hu": "hu",
+        "in": "in",
+        "it": "it",
+        "iw": "iw",
+        "ja": "ja",
+        "ko": "ko",
+        "no": "no",
+        "pl": "pl",
+        "ro": "ro",
+        "ru": "ru",
+        "sr": "sr",
+        "tr": "tr",
+        "uk": "uk"
+        }
+      }
   - source: /fastlane/metadata/android/en-US/full_description.txt
     translation: /fastlane/metadata/android/%locale%/%original_file_name%
-    skip_untranslated_strings: false
+    skip_untranslated_strings: true
+    skip_untranslated_files: true
+    export_only_approved: true
+  - source: /fastlane/metadata/android/en-US/short_description.txt
+    translation: /fastlane/metadata/android/%locale%/%original_file_name%
+    skip_untranslated_strings: true
     skip_untranslated_files: true
     export_only_approved: true
