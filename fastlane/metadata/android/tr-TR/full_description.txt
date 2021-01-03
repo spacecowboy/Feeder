@@ -1,0 +1,19 @@
+<p>Kişisel bilgilerinizi çalan özgür olmayan, abartılmış okuyuculardan bıktınız mı?<br/>
+Saatlerce sunucu yapılandırması gerektiren karmaşık senkronizasyon kurulumlarından bıktınız mı?<br/>
+Her yerde hesap oluşturmaktan bıktınız mı?<br/></p>
+
+<p>O zaman Feeder'ı deneyin!</p>
+
+<p>Feeder, tamamen özgür/libre bir rss okuyucusudur. JSONFeed dahil tüm yaygın yayın formatlarını destekler. Sizi takip etmez. Herhangi bir kurulum gerektirmez. Hesap oluşturmanıza bile gerek yok! Yayın akışılarınızı ayarlayın veya eski okuyucunuzdan OPML aracılığıyla içe aktarın, ardından senkronize edip okumaya başlayın.</p>
+
+<p><b>Özellikler</b></p>
+
+<ul>
+<li>HTML'yi ayrıştırır ve yerel bir TextView'da görüntüler</li>
+<li>Çevrimdışı okuma</li>
+<li>Arka planda senkronizasyon</li>
+<li>Bildirimler</li>
+<li>OPML içe/dışa aktarma</li>
+<li>Ek bağlantılara pratik erişim</li>
+<li>Materyal tasarım</li>
+</ul>

@@ -1,26 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
   <string name="navigation_drawer_open">Buka laci navigasi</string>
   <string name="navigation_drawer_close">Tutup laci navigasi</string>
   <string name="action_settings">Pengaturan</string>
   <string name="add_feed">Tambah feed</string>
   <string name="title_activity_edit_feed">Berlangganan feed</string>
-  <string name="url">URL</string>
-  <string name="tag">Tag</string>
   <string name="add_feed_search_hint">URL feed</string>
   <string name="title">Judul</string>
-
-  <string name="by_author_on_date">%1$s, %2$s</string>
-  <string name="on_date">%1$s</string>
   <string name="save">Simpan</string>
   <string name="empty_feed_top">Belum ada feed. Apakah anda ingin…</string>
-  <string name="empty_feed_open">
-    <![CDATA[<font color="#607D8B">Membuka</font> feed?]]></string>
-  <string name="empty_feed_add">
-    <![CDATA[<font color="#607D8B">Menambahkan</font> feed?]]></string>
-
-
+  <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Membuka</font> feed?]]></string>
+  <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Menambahkan</font> feed?]]></string>
   <string name="search_feed_empty_hint">Masukkan alamat feed</string>
   <string name="mark_as_read">Tandai sudah dibaca</string>
   <string name="mark_as_unread">Tandai belum dibaca</string>
@@ -48,7 +38,6 @@
   <string name="nothing_to_display">Tidak ada yang bisa ditampilkan!</string>
   <string name="title_activity_settings">Pengaturan</string>
   <string name="all_feeds">Semua feed</string>
-
   <string name="sync_option_manually">Secara manual</string>
   <string name="sync_option_every_15min">Setiap 15 menit</string>
   <string name="sync_option_every_30min">Setiap 30 menit</string>
@@ -57,7 +46,6 @@
   <string name="sync_option_every_6_hours">Setiap 6 jam</string>
   <string name="sync_option_every_12_hours">Setiap 12 jam</string>
   <string name="sync_option_every_day">Setiap hari</string>
-
   <string name="synchronization">Sinkronisasi</string>
   <string name="only_on_wifi">Hanya pada WiFi</string>
   <string name="show_thumbnails">Tampilkan thumbnail</string>
@@ -76,14 +64,12 @@
   <string name="open_in_reader">Pembaca</string>
   <string name="open_in_webview">Webview</string>
   <string name="open_in_default_browser">Peramban</string>
-  <string name="open_in_custom_tab">Custom tab</string>
   <string name="open_item_by_default_with">Buka item feed dengan</string>
   <string name="open_links_with">Buka tautan dengan</string>
   <string name="reader_settings">Pembaca</string>
   <string name="open_link_in_web_view">Buka tautan di Webview</string>
   <string name="max_feed_items">Jumlah maksimum item per feed</string>
   <string name="could_not_load_url">Tidak bisa memuat URL</string>
-
   <string name="theme_system">Ikuti sistem</string>
   <string name="theme_automatic">Otomatis</string>
   <string name="theme_day">Terang</string>
@@ -95,15 +81,12 @@
   <string name="send_bug_report">Kirim laporan bug</string>
   <string name="no_email_client">Tidak bisa membuka aplikasi surel</string>
   <string name="touch_to_play_video">Sentuh untuk memutar video</string>
-  <string name="javascript">Javascript</string>
   <string name="open_feed">Buka feed</string>
   <string name="mark_items_below_as_read">Tandai item di bawah sudah dibaca</string>
   <string name="discovered_feeds_list">Daftar feed yang ditemukan</string>
   <string name="toggle_tag_expansion">Aktif/nonaktifkan ekspansi tag</string>
-
   <string name="battery_optimization">Pengoptimalan baterai</string>
   <string name="battery_optimization_disabled">Pengoptimalan baterai dinonaktifkan</string>
   <string name="battery_optimization_enabled">Pengoptimalan baterai diaktifkan</string>
   <string name="preload_custom_tab">Pramuat custom tab</string>
-
 </resources>

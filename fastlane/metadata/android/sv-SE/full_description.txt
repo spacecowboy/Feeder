@@ -1,0 +1,19 @@
+<p>Är du less på stora ofria appar som stjäl dina personuppgifter?<br/>
+Har du fått nog av komplicerade synkroniseringsinställningar som kräver timmar av konfiguration?<br/>
+Är du trött på att skapa nya konton överallt?<br/></p>
+
+<p>Pröva Feeder istället!</p>
+
+<p>Feeder är en helt fri flödesläsare. Den stödjer alla vanliga flödesformat, inklusive JSONFeed. Den spionerar inte på dig. Den behöver inga inställningar. Du behöver inte ens skapa något konto! Bara lägg till dina flöden, eller importera dom från din förra läsare via OPML, sen är du igång med synkronisering och läsning.</p>
+
+<p><b>Egenskaper</b></p>
+
+<ul>
+<li>Tolkar HTML och visar den i en riktig TextView</li>
+<li>Offline-läsning</li>
+<li>Bakgrundssynkronisering</li>
+<li>Notiser</li>
+<li>OPML import/export</li>
+<li>Enkel åtkomst till bifogad media</li>
+<li>Material design</li>
+</ul>

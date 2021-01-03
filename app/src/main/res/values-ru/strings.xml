@@ -1,26 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
   <string name="navigation_drawer_open">Открыть меню навигации</string>
   <string name="navigation_drawer_close">Закрыть меню навигации</string>
   <string name="action_settings">Настройки</string>
   <string name="add_feed">Добавить ленту</string>
   <string name="title_activity_edit_feed">Подписаться на ленту</string>
-  <string name="url">URL</string>
   <string name="tag">Метка</string>
   <string name="add_feed_search_hint">URL ленты</string>
   <string name="title">Название</string>
-
   <string name="by_author_on_date">автор: %1$s, %2$s</string>
-  <string name="on_date">%1$s</string>
   <string name="save">Сохранить</string>
-  <string name="empty_feed_top">Здесь нечего читать. Хотите…</string>
-  <string name="empty_feed_open">
-    <![CDATA[<font color="#607D8B">Открыть</font> другую ленту?]]></string>
-  <string name="empty_feed_add">
-    <![CDATA[<font color="#607D8B">Добавить</font> ещё ленту?]]></string>
-
-
+  <string name="empty_feed_top">Здесь нечего читать. Хотите...</string>
+  <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Открыть</font> другую ленту?]]></string>
+  <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Добавить</font> ещё ленту?]]></string>
   <string name="search_feed_empty_hint">Введите адрес ленты</string>
   <string name="mark_as_read">Отметить как прочитанное</string>
   <string name="mark_as_unread">Отметить как непрочитанное</string>
@@ -49,7 +41,6 @@
   <string name="nothing_to_display">Здесь ничего нет!</string>
   <string name="title_activity_settings">Настройки</string>
   <string name="all_feeds">Все ленты</string>
-
   <string name="sync_option_manually">Вручную</string>
   <string name="sync_option_every_15min">Каждые 15 минут</string>
   <string name="sync_option_every_30min">Каждые 30 минут</string>
@@ -58,7 +49,6 @@
   <string name="sync_option_every_6_hours">Каждые 6 часов</string>
   <string name="sync_option_every_12_hours">Каждые 12 часов</string>
   <string name="sync_option_every_day">Каждый день</string>
-
   <string name="synchronization">Синхронизация</string>
   <string name="only_on_wifi">Только по Wi-Fi</string>
   <string name="show_thumbnails">Показывать миниатюры</string>
@@ -81,7 +71,6 @@
   <string name="open_in_web_view">Открыть в Web view</string>
   <string name="max_feed_items">Максимальное число элементов в ленте</string>
   <string name="could_not_load_url">Не удалось загрузить URL</string>
-
   <string name="theme_system">Системная</string>
   <string name="theme_automatic">Автоматическая</string>
   <string name="theme_day">День</string>
@@ -97,9 +86,7 @@
   <string name="mark_items_below_as_read">Отметить прочитанными элементы ниже</string>
   <string name="discovered_feeds_list">Список обнаруженных лент</string>
   <string name="toggle_tag_expansion">Переключить расширение меток</string>
-
   <string name="battery_optimization">Оптимизация использования батареи</string>
   <string name="battery_optimization_disabled">Оптимизация отключена</string>
   <string name="battery_optimization_enabled">Оптимизация включена</string>
-
 </resources>

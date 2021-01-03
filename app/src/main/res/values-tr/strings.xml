@@ -90,6 +90,7 @@
   <string name="touch_to_play_video">Videoyu oynatmak için dokun</string>
   <string name="javascript">JavaScript</string>
   <string name="open_feed">Beslemeyi aç</string>
+  <string name="mark_items_above_as_read">Yukarıdaki öğeleri okundu olarak işaretle</string>
   <string name="mark_items_below_as_read">Aşağıdaki öğeleri okundu olarak işaretle</string>
   <string name="discovered_feeds_list">Keşfedilen yayın listesi</string>
   <string name="toggle_tag_expansion">Etiket genişletmeyi aç-kapat</string>

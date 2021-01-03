@@ -4,7 +4,7 @@
   <string name="navigation_drawer_close">Schließe die Navigationsleiste</string>
   <string name="action_settings">Einstellungen</string>
   <string name="add_feed">Feed hinzufügen</string>
-  <string name="title_activity_edit_feed">Feed abonieren</string>
+  <string name="title_activity_edit_feed">Feed abonnieren</string>
   <string name="tag">Gruppe</string>
   <string name="add_feed_search_hint">Feed URL</string>
   <string name="title">Titel</string>
