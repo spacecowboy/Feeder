@@ -56,11 +56,6 @@ class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
         if (!this::liveImageText.isInitialized) {
             liveImageText = liveIsNightMode.switchMap { _ ->
                 liveData(context = viewModelScope.coroutineContext) {
-                    // TODO resources
-                    emit(
-                            SpannableString("Loading...")
-                    )
-
                     try {
                         withContext(Dispatchers.IO) {
                             val allowDownload = prefs.shouldLoadImages()

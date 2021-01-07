@@ -170,8 +170,10 @@ class ReaderFragment : KodeinAwareFragment() {
             ).observe(
                     this@ReaderFragment,
                     androidx.lifecycle.Observer {
-                        if (it.hashCode() !in observedTexts) {
-                            observedTexts.add(it.hashCode())
+                        val hash = it.hashCode()
+                        // Textview will go blank sometimes when resumed, so let the last text through
+                        if (hash == observedTexts.lastOrNull() || hash !in observedTexts) {
+                            observedTexts.add(hash)
                             bodyTextView.text = it
                         }
                     }
