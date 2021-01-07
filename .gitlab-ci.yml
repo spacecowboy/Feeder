@@ -31,6 +31,7 @@ cache:
       && rm -rf /var/lib/apt/lists/*
     - export GRADLE_USER_HOME="$(pwd)/.gradle"
     - export ANDROID_HOME="$(pwd)/.androidhome"
+    - export ANDROID_SDK_ROOT="$(pwd)/.androidhome"
     - export PATH="${ANDROID_HOME}/emulator/:${ANDROID_HOME}/tools/bin/:${ANDROID_HOME}/tools/:${ANDROID_HOME}/platform-tools/:${PATH}"
     - ci/before
     - chmod +x ./gradlew
