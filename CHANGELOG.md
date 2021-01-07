@@ -1,3 +1,7 @@
+# 1.10.8
+Jonas Kalderstam (2):
+  * [472dc314] Fixed reader going blank after opening a web view
+
 # 1.10.7
 Jonas Kalderstam (22):
   * [27cd9114] Updated translations
