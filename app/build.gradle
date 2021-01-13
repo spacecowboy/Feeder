@@ -77,8 +77,8 @@ android {
       matchingFallbacks = ['debug']
     }
     release {
-      minifyEnabled true
-      shrinkResources true
+      minifyEnabled false
+      shrinkResources false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
       if (project.hasProperty('STORE_FILE')) {
@@ -87,8 +87,9 @@ android {
     }
     play {
       applicationIdSuffix ".play"
-      minifyEnabled true
-      shrinkResources true
+      // If you re-enable this - fix the issues on Android 4.3
+      minifyEnabled false
+      shrinkResources false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
       if (project.hasProperty('STORE_FILE')) {

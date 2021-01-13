@@ -16,6 +16,8 @@
 #   public *;
 #}
 
+-dontobfuscate
+
 ## The following is necessary to avoid R8, which is used by desugaring
 ## lib, from breaking even the debug build
 # Keep kotlin.Metadata annotations to maintain metadata on kept items.
