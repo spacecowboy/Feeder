@@ -1,3 +1,11 @@
+# 1.10.9
+Jonas Kalderstam (3):
+  * [5ac2bc2c] Disabled minification due to crash on old Android
+  * [0add4d20] Added comments to some strings
+
+Space Cowboy (5):
+  * [7a715fa4] Updated translations from Crowdin
+
 # 1.10.8
 Jonas Kalderstam (2):
   * [472dc314] Fixed reader going blank after opening a web view
