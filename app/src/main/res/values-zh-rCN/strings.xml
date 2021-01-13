@@ -5,9 +5,12 @@
   <string name="action_settings">设置</string>
   <string name="add_feed">添加订阅</string>
   <string name="title_activity_edit_feed">订阅 Feed</string>
+  <string name="url">URL</string>
   <string name="tag">标签</string>
   <string name="add_feed_search_hint">订阅 URL</string>
   <string name="title">标题</string>
+  <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
+  <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
   <string name="save">保存</string>
   <string name="empty_feed_top">没有可阅读的内容。您是否想要…</string>
   <string name="empty_feed_open"><![CDATA[<font color="#607D8B">打开</font>另一个订阅？]]></string>
@@ -27,6 +30,7 @@
   <string name="dont_notify_for_new_items">停止通知</string>
   <string name="toggle_read_status">切换阅读模式</string>
   <string name="open_link_in_browser">在浏览器中打开链接</string>
+  <string name="open_in_browser">在浏览器中打开</string>
   <string name="open_enclosed_media">打开内嵌媒体</string>
   <string name="sync">同步</string>
   <string name="export_feeds_to_opml">将订阅导出为 OPML</string>
@@ -35,7 +39,7 @@
   <string name="new_based_on_this">在此基础上新建</string>
   <string name="indicator_for_mark_as_read">标记为已读的标志</string>
   <string name="share">分享</string>
-  <string name="no_such_feed">找不到此订阅。尝试使用 http 。</string>
+  <string name="no_such_feed">找不到此订阅。尝试使用 https 。</string>
   <string name="nothing_to_display">没有可显示内容！</string>
   <string name="title_activity_settings">设置</string>
   <string name="all_feeds">全部订阅</string>
@@ -70,6 +74,7 @@
   <string name="open_links_with">链接打开方式</string>
   <string name="reader_settings">阅读器</string>
   <string name="open_link_in_web_view">以网页视图打开链接</string>
+  <string name="open_in_web_view">在网页视图中打开</string>
   <string name="max_feed_items">每个订阅的最大内容数</string>
   <string name="could_not_load_url">无法加载 URL</string>
   <string name="theme_system">跟随系统</string>
@@ -83,7 +88,9 @@
   <string name="send_bug_report">发送错误报告</string>
   <string name="no_email_client">无法打开电子邮件客户端</string>
   <string name="touch_to_play_video">轻触播放视频</string>
+  <string name="javascript">Javascript</string>
   <string name="open_feed">打开订阅</string>
+  <string name="mark_items_above_as_read">标记以上内容为已读</string>
   <string name="mark_items_below_as_read">标记以下项为已读</string>
   <string name="discovered_feeds_list">已发现订阅列表</string>
   <string name="toggle_tag_expansion">展开/闭合标签</string>
