@@ -31,4 +31,4 @@ KEY_ALIAS=${KEYALIAS}
 KEY_PASSWORD=${KEYPASSWORD}
 EOF
 
-fastlane deploy
+fastlane build_and_deploy

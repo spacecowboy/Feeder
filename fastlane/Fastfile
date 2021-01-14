@@ -46,11 +46,16 @@ platform :android do
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do
-    bump_version_code
-    build_play_bundle
+    # mapping: "app/build/outputs/mapping/play/mapping.txt",
     upload_to_play_store(
-      mapping: "app/build/outputs/mapping/play/mapping.txt",
       aab: "app/build/outputs/bundle/play/app.aab"
     )
+  end
+
+  desc "Build and deploy a new version to the Google Play"
+  lane :build_and_deploy do
+    bump_version_code
+    build_play_bundle
+    deploy
   end
 end

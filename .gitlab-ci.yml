@@ -2,11 +2,11 @@ stages:
   - build
   - deploy
 
-image: openjdk:8-jdk
+#image: spacecowboy/android-docker-builder:base
+image: registry.gitlab.com/spacecowboy/feeder:builder
 
 variables:
-  ANDROID_COMPILE_SDK: "27"
-  ANDROID_BUILD_TOOLS: "27.0.1"
+  GIT_SUBMODULE_STRATEGY: recursive
 
 cache:
   key: "uber"
@@ -14,47 +14,19 @@ cache:
      - .gradle/caches
      - .gradle/wrapper
 
-.sdk_apt: &before_docker
-  before_script:
-    - set -euo pipefail
-    - git submodule sync --recursive
-    - git submodule update --init --recursive
-    - apt-get --quiet update --yes
-      && apt-get --quiet install --yes --no-install-recommends wget
-                                                               tar
-                                                               unzip
-                                                               lib32stdc++6
-                                                               lib32z1
-                                                               file
-                                                               mesa-utils
-                                                               pciutils
-      && rm -rf /var/lib/apt/lists/*
-    - export GRADLE_USER_HOME="$(pwd)/.gradle"
-    - export ANDROID_HOME="$(pwd)/.androidhome"
-    - export ANDROID_SDK_ROOT="$(pwd)/.androidhome"
-    - export PATH="${ANDROID_HOME}/emulator/:${ANDROID_HOME}/tools/bin/:${ANDROID_HOME}/tools/:${ANDROID_HOME}/platform-tools/:${PATH}"
-    - ci/before
-    - chmod +x ./gradlew
-
 check:
-  <<: *before_docker
   stage: build
   script:
-    - ./gradlew assembleDebug packageDebugAndroidTest check -PdisablePreDex
+    - source devenv && ./gradlew assembleDebug packageDebugAndroidTest check -PdisablePreDex
   artifacts:
     paths:
     - app/build/outputs/
     - build/logs/
 
 deploy_playstore:
-  <<: *before_docker
   stage: deploy
-  before_script:
-    - apt update && apt-get install -y ruby-full build-essential
-    - gem install rake
-    - gem install fastlane
   script:
-    - ./deploy_playstore.sh
+    - source devenv && ./deploy_playstore.sh
   only:
     - tags
     - /^\d+\.\d+\.\d+$/
