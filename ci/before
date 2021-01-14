@@ -16,6 +16,4 @@ mkdir -p "${LOGDIR}"
 echo y | sdkmanager --update >>"${LOG}"
 echo y | sdkmanager \
            "tools" \
-           "platform-tools" \
-           "build-tools;${ANDROID_BUILD_TOOLS}" \
-           "platforms;android-${ANDROID_COMPILE_SDK}" >>"${LOG}"
+           "platform-tools"
