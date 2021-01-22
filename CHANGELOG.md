@@ -1,3 +1,7 @@
+# 1.10.10
+Space Cowboy (3):
+  * [b316df06] New translations from Crowdin
+
 # 1.10.9
 Jonas Kalderstam (3):
   * [5ac2bc2c] Disabled minification due to crash on old Android
