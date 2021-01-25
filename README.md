@@ -36,6 +36,6 @@ This is a no-nonsense RSS/Atom/JSON feed reader app for Android.
 
 ### Screenshots
 
-<img src="fastlane/metadata/android/en-US/phoneScreenshots/feed_day.png" width=50%/><img src="fastlane/metadata/android/en-US/phoneScreenshots/feed_night.png" width=50%/>
-<img src="fastlane/metadata/android/en-US/phoneScreenshots/article_day.png" width=50%/><img src="fastlane/metadata/android/en-US/phoneScreenshots/article_night.png" width=50%/>
-<img src="fastlane/metadata/android/en-US/phoneScreenshots/settings_day.png" width=50%/><img src="fastlane/metadata/android/en-US/phoneScreenshots/settings_night.png" width=50%/>
+<img src="https://gitlab.com/spacecowboy/Feeder/-/raw/9e9c46f55ac528bd619413c21891fda23d2d3ac6/fastlane/metadata/android/en-US/images/phoneScreenshots/1_en-US.png" width=50%/><img src="https://gitlab.com/spacecowboy/Feeder/-/raw/9e9c46f55ac528bd619413c21891fda23d2d3ac6/fastlane/metadata/android/en-US/images/phoneScreenshots/2_en-US.png" width=50%/>
+<img src="https://gitlab.com/spacecowboy/Feeder/-/raw/9e9c46f55ac528bd619413c21891fda23d2d3ac6/fastlane/metadata/android/en-US/images/phoneScreenshots/3_en-US.png" width=50%/><img src="https://gitlab.com/spacecowboy/Feeder/-/raw/9e9c46f55ac528bd619413c21891fda23d2d3ac6/fastlane/metadata/android/en-US/images/phoneScreenshots/4_en-US.png" width=50%/>
+<img src="https://gitlab.com/spacecowboy/Feeder/-/raw/9e9c46f55ac528bd619413c21891fda23d2d3ac6/fastlane/metadata/android/en-US/images/phoneScreenshots/5_en-US.png" width=50%/><img src="https://gitlab.com/spacecowboy/Feeder/-/raw/9e9c46f55ac528bd619413c21891fda23d2d3ac6/fastlane/metadata/android/en-US/images/phoneScreenshots/6_en-US.png" width=50%/>
