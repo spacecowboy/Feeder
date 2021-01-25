@@ -13,6 +13,12 @@ Feeder
 
 **GPLv3**, for more info see *LICENSE*.
 
+### Contributions are welcome!
+
+If you want to translate Feeder into your native language the easiest way is to go to [Weblate](https://hosted.weblate.org/engage/feeder/) but making a merge request is of course fine if that is something you are comfortable with.
+
+In case you want to contribute with fixing bugs or features - you probably know what you need to do. If not just ping me.
+
 ### Quick install
 
 Clone the project:
