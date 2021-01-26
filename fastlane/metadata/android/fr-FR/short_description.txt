@@ -1,1 +1,1 @@
-An awesome Free and Open Source RSS Feed reader
+Un super lecteur de flux RSS gratuit et à code source ouvert
