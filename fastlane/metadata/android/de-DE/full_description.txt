@@ -1,17 +1,17 @@
-<p>Haben Sie genug von aufgeblähten, nicht kostenlosen Readern, die Ihre persönlichen Daten stehlen?<br/>
-Haben Sie genug von umständlichen Synchronisations-Setups, die stundenlange Serverkonfigurationen erfordern?<br/>
+<p>Haben Sie genug von aufgeblähten, nicht freien Eingabelesern, die Ihre persönlichen Daten stehlen?<br/>
+Haben Sie genug von umständlichen Synchronisierungskonfigurationen, die stundenlange Serverkonfigurationen erfordern?<br/>
 Sind Sie es leid, überall Konten anlegen zu müssen?<br/></p>
 
 <p>Versuchen Sie stattdessen den Feeder!</p>
 
-<p>Feeder ist ein vollständig kostenloser/freier Feed-Reader. Er unterstützt alle gängigen Feed-Formate, einschließlich JSONFeed. Es verfolgt Sie nicht. Es erfordert keine Einrichtung. Dazu müssen Sie nicht einmal ein Konto anlegen! Richten Sie einfach Ihre Feeds ein oder importieren Sie sie von Ihrem alten Reader über OPML, dann können Sie mit dem Synchronisieren und Lesen beginnen</p>
+<p>Feeder ist ein vollständig kostenloser und freier Feedreader. Er unterstützt alle gängigen Feed-Formate, einschließlich JSONFeed. Es verfolgt Sie nicht. Es erfordert keine Einrichtung. Dazu müssen Sie nicht einmal ein Konto anlegen! Richten Sie einfach Ihre Feeds ein oder importieren Sie sie von Ihrem alten Reader über OPML, dann können Sie mit dem Synchronisieren und Lesen beginnen</p>
 
 <p><b>Funktionen</b></p>
 
 <ul>
 <li>Parst HTML und zeigt es in einer nativen Textansicht</li>
 <li>Offline lesen</li>
-<li>Hintergrundsynchronisation</li>
+<li>Hintergrundsynchronisierung</li>
 <li>Benachrichtigungen</li>
 <li>OPML Import/Export</li>
 <li>Praktischer Zugriff auf eingefügte Links</li>

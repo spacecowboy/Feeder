@@ -1,1 +1,1 @@
-Ein großartiger kostenloser und Open Source RSS-Feed-Reader
+Ein großartiger, kostenloser und quelloffener RSS-Feedreader
