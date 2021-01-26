@@ -1,0 +1,7 @@
+# 1.10.9
+Jonas Kalderstam (3):
+  * [5ac2bc2c] Deaktivierte Minifizierung aufgrund eines Absturzes auf älteren Androidversion
+  * [0add4d20] Kommentare zu einigen Strings hinzugefügt
+
+Space Cowboy (5):
+  * [7a715fa4] Neue Übersetzungen von Crowdin
