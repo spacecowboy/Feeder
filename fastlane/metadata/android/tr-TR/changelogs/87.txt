@@ -1,0 +1,14 @@
+# 1.10.7
+Jonas Kalderstam (22):
+  * [27cd9114] Çeviriler güncellendi
+  * [5fa9116f] Play ve yayın derlemeleri için küçültme etkinleştirildi
+
+Muha Aliss (2):
+  * [45ac6e09] Türkçe çeviri güncellendi
+  * [387db7cd] Türkçe çeviri gözden geçirildi ve güncellendi.
+
+mezysinc (4):
+  * [6dd67f76] Portekizce (Brezilya) açıklama
+  * [3de13944] Portekizce (Brezilya) tam açıklama
+  * [4044ee48] .gitkeep dosyasını sil
+  * [589ac044] Portekizce (Brezilya) dizgeler güncellendi
