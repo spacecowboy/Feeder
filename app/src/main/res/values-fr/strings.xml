@@ -11,7 +11,7 @@
     <string name="save">Enregistrer</string>
     <string name="empty_feed_top">Rien à lire ici. Souhaitez-vous…</string>
     <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Ouvrir</font> un autre flux ?]]></string>
-    <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Ajouter</font> d\'autres flux?]]></string>
+    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Ajouter&lt;/font&gt; d\'autres flux \?</string>
     <string name="search_feed_empty_hint">Saisir l\'adresse d\'un flux</string>
     <string name="mark_all_as_read">Tout marquer comme lu</string>
     <string name="edit_feed">Modifier le flux</string>

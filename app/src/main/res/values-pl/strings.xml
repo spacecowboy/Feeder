@@ -54,7 +54,7 @@
     <string name="synchronization">Synchronizacja</string>
     <string name="only_on_wifi">Tylko przez WiFi</string>
     <string name="show_thumbnails">Pokazuj miniaturki</string>
-    <string name="may_result_data_charges">Może spowodować opłaty za transmisję danych w sieci komórkowej</string>
+    <string name="may_result_data_charges">Może spowodować opłaty za transmisję danych w sieci komórkowej.</string>
     <string name="only_when_charging">Tylko podczas ładowania</string>
     <string name="image_loading">Wczytywanie obrazków</string>
     <string name="no_activity_for_link">Nie udało się znaleźć aktywności mogącej otworzyć link</string>
