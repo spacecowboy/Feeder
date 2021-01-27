@@ -10,7 +10,7 @@
     <string name="max_feed_items">Maksimalt antall elementer per informasjonskanal</string>
     <string name="open_item_by_default_with">Åpne elementer som forvalg med</string>
     <string name="show_fab">Vis flytende handlingsknapp</string>
-    <string name="no_such_feed">Fant ingen slik informasjonskanal. Prøv å bruke HTTPS\?</string>
+    <string name="no_such_feed">Fant ingen slik informasjonskanal. Prøv å bruke HTTPS.</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="preload_custom_tab">Forhåndsinnlast egedefinert fane</string>
     <string name="battery_optimization_disabled">Batterioptimisering avskrudd</string>
@@ -34,7 +34,7 @@
     <string name="notification_channel_name">Uleste informasjonskanaler</string>
     <string name="selected">Valgt</string>
     <string name="on_startup">Ved oppstart</string>
-    <string name="no_activity_for_link"></string>
+    <string name="no_activity_for_link"/>
     <string name="image_loading">Bildeinnlasting</string>
     <string name="only_when_charging">Kun under lading</string>
     <string name="show_thumbnails">Vis miniatyrbilder</string>
@@ -50,7 +50,7 @@
     <string name="sync_option_manually">Manuelt</string>
     <string name="all_feeds">Alle informasjonskanaler</string>
     <string name="title_activity_settings">Innstillinger</string>
-    <string name="nothing_to_display">Ingenting å vise.</string>
+    <string name="nothing_to_display">Ingenting å vise!</string>
     <string name="share">Del</string>
     <string name="indicator_for_mark_as_read">Indikator for leste</string>
     <string name="new_based_on_this">Ny basert på dette</string>
@@ -77,7 +77,7 @@
     <string name="search_feed_empty_hint">Skriv inn adressen til en informasjonskanal</string>
     <string name="empty_feed_add">&lt;font color=#607D8B&gt;Add&lt;/font&gt; flere informasjonskanaler\?</string>
     <string name="empty_feed_open">&lt;font color=#607D8B&gt;Open&lt;/font&gt; en annen informasjonskanal\?</string>
-    <string name="empty_feed_top">Ingenting å lese her. Ønsker du å …</string>
+    <string name="empty_feed_top">Ingenting å lese her. Ønsker du å…</string>
     <string name="save">Lagre</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">av %1$s, %2$s</string>
     <string name="title">Tittel</string>
