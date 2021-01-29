@@ -1,1 +1,1 @@
-Mahtava Ilmainen ja Avoimen Lähdekoodin RSS-syötteen lukija
+Mahtava vapaa ja avoimen lähdekoodin RSS-syötteen lukija
