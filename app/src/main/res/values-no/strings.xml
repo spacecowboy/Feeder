@@ -34,7 +34,7 @@
     <string name="notification_channel_name">Uleste informasjonskanaler</string>
     <string name="selected">Valgt</string>
     <string name="on_startup">Ved oppstart</string>
-    <string name="no_activity_for_link"/>
+    <string name="no_activity_for_link">Fant ikke noe program å åpne lenken med</string>
     <string name="image_loading">Bildeinnlasting</string>
     <string name="only_when_charging">Kun under lading</string>
     <string name="show_thumbnails">Vis miniatyrbilder</string>
@@ -89,4 +89,13 @@
     <string name="action_settings">Innstillinger</string>
     <string name="navigation_drawer_close">Lukk navigasjonsskuff</string>
     <string name="navigation_drawer_open">Åpne navigasjonsskuff</string>
+    <string name="notification_channel_description">Merknader vises kun for uleste elementer i oppsatte informasjonskanaler</string>
+    <string name="include_mobile_hotspots">Inkluder trådløsdelingspunkter</string>
+    <string name="updated_feeds">Oppdaterte informasjonskanaler</string>
+    <string name="toggle_tag_expansion">Veksle utfolding av etiketter</string>
+    <string name="discovered_feeds_list">Oppdaget informasjonskanalsliste</string>
+    <string name="reader_settings">Leser</string>
+    <string name="open_in_reader">Leser</string>
+    <string name="check_for_updates">Se etter oppdateringer</string>
+    <string name="may_result_data_charges">Mobildatakostnader kan påløpe.</string>
 </resources>
