@@ -1,0 +1,14 @@
+# 1.10.7
+Jonas Kalderstam (22):
+  * [27cd9114] Traduccions actualitzades
+  * [5fa9116f] Minificació habilitada per a les construccions de Play i llançament
+
+Muha Aliss (2):
+  * [45ac6e09] Traducció turca actualitzada
+  * [387db7cd] Traducció turca comprovada i actualitzada.
+
+mezysinc (4):
+  * [6dd67f76] descripció en ptbr
+  * [3de13944] descripció completa ptbr
+  * [4044ee48] .gitkeep suprimit
+  * [589ac044] cadenes ptbr actualitzades
