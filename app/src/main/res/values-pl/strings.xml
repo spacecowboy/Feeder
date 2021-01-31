@@ -84,7 +84,7 @@
     <string name="theme">Motyw</string>
     <string name="sort_newest_first">Od najnowszych</string>
     <string name="sort_oldest_first">Od najstarszych</string>
-    <string name="sort">Sortu według</string>
+    <string name="sort">Sortuj według</string>
     <string name="send_bug_report">Wyślij raport o błędach</string>
     <string name="no_email_client">Nie można było otworzyć klienta poczty elektronicznej</string>
     <string name="touch_to_play_video">Dotknij, aby odtworzyć wideo</string>
