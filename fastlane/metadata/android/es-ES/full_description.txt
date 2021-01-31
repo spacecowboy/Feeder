@@ -4,7 +4,7 @@
 
 <p>¡Prueba Feeder!</p>
 
-<p>Feeder is a fully free/libre feed reader. It supports all common feed formats, including JSONFeed. It doesn't track you. It doesn't require any setup. It doesn't even need you to create an account! Just setup your feeds, or import them from your old reader via OPML, then get on with syncing and reading.</p>
+<p>Feeder es un lector de noticias totalmente gratuito. Admite todos los formatos comunes, incluido JSONFeed. No te rastrea. No requiere ninguna configuración. ¡Ni siquiera necesita que crees una cuenta! Simplemente configura tus orígenes o impórtalos desde tu antiguo lector a través de OPML, luego continúa con la sincronización y la lectura.</p>
 
 <p><b>Características</b></p>
 
@@ -14,6 +14,6 @@
 <li>Sincronización en segundo plano</li>
 <li>Notificaciones</li>
 <li>Importar/Exportar en OPML</li>
-<li>Handy access to enclosure links</li>
+<li>Acceso práctico a los enlaces</li>
 <li>Diseño Material</li>
 </ul>
