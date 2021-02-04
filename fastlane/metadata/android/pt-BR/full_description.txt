@@ -6,7 +6,7 @@ Você está farto de ter que criar contas em todos os lugares?<br/></p>
 
 <p>O Feeder é um leitor de 'feeds' totalmente livre. Ele suporta todos os formatos de 'feeds' comuns, incluindo JSONFeed. Ele não rastreia você. Ele não requer nenhuma configuração. Ele não precisa nem mesmo que você crie uma conta! Basta configurar seus 'feeds', ou importá-los de seu antigo leitor via arquivo OPML, e prosseguir com a sincronização e a leitura.</p>
 
-<p><b>Funcionalidades</b><</p>
+<p><b>Funcionalidades</b></p>
 
 <ul>
 <li>Processa HTML e o exibe em um TextView nativo</li>

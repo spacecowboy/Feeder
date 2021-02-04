@@ -2,7 +2,7 @@
 <resources>
     <string name="no_tag">അടയാളങ്ങളൊന്നുമില്ല</string>
     <string name="show_unread_items">വായിക്കാത്ത ഇനങ്ങൾ കാണിക്കൂ</string>
-    <string name="empty_feed_top">ഇവിടെ വായിക്കാൻ ഒന്നുമില്ല. ഇത് ചെയ്യാൻ നിങ്ങൾ ആഗ്രഹിക്കുന്നോ..</string>
+    <string name="empty_feed_top">ഇവിടെ വായിക്കാൻ ഒന്നുമില്ല. ഇത് ചെയ്യാൻ നിങ്ങൾ ആഗ്രഹിക്കുന്നോ…</string>
     <string name="title_activity_edit_feed">ഫീഡിലേക്ക് സബ്സ്ക്രൈബ് ചെയ്യൂ</string>
     <string name="sort">ഇങ്ങനെ അടുക്കുക</string>
     <string name="theme_automatic">സ്വയം</string>
