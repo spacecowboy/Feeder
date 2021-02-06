@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_tag">അടയാളങ്ങളൊന്നുമില്ല</string>
+    <string name="show_unread_items">വായിക്കാത്ത ഇനങ്ങൾ കാണിക്കൂ</string>
+    <string name="empty_feed_top">ഇവിടെ വായിക്കാൻ ഒന്നുമില്ല. ഇത് ചെയ്യാൻ നിങ്ങൾ ആഗ്രഹിക്കുന്നോ…</string>
+    <string name="title_activity_edit_feed">ഫീഡിലേക്ക് സബ്സ്ക്രൈബ് ചെയ്യൂ</string>
+    <string name="sort">ഇങ്ങനെ അടുക്കുക</string>
+    <string name="theme_automatic">സ്വയം</string>
+    <string name="theme_system">സിസ്റ്റം പിന്തുടരൂ</string>
+    <string name="reader_settings">വായനക്കാരൻ</string>
+    <string name="sync_option_manually">തന്നത്താന്‍</string>
+    <string name="sync_option_every_hour">എല്ലാ മണിക്കൂറും</string>
+    <string name="sync_option_every_3_hours">എല്ലാ 3 മണിക്കൂറും</string>
+    <string name="sync_option_every_6_hours">എല്ലാ 6 മണിക്കൂറും</string>
+    <string name="sync_option_every_12_hours">എല്ലാ 12 മണിക്കൂറും</string>
+    <string name="sync_option_every_day">എല്ലാ ദിവസവും</string>
+    <string name="only_when_charging">ചാർജ് ചെയ്യുമ്പോൾ മാത്രം</string>
+    <string name="synchronization">സമന്വയം</string>
+    <string name="sync">സമന്വയിപ്പിക്കൂ</string>
+    <string name="mark_as_unread">വായിക്കാത്തതായി കാണിക്കൂ</string>
+    <string name="empty_feed_open">മറ്റൊരു ഫീഡ് &lt;font color=#607D8B&gt;തുറക്കണോ&lt;/font&gt;\?</string>
+    <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
+    <string name="add_feed_search_hint">ഫീഡിനുള്ള URL</string>
+    <string name="navigation_drawer_close">നാവിഗേഷൻ ഡ്രോയർ അടയ്‌ക്കൂ</string>
+    <string name="navigation_drawer_open">നാവിഗേഷൻ ഡ്രോയർ തുറക്കൂ</string>
+    <string name="open_feed">ഫീഡ് തുറക്കൂ</string>
+    <string name="selected">തിരഞ്ഞെടുത്തു</string>
+    <string name="show_thumbnails">ലഖുചിത്രങ്ങൾ കാണിക്കൂ</string>
+    <string name="only_on_wifi">WiFi-ൽ മാത്രം</string>
+    <string name="all_feeds">എല്ലാ ഫീഡുകളും</string>
+    <string name="title_activity_settings">ക്രമീകരണങ്ങൾ</string>
+    <string name="nothing_to_display">കാണിക്കാനൊന്നുമില്ല!</string>
+    <string name="share">പങ്കിടൂ</string>
+    <string name="open_in_browser">ബ്രൗസറിൽ തുറക്കൂ</string>
+    <string name="open_link_in_browser">ബ്രൗസറിൽ ലിങ്ക് തുറക്കൂ</string>
+    <string name="dont_notify_for_new_items">അറിയിപ്പുകൾ നിർത്തൂ</string>
+    <string name="new_items_available">പുതിയ ഇനങ്ങൾ ലഭ്യമാണ്</string>
+    <string name="show_all_items">എല്ലാ ഇനങ്ങളും കാണിക്കൂ</string>
+    <string name="delete_feed">ഫീഡ് ഇല്ലാതാക്കൂ</string>
+    <string name="edit_feed">ഫീഡ് തിരുത്തൂ</string>
+    <string name="mark_all_as_read">എല്ലാം വായിച്ചതായി കാണിക്കൂ</string>
+    <string name="mark_as_read">വായിച്ചതായി കാണിക്കൂ</string>
+    <string name="search_feed_empty_hint">ഒരു ഫീഡ് വിലാസം നൽകുക</string>
+    <string name="save">സംരക്ഷിക്കൂ</string>
+    <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
+    <string name="title">ശീർഷകം</string>
+    <string name="tag">അടയാളം</string>
+    <string name="url">URL</string>
+    <string name="add_feed">ഫീഡ് ചേർക്കൂ</string>
+    <string name="action_settings">ക്രമീകരണങ്ങൾ</string>
+</resources>

@@ -89,4 +89,9 @@
     <string name="battery_optimization">Оптимизация использования батареи</string>
     <string name="battery_optimization_disabled">Оптимизация отключена</string>
     <string name="battery_optimization_enabled">Оптимизация включена</string>
+    <string name="preload_custom_tab">Предварительная загрузка custom tab</string>
+    <string name="mark_items_above_as_read">Отметить элементы выше как прочитанные</string>
+    <string name="javascript">Javascript</string>
+    <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
+    <string name="url">URL-адрес</string>
 </resources>
