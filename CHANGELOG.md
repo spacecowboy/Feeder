@@ -1,3 +1,46 @@
+# 1.10.11
+Allan Nordhøy (2):
+  * [c64b4a57] Updated Norwegian Bokmål translation using Weblate
+  * [853b7f0a] Translated using Weblate (Norwegian Bokmål)
+
+El Pirujo (1):
+  * [18a10d55] Translated using Weblate (Spanish)
+
+George (1):
+  * [f317a3ee] Translated using Weblate (Greek)
+
+J. Lavoie (1):
+  * [53b67002] Translated using Weblate (Italian)
+
+Jakub Fabijan (1):
+  * [a084f837] Added Esperanto translation using Weblate
+
+Jonas Kalderstam (15):
+  * [9e9c46f5] Replaced Crowdin widget with Weblate widget
+  * [f5739850] Added contribution notes in README
+  * [bc00fba3] Updated Russian translation using Weblate
+  * [80eca008] Updated Norwegian Bokmål translation using Weblate
+  * [fb557d58] Updated Malayalam translation using Weblate
+
+Nikita Epifanov (1):
+  * [eb3bbeff] Translated using Weblate (Russian)
+
+Oğuz Ersen (1):
+  * [eafe6fb8] Translated using Weblate (Turkish)
+
+Riku Viitanen (2):
+  * [78112ea3] Translated using Weblate (Finnish)
+  * [6ccbdaa3] Translated using Weblate (Finnish)
+
+WaldiS (1):
+  * [d3a99c11] Translated using Weblate (Polish)
+
+vachan-maker (1):
+  * [0abb9096] Updated Malayalam translation using Weblate
+
+Ícar N. S (1):
+  * [65b7bc99] Translated using Weblate (Catalan)
+
 # 1.10.10
 Space Cowboy (3):
   * [b316df06] New translations from Crowdin
