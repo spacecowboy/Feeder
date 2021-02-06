@@ -36,6 +36,16 @@ Build play bundle
 fastlane android deploy
 ```
 Deploy a new version to the Google Play
+### android validate_deploy
+```
+fastlane android validate_deploy
+```
+Validate deployment of a new version to the Google Play
+### android build_and_deploy
+```
+fastlane android build_and_deploy
+```
+Build and deploy a new version to the Google Play
 
 ----
 

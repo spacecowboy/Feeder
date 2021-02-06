@@ -27,9 +27,10 @@ deploy_playstore:
   stage: deploy
   script:
     - source devenv && ./deploy_playstore.sh
-  only:
-    - tags
-    - /^\d+\.\d+\.\d+$/
+# Non-tags will only perform validation
+#  only:
+#    - tags
+#    - /^\d+\.\d+\.\d+$/
   environment:
     name: Play
     url: https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play

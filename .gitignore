@@ -10,3 +10,7 @@ local.properties
 captures
 creds.json
 report.xml
+app/creds.b64
+keystore.b64
+devenv.local
+keystore

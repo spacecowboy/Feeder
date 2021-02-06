@@ -52,10 +52,26 @@ platform :android do
     )
   end
 
+  desc "Validate deployment of a new version to the Google Play"
+  lane :validate_deploy do
+    # mapping: "app/build/outputs/mapping/play/mapping.txt",
+    upload_to_play_store(
+      aab: "app/build/outputs/bundle/play/app.aab",
+      validate_only: true
+    )
+  end
+
   desc "Build and deploy a new version to the Google Play"
   lane :build_and_deploy do
     bump_version_code
     build_play_bundle
     deploy
+  end
+
+  desc "Build and valdidate deployment of a new version to the Google Play"
+  lane :build_and_validate do
+    bump_version_code
+    build_play_bundle
+    validate_deploy
   end
 end
