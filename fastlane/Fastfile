@@ -32,11 +32,13 @@ platform :android do
     last_version_code = get_latest_production_version
 
     s = File.read(path)
-    s[re, 1] = (last_version_code + 1).to_s
+    if (s[re, 1] <= last_version_code) then
+      s[re, 1] = (last_version_code + 1).to_s
 
-    f = File.new(path, 'w')
-    f.write(s)
-    f.close
+      f = File.new(path, 'w')
+      f.write(s)
+      f.close
+    end
   end
 
   desc "Build play bundle"
