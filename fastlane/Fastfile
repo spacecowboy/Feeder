@@ -32,7 +32,7 @@ platform :android do
     last_version_code = get_latest_production_version
 
     s = File.read(path)
-    if (s[re, 1] <= last_version_code) then
+    if (s[re, 1].to_i <= last_version_code) then
       s[re, 1] = (last_version_code + 1).to_s
 
       f = File.new(path, 'w')
