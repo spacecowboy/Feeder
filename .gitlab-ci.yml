@@ -28,8 +28,9 @@ deploy_playstore:
   script:
     - source devenv && ./deploy_playstore.sh
 # Non-tags will only perform validation
-#  only:
-#    - tags
+  only:
+    - tags
+    - master
 #    - /^\d+\.\d+\.\d+$/
   environment:
     name: Play
