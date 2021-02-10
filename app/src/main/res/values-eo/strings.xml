@@ -1,2 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="open_in_reader">Ligilo</string>
+    <string name="notification_channel_name">Nelegitaj fluoj</string>
+    <string name="selected">Elektitaj</string>
+    <string name="updated_feeds">Laste ĝisdatigitaj</string>
+    <string name="on_startup">Dum startigado</string>
+    <string name="image_loading">Ŝarĝado de bildo</string>
+    <string name="only_when_charging">Nur dum baterioŝargado</string>
+    <string name="show_thumbnails">Montri bildetojn</string>
+    <string name="only_on_wifi">Nur per vifio</string>
+    <string name="synchronization">Sinkronigo</string>
+    <string name="sync_option_every_day">Ĉiu tago</string>
+    <string name="sync_option_every_12_hours">Ĉiuj 12 horoj</string>
+    <string name="sync_option_every_6_hours">Ĉiuj 6 horoj</string>
+    <string name="sync_option_every_3_hours">Ĉiu 3 horoj</string>
+    <string name="sync_option_every_hour">Ĉiu horo</string>
+    <string name="sync_option_every_30min">Ĉiuj 30 minutoj</string>
+    <string name="sync_option_every_15min">Ĉiuj 15 minutojn</string>
+    <string name="sync_option_manually">Permane</string>
+    <string name="all_feeds">Ĉiuj fluoj</string>
+    <string name="title_activity_settings">Agordoj</string>
+    <string name="nothing_to_display">Neniu por montri!</string>
+    <string name="no_such_feed">Ne troveblas ĉi tiun fluon. Klopodu uzi HTTPS.</string>
+    <string name="share">Konigi</string>
+    <string name="indicator_for_mark_as_read">Indikilo de legita statuso</string>
+    <string name="new_based_on_this">Nova bazita sur ĉi tiu</string>
+    <string name="view_debug_log">Montri sencimigoprotokolon</string>
+    <string name="import_feeds_from_opml">Enporti fluojn el OPML</string>
+    <string name="export_feeds_to_opml">Elporti fluojn al OPML</string>
+    <string name="sync">Sinkronigi</string>
+    <string name="open_enclosed_media">Malfermi enestajn aŭdvidaĵojn</string>
+    <string name="open_in_browser">Malfermi en TTT-legilo</string>
+    <string name="open_link_in_browser">Malfermi ligilon en TTT-legilo</string>
+    <string name="toggle_read_status">Baskuligi legitan statuson</string>
+    <string name="dont_notify_for_new_items">Ĉesi sciigojn</string>
+    <string name="notify_for_new_items">Sciigi pri novaj elementoj</string>
+    <string name="view">Vido</string>
+    <string name="new_items_available">Novaj elementoj disponeblaj</string>
+    <string name="show_unread_items">Montri nelegitajn elementojn</string>
+    <string name="show_all_items">Montri ĉiujn elementojn</string>
+    <string name="delete_feed">Forigi fluon</string>
+    <string name="edit_feed">Redakti fluon</string>
+    <string name="mark_all_as_read">Marki ĉiujn legita</string>
+    <string name="mark_as_unread">Marki nelegita</string>
+    <string name="mark_as_read">Marki legita</string>
+    <string name="search_feed_empty_hint">Tajpu adreso de fluo</string>
+    <string name="empty_feed_top">Neniu por legi ĉi tie. Ĉu vi volus…</string>
+    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Aldoni&lt;/font&gt; plu fluojn\?</string>
+    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Malfermi&lt;/font&gt; alian fluon\?</string>
+    <string name="save">Konservi</string>
+    <string name="title">Titolo</string>
+    <string name="add_feed_search_hint">URL de fluo</string>
+    <string name="add_feed">Aldoni fluon</string>
+    <string name="title_activity_edit_feed">Aboni fluon</string>
+    <string name="action_settings">Agordoj</string>
+</resources>
