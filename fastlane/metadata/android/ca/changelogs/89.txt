@@ -1,7 +1,0 @@
-# 1.10.9
-Jonas Kalderstam (3):
-  * [5ac2bc2c] Miniaturització desactivada a causa d'una fallada a l'Android antic
-  * [0add4d20] Comentaris afegits a algunes cadenes
-
-Space Cowboy (5):
-  * [7a715fa4] Actualitzades traduccions des de Crowdin

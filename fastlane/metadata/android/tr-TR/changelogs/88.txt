@@ -1,3 +1,0 @@
-# 1.10.8
-Jonas Kalderstam (2):
-  * [472dc314] Web görünümünü açtıktan sonra okuyucunun boş görünmesi düzeltildi

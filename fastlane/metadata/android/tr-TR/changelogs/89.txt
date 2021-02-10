@@ -1,7 +1,0 @@
-# 1.10.9
-Jonas Kalderstam (3):
-  * [5ac2bc2c] Eski Android'deki çökme nedeniyle küçültme devre dışı bırakıldı
-  * [0add4d20] Bazı dizgelere yorum eklendi
-
-Space Cowboy (5):
-  * [7a715fa4] Crowdin'den çeviriler güncellendi

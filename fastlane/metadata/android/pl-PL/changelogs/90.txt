@@ -1,3 +1,0 @@
-# 1.10.10
-Space Cowboy (3):
-  * [b316df06] Nowe tłumaczenia od Crowdin

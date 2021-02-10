@@ -1,3 +1,0 @@
-# 1.10.8
-Jonas Kalderstam (2):
-  * [472dc314] Arreglat el lector tornant-se buit un cop oberta una visualització web

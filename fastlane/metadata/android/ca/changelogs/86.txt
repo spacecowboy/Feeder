@@ -1,5 +1,0 @@
-# 1.10.6
-Jonas Kalderstam (5):
-  * [06f7fb81] Barra de desplaçament afegida al lector
-  * [05078389] Arreglat el contingut HTML del canal atòmic no sent escapat dues vegades
-  * [e8c5470d] Arreglat casos addicionals d'escapada HTML
