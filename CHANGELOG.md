@@ -1,3 +1,16 @@
+# 1.10.12
+Belmar Begić (1):
+  * [07443bf7] Updated Bosnian translation using Weblate
+
+Jakub Fabijan (1):
+  * [7b225d25] Updated Esperanto translation using Weblate
+
+Jonas Kalderstam (9):
+  * [365bd45c] Removed empty translations
+
+Reza Almanda (1):
+  * [b088b923] Updated Indonesian translation using Weblate
+
 # 1.10.11
 Allan Nordhøy (2):
   * [c64b4a57] Updated Norwegian Bokmål translation using Weblate
