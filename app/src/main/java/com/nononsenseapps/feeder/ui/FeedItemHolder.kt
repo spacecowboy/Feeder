@@ -13,15 +13,32 @@ import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.SettingsViewModel
-import com.nononsenseapps.feeder.util.*
-import kotlinx.coroutines.*
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_CUSTOM_TAB
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
+import com.nononsenseapps.feeder.util.Prefs
+import com.nononsenseapps.feeder.util.bundle
+import com.nononsenseapps.feeder.util.openLinkInBrowser
+import com.nononsenseapps.feeder.util.openLinkInCustomTab
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
@@ -33,12 +50,12 @@ import org.kodein.di.generic.instance
 @FlowPreview
 @ExperimentalCoroutinesApi
 class FeedItemHolder(
-        val view: View,
-        private val feedItemsViewModel: FeedItemsViewModel,
-        private val settingsViewModel: SettingsViewModel,
-        private val actionCallback: ActionCallback
+    val view: View,
+    private val feedItemsViewModel: FeedItemsViewModel,
+    private val settingsViewModel: SettingsViewModel,
+    private val actionCallback: ActionCallback
 ) : ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener, KodeinAware,
-        View.OnCreateContextMenuListener {
+    View.OnCreateContextMenuListener {
     private val TAG = "FeedItemHolder"
     val titleTextView: TextView = view.findViewById(R.id.story_snippet)
     val dateTextView: TextView = view.findViewById(R.id.story_date)
@@ -53,6 +70,8 @@ class FeedItemHolder(
 
     override val kodein: Kodein by closestKodein(view.context)
     val prefs: Prefs by instance()
+    private val imageLoader: ImageLoader by instance()
+    private var imageFetchJob: Job? = null
 
     init {
         view.setOnClickListener(this)
@@ -106,6 +125,8 @@ class FeedItemHolder(
     }
 
     fun resetView() {
+        imageFetchJob?.cancel("View reset")
+        imageFetchJob = null
         checkBg.visibility = View.INVISIBLE
         checkLeft.visibility = View.INVISIBLE
         checkRight.visibility = View.INVISIBLE
@@ -126,17 +147,17 @@ class FeedItemHolder(
             val textSpan = SpannableString(temps)
 
             textSpan.setSpan(TextAppearanceSpan(view.context, R.style.TextAppearance_ListItem_Body),
-                    rssItem.plainTitle.length, temps.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                rssItem.plainTitle.length, temps.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
             if (rssItem.unread && !forceRead) {
                 textSpan.setSpan(TextAppearanceSpan(view.context, R.style.TextAppearance_ListItem_Title),
-                        0, rssItem.plainTitle.length,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    0, rssItem.plainTitle.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             } else {
                 textSpan.setSpan(TextAppearanceSpan(view.context, R.style.TextAppearance_ListItem_Title_Read),
-                        0, rssItem.plainTitle.length,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    0, rssItem.plainTitle.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
             titleTextView.text = textSpan
         }
@@ -152,10 +173,8 @@ class FeedItemHolder(
      * @param view
      */
     override fun onClick(view: View) {
-        val context = view.context
-        if (context == null) {
-            return
-        }
+        val context = view.context ?: return
+
         try {
             val openItemWith = when (val defaultOpenItemWith = prefs.openItemsWith) {
                 PREF_VAL_OPEN_WITH_READER -> {
@@ -192,12 +211,12 @@ class FeedItemHolder(
                         else -> {
                             rssItem?.let {
                                 view.findNavController().navigate(
-                                        R.id.action_feedFragment_to_readerWebViewFragment,
-                                        bundle {
-                                            putString(ARG_URL, it.link)
-                                            putString(ARG_ENCLOSURE, it.enclosureLink)
-                                            putLong(ARG_ID, it.id)
-                                        }
+                                    R.id.action_feedFragment_to_readerWebViewFragment,
+                                    bundle {
+                                        putString(ARG_URL, it.link)
+                                        putString(ARG_ENCLOSURE, it.enclosureLink)
+                                        putLong(ARG_ID, it.id)
+                                    }
                                 )
                             }
                         }
@@ -227,24 +246,28 @@ class FeedItemHolder(
         val context = view.context
         if (context != null) {
             rssItem?.let { rssItem ->
-                try {
-                    GlideUtils.glide(
-                            context, rssItem.imageUrl,
-                            prefs.shouldLoadImages()
-                    )
-                            .centerCrop()
-                            .also {
-                                it.error(
-                                        when (prefs.isNightMode) {
-                                            true -> R.drawable.placeholder_image_list_night_64dp
-                                            false -> R.drawable.placeholder_image_list_day_64dp
-                                        }
-                                )
-                            }
-                            .into(imageView)
-                } catch (e: IllegalArgumentException) {
-                    // Could still happen if we have a race-condition?
-                    Log.d(TAG, e.localizedMessage)
+                imageFetchJob?.cancel("New image about to be loaded")
+                imageFetchJob = feedItemsViewModel.viewModelScope.launch {
+                    try {
+                        val placeHolderImage = when (prefs.isNightMode) {
+                            true -> R.drawable.placeholder_image_list_night_64dp
+                            false -> R.drawable.placeholder_image_list_day_64dp
+                        }
+
+                        imageLoader.enqueue(
+                            ImageRequest.Builder(context)
+                                .placeholder(placeHolderImage)
+                                .fallback(placeHolderImage)
+                                .error(placeHolderImage)
+                                .crossfade(true)
+                                .scale(Scale.FILL)
+                                .data(rssItem.imageUrl ?: "")
+                                .target(imageView)
+                                .build()
+                        )
+                    } catch (t: Throwable) {
+                        Log.d(TAG, "Error when trying to fetch image", t)
+                    }
                 }
             }
         }

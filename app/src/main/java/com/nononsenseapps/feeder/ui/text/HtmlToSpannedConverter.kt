@@ -13,12 +13,25 @@ import android.text.Layout
 import android.text.Spannable
 import android.text.Spanned
 import android.text.TextUtils
-import android.text.style.*
+import android.text.style.AlignmentSpan
+import android.text.style.BackgroundColorSpan
+import android.text.style.BulletSpan
+import android.text.style.ImageSpan
+import android.text.style.LeadingMarginSpan
+import android.text.style.ParagraphStyle
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
+import android.text.style.SubscriptSpan
+import android.text.style.SuperscriptSpan
+import android.text.style.TextAppearanceSpan
+import android.text.style.TypefaceSpan
+import android.text.style.UnderlineSpan
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.getColorCompat
+import com.nononsenseapps.feeder.util.AsyncImageLoader
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import kotlinx.coroutines.FlowPreview
@@ -26,7 +39,12 @@ import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.instance
-import org.xml.sax.*
+import org.xml.sax.Attributes
+import org.xml.sax.ContentHandler
+import org.xml.sax.InputSource
+import org.xml.sax.Locator
+import org.xml.sax.SAXException
+import org.xml.sax.XMLReader
 import java.io.IOException
 import java.io.Reader
 import java.net.URL
@@ -72,6 +90,8 @@ open class HtmlToSpannedConverter(private var source: Reader,
     private val context: Application by instance()
 
     private val prefs: Prefs by instance()
+
+    private val asyncImageLoader: AsyncImageLoader by instance()
 
     fun convert(): Spanned {
 
@@ -163,8 +183,8 @@ open class HtmlToSpannedConverter(private var source: Reader,
             tag.equals("sup", ignoreCase = true) -> start(spannableStringBuilder, Super())
             tag.equals("sub", ignoreCase = true) -> start(spannableStringBuilder, Sub())
             tag.length == 2 &&
-                    Character.toLowerCase(tag[0]) == 'h' &&
-                    tag[1] >= '1' && tag[1] <= '6' -> {
+                Character.toLowerCase(tag[0]) == 'h' &&
+                tag[1] >= '1' && tag[1] <= '6' -> {
                 handleP(spannableStringBuilder)
                 start(spannableStringBuilder, Header(tag[1] - '1'))
             }
@@ -218,17 +238,22 @@ open class HtmlToSpannedConverter(private var source: Reader,
     }
 
     protected open fun getImgDrawable(src: String): Drawable? =
-            if (src.isNotBlank()) {
-                AppCompatResources.getDrawable(context,
-                        when (prefs.isNightMode) {
-                            true -> R.drawable.placeholder_image_article_night
-                            false -> R.drawable.placeholder_image_article_day
-                        })?.also {
-                    it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-                }
-            } else {
-                null
+        if (src.isNotBlank()) {
+            if (prefs.shouldLoadImages()) {
+                asyncImageLoader.downloadImageInBackground(relativeLinkIntoAbsolute(siteUrl, src))
             }
+
+            AppCompatResources.getDrawable(context,
+                when (prefs.isNightMode) {
+                    true -> R.drawable.placeholder_image_article_night
+                    false -> R.drawable.placeholder_image_article_day
+                })?.also {
+                val (x, y) = it.fitCenterScale(maxSize.x, maxSize.y)
+                it.setBounds(0, 0, x, y)
+            }
+        } else {
+            null
+        }
 
     protected open fun startImg(text: SensibleSpannableStringBuilder,
                                 attributes: Attributes) {
@@ -279,7 +304,7 @@ open class HtmlToSpannedConverter(private var source: Reader,
             text.append("\uFFFC")
 
             text.setSpan(ImageSpan(d, imgLink), len, text.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
             text.append("\n")
 
@@ -289,8 +314,8 @@ open class HtmlToSpannedConverter(private var source: Reader,
                 val from = text.length
                 text.append(alt)
                 text.setSpan(StyleSpan(Typeface.ITALIC), from,
-                        text.length,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    text.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 text.append("\n")
             }
         }
@@ -353,12 +378,19 @@ open class HtmlToSpannedConverter(private var source: Reader,
         start(text, Code())
     }
 
-    protected open fun getYoutubeThumb(video: Video): Drawable =
-            // Full size youtube icon
-            AppCompatResources.getDrawable(context, R.drawable.youtube_icon)!!.also {
-                val scaled = scaleImage(it.intrinsicWidth, it.intrinsicHeight)
-                it.setBounds(0, 0, scaled.x, scaled.y)
+    protected open fun getYoutubeThumb(video: Video): Drawable {
+        if (prefs.shouldLoadImages()) {
+            val imgLink = relativeLinkIntoAbsolute(siteUrl, video.imageUrl)
+            asyncImageLoader.downloadImageInBackground(imgLink) {
+                error(R.drawable.youtube_icon)
             }
+        }
+        // Full size youtube icon
+        return AppCompatResources.getDrawable(context, R.drawable.youtube_icon)!!.also {
+            val scaled = scaleImage(it.intrinsicWidth, it.intrinsicHeight)
+            it.setBounds(0, 0, scaled.x, scaled.y)
+        }
+    }
 
     /**
      * Keeps aspect ratio.
@@ -390,7 +422,7 @@ open class HtmlToSpannedConverter(private var source: Reader,
                 val span = object : ClickableImageSpan(it) {
                     override fun onClick() {
                         val i = Intent(Intent.ACTION_VIEW,
-                                Uri.parse(video.link))
+                            Uri.parse(video.link))
                         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         try {
                             context.startActivity(i)
@@ -402,13 +434,13 @@ open class HtmlToSpannedConverter(private var source: Reader,
                 val len = text.length
                 text.append("\uFFFC")
                 text.setSpan(span, len, text.length,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 // Add newline also
                 text.append("\n")
                 val from = text.length
                 text.append(context.getString(R.string.touch_to_play_video))
                 text.setSpan(StyleSpan(Typeface.ITALIC), from,
-                        text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 text.append("\n\n")
             }
         } catch (e: Throwable) {
@@ -423,7 +455,7 @@ open class HtmlToSpannedConverter(private var source: Reader,
 
     @Suppress("UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
     inline fun <reified T> getLast(text: SensibleSpannableStringBuilder, kind: Class<T>): T? =
-            text.getAllSpansWithType<T>().lastOrNull()
+        text.getAllSpansWithType<T>().lastOrNull()
 
     inline fun <reified T> end(text: SensibleSpannableStringBuilder, kind: Class<T>,
                                repl: Any) {
@@ -452,10 +484,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
         if (where != len) {
             // Set quote span
             text.setSpan(MyQuoteSpan(mAccentColor, mQuoteGapWidth, mQuoteStripeWidth), where, len,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             // Be slightly smaller
             text.setSpan(RelativeSizeSpan(0.8f), where, len,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             // And have background color
             //            text.setSpan(new BackgroundColorSpan(Color.DKGRAY), where, len,
             //                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -473,35 +505,35 @@ open class HtmlToSpannedConverter(private var source: Reader,
             tag.equals("p", ignoreCase = true) -> handleP(spannableStringBuilder)
             tag.equals("div", ignoreCase = true) -> handleP(spannableStringBuilder)
             tag.equals("strong", ignoreCase = true) -> end(spannableStringBuilder, Bold::class.java,
-                    StyleSpan(Typeface.BOLD))
+                StyleSpan(Typeface.BOLD))
             tag.equals("b", ignoreCase = true) -> end(spannableStringBuilder, Bold::class.java,
-                    StyleSpan(Typeface.BOLD))
+                StyleSpan(Typeface.BOLD))
             tag.equals("em", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
-                    StyleSpan(Typeface.ITALIC))
+                StyleSpan(Typeface.ITALIC))
             tag.equals("cite", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
-                    StyleSpan(Typeface.ITALIC))
+                StyleSpan(Typeface.ITALIC))
             tag.equals("dfn", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
-                    StyleSpan(Typeface.ITALIC))
+                StyleSpan(Typeface.ITALIC))
             tag.equals("i", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
-                    StyleSpan(Typeface.ITALIC))
+                StyleSpan(Typeface.ITALIC))
             tag.equals("big", ignoreCase = true) -> end(spannableStringBuilder, Big::class.java,
-                    RelativeSizeSpan(1.25f))
+                RelativeSizeSpan(1.25f))
             tag.equals("small", ignoreCase = true) -> end(spannableStringBuilder, Small::class.java,
-                    RelativeSizeSpan(0.8f))
+                RelativeSizeSpan(0.8f))
             tag.equals("font", ignoreCase = true) -> endFont(spannableStringBuilder)
             tag.equals("blockquote", ignoreCase = true) -> {
                 endQuote(spannableStringBuilder)
                 handleP(spannableStringBuilder)
             }
             tag.equals("tt", ignoreCase = true) -> end(spannableStringBuilder, Monospace::class.java,
-                    TypefaceSpan("monospace"))
+                TypefaceSpan("monospace"))
             tag.equals("a", ignoreCase = true) -> endA(spannableStringBuilder)
             tag.equals("u", ignoreCase = true) -> end(spannableStringBuilder, Underline::class.java, UnderlineSpan())
             tag.equals("sup", ignoreCase = true) -> end(spannableStringBuilder, Super::class.java, SuperscriptSpan())
             tag.equals("sub", ignoreCase = true) -> end(spannableStringBuilder, Sub::class.java, SubscriptSpan())
             tag.length == 2 &&
-                    Character.toLowerCase(tag[0]) == 'h' &&
-                    tag[1] >= '1' && tag[1] <= '6' -> {
+                Character.toLowerCase(tag[0]) == 'h' &&
+                tag[1] >= '1' && tag[1] <= '6' -> {
                 handleP(spannableStringBuilder)
                 endHeader(spannableStringBuilder)
             }
@@ -555,14 +587,14 @@ open class HtmlToSpannedConverter(private var source: Reader,
                         @Suppress("DEPRECATION")
                         val colors = res.getColorStateList(colorRes)
                         text.setSpan(TextAppearanceSpan(null, 0, 0, colors, null), where, len,
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                     }
                 }
             }
 
             f?.mFace?.let {
                 text.setSpan(TypefaceSpan(it), where, len,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
     }
@@ -579,7 +611,7 @@ open class HtmlToSpannedConverter(private var source: Reader,
 
             h?.mHref?.let { link ->
                 text.setSpan(URLSpanWithListener(link, urlClickListener), where, len,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
     }
@@ -602,10 +634,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
 
             h?.mLevel?.let {
                 text.setSpan(RelativeSizeSpan(HEADER_SIZES[it]), where,
-                        len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
             text.setSpan(StyleSpan(Typeface.BOLD), where, len,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }
 
@@ -675,13 +707,13 @@ open class HtmlToSpannedConverter(private var source: Reader,
         if (where != len) {
             // Want it to be monospace
             text.setSpan(TypefaceSpan("monospace"), where, len,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             // TODO
             // Make sure text does not wrap.
             // No easy solution exists for this
             text.setSpan(AlignmentSpan.Standard(Layout.Alignment
-                    .ALIGN_NORMAL), where, len,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                .ALIGN_NORMAL), where, len,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
         respectFormatting--
@@ -701,13 +733,13 @@ open class HtmlToSpannedConverter(private var source: Reader,
         if (where != len) {
             // Want it to be monospace
             text.setSpan(TypefaceSpan("monospace"), where, len,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             // Be slightly smaller
             text.setSpan(RelativeSizeSpan(0.8f), where, len,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             // And have background color
             text.setSpan(BackgroundColorSpan(codeTextBgColor), where, len,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }
 
@@ -732,29 +764,29 @@ open class HtmlToSpannedConverter(private var source: Reader,
          */
 
         (0 until length)
-                .asSequence()
-                .map { ch[it + start] }
-                .forEach {
-                    if (respectFormatting < 1 && it.isWhitespace()) {
-                        val prev: Char = if (sb.isEmpty()) {
-                            val len = spannableStringBuilder.length
+            .asSequence()
+            .map { ch[it + start] }
+            .forEach {
+                if (respectFormatting < 1 && it.isWhitespace()) {
+                    val prev: Char = if (sb.isEmpty()) {
+                        val len = spannableStringBuilder.length
 
-                            if (len == 0) {
-                                '\n'
-                            } else {
-                                spannableStringBuilder[len - 1]
-                            }
+                        if (len == 0) {
+                            '\n'
                         } else {
-                            sb.last()
-                        }
-
-                        if (!prev.isWhitespace()) {
-                            sb.append(' ')
+                            spannableStringBuilder[len - 1]
                         }
                     } else {
-                        sb.append(it)
+                        sb.last()
                     }
+
+                    if (!prev.isWhitespace()) {
+                        sb.append(' ')
+                    }
+                } else {
+                    sb.append(it)
                 }
+            }
 
         spannableStringBuilder.append(sb)
     }
