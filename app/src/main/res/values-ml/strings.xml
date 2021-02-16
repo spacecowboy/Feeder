@@ -48,4 +48,10 @@
     <string name="url">URL</string>
     <string name="add_feed">ഫീഡ് ചേർക്കൂ</string>
     <string name="action_settings">ക്രമീകരണങ്ങൾ</string>
+    <string name="touch_to_play_video">വീഡിയോ പ്ലേ ചെയ്യാൻ തൊടുക</string>
+    <string name="open_links_with">ഇത് ഉപയോഗിച്ച് ലിങ്കുകൾ തുറക്കുക</string>
+    <string name="check_for_updates">അപ്‌ഡേറ്റുകൾക്കായി പരിശോധിക്കുക</string>
+    <string name="sync_option_every_30min">എല്ലാ 30 മിനിറ്റും</string>
+    <string name="sync_option_every_15min">എല്ലാ 15 മിനിറ്റും</string>
+    <string name="no_such_feed">അത്തരം ഫീഡുകളൊന്നും കണ്ടെത്താൻ കഴിഞ്ഞില്ല. ഒരുപക്ഷേ https ഉപയോഗിച്ചു നോക്കൂ.</string>
 </resources>

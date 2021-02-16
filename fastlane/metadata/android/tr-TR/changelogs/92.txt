@@ -1,0 +1,12 @@
+# 1.10.12
+Belmar Begić (1):
+  * [07443bf7] Weblate kullanılarak Boşnakça çevirisi güncellendi
+
+Jakub Fabijan (1):
+  * [7b225d25] Weblate kullanılarak Esperanto çevirisi güncellendi
+
+Jonas Kalderstam (9):
+  * [365bd45c] Boş çeviriler kaldırıldı
+
+Reza Almanda (1):
+  * [b088b923] Weblate kullanılarak Endonezce çevirisi güncellendi
