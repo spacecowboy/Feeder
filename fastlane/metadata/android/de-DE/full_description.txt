@@ -1,4 +1,4 @@
-<p>Haben Sie genug von aufgeblähten, nicht freien Eingabelesern, die Ihre persönlichen Daten stehlen?<br />
+<p>Haben Sie genug von aufgeblähten, nicht freien RSS-Feedreader, die Ihre persönlichen Daten stehlen?<br />
 Haben Sie genug von umständlichen Synchronisierungskonfigurationen, die stundenlange Serverkonfigurationen erfordern?<br />
 Sind Sie es leid, überall Konten anlegen zu müssen?<br /></p>
 
@@ -9,7 +9,7 @@ Sind Sie es leid, überall Konten anlegen zu müssen?<br /></p>
 <p><b>Funktionen</b></p>
 
 <ul>
-<li>Parst HTML und zeigt es in einer nativen Textansicht</li>
+<li>Analysiert HTML und zeigt es in einer nativen Textansicht</li>
 <li>Offline lesen</li>
 <li>Hintergrundsynchronisierung</li>
 <li>Benachrichtigungen</li>
