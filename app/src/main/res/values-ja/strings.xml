@@ -71,4 +71,24 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="url">URL</string>
     <string name="open_links_with">リンクを開く</string>
+    <string name="preload_custom_tab">カスタムタブのプリロード</string>
+    <string name="battery_optimization_enabled">電池の最適化が有効</string>
+    <string name="battery_optimization_disabled">電池の最適化が無効</string>
+    <string name="battery_optimization">電池の最適化</string>
+    <string name="mark_items_below_as_read">以下の項目を既読としてマーク</string>
+    <string name="mark_items_above_as_read">以上の項目を既読としてマーク</string>
+    <string name="open_feed">フィードを開く</string>
+    <string name="javascript">Javascript</string>
+    <string name="touch_to_play_video">タッチしてビデオを再生</string>
+    <string name="no_email_client">メールクライアントを開けませんでした</string>
+    <string name="send_bug_report">バグレポートの送信</string>
+    <string name="theme_automatic">自動</string>
+    <string name="theme_system">システムに従う</string>
+    <string name="could_not_load_url">URLを読み込めませんでした</string>
+    <string name="max_feed_items">フィードごとの最大アイテム数</string>
+    <string name="notification_channel_description">通知は、構成されたフィードの未読アイテムに対してのみ表示されます</string>
+    <string name="notification_channel_name">未読フィード</string>
+    <string name="selected">選択済み</string>
+    <string name="updated_feeds">更新されたフィード</string>
+    <string name="may_result_data_charges">モバイルデータ通信の料金がかかる場合があります。</string>
 </resources>
