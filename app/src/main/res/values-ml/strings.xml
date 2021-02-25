@@ -54,4 +54,19 @@
     <string name="sync_option_every_30min">എല്ലാ 30 മിനിറ്റും</string>
     <string name="sync_option_every_15min">എല്ലാ 15 മിനിറ്റും</string>
     <string name="no_such_feed">അത്തരം ഫീഡുകളൊന്നും കണ്ടെത്താൻ കഴിഞ്ഞില്ല. ഒരുപക്ഷേ https ഉപയോഗിച്ചു നോക്കൂ.</string>
+    <string name="show_fab">ഫ്ലോട്ടിംഗ് ആക്ഷൻ ബട്ടൺ കാണിക്കുക</string>
+    <string name="empty_feed_add">കൂടുതൽ ഫീഡുകൾ &lt;font color=#607D8B&gt; ചേർക്കണോ&lt;/font&gt;\?</string>
+    <string name="updated_feeds">പുതുക്കിയ ഫീഡുകൾ</string>
+    <string name="image_loading">ചിത്രം ലഭ്യമാക്കുന്നൂ</string>
+    <string name="sort_newest_first">ഏറ്റവും പുതിയത് ആദ്യം</string>
+    <string name="sort_oldest_first">ഏറ്റവും പഴയത് ആദ്യം</string>
+    <string name="mark_items_above_as_read">മുകളിലുള്ള ഇനങ്ങൾ വായിച്ചതായി കാണിക്കൂ</string>
+    <string name="mark_items_below_as_read">ചുവടെയുള്ള ഇനങ്ങൾ വായിച്ചതായി കാണിക്കൂ</string>
+    <string name="theme_night">രാത്രി</string>
+    <string name="send_bug_report">ബഗ് റിപ്പോർട്ട് അയയ്ക്കൂ</string>
+    <string name="theme">രൂപഭംഗി</string>
+    <string name="discovered_feeds_list">കണ്ടെത്തിയ ഫീഡുകളുടെ പട്ടിക</string>
+    <string name="preload_custom_tab">ഇഷ്‌ടാനുസൃത ടാബ് പ്രീലോഡുചെയ്യുക</string>
+    <string name="open_in_default_browser">സ്ഥിര ബ്രൌസർ</string>
+    <string name="notification_channel_name">വായിക്കാത്ത ഫീഡുകൾ</string>
 </resources>
