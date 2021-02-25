@@ -2,7 +2,7 @@
 
 buildscript {
   ext {
-    kotlin_version = '1.3.50'
+    kotlin_version = '1.3.72'
     gradle_build_version = "3.4.0"
     build_tools_version = "28.0.3"
 
@@ -29,7 +29,7 @@ buildscript {
     test_rules_version = "1.1.0"
     paging_version = '2.1.1'
     lifecycle_version = "2.2.0"
-    room_version = "2.2.3"
+    room_version = "2.2.6"
     nav_version = "2.1.0"
 
     espresso_version = "3.1.0"
@@ -43,7 +43,6 @@ buildscript {
 
 
   repositories {
-    jcenter()
     mavenCentral()
     google()
   }

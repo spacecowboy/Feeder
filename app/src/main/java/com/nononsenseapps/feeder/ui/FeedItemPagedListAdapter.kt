@@ -62,6 +62,11 @@ class FeedItemPagedListAdapter(
                     actionCallback
             )
 
+    override fun onViewRecycled(vHolder: RecyclerView.ViewHolder) {
+        val holder = vHolder as FeedItemHolder
+        holder.resetView()
+    }
+
     override fun onBindViewHolder(vHolder: RecyclerView.ViewHolder, position: Int) {
         val holder = vHolder as FeedItemHolder
 

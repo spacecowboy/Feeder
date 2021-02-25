@@ -59,6 +59,7 @@
       android:layout_width="@dimen/item_img_def_width"
       android:layout_height="0dp"
       android:visibility="gone"
+      android:scaleType="centerCrop"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintTop_toTopOf="parent"

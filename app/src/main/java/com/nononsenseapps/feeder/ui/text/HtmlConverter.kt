@@ -33,7 +33,7 @@ fun toSpannedWithImages(
         throw RuntimeException(e)
     }
 
-    val converter = GlideConverter(kodein, source, siteUrl, parser, maxSize, allowDownload, spannableStringBuilder, urlClickListener = urlClickListener)
+    val converter = CoilConverter(kodein, source, siteUrl, parser, maxSize, spannableStringBuilder, urlClickListener = urlClickListener)
     return converter.convert()
 }
 
