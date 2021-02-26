@@ -1,3 +1,30 @@
+# 1.10.13
+Eduardo Rodrigues (1):
+  * [7d01b89f] Translated using Weblate (Portuguese (Brazil))
+
+Jonas Kalderstam (3):
+  * [9f191f73] Implemented parallel load of images in Reader view
+
+Meiru (2):
+  * [a92e14d8] Updated Japanese translation using Weblate
+  * [607a0947] Translated using Weblate (Japanese)
+
+Reza Almanda (1):
+  * [253fdd6d] Translated using Weblate (Indonesian)
+
+daywalk3r666 (1):
+  * [017de69c] Translated using Weblate (German)
+
+vachan-maker (2):
+  * [c71b9210] Updated Malayalam translation using Weblate
+  * [9a5a8f2e] Updated Malayalam translation using Weblate
+
+zmni (1):
+  * [b59e249b] Update Indonesian translation
+
+Ícar N. S (1):
+  * [c67896b7] Updated Catalan translation using Weblate
+
 # 1.10.12
 Belmar Begić (1):
   * [07443bf7] Updated Bosnian translation using Weblate
