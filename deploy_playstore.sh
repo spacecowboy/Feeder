@@ -34,7 +34,7 @@ rm -rf fastlane/metadata/android/bs-BA \
    fastlane/metadata/android/el \
    fastlane/metadata/android/ru
 
-if [[ "${LATEST_TAG}" != "${CURRENT_VERSION}" ]]; then
+if [[ "${1:-}" == "--dry-run" ]] || [[ "${LATEST_TAG}" != "${CURRENT_VERSION}" ]]; then
   echo "${CURRENT_VERSION} is not tag - validating deployment"
   fastlane build_and_validate
 else

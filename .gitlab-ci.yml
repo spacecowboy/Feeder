@@ -23,6 +23,14 @@ check:
     - app/build/outputs/
     - build/logs/
 
+validate_deployment:
+  stage: deploy
+  script:
+    - source devenv && ./deploy_playstore.sh --dry-run
+# Non-tags will only perform validation
+  only:
+    - master
+
 deploy_playstore:
   stage: deploy
   script:
@@ -30,7 +38,6 @@ deploy_playstore:
 # Non-tags will only perform validation
   only:
     - tags
-    - master
 #    - /^\d+\.\d+\.\d+$/
   environment:
     name: Play
