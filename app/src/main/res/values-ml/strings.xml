@@ -69,4 +69,6 @@
     <string name="preload_custom_tab">ഇഷ്‌ടാനുസൃത ടാബ് പ്രീലോഡുചെയ്യുക</string>
     <string name="open_in_default_browser">സ്ഥിര ബ്രൌസർ</string>
     <string name="notification_channel_name">വായിക്കാത്ത ഫീഡുകൾ</string>
+    <string name="notify_for_new_items">പുതിയ ഇനങ്ങൾക്കായി അറിയിക്കുക</string>
+    <string name="view">പ്രദർശനം</string>
 </resources>
