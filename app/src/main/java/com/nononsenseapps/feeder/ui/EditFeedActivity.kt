@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareActivity
 import com.nononsenseapps.feeder.db.URI_FEEDS
@@ -24,11 +26,17 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onErrorReturn
 import org.kodein.di.generic.instance
+import java.lang.RuntimeException
 import java.net.URL
 
 const val TEMPLATE = "template"
@@ -38,6 +46,7 @@ const val TEMPLATE = "template"
 @ExperimentalCoroutinesApi
 class EditFeedActivity : KodeinAwareActivity() {
     private var id: Long = ID_UNSET
+
     // Views and shit
     private lateinit var textTitle: EditText
     private lateinit var textUrl: EditText
@@ -104,14 +113,14 @@ class EditFeedActivity : KodeinAwareActivity() {
 
         textSearch.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, event ->
             if (actionId == EditorInfo.IME_ACTION_GO ||
-                    actionId == EditorInfo.IME_NULL && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER) {
+                actionId == EditorInfo.IME_NULL && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER) {
                 // Hide keyboard
                 val f = currentFocus
                 if (f != null) {
                     val imm = getSystemService(
-                            Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(f.windowToken,
-                            0)
+                        0)
                 }
 
                 try {
@@ -126,8 +135,8 @@ class EditFeedActivity : KodeinAwareActivity() {
                 } catch (exc: Exception) {
                     exc.printStackTrace()
                     Toast.makeText(this@EditFeedActivity,
-                            R.string.could_not_load_url,
-                            Toast.LENGTH_SHORT).show()
+                        R.string.could_not_load_url,
+                        Toast.LENGTH_SHORT).show()
                 }
 
                 return@OnEditorActionListener true
@@ -146,11 +155,11 @@ class EditFeedActivity : KodeinAwareActivity() {
             }
 
             val feed = com.nononsenseapps.feeder.db.room.Feed(
-                    id = id,
-                    title = feedTitle,
-                    customTitle = customTitle,
-                    tag = textTag.text.toString().trim(),
-                    url = sloppyLinkToStrictURLNoThrows(textUrl.text.toString().trim())
+                id = id,
+                title = feedTitle,
+                customTitle = customTitle,
+                tag = textTag.text.toString().trim(),
+                url = sloppyLinkToStrictURLNoThrows(textUrl.text.toString().trim())
             )
 
             lifecycleScope.launch {
@@ -162,8 +171,8 @@ class EditFeedActivity : KodeinAwareActivity() {
 
                 val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId"))
                 intent.putExtra(ARG_FEED_TITLE, title)
-                        .putExtra(ARG_FEED_URL, feed.url.toString())
-                        .putExtra(ARG_FEED_TAG, feed.tag)
+                    .putExtra(ARG_FEED_URL, feed.url.toString())
+                    .putExtra(ARG_FEED_TAG, feed.tag)
 
                 setResult(RESULT_OK, intent)
                 finish()
@@ -227,9 +236,9 @@ class EditFeedActivity : KodeinAwareActivity() {
             val data = feedDao.loadTags()
 
             val tagsAdapter = ArrayAdapter<String>(this@EditFeedActivity,
-                    android.R.layout.simple_list_item_1,
-                    android.R.id.text1,
-                    data)
+                android.R.layout.simple_list_item_1,
+                android.R.id.text1,
+                data)
 
             // Set the adapter
             textTag.setAdapter(tagsAdapter)
@@ -240,7 +249,7 @@ class EditFeedActivity : KodeinAwareActivity() {
         val theme = theme
         val floatingWindowFlag = TypedValue()
         if (theme == null || !theme.resolveAttribute(R.attr.isFloatingWindow, floatingWindowFlag,
-                        true)) {
+                true)) {
             // isFloatingWindow flag is not defined in theme
             return false
         }
@@ -251,9 +260,9 @@ class EditFeedActivity : KodeinAwareActivity() {
         // configure this Activity as a floating window, dimming the background
         val params = window.attributes
         params.width = resources
-                .getDimensionPixelSize(R.dimen.session_details_floating_width)
+            .getDimensionPixelSize(R.dimen.session_details_floating_width)
         params.height = resources
-                .getDimensionPixelSize(R.dimen.session_details_floating_height)
+            .getDimensionPixelSize(R.dimen.session_details_floating_height)
         params.alpha = 1f
         params.dimAmount = 0.7f
         params.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND
@@ -273,11 +282,11 @@ class EditFeedActivity : KodeinAwareActivity() {
         // Focus on tag
         textTag.requestFocus()
         val imm = getSystemService(
-                Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(textTag, 0)
     }
 
-    private inner class FeedResult(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view), View.OnClickListener {
+    private inner class FeedResult(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
 
         var textTitle: TextView = view.findViewById(R.id.feed_title)
         var textUrl: TextView = view.findViewById(R.id.feed_url)
@@ -295,28 +304,79 @@ class EditFeedActivity : KodeinAwareActivity() {
         }
     }
 
-    private inner class ResultsAdapter : androidx.recyclerview.widget.RecyclerView.Adapter<FeedResult>() {
+    private inner class ResultsAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        private var items: MutableList<Feed> = mutableListOf()
-        val data: List<Feed>
+        private var items: MutableList<Any> = mutableListOf()
+        val data: List<Any>
             get() = items
 
-        override fun onBindViewHolder(holder: FeedResult, position: Int) {
+        override fun getItemViewType(position: Int): Int =
+            when (items[position]) {
+                is Feed -> VIEW_TYPE_FEED_RESULT
+                else -> VIEW_TYPE_ERROR_RESULT
+            }
+
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val item = items[position]
 
-            holder.item = item
-            holder.textTitle.text = item.title ?: ""
-            holder.textDescription.text = item.description ?: ""
-            holder.textUrl.text = item.feed_url ?: ""
+            when (holder) {
+                is FeedResult -> {
+                    when (item) {
+                        is Feed -> {
+                            holder.item = item
+                            holder.textTitle.text = item.title ?: ""
+                            holder.textDescription.text = item.description ?: ""
+                            holder.textUrl.text = item.feed_url ?: ""
+                        }
+                    }
+                }
+                is ErrorResult -> {
+                    when (item) {
+                        is FeedParser.FeedParsingError -> {
+                            holder.textTitle.text = getString(
+                                R.string.failed_to_parse,
+                                item.url.toString()
+                            )
+                            holder.textDescription.text = item.message
+                        }
+                        is Throwable -> {
+                            holder.textTitle.text = getString(
+                                R.string.failed_to_parse,
+                                ""
+                            )
+                            holder.textDescription.text = item.message
+                        }
+                    }
+                }
+            }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedResult =
-                FeedResult(LayoutInflater.from(parent.context)
-                        .inflate(R.layout.view_feed_result, parent, false))
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+            when (viewType) {
+                VIEW_TYPE_FEED_RESULT -> {
+                    FeedResult(
+                        LayoutInflater.from(parent.context)
+                            .inflate(R.layout.view_feed_result, parent, false)
+                    )
+                }
+                VIEW_TYPE_ERROR_RESULT -> {
+                    ErrorResult(
+                        LayoutInflater.from(parent.context)
+                            .inflate(R.layout.view_error_result, parent, false)
+                    )
+                }
+                else -> error("Unknown view type - programmer error")
+            }
 
         override fun getItemCount(): Int = items.size
+
         fun addFeed(feed: Feed) {
             items.add(feed)
+            notifyItemInserted(items.lastIndex)
+        }
+
+        fun addError(exception: Throwable) {
+            items.add(exception)
             notifyItemInserted(items.lastIndex)
         }
 
@@ -330,32 +390,57 @@ class EditFeedActivity : KodeinAwareActivity() {
     @ExperimentalCoroutinesApi
     private fun searchForFeeds(url: URL): Job = lifecycleScope.launchWhenResumed {
         resultAdapter.clearData()
+        val errors: MutableList<Throwable> = mutableListOf()
 
         flow {
             emit(url)
             feedParser.getAlternateFeedLinksAtUrl(url).forEach {
                 emit(sloppyLinkToStrictURL(it.first))
             }
-        }.mapNotNull {
-            try {
-                feedParser.parseFeedUrl(it)
-            } catch (e: Throwable) {
-                // Will happen for the site url - if it isn't a feed
-                null
-            }
-        }.flowOn(Dispatchers.Default).collect {
-            resultAdapter.addFeed(it)
-            // Show results, unless user has clicked on one
-            if (detailsFrame.visibility == View.GONE) {
-                searchFrame.visibility = View.VISIBLE
-                listResults.visibility = View.VISIBLE
-            }
         }
-
-        loadingProgress.visibility = View.GONE
-        if (resultAdapter.data.isEmpty()) {
-            emptyText.text = getString(R.string.no_such_feed)
-            emptyText.visibility = View.VISIBLE
-        }
+            .mapNotNull {
+                try {
+                    feedParser.parseFeedUrl(it)
+                } catch (t: Throwable) {
+                    t
+                }
+            }
+            .flowOn(Dispatchers.Default)
+            .onEach {
+                when (it) {
+                    is Feed -> resultAdapter.addFeed(it)
+                    is Throwable -> {
+                        val msg = when (it) {
+                            is FeedParser.FeedParsingError -> "Error fetching ${it.url}"
+                            else -> "Error fetching"
+                        }
+                        Log.e("FeederFeedSearch", msg, RuntimeException(msg, it))
+                        errors.add(it)
+                    }
+                }
+                // Show results, unless user has clicked on one
+                if (detailsFrame.visibility == View.GONE && resultAdapter.data.isNotEmpty()) {
+                    searchFrame.visibility = View.VISIBLE
+                    listResults.visibility = View.VISIBLE
+                }
+            }
+            .onCompletion {
+                loadingProgress.visibility = View.GONE
+                if (resultAdapter.data.isEmpty()) {
+                    if (errors.isEmpty()) {
+                        emptyText.text = getString(R.string.no_such_feed)
+                        emptyText.visibility = View.VISIBLE
+                    } else {
+                        // Only show errors in case no feed could be found at all
+                        errors.forEach { resultAdapter.addError(it) }
+                        searchFrame.visibility = View.VISIBLE
+                        listResults.visibility = View.VISIBLE
+                    }
+                }
+            }
+            .collect()
     }
 }
+
+const val VIEW_TYPE_FEED_RESULT = 1
+const val VIEW_TYPE_ERROR_RESULT = 2

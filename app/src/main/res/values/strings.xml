@@ -105,4 +105,6 @@
   <string name="battery_optimization_enabled">Battery optimization enabled</string>
   <string name="preload_custom_tab">Preload custom tab</string>
 
+  <string name="failed_to_parse">Failed to parse %1$s</string>
+
 </resources>

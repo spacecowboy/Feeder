@@ -227,17 +227,14 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
     @Throws(FeedParsingError::class)
     suspend fun parseFeedUrl(url: URL): Feed? {
         try {
-
             var result: Feed? = null
             curlAndOnResponse(url) {
                 result = parseFeedResponse(it)
             }
-
             return result
         } catch (e: Throwable) {
-            throw FeedParsingError(e)
+            throw FeedParsingError(url, e)
         }
-
     }
 
     @Throws(FeedParsingError::class)
@@ -264,7 +261,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
                 feed
             }
         } catch (e: Throwable) {
-            throw FeedParsingError(e)
+            throw FeedParsingError(response.request().url().url(), e)
         }
     }
 
@@ -306,7 +303,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
                     return parseFeedInputStream(baseUrl, it)
                 }
             } catch (e: Throwable) {
-                throw FeedParsingError(e)
+                throw FeedParsingError(baseUrl, e)
             }
         }
     }
@@ -320,12 +317,12 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
             } catch (e: NumberFormatException) {
                 throw e
             } catch (e: Throwable) {
-                throw FeedParsingError(e)
+                throw FeedParsingError(baseUrl, e)
             }
         }
     }
 
-    class FeedParsingError(e: Throwable) : Exception(e)
+    class FeedParsingError(val url: URL, e: Throwable) : Exception(e.message, e)
 }
 
 fun Response.safeBody(): ByteArray? {
