@@ -98,4 +98,5 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="tag">Étiquette</string>
     <string name="url">URL</string>
+    <string name="failed_to_parse">Échec de l’analyse %1$s</string>
 </resources>

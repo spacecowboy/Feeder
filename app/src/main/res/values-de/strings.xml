@@ -98,4 +98,5 @@
     <string name="battery_optimization_disabled">Nicht optimiert</string>
     <string name="battery_optimization_enabled">Optimiert</string>
     <string name="preload_custom_tab">Standard-Registerkarte vorladen</string>
+    <string name="failed_to_parse">Fehler beim Analysieren %1$s</string>
 </resources>
