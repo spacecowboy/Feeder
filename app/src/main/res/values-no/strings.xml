@@ -98,4 +98,5 @@
     <string name="open_in_reader">Leser</string>
     <string name="check_for_updates">Se etter oppdateringer</string>
     <string name="may_result_data_charges">Mobildatakostnader kan påløpe.</string>
+    <string name="failed_to_parse">Klarte ikke å tolke %1$s</string>
 </resources>
