@@ -98,4 +98,5 @@
     <string name="battery_optimization_disabled">Optymalizacja baterii wyłączona</string>
     <string name="battery_optimization_enabled">Optymalizacja baterii włączona</string>
     <string name="preload_custom_tab">Wstępnie załaduj własną kartę</string>
+    <string name="failed_to_parse">Nie można przeanalizować %1$s</string>
 </resources>
