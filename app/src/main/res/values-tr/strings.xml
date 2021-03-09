@@ -98,4 +98,5 @@
     <string name="battery_optimization_disabled">Pil optimizasyonu devre dışı bırakıldı</string>
     <string name="battery_optimization_enabled">Pil optimizasyonu etkinleştirildi</string>
     <string name="preload_custom_tab">Özel sekmeyi önceden yükle</string>
+    <string name="failed_to_parse">%1$s ayrıştırılamadı</string>
 </resources>
