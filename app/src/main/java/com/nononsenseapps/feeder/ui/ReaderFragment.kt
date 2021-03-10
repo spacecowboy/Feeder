@@ -66,6 +66,7 @@ class ReaderFragment : KodeinAwareFragment() {
     // Important to get the activity bound view model here hence no arg specified
     private val settingsViewModel: SettingsViewModel by instance()
     private val prefs: Prefs by instance()
+    private val warmer: CustomTabsWarmer by instance()
 
     // Livedata emits on each resume from background - ignore if data is the same so scroll position
     // is not screwed up.
@@ -75,7 +76,6 @@ class ReaderFragment : KodeinAwareFragment() {
         lifecycleScope.launchWhenStarted {
             try {
                 if (prefs.shouldPreloadCustomTab) {
-                    val warmer = CustomTabsWarmer(context)
                     warmer.preLoad {
                         rssItem?.link?.let { Uri.parse(it) }
                     }
