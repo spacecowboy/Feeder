@@ -92,8 +92,8 @@
     <string name="updated_feeds">更新されたフィード</string>
     <string name="may_result_data_charges">モバイルデータ通信の料金がかかる場合があります。</string>
     <string name="open_link_in_web_view">Web viewでリンクを開く</string>
-    <string name="reader_settings">Reader</string>
-    <string name="open_in_reader">Reader</string>
+    <string name="reader_settings">リーダー</string>
+    <string name="open_in_reader">リーダー</string>
     <string name="toggle_tag_expansion">タグ展開の切り替え</string>
     <string name="discovered_feeds_list">検出されたフィードリスト</string>
     <string name="open_in_web_view">Web viewで開く</string>
