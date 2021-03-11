@@ -82,11 +82,17 @@
   <string name="no_email_client">Nenalezen e-mailový klient</string>
   <string name="touch_to_play_video">Klepnutím přehrajete video</string>
   <string name="open_feed">Otevřít zdroj</string>
-  <string name="mark_items_below_as_read">Označit články níže za přečtené</string>
+  <string name="mark_items_below_as_read">Označit níže uvedené články za přečtené</string>
   <string name="discovered_feeds_list">Seznam objevených zdrojů</string>
   <string name="toggle_tag_expansion">Přepínač rozšíření štítku</string>
   <string name="battery_optimization">Optimalizace baterie</string>
   <string name="battery_optimization_disabled">Optimalizace baterie zakázána</string>
   <string name="battery_optimization_enabled">Optimalizace baterie povolena</string>
   <string name="preload_custom_tab">Přenačtení vlastní záložky</string>
+  <string name="mark_items_above_as_read">Označit výše uvedené články za přečtené</string>
+  <string name="javascript">Javascript</string>
+  <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
+  <string name="url">URL</string>
+  <string name="failed_to_parse">Nelze analyzovat %1$s</string>
+
 </resources>
