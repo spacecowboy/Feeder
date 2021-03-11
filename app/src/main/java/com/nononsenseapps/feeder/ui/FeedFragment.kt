@@ -20,6 +20,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
@@ -64,6 +65,7 @@ const val ARG_FEED_ID = "feed_id"
 const val ARG_FEED_TITLE = "feed_title"
 const val ARG_FEED_URL = "feed_url"
 const val ARG_FEED_TAG = "feed_tag"
+const val ARG_FEED_FULL_TEXT_BY_DEFAULT = "feed_full_text_by_default"
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -92,7 +94,16 @@ class FeedFragment : KodeinAwareFragment() {
 
     private lateinit var adapter: FeedItemPagedListAdapter
 
+    private var feedFullTextByDefault: Boolean = false
+
     init {
+        lifecycleScope.launchWhenCreated {
+            if (id > ID_UNSET) {
+                feedViewModel.getLiveFeed(id).observe(this@FeedFragment) {
+                    feedFullTextByDefault = it.fullTextByDefault
+                }
+            }
+        }
         // Listens on sync state changes
         lifecycleScope.launchWhenResumed {
             currentlySyncing.asFlow().collect {
@@ -177,7 +188,7 @@ class FeedFragment : KodeinAwareFragment() {
 
             // use a grid layout
             GridLayoutManager(activity,
-                    cols)
+                cols)
         } else {
             // use a linear layout manager
             LinearLayoutManager(activity)
@@ -188,19 +199,19 @@ class FeedFragment : KodeinAwareFragment() {
 
         // The arrow will cycle between these colors (in order)
         swipeRefreshLayout.setColorSchemeResources(
-                R.color.refresh_progress_1,
-                R.color.refresh_progress_2,
-                R.color.refresh_progress_3)
+            R.color.refresh_progress_1,
+            R.color.refresh_progress_2,
+            R.color.refresh_progress_3)
 
         swipeRefreshLayout.setOnRefreshListener {
             // Sync this specific feed(s) immediately
             requestFeedSync(
-                    kodein = kodein,
-                    feedId = id,
-                    feedTag = feedTag ?: "",
-                    ignoreConnectivitySettings = true,
-                    forceNetwork = true,
-                    parallell = true
+                kodein = kodein,
+                feedId = id,
+                feedTag = feedTag ?: "",
+                ignoreConnectivitySettings = true,
+                forceNetwork = true,
+                parallell = true
             )
         }
 
@@ -215,66 +226,66 @@ class FeedFragment : KodeinAwareFragment() {
 
         emptyAddFeed.setOnClickListener {
             startActivity(Intent(activity,
-                    EditFeedActivity::class.java))
+                EditFeedActivity::class.java))
         }
 
         emptyOpenFeeds.setOnClickListener { (activity as FeedActivity).openNavDrawer() }
 
         // specify an adapter
         adapter = FeedItemPagedListAdapter(
-                activity!!,
-                feedItemsViewModel,
-                settingsViewModel,
-                prefs,
-                object : ActionCallback {
-                    override fun coroutineScope(): CoroutineScope {
-                        return lifecycleScope
-                    }
+            activity!!,
+            feedItemsViewModel,
+            settingsViewModel,
+            prefs,
+            object : ActionCallback {
+                override fun coroutineScope(): CoroutineScope {
+                    return lifecycleScope
+                }
 
-                    override fun onDismiss(item: PreviewItem?) {
-                        item?.let {
-                            lifecycleScope.launch { feedItemsViewModel.toggleReadState(it) }
-                        }
+                override fun onDismiss(item: PreviewItem?) {
+                    item?.let {
+                        lifecycleScope.launch { feedItemsViewModel.toggleReadState(it) }
                     }
+                }
 
-                    override fun onSwipeStarted() {
-                        // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
-                        swipeRefreshLayout.isEnabled = false
-                    }
+                override fun onSwipeStarted() {
+                    // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
+                    swipeRefreshLayout.isEnabled = false
+                }
 
-                    override fun onSwipeCancelled() {
-                        // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
-                        swipeRefreshLayout.isEnabled = true
-                    }
+                override fun onSwipeCancelled() {
+                    // SwipeRefreshLayout does not honor requestDisallowInterceptTouchEvent
+                    swipeRefreshLayout.isEnabled = true
+                }
 
-                    override fun markAsRead(position: Int, markBelow: Boolean) {
-                        recyclerView.adapter?.let { adapter ->
-                            lifecycleScope.launch {
-                                if (position > NO_POSITION) {
-                                    val indexes = if (markBelow) {
-                                        ((position + 1) until adapter.itemCount)
-                                    } else {
-                                        (0 until position)
-                                    }
-                                    val ids = indexes
-                                        .asSequence()
-                                        .map {
-                                            adapter.getItemId(it)
-                                        }
-                                        .toList()
-                                    feedItemsViewModel.markAsRead(ids)
+                override fun markAsRead(position: Int, markBelow: Boolean) {
+                    recyclerView.adapter?.let { adapter ->
+                        lifecycleScope.launch {
+                            if (position > NO_POSITION) {
+                                val indexes = if (markBelow) {
+                                    ((position + 1) until adapter.itemCount)
+                                } else {
+                                    (0 until position)
                                 }
+                                val ids = indexes
+                                    .asSequence()
+                                    .map {
+                                        adapter.getItemId(it)
+                                    }
+                                    .toList()
+                                feedItemsViewModel.markAsRead(ids)
                             }
                         }
                     }
-                }).also {
+                }
+            }).also {
             it.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                 var firstInsertion = true
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                     if (firstInsertion) {
                         ephemeralState.firstVisibleListItem?.let { pos ->
                             if (ephemeralState.lastOpenFeedId == this@FeedFragment.id &&
-                                    ephemeralState.lastOpenFeedTag == this@FeedFragment.feedTag ?: "") {
+                                ephemeralState.lastOpenFeedTag == this@FeedFragment.feedTag ?: "") {
                                 recyclerView.scrollToPosition(pos)
                             }
                         }
@@ -298,8 +309,8 @@ class FeedFragment : KodeinAwareFragment() {
         val newestFirst = prefs.isNewestFirst
         feedItemsViewModel.setNewestFirst(newestFirst)
         liveDbPreviews = feedItemsViewModel.getLiveDbPreviews(
-                feedId = id,
-                tag = feedTag ?: ""
+            feedId = id,
+            tag = feedTag ?: ""
         )
         liveDbPreviews.observe(this, Observer<PagedList<PreviewItem>> {
             adapter.submitList(it)
@@ -340,11 +351,11 @@ class FeedFragment : KodeinAwareFragment() {
                 activity?.let { activity ->
                     feedViewModel.getLiveFeedsNotify(id, feedTag ?: "").observe(this, Observer {
                         it.fold(true) { a, b -> a && b }
-                                .let { notify ->
-                                    this.notify = notify
-                                    // Update state of notification toggle
-                                    activity.invalidateOptionsMenu()
-                                }
+                            .let { notify ->
+                                this.notify = notify
+                                // Update state of notification toggle
+                                activity.invalidateOptionsMenu()
+                            }
                     })
                 }
             }
@@ -392,10 +403,10 @@ class FeedFragment : KodeinAwareFragment() {
             menuItem.setTitle(if (onlyUnread) R.string.show_all_items else R.string.show_unread_items)
 
             menuItem.setIcon(
-                    when (onlyUnread) {
-                        true -> R.drawable.ic_visibility_off_white_24dp
-                        false -> R.drawable.ic_visibility_white_24dp
-                    }
+                when (onlyUnread) {
+                    true -> R.drawable.ic_visibility_off_white_24dp
+                    false -> R.drawable.ic_visibility_white_24dp
+                }
             )
         }
 
@@ -461,10 +472,10 @@ class FeedFragment : KodeinAwareFragment() {
             itemId == R.id.action_sync -> {
                 // Sync all feeds when menu button pressed
                 requestFeedSync(
-                        kodein = kodein,
-                        ignoreConnectivitySettings = true,
-                        forceNetwork = true,
-                        parallell = true
+                    kodein = kodein,
+                    ignoreConnectivitySettings = true,
+                    forceNetwork = true,
+                    parallell = true
                 )
                 true
             }
@@ -476,6 +487,7 @@ class FeedFragment : KodeinAwareFragment() {
                     i.putExtra(ARG_CUSTOMTITLE, customTitle)
                     i.putExtra(ARG_TITLE, title)
                     i.putExtra(ARG_FEED_TAG, feedTag)
+                    i.putExtra(ARG_FEED_FULL_TEXT_BY_DEFAULT, feedFullTextByDefault)
                     i.data = Uri.parse(url)
                     startActivity(i)
                 }
@@ -496,11 +508,11 @@ class FeedFragment : KodeinAwareFragment() {
                     val feeds: List<FeedTitle> = feedViewModel.getVisibleFeeds(id, feedTag)
 
                     findNavController().navigate(
-                            R.id.action_feedFragment_to_deleteFeedsDialogFragment,
-                            bundleOf(
-                                    ARG_FEED_IDS to feeds.map { it.id }.toLongArray(),
-                                    ARG_FEED_TITLES to feeds.map { it.displayTitle }.toTypedArray()
-                            )
+                        R.id.action_feedFragment_to_deleteFeedsDialogFragment,
+                        bundleOf(
+                            ARG_FEED_IDS to feeds.map { it.id }.toLongArray(),
+                            ARG_FEED_TITLES to feeds.map { it.displayTitle }.toTypedArray()
+                        )
                     )
                 }
                 true
@@ -544,7 +556,7 @@ class FeedFragment : KodeinAwareFragment() {
                     intent.putExtra(AbstractFilePickerActivity.EXTRA_MODE, AbstractFilePickerActivity.MODE_NEW_FILE)
                     intent.putExtra(AbstractFilePickerActivity.EXTRA_ALLOW_EXISTING_FILE, true)
                     intent.putExtra(AbstractFilePickerActivity.EXTRA_START_PATH,
-                            File(Environment.getExternalStorageDirectory(), "feeder.opml").path)
+                        File(Environment.getExternalStorageDirectory(), "feeder.opml").path)
                 }
                 startActivityForResult(intent, EXPORT_OPML_CODE)
                 true
@@ -557,7 +569,7 @@ class FeedFragment : KodeinAwareFragment() {
                     intent.addCategory(Intent.CATEGORY_OPENABLE)
                     intent.type = "*/*"
                     intent.putExtra(Intent.EXTRA_MIME_TYPES,
-                            arrayOf("text/plain", "text/xml", "text/opml", "*/*"))
+                        arrayOf("text/plain", "text/xml", "text/opml", "*/*"))
                 } else {
                     intent = Intent(context, MyFilePickerActivity::class.java)
                     intent.putExtra(AbstractFilePickerActivity.EXTRA_SINGLE_CLICK, true)
@@ -580,13 +592,13 @@ class FeedFragment : KodeinAwareFragment() {
             itemId == R.id.action_share -> {
                 url?.let { url ->
                     startActivity(
-                            Intent.createChooser(
-                                    Intent(Intent.ACTION_SEND).also { intent ->
-                                        intent.type = "text/plain"
-                                        intent.putExtra(Intent.EXTRA_TEXT, url)
-                                    },
-                                    getString(R.string.share)
-                            )
+                        Intent.createChooser(
+                            Intent(Intent.ACTION_SEND).also { intent ->
+                                intent.type = "text/plain"
+                                intent.putExtra(Intent.EXTRA_TEXT, url)
+                            },
+                            getString(R.string.share)
+                        )
                     )
                 }
                 true

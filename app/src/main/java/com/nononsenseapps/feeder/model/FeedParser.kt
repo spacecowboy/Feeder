@@ -137,92 +137,13 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
     /**
      * @throws IOException if request fails due to network issue for example
      */
-    private suspend fun curl(url: URL): String? {
-        var result: String? = null
-        curlAndOnResponse(url) {
-            result = it.body()?.string()
-        }
-        return result
-    }
+    private suspend fun curl(url: URL) = client.curl(url)
 
     /**
      * @throws IOException if request fails due to network issue for example
      */
-    private suspend fun curlAndOnResponse(url: URL, block: (suspend (Response) -> Unit)) {
-        val response = getResponse(url)
-
-        if (!response.isSuccessful) {
-            throw IOException("Unexpected code $response")
-        }
-
-        response.use {
-            block(it)
-        }
-    }
-
-    /**
-     * @throws IOException if call fails due to network issue for example
-     */
-    suspend fun getResponse(url: URL, forceNetwork: Boolean = false): Response {
-        val request = Request.Builder()
-                .url(url)
-                .cacheControl(CacheControl.Builder()
-                        .let {
-                            if (forceNetwork) {
-                                // Force a cache revalidation
-                                it.maxAge(0, TimeUnit.SECONDS)
-                            } else {
-                                // Do a cache revalidation at most every minute
-                                it.maxAge(1, TimeUnit.MINUTES)
-                            }
-                        }
-                        .build())
-                .build()
-
-        val clientToUse = if (url.userInfo?.isNotBlank() == true) {
-            val parts = url.userInfo.split(':')
-            val user = parts.first()
-            val pass = if (parts.size > 1) {
-                parts[1]
-            } else {
-                ""
-            }
-            val decodedUser = URLDecoder.decode(user, "UTF-8")
-            val decodedPass = URLDecoder.decode(pass, "UTF-8")
-            val credentials = Credentials.basic(decodedUser, decodedPass)
-            client.newBuilder()
-                    .authenticator { _, response ->
-                        when {
-                            response.request().header("Authorization") != null -> {
-                                null
-                            }
-                            else -> {
-                                response.request().newBuilder()
-                                        .header("Authorization", credentials)
-                                        .build()
-                            }
-                        }
-                    }
-                    .proxyAuthenticator { _, response ->
-                        when {
-                            response.request().header("Proxy-Authorization") != null -> {
-                                null
-                            }
-                            else -> {
-                                response.request().newBuilder()
-                                        .header("Proxy-Authorization", credentials)
-                                        .build()
-                            }
-                        }
-                    }.build()
-        } else {
-            client
-        }
-
-        return withContext(IO) {
-            clientToUse.newCall(request).execute()
-        }
-    }
+    private suspend fun curlAndOnResponse(url: URL, block: (suspend (Response) -> Unit)) =
+        client.curlAndOnResponse(url, block)
 
     @Throws(FeedParsingError::class)
     suspend fun parseFeedUrl(url: URL): Feed? {
@@ -353,5 +274,86 @@ fun Response.safeBody(): ByteArray? {
         } else {
             body.bytes()
         }
+    }
+}
+
+suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): Response {
+    val request = Request.Builder()
+        .url(url)
+        .cacheControl(CacheControl.Builder()
+            .let {
+                if (forceNetwork) {
+                    // Force a cache revalidation
+                    it.maxAge(0, TimeUnit.SECONDS)
+                } else {
+                    // Do a cache revalidation at most every minute
+                    it.maxAge(1, TimeUnit.MINUTES)
+                }
+            }
+            .build())
+        .build()
+
+    val clientToUse = if (url.userInfo?.isNotBlank() == true) {
+        val parts = url.userInfo.split(':')
+        val user = parts.first()
+        val pass = if (parts.size > 1) {
+            parts[1]
+        } else {
+            ""
+        }
+        val decodedUser = URLDecoder.decode(user, "UTF-8")
+        val decodedPass = URLDecoder.decode(pass, "UTF-8")
+        val credentials = Credentials.basic(decodedUser, decodedPass)
+        newBuilder()
+            .authenticator { _, response ->
+                when {
+                    response.request().header("Authorization") != null -> {
+                        null
+                    }
+                    else -> {
+                        response.request().newBuilder()
+                            .header("Authorization", credentials)
+                            .build()
+                    }
+                }
+            }
+            .proxyAuthenticator { _, response ->
+                when {
+                    response.request().header("Proxy-Authorization") != null -> {
+                        null
+                    }
+                    else -> {
+                        response.request().newBuilder()
+                            .header("Proxy-Authorization", credentials)
+                            .build()
+                    }
+                }
+            }.build()
+    } else {
+        this
+    }
+
+    return withContext(IO) {
+        clientToUse.newCall(request).execute()
+    }
+}
+
+suspend fun OkHttpClient.curl(url: URL): String? {
+    var result: String? = null
+    curlAndOnResponse(url) {
+        result = it.body()?.string()
+    }
+    return result
+}
+
+suspend fun OkHttpClient.curlAndOnResponse(url: URL, block: (suspend (Response) -> Unit)) {
+    val response = getResponse(url)
+
+    if (!response.isSuccessful) {
+        throw IOException("Unexpected code $response")
+    }
+
+    response.use {
+        block(it)
     }
 }

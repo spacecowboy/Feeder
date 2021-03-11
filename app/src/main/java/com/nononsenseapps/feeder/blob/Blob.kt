@@ -17,3 +17,14 @@ fun blobInputStream(itemId: Long, filesDir: File): InputStream =
 @Throws(IOException::class)
 fun blobOutputStream(itemId: Long, filesDir: File): OutputStream =
         GZIPOutputStream(blobFile(itemId = itemId, filesDir = filesDir).outputStream())
+
+fun blobFullFile(itemId: Long, filesDir: File): File =
+    File(filesDir, "$itemId.full.html.gz")
+
+@Throws(IOException::class)
+fun blobFullInputStream(itemId: Long, filesDir: File): InputStream =
+    GZIPInputStream(blobFullFile(itemId = itemId, filesDir = filesDir).inputStream())
+
+@Throws(IOException::class)
+fun blobFullOutputStream(itemId: Long, filesDir: File): OutputStream =
+    GZIPOutputStream(blobFullFile(itemId = itemId, filesDir = filesDir).outputStream())

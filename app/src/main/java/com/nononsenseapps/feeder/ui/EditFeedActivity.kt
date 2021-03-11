@@ -26,15 +26,12 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onErrorReturn
 import org.kodein.di.generic.instance
 import java.lang.RuntimeException
 import java.net.URL
@@ -51,6 +48,7 @@ class EditFeedActivity : KodeinAwareActivity() {
     private lateinit var textTitle: EditText
     private lateinit var textUrl: EditText
     private lateinit var textTag: AutoCompleteTextView
+    private lateinit var checkboxDefaultFullText: CheckBox
     private lateinit var textSearch: EditText
     private lateinit var detailsFrame: View
     private lateinit var listResults: androidx.recyclerview.widget.RecyclerView
@@ -98,6 +96,7 @@ class EditFeedActivity : KodeinAwareActivity() {
         textUrl = findViewById(R.id.feed_url)
         urlLabel = textUrl.parent as FloatLabelLayout
         textTag = findViewById(R.id.feed_tag)
+        checkboxDefaultFullText = findViewById(R.id.feed_default_full_text)
         tagLabel = textTag.parent as FloatLabelLayout
         detailsFrame = findViewById(R.id.feed_details_frame)
         searchFrame = findViewById(R.id.feed_search_frame)
@@ -159,6 +158,7 @@ class EditFeedActivity : KodeinAwareActivity() {
                 title = feedTitle,
                 customTitle = customTitle,
                 tag = textTag.text.toString().trim(),
+                fullTextByDefault = checkboxDefaultFullText.isChecked,
                 url = sloppyLinkToStrictURLNoThrows(textUrl.text.toString().trim())
             )
 
@@ -228,6 +228,10 @@ class EditFeedActivity : KodeinAwareActivity() {
             i.getStringExtra(ARG_FEED_TAG)?.let {
                 // Use append instead of setText to make sure cursor is at end
                 textTag.append(it)
+            }
+
+            i.getBooleanExtra(ARG_FEED_FULL_TEXT_BY_DEFAULT, false).let {
+                checkboxDefaultFullText.isChecked = it
             }
         }
 

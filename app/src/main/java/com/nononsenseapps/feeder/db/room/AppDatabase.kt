@@ -31,7 +31,7 @@ const val ID_ALL_FEEDS: Long = -10
  */
 
 @FlowPreview
-@Database(entities = [Feed::class, FeedItem::class], version = 12)
+@Database(entities = [Feed::class, FeedItem::class], version = 13)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun feedDao(): FeedDao
@@ -59,8 +59,8 @@ abstract class AppDatabase : RoomDatabase() {
 
         private fun buildDatabase(context: Context): AppDatabase {
             return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
-                    .addMigrations(*allMigrations)
-                    .build()
+                .addMigrations(*allMigrations)
+                .build()
         }
     }
 }
@@ -68,19 +68,31 @@ abstract class AppDatabase : RoomDatabase() {
 @FlowPreview
 @ExperimentalCoroutinesApi
 val allMigrations = arrayOf(
-        MIGRATION_5_7,
-        MIGRATION_6_7,
-        MIGRATION_7_8,
-        MIGRATION_8_9,
-        MIGRATION_9_10,
-        MIGRATION_10_11,
-        MIGRATION_11_12
+    MIGRATION_5_7,
+    MIGRATION_6_7,
+    MIGRATION_7_8,
+    MIGRATION_8_9,
+    MIGRATION_9_10,
+    MIGRATION_10_11,
+    MIGRATION_11_12,
+    MIGRATION_12_13
 )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+
+@FlowPreview
+@ExperimentalCoroutinesApi
+@Suppress("ClassName")
+object MIGRATION_12_13 : Migration(12, 13) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("""
+            ALTER TABLE feeds ADD COLUMN fulltext_by_default INTEGER NOT NULL DEFAULT 0
+        """.trimIndent())
+    }
+}
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -218,17 +230,17 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
             val oldFeedId = cursor.getLong(0)
 
             val newFeedId = database.insert("feeds",
-                    SQLiteDatabase.CONFLICT_FAIL,
-                    contentValues {
-                        setString("title" to cursor.getString(1))
-                        setString("custom_title" to cursor.getString(4))
-                        setString("url" to cursor.getString(2))
-                        setString("tag" to cursor.getString(3))
-                        setInt("notify" to cursor.getInt(5))
-                        if (version == 6) {
-                            setString("image_url" to cursor.getString(6))
-                        }
-                    })
+                SQLiteDatabase.CONFLICT_FAIL,
+                contentValues {
+                    setString("title" to cursor.getString(1))
+                    setString("custom_title" to cursor.getString(4))
+                    setString("url" to cursor.getString(2))
+                    setString("tag" to cursor.getString(3))
+                    setInt("notify" to cursor.getInt(5))
+                    if (version == 6) {
+                        setString("image_url" to cursor.getString(6))
+                    }
+                })
 
             database.query("""
                     SELECT title, description, plainTitle, plainSnippet, imageUrl, link, author,
@@ -239,22 +251,22 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
                 database.inTransaction {
                     cursor.forEach { _ ->
                         database.insert("feed_items",
-                                SQLiteDatabase.CONFLICT_FAIL,
-                                contentValues {
-                                    setString("guid" to cursor.getString(12))
-                                    setString("title" to cursor.getString(0))
-                                    setString("description" to cursor.getString(1))
-                                    setString("plain_title" to cursor.getString(2))
-                                    setString("plain_snippet" to cursor.getString(3))
-                                    setString("image_url" to cursor.getString(4))
-                                    setString("enclosure_link" to cursor.getString(10))
-                                    setString("author" to cursor.getString(6))
-                                    setString("pub_date" to cursor.getString(7))
-                                    setString("link" to cursor.getString(5))
-                                    setInt("unread" to cursor.getInt(8))
-                                    setInt("notified" to cursor.getInt(11))
-                                    setLong("feed_id" to newFeedId)
-                                })
+                            SQLiteDatabase.CONFLICT_FAIL,
+                            contentValues {
+                                setString("guid" to cursor.getString(12))
+                                setString("title" to cursor.getString(0))
+                                setString("description" to cursor.getString(1))
+                                setString("plain_title" to cursor.getString(2))
+                                setString("plain_snippet" to cursor.getString(3))
+                                setString("image_url" to cursor.getString(4))
+                                setString("enclosure_link" to cursor.getString(10))
+                                setString("author" to cursor.getString(6))
+                                setString("pub_date" to cursor.getString(7))
+                                setString("link" to cursor.getString(5))
+                                setInt("unread" to cursor.getInt(8))
+                                setInt("notified" to cursor.getInt(11))
+                                setLong("feed_id" to newFeedId)
+                            })
                     }
                 }
             }

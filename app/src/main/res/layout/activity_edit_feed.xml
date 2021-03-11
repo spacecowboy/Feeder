@@ -85,13 +85,17 @@
           android:textDirection="anyRtl" />
       </com.nononsenseapps.feeder.views.FloatLabelLayout>
 
-      <!--<View-->
-      <!--android:layout_height="1dp"-->
-      <!--android:layout_width="match_parent"-->
-      <!--android:background="?android:attr/dividerHorizontal"-->
-      <!--android:layout_marginBottom="2dip"-->
-      <!--android:layout_marginTop="2dip"-->
-      <!--/>-->
+
+        <CheckBox
+          android:id="@+id/feed_default_full_text"
+          style="@style/TextAppearance.Title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="8dp"
+          android:layout_marginBottom="2dp"
+          android:text="@string/fetch_full_articles_by_default"
+          android:singleLine="true"
+          android:textDirection="anyRtl" />
 
       <Button
         android:id="@+id/add_button"

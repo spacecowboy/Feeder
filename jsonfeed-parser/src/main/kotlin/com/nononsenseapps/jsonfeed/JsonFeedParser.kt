@@ -15,11 +15,13 @@ import java.util.concurrent.TimeUnit
 const val MIN_MAXAGE = 600
 val MAX_AGE_PATTERN = """max-age=(\d+)""".toRegex()
 
-fun cachingHttpClient(cacheDirectory: File? = null,
-                      cacheSize: Long = 10L * 1024L * 1024L,
-                      trustAllCerts: Boolean = true,
-                      connectTimeoutSecs: Long = 30L,
-                      readTimeoutSecs: Long = 30L): OkHttpClient {
+fun cachingHttpClient(
+    cacheDirectory: File? = null,
+    cacheSize: Long = 10L * 1024L * 1024L,
+    trustAllCerts: Boolean = true,
+    connectTimeoutSecs: Long = 30L,
+    readTimeoutSecs: Long = 30L
+): OkHttpClient {
     val builder: OkHttpClient.Builder = OkHttpClient.Builder()
 
     if (cacheDirectory != null) {
@@ -45,16 +47,18 @@ fun cachingHttpClient(cacheDirectory: File? = null,
             maxAge = maxOf(maxAge, MIN_MAXAGE)
 
             response.newBuilder()
-                    .header("Cache-Control", "public, max-age=$maxAge")
-                    .build()
+                .header("Cache-Control", "public, max-age=$maxAge")
+                .build()
 
         } catch (ignored: Throwable) {
             response
         }
     }
 
-    builder.connectTimeout(connectTimeoutSecs, TimeUnit.SECONDS)
-            .readTimeout(readTimeoutSecs, TimeUnit.SECONDS)
+    builder
+        .connectTimeout(connectTimeoutSecs, TimeUnit.SECONDS)
+        .readTimeout(readTimeoutSecs, TimeUnit.SECONDS)
+        .followRedirects(true)
 
     if (trustAllCerts) {
         builder.trustAllCerts()
@@ -77,14 +81,14 @@ class JsonFeedParser(private val httpClient: OkHttpClient,
                 trustAllCerts: Boolean = true,
                 connectTimeoutSecs: Long = 5L,
                 readTimeoutSecs: Long = 5L) : this(
-            cachingHttpClient(
-                    cacheDirectory = cacheDirectory,
-                    cacheSize = cacheSize,
-                    trustAllCerts = trustAllCerts,
-                    connectTimeoutSecs = connectTimeoutSecs,
-                    readTimeoutSecs = readTimeoutSecs
-            ),
-            feedAdapter()
+        cachingHttpClient(
+            cacheDirectory = cacheDirectory,
+            cacheSize = cacheSize,
+            trustAllCerts = trustAllCerts,
+            connectTimeoutSecs = connectTimeoutSecs,
+            readTimeoutSecs = readTimeoutSecs
+        ),
+        feedAdapter()
     )
 
     /**
@@ -94,8 +98,8 @@ class JsonFeedParser(private val httpClient: OkHttpClient,
         val request: Request
         try {
             request = Request.Builder()
-                    .url(url)
-                    .build()
+                .url(url)
+                .build()
         } catch (error: Throwable) {
             throw IllegalArgumentException("Bad URL. Perhaps it is missing an http:// prefix?", error)
         }
@@ -120,13 +124,13 @@ class JsonFeedParser(private val httpClient: OkHttpClient,
      * Parse a JSONFeed
      */
     fun parseJson(json: String): Feed =
-            json.byteInputStream().use { return parseJsonStream(Okio.buffer(Okio.source(it))) }
+        json.byteInputStream().use { return parseJsonStream(Okio.buffer(Okio.source(it))) }
 
     /**
      * Parse a JSONFeed
      */
     fun parseJsonBytes(json: ByteArray): Feed =
-            json.inputStream().use { return parseJsonStream(Okio.buffer(Okio.source(it))) }
+        json.inputStream().use { return parseJsonStream(Okio.buffer(Okio.source(it))) }
 
 
     /**

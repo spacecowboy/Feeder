@@ -53,6 +53,14 @@ interface FeedItemDao {
     suspend fun loadFeedItem(id: Long): FeedItem?
 
     @Query("""
+        SELECT $feedItemColumnsWithFeed
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_items.id IS :id
+        """)
+    suspend fun loadFeedItemWithFeed(id: Long): FeedItemWithFeed?
+
+    @Query("""
         SELECT $FEEDS_TABLE_NAME.$COL_URL
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
@@ -259,7 +267,7 @@ suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > I
 @FlowPreview
 suspend fun FeedItemDao.upsertFeedItems(
         itemsWithText: List<Pair<FeedItem, String>>,
-        block: suspend (Long, String) -> Unit
+        block: suspend (FeedItem, String) -> Unit
 ) {
     val updatedItems = itemsWithText.filter { (item, _) ->
         item.id > ID_UNSET
@@ -272,10 +280,14 @@ suspend fun FeedItemDao.upsertFeedItems(
     val insertedIds = insertFeedItems(insertedItems.map { (item, _) -> item })
 
     updatedItems.forEach { (item, text) ->
-        block(item.id, text)
+        block(item, text)
     }
 
-    insertedIds.zip(insertedItems).forEach {
-        block(it.first, it.second.second)
+    insertedIds.zip(insertedItems).forEach { (itemId, itemToText) ->
+        val (item, text) = itemToText
+
+        item.id = itemId
+
+        block(item, text)
     }
 }

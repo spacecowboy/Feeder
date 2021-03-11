@@ -2,11 +2,14 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.util.Log
+import androidx.work.WorkManager
 import com.nononsenseapps.feeder.blob.blobFile
+import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.db.room.upsertFeedItems
@@ -22,6 +25,8 @@ import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import net.dankito.readability4j.Readability4J
+import okhttp3.OkHttpClient
 import okhttp3.Response
 import org.kodein.di.Kodein
 import org.kodein.di.android.closestKodein
@@ -31,6 +36,7 @@ import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 import java.io.File
 import java.io.IOException
+import java.net.URL
 import java.util.concurrent.Executors
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
@@ -39,42 +45,45 @@ val singleThreadedSync = Executors.newSingleThreadExecutor().asCoroutineDispatch
 val syncMutex = Mutex()
 
 @FlowPreview
-suspend fun syncFeeds(context: Context,
-                      feedId: Long = ID_UNSET,
-                      feedTag: String = "",
-                      forceNetwork: Boolean = false,
-                      parallel: Boolean = false,
-                      minFeedAgeMinutes: Int = 15): Boolean {
+suspend fun syncFeeds(
+    context: Context,
+    feedId: Long = ID_UNSET,
+    feedTag: String = "",
+    forceNetwork: Boolean = false,
+    parallel: Boolean = false,
+    minFeedAgeMinutes: Int = 15
+): Boolean {
     val kodein: Kodein by closestKodein(context)
     val prefs: Prefs by kodein.instance()
     Log.d("CoroutineSync", "${Thread.currentThread().name}: Taking sync mutex")
     return syncMutex.withLock {
         withContext(singleThreadedSync) {
             syncFeeds(
-                    db = kodein.direct.instance(),
-                    filesDir = context.filesDir,
-                    feedParser = kodein.direct.instance(),
-                    feedId = feedId,
-                    feedTag = feedTag,
-                    maxFeedItemCount = prefs.maximumCountPerFeed,
-                    forceNetwork = forceNetwork,
-                    parallel = parallel,
-                    minFeedAgeMinutes = minFeedAgeMinutes
+                kodein,
+                filesDir = context.filesDir,
+                feedId = feedId,
+                feedTag = feedTag,
+                maxFeedItemCount = prefs.maximumCountPerFeed,
+                forceNetwork = forceNetwork,
+                parallel = parallel,
+                minFeedAgeMinutes = minFeedAgeMinutes
             )
         }
     }
 }
 
 @FlowPreview
-internal suspend fun syncFeeds(db: AppDatabase,
-                               filesDir: File,
-                               feedParser: FeedParser,
-                               feedId: Long = ID_UNSET,
-                               feedTag: String = "",
-                               maxFeedItemCount: Int = 100,
-                               forceNetwork: Boolean = false,
-                               parallel: Boolean = false,
-                               minFeedAgeMinutes: Int = 15): Boolean {
+internal suspend fun syncFeeds(
+    kodein: Kodein,
+    filesDir: File,
+    feedId: Long = ID_UNSET,
+    feedTag: String = "",
+    maxFeedItemCount: Int = 100,
+    forceNetwork: Boolean = false,
+    parallel: Boolean = false,
+    minFeedAgeMinutes: Int = 15
+): Boolean {
+    val db: AppDatabase by kodein.instance()
     var result = false
     // Let all new items share download time
     val downloadTime = Instant.now()
@@ -85,7 +94,7 @@ internal suspend fun syncFeeds(db: AppDatabase,
                     Instant.now().toEpochMilli()
                 } else {
                     Instant.now().minus(minFeedAgeMinutes.toLong(), ChronoUnit.MINUTES)
-                            .toEpochMilli()
+                        .toEpochMilli()
                 }
                 val feedsToFetch = feedsToSync(db.feedDao(), feedId, feedTag, staleTime = staleTime)
 
@@ -102,10 +111,9 @@ internal suspend fun syncFeeds(db: AppDatabase,
                     launch(coroutineContext) {
                         try {
                             syncFeed(
+                                kodein = kodein,
                                 feedSql = it,
-                                db = db,
                                 filesDir = filesDir,
-                                feedParser = feedParser,
                                 maxFeedItemCount = maxFeedItemCount,
                                 forceNetwork = forceNetwork,
                                 downloadTime = downloadTime
@@ -131,38 +139,43 @@ internal suspend fun syncFeeds(db: AppDatabase,
 }
 
 @FlowPreview
-private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
-                             db: AppDatabase,
-                             filesDir: File,
-                             feedParser: FeedParser,
-                             maxFeedItemCount: Int,
-                             forceNetwork: Boolean = false,
-                             downloadTime: Instant) {
+private suspend fun syncFeed(
+    kodein: Kodein,
+    feedSql: com.nononsenseapps.feeder.db.room.Feed,
+    filesDir: File,
+    maxFeedItemCount: Int,
+    forceNetwork: Boolean = false,
+    downloadTime: Instant
+) {
     Log.d("CoroutineSync", "Fetching ${feedSql.displayTitle}")
-    val response: Response = fetchFeed(feedParser, feedSql, forceNetwork = forceNetwork)
+    val db: AppDatabase by kodein.instance()
+    val feedParser: FeedParser by kodein.instance()
+    val okHttpClient: OkHttpClient by kodein.instance()
+
+    val response: Response = okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
 
     var responseHash = 0
 
     val feed: Feed? =
-            response.use {
-                val responseBody = it.safeBody()
-                responseBody?.let { body ->
-                    responseHash = body.contentHashCode()
-                    when {
-                        !response.isSuccessful -> {
-                            throw ResponseFailure("${response.code()} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
-                        }
-                        feedSql.responseHash == responseHash -> null // no change
-                        else -> feedParser.parseFeedResponse(it, body)
-                    }
-                }
-            }?.let {
-                // Double check that icon is not base64
+        response.use {
+            val responseBody = it.safeBody()
+            responseBody?.let { body ->
+                responseHash = body.contentHashCode()
                 when {
-                    it.icon?.startsWith("data") == true -> it.copy(icon = null)
-                    else -> it
+                    !response.isSuccessful -> {
+                        throw ResponseFailure("${response.code()} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
+                    }
+                    feedSql.responseHash == responseHash -> null // no change
+                    else -> feedParser.parseFeedResponse(it, body)
                 }
             }
+        }?.let {
+            // Double check that icon is not base64
+            when {
+                it.icon?.startsWith("data") == true -> it.copy(icon = null)
+                else -> it
+            }
+        }
 
     // Always update the feeds last sync field
     feedSql.lastSync = Instant.now()
@@ -173,24 +186,33 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
         val itemDao = db.feedItemDao()
 
         val feedItemSqls =
-                feed.items
-                        ?.map {
-                            val guid = it.id ?: "${it.title}-${it.summary}"
-                            it to guid
-                        }
-                        ?.reversed()
-                        ?.map { (item, guid) ->
-                            val feedItemSql = itemDao.loadFeedItem(guid = guid,
-                                    feedId = feedSql.id) ?: FeedItem(firstSyncedTime = downloadTime)
+            feed.items
+                ?.map {
+                    val guid = it.id ?: "${it.title}-${it.summary}"
+                    it to guid
+                }
+                ?.reversed()
+                ?.map { (item, guid) ->
+                    val feedItemSql = itemDao.loadFeedItem(
+                        guid = guid,
+                        feedId = feedSql.id
+                    ) ?: FeedItem(firstSyncedTime = downloadTime)
 
-                            feedItemSql.updateFromParsedEntry(item, guid, feed)
-                            feedItemSql.feedId = feedSql.id
-                            feedItemSql to (item.content_html ?: item.content_text ?: "")
-                        } ?: emptyList()
+                    feedItemSql.updateFromParsedEntry(item, guid, feed)
+                    feedItemSql.feedId = feedSql.id
+                    feedItemSql to (item.content_html ?: item.content_text ?: "")
+                } ?: emptyList()
 
-        itemDao.upsertFeedItems(feedItemSqls) { feedItemId, text ->
+        itemDao.upsertFeedItems(feedItemSqls) { feedItem, text ->
+            if (feedSql.fullTextByDefault) {
+                scheduleFullTextParse(
+                    kodein = kodein,
+                    feedItem = feedItem
+                )
+            }
+
             withContext(Dispatchers.IO) {
-                blobOutputStream(feedItemId, filesDir).bufferedWriter().use {
+                blobOutputStream(feedItem.id, filesDir).bufferedWriter().use {
                     it.write(text)
                 }
             }
@@ -202,13 +224,13 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
         feedSql.title = feed.title ?: feedSql.title
         feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
         feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) }
-                ?: feedSql.imageUrl
+            ?: feedSql.imageUrl
         db.feedDao().upsertFeed(feedSql)
 
         // Finally, prune database of old items
         val ids = db.feedItemDao().getItemsToBeCleanedFromFeed(
-                feedId = feedSql.id,
-                keepCount = max(maxFeedItemCount, feed.items?.size ?: 0)
+            feedId = feedSql.id,
+            keepCount = max(maxFeedItemCount, feed.items?.size ?: 0)
         )
 
         for (id in ids) {
@@ -226,14 +248,6 @@ private suspend fun syncFeed(feedSql: com.nononsenseapps.feeder.db.room.Feed,
     }
 }
 
-@FlowPreview
-private suspend fun fetchFeed(
-        feedParser: FeedParser,
-        feedSql: com.nononsenseapps.feeder.db.room.Feed,
-        forceNetwork: Boolean = false
-): Response =
-        feedParser.getResponse(feedSql.url, forceNetwork = forceNetwork)
-
 internal suspend fun feedsToSync(feedDao: FeedDao, feedId: Long, tag: String, staleTime: Long = -1L): List<com.nononsenseapps.feeder.db.room.Feed> {
     return when {
         feedId > 0 -> {
@@ -244,7 +258,7 @@ internal suspend fun feedsToSync(feedDao: FeedDao, feedId: Long, tag: String, st
                 emptyList()
             }
         }
-        !tag.isEmpty() -> if (staleTime > 0) feedDao.loadFeedsIfStale(tag = tag, staleTime = staleTime) else feedDao.loadFeeds(tag)
+        tag.isNotEmpty() -> if (staleTime > 0) feedDao.loadFeedsIfStale(tag = tag, staleTime = staleTime) else feedDao.loadFeeds(tag)
         else -> if (staleTime > 0) feedDao.loadFeedsIfStale(staleTime) else feedDao.loadFeeds()
     }
 }

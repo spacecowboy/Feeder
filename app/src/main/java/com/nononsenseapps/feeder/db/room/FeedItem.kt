@@ -11,6 +11,7 @@ import com.nononsenseapps.feeder.db.COL_AUTHOR
 import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
 import com.nononsenseapps.feeder.db.COL_FEEDID
 import com.nononsenseapps.feeder.db.COL_FIRSTSYNCEDTIME
+import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
 import com.nononsenseapps.feeder.db.COL_GUID
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
@@ -39,31 +40,31 @@ const val MAX_SNIPPET_LENGTH = 200
 
 @FlowPreview
 @Entity(tableName = FEED_ITEMS_TABLE_NAME,
-        indices = [Index(value = [COL_GUID, COL_FEEDID], unique = true),
-            Index(value = [COL_FEEDID])],
-        foreignKeys = [ForeignKey(entity = Feed::class,
-                parentColumns = [COL_ID],
-                childColumns = [COL_FEEDID],
-                onDelete = CASCADE)])
+    indices = [Index(value = [COL_GUID, COL_FEEDID], unique = true),
+        Index(value = [COL_FEEDID])],
+    foreignKeys = [ForeignKey(entity = Feed::class,
+        parentColumns = [COL_ID],
+        childColumns = [COL_FEEDID],
+        onDelete = CASCADE)])
 data class FeedItem @Ignore constructor(
-        @PrimaryKey(autoGenerate = true)
-        @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
-        @ColumnInfo(name = COL_GUID) var guid: String = "",
-        @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
-        @ColumnInfo(name = COL_TITLE) var title: String = "",
-        @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
-        @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
-        @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
-        @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
-        @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
-        @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) var pubDate: ZonedDateTime? = null,
-        @ColumnInfo(name = COL_LINK) var link: String? = null,
-        @ColumnInfo(name = COL_UNREAD) var unread: Boolean = true,
-        @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
-        @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
-        @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH,
-        @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) var primarySortTime: Instant = Instant.EPOCH
-) {
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = COL_ID) override var id: Long = ID_UNSET,
+    @ColumnInfo(name = COL_GUID) var guid: String = "",
+    @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
+    @ColumnInfo(name = COL_TITLE) var title: String = "",
+    @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
+    @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
+    @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
+    @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
+    @ColumnInfo(name = COL_AUTHOR) var author: String? = null,
+    @ColumnInfo(name = COL_PUBDATE, typeAffinity = ColumnInfo.TEXT) var pubDate: ZonedDateTime? = null,
+    @ColumnInfo(name = COL_LINK) override var link: String? = null,
+    @ColumnInfo(name = COL_UNREAD) var unread: Boolean = true,
+    @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
+    @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
+    @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH,
+    @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) var primarySortTime: Instant = Instant.EPOCH
+): FeedItemForFetching {
 
     constructor() : this(id = ID_UNSET)
 
@@ -71,7 +72,8 @@ data class FeedItem @Ignore constructor(
         val converter = HtmlToPlainTextConverter()
         // Be careful about nulls.
         val text = entry.content_html ?: entry.content_text ?: ""
-        val summary: String? = (entry.summary ?: entry.content_text ?: converter.convert(text)).take(MAX_SNIPPET_LENGTH)
+        val summary: String? = (entry.summary ?: entry.content_text
+        ?: converter.convert(text)).take(MAX_SNIPPET_LENGTH)
 
         // Make double sure no base64 images are used as thumbnails
         val safeImage = when {
@@ -98,13 +100,13 @@ data class FeedItem @Ignore constructor(
         this.link = entry.url
 
         this.pubDate =
-                try {
-                    // Allow an actual pubdate to be updated
-                    ZonedDateTime.parse(entry.date_published)
-                } catch (t: Throwable) {
-                    // If a pubdate is missing, then don't update if one is already set
-                    this.pubDate ?: ZonedDateTime.now(ZoneOffset.UTC)
-                }
+            try {
+                // Allow an actual pubdate to be updated
+                ZonedDateTime.parse(entry.date_published)
+            } catch (t: Throwable) {
+                // If a pubdate is missing, then don't update if one is already set
+                this.pubDate ?: ZonedDateTime.now(ZoneOffset.UTC)
+            }
         primarySortTime = minOf(firstSyncedTime, pubDate?.toInstant() ?: firstSyncedTime)
     }
 
@@ -139,4 +141,9 @@ data class FeedItem @Ignore constructor(
             }
             return null
         }
+}
+
+interface FeedItemForFetching {
+    val id: Long
+    val link: String?
 }

@@ -16,6 +16,7 @@ buildscript {
     threetentest_version = "1.2.2"
     threetenabp_version = "1.2.2"
     jsoup_version = "1.7.3"
+    readability4j_version = "1.0.5"
 
     androidx_core_version = "1.2.0"
     workmanager_version = '2.4.0'

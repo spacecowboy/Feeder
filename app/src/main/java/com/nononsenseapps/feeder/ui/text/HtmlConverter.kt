@@ -15,13 +15,12 @@ val schema: HTMLSchema by lazy { HTMLSchema() }
 
 @FlowPreview
 fun toSpannedWithImages(
-        kodein: Kodein,
-        source: Reader,
-        siteUrl: URL,
-        maxSize: Point,
-        allowDownload: Boolean,
-        spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
-        urlClickListener: UrlClickListener?
+    kodein: Kodein,
+    source: Reader,
+    siteUrl: URL,
+    maxSize: Point,
+    spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
+    urlClickListener: UrlClickListener?
 ): Spanned {
     val parser = Parser()
     try {

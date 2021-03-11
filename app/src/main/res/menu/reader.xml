@@ -27,6 +27,11 @@
     android:title="@string/open_enclosed_media"
     app:showAsAction="ifRoom" />
   <item
+    android:id="@+id/action_fetch_article"
+    android:icon="@drawable/ic_fetch_article_24dp"
+    android:title="@string/fetch_full_article"
+    app:showAsAction="ifRoom" />
+  <item
     android:id="@+id/action_open_in_webview"
     android:icon="@drawable/ic_web_white_24dp"
     android:title="@string/open_in_web_view"

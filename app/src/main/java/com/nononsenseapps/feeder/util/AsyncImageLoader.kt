@@ -18,6 +18,7 @@ class AsyncImageLoader(override val kodein: Kodein) : KodeinAware {
     private val coroutineScope: CoroutineScope by instance()
     private val imageLoader: ImageLoader by instance()
     private val context: Context by instance()
+    // TODO fix concurrent modification error
     private val cache: ArrayMap<String, Deferred<ImageResult>> = ArrayMap()
 
     /**
