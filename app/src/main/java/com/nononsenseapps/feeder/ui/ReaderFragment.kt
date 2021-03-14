@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.text.Spanned
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -15,14 +16,19 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.text.BidiFormatter
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareFragment
+import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
+import com.nononsenseapps.feeder.model.TextOptions
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_CUSTOM_TAB
@@ -53,39 +59,99 @@ const val ARG_DATE = "date"
 @FlowPreview
 class ReaderFragment : KodeinAwareFragment() {
     private val dateTimeFormat =
-            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
-                    .withLocale(Locale.getDefault())
+        DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
+            .withLocale(Locale.getDefault())
 
     private var _id: Long = ID_UNSET
 
-    // All content contained in RssItem
-    private var rssItem: FeedItemWithFeed? = null
     private lateinit var titleTextView: TextView
+    private lateinit var bodyTextView: TextView
+    private lateinit var authorTextView: TextView
+    private lateinit var feedTitleTextView: TextView
 
     private val viewModel: FeedItemViewModel by instance(arg = this)
-    // Important to get the activity bound view model here hence no arg specified
-    private val settingsViewModel: SettingsViewModel by instance()
+
     private val prefs: Prefs by instance()
     private val warmer: CustomTabsWarmer by instance()
 
-    // Livedata emits on each resume from background - ignore if data is the same so scroll position
-    // is not screwed up.
-    private val observedTexts: MutableSet<Int> = mutableSetOf()
+    private var liveText: LiveData<Spanned>? = null
+
+    // For menu things
+    private var rssItemMenu: FeedItemWithFeed? = null
 
     init {
+        lifecycleScope.launchWhenCreated {
+            liveText = viewModel.getLiveTextMaybeFull(
+                getTextOptions(),
+                urlClickListener()
+            )
+
+            liveText?.observe(this@ReaderFragment) {
+                Log.d("FeederReaderFragment", "Got body text emission")
+                bodyTextView.text = it
+            }
+
+            viewModel.getLiveItem(_id).observe(this@ReaderFragment) { rssItem ->
+                rssItemMenu = rssItem
+
+                titleTextView.text = rssItem.plainTitle
+
+                rssItem.feedId?.let { feedId ->
+                    feedTitleTextView.setOnClickListener {
+                        findNavController()
+                            .navigate(
+                                R.id.action_readerFragment_to_feedFragment,
+                                bundle {
+                                    putLong(ARG_FEED_ID, feedId)
+                                }
+                            )
+                    }
+                }
+
+                feedTitleTextView.text = rssItem.feedDisplayTitle
+
+                rssItem.pubDate.let { pubDate ->
+                    rssItem.author.let { author ->
+                        when {
+                            author == null && pubDate != null ->
+                                authorTextView.text = getString(R.string.on_date,
+                                    pubDate.format(dateTimeFormat))
+                            author != null && pubDate != null ->
+                                authorTextView.text = getString(R.string.by_author_on_date,
+                                    // Must wrap author in unicode marks to ensure it formats
+                                    // correctly in RTL
+                                    unicodeWrap(author),
+                                    pubDate.format(dateTimeFormat))
+                            else -> authorTextView.visibility = View.GONE
+                        }
+                    }
+                }
+
+                // Update state of notification toggle
+                activity?.invalidateOptionsMenu()
+            }
+        }
         lifecycleScope.launchWhenStarted {
             try {
                 if (prefs.shouldPreloadCustomTab) {
+                    val rssItem = viewModel.getItem(_id)
                     warmer.preLoad {
-                        rssItem?.link?.let { Uri.parse(it) }
+                        rssItem.link?.let { Uri.parse(it) }
                     }
                 }
             } catch (e: Exception) {
                 // Don't let this crash
-                Log.e("ReaderFragment", "Couldn't preload ${rssItem?.link}", e)
+                Log.e("ReaderFragment", "Couldn't preload $_id", e)
             }
         }
     }
+
+    private fun getTextOptions(): TextOptions =
+        TextOptions(
+            itemId = _id,
+            maxImageSize = requireActivity().maxImageSize(),
+            nightMode = prefs.isNightMode
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,83 +185,23 @@ class ReaderFragment : KodeinAwareFragment() {
         val rootView = inflater.inflate(theLayout, container, false)
 
         titleTextView = rootView.findViewById(R.id.story_title)
-        val bodyTextView = rootView.findViewById<TextView>(R.id.story_body)
-        val authorTextView = rootView.findViewById<TextView>(R.id.story_author)
-        val feedTitleTextView = rootView.findViewById<TextView>(R.id.story_feedtitle)
+        bodyTextView = rootView.findViewById<TextView>(R.id.story_body)
+        authorTextView = rootView.findViewById<TextView>(R.id.story_author)
+        feedTitleTextView = rootView.findViewById<TextView>(R.id.story_feedtitle)
 
-        lifecycleScope.launchWhenCreated {
-            viewModel.getLiveItem(_id).observe(this@ReaderFragment, androidx.lifecycle.Observer {
-                rssItem = it
-
-                rssItem?.let { rssItem ->
-                    titleTextView.text = rssItem.plainTitle
-
-                    rssItem.feedId?.let { feedId ->
-                        feedTitleTextView.setOnClickListener {
-                            findNavController().navigate(R.id.action_readerFragment_to_feedFragment, bundle {
-                                putLong(ARG_FEED_ID, feedId)
-                            })
-                        }
-                    }
-
-                    feedTitleTextView.text = rssItem.feedDisplayTitle
-
-                    rssItem.pubDate.let { pubDate ->
-                        rssItem.author.let { author ->
-                            when {
-                                author == null && pubDate != null ->
-                                    authorTextView.text = getString(R.string.on_date,
-                                            pubDate.format(dateTimeFormat))
-                                author != null && pubDate != null ->
-                                    authorTextView.text = getString(R.string.by_author_on_date,
-                                            // Must wrap author in unicode marks to ensure it formats
-                                            // correctly in RTL
-                                            unicodeWrap(author),
-                                            pubDate.format(dateTimeFormat))
-                                else -> authorTextView.visibility = View.GONE
-                            }
-                        }
-                    }
-
-                    // Update state of notification toggle
-                    activity?.invalidateOptionsMenu()
-                }
-            })
-
-            viewModel.getLiveImageText(
-                    _id,
-                    activity!!.maxImageSize(),
-                    urlClickListener(),
-                    settingsViewModel.liveIsNightMode
-            ).observe(
-                    this@ReaderFragment,
-                    androidx.lifecycle.Observer {
-                        val hash = it.hashCode()
-                        // Textview will go blank sometimes when resumed, so let the last text through
-                        if (hash == observedTexts.lastOrNull() || hash !in observedTexts) {
-                            observedTexts.add(hash)
-                            bodyTextView.text = it
-                        }
-                    }
-            )
-        }
         return rootView
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        rssItem?.storeInBundle(outState)
-        super.onSaveInstanceState(outState)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.reader, menu)
 
         // Set intent
-        rssItem?.let { rssItem ->
+        rssItemMenu?.let { rssItem ->
             // Show/Hide buttons
             menu.findItem(R.id.action_open_enclosure).isVisible = rssItem.enclosureLink != null
             menu.findItem(R.id.action_open_in_webview).isVisible = rssItem.link != null
             menu.findItem(R.id.action_open_in_browser).isVisible = rssItem.link != null
+            menu.findItem(R.id.action_fetch_article).isVisible = !rssItem.fullTextByDefault
             // Add filename to tooltip
             if (rssItem.enclosureLink != null) {
                 val filename = rssItem.enclosureFilename
@@ -212,23 +218,37 @@ class ReaderFragment : KodeinAwareFragment() {
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
+            R.id.action_fetch_article -> {
+                lifecycleScope.launch {
+                    liveText?.removeObservers(this@ReaderFragment)
+                    liveText = viewModel.getLiveFullText(
+                        getTextOptions(),
+                        urlClickListener()
+                    )
+                    liveText?.observe(this@ReaderFragment) {
+                        bodyTextView.text = it
+                    }
+                }
+                true
+            }
             R.id.action_open_in_webview -> {
                 // Open in web view or custom tab
-                context?.let { context ->
-                    rssItem?.let { rssItem ->
+                lifecycleScope.launch {
+                    context?.let { context ->
+                        val rssItem = viewModel.getItem(_id)
                         rssItem.link?.let { link ->
                             when (prefs.openLinksWith) {
                                 PREF_VAL_OPEN_WITH_CUSTOM_TAB -> {
-                                    openLinkInCustomTab(context, link, rssItem.id)
+                                    openLinkInCustomTab(context, link, _id)
                                 }
                                 else -> {
                                     findNavController().navigate(
-                                            R.id.action_readerFragment_to_readerWebViewFragment,
-                                            bundle {
-                                                putString(ARG_URL, link)
-                                                putString(ARG_ENCLOSURE, rssItem.enclosureLink)
-                                                putLong(ARG_ID, _id)
-                                            }
+                                        R.id.action_readerFragment_to_readerWebViewFragment,
+                                        bundle {
+                                            putString(ARG_URL, link)
+                                            putString(ARG_ENCLOSURE, rssItem.enclosureLink)
+                                            putLong(ARG_ID, _id)
+                                        }
                                     )
                                 }
                             }
@@ -238,20 +258,23 @@ class ReaderFragment : KodeinAwareFragment() {
                 true
             }
             R.id.action_open_in_browser -> {
-                val link = rssItem?.link
-                if (link != null) {
-                    context?.let { context ->
-                        openLinkInBrowser(context, link)
+                lifecycleScope.launch {
+                    val link = viewModel.getItem(_id).link
+                    if (link != null) {
+                        context?.let { context ->
+                            openLinkInBrowser(context, link)
+                        }
                     }
                 }
-
                 true
             }
             R.id.action_open_enclosure -> {
-                val link = rssItem?.enclosureLink
-                if (link != null) {
-                    context?.let { context ->
-                        openLinkInBrowser(context, link)
+                lifecycleScope.launch {
+                    val link = viewModel.getItem(_id).enclosureLink
+                    if (link != null) {
+                        context?.let { context ->
+                            openLinkInBrowser(context, link)
+                        }
                     }
                 }
 
@@ -264,12 +287,14 @@ class ReaderFragment : KodeinAwareFragment() {
                 true
             }
             R.id.action_share -> {
-                rssItem?.link?.let { link ->
-                    val shareIntent = Intent(Intent.ACTION_SEND)
-                    shareIntent.type = "text/plain"
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, link)
+                lifecycleScope.launch {
+                    viewModel.getItem(_id).link?.let { link ->
+                        val shareIntent = Intent(Intent.ACTION_SEND)
+                        shareIntent.type = "text/plain"
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, link)
 
-                    startActivity(Intent.createChooser(shareIntent, getString(R.string.share)))
+                        startActivity(Intent.createChooser(shareIntent, getString(R.string.share)))
+                    }
                 }
                 true
             }
@@ -279,21 +304,21 @@ class ReaderFragment : KodeinAwareFragment() {
 }
 
 fun Fragment.unicodeWrap(text: String): String =
-        BidiFormatter.getInstance(getLocale()).unicodeWrap(text)
+    BidiFormatter.getInstance(getLocale()).unicodeWrap(text)
 
 fun Fragment.getLocale(): Locale? =
-        context?.getLocale()
+    context?.getLocale()
 
 fun Context.unicodeWrap(text: String): String =
-        BidiFormatter.getInstance(getLocale()).unicodeWrap(text)
+    BidiFormatter.getInstance(getLocale()).unicodeWrap(text)
 
 fun Context.getLocale(): Locale =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            resources.configuration.locales[0]
-        } else {
-            @Suppress("DEPRECATION")
-            resources.configuration.locale
-        }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        resources.configuration.locales[0]
+    } else {
+        @Suppress("DEPRECATION")
+        resources.configuration.locale
+    }
 
 fun Fragment.urlClickListener(): (link: String) -> Unit = { link ->
     context?.let { context ->

@@ -167,6 +167,8 @@ dependencies {
   implementation "org.kodein.di:kodein-di-framework-android-x:$kodein_version"
   // Custom tabs
   implementation "com.android.support:customtabs:28.0.0"
+  // Full text
+  implementation "net.dankito.readability4j:readability4j:$readability4j_version"
   // tests
   testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"

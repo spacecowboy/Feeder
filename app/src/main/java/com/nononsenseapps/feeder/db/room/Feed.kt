@@ -6,6 +6,7 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
+import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
 import com.nononsenseapps.feeder.db.COL_LASTSYNC
@@ -32,7 +33,8 @@ data class Feed @Ignore constructor(
         @ColumnInfo(name = COL_NOTIFY) var notify: Boolean = false,
         @ColumnInfo(name = COL_IMAGEURL) var imageUrl: URL? = null,
         @ColumnInfo(name = COL_LASTSYNC, typeAffinity = ColumnInfo.INTEGER) var lastSync: Instant = Instant.EPOCH,
-        @ColumnInfo(name = COL_RESPONSEHASH) var responseHash: Int = 0
+        @ColumnInfo(name = COL_RESPONSEHASH) var responseHash: Int = 0,
+        @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false
 ) {
     constructor() : this(id = ID_UNSET)
 

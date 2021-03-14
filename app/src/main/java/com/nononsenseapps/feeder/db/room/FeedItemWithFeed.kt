@@ -10,6 +10,7 @@ import com.nononsenseapps.feeder.db.COL_FEEDCUSTOMTITLE
 import com.nononsenseapps.feeder.db.COL_FEEDID
 import com.nononsenseapps.feeder.db.COL_FEEDTITLE
 import com.nononsenseapps.feeder.db.COL_FEEDURL
+import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
 import com.nononsenseapps.feeder.db.COL_GUID
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
@@ -44,27 +45,29 @@ const val feedItemColumnsWithFeed = "$FEED_ITEMS_TABLE_NAME.$COL_ID AS $COL_ID, 
         "$COL_AUTHOR, $COL_PUBDATE, $COL_LINK, $COL_UNREAD, $FEEDS_TABLE_NAME.$COL_TAG AS $COL_TAG, $FEEDS_TABLE_NAME.$COL_ID AS $COL_FEEDID, " +
         "$FEEDS_TABLE_NAME.$COL_TITLE AS $COL_FEEDTITLE, " +
         "$FEEDS_TABLE_NAME.$COL_CUSTOM_TITLE AS $COL_FEEDCUSTOMTITLE, " +
-        "$FEEDS_TABLE_NAME.$COL_URL AS $COL_FEEDURL"
+        "$FEEDS_TABLE_NAME.$COL_URL AS $COL_FEEDURL, " +
+        "$FEEDS_TABLE_NAME.$COL_FULLTEXT_BY_DEFAULT AS $COL_FULLTEXT_BY_DEFAULT"
 
 data class FeedItemWithFeed @Ignore constructor(
-        var id: Long = ID_UNSET,
-        var guid: String = "",
-        @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
+    override var id: Long = ID_UNSET,
+    var guid: String = "",
+    @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
         var title: String = "",
-        @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
-        @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
-        @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
-        @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
-        var author: String? = null,
-        @ColumnInfo(name = COL_PUBDATE) var pubDate: ZonedDateTime? = null,
-        var link: String? = null,
-        var tag: String = "",
-        var unread: Boolean = true,
-        @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
-        @ColumnInfo(name = COL_FEEDTITLE) var feedTitle: String = "",
-        @ColumnInfo(name = COL_FEEDCUSTOMTITLE) var feedCustomTitle: String = "",
-        @ColumnInfo(name = COL_FEEDURL) var feedUrl: URL = sloppyLinkToStrictURLNoThrows("")
-) {
+    @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
+    @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
+    @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
+    @ColumnInfo(name = COL_ENCLOSURELINK) var enclosureLink: String? = null,
+    var author: String? = null,
+    @ColumnInfo(name = COL_PUBDATE) var pubDate: ZonedDateTime? = null,
+    override var link: String? = null,
+    var tag: String = "",
+    var unread: Boolean = true,
+    @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
+    @ColumnInfo(name = COL_FEEDTITLE) var feedTitle: String = "",
+    @ColumnInfo(name = COL_FEEDCUSTOMTITLE) var feedCustomTitle: String = "",
+    @ColumnInfo(name = COL_FEEDURL) var feedUrl: URL = sloppyLinkToStrictURLNoThrows(""),
+    @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false
+): FeedItemForFetching {
     constructor() : this(id = ID_UNSET)
 
     val feedDisplayTitle: String

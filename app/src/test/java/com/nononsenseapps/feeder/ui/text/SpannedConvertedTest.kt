@@ -77,13 +77,12 @@ class SpannedConverterTest: KodeinAware {
     fun testOnePixelImagesAreNotRenderedWithGlide() {
         val builder = FakeBuilder()
         toSpannedWithImages(
-                kodein,
-                StringReader("<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">"),
-                URL("http://foo.com"),
-                Point(100, 100),
-                true,
-                builder,
-                null
+            kodein,
+            StringReader("<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">"),
+            URL("http://foo.com"),
+            Point(100, 100),
+            builder,
+            null
         )
 
         assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<ImageSpan>())
