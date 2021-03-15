@@ -99,4 +99,8 @@
     <string name="battery_optimization_enabled">Pil optimizasyonu etkinleştirildi</string>
     <string name="preload_custom_tab">Özel sekmeyi önceden yükle</string>
     <string name="failed_to_parse">%1$s ayrıştırılamadı</string>
+    <string name="fetching_full_article">Makalenin tamamı alınıyor…</string>
+    <string name="failed_to_fetch_full_article">Makalenin tamamı alınamadı</string>
+    <string name="fetch_full_articles_by_default">Öntanımlı olarak makalelerin tamamını al</string>
+    <string name="fetch_full_article">Makalenin tamamını al</string>
 </resources>
