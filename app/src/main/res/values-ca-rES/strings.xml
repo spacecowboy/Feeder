@@ -84,7 +84,7 @@
     <string name="mark_as_read">Marca com a llegit</string>
     <string name="search_feed_empty_hint">Introdueix una adreça de canal</string>
     <string name="empty_feed_add">&lt;font color=#607D8B&gt;Afegir&lt;/font&gt; més canals\?</string>
-    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Obre&lt;/font&gt; un altre canal\?</string>
+    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Obrir&lt;/font&gt; un altre canal\?</string>
     <string name="empty_feed_top">Res a llegir aquí. Voldries…</string>
     <string name="save">Desa</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
@@ -98,4 +98,9 @@
     <string name="action_settings">Configuració</string>
     <string name="navigation_drawer_close">Tanca el panell de navegació</string>
     <string name="navigation_drawer_open">Obre el panell de navegació</string>
+    <string name="fetching_full_article">Obtenint l\'article sencer…</string>
+    <string name="failed_to_fetch_full_article">No s\'ha pogut obtenir l\'article sencer</string>
+    <string name="fetch_full_articles_by_default">Obté els articles sencers per defecte</string>
+    <string name="fetch_full_article">Obté l\'article sencer</string>
+    <string name="failed_to_parse">No s\'ha pogut analitzar %1$s</string>
 </resources>
