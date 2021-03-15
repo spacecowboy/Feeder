@@ -99,4 +99,8 @@
     <string name="tag">Étiquette</string>
     <string name="url">URL</string>
     <string name="failed_to_parse">Échec de l’analyse %1$s</string>
+    <string name="fetching_full_article">Récupération de l\'article entier…</string>
+    <string name="failed_to_fetch_full_article">Échec de la récupération de l\'article entier</string>
+    <string name="fetch_full_articles_by_default">Récupérer l\'article entier par défaut</string>
+    <string name="fetch_full_article">Récupérer l\'article entier</string>
 </resources>
