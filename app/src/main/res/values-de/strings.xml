@@ -99,4 +99,8 @@
     <string name="battery_optimization_enabled">Optimiert</string>
     <string name="preload_custom_tab">Standard-Registerkarte vorladen</string>
     <string name="failed_to_parse">Fehler beim Analysieren %1$s</string>
+    <string name="fetching_full_article">Vollständiger Artikel wird abgerufen …</string>
+    <string name="failed_to_fetch_full_article">Fehler beim Abrufen des vollständigen Artikels</string>
+    <string name="fetch_full_articles_by_default">Vollständige Artikel standardmäßig abrufen</string>
+    <string name="fetch_full_article">Vollständigen Artikel abrufen</string>
 </resources>
