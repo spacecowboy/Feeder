@@ -99,4 +99,8 @@
     <string name="check_for_updates">Se etter oppdateringer</string>
     <string name="may_result_data_charges">Mobildatakostnader kan påløpe.</string>
     <string name="failed_to_parse">Klarte ikke å tolke %1$s</string>
+    <string name="fetching_full_article">Henter hele artikkelen …</string>
+    <string name="failed_to_fetch_full_article">Klarte ikke å hente hele artikkelen</string>
+    <string name="fetch_full_articles_by_default">Hent fullstendige artikler som forvalg</string>
+    <string name="fetch_full_article">Hent hele artikkelen</string>
 </resources>

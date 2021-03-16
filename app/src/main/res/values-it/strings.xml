@@ -99,4 +99,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="url">URL</string>
     <string name="failed_to_parse">Impossibile analizzare %1$s</string>
+    <string name="fetching_full_article">Recupero dell\'articolo completo…</string>
+    <string name="failed_to_fetch_full_article">Impossibile recuperare l\'articolo completo</string>
+    <string name="fetch_full_articles_by_default">Recupera articoli completi per impostazione predefinita</string>
+    <string name="fetch_full_article">Recupera l\'articolo completo</string>
 </resources>

@@ -99,4 +99,8 @@
     <string name="battery_optimization_enabled">Optimización de batería habilitada</string>
     <string name="preload_custom_tab">Precargar pestaña personalizada</string>
     <string name="failed_to_parse">Fallo al analizar %1$s</string>
+    <string name="fetching_full_article">Buscando artículo completo…</string>
+    <string name="failed_to_fetch_full_article">Falló la búsqueda de artículo completo</string>
+    <string name="fetch_full_articles_by_default">Buscar artículos completos por defecto</string>
+    <string name="fetch_full_article">Buscar el artículo completo</string>
 </resources>
