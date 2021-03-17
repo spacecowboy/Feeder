@@ -99,4 +99,8 @@
     <string name="battery_optimization_enabled">Pengoptimalan baterai diaktifkan</string>
     <string name="preload_custom_tab">Pramuat custom tab</string>
     <string name="failed_to_parse">Gagal mengurai %1$s</string>
+    <string name="fetching_full_article">Mengambil artikel lengkap…</string>
+    <string name="failed_to_fetch_full_article">Gagal mengambil artikel lengkap</string>
+    <string name="fetch_full_articles_by_default">Ambil artikel lengkap secara default</string>
+    <string name="fetch_full_article">Ambil artikel lengkap</string>
 </resources>
