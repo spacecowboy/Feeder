@@ -39,7 +39,6 @@ buildscript {
 
     mockk_version = "1.9.3"
     mockito_version = "2.13.0"
-
   }
 
 
@@ -59,8 +58,13 @@ buildscript {
 allprojects {
   repositories {
     google()
-    jcenter()
     mavenCentral()
+    jcenter() {
+      content {
+        includeModule("org.jetbrains.trove4j", "trove4j")
+        includeModule("com.linkedin.dexmaker", "dexmaker")
+      }
+    }
   }
 
   tasks.withType(JavaCompile) {

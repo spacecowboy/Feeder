@@ -139,7 +139,7 @@ dependencies {
   implementation "androidx.paging:paging-runtime-ktx:$paging_version"
 
   // To support SDK18
-  implementation "com.nononsenseapps:filepicker:4.1.0"
+  implementation "com.nononsenseapps:filepicker:4.2.1"
   // Better times
   implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
   // HTML parsing
