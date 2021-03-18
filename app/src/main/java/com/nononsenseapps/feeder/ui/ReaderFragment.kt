@@ -22,12 +22,9 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareFragment
-import com.nononsenseapps.feeder.db.room.Feed
-import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
-import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextOptions
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.maxImageSize
@@ -45,7 +42,7 @@ import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
-import java.util.*
+import java.util.Locale
 
 const val ARG_TITLE = "title"
 const val ARG_CUSTOMTITLE = "customtitle"
@@ -114,14 +111,18 @@ class ReaderFragment : KodeinAwareFragment() {
                     rssItem.author.let { author ->
                         when {
                             author == null && pubDate != null ->
-                                authorTextView.text = getString(R.string.on_date,
-                                    pubDate.format(dateTimeFormat))
+                                authorTextView.text = getString(
+                                    R.string.on_date,
+                                    pubDate.format(dateTimeFormat)
+                                )
                             author != null && pubDate != null ->
-                                authorTextView.text = getString(R.string.by_author_on_date,
+                                authorTextView.text = getString(
+                                    R.string.by_author_on_date,
                                     // Must wrap author in unicode marks to ensure it formats
                                     // correctly in RTL
                                     unicodeWrap(author),
-                                    pubDate.format(dateTimeFormat))
+                                    pubDate.format(dateTimeFormat)
+                                )
                             else -> authorTextView.visibility = View.GONE
                         }
                     }
@@ -174,8 +175,11 @@ class ReaderFragment : KodeinAwareFragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
         val theLayout = if (TabletUtils.isTablet(activity)) {
             R.layout.fragment_reader_tablet
@@ -208,7 +212,6 @@ class ReaderFragment : KodeinAwareFragment() {
                 if (filename != null) {
                     menu.findItem(R.id.action_open_enclosure).title = filename
                 }
-
             }
         }
 
@@ -330,9 +333,12 @@ fun Fragment.urlClickListener(): (link: String) -> Unit = { link ->
                 openLinkInCustomTab(context, link, null)
             }
             PREF_VAL_OPEN_WITH_WEBVIEW -> {
-                findNavController().navigate(R.id.action_readerFragment_to_readerWebViewFragment, bundle {
-                    putString(ARG_URL, link)
-                })
+                findNavController().navigate(
+                    R.id.action_readerFragment_to_readerWebViewFragment,
+                    bundle {
+                        putString(ARG_URL, link)
+                    }
+                )
             }
             else -> {
                 openLinkInBrowser(context, link)

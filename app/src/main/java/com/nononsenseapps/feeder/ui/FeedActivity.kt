@@ -16,15 +16,23 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.AppBarLayout.LayoutParams.*
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareActivity
-import com.nononsenseapps.feeder.model.*
+import com.nononsenseapps.feeder.model.FeedListViewModel
+import com.nononsenseapps.feeder.model.FeedUnreadCount
+import com.nononsenseapps.feeder.model.SettingsViewModel
+import com.nononsenseapps.feeder.model.configurePeriodicSync
+import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
+import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.bundle
-import kotlinx.android.synthetic.main.activity_navigation.*
-import kotlinx.android.synthetic.main.app_bar_navigation.*
-import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.*
+import kotlinx.android.synthetic.main.activity_navigation.drawer_layout
+import kotlinx.android.synthetic.main.app_bar_navigation.fab
+import kotlinx.android.synthetic.main.app_bar_navigation.toolbar
+import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.navdrawer_list
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
@@ -69,20 +77,20 @@ class FeedActivity : KodeinAwareActivity() {
 
             settingsViewModel.liveThemePreferenceNoInitial.observe(this@FeedActivity) {
                 val intents = NavDeepLinkBuilder(this@FeedActivity)
-                        .setGraph(R.navigation.nav_graph)
-                        .setDestination(R.id.settingsFragment)
-                        .createTaskStackBuilder()
-                        .intents
+                    .setGraph(R.navigation.nav_graph)
+                    .setDestination(R.id.settingsFragment)
+                    .createTaskStackBuilder()
+                    .intents
 
                 finish()
                 startActivities(intents)
             }
 
             feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observe(
-                    this@FeedActivity,
-                    androidx.lifecycle.Observer<List<FeedUnreadCount>> {
-                        navAdapter.submitList(it)
-                    }
+                this@FeedActivity,
+                androidx.lifecycle.Observer<List<FeedUnreadCount>> {
+                    navAdapter.submitList(it)
+                }
             )
 
             // When the user runs the app for the first time, we want to land them with the
@@ -126,11 +134,11 @@ class FeedActivity : KodeinAwareActivity() {
         }
 
         val toggle = ActionBarDrawerToggle(
-                this,
-                drawer_layout,
-                toolbar,
-                R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close
+            this,
+            drawer_layout,
+            toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
@@ -147,12 +155,15 @@ class FeedActivity : KodeinAwareActivity() {
                 drawer_layout.closeDrawer(GravityCompat.START)
 
                 if (navController.currentDestination?.id == R.id.feedFragment) {
-                    navController.navigate(R.id.action_feedFragment_self, bundle {
-                        putLong(ARG_FEED_ID, id)
-                        putString(ARG_FEED_TITLE, displayTitle)
-                        putString(ARG_FEED_URL, url)
-                        putString(ARG_FEED_TAG, tag)
-                    })
+                    navController.navigate(
+                        R.id.action_feedFragment_self,
+                        bundle {
+                            putLong(ARG_FEED_ID, id)
+                            putString(ARG_FEED_TITLE, displayTitle)
+                            putString(ARG_FEED_URL, url)
+                            putString(ARG_FEED_TAG, tag)
+                        }
+                    )
                 }
             }
         })
@@ -174,7 +185,7 @@ class FeedActivity : KodeinAwareActivity() {
             when (destination.id) {
                 R.id.feedFragment -> {
                     fab.setImageResource(R.drawable.ic_done_all_white_24dp)
-                    if ( prefs.show_fab ) {
+                    if (prefs.show_fab) {
                         fab.show()
                     } else {
                         fab.hide()
@@ -234,14 +245,14 @@ class FeedActivity : KodeinAwareActivity() {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
             val handled: Boolean = supportFragmentManager
-                    .primaryNavigationFragment
-                    ?.childFragmentManager
-                    ?.primaryNavigationFragment.let {
-                when (it) {
-                    is ReaderWebViewFragment -> it.goBack()
-                    else -> false
+                .primaryNavigationFragment
+                ?.childFragmentManager
+                ?.primaryNavigationFragment.let {
+                    when (it) {
+                        is ReaderWebViewFragment -> it.goBack()
+                        else -> false
+                    }
                 }
-            }
 
             if (!handled) {
                 super.onBackPressed()
@@ -262,10 +273,12 @@ class FeedActivity : KodeinAwareActivity() {
     private fun syncFeedsMaybe() = lifecycleScope.launch {
         if (prefs.syncOnResume) {
             if (isOkToSyncAutomatically(applicationContext)) {
-                requestFeedSync(kodein = kodein,
-                        ignoreConnectivitySettings = false,
-                        forceNetwork = false,
-                        parallell = true)
+                requestFeedSync(
+                    kodein = kodein,
+                    ignoreConnectivitySettings = false,
+                    forceNetwork = false,
+                    parallell = true
+                )
             }
         }
     }

@@ -12,8 +12,6 @@ import androidx.browser.customtabs.CustomTabsSession
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.FeederService
 import com.nononsenseapps.feeder.model.getColorCompat
-import java.util.regex.Pattern
-
 
 // Using negative lookahead to skip data: urls, being inline base64
 // And capturing original quote to use as ending quote
@@ -51,13 +49,13 @@ fun openLinkInCustomTab(context: Context, link: String, feedItemId: Long?, sessi
 
             if (feedItemId != null) {
                 addMenuItem(
-                        context.getString(R.string.mark_as_unread),
-                        PendingIntent.getService(
-                                context,
-                                0,
-                                FeederService.getIntentForId(context, feedItemId),
-                                PendingIntent.FLAG_UPDATE_CURRENT
-                        )
+                    context.getString(R.string.mark_as_unread),
+                    PendingIntent.getService(
+                        context,
+                        0,
+                        FeederService.getIntentForId(context, feedItemId),
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    )
                 )
             }
         }.build()

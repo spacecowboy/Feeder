@@ -59,17 +59,21 @@ class CustomFeedTitleIsShownInListItemsTest {
     }
 
     private suspend fun insertDataAndLaunch(title: String, customTitle: String) {
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
                 title = title,
                 customTitle = customTitle,
                 url = URL("http://foo")
-        ))
+            )
+        )
 
-        testDb.db.feedItemDao().insertFeedItem(FeedItem(
+        testDb.db.feedItemDao().insertFeedItem(
+            FeedItem(
                 guid = "fooitem1",
                 feedId = feedId,
                 title = "fooitem"
-        ))
+            )
+        )
 
         activityRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId")))
     }

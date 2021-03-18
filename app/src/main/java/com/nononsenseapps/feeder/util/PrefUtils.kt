@@ -96,7 +96,7 @@ object PreferenceSummaryUpdater : Preference.OnPreferenceChangeListener {
 }
 
 fun SharedPreferences.getStringNonNull(key: String, defaultValue: String): String =
-        getString(key, defaultValue) ?: defaultValue
+    getString(key, defaultValue) ?: defaultValue
 
 class Prefs(override val kodein: Kodein) : KodeinAware {
     private val sp: SharedPreferences by instance()
@@ -165,12 +165,12 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
             else -> CurrentTheme.SYSTEM
         }
         set(value) = sp.edit().putString(
-                PREF_THEME,
-                when (value) {
-                    CurrentTheme.NIGHT -> app.getString(R.string.pref_theme_value_night)
-                    CurrentTheme.DAY -> app.getString(R.string.pref_theme_value_day)
-                    CurrentTheme.SYSTEM -> app.getString(R.string.pref_theme_value_system)
-                }
+            PREF_THEME,
+            when (value) {
+                CurrentTheme.NIGHT -> app.getString(R.string.pref_theme_value_night)
+                CurrentTheme.DAY -> app.getString(R.string.pref_theme_value_day)
+                CurrentTheme.SYSTEM -> app.getString(R.string.pref_theme_value_system)
+            }
         ).apply()
 
     var isNightMode: Boolean
@@ -190,14 +190,13 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
         get() = when (sp.getString(PREF_SORT, app.getString(R.string.pref_sort_value_default))) {
             app.getString(R.string.pref_sort_value_oldest_first) -> CurrentSorting.OLDEST_FIRST
             else -> CurrentSorting.NEWEST_FIRST
-
         }
         set(value) = sp.edit().putString(
-                PREF_SORT,
-                when (value) {
-                    CurrentSorting.NEWEST_FIRST -> app.getString(R.string.pref_sort_value_newest_first)
-                    CurrentSorting.OLDEST_FIRST -> app.getString(R.string.pref_sort_value_oldest_first)
-                }
+            PREF_SORT,
+            when (value) {
+                CurrentSorting.NEWEST_FIRST -> app.getString(R.string.pref_sort_value_newest_first)
+                CurrentSorting.OLDEST_FIRST -> app.getString(R.string.pref_sort_value_oldest_first)
+            }
         ).apply()
 
     var isNewestFirst: Boolean
@@ -228,9 +227,9 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
      * @param tag
      */
     fun setLastOpenFeed(id: Long, tag: String?) =
-            sp.edit().putLong(PREF_LAST_FEED_ID, id)
-                    .putString(PREF_LAST_FEED_TAG, tag)
-                    .apply()
+        sp.edit().putLong(PREF_LAST_FEED_ID, id)
+            .putString(PREF_LAST_FEED_TAG, tag)
+            .apply()
 
     /**
      * Get which feed tag was last open. Check id first.
@@ -270,4 +269,3 @@ enum class CurrentSorting {
 
 val Context.isSystemThemeNight: Boolean
     get() = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-

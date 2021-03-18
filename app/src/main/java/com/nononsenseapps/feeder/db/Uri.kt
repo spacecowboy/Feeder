@@ -4,7 +4,6 @@ package com.nononsenseapps.feeder.db
 
 import android.net.Uri
 
-
 const val AUTHORITY = "com.nononsenseapps.feeder.provider"
 const val SCHEME = "content://"
 

@@ -22,8 +22,8 @@ import java.lang.reflect.InvocationTargetException
  */
 open class KodeinAwareViewModel(override val kodein: Kodein) : AndroidViewModel(kodein.direct.instance()), KodeinAware
 
-class KodeinAwareViewModelFactory(override val kodein: Kodein)
-    : ViewModelProvider.AndroidViewModelFactory(kodein.direct.instance()), KodeinAware {
+class KodeinAwareViewModelFactory(override val kodein: Kodein) :
+    ViewModelProvider.AndroidViewModelFactory(kodein.direct.instance()), KodeinAware {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return if (KodeinAwareViewModel::class.java.isAssignableFrom(modelClass)) {
             try {
@@ -44,14 +44,14 @@ class KodeinAwareViewModelFactory(override val kodein: Kodein)
 }
 
 inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.activityViewModelProvider():
-        Provider<C, T> {
+    Provider<C, T> {
     return provider {
         ViewModelProvider(instance<FragmentActivity>(), instance<KodeinAwareViewModelFactory>()).get(T::class.java)
     }
 }
 
 inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.fragmentViewModelFactory():
-        Factory<C, Fragment, T> {
+    Factory<C, Fragment, T> {
     return factory { fragment: Fragment ->
         ViewModelProvider(fragment, instance<KodeinAwareViewModelFactory>()).get(T::class.java)
     }

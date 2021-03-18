@@ -22,31 +22,38 @@ class MigrationFrom10To11 {
     @Rule
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
-            InstrumentationRegistry.getInstrumentation(),
-            AppDatabase::class.java.canonicalName,
-            FrameworkSQLiteOpenHelperFactory())
+        InstrumentationRegistry.getInstrumentation(),
+        AppDatabase::class.java.canonicalName,
+        FrameworkSQLiteOpenHelperFactory()
+    )
 
     @Test
     fun migrate10to11() {
         var db = testHelper.createDatabase(dbName, 10)
 
         db.use {
-            db.execSQL("""
+            db.execSQL(
+                """
             INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash)
             VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666)
-        """.trimIndent())
+                """.trimIndent()
+            )
 
-            db.execSQL("""
+            db.execSQL(
+                """
             INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id)
             VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1)
-        """.trimIndent())
+                """.trimIndent()
+            )
         }
 
         db = testHelper.runMigrationsAndValidate(dbName, 11, true, MIGRATION_10_11)
 
-        db.query("""
+        db.query(
+            """
             SELECT first_synced_time FROM feed_items
-        """.trimIndent())!!.use {
+            """.trimIndent()
+        )!!.use {
             assert(it.count == 1)
             assert(it.moveToFirst())
             assertEquals(0L, it.getLong(0))

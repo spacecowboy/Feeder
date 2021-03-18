@@ -22,7 +22,7 @@ class FeedHolder(private val onNavigationItemClickListener: OnNavigationItemClic
     override fun onClick(v: View) {
         item?.let {
             onNavigationItemClickListener.onNavigationItemClick(
-                    it.id, it.displayTitle, it.url.toString(), it.tag
+                it.id, it.displayTitle, it.url.toString(), it.tag
             )
         }
     }

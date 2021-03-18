@@ -27,21 +27,29 @@ class NotificationClearingTest {
 
     @Test
     fun clearingNotificationMarksAsNotified() = runBlocking {
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
                 title = "testFeed",
                 url = URL("http://testfeed"),
                 tag = "testTag"
-        ))
+            )
+        )
 
-        val item1Id = testDb.db.feedItemDao().insertFeedItem(FeedItem(
+        val item1Id = testDb.db.feedItemDao().insertFeedItem(
+            FeedItem(
                 feedId = feedId,
                 guid = "item1",
                 title = "item1",
                 notified = false
-        ))
+            )
+        )
 
-        val di = getDeleteIntent(getApplicationContext(), FeedItemWithFeed(
-                id = item1Id, feedId = feedId, guid = "item1", title = "item1"))
+        val di = getDeleteIntent(
+            getApplicationContext(),
+            FeedItemWithFeed(
+                id = item1Id, feedId = feedId, guid = "item1", title = "item1"
+            )
+        )
 
         runBlocking {
             // Receiver runs on main thread
@@ -58,18 +66,22 @@ class NotificationClearingTest {
 
     @Test
     fun notifyWorksOnMainThread() = runBlocking {
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
                 title = "testFeed",
                 url = URL("http://testfeed"),
                 tag = "testTag"
-        ))
+            )
+        )
 
-        testDb.db.feedItemDao().insertFeedItem(FeedItem(
+        testDb.db.feedItemDao().insertFeedItem(
+            FeedItem(
                 feedId = feedId,
                 guid = "item1",
                 title = "item1",
                 notified = false
-        ))
+            )
+        )
 
         runBlocking {
             // Try to notify on main thread

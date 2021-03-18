@@ -49,14 +49,16 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null
 
             // Update shortcuts
             val shortcut: ShortcutInfo = ShortcutInfo.Builder(this, "$id")
-                    .setShortLabel(label)
-                    .setLongLabel(label)
-                    .setIcon(icon
-                            ?: Icon.createWithBitmap(getLetterIcon(label, id, radius = shortcutManager.iconMaxHeight)))
-                    .setIntent(intent)
-                    .setDisabledMessage("Feed deleted")
-                    .setRank(0)
-                    .build()
+                .setShortLabel(label)
+                .setLongLabel(label)
+                .setIcon(
+                    icon
+                        ?: Icon.createWithBitmap(getLetterIcon(label, id, radius = shortcutManager.iconMaxHeight))
+                )
+                .setIntent(intent)
+                .setDisabledMessage("Feed deleted")
+                .setRank(0)
+                .build()
 
             if (current.map { it.id }.contains(shortcut.id)) {
                 // Just update existing one

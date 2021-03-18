@@ -2,7 +2,11 @@ package com.nononsenseapps.feeder.util
 
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.*
+import android.content.Intent.ACTION_SENDTO
+import android.content.Intent.ACTION_VIEW
+import android.content.Intent.EXTRA_EMAIL
+import android.content.Intent.EXTRA_SUBJECT
+import android.content.Intent.EXTRA_TEXT
 import android.net.Uri
 import android.os.Build
 import com.nononsenseapps.feeder.BuildConfig
@@ -22,7 +26,7 @@ if (isTablet) {
 }}
 
             Describe your issue and how to reproduce it below:
-        """.trimIndent()
+""".trimIndent()
 
 internal fun emailReportAddress(): String = "jonas.feederbugs@cowboyprogrammer.org"
 
@@ -32,7 +36,6 @@ fun emailBugReportIntent(context: Context?): Intent = Intent(ACTION_SENDTO).also
     it.putExtra(EXTRA_EMAIL, emailReportAddress())
     it.data = Uri.parse("mailto:${emailReportAddress()}")
 }
-
 
 fun openGitlabIssues(): Intent = Intent(ACTION_VIEW).also {
     it.data = Uri.parse("https://gitlab.com/spacecowboy/Feeder/issues")

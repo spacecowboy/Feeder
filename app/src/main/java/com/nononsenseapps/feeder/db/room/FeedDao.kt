@@ -29,9 +29,11 @@ interface FeedDao {
     @Query("DELETE FROM feeds WHERE id IS :feedId")
     suspend fun deleteFeedWithId(feedId: Long)
 
-    @Query("""
+    @Query(
+        """
         DELETE FROM feeds WHERE id IN (:ids)
-        """)
+        """
+    )
     suspend fun deleteFeeds(ids: List<Long>)
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
@@ -43,11 +45,13 @@ interface FeedDao {
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
     suspend fun loadFeed(feedId: Long): Feed?
 
-    @Query("""
+    @Query(
+        """
        SELECT * FROM feeds
        WHERE id is :feedId
        AND last_sync < :staleTime
-    """)
+    """
+    )
     suspend fun loadFeedIfStale(feedId: Long, staleTime: Long): Feed?
 
     @Query("SELECT * FROM feeds WHERE tag IS :tag")
@@ -77,7 +81,8 @@ interface FeedDao {
     @Query("SELECT id FROM feeds WHERE notify IS 1")
     suspend fun loadFeedIdsToNotify(): List<Long>
 
-    @Query("""
+    @Query(
+        """
         SELECT id, title, url, tag, custom_title, notify, image_url, unread_count
         FROM feeds
         LEFT JOIN (SELECT COUNT(1) AS unread_count, feed_id
@@ -86,7 +91,8 @@ interface FeedDao {
           GROUP BY feed_id
         )
         ON feeds.id = feed_id
-    """)
+    """
+    )
     fun loadLiveFeedsWithUnreadCounts(): Flow<List<FeedUnreadCount>>
 
     @Query("UPDATE feeds SET notify = :notify WHERE id IS :id")
@@ -101,11 +107,13 @@ interface FeedDao {
     @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds WHERE id IS :feedId")
     suspend fun getFeedTitle(feedId: Long): List<FeedTitle>
 
-    @Query("""
+    @Query(
+        """
         SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE
         FROM feeds
         WHERE $COL_TAG IS :feedTag
-        """)
+        """
+    )
     suspend fun getFeedTitlesWithTag(feedTag: String): List<FeedTitle>
 
     @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds")

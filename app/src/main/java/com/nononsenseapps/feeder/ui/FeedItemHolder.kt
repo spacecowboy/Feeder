@@ -54,7 +54,10 @@ class FeedItemHolder(
     private val feedItemsViewModel: FeedItemsViewModel,
     private val settingsViewModel: SettingsViewModel,
     private val actionCallback: ActionCallback
-) : ViewHolder(view), View.OnClickListener, ViewTreeObserver.OnPreDrawListener, KodeinAware,
+) : ViewHolder(view),
+    View.OnClickListener,
+    ViewTreeObserver.OnPreDrawListener,
+    KodeinAware,
     View.OnCreateContextMenuListener {
     private val TAG = "FeedItemHolder"
     val titleTextView: TextView = view.findViewById(R.id.story_snippet)
@@ -77,51 +80,56 @@ class FeedItemHolder(
         view.setOnClickListener(this)
         view.setOnCreateContextMenuListener(this)
         // Swipe handler
-        view.setOnTouchListener(SwipeDismissTouchListener(view, null, object : SwipeDismissTouchListener.DismissCallbacks {
-            override fun canDismiss(token: Any?): Boolean = rssItem != null
+        view.setOnTouchListener(
+            SwipeDismissTouchListener(
+                view, null,
+                object : SwipeDismissTouchListener.DismissCallbacks {
+                    override fun canDismiss(token: Any?): Boolean = rssItem != null
 
-            override fun onDismiss(view: View, token: Any?) {
-                actionCallback.onDismiss(rssItem)
-            }
+                    override fun onDismiss(view: View, token: Any?) {
+                        actionCallback.onDismiss(rssItem)
+                    }
 
-            /**
-             * Called when a swipe is started.
-             *
-             * @param goingRight true if swiping to the right, false if left
-             */
-            override fun onSwipeStarted(goingRight: Boolean) {
-                actionCallback.onSwipeStarted()
+                    /**
+                     * Called when a swipe is started.
+                     *
+                     * @param goingRight true if swiping to the right, false if left
+                     */
+                    override fun onSwipeStarted(goingRight: Boolean) {
+                        actionCallback.onSwipeStarted()
 
-                bgFrame.setBackgroundColor(settingsViewModel.backgroundColor)
+                        bgFrame.setBackgroundColor(settingsViewModel.backgroundColor)
 
-                checkBg.visibility = View.VISIBLE
-                if (goingRight) {
-                    checkLeft.visibility = View.VISIBLE
-                } else {
-                    checkRight.visibility = View.VISIBLE
+                        checkBg.visibility = View.VISIBLE
+                        if (goingRight) {
+                            checkLeft.visibility = View.VISIBLE
+                        } else {
+                            checkRight.visibility = View.VISIBLE
+                        }
+                    }
+
+                    /**
+                     * Called when user doesn't swipe all the way.
+                     */
+                    override fun onSwipeCancelled() {
+                        actionCallback.onSwipeCancelled()
+
+                        checkBg.visibility = View.INVISIBLE
+                        checkLeft.visibility = View.INVISIBLE
+                        checkRight.visibility = View.INVISIBLE
+
+                        bgFrame.background = null
+                    }
+
+                    /**
+                     * @return the subview which should move
+                     */
+                    override fun getSwipingView(): View {
+                        return bgFrame
+                    }
                 }
-            }
-
-            /**
-             * Called when user doesn't swipe all the way.
-             */
-            override fun onSwipeCancelled() {
-                actionCallback.onSwipeCancelled()
-
-                checkBg.visibility = View.INVISIBLE
-                checkLeft.visibility = View.INVISIBLE
-                checkRight.visibility = View.INVISIBLE
-
-                bgFrame.background = null
-            }
-
-            /**
-             * @return the subview which should move
-             */
-            override fun getSwipingView(): View {
-                return bgFrame
-            }
-        }))
+            )
+        )
     }
 
     fun resetView() {
@@ -146,18 +154,24 @@ class FeedItemHolder(
                 rssItem.plainTitle + " \u2014 " + rssItem.plainSnippet + "\u2026"
             val textSpan = SpannableString(temps)
 
-            textSpan.setSpan(TextAppearanceSpan(view.context, R.style.TextAppearance_ListItem_Body),
+            textSpan.setSpan(
+                TextAppearanceSpan(view.context, R.style.TextAppearance_ListItem_Body),
                 rssItem.plainTitle.length, temps.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
 
             if (rssItem.unread && !forceRead) {
-                textSpan.setSpan(TextAppearanceSpan(view.context, R.style.TextAppearance_ListItem_Title),
+                textSpan.setSpan(
+                    TextAppearanceSpan(view.context, R.style.TextAppearance_ListItem_Title),
                     0, rssItem.plainTitle.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             } else {
-                textSpan.setSpan(TextAppearanceSpan(view.context, R.style.TextAppearance_ListItem_Title_Read),
+                textSpan.setSpan(
+                    TextAppearanceSpan(view.context, R.style.TextAppearance_ListItem_Title_Read),
                     0, rssItem.plainTitle.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
             titleTextView.text = textSpan
         }
@@ -224,9 +238,12 @@ class FeedItemHolder(
                 }
                 else -> {
                     rssItem?.let {
-                        view.findNavController().navigate(R.id.action_feedFragment_to_readerFragment, bundle {
-                            putLong(ARG_ID, it.id)
-                        })
+                        view.findNavController().navigate(
+                            R.id.action_feedFragment_to_readerFragment,
+                            bundle {
+                                putLong(ARG_ID, it.id)
+                            }
+                        )
                     }
                 }
             }
@@ -283,9 +300,12 @@ class FeedItemHolder(
             menuInflater.inflate(R.menu.feeditem, menu)
             menu.findItem(R.id.open_feed).setOnMenuItemClickListener {
                 rssItem?.feedId?.let {
-                    findNavController(view).navigate(R.id.action_feedFragment_self, bundle {
-                        putLong(ARG_FEED_ID, it)
-                    })
+                    findNavController(view).navigate(
+                        R.id.action_feedFragment_self,
+                        bundle {
+                            putLong(ARG_FEED_ID, it)
+                        }
+                    )
                 }
                 true
             }

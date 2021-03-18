@@ -59,17 +59,18 @@ class RssLocalSyncKtTest {
     }
 
     suspend fun insertFeed(title: String, url: URL, raw: String, isJson: Boolean = true): Long {
-        val id = testDb.db.feedDao().insertFeed(Feed(
-            title = title,
-            url = url,
-            tag = ""
-        ))
+        val id = testDb.db.feedDao().insertFeed(
+            Feed(
+                title = title,
+                url = url,
+                tag = ""
+            )
+        )
 
         server.setDispatcher(object : Dispatcher() {
             override fun dispatch(request: RecordedRequest?): MockResponse {
                 return responses.getOrDefault(request?.requestUrl?.url(), MockResponse().setResponseCode(404))
             }
-
         })
 
         responses[url] = MockResponse().apply {
@@ -85,8 +86,10 @@ class RssLocalSyncKtTest {
 
     @Test
     fun syncCowboyJsonWorks() = runBlocking {
-        val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
-            cowboyJson)
+        val cowboyJsonId = insertFeed(
+            "cowboyjson", server.url("/feed.json").url(),
+            cowboyJson
+        )
 
         runBlocking {
             syncFeeds(
@@ -99,13 +102,16 @@ class RssLocalSyncKtTest {
         assertEquals(
             "Unexpected number of items in feed",
             10,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size)
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size
+        )
     }
 
     @Test
     fun syncCowboyAtomWorks() = runBlocking {
-        val cowboyAtomId = insertFeed("cowboyatom", server.url("/atom.xml").url(),
-            cowboyAtom, isJson = false)
+        val cowboyAtomId = insertFeed(
+            "cowboyatom", server.url("/atom.xml").url(),
+            cowboyAtom, isJson = false
+        )
 
         runBlocking {
             syncFeeds(
@@ -118,15 +124,20 @@ class RssLocalSyncKtTest {
         assertEquals(
             "Unexpected number of items in feed",
             15,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size)
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size
+        )
     }
 
     @Test
     fun syncAllWorks() = runBlocking {
-        val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
-            cowboyJson)
-        val cowboyAtomId = insertFeed("cowboyatom", server.url("/atom.xml").url(),
-            cowboyAtom, isJson = false)
+        val cowboyJsonId = insertFeed(
+            "cowboyjson", server.url("/feed.json").url(),
+            cowboyJson
+        )
+        val cowboyAtomId = insertFeed(
+            "cowboyatom", server.url("/atom.xml").url(),
+            cowboyAtom, isJson = false
+        )
 
         runBlocking {
             syncFeeds(
@@ -140,18 +151,22 @@ class RssLocalSyncKtTest {
         assertEquals(
             "Unexpected number of items in feed",
             10,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size)
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size
+        )
 
         assertEquals(
             "Unexpected number of items in feed",
             15,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size)
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size
+        )
     }
 
     @Test
     fun responsesAreNotParsedUnlessFeedHashHasChanged() = runBlocking {
-        val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
-            cowboyJson)
+        val cowboyJsonId = insertFeed(
+            "cowboyjson", server.url("/feed.json").url(),
+            cowboyJson
+        )
 
         runBlocking {
             syncFeeds(kodein = kodein, filesDir = filesDir, feedId = cowboyJsonId, forceNetwork = true)
@@ -169,13 +184,16 @@ class RssLocalSyncKtTest {
         assertNotEquals(
             "Cached response should still have updated feed last sync",
             999L,
-            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync.toEpochMilli())
+            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync.toEpochMilli()
+        )
     }
 
     @Test
     fun feedsSyncedWithin15MinAreIgnored() = runBlocking {
-        val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
-            cowboyJson)
+        val cowboyJsonId = insertFeed(
+            "cowboyjson", server.url("/feed.json").url(),
+            cowboyJson
+        )
 
         val fourteenMinsAgo = Instant.now().minusMinutes(14)
         runBlocking {
@@ -186,23 +204,30 @@ class RssLocalSyncKtTest {
 
                 testDb.db.feedDao().updateFeed(feed.copy(lastSync = fourteenMinsAgo))
             }
-            syncFeeds(kodein = kodein, filesDir = filesDir,
-                feedId = cowboyJsonId, forceNetwork = false, minFeedAgeMinutes = 15)
+            syncFeeds(
+                kodein = kodein, filesDir = filesDir,
+                feedId = cowboyJsonId, forceNetwork = false, minFeedAgeMinutes = 15
+            )
         }
 
-        assertEquals("Recently synced feed should not get a second network request",
-            1, server.requestCount)
+        assertEquals(
+            "Recently synced feed should not get a second network request",
+            1, server.requestCount
+        )
 
         assertEquals(
             "Last sync should not have changed",
             fourteenMinsAgo,
-            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync)
+            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync
+        )
     }
 
     @Test
     fun feedsSyncedWithin15MinAreNotIgnoredWhenForcingNetwork() = runBlocking {
-        val cowboyJsonId = insertFeed("cowboyjson", server.url("/feed.json").url(),
-            cowboyJson)
+        val cowboyJsonId = insertFeed(
+            "cowboyjson", server.url("/feed.json").url(),
+            cowboyJson
+        )
 
         val fourteenMinsAgo = Instant.now().minusMinutes(14)
         runBlocking {
@@ -213,8 +238,10 @@ class RssLocalSyncKtTest {
 
                 testDb.db.feedDao().updateFeed(feed.copy(lastSync = fourteenMinsAgo))
             }
-            syncFeeds(kodein = kodein, filesDir = filesDir,
-                feedId = cowboyJsonId, forceNetwork = true, minFeedAgeMinutes = 15)
+            syncFeeds(
+                kodein = kodein, filesDir = filesDir,
+                feedId = cowboyJsonId, forceNetwork = true, minFeedAgeMinutes = 15
+            )
         }
 
         assertEquals("Request should have been sent due to forced network", 2, server.requestCount)
@@ -222,7 +249,8 @@ class RssLocalSyncKtTest {
         assertNotEquals(
             "Last sync should have changed",
             fourteenMinsAgo,
-            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync)
+            testDb.db.feedDao().loadFeed(cowboyJsonId)!!.lastSync
+        )
     }
 
     @Test
@@ -234,11 +262,13 @@ class RssLocalSyncKtTest {
 
         val url = server.url("/feed.json")
 
-        val failingJsonId = testDb.db.feedDao().insertFeed(Feed(
-            title = "failJson",
-            url = URL("$url"),
-            tag = ""
-        ))
+        val failingJsonId = testDb.db.feedDao().insertFeed(
+            Feed(
+                title = "failJson",
+                url = URL("$url"),
+                tag = ""
+            )
+        )
 
         runBlocking {
             syncFeeds(kodein = kodein, filesDir = filesDir, feedId = failingJsonId)
@@ -264,11 +294,13 @@ class RssLocalSyncKtTest {
 
         val url = server.url("/news-rss.xml")
 
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
-            title = "NixOS",
-            url = URL("$url"),
-            tag = ""
-        ))
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
+                title = "NixOS",
+                url = URL("$url"),
+                tag = ""
+            )
+        )
 
         runBlocking {
             syncFeeds(kodein = kodein, filesDir = filesDir, feedId = feedId)
@@ -278,13 +310,17 @@ class RssLocalSyncKtTest {
         assertEquals("/news-rss.xml", server.takeRequest().path)
 
         val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
-        assertEquals("Unique IDs should have been generated for items",
-            99, items.size)
+        assertEquals(
+            "Unique IDs should have been generated for items",
+            99, items.size
+        )
 
         // Should be unique to item so that it stays the same after updates
-        assertEquals("Unexpected ID",
+        assertEquals(
+            "Unexpected ID",
             "NixOS 18.09 released-NixOS 18.09 “Jellyfish” has been released, the tenth stable release branch. See the release notes for details. You can get NixOS 18.09 ISOs and VirtualBox appliances from the download page. For inform",
-            items.first().guid)
+            items.first().guid
+        )
     }
 
     @Test
@@ -297,9 +333,11 @@ class RssLocalSyncKtTest {
 
         val url = server.url("/rss")
 
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
-            url = URL("$url")
-        ))
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
+                url = URL("$url")
+            )
+        )
 
         val beforeSyncTime = Instant.now()
 
@@ -312,39 +350,51 @@ class RssLocalSyncKtTest {
 
         val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
 
-        assertNotNull("Item should have gotten a pubDate generated",
-            items[0].pubDate)
+        assertNotNull(
+            "Item should have gotten a pubDate generated",
+            items[0].pubDate
+        )
 
-        assertNotEquals("Items should have distinct pubDates",
-            items[0].pubDate, items[1].pubDate)
+        assertNotEquals(
+            "Items should have distinct pubDates",
+            items[0].pubDate, items[1].pubDate
+        )
 
-        assertTrue("The pubDate should be after 'before sync time'",
-            items[0].pubDate!!.toInstant() > beforeSyncTime)
+        assertTrue(
+            "The pubDate should be after 'before sync time'",
+            items[0].pubDate!!.toInstant() > beforeSyncTime
+        )
 
         // Compare ID to compare insertion order (and thus pubdate compared to raw feed)
         assertTrue("The pubDates' magnitude should match descending iteration order") {
-            items[0].guid == "https://foo.bar/1"
-                && items[1].guid == "https://foo.bar/2"
-                && items[0].pubDate!! > items[1].pubDate!!
+            items[0].guid == "https://foo.bar/1" &&
+                items[1].guid == "https://foo.bar/2" &&
+                items[0].pubDate!! > items[1].pubDate!!
         }
     }
 
     @Test
     fun feedWithNoDatesShouldNotGetOverriddenDatesNextSync() = runBlocking {
-        server.enqueue(MockResponse().also {
-            it.setResponseCode(200)
-            it.setBody(fooRss(1))
-        })
-        server.enqueue(MockResponse().also {
-            it.setResponseCode(200)
-            it.setBody(fooRss(2))
-        })
+        server.enqueue(
+            MockResponse().also {
+                it.setResponseCode(200)
+                it.setBody(fooRss(1))
+            }
+        )
+        server.enqueue(
+            MockResponse().also {
+                it.setResponseCode(200)
+                it.setBody(fooRss(2))
+            }
+        )
 
         val url = server.url("/rss")
 
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
-            url = URL("$url")
-        ))
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
+                url = URL("$url")
+            )
+        )
 
         // Sync first time
         runBlocking {
@@ -355,8 +405,10 @@ class RssLocalSyncKtTest {
         assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
         val firstItem = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
-            assertNotNull("Item should have gotten a pubDate generated",
-                items[0].pubDate)
+            assertNotNull(
+                "Item should have gotten a pubDate generated",
+                items[0].pubDate
+            )
 
             items[0]
         }
@@ -370,48 +422,62 @@ class RssLocalSyncKtTest {
         assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
         testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
-            assertEquals("Should be 2 items in feed",
-                2, items.size)
+            assertEquals(
+                "Should be 2 items in feed",
+                2, items.size
+            )
 
             val item = items.last()
 
-            assertEquals("Making sure we are comparing the same item",
-                firstItem.id, item.id)
+            assertEquals(
+                "Making sure we are comparing the same item",
+                firstItem.id, item.id
+            )
 
-            assertEquals("Pubdate should not have changed",
-                firstItem.pubDate, item.pubDate)
+            assertEquals(
+                "Pubdate should not have changed",
+                firstItem.pubDate, item.pubDate
+            )
         }
     }
 
     @Test
     fun feedShouldNotBeCleanedToHaveLessItemsThanActualFeed() = runBlocking {
         val feedItemCount = 9
-        server.enqueue(MockResponse().also {
-            it.setResponseCode(200)
-            it.setBody(fooRss(feedItemCount))
-        })
+        server.enqueue(
+            MockResponse().also {
+                it.setResponseCode(200)
+                it.setBody(fooRss(feedItemCount))
+            }
+        )
 
         val url = server.url("/rss")
 
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
-            url = URL("$url")
-        ))
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
+                url = URL("$url")
+            )
+        )
 
         val maxFeedItemCount = 5
 
         // Sync first time
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir,
+            syncFeeds(
+                kodein = kodein, filesDir = filesDir,
                 feedId = feedId,
-                maxFeedItemCount = maxFeedItemCount)
+                maxFeedItemCount = maxFeedItemCount
+            )
         }
 
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
         testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
-            assertEquals("Feed should have no less items than in the raw feed even if that's more than cleanup count",
-                feedItemCount, items.size)
+            assertEquals(
+                "Feed should have no less items than in the raw feed even if that's more than cleanup count",
+                feedItemCount, items.size
+            )
         }
     }
 
@@ -428,7 +494,8 @@ class RssLocalSyncKtTest {
         assertEquals(
             "Feed should have been parsed from slow response",
             15,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size)
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size
+        )
     }
 
     @Test
@@ -444,7 +511,8 @@ class RssLocalSyncKtTest {
         assertEquals(
             "Feed should not have been parsed from extremely slow response",
             0,
-            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size)
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size
+        )
     }
 
     val nixosRss: InputStream
@@ -478,6 +546,6 @@ class RssLocalSyncKtTest {
         }
                 </channel>
                 </rss>
-            """.trimIndent()
+        """.trimIndent()
     }
 }

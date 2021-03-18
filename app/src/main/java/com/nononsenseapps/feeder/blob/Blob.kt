@@ -8,15 +8,15 @@ import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
 fun blobFile(itemId: Long, filesDir: File): File =
-        File(filesDir, "$itemId.txt.gz")
+    File(filesDir, "$itemId.txt.gz")
 
 @Throws(IOException::class)
 fun blobInputStream(itemId: Long, filesDir: File): InputStream =
-        GZIPInputStream(blobFile(itemId = itemId, filesDir = filesDir).inputStream())
+    GZIPInputStream(blobFile(itemId = itemId, filesDir = filesDir).inputStream())
 
 @Throws(IOException::class)
 fun blobOutputStream(itemId: Long, filesDir: File): OutputStream =
-        GZIPOutputStream(blobFile(itemId = itemId, filesDir = filesDir).outputStream())
+    GZIPOutputStream(blobFile(itemId = itemId, filesDir = filesDir).outputStream())
 
 fun blobFullFile(itemId: Long, filesDir: File): File =
     File(filesDir, "$itemId.full.html.gz")

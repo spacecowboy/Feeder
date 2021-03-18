@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.pressImeActionButton
+import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -30,7 +32,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.net.URL
-
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -57,10 +58,10 @@ class EditFeedTest {
     fun badUrlDisplaysEmptyView() {
         onView(withId(android.R.id.empty)).check(matches(not(isDisplayed())))
         onView(withId(R.id.search_view))
-                .perform(
-                        typeText("abc123-_.\\"),
-                        pressImeActionButton()
-                )
+            .perform(
+                typeText("abc123-_.\\"),
+                pressImeActionButton()
+            )
         runBlocking {
             untilEq(true) {
                 activityRule.activity?.searchJob?.isCompleted
@@ -71,19 +72,21 @@ class EditFeedTest {
 
     @Test
     fun badResponseShowsEmptyView() {
-        server.enqueue(MockResponse().also {
-            it.setBody("NOT VALID XML")
-        })
+        server.enqueue(
+            MockResponse().also {
+                it.setBody("NOT VALID XML")
+            }
+        )
         server.start()
 
         val url = server.url("/rss.xml")
 
         onView(withId(android.R.id.empty)).check(matches(not(isDisplayed())))
         onView(withId(R.id.search_view))
-                .perform(
-                        typeText("$url"),
-                        pressImeActionButton()
-                )
+            .perform(
+                typeText("$url"),
+                pressImeActionButton()
+            )
         runBlocking {
             untilEq(true) {
                 activityRule.activity?.searchJob?.isCompleted
@@ -108,10 +111,10 @@ class EditFeedTest {
 
         onView(withId(android.R.id.empty)).check(matches(not(isDisplayed())))
         onView(withId(R.id.search_view))
-                .perform(
-                        typeText("$url"),
-                        pressImeActionButton()
-                )
+            .perform(
+                typeText("$url"),
+                pressImeActionButton()
+            )
 
         val recyclerView: RecyclerView = activityRule.activity.findViewById(R.id.results_listview)
 
@@ -129,11 +132,13 @@ class EditFeedTest {
         assertEquals("/feed.json", request.path)
 
         val viewHolder = recyclerView.findViewHolderForAdapterPosition(0)!!
-        assertEquals("https://cowboyprogrammer.org/feed.json",
-                viewHolder.itemView.findViewById<TextView>(R.id.feed_url)!!.text)
+        assertEquals(
+            "https://cowboyprogrammer.org/feed.json",
+            viewHolder.itemView.findViewById<TextView>(R.id.feed_url)!!.text
+        )
 
         onView(withId(R.id.results_listview)).perform(
-                RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click())
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click())
         )
 
         onView(withId(R.id.feed_details_frame)).check(matches(isDisplayed()))
@@ -148,8 +153,8 @@ class EditFeedTest {
             testDb.db.feedDao().loadFeedWithUrl(URL("https://cowboyprogrammer.org/feed.json"))
         }
         assertEquals(
-                "Cowboy Programmer",
-                feed?.title
+            "Cowboy Programmer",
+            feed?.title
         )
     }
 }

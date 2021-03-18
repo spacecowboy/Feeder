@@ -69,24 +69,30 @@ class BadImagePlaceHolderTest {
     }
 
     private suspend fun placeHolderIsShownOnBadImage() {
-        server.enqueue(MockResponse().also {
-            it.setResponseCode(400)
-        })
+        server.enqueue(
+            MockResponse().also {
+                it.setResponseCode(400)
+            }
+        )
         server.start()
 
         val imgUrl = server.url("/img.png")
 
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
                 title = "foo",
                 url = URL("http://foo")
-        ))
+            )
+        )
 
-        testDb.db.feedItemDao().insertFeedItem(FeedItem(
+        testDb.db.feedItemDao().insertFeedItem(
+            FeedItem(
                 guid = "bar",
                 feedId = feedId,
                 title = "foo",
                 imageUrl = "$imgUrl"
-        ))
+            )
+        )
 
         activityRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId")))
 

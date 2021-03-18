@@ -12,9 +12,6 @@ import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.di.CURRENTLY_SYNCING_STATE
-import com.nononsenseapps.feeder.util.contentHtml
-import com.nononsenseapps.feeder.util.naiveFindImageLink
-import com.nononsenseapps.feeder.util.thumbnail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -22,7 +19,6 @@ import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.withContext
 import net.dankito.readability4j.Readability4J
 import okhttp3.OkHttpClient
-import org.jsoup.parser.Parser
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein

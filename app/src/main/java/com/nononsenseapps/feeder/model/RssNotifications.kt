@@ -36,7 +36,6 @@ import org.kodein.di.Kodein
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
-
 const val notificationId = 73583
 const val channelId = "feederNotifications"
 
@@ -114,50 +113,64 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
     style.setBigContentTitle(title)
 
     val contentIntent =
-            NavDeepLinkBuilder(context)
-                    .setGraph(R.navigation.nav_graph)
-                    .setDestination(R.id.readerFragment)
-                    .setArguments(bundle {
-                        putLong(ARG_ID, item.id)
-                    })
-                    .createPendingIntent(requestCode = item.id.toInt())
+        NavDeepLinkBuilder(context)
+            .setGraph(R.navigation.nav_graph)
+            .setDestination(R.id.readerFragment)
+            .setArguments(
+                bundle {
+                    putLong(ARG_ID, item.id)
+                }
+            )
+            .createPendingIntent(requestCode = item.id.toInt())
 
     val builder = notificationBuilder(context)
 
     builder.setContentText(text)
-            .setContentTitle(title)
-            .setContentIntent(contentIntent)
-            .setDeleteIntent(getPendingDeleteIntent(context, item))
-            .setNumber(1)
+        .setContentTitle(title)
+        .setContentIntent(contentIntent)
+        .setDeleteIntent(getPendingDeleteIntent(context, item))
+        .setNumber(1)
 
     // Note that notifications must use PNG resources, because there is no compatibility for vector drawables here
 
     item.enclosureLink?.let { enclosureLink ->
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(enclosureLink))
         intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
-        builder.addAction(R.drawable.notification_play_circle_outline,
-                context.getString(R.string.open_enclosed_media),
-                PendingIntent.getActivity(context,
-                        item.id.toInt(),
-                        getOpenInDefaultActivityIntent(context, item.id, enclosureLink),
-                        PendingIntent.FLAG_UPDATE_CURRENT))
+        builder.addAction(
+            R.drawable.notification_play_circle_outline,
+            context.getString(R.string.open_enclosed_media),
+            PendingIntent.getActivity(
+                context,
+                item.id.toInt(),
+                getOpenInDefaultActivityIntent(context, item.id, enclosureLink),
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        )
     }
 
     item.link?.let { link ->
-        builder.addAction(R.drawable.notification_open_in_browser,
-                context.getString(R.string.open_link_in_browser),
-                PendingIntent.getActivity(context,
-                        item.id.toInt(),
-                        getOpenInDefaultActivityIntent(context, item.id, link),
-                        PendingIntent.FLAG_UPDATE_CURRENT))
+        builder.addAction(
+            R.drawable.notification_open_in_browser,
+            context.getString(R.string.open_link_in_browser),
+            PendingIntent.getActivity(
+                context,
+                item.id.toInt(),
+                getOpenInDefaultActivityIntent(context, item.id, link),
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        )
     }
 
-    builder.addAction(R.drawable.notification_check,
-            context.getString(R.string.mark_as_read),
-            PendingIntent.getActivity(context,
-                    item.id.toInt(),
-                    getOpenInDefaultActivityIntent(context, item.id, link = null),
-                    PendingIntent.FLAG_UPDATE_CURRENT))
+    builder.addAction(
+        R.drawable.notification_check,
+        context.getString(R.string.mark_as_read),
+        PendingIntent.getActivity(
+            context,
+            item.id.toInt(),
+            getOpenInDefaultActivityIntent(context, item.id, link = null),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    )
 
     style.setBuilder(builder)
     return style.build()
@@ -165,15 +178,17 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
 
 @FlowPreview
 internal fun getOpenInDefaultActivityIntent(context: Context, feedItemId: Long, link: String? = null): Intent =
-        Intent(Intent.ACTION_VIEW,
-                // Important to keep the URI different so PendingIntents don't collide
-                URI_FEEDITEMS.buildUpon().appendPath("$feedItemId").also {
-                    if (link != null) {
-                        it.appendQueryParameter(COL_LINK, link)
-                    }
-                }.build(),
-                context,
-                OpenLinkInDefaultActivity::class.java)
+    Intent(
+        Intent.ACTION_VIEW,
+        // Important to keep the URI different so PendingIntents don't collide
+        URI_FEEDITEMS.buildUpon().appendPath("$feedItemId").also {
+            if (link != null) {
+                it.appendQueryParameter(COL_LINK, link)
+            }
+        }.build(),
+        context,
+        OpenLinkInDefaultActivity::class.java
+    )
 
 /**
  * Use this on platforms older than 24 to bundle notifications together
@@ -189,9 +204,10 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
     }
 
     val contentIntent = NavDeepLinkBuilder(context)
-            .setGraph(R.navigation.nav_graph)
-            .setDestination(R.id.feedFragment)
-            .setArguments(bundle {
+        .setGraph(R.navigation.nav_graph)
+        .setDestination(R.id.feedFragment)
+        .setArguments(
+            bundle {
                 putLongArray(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED, LongArray(feedItems.size) { i -> feedItems[i].id })
                 // We can be a little bit smart - if all items are from the same feed then go to that feed
                 // Otherwise we should go to All feeds
@@ -203,16 +219,17 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
                 } else {
                     putLong(ARG_FEED_ID, ID_ALL_FEEDS)
                 }
-            })
-            .createPendingIntent(requestCode = notificationId)
+            }
+        )
+        .createPendingIntent(requestCode = notificationId)
 
     val builder = notificationBuilder(context)
 
     builder.setContentText(text)
-            .setContentTitle(title)
-            .setContentIntent(contentIntent)
-            .setDeleteIntent(getDeleteIntent(context, feedItems))
-            .setNumber(feedItems.size)
+        .setContentTitle(title)
+        .setContentIntent(contentIntent)
+        .setDeleteIntent(getDeleteIntent(context, feedItems))
+        .setNumber(feedItems.size)
 
     style.setBuilder(builder)
     return style.build()
@@ -239,18 +256,17 @@ internal fun getDeleteIntent(context: Context, feedItem: FeedItemWithFeed): Inte
 }
 
 private fun getPendingDeleteIntent(context: Context, feedItem: FeedItemWithFeed): PendingIntent =
-        PendingIntent.getBroadcast(context, 0, getDeleteIntent(context, feedItem), PendingIntent.FLAG_UPDATE_CURRENT)
-
+    PendingIntent.getBroadcast(context, 0, getDeleteIntent(context, feedItem), PendingIntent.FLAG_UPDATE_CURRENT)
 
 private fun notificationBuilder(context: Context): NotificationCompat.Builder {
     val bm = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
 
     return NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_stat_f)
-            .setLargeIcon(bm)
-            .setAutoCancel(true)
-            .setCategory(NotificationCompat.CATEGORY_SOCIAL)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+        .setSmallIcon(R.drawable.ic_stat_f)
+        .setLargeIcon(bm)
+        .setAutoCancel(true)
+        .setCategory(NotificationCompat.CATEGORY_SOCIAL)
+        .setPriority(NotificationCompat.PRIORITY_LOW)
 }
 
 @FlowPreview
@@ -267,4 +283,4 @@ private suspend fun getItemsToNotify(kodein: Kodein): List<FeedItemWithFeed> {
 }
 
 fun NavDeepLinkBuilder.createPendingIntent(requestCode: Int): PendingIntent? =
-        this.createTaskStackBuilder().getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT)
+    this.createTaskStackBuilder().getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT)

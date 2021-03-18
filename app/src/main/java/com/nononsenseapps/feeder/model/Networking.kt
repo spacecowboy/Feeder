@@ -7,10 +7,10 @@ import okhttp3.Response
 object UserAgentInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         return chain.proceed(
-                chain.request()
-                        .newBuilder()
-                        .header("User-Agent", USER_AGENT_STRING)
-                        .build()
+            chain.request()
+                .newBuilder()
+                .header("User-Agent", USER_AGENT_STRING)
+                .build()
         )
     }
 }

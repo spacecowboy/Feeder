@@ -162,8 +162,11 @@ class FeedFragment : KodeinAwareFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val rootView = inflater.inflate(R.layout.fragment_feed, container, false)
         val recyclerView = rootView.findViewById<RecyclerView>(android.R.id.list)
 
@@ -187,8 +190,10 @@ class FeedFragment : KodeinAwareFragment() {
             recyclerView.addItemDecoration(DividerColor(activity, DividerColor.HORIZONTAL_LIST))
 
             // use a grid layout
-            GridLayoutManager(activity,
-                cols)
+            GridLayoutManager(
+                activity,
+                cols
+            )
         } else {
             // use a linear layout manager
             LinearLayoutManager(activity)
@@ -201,7 +206,8 @@ class FeedFragment : KodeinAwareFragment() {
         swipeRefreshLayout.setColorSchemeResources(
             R.color.refresh_progress_1,
             R.color.refresh_progress_2,
-            R.color.refresh_progress_3)
+            R.color.refresh_progress_3
+        )
 
         swipeRefreshLayout.setOnRefreshListener {
             // Sync this specific feed(s) immediately
@@ -225,8 +231,12 @@ class FeedFragment : KodeinAwareFragment() {
         emptyOpenFeeds.text = android.text.Html.fromHtml(getString(R.string.empty_feed_open))
 
         emptyAddFeed.setOnClickListener {
-            startActivity(Intent(activity,
-                EditFeedActivity::class.java))
+            startActivity(
+                Intent(
+                    activity,
+                    EditFeedActivity::class.java
+                )
+            )
         }
 
         emptyOpenFeeds.setOnClickListener { (activity as FeedActivity).openNavDrawer() }
@@ -278,14 +288,16 @@ class FeedFragment : KodeinAwareFragment() {
                         }
                     }
                 }
-            }).also {
+            }
+        ).also {
             it.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
                 var firstInsertion = true
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                     if (firstInsertion) {
                         ephemeralState.firstVisibleListItem?.let { pos ->
                             if (ephemeralState.lastOpenFeedId == this@FeedFragment.id &&
-                                ephemeralState.lastOpenFeedTag == this@FeedFragment.feedTag ?: "") {
+                                ephemeralState.lastOpenFeedTag == this@FeedFragment.feedTag ?: ""
+                            ) {
                                 recyclerView.scrollToPosition(pos)
                             }
                         }
@@ -312,58 +324,66 @@ class FeedFragment : KodeinAwareFragment() {
             feedId = id,
             tag = feedTag ?: ""
         )
-        liveDbPreviews.observe(this, Observer<PagedList<PreviewItem>> {
-            adapter.submitList(it)
-            emptyView.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
-        })
+        liveDbPreviews.observe(
+            this,
+            Observer<PagedList<PreviewItem>> {
+                adapter.submitList(it)
+                emptyView.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+            }
+        )
 
         when {
             id > ID_UNSET -> { // Load feed if feed
-                feedViewModel.getLiveFeed(id).observe(this, Observer {
-                    it?.let { feed ->
-                        this.title = feed.title
-                        this.customTitle = feed.customTitle
-                        this.displayTitle = feed.displayTitle
-                        this.url = feed.url.toString()
-                        this.notify = feed.notify
-                        this.feedTag = feed.tag
+                feedViewModel.getLiveFeed(id).observe(
+                    this,
+                    Observer {
+                        it?.let { feed ->
+                            this.title = feed.title
+                            this.customTitle = feed.customTitle
+                            this.displayTitle = feed.displayTitle
+                            this.url = feed.url.toString()
+                            this.notify = feed.notify
+                            this.feedTag = feed.tag
 
-                        (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
+                            (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
-                        // Update state of notification toggle
-                        activity?.invalidateOptionsMenu()
+                            // Update state of notification toggle
+                            activity?.invalidateOptionsMenu()
 
-                        // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
-                        // extra statistics on opening the feed.
-                        if (firstFeedLoad) {
-                            // Title has been fetched, so add shortcut
-                            activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
-                            // Report shortcut usage
-                            activity?.reportShortcutToFeedUsed(feed.id)
+                            // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
+                            // extra statistics on opening the feed.
+                            if (firstFeedLoad) {
+                                // Title has been fetched, so add shortcut
+                                activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
+                                // Report shortcut usage
+                                activity?.reportShortcutToFeedUsed(feed.id)
+                            }
+                            firstFeedLoad = false
                         }
-                        firstFeedLoad = false
                     }
-                })
+                )
             }
             else -> { // Load notification settings for all
                 (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
                 activity?.let { activity ->
-                    feedViewModel.getLiveFeedsNotify(id, feedTag ?: "").observe(this, Observer {
-                        it.fold(true) { a, b -> a && b }
-                            .let { notify ->
-                                this.notify = notify
-                                // Update state of notification toggle
-                                activity.invalidateOptionsMenu()
-                            }
-                    })
+                    feedViewModel.getLiveFeedsNotify(id, feedTag ?: "").observe(
+                        this,
+                        Observer {
+                            it.fold(true) { a, b -> a && b }
+                                .let { notify ->
+                                    this.notify = notify
+                                    // Update state of notification toggle
+                                    activity.invalidateOptionsMenu()
+                                }
+                        }
+                    )
                 }
             }
         }
 
         return rootView
     }
-
 
     private fun onSyncStateChanged(syncing: Boolean) {
         // Background syncs will only disable the animation, never start it
@@ -555,8 +575,10 @@ class FeedFragment : KodeinAwareFragment() {
                     intent = Intent(context, MyFilePickerActivity::class.java)
                     intent.putExtra(AbstractFilePickerActivity.EXTRA_MODE, AbstractFilePickerActivity.MODE_NEW_FILE)
                     intent.putExtra(AbstractFilePickerActivity.EXTRA_ALLOW_EXISTING_FILE, true)
-                    intent.putExtra(AbstractFilePickerActivity.EXTRA_START_PATH,
-                        File(Environment.getExternalStorageDirectory(), "feeder.opml").path)
+                    intent.putExtra(
+                        AbstractFilePickerActivity.EXTRA_START_PATH,
+                        File(Environment.getExternalStorageDirectory(), "feeder.opml").path
+                    )
                 }
                 startActivityForResult(intent, EXPORT_OPML_CODE)
                 true
@@ -568,8 +590,10 @@ class FeedFragment : KodeinAwareFragment() {
                     intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
                     intent.addCategory(Intent.CATEGORY_OPENABLE)
                     intent.type = "*/*"
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES,
-                        arrayOf("text/plain", "text/xml", "text/opml", "*/*"))
+                    intent.putExtra(
+                        Intent.EXTRA_MIME_TYPES,
+                        arrayOf("text/plain", "text/xml", "text/opml", "*/*")
+                    )
                 } else {
                     intent = Intent(context, MyFilePickerActivity::class.java)
                     intent.putExtra(AbstractFilePickerActivity.EXTRA_SINGLE_CLICK, true)
@@ -631,10 +655,13 @@ class FeedFragment : KodeinAwareFragment() {
             }
             EDIT_FEED_CODE -> {
                 data?.data?.lastPathSegment?.toLong()?.let { id ->
-                    findNavController().navigate(R.id.action_feedFragment_self, bundle {
-                        putLong(ARG_FEED_ID, id)
-                        putString(ARG_FEED_TAG, data.extras?.getString(ARG_FEED_TAG))
-                    })
+                    findNavController().navigate(
+                        R.id.action_feedFragment_self,
+                        bundle {
+                            putLong(ARG_FEED_ID, id)
+                            putString(ARG_FEED_TAG, data.extras?.getString(ARG_FEED_TAG))
+                        }
+                    )
                 }
             }
         }

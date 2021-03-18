@@ -15,7 +15,8 @@ class JsonFeedParserTest {
     fun basic() {
         val parser = JsonFeedParser()
 
-        val feed = parser.parseJson("""
+        val feed = parser.parseJson(
+            """
 {
     "version": "https://jsonfeed.org/version/1",
     "title": "My Example Feed",
@@ -34,7 +35,8 @@ class JsonFeedParserTest {
         }
     ]
 }
-        """)
+        """
+        )
 
         assertEquals("https://jsonfeed.org/version/1", feed.version)
         assertEquals("My Example Feed", feed.title)
@@ -56,7 +58,8 @@ class JsonFeedParserTest {
     fun dateParsing() {
         val parser = JsonFeedParser()
 
-        val feed = parser.parseJson("""
+        val feed = parser.parseJson(
+            """
 {
     "version": "https://jsonfeed.org/version/1",
     "title": "My Example Feed",
@@ -72,7 +75,8 @@ class JsonFeedParserTest {
         }
     ]
 }
-        """)
+        """
+        )
 
         assertEquals("https://jsonfeed.org/version/1", feed.version)
         assertEquals("My Example Feed", feed.title)

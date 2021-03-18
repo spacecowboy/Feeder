@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.text
 
-
 import android.graphics.Point
 import android.text.Spanned
 import kotlinx.coroutines.FlowPreview
@@ -9,7 +8,6 @@ import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.Kodein
 import java.io.Reader
 import java.net.URL
-
 
 val schema: HTMLSchema by lazy { HTMLSchema() }
 
@@ -50,12 +48,13 @@ fun toSpannedWithImages(
  */
 @FlowPreview
 fun toSpannedWithNoImages(
-        kodein: Kodein,
-        source: Reader,
-        siteUrl: URL,
-        maxSize: Point,
-        spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
-        urlClickListener: UrlClickListener?): Spanned {
+    kodein: Kodein,
+    source: Reader,
+    siteUrl: URL,
+    maxSize: Point,
+    spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
+    urlClickListener: UrlClickListener?
+): Spanned {
     val parser = Parser()
     try {
         parser.setProperty(Parser.schemaProperty, schema)

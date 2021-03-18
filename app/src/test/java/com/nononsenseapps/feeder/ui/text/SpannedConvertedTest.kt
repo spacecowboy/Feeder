@@ -18,12 +18,12 @@ import org.kodein.di.generic.bind
 import org.kodein.di.generic.singleton
 import java.io.StringReader
 import java.net.URL
-import java.util.*
+import java.util.ArrayList
 
 @FlowPreview
-class SpannedConverterTest: KodeinAware {
+class SpannedConverterTest : KodeinAware {
     private val mockResources: Resources = mockk(relaxed = true)
-    //private val mockContext: Context = mockk(relaxed = true)
+    // private val mockContext: Context = mockk(relaxed = true)
     private val mockContext: Application = mockk(relaxed = true)
     private val mockPrefs: Prefs = mockk(relaxed = true)
 
@@ -46,12 +46,13 @@ class SpannedConverterTest: KodeinAware {
     fun testFontWithNoColorDoesntCrash() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("<font>No color</font>"),
-                URL("http://foo.com"),
-                Point(100, 100),
-                builder,
-                null)
+            kodein,
+            StringReader("<font>No color</font>"),
+            URL("http://foo.com"),
+            Point(100, 100),
+            builder,
+            null
+        )
 
         assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<TextAppearanceSpan>())
         assertEquals("No color", builder.toString())
@@ -62,12 +63,13 @@ class SpannedConverterTest: KodeinAware {
     fun testOnePixelImagesAreNotRenderedWithBase() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">"),
-                URL("http://foo.com"),
-                Point(100, 100),
-                builder,
-                null)
+            kodein,
+            StringReader("<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">"),
+            URL("http://foo.com"),
+            Point(100, 100),
+            builder,
+            null
+        )
 
         assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<ImageSpan>())
     }
@@ -93,12 +95,13 @@ class SpannedConverterTest: KodeinAware {
     fun testNotRenderScriptTag() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("<p>foo</p><script>script</script><p>bar</p>"),
-                URL("http://foo.bar"),
-                Point(100, 100),
-                builder,
-                null)
+            kodein,
+            StringReader("<p>foo</p><script>script</script><p>bar</p>"),
+            URL("http://foo.bar"),
+            Point(100, 100),
+            builder,
+            null
+        )
 
         assertEquals("foo\n\nbar\n\n", builder.toString())
     }
@@ -108,12 +111,13 @@ class SpannedConverterTest: KodeinAware {
     fun testNotRenderStyleTag() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("<p>foo</p><style>style</style><p>bar</p>"),
-                URL("http://foo.bar"),
-                Point(100, 100),
-                builder,
-                null)
+            kodein,
+            StringReader("<p>foo</p><style>style</style><p>bar</p>"),
+            URL("http://foo.bar"),
+            Point(100, 100),
+            builder,
+            null
+        )
 
         assertEquals("foo\n\nbar\n\n", builder.toString())
     }
@@ -123,8 +127,9 @@ class SpannedConverterTest: KodeinAware {
     fun tableColumnsSeparatedNewLinesTest() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("""
+            kodein,
+            StringReader(
+                """
                     <table>
                     <tr>
                         <th>r1c1</th>
@@ -135,11 +140,13 @@ class SpannedConverterTest: KodeinAware {
                         <td>r2c2</td>
                       </tr>
                     </table>
-                    """),
-                URL("http://foo.bar"),
-                Point(100, 100),
-                builder,
-                null)
+                    """
+            ),
+            URL("http://foo.bar"),
+            Point(100, 100),
+            builder,
+            null
+        )
 
         assertEquals("r1c1\nr1c2\nr2c1\nr2c2\n\n", builder.toString())
     }
@@ -156,14 +163,17 @@ class SpannedConverterTest: KodeinAware {
             |me
             """.trimMargin()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("""
+            kodein,
+            StringReader(
+                """
                     <pre>$text</pre>
-                    """),
-                URL("http://foo.bar"),
-                Point(100, 100),
-                builder,
-                null)
+                    """
+            ),
+            URL("http://foo.bar"),
+            Point(100, 100),
+            builder,
+            null
+        )
 
         assertEquals(text, builder.toString().trimEnd { it == '\n' })
     }

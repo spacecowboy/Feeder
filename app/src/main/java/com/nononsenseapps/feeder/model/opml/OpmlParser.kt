@@ -14,7 +14,7 @@ import org.xml.sax.SAXException
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.util.*
+import java.util.Stack
 
 class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
 
@@ -84,29 +84,32 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
                 ignoring > 0 || isFeedTag -> ignoring++
                 outlineIsFeed(atts) -> {
                     isFeedTag = true
-                    val feedTitle = unescape(atts?.getValue("title") ?: atts?.getValue("text")
-                    ?: "")
+                    val feedTitle = unescape(
+                        atts?.getValue("title") ?: atts?.getValue("text")
+                            ?: ""
+                    )
                     val feed = Feed(
-                            title = feedTitle,
-                            customTitle = feedTitle,
-                            tag = if (tagStack.isNotEmpty()) tagStack.peek() else "",
-                            url = sloppyLinkToStrictURL(atts?.getValue("xmlurl") ?: ""))
+                        title = feedTitle,
+                        customTitle = feedTitle,
+                        tag = if (tagStack.isNotEmpty()) tagStack.peek() else "",
+                        url = sloppyLinkToStrictURL(atts?.getValue("xmlurl") ?: "")
+                    )
 
                     feeds.add(feed)
                 }
                 else -> tagStack.push(
-                        unescape(
-                                atts?.getValue("title")
-                                        ?: atts?.getValue("text")
-                                        ?: ""
-                        )
+                    unescape(
+                        atts?.getValue("title")
+                            ?: atts?.getValue("text")
+                            ?: ""
+                    )
                 )
             }
         }
     }
 
     private fun outlineIsFeed(atts: Attributes?): Boolean =
-            atts?.getValue("xmlurl") != null
+        atts?.getValue("xmlurl") != null
 
     override fun skippedEntity(name: String?) {
     }
@@ -119,5 +122,4 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
 
     override fun startDocument() {
     }
-
 }

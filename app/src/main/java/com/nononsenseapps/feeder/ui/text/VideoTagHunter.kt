@@ -12,18 +12,20 @@ fun getVideo(src: String?): Video? {
         YoutubeIdPattern.find(src)?.let { match ->
             val videoId = match.groupValues[1]
             Video(
-                    src = src,
-                    imageUrl = "http://img.youtube.com/vi/$videoId/hqdefault.jpg",
-                    link = "https://www.youtube.com/watch?v=$videoId"
+                src = src,
+                imageUrl = "http://img.youtube.com/vi/$videoId/hqdefault.jpg",
+                link = "https://www.youtube.com/watch?v=$videoId"
             )
         }
     }
 }
 
-data class Video(val src: String,
-                 val imageUrl: String,
-        // Youtube needs a different link than embed links
-                 val link: String) {
+data class Video(
+    val src: String,
+    val imageUrl: String,
+    // Youtube needs a different link than embed links
+    val link: String
+) {
     val width: Int
         get() = 480
 

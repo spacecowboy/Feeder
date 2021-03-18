@@ -11,7 +11,6 @@ import com.nononsenseapps.feeder.db.COL_AUTHOR
 import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
 import com.nononsenseapps.feeder.db.COL_FEEDID
 import com.nononsenseapps.feeder.db.COL_FIRSTSYNCEDTIME
-import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
 import com.nononsenseapps.feeder.db.COL_GUID
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
@@ -39,13 +38,21 @@ const val MAX_TITLE_LENGTH = 200
 const val MAX_SNIPPET_LENGTH = 200
 
 @FlowPreview
-@Entity(tableName = FEED_ITEMS_TABLE_NAME,
-    indices = [Index(value = [COL_GUID, COL_FEEDID], unique = true),
-        Index(value = [COL_FEEDID])],
-    foreignKeys = [ForeignKey(entity = Feed::class,
-        parentColumns = [COL_ID],
-        childColumns = [COL_FEEDID],
-        onDelete = CASCADE)])
+@Entity(
+    tableName = FEED_ITEMS_TABLE_NAME,
+    indices = [
+        Index(value = [COL_GUID, COL_FEEDID], unique = true),
+        Index(value = [COL_FEEDID])
+    ],
+    foreignKeys = [
+        ForeignKey(
+            entity = Feed::class,
+            parentColumns = [COL_ID],
+            childColumns = [COL_FEEDID],
+            onDelete = CASCADE
+        )
+    ]
+)
 data class FeedItem @Ignore constructor(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COL_ID) override var id: Long = ID_UNSET,
@@ -64,7 +71,7 @@ data class FeedItem @Ignore constructor(
     @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
     @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH,
     @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) var primarySortTime: Instant = Instant.EPOCH
-): FeedItemForFetching {
+) : FeedItemForFetching {
 
     constructor() : this(id = ID_UNSET)
 
@@ -72,8 +79,10 @@ data class FeedItem @Ignore constructor(
         val converter = HtmlToPlainTextConverter()
         // Be careful about nulls.
         val text = entry.content_html ?: entry.content_text ?: ""
-        val summary: String? = (entry.summary ?: entry.content_text
-        ?: converter.convert(text)).take(MAX_SNIPPET_LENGTH)
+        val summary: String? = (
+            entry.summary ?: entry.content_text
+                ?: converter.convert(text)
+            ).take(MAX_SNIPPET_LENGTH)
 
         // Make double sure no base64 images are used as thumbnails
         val safeImage = when {

@@ -7,9 +7,11 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 
-class TagHolder(private val onNavigationItemClickListener: OnNavigationItemClickListener,
-                private val adapter: FeedsAdapter,
-                v: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v), View.OnClickListener {
+class TagHolder(
+    private val onNavigationItemClickListener: OnNavigationItemClickListener,
+    private val adapter: FeedsAdapter,
+    v: View
+) : androidx.recyclerview.widget.RecyclerView.ViewHolder(v), View.OnClickListener {
     val title: TextView = v.findViewById(R.id.tag_name)
     val unreadCount: TextView = v.findViewById(R.id.tag_unreadcount)
     val expander: ImageView = v.findViewById(R.id.tag_expander)
@@ -35,7 +37,7 @@ class TagHolder(private val onNavigationItemClickListener: OnNavigationItemClick
     override fun onClick(v: View) {
         wrap?.let {
             onNavigationItemClickListener.onNavigationItemClick(
-                    ID_UNSET, it.tag, null, it.tag
+                ID_UNSET, it.tag, null, it.tag
             )
         }
     }

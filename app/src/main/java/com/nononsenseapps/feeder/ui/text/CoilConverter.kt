@@ -20,7 +20,6 @@ import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import org.xml.sax.Attributes
-import java.io.IOException
 import java.io.Reader
 import java.net.URL
 import java.util.concurrent.ExecutionException
@@ -108,9 +107,11 @@ class CoilConverter(
         if (alt?.isNotEmpty() == true) {
             val from = text.length
             text.append(alt)
-            text.setSpan(StyleSpan(Typeface.ITALIC), from,
+            text.setSpan(
+                StyleSpan(Typeface.ITALIC), from,
                 text.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
             text.append("\n")
         }
     }

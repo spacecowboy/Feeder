@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.ui.text
 import android.content.Context
 import android.graphics.Point
 import android.text.style.BackgroundColorSpan
-import android.text.style.BulletSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.TypefaceSpan
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
@@ -17,7 +16,6 @@ import org.kodein.di.android.closestKodein
 import java.io.StringReader
 import java.net.URL
 
-
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class SpannedConverterPreTest {
@@ -28,12 +26,12 @@ class SpannedConverterPreTest {
     fun preIsMonospaced() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("Some <pre>pre  formatted</pre> text"),
-                URL("http://foo.com"),
-                Point(100, 100),
-                builder,
-                null
+            kodein,
+            StringReader("Some <pre>pre  formatted</pre> text"),
+            URL("http://foo.com"),
+            Point(100, 100),
+            builder,
+            null
         )
 
         assertEquals(1, builder.getAllSpansWithType<TypefaceSpan>().size)
@@ -48,12 +46,12 @@ class SpannedConverterPreTest {
     fun codeIsMonospacedAndMore() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("Some <code>code  formatted</code> text"),
-                URL("http://foo.com"),
-                Point(100, 100),
-                builder,
-                null
+            kodein,
+            StringReader("Some <code>code  formatted</code> text"),
+            URL("http://foo.com"),
+            Point(100, 100),
+            builder,
+            null
         )
 
         assertEquals(1, builder.getAllSpansWithType<TypefaceSpan>().size)
@@ -68,12 +66,12 @@ class SpannedConverterPreTest {
     fun preCodeIsMonospacedAndMore() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("Some <pre><code>pre  code  formatted</code></pre> text"),
-                URL("http://foo.com"),
-                Point(100, 100),
-                builder,
-                null
+            kodein,
+            StringReader("Some <pre><code>pre  code  formatted</code></pre> text"),
+            URL("http://foo.com"),
+            Point(100, 100),
+            builder,
+            null
         )
 
         assertEquals(2, builder.getAllSpansWithType<TypefaceSpan>().size)

@@ -26,7 +26,6 @@ import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 import java.net.URL
 
-
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class WebViewThemeResettingTest {
@@ -43,23 +42,29 @@ class WebViewThemeResettingTest {
 
     @Before
     fun setup() = runBlocking {
-        server.enqueue(MockResponse().also {
-            it.setBody("<html><body>Hello!</body></html>")
-        })
+        server.enqueue(
+            MockResponse().also {
+                it.setBody("<html><body>Hello!</body></html>")
+            }
+        )
         server.start()
 
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
                 title = "foo",
                 url = URL("http:")
-        ))
+            )
+        )
 
-        val feedItemId = testDb.db.feedItemDao().insertFeedItem(FeedItem(
+        val feedItemId = testDb.db.feedItemDao().insertFeedItem(
+            FeedItem(
                 guid = "bar",
                 feedId = feedId,
                 title = "foo",
                 imageUrl = null,
                 link = server.url("/bar.html").url().toString()
-        ))
+            )
+        )
 
         prefs.isNightMode = true
 
@@ -87,10 +92,10 @@ class WebViewThemeResettingTest {
 
     private fun assertTextColorIsReadableInNightMode() {
         onView(withId(com.nononsenseapps.feeder.R.id.story_body))
-                .check(ViewAssertions.matches(hasTextColor(com.nononsenseapps.feeder.R.color.white_87)))
+            .check(ViewAssertions.matches(hasTextColor(com.nononsenseapps.feeder.R.color.white_87)))
     }
 
     private fun openWebView() =
-            onView(withId(com.nononsenseapps.feeder.R.id.action_open_in_webview))
-                    .perform(click())
+        onView(withId(com.nononsenseapps.feeder.R.id.action_open_in_webview))
+            .perform(click())
 }

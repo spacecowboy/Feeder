@@ -21,7 +21,7 @@ class TopHolder(private val onNavigationItemClickListener: OnNavigationItemClick
      */
     override fun onClick(v: View) {
         onNavigationItemClickListener.onNavigationItemClick(
-                ID_ALL_FEEDS, null, null, null
+            ID_ALL_FEEDS, null, null, null
         )
     }
 }

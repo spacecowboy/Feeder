@@ -41,9 +41,11 @@ class OpenLinkInDefaultActivity : KodeinAwareActivity() {
 
             if (link != null) {
                 try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)).also {
-                        intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
-                    })
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse(link)).also {
+                            intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
+                        }
+                    )
                 } catch (e: Throwable) {
                     e.printStackTrace()
                     Toast.makeText(this, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()

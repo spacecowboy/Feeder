@@ -9,14 +9,18 @@ import org.threeten.bp.ZonedDateTime
 class ConvertersTest {
     @Test
     fun zeroIs1970() {
-        assertEquals(Instant.EPOCH,
-                Converters().instantFromLong(0))
+        assertEquals(
+            Instant.EPOCH,
+            Converters().instantFromLong(0)
+        )
     }
 
     @Test
     fun negativeLongGivesValidDate() {
-        assertEquals(Instant.ofEpochMilli(-1),
-                Converters().instantFromLong(-1))
+        assertEquals(
+            Instant.ofEpochMilli(-1),
+            Converters().instantFromLong(-1)
+        )
     }
 
     @Test
@@ -31,7 +35,9 @@ class ConvertersTest {
 
     @Test
     fun instantGivesLong() {
-        assertEquals(1514768461000,
-                Converters().longFromInstant(ZonedDateTime.parse("2018-01-01T01:01:01Z").toInstant()))
+        assertEquals(
+            1514768461000,
+            Converters().longFromInstant(ZonedDateTime.parse("2018-01-01T01:01:01Z").toInstant())
+        )
     }
 }

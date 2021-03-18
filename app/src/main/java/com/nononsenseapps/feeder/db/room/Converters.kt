@@ -22,11 +22,11 @@ class Converters {
 
     @TypeConverter
     fun stringFromDateTime(value: ZonedDateTime?): String? =
-            value?.toString()
+        value?.toString()
 
     @TypeConverter
     fun stringFromURL(value: URL?): String? =
-            value?.toString()
+        value?.toString()
 
     @TypeConverter
     fun urlFromString(value: String?): URL? =
@@ -34,13 +34,13 @@ class Converters {
 
     @TypeConverter
     fun instantFromLong(value: Long?): Instant? =
-            try {
-                value?.let { Instant.ofEpochMilli(it) }
-            } catch (t: Throwable) {
-                null
-            }
+        try {
+            value?.let { Instant.ofEpochMilli(it) }
+        } catch (t: Throwable) {
+            null
+        }
 
     @TypeConverter
     fun longFromInstant(value: Instant?): Long? =
-            value?.toEpochMilli()
+        value?.toEpochMilli()
 }

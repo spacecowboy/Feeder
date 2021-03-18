@@ -6,46 +6,55 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
-suspend fun writeFile(path: String,
-              tags: Iterable<String>,
-              feedsWithTag: suspend (String) -> Iterable<Feed>) {
+suspend fun writeFile(
+    path: String,
+    tags: Iterable<String>,
+    feedsWithTag: suspend (String) -> Iterable<Feed>
+) {
     writeOutputStream(FileOutputStream(path), tags, feedsWithTag)
 }
 
-suspend fun writeOutputStream(os: OutputStream,
-                      tags: Iterable<String>,
-                      feedsWithTag: suspend (String) -> Iterable<Feed>) {
+suspend fun writeOutputStream(
+    os: OutputStream,
+    tags: Iterable<String>,
+    feedsWithTag: suspend (String) -> Iterable<Feed>
+) {
     try {
         os.bufferedWriter().use {
             it.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
             it.write(
-                    opml {
-                        head {
-                            title { +"Feeder" }
-                        }
-                        body {
-                            tags.forEach {
-                                if (it.isEmpty()) {
+                opml {
+                    head {
+                        title { +"Feeder" }
+                    }
+                    body {
+                        tags.forEach {
+                            if (it.isEmpty()) {
+                                feedsWithTag(it).forEach {
+                                    outline(
+                                        title = escape(it.displayTitle),
+                                        type = "rss",
+                                        xmlUrl = escape(it.url.toString())
+                                    ) {}
+                                }
+                            } else {
+                                outline(title = escape(it)) {
                                     feedsWithTag(it).forEach {
-                                        outline(title = escape(it.displayTitle),
-                                                type = "rss",
-                                                xmlUrl = escape(it.url.toString())) {}
-                                    }
-                                } else {
-                                    outline(title = escape(it)) {
-                                        feedsWithTag(it).forEach {
-                                            outline(title = escape(it.displayTitle),
-                                                    type = "rss",
-                                                    xmlUrl = escape(it.url.toString())) {}
-                                        }
+                                        outline(
+                                            title = escape(it.displayTitle),
+                                            type = "rss",
+                                            xmlUrl = escape(it.url.toString())
+                                        ) {}
                                     }
                                 }
                             }
                         }
-                    }.toString())
+                    }
+                }.toString()
+            )
         }
     } catch (e: IOException) {
-        Log.e("OmplWriter", "Failed to write stream", e);
+        Log.e("OmplWriter", "Failed to write stream", e)
     }
 }
 
@@ -57,10 +66,10 @@ suspend fun writeOutputStream(os: OutputStream,
  */
 internal fun escape(s: String): String {
     return s.replace("&", "&amp;")
-            .replace("\"", "&quot;")
-            .replace("'", "&apos;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&apos;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
 }
 
 /**
@@ -71,10 +80,10 @@ internal fun escape(s: String): String {
  */
 internal fun unescape(s: String): String {
     return s.replace("&quot;", "\"")
-            .replace("&apos;", "'")
-            .replace("&lt;", "<")
-            .replace("&gt;", ">")
-            .replace("&amp;", "&")
+        .replace("&apos;", "'")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&amp;", "&")
 }
 
 // OPML DSL
@@ -126,7 +135,6 @@ abstract class Tag(val name: String) : Element {
         return builder.toString()
     }
 
-
     override fun toString(): String {
         val builder = StringBuilder()
         render(builder, "")
@@ -156,11 +164,13 @@ class Head : TagWithText("head") {
 class Title : TagWithText("title")
 
 abstract class BodyTag(name: String) : TagWithText(name) {
-    suspend fun outline(title: String,
-                text: String = title,
-                type: String? = null,
-                xmlUrl: String? = null,
-                init: suspend Outline.() -> Unit) {
+    suspend fun outline(
+        title: String,
+        text: String = title,
+        type: String? = null,
+        xmlUrl: String? = null,
+        init: suspend Outline.() -> Unit
+    ) {
         val o = initTag(Outline(), init)
         o.title = title
         o.text = text
@@ -175,7 +185,7 @@ abstract class BodyTag(name: String) : TagWithText(name) {
 
 class Body : BodyTag("body")
 
-class Outline: BodyTag("outline") {
+class Outline : BodyTag("outline") {
     var title: String
         get() = attributes["title"]!!
         set(value) {

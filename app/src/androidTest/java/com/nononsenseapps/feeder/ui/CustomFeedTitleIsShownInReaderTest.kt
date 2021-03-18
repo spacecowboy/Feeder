@@ -41,17 +41,21 @@ class CustomFeedTitleIsShownInReaderTest {
     }
 
     private suspend fun insertDataAndLaunch(title: String, customTitle: String) {
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
                 title = title,
                 customTitle = customTitle,
                 url = URL("http://foo")
-        ))
+            )
+        )
 
-        val feedItemId = testDb.db.feedItemDao().insertFeedItem(FeedItem(
+        val feedItemId = testDb.db.feedItemDao().insertFeedItem(
+            FeedItem(
                 guid = "fooitem1",
                 feedId = feedId,
                 title = "fooitem"
-        ))
+            )
+        )
 
         activityRule.launchReader(feedItemId)
     }

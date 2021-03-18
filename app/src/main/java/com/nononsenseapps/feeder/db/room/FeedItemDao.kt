@@ -33,17 +33,21 @@ interface FeedItemDao {
     @Delete
     suspend fun deleteFeedItem(item: FeedItem)
 
-    @Query("""
+    @Query(
+        """
         DELETE FROM feed_items WHERE id IN (:ids)
-        """)
+        """
+    )
     suspend fun deleteFeedItems(ids: List<Long>)
 
-    @Query("""
+    @Query(
+        """
         SELECT id FROM feed_items
         WHERE feed_id IS :feedId
         ORDER BY primary_sort_time DESC, pub_date DESC
         LIMIT -1 OFFSET :keepCount
-        """)
+        """
+    )
     suspend fun getItemsToBeCleanedFromFeed(feedId: Long, keepCount: Int): List<Long>
 
     @Query("SELECT * FROM feed_items WHERE guid IS :guid AND feed_id IS :feedId")
@@ -52,159 +56,194 @@ interface FeedItemDao {
     @Query("SELECT * FROM feed_items WHERE id IS :id")
     suspend fun loadFeedItem(id: Long): FeedItem?
 
-    @Query("""
+    @Query(
+        """
         SELECT $feedItemColumnsWithFeed
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_items.id IS :id
-        """)
+        """
+    )
     suspend fun loadFeedItemWithFeed(id: Long): FeedItemWithFeed?
 
-    @Query("""
+    @Query(
+        """
         SELECT $FEEDS_TABLE_NAME.$COL_URL
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_items.id IS :id
-        """)
+        """
+    )
     suspend fun loadFeedUrlOfFeedItem(id: Long): URL?
 
-    @Query("""
+    @Query(
+        """
         SELECT *
         FROM feed_items
         WHERE feed_items.feed_id = :feedId
         ORDER BY primary_sort_time DESC, pub_date DESC
-        """)
+        """
+    )
     suspend fun loadFeedItemsInFeedDesc(feedId: Long): List<FeedItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT *
         FROM feed_items
         WHERE feed_items.feed_id = :feedId
         ORDER BY primary_sort_time ASC, pub_date ASC
-        """)
+        """
+    )
     suspend fun loadFeedItemsInFeedAsc(feedId: Long): List<FeedItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $feedItemColumnsWithFeed
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_items.id IS :id
-        """)
+        """
+    )
     fun loadLiveFeedItem(id: Long): Flow<FeedItemWithFeed>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
         ORDER BY primary_sort_time DESC, pub_date DESC
-        """)
+        """
+    )
     fun loadLivePreviewsDesc(feedId: Long): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
         ORDER BY primary_sort_time ASC, pub_date ASC
-        """)
+        """
+    )
     fun loadLivePreviewsAsc(feedId: Long): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
         ORDER BY primary_sort_time DESC, pub_date DESC
-        """)
+        """
+    )
     fun loadLivePreviewsDesc(tag: String): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
         ORDER BY primary_sort_time ASC, pub_date ASC
-        """)
+        """
+    )
     fun loadLivePreviewsAsc(tag: String): DataSource.Factory<Int, PreviewItem>
 
-
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         ORDER BY primary_sort_time DESC, pub_date DESC
-        """)
+        """
+    )
     fun loadLivePreviewsDesc(): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         ORDER BY primary_sort_time ASC, pub_date ASC
-        """)
+        """
+    )
     fun loadLivePreviewsAsc(): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND unread IS :unread
         ORDER BY primary_sort_time DESC, pub_date DESC
-        """)
+        """
+    )
     fun loadLiveUnreadPreviewsDesc(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND unread IS :unread
         ORDER BY primary_sort_time ASC, pub_date ASC
-        """)
+        """
+    )
     fun loadLiveUnreadPreviewsAsc(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag AND unread IS :unread
         ORDER BY primary_sort_time DESC, pub_date DESC
-        """)
+        """
+    )
     fun loadLiveUnreadPreviewsDesc(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag AND unread IS :unread
         ORDER BY primary_sort_time ASC, pub_date ASC
-        """)
+        """
+    )
     fun loadLiveUnreadPreviewsAsc(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE unread IS :unread
         ORDER BY primary_sort_time DESC, pub_date DESC
-        """)
+        """
+    )
     fun loadLiveUnreadPreviewsDesc(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE unread IS :unread
         ORDER BY primary_sort_time ASC, pub_date ASC
-        """)
+        """
+    )
     fun loadLiveUnreadPreviewsAsc(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
 
-    @Query("""
+    @Query(
+        """
         SELECT $feedItemColumnsWithFeed
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IN (:feedIds) AND notified IS 0 AND unread IS 1
-        """)
+        """
+    )
     suspend fun loadItemsToNotify(feedIds: List<Long>): List<FeedItemWithFeed>
 
     @Query("UPDATE feed_items SET unread = 0")
@@ -213,7 +252,8 @@ interface FeedItemDao {
     @Query("UPDATE feed_items SET unread = 0 WHERE feed_id IS :feedId")
     suspend fun markAllAsRead(feedId: Long?)
 
-    @Query("""
+    @Query(
+        """
         UPDATE feed_items
         SET unread = 0
         WHERE id IN (
@@ -221,7 +261,8 @@ interface FeedItemDao {
           FROM feed_items
           LEFT JOIN feeds ON feed_items.feed_id = feeds.id
           WHERE tag IS :tag
-        )""")
+        )"""
+    )
     suspend fun markAllAsRead(tag: String)
 
     @Query("UPDATE feed_items SET unread = :unread WHERE id IS :id")
@@ -236,7 +277,8 @@ interface FeedItemDao {
     @Query("UPDATE feed_items SET notified = :notified WHERE id IS :id")
     suspend fun markAsNotified(id: Long, notified: Boolean = true)
 
-    @Query("""
+    @Query(
+        """
         UPDATE feed_items
         SET notified = :notified
         WHERE id IN (
@@ -244,7 +286,8 @@ interface FeedItemDao {
           FROM feed_items
           LEFT JOIN feeds ON feed_items.feed_id = feeds.id
           WHERE tag IS :tag
-        )""")
+        )"""
+    )
     suspend fun markTagAsNotified(tag: String, notified: Boolean = true)
 
     @Query("UPDATE feed_items SET notified = :notified")
@@ -263,11 +306,10 @@ suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > I
     false -> insertFeedItem(item)
 }
 
-
 @FlowPreview
 suspend fun FeedItemDao.upsertFeedItems(
-        itemsWithText: List<Pair<FeedItem, String>>,
-        block: suspend (FeedItem, String) -> Unit
+    itemsWithText: List<Pair<FeedItem, String>>,
+    block: suspend (FeedItem, String) -> Unit
 ) {
     val updatedItems = itemsWithText.filter { (item, _) ->
         item.id > ID_UNSET

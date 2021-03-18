@@ -4,9 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkInfo
 import android.os.BatteryManager
 import android.os.Build
 
@@ -43,13 +40,13 @@ fun currentlyConnected(context: Context): Boolean {
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         return connManager?.allNetworks?.map { connManager.getNetworkInfo(it)?.isConnected }
-                ?.fold(false) { result, connected ->
-                    result || (connected ?: false)
-                } ?: false
-    }
-    @Suppress("DEPRECATION")
-    return connManager?.allNetworkInfo?.map { it?.isConnected }
             ?.fold(false) { result, connected ->
                 result || (connected ?: false)
             } ?: false
+    }
+    @Suppress("DEPRECATION")
+    return connManager?.allNetworkInfo?.map { it?.isConnected }
+        ?.fold(false) { result, connected ->
+            result || (connected ?: false)
+        } ?: false
 }

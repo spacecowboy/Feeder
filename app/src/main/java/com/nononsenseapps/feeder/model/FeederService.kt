@@ -29,9 +29,9 @@ class FeederService : KodeinAwareIntentService("FeederService") {
 
     companion object {
         fun getIntentForId(context: Context, feedItemId: Long): Intent =
-                Intent(context, FeederService::class.java).apply {
-                    action = ACTION_MARK_AS_UNREAD
-                    data = Uri.parse("com.nononsenseapps.feeder/feeditem/$feedItemId")
-                }
+            Intent(context, FeederService::class.java).apply {
+                action = ACTION_MARK_AS_UNREAD
+                data = Uri.parse("com.nononsenseapps.feeder/feeditem/$feedItemId")
+            }
     }
 }

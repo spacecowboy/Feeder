@@ -3,7 +3,12 @@ package com.nononsenseapps.feeder.di
 import com.nononsenseapps.feeder.base.KodeinAwareViewModelFactory
 import com.nononsenseapps.feeder.base.activityViewModelProvider
 import com.nononsenseapps.feeder.base.bindWithKodeinAwareViewModelFactory
-import com.nononsenseapps.feeder.model.*
+import com.nononsenseapps.feeder.model.EphemeralState
+import com.nononsenseapps.feeder.model.FeedItemViewModel
+import com.nononsenseapps.feeder.model.FeedItemsViewModel
+import com.nononsenseapps.feeder.model.FeedListViewModel
+import com.nononsenseapps.feeder.model.FeedViewModel
+import com.nononsenseapps.feeder.model.SettingsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.kodein.di.Kodein

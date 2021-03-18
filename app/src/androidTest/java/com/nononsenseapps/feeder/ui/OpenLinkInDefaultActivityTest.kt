@@ -19,7 +19,6 @@ import org.junit.runner.RunWith
 import java.net.URL
 import kotlin.test.assertEquals
 
-
 @RunWith(AndroidJUnit4::class)
 class OpenLinkInDefaultActivityTest {
     @get:Rule
@@ -34,18 +33,20 @@ class OpenLinkInDefaultActivityTest {
     fun setup() = runBlocking {
         val db = testDb.db
 
-        val feedId = db.feedDao().insertFeed(Feed(
+        val feedId = db.feedDao().insertFeed(
+            Feed(
                 title = "foo",
                 url = URL("http://foo")
-        ))
+            )
+        )
 
         val item = FeedItem(
-                feedId = feedId,
-                guid = "foobar",
-                title = "bla",
-                link = "http://foo",
-                notified = false,
-                unread = true
+            feedId = feedId,
+            guid = "foobar",
+            title = "bla",
+            link = "http://foo",
+            notified = false,
+            unread = true
         )
 
         val feedItemId = db.feedItemDao().insertFeedItem(item)
@@ -74,9 +75,13 @@ class OpenLinkInDefaultActivityTest {
 
     @Test
     fun faultyLinkDoesntCrash() {
-        activityTestRule.launchActivity(getOpenInDefaultActivityIntent(getApplicationContext(),
+        activityTestRule.launchActivity(
+            getOpenInDefaultActivityIntent(
+                getApplicationContext(),
                 feedItemId = -252,
-                link = "bob"))
+                link = "bob"
+            )
+        )
 
         runBlocking {
             val item = withContext(Dispatchers.Default) {
@@ -90,13 +95,17 @@ class OpenLinkInDefaultActivityTest {
 
     @Test
     fun withIntentItemIsMarkedAsReadAndNotified() {
-        activityTestRule.launchActivity(getOpenInDefaultActivityIntent(getApplicationContext(),
+        activityTestRule.launchActivity(
+            getOpenInDefaultActivityIntent(
+                getApplicationContext(),
                 feedItemId = feedItem.id,
-                link = feedItem.link!!))
+                link = feedItem.link!!
+            )
+        )
 
         val expected = feedItem.copy(
-                unread = false,
-                notified = true
+            unread = false,
+            notified = true
         )
 
         runBlocking {
@@ -111,12 +120,16 @@ class OpenLinkInDefaultActivityTest {
 
     @Test
     fun noLinkButItemIsMarkedAsReadAndNotified() {
-        activityTestRule.launchActivity(getOpenInDefaultActivityIntent(getApplicationContext(),
-                feedItemId = feedItem.id))
+        activityTestRule.launchActivity(
+            getOpenInDefaultActivityIntent(
+                getApplicationContext(),
+                feedItemId = feedItem.id
+            )
+        )
 
         val expected = feedItem.copy(
-                unread = false,
-                notified = true
+            unread = false,
+            notified = true
         )
 
         runBlocking {

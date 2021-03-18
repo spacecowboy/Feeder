@@ -1,7 +1,11 @@
 package com.nononsenseapps.feeder.util
 
 import android.content.Context
-import android.content.Intent.*
+import android.content.Intent.ACTION_SENDTO
+import android.content.Intent.ACTION_VIEW
+import android.content.Intent.EXTRA_EMAIL
+import android.content.Intent.EXTRA_SUBJECT
+import android.content.Intent.EXTRA_TEXT
 import android.net.Uri
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
@@ -13,48 +17,52 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class BugReportKTest {
     @Test
     fun bodyContainsAndroidInformation() {
-        assertEquals("""
+        assertEquals(
+            """
             ${BuildConfig.APPLICATION_ID} (flavor ${BuildConfig.FLAVOR.ifBlank { "None" }})
             version ${BuildConfig.VERSION_NAME} (code ${BuildConfig.VERSION_CODE})
             on Android ${Build.VERSION.RELEASE} (SDK-${Build.VERSION.SDK_INT})
             on a Tablet? No
 
             Describe your issue and how to reproduce it below:
-        """.trimIndent(),
-                emailBody(false))
+            """.trimIndent(),
+            emailBody(false)
+        )
     }
 
     @Test
     fun bodyContainsAndroidInformationAsTablet() {
-        assertEquals("""
+        assertEquals(
+            """
             ${BuildConfig.APPLICATION_ID} (flavor ${BuildConfig.FLAVOR.ifBlank { "None" }})
             version ${BuildConfig.VERSION_NAME} (code ${BuildConfig.VERSION_CODE})
             on Android ${Build.VERSION.RELEASE} (SDK-${Build.VERSION.SDK_INT})
             on a Tablet? Yes
 
             Describe your issue and how to reproduce it below:
-        """.trimIndent(),
-                emailBody(true))
+            """.trimIndent(),
+            emailBody(true)
+        )
     }
 
     @Test
     fun subjectIsSensible() {
         assertEquals(
-                "Bug report for Feeder",
-                emailSubject())
+            "Bug report for Feeder",
+            emailSubject()
+        )
     }
 
     @Test
     fun emailAddressIsCorrect() {
         assertEquals(
-                "jonas.feederbugs@cowboyprogrammer.org",
-                emailReportAddress()
+            "jonas.feederbugs@cowboyprogrammer.org",
+            emailReportAddress()
         )
     }
 

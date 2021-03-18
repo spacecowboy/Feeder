@@ -4,8 +4,7 @@ import android.content.Context
 import android.util.Log
 import java.io.File
 
-
-fun ensureDebugLogDeleted(context: Context)  {
+fun ensureDebugLogDeleted(context: Context) {
     try {
         val logFile = File(context.filesDir, "feeder.log")
         if (logFile.exists()) {

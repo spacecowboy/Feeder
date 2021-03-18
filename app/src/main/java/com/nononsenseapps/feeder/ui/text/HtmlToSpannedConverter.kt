@@ -57,13 +57,15 @@ typealias UrlClickListener = ((String) -> Unit)
  */
 @FlowPreview
 @Suppress("UNUSED_PARAMETER")
-open class HtmlToSpannedConverter(private var source: Reader,
-                                  private var siteUrl: URL,
-                                  parser: Parser,
-                                  override val kodein: Kodein,
-                                  val maxSize: Point,
-                                  private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
-                                  private var urlClickListener: UrlClickListener?) : ContentHandler, KodeinAware {
+open class HtmlToSpannedConverter(
+    private var source: Reader,
+    private var siteUrl: URL,
+    parser: Parser,
+    override val kodein: Kodein,
+    val maxSize: Point,
+    private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
+    private var urlClickListener: UrlClickListener?
+) : ContentHandler, KodeinAware {
     private val mAccentColor: Int
         get() = when (prefs.isNightMode) {
             true -> context.getColorCompat(R.color.accentNight)
@@ -150,8 +152,12 @@ open class HtmlToSpannedConverter(private var source: Reader,
     }
 
     @Throws(SAXException::class)
-    override fun startElement(uri: String, localName: String, qName: String,
-                              attributes: Attributes) {
+    override fun startElement(
+        uri: String,
+        localName: String,
+        qName: String,
+        attributes: Attributes
+    ) {
         handleStartTag(localName, attributes)
     }
 
@@ -214,8 +220,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
         text.setSpan(mark, len, len, Spannable.SPAN_MARK_MARK)
     }
 
-    private fun startFont(text: SensibleSpannableStringBuilder,
-                          attributes: Attributes) {
+    private fun startFont(
+        text: SensibleSpannableStringBuilder,
+        attributes: Attributes
+    ) {
         val color: String? = attributes.getValue("", "color")
         val face: String? = attributes.getValue("", "face")
 
@@ -224,8 +232,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
         text.setSpan(Font(color ?: "", face), len, len, Spannable.SPAN_MARK_MARK)
     }
 
-    private fun startA(text: SensibleSpannableStringBuilder,
-                       attributes: Attributes) {
+    private fun startA(
+        text: SensibleSpannableStringBuilder,
+        attributes: Attributes
+    ) {
         var href: String? = attributes.getValue("", "href")
 
         if (href != null) {
@@ -243,11 +253,13 @@ open class HtmlToSpannedConverter(private var source: Reader,
                 asyncImageLoader.downloadImageInBackground(relativeLinkIntoAbsolute(siteUrl, src))
             }
 
-            AppCompatResources.getDrawable(context,
+            AppCompatResources.getDrawable(
+                context,
                 when (prefs.isNightMode) {
                     true -> R.drawable.placeholder_image_article_night
                     false -> R.drawable.placeholder_image_article_day
-                })?.also {
+                }
+            )?.also {
                 val (x, y) = it.fitCenterScale(maxSize.x, maxSize.y)
                 it.setBounds(0, 0, x, y)
             }
@@ -255,8 +267,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
             null
         }
 
-    protected open fun startImg(text: SensibleSpannableStringBuilder,
-                                attributes: Attributes) {
+    protected open fun startImg(
+        text: SensibleSpannableStringBuilder,
+        attributes: Attributes
+    ) {
         val width: String? = attributes.getValue("", "width")
         val height: String? = attributes.getValue("", "height")
 
@@ -303,8 +317,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
             val len = text.length
             text.append("\uFFFC")
 
-            text.setSpan(ImageSpan(d, imgLink), len, text.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            text.setSpan(
+                ImageSpan(d, imgLink), len, text.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
 
             text.append("\n")
 
@@ -313,9 +329,11 @@ open class HtmlToSpannedConverter(private var source: Reader,
             if (alt?.isNotBlank() == true) {
                 val from = text.length
                 text.append(alt)
-                text.setSpan(StyleSpan(Typeface.ITALIC), from,
+                text.setSpan(
+                    StyleSpan(Typeface.ITALIC), from,
                     text.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
                 text.append("\n")
             }
         }
@@ -323,8 +341,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
         ensureSingleNewline(text)
     }
 
-    private fun startUl(text: SensibleSpannableStringBuilder,
-                        attributes: Attributes) {
+    private fun startUl(
+        text: SensibleSpannableStringBuilder,
+        attributes: Attributes
+    ) {
         // Start lists with linebreak
         val len = text.length
         if (len < 1 || text[len - 1] != '\n') {
@@ -335,8 +355,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
         start(text, Listing(false))
     }
 
-    private fun startOl(text: SensibleSpannableStringBuilder,
-                        attributes: Attributes) {
+    private fun startOl(
+        text: SensibleSpannableStringBuilder,
+        attributes: Attributes
+    ) {
         // Start lists with linebreak
         val len = text.length
         if (len < 1 || text[len - 1] != '\n') {
@@ -347,8 +369,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
         start(text, Listing(true))
     }
 
-    private fun startLi(text: SensibleSpannableStringBuilder,
-                        attributes: Attributes) {
+    private fun startLi(
+        text: SensibleSpannableStringBuilder,
+        attributes: Attributes
+    ) {
         // Get type of list
         val list: Listing? = getLast(text, Listing::class.java)
 
@@ -366,15 +390,19 @@ open class HtmlToSpannedConverter(private var source: Reader,
         }
     }
 
-    private fun startPre(text: SensibleSpannableStringBuilder,
-                         attributes: Attributes) {
+    private fun startPre(
+        text: SensibleSpannableStringBuilder,
+        attributes: Attributes
+    ) {
         respectFormatting++
         ensureDoubleNewline(text)
         start(text, Pre())
     }
 
-    private fun startCode(text: SensibleSpannableStringBuilder,
-                          attributes: Attributes) {
+    private fun startCode(
+        text: SensibleSpannableStringBuilder,
+        attributes: Attributes
+    ) {
         start(text, Code())
     }
 
@@ -409,8 +437,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
         return Point(newWidth, newHeight)
     }
 
-    protected open fun startIframe(text: SensibleSpannableStringBuilder,
-                                   attributes: Attributes) {
+    protected open fun startIframe(
+        text: SensibleSpannableStringBuilder,
+        attributes: Attributes
+    ) {
         // Parse information
         val video: Video? = getVideo(attributes.getValue("", "src"))
 
@@ -421,8 +451,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
             }?.let {
                 val span = object : ClickableImageSpan(it) {
                     override fun onClick() {
-                        val i = Intent(Intent.ACTION_VIEW,
-                            Uri.parse(video.link))
+                        val i = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(video.link)
+                        )
                         i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         try {
                             context.startActivity(i)
@@ -433,14 +465,18 @@ open class HtmlToSpannedConverter(private var source: Reader,
                 }
                 val len = text.length
                 text.append("\uFFFC")
-                text.setSpan(span, len, text.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                text.setSpan(
+                    span, len, text.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
                 // Add newline also
                 text.append("\n")
                 val from = text.length
                 text.append(context.getString(R.string.touch_to_play_video))
-                text.setSpan(StyleSpan(Typeface.ITALIC), from,
-                    text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                text.setSpan(
+                    StyleSpan(Typeface.ITALIC), from,
+                    text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
                 text.append("\n\n")
             }
         } catch (e: Throwable) {
@@ -448,8 +484,11 @@ open class HtmlToSpannedConverter(private var source: Reader,
         }
     }
 
-    private fun startUnknownTag(tag: String, text: SensibleSpannableStringBuilder,
-                                attr: Attributes) {
+    private fun startUnknownTag(
+        tag: String,
+        text: SensibleSpannableStringBuilder,
+        attr: Attributes
+    ) {
         // Override me
     }
 
@@ -457,8 +496,11 @@ open class HtmlToSpannedConverter(private var source: Reader,
     inline fun <reified T> getLast(text: SensibleSpannableStringBuilder, kind: Class<T>): T? =
         text.getAllSpansWithType<T>().lastOrNull()
 
-    inline fun <reified T> end(text: SensibleSpannableStringBuilder, kind: Class<T>,
-                               repl: Any) {
+    inline fun <reified T> end(
+        text: SensibleSpannableStringBuilder,
+        kind: Class<T>,
+        repl: Any
+    ) {
         val len = text.length
 
         val obj = getLast(text, kind)
@@ -483,11 +525,15 @@ open class HtmlToSpannedConverter(private var source: Reader,
 
         if (where != len) {
             // Set quote span
-            text.setSpan(MyQuoteSpan(mAccentColor, mQuoteGapWidth, mQuoteStripeWidth), where, len,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            text.setSpan(
+                MyQuoteSpan(mAccentColor, mQuoteGapWidth, mQuoteStripeWidth), where, len,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
             // Be slightly smaller
-            text.setSpan(RelativeSizeSpan(0.8f), where, len,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            text.setSpan(
+                RelativeSizeSpan(0.8f), where, len,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
             // And have background color
             //            text.setSpan(new BackgroundColorSpan(Color.DKGRAY), where, len,
             //                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -504,29 +550,47 @@ open class HtmlToSpannedConverter(private var source: Reader,
             tag.equals("br", ignoreCase = true) -> handleBr(spannableStringBuilder)
             tag.equals("p", ignoreCase = true) -> handleP(spannableStringBuilder)
             tag.equals("div", ignoreCase = true) -> handleP(spannableStringBuilder)
-            tag.equals("strong", ignoreCase = true) -> end(spannableStringBuilder, Bold::class.java,
-                StyleSpan(Typeface.BOLD))
-            tag.equals("b", ignoreCase = true) -> end(spannableStringBuilder, Bold::class.java,
-                StyleSpan(Typeface.BOLD))
-            tag.equals("em", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
-                StyleSpan(Typeface.ITALIC))
-            tag.equals("cite", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
-                StyleSpan(Typeface.ITALIC))
-            tag.equals("dfn", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
-                StyleSpan(Typeface.ITALIC))
-            tag.equals("i", ignoreCase = true) -> end(spannableStringBuilder, Italic::class.java,
-                StyleSpan(Typeface.ITALIC))
-            tag.equals("big", ignoreCase = true) -> end(spannableStringBuilder, Big::class.java,
-                RelativeSizeSpan(1.25f))
-            tag.equals("small", ignoreCase = true) -> end(spannableStringBuilder, Small::class.java,
-                RelativeSizeSpan(0.8f))
+            tag.equals("strong", ignoreCase = true) -> end(
+                spannableStringBuilder, Bold::class.java,
+                StyleSpan(Typeface.BOLD)
+            )
+            tag.equals("b", ignoreCase = true) -> end(
+                spannableStringBuilder, Bold::class.java,
+                StyleSpan(Typeface.BOLD)
+            )
+            tag.equals("em", ignoreCase = true) -> end(
+                spannableStringBuilder, Italic::class.java,
+                StyleSpan(Typeface.ITALIC)
+            )
+            tag.equals("cite", ignoreCase = true) -> end(
+                spannableStringBuilder, Italic::class.java,
+                StyleSpan(Typeface.ITALIC)
+            )
+            tag.equals("dfn", ignoreCase = true) -> end(
+                spannableStringBuilder, Italic::class.java,
+                StyleSpan(Typeface.ITALIC)
+            )
+            tag.equals("i", ignoreCase = true) -> end(
+                spannableStringBuilder, Italic::class.java,
+                StyleSpan(Typeface.ITALIC)
+            )
+            tag.equals("big", ignoreCase = true) -> end(
+                spannableStringBuilder, Big::class.java,
+                RelativeSizeSpan(1.25f)
+            )
+            tag.equals("small", ignoreCase = true) -> end(
+                spannableStringBuilder, Small::class.java,
+                RelativeSizeSpan(0.8f)
+            )
             tag.equals("font", ignoreCase = true) -> endFont(spannableStringBuilder)
             tag.equals("blockquote", ignoreCase = true) -> {
                 endQuote(spannableStringBuilder)
                 handleP(spannableStringBuilder)
             }
-            tag.equals("tt", ignoreCase = true) -> end(spannableStringBuilder, Monospace::class.java,
-                TypefaceSpan("monospace"))
+            tag.equals("tt", ignoreCase = true) -> end(
+                spannableStringBuilder, Monospace::class.java,
+                TypefaceSpan("monospace")
+            )
             tag.equals("a", ignoreCase = true) -> endA(spannableStringBuilder)
             tag.equals("u", ignoreCase = true) -> end(spannableStringBuilder, Underline::class.java, UnderlineSpan())
             tag.equals("sup", ignoreCase = true) -> end(spannableStringBuilder, Super::class.java, SuperscriptSpan())
@@ -586,15 +650,19 @@ open class HtmlToSpannedConverter(private var source: Reader,
                     if (colorRes != 0) {
                         @Suppress("DEPRECATION")
                         val colors = res.getColorStateList(colorRes)
-                        text.setSpan(TextAppearanceSpan(null, 0, 0, colors, null), where, len,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                        text.setSpan(
+                            TextAppearanceSpan(null, 0, 0, colors, null), where, len,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
                     }
                 }
             }
 
             f?.mFace?.let {
-                text.setSpan(TypefaceSpan(it), where, len,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                text.setSpan(
+                    TypefaceSpan(it), where, len,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
         }
     }
@@ -610,8 +678,10 @@ open class HtmlToSpannedConverter(private var source: Reader,
             val h: Href? = obj
 
             h?.mHref?.let { link ->
-                text.setSpan(URLSpanWithListener(link, urlClickListener), where, len,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                text.setSpan(
+                    URLSpanWithListener(link, urlClickListener), where, len,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
         }
     }
@@ -633,11 +703,15 @@ open class HtmlToSpannedConverter(private var source: Reader,
             val h: Header? = obj
 
             h?.mLevel?.let {
-                text.setSpan(RelativeSizeSpan(HEADER_SIZES[it]), where,
-                    len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                text.setSpan(
+                    RelativeSizeSpan(HEADER_SIZES[it]), where,
+                    len, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
-            text.setSpan(StyleSpan(Typeface.BOLD), where, len,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            text.setSpan(
+                StyleSpan(Typeface.BOLD), where, len,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
     }
 
@@ -706,14 +780,21 @@ open class HtmlToSpannedConverter(private var source: Reader,
 
         if (where != len) {
             // Want it to be monospace
-            text.setSpan(TypefaceSpan("monospace"), where, len,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            text.setSpan(
+                TypefaceSpan("monospace"), where, len,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
             // TODO
             // Make sure text does not wrap.
             // No easy solution exists for this
-            text.setSpan(AlignmentSpan.Standard(Layout.Alignment
-                .ALIGN_NORMAL), where, len,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            text.setSpan(
+                AlignmentSpan.Standard(
+                    Layout.Alignment
+                        .ALIGN_NORMAL
+                ),
+                where, len,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
 
         respectFormatting--
@@ -732,19 +813,24 @@ open class HtmlToSpannedConverter(private var source: Reader,
 
         if (where != len) {
             // Want it to be monospace
-            text.setSpan(TypefaceSpan("monospace"), where, len,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            text.setSpan(
+                TypefaceSpan("monospace"), where, len,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
             // Be slightly smaller
-            text.setSpan(RelativeSizeSpan(0.8f), where, len,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            text.setSpan(
+                RelativeSizeSpan(0.8f), where, len,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
             // And have background color
-            text.setSpan(BackgroundColorSpan(codeTextBgColor), where, len,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            text.setSpan(
+                BackgroundColorSpan(codeTextBgColor), where, len,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
     }
 
     private fun endIframe(text: SensibleSpannableStringBuilder) {
-
     }
 
     private fun endUnknownTag(tag: String, text: SensibleSpannableStringBuilder) {

@@ -18,8 +18,10 @@ class RssNotificationsKtTest {
     fun openInBrowserIntentPointsToActivityWithIdAndLink() {
         val intent: Intent = getOpenInDefaultActivityIntent(getInstrumentation().context, 99, "http://foo")
 
-        assertEquals("com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivity",
-                intent.component?.className)
+        assertEquals(
+            "com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivity",
+            intent.component?.className
+        )
         assertEquals("99", intent.data?.lastPathSegment)
         assertEquals("http://foo", intent.data?.getQueryParameter(COL_LINK))
     }
@@ -27,23 +29,29 @@ class RssNotificationsKtTest {
     @Test
     fun openInDefaultActivityIntentsAreConsideredDifferentForSameItem() {
         val feedItem = FeedItem(
-                id = 5,
-                link = "http://foo",
-                enclosureLink = "ftp://bar"
+            id = 5,
+            link = "http://foo",
+            enclosureLink = "ftp://bar"
         )
 
         val linkIntent = getOpenInDefaultActivityIntent(getInstrumentation().context, feedItem.id, link = feedItem.link)
         val enclosureIntent = getOpenInDefaultActivityIntent(getInstrumentation().context, feedItem.id, link = feedItem.enclosureLink)
         val markAsReadIntent = getOpenInDefaultActivityIntent(getInstrumentation().context, feedItem.id, link = null)
 
-        assertFalse(linkIntent.filterEquals(enclosureIntent),
-                message = "linkIntent should not be considered equal to enclosureIntent")
+        assertFalse(
+            linkIntent.filterEquals(enclosureIntent),
+            message = "linkIntent should not be considered equal to enclosureIntent"
+        )
 
-        assertFalse(linkIntent.filterEquals(markAsReadIntent),
-                message = "linkIntent should not be considered equal to markAsReadIntent")
+        assertFalse(
+            linkIntent.filterEquals(markAsReadIntent),
+            message = "linkIntent should not be considered equal to markAsReadIntent"
+        )
 
-        assertFalse(enclosureIntent.filterEquals(markAsReadIntent),
-                message = "enclosureIntent should not be considered equal to markAsReadIntent")
+        assertFalse(
+            enclosureIntent.filterEquals(markAsReadIntent),
+            message = "enclosureIntent should not be considered equal to markAsReadIntent"
+        )
     }
 
     @Test
@@ -52,15 +60,19 @@ class RssNotificationsKtTest {
 
         val enclosureIntent = getOpenInDefaultActivityIntent(getInstrumentation().context, 5, link = magnetLink)
 
-        assertEquals(magnetLink, enclosureIntent.data?.getQueryParameter(COL_LINK),
-                message = "Expected link to not get garbled as query parameter")
+        assertEquals(
+            magnetLink, enclosureIntent.data?.getQueryParameter(COL_LINK),
+            message = "Expected link to not get garbled as query parameter"
+        )
     }
 
     @Test
     fun nullLinkIsNullQueryParam() {
         val enclosureIntent = getOpenInDefaultActivityIntent(getInstrumentation().context, 5, link = null)
 
-        assertNull(enclosureIntent.data?.getQueryParameter(COL_LINK),
-                message = "Expected a null query parameter")
+        assertNull(
+            enclosureIntent.data?.getQueryParameter(COL_LINK),
+            message = "Expected a null query parameter"
+        )
     }
 }

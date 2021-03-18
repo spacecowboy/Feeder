@@ -13,7 +13,7 @@ private const val VIEWTYPE_FEED = 2
 private const val VIEWTYPE_FEED_CHILD = 3
 
 class FeedsAdapter(
-        private val onClickListener: OnNavigationItemClickListener
+    private val onClickListener: OnNavigationItemClickListener
 ) : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
     private val expandedTags: MutableSet<String> = androidx.collection.ArraySet(setOf(""))
     private var allItems: List<FeedUnreadCount> = emptyList()
@@ -22,7 +22,6 @@ class FeedsAdapter(
     init {
         setHasStableIds(true)
     }
-
 
     override fun getItemCount(): Int = visibleItems.size
 
@@ -60,7 +59,7 @@ class FeedsAdapter(
             }
         }
 
-        val diffResult = DiffUtil.calculateDiff(object: DiffUtil.Callback() {
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val oldItem: FeedUnreadCount = oldVisibleItems[oldItemPosition]
                 val newItem: FeedUnreadCount = visibleItems[newItemPosition]
@@ -82,11 +81,11 @@ class FeedsAdapter(
 
                 return when {
                     oldItem.isTag && newItem.isTag -> {
-                                oldItem.unreadCount == newItem.unreadCount
+                        oldItem.unreadCount == newItem.unreadCount
                     }
                     !oldItem.isTag && !newItem.isTag -> {
                         oldItem.displayTitle == newItem.displayTitle &&
-                                oldItem.unreadCount == newItem.unreadCount
+                            oldItem.unreadCount == newItem.unreadCount
                     }
                     else -> false
                 }
@@ -124,7 +123,6 @@ class FeedsAdapter(
             else -> FeedHolder(onClickListener, LayoutInflater.from(parent.context).inflate(R.layout.view_feed, parent, false))
         }
     }
-
 
     override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
         val wrap = visibleItems[position]

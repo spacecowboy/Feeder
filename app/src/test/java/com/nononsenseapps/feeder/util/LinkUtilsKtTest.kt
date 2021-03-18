@@ -22,7 +22,9 @@ class LinkUtilsKtTest {
 
     @Test
     fun testRelativeToAbsoluteWithFeedLinkAsBase() {
-        assertEquals(URL("http://cowboy.com/bob.jpg"),
-                relativeLinkIntoAbsoluteOrThrow(URL("http://cowboy.com/feed.xml"), "/bob.jpg"))
+        assertEquals(
+            URL("http://cowboy.com/bob.jpg"),
+            relativeLinkIntoAbsoluteOrThrow(URL("http://cowboy.com/feed.xml"), "/bob.jpg")
+        )
     }
 }

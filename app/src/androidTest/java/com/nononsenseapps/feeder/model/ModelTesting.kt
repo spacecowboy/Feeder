@@ -7,14 +7,14 @@ import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
 
 suspend fun TestDatabaseRule.insertFeedItemWithBlob(
-        feedItem: FeedItem,
-        description: String
+    feedItem: FeedItem,
+    description: String
 ): Long {
     val feedItemId = db.feedItemDao().insertFeedItem(feedItem)
 
     blobOutputStream(
-            itemId = feedItemId,
-            filesDir = getApplicationContext<FeederApplication>().filesDir
+        itemId = feedItemId,
+        filesDir = getApplicationContext<FeederApplication>().filesDir
     ).bufferedWriter().use {
         it.write(description)
     }

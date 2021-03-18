@@ -46,17 +46,19 @@ class OpenFeedFromTitleTest {
 
     @Before
     fun setup() = runBlocking {
-        feedId = testDb.db.feedDao().insertFeed(Feed(
+        feedId = testDb.db.feedDao().insertFeed(
+            Feed(
                 title = "ANON",
                 url = URL("http://ANON.com/sub")
-        ))
+            )
+        )
 
         val item = FeedItem(
-                feedId = feedId,
-                guid = "http://ANON.com/sub/##",
-                title = "ANON",
-                plainTitle = "ANON",
-                plainSnippet = "ANON"
+            feedId = feedId,
+            guid = "http://ANON.com/sub/##",
+            title = "ANON",
+            plainTitle = "ANON",
+            plainSnippet = "ANON"
         )
 
         val feedItemId = testDb.db.feedItemDao().insertFeedItem(item)
@@ -68,7 +70,7 @@ class OpenFeedFromTitleTest {
         activityRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDITEMS, "${feedItem.id}")))
 
         onView(withId(R.id.story_feedtitle))
-                .perform(click())
+            .perform(click())
 
         onView(withId(android.R.id.list)).check(matches(isDisplayed()))
     }

@@ -54,8 +54,16 @@ class YoutubePlaceHolderArticleTest {
         activityRule.launchReader(itemId)
 
         onView(withId(R.id.story_body))
-                .check(matches(withText(containsString(getApplicationContext<Context>()
-                        .getString(R.string.touch_to_play_video)))))
+            .check(
+                matches(
+                    withText(
+                        containsString(
+                            getApplicationContext<Context>()
+                                .getString(R.string.touch_to_play_video)
+                        )
+                    )
+                )
+            )
     }
 
     @Test
@@ -71,31 +79,44 @@ class YoutubePlaceHolderArticleTest {
         activityRule.launchReader(itemId)
 
         onView(withId(R.id.story_body))
-                .check(matches(withText(not(containsString(getApplicationContext<Context>()
-                        .getString(R.string.touch_to_play_video))))))
+            .check(
+                matches(
+                    withText(
+                        not(
+                            containsString(
+                                getApplicationContext<Context>()
+                                    .getString(R.string.touch_to_play_video)
+                            )
+                        )
+                    )
+                )
+            )
     }
 
     private suspend fun setup(urlSuffix: String, description: (HttpUrl) -> String): Long {
-        server.enqueue(MockResponse().also {
-            it.setResponseCode(400)
-        })
+        server.enqueue(
+            MockResponse().also {
+                it.setResponseCode(400)
+            }
+        )
         server.start()
 
         val imgUrl = server.url(urlSuffix)
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
                 title = "foo",
                 url = URL("http://foo")
-        ))
+            )
+        )
 
         return testDb.insertFeedItemWithBlob(
-                FeedItem(
-                        guid = "bar",
-                        feedId = feedId,
-                        title = "foo",
-                        imageUrl = "$imgUrl"
-                ),
-                description = description(imgUrl)
+            FeedItem(
+                guid = "bar",
+                feedId = feedId,
+                title = "foo",
+                imageUrl = "$imgUrl"
+            ),
+            description = description(imgUrl)
         )
     }
-
 }

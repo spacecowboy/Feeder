@@ -3,10 +3,16 @@ package com.nononsenseapps.feeder.ui.text
 import kotlinx.coroutines.FlowPreview
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
-import org.xml.sax.*
+import org.xml.sax.Attributes
+import org.xml.sax.ContentHandler
+import org.xml.sax.InputSource
+import org.xml.sax.Locator
+import org.xml.sax.SAXException
+import org.xml.sax.SAXNotRecognizedException
+import org.xml.sax.SAXNotSupportedException
 import java.io.IOException
 import java.io.StringReader
-import java.util.*
+import java.util.Stack
 
 @FlowPreview
 @Suppress("UNUSED_PARAMETER")
@@ -56,12 +62,10 @@ class HtmlToPlainTextConverter : ContentHandler {
     }
 
     override fun setDocumentLocator(locator: Locator) {
-
     }
 
     @Throws(SAXException::class)
     override fun startDocument() {
-
     }
 
     @Throws(SAXException::class)
@@ -76,12 +80,10 @@ class HtmlToPlainTextConverter : ContentHandler {
 
     @Throws(SAXException::class)
     override fun startPrefixMapping(prefix: String, uri: String) {
-
     }
 
     @Throws(SAXException::class)
     override fun endPrefixMapping(prefix: String) {
-
     }
 
     @Throws(SAXException::class)
@@ -106,8 +108,8 @@ class HtmlToPlainTextConverter : ContentHandler {
             tag.equals("blockquote", ignoreCase = true) -> ensureSpace(builder)
             tag.equals("a", ignoreCase = true) -> startA(builder, attributes)
             tag.length == 2 &&
-                    Character.toLowerCase(tag[0]) == 'h' &&
-                    tag[1] >= '1' && tag[1] <= '6' -> ensureSpace(builder)
+                Character.toLowerCase(tag[0]) == 'h' &&
+                tag[1] >= '1' && tag[1] <= '6' -> ensureSpace(builder)
             tag.equals("ul", ignoreCase = true) -> startUl(builder)
             tag.equals("ol", ignoreCase = true) -> startOl(builder)
             tag.equals("li", ignoreCase = true) -> startLi(builder)
@@ -195,8 +197,8 @@ class HtmlToPlainTextConverter : ContentHandler {
             tag.equals("blockquote", ignoreCase = true) -> ensureSpace(builder)
             tag.equals("a", ignoreCase = true) -> endA(builder)
             tag.length == 2 &&
-                    Character.toLowerCase(tag[0]) == 'h' &&
-                    tag[1] >= '1' && tag[1] <= '6' -> ensureSpace(builder)
+                Character.toLowerCase(tag[0]) == 'h' &&
+                tag[1] >= '1' && tag[1] <= '6' -> ensureSpace(builder)
             tag.equals("ul", ignoreCase = true) -> endUl(builder)
             tag.equals("ol", ignoreCase = true) -> endOl(builder)
             tag.equals("li", ignoreCase = true) -> endLi(builder)
@@ -266,17 +268,14 @@ class HtmlToPlainTextConverter : ContentHandler {
 
     @Throws(SAXException::class)
     override fun ignorableWhitespace(ch: CharArray, start: Int, length: Int) {
-
     }
 
     @Throws(SAXException::class)
     override fun processingInstruction(target: String, data: String) {
-
     }
 
     @Throws(SAXException::class)
     override fun skippedEntity(name: String) {
-
     }
 }
 
@@ -289,4 +288,3 @@ fun repeated(string: String, count: Int): String {
 
     return sb.toString()
 }
-

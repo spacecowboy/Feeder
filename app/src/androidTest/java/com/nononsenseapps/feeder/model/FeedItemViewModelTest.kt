@@ -30,7 +30,6 @@ import org.kodein.di.generic.instance
 import java.net.URL
 import kotlin.test.fail
 
-
 @RunWith(AndroidJUnit4::class)
 class FeedItemViewModelTest {
     @get:Rule
@@ -43,10 +42,12 @@ class FeedItemViewModelTest {
 
     @Before
     fun initDb() = runBlocking {
-        feedId = testDb.db.feedDao().insertFeed(Feed(
+        feedId = testDb.db.feedDao().insertFeed(
+            Feed(
                 title = "foo",
                 url = URL("http://foo")
-        ))
+            )
+        )
     }
 
     @Test
@@ -54,17 +55,21 @@ class FeedItemViewModelTest {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
         itemId = runBlocking {
-            testDb.insertFeedItemWithBlob(FeedItem(
+            testDb.insertFeedItemWithBlob(
+                FeedItem(
                     feedId = feedId,
                     guid = "foobar",
-                    title = "title"),
-                    description = "description <img src='file://img.png' alt='img here'></img>"
+                    title = "title"
+                ),
+                description = "description <img src='file://img.png' alt='img here'></img>"
             )
         }
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchActivity(
+            Intent().also {
+                it.putExtra(ARG_ID, itemId)
+            }
+        )
 
         runBlocking {
             withContext(Dispatchers.Main) {
@@ -82,17 +87,21 @@ class FeedItemViewModelTest {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
         itemId = runBlocking {
-            testDb.insertFeedItemWithBlob(FeedItem(
+            testDb.insertFeedItemWithBlob(
+                FeedItem(
                     feedId = feedId,
                     guid = "foobar",
-                    title = "title"),
-                    description = "description <b>bold</b>"
+                    title = "title"
+                ),
+                description = "description <b>bold</b>"
             )
         }
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchActivity(
+            Intent().also {
+                it.putExtra(ARG_ID, itemId)
+            }
+        )
 
         runBlocking {
             withContext(Dispatchers.Main) {
@@ -110,9 +119,9 @@ class FeedItemViewModelTest {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
         var item = FeedItem(
-                feedId = feedId,
-                guid = "foobar",
-                title = "title"
+            feedId = feedId,
+            guid = "foobar",
+            title = "title"
         )
         val description = "description <b>bold</b>"
 
@@ -121,9 +130,11 @@ class FeedItemViewModelTest {
         }
         item = item.copy(id = itemId)
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchActivity(
+            Intent().also {
+                it.putExtra(ARG_ID, itemId)
+            }
+        )
 
         runBlocking {
             withContext(Dispatchers.Main) {
@@ -150,9 +161,10 @@ class FeedItemViewModelTest {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
         var item = FeedItem(
-                feedId = feedId,
-                guid = "foobar",
-                title = "title")
+            feedId = feedId,
+            guid = "foobar",
+            title = "title"
+        )
         val description = "description <b>bold</b>"
 
         itemId = runBlocking {
@@ -160,9 +172,11 @@ class FeedItemViewModelTest {
         }
         item = item.copy(id = itemId)
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchActivity(
+            Intent().also {
+                it.putExtra(ARG_ID, itemId)
+            }
+        )
 
         runBlocking {
             withContext(Dispatchers.Main) {
@@ -176,7 +190,7 @@ class FeedItemViewModelTest {
             clearMocks(observer)
 
             fail("Not monitoring changes to file")
-            //assertEquals(1, testDb.db.feedItemDao().updateFeedItem(item.copy(description = "updated body")))
+            // assertEquals(1, testDb.db.feedItemDao().updateFeedItem(item.copy(description = "updated body")))
 
 //            verify(exactly = 1, timeout = 500) {
 //                observer.onChanged(any())
@@ -190,9 +204,9 @@ class FeedItemViewModelTest {
         val observer = mockk<Observer<Spanned>>(relaxed = true)
 
         val item = FeedItem(
-                feedId = feedId,
-                guid = "foobar",
-                title = "title"
+            feedId = feedId,
+            guid = "foobar",
+            title = "title"
         )
         val description = "description <img src='file://img.png' alt='img here'></img>"
 
@@ -200,9 +214,11 @@ class FeedItemViewModelTest {
             testDb.insertFeedItemWithBlob(item, description)
         }
 
-        activityRule.launchActivity(Intent().also {
-            it.putExtra(ARG_ID, itemId)
-        })
+        activityRule.launchActivity(
+            Intent().also {
+                it.putExtra(ARG_ID, itemId)
+            }
+        )
 
         runBlocking {
             withContext(Dispatchers.Main) {

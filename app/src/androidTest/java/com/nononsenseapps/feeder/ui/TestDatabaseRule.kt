@@ -10,8 +10,8 @@ class TestDatabaseRule(val context: Context) : ExternalResource() {
 
     override fun before() {
         db = Room.inMemoryDatabaseBuilder(
-                context,
-                AppDatabase::class.java
+            context,
+            AppDatabase::class.java
         ).build().also {
             // Ensure all classes use test database
             AppDatabase.setInstance(it)

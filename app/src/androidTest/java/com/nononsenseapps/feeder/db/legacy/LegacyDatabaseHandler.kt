@@ -8,9 +8,11 @@ import com.nononsenseapps.feeder.db.room.DATABASE_NAME
 const val LEGACY_DATABASE_VERSION = 6
 const val LEGACY_DATABASE_NAME = DATABASE_NAME
 
-class LegacyDatabaseHandler constructor(context: Context,
-                                        name: String = LEGACY_DATABASE_NAME,
-                                        version: Int = LEGACY_DATABASE_VERSION): SQLiteOpenHelper(context, name, null, version) {
+class LegacyDatabaseHandler constructor(
+    context: Context,
+    name: String = LEGACY_DATABASE_NAME,
+    version: Int = LEGACY_DATABASE_VERSION
+) : SQLiteOpenHelper(context, name, null, version) {
 
     override fun onCreate(db: SQLiteDatabase) {
     }
@@ -87,7 +89,6 @@ const val CREATE_COUNT_VIEW = """
          WHERE $COL_UNREAD IS 1
          GROUP BY $COL_FEED)
        ON $FEED_TABLE_NAME.$COL_ID = $COL_FEED"""
-
 
 const val CREATE_TAGS_VIEW = """
     CREATE TEMP VIEW IF NOT EXISTS TagsWithUnreadCount

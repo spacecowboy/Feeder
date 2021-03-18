@@ -48,7 +48,7 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
 
     override val kodein by Kodein.lazy {
-        //import(androidXModule(this@FeederApplication))
+        // import(androidXModule(this@FeederApplication))
 
         bind<Application>() with singleton { this@FeederApplication }
         bind<AppDatabase>() with singleton { AppDatabase.getInstance(this@FeederApplication) }

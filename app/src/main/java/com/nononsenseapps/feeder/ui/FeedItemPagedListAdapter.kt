@@ -19,22 +19,21 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
-import java.util.*
-
+import java.util.Locale
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 class FeedItemPagedListAdapter(
-        private val context: Context,
-        private val feedItemsViewModel: FeedItemsViewModel,
-        private val settingsViewModel: SettingsViewModel,
-        private val prefs: Prefs,
-        private val actionCallback: ActionCallback
+    private val context: Context,
+    private val feedItemsViewModel: FeedItemsViewModel,
+    private val settingsViewModel: SettingsViewModel,
+    private val prefs: Prefs,
+    private val actionCallback: ActionCallback
 ) :
-        PagedListAdapter<PreviewItem, RecyclerView.ViewHolder>(PreviewItemDiffer) {
+    PagedListAdapter<PreviewItem, RecyclerView.ViewHolder>(PreviewItemDiffer) {
 
     private val shortDateTimeFormat: DateTimeFormatter =
-            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
+        DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
 
     private val linkColor: Int by lazy {
         settingsViewModel.accentColor
@@ -49,18 +48,18 @@ class FeedItemPagedListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-            FeedItemHolder(
-                    LayoutInflater
-                            .from(parent.context)
-                            .inflate(
-                                    R.layout.list_story_item,
-                                    parent,
-                                    false
-                            ),
-                    feedItemsViewModel,
-                    settingsViewModel,
-                    actionCallback
-            )
+        FeedItemHolder(
+            LayoutInflater
+                .from(parent.context)
+                .inflate(
+                    R.layout.list_story_item,
+                    parent,
+                    false
+                ),
+            feedItemsViewModel,
+            settingsViewModel,
+            actionCallback
+        )
 
     override fun onViewRecycled(vHolder: RecyclerView.ViewHolder) {
         val holder = vHolder as FeedItemHolder
@@ -95,9 +94,11 @@ class FeedItemPagedListAdapter(
             }
 
             if (titleText.length > item.feedDisplayTitle.length) {
-                titleText.setSpan(ForegroundColorSpan(linkColor),
-                        item.feedDisplayTitle.length + 3, titleText.length,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                titleText.setSpan(
+                    ForegroundColorSpan(linkColor),
+                    item.feedDisplayTitle.length + 3, titleText.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
         }
         holder.authorTextView.text = titleText
@@ -122,5 +123,4 @@ class FeedItemPagedListAdapter(
             holder.imageView.visibility = View.GONE
         }
     }
-
 }

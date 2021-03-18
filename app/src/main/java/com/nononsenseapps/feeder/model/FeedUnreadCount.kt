@@ -8,17 +8,17 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.URL
 
 data class FeedUnreadCount @Ignore constructor(
-        var id: Long = ID_UNSET,
-        var title: String = "",
-        var url: URL = sloppyLinkToStrictURLNoThrows(""),
-        var tag: String = "",
-        @ColumnInfo(name = "custom_title") var customTitle: String = "",
-        var notify: Boolean = false,
-        @ColumnInfo(name = "image_url") var imageUrl: URL? = null,
-        @ColumnInfo(name = "unread_count") var unreadCount: Int = 0
+    var id: Long = ID_UNSET,
+    var title: String = "",
+    var url: URL = sloppyLinkToStrictURLNoThrows(""),
+    var tag: String = "",
+    @ColumnInfo(name = "custom_title") var customTitle: String = "",
+    var notify: Boolean = false,
+    @ColumnInfo(name = "image_url") var imageUrl: URL? = null,
+    @ColumnInfo(name = "unread_count") var unreadCount: Int = 0
 ) {
     constructor() : this(id = ID_UNSET)
-    
+
     val displayTitle: String
         get() = (if (customTitle.isBlank()) title else customTitle)
 
@@ -49,7 +49,7 @@ data class FeedUnreadCount @Ignore constructor(
         return when (other) {
             null -> false
             is FeedUnreadCount -> {
-                //val f = other as FeedWrapper?
+                // val f = other as FeedWrapper?
                 if (isTag && other.isTag) {
                     // Compare tags
                     tag == other.tag

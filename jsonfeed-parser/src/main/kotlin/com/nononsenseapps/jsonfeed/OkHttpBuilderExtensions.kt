@@ -28,11 +28,10 @@ fun OkHttpClient.Builder.trustAllCerts() {
         val sslSocketFactory = sslContext.socketFactory
 
         sslSocketFactory(sslSocketFactory, trustManager)
-                .hostnameVerifier({ _, _ -> true })
+            .hostnameVerifier({ _, _ -> true })
     } catch (e: NoSuchAlgorithmException) {
         // ignore
     } catch (e: KeyManagementException) {
         // ignore
     }
-
 }

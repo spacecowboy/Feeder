@@ -36,23 +36,26 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
         if (!this::livePreviews.isInitialized) {
             livePagedAll = Transformations.switchMap(liveNewestFirst) { newestFirst ->
                 LivePagedListBuilder(
-                        when {
-                            feedId > ID_UNSET -> loadLivePreviews(feedId = feedId, newestFirst = newestFirst)
-                            feedId == ID_ALL_FEEDS -> loadLivePreviews(newestFirst = newestFirst)
-                            tag.isNotEmpty() -> loadLivePreviews(tag = tag, newestFirst = newestFirst)
-                            else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
-                        }, PAGE_SIZE).build()
+                    when {
+                        feedId > ID_UNSET -> loadLivePreviews(feedId = feedId, newestFirst = newestFirst)
+                        feedId == ID_ALL_FEEDS -> loadLivePreviews(newestFirst = newestFirst)
+                        tag.isNotEmpty() -> loadLivePreviews(tag = tag, newestFirst = newestFirst)
+                        else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
+                    },
+                    PAGE_SIZE
+                ).build()
             }
-
 
             livePagedUnread = Transformations.switchMap(liveNewestFirst) { newestFirst ->
                 LivePagedListBuilder(
-                        when {
-                            feedId > ID_UNSET -> loadLiveUnreadPreviews(feedId = feedId, newestFirst = newestFirst)
-                            feedId == ID_ALL_FEEDS -> loadLiveUnreadPreviews(newestFirst = newestFirst)
-                            tag.isNotEmpty() -> loadLiveUnreadPreviews(tag = tag, newestFirst = newestFirst)
-                            else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
-                        }, PAGE_SIZE).build()
+                    when {
+                        feedId > ID_UNSET -> loadLiveUnreadPreviews(feedId = feedId, newestFirst = newestFirst)
+                        feedId == ID_ALL_FEEDS -> loadLiveUnreadPreviews(newestFirst = newestFirst)
+                        tag.isNotEmpty() -> loadLiveUnreadPreviews(tag = tag, newestFirst = newestFirst)
+                        else -> throw IllegalArgumentException("Tag was empty, but no valid feed id was provided either")
+                    },
+                    PAGE_SIZE
+                ).build()
             }
 
             livePreviews = Transformations.switchMap(liveOnlyUnread) { onlyUnread ->
@@ -95,13 +98,13 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     }
 
     suspend fun markAsNotified(ids: List<Long>, notified: Boolean = true) =
-            dao.markAsNotified(ids = ids, notified = notified)
+        dao.markAsNotified(ids = ids, notified = notified)
 
     suspend fun markAsRead(ids: List<Long>, unread: Boolean = false) =
-            dao.markAsRead(ids = ids, unread = unread)
+        dao.markAsRead(ids = ids, unread = unread)
 
     suspend fun markAsRead(id: Long, unread: Boolean = false) =
-            dao.markAsRead(id = id, unread = unread)
+        dao.markAsRead(id = id, unread = unread)
 
     suspend fun loadFeedItemsInFeed(feedId: Long, newestFirst: Boolean): List<FeedItem> {
         return if (newestFirst) dao.loadFeedItemsInFeedDesc(feedId) else dao.loadFeedItemsInFeedAsc(feedId)
@@ -130,5 +133,4 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     fun loadLiveUnreadPreviews(unread: Boolean = true, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
         return if (newestFirst) dao.loadLiveUnreadPreviewsDesc(unread) else dao.loadLiveUnreadPreviewsAsc(unread)
     }
-
 }

@@ -19,7 +19,6 @@ import org.junit.runner.RunWith
 import java.net.URL
 import kotlin.test.assertFalse
 
-
 @RunWith(AndroidJUnit4::class)
 class OpenLinkInDefaultActivityTaskTest {
     @get:Rule
@@ -36,18 +35,20 @@ class OpenLinkInDefaultActivityTaskTest {
     fun setup() = runBlocking {
         val db = testDb.db
 
-        val feedId = db.feedDao().insertFeed(Feed(
+        val feedId = db.feedDao().insertFeed(
+            Feed(
                 title = "foo",
                 url = URL("http://foo")
-        ))
+            )
+        )
 
         val item = FeedItem(
-                feedId = feedId,
-                guid = "foobar",
-                title = "bla",
-                link = "http://foo",
-                notified = false,
-                unread = true
+            feedId = feedId,
+            guid = "foobar",
+            title = "bla",
+            link = "http://foo",
+            notified = false,
+            unread = true
         )
 
         val feedItemId = db.feedItemDao().insertFeedItem(item)
@@ -60,26 +61,33 @@ class OpenLinkInDefaultActivityTaskTest {
         UiDevice.getInstance(getInstrumentation()).pressHome()
     }
 
-
     @Test
     fun openInBrowserThenGoingBackDoesNotGoToMainTask() {
-        mainTaskTestRule.launchActivity(Intent(
+        mainTaskTestRule.launchActivity(
+            Intent(
                 Intent.ACTION_VIEW,
-                URI_FEEDITEMS.buildUpon().appendPath("${feedItem.id}").build())
+                URI_FEEDITEMS.buildUpon().appendPath("${feedItem.id}").build()
+            )
         )
 
         UiDevice.getInstance(getInstrumentation()).pressHome()
 
-        activityTestRule.launchActivity(getOpenInDefaultActivityIntent(getApplicationContext(),
+        activityTestRule.launchActivity(
+            getOpenInDefaultActivityIntent(
+                getApplicationContext(),
                 feedItemId = feedItem.id,
-                link = feedItem.link!!))
+                link = feedItem.link!!
+            )
+        )
 
         // Hack - first back exits browser, second back exits main task if it is shown after the first back
         // if it's not shown, then pressing back will not finish it
         UiDevice.getInstance(getInstrumentation()).pressBack()
         UiDevice.getInstance(getInstrumentation()).pressBack()
 
-        assertFalse(mainTaskTestRule.activity.isFinishing,
-                message = "Main activity should not be on screen after pressing back")
+        assertFalse(
+            mainTaskTestRule.activity.isFinishing,
+            message = "Main activity should not be on screen after pressing back"
+        )
     }
 }

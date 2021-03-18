@@ -2,14 +2,11 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.util.Log
-import androidx.work.WorkManager
 import com.nononsenseapps.feeder.blob.blobFile
-import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
-import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.db.room.upsertFeedItems
@@ -25,18 +22,15 @@ import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import net.dankito.readability4j.Readability4J
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import org.kodein.di.Kodein
 import org.kodein.di.android.closestKodein
-import org.kodein.di.direct
 import org.kodein.di.generic.instance
 import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 import java.io.File
 import java.io.IOException
-import java.net.URL
 import java.util.concurrent.Executors
 import kotlin.math.max
 import kotlin.system.measureTimeMillis

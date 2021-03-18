@@ -12,7 +12,11 @@ import com.rometools.rome.io.XmlReader
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
-import okhttp3.*
+import okhttp3.CacheControl
+import okhttp3.Credentials
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import okio.Buffer
 import okio.GzipSource
 import org.jsoup.Jsoup
@@ -40,24 +44,26 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
     /**
      * Finds the preferred alternate link in the header of an HTML/XML document pointing to feeds.
      */
-    fun findFeedUrl(html: String,
-                    preferRss: Boolean = false,
-                    preferAtom: Boolean = false,
-                    preferJSON: Boolean = false): URL? {
+    fun findFeedUrl(
+        html: String,
+        preferRss: Boolean = false,
+        preferAtom: Boolean = false,
+        preferJSON: Boolean = false
+    ): URL? {
 
         val feedLinks = getAlternateFeedLinksInHtml(html)
-                .sortedBy {
-                    val t = it.second.toLowerCase()
-                    when {
-                        preferAtom && t.contains("atom") -> "0"
-                        preferRss && t.contains("rss") -> "1"
-                        preferJSON && t.contains("json") -> "2"
-                        else -> t
-                    }
+            .sortedBy {
+                val t = it.second.toLowerCase()
+                when {
+                    preferAtom && t.contains("atom") -> "0"
+                    preferRss && t.contains("rss") -> "1"
+                    preferJSON && t.contains("json") -> "2"
+                    else -> t
                 }
-                .map {
-                    sloppyLinkToStrictURL(it.first) to it.second
-                }
+            }
+            .map {
+                sloppyLinkToStrictURL(it.first) to it.second
+            }
 
         return feedLinks.firstOrNull()?.first
     }
@@ -85,36 +91,36 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
         val doc = Jsoup.parse(html.byteInputStream(), "UTF-8", "")
 
         val feeds = doc.getElementsByAttributeValue("rel", "alternate")
-                ?.filter { it.hasAttr("href") && it.hasAttr("type") }
-                ?.filter {
-                    val t = it.attr("type").toLowerCase()
-                    when {
-                        t.contains("application/atom") -> true
-                        t.contains("application/rss") -> true
-                        // Youtube for example has alternate links with application/json+oembed type.
-                        t == "application/json" -> true
-                        else -> false
-                    }
+            ?.filter { it.hasAttr("href") && it.hasAttr("type") }
+            ?.filter {
+                val t = it.attr("type").toLowerCase()
+                when {
+                    t.contains("application/atom") -> true
+                    t.contains("application/rss") -> true
+                    // Youtube for example has alternate links with application/json+oembed type.
+                    t == "application/json" -> true
+                    else -> false
                 }
-                ?.filter {
-                    val l = it.attr("href").toLowerCase()
-                    try {
-                        if (baseUrl != null) {
-                            relativeLinkIntoAbsoluteOrThrow(base = baseUrl, link = l)
-                        } else {
-                            URL(l)
-                        }
-                        true
-                    } catch (_: MalformedURLException) {
-                        false
+            }
+            ?.filter {
+                val l = it.attr("href").toLowerCase()
+                try {
+                    if (baseUrl != null) {
+                        relativeLinkIntoAbsoluteOrThrow(base = baseUrl, link = l)
+                    } else {
+                        URL(l)
                     }
+                    true
+                } catch (_: MalformedURLException) {
+                    false
                 }
-                ?.map {
-                    when {
-                        baseUrl != null -> relativeLinkIntoAbsolute(base = baseUrl, link = it.attr("href")) to it.attr("type")
-                        else -> sloppyLinkToStrictURL(it.attr("href")).toString() to it.attr("type")
-                    }
-                } ?: emptyList()
+            }
+            ?.map {
+                when {
+                    baseUrl != null -> relativeLinkIntoAbsolute(base = baseUrl, link = it.attr("href")) to it.attr("type")
+                    else -> sloppyLinkToStrictURL(it.attr("href")).toString() to it.attr("type")
+                }
+            } ?: emptyList()
 
         return when {
             feeds.isNotEmpty() -> feeds
@@ -125,8 +131,8 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
 
     private fun findFeedLinksForYoutube(doc: Document): List<Pair<String, String>> {
         val channelId: String? = doc.body()?.getElementsByAttribute(YOUTUBE_CHANNEL_ID_ATTR)
-                ?.firstOrNull()
-                ?.attr(YOUTUBE_CHANNEL_ID_ATTR)
+            ?.firstOrNull()
+            ?.attr(YOUTUBE_CHANNEL_ID_ATTR)
 
         return when (channelId) {
             null -> emptyList()
@@ -160,9 +166,9 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
 
     @Throws(FeedParsingError::class)
     fun parseFeedResponse(response: Response): Feed? =
-            response.safeBody()?.let { body ->
-                parseFeedResponse(response, body)
-            }
+        response.safeBody()?.let { body ->
+            parseFeedResponse(response, body)
+        }
 
     /**
      * Takes body as bytes to handle encoding correctly
@@ -191,18 +197,18 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
      */
     @Throws(FeedParsingError::class)
     suspend fun parseFeedResponseOrFallbackToAlternateLink(response: Response): Feed? =
-            response.body()?.use { responseBody ->
-                responseBody.bytes().let { body ->
-                    // Encoding is not an issue for reading HTML (probably)
-                    val alternateFeedLink = findFeedUrl(String(body), preferAtom = true)
+        response.body()?.use { responseBody ->
+            responseBody.bytes().let { body ->
+                // Encoding is not an issue for reading HTML (probably)
+                val alternateFeedLink = findFeedUrl(String(body), preferAtom = true)
 
-                    return if (alternateFeedLink != null) {
-                        parseFeedUrl(alternateFeedLink)
-                    } else {
-                        parseFeedResponse(response, body)
-                    }
+                return if (alternateFeedLink != null) {
+                    parseFeedUrl(alternateFeedLink)
+                } else {
+                    parseFeedResponse(response, body)
                 }
             }
+        }
 
     @Throws(FeedParsingError::class)
     internal fun parseRssAtomBytes(baseUrl: URL, feedXml: ByteArray): Feed {
@@ -213,12 +219,14 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
                 // Try to work around bug in Rome
                 var encoding: String? = null
                 val xml: String = slashPattern.replace(
-                        feedXml.inputStream().use {
-                            XmlReader(it).use {
-                                encoding = it.encoding
-                                it.readText()
-                            }
-                        }, "")
+                    feedXml.inputStream().use {
+                        XmlReader(it).use {
+                            encoding = it.encoding
+                            it.readText()
+                        }
+                    },
+                    ""
+                )
 
                 xml.byteInputStream(Charset.forName(encoding ?: "UTF-8")).use {
                     return parseFeedInputStream(baseUrl, it)
@@ -250,11 +258,11 @@ fun Response.safeBody(): ByteArray? {
     return this.body()?.use { body ->
         if (header("Transfer-Encoding") == "chunked") {
             val source =
-                    if (header("Content-Encoding") == "gzip") {
-                        GzipSource(body.source())
-                    } else {
-                        body.source()
-                    }
+                if (header("Content-Encoding") == "gzip") {
+                    GzipSource(body.source())
+                } else {
+                    body.source()
+                }
             val buffer = Buffer()
             try {
                 var readBytes: Long = 0
@@ -265,9 +273,9 @@ fun Response.safeBody(): ByteArray? {
                 // This is not always fatal - sometimes the server might have sent the wrong
                 // content-length (I suspect)
                 Log.e(
-                        "FeedParser",
-                        "Encountered EOF exception while parsing response with headers: ${headers()}",
-                        e
+                    "FeedParser",
+                    "Encountered EOF exception while parsing response with headers: ${headers()}",
+                    e
                 )
             }
             buffer.readByteArray()
@@ -280,17 +288,19 @@ fun Response.safeBody(): ByteArray? {
 suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): Response {
     val request = Request.Builder()
         .url(url)
-        .cacheControl(CacheControl.Builder()
-            .let {
-                if (forceNetwork) {
-                    // Force a cache revalidation
-                    it.maxAge(0, TimeUnit.SECONDS)
-                } else {
-                    // Do a cache revalidation at most every minute
-                    it.maxAge(1, TimeUnit.MINUTES)
+        .cacheControl(
+            CacheControl.Builder()
+                .let {
+                    if (forceNetwork) {
+                        // Force a cache revalidation
+                        it.maxAge(0, TimeUnit.SECONDS)
+                    } else {
+                        // Do a cache revalidation at most every minute
+                        it.maxAge(1, TimeUnit.MINUTES)
+                    }
                 }
-            }
-            .build())
+                .build()
+        )
         .build()
 
     val clientToUse = if (url.userInfo?.isNotBlank() == true) {

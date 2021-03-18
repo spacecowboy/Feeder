@@ -88,9 +88,11 @@ val allMigrations = arrayOf(
 @Suppress("ClassName")
 object MIGRATION_12_13 : Migration(12, 13) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("""
+        database.execSQL(
+            """
             ALTER TABLE feeds ADD COLUMN fulltext_by_default INTEGER NOT NULL DEFAULT 0
-        """.trimIndent())
+            """.trimIndent()
+        )
     }
 }
 
@@ -99,9 +101,11 @@ object MIGRATION_12_13 : Migration(12, 13) {
 @Suppress("ClassName")
 object MIGRATION_11_12 : Migration(11, 12) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("""
+        database.execSQL(
+            """
             ALTER TABLE feed_items ADD COLUMN primary_sort_time INTEGER NOT NULL DEFAULT 0
-        """.trimIndent())
+            """.trimIndent()
+        )
     }
 }
 
@@ -110,9 +114,11 @@ object MIGRATION_11_12 : Migration(11, 12) {
 @Suppress("ClassName")
 object MIGRATION_10_11 : Migration(10, 11) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("""
+        database.execSQL(
+            """
             ALTER TABLE feed_items ADD COLUMN first_synced_time INTEGER NOT NULL DEFAULT 0
-        """.trimIndent())
+            """.trimIndent()
+        )
     }
 }
 
@@ -121,20 +127,26 @@ object MIGRATION_10_11 : Migration(10, 11) {
 @Suppress("ClassName")
 object MIGRATION_9_10 : Migration(9, 10) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("""
+        database.execSQL(
+            """
             CREATE TABLE IF NOT EXISTS `feed_items_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `guid` TEXT NOT NULL, `title` TEXT NOT NULL, `plain_title` TEXT NOT NULL, `plain_snippet` TEXT NOT NULL, `image_url` TEXT, `enclosure_link` TEXT, `author` TEXT, `pub_date` TEXT, `link` TEXT, `unread` INTEGER NOT NULL, `notified` INTEGER NOT NULL, `feed_id` INTEGER, FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
-        """.trimIndent())
+            """.trimIndent()
+        )
 
-        database.execSQL("""
+        database.execSQL(
+            """
             INSERT INTO `feed_items_new` (`id`, `guid`, `title`, `plain_title`, `plain_snippet`, `image_url`, `enclosure_link`, `author`, `pub_date`, `link`, `unread`, `notified`, `feed_id`)
             SELECT `id`, `guid`, `title`, `plain_title`, `plain_snippet`, `image_url`, `enclosure_link`, `author`, `pub_date`, `link`, `unread`, `notified`, `feed_id` FROM `feed_items`
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         // Iterate over all items using the minimum query. Also restrict the text field to
         // 1 MB which should be safe enough considering the window size is 2MB large.
-        database.query("""
+        database.query(
+            """
             SELECT id, substr(description,0,1000000) FROM feed_items
-        """.trimIndent())?.use { cursor ->
+            """.trimIndent()
+        )?.use { cursor ->
             cursor.forEach {
                 val feedItemId = cursor.getLong(0)
                 val description = cursor.getString(1)
@@ -145,43 +157,57 @@ object MIGRATION_9_10 : Migration(9, 10) {
             }
         }
 
-        database.execSQL("""
+        database.execSQL(
+            """
             DROP TABLE feed_items
-        """.trimIndent())
+            """.trimIndent()
+        )
 
-        database.execSQL("""
+        database.execSQL(
+            """
             ALTER TABLE feed_items_new RENAME TO feed_items
-        """.trimIndent())
+            """.trimIndent()
+        )
 
-        database.execSQL("""
+        database.execSQL(
+            """
             CREATE UNIQUE INDEX IF NOT EXISTS `index_feed_items_guid_feed_id` ON `feed_items` (`guid`, `feed_id`)
-        """.trimIndent())
+            """.trimIndent()
+        )
 
-        database.execSQL("""
+        database.execSQL(
+            """
             CREATE INDEX IF NOT EXISTS `index_feed_items_feed_id` ON `feed_items` (`feed_id`)
-        """.trimIndent())
+            """.trimIndent()
+        )
 
         // And reset response hash on all feeds to trigger parsing of results next sync so items
         // are written disk (in case migration substring was too short)
-        database.execSQL("""
+        database.execSQL(
+            """
             UPDATE `feeds` SET `response_hash` = 0
-        """.trimIndent())
+            """.trimIndent()
+        )
     }
 }
 
 object MIGRATION_8_9 : Migration(8, 9) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("""
+        database.execSQL(
+            """
             ALTER TABLE feeds ADD COLUMN response_hash INTEGER NOT NULL DEFAULT 0
-        """.trimIndent())
+            """.trimIndent()
+        )
     }
 }
 
 object MIGRATION_7_8 : Migration(7, 8) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("""
+        database.execSQL(
+            """
             ALTER TABLE feeds ADD COLUMN last_sync INTEGER NOT NULL DEFAULT 0
-        """.trimIndent())
+            """.trimIndent()
+        )
     }
 }
 
@@ -200,36 +226,51 @@ object MIGRATION_5_7 : Migration(5, 7) {
 private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
     // Create new tables and indices
     // Feeds
-    database.execSQL("""
+    database.execSQL(
+        """
             CREATE TABLE IF NOT EXISTS `feeds` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `custom_title` TEXT NOT NULL, `url` TEXT NOT NULL, `tag` TEXT NOT NULL, `notify` INTEGER NOT NULL, `image_url` TEXT)
-        """.trimIndent())
-    database.execSQL("""
+        """.trimIndent()
+    )
+    database.execSQL(
+        """
             CREATE UNIQUE INDEX `index_Feed_url` ON `feeds` (`url`)
-        """.trimIndent())
-    database.execSQL("""
+        """.trimIndent()
+    )
+    database.execSQL(
+        """
             CREATE UNIQUE INDEX `index_Feed_id_url_title` ON `feeds` (`id`, `url`, `title`)
-        """.trimIndent())
+        """.trimIndent()
+    )
 
     // Items
-    database.execSQL("""
+    database.execSQL(
+        """
             CREATE TABLE IF NOT EXISTS `feed_items` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `guid` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `plain_title` TEXT NOT NULL, `plain_snippet` TEXT NOT NULL, `image_url` TEXT, `enclosure_link` TEXT, `author` TEXT, `pub_date` TEXT, `link` TEXT, `unread` INTEGER NOT NULL, `notified` INTEGER NOT NULL, `feed_id` INTEGER, FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
-            """.trimIndent())
-    database.execSQL("""
+        """.trimIndent()
+    )
+    database.execSQL(
+        """
             CREATE UNIQUE INDEX `index_feed_item_guid_feed_id` ON `feed_items` (`guid`, `feed_id`)
-        """.trimIndent())
-    database.execSQL("""
+        """.trimIndent()
+    )
+    database.execSQL(
+        """
              CREATE  INDEX `index_feed_item_feed_id` ON `feed_items` (`feed_id`)
-        """.trimIndent())
+        """.trimIndent()
+    )
 
     // Migrate to new tables
-    database.query("""
+    database.query(
+        """
             SELECT _id, title, url, tag, customtitle, notify ${if (version == 6) ", imageUrl" else ""}
             FROM Feed
-        """.trimIndent())?.use { cursor ->
+        """.trimIndent()
+    )?.use { cursor ->
         cursor.forEach { _ ->
             val oldFeedId = cursor.getLong(0)
 
-            val newFeedId = database.insert("feeds",
+            val newFeedId = database.insert(
+                "feeds",
                 SQLiteDatabase.CONFLICT_FAIL,
                 contentValues {
                     setString("title" to cursor.getString(1))
@@ -240,17 +281,21 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
                     if (version == 6) {
                         setString("image_url" to cursor.getString(6))
                     }
-                })
+                }
+            )
 
-            database.query("""
+            database.query(
+                """
                     SELECT title, description, plainTitle, plainSnippet, imageUrl, link, author,
                            pubdate, unread, feed, enclosureLink, notified, guid
                     FROM FeedItem
                     WHERE feed = $oldFeedId
-                """.trimIndent())?.use { cursor ->
+                """.trimIndent()
+            )?.use { cursor ->
                 database.inTransaction {
                     cursor.forEach { _ ->
-                        database.insert("feed_items",
+                        database.insert(
+                            "feed_items",
                             SQLiteDatabase.CONFLICT_FAIL,
                             contentValues {
                                 setString("guid" to cursor.getString(12))
@@ -266,7 +311,8 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
                                 setInt("unread" to cursor.getInt(8))
                                 setInt("notified" to cursor.getInt(11))
                                 setLong("feed_id" to newFeedId)
-                            })
+                            }
+                        )
                     }
                 }
             }

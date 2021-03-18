@@ -51,9 +51,11 @@ class BadImagePlaceHolderArticleTest {
 
     @Before
     fun startServer() {
-        server.enqueue(MockResponse().also {
-            it.setResponseCode(400)
-        })
+        server.enqueue(
+            MockResponse().also {
+                it.setResponseCode(400)
+            }
+        )
         server.start()
     }
 
@@ -74,7 +76,7 @@ class BadImagePlaceHolderArticleTest {
                 Image is: <img src="$imgUrl" alt="alt text"></img>
                 <p>
                 And that is that
-                """.trimIndent()
+            """.trimIndent()
         }
 
         activityRule.launchReader(itemId)
@@ -84,7 +86,7 @@ class BadImagePlaceHolderArticleTest {
         }
 
         onView(withId(R.id.story_body))
-                .check(matches(withText(containsString("alt text"))))
+            .check(matches(withText(containsString("alt text"))))
     }
 
     @Test
@@ -99,7 +101,7 @@ class BadImagePlaceHolderArticleTest {
                 Image is: <img src="$imgUrl" alt="alt text"></img>
                 <p>
                 And that is that
-                """.trimIndent()
+            """.trimIndent()
         }
 
         activityRule.launchReader(itemId)
@@ -109,7 +111,7 @@ class BadImagePlaceHolderArticleTest {
         }
 
         onView(withId(R.id.story_body))
-                .check(matches(withText(containsString("alt text"))))
+            .check(matches(withText(containsString("alt text"))))
     }
 
     @Test
@@ -119,7 +121,7 @@ class BadImagePlaceHolderArticleTest {
                 Image is: <img src="" alt="alt text"></img>
                 <p>
                 And that is that
-                """.trimIndent()
+            """.trimIndent()
         }
 
         activityRule.launchReader(itemId)
@@ -129,7 +131,7 @@ class BadImagePlaceHolderArticleTest {
         }
 
         onView(withId(R.id.story_body))
-                .check(matches(withText(not(containsString("alt text")))))
+            .check(matches(withText(not(containsString("alt text")))))
     }
 
     @Test
@@ -141,7 +143,7 @@ class BadImagePlaceHolderArticleTest {
                 Image is: <img src="$imgUrl" alt="alt text"></img>
                 <p>
                 And that is that
-                """.trimIndent()
+            """.trimIndent()
         }
 
         activityRule.launchReader(itemId)
@@ -151,7 +153,7 @@ class BadImagePlaceHolderArticleTest {
         }
 
         onView(withId(R.id.story_body))
-                .check(matches(withText(containsString("alt text"))))
+            .check(matches(withText(containsString("alt text"))))
     }
 
     @Test
@@ -163,7 +165,7 @@ class BadImagePlaceHolderArticleTest {
                 Image is:<img src="$imgUrl" alt="alt text"></img>
                 <p>
                 And that is that
-                """.trimIndent()
+            """.trimIndent()
         }
 
         activityRule.launchReader(itemId)
@@ -173,31 +175,35 @@ class BadImagePlaceHolderArticleTest {
         }
 
         onView(withId(R.id.story_body))
-                .check(matches(withText(containsString("Image is:\n"))))
+            .check(matches(withText(containsString("Image is:\n"))))
         onView(withId(R.id.story_body))
-                .check(matches(withText(containsString("\nalt text\n"))))
+            .check(matches(withText(containsString("\nalt text\n"))))
     }
 
     private suspend fun insertData(imgUrl: HttpUrl? = null, description: () -> String): Long {
 
-        val feedId = testDb.db.feedDao().insertFeed(Feed(
+        val feedId = testDb.db.feedDao().insertFeed(
+            Feed(
                 title = "foo",
                 url = URL("http://foo")
-        ))
+            )
+        )
 
         return testDb.insertFeedItemWithBlob(
-                FeedItem(
-                        guid = "bar",
-                        feedId = feedId,
-                        title = "foo",
-                        imageUrl = imgUrl?.let { "$it" }
-                ),
-                description = description()
+            FeedItem(
+                guid = "bar",
+                feedId = feedId,
+                title = "foo",
+                imageUrl = imgUrl?.let { "$it" }
+            ),
+            description = description()
         )
     }
 }
 
 fun ActivityTestRule<FeedActivity>.launchReader(itemId: Long) =
-        launchActivity(Intent().also {
+    launchActivity(
+        Intent().also {
             it.data = URI_FEEDITEMS.buildUpon().appendPath("$itemId").build()
-        })
+        }
+    )

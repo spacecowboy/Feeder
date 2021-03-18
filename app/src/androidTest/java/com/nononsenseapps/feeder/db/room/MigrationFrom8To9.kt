@@ -18,26 +18,31 @@ class MigrationFrom8To9 {
     @Rule
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
-            InstrumentationRegistry.getInstrumentation(),
-            AppDatabase::class.java.canonicalName,
-            FrameworkSQLiteOpenHelperFactory())
+        InstrumentationRegistry.getInstrumentation(),
+        AppDatabase::class.java.canonicalName,
+        FrameworkSQLiteOpenHelperFactory()
+    )
 
     @Test
     fun migrate8to9() {
         var db = testHelper.createDatabase(dbName, 8)
 
         db.use {
-            db.execSQL("""
+            db.execSQL(
+                """
             INSERT INTO feeds(title, url, custom_title, tag, notify, last_sync)
             VALUES('feed', 'http://url', '', '', 0, 0)
-        """.trimIndent())
+                """.trimIndent()
+            )
         }
 
         db = testHelper.runMigrationsAndValidate(dbName, 9, true, MIGRATION_8_9)
 
-        db.query("""
+        db.query(
+            """
             SELECT title, url, response_hash FROM feeds
-        """.trimIndent())!!.use {
+            """.trimIndent()
+        )!!.use {
             assert(it.count == 1)
             assert(it.moveToFirst())
             assertEquals("feed", it.getString(0))

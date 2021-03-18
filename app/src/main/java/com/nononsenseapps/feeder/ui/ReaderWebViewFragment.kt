@@ -139,51 +139,51 @@ class ReaderWebViewFragment : KodeinAwareFragment() {
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean =
-            when (menuItem.itemId) {
-                R.id.action_toggle_javascript -> {
-                    prefs.javascriptEnabled = (!prefs.javascriptEnabled).also {
-                        menuItem.isChecked = it
-                        webView?.settings?.javaScriptEnabled = it
-                        webView?.reload()
-                    }
-                    true
+        when (menuItem.itemId) {
+            R.id.action_toggle_javascript -> {
+                prefs.javascriptEnabled = (!prefs.javascriptEnabled).also {
+                    menuItem.isChecked = it
+                    webView?.settings?.javaScriptEnabled = it
+                    webView?.reload()
                 }
-                R.id.action_open_in_browser -> {
-                    // Use the currently visible page as the url
-                    val link = webView?.url ?: url
+                true
+            }
+            R.id.action_open_in_browser -> {
+                // Use the currently visible page as the url
+                val link = webView?.url ?: url
+                context?.let { context ->
+                    openLinkInBrowser(context, link)
+                }
+
+                true
+            }
+            R.id.action_open_enclosure -> {
+                enclosureUrl?.let { link ->
                     context?.let { context ->
                         openLinkInBrowser(context, link)
                     }
+                }
 
-                    true
-                }
-                R.id.action_open_enclosure -> {
-                    enclosureUrl?.let { link ->
-                        context?.let { context ->
-                            openLinkInBrowser(context, link)
-                        }
-                    }
-
-                    true
-                }
-                R.id.action_share -> {
-                    if (currentUrl.isNotBlank()) {
-                        val shareIntent = Intent(Intent.ACTION_SEND)
-                        shareIntent.type = "text/plain"
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, currentUrl)
-
-                        startActivity(Intent.createChooser(shareIntent, getString(R.string.share)))
-                    }
-                    true
-                }
-                R.id.action_mark_as_unread -> {
-                    lifecycleScope.launch {
-                        viewModel.markAsRead(_id, unread = true)
-                    }
-                    true
-                }
-                else -> super.onOptionsItemSelected(menuItem)
+                true
             }
+            R.id.action_share -> {
+                if (currentUrl.isNotBlank()) {
+                    val shareIntent = Intent(Intent.ACTION_SEND)
+                    shareIntent.type = "text/plain"
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, currentUrl)
+
+                    startActivity(Intent.createChooser(shareIntent, getString(R.string.share)))
+                }
+                true
+            }
+            R.id.action_mark_as_unread -> {
+                lifecycleScope.launch {
+                    viewModel.markAsRead(_id, unread = true)
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(menuItem)
+        }
 
     /**
      * Returns true if the web view navigated back, false otherwise
@@ -218,12 +218,16 @@ private object WebViewClientHandler : WebViewClient() {
     }
 }
 
-fun View.setPadding(left: Int? = null,
-                    top: Int? = null,
-                    right: Int? = null,
-                    bottom: Int? = null) {
-    this.setPadding(left ?: this.paddingLeft,
-            top ?: this.paddingTop,
-            right ?: this.paddingRight,
-            bottom ?: this.paddingBottom)
+fun View.setPadding(
+    left: Int? = null,
+    top: Int? = null,
+    right: Int? = null,
+    bottom: Int? = null
+) {
+    this.setPadding(
+        left ?: this.paddingLeft,
+        top ?: this.paddingTop,
+        right ?: this.paddingRight,
+        bottom ?: this.paddingBottom
+    )
 }

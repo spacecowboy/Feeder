@@ -11,7 +11,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
-import com.nononsenseapps.feeder.util.*
+import com.nononsenseapps.feeder.util.CurrentTheme
+import com.nononsenseapps.feeder.util.PREF_THEME
+import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -33,10 +35,10 @@ class SettingsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein), SharedPr
     private val keyFlow = keyChannel.asFlow()
 
     val liveThemePreferenceNoInitial: LiveData<CurrentTheme> =
-            keyFlow.filter { it == PREF_THEME }
-                    .map { prefs.currentTheme }
-                    .conflate()
-                    .asLiveData()
+        keyFlow.filter { it == PREF_THEME }
+            .map { prefs.currentTheme }
+            .conflate()
+            .asLiveData()
 
     val liveIsNightMode: MutableLiveData<Boolean> by lazy { MutableLiveData(prefs.isNightMode) }
 

@@ -61,24 +61,29 @@ class MigrationFromLegacy6ToLatest {
     @Rule
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
-            InstrumentationRegistry.getInstrumentation(),
-            AppDatabase::class.java.canonicalName,
-            FrameworkSQLiteOpenHelperFactory())
+        InstrumentationRegistry.getInstrumentation(),
+        AppDatabase::class.java.canonicalName,
+        FrameworkSQLiteOpenHelperFactory()
+    )
 
     private val testDbName = "TestingDatabase"
 
     private val legacyDb: LegacyDatabaseHandler
-        get() = LegacyDatabaseHandler(context = feederApplication,
-                name = testDbName,
-                version = 6)
+        get() = LegacyDatabaseHandler(
+            context = feederApplication,
+            name = testDbName,
+            version = 6
+        )
 
     private val roomDb: AppDatabase
         get() =
-            Room.databaseBuilder(feederApplication,
-                    AppDatabase::class.java,
-                    testDbName)
-                    .addMigrations(*allMigrations)
-                    .build().also { testHelper.closeWhenFinished(it) }
+            Room.databaseBuilder(
+                feederApplication,
+                AppDatabase::class.java,
+                testDbName
+            )
+                .addMigrations(*allMigrations)
+                .build().also { testHelper.closeWhenFinished(it) }
 
     @Before
     fun setup() {
@@ -88,54 +93,66 @@ class MigrationFromLegacy6ToLatest {
             createViewsAndTriggers(db)
 
             // Bare minimum non-null feeds
-            val idA = db.insert(FEED_TABLE_NAME, null, contentValues {
-                setString(COL_TITLE to "feedA")
-                setString(COL_CUSTOM_TITLE to "feedACustom")
-                setString(COL_URL to "https://feedA")
-                setString(COL_TAG to "")
-            })
+            val idA = db.insert(
+                FEED_TABLE_NAME, null,
+                contentValues {
+                    setString(COL_TITLE to "feedA")
+                    setString(COL_CUSTOM_TITLE to "feedACustom")
+                    setString(COL_URL to "https://feedA")
+                    setString(COL_TAG to "")
+                }
+            )
 
             // All fields filled
-            val idB = db.insert(FEED_TABLE_NAME, null, contentValues {
-                setString(COL_TITLE to "feedB")
-                setString(COL_CUSTOM_TITLE to "feedBCustom")
-                setString(COL_URL to "https://feedB")
-                setString(COL_TAG to "tag")
-                setString(COL_IMAGEURL to "https://image")
-                setInt(COL_NOTIFY to 1)
-            })
+            val idB = db.insert(
+                FEED_TABLE_NAME, null,
+                contentValues {
+                    setString(COL_TITLE to "feedB")
+                    setString(COL_CUSTOM_TITLE to "feedBCustom")
+                    setString(COL_URL to "https://feedB")
+                    setString(COL_TAG to "tag")
+                    setString(COL_IMAGEURL to "https://image")
+                    setInt(COL_NOTIFY to 1)
+                }
+            )
 
             IntRange(0, 1).forEach { index ->
-                db.insert(FEED_ITEM_TABLE_NAME, null, contentValues {
-                    setLong(COL_FEED to idA)
-                    setString(COL_GUID to "guid$index")
-                    setString(COL_TITLE to "title$index")
-                    setString(COL_DESCRIPTION to "desc$index")
-                    setString(COL_PLAINTITLE to "plain$index")
-                    setString(COL_PLAINSNIPPET to "snippet$index")
-                    setString(COL_FEEDTITLE to "feedA")
-                    setString(COL_FEEDURL to "https://feedA")
-                    setString(COL_TAG to "")
-                })
+                db.insert(
+                    FEED_ITEM_TABLE_NAME, null,
+                    contentValues {
+                        setLong(COL_FEED to idA)
+                        setString(COL_GUID to "guid$index")
+                        setString(COL_TITLE to "title$index")
+                        setString(COL_DESCRIPTION to "desc$index")
+                        setString(COL_PLAINTITLE to "plain$index")
+                        setString(COL_PLAINSNIPPET to "snippet$index")
+                        setString(COL_FEEDTITLE to "feedA")
+                        setString(COL_FEEDURL to "https://feedA")
+                        setString(COL_TAG to "")
+                    }
+                )
 
-                db.insert(FEED_ITEM_TABLE_NAME, null, contentValues {
-                    setLong(COL_FEED to idB)
-                    setString(COL_GUID to "guid$index")
-                    setString(COL_TITLE to "title$index")
-                    setString(COL_DESCRIPTION to "desc$index")
-                    setString(COL_PLAINTITLE to "plain$index")
-                    setString(COL_PLAINSNIPPET to "snippet$index")
-                    setString(COL_FEEDTITLE to "feedB")
-                    setString(COL_FEEDURL to "https://feedB")
-                    setString(COL_TAG to "tag")
-                    setInt(COL_NOTIFIED to 1)
-                    setInt(COL_UNREAD to 0)
-                    setString(COL_AUTHOR to "author$index")
-                    setString(COL_ENCLOSURELINK to "https://enclosure$index")
-                    setString(COL_IMAGEURL to "https://image$index")
-                    setString(COL_PUBDATE to "2018-02-03T04:05:00Z")
-                    setString(COL_LINK to "https://link$index")
-                })
+                db.insert(
+                    FEED_ITEM_TABLE_NAME, null,
+                    contentValues {
+                        setLong(COL_FEED to idB)
+                        setString(COL_GUID to "guid$index")
+                        setString(COL_TITLE to "title$index")
+                        setString(COL_DESCRIPTION to "desc$index")
+                        setString(COL_PLAINTITLE to "plain$index")
+                        setString(COL_PLAINSNIPPET to "snippet$index")
+                        setString(COL_FEEDTITLE to "feedB")
+                        setString(COL_FEEDURL to "https://feedB")
+                        setString(COL_TAG to "tag")
+                        setInt(COL_NOTIFIED to 1)
+                        setInt(COL_UNREAD to 0)
+                        setString(COL_AUTHOR to "author$index")
+                        setString(COL_ENCLOSURELINK to "https://enclosure$index")
+                        setString(COL_IMAGEURL to "https://image$index")
+                        setString(COL_PUBDATE to "2018-02-03T04:05:00Z")
+                        setString(COL_LINK to "https://link$index")
+                    }
+                )
             }
         }
     }
@@ -147,8 +164,10 @@ class MigrationFromLegacy6ToLatest {
 
     @Test
     fun legacyMigrationTo7MinimalFeed() = runBlocking {
-        testHelper.runMigrationsAndValidate(testDbName, 7, true,
-                MIGRATION_6_7)
+        testHelper.runMigrationsAndValidate(
+            testDbName, 7, true,
+            MIGRATION_6_7
+        )
 
         roomDb.let { db ->
             val feeds = db.feedDao().loadFeeds()
@@ -169,8 +188,10 @@ class MigrationFromLegacy6ToLatest {
 
     @Test
     fun legacyMigrationTo7CompleteFeed() = runBlocking {
-        testHelper.runMigrationsAndValidate(testDbName, 7, true,
-                MIGRATION_6_7)
+        testHelper.runMigrationsAndValidate(
+            testDbName, 7, true,
+            MIGRATION_6_7
+        )
 
         roomDb.let { db ->
             val feeds = db.feedDao().loadFeeds()
@@ -191,8 +212,10 @@ class MigrationFromLegacy6ToLatest {
 
     @Test
     fun legacyMigrationTo7MinimalFeedItem() = runBlocking {
-        testHelper.runMigrationsAndValidate(testDbName, 7, true,
-                MIGRATION_6_7)
+        testHelper.runMigrationsAndValidate(
+            testDbName, 7, true,
+            MIGRATION_6_7
+        )
 
         roomDb.let { db ->
             val feed = db.feedDao().loadFeeds()[0]
@@ -220,8 +243,10 @@ class MigrationFromLegacy6ToLatest {
 
     @Test
     fun legacyMigrationTo7CompleteFeedItem() = runBlocking {
-        testHelper.runMigrationsAndValidate(testDbName, 7, true,
-                MIGRATION_6_7)
+        testHelper.runMigrationsAndValidate(
+            testDbName, 7, true,
+            MIGRATION_6_7
+        )
 
         roomDb.let { db ->
             val feed = db.feedDao().loadFeeds()[1]

@@ -36,29 +36,29 @@ class DeleteFeedsDialogFragment : KodeinAwareDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.delete_feed)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    val idsToDelete = feedIds.zip(checkedItems.asIterable())
-                            .filter { (_, checked) ->
-                                checked
-                            }.map { (id, _) ->
-                                id
-                            }
-
-                    GlobalScope.launch {
-                        feedViewModel.deleteFeeds(idsToDelete)
+            .setTitle(R.string.delete_feed)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val idsToDelete = feedIds.zip(checkedItems.asIterable())
+                    .filter { (_, checked) ->
+                        checked
+                    }.map { (id, _) ->
+                        id
                     }
 
-                    findNavController().navigate(
-                            R.id.action_deleteFeedsDialogFragment_to_feedFragment,
-                            bundleOf(ARG_FEED_ID to ID_ALL_FEEDS)
-                    )
-                }
-                .setNegativeButton(android.R.string.cancel) { _, _ -> }
-                .setMultiChoiceItems(feedTitles, checkedItems) { _: DialogInterface, position: Int, checked: Boolean ->
-                    checkedItems[position] = checked
+                GlobalScope.launch {
+                    feedViewModel.deleteFeeds(idsToDelete)
                 }
 
-                return builder.create()
+                findNavController().navigate(
+                    R.id.action_deleteFeedsDialogFragment_to_feedFragment,
+                    bundleOf(ARG_FEED_ID to ID_ALL_FEEDS)
+                )
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+            .setMultiChoiceItems(feedTitles, checkedItems) { _: DialogInterface, position: Int, checked: Boolean ->
+                checkedItems[position] = checked
+            }
+
+        return builder.create()
     }
 }

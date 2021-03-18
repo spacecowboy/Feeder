@@ -22,24 +22,26 @@ const val ARG_AUTHOR = "author"
 const val ARG_DATE = "date"
 
 fun Bundle.asFeedItemFoo(): FeedItemWithFeed {
-    return FeedItemWithFeed(id = getLong(ARG_ID, ID_UNSET),
-            title = getString(ARG_TITLE, ""),
-            link = getString(ARG_LINK),
-            enclosureLink = getString(ARG_ENCLOSURE),
-            imageUrl = getString(ARG_IMAGEURL),
-            author = getString(ARG_AUTHOR),
-            feedTitle = getString(ARG_FEEDTITLE, ""),
-            feedUrl = sloppyLinkToStrictURL(getString(ARG_FEED_URL, "")),
-            pubDate = when(getString(ARG_DATE)) {
-                null -> null
-                else -> {
-                    var dt: ZonedDateTime? = null
-                    try {
-                        dt = ZonedDateTime.parse(getString(ARG_DATE))
-                    } catch(t: Throwable) {}
-                    dt
-                }
-            })
+    return FeedItemWithFeed(
+        id = getLong(ARG_ID, ID_UNSET),
+        title = getString(ARG_TITLE, ""),
+        link = getString(ARG_LINK),
+        enclosureLink = getString(ARG_ENCLOSURE),
+        imageUrl = getString(ARG_IMAGEURL),
+        author = getString(ARG_AUTHOR),
+        feedTitle = getString(ARG_FEEDTITLE, ""),
+        feedUrl = sloppyLinkToStrictURL(getString(ARG_FEED_URL, "")),
+        pubDate = when (getString(ARG_DATE)) {
+            null -> null
+            else -> {
+                var dt: ZonedDateTime? = null
+                try {
+                    dt = ZonedDateTime.parse(getString(ARG_DATE))
+                } catch (t: Throwable) {}
+                dt
+            }
+        }
+    )
 }
 
 fun Bundle.setLong(pair: Pair<String, Long>) {

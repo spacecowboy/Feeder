@@ -10,15 +10,17 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
 import java.io.IOException
 import java.net.URL
-import java.util.*
-
+import java.util.ArrayList
 
 private val sampleFile: List<String> = """<?xml version="1.0" encoding="UTF-8"?>
         |<opml version="1.1">
@@ -75,13 +77,14 @@ class OPMLTest {
         // Create some feeds
         createSampleFeeds()
 
-        writeFile(path!!.absolutePath,
-                getTags()
+        writeFile(
+            path!!.absolutePath,
+            getTags()
         ) { tag ->
             db.feedDao().loadFeeds(tag = tag)
         }
 
-        //check contents of file
+        // check contents of file
         path!!.bufferedReader().useLines { lines ->
             lines.forEachIndexed { i, line ->
                 assertEquals("line $i differed", sampleFile[i], line)
@@ -137,15 +140,17 @@ class OPMLTest {
 
         // Create something that does not exist
         var feednew = Feed(
-                url = URL("http://somedomain20.com/rss.xml"),
-                title = "\"20\"",
-                tag = "kapow")
+            url = URL("http://somedomain20.com/rss.xml"),
+            title = "\"20\"",
+            tag = "kapow"
+        )
         var id = db.feedDao().insertFeed(feednew)
         feednew = feednew.copy(id = id)
         // Create something that will exist
         var feedold = Feed(
-                url = URL("http://somedomain0.com/rss.xml"),
-                title = "\"0\"")
+            url = URL("http://somedomain0.com/rss.xml"),
+            title = "\"0\""
+        )
         id = db.feedDao().insertFeed(feedold)
 
         feedold = feedold.copy(id = id)
@@ -205,7 +210,7 @@ class OPMLTest {
     @Test
     @Throws(Exception::class)
     fun testReadBadFile() = runBlocking {
-        //val path = File(dir, "feeds.opml")
+        // val path = File(dir, "feeds.opml")
 
         path!!.bufferedWriter().use {
             it.write("This is just some bullshit in the file\n")
@@ -250,33 +255,34 @@ class OPMLTest {
     private suspend fun createSampleFeeds() {
         for (i in 0..9) {
             val feed = Feed(
-                    url = URL("http://somedomain$i.com/rss.xml"),
-                    title = "\"$i\"",
-                    customTitle = if (i == 0) "" else "custom \"$i\"",
-                    tag = when (i % 3) {
-                        1 -> "tag1"
-                        2 -> "tag2"
-                        else -> ""
-                    })
+                url = URL("http://somedomain$i.com/rss.xml"),
+                title = "\"$i\"",
+                customTitle = if (i == 0) "" else "custom \"$i\"",
+                tag = when (i % 3) {
+                    1 -> "tag1"
+                    2 -> "tag2"
+                    else -> ""
+                }
+            )
 
             db.feedDao().insertFeed(feed)
         }
     }
 
     private suspend fun getTags(): List<String> =
-            db.feedDao().loadTags()
+        db.feedDao().loadTags()
 
     @Test
     @MediumTest
     fun antennaPodOPMLImports() = runBlocking {
-        //given
+        // given
         val opmlStream = this@OPMLTest.javaClass.getResourceAsStream("antennapod-feeds.opml")!!
 
-        //when
+        // when
         val parser = OpmlParser(OPMLToRoom(db))
         parser.parseInputStream(opmlStream)
 
-        //then
+        // then
         val feeds = db.feedDao().loadFeeds()
         val tags = db.feedDao().loadTags()
         assertEquals("Expecting 8 feeds", 8, feeds.size)
@@ -317,14 +323,14 @@ class OPMLTest {
     @Test
     @MediumTest
     fun flymOPMLImports() = runBlocking {
-        //given
+        // given
         val opmlStream = this@OPMLTest.javaClass.getResourceAsStream("Flym_auto_backup.opml")!!
 
-        //when
+        // when
         val parser = OpmlParser(OPMLToRoom(db))
         parser.parseInputStream(opmlStream)
 
-        //then
+        // then
         val feeds = db.feedDao().loadFeeds()
         val tags = db.feedDao().loadTags()
         assertEquals("Expecting 11 feeds", 11, feeds.size)
@@ -384,14 +390,14 @@ class OPMLTest {
     @Test
     @MediumTest
     fun rssGuardOPMLImports1() = runBlocking {
-        //given
+        // given
         val opmlStream = this@OPMLTest.javaClass.getResourceAsStream("rssguard_1.opml")!!
 
-        //when
+        // when
         val parser = OpmlParser(OPMLToRoom(db))
         parser.parseInputStream(opmlStream)
 
-        //then
+        // then
         val feeds = db.feedDao().loadFeeds()
         val tags = db.feedDao().loadTags()
         assertEquals("Expecting 30 feeds", 30, feeds.size)
@@ -434,14 +440,14 @@ class OPMLTest {
     @Test
     @MediumTest
     fun rssGuardOPMLImports2() = runBlocking {
-        //given
+        // given
         val opmlStream = this@OPMLTest.javaClass.getResourceAsStream("rssguard_2.opml")!!
 
-        //when
+        // when
         val parser = OpmlParser(OPMLToRoom(db))
         parser.parseInputStream(opmlStream)
 
-        //then
+        // then
         val feeds = db.feedDao().loadFeeds()
         val tags = db.feedDao().loadTags()
         assertEquals("Expecting 30 feeds", 30, feeds.size)

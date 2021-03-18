@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
@@ -17,7 +16,16 @@ import androidx.preference.PreferenceFragmentCompat
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.configurePeriodicSync
-import com.nononsenseapps.feeder.util.*
+import com.nononsenseapps.feeder.util.PREF_BATTERY_OPTIMIZATION
+import com.nononsenseapps.feeder.util.PREF_DEFAULT_OPEN_ITEM_WITH
+import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
+import com.nononsenseapps.feeder.util.PREF_OPEN_LINKS_WITH
+import com.nononsenseapps.feeder.util.PREF_SORT
+import com.nononsenseapps.feeder.util.PREF_SYNC_FREQ
+import com.nononsenseapps.feeder.util.PREF_SYNC_ONLY_CHARGING
+import com.nononsenseapps.feeder.util.PREF_SYNC_ONLY_WIFI
+import com.nononsenseapps.feeder.util.PREF_THEME
+import com.nononsenseapps.feeder.util.PreferenceSummaryUpdater
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.kodein.di.KodeinAware
@@ -77,8 +85,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             preference.onPreferenceChangeListener = PreferenceSummaryUpdater
             // Trigger the listener immediately with the preference's  current value.
             PreferenceSummaryUpdater.onPreferenceChange(
-                    preference,
-                    sharedPreferences.getString(preference.key, "")
+                preference,
+                sharedPreferences.getString(preference.key, "")
             )
         }
     }
@@ -88,7 +96,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 pref.setOnPreferenceClickListener {
                     context?.startActivity(
-                            Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                        Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
                     )
 
                     true
@@ -106,10 +114,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedP
                 val powerManager = context?.getSystemService<PowerManager>()
 
                 pref.setSummary(
-                        when (powerManager?.isIgnoringBatteryOptimizations(context?.packageName)) {
-                            true -> R.string.battery_optimization_disabled
-                            else -> R.string.battery_optimization_enabled
-                        }
+                    when (powerManager?.isIgnoringBatteryOptimizations(context?.packageName)) {
+                        true -> R.string.battery_optimization_disabled
+                        else -> R.string.battery_optimization_enabled
+                    }
                 )
             }
         }

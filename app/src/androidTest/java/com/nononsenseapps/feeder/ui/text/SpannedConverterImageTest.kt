@@ -13,7 +13,6 @@ import org.kodein.di.android.closestKodein
 import java.io.StringReader
 import java.net.URL
 
-
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class SpannedConverterImageTest {
@@ -24,12 +23,12 @@ class SpannedConverterImageTest {
     fun imgGetsPlaceHolderInserted() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("<img src=\"https://foo.com/bar.gif\">"),
-                URL("http://foo.com"),
-                Point(100, 100),
-                builder,
-                null
+            kodein,
+            StringReader("<img src=\"https://foo.com/bar.gif\">"),
+            URL("http://foo.com"),
+            Point(100, 100),
+            builder,
+            null
         )
 
         assertEquals(1, builder.getAllSpansWithType<ImageSpan>().size)
@@ -40,17 +39,16 @@ class SpannedConverterImageTest {
     fun imgWithNoSrcGetsNoPlaceHolder() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("<img src=\"\">"),
-                URL("http://foo.com"),
-                Point(100, 100),
-                builder,
-                null
+            kodein,
+            StringReader("<img src=\"\">"),
+            URL("http://foo.com"),
+            Point(100, 100),
+            builder,
+            null
         )
 
         assertEquals(emptyList<ImageSpan>(), builder.getAllSpansWithType<ImageSpan>())
     }
-
 }
 
 internal class FakeBuilder2 : SensibleSpannableStringBuilder() {

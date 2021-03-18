@@ -32,21 +32,21 @@ fun SyndFeed.asFeed(baseUrl: URL): Feed {
     }
 
     return Feed(
-            title = plainTitle(),
-            home_page_url = relativeLinkIntoAbsoluteOrNull(
-                    baseUrl,
-                    this.links?.firstOrNull {
-                        "alternate" == it.rel && "text/html" == it.type
-                    }?.href ?: this.link
-            ),
-            feed_url = relativeLinkIntoAbsoluteOrNull(
-                    baseUrl,
-                    this.links?.firstOrNull { "self" == it.rel }?.href
-            ),
-            description = this.description,
-            icon = icon,
-            author = feedAuthor,
-            items = this.entries?.map { it.asItem(baseUrl = baseUrl, feedAuthor = feedAuthor) }
+        title = plainTitle(),
+        home_page_url = relativeLinkIntoAbsoluteOrNull(
+            baseUrl,
+            this.links?.firstOrNull {
+                "alternate" == it.rel && "text/html" == it.type
+            }?.href ?: this.link
+        ),
+        feed_url = relativeLinkIntoAbsoluteOrNull(
+            baseUrl,
+            this.links?.firstOrNull { "self" == it.rel }?.href
+        ),
+        description = this.description,
+        icon = icon,
+        author = feedAuthor,
+        items = this.entries?.map { it.asItem(baseUrl = baseUrl, feedAuthor = feedAuthor) }
     )
 }
 
@@ -63,25 +63,25 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
         }
     }
     return Item(
-            id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
-            url = linkToHtml(baseUrl),
-            title = plainTitle(),
-            content_text = contentText,
-            content_html = contentHtml(),
-            summary = contentText.take(200),
-            image = image,
-            date_published = publishedRFC3339Date(),
-            date_modified = modifiedRFC3339Date(),
-            author = authors?.firstOrNull()?.asAuthor() ?: feedAuthor,
-            attachments = enclosures?.map { it.asAttachment(baseUrl = baseUrl) }
+        id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
+        url = linkToHtml(baseUrl),
+        title = plainTitle(),
+        content_text = contentText,
+        content_html = contentHtml(),
+        summary = contentText.take(200),
+        image = image,
+        date_published = publishedRFC3339Date(),
+        date_modified = modifiedRFC3339Date(),
+        author = authors?.firstOrNull()?.asAuthor() ?: feedAuthor,
+        attachments = enclosures?.map { it.asAttachment(baseUrl = baseUrl) }
     )
 }
 
 fun String.orIfBlank(block: () -> String): String =
-        when (this.isBlank()) {
-            true -> block()
-            false -> this
-        }
+    when (this.isBlank()) {
+        true -> block()
+        false -> this
+    }
 
 /**
  * Returns an absolute link, or null
@@ -106,15 +106,14 @@ fun SyndEntry.linkToHtml(feedBaseUrl: URL): String? {
     return null
 }
 
-
 fun SyndEnclosure.asAttachment(baseUrl: URL): Attachment {
     return Attachment(
-            url = relativeLinkIntoAbsoluteOrNull(
-                    baseUrl,
-                    this.url
-            ),
-            mime_type = this.type,
-            size_in_bytes = this.length
+        url = relativeLinkIntoAbsoluteOrNull(
+            baseUrl,
+            this.url
+        ),
+        mime_type = this.type,
+        size_in_bytes = this.length
     )
 }
 
@@ -124,8 +123,10 @@ fun SyndPerson.asAuthor(): Author {
         this.email != null -> "mailto:${this.email}"
         else -> null
     }
-    return Author(name = this.name,
-            url = url)
+    return Author(
+        name = this.name,
+        url = url
+    )
 }
 
 @FlowPreview
@@ -193,8 +194,8 @@ fun SyndEntry.mediaDescription(): String? {
     val media = this.getModule(MediaModule.URI) as MediaEntryModule?
 
     return media?.metadata?.description
-            ?: media?.mediaContents?.firstOrNull { it.metadata?.description?.isNotBlank() == true }?.metadata?.description
-            ?: media?.mediaGroups?.firstOrNull { it.metadata?.description?.isNotBlank() == true }?.metadata?.description
+        ?: media?.mediaContents?.firstOrNull { it.metadata?.description?.isNotBlank() == true }?.metadata?.description
+        ?: media?.mediaGroups?.firstOrNull { it.metadata?.description?.isNotBlank() == true }?.metadata?.description
 }
 
 /**
@@ -204,13 +205,13 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     val media = this.getModule(MediaModule.URI) as MediaEntryModule?
 
     val thumbnail: String? = media?.metadata?.thumbnail?.firstOrNull()?.url?.toString()
-            ?: media?.mediaContents?.firstOrNull { "image" == it.medium }?.reference?.toString()
-            ?: media?.mediaGroups?.mapNotNull { it.metadata?.thumbnail?.firstOrNull() }?.firstOrNull()?.url?.toString()
-            ?: enclosures?.asSequence()
-                    ?.filterNotNull()
-                    ?.filter { it.type?.startsWith("image/") == true }
-                    ?.mapNotNull { it.url }
-                    ?.firstOrNull()
+        ?: media?.mediaContents?.firstOrNull { "image" == it.medium }?.reference?.toString()
+        ?: media?.mediaGroups?.mapNotNull { it.metadata?.thumbnail?.firstOrNull() }?.firstOrNull()?.url?.toString()
+        ?: enclosures?.asSequence()
+            ?.filterNotNull()
+            ?.filter { it.type?.startsWith("image/") == true }
+            ?.mapNotNull { it.url }
+            ?.firstOrNull()
 
     return when {
         thumbnail != null -> relativeLinkIntoAbsolute(feedBaseUrl, thumbnail)
@@ -229,13 +230,13 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
 }
 
 fun SyndEntry.publishedRFC3339Date(): String? =
-        when (publishedDate != null) {
-            true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(publishedDate.time), ZoneOffset.systemDefault()).toString()
-            else -> modifiedRFC3339Date() // This is the required element in atom feeds so it is a good fallback
-        }
+    when (publishedDate != null) {
+        true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(publishedDate.time), ZoneOffset.systemDefault()).toString()
+        else -> modifiedRFC3339Date() // This is the required element in atom feeds so it is a good fallback
+    }
 
 fun SyndEntry.modifiedRFC3339Date(): String? =
-        when (updatedDate != null) {
-            true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(updatedDate.time), ZoneOffset.systemDefault()).toString()
-            else -> null
-        }
+    when (updatedDate != null) {
+        true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(updatedDate.time), ZoneOffset.systemDefault()).toString()
+        else -> null
+    }

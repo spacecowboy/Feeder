@@ -6,10 +6,20 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
-import android.view.*
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nononsenseapps.feeder.R
@@ -25,19 +35,21 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
-import java.lang.RuntimeException
 import java.net.URL
 
 const val TEMPLATE = "template"
-
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -105,43 +117,51 @@ class EditFeedActivity : KodeinAwareActivity() {
         emptyText = findViewById(android.R.id.empty)
         loadingProgress = findViewById(R.id.loading_progress)
         resultAdapter = ResultsAdapter()
-        //listResults.emptyView = emptyText
+        // listResults.emptyView = emptyText
         listResults.setHasFixedSize(true)
         listResults.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         listResults.adapter = resultAdapter
 
-        textSearch.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_GO ||
-                actionId == EditorInfo.IME_NULL && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER) {
-                // Hide keyboard
-                val f = currentFocus
-                if (f != null) {
-                    val imm = getSystemService(
-                        Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(f.windowToken,
-                        0)
+        textSearch.setOnEditorActionListener(
+            TextView.OnEditorActionListener { _, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_GO ||
+                    actionId == EditorInfo.IME_NULL && event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER
+                ) {
+                    // Hide keyboard
+                    val f = currentFocus
+                    if (f != null) {
+                        val imm = getSystemService(
+                            Context.INPUT_METHOD_SERVICE
+                        ) as InputMethodManager
+                        imm.hideSoftInputFromWindow(
+                            f.windowToken,
+                            0
+                        )
+                    }
+
+                    try {
+                        // Issue search
+                        val url: URL = sloppyLinkToStrictURL(textSearch.text.toString().trim())
+
+                        listResults.visibility = View.GONE
+                        emptyText.visibility = View.GONE
+                        loadingProgress.visibility = View.VISIBLE
+
+                        searchJob = searchForFeeds(url)
+                    } catch (exc: Exception) {
+                        exc.printStackTrace()
+                        Toast.makeText(
+                            this@EditFeedActivity,
+                            R.string.could_not_load_url,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    return@OnEditorActionListener true
                 }
-
-                try {
-                    // Issue search
-                    val url: URL = sloppyLinkToStrictURL(textSearch.text.toString().trim())
-
-                    listResults.visibility = View.GONE
-                    emptyText.visibility = View.GONE
-                    loadingProgress.visibility = View.VISIBLE
-
-                    searchJob = searchForFeeds(url)
-                } catch (exc: Exception) {
-                    exc.printStackTrace()
-                    Toast.makeText(this@EditFeedActivity,
-                        R.string.could_not_load_url,
-                        Toast.LENGTH_SHORT).show()
-                }
-
-                return@OnEditorActionListener true
+                false
             }
-            false
-        })
+        )
 
         val addButton = findViewById<Button>(R.id.add_button)
         addButton.setOnClickListener { _ ->
@@ -193,8 +213,8 @@ class EditFeedActivity : KodeinAwareActivity() {
                 detailsFrame.visibility = View.VISIBLE
                 if (id > ID_UNSET) {
                     // Don't allow editing url, but allow copying the text
-                    //textUrl.setInputType(InputType.TYPE_NULL);
-                    //textUrl.setTextIsSelectable(true);
+                    // textUrl.setInputType(InputType.TYPE_NULL);
+                    // textUrl.setTextIsSelectable(true);
                     // Focus on tag
                     textTag.requestFocus()
                     addButton.text = getString(R.string.save)
@@ -239,10 +259,12 @@ class EditFeedActivity : KodeinAwareActivity() {
         lifecycleScope.launchWhenCreated {
             val data = feedDao.loadTags()
 
-            val tagsAdapter = ArrayAdapter<String>(this@EditFeedActivity,
+            val tagsAdapter = ArrayAdapter<String>(
+                this@EditFeedActivity,
                 android.R.layout.simple_list_item_1,
                 android.R.id.text1,
-                data)
+                data
+            )
 
             // Set the adapter
             textTag.setAdapter(tagsAdapter)
@@ -252,8 +274,11 @@ class EditFeedActivity : KodeinAwareActivity() {
     private fun shouldBeFloatingWindow(): Boolean {
         val theme = theme
         val floatingWindowFlag = TypedValue()
-        if (theme == null || !theme.resolveAttribute(R.attr.isFloatingWindow, floatingWindowFlag,
-                true)) {
+        if (theme == null || !theme.resolveAttribute(
+                R.attr.isFloatingWindow, floatingWindowFlag,
+                true
+            )
+        ) {
             // isFloatingWindow flag is not defined in theme
             return false
         }
@@ -286,7 +311,8 @@ class EditFeedActivity : KodeinAwareActivity() {
         // Focus on tag
         textTag.requestFocus()
         val imm = getSystemService(
-            Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            Context.INPUT_METHOD_SERVICE
+        ) as InputMethodManager
         imm.showSoftInput(textTag, 0)
     }
 
@@ -388,7 +414,6 @@ class EditFeedActivity : KodeinAwareActivity() {
             items.clear()
             notifyDataSetChanged()
         }
-
     }
 
     @ExperimentalCoroutinesApi

@@ -13,7 +13,6 @@ import org.kodein.di.android.closestKodein
 import java.io.StringReader
 import java.net.URL
 
-
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class SpannedConverterListTest {
@@ -24,15 +23,14 @@ class SpannedConverterListTest {
     fun nakedLiTagIsBulletized() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-                kodein,
-                StringReader("Some <li> bullet </li> text"),
-                URL("http://foo.com"),
-                Point(100, 100),
-                builder,
-                null
+            kodein,
+            StringReader("Some <li> bullet </li> text"),
+            URL("http://foo.com"),
+            Point(100, 100),
+            builder,
+            null
         )
 
         assertEquals(1, builder.getAllSpansWithType<BulletSpan>().size)
     }
-
 }
