@@ -1,3 +1,44 @@
+# 1.11.0
+Allan Nordhøy (2):
+  * [4e05cb55] Updated Norwegian Bokmål translation using Weblate
+
+Eduardo (1):
+  * [7d23f022] Updated Portuguese (Brazil) translation using Weblate
+
+El Pirujo (2):
+  * [4af3761e] Updated Spanish translation using Weblate
+
+J. Lavoie (2):
+  * [65079f61] Updated Italian translation using Weblate
+
+Jakub Fabijan (1):
+  * [d49aa9e6] Updated Esperanto translation using Weblate
+
+Jonas Kalderstam (7):
+  * [074e85ac] Fixed links not opening after screen rotation
+  * [2bd413a7] Fixed a leaking service connection
+  * [72b26b59] Updated Japanese translation using Weblate
+  * [13b0b601] Added full text parsing option using Readability4J
+  * [e6a632d9] Updated Swedish translation using Weblate
+
+Oğuz Ersen (2):
+  * [e420ef80] Updated Turkish translation using Weblate
+
+Reza Almanda (1):
+  * [90cd9031] Updated Indonesian translation using Weblate
+
+Tomáš Tihlařík (1):
+  * [ab41bf6e] Update Czech strings.xml
+
+WaldiS (1):
+  * [b6ffe8bf] Updated Polish translation using Weblate
+
+zmni (1):
+  * [5d763077] Updated Indonesian translation using Weblate
+
+Ícar N. S (1):
+  * [d36e6d67] Updated Catalan translation using Weblate
+
 # 1.10.14
 Jonas Kalderstam (2):
   * [3777ebfd] Added error reporting when trying to add a feed fails
