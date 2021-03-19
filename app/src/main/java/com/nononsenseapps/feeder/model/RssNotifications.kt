@@ -173,7 +173,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
     )
 
     style.setBuilder(builder)
-    return style.build()
+    return style.build() ?: error("Null??")
 }
 
 @FlowPreview
@@ -232,7 +232,7 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
         .setNumber(feedItems.size)
 
     style.setBuilder(builder)
-    return style.build()
+    return style.build() ?: error("How null??")
 }
 
 private fun getDeleteIntent(context: Context, feedItems: List<FeedItemWithFeed>): PendingIntent {

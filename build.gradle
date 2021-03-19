@@ -2,9 +2,9 @@
 
 buildscript {
   ext {
-    kotlin_version = '1.4.21'
-    gradle_build_version = "4.2.1"
-    build_tools_version = "30.0.2"
+    kotlin_version = "1.4.30"
+    gradle_build_version = "7.0.0-alpha10"
+    build_tools_version = "30.0.3"
 
     multi_dex_version = "1.0.3"
 
@@ -36,6 +36,8 @@ buildscript {
     lifecycle_version = "2.2.0"
     room_version = "2.2.6"
     nav_version = "2.1.0"
+    activityComposeVersion = "1.3.0-alpha03"
+    composeVersion = "1.0.0-beta01"
 
     espresso_version = "3.1.0"
     uiautomator_version = "2.2.0"
@@ -60,19 +62,39 @@ buildscript {
 }
 
 allprojects {
-  repositories {
-    google()
-    mavenCentral()
-    jcenter() {
-      content {
-        includeModule("org.jetbrains.trove4j", "trove4j")
-        includeModule("com.linkedin.dexmaker", "dexmaker")
-      }
-    }
-  }
+//  repositories {
+//    google()
+//    mavenCentral()
+//    jcenter() {
+//      content {
+//        includeModule("org.jetbrains.trove4j", "trove4j")
+//        includeModule("com.linkedin.dexmaker", "dexmaker")
+//      }
+//    }
+//  }
 
   tasks.withType(JavaCompile) {
     options.incremental = true
     options.encoding = 'UTF-8'
+  }
+}
+
+
+subprojects {
+  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+      // Treat all Kotlin warnings as errors
+      allWarningsAsErrors = false
+
+      freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
+
+      // Enable experimental coroutines APIs, including Flow
+      freeCompilerArgs += '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi'
+      freeCompilerArgs += '-Xopt-in=kotlinx.coroutines.FlowPreview'
+      freeCompilerArgs += '-Xopt-in=kotlin.Experimental'
+
+      // Set JVM target to 1.8
+      jvmTarget = "1.8"
+    }
   }
 }

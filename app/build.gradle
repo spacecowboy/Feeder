@@ -104,6 +104,21 @@ android {
 
   kotlinOptions {
     jvmTarget = "1.8"
+    useIR = true
+  }
+
+  buildFeatures {
+    compose true
+    buildConfig true
+    aidl false
+    renderScript false
+    resValues false
+    shaders false
+  }
+
+  composeOptions {
+    kotlinCompilerExtensionVersion composeVersion
+//    kotlinCompilerVersion '1.4.30'
   }
 
   packagingOptions {
@@ -154,7 +169,6 @@ dependencies {
   implementation "androidx.legacy:legacy-support-v4:$legacy_support_version"
   implementation "androidx.appcompat:appcompat:$appcompat_version"
   implementation "androidx.preference:preference:$preference_version"
-  implementation "com.google.android.material:material:$material_version"
   implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
   implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
@@ -163,6 +177,18 @@ dependencies {
   implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
   implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+
+  // Compose
+  implementation "androidx.activity:activity-compose:$activityComposeVersion"
+  implementation "androidx.compose.ui:ui:$composeVersion"
+  implementation "androidx.compose.foundation:foundation:$composeVersion"
+  implementation "androidx.compose.foundation:foundation-layout:$composeVersion"
+  implementation "androidx.compose.material:material:$composeVersion"
+  implementation "androidx.compose.material:material-icons-extended:$composeVersion"
+  implementation "androidx.compose.runtime:runtime:$composeVersion"
+  implementation "androidx.compose.runtime:runtime-livedata:$composeVersion"
+  implementation "androidx.compose.ui:ui-tooling:$composeVersion"
+  implementation "com.google.android.material:material:$material_version"
 
   // Better times
   implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
