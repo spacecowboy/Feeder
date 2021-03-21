@@ -94,4 +94,9 @@
     <string name="javascript">Javascript</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="url">URL-адрес</string>
+    <string name="fetching_full_article">Получение полной статьи…</string>
+    <string name="failed_to_fetch_full_article">Не удалось получить полную статью</string>
+    <string name="fetch_full_articles_by_default">По умолчанию получать полные статьи</string>
+    <string name="fetch_full_article">Получить полную статью</string>
+    <string name="failed_to_parse">Не удалось разобрать %1$s</string>
 </resources>
