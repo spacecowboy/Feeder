@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.stateIn
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
+import java.util.*
 import kotlin.collections.set
 
 @ExperimentalCoroutinesApi
@@ -34,20 +35,22 @@ class FeedListViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
             5000L
         ) {
             feedsWithUnreadCounts.collectLatest { feeds ->
-                val topTag = FeedUnreadCount(id = ID_ALL_FEEDS)
+                val topTag = FeedUnreadCount.topTag
                 val tags: MutableMap<String, FeedUnreadCount> = ArrayMap()
-                val data: MutableList<FeedUnreadCount> = mutableListOf(topTag)
+                val data: SortedSet<FeedUnreadCount> = sortedSetOf(topTag)
 
                 feeds.forEach { feed ->
                     if (feed.tag.isNotEmpty()) {
-                        if (!tags.contains(feed.tag)) {
+                        if (feed.tag !in tags) {
                             val tag = FeedUnreadCount(tag = feed.tag)
                             data.add(tag)
                             tags[feed.tag] = tag
+                            topTag.addChild(tag)
                         }
 
                         tags[feed.tag]?.let { tag ->
                             tag.unreadCount += feed.unreadCount
+                            tag.addChild(feed)
                         }
                     }
 
@@ -56,9 +59,8 @@ class FeedListViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
                     data.add(feed)
                 }
 
-                data.sortWith(Comparator { a, b -> a.compareTo(b) })
-
-                emit(data)
+//                data.sortedBy { it }
+                emit(data.toList())
             }
         }
     }

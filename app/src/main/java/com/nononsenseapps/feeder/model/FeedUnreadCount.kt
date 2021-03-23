@@ -6,6 +6,7 @@ import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.URL
+import java.util.*
 
 data class FeedUnreadCount @Ignore constructor(
     var id: Long = ID_UNSET,
@@ -16,7 +17,7 @@ data class FeedUnreadCount @Ignore constructor(
     var notify: Boolean = false,
     @ColumnInfo(name = "image_url") var imageUrl: URL? = null,
     @ColumnInfo(name = "unread_count") var unreadCount: Int = 0
-) {
+) : Comparable<FeedUnreadCount> {
     constructor() : this(id = ID_UNSET)
 
     val displayTitle: String
@@ -28,7 +29,18 @@ data class FeedUnreadCount @Ignore constructor(
     val isTag: Boolean
         get() = id < 1 && tag.isNotEmpty()
 
-    operator fun compareTo(other: FeedUnreadCount): Int {
+    @Ignore
+    private val _children: SortedSet<FeedUnreadCount> = sortedSetOf()
+
+    val children: List<FeedUnreadCount>
+        get() = _children.toList()
+
+    fun addChild(child: FeedUnreadCount) {
+        _children.add(child)
+    }
+
+
+    override operator fun compareTo(other: FeedUnreadCount): Int {
         return when {
             // Top tag is always at the top (implies empty tags)
             isTop -> -1
@@ -70,5 +82,9 @@ data class FeedUnreadCount @Ignore constructor(
             // Item
             id.hashCode()
         }
+    }
+
+    companion object {
+        val topTag = FeedUnreadCount(id = ID_ALL_FEEDS)
     }
 }
