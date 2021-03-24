@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.core.app.NotificationManagerCompat
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.ui.ARG_FEED_TITLE
@@ -32,6 +33,7 @@ val Context.notificationManager: NotificationManagerCompat
  * Ensures that a maximum number of shortcuts is available at any time with the last used being bumped out of the list
  * first.
  */
+@ExperimentalAnimationApi
 @FlowPreview
 @ExperimentalCoroutinesApi
 fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null) {

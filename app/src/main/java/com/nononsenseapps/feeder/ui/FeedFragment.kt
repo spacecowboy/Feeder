@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
@@ -65,6 +66,7 @@ const val ARG_FEED_TAG = "feed_tag"
 const val ARG_FEED_FULL_TEXT_BY_DEFAULT = "feed_full_text_by_default"
 const val ARG_FEED_OPEN_ARTICLES_WITH = "feed_open_articles_with"
 
+@ExperimentalAnimationApi
 @FlowPreview
 @ExperimentalCoroutinesApi
 class FeedFragment : KodeinAwareFragment() {

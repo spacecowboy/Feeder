@@ -14,9 +14,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
@@ -55,10 +58,12 @@ fun FeedList(feedListViewModel: FeedListViewModel) {
         feedListViewModel.onItemClicked(item)
     }
 
-    LazyColumn(
-
+    Column(
+        modifier = Modifier
+            .width(300.dp)
+            .fillMaxHeight()
     ) {
-        items(feedsAndTags) { item ->
+        for (item in feedsAndTags) {
             when {
                 item.isTag -> ExpandableTag(
                     item = item,
