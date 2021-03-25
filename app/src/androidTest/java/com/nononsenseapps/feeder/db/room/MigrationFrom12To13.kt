@@ -28,7 +28,7 @@ class MigrationFrom12To13 {
     )
 
     @Test
-    fun migrate11to12() {
+    fun migrate12to13() {
         var db = testHelper.createDatabase(dbName, 12)
 
         db.use {
@@ -47,11 +47,11 @@ class MigrationFrom12To13 {
             )
         }
 
-        db = testHelper.runMigrationsAndValidate(dbName, 12, true, MIGRATION_11_12)
+        db = testHelper.runMigrationsAndValidate(dbName, 13, true, MIGRATION_12_13)
 
         db.query(
             """
-            SELECT fulltext_by_default FROM feed_items
+            SELECT fulltext_by_default FROM feeds
             """.trimIndent()
         )!!.use {
             assert(it.count == 1)
