@@ -98,4 +98,9 @@
     <string name="battery_optimization_disabled">电池优化已禁用</string>
     <string name="battery_optimization_enabled">电池优化已启用</string>
     <string name="preload_custom_tab">预加载自定义标签页</string>
+    <string name="fetching_full_article">获取全文中…</string>
+    <string name="failed_to_fetch_full_article">获取全文失败</string>
+    <string name="fetch_full_articles_by_default">默认获取全文</string>
+    <string name="fetch_full_article">获取全文</string>
+    <string name="failed_to_parse">解析失败项 %1$s</string>
 </resources>
