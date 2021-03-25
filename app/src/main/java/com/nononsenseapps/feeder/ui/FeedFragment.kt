@@ -20,7 +20,6 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
@@ -94,16 +93,7 @@ class FeedFragment : KodeinAwareFragment() {
 
     private lateinit var adapter: FeedItemPagedListAdapter
 
-    private var feedFullTextByDefault: Boolean = false
-
     init {
-        lifecycleScope.launchWhenCreated {
-            if (id > ID_UNSET) {
-                feedViewModel.getLiveFeed(id).observe(this@FeedFragment) {
-                    feedFullTextByDefault = it.fullTextByDefault
-                }
-            }
-        }
         // Listens on sync state changes
         lifecycleScope.launchWhenResumed {
             currentlySyncing.asFlow().collect {
@@ -501,15 +491,20 @@ class FeedFragment : KodeinAwareFragment() {
             }
             itemId == R.id.action_edit_feed && this.id > ID_UNSET -> {
                 this.id.let { feedId ->
-                    val i = Intent(activity, EditFeedActivity::class.java)
-                    // TODO do not animate the back movement here
-                    i.putExtra(ARG_ID, feedId)
-                    i.putExtra(ARG_CUSTOMTITLE, customTitle)
-                    i.putExtra(ARG_TITLE, title)
-                    i.putExtra(ARG_FEED_TAG, feedTag)
-                    i.putExtra(ARG_FEED_FULL_TEXT_BY_DEFAULT, feedFullTextByDefault)
-                    i.data = Uri.parse(url)
-                    startActivity(i)
+                    lifecycleScope.launch {
+                        val feedFullTextByDefault =
+                            feedViewModel.getFeed(feedId)?.fullTextByDefault ?: false
+
+                        val i = Intent(activity, EditFeedActivity::class.java)
+                        // TODO do not animate the back movement here
+                        i.putExtra(ARG_ID, feedId)
+                        i.putExtra(ARG_CUSTOMTITLE, customTitle)
+                        i.putExtra(ARG_TITLE, title)
+                        i.putExtra(ARG_FEED_TAG, feedTag)
+                        i.putExtra(ARG_FEED_FULL_TEXT_BY_DEFAULT, feedFullTextByDefault)
+                        i.data = Uri.parse(url)
+                        startActivity(i)
+                    }
                 }
 
                 true

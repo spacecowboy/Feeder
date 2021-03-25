@@ -36,6 +36,10 @@ class FeedViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
         return liveFeed
     }
 
+    suspend fun getFeed(id: Long): Feed? {
+        return dao.loadFeed(feedId = id)
+    }
+
     suspend fun setNotify(tag: String, notify: Boolean) {
         dao.setNotify(tag = tag, notify = notify)
     }
