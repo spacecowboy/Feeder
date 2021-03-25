@@ -1,5 +1,6 @@
 stages:
   - build
+  - validate_deploy
   - deploy
 
 #image: spacecowboy/android-docker-builder:base
@@ -24,18 +25,17 @@ check:
     - build/logs/
 
 validate_deployment:
-  stage: deploy
+  stage: validate_deploy
   script:
     - source devenv && ./deploy_playstore.sh --dry-run
-# Non-tags will only perform validation
   only:
     - master
+    - tags
 
 deploy_playstore:
   stage: deploy
   script:
     - source devenv && ./deploy_playstore.sh
-# Non-tags will only perform validation
   only:
     - tags
 #    - /^\d+\.\d+\.\d+$/
