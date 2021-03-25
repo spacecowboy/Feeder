@@ -18,8 +18,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.GridLayoutManager
@@ -92,6 +92,7 @@ class FeedFragment : KodeinAwareFragment() {
     private val currentlySyncing: ConflatedBroadcastChannel<Boolean> by instance(tag = CURRENTLY_SYNCING_STATE)
 
     private lateinit var adapter: FeedItemPagedListAdapter
+    private var emptyView: View? = null
 
     init {
         // Listens on sync state changes
@@ -212,24 +213,26 @@ class FeedFragment : KodeinAwareFragment() {
         }
 
         // Set up the empty view
-        val emptyView: View = rootView.findViewById(android.R.id.empty)
-        val emptyAddFeed: TextView = emptyView.findViewById(R.id.empty_add_feed)
-        @Suppress("DEPRECATION")
-        emptyAddFeed.text = android.text.Html.fromHtml(getString(R.string.empty_feed_add))
-        val emptyOpenFeeds: TextView = emptyView.findViewById(R.id.empty_open_feeds)
-        @Suppress("DEPRECATION")
-        emptyOpenFeeds.text = android.text.Html.fromHtml(getString(R.string.empty_feed_open))
+        emptyView = rootView.findViewById(android.R.id.empty)
+        emptyView?.let { emptyView ->
+            val emptyAddFeed: TextView = emptyView.findViewById(R.id.empty_add_feed)
+            @Suppress("DEPRECATION")
+            emptyAddFeed.text = android.text.Html.fromHtml(getString(R.string.empty_feed_add))
+            val emptyOpenFeeds: TextView = emptyView.findViewById(R.id.empty_open_feeds)
+            @Suppress("DEPRECATION")
+            emptyOpenFeeds.text = android.text.Html.fromHtml(getString(R.string.empty_feed_open))
 
-        emptyAddFeed.setOnClickListener {
-            startActivity(
-                Intent(
-                    activity,
-                    EditFeedActivity::class.java
+            emptyAddFeed.setOnClickListener {
+                startActivity(
+                    Intent(
+                        activity,
+                        EditFeedActivity::class.java
+                    )
                 )
-            )
-        }
+            }
 
-        emptyOpenFeeds.setOnClickListener { (activity as FeedActivity).openNavDrawer() }
+            emptyOpenFeeds.setOnClickListener { (activity as FeedActivity).openNavDrawer() }
+        }
 
         // specify an adapter
         adapter = FeedItemPagedListAdapter(
@@ -314,52 +317,52 @@ class FeedFragment : KodeinAwareFragment() {
             feedId = id,
             tag = feedTag ?: ""
         )
-        liveDbPreviews.observe(
-            this,
-            Observer<PagedList<PreviewItem>> {
-                adapter.submitList(it)
-                emptyView.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
-            }
-        )
+
+        return rootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        liveDbPreviews.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+            emptyView?.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+        }
 
         when {
             id > ID_UNSET -> { // Load feed if feed
-                feedViewModel.getLiveFeed(id).observe(
-                    this,
-                    Observer {
-                        it?.let { feed ->
-                            this.title = feed.title
-                            this.customTitle = feed.customTitle
-                            this.displayTitle = feed.displayTitle
-                            this.url = feed.url.toString()
-                            this.notify = feed.notify
-                            this.feedTag = feed.tag
+                feedViewModel.getLiveFeed(id).observe(viewLifecycleOwner) {
+                    it?.let { feed ->
+                        this.title = feed.title
+                        this.customTitle = feed.customTitle
+                        this.displayTitle = feed.displayTitle
+                        this.url = feed.url.toString()
+                        this.notify = feed.notify
+                        this.feedTag = feed.tag
 
-                            (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
+                        (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
-                            // Update state of notification toggle
-                            activity?.invalidateOptionsMenu()
+                        // Update state of notification toggle
+                        activity?.invalidateOptionsMenu()
 
-                            // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
-                            // extra statistics on opening the feed.
-                            if (firstFeedLoad) {
-                                // Title has been fetched, so add shortcut
-                                activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
-                                // Report shortcut usage
-                                activity?.reportShortcutToFeedUsed(feed.id)
-                            }
-                            firstFeedLoad = false
+                        // If user edits the feed then the variables and the UI should reflect it but we shouldn't add
+                        // extra statistics on opening the feed.
+                        if (firstFeedLoad) {
+                            // Title has been fetched, so add shortcut
+                            activity?.addDynamicShortcutToFeed(feed.displayTitle, feed.id, null)
+                            // Report shortcut usage
+                            activity?.reportShortcutToFeedUsed(feed.id)
                         }
+                        firstFeedLoad = false
                     }
-                )
+                }
             }
             else -> { // Load notification settings for all
                 (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
                 activity?.let { activity ->
-                    feedViewModel.getLiveFeedsNotify(id, feedTag ?: "").observe(
-                        this,
-                        Observer {
+                    feedViewModel.getLiveFeedsNotify(id, feedTag ?: "")
+                        .observe(viewLifecycleOwner) {
                             it.fold(true) { a, b -> a && b }
                                 .let { notify ->
                                     this.notify = notify
@@ -367,12 +370,9 @@ class FeedFragment : KodeinAwareFragment() {
                                     activity.invalidateOptionsMenu()
                                 }
                         }
-                    )
                 }
             }
         }
-
-        return rootView
     }
 
     private fun onSyncStateChanged(syncing: Boolean) {
