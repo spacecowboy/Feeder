@@ -39,7 +39,7 @@ class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
     val context: Application by instance()
     private val okHttpClient: OkHttpClient by instance()
 
-    private lateinit var liveItem: LiveData<FeedItemWithFeed>
+    private lateinit var liveItem: LiveData<FeedItemWithFeed?>
     private lateinit var feedItem: FeedItemWithFeed
 
     private lateinit var liveDefaultText: LiveData<Spanned>
@@ -50,7 +50,7 @@ class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
 
     private var fragmentUrlClickListener: UrlClickListener? = null
 
-    fun getLiveItem(id: Long): LiveData<FeedItemWithFeed> {
+    fun getLiveItem(id: Long): LiveData<FeedItemWithFeed?> {
         if (!this::liveItem.isInitialized) {
             liveItem = dao.loadLiveFeedItem(id).asLiveData()
         }

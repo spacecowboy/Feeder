@@ -37,7 +37,7 @@ interface FeedDao {
     suspend fun deleteFeeds(ids: List<Long>)
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
-    fun loadLiveFeed(feedId: Long): Flow<Feed>
+    fun loadLiveFeed(feedId: Long): Flow<Feed?>
 
     @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
     suspend fun loadTags(): List<String>

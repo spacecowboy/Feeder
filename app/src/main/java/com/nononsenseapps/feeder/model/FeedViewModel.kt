@@ -27,9 +27,9 @@ class FeedViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
         return liveFeedsNotify
     }
 
-    private lateinit var liveFeed: LiveData<Feed>
+    private lateinit var liveFeed: LiveData<Feed?>
 
-    fun getLiveFeed(id: Long): LiveData<Feed> {
+    fun getLiveFeed(id: Long): LiveData<Feed?> {
         if (!this::liveFeed.isInitialized) {
             liveFeed = dao.loadLiveFeed(feedId = id).asLiveData()
         }
