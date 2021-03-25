@@ -77,61 +77,6 @@ class ReaderFragment : KodeinAwareFragment() {
     private var rssItemMenu: FeedItemWithFeed? = null
 
     init {
-        lifecycleScope.launchWhenCreated {
-            liveText = viewModel.getLiveTextMaybeFull(
-                getTextOptions(),
-                urlClickListener()
-            )
-
-            liveText?.observe(this@ReaderFragment) {
-                Log.d("FeederReaderFragment", "Got body text emission")
-                bodyTextView.text = it
-            }
-
-            viewModel.getLiveItem(_id).observe(this@ReaderFragment) { rssItem ->
-                rssItemMenu = rssItem
-
-                titleTextView.text = rssItem.plainTitle
-
-                rssItem.feedId?.let { feedId ->
-                    feedTitleTextView.setOnClickListener {
-                        findNavController()
-                            .navigate(
-                                R.id.action_readerFragment_to_feedFragment,
-                                bundle {
-                                    putLong(ARG_FEED_ID, feedId)
-                                }
-                            )
-                    }
-                }
-
-                feedTitleTextView.text = rssItem.feedDisplayTitle
-
-                rssItem.pubDate.let { pubDate ->
-                    rssItem.author.let { author ->
-                        when {
-                            author == null && pubDate != null ->
-                                authorTextView.text = getString(
-                                    R.string.on_date,
-                                    pubDate.format(dateTimeFormat)
-                                )
-                            author != null && pubDate != null ->
-                                authorTextView.text = getString(
-                                    R.string.by_author_on_date,
-                                    // Must wrap author in unicode marks to ensure it formats
-                                    // correctly in RTL
-                                    unicodeWrap(author),
-                                    pubDate.format(dateTimeFormat)
-                                )
-                            else -> authorTextView.visibility = View.GONE
-                        }
-                    }
-                }
-
-                // Update state of notification toggle
-                activity?.invalidateOptionsMenu()
-            }
-        }
         lifecycleScope.launchWhenStarted {
             try {
                 if (prefs.shouldPreloadCustomTab) {
@@ -142,7 +87,7 @@ class ReaderFragment : KodeinAwareFragment() {
                 }
             } catch (e: Exception) {
                 // Don't let this crash
-                Log.e("ReaderFragment", "Couldn't preload $_id", e)
+                Log.e("FeederReaderFragment", "Couldn't preload $_id", e)
             }
         }
     }
@@ -153,6 +98,72 @@ class ReaderFragment : KodeinAwareFragment() {
             maxImageSize = requireActivity().maxImageSize(),
             nightMode = prefs.isNightMode
         )
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Fragment's views have their own coroutine scope
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            // It may have been manually overridden by fetching full text
+            if (liveText == null) {
+                liveText = viewModel.getLiveTextMaybeFull(
+                    getTextOptions(),
+                    urlClickListener()
+                )
+            }
+
+            // Fragment's views have their own lifecycle
+            liveText?.observe(viewLifecycleOwner) {
+                bodyTextView.text = it
+            }
+        }
+        viewModel.getLiveItem(_id).observe(viewLifecycleOwner) { rssItem ->
+            if (rssItem == null) {
+                return@observe
+            }
+            rssItemMenu = rssItem
+
+            titleTextView.text = rssItem.plainTitle
+
+            rssItem.feedId?.let { feedId ->
+                feedTitleTextView.setOnClickListener {
+                    findNavController()
+                        .navigate(
+                            R.id.action_readerFragment_to_feedFragment,
+                            bundle {
+                                putLong(ARG_FEED_ID, feedId)
+                            }
+                        )
+                }
+            }
+
+            feedTitleTextView.text = rssItem.feedDisplayTitle
+
+            rssItem.pubDate.let { pubDate ->
+                rssItem.author.let { author ->
+                    when {
+                        author == null && pubDate != null ->
+                            authorTextView.text = getString(
+                                R.string.on_date,
+                                pubDate.format(dateTimeFormat)
+                            )
+                        author != null && pubDate != null ->
+                            authorTextView.text = getString(
+                                R.string.by_author_on_date,
+                                // Must wrap author in unicode marks to ensure it formats
+                                // correctly in RTL
+                                unicodeWrap(author),
+                                pubDate.format(dateTimeFormat)
+                            )
+                        else -> authorTextView.visibility = View.GONE
+                    }
+                }
+            }
+
+            // Update state of notification toggle
+            activity?.invalidateOptionsMenu()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -189,9 +200,9 @@ class ReaderFragment : KodeinAwareFragment() {
         val rootView = inflater.inflate(theLayout, container, false)
 
         titleTextView = rootView.findViewById(R.id.story_title)
-        bodyTextView = rootView.findViewById<TextView>(R.id.story_body)
-        authorTextView = rootView.findViewById<TextView>(R.id.story_author)
-        feedTitleTextView = rootView.findViewById<TextView>(R.id.story_feedtitle)
+        bodyTextView = rootView.findViewById(R.id.story_body)
+        authorTextView = rootView.findViewById(R.id.story_author)
+        feedTitleTextView = rootView.findViewById(R.id.story_feedtitle)
 
         return rootView
     }
