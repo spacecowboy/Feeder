@@ -1,20 +1,11 @@
 package com.nononsenseapps.feeder.ui.compose.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,8 +36,6 @@ import com.nononsenseapps.feeder.model.FeedUnreadCount
 
 const val EXPAND_ANIMATION_DURATION = 300
 const val COLLAPSE_ANIMATION_DURATION = 300
-const val FADE_IN_ANIMATION_DURATION = 350
-const val FADE_OUT_ANIMATION_DURATION = 300
 
 @ExperimentalAnimationApi
 @Composable
@@ -54,28 +43,58 @@ fun FeedList(feedListViewModel: FeedListViewModel) {
     val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observeAsState(initial = emptyList())
     val expandedTags by feedListViewModel.expandedTags.collectAsState()
 
-    val onItemClick: (FeedUnreadCount) -> Unit = { item ->
-        feedListViewModel.onItemClicked(item)
-    }
+    FeedList(
+        feedsAndTags = feedsAndTags,
+        expandedTags = expandedTags,
+        onItemClick = { item -> feedListViewModel.onItemClicked(item) },
+        onToggleExpand = { tag -> feedListViewModel.toggleExpansion(tag) }
+    )
+}
 
-    Column(
+@ExperimentalAnimationApi
+@Composable
+@Preview
+private fun FeedListPreview() {
+    FeedList(
+        listOf(
+            FeedUnreadCount(tag = "News tag", unreadCount = 3),
+            FeedUnreadCount(id = 1, title = "Times", tag = "News tag", unreadCount = 1),
+            FeedUnreadCount(id = 2, title = "Post", tag = "News tag", unreadCount = 2),
+            FeedUnreadCount(tag = "Funny tag", unreadCount = 6),
+            FeedUnreadCount(id = 3, title = "Hidden", tag = "Funny tag", unreadCount = 6),
+            FeedUnreadCount(id = 4, title = "Top Dog", unreadCount = 99)
+        ),
+        setOf("News tag"),
+        {},
+        {}
+    )
+}
+
+@ExperimentalAnimationApi
+@Composable
+private fun FeedList(
+    feedsAndTags: List<FeedUnreadCount>,
+    expandedTags: Set<String>,
+    onItemClick: (FeedUnreadCount) -> Unit,
+    onToggleExpand: (String) -> Unit
+) {
+    LazyColumn(
         modifier = Modifier
             .width(300.dp)
             .fillMaxHeight()
     ) {
-        for (item in feedsAndTags) {
+        items(feedsAndTags) { item ->
             when {
                 item.isTag -> ExpandableTag(
                     item = item,
                     children = item.children,
                     expanded = item.tag in expandedTags,
-                    onToggleExpand = { feedListViewModel.toggleExpansion(item.tag) },
+                    onToggleExpand = onToggleExpand,
                     onItemClick = onItemClick
                 )
                 item.isTop -> TopLevelFeed(item = item, onItemClick = onItemClick)
                 item.tag.isEmpty() -> TopLevelFeed(item = item, onItemClick = onItemClick)
-                // Inside objects now
-//                item.tag in expandedTags -> ChildFeed(item = item, onItemClick = onItemClick)
+                item.tag in expandedTags -> ChildFeed(item = item, onItemClick = onItemClick)
             }
         }
     }
@@ -91,7 +110,7 @@ private fun ExpandableTag(
         FeedUnreadCount(title = "bar", unreadCount = 1)
     ),
     expanded: Boolean = true,
-    onToggleExpand: () -> Unit = {},
+    onToggleExpand: (String) -> Unit = {},
     onItemClick: (FeedUnreadCount) -> Unit = {},
 ) {
     val transitionState = remember {
@@ -115,7 +134,7 @@ private fun ExpandableTag(
         val (expandButton, text, unreadCount, childItems) = createRefs()
         ExpandArrow(
             degrees = arrowRotationDegree,
-            onClick = onToggleExpand,
+            onClick = { onToggleExpand(item.tag) },
             modifier = Modifier
                 .constrainAs(expandButton) {
                     top.linkTo(parent.top)
@@ -146,64 +165,6 @@ private fun ExpandableTag(
                     centerVerticallyTo(expandButton)
                 }
         )
-        TagChildren(
-            visible = expanded,
-            children = children,
-            onItemClick = onItemClick,
-            modifier = Modifier
-                .constrainAs(childItems) {
-                    top.linkTo(expandButton.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-        )
-    }
-}
-
-@ExperimentalAnimationApi
-@Composable
-fun TagChildren(
-    visible: Boolean,
-    children: List<FeedUnreadCount>,
-    onItemClick: (FeedUnreadCount) -> Unit = {},
-    modifier: Modifier
-) {
-    val enterFadeIn = remember {
-        fadeIn(
-            animationSpec = TweenSpec(
-                durationMillis = FADE_IN_ANIMATION_DURATION,
-                easing = FastOutLinearInEasing
-            )
-        )
-    }
-    val enterExpand = remember {
-        expandVertically(animationSpec = tween(EXPAND_ANIMATION_DURATION))
-    }
-    val exitFadeOut = remember {
-        fadeOut(
-            animationSpec = TweenSpec(
-                durationMillis = FADE_OUT_ANIMATION_DURATION,
-                easing = LinearOutSlowInEasing
-            )
-        )
-    }
-    val exitCollapse = remember {
-        shrinkVertically(animationSpec = tween(COLLAPSE_ANIMATION_DURATION))
-    }
-    AnimatedVisibility(
-        visible = visible,
-        modifier = modifier,
-        enter = enterExpand + enterFadeIn,
-        exit = exitCollapse + exitFadeOut
-    ) {
-        LazyColumn {
-            items(children) { feed ->
-                ChildFeed(
-                    item = feed,
-                    onItemClick = onItemClick
-                )
-            }
-        }
     }
 }
 
