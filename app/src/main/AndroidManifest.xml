@@ -22,6 +22,17 @@
     <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true" />
 
     <activity
+      android:name="com.nononsenseapps.feeder.ui.MainActivity"
+      android:exported="true"
+      android:label="FeedComp"
+      android:theme="@style/AppThemeDay.NoActionBar">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+
+    <activity
       android:name=".ui.FeedActivity"
       android:label="@string/app_name">
 

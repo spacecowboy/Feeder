@@ -1,7 +1,7 @@
 package com.nononsenseapps.feeder.base
 
+import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -46,7 +46,7 @@ class KodeinAwareViewModelFactory(override val kodein: Kodein) :
 inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.activityViewModelProvider():
     Provider<C, T> {
     return provider {
-        ViewModelProvider(instance<FragmentActivity>(), instance<KodeinAwareViewModelFactory>()).get(T::class.java)
+        ViewModelProvider(instance<ComponentActivity>(), instance<KodeinAwareViewModelFactory>()).get(T::class.java)
     }
 }
 

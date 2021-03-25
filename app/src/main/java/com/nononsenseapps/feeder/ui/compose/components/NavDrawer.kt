@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 
@@ -57,6 +58,7 @@ fun FeedList(feedListViewModel: FeedListViewModel) {
 private fun FeedListPreview() {
     FeedList(
         listOf(
+            FeedUnreadCount(id = ID_ALL_FEEDS, unreadCount = 100),
             FeedUnreadCount(tag = "News tag", unreadCount = 3),
             FeedUnreadCount(id = 1, title = "Times", tag = "News tag", unreadCount = 1),
             FeedUnreadCount(id = 2, title = "Post", tag = "News tag", unreadCount = 2),
@@ -192,7 +194,7 @@ fun TopLevelFeed(
     item: FeedUnreadCount = FeedUnreadCount(title = "A feed", unreadCount = 999),
     onItemClick: (FeedUnreadCount) -> Unit = {}
 ) = Feed(
-    title = item.displayTitle,
+    title = if (item.isTop) stringResource(id = R.string.all_feeds) else item.displayTitle,
     unreadCount = item.unreadCount,
     startPadding = 16.dp,
     onItemClick = { onItemClick(item) }

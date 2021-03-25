@@ -238,7 +238,7 @@ class FeedFragment : KodeinAwareFragment() {
 
         // specify an adapter
         adapter = FeedItemPagedListAdapter(
-            activity!!,
+            requireActivity(),
             feedItemsViewModel,
             settingsViewModel,
             prefs,

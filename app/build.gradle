@@ -118,7 +118,7 @@ android {
 
   composeOptions {
     kotlinCompilerExtensionVersion composeVersion
-//    kotlinCompilerVersion '1.4.30'
+    kotlinCompilerVersion '1.4.30'
   }
 
   packagingOptions {
@@ -253,4 +253,6 @@ dependencies {
   androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
   androidTestImplementation "androidx.test.espresso:espresso-contrib:$espresso_version"
   androidTestImplementation "androidx.test.uiautomator:uiautomator:$uiautomator_version"
+
+  androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
 }

@@ -1,0 +1,8 @@
+<resources>
+  <style name="AppThemeDay.NoActionBar" >
+  <item name="windowActionBar">false</item>
+  <item name="windowNoTitle">true</item>
+</style>
+  <style name="AppThemeDay.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+  <style name="AppThemeDay.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
