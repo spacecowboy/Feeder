@@ -1,3 +1,11 @@
+# 1.11.1
+Jonas Kalderstam (2):
+  * [130137d3] Fixed database test
+  * [aa9ebbd3] Maybe fixed a nullpointer error
+
+Nikita Epifanov (1):
+  * [d09adafe] Updated Russian translation using Weblate
+
 # 1.11.0
 Allan Nordhøy (2):
   * [4e05cb55] Updated Norwegian Bokmål translation using Weblate
