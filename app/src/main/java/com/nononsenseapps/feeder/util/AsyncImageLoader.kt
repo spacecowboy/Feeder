@@ -10,6 +10,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.instance
@@ -18,8 +20,8 @@ class AsyncImageLoader(override val kodein: Kodein) : KodeinAware {
     private val coroutineScope: CoroutineScope by instance()
     private val imageLoader: ImageLoader by instance()
     private val context: Context by instance()
-    // TODO fix concurrent modification error
     private val cache: ArrayMap<String, Deferred<ImageResult>> = ArrayMap()
+    private val cacheMutex = Mutex()
 
     /**
      * Initiates a download of the image - keeping the result for later
@@ -28,8 +30,12 @@ class AsyncImageLoader(override val kodein: Kodein) : KodeinAware {
         imgLink: String,
         block: ImageRequest.Builder.() -> ImageRequest.Builder = { this }
     ) {
-        if (imgLink !in cache) {
-            cache[imgLink] = getImageAsync(imgLink, block)
+        runBlocking {
+            cacheMutex.withLock {
+                if (imgLink !in cache) {
+                    cache[imgLink] = getImageAsync(imgLink, block)
+                }
+            }
         }
     }
 
@@ -60,8 +66,11 @@ class AsyncImageLoader(override val kodein: Kodein) : KodeinAware {
         // Some blogs (ahem, Android Developers Blog, ahem) have duplicate images in them.
         // In those cases, we need to read the image in again since it's gone from the cache.
         // However, in that case the image should be in the OkHttp cache so still being fast
-        val result = cache.remove(imgLink)
-            ?: getImageAsync(imgLink)
+
+        val result =
+            cacheMutex.withLock {
+                cache.remove(imgLink)
+            } ?: getImageAsync(imgLink)
 
         result.await()
     }
