@@ -110,27 +110,27 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
         return if (newestFirst) dao.loadFeedItemsInFeedDesc(feedId) else dao.loadFeedItemsInFeedAsc(feedId)
     }
 
-    fun loadLivePreviews(feedId: Long, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+    private fun loadLivePreviews(feedId: Long, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
         return if (newestFirst) dao.loadLivePreviewsDesc(feedId) else dao.loadLivePreviewsAsc(feedId)
     }
 
-    fun loadLivePreviews(tag: String, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+    private fun loadLivePreviews(tag: String, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
         return if (newestFirst) dao.loadLivePreviewsDesc(tag) else dao.loadLivePreviewsAsc(tag)
     }
 
-    fun loadLivePreviews(newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+    private fun loadLivePreviews(newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
         return if (newestFirst) dao.loadLivePreviewsDesc() else dao.loadLivePreviewsAsc()
     }
 
-    fun loadLiveUnreadPreviews(feedId: Long?, unread: Boolean = true, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+    private fun loadLiveUnreadPreviews(feedId: Long?, unread: Boolean = true, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
         return if (newestFirst) dao.loadLiveUnreadPreviewsDesc(feedId, unread) else dao.loadLiveUnreadPreviewsAsc(feedId, unread)
     }
 
-    fun loadLiveUnreadPreviews(tag: String, unread: Boolean = true, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+    private fun loadLiveUnreadPreviews(tag: String, unread: Boolean = true, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
         return if (newestFirst) dao.loadLiveUnreadPreviewsDesc(tag, unread) else dao.loadLiveUnreadPreviewsAsc(tag, unread)
     }
 
-    fun loadLiveUnreadPreviews(unread: Boolean = true, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
+    private fun loadLiveUnreadPreviews(unread: Boolean = true, newestFirst: Boolean): DataSource.Factory<Int, PreviewItem> {
         return if (newestFirst) dao.loadLiveUnreadPreviewsDesc(unread) else dao.loadLiveUnreadPreviewsAsc(unread)
     }
 }

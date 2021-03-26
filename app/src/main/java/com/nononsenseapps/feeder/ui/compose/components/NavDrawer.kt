@@ -40,11 +40,11 @@ const val COLLAPSE_ANIMATION_DURATION = 300
 
 @ExperimentalAnimationApi
 @Composable
-fun FeedList(feedListViewModel: FeedListViewModel) {
+fun ListOfFeedsAndTags(feedListViewModel: FeedListViewModel) {
     val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observeAsState(initial = emptyList())
     val expandedTags by feedListViewModel.expandedTags.collectAsState()
 
-    FeedList(
+    ListOfFeedsAndTags(
         feedsAndTags = feedsAndTags,
         expandedTags = expandedTags,
         onItemClick = { item -> feedListViewModel.onItemClicked(item) },
@@ -55,8 +55,8 @@ fun FeedList(feedListViewModel: FeedListViewModel) {
 @ExperimentalAnimationApi
 @Composable
 @Preview
-private fun FeedListPreview() {
-    FeedList(
+private fun ListOfFeedsAndTagsPreview() {
+    ListOfFeedsAndTags(
         listOf(
             FeedUnreadCount(id = ID_ALL_FEEDS, unreadCount = 100),
             FeedUnreadCount(tag = "News tag", unreadCount = 3),
@@ -74,7 +74,7 @@ private fun FeedListPreview() {
 
 @ExperimentalAnimationApi
 @Composable
-private fun FeedList(
+private fun ListOfFeedsAndTags(
     feedsAndTags: List<FeedUnreadCount>,
     expandedTags: Set<String>,
     onItemClick: (FeedUnreadCount) -> Unit,
@@ -171,7 +171,7 @@ private fun ExpandableTag(
 }
 
 @Composable
-fun ExpandArrow(
+private fun ExpandArrow(
     degrees: Float,
     modifier: Modifier,
     onClick: () -> Unit
@@ -190,7 +190,7 @@ fun ExpandArrow(
 
 @Preview
 @Composable
-fun TopLevelFeed(
+private fun TopLevelFeed(
     item: FeedUnreadCount = FeedUnreadCount(title = "A feed", unreadCount = 999),
     onItemClick: (FeedUnreadCount) -> Unit = {}
 ) = Feed(
@@ -202,7 +202,7 @@ fun TopLevelFeed(
 
 @Preview
 @Composable
-fun ChildFeed(
+private fun ChildFeed(
     item: FeedUnreadCount = FeedUnreadCount(title = "Some feed", unreadCount = 21),
     onItemClick: (FeedUnreadCount) -> Unit = {}
 ) = Feed(

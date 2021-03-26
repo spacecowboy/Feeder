@@ -27,7 +27,7 @@ import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.configurePeriodicSync
 import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.requestFeedSync
-import com.nononsenseapps.feeder.ui.compose.components.FeedList
+import com.nononsenseapps.feeder.ui.compose.components.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.android.synthetic.main.activity_navigation.drawer_layout
 import kotlinx.android.synthetic.main.app_bar_navigation.fab
@@ -141,7 +141,7 @@ class FeedActivity : KodeinAwareActivity() {
 
         // Drawer stuff
         compose_navdrawer.setContent {
-            FeedList(feedListViewModel = feedListViewModel)
+            ListOfFeedsAndTags(feedListViewModel = feedListViewModel)
         }
 
         // Navigation stuff
