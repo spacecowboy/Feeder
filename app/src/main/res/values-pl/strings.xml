@@ -99,4 +99,8 @@
     <string name="battery_optimization_enabled">Optymalizacja baterii włączona</string>
     <string name="preload_custom_tab">Wstępnie załaduj własną kartę</string>
     <string name="failed_to_parse">Nie można przeanalizować %1$s</string>
+    <string name="fetching_full_article">Pobieranie całego artykułu…</string>
+    <string name="failed_to_fetch_full_article">Nie udało się pobrać całego artykułu</string>
+    <string name="fetch_full_articles_by_default">Domyślnie pobieraj całe artykuły</string>
+    <string name="fetch_full_article">Pobierz cały artykuł</string>
 </resources>
