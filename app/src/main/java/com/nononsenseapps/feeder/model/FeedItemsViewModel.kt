@@ -6,16 +6,21 @@ import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.toLiveData
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 
-private val PAGE_SIZE = 50
+private const val PAGE_SIZE = 50
 
 @FlowPreview
 class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
@@ -67,6 +72,51 @@ class FeedItemsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
             }
         }
         return livePreviews
+    }
+
+    fun getFlowOfDbPreviews(
+        feedId: Long,
+        tag: String,
+        newestFirst: Boolean,
+        onlyUnread: Boolean
+    ): Flow<PagingData<PreviewItem>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = PAGE_SIZE,
+                enablePlaceholders = false
+            )
+        ) {
+            when {
+                onlyUnread && newestFirst -> {
+                    when {
+                        feedId > ID_UNSET -> dao.pagingUnreadPreviewsDesc(feedId = feedId)
+                        tag.isNotEmpty() -> dao.pagingUnreadPreviewsDesc(tag = tag)
+                        else -> dao.pagingUnreadPreviewsDesc()
+                    }
+                }
+                onlyUnread -> {
+                    when {
+                        feedId > ID_UNSET -> dao.pagingUnreadPreviewsAsc(feedId = feedId)
+                        tag.isNotEmpty() -> dao.pagingUnreadPreviewsAsc(tag = tag)
+                        else -> dao.pagingUnreadPreviewsAsc()
+                    }
+                }
+                newestFirst -> {
+                    when {
+                        feedId > ID_UNSET -> dao.pagingPreviewsDesc(feedId = feedId)
+                        tag.isNotEmpty() -> dao.pagingPreviewsDesc(tag = tag)
+                        else -> dao.pagingPreviewsDesc()
+                    }
+                }
+                else -> {
+                    when {
+                        feedId > ID_UNSET -> dao.pagingPreviewsAsc(feedId = feedId)
+                        tag.isNotEmpty() -> dao.pagingPreviewsAsc(tag = tag)
+                        else -> dao.pagingPreviewsAsc()
+                    }
+                }
+            }
+        }.flow
     }
 
     fun setOnlyUnread(onlyUnread: Boolean) {

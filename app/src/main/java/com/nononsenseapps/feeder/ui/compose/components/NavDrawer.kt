@@ -74,7 +74,7 @@ private fun ListOfFeedsAndTagsPreview() {
 
 @ExperimentalAnimationApi
 @Composable
-private fun ListOfFeedsAndTags(
+fun ListOfFeedsAndTags(
     feedsAndTags: List<FeedUnreadCount>,
     expandedTags: Set<String>,
     onItemClick: (FeedUnreadCount) -> Unit,

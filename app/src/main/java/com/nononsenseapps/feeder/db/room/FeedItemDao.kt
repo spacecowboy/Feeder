@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.db.room
 
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -180,6 +181,136 @@ interface FeedItemDao {
         """
     )
     fun loadLiveUnreadPreviewsDesc(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_id IS :feedId AND unread IS :unread
+        ORDER BY primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingUnreadPreviewsDesc(feedId: Long, unread: Boolean = true): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE tag IS :tag AND unread IS :unread
+        ORDER BY primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingUnreadPreviewsDesc(tag: String, unread: Boolean = true): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE unread IS :unread
+        ORDER BY primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingUnreadPreviewsDesc(unread: Boolean = true): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_id IS :feedId AND unread IS :unread
+        ORDER BY primary_sort_time DESC, pub_date ASC
+        """
+    )
+    fun pagingUnreadPreviewsAsc(feedId: Long, unread: Boolean = true): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE tag IS :tag AND unread IS :unread
+        ORDER BY primary_sort_time DESC, pub_date ASC
+        """
+    )
+    fun pagingUnreadPreviewsAsc(tag: String, unread: Boolean = true): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE unread IS :unread
+        ORDER BY primary_sort_time DESC, pub_date ASC
+        """
+    )
+    fun pagingUnreadPreviewsAsc(unread: Boolean = true): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_id IS :feedId
+        ORDER BY primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingPreviewsDesc(feedId: Long): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE tag IS :tag
+        ORDER BY primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingPreviewsDesc(tag: String): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        ORDER BY primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingPreviewsDesc(): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_id IS :feedId
+        ORDER BY primary_sort_time DESC, pub_date ASC
+        """
+    )
+    fun pagingPreviewsAsc(feedId: Long): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE tag IS :tag
+        ORDER BY primary_sort_time DESC, pub_date ASC
+        """
+    )
+    fun pagingPreviewsAsc(tag: String): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        ORDER BY primary_sort_time DESC, pub_date ASC
+        """
+    )
+    fun pagingPreviewsAsc(): PagingSource<Int, PreviewItem>
 
     @Query(
         """

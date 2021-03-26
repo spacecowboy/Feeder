@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import com.nononsenseapps.feeder.base.KodeinAwareComponentActivity
+import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.ui.compose.screens.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
@@ -16,12 +17,15 @@ class MainActivity : KodeinAwareComponentActivity() {
     private val feedListViewModel: FeedListViewModel by viewModels {
         kodein.direct.instance()
     }
+    private val feedItemsViewModel: FeedItemsViewModel by viewModels {
+        kodein.direct.instance()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             FeederTheme {
-//                FeedScreen(feedListViewModel)
+                FeedScreen(feedListViewModel, feedItemsViewModel)
             }
         }
     }
