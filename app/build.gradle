@@ -192,6 +192,7 @@ dependencies {
   implementation "androidx.constraintlayout:constraintlayout-compose:$constraintLayoutComposeVersion"
   implementation "androidx.navigation:navigation-compose:$navigationComposeVersion"
   implementation "androidx.paging:paging-compose:$pagingComposeVersion"
+  implementation "com.google.accompanist:accompanist-coil:$coilComposeVersion"
 
   // Better times
   implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"

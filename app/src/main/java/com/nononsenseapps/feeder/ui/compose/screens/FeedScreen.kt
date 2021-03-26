@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.screens
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.material.DrawerValue
@@ -114,7 +115,12 @@ fun FeedScreen(
             ListOfFeedsAndTags(
                 feedsAndTags = feedsAndTags,
                 expandedTags = expandedTags,
-                onItemClick = { item -> currentFeed.value = item.id to item.tag },
+                onItemClick = { item ->
+                    coroutineScope.launch {
+                        currentFeed.value = item.id to item.tag
+                        scaffoldState.drawerState.close()
+                    }
+                },
                 onToggleExpand = { tag -> feedListViewModel.toggleExpansion(tag) }
             )
         }
@@ -126,10 +132,11 @@ fun FeedScreen(
         ) {
             when (feedItems.loadState.append) {
                 is LoadState.NotLoading -> {
-                    if (feedItems.itemCount > 0) {
-                        FeedList(feedItems, feedItemsViewModel)
-                    } else {
-                        NothingToRead()
+                    Crossfade(targetState = feedItems.itemCount) { itemCount ->
+                        when {
+                            itemCount > 0 -> FeedList(feedItems, feedItemsViewModel)
+                            else -> NothingToRead()
+                        }
                     }
                 }
                 LoadState.Loading -> Text("Loading TODO")

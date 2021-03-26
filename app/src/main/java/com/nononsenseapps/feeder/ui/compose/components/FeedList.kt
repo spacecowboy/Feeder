@@ -33,7 +33,7 @@ fun FeedList(
                 return@items
             }
 
-            Text(previewItem.plainTitle)
+            FeedItemPreview(item = previewItem, onItemClick = {})
         }
     }
 }
