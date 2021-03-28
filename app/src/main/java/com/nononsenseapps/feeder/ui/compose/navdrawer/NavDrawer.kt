@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.ui.compose.components
+package com.nononsenseapps.feeder.ui.compose.navdrawer
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState

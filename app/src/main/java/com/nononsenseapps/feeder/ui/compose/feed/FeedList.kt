@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.ui.compose.components
+package com.nononsenseapps.feeder.ui.compose.feed
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

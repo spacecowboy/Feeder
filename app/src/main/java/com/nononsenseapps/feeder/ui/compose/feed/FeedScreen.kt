@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.ui.compose.screens
+package com.nononsenseapps.feeder.ui.compose.feed
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -32,9 +32,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.FeedListViewModel
-import com.nononsenseapps.feeder.ui.compose.components.FeedList
-import com.nononsenseapps.feeder.ui.compose.components.ListOfFeedsAndTags
-import com.nononsenseapps.feeder.ui.compose.components.NothingToRead
+import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.components.SwipeToRefreshLayout
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import kotlinx.coroutines.launch

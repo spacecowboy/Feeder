@@ -7,7 +7,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import com.nononsenseapps.feeder.base.KodeinAwareComponentActivity
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.FeedListViewModel
-import com.nononsenseapps.feeder.ui.compose.screens.FeedScreen
+import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import org.kodein.di.direct
 import org.kodein.di.generic.instance
