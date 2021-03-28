@@ -25,7 +25,8 @@ import com.nononsenseapps.feeder.model.PreviewItem
 @Composable
 fun FeedList(
     feedItems: LazyPagingItems<PreviewItem>,
-    feedListViewModel: FeedItemsViewModel
+    feedListViewModel: FeedItemsViewModel,
+    onItemClick: (Long) -> Unit
 ) {
     LazyColumn {
         items(feedItems) { previewItem ->
@@ -33,7 +34,7 @@ fun FeedList(
                 return@items
             }
 
-            FeedItemPreview(item = previewItem, onItemClick = {})
+            FeedItemPreview(item = previewItem, onItemClick = { onItemClick(previewItem.id) })
         }
     }
 }
@@ -48,6 +49,7 @@ fun NothingToRead() {
             .padding(start = 8.dp, end = 8.dp),
         verticalArrangement = Arrangement.Center
     ) {
+        // TODO clickable
         Text(stringResource(id = R.string.empty_feed_top))
         Spacer(modifier = Modifier.height(32.dp))
         Text(stringResource(id = R.string.empty_feed_open))

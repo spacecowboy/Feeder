@@ -10,13 +10,16 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+
 import com.nononsenseapps.feeder.ui.text.ClickableImageSpan;
 
 /**
  * A textview containing clickable links.
  */
 public class LinkedTextView extends TextView {
-    public LinkedTextView(final Context context, final AttributeSet attrs) {
+    public LinkedTextView(final Context context, @Nullable final AttributeSet attrs) {
         super(context, attrs);
     }
 

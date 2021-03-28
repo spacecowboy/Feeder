@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.navigate
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.nononsenseapps.feeder.R
@@ -40,6 +42,7 @@ import kotlinx.coroutines.launch
 @ExperimentalAnimationApi
 @Composable
 fun FeedScreen(
+    navController: NavHostController,
     feedListViewModel: FeedListViewModel,
     feedItemsViewModel: FeedItemsViewModel
 ) {
@@ -132,7 +135,9 @@ fun FeedScreen(
                 is LoadState.NotLoading -> {
                     Crossfade(targetState = feedItems.itemCount) { itemCount ->
                         when {
-                            itemCount > 0 -> FeedList(feedItems, feedItemsViewModel)
+                            itemCount > 0 -> FeedList(feedItems, feedItemsViewModel) { itemId ->
+                                navController.navigate("reader/$itemId")
+                            }
                             else -> NothingToRead()
                         }
                     }
