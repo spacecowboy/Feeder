@@ -48,6 +48,7 @@ import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.openGitlabIssues
+import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity
 import kotlinx.coroutines.CoroutineScope
@@ -331,8 +332,19 @@ class FeedFragment : KodeinAwareFragment() {
 
         when {
             id > ID_UNSET -> { // Load feed if feed
-                feedViewModel.getLiveFeed(id).observe(viewLifecycleOwner) {
-                    it?.let { feed ->
+                feedViewModel.getLiveFeed(id).observe(viewLifecycleOwner) { feed ->
+                    if (feed == null) {
+                        // Can happen on dynamic shortcut and feed was deleted
+                        requireContext().removeDynamicShortcutToFeed(id)
+
+                        findNavController().navigate(
+                            R.id.action_feedFragment_self,
+                            bundle {
+                                putLong(ARG_FEED_ID, ID_ALL_FEEDS)
+                                putString(ARG_FEED_TAG, "")
+                            }
+                        )
+                    } else {
                         this.title = feed.title
                         this.customTitle = feed.customTitle
                         this.displayTitle = feed.displayTitle

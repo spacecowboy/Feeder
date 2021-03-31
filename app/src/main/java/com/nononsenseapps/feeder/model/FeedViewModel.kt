@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.model
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
@@ -8,6 +9,7 @@ import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 
@@ -54,10 +56,18 @@ class FeedViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
 
     suspend fun deleteFeed(id: Long) {
         dao.deleteFeedWithId(feedId = id)
+
+        val context: Context by instance()
+        context.removeDynamicShortcutToFeed(id)
     }
 
     suspend fun deleteFeeds(ids: List<Long>) {
         dao.deleteFeeds(ids)
+        
+        val context: Context by instance()
+        for (id in ids) {
+            context.removeDynamicShortcutToFeed(id)
+        }
     }
 
     suspend fun getVisibleFeeds(id: Long, feedTag: String?): List<FeedTitle> {

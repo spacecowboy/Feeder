@@ -65,9 +65,11 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null
                 shortcutManager.updateShortcuts(mutableListOf(shortcut))
             } else {
                 // Ensure we do not exceed max limits
-                if (current.size >= Math.min(3, shortcutManager.maxShortcutCountPerActivity)) {
+                if (current.size >= shortcutManager.maxShortcutCountPerActivity.coerceAtMost(3)) {
                     current.sortBy { it.rank }
-                    current.last().let { removeDynamicShortcutToFeed(it.id) }
+                    current.lastOrNull()?.let {
+                        removeDynamicShortcutToFeed(it.id)
+                    }
                 }
 
                 // It's new!
