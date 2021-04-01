@@ -12,6 +12,7 @@ import androidx.lifecycle.asLiveData
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.util.CurrentTheme
+import com.nononsenseapps.feeder.util.PREF_SORT
 import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,6 +42,12 @@ class SettingsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein), SharedPr
             .asLiveData()
 
     val liveIsNightMode: MutableLiveData<Boolean> by lazy { MutableLiveData(prefs.isNightMode) }
+
+    val liveIsNewestFirst: LiveData<Boolean> =
+        keyFlow.filter { it == PREF_SORT }
+            .map { prefs.isNewestFirst }
+            .conflate()
+            .asLiveData()
 
     val backgroundColor: Int
         get() =

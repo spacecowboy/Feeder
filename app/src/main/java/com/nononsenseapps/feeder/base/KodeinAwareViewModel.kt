@@ -1,12 +1,17 @@
 package com.nononsenseapps.feeder.base
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nononsenseapps.feeder.ui.compose.instance
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
+import org.kodein.di.android.closestKodein
 import org.kodein.di.bindings.Factory
 import org.kodein.di.bindings.Provider
 import org.kodein.di.direct
@@ -20,10 +25,12 @@ import java.lang.reflect.InvocationTargetException
  * A view model which is also kodein aware. Construct any deriving class by using the getViewModel()
  * extension function.
  */
-open class KodeinAwareViewModel(override val kodein: Kodein) : AndroidViewModel(kodein.direct.instance()), KodeinAware
+abstract class KodeinAwareViewModel(override val kodein: Kodein) :
+    AndroidViewModel(kodein.direct.instance()), KodeinAware
 
-class KodeinAwareViewModelFactory(override val kodein: Kodein) :
-    ViewModelProvider.AndroidViewModelFactory(kodein.direct.instance()), KodeinAware {
+class KodeinAwareViewModelFactory(
+    override val kodein: Kodein
+) : ViewModelProvider.AndroidViewModelFactory(kodein.direct.instance()), KodeinAware {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return if (KodeinAwareViewModel::class.java.isAssignableFrom(modelClass)) {
             try {
@@ -46,7 +53,10 @@ class KodeinAwareViewModelFactory(override val kodein: Kodein) :
 inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.activityViewModelProvider():
     Provider<C, T> {
     return provider {
-        ViewModelProvider(instance<ComponentActivity>(), instance<KodeinAwareViewModelFactory>()).get(T::class.java)
+        ViewModelProvider(
+            instance<ComponentActivity>(),
+            instance<KodeinAwareViewModelFactory>()
+        ).get(T::class.java)
     }
 }
 
@@ -60,4 +70,13 @@ inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<
 inline fun <reified T : KodeinAwareViewModel> Kodein.Builder.bindWithKodeinAwareViewModelFactory() {
     bind<T>() with activityViewModelProvider()
     bind<T>() with fragmentViewModelFactory()
+}
+
+@Composable
+inline fun <reified T : KodeinAwareViewModel> kodeinAwareViewModel(
+    key: String? = null
+): T {
+    val factory: KodeinAwareViewModelFactory by instance()
+
+    return viewModel(T::class.java, key, factory)
 }

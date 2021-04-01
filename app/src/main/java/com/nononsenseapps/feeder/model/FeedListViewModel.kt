@@ -7,9 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.base.KodeinAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
@@ -52,19 +49,6 @@ class FeedListViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
 
 //                data.sortedBy { it }
                 emit(data.toList())
-            }
-        }
-    }
-
-    private val _expandedTags: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
-
-    val expandedTags: StateFlow<Set<String>>
-        get() = _expandedTags.asStateFlow()
-
-    fun toggleExpansion(tag: String) {
-        _expandedTags.value = _expandedTags.value.toMutableSet().also { set ->
-            if (!set.add(tag)) {
-                set.remove(tag)
             }
         }
     }

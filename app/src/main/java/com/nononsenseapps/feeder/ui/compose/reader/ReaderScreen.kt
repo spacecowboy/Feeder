@@ -27,6 +27,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.base.kodeinAwareViewModel
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.TextOptions
 import com.nononsenseapps.feeder.ui.compose.theme.Typography
@@ -45,9 +46,9 @@ private val dateTimeFormat =
 fun ReaderScreen(
     itemId: Long,
     navController: NavHostController,
-    feedItemViewModel: FeedItemViewModel,
     maxImageSize: Point
 ) {
+    val feedItemViewModel: FeedItemViewModel = kodeinAwareViewModel()
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(

@@ -141,7 +141,7 @@ class FeedActivity : KodeinAwareActivity() {
 
         // Drawer stuff
         compose_navdrawer.setContent {
-            ListOfFeedsAndTags(feedListViewModel = feedListViewModel)
+            ListOfFeedsAndTags()
         }
 
         // Navigation stuff

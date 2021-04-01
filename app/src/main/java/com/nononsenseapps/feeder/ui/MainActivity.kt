@@ -22,16 +22,6 @@ import org.kodein.di.generic.instance
 
 @ExperimentalAnimationApi
 class MainActivity : KodeinAwareComponentActivity() {
-    private val feedListViewModel: FeedListViewModel by viewModels {
-        kodein.direct.instance()
-    }
-    private val feedItemsViewModel: FeedItemsViewModel by viewModels {
-        kodein.direct.instance()
-    }
-    private val feedItemViewModel: FeedItemViewModel by viewModels {
-        kodein.direct.instance()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -40,10 +30,7 @@ class MainActivity : KodeinAwareComponentActivity() {
 
                 NavHost(navController, startDestination = "feed") {
                     composable("feed") {
-                        FeedScreen(
-                            navController = navController,
-                            feedListViewModel = feedListViewModel,
-                            feedItemsViewModel = feedItemsViewModel)
+                        FeedScreen(navController = navController)
                     }
                     composable(
                         "reader/{itemId}",
@@ -54,7 +41,6 @@ class MainActivity : KodeinAwareComponentActivity() {
                         ReaderScreen(
                             itemId = backStackEntry.arguments?.getLong("itemId") ?: -1L,
                             navController = navController,
-                            feedItemViewModel = feedItemViewModel,
                             maxImageSize = maxImageSize()
                         )
                     }

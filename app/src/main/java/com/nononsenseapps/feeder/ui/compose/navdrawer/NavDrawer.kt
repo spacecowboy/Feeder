@@ -20,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.base.kodeinAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
@@ -40,15 +43,14 @@ const val COLLAPSE_ANIMATION_DURATION = 300
 
 @ExperimentalAnimationApi
 @Composable
-fun ListOfFeedsAndTags(feedListViewModel: FeedListViewModel) {
-    val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observeAsState(initial = emptyList())
-    val expandedTags by feedListViewModel.expandedTags.collectAsState()
+fun ListOfFeedsAndTags() {
+    val feedListViewModel: FeedListViewModel by kodeinAwareViewModel()
+    val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts
+        .observeAsState(initial = emptyList())
 
     ListOfFeedsAndTags(
         feedsAndTags = feedsAndTags,
-        expandedTags = expandedTags,
-        onItemClick = { item -> feedListViewModel.onItemClicked(item) },
-        onToggleExpand = { tag -> feedListViewModel.toggleExpansion(tag) }
+        onItemClick = { item -> feedListViewModel.onItemClicked(item) }
     )
 }
 
@@ -65,21 +67,20 @@ private fun ListOfFeedsAndTagsPreview() {
             FeedUnreadCount(tag = "Funny tag", unreadCount = 6),
             FeedUnreadCount(id = 3, title = "Hidden", tag = "Funny tag", unreadCount = 6),
             FeedUnreadCount(id = 4, title = "Top Dog", unreadCount = 99)
-        ),
-        setOf("News tag"),
-        {},
-        {}
-    )
+        )
+    ) {}
 }
 
 @ExperimentalAnimationApi
 @Composable
 fun ListOfFeedsAndTags(
     feedsAndTags: List<FeedUnreadCount>,
-    expandedTags: Set<String>,
-    onItemClick: (FeedUnreadCount) -> Unit,
-    onToggleExpand: (String) -> Unit
+    onItemClick: (FeedUnreadCount) -> Unit
 ) {
+    var expandedTags by remember {
+        mutableStateOf<Set<String>>(emptySet())
+    }
+
     LazyColumn(
         modifier = Modifier
             .width(300.dp)
@@ -91,7 +92,8 @@ fun ListOfFeedsAndTags(
                     item = item,
                     children = item.children,
                     expanded = item.tag in expandedTags,
-                    onToggleExpand = onToggleExpand,
+                    onExpand = { expandedTags = expandedTags + item.tag },
+                    onContract = { expandedTags = expandedTags - item.tag },
                     onItemClick = onItemClick
                 )
                 item.isTop -> TopLevelFeed(item = item, onItemClick = onItemClick)
@@ -112,7 +114,8 @@ private fun ExpandableTag(
         FeedUnreadCount(title = "bar", unreadCount = 1)
     ),
     expanded: Boolean = true,
-    onToggleExpand: (String) -> Unit = {},
+    onExpand: (String) -> Unit = {},
+    onContract: (String) -> Unit = {},
     onItemClick: (FeedUnreadCount) -> Unit = {},
 ) {
     val transitionState = remember {
@@ -136,7 +139,13 @@ private fun ExpandableTag(
         val (expandButton, text, unreadCount, childItems) = createRefs()
         ExpandArrow(
             degrees = arrowRotationDegree,
-            onClick = { onToggleExpand(item.tag) },
+            onClick = {
+                if (expanded) {
+                    onContract(item.tag)
+                } else {
+                    onExpand(item.tag)
+                }
+            },
             modifier = Modifier
                 .constrainAs(expandButton) {
                     top.linkTo(parent.top)
