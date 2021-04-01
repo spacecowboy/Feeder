@@ -95,6 +95,7 @@ fun FeedScreen(
                 Crossfade(targetState = feedItems.itemCount) { itemCount ->
                     when {
                         itemCount > 0 -> FeedList(feedItems) { itemId ->
+                            // TODO modify back stack?
                             navController.navigate("reader/$itemId")
                         }
                         else -> NothingToRead()

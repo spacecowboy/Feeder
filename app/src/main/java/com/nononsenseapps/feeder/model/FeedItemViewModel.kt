@@ -9,8 +9,10 @@ import android.text.style.ImageSpan
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataScope
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.DIAwareViewModel
@@ -48,6 +50,9 @@ class FeedItemViewModel(di: DI) : DIAwareViewModel(di) {
     private lateinit var liveFullText: LiveData<Spanned>
     private var currentFullTextOptions: TextOptions? = null
 
+    private val liveNullText: LiveData<Spanned> =
+        MutableLiveData(SpannableString("null maybe loading"))
+
     private var fragmentUrlClickListener: UrlClickListener? = null
 
     fun getLiveItem(id: Long): LiveData<FeedItemWithFeed?> {
@@ -64,16 +69,20 @@ class FeedItemViewModel(di: DI) : DIAwareViewModel(di) {
         return feedItem
     }
 
-    suspend fun getLiveTextMaybeFull(
+    fun getLiveTextMaybeFull(
         options: TextOptions,
         urlClickListener: UrlClickListener?
     ): LiveData<Spanned> =
-        when (getItem(options.itemId).fullTextByDefault) {
-            true -> getLiveFullText(options, urlClickListener)
-            false -> getLiveDefaultText(options, urlClickListener)
-        }
+        getLiveItem(options.itemId)
+            .switchMap { feedItem ->
+                when (feedItem?.fullTextByDefault) {
+                    true -> getLiveFullText(options, urlClickListener)
+                    false -> getLiveDefaultText(options, urlClickListener)
+                    null -> liveNullText
+                }
+            }
 
-    suspend fun getLiveDefaultText(
+    fun getLiveDefaultText(
         options: TextOptions,
         urlClickListener: UrlClickListener?
     ): LiveData<Spanned> {
@@ -132,7 +141,9 @@ class FeedItemViewModel(di: DI) : DIAwareViewModel(di) {
         return liveFullText
     }
 
-    suspend fun markAsRead(id: Long, unread: Boolean = false) = dao.markAsRead(id = id, unread = unread)
+    suspend fun markAsRead(id: Long, unread: Boolean = false) =
+        dao.markAsRead(id = id, unread = unread)
+
     suspend fun markAsReadAndNotified(id: Long) = dao.markAsReadAndNotified(id = id)
 
     private suspend fun LiveDataScope<Spanned>.loadTextFrom(

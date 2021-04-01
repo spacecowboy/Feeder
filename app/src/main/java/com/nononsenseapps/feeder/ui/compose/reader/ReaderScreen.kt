@@ -4,6 +4,7 @@ import android.graphics.Point
 import android.text.SpannableString
 import android.text.Spanned
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -18,10 +19,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
@@ -33,7 +34,6 @@ import com.nononsenseapps.feeder.model.TextOptions
 import com.nononsenseapps.feeder.ui.compose.theme.Typography
 import com.nononsenseapps.feeder.ui.unicodeWrap
 import com.nononsenseapps.feeder.views.LinkedTextView
-import kotlinx.coroutines.runBlocking
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.util.*
@@ -49,7 +49,6 @@ fun ReaderScreen(
     maxImageSize: Point
 ) {
     val feedItemViewModel: FeedItemViewModel = DIAwareViewModel()
-    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -74,17 +73,14 @@ fun ReaderScreen(
         }
     ) {
         val feedItem by feedItemViewModel.getLiveItem(itemId).observeAsState()
-        val liveText = runBlocking(coroutineScope.coroutineContext) {
-            feedItemViewModel.getLiveTextMaybeFull(
-                options = TextOptions(
-                    itemId = itemId,
-                    maxImageSize = maxImageSize,
-                    nightMode = false /* TODO theme */
-                ),
-                urlClickListener = null /* TODO */
-            )
-        }
-        val articleText by liveText.observeAsState(initial = SpannableString("Loading..."))
+        val articleText by feedItemViewModel.getLiveTextMaybeFull(
+            options = TextOptions(
+                itemId = itemId,
+                maxImageSize = maxImageSize,
+                nightMode = isSystemInDarkTheme() /* TODO should be prefs or something - also in theme */
+            ),
+            urlClickListener = null /* TODO */
+        ).observeAsState(initial = SpannableString("Loading..."))
 
         val author = feedItem?.author
         val pubDate = feedItem?.pubDate
@@ -114,11 +110,12 @@ fun ReaderScreen(
 }
 
 @Composable
+@Preview
 private fun ReaderView(
-    articleTitle: String,
-    feedTitle: String,
-    authorDate: String?,
-    articleText: Spanned
+    articleTitle: String = "Article title on top",
+    feedTitle: String = "Feed Title is here",
+    authorDate: String? = "2018-01-02",
+    articleText: Spanned = SpannableString("text goes here")
 ) {
     Column {
         Text(
