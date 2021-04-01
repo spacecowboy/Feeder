@@ -17,10 +17,10 @@ import org.intellij.lang.annotations.Language
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
+import org.kodein.di.DI
+import org.kodein.di.DIAware
 import org.kodein.di.generic.bind
-import org.kodein.di.generic.instance
+import org.kodein.di.instance
 import org.kodein.di.generic.singleton
 import java.io.InputStream
 import java.net.URL
@@ -32,7 +32,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @FlowPreview
-class FeedParserTest : KodeinAware {
+class FeedParserTest : DIAware {
     @Rule
     @JvmField
     var tempFolder = TemporaryFolder()

@@ -24,7 +24,7 @@ import android.widget.Spinner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareActivity
+import com.nononsenseapps.feeder.base.DIAwareActivity
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -52,14 +52,14 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import org.kodein.di.generic.instance
+import org.kodein.di.instance
 import java.net.URL
 
 const val TEMPLATE = "template"
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class EditFeedActivity : KodeinAwareActivity() {
+class EditFeedActivity : DIAwareActivity() {
     private var id: Long = ID_UNSET
 
     // Views and shit
@@ -194,7 +194,7 @@ class EditFeedActivity : KodeinAwareActivity() {
                 val feedId: Long? = feedDao.upsertFeed(feed)
 
                 feedId?.let {
-                    requestFeedSync(kodein, feedId, ignoreConnectivitySettings = false, forceNetwork = true)
+                    requestFeedSync(di, feedId, ignoreConnectivitySettings = false, forceNetwork = true)
                 }
 
                 val intent = Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(URI_FEEDS, "$feedId"))

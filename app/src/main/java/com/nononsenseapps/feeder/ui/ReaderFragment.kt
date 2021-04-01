@@ -21,7 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareFragment
+import com.nononsenseapps.feeder.base.DIAwareFragment
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
@@ -38,9 +38,9 @@ import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
-import org.kodein.di.Kodein
-import org.kodein.di.android.x.closestKodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.android.x.closestDI
+import org.kodein.di.instance
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.util.Locale
@@ -55,7 +55,7 @@ const val ARG_AUTHOR = "author"
 const val ARG_DATE = "date"
 
 @FlowPreview
-class ReaderFragment : KodeinAwareFragment() {
+class ReaderFragment : DIAwareFragment() {
     private val dateTimeFormat =
         DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
             .withLocale(Locale.getDefault())
@@ -366,8 +366,8 @@ fun Context.getLocale(): Locale =
 
 fun Fragment.urlClickListener(): (link: String) -> Unit = { link ->
     context?.let { context ->
-        val kodein: Kodein by closestKodein()
-        val prefs: Prefs by kodein.instance()
+        val di: DI by closestDI()
+        val prefs: Prefs by di.instance()
 
         when (prefs.openLinksWith) {
             PREF_VAL_OPEN_WITH_CUSTOM_TAB -> {

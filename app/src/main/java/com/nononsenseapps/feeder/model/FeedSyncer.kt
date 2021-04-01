@@ -21,10 +21,10 @@ import com.nononsenseapps.feeder.util.currentlyUnmetered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.closestKodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 import java.util.concurrent.TimeUnit
 
 const val ARG_FORCE_NETWORK = "force_network"
@@ -35,8 +35,8 @@ const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
 const val IGNORE_CONNECTIVITY_SETTINGS = "ignore_connectivity_settings"
 
 fun isOkToSyncAutomatically(context: Context): Boolean {
-    val kodein: Kodein by closestKodein(context)
-    val prefs: Prefs by kodein.instance()
+    val di: DI by closestDI(context)
+    val prefs: Prefs by di.instance()
     return (
         currentlyConnected(context) &&
             (!prefs.onlySyncWhileCharging || currentlyCharging(context)) &&
@@ -46,8 +46,8 @@ fun isOkToSyncAutomatically(context: Context): Boolean {
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class FeedSyncer(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), KodeinAware {
-    override val kodein: Kodein by closestKodein(context)
+class FeedSyncer(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), DIAware {
+    override val di: DI by closestDI(context)
     private val currentlySyncing: ConflatedBroadcastChannel<Boolean> by instance(tag = CURRENTLY_SYNCING_STATE)
 
     override suspend fun doWork(): Result {
@@ -92,7 +92,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Corouti
 @FlowPreview
 @ExperimentalCoroutinesApi
 fun requestFeedSync(
-    kodein: Kodein,
+    di: DI,
     feedId: Long = ID_UNSET,
     feedTag: String = "",
     ignoreConnectivitySettings: Boolean = false,
@@ -110,16 +110,16 @@ fun requestFeedSync(
     )
 
     workRequest.setInputData(data)
-    val workManager by kodein.instance<WorkManager>()
+    val workManager by di.instance<WorkManager>()
     workManager.enqueue(workRequest.build())
 }
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
-    val kodein by closestKodein(context)
-    val workManager: WorkManager by kodein.instance()
-    val prefs: Prefs by kodein.instance()
+    val di by closestDI(context)
+    val workManager: WorkManager by di.instance()
+    val prefs: Prefs by di.instance()
     val shouldSync = prefs.shouldSync()
 
     if (shouldSync) {

@@ -219,8 +219,8 @@ dependencies {
   // For doing coroutines on UI thread
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
   // Dependency injection
-  implementation "org.kodein.di:kodein-di-generic-jvm:$kodein_version"
-  implementation "org.kodein.di:kodein-di-framework-android-x:$kodein_version"
+  implementation "org.kodein.di:kodein-di-framework-android-x:$kodeinVersion"
+  implementation "org.kodein.di:kodein-di-framework-compose:$kodeinVersion"
   // Custom tabs
   implementation "com.android.support:customtabs:28.0.0"
   // Full text

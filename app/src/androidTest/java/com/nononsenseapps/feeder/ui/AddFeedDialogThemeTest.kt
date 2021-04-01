@@ -14,8 +14,8 @@ import com.nononsenseapps.feeder.util.Prefs
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.kodein.di.android.closestKodein
-import org.kodein.di.generic.instance
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -23,8 +23,8 @@ class AddFeedDialogThemeTest {
     @get:Rule
     var activityRule: ActivityTestRule<EditFeedActivity> = ActivityTestRule(EditFeedActivity::class.java, false, false)
 
-    private val kodein by closestKodein(getApplicationContext() as Context)
-    private val prefs by kodein.instance<Prefs>()
+    private val di by closestDI(getApplicationContext() as Context)
+    private val prefs by di.instance<Prefs>()
 
     @Test
     fun startsInDarkModeIfSet() {

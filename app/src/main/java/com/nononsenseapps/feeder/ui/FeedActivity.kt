@@ -21,7 +21,7 @@ import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareActivity
+import com.nononsenseapps.feeder.base.DIAwareActivity
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.configurePeriodicSync
@@ -36,7 +36,8 @@ import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.compose_navdrawer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
-import org.kodein.di.generic.instance
+import org.kodein.di.compose.withDI
+import org.kodein.di.instance
 
 const val EXPORT_OPML_CODE = 101
 const val IMPORT_OPML_CODE = 102
@@ -47,7 +48,7 @@ const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notifi
 @ExperimentalAnimationApi
 @FlowPreview
 @ExperimentalCoroutinesApi
-class FeedActivity : KodeinAwareActivity() {
+class FeedActivity : DIAwareActivity() {
     private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)
     }
@@ -141,7 +142,9 @@ class FeedActivity : KodeinAwareActivity() {
 
         // Drawer stuff
         compose_navdrawer.setContent {
-            ListOfFeedsAndTags()
+            withDI {
+                ListOfFeedsAndTags()
+            }
         }
 
         // Navigation stuff
@@ -250,7 +253,7 @@ class FeedActivity : KodeinAwareActivity() {
         if (prefs.syncOnResume) {
             if (isOkToSyncAutomatically(applicationContext)) {
                 requestFeedSync(
-                    kodein = kodein,
+                    di = di,
                     ignoreConnectivitySettings = false,
                     forceNetwork = false,
                     parallell = true

@@ -16,19 +16,19 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.lifecycle.lifecycleScope
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareFragment
+import com.nononsenseapps.feeder.base.DIAwareFragment
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
-import org.kodein.di.generic.instance
+import org.kodein.di.instance
 
 const val ARG_URL = "url"
 
 @FlowPreview
-class ReaderWebViewFragment : KodeinAwareFragment() {
+class ReaderWebViewFragment : DIAwareFragment() {
     private var webView: WebView? = null
     var url: String = ""
     private var currentUrl = url

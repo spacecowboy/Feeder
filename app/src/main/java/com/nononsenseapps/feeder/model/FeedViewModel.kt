@@ -3,17 +3,17 @@ package com.nononsenseapps.feeder.model
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
-import com.nononsenseapps.feeder.base.KodeinAwareViewModel
+import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
-import org.kodein.di.Kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.instance
 
-class FeedViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
+class FeedViewModel(di: DI) : DIAwareViewModel(di) {
     private val dao: FeedDao by instance()
 
     private lateinit var liveFeedsNotify: LiveData<List<Boolean>>

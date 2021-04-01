@@ -23,9 +23,9 @@ import okio.Buffer
 import okio.GzipSource
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 import java.io.EOFException
 import java.io.IOException
 import java.io.InputStream
@@ -39,7 +39,7 @@ val slashPattern = """<\s*slash:comments\s*/>""".toRegex(RegexOption.IGNORE_CASE
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
 @FlowPreview
-class FeedParser(override val kodein: Kodein) : KodeinAware {
+class FeedParser(override val di: DI) : DIAware {
     private val client: OkHttpClient by instance()
     private val jsonFeedParser: JsonFeedParser by instance()
 

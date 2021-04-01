@@ -9,15 +9,15 @@ import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.widget.Toast
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareViewModel
+import com.nononsenseapps.feeder.base.DIAwareViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.kodein.di.Kodein
+import org.kodein.di.DI
 import java.util.Locale
 
-class TextToSpeechViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein), TextToSpeech.OnInitListener {
+class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitListener {
 
     private val textToSpeech = TextToSpeech(getApplication<Application>().applicationContext, this)
     private val speechListener: UtteranceProgressListener = object : UtteranceProgressListener() {

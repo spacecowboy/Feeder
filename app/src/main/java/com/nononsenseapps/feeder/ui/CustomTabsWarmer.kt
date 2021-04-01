@@ -8,12 +8,12 @@ import androidx.browser.customtabs.CustomTabsClient
 import androidx.browser.customtabs.CustomTabsServiceConnection
 import androidx.browser.customtabs.CustomTabsSession
 import kotlinx.coroutines.delay
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
+import org.kodein.di.DI
+import org.kodein.di.DIAware
 import org.kodein.di.direct
-import org.kodein.di.generic.instance
+import org.kodein.di.instance
 
-class CustomTabsWarmer(override val kodein: Kodein) : KodeinAware {
+class CustomTabsWarmer(override val di: DI) : DIAware {
     private var customClient: CustomTabsClient? = null
     private var customSession: CustomTabsSession? = null
 
@@ -31,7 +31,7 @@ class CustomTabsWarmer(override val kodein: Kodein) : KodeinAware {
         }
 
         CustomTabsClient.bindCustomTabsService(
-            kodein.direct.instance(),
+            di.direct.instance(),
             "com.android.chrome",
             conn
         )

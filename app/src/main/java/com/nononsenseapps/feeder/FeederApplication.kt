@@ -34,11 +34,11 @@ import okhttp3.Cache
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import org.conscrypt.Conscrypt
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.instance
-import org.kodein.di.generic.singleton
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.bind
+import org.kodein.di.instance
+import org.kodein.di.singleton
 import java.io.File
 import java.security.Security
 import java.util.concurrent.TimeUnit
@@ -46,10 +46,10 @@ import java.util.concurrent.TimeUnit
 @FlowPreview
 @ExperimentalCoroutinesApi
 @Suppress("unused")
-class FeederApplication : MultiDexApplication(), KodeinAware {
+class FeederApplication : MultiDexApplication(), DIAware {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
 
-    override val kodein by Kodein.lazy {
+    override val di by DI.lazy {
         // import(androidXModule(this@FeederApplication))
 
         bind<Application>() with singleton { this@FeederApplication }
@@ -69,8 +69,12 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
             }
         }
         bind<NotificationManagerCompat>() with singleton { NotificationManagerCompat.from(this@FeederApplication) }
-        bind<SharedPreferences>() with singleton { PreferenceManager.getDefaultSharedPreferences(this@FeederApplication) }
-        bind<Prefs>() with singleton { Prefs(kodein) }
+        bind<SharedPreferences>() with singleton {
+            PreferenceManager.getDefaultSharedPreferences(
+                this@FeederApplication
+            )
+        }
+        bind<Prefs>() with singleton { Prefs(di) }
 
         bind<OkHttpClient>() with singleton {
             cachingHttpClient(
@@ -118,7 +122,7 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
                 }
                 .build()
         }
-        bind<AsyncImageLoader>() with singleton { AsyncImageLoader(kodein) }
+        bind<AsyncImageLoader>() with singleton { AsyncImageLoader(di) }
         bind<ApplicationCoroutineScope>() with instance(applicationCoroutineScope)
         import(networkModule)
         import(stateModule)

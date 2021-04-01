@@ -40,10 +40,10 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.closestKodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
@@ -58,7 +58,7 @@ class FeedItemHolder(
 ) : ViewHolder(view),
     View.OnClickListener,
     ViewTreeObserver.OnPreDrawListener,
-    KodeinAware,
+    DIAware,
     View.OnCreateContextMenuListener {
     private val TAG = "FeedItemHolder"
     val titleTextView: TextView = view.findViewById(R.id.story_snippet)
@@ -72,7 +72,7 @@ class FeedItemHolder(
 
     var rssItem: PreviewItem? = null
 
-    override val kodein: Kodein by closestKodein(view.context)
+    override val di: DI by closestDI(view.context)
     val prefs: Prefs by instance()
     private val imageLoader: ImageLoader by instance()
     private var imageFetchJob: Job? = null

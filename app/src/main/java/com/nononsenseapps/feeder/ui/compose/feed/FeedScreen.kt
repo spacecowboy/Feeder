@@ -31,26 +31,26 @@ import androidx.navigation.compose.navigate
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.kodeinAwareViewModel
+import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.components.SwipeToRefreshLayout
-import com.nononsenseapps.feeder.ui.compose.instance
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.launch
+import org.kodein.di.compose.instance
 
 @ExperimentalAnimationApi
 @Composable
 fun FeedScreen(
     navController: NavHostController
 ) {
-    val feedListViewModel: FeedListViewModel = kodeinAwareViewModel()
-    val feedItemsViewModel: FeedItemsViewModel = kodeinAwareViewModel()
-    val settingsViewModel: SettingsViewModel = kodeinAwareViewModel()
+    val feedListViewModel: FeedListViewModel = DIAwareViewModel()
+    val feedItemsViewModel: FeedItemsViewModel = DIAwareViewModel()
+    val settingsViewModel: SettingsViewModel = DIAwareViewModel()
     val prefs: Prefs by instance()
 
     val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts

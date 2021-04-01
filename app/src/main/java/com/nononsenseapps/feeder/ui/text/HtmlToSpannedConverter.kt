@@ -36,9 +36,9 @@ import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import kotlinx.coroutines.FlowPreview
 import org.ccil.cowan.tagsoup.Parser
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 import org.xml.sax.Attributes
 import org.xml.sax.ContentHandler
 import org.xml.sax.InputSource
@@ -61,11 +61,11 @@ open class HtmlToSpannedConverter(
     private var source: Reader,
     private var siteUrl: URL,
     parser: Parser,
-    override val kodein: Kodein,
+    override val di: DI,
     val maxSize: Point,
     private val spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
     private var urlClickListener: UrlClickListener?
-) : ContentHandler, KodeinAware {
+) : ContentHandler, DIAware {
     private val mAccentColor: Int
         get() = when (prefs.isNightMode) {
             true -> context.getColorCompat(R.color.accentNight)

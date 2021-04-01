@@ -13,7 +13,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareViewModel
+import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
@@ -27,14 +27,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
-import org.kodein.di.Kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.instance
 import java.io.InputStream
 import java.net.URL
 import kotlin.math.roundToInt
 
 @FlowPreview
-class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
+class FeedItemViewModel(di: DI) : DIAwareViewModel(di) {
     private val dao: FeedItemDao by instance()
     val context: Application by instance()
     private val okHttpClient: OkHttpClient by instance()
@@ -147,7 +147,7 @@ class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
             val noImages = withContext(Dispatchers.IO) {
                 streamProvider().bufferedReader().use { reader ->
                     toSpannedWithNoImages(
-                        kodein = kodein,
+                        di = di,
                         source = reader,
                         siteUrl = feedUrl,
                         maxSize = options.maxImageSize,
@@ -177,7 +177,7 @@ class FeedItemViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
                 val withImages = withContext(Dispatchers.IO) {
                     streamProvider().bufferedReader().use { reader ->
                         toSpannedWithImages(
-                            kodein = kodein,
+                            di = di,
                             source = reader,
                             siteUrl = feedUrl,
                             maxSize = options.maxImageSize,

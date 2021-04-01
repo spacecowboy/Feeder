@@ -17,8 +17,8 @@ import com.nononsenseapps.feeder.util.AsyncImageLoader
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import kotlinx.coroutines.FlowPreview
 import org.ccil.cowan.tagsoup.Parser
-import org.kodein.di.Kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.instance
 import org.xml.sax.Attributes
 import java.io.Reader
 import java.net.URL
@@ -27,14 +27,14 @@ import kotlin.math.roundToInt
 
 @FlowPreview
 class CoilConverter(
-    kodein: Kodein,
+    di: DI,
     source: Reader,
     private val siteUrl: URL,
     parser: Parser,
     maxSize: Point,
     spannableStringBuilder: SensibleSpannableStringBuilder = SensibleSpannableStringBuilder(),
     urlClickListener: UrlClickListener?
-) : HtmlToSpannedConverter(source, siteUrl, parser, kodein, maxSize, spannableStringBuilder, urlClickListener = urlClickListener) {
+) : HtmlToSpannedConverter(source, siteUrl, parser, di, maxSize, spannableStringBuilder, urlClickListener = urlClickListener) {
 
     private val context: Application by instance()
     private val asyncImageLoader: AsyncImageLoader by instance()

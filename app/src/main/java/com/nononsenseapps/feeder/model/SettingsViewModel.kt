@@ -10,7 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareViewModel
+import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.util.CurrentTheme
 import com.nononsenseapps.feeder.util.PREF_SORT
 import com.nononsenseapps.feeder.util.PREF_THEME
@@ -22,12 +22,12 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import org.kodein.di.Kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.instance
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class SettingsViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein), SharedPreferences.OnSharedPreferenceChangeListener {
+class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnSharedPreferenceChangeListener {
     private val app: Application by instance()
     private val prefs: Prefs by instance()
     private val sharedPreferences: SharedPreferences by instance()

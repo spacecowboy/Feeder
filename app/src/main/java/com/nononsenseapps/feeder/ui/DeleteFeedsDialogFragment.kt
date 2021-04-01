@@ -7,17 +7,17 @@ import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareDialogFragment
+import com.nononsenseapps.feeder.base.DIAwareDialogFragment
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.model.FeedViewModel
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.kodein.di.generic.instance
+import org.kodein.di.instance
 
 const val ARG_FEED_IDS = "feed_ids"
 const val ARG_FEED_TITLES = "feed_titles"
 
-class DeleteFeedsDialogFragment : KodeinAwareDialogFragment() {
+class DeleteFeedsDialogFragment : DIAwareDialogFragment() {
     private val feedViewModel: FeedViewModel by instance()
 
     private lateinit var feedIds: LongArray

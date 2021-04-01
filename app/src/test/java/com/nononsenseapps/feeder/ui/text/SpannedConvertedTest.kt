@@ -12,8 +12,8 @@ import kotlinx.coroutines.FlowPreview
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
+import org.kodein.di.DI
+import org.kodein.di.DIAware
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.singleton
 import java.io.StringReader
@@ -21,7 +21,7 @@ import java.net.URL
 import java.util.ArrayList
 
 @FlowPreview
-class SpannedConverterTest : KodeinAware {
+class SpannedConverterTest : DIAware {
     private val mockResources: Resources = mockk(relaxed = true)
     // private val mockContext: Context = mockk(relaxed = true)
     private val mockContext: Application = mockk(relaxed = true)

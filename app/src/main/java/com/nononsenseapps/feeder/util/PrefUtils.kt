@@ -8,9 +8,9 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
 /**
  * Boolean indicating whether we performed the (one-time) welcome flow.
@@ -98,7 +98,7 @@ object PreferenceSummaryUpdater : Preference.OnPreferenceChangeListener {
 fun SharedPreferences.getStringNonNull(key: String, defaultValue: String): String =
     getString(key, defaultValue) ?: defaultValue
 
-class Prefs(override val kodein: Kodein) : KodeinAware {
+class Prefs(override val di: DI) : DIAware {
     private val sp: SharedPreferences by instance()
     private val app: Application by instance()
 

@@ -7,7 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
-import com.nononsenseapps.feeder.base.KodeinAwareActivity
+import com.nononsenseapps.feeder.base.DIAwareActivity
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -26,7 +26,7 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.kodein.di.generic.instance
+import org.kodein.di.instance
 import java.net.URL
 import kotlin.test.fail
 
@@ -243,7 +243,7 @@ class FeedItemViewModelTest {
     }
 }
 
-suspend fun KodeinAwareActivity.getLiveFeedItemImageText(id: Long): LiveData<Spanned> {
+suspend fun DIAwareActivity.getLiveFeedItemImageText(id: Long): LiveData<Spanned> {
     val viewModel: FeedItemViewModel by instance()
     return viewModel.getLiveDefaultText(
         TextOptions(

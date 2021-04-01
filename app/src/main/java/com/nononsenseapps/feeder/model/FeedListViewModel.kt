@@ -4,16 +4,16 @@ import androidx.collection.ArrayMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.nononsenseapps.feeder.base.KodeinAwareViewModel
+import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import org.kodein.di.Kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.instance
 import java.util.*
 import kotlin.collections.set
 
-class FeedListViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
+class FeedListViewModel(di: DI) : DIAwareViewModel(di) {
     private val dao: FeedDao by instance()
     private val feedsWithUnreadCounts = dao.loadLiveFeedsWithUnreadCounts()
 

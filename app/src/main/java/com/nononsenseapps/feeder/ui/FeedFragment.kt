@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareFragment
+import com.nononsenseapps.feeder.base.DIAwareFragment
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -56,7 +56,7 @@ import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import org.kodein.di.generic.instance
+import org.kodein.di.instance
 import java.io.File
 
 const val ARG_FEED_ID = "feed_id"
@@ -69,7 +69,7 @@ const val ARG_FEED_OPEN_ARTICLES_WITH = "feed_open_articles_with"
 @ExperimentalAnimationApi
 @FlowPreview
 @ExperimentalCoroutinesApi
-class FeedFragment : KodeinAwareFragment() {
+class FeedFragment : DIAwareFragment() {
     internal lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private var id: Long = ID_UNSET
@@ -205,7 +205,7 @@ class FeedFragment : KodeinAwareFragment() {
         swipeRefreshLayout.setOnRefreshListener {
             // Sync this specific feed(s) immediately
             requestFeedSync(
-                kodein = kodein,
+                di = di,
                 feedId = id,
                 feedTag = feedTag ?: "",
                 ignoreConnectivitySettings = true,
@@ -496,7 +496,7 @@ class FeedFragment : KodeinAwareFragment() {
             itemId == R.id.action_sync -> {
                 // Sync all feeds when menu button pressed
                 requestFeedSync(
-                    kodein = kodein,
+                    di = di,
                     ignoreConnectivitySettings = true,
                     forceNetwork = true,
                     parallell = true
@@ -634,7 +634,7 @@ class FeedFragment : KodeinAwareFragment() {
                 val uri: Uri? = data?.data
                 if (uri != null) {
                     lifecycleScope.launch {
-                        exportOpml(kodein, uri)
+                        exportOpml(di, uri)
                     }
                 }
             }
@@ -642,7 +642,7 @@ class FeedFragment : KodeinAwareFragment() {
                 val uri: Uri? = data?.data
                 if (uri != null) {
                     lifecycleScope.launch {
-                        importOpml(kodein, uri)
+                        importOpml(di, uri)
                     }
                 }
             }

@@ -9,14 +9,14 @@ import androidx.test.filters.MediumTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.kodein.di.android.closestKodein
+import org.kodein.di.android.closestDI
 import java.io.StringReader
 import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class SpannedConverterListTest {
-    private val kodein by closestKodein(getApplicationContext() as Context)
+    private val di by closestDI(getApplicationContext() as Context)
 
     @Test
     @Throws(Exception::class)

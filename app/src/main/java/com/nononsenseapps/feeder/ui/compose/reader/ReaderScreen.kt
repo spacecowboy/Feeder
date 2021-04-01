@@ -27,7 +27,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.kodeinAwareViewModel
+import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.TextOptions
 import com.nononsenseapps.feeder.ui.compose.theme.Typography
@@ -48,7 +48,7 @@ fun ReaderScreen(
     navController: NavHostController,
     maxImageSize: Point
 ) {
-    val feedItemViewModel: FeedItemViewModel = kodeinAwareViewModel()
+    val feedItemViewModel: FeedItemViewModel = DIAwareViewModel()
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(

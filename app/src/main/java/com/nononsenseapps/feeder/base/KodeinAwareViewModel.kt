@@ -2,39 +2,36 @@ package com.nononsenseapps.feeder.base
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.nononsenseapps.feeder.ui.compose.instance
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.closestKodein
-import org.kodein.di.bindings.Factory
-import org.kodein.di.bindings.Provider
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.bind
+import org.kodein.di.compose.LocalDI
+import org.kodein.di.compose.instance
 import org.kodein.di.direct
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.factory
-import org.kodein.di.generic.instance
-import org.kodein.di.generic.provider
+import org.kodein.di.factory
+import org.kodein.di.instance
+import org.kodein.di.provider
 import java.lang.reflect.InvocationTargetException
 
 /**
  * A view model which is also kodein aware. Construct any deriving class by using the getViewModel()
  * extension function.
  */
-abstract class KodeinAwareViewModel(override val kodein: Kodein) :
-    AndroidViewModel(kodein.direct.instance()), KodeinAware
+abstract class DIAwareViewModel(override val di: DI) :
+    AndroidViewModel(di.direct.instance()), DIAware
 
-class KodeinAwareViewModelFactory(
-    override val kodein: Kodein
-) : ViewModelProvider.AndroidViewModelFactory(kodein.direct.instance()), KodeinAware {
+class DIAwareViewModelFactory(
+    override val di: DI
+) : ViewModelProvider.AndroidViewModelFactory(di.direct.instance()), DIAware {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return if (KodeinAwareViewModel::class.java.isAssignableFrom(modelClass)) {
+        return if (DIAwareViewModel::class.java.isAssignableFrom(modelClass)) {
             try {
-                modelClass.getConstructor(Kodein::class.java).newInstance(kodein)
+                modelClass.getConstructor(DI::class.java).newInstance(di)
             } catch (e: NoSuchMethodException) {
                 throw RuntimeException("No such constructor $modelClass", e)
             } catch (e: IllegalAccessException) {
@@ -50,33 +47,25 @@ class KodeinAwareViewModelFactory(
     }
 }
 
-inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.activityViewModelProvider():
-    Provider<C, T> {
-    return provider {
-        ViewModelProvider(
-            instance<ComponentActivity>(),
-            instance<KodeinAwareViewModelFactory>()
-        ).get(T::class.java)
-    }
-}
-
-inline fun <C, reified T : KodeinAwareViewModel> Kodein.BindBuilder.WithContext<C>.fragmentViewModelFactory():
-    Factory<C, Fragment, T> {
-    return factory { fragment: Fragment ->
-        ViewModelProvider(fragment, instance<KodeinAwareViewModelFactory>()).get(T::class.java)
-    }
-}
-
-inline fun <reified T : KodeinAwareViewModel> Kodein.Builder.bindWithKodeinAwareViewModelFactory() {
+inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithDIAwareViewModelFactory() {
     bind<T>() with activityViewModelProvider()
-    bind<T>() with fragmentViewModelFactory()
+    bind<T>() with factory { fragment: Fragment ->
+        ViewModelProvider(fragment, instance<DIAwareViewModelFactory>()).get(T::class.java)
+    }
+}
+
+inline fun <reified T : DIAwareViewModel> DI.Builder.activityViewModelProvider() = provider {
+    ViewModelProvider(
+        instance<ComponentActivity>(),
+        instance<DIAwareViewModelFactory>()
+    ).get(T::class.java)
 }
 
 @Composable
-inline fun <reified T : KodeinAwareViewModel> kodeinAwareViewModel(
+inline fun <reified T : DIAwareViewModel> DIAwareViewModel(
     key: String? = null
 ): T {
-    val factory: KodeinAwareViewModelFactory by instance()
+    val factory: DIAwareViewModelFactory = LocalDI.current.direct.instance()
 
     return viewModel(T::class.java, key, factory)
 }

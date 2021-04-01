@@ -32,9 +32,9 @@ import com.nononsenseapps.feeder.util.notificationManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
-import org.kodein.di.Kodein
-import org.kodein.di.android.closestKodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 
 const val notificationId = 73583
 const val channelId = "feederNotifications"
@@ -45,11 +45,11 @@ suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
         createNotificationChannel(appContext)
     }
 
-    val kodein by closestKodein(appContext)
+    val di by closestDI(appContext)
 
-    val nm: NotificationManagerCompat by kodein.instance()
+    val nm: NotificationManagerCompat by di.instance()
 
-    val feedItems = getItemsToNotify(kodein)
+    val feedItems = getItemsToNotify(di)
 
     val notifications: List<Pair<Int, Notification>> = if (feedItems.isEmpty()) {
         emptyList()
@@ -270,9 +270,9 @@ private fun notificationBuilder(context: Context): NotificationCompat.Builder {
 }
 
 @FlowPreview
-private suspend fun getItemsToNotify(kodein: Kodein): List<FeedItemWithFeed> {
-    val feedDao: FeedDao by kodein.instance()
-    val feedItemDao: FeedItemDao by kodein.instance()
+private suspend fun getItemsToNotify(di: DI): List<FeedItemWithFeed> {
+    val feedDao: FeedDao by di.instance()
+    val feedItemDao: FeedItemDao by di.instance()
 
     val feeds = feedDao.loadFeedIdsToNotify()
 

@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.kodeinAwareViewModel
+import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
@@ -44,7 +44,7 @@ const val COLLAPSE_ANIMATION_DURATION = 300
 @ExperimentalAnimationApi
 @Composable
 fun ListOfFeedsAndTags() {
-    val feedListViewModel: FeedListViewModel by kodeinAwareViewModel()
+    val feedListViewModel: FeedListViewModel = DIAwareViewModel()
     val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts
         .observeAsState(initial = emptyList())
 

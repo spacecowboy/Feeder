@@ -8,14 +8,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareActivity
+import com.nononsenseapps.feeder.base.DIAwareActivity
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
-import org.kodein.di.generic.instance
+import org.kodein.di.instance
 
 /**
  * Proxy activity to mark item as read and notified in database as well as cancelling the
@@ -24,7 +24,7 @@ import org.kodein.di.generic.instance
  * If link is null, then item is only marked as read and notified.
  */
 @FlowPreview
-class OpenLinkInDefaultActivity : KodeinAwareActivity() {
+class OpenLinkInDefaultActivity : DIAwareActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

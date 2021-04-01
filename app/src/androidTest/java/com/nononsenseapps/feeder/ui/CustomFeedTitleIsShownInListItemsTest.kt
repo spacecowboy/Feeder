@@ -25,8 +25,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.kodein.di.android.closestKodein
-import org.kodein.di.generic.instance
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
@@ -38,8 +38,8 @@ class CustomFeedTitleIsShownInListItemsTest {
     @get:Rule
     val testDb = TestDatabaseRule(getApplicationContext())
 
-    private val kodein by closestKodein(getApplicationContext() as Context)
-    private val prefs by kodein.instance<Prefs>()
+    private val di by closestDI(getApplicationContext() as Context)
+    private val prefs by di.instance<Prefs>()
 
     @Before
     fun keepNavDrawerClosed() {

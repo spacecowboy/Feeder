@@ -19,10 +19,10 @@ import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.withContext
 import net.dankito.readability4j.Readability4J
 import okhttp3.OkHttpClient
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.closestKodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 import java.io.File
 import java.net.URL
 
@@ -32,7 +32,7 @@ const val ARG_FEED_ITEM_LINK = "feed_item_link"
 @FlowPreview
 @ExperimentalCoroutinesApi
 fun scheduleFullTextParse(
-    kodein: Kodein,
+    di: DI,
     feedItem: FeedItemForFetching
 ) {
     val workRequest = OneTimeWorkRequestBuilder<FullTextWorker>()
@@ -43,7 +43,7 @@ fun scheduleFullTextParse(
     )
 
     workRequest.setInputData(data)
-    val workManager by kodein.instance<WorkManager>()
+    val workManager by di.instance<WorkManager>()
     workManager.enqueue(workRequest.build())
 }
 
@@ -52,8 +52,8 @@ fun scheduleFullTextParse(
 class FullTextWorker(
     val context: Context,
     workerParams: WorkerParameters
-) : CoroutineWorker(context, workerParams), KodeinAware {
-    override val kodein: Kodein by closestKodein(context)
+) : CoroutineWorker(context, workerParams), DIAware {
+    override val di: DI by closestDI(context)
     private val currentlySyncing: ConflatedBroadcastChannel<Boolean> by instance(tag = CURRENTLY_SYNCING_STATE)
     private val okHttpClient: OkHttpClient by instance()
 

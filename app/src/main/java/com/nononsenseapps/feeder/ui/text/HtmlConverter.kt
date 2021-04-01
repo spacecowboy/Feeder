@@ -5,7 +5,7 @@ import android.text.Spanned
 import kotlinx.coroutines.FlowPreview
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
-import org.kodein.di.Kodein
+import org.kodein.di.DI
 import java.io.Reader
 import java.net.URL
 
@@ -13,7 +13,7 @@ val schema: HTMLSchema by lazy { HTMLSchema() }
 
 @FlowPreview
 fun toSpannedWithImages(
-    kodein: Kodein,
+    di: DI,
     source: Reader,
     siteUrl: URL,
     maxSize: Point,
@@ -30,7 +30,7 @@ fun toSpannedWithImages(
         throw RuntimeException(e)
     }
 
-    val converter = CoilConverter(kodein, source, siteUrl, parser, maxSize, spannableStringBuilder, urlClickListener = urlClickListener)
+    val converter = CoilConverter(di, source, siteUrl, parser, maxSize, spannableStringBuilder, urlClickListener = urlClickListener)
     return converter.convert()
 }
 
@@ -48,7 +48,7 @@ fun toSpannedWithImages(
  */
 @FlowPreview
 fun toSpannedWithNoImages(
-    kodein: Kodein,
+    di: DI,
     source: Reader,
     siteUrl: URL,
     maxSize: Point,
@@ -65,6 +65,6 @@ fun toSpannedWithNoImages(
         throw RuntimeException(e)
     }
 
-    val converter = HtmlToSpannedConverter(source, siteUrl, parser, kodein, maxSize, spannableStringBuilder, urlClickListener = urlClickListener)
+    val converter = HtmlToSpannedConverter(source, siteUrl, parser, di, maxSize, spannableStringBuilder, urlClickListener = urlClickListener)
     return converter.convert()
 }

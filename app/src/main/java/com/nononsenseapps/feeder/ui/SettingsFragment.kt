@@ -28,14 +28,14 @@ import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.PreferenceSummaryUpdater
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.x.closestKodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DIAware
+import org.kodein.di.android.x.closestDI
+import org.kodein.di.instance
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener, KodeinAware {
-    override val kodein by closestKodein()
+class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener, DIAware {
+    override val di by closestDI()
     private val sharedPreferences: SharedPreferences by instance()
     private val settingsViewModel: SettingsViewModel by instance()
 
