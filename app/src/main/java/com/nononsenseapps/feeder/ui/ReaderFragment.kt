@@ -219,6 +219,11 @@ class ReaderFragment : KodeinAwareFragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    enum class ReadingState {
+        NOT_STARTED, PAUSED, READING
+    }
+    private var readingState: ReadingState = ReadingState.NOT_STARTED
+
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.action_fetch_article -> {
@@ -286,6 +291,30 @@ class ReaderFragment : KodeinAwareFragment() {
             R.id.action_mark_as_unread -> {
                 lifecycleScope.launch {
                     viewModel.markAsRead(_id, unread = true)
+                }
+                true
+            }
+            R.id.action_read_article_aloud -> {
+                val feedActivity = (activity as FeedActivity)
+                when (readingState) {
+                    ReadingState.NOT_STARTED -> {
+                        val fullText = liveText?.value.toString()
+                        feedActivity.textToSpeechClear()
+                        feedActivity.textToSpeechAddText(fullText)
+                        feedActivity.textToSpeechStart()
+                        menuItem.title = getString(R.string.pause_reading)
+                        readingState = ReadingState.READING
+                    }
+                    ReadingState.READING -> {
+                        feedActivity.textToSpeechPause()
+                        menuItem.title = getString(R.string.resume_reading)
+                        readingState = ReadingState.PAUSED
+                    }
+                    ReadingState.PAUSED -> {
+                        feedActivity.textToSpeechStart()
+                        menuItem.title = getString(R.string.pause_reading)
+                        readingState = ReadingState.READING
+                    }
                 }
                 true
             }
