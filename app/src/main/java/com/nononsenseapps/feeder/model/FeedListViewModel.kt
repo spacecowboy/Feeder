@@ -6,6 +6,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import org.kodein.di.DI
@@ -23,7 +24,7 @@ class FeedListViewModel(di: DI) : DIAwareViewModel(di) {
             5000L
         ) {
             feedsWithUnreadCounts.collectLatest { feeds ->
-                val topTag = FeedUnreadCount.topTag
+                val topTag = FeedUnreadCount(id = ID_ALL_FEEDS)
                 val tags: MutableMap<String, FeedUnreadCount> = ArrayMap()
                 val data: SortedSet<FeedUnreadCount> = sortedSetOf(topTag)
 
@@ -33,12 +34,10 @@ class FeedListViewModel(di: DI) : DIAwareViewModel(di) {
                             val tag = FeedUnreadCount(tag = feed.tag)
                             data.add(tag)
                             tags[feed.tag] = tag
-                            topTag.addChild(tag)
                         }
 
                         tags[feed.tag]?.let { tag ->
                             tag.unreadCount += feed.unreadCount
-                            tag.addChild(feed)
                         }
                     }
 
@@ -51,9 +50,5 @@ class FeedListViewModel(di: DI) : DIAwareViewModel(di) {
                 emit(data.toList())
             }
         }
-    }
-
-    fun onItemClicked(item: FeedUnreadCount) {
-        // TODO
     }
 }

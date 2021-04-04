@@ -55,7 +55,7 @@ fun ListOfFeedsAndTags() {
 
     ListOfFeedsAndTags(
         feedsAndTags = feedsAndTags,
-        onItemClick = { item -> feedListViewModel.onItemClicked(item) }
+        onItemClick = { /* TODO in old UI */ }
     )
 }
 
@@ -95,7 +95,6 @@ fun ListOfFeedsAndTags(
             when {
                 item.isTag -> ExpandableTag(
                     item = item,
-                    children = item.children,
                     expanded = item.tag in expandedTags,
                     onExpand = { expandedTags = expandedTags + item.tag },
                     onContract = { expandedTags = expandedTags - item.tag },
@@ -118,10 +117,6 @@ fun ListOfFeedsAndTags(
 @Composable
 private fun ExpandableTag(
     item: FeedUnreadCount = FeedUnreadCount(tag = "News tag", unreadCount = 3),
-    children: List<FeedUnreadCount> = listOf(
-        FeedUnreadCount(title = "foo", unreadCount = 2),
-        FeedUnreadCount(title = "bar", unreadCount = 1)
-    ),
     expanded: Boolean = true,
     onExpand: (String) -> Unit = {},
     onContract: (String) -> Unit = {},

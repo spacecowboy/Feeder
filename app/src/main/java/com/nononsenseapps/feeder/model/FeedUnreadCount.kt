@@ -29,17 +29,6 @@ data class FeedUnreadCount @Ignore constructor(
     val isTag: Boolean
         get() = id < 1 && tag.isNotEmpty()
 
-    @Ignore
-    private val _children: SortedSet<FeedUnreadCount> = sortedSetOf()
-
-    val children: List<FeedUnreadCount>
-        get() = _children.toList()
-
-    fun addChild(child: FeedUnreadCount) {
-        _children.add(child)
-    }
-
-
     override operator fun compareTo(other: FeedUnreadCount): Int {
         return when {
             // Top tag is always at the top (implies empty tags)
@@ -82,9 +71,5 @@ data class FeedUnreadCount @Ignore constructor(
             // Item
             id.hashCode()
         }
-    }
-
-    companion object {
-        val topTag = FeedUnreadCount(id = ID_ALL_FEEDS)
     }
 }
