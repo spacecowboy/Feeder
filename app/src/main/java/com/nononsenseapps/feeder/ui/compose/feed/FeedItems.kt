@@ -14,8 +14,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import coil.ImageLoader
 import com.google.accompanist.coil.CoilImage
 import com.nononsenseapps.feeder.model.PreviewItem
+import org.kodein.di.compose.instance
+import org.kodein.di.instance
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.util.*
@@ -38,10 +41,12 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
         val hasImage = item.imageUrl != null
 
         item.imageUrl?.let { imageUrl ->
-            // TODO use same image loader as in AsyncImageLoader
+            val imageLoader: ImageLoader by instance()
+
             CoilImage(
                 data = imageUrl,
                 contentDescription = "Thumbnail for the article",
+                imageLoader = imageLoader,
                 modifier = Modifier
                     .width(64.dp)
                     .constrainAs(refImage) {
