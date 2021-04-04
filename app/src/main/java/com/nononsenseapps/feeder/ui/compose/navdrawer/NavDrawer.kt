@@ -1,10 +1,15 @@
 package com.nononsenseapps.feeder.ui.compose.navdrawer
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,12 +22,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
@@ -98,7 +103,11 @@ fun ListOfFeedsAndTags(
                 )
                 item.isTop -> TopLevelFeed(item = item, onItemClick = onItemClick)
                 item.tag.isEmpty() -> TopLevelFeed(item = item, onItemClick = onItemClick)
-                item.tag in expandedTags -> ChildFeed(item = item, onItemClick = onItemClick)
+                else -> ChildFeed(
+                    item = item,
+                    visible = item.tag in expandedTags,
+                    onItemClick = onItemClick
+                )
             }
         }
     }
@@ -209,17 +218,27 @@ private fun TopLevelFeed(
     onItemClick = { onItemClick(item) }
 )
 
+@ExperimentalAnimationApi
 @Preview
 @Composable
 private fun ChildFeed(
     item: FeedUnreadCount = FeedUnreadCount(title = "Some feed", unreadCount = 21),
+    visible: Boolean = true,
     onItemClick: (FeedUnreadCount) -> Unit = {}
-) = Feed(
-    title = item.displayTitle,
-    unreadCount = item.unreadCount,
-    startPadding = 48.dp,
-    onItemClick = { onItemClick(item) }
-)
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+    ) {
+        Feed(
+            title = item.displayTitle,
+            unreadCount = item.unreadCount,
+            startPadding = 48.dp,
+            onItemClick = { onItemClick(item) }
+        )
+    }
+}
 
 @Composable
 private fun Feed(
