@@ -53,7 +53,7 @@ const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notifi
 
 @FlowPreview
 @ExperimentalCoroutinesApi
-class FeedActivity : KodeinAwareActivity(), TextToSpeech.OnInitListener {
+class FeedActivity : KodeinAwareActivity() {
     private lateinit var navAdapter: FeedsAdapter
     private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)
@@ -108,49 +108,6 @@ class FeedActivity : KodeinAwareActivity(), TextToSpeech.OnInitListener {
                 openNavDrawer()
             }
         }
-    }
-
-    private var textToSpeech: TextToSpeech? = null
-    private var textToSpeechQueue: LinkedHashMap<String, String> = LinkedHashMap()
-    private var textToSpeechCounter: Int = 0
-
-    fun textToSpeechAddText(fullText: String) {
-        val textArray = fullText.split("\n", ". ")
-        for (text in textArray) {
-            textToSpeechQueue[textToSpeechCounter.toString()] = text
-            textToSpeechCounter++
-        }
-    }
-
-    fun textToSpeechStart() {
-        val speechListener = object : UtteranceProgressListener() {
-            override fun onDone(utteranceId: String) {
-                textToSpeechQueue.remove(utteranceId)
-            }
-            override fun onStart(utteranceId: String) {}
-            override fun onError(utteraceId: String) {}
-        }
-        textToSpeech?.setOnUtteranceProgressListener(speechListener)
-        for (pair in textToSpeechQueue) {
-            val utteranceId = pair.key
-            val text = pair.value
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                textToSpeech?.speak(text,TextToSpeech.QUEUE_ADD,null, utteranceId);
-            } else {
-                val params = HashMap<String, String>()
-                params[KEY_PARAM_UTTERANCE_ID] = utteranceId
-                textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, params);
-            }
-        }
-    }
-
-    fun textToSpeechPause() {
-        textToSpeech?.stop()
-    }
-
-    fun textToSpeechClear() {
-        textToSpeech?.stop()
-        textToSpeechQueue.clear()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -261,7 +218,6 @@ class FeedActivity : KodeinAwareActivity(), TextToSpeech.OnInitListener {
             navController.restoreState(it)
         }
 
-        textToSpeech = TextToSpeech(applicationContext, this)
     }
 
     private fun hideableToolbar() {
@@ -341,18 +297,5 @@ class FeedActivity : KodeinAwareActivity(), TextToSpeech.OnInitListener {
 
     private fun setNightModeViewModelState() {
         settingsViewModel.liveIsNightMode.value = prefs.isNightMode
-    }
-
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            // set UK English as the default language for the TTS engine:
-            val result = textToSpeech!!.setLanguage(Locale.UK)
-
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("Text to speech", "The Language specified is not supported!")
-            }
-        } else {
-            Log.e("Text to speech", "Failed to load TextToSpeech object.")
-        }
     }
 }
