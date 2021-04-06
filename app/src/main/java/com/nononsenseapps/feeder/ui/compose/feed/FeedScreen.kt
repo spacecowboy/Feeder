@@ -3,8 +3,15 @@ package com.nononsenseapps.feeder.ui.compose.feed
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.Divider
 import androidx.compose.material.DrawerValue
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -13,6 +20,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -22,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,6 +46,7 @@ import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.components.SwipeToRefreshLayout
+import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.Prefs
@@ -123,6 +133,12 @@ fun FeedScreen(
     val scaffoldState = rememberScaffoldState(
         rememberDrawerState(initialValue = DrawerValue.Closed)
     )
+    var showMenu by remember {
+        mutableStateOf(false)
+    }
+    var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -158,6 +174,30 @@ fun FeedScreen(
                             )
                         }
                     }
+
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Open menu")
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
+                                Text("Refresh")
+                            }
+                            DropdownMenuItem(onClick = { showDeleteDialog = true }) {
+                                Text(stringResource(id = R.string.delete_feed))
+                            }
+                            DropdownMenuItem(onClick = { /* Handle settings! */ }) {
+                                Text("Settings")
+                            }
+                            Divider()
+                            DropdownMenuItem(onClick = { /* Handle send feedback! */ }) {
+                                Text("Send Feedback")
+                            }
+                        }
+                    }
                 }
             )
         },
@@ -179,6 +219,14 @@ fun FeedScreen(
             refreshIndicator = { /*TODO*/ },
             content = content
         )
+
+        if (showDeleteDialog) {
+            DeleteFeedDialog(
+                feeds = listOf(/*TODO*/),
+                onDismiss = { showDeleteDialog = false }) {
+                // TODO
+            }
+        }
     }
 }
 

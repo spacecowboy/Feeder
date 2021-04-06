@@ -91,7 +91,7 @@ fun ListOfFeedsAndTags(
             .width(300.dp)
             .fillMaxHeight()
     ) {
-        items(feedsAndTags) { item ->
+        items(feedsAndTags, key = { it.id to it.tag }) { item ->
             when {
                 item.isTag -> ExpandableTag(
                     item = item,
