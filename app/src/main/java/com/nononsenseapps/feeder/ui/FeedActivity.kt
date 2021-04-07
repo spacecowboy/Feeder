@@ -1,12 +1,7 @@
 package com.nononsenseapps.feeder.ui
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
-import android.speech.tts.TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID
-import android.speech.tts.UtteranceProgressListener
-import android.util.Log
 import android.view.Menu
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
@@ -42,8 +37,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import org.kodein.di.generic.instance
-import java.util.*
-import kotlin.collections.LinkedHashMap
 
 const val EXPORT_OPML_CODE = 101
 const val IMPORT_OPML_CODE = 102
