@@ -114,5 +114,6 @@
   <string name="fetch_full_articles_by_default">Fetch full articles by default</string>
   <string name="failed_to_fetch_full_article">Failed to fetch full article</string>
   <string name="fetching_full_article">Fetching full article…</string>
+  <string name="failed_to_load_text_to_speech">Failed to load text to speech</string>
 
 </resources>

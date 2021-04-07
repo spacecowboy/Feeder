@@ -174,9 +174,6 @@ class ReaderFragment : KodeinAwareFragment() {
         }
 
         setHasOptionsMenu(true)
-
-        // necessary for some reason:
-        textToSpeechViewModel.initializeTextToSpeechObject()
     }
 
     override fun onCreateView(
@@ -305,7 +302,7 @@ class ReaderFragment : KodeinAwareFragment() {
                         val fullText = liveText?.value.toString()
                         textToSpeechViewModel.textToSpeechClear()
                         textToSpeechViewModel.textToSpeechAddText(fullText)
-                        textToSpeechViewModel.textToSpeechStart()
+                        textToSpeechViewModel.textToSpeechStart(lifecycleScope)
                         menuItem.title = getString(R.string.pause_reading)
                         readingState = ReadingState.READING
                     }
@@ -315,7 +312,7 @@ class ReaderFragment : KodeinAwareFragment() {
                         readingState = ReadingState.PAUSED
                     }
                     ReadingState.PAUSED -> {
-                        textToSpeechViewModel.textToSpeechStart()
+                        textToSpeechViewModel.textToSpeechStart(lifecycleScope)
                         menuItem.title = getString(R.string.pause_reading)
                         readingState = ReadingState.READING
                     }
