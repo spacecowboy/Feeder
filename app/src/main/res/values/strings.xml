@@ -34,6 +34,9 @@
   <string name="open_link_in_browser">Open link in browser</string>
   <string name="open_in_browser">Open in browser</string>
   <string name="open_enclosed_media">Open enclosed media</string>
+  <string name="read_article">Read aloud</string>
+  <string name="pause_reading">Pause reading</string>
+  <string name="resume_reading">Resume reading</string>
   <string name="sync">Sync</string>
   <string name="export_feeds_to_opml">Export feeds to OPML</string>
   <string name="import_feeds_from_opml">Import feeds from OPML</string>
@@ -111,5 +114,6 @@
   <string name="fetch_full_articles_by_default">Fetch full articles by default</string>
   <string name="failed_to_fetch_full_article">Failed to fetch full article</string>
   <string name="fetching_full_article">Fetching full article…</string>
+  <string name="failed_to_load_text_to_speech">Failed to load text to speech</string>
 
 </resources>

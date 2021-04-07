@@ -210,6 +210,7 @@ class FeedActivity : KodeinAwareActivity() {
             restoredState = true
             navController.restoreState(it)
         }
+
     }
 
     private fun hideableToolbar() {

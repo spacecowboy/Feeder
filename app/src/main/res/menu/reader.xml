@@ -50,4 +50,8 @@
     android:id="@+id/action_mark_as_unread"
     android:title="@string/mark_as_unread"
     app:showAsAction="never" />
+  <item
+    android:id="@+id/action_read_article_aloud"
+    android:title="@string/read_article"
+    app:showAsAction="never" />
 </menu>

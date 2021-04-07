@@ -25,6 +25,7 @@ import com.nononsenseapps.feeder.base.KodeinAwareFragment
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
+import com.nononsenseapps.feeder.model.TextToSpeechViewModel
 import com.nononsenseapps.feeder.model.TextOptions
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.maxImageSize
@@ -230,6 +231,12 @@ class ReaderFragment : KodeinAwareFragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    enum class ReadingState {
+        NOT_STARTED, PAUSED, READING
+    }
+    private var readingState: ReadingState = ReadingState.NOT_STARTED
+    private val textToSpeechViewModel: TextToSpeechViewModel by instance()
+
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.action_fetch_article -> {
@@ -297,6 +304,29 @@ class ReaderFragment : KodeinAwareFragment() {
             R.id.action_mark_as_unread -> {
                 lifecycleScope.launch {
                     viewModel.markAsRead(_id, unread = true)
+                }
+                true
+            }
+            R.id.action_read_article_aloud -> {
+                when (readingState) {
+                    ReadingState.NOT_STARTED -> {
+                        val fullText = liveText?.value.toString()
+                        textToSpeechViewModel.textToSpeechClear()
+                        textToSpeechViewModel.textToSpeechAddText(fullText)
+                        textToSpeechViewModel.textToSpeechStart(lifecycleScope)
+                        menuItem.title = getString(R.string.pause_reading)
+                        readingState = ReadingState.READING
+                    }
+                    ReadingState.READING -> {
+                        textToSpeechViewModel.textToSpeechPause()
+                        menuItem.title = getString(R.string.resume_reading)
+                        readingState = ReadingState.PAUSED
+                    }
+                    ReadingState.PAUSED -> {
+                        textToSpeechViewModel.textToSpeechStart(lifecycleScope)
+                        menuItem.title = getString(R.string.pause_reading)
+                        readingState = ReadingState.READING
+                    }
                 }
                 true
             }

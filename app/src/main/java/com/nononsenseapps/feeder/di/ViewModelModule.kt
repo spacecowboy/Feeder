@@ -9,6 +9,7 @@ import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
+import com.nononsenseapps.feeder.model.TextToSpeechViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.kodein.di.Kodein
@@ -24,6 +25,7 @@ val viewModelModule = Kodein.Module(name = "view models") {
     bindWithKodeinAwareViewModelFactory<SettingsViewModel>()
     bindWithKodeinAwareViewModelFactory<FeedItemViewModel>()
     bindWithKodeinAwareViewModelFactory<FeedViewModel>()
+    bindWithKodeinAwareViewModelFactory<TextToSpeechViewModel>()
 
     bind<EphemeralState>() with activityViewModelProvider()
 }
