@@ -103,4 +103,8 @@
     <string name="failed_to_fetch_full_article">Impossibile recuperare l\'articolo completo</string>
     <string name="fetch_full_articles_by_default">Recupera articoli completi per impostazione predefinita</string>
     <string name="fetch_full_article">Recupera l\'articolo completo</string>
+    <string name="failed_to_load_text_to_speech">Impossibile caricare la sintesi vocale</string>
+    <string name="resume_reading">Riprendi la lettura</string>
+    <string name="pause_reading">Metti in pausa la lettura</string>
+    <string name="read_article">Leggi ad alta voce</string>
 </resources>
