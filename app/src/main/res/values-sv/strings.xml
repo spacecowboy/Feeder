@@ -103,4 +103,8 @@
     <string name="fetch_full_articles_by_default">Hämta hela artiklar automatiskt</string>
     <string name="fetch_full_article">Hämta hela artikeln</string>
     <string name="failed_to_parse">Kunde inte läsa %1$s</string>
+    <string name="failed_to_load_text_to_speech">Kunde inte ladda text till tal</string>
+    <string name="resume_reading">Återuppta uppläsning</string>
+    <string name="pause_reading">Pausa uppläsning</string>
+    <string name="read_article">Läs högt</string>
 </resources>
