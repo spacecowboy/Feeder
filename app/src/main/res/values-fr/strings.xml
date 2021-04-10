@@ -103,4 +103,8 @@
     <string name="failed_to_fetch_full_article">Échec de la récupération de l\'article entier</string>
     <string name="fetch_full_articles_by_default">Récupérer l\'article entier par défaut</string>
     <string name="fetch_full_article">Récupérer l\'article entier</string>
+    <string name="failed_to_load_text_to_speech">Échec du chargement de la synthèse vocale</string>
+    <string name="resume_reading">Reprendre la lecture</string>
+    <string name="pause_reading">Mettre la lecture en pause</string>
+    <string name="read_article">Lire à haute voix</string>
 </resources>

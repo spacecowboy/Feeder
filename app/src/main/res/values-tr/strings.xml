@@ -103,4 +103,8 @@
     <string name="failed_to_fetch_full_article">Makalenin tamamı alınamadı</string>
     <string name="fetch_full_articles_by_default">Öntanımlı olarak makalelerin tamamını al</string>
     <string name="fetch_full_article">Makalenin tamamını al</string>
+    <string name="failed_to_load_text_to_speech">Metinden konuşmaya yüklenemedi</string>
+    <string name="resume_reading">Okumaya devam et</string>
+    <string name="pause_reading">Okumayı duraklat</string>
+    <string name="read_article">Yüksek sesle oku</string>
 </resources>

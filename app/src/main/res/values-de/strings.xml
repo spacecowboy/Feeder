@@ -103,4 +103,8 @@
     <string name="failed_to_fetch_full_article">Fehler beim Abrufen des vollständigen Artikels</string>
     <string name="fetch_full_articles_by_default">Vollständige Artikel standardmäßig abrufen</string>
     <string name="fetch_full_article">Vollständigen Artikel abrufen</string>
+    <string name="failed_to_load_text_to_speech">Fehler beim Laden der Sprachsynthese</string>
+    <string name="resume_reading">Vorlesen fortsetzen</string>
+    <string name="pause_reading">Vorlesen pausieren</string>
+    <string name="read_article">Vorlesen</string>
 </resources>

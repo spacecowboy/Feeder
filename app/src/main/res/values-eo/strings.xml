@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="open_in_reader">Ligilo</string>
+    <string name="open_in_reader">Legilo</string>
     <string name="notification_channel_name">Nelegitaj fluoj</string>
     <string name="selected">Elektitaj</string>
     <string name="updated_feeds">Laste ĝisdatigitaj</string>
     <string name="on_startup">Dum startigado</string>
-    <string name="image_loading">Ŝarĝado de bildo</string>
+    <string name="image_loading">Ŝargado de bildo</string>
     <string name="only_when_charging">Nur dum baterioŝargado</string>
     <string name="show_thumbnails">Montri bildetojn</string>
     <string name="only_on_wifi">Nur per vifio</string>
     <string name="synchronization">Sinkronigo</string>
-    <string name="sync_option_every_day">Ĉiu tago</string>
-    <string name="sync_option_every_12_hours">Ĉiuj 12 horoj</string>
-    <string name="sync_option_every_6_hours">Ĉiuj 6 horoj</string>
-    <string name="sync_option_every_3_hours">Ĉiu 3 horoj</string>
-    <string name="sync_option_every_hour">Ĉiu horo</string>
-    <string name="sync_option_every_30min">Ĉiuj 30 minutoj</string>
-    <string name="sync_option_every_15min">Ĉiuj 15 minutojn</string>
-    <string name="sync_option_manually">Permane</string>
+    <string name="sync_option_every_day">Ĉiutage</string>
+    <string name="sync_option_every_12_hours">Ĉiuduontage</string>
+    <string name="sync_option_every_6_hours">Ĉiukvarontage</string>
+    <string name="sync_option_every_3_hours">Ĉiutrihore</string>
+    <string name="sync_option_every_hour">Ĉiuhore</string>
+    <string name="sync_option_every_30min">Ĉiuduonhore</string>
+    <string name="sync_option_every_15min">Ĉiukvaronhore</string>
+    <string name="sync_option_manually">Mane</string>
     <string name="all_feeds">Ĉiuj fluoj</string>
     <string name="title_activity_settings">Agordoj</string>
     <string name="nothing_to_display">Neniu por montri!</string>
-    <string name="no_such_feed">Ne troveblas ĉi tiun fluon. Klopodu uzi HTTPS.</string>
+    <string name="no_such_feed">Ne troviĝis ĉi tiu fluo. Provu uzi HTTPS.</string>
     <string name="share">Konigi</string>
     <string name="indicator_for_mark_as_read">Indikilo de legita statuso</string>
     <string name="new_based_on_this">Nova bazita sur ĉi tiu</string>
@@ -29,10 +29,10 @@
     <string name="import_feeds_from_opml">Enporti fluojn el OPML</string>
     <string name="export_feeds_to_opml">Elporti fluojn al OPML</string>
     <string name="sync">Sinkronigi</string>
-    <string name="open_enclosed_media">Malfermi enestajn aŭdvidaĵojn</string>
+    <string name="open_enclosed_media">Malfermi envolvitajn aŭdvidaĵojn</string>
     <string name="open_in_browser">Malfermi en TTT-legilo</string>
     <string name="open_link_in_browser">Malfermi ligilon en TTT-legilo</string>
-    <string name="toggle_read_status">Baskuligi legitan statuson</string>
+    <string name="toggle_read_status">Baskuligi legitecon</string>
     <string name="dont_notify_for_new_items">Ĉesi sciigojn</string>
     <string name="notify_for_new_items">Sciigi pri novaj elementoj</string>
     <string name="view">Vido</string>
@@ -41,12 +41,12 @@
     <string name="show_all_items">Montri ĉiujn elementojn</string>
     <string name="delete_feed">Forigi fluon</string>
     <string name="edit_feed">Redakti fluon</string>
-    <string name="mark_all_as_read">Marki ĉiujn legita</string>
-    <string name="mark_as_unread">Marki nelegita</string>
-    <string name="mark_as_read">Marki legita</string>
-    <string name="search_feed_empty_hint">Tajpu adreso de fluo</string>
-    <string name="empty_feed_top">Neniu por legi ĉi tie. Ĉu vi volus…</string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Aldoni&lt;/font&gt; plu fluojn\?</string>
+    <string name="mark_all_as_read">Marki ĉiujn kiel legitajn</string>
+    <string name="mark_as_unread">Marki kiel nelegitan</string>
+    <string name="mark_as_read">Marki kiel legitan</string>
+    <string name="search_feed_empty_hint">Tajpu adreson de fluo</string>
+    <string name="empty_feed_top">Neniu legaĵo ĉi tie. Ĉu vi volas…</string>
+    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Aldoni&lt;/font&gt; pli da fluoj\?</string>
     <string name="empty_feed_open">&lt;font color=#607D8B&gt;Malfermi&lt;/font&gt; alian fluon\?</string>
     <string name="save">Konservi</string>
     <string name="title">Titolo</string>
@@ -56,8 +56,8 @@
     <string name="action_settings">Agordoj</string>
     <string name="no_email_client">Ne povis malfermi retpoŝtilon</string>
     <string name="could_not_load_url">Me povis ŝargi URL-on</string>
-    <string name="navigation_drawer_close">Fermi navigacia bretono</string>
-    <string name="navigation_drawer_open">Malfermi navigacia bretono</string>
+    <string name="navigation_drawer_close">Fermi navigilon</string>
+    <string name="navigation_drawer_open">Malfermi navigilon</string>
     <string name="mark_items_below_as_read">Marki elementojn malsupre kiel legitaj</string>
     <string name="mark_items_above_as_read">Marki elementojn supre kiel legitaj</string>
     <string name="open_feed">Malfermi fluon</string>
@@ -73,9 +73,38 @@
     <string name="open_link_in_web_view">Malfermi ligilon en Web view</string>
     <string name="reader_settings">Legilo</string>
     <string name="open_links_with">Malfermi ligilojn per</string>
-    <string name="open_item_by_default_with">Malfermi elementojn defaŭlte per</string>
+    <string name="open_item_by_default_with">Implicite malfermi elementojn per</string>
     <string name="open_in_custom_tab">Adaptita langeto</string>
-    <string name="open_in_default_browser">Defaŭlta legumilo</string>
+    <string name="open_in_default_browser">Implicita TTT-legilo</string>
     <string name="no_tag">Sen etikedo</string>
     <string name="tag">Etikedo</string>
+    <string name="preload_custom_tab">Antaŭŝargi adaptitan langeton</string>
+    <string name="notification_channel_description">Sciigoj montriĝas nur por nelegitaj elementoj en agorditaj fluoj</string>
+    <string name="include_mobile_hotspots">Inkluzivi poŝaparatajn retkaptejojn</string>
+    <string name="show_fab">Montri flosantan agbutonon</string>
+    <string name="no_activity_for_link">Ne troviĝis aktiveco, kiu povas malfermi tian ligilon</string>
+    <string name="discovered_feeds_list">Listo de trovitaj fluoj</string>
+    <string name="toggle_tag_expansion">Baskuligi malvolvon de etikedoj</string>
+    <string name="max_feed_items">Maksimuma nombro de elementoj en fluo</string>
+    <string name="touch_to_play_video">Tuŝi por ekspekti filmon</string>
+    <string name="fetching_full_article">Elŝutante plenan artikolon…</string>
+    <string name="failed_to_fetch_full_article">Malsukcesis elŝuti plenan artikolon</string>
+    <string name="fetch_full_articles_by_default">Implicite elŝuti plenajn artikolojn</string>
+    <string name="fetch_full_article">Elŝuti plenan artikolon</string>
+    <string name="may_result_data_charges">Tio eble kaŭzos pagendajn datenuzojn.</string>
+    <string name="check_for_updates">Kontroli pri ĝisdatigoj</string>
+    <string name="send_bug_report">Sendi raporton pri cimo</string>
+    <string name="failed_to_parse">Malsukcesis analizi la sintakson de %1$s</string>
+    <string name="battery_optimization_enabled">Ŝparado de baterio estas ŝaltita</string>
+    <string name="battery_optimization_disabled">Ŝparado de baterio estas malŝaltita</string>
+    <string name="battery_optimization">Ŝparado de baterio</string>
+    <string name="javascript">JavaScript</string>
+    <string name="open_in_webview">Retvidigilo</string>
+    <string name="url">URL</string>
+    <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
+    <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
+    <string name="failed_to_load_text_to_speech">Malsukcesis ŝargi parolsintezilon</string>
+    <string name="resume_reading">Rekomenci laŭtlegadon</string>
+    <string name="pause_reading">Paŭzigi laŭtlegadon</string>
+    <string name="read_article">Laŭtlegi</string>
 </resources>

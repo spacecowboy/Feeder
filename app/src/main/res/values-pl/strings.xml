@@ -103,4 +103,8 @@
     <string name="failed_to_fetch_full_article">Nie udało się pobrać całego artykułu</string>
     <string name="fetch_full_articles_by_default">Domyślnie pobieraj całe artykuły</string>
     <string name="fetch_full_article">Pobierz cały artykuł</string>
+    <string name="failed_to_load_text_to_speech">Nie udało się załadować zamiany tekstu na mowę</string>
+    <string name="resume_reading">Wznów czytanie</string>
+    <string name="pause_reading">Zatrzymaj czytanie</string>
+    <string name="read_article">Czytaj na głos</string>
 </resources>

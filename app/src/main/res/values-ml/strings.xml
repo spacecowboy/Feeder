@@ -71,4 +71,8 @@
     <string name="notification_channel_name">വായിക്കാത്ത ഫീഡുകൾ</string>
     <string name="notify_for_new_items">പുതിയ ഇനങ്ങൾക്കായി അറിയിക്കുക</string>
     <string name="view">പ്രദർശനം</string>
+    <string name="fetch_full_article">മുഴുവൻ ലേഖനവും ലഭ്യമാക്കൂ</string>
+    <string name="open_link_in_web_view">ലിങ്ക് Web view-ൽ തുറക്കൂ</string>
+    <string name="indicator_for_mark_as_read">വായിച്ചന്ന് കാണിക്കുന്നതിനുള്ള സൂചകം</string>
+    <string name="export_feeds_to_opml">OPML-ലേക്ക് ഫീഡുകൾ കയറ്റുമതി ചെയ്യൂ</string>
 </resources>
