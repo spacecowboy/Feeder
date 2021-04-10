@@ -89,7 +89,7 @@
     <string name="battery_optimization">Оптимизация использования батареи</string>
     <string name="battery_optimization_disabled">Оптимизация отключена</string>
     <string name="battery_optimization_enabled">Оптимизация включена</string>
-    <string name="preload_custom_tab">Предварительная загрузка custom tab</string>
+    <string name="preload_custom_tab">Предварительная загрузка пользовательской вкладки</string>
     <string name="mark_items_above_as_read">Отметить элементы выше как прочитанные</string>
     <string name="javascript">Javascript</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
@@ -99,4 +99,12 @@
     <string name="fetch_full_articles_by_default">По умолчанию получать полные статьи</string>
     <string name="fetch_full_article">Получить полную статью</string>
     <string name="failed_to_parse">Не удалось разобрать %1$s</string>
+    <string name="reader_settings">Чтение</string>
+    <string name="open_in_reader">В приложении</string>
+    <string name="read_article">Читать вслух</string>
+    <string name="failed_to_load_text_to_speech">Не удалось загрузить преобразование текста в речь</string>
+    <string name="open_in_custom_tab">Пользовательская вкладка</string>
+    <string name="open_in_webview">Веб-просмотр</string>
+    <string name="resume_reading">Возобновить чтение</string>
+    <string name="pause_reading">Приостановить чтение</string>
 </resources>
