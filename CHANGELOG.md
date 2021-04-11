@@ -1,3 +1,48 @@
+# 1.12.0
+El Pirujo (1):
+  * [ddf06c3a] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [34e65ed7] Updated Chinese (Simplified) translation using Weblate
+
+Francesco Bonazzi (2):
+  * [6d51fd8c] Add support for reading feeds aloud with Android's
+         TextToSpeech engine
+  * [770ce381] moved text-to-speech code to model-view class
+
+Hierax Swiftwing (1):
+  * [c1e336fe] Translated using Weblate (Serbian)
+
+J. Lavoie (1):
+  * [d491cd62] Updated Italian translation using Weblate
+
+Jonas Kalderstam (5):
+  * [65a1d9b4] Handle dynamic shortcuts for deleted feeds
+  * [dccdfa02] Cleaned up TextToSpeech slightly
+  * [187d22de] Removed unused imports
+  * [af708e46] Updated Swedish translation using Weblate
+  * [f67bb187] Added esperanto to list of languages unsupported by play
+         store
+
+Nikita Epifanov (1):
+  * [e2ffcab3] Updated Russian translation using Weblate
+
+Oğuz Ersen (1):
+  * [01d03869] Updated Turkish translation using Weblate
+
+gnu-ewm (2):
+  * [1bb598ce] Updated Polish translation using Weblate
+  * [94b80f52] Updated Polish translation using Weblate
+
+phlostically (1):
+  * [a3302d9f] Updated Esperanto translation using Weblate
+
+vachan-maker (1):
+  * [8260c442] Updated Malayalam translation using Weblate
+
+zmni (1):
+  * [ddf53f41] Updated Indonesian translation using Weblate
+
 # 1.11.3
 Eric (1):
   * [b5a50dfb] Updated Chinese (Simplified) translation using Weblate
