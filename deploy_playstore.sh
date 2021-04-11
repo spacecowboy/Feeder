@@ -32,7 +32,8 @@ fi
 # Delete unsupported google play store languages
 rm -rf fastlane/metadata/android/bs-BA \
    fastlane/metadata/android/el \
-   fastlane/metadata/android/ru
+   fastlane/metadata/android/ru \
+   fastlane/metadata/android/eo
 
 if [[ "${1:-}" == "--dry-run" ]] || [[ "${LATEST_TAG}" != "${CURRENT_VERSION}" ]]; then
   echo "${CURRENT_VERSION} is not tag - validating deployment"
