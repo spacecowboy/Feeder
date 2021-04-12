@@ -15,7 +15,6 @@ import androidx.core.graphics.drawable.toBitmap
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.util.AsyncImageLoader
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
-import kotlinx.coroutines.FlowPreview
 import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -25,7 +24,6 @@ import java.net.URL
 import java.util.concurrent.ExecutionException
 import kotlin.math.roundToInt
 
-@FlowPreview
 class CoilConverter(
     di: DI,
     source: Reader,

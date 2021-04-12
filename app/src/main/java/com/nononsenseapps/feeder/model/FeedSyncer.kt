@@ -18,8 +18,6 @@ import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.currentlyCharging
 import com.nononsenseapps.feeder.util.currentlyConnected
 import com.nononsenseapps.feeder.util.currentlyUnmetered
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -44,8 +42,6 @@ fun isOkToSyncAutomatically(context: Context): Boolean {
         )
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class FeedSyncer(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), DIAware {
     override val di: DI by closestDI(context)
     private val currentlySyncing: ConflatedBroadcastChannel<Boolean> by instance(tag = CURRENTLY_SYNCING_STATE)
@@ -89,8 +85,6 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Corouti
     }
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 fun requestFeedSync(
     di: DI,
     feedId: Long = ID_UNSET,
@@ -114,8 +108,6 @@ fun requestFeedSync(
     workManager.enqueue(workRequest.build())
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
     val di by closestDI(context)
     val workManager: WorkManager by di.instance()

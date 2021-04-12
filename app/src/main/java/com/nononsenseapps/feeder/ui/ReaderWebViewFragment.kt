@@ -21,13 +21,11 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.openLinkInBrowser
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
 
 const val ARG_URL = "url"
 
-@FlowPreview
 class ReaderWebViewFragment : DIAwareFragment() {
     private var webView: WebView? = null
     var url: String = ""

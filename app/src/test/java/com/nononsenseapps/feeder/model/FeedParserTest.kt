@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.model
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.jsonfeed.Author
 import com.nononsenseapps.jsonfeed.cachingHttpClient
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -31,7 +30,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@FlowPreview
 class FeedParserTest : DIAware {
     @Rule
     @JvmField

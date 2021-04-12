@@ -33,8 +33,6 @@ import kotlinx.android.synthetic.main.activity_navigation.drawer_layout
 import kotlinx.android.synthetic.main.app_bar_navigation.fab
 import kotlinx.android.synthetic.main.app_bar_navigation.toolbar
 import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.compose_navdrawer
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.withDI
 import org.kodein.di.instance
@@ -46,8 +44,6 @@ const val EDIT_FEED_CODE = 103
 const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
 @ExperimentalAnimationApi
-@FlowPreview
-@ExperimentalCoroutinesApi
 class FeedActivity : DIAwareActivity() {
     private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)

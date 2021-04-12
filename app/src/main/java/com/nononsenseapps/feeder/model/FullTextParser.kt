@@ -13,8 +13,6 @@ import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.di.CURRENTLY_SYNCING_STATE
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.withContext
 import net.dankito.readability4j.Readability4J
@@ -29,8 +27,6 @@ import java.net.URL
 const val ARG_FEED_ITEM_ID = "feed_item_id"
 const val ARG_FEED_ITEM_LINK = "feed_item_link"
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 fun scheduleFullTextParse(
     di: DI,
     feedItem: FeedItemForFetching
@@ -47,8 +43,6 @@ fun scheduleFullTextParse(
     workManager.enqueue(workRequest.build())
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class FullTextWorker(
     val context: Context,
     workerParams: WorkerParameters

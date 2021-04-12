@@ -10,7 +10,6 @@ import com.nononsenseapps.jsonfeed.JsonFeedParser
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
 import okhttp3.Authenticator
 import okhttp3.CacheControl
@@ -38,7 +37,6 @@ import java.util.concurrent.TimeUnit
 val slashPattern = """<\s*slash:comments\s*/>""".toRegex(RegexOption.IGNORE_CASE)
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
-@FlowPreview
 class FeedParser(override val di: DI) : DIAware {
     private val client: OkHttpClient by instance()
     private val jsonFeedParser: JsonFeedParser by instance()

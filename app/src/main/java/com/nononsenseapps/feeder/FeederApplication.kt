@@ -26,8 +26,6 @@ import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
 import okhttp3.Cache
@@ -43,8 +41,6 @@ import java.io.File
 import java.security.Security
 import java.util.concurrent.TimeUnit
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @Suppress("unused")
 class FeederApplication : MultiDexApplication(), DIAware {
     private val applicationCoroutineScope = ApplicationCoroutineScope()

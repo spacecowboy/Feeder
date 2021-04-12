@@ -14,8 +14,6 @@ import androidx.core.app.NotificationManagerCompat
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.ui.ARG_FEED_TITLE
 import com.nononsenseapps.feeder.ui.FeedActivity
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
 interface ToastMaker {
     suspend fun makeToast(text: String)
@@ -34,8 +32,6 @@ val Context.notificationManager: NotificationManagerCompat
  * first.
  */
 @ExperimentalAnimationApi
-@FlowPreview
-@ExperimentalCoroutinesApi
 fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null) {
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {

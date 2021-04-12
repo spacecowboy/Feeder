@@ -27,7 +27,6 @@ import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.jsonfeed.Item
-import kotlinx.coroutines.FlowPreview
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
@@ -37,7 +36,6 @@ import java.net.URL
 const val MAX_TITLE_LENGTH = 200
 const val MAX_SNIPPET_LENGTH = 200
 
-@FlowPreview
 @Entity(
     tableName = FEED_ITEMS_TABLE_NAME,
     indices = [

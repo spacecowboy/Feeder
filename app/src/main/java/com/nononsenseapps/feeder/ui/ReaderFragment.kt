@@ -36,7 +36,6 @@ import com.nononsenseapps.feeder.util.TabletUtils
 import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.android.x.closestDI
@@ -54,7 +53,6 @@ const val ARG_ID = "dbid"
 const val ARG_AUTHOR = "author"
 const val ARG_DATE = "date"
 
-@FlowPreview
 class ReaderFragment : DIAwareFragment() {
     private val dateTimeFormat =
         DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)

@@ -34,7 +34,6 @@ import com.nononsenseapps.feeder.model.getColorCompat
 import com.nononsenseapps.feeder.util.AsyncImageLoader
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
-import kotlinx.coroutines.FlowPreview
 import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -55,7 +54,6 @@ typealias UrlClickListener = ((String) -> Unit)
 /**
  * Convert an HTML document into a spannable string.
  */
-@FlowPreview
 @Suppress("UNUSED_PARAMETER")
 open class HtmlToSpannedConverter(
     private var source: Reader,

@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui.text
 
 import android.graphics.Point
 import android.text.Spanned
-import kotlinx.coroutines.FlowPreview
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
 import org.kodein.di.DI
@@ -11,7 +10,6 @@ import java.net.URL
 
 val schema: HTMLSchema by lazy { HTMLSchema() }
 
-@FlowPreview
 fun toSpannedWithImages(
     di: DI,
     source: Reader,
@@ -46,7 +44,6 @@ fun toSpannedWithImages(
  * This uses TagSoup to handle real HTML, including all of the brokenness
  * found in the wild.
  */
-@FlowPreview
 fun toSpannedWithNoImages(
     di: DI,
     source: Reader,

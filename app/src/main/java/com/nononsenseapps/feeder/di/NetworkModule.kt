@@ -6,7 +6,6 @@ import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.JsonFeedParser
 import com.nononsenseapps.jsonfeed.feedAdapter
 import com.squareup.moshi.JsonAdapter
-import kotlinx.coroutines.FlowPreview
 import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.bind
@@ -14,7 +13,6 @@ import org.kodein.di.instance
 import org.kodein.di.provider
 import org.kodein.di.singleton
 
-@FlowPreview
 val networkModule = DI.Module(name = "network") {
     // Parsers can carry state so safer to use providers
     bind<JsonAdapter<Feed>>() with provider { feedAdapter() }

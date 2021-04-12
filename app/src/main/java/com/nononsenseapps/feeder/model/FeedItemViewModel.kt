@@ -26,7 +26,6 @@ import com.nononsenseapps.feeder.ui.text.toSpannedWithImages
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.TabletUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import org.kodein.di.DI
@@ -35,7 +34,6 @@ import java.io.InputStream
 import java.net.URL
 import kotlin.math.roundToInt
 
-@FlowPreview
 class FeedItemViewModel(di: DI) : DIAwareViewModel(di) {
     private val dao: FeedItemDao by instance()
     val context: Application by instance()

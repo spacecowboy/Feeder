@@ -14,14 +14,12 @@ import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import org.kodein.di.DI
 import org.kodein.di.instance
 
 private const val PAGE_SIZE = 50
 
-@FlowPreview
 class FeedItemsViewModel(di: DI) : DIAwareViewModel(di) {
     private val dao: FeedItemDao by instance()
     private val liveOnlyUnread = MutableLiveData<Boolean>()

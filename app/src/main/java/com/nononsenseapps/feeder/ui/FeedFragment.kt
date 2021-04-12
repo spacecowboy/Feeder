@@ -50,8 +50,6 @@ import com.nononsenseapps.feeder.util.openGitlabIssues
 import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
@@ -67,8 +65,6 @@ const val ARG_FEED_FULL_TEXT_BY_DEFAULT = "feed_full_text_by_default"
 const val ARG_FEED_OPEN_ARTICLES_WITH = "feed_open_articles_with"
 
 @ExperimentalAnimationApi
-@FlowPreview
-@ExperimentalCoroutinesApi
 class FeedFragment : DIAwareFragment() {
     internal lateinit var swipeRefreshLayout: SwipeRefreshLayout
 

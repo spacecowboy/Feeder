@@ -26,14 +26,10 @@ import com.nononsenseapps.feeder.util.PREF_SYNC_ONLY_CHARGING
 import com.nononsenseapps.feeder.util.PREF_SYNC_ONLY_WIFI
 import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.PreferenceSummaryUpdater
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import org.kodein.di.DIAware
 import org.kodein.di.android.x.closestDI
 import org.kodein.di.instance
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener, DIAware {
     override val di by closestDI()
     private val sharedPreferences: SharedPreferences by instance()

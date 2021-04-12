@@ -15,8 +15,6 @@ import com.nononsenseapps.feeder.util.CurrentTheme
 import com.nononsenseapps.feeder.util.PREF_SORT
 import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.Prefs
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.conflate
@@ -25,8 +23,6 @@ import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
 import org.kodein.di.instance
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnSharedPreferenceChangeListener {
     private val app: Application by instance()
     private val prefs: Prefs by instance()

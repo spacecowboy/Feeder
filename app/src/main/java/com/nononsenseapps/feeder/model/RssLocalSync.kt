@@ -15,7 +15,6 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -38,7 +37,6 @@ import kotlin.system.measureTimeMillis
 val singleThreadedSync = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 val syncMutex = Mutex()
 
-@FlowPreview
 suspend fun syncFeeds(
     context: Context,
     feedId: Long = ID_UNSET,
@@ -66,7 +64,6 @@ suspend fun syncFeeds(
     }
 }
 
-@FlowPreview
 internal suspend fun syncFeeds(
     di: DI,
     filesDir: File,
@@ -132,7 +129,6 @@ internal suspend fun syncFeeds(
     return result
 }
 
-@FlowPreview
 private suspend fun syncFeed(
     di: DI,
     feedSql: com.nononsenseapps.feeder.db.room.Feed,

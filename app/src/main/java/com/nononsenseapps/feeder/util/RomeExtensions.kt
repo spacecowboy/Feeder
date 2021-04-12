@@ -12,14 +12,12 @@ import com.rometools.rome.feed.synd.SyndEnclosure
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.feed.synd.SyndPerson
-import kotlinx.coroutines.FlowPreview
 import org.jsoup.parser.Parser.unescapeEntities
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
 import java.net.URL
 
-@FlowPreview
 fun SyndFeed.asFeed(baseUrl: URL): Feed {
     val feedAuthor: Author? = this.authors?.firstOrNull()?.asAuthor()
 
@@ -50,7 +48,6 @@ fun SyndFeed.asFeed(baseUrl: URL): Feed {
     )
 }
 
-@FlowPreview
 fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
     val contentText = contentText().orIfBlank {
         mediaDescription() ?: ""
@@ -133,7 +130,6 @@ fun SyndPerson.asAuthor(): Author {
     )
 }
 
-@FlowPreview
 fun SyndEntry.contentText(): String {
     val possiblyHtml = when {
         contents != null && contents.isNotEmpty() -> { // Atom
@@ -171,14 +167,11 @@ fun SyndEntry.contentText(): String {
     }
 }
 
-@FlowPreview
 private fun convertAtomContentToPlainText(content: SyndContent?, fallback: String?): String {
     return HtmlToPlainTextConverter().convert(content?.value ?: fallback ?: "")
 }
 
-@FlowPreview
 fun SyndFeed.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
-@FlowPreview
 fun SyndEntry.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
 
 fun SyndEntry.contentHtml(): String? {

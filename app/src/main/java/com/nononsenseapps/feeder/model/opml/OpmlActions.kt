@@ -8,8 +8,6 @@ import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.util.ToastMaker
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.direct
@@ -43,8 +41,6 @@ suspend fun exportOpml(di: DI, uri: Uri) = withContext(Dispatchers.IO) {
 /**
  * Imports OPML on a background thread
  */
-@FlowPreview
-@ExperimentalCoroutinesApi
 suspend fun importOpml(di: DI, uri: Uri) = withContext(Dispatchers.IO) {
     val db: AppDatabase by di.instance()
     try {

@@ -35,8 +35,6 @@ import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -48,8 +46,6 @@ import org.kodein.di.instance
 // Provide a reference to the views for each data item
 // Complex data items may need more than one view per item, and
 // you provide access to all the views for a data item in a view holder
-@FlowPreview
-@ExperimentalCoroutinesApi
 class FeedItemHolder(
     val view: View,
     private val feedItemsViewModel: FeedItemsViewModel,

@@ -42,8 +42,6 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.feeder.views.FloatLabelLayout
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -57,8 +55,6 @@ import java.net.URL
 
 const val TEMPLATE = "template"
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class EditFeedActivity : DIAwareActivity() {
     private var id: Long = ID_UNSET
 
@@ -456,7 +452,6 @@ class EditFeedActivity : DIAwareActivity() {
         }
     }
 
-    @ExperimentalCoroutinesApi
     private fun searchForFeeds(url: URL): Job = lifecycleScope.launchWhenResumed {
         resultAdapter.clearData()
         val errors: MutableList<Throwable> = mutableListOf()

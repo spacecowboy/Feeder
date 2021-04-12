@@ -15,14 +15,10 @@ import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.util.Prefs
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.util.Locale
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class FeedItemPagedListAdapter(
     private val context: Context,
     private val feedItemsViewModel: FeedItemsViewModel,

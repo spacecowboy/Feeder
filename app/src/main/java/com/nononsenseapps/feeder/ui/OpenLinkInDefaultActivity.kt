@@ -13,7 +13,6 @@ import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
 
@@ -23,7 +22,6 @@ import org.kodein.di.instance
  *
  * If link is null, then item is only marked as read and notified.
  */
-@FlowPreview
 class OpenLinkInDefaultActivity : DIAwareActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
