@@ -35,7 +35,10 @@ rm -rf fastlane/metadata/android/bs-BA \
    fastlane/metadata/android/ru \
    fastlane/metadata/android/eo
 
-if [[ "${1:-}" == "--dry-run" ]] || [[ "${LATEST_TAG}" != "${CURRENT_VERSION}" ]]; then
+if [[ "${1:-}" == "--dry-run" ]] && [[ "${LATEST_TAG}" == "${CURRENT_VERSION}" ]]; then
+  # Gitlab runs master and tag pipelines concurrently and fastlane will conflict if run concurrently
+  echo "${CURRENT_VERSION} is a tag but --dry-run was specified - not doing anything"
+elif [[ "${1:-}" == "--dry-run" ]] || [[ "${LATEST_TAG}" != "${CURRENT_VERSION}" ]]; then
   echo "${CURRENT_VERSION} is not tag - validating deployment"
   fastlane build_and_validate
 else
