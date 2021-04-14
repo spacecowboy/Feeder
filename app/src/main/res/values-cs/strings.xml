@@ -94,5 +94,12 @@
   <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
   <string name="url">URL</string>
   <string name="failed_to_parse">Nelze analyzovat %1$s</string>
-
+  <string name="fetching_full_article">Načítání celého článku...</string>
+  <string name="failed_to_fetch_full_article">Nepodařilo se načíst celý článek</string>
+  <string name="fetch_full_articles_by_default">Ve výchozím nastavení načítat celé články</string>
+  <string name="fetch_full_article">Načíst celý článek</string>
+  <string name="failed_to_load_text_to_speech">Nepodařilo se načíst převod textu na řeč</string>
+  <string name="resume_reading">Pokračovat v předčítání</string>
+  <string name="pause_reading">Přerušit předčítání</string>
+  <string name="read_article">Předčítat článek</string>
 </resources>
