@@ -98,4 +98,13 @@
     <string name="battery_optimization_disabled">Isključena optimizacija baterije</string>
     <string name="battery_optimization_enabled">Uključena optimizacija baterije</string>
     <string name="preload_custom_tab">Predučitaj prilagođeni tab</string>
+    <string name="failed_to_load_text_to_speech">Neuspješno učitavanje usluge čitanja teksta (TTS)</string>
+    <string name="fetching_full_article">Dohvatanje potpunog članka…</string>
+    <string name="failed_to_fetch_full_article">Neuspješan prikaz potpunog članka</string>
+    <string name="fetch_full_article">Prikaži potpuni članak</string>
+    <string name="fetch_full_articles_by_default">Prikazuj potpune članke po defaultu</string>
+    <string name="failed_to_parse">Neuspješno raščlanjivanje %1$s</string>
+    <string name="resume_reading">Nastavi čitati</string>
+    <string name="pause_reading">Pauziraj čitanje</string>
+    <string name="read_article">Čitaj naglas</string>
 </resources>
