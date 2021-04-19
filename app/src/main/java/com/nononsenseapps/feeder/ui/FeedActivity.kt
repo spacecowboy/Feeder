@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
@@ -23,18 +22,18 @@ import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.DIAwareActivity
 import com.nononsenseapps.feeder.model.FeedListViewModel
+import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.configurePeriodicSync
 import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.requestFeedSync
-import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.util.Prefs
+import com.nononsenseapps.feeder.util.bundle
 import kotlinx.android.synthetic.main.activity_navigation.drawer_layout
 import kotlinx.android.synthetic.main.app_bar_navigation.fab
 import kotlinx.android.synthetic.main.app_bar_navigation.toolbar
-import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.compose_navdrawer
+import kotlinx.android.synthetic.main.navdrawer_for_ab_overlay.*
 import kotlinx.coroutines.launch
-import org.kodein.di.compose.withDI
 import org.kodein.di.instance
 
 const val EXPORT_OPML_CODE = 101
@@ -43,8 +42,8 @@ const val EDIT_FEED_CODE = 103
 
 const val EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED: String = "items_to_mark_as_notified"
 
-@ExperimentalAnimationApi
 class FeedActivity : DIAwareActivity() {
+    private lateinit var navAdapter: FeedsAdapter
     private val navController: NavController by lazy {
         findNavController(R.id.nav_host_fragment)
     }
@@ -82,6 +81,13 @@ class FeedActivity : DIAwareActivity() {
                 finish()
                 startActivities(intents)
             }
+
+            feedListViewModel.liveFeedsAndTagsWithUnreadCounts.observe(
+                this@FeedActivity,
+                androidx.lifecycle.Observer<List<FeedUnreadCount>> {
+                    navAdapter.submitList(it)
+                }
+            )
 
             // When the user runs the app for the first time, we want to land them with the
             // navigation drawer open. But just the first time.
@@ -137,11 +143,27 @@ class FeedActivity : DIAwareActivity() {
         toolbar.setupWithNavController(navController, appBarConfiguration)
 
         // Drawer stuff
-        compose_navdrawer.setContent {
-            withDI {
-                ListOfFeedsAndTags()
+        navdrawer_list.setHasFixedSize(true)
+        navdrawer_list.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+
+        navAdapter = FeedsAdapter(object : OnNavigationItemClickListener {
+            override fun onNavigationItemClick(id: Long, displayTitle: String?, url: String?, tag: String?) {
+                drawer_layout.closeDrawer(GravityCompat.START)
+
+                if (navController.currentDestination?.id == R.id.feedFragment) {
+                    navController.navigate(
+                        R.id.action_feedFragment_self,
+                        bundle {
+                            putLong(ARG_FEED_ID, id)
+                            putString(ARG_FEED_TITLE, displayTitle)
+                            putString(ARG_FEED_URL, url)
+                            putString(ARG_FEED_TAG, tag)
+                        }
+                    )
+                }
             }
-        }
+        })
+        navdrawer_list.adapter = navAdapter
 
         // Navigation stuff
         navController.addOnDestinationChangedListener { _, destination, _ ->
