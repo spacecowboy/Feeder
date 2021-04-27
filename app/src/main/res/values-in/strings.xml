@@ -106,4 +106,5 @@
     <string name="failed_to_load_text_to_speech">Gagal memuat text to speech</string>
     <string name="resume_reading">Lanjutkan membaca</string>
     <string name="pause_reading">Jeda membaca</string>
+    <string name="read_article">Baca lantang</string>
 </resources>
