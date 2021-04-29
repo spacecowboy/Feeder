@@ -15,10 +15,13 @@ import com.nononsenseapps.feeder.db.COL_RESPONSEHASH
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
+import com.nononsenseapps.feeder.db.COL_OPEN_ARTICLES_WITH
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import org.threeten.bp.Instant
 import java.net.URL
+
+const val OPEN_ARTICLE_WITH_APPLICATION_DEFAULT = ""
 
 @Entity(
     tableName = FEEDS_TABLE_NAME,
@@ -38,7 +41,8 @@ data class Feed @Ignore constructor(
     @ColumnInfo(name = COL_IMAGEURL) var imageUrl: URL? = null,
     @ColumnInfo(name = COL_LASTSYNC, typeAffinity = ColumnInfo.INTEGER) var lastSync: Instant = Instant.EPOCH,
     @ColumnInfo(name = COL_RESPONSEHASH) var responseHash: Int = 0,
-    @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false
+    @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
+    @ColumnInfo(name = COL_OPEN_ARTICLES_WITH) var openArticlesWith: String = ""
 ) {
     constructor() : this(id = ID_UNSET)
 

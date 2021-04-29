@@ -20,6 +20,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.Spinner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.nononsenseapps.feeder.R
@@ -27,9 +28,14 @@ import com.nononsenseapps.feeder.base.KodeinAwareActivity
 import com.nononsenseapps.feeder.db.URI_FEEDS
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.OPEN_ARTICLE_WITH_APPLICATION_DEFAULT
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.model.requestFeedSync
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_CUSTOM_TAB
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
@@ -72,6 +78,7 @@ class EditFeedActivity : KodeinAwareActivity() {
     private lateinit var urlLabel: FloatLabelLayout
     private lateinit var titleLabel: FloatLabelLayout
     private lateinit var tagLabel: FloatLabelLayout
+    private lateinit var openArticlesWith: Spinner
 
     private var feedTitle: String = ""
 
@@ -116,6 +123,7 @@ class EditFeedActivity : KodeinAwareActivity() {
         listResults = findViewById(R.id.results_listview)
         emptyText = findViewById(android.R.id.empty)
         loadingProgress = findViewById(R.id.loading_progress)
+        openArticlesWith = findViewById(R.id.open_articles_with)
         resultAdapter = ResultsAdapter()
         // listResults.emptyView = emptyText
         listResults.setHasFixedSize(true)
@@ -179,9 +187,9 @@ class EditFeedActivity : KodeinAwareActivity() {
                 customTitle = customTitle,
                 tag = textTag.text.toString().trim(),
                 fullTextByDefault = checkboxDefaultFullText.isChecked,
-                url = sloppyLinkToStrictURLNoThrows(textUrl.text.toString().trim())
+                url = sloppyLinkToStrictURLNoThrows(textUrl.text.toString().trim()),
+                openArticlesWith =  openWithToPrefValue(openArticlesWith.selectedItem.toString())
             )
-
             lifecycleScope.launch {
                 val feedId: Long? = feedDao.upsertFeed(feed)
 
@@ -253,6 +261,18 @@ class EditFeedActivity : KodeinAwareActivity() {
             i.getBooleanExtra(ARG_FEED_FULL_TEXT_BY_DEFAULT, false).let {
                 checkboxDefaultFullText.isChecked = it
             }
+
+
+            i.getStringExtra(ARG_FEED_OPEN_ARTICLES_WITH).let {
+                val adapter = openArticlesWith.adapter
+
+                for (position in 0 until adapter.count ){
+                    if(adapter.getItem(position) == openWithPrefToSpinnerValue(it)) {
+                        openArticlesWith.setSelection(position)
+                        break
+                    }
+                }
+            }
         }
 
         // Create an adapter
@@ -268,6 +288,26 @@ class EditFeedActivity : KodeinAwareActivity() {
 
             // Set the adapter
             textTag.setAdapter(tagsAdapter)
+        }
+    }
+
+    private fun openWithToPrefValue(openWith: String): String{
+        return when (openWith) {
+            resources.getString(R.string.open_in_default_browser) -> PREF_VAL_OPEN_WITH_BROWSER
+            resources.getString(R.string.open_in_custom_tab) -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+            resources.getString(R.string.open_in_webview) -> PREF_VAL_OPEN_WITH_WEBVIEW
+            resources.getString(R.string.open_in_reader) -> PREF_VAL_OPEN_WITH_READER
+            else -> OPEN_ARTICLE_WITH_APPLICATION_DEFAULT
+        }
+    }
+
+    private fun openWithPrefToSpinnerValue(openWith: String?): String{
+        return when (openWith) {
+            PREF_VAL_OPEN_WITH_BROWSER -> resources.getString(R.string.open_in_default_browser)
+            PREF_VAL_OPEN_WITH_CUSTOM_TAB -> resources.getString(R.string.open_in_custom_tab)
+            PREF_VAL_OPEN_WITH_WEBVIEW -> resources.getString(R.string.open_in_webview)
+            PREF_VAL_OPEN_WITH_READER -> resources.getString(R.string.open_in_reader)
+            else -> resources.getString(R.string.use_app_default)
         }
     }
 

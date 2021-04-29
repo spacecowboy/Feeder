@@ -85,6 +85,23 @@
           android:textDirection="anyRtl" />
       </com.nononsenseapps.feeder.views.FloatLabelLayout>
 
+      <TextView
+          style="@style/TextAppearance.FloatLabel"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="5dp"
+          android:layout_marginTop="10dip"
+          android:layout_marginBottom="5dp"
+          android:text="@string/open_item_by_default_with" />
+
+      <Spinner
+          android:id="@+id/open_articles_with"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:dropDownWidth="match_parent"
+          android:entries="@array/array_open_feed_article_options"
+          android:spinnerMode="dropdown" />
+
 
         <CheckBox
           android:id="@+id/feed_default_full_text"

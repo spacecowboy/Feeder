@@ -66,6 +66,7 @@ const val ARG_FEED_TITLE = "feed_title"
 const val ARG_FEED_URL = "feed_url"
 const val ARG_FEED_TAG = "feed_tag"
 const val ARG_FEED_FULL_TEXT_BY_DEFAULT = "feed_full_text_by_default"
+const val ARG_FEED_OPEN_ARTICLES_WITH = "feed_open_articles_with"
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -79,6 +80,7 @@ class FeedFragment : KodeinAwareFragment() {
     private var firstFeedLoad: Boolean = true
     private var displayTitle = ""
     private var customTitle = ""
+    private var openArticlesWith = ""
     private var notify = false
 
     private val feedViewModel: FeedViewModel by instance(arg = this)
@@ -351,6 +353,7 @@ class FeedFragment : KodeinAwareFragment() {
                         this.url = feed.url.toString()
                         this.notify = feed.notify
                         this.feedTag = feed.tag
+                        this.openArticlesWith = feed.openArticlesWith
 
                         (activity as AppCompatActivity?)?.supportActionBar?.title = displayTitle
 
@@ -514,6 +517,7 @@ class FeedFragment : KodeinAwareFragment() {
                         i.putExtra(ARG_TITLE, title)
                         i.putExtra(ARG_FEED_TAG, feedTag)
                         i.putExtra(ARG_FEED_FULL_TEXT_BY_DEFAULT, feedFullTextByDefault)
+                        i.putExtra(ARG_FEED_OPEN_ARTICLES_WITH, openArticlesWith)
                         i.data = Uri.parse(url)
                         startActivity(i)
                     }
