@@ -12,6 +12,7 @@ object PreviewItemDiffer : DiffUtil.ItemCallback<PreviewItem>() {
             a.feedDisplayTitle.compareTo(b.feedDisplayTitle, ignoreCase = true) == 0 &&
             (a.domain == null && b.domain == null || a.domain != null && a.domain!!.compareTo(b.domain!!, ignoreCase = true) == 0) &&
             a.plainSnippet.compareTo(b.plainSnippet, ignoreCase = true) == 0 &&
-            a.plainTitle.compareTo(b.plainTitle, ignoreCase = true) == 0
+            a.plainTitle.compareTo(b.plainTitle, ignoreCase = true) == 0 &&
+            a.feedOpenArticlesWith.compareTo(b.feedOpenArticlesWith) == 0
     }
 }

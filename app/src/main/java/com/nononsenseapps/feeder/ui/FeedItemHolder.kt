@@ -190,7 +190,12 @@ class FeedItemHolder(
         val context = view.context ?: return
 
         try {
-            val openItemWith = when (val defaultOpenItemWith = prefs.openItemsWith) {
+            val defaultOpenItemWith = when (rssItem?.feedOpenArticlesWith?.isNotBlank()) {
+                true -> rssItem?.feedOpenArticlesWith
+                else -> prefs.openItemsWith
+            }
+
+            val openItemWith = when (defaultOpenItemWith) {
                 PREF_VAL_OPEN_WITH_READER -> {
                     if (rssItem?.plainSnippet?.isNotEmpty() == true) {
                         defaultOpenItemWith
@@ -316,6 +321,7 @@ class FeedItemHolder(
                     i.putExtra(ARG_CUSTOMTITLE, it.feedCustomTitle)
                     i.putExtra(ARG_TITLE, it.feedTitle)
                     i.putExtra(ARG_FEED_TAG, it.tag)
+                    i.putExtra(ARG_FEED_OPEN_ARTICLES_WITH, it.feedOpenArticlesWith)
                     i.data = Uri.parse(it.feedUrl.toString())
                     view.context.startActivity(i)
                 }
