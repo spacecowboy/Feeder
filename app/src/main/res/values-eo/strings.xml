@@ -107,4 +107,5 @@
     <string name="resume_reading">Rekomenci laŭtlegadon</string>
     <string name="pause_reading">Paŭzigi laŭtlegadon</string>
     <string name="read_article">Laŭtlegi</string>
+    <string name="use_app_default">Uzi implicitaĵon de programo</string>
 </resources>
