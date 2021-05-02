@@ -72,7 +72,7 @@
     <string name="open_in_custom_tab">Standard-Registerkarte</string>
     <string name="open_item_by_default_with">Nachrichten lesen mit</string>
     <string name="open_links_with">Links öffnen mit</string>
-    <string name="reader_settings">Eingabeleser</string>
+    <string name="reader_settings">Feedreader</string>
     <string name="open_link_in_web_view">Link mit Webview öffnen</string>
     <string name="open_in_web_view">In Webview öffnen</string>
     <string name="max_feed_items">Nachrichtenlimit pro Feed</string>
@@ -107,4 +107,5 @@
     <string name="resume_reading">Vorlesen fortsetzen</string>
     <string name="pause_reading">Vorlesen pausieren</string>
     <string name="read_article">Vorlesen</string>
+    <string name="use_app_default">Standardeinstellung verwenden</string>
 </resources>

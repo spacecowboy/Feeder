@@ -107,4 +107,5 @@
     <string name="resume_reading">Continuar lectura</string>
     <string name="pause_reading">Pausar lectura</string>
     <string name="read_article">Leer en voz alta</string>
+    <string name="use_app_default">Usar aplicación por defecto</string>
 </resources>

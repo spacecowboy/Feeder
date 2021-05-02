@@ -107,4 +107,5 @@
     <string name="resume_reading">继续朗读</string>
     <string name="pause_reading">暂停朗读</string>
     <string name="read_article">大声朗读</string>
+    <string name="use_app_default">使用应用默认值</string>
 </resources>
