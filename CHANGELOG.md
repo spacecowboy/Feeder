@@ -1,3 +1,37 @@
+# 1.13.0
+Drhaal (1):
+  * [64512d3a] Added option to set article reader on a per feed basis
+
+El Pirujo (1):
+  * [966376eb] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [fd48664d] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [4995ea75] Updated Italian translation using Weblate
+
+Oğuz Ersen (1):
+  * [add0ef71] Updated Turkish translation using Weblate
+
+Simona Iacob (1):
+  * [47baaad1] Added Romanian translation using Weblate
+
+VfBFan (1):
+  * [e03eabb2] Updated German translation using Weblate
+
+WaldiS (1):
+  * [a375332b] Updated Polish translation using Weblate
+
+phlostically (1):
+  * [0293dec5] Updated Esperanto translation using Weblate
+
+ssantos (1):
+  * [46890329] Translated using Weblate (Portuguese)
+
+zmni (1):
+  * [b351658f] Updated Indonesian translation using Weblate
+
 # 1.12.1
 Belmar Begić (1):
   * [666f0e3c] Updated Bosnian translation using Weblate
