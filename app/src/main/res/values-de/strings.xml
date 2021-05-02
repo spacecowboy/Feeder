@@ -107,4 +107,5 @@
     <string name="resume_reading">Vorlesen fortsetzen</string>
     <string name="pause_reading">Vorlesen pausieren</string>
     <string name="read_article">Vorlesen</string>
+    <string name="use_app_default">Standardeinstellung verwenden</string>
 </resources>
