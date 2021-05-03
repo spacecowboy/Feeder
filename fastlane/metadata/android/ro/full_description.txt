@@ -1,0 +1,19 @@
+<p>V-ați săturat de cititoarele umflate și non-gratuite care vă fură informațiile personale?<br/>
+V-ați săturat de setări de sincronizare complicate care necesită ore de configurare a serverului?<br/>
+V-ați săturat să trebuiască să vă creați conturi peste tot?<br/></p>
+
+<p>Încearcă în schimb Feeder!</p>
+
+<p>Feeder este un cititor de feed-uri complet gratuit/liber. Acesta suportă toate formatele de fluxuri comune, inclusiv JSONFeed. Nu vă urmărește. Nu necesită nicio configurare. Nici măcar nu are nevoie să vă creați un cont! Trebuie doar să vă configurați fluxurile sau să le importați de la vechiul cititor prin OPML, apoi treceți la sincronizare și citire.</p>
+
+<p><b>Caracteristici</b></p>
+
+<ul>
+<li>Parează HTML și îl afișează într-un TextView nativ</li>
+<li>Citire offline</li>
+<li>Sincronizare în fundal</li>
+<li>Notificări</li>
+<li>OPML Import/Export</li>
+<li>Acces facil la legăturile de închidere</li>
+<li>Material design</li>
+</ul>
