@@ -107,4 +107,5 @@
     <string name="resume_reading">Lanjutkan membaca</string>
     <string name="pause_reading">Jeda membaca</string>
     <string name="read_article">Baca lantang</string>
+    <string name="use_app_default">Bawaan aplikasi</string>
 </resources>
