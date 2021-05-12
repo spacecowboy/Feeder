@@ -107,4 +107,5 @@
     <string name="open_in_webview">Веб-просмотр</string>
     <string name="resume_reading">Возобновить чтение</string>
     <string name="pause_reading">Приостановить чтение</string>
+    <string name="use_app_default">Использовать приложение по умолчанию</string>
 </resources>
