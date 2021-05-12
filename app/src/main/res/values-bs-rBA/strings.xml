@@ -107,4 +107,5 @@
     <string name="resume_reading">Nastavi čitati</string>
     <string name="pause_reading">Pauziraj čitanje</string>
     <string name="read_article">Čitaj naglas</string>
+    <string name="use_app_default">Koristi zadane postavke</string>
 </resources>
