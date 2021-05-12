@@ -1,0 +1,19 @@
+<p>Bạn có chán các trình đọc gây nặng máy, không tự do và ăn trộm thông tin cá nhân của bạn không?<br/>
+Bạn có chán các thiết lập đồng bộ phức tạp yêu cầu hàng tiếng đồng hồ cho việc thiết lập máy chủ không?<br/>
+Bạn có chán việc phải tạo tài khoản ở khắp mọi nơi không?<br/></p>
+
+<p>Thay vào đó hãy thử Feeder!</p>
+
+<p>Feeder là một trình đọc nguồn dữ liệu hoàn toàn tự do. Nó hỗ trợ tất cả định dạng nguồn dữ liệu phổ biến, bao gồm cả JSONFeed. Nó không theo dõi bạn. Nó không yêu cầu bất kỳ thiết lập nào. Nó còn không cần bạn tạo tài khoản! Chỉ cần thiết lập các nguồn dữ liệu của bạn, hoặc nhập chúng từ trình đọc cũ của bạn qua OPML, rồi tiếp tục với việc đồng bộ và đọc.</p>
+
+<p><b>Các tính năng</b></p>
+
+<ul>
+<li>Xử lý HTML và hiển thị nó trong TextView của hệ thống</li>
+<li>Đọc ngoại tuyến</li>
+<li>Đồng bộ hoá trong nền</li>
+<li>Thông báo</li>
+<li>Nhập/Xuất OPML</li>
+<li>Truy cập thuận tiện vào các liên kết bao bọc</li>
+<li>Thiết kế Material</li>
+</ul>
