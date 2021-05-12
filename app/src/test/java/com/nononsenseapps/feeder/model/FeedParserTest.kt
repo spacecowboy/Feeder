@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.model
 
 import com.nononsenseapps.feeder.di.networkModule
+import com.nononsenseapps.jsonfeed.Author
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
@@ -53,6 +54,17 @@ class FeedParserTest : KodeinAware {
                 feeds
             )
         }
+    }
+
+    @Test
+    fun dcCreatorEndsUpAsAuthor() {
+        javaClass.getResourceAsStream("openstreetmap.xml")!!
+            .use {
+                val feed = feedParser.parseFeedInputStream(URL("http://https://www.openstreetmap.org/diary/rss"), it)
+                val item = feed.items!!.first()
+
+                assertEquals(Author(name = "0235"), item.author)
+            }
     }
 
     @Test

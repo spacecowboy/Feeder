@@ -62,6 +62,10 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
             else -> img
         }
     }
+    val writer = when (author?.isNotBlank()) {
+        true -> Author(name = author)
+        else -> feedAuthor
+    }
     return Item(
         id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
         url = linkToHtml(baseUrl),
@@ -72,7 +76,7 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
         image = image,
         date_published = publishedRFC3339Date(),
         date_modified = modifiedRFC3339Date(),
-        author = authors?.firstOrNull()?.asAuthor() ?: feedAuthor,
+        author = writer,
         attachments = enclosures?.map { it.asAttachment(baseUrl = baseUrl) }
     )
 }
