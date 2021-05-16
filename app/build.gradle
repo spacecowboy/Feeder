@@ -23,7 +23,7 @@ android {
     versionCode 102
     versionName "1.13.1"
     compileSdkVersion 30
-    minSdkVersion 18 // 23 was the conscrypt cutoff
+    minSdkVersion 23
     targetSdkVersion 30
     multiDexEnabled true
 
@@ -102,11 +102,6 @@ android {
     unitTests.returnDefaultValues = true
   }
 
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
-
   kotlinOptions {
     jvmTarget = "1.8"
   }
@@ -156,8 +151,6 @@ dependencies {
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
   implementation "androidx.paging:paging-runtime-ktx:$paging_version"
 
-  // To support SDK18
-  implementation "com.nononsenseapps:filepicker:4.2.1"
   // Better times
   implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
   // HTML parsing
