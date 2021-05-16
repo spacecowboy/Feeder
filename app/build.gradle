@@ -163,6 +163,8 @@ dependencies {
   implementation project(":jsonfeed-parser")
   // For better fetching
   implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
+  // For supporting TLSv1.3 on pre Android-10
+  implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
   // Image loading
   implementation("io.coil-kt:coil-base:1.1.1")
   implementation("io.coil-kt:coil-gif:1.1.1")

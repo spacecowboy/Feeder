@@ -33,12 +33,14 @@ import kotlinx.coroutines.withContext
 import okhttp3.Cache
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
+import org.conscrypt.Conscrypt
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
 import org.kodein.di.generic.singleton
 import java.io.File
+import java.security.Security
 import java.util.concurrent.TimeUnit
 
 @FlowPreview
@@ -120,6 +122,11 @@ class FeederApplication : MultiDexApplication(), KodeinAware {
         bind<ApplicationCoroutineScope>() with instance(applicationCoroutineScope)
         import(networkModule)
         import(stateModule)
+    }
+
+    init {
+        // Install Conscrypt to handle TLSv1.3 pre Android10
+        Security.insertProviderAt(Conscrypt.newProvider(), 1)
     }
 
     override fun onCreate() {
