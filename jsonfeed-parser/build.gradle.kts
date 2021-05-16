@@ -9,6 +9,23 @@ val compileKotlin: KotlinCompile by tasks
 
 compileKotlin.kotlinOptions.jvmTarget = "1.8"
 
+configurations.all {
+    resolutionStrategy {
+        failOnVersionConflict()
+
+        val kotlin_version: String by project
+        val okio_version: String by project
+
+        force("com.squareup.okio:okio:$okio_version")
+        force("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
+        force("org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
+        force("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
+    }
+}
+
+
 dependencies {
     val kotlin_version: String by project
     val okhttp_version: String by project
