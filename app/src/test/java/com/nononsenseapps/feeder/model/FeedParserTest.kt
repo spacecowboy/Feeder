@@ -6,11 +6,13 @@ import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.intellij.lang.annotations.Language
 import org.junit.Rule
 import org.junit.Test
@@ -226,7 +228,7 @@ class FeedParserTest : KodeinAware {
     @Test
     @Throws(Exception::class)
     fun encodingIsHandledInAtomRss() {
-        val responseBody: ResponseBody = ResponseBody.create(MediaType.parse("application/xml"), golemDe)
+        val responseBody: ResponseBody = golemDe.toResponseBody("application/xml".toMediaTypeOrNull())
 
         val response: Response = Response.Builder()
             .body(responseBody)
@@ -249,7 +251,7 @@ class FeedParserTest : KodeinAware {
     @Test
     @Throws(Exception::class)
     fun emptySlashCommentsDontCrashParsingAndEncodingIsStillRespected() {
-        val responseBody: ResponseBody = ResponseBody.create(MediaType.parse("application/xml"), emptySlashComment)
+        val responseBody: ResponseBody = emptySlashComment.toResponseBody("application/xml".toMediaTypeOrNull())
 
         val response: Response = Response.Builder()
             .body(responseBody)

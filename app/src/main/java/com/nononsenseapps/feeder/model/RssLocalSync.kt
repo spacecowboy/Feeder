@@ -157,7 +157,7 @@ private suspend fun syncFeed(
                 responseHash = body.contentHashCode()
                 when {
                     !response.isSuccessful -> {
-                        throw ResponseFailure("${response.code()} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
+                        throw ResponseFailure("${response.code} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
                     }
                     feedSql.responseHash == responseHash -> null // no change
                     else -> feedParser.parseFeedResponse(it, body)

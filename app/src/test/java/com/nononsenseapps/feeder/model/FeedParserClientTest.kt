@@ -69,7 +69,7 @@ class FeedParserClientTest : KodeinAware {
             }
         )
 
-        val url = server.url("/foo").newBuilder().username("user").build().url()
+        val url = server.url("/foo").newBuilder().username("user").build().toUrl()
 
         assertTrue {
             url.userInfo == "user"
@@ -98,7 +98,7 @@ class FeedParserClientTest : KodeinAware {
         )
 
         // Some feeds return 403 unless they get a user-agent
-        val url = server.url("/foo").url()
+        val url = server.url("/foo").toUrl()
 
         runBlocking {
             launch {

@@ -115,6 +115,9 @@ android {
 dependencies {
   kapt "androidx.room:room-compiler:$room_version"
 
+  // BOMS
+  api(platform("com.squareup.okhttp3:okhttp-bom:$okhttp_version"))
+
   // Needed pre SDK21
   implementation "com.android.support:multidex:$multi_dex_version"
 
@@ -151,7 +154,7 @@ dependencies {
   // JSONFeed
   implementation project(":jsonfeed-parser")
   // For better fetching
-  implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+  implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
   // Image loading
   implementation("io.coil-kt:coil-base:1.1.1")
   implementation("io.coil-kt:coil-gif:1.1.1")

@@ -6,7 +6,8 @@ import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.BufferedSource
-import okio.Okio
+import okio.buffer
+import okio.source
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -34,7 +35,7 @@ fun cachingHttpClient(
         val response = it.proceed(it.request())
 
         try {
-            val cacheHeaders = response.headers("Cache-Control") ?: emptyList()
+            val cacheHeaders = response.headers("Cache-Control")
 
             var maxAge = -1
 
@@ -113,10 +114,10 @@ class JsonFeedParser(
             throw IOException("Failed to download feed: $response")
         }
 
-        val body = response.body()
+        val body = response.body
         if (body != null) {
             body.source().inputStream().use {
-                return parseJsonStream(Okio.buffer(Okio.source(it)))
+                return parseJsonStream(it.source().buffer())
             }
         } else {
             throw IOException("Failed to parse feed: body was NULL")
@@ -127,13 +128,13 @@ class JsonFeedParser(
      * Parse a JSONFeed
      */
     fun parseJson(json: String): Feed =
-        json.byteInputStream().use { return parseJsonStream(Okio.buffer(Okio.source(it))) }
+        json.byteInputStream().use { return parseJsonStream(it.source().buffer()) }
 
     /**
      * Parse a JSONFeed
      */
     fun parseJsonBytes(json: ByteArray): Feed =
-        json.inputStream().use { return parseJsonStream(Okio.buffer(Okio.source(it))) }
+        json.inputStream().use { return parseJsonStream(it.source().buffer()) }
 
     /**
      * Parse a JSONFeed
