@@ -3,7 +3,6 @@ stages:
   - validate_deploy
   - deploy
 
-#image: spacecowboy/android-docker-builder:base
 image: registry.gitlab.com/spacecowboy/feeder:builder
 
 variables:
@@ -15,10 +14,23 @@ cache:
      - .gradle/caches
      - .gradle/wrapper
 
-check:
+lint:
   stage: build
   script:
-    - source devenv && ./gradlew assembleDebug packageDebugAndroidTest check -PdisablePreDex
+    - source devenv && ./gradlew :app:lint
+  needs: []
+
+test:
+  stage: build
+  script:
+    - source devenv && ./gradlew test :jsonfeed-parser:check
+  needs: []
+
+compile:
+  stage: build
+  script:
+    - source devenv && ./gradlew assembleDebug packageDebugAndroidTest -PdisablePreDex
+  needs: []
   artifacts:
     paths:
     - app/build/outputs/
@@ -28,6 +40,7 @@ validate_deployment:
   stage: validate_deploy
   script:
     - source devenv && ./deploy_playstore.sh --dry-run
+  needs: []
   only:
     - master
     - tags
@@ -36,9 +49,9 @@ deploy_playstore:
   stage: deploy
   script:
     - source devenv && ./deploy_playstore.sh
+  needs: ["validate_deployment", "compile", "lint", "test"]
   only:
     - tags
-#    - /^\d+\.\d+\.\d+$/
   environment:
     name: Play
     url: https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play
