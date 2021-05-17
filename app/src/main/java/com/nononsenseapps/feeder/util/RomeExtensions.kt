@@ -182,7 +182,7 @@ fun SyndFeed.plainTitle(): String = convertAtomContentToPlainText(titleEx, title
 fun SyndEntry.plainTitle(): String = convertAtomContentToPlainText(titleEx, title)
 
 fun SyndEntry.contentHtml(): String? {
-    contents?.minBy {
+    contents?.minByOrNull {
         when (it.type) {
             "xhtml", "html" -> 0
             else -> 1

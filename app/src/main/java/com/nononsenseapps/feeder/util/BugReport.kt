@@ -15,7 +15,7 @@ import com.nononsenseapps.feeder.R
 internal fun emailSubject(): String = "Bug report for Feeder"
 
 internal fun emailBody(isTablet: Boolean): String = """
-            ${BuildConfig.APPLICATION_ID} (flavor ${BuildConfig.FLAVOR.ifBlank { "None" }})
+            ${BuildConfig.APPLICATION_ID} (flavor ${BuildConfig.BUILD_TYPE.ifBlank { "None" }})
             version ${BuildConfig.VERSION_NAME} (code ${BuildConfig.VERSION_CODE})
             on Android ${Build.VERSION.RELEASE} (SDK-${Build.VERSION.SDK_INT})
             on a Tablet? ${

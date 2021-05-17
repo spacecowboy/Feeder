@@ -42,7 +42,6 @@ class RssLocalSyncKtTest {
     private val filesDir = getApplicationContext<FeederApplication>().filesDir
 
     private val kodein by closestKodein(getApplicationContext() as Context)
-    private val feedParser: FeedParser by kodein.instance()
 
     val server = MockWebServer()
 
@@ -67,11 +66,11 @@ class RssLocalSyncKtTest {
             )
         )
 
-        server.setDispatcher(object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest?): MockResponse {
-                return responses.getOrDefault(request?.requestUrl?.url(), MockResponse().setResponseCode(404))
+        server.dispatcher = object: Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                return responses.getOrDefault(request.requestUrl?.toUrl(), MockResponse().setResponseCode(404))
             }
-        })
+        }
 
         responses[url] = MockResponse().apply {
             setResponseCode(200)
@@ -87,7 +86,7 @@ class RssLocalSyncKtTest {
     @Test
     fun syncCowboyJsonWorks() = runBlocking {
         val cowboyJsonId = insertFeed(
-            "cowboyjson", server.url("/feed.json").url(),
+            "cowboyjson", server.url("/feed.json").toUrl(),
             cowboyJson
         )
 
@@ -109,7 +108,7 @@ class RssLocalSyncKtTest {
     @Test
     fun syncCowboyAtomWorks() = runBlocking {
         val cowboyAtomId = insertFeed(
-            "cowboyatom", server.url("/atom.xml").url(),
+            "cowboyatom", server.url("/atom.xml").toUrl(),
             cowboyAtom, isJson = false
         )
 
@@ -131,11 +130,11 @@ class RssLocalSyncKtTest {
     @Test
     fun syncAllWorks() = runBlocking {
         val cowboyJsonId = insertFeed(
-            "cowboyjson", server.url("/feed.json").url(),
+            "cowboyjson", server.url("/feed.json").toUrl(),
             cowboyJson
         )
         val cowboyAtomId = insertFeed(
-            "cowboyatom", server.url("/atom.xml").url(),
+            "cowboyatom", server.url("/atom.xml").toUrl(),
             cowboyAtom, isJson = false
         )
 
@@ -164,7 +163,7 @@ class RssLocalSyncKtTest {
     @Test
     fun responsesAreNotParsedUnlessFeedHashHasChanged() = runBlocking {
         val cowboyJsonId = insertFeed(
-            "cowboyjson", server.url("/feed.json").url(),
+            "cowboyjson", server.url("/feed.json").toUrl(),
             cowboyJson
         )
 
@@ -191,7 +190,7 @@ class RssLocalSyncKtTest {
     @Test
     fun feedsSyncedWithin15MinAreIgnored() = runBlocking {
         val cowboyJsonId = insertFeed(
-            "cowboyjson", server.url("/feed.json").url(),
+            "cowboyjson", server.url("/feed.json").toUrl(),
             cowboyJson
         )
 
@@ -225,7 +224,7 @@ class RssLocalSyncKtTest {
     @Test
     fun feedsSyncedWithin15MinAreNotIgnoredWhenForcingNetwork() = runBlocking {
         val cowboyJsonId = insertFeed(
-            "cowboyjson", server.url("/feed.json").url(),
+            "cowboyjson", server.url("/feed.json").toUrl(),
             cowboyJson
         )
 
@@ -483,7 +482,7 @@ class RssLocalSyncKtTest {
 
     @Test
     fun slowResponseShouldBeOk() = runBlocking {
-        val url = server.url("/atom.xml").url()
+        val url = server.url("/atom.xml").toUrl()
         val cowboyAtomId = insertFeed("cowboy", url, cowboyAtom, isJson = false)
         responses[url]!!.throttleBody(1024 * 100, 29, TimeUnit.SECONDS)
 
@@ -500,7 +499,7 @@ class RssLocalSyncKtTest {
 
     @Test
     fun verySlowResponseShouldBeCancelled() = runBlocking {
-        val url = server.url("/atom.xml").url()
+        val url = server.url("/atom.xml").toUrl()
         val cowboyAtomId = insertFeed("cowboy", url, cowboyAtom, isJson = false)
         responses[url]!!.throttleBody(1024 * 100, 31, TimeUnit.SECONDS)
 

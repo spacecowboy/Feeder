@@ -23,7 +23,7 @@ android {
     versionCode 102
     versionName "1.13.1"
     compileSdkVersion 30
-    minSdkVersion 18 // 23 was the conscrypt cutoff
+    minSdkVersion 23
     targetSdkVersion 30
     multiDexEnabled true
 
@@ -102,18 +102,44 @@ android {
     unitTests.returnDefaultValues = true
   }
 
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
-
   kotlinOptions {
     jvmTarget = "1.8"
+  }
+
+  packagingOptions {
+    exclude 'META-INF/DEPENDENCIES'
+    exclude 'META-INF/LICENSE'
+    exclude 'META-INF/LICENSE.txt'
+    exclude 'META-INF/license.txt'
+    exclude 'META-INF/NOTICE'
+    exclude 'META-INF/NOTICE.txt'
+    exclude 'META-INF/notice.txt'
+    exclude 'META-INF/ASL2.0'
+    exclude 'META-INF/AL2.0'
+    exclude 'META-INF/LGPL2.1'
+  }
+}
+
+configurations.all {
+  resolutionStrategy {
+//    failOnVersionConflict()
+
+    force "com.squareup.okhttp3:okhttp:$okhttp_version"
+    force "com.squareup.okio:okio:$okio_version"
+    force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    force "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    force "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+    force "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
   }
 }
 
 dependencies {
   kapt "androidx.room:room-compiler:$room_version"
+
+  // BOMS
+  api(platform("com.squareup.okhttp3:okhttp-bom:$okhttp_version"))
 
   // Needed pre SDK21
   implementation "com.android.support:multidex:$multi_dex_version"
@@ -138,8 +164,6 @@ dependencies {
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
   implementation "androidx.paging:paging-runtime-ktx:$paging_version"
 
-  // To support SDK18
-  implementation "com.nononsenseapps:filepicker:4.2.1"
   // Better times
   implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
   // HTML parsing
@@ -151,7 +175,9 @@ dependencies {
   // JSONFeed
   implementation project(":jsonfeed-parser")
   // For better fetching
-  implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+  implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
+  // For supporting TLSv1.3 on pre Android-10
+  implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
   // Image loading
   implementation("io.coil-kt:coil-base:1.1.1")
   implementation("io.coil-kt:coil-gif:1.1.1")

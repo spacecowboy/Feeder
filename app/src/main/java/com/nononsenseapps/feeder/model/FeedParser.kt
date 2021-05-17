@@ -12,11 +12,13 @@ import com.rometools.rome.io.XmlReader
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.withContext
+import okhttp3.Authenticator
 import okhttp3.CacheControl
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.Route
 import okio.Buffer
 import okio.GzipSource
 import org.jsoup.Jsoup
@@ -178,17 +180,17 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
         try {
             val feed = when ((response.header("content-type") ?: "").contains("json")) {
                 true -> jsonFeedParser.parseJsonBytes(body)
-                false -> parseRssAtomBytes(response.request().url().url(), body)
+                false -> parseRssAtomBytes(response.request.url.toUrl(), body)
             }
 
             return if (feed.feed_url == null) {
                 // Nice to return non-null value here
-                feed.copy(feed_url = response.request().url().toString())
+                feed.copy(feed_url = response.request.url.toString())
             } else {
                 feed
             }
         } catch (e: Throwable) {
-            throw FeedParsingError(response.request().url().url(), e)
+            throw FeedParsingError(response.request.url.toUrl(), e)
         }
     }
 
@@ -197,7 +199,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
      */
     @Throws(FeedParsingError::class)
     suspend fun parseFeedResponseOrFallbackToAlternateLink(response: Response): Feed? =
-        response.body()?.use { responseBody ->
+        response.body?.use { responseBody ->
             responseBody.bytes().let { body ->
                 // Encoding is not an issue for reading HTML (probably)
                 val alternateFeedLink = findFeedUrl(String(body), preferAtom = true)
@@ -255,7 +257,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
 }
 
 fun Response.safeBody(): ByteArray? {
-    return this.body()?.use { body ->
+    return this.body?.use { body ->
         if (header("Transfer-Encoding") == "chunked") {
             val source =
                 if (header("Content-Encoding") == "gzip") {
@@ -274,7 +276,7 @@ fun Response.safeBody(): ByteArray? {
                 // content-length (I suspect)
                 Log.e(
                     "FeedParser",
-                    "Encountered EOF exception while parsing response with headers: ${headers()}",
+                    "Encountered EOF exception while parsing response with headers: $headers",
                     e
                 )
             }
@@ -315,30 +317,36 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
         val decodedPass = URLDecoder.decode(pass, "UTF-8")
         val credentials = Credentials.basic(decodedUser, decodedPass)
         newBuilder()
-            .authenticator { _, response ->
-                when {
-                    response.request().header("Authorization") != null -> {
-                        null
-                    }
-                    else -> {
-                        response.request().newBuilder()
-                            .header("Authorization", credentials)
-                            .build()
-                    }
-                }
-            }
-            .proxyAuthenticator { _, response ->
-                when {
-                    response.request().header("Proxy-Authorization") != null -> {
-                        null
-                    }
-                    else -> {
-                        response.request().newBuilder()
-                            .header("Proxy-Authorization", credentials)
-                            .build()
+            .authenticator(object: Authenticator {
+                override fun authenticate(route: Route?, response: Response): Request? {
+                    return when {
+                        response.request.header("Authorization") != null -> {
+                            null
+                        }
+                        else -> {
+                            response.request.newBuilder()
+                                .header("Authorization", credentials)
+                                .build()
+                        }
                     }
                 }
-            }.build()
+            })
+            .proxyAuthenticator(object: Authenticator {
+                override fun authenticate(route: Route?, response: Response): Request? {
+                    return when {
+                        response.request.header("Proxy-Authorization") != null -> {
+                            null
+                        }
+                        else -> {
+                            response.request.newBuilder()
+                                .header("Proxy-Authorization", credentials)
+                                .build()
+                        }
+                    }
+                }
+
+            })
+            .build()
     } else {
         this
     }
@@ -351,7 +359,7 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
 suspend fun OkHttpClient.curl(url: URL): String? {
     var result: String? = null
     curlAndOnResponse(url) {
-        result = it.body()?.string()
+        result = it.body?.string()
     }
     return result
 }
