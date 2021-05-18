@@ -12,8 +12,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@ExperimentalCoroutinesApi
-@FlowPreview
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class MigrationFrom13To14 {

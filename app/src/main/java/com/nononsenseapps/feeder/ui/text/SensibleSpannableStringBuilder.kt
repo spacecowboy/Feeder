@@ -11,6 +11,7 @@ open class SensibleSpannableStringBuilder(
 
     init {
         // TODO why must I access this to prevent a crash?
+        // TODO later note: it does not prevent crash at all
         Log.d("FeederSensibleSpannableStringBuilder", "Length is: $length")
     }
 
