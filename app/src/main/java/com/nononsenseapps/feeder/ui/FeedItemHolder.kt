@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.Navigation.findNavController
@@ -65,8 +66,8 @@ class FeedItemHolder(
     val authorTextView: TextView = view.findViewById(R.id.story_author)
     val imageView: ImageView = view.findViewById(R.id.story_image)
     private val bgFrame: View = view.findViewById(R.id.swiping_item)
-    private val checkLeft: View = view.findViewById(R.id.check_left)
-    private val checkRight: View = view.findViewById(R.id.check_right)
+    private val checkLeft: ImageView = view.findViewById(R.id.check_left)
+    private val checkRight: ImageView = view.findViewById(R.id.check_right)
     private val checkBg: View = view.findViewById(R.id.check_bg)
 
     var rssItem: PreviewItem? = null
@@ -99,6 +100,15 @@ class FeedItemHolder(
                         actionCallback.onSwipeStarted()
 
                         bgFrame.setBackgroundColor(settingsViewModel.backgroundColor)
+
+                        rssItem?.let {
+                            val bgColor = if (it.unread) R.color.swiping_item_color else R.color.ic_launcher_background
+                            val swipeIcon = if (it.unread) R.drawable.ic_visibility_off_white_24dp else R.drawable.ic_visibility_white_24dp
+
+                            checkBg.setBackgroundColor(getColor(view.context, bgColor))
+                            checkLeft.setImageResource(swipeIcon)
+                            checkRight.setImageResource(swipeIcon)
+                        }
 
                         checkBg.visibility = View.VISIBLE
                         if (goingRight) {
