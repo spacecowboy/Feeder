@@ -1,6 +1,6 @@
 Feeder
 =====
-[![build status](https://gitlab.com/spacecowboy/Feeder/badges/master/build.svg)](https://gitlab.com/spacecowboy/Feeder/builds)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y44OYQL)
 
 <a href="https://f-droid.org/repository/browse/?fdid=com.nononsenseapps.feeder" target="_blank">
 <img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"/></a>
@@ -8,6 +8,8 @@ Feeder
 <a href="https://hosted.weblate.org/engage/feeder/">
 <img src="https://hosted.weblate.org/widgets/feeder/-/android-strings/svg-badge.svg" alt="Translation status" />
 </a>
+
+[![build status](https://gitlab.com/spacecowboy/Feeder/badges/master/build.svg)](https://gitlab.com/spacecowboy/Feeder/builds)
 
 ### License
 
