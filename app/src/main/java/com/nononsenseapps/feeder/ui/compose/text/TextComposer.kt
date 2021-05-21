@@ -6,12 +6,11 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 
 class TextComposer(
-    val paragraphEmitter: @Composable (AnnotatedString) -> Unit
+    val paragraphEmitter: (AnnotatedString) -> Unit
 ) {
     val spanStack: MutableList<Span> = mutableListOf()
     var builder: AnnotatedParagraphStringBuilder = AnnotatedParagraphStringBuilder()
 
-    @Composable
     fun terminateCurrentText() {
         if (builder.isEmpty()) {
             // Nothing to emit, and nothing to reset
@@ -45,8 +44,7 @@ class TextComposer(
         return block()
     }
 
-    @Composable
-    fun <R> appendImage(block: @Composable (onClick: (() -> Unit)?) -> R): R {
+    fun <R> appendImage(block: (onClick: (() -> Unit)?) -> R): R {
         val url = findClosestLink()
         builder.ensureDoubleNewline()
         terminateCurrentText()
@@ -58,7 +56,7 @@ class TextComposer(
         } else {
             null
         }
-        return block(onClick = onClick)
+        return block(onClick)
     }
 
     private fun findClosestLink(): String? {

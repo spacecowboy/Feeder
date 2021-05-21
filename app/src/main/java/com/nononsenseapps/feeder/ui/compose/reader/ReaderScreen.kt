@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
@@ -82,6 +83,16 @@ fun ReaderScreen(
         val author = feedItem?.author
         val pubDate = feedItem?.pubDate
 
+        // TODO state so it isn't reloaded all teh time
+        val blob = feedItem?.let { item ->
+            // TODO full article fetch action
+            when (item.fullTextByDefault) {
+                true -> blobFullInputStream(item.id, LocalContext.current.filesDir)
+                false -> blobInputStream(item.id, LocalContext.current.filesDir)
+            }
+        }
+        val feedUrl = feedItem?.feedUrl?.toString() ?: ""
+
         ReaderView(
             articleTitle = feedItem?.plainTitle ?: "Could not load",
             feedTitle = feedItem?.feedDisplayTitle ?: "Unknown feed",
@@ -102,110 +113,43 @@ fun ReaderScreen(
                 else -> null
             }
         ) {
-            feedItem?.let { item ->
-                // TODO full article fetch action
-                when (item.fullTextByDefault) {
-                    true -> blobFullInputStream(item.id, LocalContext.current.filesDir)
-                    false -> blobInputStream(item.id, LocalContext.current.filesDir)
-                }.use { inputStream ->
-                    HtmlFormattedText(inputStream = inputStream, baseUrl = item.feedUrl.toString())
-                }
+            blob?.use { inputStream ->
+                HtmlFormattedText(inputStream = inputStream, baseUrl = feedUrl)
             }
         }
     }
 }
 
 @Composable
-@Preview
 private fun ReaderView(
     articleTitle: String = "Article title on top",
     feedTitle: String = "Feed Title is here",
     authorDate: String? = "2018-01-02",
-    articleBody: @Composable () -> Unit = { Text("body goes here") }
+    articleBody: LazyListScope.() -> Unit
 ) {
-    val scrollState = rememberScrollState()
-    Column(modifier = Modifier.verticalScroll(scrollState)) {
-        Text(
-            text = articleTitle,
-            style = Typography.h1
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = feedTitle,
-            style = Typography.subtitle1
-        )
-        if (authorDate != null) {
-            Spacer(modifier = Modifier.height(4.dp))
+//    val scrollState = rememberScrollState()
+//    Column(modifier = Modifier.verticalScroll(scrollState)) {
+    LazyColumn {
+        item {
             Text(
-                text = authorDate,
+                text = articleTitle,
+                style = Typography.h1
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = feedTitle,
                 style = Typography.subtitle1
             )
+            if (authorDate != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = authorDate,
+                    style = Typography.subtitle1
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
         articleBody()
-
-//        ClickableTextWithInlineContent(
-//            text = articleText,
-//            inlineContent = mapOf(
-//                "IMAGE" to InlineTextContent(
-//                    Placeholder(100.sp, 100.sp, PlaceholderVerticalAlign.TextBottom)
-//                ) { alternateText ->
-//                    // TODO Render image
-//                }
-//            )
-//        ) { offset ->
-//            // TODO("on click with offset / index position")
-//            articleText.getStringAnnotations("TODO TAG NAME", offset, offset)
-//                .firstOrNull()
-//                ?.let {
-//                    // it.item should have destination
-//                    TODO("handle click")
-//                }
-//        }
-        // TODO
-//        Text(text = articleText)
-//        AndroidView(
-//            factory = { context ->
-//                LinkedTextView(context, null).also { view ->
-//                    view.setTextIsSelectable(true)
-//                    // TODO style
-//                    // TODO text direction
-//                }
-//            },
-//            modifier = Modifier
-//                .defaultMinSize(minHeight = 300.dp)
-//                .fillMaxWidth(),
-//            update = { view ->
-//                view.text = articleText
-//            }
-//        )
     }
 }
-
-//@Composable
-//private fun AnnotatedClickableText(
-//    text: SpannableString
-//) {
-//    val annotatedText = buildAnnotatedString {
-//        append(text.toString())
-//
-//        for (span in text.getSpans<Any>()) {
-//            when (span) {
-//                ClickableSpan -> addStringAnnotation("clickable", "clickable", span.)
-//            }
-//        }
-//    }
-//    /*
-//
-//                ClickableSpan[] link =
-//                        buffer.getSpans(off, off, ClickableSpan.class);
-//
-//                ClickableImageSpan[] image =
-//                        buffer.getSpans(off, off, ClickableImageSpan.class);
-//
-//     */
-//    ClickableText(text = annotatedText) { offset ->
-//
-//    }
-//}
