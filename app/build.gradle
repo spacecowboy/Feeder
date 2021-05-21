@@ -219,7 +219,7 @@ dependencies {
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
   // Dependency injection
   implementation "org.kodein.di:kodein-di-framework-android-x:$kodeinVersion"
-  implementation "org.kodein.di:kodein-di-framework-compose:$kodeinVersion"
+//  implementation "org.kodein.di:kodein-di-framework-compose:$kodeinVersion"
   // Custom tabs
   implementation "com.android.support:customtabs:28.0.0"
   // Full text
@@ -243,7 +243,7 @@ dependencies {
   androidTestImplementation "junit:junit:4.12"
   androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
 
-  androidTestImplementation "androidx.test:core:$androidx_core_version"
+  androidTestImplementation "androidx.test:core:$androidx_testcore_version"
   androidTestImplementation "androidx.test:runner:$test_runner_version"
   androidTestImplementation "androidx.test:rules:$test_rules_version"
   androidTestImplementation "androidx.test.ext:junit:$test_ext_junit_version"

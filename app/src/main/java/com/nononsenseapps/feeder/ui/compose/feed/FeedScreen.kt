@@ -4,8 +4,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Divider
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.DropdownMenu
@@ -30,13 +28,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.navigate
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.nononsenseapps.feeder.R
@@ -74,6 +70,7 @@ fun FeedScreen(
         mutableStateOf(prefs.lastOpenFeedId to (prefs.lastOpenFeedTag ?: ""))
     }
 
+    // TODO can remember be used to reduce load flicker on resume?
     val feedItems = feedItemsViewModel
         .getFlowOfDbPreviews(
             feedId = currentFeed.first,

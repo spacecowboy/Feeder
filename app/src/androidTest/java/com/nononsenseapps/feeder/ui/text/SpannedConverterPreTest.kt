@@ -26,7 +26,7 @@ class SpannedConverterPreTest {
     fun preIsMonospaced() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader("Some <pre>pre  formatted</pre> text"),
             URL("http://foo.com"),
             Point(100, 100),
@@ -46,7 +46,7 @@ class SpannedConverterPreTest {
     fun codeIsMonospacedAndMore() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader("Some <code>code  formatted</code> text"),
             URL("http://foo.com"),
             Point(100, 100),
@@ -66,7 +66,7 @@ class SpannedConverterPreTest {
     fun preCodeIsMonospacedAndMore() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader("Some <pre><code>pre  code  formatted</code></pre> text"),
             URL("http://foo.com"),
             Point(100, 100),

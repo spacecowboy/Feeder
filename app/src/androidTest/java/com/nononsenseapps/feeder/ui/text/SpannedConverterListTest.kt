@@ -23,7 +23,7 @@ class SpannedConverterListTest {
     fun nakedLiTagIsBulletized() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader("Some <li> bullet </li> text"),
             URL("http://foo.com"),
             Point(100, 100),

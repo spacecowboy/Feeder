@@ -18,9 +18,9 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.kodein.di.DI
 import org.kodein.di.DIAware
-import org.kodein.di.generic.bind
+import org.kodein.di.bind
 import org.kodein.di.instance
-import org.kodein.di.generic.singleton
+import org.kodein.di.singleton
 import java.io.InputStream
 import java.net.URL
 import kotlin.test.Ignore
@@ -37,7 +37,7 @@ class FeedParserTest : DIAware {
 
     private val feedParser: FeedParser by instance()
 
-    override val kodein by Kodein.lazy {
+    override val di by DI.lazy {
         bind<OkHttpClient>() with singleton { cachingHttpClient() }
         import(networkModule)
     }

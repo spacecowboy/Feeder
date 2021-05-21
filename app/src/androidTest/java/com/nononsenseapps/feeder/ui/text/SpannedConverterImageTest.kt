@@ -23,7 +23,7 @@ class SpannedConverterImageTest {
     fun imgGetsPlaceHolderInserted() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader("<img src=\"https://foo.com/bar.gif\">"),
             URL("http://foo.com"),
             Point(100, 100),
@@ -39,7 +39,7 @@ class SpannedConverterImageTest {
     fun imgWithNoSrcGetsNoPlaceHolder() {
         val builder = FakeBuilder2()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader("<img src=\"\">"),
             URL("http://foo.com"),
             Point(100, 100),

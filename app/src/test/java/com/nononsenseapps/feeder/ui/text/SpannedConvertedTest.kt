@@ -13,8 +13,8 @@ import org.junit.Before
 import org.junit.Test
 import org.kodein.di.DI
 import org.kodein.di.DIAware
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.singleton
+import org.kodein.di.bind
+import org.kodein.di.singleton
 import java.io.StringReader
 import java.net.URL
 import java.util.ArrayList
@@ -25,7 +25,7 @@ class SpannedConverterTest : DIAware {
     private val mockContext: Application = mockk(relaxed = true)
     private val mockPrefs: Prefs = mockk(relaxed = true)
 
-    override val kodein by Kodein.lazy {
+    override val di by DI.lazy {
         bind<Application>() with singleton { mockContext }
         bind<Prefs>() with singleton { mockPrefs }
     }
@@ -44,7 +44,7 @@ class SpannedConverterTest : DIAware {
     fun testFontWithNoColorDoesntCrash() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader("<font>No color</font>"),
             URL("http://foo.com"),
             Point(100, 100),
@@ -61,7 +61,7 @@ class SpannedConverterTest : DIAware {
     fun testOnePixelImagesAreNotRenderedWithBase() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader("<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">"),
             URL("http://foo.com"),
             Point(100, 100),
@@ -77,7 +77,7 @@ class SpannedConverterTest : DIAware {
     fun testOnePixelImagesAreNotRenderedWithGlide() {
         val builder = FakeBuilder()
         toSpannedWithImages(
-            kodein,
+            di,
             StringReader("<img src=\"https://foo.com/bar.gif\" width=\"1\" height=\"1\">"),
             URL("http://foo.com"),
             Point(100, 100),
@@ -93,7 +93,7 @@ class SpannedConverterTest : DIAware {
     fun testNotRenderScriptTag() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader("<p>foo</p><script>script</script><p>bar</p>"),
             URL("http://foo.bar"),
             Point(100, 100),
@@ -109,7 +109,7 @@ class SpannedConverterTest : DIAware {
     fun testNotRenderStyleTag() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader("<p>foo</p><style>style</style><p>bar</p>"),
             URL("http://foo.bar"),
             Point(100, 100),
@@ -125,7 +125,7 @@ class SpannedConverterTest : DIAware {
     fun tableColumnsSeparatedNewLinesTest() {
         val builder = FakeBuilder()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader(
                 """
                     <table>
@@ -161,7 +161,7 @@ class SpannedConverterTest : DIAware {
             |me
             """.trimMargin()
         toSpannedWithNoImages(
-            kodein,
+            di,
             StringReader(
                 """
                     <pre>$text</pre>
