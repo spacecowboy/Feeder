@@ -23,7 +23,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,26 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
-import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 
 const val EXPAND_ANIMATION_DURATION = 300
 const val COLLAPSE_ANIMATION_DURATION = 300
-
-@ExperimentalAnimationApi
-@Composable()
-fun ListOfFeedsAndTags() {
-    val feedListViewModel: FeedListViewModel = DIAwareViewModel()
-    val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts
-        .observeAsState(initial = emptyList())
-
-    ListOfFeedsAndTags(
-        feedsAndTags = feedsAndTags,
-        onItemClick = { /* TODO in old UI */ }
-    )
-}
 
 @ExperimentalAnimationApi
 @Composable

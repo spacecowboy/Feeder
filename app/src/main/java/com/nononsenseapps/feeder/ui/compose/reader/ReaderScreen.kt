@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.reader
 
-import android.graphics.Point
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -19,10 +18,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.model.FeedItemViewModel
@@ -38,25 +36,28 @@ private val dateTimeFormat =
 
 @Composable
 fun ReaderScreen(
-    itemId: Long,
-    navController: NavHostController,
-    maxImageSize: Point
+    feedItemViewModel: FeedItemViewModel,
+    onNavigateUp: () -> Unit
 ) {
-    val feedItemViewModel: FeedItemViewModel = DIAwareViewModel()
+    val feedItem by feedItemViewModel.currentLiveItem.observeAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Article Title") },
+                title = {
+                    Text(
+                        text = feedItem?.feedDisplayTitle ?: "",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 navigationIcon = {
                     Icon(
                         Icons.Default.ArrowBack,
                         contentDescription = "Back button",
                         modifier = Modifier
                             .clickable {
-                                navController.navigate("feed") {
-                                    launchSingleTop = true
-                                }
+                                onNavigateUp()
                             }
                     )
                 },
@@ -66,7 +67,6 @@ fun ReaderScreen(
             )
         }
     ) {
-        val feedItem by feedItemViewModel.getLiveItem(itemId).observeAsState()
 //        val articleText by feedItemViewModel.getLiveTextMaybeFull(
 //            options = TextOptions(
 //                itemId = itemId,
@@ -79,6 +79,7 @@ fun ReaderScreen(
         val author = feedItem?.author
         val pubDate = feedItem?.pubDate
 
+        // TODO some remember action
         val blob = feedItem?.let { item ->
             // TODO full article fetch action
             when (item.fullTextByDefault) {

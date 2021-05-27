@@ -86,43 +86,6 @@ class FeedItemsViewModel(di: DI) : DIAwareViewModel(di) {
         return livePreviews
     }
 
-    fun getPagingSource(
-        feedId: Long,
-        tag: String,
-        newestFirst: Boolean,
-        onlyUnread: Boolean
-    ) = when {
-        onlyUnread && newestFirst -> {
-            when {
-                feedId > ID_UNSET -> dao.pagingUnreadPreviewsDesc(feedId = feedId)
-                tag.isNotEmpty() -> dao.pagingUnreadPreviewsDesc(tag = tag)
-                else -> dao.pagingUnreadPreviewsDesc()
-            }
-        }
-        onlyUnread -> {
-            when {
-                feedId > ID_UNSET -> dao.pagingUnreadPreviewsAsc(feedId = feedId)
-                tag.isNotEmpty() -> dao.pagingUnreadPreviewsAsc(tag = tag)
-                else -> dao.pagingUnreadPreviewsAsc()
-            }
-        }
-        newestFirst -> {
-            when {
-                feedId > ID_UNSET -> dao.pagingPreviewsDesc(feedId = feedId)
-                tag.isNotEmpty() -> dao.pagingPreviewsDesc(tag = tag)
-                else -> dao.pagingPreviewsDesc()
-            }
-        }
-        else -> {
-            when {
-                feedId > ID_UNSET -> dao.pagingPreviewsAsc(feedId = feedId)
-                tag.isNotEmpty() -> dao.pagingPreviewsAsc(tag = tag)
-                else -> dao.pagingPreviewsAsc()
-            }
-        }
-    }
-
-
     fun getPreviewPager(
         feedId: Long,
         tag: String,

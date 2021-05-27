@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.theme
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
@@ -76,7 +77,7 @@ object FeederTypography {
         fontWeight = FontWeight.Light
     )
     val previewTitle = TextStyle(
-        fontWeight = FontWeight.Medium
+        fontWeight = FontWeight.SemiBold
     )
     val previewDate = TextStyle(
         fontWeight = FontWeight.Medium

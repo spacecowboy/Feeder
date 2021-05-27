@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataScope
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
@@ -21,6 +22,7 @@ import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.text.UrlClickListener
 import com.nononsenseapps.feeder.ui.text.toSpannedWithImages
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
@@ -34,7 +36,9 @@ import java.io.InputStream
 import java.net.URL
 import kotlin.math.roundToInt
 
-class FeedItemViewModel(di: DI) : DIAwareViewModel(di) {
+private const val KEY_ITEM_ID = "FeedItemViewModel itemid"
+
+class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
     private val dao: FeedItemDao by instance()
     val context: Application by instance()
     private val okHttpClient: OkHttpClient by instance()
@@ -52,6 +56,20 @@ class FeedItemViewModel(di: DI) : DIAwareViewModel(di) {
         MutableLiveData(SpannableString("null maybe loading"))
 
     private var fragmentUrlClickListener: UrlClickListener? = null
+
+    var currentItemId: Long
+        get() = state[KEY_ITEM_ID] ?: ID_UNSET
+        set(value) = state.set(KEY_ITEM_ID, value)
+
+    private val currentLiveItemId: LiveData<Long> =
+        state.getLiveData(KEY_ITEM_ID, ID_UNSET)
+
+    val currentLiveItem: LiveData<FeedItemWithFeed?> =
+        currentLiveItemId.switchMap { itemId ->
+            dao.loadLiveFeedItem(itemId).asLiveData()
+        }
+
+    suspend fun markCurrentItemAsReadAndNotified() = dao.markAsReadAndNotified(id = currentItemId)
 
     fun getLiveItem(id: Long): LiveData<FeedItemWithFeed?> {
         if (!this::liveItem.isInitialized) {

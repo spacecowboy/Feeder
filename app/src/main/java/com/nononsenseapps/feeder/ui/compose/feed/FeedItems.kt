@@ -33,7 +33,7 @@ import java.util.*
 private val shortDateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
 
-private val feedItemHeight = 92.dp
+private val feedItemHeight = 128.dp
 
 //@Composable
 //fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
@@ -176,17 +176,17 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
 
             Text(
                 text = buildAnnotatedString {
-
                     withStyle(
                         MaterialTheme.typography.subtitle1.merge(FeederTypography.previewTitle.merge())
                             .toSpanStyle()
                     ) {
                         append(item.plainTitle)
                     }
-                    append(" — ${item.plainSnippet}")
+                    append(" — ${item.plainSnippet}…")
                 },
                 style = MaterialTheme.typography.body1,
-                overflow = TextOverflow.Clip,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 5,
                 modifier = Modifier
                     .weight(weight = 1.0f, fill = true)
 //                    .border(1.dp, Color.Green)

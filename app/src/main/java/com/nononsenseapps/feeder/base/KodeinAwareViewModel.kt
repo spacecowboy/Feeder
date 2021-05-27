@@ -1,12 +1,18 @@
 package com.nononsenseapps.feeder.base
 
+import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.savedstate.SavedStateRegistryOwner
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.bind
@@ -61,11 +67,37 @@ inline fun <reified T : DIAwareViewModel> DI.Builder.activityViewModelProvider()
     ).get(T::class.java)
 }
 
+class DIAwareSavedStateViewModelFactory(
+    override val di: DI,
+    owner: SavedStateRegistryOwner,
+    defaultArgs: Bundle? = null
+) : AbstractSavedStateViewModelFactory(owner, defaultArgs), DIAware {
+    override fun <T : ViewModel> create(
+        key: String,
+        modelClass: Class<T>,
+        handle: SavedStateHandle
+    ): T {
+        return if (DIAwareViewModel::class.java.isAssignableFrom(modelClass)) {
+            try {
+                modelClass.getConstructor(DI::class.java, SavedStateHandle::class.java).newInstance(di, handle)
+            } catch (orgError: Exception) {
+                try {
+                    modelClass.getConstructor(DI::class.java).newInstance(di)
+                } catch (e: Exception) {
+                    throw orgError
+                }
+            }
+        } else {
+            throw RuntimeException("Not a DIAwareViewModel! Please use by viewModel() instead")
+        }
+    }
+}
+
 @Composable
-inline fun <reified T : DIAwareViewModel> DIAwareViewModel(
+inline fun <reified T : DIAwareViewModel> SavedStateRegistryOwner.DIAwareViewModel(
     key: String? = null
 ): T {
-    val factory: DIAwareViewModelFactory = LocalDI.current.direct.instance()
+    val factory = DIAwareSavedStateViewModelFactory(LocalDI.current, this)
 
     return viewModel(T::class.java, key, factory)
 }

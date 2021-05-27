@@ -62,11 +62,10 @@ import org.kodein.di.compose.instance
 @Composable
 fun FeedScreen(
     onItemClick: (Long) -> Unit,
-    feedListViewModel: FeedListViewModel = DIAwareViewModel(),
-    feedItemsViewModel: FeedItemsViewModel = DIAwareViewModel(),
-    settingsViewModel: SettingsViewModel = DIAwareViewModel()
+    feedListViewModel: FeedListViewModel,
+    feedItemsViewModel: FeedItemsViewModel,
+    settingsViewModel: SettingsViewModel
 ) {
-
     val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts
         .observeAsState(initial = emptyList())
 
