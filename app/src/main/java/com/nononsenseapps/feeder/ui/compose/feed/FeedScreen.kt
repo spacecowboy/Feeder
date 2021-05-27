@@ -1,9 +1,12 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import androidx.compose.animation.Crossfade
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.DropdownMenu
@@ -22,6 +25,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -32,85 +36,131 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavHostController
+import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.SettingsViewModel
-import com.nononsenseapps.feeder.ui.compose.components.SwipeToRefreshLayout
+import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.launch
+import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
 
 @ExperimentalAnimationApi
 @Composable
 fun FeedScreen(
-    navController: NavHostController
+    onItemClick: (Long) -> Unit,
+    feedListViewModel: FeedListViewModel = DIAwareViewModel(),
+    feedItemsViewModel: FeedItemsViewModel = DIAwareViewModel(),
+    settingsViewModel: SettingsViewModel = DIAwareViewModel()
 ) {
-    val feedListViewModel: FeedListViewModel = DIAwareViewModel()
-    val feedItemsViewModel: FeedItemsViewModel = DIAwareViewModel()
-    val settingsViewModel: SettingsViewModel = DIAwareViewModel()
-    val prefs: Prefs by instance()
 
     val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts
         .observeAsState(initial = emptyList())
 
-    var onlyUnread by remember {
-        mutableStateOf(prefs.showOnlyUnread)
-    }
+    val onlyUnread by settingsViewModel.showOnlyUnread.collectAsState()
     val newestFirst by settingsViewModel.liveIsNewestFirst.observeAsState(initial = true)
-    var currentFeed by remember {
-        mutableStateOf(prefs.lastOpenFeedId to (prefs.lastOpenFeedTag ?: ""))
-    }
+    val currentFeed by settingsViewModel.currentFeedAndTag.collectAsState()
 
-    // TODO can remember be used to reduce load flicker on resume?
-    val feedItems = feedItemsViewModel
-        .getFlowOfDbPreviews(
-            feedId = currentFeed.first,
-            tag = currentFeed.second,
-            onlyUnread = onlyUnread,
-            newestFirst = newestFirst
-        )
+    val feedItems = feedItemsViewModel.getPreviewPager(
+        feedId = currentFeed.first,
+        tag = currentFeed.second,
+        onlyUnread = onlyUnread,
+        newestFirst = newestFirst
+    )
         .collectAsLazyPagingItems()
+
+    val applicationState: ApplicationState by instance()
+    val isRefreshing by applicationState.isRefreshing.collectAsState()
+    val refreshState = rememberSwipeRefreshState(isRefreshing)
+
+    val di = LocalDI.current
 
     FeedScreen(
         feedsAndTags = feedsAndTags,
-        refreshing = false, // TODO live state
-        onRefresh = { /*TODO*/ },
+        refreshState = refreshState,
+        onRefresh = {
+            applicationState.setRefreshing()
+            requestFeedSync(
+                di = di,
+                feedId = currentFeed.first,
+                feedTag = currentFeed.second,
+                ignoreConnectivitySettings = true,
+                forceNetwork = true,
+                parallell = true
+            )
+        },
         onlyUnread = onlyUnread,
         onToggleOnlyUnread = { value ->
-            // Remember for later
-            prefs.showOnlyUnread = value
-            // And trigger recompose
-            onlyUnread = value
+            settingsViewModel.setShowOnlyUnread(value)
         },
         onDrawerItemSelected = { id, tag ->
-            prefs.lastOpenFeedId = id
-            prefs.lastOpenFeedTag = tag
-            currentFeed = id to tag
+            settingsViewModel.setCurrentFeedAndTag(feedId = id, tag = tag)
         }
-    ) {
-        when (feedItems.loadState.append) {
-            is LoadState.NotLoading -> {
-                Crossfade(targetState = feedItems.itemCount) { itemCount ->
-                    when {
-                        itemCount > 0 -> FeedList(feedItems) { itemId ->
-                            // TODO modify back stack?
-                            navController.navigate("reader/$itemId")
+    ) { openNavDrawer ->
+        LazyColumn {
+            items(feedItems) { previewItem ->
+                if (previewItem == null) {
+                    return@items
+                }
+
+                FeedItemPreview(item = previewItem, onItemClick = {
+                    onItemClick(previewItem.id)
+                })
+            }
+
+            when {
+                feedItems.loadState.prepend is LoadState.Loading -> {
+                    Log.d("JONAS", "Prepend")
+                }
+                feedItems.loadState.refresh is LoadState.Loading -> {
+                    Log.d("JONAS", "Refresh")
+                }
+                feedItems.loadState.append is LoadState.Loading -> {
+                    Log.d("JONAS", "Append")
+                }
+                feedItems.loadState.prepend is LoadState.Error -> {
+                    item {
+                        Text("Prepend Error! TODO")
+                    }
+                }
+                feedItems.loadState.refresh is LoadState.Error -> {
+                    item {
+                        Text("Refresh Error! TODO")
+                    }
+                }
+                feedItems.loadState.append is LoadState.Error -> {
+                    item {
+                        Text("Append Error! TODO")
+                    }
+                }
+                feedItems.loadState.append.endOfPaginationReached -> {
+                    // User has reached the end of the list, could insert something here
+
+                    if (feedItems.itemCount == 0) {
+                        Log.d("JONAS", "Nothing")
+                        item {
+                            NothingToRead(openNavDrawer) {}
                         }
-                        else -> NothingToRead()
+                    } else {
+                        item {
+                            Spacer(modifier = Modifier.height(92.dp))
+                        }
                     }
                 }
             }
-            LoadState.Loading -> Text("Loading TODO")
-            is LoadState.Error -> Text("Error happened TODO")
         }
     }
 }
@@ -119,12 +169,12 @@ fun FeedScreen(
 @Composable
 fun FeedScreen(
     feedsAndTags: List<FeedUnreadCount>,
-    refreshing: Boolean,
+    refreshState: SwipeRefreshState,
     onRefresh: () -> Unit,
     onlyUnread: Boolean,
     onToggleOnlyUnread: (Boolean) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
-    content: @Composable () -> Unit
+    content: @Composable (suspend () -> Unit) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState(
@@ -210,12 +260,14 @@ fun FeedScreen(
             )
         }
     ) {
-        SwipeToRefreshLayout(
-            refreshingState = refreshing,
-            onRefresh = onRefresh,
-            refreshIndicator = { /*TODO*/ },
-            content = content
-        )
+        SwipeRefresh(
+            state = refreshState,
+            onRefresh = onRefresh
+        ) {
+            content {
+                scaffoldState.drawerState.open()
+            }
+        }
 
         if (showDeleteDialog) {
             DeleteFeedDialog(

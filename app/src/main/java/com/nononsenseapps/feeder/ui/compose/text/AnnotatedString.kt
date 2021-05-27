@@ -70,13 +70,6 @@ private fun AnnotatedParagraphStringBuilder.ensureSingleNewline() {
     }
 }
 
-inline fun <R : Any> AnnotatedParagraphStringBuilder.withParagraph(
-    crossinline block: AnnotatedParagraphStringBuilder.() -> R
-): R {
-    ensureDoubleNewline()
-    return block(this)
-}
-
 inline fun <R : Any> AnnotatedParagraphStringBuilder.withStyle(
     style: SpanStyle,
     crossinline block: AnnotatedParagraphStringBuilder.() -> R

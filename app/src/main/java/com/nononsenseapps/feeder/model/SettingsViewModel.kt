@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
+import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.lifecycle.LiveData
@@ -16,7 +17,10 @@ import com.nononsenseapps.feeder.util.PREF_SORT
 import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -28,6 +32,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnShar
     private val prefs: Prefs by instance()
     private val sharedPreferences: SharedPreferences by instance()
 
+    // TODO remove
     private val keyChannel = ConflatedBroadcastChannel<String>()
     private val keyFlow = keyChannel.asFlow()
 
@@ -59,6 +64,25 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnShar
                 false -> app.getColorCompat(R.color.accentDay)
             }
 
+    private val _showOnlyUnread = MutableStateFlow(prefs.showOnlyUnread)
+    val showOnlyUnread = _showOnlyUnread.asStateFlow()
+    fun setShowOnlyUnread(onlyUnread: Boolean) {
+        Log.d("JONAS", "Setting only unread: $onlyUnread")
+        _showOnlyUnread.value = onlyUnread
+        prefs.showOnlyUnread = onlyUnread
+    }
+
+    private val _currentFeedAndTag = MutableStateFlow(
+        prefs.lastOpenFeedId to (prefs.lastOpenFeedTag ?: "")
+    )
+    val currentFeedAndTag = _currentFeedAndTag.asStateFlow()
+    fun setCurrentFeedAndTag(feedId: Long, tag: String) {
+        _currentFeedAndTag.value = feedId to tag
+        prefs.lastOpenFeedId = feedId
+        prefs.lastOpenFeedTag = tag
+    }
+
+
     init {
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
@@ -66,6 +90,11 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnShar
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key != null && !keyChannel.isClosedForSend) {
             keyChannel.offer(key)
+        }
+
+        // TODO update mutable state - or just force everything through the view model
+        when (key) {
+
         }
     }
 

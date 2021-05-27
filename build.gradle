@@ -43,7 +43,7 @@ buildscript {
     navigationComposeVersion = "2.4.0-alpha01"
     pagingVersion = "3.0.0-beta02"
     pagingComposeVersion = "1.0.0-alpha09"
-    coilComposeVersion = "0.10.0"
+    accompanistVersion = "0.10.0"
 
     espresso_version = "3.1.0"
     uiautomator_version = "2.2.0"

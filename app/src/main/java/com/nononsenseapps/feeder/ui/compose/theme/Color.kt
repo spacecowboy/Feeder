@@ -2,7 +2,7 @@ package com.nononsenseapps.feeder.ui.compose.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple200 = Color(0xFFBB86FC)
-val Purple500 = Color(0xFF6200EE)
-val Purple700 = Color(0xFF3700B3)
-val Teal200 = Color(0xFF03DAC5)
+val Green700 = Color(0xff0b8043)
+val Green900 = Color(0xff1b5e20)
+val DarkTealA400 = Color(0xff009688)
+val AccentDay = Color(0xff009688)

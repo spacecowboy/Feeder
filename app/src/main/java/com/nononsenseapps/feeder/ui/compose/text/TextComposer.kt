@@ -37,8 +37,7 @@ class TextComposer(
         builder.append(char)
     }
 
-    @Composable
-    fun <R> appendTable(block: @Composable () -> R): R {
+    fun <R> appendTable(block: () -> R): R {
         builder.ensureDoubleNewline()
         terminateCurrentText()
         return block()

@@ -42,8 +42,11 @@ fun isOkToSyncAutomatically(context: Context): Boolean {
         )
 }
 
-class FeedSyncer(val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), DIAware {
+class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
+    CoroutineWorker(context, workerParams), DIAware {
     override val di: DI by closestDI(context)
+
+    // TODO remove this broadcast
     private val currentlySyncing: ConflatedBroadcastChannel<Boolean> by instance(tag = CURRENTLY_SYNCING_STATE)
 
     override suspend fun doWork(): Result {
@@ -52,30 +55,39 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) : Corouti
 
         var success = false
 
-        if (ignoreConnectivitySettings || isOkToSyncAutomatically(context)) {
-            if (!currentlySyncing.isClosedForSend) {
-                currentlySyncing.offer(true)
+        val applicationState by di.instance<ApplicationState>()
+
+        try {
+            if (ignoreConnectivitySettings || isOkToSyncAutomatically(context)) {
+                applicationState.setRefreshing()
+
+                if (!currentlySyncing.isClosedForSend) {
+                    currentlySyncing.offer(true)
+                }
+
+                val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
+                val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
+                val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
+                val minFeedAgeMinutes = inputData.getInt(MIN_FEED_AGE_MINUTES, 15)
+
+                success = syncFeeds(
+                    context = applicationContext,
+                    feedId = feedId,
+                    feedTag = feedTag,
+                    forceNetwork = forceNetwork,
+                    parallel = goParallel,
+                    minFeedAgeMinutes = minFeedAgeMinutes
+                )
+                // Send notifications for configured feeds
+                notify(applicationContext)
             }
 
-            val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
-            val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
-            val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
-            val minFeedAgeMinutes = inputData.getInt(MIN_FEED_AGE_MINUTES, 15)
-
-            success = syncFeeds(
-                context = applicationContext,
-                feedId = feedId,
-                feedTag = feedTag,
-                forceNetwork = forceNetwork,
-                parallel = goParallel,
-                minFeedAgeMinutes = minFeedAgeMinutes
-            )
-            // Send notifications for configured feeds
-            notify(applicationContext)
-        }
-
-        if (!currentlySyncing.isClosedForSend) {
-            currentlySyncing.offer(false)
+            // TODO remove this broadcast
+            if (!currentlySyncing.isClosedForSend) {
+                currentlySyncing.offer(false)
+            }
+        } finally {
+            applicationState.setRefreshing(false)
         }
 
         return when (success) {

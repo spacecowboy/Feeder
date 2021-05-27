@@ -2,14 +2,12 @@ package com.nononsenseapps.feeder.ui.compose.reader
 
 import android.graphics.Point
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -21,7 +19,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.nononsenseapps.feeder.R
@@ -29,8 +26,7 @@ import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.model.FeedItemViewModel
-import com.nononsenseapps.feeder.ui.compose.text.HtmlFormattedText
-import com.nononsenseapps.feeder.ui.compose.theme.Typography
+import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.unicodeWrap
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
@@ -83,7 +79,6 @@ fun ReaderScreen(
         val author = feedItem?.author
         val pubDate = feedItem?.pubDate
 
-        // TODO state so it isn't reloaded all teh time
         val blob = feedItem?.let { item ->
             // TODO full article fetch action
             when (item.fullTextByDefault) {
@@ -114,7 +109,7 @@ fun ReaderScreen(
             }
         ) {
             blob?.use { inputStream ->
-                HtmlFormattedText(inputStream = inputStream, baseUrl = feedUrl)
+                htmlFormattedText(inputStream = inputStream, baseUrl = feedUrl)
             }
         }
     }
@@ -133,18 +128,18 @@ private fun ReaderView(
         item {
             Text(
                 text = articleTitle,
-                style = Typography.h1
+                style = MaterialTheme.typography.h1
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = feedTitle,
-                style = Typography.subtitle1
+                style = MaterialTheme.typography.subtitle1
             )
             if (authorDate != null) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = authorDate,
-                    style = Typography.subtitle1
+                    style = MaterialTheme.typography.subtitle1
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))

@@ -2,9 +2,12 @@ package com.nononsenseapps.feeder.ui.compose.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 
 // Set of Material typography styles to start with
@@ -59,12 +62,23 @@ val Typography = Typography(
 )
 
 @Immutable
-class FeederTypography(
-    val codeBlock: TextStyle = Typography.body1.merge(
-        TextStyle(
-            background = TODO(),
-            fontFamily = FontFamily.Monospace,
-
-        )
+object FeederTypography {
+    val codeBlock = TextStyle(
+        background = Color.Gray, // TODO
+        fontFamily = FontFamily.Monospace
     )
-)
+    val link = TextStyle(
+        color = Color.Cyan,
+        textDecoration = TextDecoration.Underline
+    )
+    val blockQuote = TextStyle(
+        color = Color.Red,
+        fontWeight = FontWeight.Light
+    )
+    val previewTitle = TextStyle(
+        fontWeight = FontWeight.Medium
+    )
+    val previewDate = TextStyle(
+        fontWeight = FontWeight.Medium
+    )
+}

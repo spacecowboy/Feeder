@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
 import com.nononsenseapps.feeder.ui.compose.theme.Typography
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
@@ -34,18 +35,18 @@ import org.jsoup.nodes.TextNode
 import org.kodein.di.compose.instance
 import java.io.InputStream
 
-fun LazyListScope.HtmlFormattedText(
+fun LazyListScope.htmlFormattedText(
     inputStream: InputStream,
     baseUrl: String
 ) {
     Jsoup.parse(inputStream, null, baseUrl)
         ?.body()
         ?.let { body ->
-            FormatBody(element = body)
+            formatBody(element = body)
         }
 }
 
-private fun LazyListScope.FormatBody(element: Element) {
+private fun LazyListScope.formatBody(element: Element) {
     val composer = TextComposer { paragraph ->
         item {
             ClickableText(
@@ -182,7 +183,7 @@ private fun TextComposer.appendTextChildren(
                         )
                     }
                     "code" -> {
-                        // TODO background
+                        // TODO background - can also use a surface if in a pre-block
                         withStyle(SpanStyle(background = Color.Magenta)) {
                             appendTextChildren(
                                 element.childNodes(),
@@ -193,9 +194,8 @@ private fun TextComposer.appendTextChildren(
                     }
                     "blockquote" -> {
                         withParagraph {
-                            // TODO move to typography
                             withStyle(
-                                SpanStyle(color = Color.Red, fontWeight = FontWeight.Light)
+                                FeederTypography.blockQuote.toSpanStyle()
                             ) {
                                 append(element.text())
                             }
@@ -204,10 +204,7 @@ private fun TextComposer.appendTextChildren(
                     "a" -> {
                         // TODO clickable and colors
                         withStyle(
-                            SpanStyle(
-                                color = Color.Cyan,
-                                textDecoration = TextDecoration.Underline
-                            )
+                            FeederTypography.link.toSpanStyle()
                         ) {
                             withAnnotation("URL", element.attr("abs:href") ?: "") {
                                 append(element.text())
@@ -272,7 +269,24 @@ private fun TextComposer.appendTextChildren(
                             }
                     }
                     "table" -> {
-                        // TODO
+                        appendTable {
+                            /*
+                            In this order:
+                            optionally a caption element (containing text children for instance),
+                            followed by zero or more colgroup elements,
+                            followed optionally by a thead element,
+                            followed by either zero or more tbody elements
+                            or one or more tr elements,
+                            followed optionally by a tfoot element
+                             */
+                            element.children()
+                                .filter { it.tagName() == "tr" }
+                                .forEach { row ->
+                                    lazyListScope.item {
+                                        Text(text = row.text())
+                                    }
+                                }
+                        }
                     }
                     "iframe" -> {
                         // TODO actual video player
@@ -324,7 +338,7 @@ private fun testIt() {
 
     html.byteInputStream().use { stream ->
         LazyColumn() {
-            HtmlFormattedText(inputStream = stream, baseUrl = "https://cowboyprogrammer.org")
+            htmlFormattedText(inputStream = stream, baseUrl = "https://cowboyprogrammer.org")
         }
     }
 }

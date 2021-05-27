@@ -47,7 +47,7 @@ const val EXPAND_ANIMATION_DURATION = 300
 const val COLLAPSE_ANIMATION_DURATION = 300
 
 @ExperimentalAnimationApi
-@Composable
+@Composable()
 fun ListOfFeedsAndTags() {
     val feedListViewModel: FeedListViewModel = DIAwareViewModel()
     val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts
@@ -61,7 +61,7 @@ fun ListOfFeedsAndTags() {
 
 @ExperimentalAnimationApi
 @Composable
-@Preview
+@Preview(showBackground = true)
 private fun ListOfFeedsAndTagsPreview() {
     ListOfFeedsAndTags(
         listOf(
@@ -113,7 +113,7 @@ fun ListOfFeedsAndTags(
 }
 
 @ExperimentalAnimationApi
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun ExpandableTag(
     item: FeedUnreadCount = FeedUnreadCount(tag = "News tag", unreadCount = 3),
@@ -127,12 +127,12 @@ private fun ExpandableTag(
             targetState = !expanded
         }
     }
-    val transition = updateTransition(transitionState)
+    val transition = updateTransition(transitionState, label = "expandedTransition")
 
     val arrowRotationDegree by transition.animateFloat({
         tween(durationMillis = EXPAND_ANIMATION_DURATION)
-    }) {
-        if (expanded) 0f else 180f
+    }, label = "expansionArrow") { expandedState ->
+        if (expandedState) 0f else 180f
     }
     ConstraintLayout(
         modifier = Modifier
@@ -201,7 +201,7 @@ private fun ExpandArrow(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun TopLevelFeed(
     item: FeedUnreadCount = FeedUnreadCount(title = "A feed", unreadCount = 999),
@@ -214,7 +214,7 @@ private fun TopLevelFeed(
 )
 
 @ExperimentalAnimationApi
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun ChildFeed(
     item: FeedUnreadCount = FeedUnreadCount(title = "Some feed", unreadCount = 21),

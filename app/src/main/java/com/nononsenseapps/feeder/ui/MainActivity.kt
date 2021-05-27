@@ -35,7 +35,11 @@ fun AppContent(maxImageSize: Point) = withDI {
 
         NavHost(navController, startDestination = "feed") {
             composable("feed") {
-                FeedScreen(navController = navController)
+                FeedScreen(
+                    onItemClick = { itemId ->
+                        navController.navigate("reader/$itemId")
+                    }
+                )
             }
             composable(
                 "reader/{itemId}",
