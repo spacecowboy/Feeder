@@ -4,12 +4,14 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.viewModelScope
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
@@ -17,6 +19,7 @@ import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.onEach
 import org.kodein.di.DI
 import org.kodein.di.instance
 
@@ -177,9 +180,9 @@ class FeedItemsViewModel(di: DI) : DIAwareViewModel(di) {
                     }
                 }
             }
-        }.flow
-        // TODO shared flow, maybe state flow???
-        // Maybe cachedIn viewModelScope?
+        }
+            .flow
+            .cachedIn(viewModelScope)
 
         Log.d("JONAS", "Making new pager from scratch")
         previewPager = PreviewPager(
