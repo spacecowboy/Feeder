@@ -313,6 +313,13 @@ private fun TextComposer.appendTextChildren(
                     "video" -> {
                         // TODO
                     }
+                    else -> {
+                        appendTextChildren(
+                            nodes = element.childNodes(),
+                            preFormatted = preFormatted,
+                            lazyListScope = lazyListScope
+                        )
+                    }
                 }
             }
         }
