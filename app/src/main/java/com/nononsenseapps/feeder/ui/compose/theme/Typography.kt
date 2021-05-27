@@ -64,8 +64,9 @@ val Typography = Typography(
 
 @Immutable
 object FeederTypography {
-    val codeBlock = TextStyle(
-        background = Color.Gray, // TODO
+    val codeBlockBackground = Color.Gray // TODO dark theme change
+    val codeInline = TextStyle(
+        background = codeBlockBackground,
         fontFamily = FontFamily.Monospace
     )
     val link = TextStyle(

@@ -3,11 +3,16 @@ package com.nononsenseapps.feeder.ui.compose.text
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.Modifier
@@ -65,6 +70,32 @@ private fun LazyListScope.formatBody(element: Element) {
     }
 
     composer.appendTextChildren(element.childNodes(), lazyListScope = this)
+
+    composer.terminateCurrentText()
+}
+
+private fun LazyListScope.formatCodeBlock(element: Element) {
+    val composer = TextComposer { paragraph ->
+        item {
+            val scrollState = rememberScrollState()
+            Surface(
+                color = FeederTypography.codeBlockBackground,
+                modifier = Modifier.horizontalScroll(
+                    state = scrollState
+                )
+            ) {
+                Text(
+                    text = paragraph,
+                    style = MaterialTheme.typography.body2,
+                    color = Color.Green,
+                    fontFamily = FontFamily.Monospace,
+                    softWrap = false
+                )
+            }
+        }
+    }
+
+    composer.appendTextChildren(element.childNodes(), preFormatted = true, lazyListScope = this)
 
     composer.terminateCurrentText()
 }
@@ -183,13 +214,18 @@ private fun TextComposer.appendTextChildren(
                         )
                     }
                     "code" -> {
-                        // TODO background - can also use a surface if in a pre-block
-                        withStyle(SpanStyle(background = Color.Magenta)) {
-                            appendTextChildren(
-                                element.childNodes(),
-                                preFormatted = preFormatted,
-                                lazyListScope = lazyListScope
-                            )
+                        if (element.parent()?.tagName() == "pre") {
+                            terminateCurrentText()
+                            lazyListScope.formatCodeBlock(element = element)
+                        } else {
+                            // inline code
+                            withStyle(FeederTypography.codeInline.toSpanStyle()) {
+                                appendTextChildren(
+                                    element.childNodes(),
+                                    preFormatted = preFormatted,
+                                    lazyListScope = lazyListScope
+                                )
+                            }
                         }
                     }
                     "blockquote" -> {
