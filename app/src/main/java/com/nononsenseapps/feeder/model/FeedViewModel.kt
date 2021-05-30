@@ -54,6 +54,7 @@ class FeedViewModel(di: DI) : DIAwareViewModel(di) {
         dao.setAllNotify(notify = notify)
     }
 
+    @Deprecated("Use FeedListViewModel instead")
     suspend fun deleteFeed(id: Long) {
         dao.deleteFeedWithId(feedId = id)
 
@@ -61,6 +62,7 @@ class FeedViewModel(di: DI) : DIAwareViewModel(di) {
         context.removeDynamicShortcutToFeed(id)
     }
 
+    @Deprecated("Use FeedListViewModel instead")
     suspend fun deleteFeeds(ids: List<Long>) {
         dao.deleteFeeds(ids)
         

@@ -14,9 +14,7 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -44,13 +42,15 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
+import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.requestFeedSync
+import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
@@ -58,7 +58,6 @@ import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
 
-@ExperimentalAnimationApi
 @Composable
 fun FeedScreen(
     onItemClick: (Long) -> Unit,
@@ -73,7 +72,7 @@ fun FeedScreen(
     val newestFirst by settingsViewModel.liveIsNewestFirst.observeAsState(initial = true)
     val currentFeed by settingsViewModel.currentFeedAndTag.collectAsState()
 
-    val feedItems = feedItemsViewModel.getPreviewPager(
+    val pagedFeedItems = feedItemsViewModel.getPreviewPager(
         feedId = currentFeed.first,
         tag = currentFeed.second,
         onlyUnread = onlyUnread,
@@ -81,13 +80,22 @@ fun FeedScreen(
     )
         .collectAsLazyPagingItems()
 
+    val coroutineScope = rememberCoroutineScope()
+
+    val visibleFeeds by feedListViewModel.getFeedTitles(
+        feedId = currentFeed.first,
+        tag = currentFeed.second
+    ).collectAsState(initial = emptyList())
+
     val applicationState: ApplicationState by instance()
     val isRefreshing by applicationState.isRefreshing.collectAsState()
     val refreshState = rememberSwipeRefreshState(isRefreshing)
 
+
     val di = LocalDI.current
 
     FeedScreen(
+        visibleFeeds = visibleFeeds,
         feedsAndTags = feedsAndTags,
         refreshState = refreshState,
         onRefresh = {
@@ -107,10 +115,15 @@ fun FeedScreen(
         },
         onDrawerItemSelected = { id, tag ->
             settingsViewModel.setCurrentFeedAndTag(feedId = id, tag = tag)
+        },
+        onDelete = { feeds ->
+            coroutineScope.launch {
+                feedListViewModel.deleteFeeds(feeds.toList())
+            }
         }
     ) { openNavDrawer ->
         LazyColumn {
-            items(feedItems) { previewItem ->
+            items(pagedFeedItems) { previewItem ->
                 if (previewItem == null) {
                     return@items
                 }
@@ -121,34 +134,34 @@ fun FeedScreen(
             }
 
             when {
-                feedItems.loadState.prepend is LoadState.Loading -> {
+                pagedFeedItems.loadState.prepend is LoadState.Loading -> {
                     Log.d("JONAS", "Prepend")
                 }
-                feedItems.loadState.refresh is LoadState.Loading -> {
+                pagedFeedItems.loadState.refresh is LoadState.Loading -> {
                     Log.d("JONAS", "Refresh")
                 }
-                feedItems.loadState.append is LoadState.Loading -> {
+                pagedFeedItems.loadState.append is LoadState.Loading -> {
                     Log.d("JONAS", "Append")
                 }
-                feedItems.loadState.prepend is LoadState.Error -> {
+                pagedFeedItems.loadState.prepend is LoadState.Error -> {
                     item {
                         Text("Prepend Error! TODO")
                     }
                 }
-                feedItems.loadState.refresh is LoadState.Error -> {
+                pagedFeedItems.loadState.refresh is LoadState.Error -> {
                     item {
                         Text("Refresh Error! TODO")
                     }
                 }
-                feedItems.loadState.append is LoadState.Error -> {
+                pagedFeedItems.loadState.append is LoadState.Error -> {
                     item {
                         Text("Append Error! TODO")
                     }
                 }
-                feedItems.loadState.append.endOfPaginationReached -> {
+                pagedFeedItems.loadState.append.endOfPaginationReached -> {
                     // User has reached the end of the list, could insert something here
 
-                    if (feedItems.itemCount == 0) {
+                    if (pagedFeedItems.itemCount == 0) {
                         Log.d("JONAS", "Nothing")
                         item {
                             NothingToRead(openNavDrawer) {}
@@ -164,15 +177,17 @@ fun FeedScreen(
     }
 }
 
-@ExperimentalAnimationApi
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FeedScreen(
+    visibleFeeds: List<FeedTitle>,
     feedsAndTags: List<FeedUnreadCount>,
     refreshState: SwipeRefreshState,
     onRefresh: () -> Unit,
     onlyUnread: Boolean,
     onToggleOnlyUnread: (Boolean) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
+    onDelete: (Iterable<Long>) -> Unit,
     content: @Composable (suspend () -> Unit) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -270,10 +285,12 @@ fun FeedScreen(
 
         if (showDeleteDialog) {
             DeleteFeedDialog(
-                feeds = listOf(/*TODO*/),
-                onDismiss = { showDeleteDialog = false }) {
-                // TODO
-            }
+                feeds = visibleFeeds.map {
+                    DeletableFeed(it.id, it.displayTitle)
+                },
+                onDismiss = { showDeleteDialog = false },
+                onDelete = onDelete
+            )
         }
     }
 }
@@ -282,25 +299,50 @@ fun FeedScreen(
 @Composable
 fun DefaultPreview() {
     FeederTheme {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Feeder") },
-                    navigationIcon = {
-                        Icon(
-                            Icons.Default.Menu,
-                            contentDescription = "Drawer toggle"
-                        )
-                    }
-                )
-            },
-            drawerContent = {
-                Text("The Drawer")
-            }
+        FeedScreen(
+            visibleFeeds = emptyList(),
+            feedsAndTags = listOf(),
+            refreshState = rememberSwipeRefreshState(false),
+            onRefresh = { },
+            onlyUnread = false,
+            onToggleOnlyUnread = {},
+            onDrawerItemSelected = { _, _ -> },
+            onDelete = {}
         ) {
-            // A surface container using the 'background' color from the theme
-            Surface(color = MaterialTheme.colors.background) {
-                Text("Hello Android")
+            LazyColumn {
+                item {
+                    FeedItemPreview(
+                        item = PreviewItem(
+                            id = 1L,
+                            plainTitle = "An interesting story",
+                            plainSnippet = "So this thing happened yesterday",
+                            feedTitle = "The Times"
+                        ),
+                        onItemClick = {}
+                    )
+                }
+                item {
+                    FeedItemPreview(
+                        item = PreviewItem(
+                            id = 2L,
+                            plainTitle = "And this other thing",
+                            plainSnippet = "One two, ".repeat(100),
+                            feedTitle = "The Middle Spread"
+                        ),
+                        onItemClick = {}
+                    )
+                }
+                item {
+                    FeedItemPreview(
+                        item = PreviewItem(
+                            id = 3L,
+                            plainTitle = "Man dies",
+                            plainSnippet = "Got old",
+                            feedTitle = "The Foobar"
+                        ),
+                        onItemClick = {}
+                    )
+                }
             }
         }
     }

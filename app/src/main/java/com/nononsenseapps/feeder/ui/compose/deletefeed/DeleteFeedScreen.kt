@@ -82,7 +82,13 @@ fun DeleteFeedDialog(
                                 onToggleFeed(feed.id, checked)
                             }
                         )
-                        Text(text = feed.title)
+                        Text(
+                            text = feed.title,
+                            modifier = Modifier
+                                .clickable {
+                                    onToggleFeed(feed.id, !isChecked(feed.id))
+                                }
+                        )
                     }
                 }
             }

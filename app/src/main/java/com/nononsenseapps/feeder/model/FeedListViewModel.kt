@@ -1,14 +1,20 @@
 package com.nononsenseapps.feeder.model
 
+import android.app.Application
 import androidx.collection.ArrayMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.util.*
@@ -50,5 +56,24 @@ class FeedListViewModel(di: DI) : DIAwareViewModel(di) {
                 emit(data.toList())
             }
         }
+    }
+
+    suspend fun deleteFeeds(ids: List<Long>) {
+        dao.deleteFeeds(ids)
+
+        val application: Application by instance()
+        for (id in ids) {
+            application.removeDynamicShortcutToFeed(id)
+        }
+    }
+
+    fun getFeedTitles(feedId: Long, tag: String): Flow<List<FeedTitle>> = flow {
+        emit(
+            when {
+                feedId > ID_UNSET -> dao.getFeedTitle(feedId = feedId)
+                tag.isNotEmpty() -> dao.getFeedTitlesWithTag(feedTag = tag)
+                else -> dao.getAllFeedTitles()
+            }
+        )
     }
 }
