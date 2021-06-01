@@ -2,10 +2,8 @@ package com.nononsenseapps.feeder.ui.compose.navdrawer
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -21,6 +19,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -106,18 +105,11 @@ private fun ExpandableTag(
     onContract: (String) -> Unit = {},
     onItemClick: (FeedUnreadCount) -> Unit = {},
 ) {
-    val transitionState = remember {
-        MutableTransitionState(expanded).apply {
-            targetState = !expanded
-        }
-    }
-    val transition = updateTransition(transitionState, label = "expandedTransition")
+    val angle: Float by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        animationSpec = tween()
+    )
 
-    val arrowRotationDegree by transition.animateFloat({
-        tween(durationMillis = EXPAND_ANIMATION_DURATION)
-    }, label = "expansionArrow") { expandedState ->
-        if (expandedState) 0f else 180f
-    }
     ConstraintLayout(
         modifier = Modifier
             .clickable(onClick = { onItemClick(item) })
@@ -126,7 +118,7 @@ private fun ExpandableTag(
     ) {
         val (expandButton, text, unreadCount, childItems) = createRefs()
         ExpandArrow(
-            degrees = arrowRotationDegree,
+            degrees = angle,
             onClick = {
                 if (expanded) {
                     onContract(item.tag)
@@ -178,7 +170,7 @@ private fun ExpandArrow(
         modifier = modifier
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_expand_less_24),
+            Icons.Filled.ExpandLess,
             contentDescription = stringResource(id = R.string.toggle_tag_expansion),
             modifier = Modifier.rotate(degrees = degrees)
         )

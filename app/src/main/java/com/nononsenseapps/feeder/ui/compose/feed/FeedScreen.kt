@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.DrawerValue
@@ -18,8 +19,16 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -31,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +69,7 @@ import org.kodein.di.compose.instance
 @Composable
 fun FeedScreen(
     onItemClick: (Long) -> Unit,
+    onAddFeed: (() -> Unit),
     onFeedEdit: (Long) -> Unit,
     feedListViewModel: FeedListViewModel,
     feedItemsViewModel: FeedItemsViewModel,
@@ -122,6 +131,7 @@ fun FeedScreen(
         onDrawerItemSelected = { id, tag ->
             settingsViewModel.setCurrentFeedAndTag(feedId = id, tag = tag)
         },
+        onAddFeed = onAddFeed,
         onEditFeed = onEditFeed,
         onDelete = { feeds ->
             feedListViewModel.deleteFeeds(feeds.toList())
@@ -193,6 +203,7 @@ fun FeedScreen(
     onToggleOnlyUnread: (Boolean) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
+    onAddFeed: (() -> Unit),
     onEditFeed: (() -> Unit)?,
     content: @Composable (suspend () -> Unit) -> Unit
 ) {
@@ -231,42 +242,75 @@ fun FeedScreen(
                     ) {
                         if (onlyUnread) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_visibility_off_white_24dp),
+                                Icons.Default.VisibilityOff,
                                 contentDescription = stringResource(id = R.string.show_all_items)
                             )
                         } else {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_visibility_white_24dp),
+                                Icons.Default.Visibility,
                                 contentDescription = stringResource(id = R.string.show_unread_items)
                             )
                         }
+                    }
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = "Sync button"
+                        )
                     }
 
                     Box {
                         IconButton(onClick = { showMenu = true }) {
                             Icon(Icons.Default.MoreVert, contentDescription = "Open menu")
                         }
+                        // TODO make it wider as necessary
                         DropdownMenu(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false }
                         ) {
-                            DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
-                                Text("Refresh")
+                            DropdownMenuItem(onClick = onAddFeed) {
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = "Add feed button"
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(id = R.string.add_feed))
                             }
                             if (onEditFeed != null) {
                                 DropdownMenuItem(onClick = onEditFeed) {
+                                    Icon(
+                                        Icons.Default.Edit,
+                                        contentDescription = "Edit feed button"
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
                                     Text(stringResource(id = R.string.edit_feed))
                                 }
                             }
                             DropdownMenuItem(onClick = { showDeleteDialog = true }) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Delete feed button"
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.delete_feed))
                             }
-                            DropdownMenuItem(onClick = { /* Handle settings! */ }) {
-                                Text("Settings")
+                            Divider()
+                            DropdownMenuItem(onClick = { /* TODO Handle settings! */ }) {
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = "Settings button"
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(id = R.string.action_settings))
                             }
                             Divider()
-                            DropdownMenuItem(onClick = { /* Handle send feedback! */ }) {
-                                Text("Send Feedback")
+                            DropdownMenuItem(onClick = { /* TODO Handle send feedback! */ }) {
+                                Icon(
+                                    Icons.Default.Email,
+                                    contentDescription = "Send bug report button"
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(id = R.string.send_bug_report))
                             }
                         }
                     }
@@ -318,6 +362,7 @@ fun DefaultPreview() {
             onlyUnread = false,
             onToggleOnlyUnread = {},
             onDrawerItemSelected = { _, _ -> },
+            onAddFeed = { },
             onEditFeed = null,
             onDelete = {}
         ) {

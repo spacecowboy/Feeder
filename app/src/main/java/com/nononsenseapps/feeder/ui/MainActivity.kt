@@ -20,6 +20,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.FeedViewModel
 import com.nononsenseapps.feeder.model.maxImageSize
+import com.nononsenseapps.feeder.ui.compose.feed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.toEditableFeed
@@ -50,6 +51,9 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                 FeedScreen(
                     onItemClick = { itemId ->
                         navController.navigate("reader/$itemId")
+                    },
+                    onAddFeed = {
+                        navController.navigate("add/feed")
                     },
                     onFeedEdit = { feedId ->
                         navController.navigate("edit/feed/$feedId")
@@ -97,6 +101,14 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                     },
                     feedViewModel = feedViewModel
                 )
+            }
+            composable(
+                "add/feed"
+            ) { backStackEntry ->
+                // Necessary to use the backstackEntry so savedState matches lifecycle
+                val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
+
+                TODO("Search window")
             }
         }
     }
