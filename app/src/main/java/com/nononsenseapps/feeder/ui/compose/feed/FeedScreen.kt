@@ -81,8 +81,6 @@ fun FeedScreen(
     )
         .collectAsLazyPagingItems()
 
-    val coroutineScope = rememberCoroutineScope()
-
     val visibleFeeds by feedListViewModel.getFeedTitles(
         feedId = currentFeed.first,
         tag = currentFeed.second
@@ -126,9 +124,7 @@ fun FeedScreen(
         },
         onEditFeed = onEditFeed,
         onDelete = { feeds ->
-            coroutineScope.launch {
-                feedListViewModel.deleteFeeds(feeds.toList())
-            }
+            feedListViewModel.deleteFeeds(feeds.toList())
         }
     ) { openNavDrawer ->
         LazyColumn {

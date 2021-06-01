@@ -7,7 +7,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -45,7 +44,6 @@ class MainActivity : DIAwareComponentActivity() {
 fun MainActivity.AppContent(maxImageSize: Point) = withDI {
     FeederTheme {
         val navController = rememberNavController()
-        val coroutineScope = rememberCoroutineScope()
 
         NavHost(navController, startDestination = "feed") {
             composable("feed") { backStackEntry ->
@@ -73,9 +71,7 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                 feedItemViewModel.currentItemId = backStackEntry.arguments?.getLong("itemId")
                     ?: ID_UNSET
 
-                coroutineScope.launch {
-                    feedItemViewModel.markCurrentItemAsReadAndNotified()
-                }
+                feedItemViewModel.markCurrentItemAsReadAndNotified()
 
                 ReaderScreen(
                     feedItemViewModel = feedItemViewModel

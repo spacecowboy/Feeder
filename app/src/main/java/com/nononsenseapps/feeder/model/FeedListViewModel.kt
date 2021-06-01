@@ -5,6 +5,7 @@ import androidx.collection.ArrayMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedTitle
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.util.*
@@ -22,6 +24,7 @@ import kotlin.collections.set
 
 class FeedListViewModel(di: DI) : DIAwareViewModel(di) {
     private val dao: FeedDao by instance()
+    private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
     private val feedsWithUnreadCounts = dao.loadLiveFeedsWithUnreadCounts()
 
     val liveFeedsAndTagsWithUnreadCounts: LiveData<List<FeedUnreadCount>> by lazy {
@@ -58,12 +61,14 @@ class FeedListViewModel(di: DI) : DIAwareViewModel(di) {
         }
     }
 
-    suspend fun deleteFeeds(ids: List<Long>) {
-        dao.deleteFeeds(ids)
+    fun deleteFeeds(ids: List<Long>) {
+        applicationCoroutineScope.launch {
+            dao.deleteFeeds(ids)
 
-        val application: Application by instance()
-        for (id in ids) {
-            application.removeDynamicShortcutToFeed(id)
+            val application: Application by instance()
+            for (id in ids) {
+                application.removeDynamicShortcutToFeed(id)
+            }
         }
     }
 

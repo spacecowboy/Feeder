@@ -15,6 +15,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.blob.blobFullFile
@@ -28,6 +29,7 @@ import com.nononsenseapps.feeder.ui.text.toSpannedWithImages
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.TabletUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import org.kodein.di.DI
@@ -40,6 +42,7 @@ private const val KEY_ITEM_ID = "FeedItemViewModel itemid"
 
 class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
     private val dao: FeedItemDao by instance()
+    private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
     val context: Application by instance()
     private val okHttpClient: OkHttpClient by instance()
 
@@ -69,7 +72,11 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
             dao.loadFeedItemFlow(itemId).asLiveData()
         }
 
-    suspend fun markCurrentItemAsReadAndNotified() = dao.markAsReadAndNotified(id = currentItemId)
+    fun markCurrentItemAsReadAndNotified() {
+        applicationCoroutineScope.launch {
+            dao.markAsReadAndNotified(id = currentItemId)
+        }
+    }
 
     fun getLiveItem(id: Long): LiveData<FeedItemWithFeed?> {
         if (!this::liveItem.isInitialized) {
