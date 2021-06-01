@@ -27,7 +27,6 @@ import com.nononsenseapps.feeder.ui.compose.feed.toEditableFeed
 import com.nononsenseapps.feeder.ui.compose.feed.updateFrom
 import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import kotlinx.coroutines.launch
 import org.kodein.di.compose.withDI
 
 @ExperimentalAnimationApi
@@ -45,6 +44,9 @@ class MainActivity : DIAwareComponentActivity() {
 fun MainActivity.AppContent(maxImageSize: Point) = withDI {
     FeederTheme {
         val navController = rememberNavController()
+
+        // TODO implement intent handling for android.intent.action.MANAGE_NETWORK_USAGE
+        // TODO implement intent for adding a feed
 
         NavHost(navController, startDestination = "feed") {
             composable("feed") { backStackEntry ->
