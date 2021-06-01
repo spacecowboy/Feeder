@@ -2,19 +2,45 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.kodein.di.DI
 import org.kodein.di.instance
 
-class FeedViewModel(di: DI) : DIAwareViewModel(di) {
+
+private const val KEY_FEED_ID = "FeedViewModel feedid"
+
+class FeedViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
     private val dao: FeedDao by instance()
+    private val coroutineScope: ApplicationCoroutineScope by instance()
+
+    var currentFeedId: Long
+        get() = state[KEY_FEED_ID] ?: ID_UNSET
+        set(value) = state.set(KEY_FEED_ID, value)
+
+    private val currentLiveFeedId: LiveData<Long> =
+        state.getLiveData(KEY_FEED_ID, ID_UNSET)
+
+    val currentLiveFeed: LiveData<Feed?> =
+        currentLiveFeedId.switchMap { feedId ->
+            dao.loadFeedFlow(feedId).asLiveData()
+        }
 
     private lateinit var liveFeedsNotify: LiveData<List<Boolean>>
 
@@ -33,9 +59,19 @@ class FeedViewModel(di: DI) : DIAwareViewModel(di) {
 
     fun getLiveFeed(id: Long): LiveData<Feed?> {
         if (!this::liveFeed.isInitialized) {
-            liveFeed = dao.loadLiveFeed(feedId = id).asLiveData()
+            liveFeed = dao.loadFeedFlow(feedId = id).asLiveData()
         }
         return liveFeed
+    }
+
+    private val _feedState = MutableStateFlow<Feed?>(null)
+    private val feedState: StateFlow<Feed?> = _feedState.asStateFlow()
+
+    fun getFeedState(id: Long): StateFlow<Feed?> {
+        viewModelScope.launch {
+            _feedState.value = dao.loadFeed(feedId = id)
+        }
+        return feedState
     }
 
     suspend fun getFeed(id: Long): Feed? {
@@ -65,7 +101,7 @@ class FeedViewModel(di: DI) : DIAwareViewModel(di) {
     @Deprecated("Use FeedListViewModel instead")
     suspend fun deleteFeeds(ids: List<Long>) {
         dao.deleteFeeds(ids)
-        
+
         val context: Context by instance()
         for (id in ids) {
             context.removeDynamicShortcutToFeed(id)
@@ -84,6 +120,12 @@ class FeedViewModel(di: DI) : DIAwareViewModel(di) {
                 dao.getFeedTitle(id)
             }
             else -> emptyList()
+        }
+    }
+
+    fun save(feed: Feed) {
+        coroutineScope.launch {
+            dao.upsertFeed(feed)
         }
     }
 }

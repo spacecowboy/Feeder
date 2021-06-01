@@ -73,7 +73,7 @@ fun DeleteFeedDialog(
                     Row(
                         horizontalArrangement = Arrangement.Start,
                         modifier = Modifier.clickable {
-                            onToggleFeed(feed.id, null)
+                            onToggleFeed(feed.id, !isChecked(feed.id))
                         }
                     ) {
                         Checkbox(

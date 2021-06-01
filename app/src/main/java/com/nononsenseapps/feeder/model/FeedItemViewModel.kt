@@ -66,14 +66,14 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
 
     val currentLiveItem: LiveData<FeedItemWithFeed?> =
         currentLiveItemId.switchMap { itemId ->
-            dao.loadLiveFeedItem(itemId).asLiveData()
+            dao.loadFeedItemFlow(itemId).asLiveData()
         }
 
     suspend fun markCurrentItemAsReadAndNotified() = dao.markAsReadAndNotified(id = currentItemId)
 
     fun getLiveItem(id: Long): LiveData<FeedItemWithFeed?> {
         if (!this::liveItem.isInitialized) {
-            liveItem = dao.loadLiveFeedItem(id).asLiveData()
+            liveItem = dao.loadFeedItemFlow(id).asLiveData()
         }
         return liveItem
     }

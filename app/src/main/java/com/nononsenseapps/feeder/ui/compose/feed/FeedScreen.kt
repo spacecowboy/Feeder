@@ -61,6 +61,7 @@ import org.kodein.di.compose.instance
 @Composable
 fun FeedScreen(
     onItemClick: (Long) -> Unit,
+    onFeedEdit: (Long) -> Unit,
     feedListViewModel: FeedListViewModel,
     feedItemsViewModel: FeedItemsViewModel,
     settingsViewModel: SettingsViewModel
@@ -91,6 +92,13 @@ fun FeedScreen(
     val isRefreshing by applicationState.isRefreshing.collectAsState()
     val refreshState = rememberSwipeRefreshState(isRefreshing)
 
+    val onEditFeed = if (visibleFeeds.size == 1) {
+        {
+            onFeedEdit(visibleFeeds.first().id)
+        }
+    } else {
+        null
+    }
 
     val di = LocalDI.current
 
@@ -116,6 +124,7 @@ fun FeedScreen(
         onDrawerItemSelected = { id, tag ->
             settingsViewModel.setCurrentFeedAndTag(feedId = id, tag = tag)
         },
+        onEditFeed = onEditFeed,
         onDelete = { feeds ->
             coroutineScope.launch {
                 feedListViewModel.deleteFeeds(feeds.toList())
@@ -188,6 +197,7 @@ fun FeedScreen(
     onToggleOnlyUnread: (Boolean) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
+    onEditFeed: (() -> Unit)?,
     content: @Composable (suspend () -> Unit) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -246,6 +256,11 @@ fun FeedScreen(
                         ) {
                             DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
                                 Text("Refresh")
+                            }
+                            if (onEditFeed != null) {
+                                DropdownMenuItem(onClick = onEditFeed) {
+                                    Text(stringResource(id = R.string.edit_feed))
+                                }
                             }
                             DropdownMenuItem(onClick = { showDeleteDialog = true }) {
                                 Text(stringResource(id = R.string.delete_feed))
@@ -307,6 +322,7 @@ fun DefaultPreview() {
             onlyUnread = false,
             onToggleOnlyUnread = {},
             onDrawerItemSelected = { _, _ -> },
+            onEditFeed = null,
             onDelete = {}
         ) {
             LazyColumn {
