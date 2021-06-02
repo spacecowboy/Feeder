@@ -12,13 +12,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.util.CurrentSorting
 import com.nononsenseapps.feeder.util.CurrentTheme
 import com.nononsenseapps.feeder.util.PREF_SORT
 import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.Prefs
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
@@ -36,14 +36,17 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnShar
     private val keyChannel = ConflatedBroadcastChannel<String>()
     private val keyFlow = keyChannel.asFlow()
 
+    @Deprecated("Use currentSorting instead")
     val liveThemePreferenceNoInitial: LiveData<CurrentTheme> =
         keyFlow.filter { it == PREF_THEME }
             .map { prefs.currentTheme }
             .conflate()
             .asLiveData()
 
+    @Deprecated("Use currentSorting instead")
     val liveIsNightMode: MutableLiveData<Boolean> by lazy { MutableLiveData(prefs.isNightMode) }
 
+    @Deprecated("Use currentSorting instead")
     val liveIsNewestFirst: LiveData<Boolean> =
         keyFlow.filter { it == PREF_SORT }
             .map { prefs.isNewestFirst }
@@ -89,6 +92,68 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnShar
         prefs.currentTheme = theme
     }
 
+    private val _currentSorting = MutableStateFlow(prefs.currentSorting)
+    val currentSorting = _currentSorting.asStateFlow()
+    fun setCurrentSorting(value: CurrentSorting) {
+        _currentSorting.value = value
+        prefs.currentSorting = value
+    }
+
+    private val _showFab = MutableStateFlow(prefs.show_fab)
+    val showFab = _showFab.asStateFlow()
+    fun setShowFab(value: Boolean) {
+        _showFab.value = value
+        prefs.show_fab = value
+    }
+
+    private val _syncOnResume = MutableStateFlow(prefs.syncOnResume)
+    val syncOnResume = _syncOnResume.asStateFlow()
+    fun setSyncOnResume(value: Boolean) {
+        _syncOnResume.value = value
+        prefs.syncOnResume = value
+    }
+
+    private val _syncOnlyOnWifi = MutableStateFlow(prefs.onlySyncOnWifi)
+    val syncOnlyOnWifi = _syncOnlyOnWifi.asStateFlow()
+    fun setSyncOnlyOnWifi(value: Boolean) {
+        _syncOnlyOnWifi.value = value
+        prefs.onlySyncOnWifi = value
+    }
+
+    private val _syncOnlyWhenCharging = MutableStateFlow(prefs.onlySyncWhileCharging)
+    val syncOnlyWhenCharging = _syncOnlyWhenCharging.asStateFlow()
+    fun setSyncOnlyWhenCharging(value: Boolean) {
+        _syncOnlyWhenCharging.value = value
+        prefs.onlySyncWhileCharging = value
+    }
+
+    private val _loadImageOnlyOnWifi = MutableStateFlow(prefs.onlyLoadImagesOnWIfi)
+    val loadImageOnlyOnWifi = _loadImageOnlyOnWifi.asStateFlow()
+    fun setLoadImageOnlyOnWifi(value: Boolean) {
+        _loadImageOnlyOnWifi.value = value
+        prefs.onlyLoadImagesOnWIfi = value
+    }
+
+    private val _showThumbnails = MutableStateFlow(prefs.showThumbnails)
+    val showThumbnails = _showThumbnails.asStateFlow()
+    fun setShowThumbnails(value: Boolean) {
+        _showThumbnails.value = value
+        prefs.showThumbnails = value
+    }
+
+    private val _preloadCustomTab = MutableStateFlow(prefs.preloadCustomTab)
+    val preloadCustomTab = _preloadCustomTab.asStateFlow()
+    fun setPreloadCustomTab(value: Boolean) {
+        _preloadCustomTab.value = value
+        prefs.preloadCustomTab = value
+    }
+
+    private val _maximumCountPerFeed = MutableStateFlow(prefs.maximumCountPerFeed)
+    val maximumCountPerFeed = _maximumCountPerFeed.asStateFlow()
+    fun setMaxCountPerFeed(value: Int) {
+        _maximumCountPerFeed.value = value
+        prefs.maximumCountPerFeed = value
+    }
 
     init {
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)

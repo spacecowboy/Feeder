@@ -121,7 +121,7 @@ class Prefs(override val di: DI) : DIAware {
         get() = sp.getBoolean(PREF_IMG_SHOW_THUMBNAILS, true)
         set(value) = sp.edit().putBoolean(PREF_IMG_SHOW_THUMBNAILS, value).apply()
 
-    var onlySyncOnWIfi: Boolean
+    var onlySyncOnWifi: Boolean
         get() = sp.getBoolean(PREF_SYNC_ONLY_WIFI, false)
         set(value) = sp.edit().putBoolean(PREF_SYNC_ONLY_WIFI, value).apply()
 
@@ -287,9 +287,14 @@ enum class CurrentTheme(
     }
 }
 
-enum class CurrentSorting(@StringRes stringId: Int) {
+enum class CurrentSorting(
+    @StringRes val stringId: Int
+) {
     NEWEST_FIRST(R.string.sort_newest_first),
-    OLDEST_FIRST(R.string.sort_oldest_first)
+    OLDEST_FIRST(R.string.sort_oldest_first);
+
+    @Composable
+    fun asString() = stringResource(id = stringId)
 }
 
 val Context.isSystemThemeNight: Boolean

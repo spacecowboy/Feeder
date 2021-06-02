@@ -38,7 +38,7 @@ fun isOkToSyncAutomatically(context: Context): Boolean {
     return (
         currentlyConnected(context) &&
             (!prefs.onlySyncWhileCharging || currentlyCharging(context)) &&
-            (!prefs.onlySyncOnWIfi || currentlyUnmetered(context))
+            (!prefs.onlySyncOnWifi || currentlyUnmetered(context))
         )
 }
 
@@ -131,7 +131,7 @@ fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
             .setRequiresBatteryNotLow(true)
             .setRequiresCharging(prefs.onlySyncWhileCharging)
 
-        if (prefs.onlySyncOnWIfi) {
+        if (prefs.onlySyncOnWifi) {
             constraints.setRequiredNetworkType(NetworkType.UNMETERED)
         } else {
             constraints.setRequiredNetworkType(NetworkType.CONNECTED)

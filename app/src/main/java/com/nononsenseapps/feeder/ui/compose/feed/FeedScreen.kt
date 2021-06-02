@@ -62,6 +62,7 @@ import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.util.CurrentSorting
 import com.nononsenseapps.feeder.util.CurrentTheme
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
@@ -81,14 +82,15 @@ fun FeedScreen(
         .observeAsState(initial = emptyList())
 
     val onlyUnread by settingsViewModel.showOnlyUnread.collectAsState()
-    val newestFirst by settingsViewModel.liveIsNewestFirst.observeAsState(initial = true)
+    val currentSorting by settingsViewModel.currentSorting.collectAsState()
     val currentFeed by settingsViewModel.currentFeedAndTag.collectAsState()
 
+    // TODO need this to update properly for changes above
     val pagedFeedItems = feedItemsViewModel.getPreviewPager(
         feedId = currentFeed.first,
         tag = currentFeed.second,
         onlyUnread = onlyUnread,
-        newestFirst = newestFirst
+        newestFirst = currentSorting == CurrentSorting.NEWEST_FIRST
     )
         .collectAsLazyPagingItems()
 
