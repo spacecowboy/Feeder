@@ -17,11 +17,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -29,21 +32,35 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.util.CurrentTheme
+import kotlin.math.exp
 
 @Composable
 fun SettingsScreen(
-    onNavigateUp: () -> Unit
+    onNavigateUp: () -> Unit,
+    settingsViewModel: SettingsViewModel
 ) {
+    val currentTheme by settingsViewModel.currentTheme.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -72,7 +89,11 @@ fun SettingsScreen(
         }
     ) { padding ->
         SettingsList(
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
+            currentThemeValue = currentTheme.asThemeOption(),
+            onThemeChanged = { value ->
+                settingsViewModel.setCurrentTheme(value.currentTheme)
+            }
         )
     }
 }
@@ -80,16 +101,22 @@ fun SettingsScreen(
 @Composable
 @Preview(showBackground = true)
 fun SettingsScreenPreview() {
-    FeederTheme(false) {
-        SettingsScreen(
-            onNavigateUp = {}
-        )
+    FeederTheme(CurrentTheme.DAY) {
+        Surface {
+            SettingsList(
+                modifier = Modifier,
+                currentThemeValue = CurrentTheme.SYSTEM.asThemeOption(),
+                onThemeChanged = {}
+            )
+        }
     }
 }
 
 @Composable
 fun SettingsList(
-    modifier: Modifier
+    modifier: Modifier,
+    currentThemeValue: ThemeOption,
+    onThemeChanged: (ThemeOption) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -97,14 +124,14 @@ fun SettingsList(
             .scrollable(rememberScrollState(), orientation = Orientation.Vertical)
     ) {
         MenuSetting(
-            currentValue = stringResource(id = R.string.theme_system),
+            currentValue = currentThemeValue,
             values = listOf(
-                stringResource(id = R.string.theme_system),
-                stringResource(id = R.string.theme_day),
-                stringResource(id = R.string.theme_night)
+                CurrentTheme.SYSTEM.asThemeOption(),
+                CurrentTheme.DAY.asThemeOption(),
+                CurrentTheme.NIGHT.asThemeOption()
             ),
             title = stringResource(id = R.string.theme),
-            onSelection = { TODO() }
+            onSelection = onThemeChanged
         )
 
         MenuSetting(
@@ -178,7 +205,8 @@ fun SettingsList(
 
         ExternalSetting(
             currentValue = stringResource(id = R.string.battery_optimization_enabled),
-            title = stringResource(id = R.string.battery_optimization)) {
+            title = stringResource(id = R.string.battery_optimization)
+        ) {
             TODO()
         }
 
@@ -307,10 +335,11 @@ fun <T> MenuSetting(
     onSelection: (T) -> Unit,
     icon: @Composable () -> Unit = {}
 ) {
+    var expanded by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { TODO() },
+            .clickable { expanded = !expanded },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -331,7 +360,34 @@ fun <T> MenuSetting(
             }
         )
 
-        // TODO actual menu
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            for (value in values) {
+                DropdownMenuItem(
+                    onClick = {
+                        expanded = false
+                        onSelection(value)
+                    }
+                ) {
+                    val style = if (value == currentValue) {
+                        MaterialTheme.typography.body1.merge(
+                            TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colors.secondary
+                            )
+                        )
+                    } else {
+                        MaterialTheme.typography.body1
+                    }
+                    Text(
+                        value.toString(),
+                        style = style
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -392,4 +448,19 @@ private fun RowScope.TitleAndSubtitle(
             }
         }
     }
+}
+
+@Composable
+fun CurrentTheme.asThemeOption() =
+    ThemeOption(
+        currentTheme = this,
+        name = stringResource(id = stringId)
+    )
+
+@Immutable
+data class ThemeOption(
+    val currentTheme: CurrentTheme,
+    val name: String
+) {
+    override fun toString() = name
 }

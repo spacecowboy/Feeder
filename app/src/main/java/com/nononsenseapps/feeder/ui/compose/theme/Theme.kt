@@ -1,33 +1,27 @@
 package com.nononsenseapps.feeder.ui.compose.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import com.nononsenseapps.feeder.util.CurrentTheme
 
-private val DarkColorPalette = darkColors(
+val feederDarkColorPalette = darkColors(
     primary = Green700,
     primaryVariant = Green900,
     secondary = DarkTealA400
 )
 
-private val LightColorPalette = lightColors(
+val feederLightColorPalette = lightColors(
     primary = Green700,
     primaryVariant = Green900,
     secondary = AccentDay
 )
 
 @Composable
-fun FeederTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
-
+fun FeederTheme(currentTheme: CurrentTheme, content: @Composable () -> Unit) {
     MaterialTheme(
-        colors = colors,
+        colors = currentTheme.getColors(),
         typography = Typography,
         shapes = Shapes,
         content = content

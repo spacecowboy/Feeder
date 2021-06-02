@@ -4,10 +4,17 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import androidx.annotation.StringRes
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.Colors
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.ui.compose.theme.feederDarkColorPalette
+import com.nononsenseapps.feeder.ui.compose.theme.feederLightColorPalette
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -159,18 +166,13 @@ class Prefs(override val di: DI) : DIAware {
         set(value) = sp.edit().putBoolean(PREF_WELCOME_DONE, value).apply()
 
     var currentTheme: CurrentTheme
-        get() = when (sp.getString(PREF_THEME, app.getString(R.string.pref_theme_value_default))) {
-            app.getString(R.string.pref_theme_value_night) -> CurrentTheme.NIGHT
-            app.getString(R.string.pref_theme_value_day) -> CurrentTheme.DAY
-            else -> CurrentTheme.SYSTEM
-        }
+        get() = CurrentTheme.fromString(
+            app,
+            sp.getString(PREF_THEME, app.getString(R.string.pref_theme_value_default))
+        )
         set(value) = sp.edit().putString(
             PREF_THEME,
-            when (value) {
-                CurrentTheme.NIGHT -> app.getString(R.string.pref_theme_value_night)
-                CurrentTheme.DAY -> app.getString(R.string.pref_theme_value_day)
-                CurrentTheme.SYSTEM -> app.getString(R.string.pref_theme_value_system)
-            }
+            app.getString(value.stringId)
         ).apply()
 
     var isNightMode: Boolean
@@ -256,15 +258,38 @@ class Prefs(override val di: DI) : DIAware {
         get() = preloadCustomTab && openLinksWith == PREF_VAL_OPEN_WITH_CUSTOM_TAB
 }
 
-enum class CurrentTheme {
-    DAY,
-    NIGHT,
-    SYSTEM
+enum class CurrentTheme(
+    @StringRes val stringId: Int
+) {
+    DAY(R.string.theme_day),
+    NIGHT(R.string.theme_night),
+    SYSTEM(R.string.theme_system);
+
+    @Composable
+    fun asString() = stringResource(id = stringId)
+
+    @Composable
+    fun getColors(): Colors {
+        return when (this) {
+            DAY -> feederLightColorPalette
+            NIGHT -> feederDarkColorPalette
+            SYSTEM -> if (isSystemInDarkTheme()) feederDarkColorPalette else feederLightColorPalette
+        }
+    }
+
+    companion object {
+        fun fromString(context: Context, value: String?): CurrentTheme =
+            when (value) {
+                context.getString(R.string.pref_theme_value_night) -> NIGHT
+                context.getString(R.string.pref_theme_value_day) -> DAY
+                else -> SYSTEM
+            }
+    }
 }
 
-enum class CurrentSorting {
-    NEWEST_FIRST,
-    OLDEST_FIRST
+enum class CurrentSorting(@StringRes stringId: Int) {
+    NEWEST_FIRST(R.string.sort_newest_first),
+    OLDEST_FIRST(R.string.sort_oldest_first)
 }
 
 val Context.isSystemThemeNight: Boolean

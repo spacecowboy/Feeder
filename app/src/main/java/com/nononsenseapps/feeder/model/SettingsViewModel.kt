@@ -82,6 +82,13 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnShar
         prefs.lastOpenFeedTag = tag
     }
 
+    private val _currentTheme = MutableStateFlow(prefs.currentTheme)
+    val currentTheme = _currentTheme.asStateFlow()
+    fun setCurrentTheme(theme: CurrentTheme) {
+        _currentTheme.value = theme
+        prefs.currentTheme = theme
+    }
+
 
     init {
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)

@@ -19,6 +19,7 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.FeedViewModel
+import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.maxImageSize
 import com.nononsenseapps.feeder.ui.compose.feed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.EditFeedScreen
@@ -26,6 +27,7 @@ import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.toEditableFeed
 import com.nononsenseapps.feeder.ui.compose.feed.updateFrom
 import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreen
+import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import org.kodein.di.compose.withDI
 
@@ -42,7 +44,13 @@ class MainActivity : DIAwareComponentActivity() {
 @ExperimentalAnimationApi
 @Composable
 fun MainActivity.AppContent(maxImageSize: Point) = withDI {
-    FeederTheme {
+    val settingsViewModel: SettingsViewModel = DIAwareViewModel()
+
+    val currentTheme by settingsViewModel.currentTheme.collectAsState()
+
+    FeederTheme(
+        currentTheme = currentTheme
+    ) {
         val navController = rememberNavController()
 
         // TODO implement intent handling for android.intent.action.MANAGE_NETWORK_USAGE
@@ -59,6 +67,9 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                     },
                     onFeedEdit = { feedId ->
                         navController.navigate("edit/feed/$feedId")
+                    },
+                    onSettings = {
+                        navController.navigate("settings")
                     },
                     feedListViewModel = backStackEntry.DIAwareViewModel(),
                     feedItemsViewModel = backStackEntry.DIAwareViewModel(),
@@ -111,6 +122,16 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                 val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
 
                 TODO("Search window")
+            }
+            composable(
+                "settings"
+            ) {
+                SettingsScreen(
+                    onNavigateUp = {
+                        navController.popBackStackOrNavigateTo(route = "feed")
+                    },
+                    settingsViewModel = settingsViewModel
+                )
             }
         }
     }

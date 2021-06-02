@@ -62,6 +62,7 @@ import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.util.CurrentTheme
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
@@ -71,6 +72,7 @@ fun FeedScreen(
     onItemClick: (Long) -> Unit,
     onAddFeed: (() -> Unit),
     onFeedEdit: (Long) -> Unit,
+    onSettings: () -> Unit,
     feedListViewModel: FeedListViewModel,
     feedItemsViewModel: FeedItemsViewModel,
     settingsViewModel: SettingsViewModel
@@ -135,7 +137,8 @@ fun FeedScreen(
         onEditFeed = onEditFeed,
         onDelete = { feeds ->
             feedListViewModel.deleteFeeds(feeds.toList())
-        }
+        },
+        onSettings = onSettings
     ) { openNavDrawer ->
         LazyColumn {
             items(pagedFeedItems) { previewItem ->
@@ -205,6 +208,7 @@ fun FeedScreen(
     onDelete: (Iterable<Long>) -> Unit,
     onAddFeed: (() -> Unit),
     onEditFeed: (() -> Unit)?,
+    onSettings: () -> Unit,
     content: @Composable (suspend () -> Unit) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -295,7 +299,7 @@ fun FeedScreen(
                                 Text(stringResource(id = R.string.delete_feed))
                             }
                             Divider()
-                            DropdownMenuItem(onClick = { /* TODO Handle settings! */ }) {
+                            DropdownMenuItem(onClick = { onSettings() }) {
                                 Icon(
                                     Icons.Default.Settings,
                                     contentDescription = "Settings button"
@@ -353,7 +357,9 @@ fun FeedScreen(
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    FeederTheme {
+    FeederTheme(
+        CurrentTheme.DAY
+    ) {
         FeedScreen(
             visibleFeeds = emptyList(),
             feedsAndTags = listOf(),
@@ -364,7 +370,8 @@ fun DefaultPreview() {
             onDrawerItemSelected = { _, _ -> },
             onAddFeed = { },
             onEditFeed = null,
-            onDelete = {}
+            onDelete = {},
+            onSettings = {}
         ) {
             LazyColumn {
                 item {
