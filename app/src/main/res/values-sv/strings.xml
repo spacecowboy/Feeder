@@ -56,7 +56,7 @@
     <string name="show_thumbnails">Visa miniatyrbilder</string>
     <string name="may_result_data_charges">Kan resultera i datakostnader.</string>
     <string name="only_when_charging">Endast under laddning</string>
-    <string name="image_loading">Bild laddas</string>
+    <string name="image_loading">Bildvisning</string>
     <string name="no_activity_for_link">Kunde inte hitta en app att öppna länken med</string>
     <string name="check_for_updates">Kolla efter uppdateringar</string>
     <string name="on_startup">Vid uppstart</string>
