@@ -15,29 +15,35 @@ import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
-import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.FeedViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.maxImageSize
-import com.nononsenseapps.feeder.ui.compose.feed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
-import com.nononsenseapps.feeder.ui.compose.feed.toEditableFeed
-import com.nononsenseapps.feeder.ui.compose.feed.updateFrom
 import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import org.kodein.di.compose.withDI
+import org.kodein.di.instance
 
 @ExperimentalAnimationApi
 class MainActivity : DIAwareComponentActivity() {
+    val applicationState: ApplicationState by instance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AppContent(maxImageSize())
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        applicationState.setResumeTime()
     }
 }
 
@@ -130,7 +136,8 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                     onNavigateUp = {
                         navController.popBackStackOrNavigateTo(route = "feed")
                     },
-                    settingsViewModel = settingsViewModel
+                    settingsViewModel = settingsViewModel,
+                    applicationState = applicationState
                 )
             }
         }

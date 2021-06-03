@@ -12,11 +12,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.DIAwareViewModel
-import com.nononsenseapps.feeder.util.CurrentSorting
-import com.nononsenseapps.feeder.util.CurrentTheme
+import com.nononsenseapps.feeder.util.ItemOpener
+import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.PREF_SORT
 import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.Prefs
+import com.nononsenseapps.feeder.util.SortingOptions
+import com.nononsenseapps.feeder.util.SyncFrequency
+import com.nononsenseapps.feeder.util.ThemeOptions
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -27,17 +30,19 @@ import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
 import org.kodein.di.instance
 
-class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnSharedPreferenceChangeListener {
+class SettingsViewModel(di: DI) : DIAwareViewModel(di),
+    SharedPreferences.OnSharedPreferenceChangeListener {
     private val app: Application by instance()
     private val prefs: Prefs by instance()
     private val sharedPreferences: SharedPreferences by instance()
 
     // TODO remove
+    @Deprecated("Use StateFlows instead")
     private val keyChannel = ConflatedBroadcastChannel<String>()
     private val keyFlow = keyChannel.asFlow()
 
     @Deprecated("Use currentSorting instead")
-    val liveThemePreferenceNoInitial: LiveData<CurrentTheme> =
+    val liveThemePreferenceNoInitial: LiveData<ThemeOptions> =
         keyFlow.filter { it == PREF_THEME }
             .map { prefs.currentTheme }
             .conflate()
@@ -87,14 +92,14 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnShar
 
     private val _currentTheme = MutableStateFlow(prefs.currentTheme)
     val currentTheme = _currentTheme.asStateFlow()
-    fun setCurrentTheme(theme: CurrentTheme) {
+    fun setCurrentTheme(theme: ThemeOptions) {
         _currentTheme.value = theme
         prefs.currentTheme = theme
     }
 
     private val _currentSorting = MutableStateFlow(prefs.currentSorting)
     val currentSorting = _currentSorting.asStateFlow()
-    fun setCurrentSorting(value: CurrentSorting) {
+    fun setCurrentSorting(value: SortingOptions) {
         _currentSorting.value = value
         prefs.currentSorting = value
     }
@@ -153,6 +158,27 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di), SharedPreferences.OnShar
     fun setMaxCountPerFeed(value: Int) {
         _maximumCountPerFeed.value = value
         prefs.maximumCountPerFeed = value
+    }
+
+    private val _itemOpener = MutableStateFlow(prefs.currentItemOpener)
+    val itemOpener = _itemOpener.asStateFlow()
+    fun setItemOpener(value: ItemOpener) {
+        _itemOpener.value = value
+        prefs.currentItemOpener = value
+    }
+
+    private val _linkOpener = MutableStateFlow(prefs.currentLinkOpener)
+    val linkOpener = _linkOpener.asStateFlow()
+    fun setLinkOpener(value: LinkOpener) {
+        _linkOpener.value = value
+        prefs.currentLinkOpener = value
+    }
+
+    private val _syncFrequency = MutableStateFlow(prefs.currentSyncFrequency)
+    val syncFrequency = _syncFrequency.asStateFlow()
+    fun setSyncFrequency(value: SyncFrequency) {
+        _syncFrequency.value = value
+        prefs.currentSyncFrequency = value
     }
 
     init {

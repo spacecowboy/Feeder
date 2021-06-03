@@ -62,8 +62,8 @@ import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.util.CurrentSorting
-import com.nononsenseapps.feeder.util.CurrentTheme
+import com.nononsenseapps.feeder.util.SortingOptions
+import com.nononsenseapps.feeder.util.ThemeOptions
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
@@ -90,7 +90,7 @@ fun FeedScreen(
         feedId = currentFeed.first,
         tag = currentFeed.second,
         onlyUnread = onlyUnread,
-        newestFirst = currentSorting == CurrentSorting.NEWEST_FIRST
+        newestFirst = currentSorting == SortingOptions.NEWEST_FIRST
     )
         .collectAsLazyPagingItems()
 
@@ -360,7 +360,7 @@ fun FeedScreen(
 @Composable
 fun DefaultPreview() {
     FeederTheme(
-        CurrentTheme.DAY
+        ThemeOptions.DAY
     ) {
         FeedScreen(
             visibleFeeds = emptyList(),

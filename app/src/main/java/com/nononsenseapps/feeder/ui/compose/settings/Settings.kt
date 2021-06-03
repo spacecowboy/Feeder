@@ -1,5 +1,8 @@
 package com.nononsenseapps.feeder.ui.compose.settings
 
+import android.content.Intent
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,22 +41,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.getSystemService
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.util.CurrentSorting
-import com.nononsenseapps.feeder.util.CurrentTheme
+import com.nononsenseapps.feeder.util.ItemOpener
+import com.nononsenseapps.feeder.util.LinkOpener
+import com.nononsenseapps.feeder.util.SortingOptions
+import com.nononsenseapps.feeder.util.SyncFrequency
+import com.nononsenseapps.feeder.util.ThemeOptions
+import kotlinx.coroutines.flow.mapLatest
 
 @Composable
 fun SettingsScreen(
     onNavigateUp: () -> Unit,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    applicationState: ApplicationState
 ) {
     val currentTheme by settingsViewModel.currentTheme.collectAsState()
     val currentSorting by settingsViewModel.currentSorting.collectAsState()
@@ -65,6 +76,21 @@ fun SettingsScreen(
     val showThumbnails by settingsViewModel.showThumbnails.collectAsState()
     val preloadCustomTab by settingsViewModel.preloadCustomTab.collectAsState()
     val maxItemsPerFeed by settingsViewModel.maximumCountPerFeed.collectAsState()
+    val itemOpener by settingsViewModel.itemOpener.collectAsState()
+    val linkOpener by settingsViewModel.linkOpener.collectAsState()
+    val syncFrequency by settingsViewModel.syncFrequency.collectAsState()
+
+
+    val context = LocalContext.current
+    val powerManager = context.getSystemService<PowerManager>()
+
+    // Each time activity is resumed (e.g. when returning from global settings)
+    // recheck value for optimization
+    val batteryOptimizationIgnored by applicationState.resumeTime
+        .mapLatest {
+            powerManager?.isIgnoringBatteryOptimizations(context.packageName) == true
+        }
+        .collectAsState(true)
 
     Scaffold(
         topBar = {
@@ -131,7 +157,20 @@ fun SettingsScreen(
             maxItemsPerFeedValue = maxItemsPerFeed,
             onMaxItemsPerFeedChanged = {
                 settingsViewModel.setMaxCountPerFeed(it)
-            }
+            },
+            currentItemOpenerValue = itemOpener,
+            onItemOpenerChanged = {
+                settingsViewModel.setItemOpener(it)
+            },
+            currentLinkOpenerValue = linkOpener,
+            onLinkOpenerChanged = {
+                settingsViewModel.setLinkOpener(it)
+            },
+            currentSyncFrequencyValue = syncFrequency,
+            onSyncFrequencyChanged = {
+                settingsViewModel.setSyncFrequency(it)
+            },
+            batteryOptimizationIgnoredValue = batteryOptimizationIgnored
         )
     }
 }
@@ -139,30 +178,37 @@ fun SettingsScreen(
 @Composable
 @Preview(showBackground = true)
 fun SettingsScreenPreview() {
-    FeederTheme(CurrentTheme.DAY) {
+    FeederTheme(ThemeOptions.DAY) {
         Surface {
             SettingsList(
                 modifier = Modifier,
-                currentThemeValue = CurrentTheme.SYSTEM.asThemeOption(),
+                currentThemeValue = ThemeOptions.SYSTEM.asThemeOption(),
                 onThemeChanged = {},
-                currentSortingValue = CurrentSorting.NEWEST_FIRST.asSortOption(),
+                currentSortingValue = SortingOptions.NEWEST_FIRST.asSortOption(),
                 onSortingChanged = {},
                 showFabValue = true,
                 onShowFabChanged = {},
                 syncOnStartupValue = true,
                 onSyncOnStartupChanged = {},
                 syncOnlyOnWifiValue = true,
+                onSyncOnlyOnWifiChanged = {},
                 syncOnlyWhenChargingValue = true,
+                onSyncOnlyWhenChargingChanged = {},
                 loadImageOnlyOnWifiValue = true,
                 onLoadImageOnlyOnWifiChanged = {},
-                onPreloadCustomTabChanged = {},
-                onShowThumbnailsChanged = {},
-                onSyncOnlyOnWifiChanged = {},
-                onSyncOnlyWhenChargingChanged = {},
-                preloadCustomTabValue = true,
                 showThumbnailsValue = true,
+                onShowThumbnailsChanged = {},
+                preloadCustomTabValue = true,
+                onPreloadCustomTabChanged = {},
                 maxItemsPerFeedValue = 101,
-                onMaxItemsPerFeedChanged = {}
+                onMaxItemsPerFeedChanged = {},
+                currentItemOpenerValue = ItemOpener.CUSTOM_TAB,
+                onItemOpenerChanged = {},
+                currentLinkOpenerValue = LinkOpener.DEFAULT_BROWSER,
+                onLinkOpenerChanged = {},
+                currentSyncFrequencyValue = SyncFrequency.EVERY_12_HOURS,
+                onSyncFrequencyChanged = {},
+                batteryOptimizationIgnoredValue = false
             )
         }
     }
@@ -190,9 +236,17 @@ fun SettingsList(
     preloadCustomTabValue: Boolean,
     onPreloadCustomTabChanged: (Boolean) -> Unit,
     maxItemsPerFeedValue: Int,
-    onMaxItemsPerFeedChanged: (Int) -> Unit
+    onMaxItemsPerFeedChanged: (Int) -> Unit,
+    currentItemOpenerValue: ItemOpener,
+    onItemOpenerChanged: (ItemOpener) -> Unit,
+    currentLinkOpenerValue: LinkOpener,
+    onLinkOpenerChanged: (LinkOpener) -> Unit,
+    currentSyncFrequencyValue: SyncFrequency,
+    onSyncFrequencyChanged: (SyncFrequency) -> Unit,
+    batteryOptimizationIgnoredValue: Boolean
 ) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -202,9 +256,9 @@ fun SettingsList(
         MenuSetting(
             currentValue = currentThemeValue,
             values = listOf(
-                CurrentTheme.SYSTEM.asThemeOption(),
-                CurrentTheme.DAY.asThemeOption(),
-                CurrentTheme.NIGHT.asThemeOption()
+                ThemeOptions.SYSTEM.asThemeOption(),
+                ThemeOptions.DAY.asThemeOption(),
+                ThemeOptions.NIGHT.asThemeOption()
             ),
             title = stringResource(id = R.string.theme),
             onSelection = onThemeChanged
@@ -213,8 +267,8 @@ fun SettingsList(
         MenuSetting(
             currentValue = currentSortingValue,
             values = listOf(
-                CurrentSorting.NEWEST_FIRST.asSortOption(),
-                CurrentSorting.OLDEST_FIRST.asSortOption()
+                SortingOptions.NEWEST_FIRST.asSortOption(),
+                SortingOptions.OLDEST_FIRST.asSortOption()
             ),
             title = stringResource(id = R.string.sort),
             onSelection = onSortingChanged
@@ -233,19 +287,14 @@ fun SettingsList(
         }
 
         MenuSetting(
-            currentValue = stringResource(id = R.string.sync_option_every_3_hours),
-            values = listOf(
-                stringResource(id = R.string.sync_option_manually),
-                stringResource(id = R.string.sync_option_every_15min),
-                stringResource(id = R.string.sync_option_every_30min),
-                stringResource(id = R.string.sync_option_every_hour),
-                stringResource(id = R.string.sync_option_every_3_hours),
-                stringResource(id = R.string.sync_option_every_6_hours),
-                stringResource(id = R.string.sync_option_every_12_hours),
-                stringResource(id = R.string.sync_option_every_day)
-            ),
+            currentValue = currentSyncFrequencyValue.asSyncFreqOption(),
+            values = SyncFrequency.values().map {
+                it.asSyncFreqOption()
+            },
             title = stringResource(id = R.string.check_for_updates),
-            onSelection = { TODO() }
+            onSelection = {
+                onSyncFrequencyChanged(it.syncFrequency)
+            }
         )
 
         SwitchSetting(
@@ -280,10 +329,15 @@ fun SettingsList(
         )
 
         ExternalSetting(
-            currentValue = stringResource(id = R.string.battery_optimization_enabled),
+            currentValue = when (batteryOptimizationIgnoredValue) {
+                true -> stringResource(id = R.string.battery_optimization_disabled)
+                false -> stringResource(id = R.string.battery_optimization_enabled)
+            },
             title = stringResource(id = R.string.battery_optimization)
         ) {
-            TODO()
+            context.startActivity(
+                Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            )
         }
 
         Divider()
@@ -311,26 +365,28 @@ fun SettingsList(
         }
 
         MenuSetting(
-            currentValue = stringResource(id = R.string.open_in_reader),
+            currentValue = currentItemOpenerValue.asItemOpenerOption(),
             values = listOf(
-                stringResource(id = R.string.open_in_reader),
-                stringResource(id = R.string.open_in_custom_tab),
-                stringResource(id = R.string.open_in_default_browser),
-                stringResource(id = R.string.open_in_web_view)
+                ItemOpener.READER.asItemOpenerOption(),
+                ItemOpener.CUSTOM_TAB.asItemOpenerOption(),
+                ItemOpener.DEFAULT_BROWSER.asItemOpenerOption()
             ),
             title = stringResource(id = R.string.open_item_by_default_with),
-            onSelection = { TODO() }
+            onSelection = {
+                onItemOpenerChanged(it.itemOpener)
+            }
         )
 
         MenuSetting(
-            currentValue = stringResource(id = R.string.open_in_custom_tab),
+            currentValue = currentLinkOpenerValue.asLinkOpenerOption(),
             values = listOf(
-                stringResource(id = R.string.open_in_custom_tab),
-                stringResource(id = R.string.open_in_default_browser),
-                stringResource(id = R.string.open_in_webview)
+                LinkOpener.CUSTOM_TAB.asLinkOpenerOption(),
+                LinkOpener.DEFAULT_BROWSER.asLinkOpenerOption()
             ),
             title = stringResource(id = R.string.open_links_with),
-            onSelection = { TODO() }
+            onSelection = {
+                onLinkOpenerChanged(it.linkOpener)
+            }
         )
 
         SwitchSetting(
@@ -406,7 +462,7 @@ fun ExternalSetting(
 @Composable
 fun <T> MenuSetting(
     currentValue: T,
-    values: List<T>,
+    values: Iterable<T>,
     title: String,
     onSelection: (T) -> Unit,
     icon: @Composable () -> Unit = {}
@@ -527,7 +583,7 @@ private fun RowScope.TitleAndSubtitle(
 }
 
 @Composable
-fun CurrentTheme.asThemeOption() =
+fun ThemeOptions.asThemeOption() =
     ThemeOption(
         currentTheme = this,
         name = stringResource(id = stringId)
@@ -535,14 +591,14 @@ fun CurrentTheme.asThemeOption() =
 
 @Immutable
 data class ThemeOption(
-    val currentTheme: CurrentTheme,
+    val currentTheme: ThemeOptions,
     val name: String
 ) {
     override fun toString() = name
 }
 
 @Composable
-fun CurrentSorting.asSortOption() =
+fun SortingOptions.asSortOption() =
     SortOption(
         currentSorting = this,
         name = stringResource(id = stringId)
@@ -550,8 +606,53 @@ fun CurrentSorting.asSortOption() =
 
 @Immutable
 data class SortOption(
-    val currentSorting: CurrentSorting,
+    val currentSorting: SortingOptions,
     val name: String
 ) {
     override fun toString() = name
 }
+
+@Immutable
+data class SyncFreqOption(
+    val syncFrequency: SyncFrequency,
+    val name: String
+) {
+    override fun toString() = name
+}
+
+@Composable
+fun SyncFrequency.asSyncFreqOption() =
+    SyncFreqOption(
+        syncFrequency = this,
+        name = stringResource(id = stringId)
+    )
+
+@Immutable
+data class ItemOpenerOption(
+    val itemOpener: ItemOpener,
+    val name: String
+) {
+    override fun toString() = name
+}
+
+@Composable
+fun ItemOpener.asItemOpenerOption() =
+    ItemOpenerOption(
+        itemOpener = this,
+        name = stringResource(id = stringId)
+    )
+
+@Immutable
+data class LinkOpenerOption(
+    val linkOpener: LinkOpener,
+    val name: String
+) {
+    override fun toString() = name
+}
+
+@Composable
+fun LinkOpener.asLinkOpenerOption() =
+    LinkOpenerOption(
+        linkOpener = this,
+        name = stringResource(id = stringId)
+    )

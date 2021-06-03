@@ -273,12 +273,6 @@ fun EditFeedView(
                 editableFeed = editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_CUSTOM_TAB)
             }
             TextRadioButton(
-                text = stringResource(id = R.string.open_in_webview),
-                selected = editableFeed.isOpenItemWithWebview
-            ) {
-                editableFeed = editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_WEBVIEW)
-            }
-            TextRadioButton(
                 text = stringResource(id = R.string.open_in_default_browser),
                 selected = editableFeed.isOpenItemWithBrowser
             ) {
