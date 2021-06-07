@@ -2,12 +2,15 @@ package com.nononsenseapps.feeder.ui
 
 import android.graphics.Point
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,10 +22,13 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.FeedViewModel
+import com.nononsenseapps.feeder.model.SearchFeedViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.maxImageSize
+import com.nononsenseapps.feeder.ui.compose.feed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
+import com.nononsenseapps.feeder.ui.compose.feed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
@@ -61,15 +67,19 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
 
         // TODO implement intent handling for android.intent.action.MANAGE_NETWORK_USAGE
         // TODO implement intent for adding a feed
+        // TODO verify currentFeed is updated on delete
 
         NavHost(navController, startDestination = "feed") {
-            composable("feed") { backStackEntry ->
+            composable(
+                "feed"
+            ) { backStackEntry ->
+
                 FeedScreen(
                     onItemClick = { itemId ->
                         navController.navigate("reader/$itemId")
                     },
                     onAddFeed = {
-                        navController.navigate("add/feed")
+                        navController.navigate("search/feed")
                     },
                     onFeedEdit = { feedId ->
                         navController.navigate("edit/feed/$feedId")
@@ -111,6 +121,7 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                 // Necessary to use the backstackEntry so savedState matches lifecycle
                 val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
 
+                // TODO change to correct thign in settingsviemodel
                 feedViewModel.currentFeedId = backStackEntry.arguments?.getLong("feedId")
                     ?: ID_UNSET
 
@@ -122,12 +133,56 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                 )
             }
             composable(
-                "add/feed"
+                "search/feed?feedUrl={feedUrl}",
+                arguments = listOf(
+                    navArgument("feedUrl") {
+                        type = NavType.StringType
+                        nullable = true
+                    }
+                )
+            ) { backStackEntry ->
+                // Necessary to use the backstackEntry so savedState matches lifecycle
+                val searchFeedViewModel: SearchFeedViewModel = backStackEntry.DIAwareViewModel()
+
+                SearchFeedScreen(
+                    onNavigateUp = {
+                        navController.popBackStackOrNavigateTo(route = "feed")
+                    },
+                    initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
+                    searchFeedViewModel = searchFeedViewModel
+                ) {
+                    navController.navigate("add/feed?feedUrl=${it.url}&feedTitle=${it.title}")
+                }
+            }
+            composable(
+                "add/feed?feedUrl={feedUrl}&feedTitle={feedTitle}",
+                arguments = listOf(
+                    navArgument("feedUrl") {
+                        type = NavType.StringType
+                    },
+                    navArgument("feedTitle") {
+                        type = NavType.StringType
+                    }
+                )
             ) { backStackEntry ->
                 // Necessary to use the backstackEntry so savedState matches lifecycle
                 val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
 
-                TODO("Search window")
+                CreateFeedScreen(
+                    onNavigateUp = {
+                        navController.popBackStackOrNavigateTo(route = "feed")
+                    },
+                    feedUrl = backStackEntry.arguments?.getString("feedUrl") ?: "",
+                    feedTitle = backStackEntry.arguments?.getString("feedTitle") ?: "",
+                    feedViewModel = feedViewModel
+                ) { feedId ->
+                    settingsViewModel.setCurrentFeedAndTag(feedId, "")
+                    navController.navigate(
+                        "feed"
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
             }
             composable(
                 "settings"

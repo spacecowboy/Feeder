@@ -53,6 +53,8 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
+import com.nononsenseapps.feeder.ui.compose.theme.upButtonStartPadding
 import com.nononsenseapps.feeder.util.ItemOpener
 import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.SortingOptions
@@ -107,7 +109,7 @@ fun SettingsScreen(
                         Icons.Default.ArrowBack,
                         contentDescription = "Back button",
                         modifier = Modifier
-                            .padding(start = 4.dp)
+                            .padding(start = upButtonStartPadding)
                             .clickable {
                                 onNavigateUp()
                             }
@@ -250,7 +252,7 @@ fun SettingsList(
 
     Column(
         modifier = modifier
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = contentHorizontalPadding)
             .verticalScroll(scrollState)
     ) {
         MenuSetting(

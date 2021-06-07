@@ -142,6 +142,15 @@ fun FeedScreen(
         },
         onSettings = onSettings
     ) { openNavDrawer ->
+        if (pagedFeedItems.loadState.append.endOfPaginationReached
+            && pagedFeedItems.itemCount == 0) {
+            NothingToRead(
+                onOpenOtherFeed = openNavDrawer
+            ) {
+                // TODO naviate to add feed
+            }
+        }
+
         LazyColumn {
             items(pagedFeedItems) { previewItem ->
                 if (previewItem == null) {
@@ -183,9 +192,6 @@ fun FeedScreen(
 
                     if (pagedFeedItems.itemCount == 0) {
                         Log.d("JONAS", "Nothing")
-                        item {
-                            NothingToRead(openNavDrawer) {}
-                        }
                     } else {
                         item {
                             Spacer(modifier = Modifier.height(92.dp))

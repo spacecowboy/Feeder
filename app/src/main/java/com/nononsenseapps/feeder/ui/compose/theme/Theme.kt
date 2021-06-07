@@ -4,6 +4,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.util.ThemeOptions
 
 val feederDarkColorPalette = darkColors(
@@ -18,8 +19,14 @@ val feederLightColorPalette = lightColors(
     secondary = AccentDay
 )
 
+val contentHorizontalPadding = 8.dp
+val upButtonStartPadding = 4.dp
+
 @Composable
-fun FeederTheme(currentTheme: ThemeOptions, content: @Composable () -> Unit) {
+fun FeederTheme(
+    currentTheme: ThemeOptions = ThemeOptions.DAY,
+    content: @Composable () -> Unit
+) {
     MaterialTheme(
         colors = currentTheme.getColors(),
         typography = Typography,

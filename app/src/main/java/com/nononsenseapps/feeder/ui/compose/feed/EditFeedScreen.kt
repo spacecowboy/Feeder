@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
@@ -26,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,11 +39,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.Feed
-import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedViewModel
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
 import com.nononsenseapps.feeder.ui.compose.components.TextRadioButton
 import com.nononsenseapps.feeder.ui.compose.components.TextSwitch
+import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
+import com.nononsenseapps.feeder.ui.compose.theme.upButtonStartPadding
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
@@ -51,20 +54,28 @@ import java.net.URL
 
 @Composable
 fun CreateFeedScreen(
-    feed: Feed,
     onNavigateUp: () -> Unit,
-    feedViewModel: FeedViewModel
+    feedUrl: String,
+    feedTitle: String,
+    feedViewModel: FeedViewModel,
+    onSaved: (Long) -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     // Only compose this when a value has been retrieved
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
-        feed = feed.toEditableFeed(),
+        feed = EditableFeed(
+            url = feedUrl,
+            title = feedTitle
+        ),
         onOk = { result ->
-            feedViewModel.save(
-                feed.updateFrom(result)
-            )
-
-            onNavigateUp()
+            coroutineScope.launch {
+                val feedId = feedViewModel.save(
+                    Feed().updateFrom(result)
+                )
+                onSaved(feedId)
+            }
         },
         onCancel = {
             onNavigateUp()
@@ -85,7 +96,7 @@ fun EditFeedScreen(
             onNavigateUp = onNavigateUp,
             feed = feed.toEditableFeed(),
             onOk = { result ->
-                feedViewModel.save(
+                feedViewModel.saveInBackground(
                     feed.updateFrom(result)
                 )
 
@@ -120,6 +131,7 @@ fun EditFeedScreen(
                         Icons.Default.ArrowBack,
                         contentDescription = "Back button",
                         modifier = Modifier
+                            .padding(start = upButtonStartPadding)
                             .clickable {
                                 onNavigateUp()
                             }
@@ -130,11 +142,12 @@ fun EditFeedScreen(
                 }
             )
         }
-    ) {
+    ) { padding ->
         EditFeedView(
             initialState = feed,
             onOk = onOk,
-            onCancel = onCancel
+            onCancel = onCancel,
+            modifier = Modifier.padding(padding)
         )
     }
 }
@@ -144,14 +157,15 @@ fun EditFeedScreen(
 fun EditFeedView(
     initialState: EditableFeed,
     onOk: (EditableFeed) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    modifier: Modifier
 ) {
-    Log.d("JONAS", "Composing with $initialState")
     // TODO rememberSaveable
     var editableFeed by remember {
-        Log.d("JONAS", "Remember $initialState")
         mutableStateOf(initialState)
     }
+
+    // TODO Focusorder
 
     OkCancelWithContent(
         onOk = {
@@ -160,7 +174,9 @@ fun EditFeedView(
             }
         },
         onCancel = onCancel,
-        okEnabled = editableFeed.isOkToSave
+        okEnabled = editableFeed.isOkToSave,
+        modifier = modifier
+            .padding(horizontal = contentHorizontalPadding)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -182,7 +198,11 @@ fun EditFeedView(
                     keyboardType = KeyboardType.Uri,
                     imeAction = ImeAction.Next
                 ),
-                keyboardActions = KeyboardActions(),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        // TODO focus order
+                    }
+                ),
                 singleLine = false,
                 maxLines = Int.MAX_VALUE,
                 colors = TextFieldDefaults.textFieldColors(),
@@ -286,20 +306,17 @@ fun EditFeedView(
 data class EditableFeed(
     val url: String,
     val title: String,
-    val customTitle: String,
-    val tag: String,
-    val fullTextByDefault: Boolean,
-    val notify: Boolean,
-    val openArticlesWith: String,
+    val customTitle: String = "",
+    val tag: String = "",
+    val fullTextByDefault: Boolean = false,
+    val notify: Boolean = false,
+    val openArticlesWith: String = PREF_VAL_OPEN_WITH_READER,
 ) {
     val isOpenItemWithBrowser: Boolean
         get() = openArticlesWith == PREF_VAL_OPEN_WITH_BROWSER
 
     val isOpenItemWithCustomTab: Boolean
         get() = openArticlesWith == PREF_VAL_OPEN_WITH_CUSTOM_TAB
-
-    val isOpenItemWithWebview: Boolean
-        get() = openArticlesWith == PREF_VAL_OPEN_WITH_WEBVIEW
 
     val isOpenItemWithReader: Boolean
         get() = openArticlesWith == PREF_VAL_OPEN_WITH_READER
@@ -315,7 +332,7 @@ data class EditableFeed(
 
     val isNotValidUrl = !isValidUrl
 
-    val isValidUrl: Boolean
+    private val isValidUrl: Boolean
         get() {
             return try {
                 URL(url)

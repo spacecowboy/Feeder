@@ -123,9 +123,13 @@ class FeedViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewMo
         }
     }
 
-    fun save(feed: Feed) {
+    fun saveInBackground(feed: Feed) {
         coroutineScope.launch {
             dao.upsertFeed(feed)
         }
+    }
+
+    suspend fun save(feed: Feed): Long {
+        return dao.upsertFeed(feed)
     }
 }
