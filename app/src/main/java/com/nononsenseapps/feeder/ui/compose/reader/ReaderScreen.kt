@@ -294,7 +294,7 @@ private fun ReaderView(
                     style = MaterialTheme.typography.subtitle1
                 )
             }
-//            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
         // TODO if any enclosure then show link or something here
