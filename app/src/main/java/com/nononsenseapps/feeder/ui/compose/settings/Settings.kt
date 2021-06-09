@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
@@ -105,15 +106,21 @@ fun SettingsScreen(
                     )
                 },
                 navigationIcon = {
-                    Icon(
-                        Icons.Default.ArrowBack,
-                        contentDescription = "Back button",
+                    Box(
+                        contentAlignment = Alignment.CenterStart,
                         modifier = Modifier
-                            .padding(start = upButtonStartPadding)
+                            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
                             .clickable {
                                 onNavigateUp()
                             }
-                    )
+                    ) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back button",
+                            modifier = Modifier
+                                .padding(start = upButtonStartPadding)
+                        )
+                    }
                 }
             )
         }

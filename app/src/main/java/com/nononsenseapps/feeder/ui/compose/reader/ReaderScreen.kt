@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -32,6 +33,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -75,15 +77,21 @@ fun ReaderScreen(
                     )
                 },
                 navigationIcon = {
-                    Icon(
-                        Icons.Default.ArrowBack,
-                        contentDescription = "Back button",
+                    Box(
+                        contentAlignment = Alignment.CenterStart,
                         modifier = Modifier
-                            .padding(start = upButtonStartPadding)
+                            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
                             .clickable {
                                 onNavigateUp()
                             }
-                    )
+                    ) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back button",
+                            modifier = Modifier
+                                .padding(start = upButtonStartPadding)
+                        )
+                    }
                 },
                 actions = {
                     // TODO
@@ -283,6 +291,7 @@ private fun ReaderView(
                 style = MaterialTheme.typography.h1
             )
             Spacer(modifier = Modifier.height(8.dp))
+            // TODO clickable so you can go direct to the feed
             Text(
                 text = feedTitle,
                 style = MaterialTheme.typography.subtitle1
