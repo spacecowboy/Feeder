@@ -172,7 +172,7 @@ class Prefs(override val di: DI) : DIAware {
         )
         set(value) = sp.edit().putString(
             PREF_THEME,
-            app.getString(value.stringId)
+            value.toPrefValue()
         ).apply()
 
     var currentItemOpener: ItemOpener
@@ -183,10 +183,10 @@ class Prefs(override val di: DI) : DIAware {
             else -> ItemOpener.READER
         }
         set(value) {
-            when (value) {
-                ItemOpener.READER -> openItemsWith = PREF_VAL_OPEN_WITH_READER
-                ItemOpener.CUSTOM_TAB -> openItemsWith = PREF_VAL_OPEN_WITH_CUSTOM_TAB
-                ItemOpener.DEFAULT_BROWSER -> openItemsWith = PREF_VAL_OPEN_WITH_BROWSER
+            openItemsWith = when (value) {
+                ItemOpener.READER -> PREF_VAL_OPEN_WITH_READER
+                ItemOpener.CUSTOM_TAB -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                ItemOpener.DEFAULT_BROWSER -> PREF_VAL_OPEN_WITH_BROWSER
             }
         }
 
@@ -314,6 +314,13 @@ enum class ThemeOptions(
             SYSTEM -> if (isSystemInDarkTheme()) feederDarkColorPalette else feederLightColorPalette
         }
     }
+
+    fun toPrefValue(): String =
+        when (this) {
+            DAY -> "day"
+            NIGHT -> "night"
+            SYSTEM -> "system"
+        }
 
     companion object {
         fun fromString(context: Context, value: String?): ThemeOptions =
