@@ -9,12 +9,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
@@ -34,8 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.model.FeedUnreadCount
@@ -111,13 +109,13 @@ private fun ExpandableTag(
         animationSpec = tween()
     )
 
-    ConstraintLayout(
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clickable(onClick = { onItemClick(item) })
             .padding(top = 2.dp, bottom = 2.dp, end = contentHorizontalPadding)
             .fillMaxWidth()
     ) {
-        val (expandButton, text, unreadCount, childItems) = createRefs()
         ExpandArrow(
             degrees = angle,
             onClick = {
@@ -126,36 +124,20 @@ private fun ExpandableTag(
                 } else {
                     onExpand(item.tag)
                 }
-            },
-            modifier = Modifier
-                .constrainAs(expandButton) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                }
-        )
-        Text(
-            text = item.unreadCount.toString(),
-            maxLines = 1,
-            modifier = Modifier
-                .padding(start = 2.dp)
-                .constrainAs(unreadCount) {
-                    top.linkTo(parent.top)
-                    end.linkTo(parent.end)
-                    centerVerticallyTo(expandButton)
-                }
+            }
         )
         Text(
             text = item.tag,
             maxLines = 1,
             modifier = Modifier
                 .padding(end = 2.dp)
-                .constrainAs(text) {
-                    top.linkTo(parent.top)
-                    start.linkTo(expandButton.end)
-                    end.linkTo(unreadCount.start)
-                    width = Dimension.fillToConstraints
-                    centerVerticallyTo(expandButton)
-                }
+                .weight(1.0f, fill = true)
+        )
+        Text(
+            text = item.unreadCount.toString(),
+            maxLines = 1,
+            modifier = Modifier
+                .padding(start = 2.dp)
         )
     }
 }
@@ -163,12 +145,10 @@ private fun ExpandableTag(
 @Composable
 private fun ExpandArrow(
     degrees: Float,
-    modifier: Modifier,
     onClick: () -> Unit
 ) {
     IconButton(
-        onClick = onClick,
-        modifier = modifier
+        onClick = onClick
     ) {
         Icon(
             Icons.Filled.ExpandLess,
@@ -219,37 +199,29 @@ private fun Feed(
     startPadding: Dp,
     onItemClick: () -> Unit
 ) {
-    ConstraintLayout(
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clickable(onClick = onItemClick)
-            .padding(start = startPadding, end = contentHorizontalPadding, top = 2.dp, bottom = 2.dp)
+            .padding(
+                start = startPadding,
+                end = contentHorizontalPadding,
+                top = 2.dp,
+                bottom = 2.dp
+            )
             .fillMaxWidth()
             .height(48.dp)
     ) {
-        val (refText, refCount) = createRefs()
-        Text(
-            text = unreadCount.toString(),
-            maxLines = 1,
-            modifier = Modifier
-                .padding(start = 2.dp)
-                .constrainAs(refCount) {
-                    top.linkTo(parent.top)
-                    end.linkTo(parent.end)
-                    centerVerticallyTo(parent)
-                }
-        )
         Text(
             text = title,
             maxLines = 1,
             modifier = Modifier
-                .padding(end = 2.dp)
-                .constrainAs(refText) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(refCount.start)
-                    width = Dimension.fillToConstraints
-                    centerVerticallyTo(parent)
-                }
+                .weight(1.0f, fill = true)
+        )
+        Text(
+            text = unreadCount.toString(),
+            maxLines = 1
         )
     }
 }
