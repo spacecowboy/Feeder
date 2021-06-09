@@ -73,7 +73,6 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
             composable(
                 "feed"
             ) { backStackEntry ->
-
                 FeedScreen(
                     onItemClick = { itemId ->
                         navController.navigate("reader/$itemId")

@@ -29,6 +29,7 @@ import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
+import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
 import org.kodein.di.compose.instance
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
@@ -45,7 +46,11 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier
-            .padding(start = 8.dp, top = 2.dp, bottom = 2.dp)
+            .padding(
+                top = 2.dp,
+                bottom = 2.dp,
+                end = if (item.imageUrl?.isNotBlank() != true) contentHorizontalPadding else 0.dp
+            )
             .heightIn(min = feedItemHeightMin, max = feedItemHeightMax)
 //            .height(feedItemHeight)
     ) {
@@ -104,14 +109,6 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
 //                    .border(1.dp, Color.Green)
             )
 
-        }
-        if (item.imageUrl == null) {
-            Spacer(
-                modifier = Modifier
-                    .width(8.dp)
-                    .height(IntrinsicSize.Min)
-//                    .fillMaxHeight()
-            )
         }
 
         item.imageUrl?.let { imageUrl ->

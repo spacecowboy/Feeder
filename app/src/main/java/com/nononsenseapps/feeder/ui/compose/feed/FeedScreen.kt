@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
@@ -62,6 +63,8 @@ import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
+import com.nononsenseapps.feeder.ui.compose.theme.upButtonStartPadding
 import com.nononsenseapps.feeder.util.SortingOptions
 import com.nononsenseapps.feeder.util.ThemeOptions
 import kotlinx.coroutines.launch
@@ -141,17 +144,20 @@ fun FeedScreen(
             feedListViewModel.deleteFeeds(feeds.toList())
         },
         onSettings = onSettings
-    ) { openNavDrawer ->
+    ) { modifier, openNavDrawer ->
         if (pagedFeedItems.loadState.append.endOfPaginationReached
             && pagedFeedItems.itemCount == 0) {
             NothingToRead(
-                onOpenOtherFeed = openNavDrawer
-            ) {
-                // TODO naviate to add feed
-            }
+                modifier = modifier,
+                onOpenOtherFeed = openNavDrawer,
+                onAddFeed = onAddFeed
+            )
         }
 
-        LazyColumn {
+        LazyColumn(
+            modifier = modifier
+                .padding(start = contentHorizontalPadding)
+        ) {
             items(pagedFeedItems) { previewItem ->
                 if (previewItem == null) {
                     return@items
@@ -217,7 +223,7 @@ fun FeedScreen(
     onAddFeed: (() -> Unit),
     onEditFeed: (() -> Unit)?,
     onSettings: () -> Unit,
-    content: @Composable (suspend () -> Unit) -> Unit
+    content: @Composable (Modifier, suspend () -> Unit) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState(
@@ -240,6 +246,7 @@ fun FeedScreen(
                         Icons.Default.Menu,
                         contentDescription = "Drawer toggle",
                         modifier = Modifier
+                            .padding(start = upButtonStartPadding)
                             .clickable {
                                 coroutineScope.launch {
                                     scaffoldState.drawerState.open()
@@ -340,12 +347,15 @@ fun FeedScreen(
                 }
             )
         }
-    ) {
+    ) { padding ->
         SwipeRefresh(
             state = refreshState,
             onRefresh = onRefresh
         ) {
-            content {
+            content(
+                Modifier
+                    .padding(padding)
+            ) {
                 scaffoldState.drawerState.open()
             }
         }
@@ -380,8 +390,11 @@ fun DefaultPreview() {
             onEditFeed = null,
             onDelete = {},
             onSettings = {}
-        ) {
-            LazyColumn {
+        ) { modifier, _ ->
+            LazyColumn(
+                modifier = modifier
+                    .padding(start = contentHorizontalPadding)
+            ) {
                 item {
                     FeedItemPreview(
                         item = PreviewItem(

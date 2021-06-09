@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 fun NothingToRead(
     modifier: Modifier = Modifier,
     onOpenOtherFeed: suspend () -> Unit = {},
-    onAddFeed: suspend () -> Unit = {}
+    onAddFeed: () -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()
 

@@ -119,7 +119,7 @@ private fun TextComposer.appendTextChildren(
             is Element -> {
                 val element = node
                 when (element.tagName()) {
-                    "p", "div" -> {
+                    "p" -> {
                         withParagraph {
                             appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
                         }
