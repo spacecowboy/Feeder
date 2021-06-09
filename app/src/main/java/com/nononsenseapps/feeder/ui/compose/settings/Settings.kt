@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
@@ -22,6 +21,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
@@ -55,7 +55,6 @@ import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
-import com.nononsenseapps.feeder.ui.compose.theme.upButtonStartPadding
 import com.nononsenseapps.feeder.util.ItemOpener
 import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.SortingOptions
@@ -106,19 +105,10 @@ fun SettingsScreen(
                     )
                 },
                 navigationIcon = {
-                    Box(
-                        contentAlignment = Alignment.CenterStart,
-                        modifier = Modifier
-                            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
-                            .clickable {
-                                onNavigateUp()
-                            }
-                    ) {
+                    IconButton(onClick = onNavigateUp) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Back button",
-                            modifier = Modifier
-                                .padding(start = upButtonStartPadding)
+                            contentDescription = "Back button"
                         )
                     }
                 }

@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -42,8 +42,6 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
-import com.nononsenseapps.feeder.ui.compose.theme.upButtonStartPadding
-import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
@@ -69,19 +67,10 @@ fun SearchFeedScreen(
                     )
                 },
                 navigationIcon = {
-                    Box(
-                        contentAlignment = Alignment.CenterStart,
-                        modifier = Modifier
-                            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
-                            .clickable {
-                                onNavigateUp()
-                            }
-                    ) {
+                    IconButton(onClick = onNavigateUp) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Back button",
-                            modifier = Modifier
-                                .padding(start = upButtonStartPadding)
+                            contentDescription = "Back button"
                         )
                     }
                 },
