@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,6 +39,7 @@ import androidx.constraintlayout.compose.Dimension
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.model.FeedUnreadCount
+import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
 
 const val EXPAND_ANIMATION_DURATION = 300
 const val COLLAPSE_ANIMATION_DURATION = 300
@@ -71,8 +73,7 @@ fun ListOfFeedsAndTags(
 
     LazyColumn(
         modifier = Modifier
-            .width(300.dp)
-            .fillMaxHeight()
+            .fillMaxSize()
     ) {
         items(feedsAndTags, key = { it.id to it.tag }) { item ->
             when {
@@ -113,7 +114,7 @@ private fun ExpandableTag(
     ConstraintLayout(
         modifier = Modifier
             .clickable(onClick = { onItemClick(item) })
-            .padding(top = 2.dp, bottom = 2.dp)
+            .padding(top = 2.dp, bottom = 2.dp, end = contentHorizontalPadding)
             .fillMaxWidth()
     ) {
         val (expandButton, text, unreadCount, childItems) = createRefs()
@@ -136,7 +137,7 @@ private fun ExpandableTag(
             text = item.unreadCount.toString(),
             maxLines = 1,
             modifier = Modifier
-                .padding(start = 2.dp, end = 4.dp)
+                .padding(start = 2.dp)
                 .constrainAs(unreadCount) {
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
@@ -221,7 +222,7 @@ private fun Feed(
     ConstraintLayout(
         modifier = Modifier
             .clickable(onClick = onItemClick)
-            .padding(start = startPadding, end = 4.dp, top = 2.dp, bottom = 2.dp)
+            .padding(start = startPadding, end = contentHorizontalPadding, top = 2.dp, bottom = 2.dp)
             .fillMaxWidth()
             .height(48.dp)
     ) {
