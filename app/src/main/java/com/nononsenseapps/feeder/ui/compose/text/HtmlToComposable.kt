@@ -12,7 +12,6 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.Modifier
@@ -20,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +56,8 @@ private fun LazyListScope.formatBody(element: Element) {
         item {
             ClickableText(
                 text = paragraph,
-                style = Typography.body1
+                style = MaterialTheme.typography.body1
+                    .merge(TextStyle(color = MaterialTheme.colors.onBackground))
             ) { offset ->
                 // TODO("on click with offset / index position")
                 paragraph.getStringAnnotations("URL", offset, offset)
@@ -198,11 +199,8 @@ private fun TextComposer.appendTextChildren(
                         }
                     }
                     "font" -> {
-                        // TODO color
-//                        val color: Color = element.attr("color")?.asColor() ?: Color.Unspecified
-                        val color = Color.Unspecified
                         val fontFamily: FontFamily? = element.attr("face")?.asFontFamily()
-                        withStyle(SpanStyle(color = color, fontFamily = fontFamily)) {
+                        withStyle(SpanStyle(fontFamily = fontFamily)) {
                             appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
                         }
                     }
@@ -289,7 +287,10 @@ private fun TextComposer.appendTextChildren(
                                 withParagraph {
                                     // no break space
                                     append("• ")
-                                    appendTextChildren(listItem.childNodes(), lazyListScope = lazyListScope)
+                                    appendTextChildren(
+                                        listItem.childNodes(),
+                                        lazyListScope = lazyListScope
+                                    )
                                 }
                             }
                     }
@@ -300,7 +301,10 @@ private fun TextComposer.appendTextChildren(
                                 withParagraph {
                                     // no break space
                                     append("${i + 1}. ")
-                                    appendTextChildren(listItem.childNodes(), lazyListScope = lazyListScope)
+                                    appendTextChildren(
+                                        listItem.childNodes(),
+                                        lazyListScope = lazyListScope
+                                    )
                                 }
                             }
                     }
