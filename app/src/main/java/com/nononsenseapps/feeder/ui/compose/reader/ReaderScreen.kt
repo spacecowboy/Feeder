@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.model.FeedItemViewModel
+import com.nononsenseapps.feeder.model.TextToDisplay
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
 import com.nononsenseapps.feeder.ui.unicodeWrap
@@ -60,6 +62,14 @@ fun ReaderScreen(
         mutableStateOf(false)
     }
 
+    if (feedItem?.fullTextByDefault == true) {
+        feedItemViewModel.displayFullText()
+    }
+
+    val textToDisplay by feedItemViewModel.textToDisplay.collectAsState()
+
+    val fetchFullButtonVisible = textToDisplay == TextToDisplay.DEFAULT
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -79,13 +89,17 @@ fun ReaderScreen(
                     }
                 },
                 actions = {
-                    // TODO
-                    // TODO hide if already fulltext
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            Icons.Default.Article,
-                            contentDescription = "Fetch full article button"
-                        )
+                    if (fetchFullButtonVisible) {
+                        IconButton(
+                            onClick = {
+                                feedItemViewModel.displayFullText()
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.Article,
+                                contentDescription = "Fetch full article button"
+                            )
+                        }
                     }
 
                     IconButton(onClick = { /*TODO open in custom tab*/ }) {
@@ -95,12 +109,13 @@ fun ReaderScreen(
                         )
                     }
 
-                    // TODO show if not showing fulltext button
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            Icons.Default.Share,
-                            contentDescription = "Share button"
-                        )
+                    if (!fetchFullButtonVisible) {
+                        IconButton(onClick = { /*TODO*/ }) {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = "Share button"
+                            )
+                        }
                     }
 
                     Box {
@@ -112,14 +127,15 @@ fun ReaderScreen(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false }
                         ) {
-                            // TODO show only if not showing action bar button
-                            DropdownMenuItem(onClick = {/* TODO */ }) {
-                                Icon(
-                                    Icons.Default.Share,
-                                    contentDescription = "Share button"
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.share))
+                            if (fetchFullButtonVisible) {
+                                DropdownMenuItem(onClick = {/* TODO */ }) {
+                                    Icon(
+                                        Icons.Default.Share,
+                                        contentDescription = "Share button"
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.share))
+                                }
                             }
 
                             DropdownMenuItem(onClick = {/* TODO */ }) {
@@ -142,91 +158,14 @@ fun ReaderScreen(
                             }
                         }
                     }
-
-                    /*
-
-
-                    Box {
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Open menu")
-                        }
-                        // TODO make it wider as necessary
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
-                        ) {
-                            DropdownMenuItem(onClick = onAddFeed) {
-                                Icon(
-                                    Icons.Default.Add,
-                                    contentDescription = "Add feed button"
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.add_feed))
-                            }
-                            if (onEditFeed != null) {
-                                DropdownMenuItem(onClick = onEditFeed) {
-                                    Icon(
-                                        Icons.Default.Edit,
-                                        contentDescription = "Edit feed button"
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(stringResource(id = R.string.edit_feed))
-                                }
-                            }
-                            DropdownMenuItem(onClick = { showDeleteDialog = true }) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = "Delete feed button"
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.delete_feed))
-                            }
-                            Divider()
-                            DropdownMenuItem(onClick = { onSettings() }) {
-                                Icon(
-                                    Icons.Default.Settings,
-                                    contentDescription = "Settings button"
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.action_settings))
-                            }
-                            Divider()
-                            DropdownMenuItem(onClick = { /* TODO Handle send feedback! */ }) {
-                                Icon(
-                                    Icons.Default.Email,
-                                    contentDescription = "Send bug report button"
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.send_bug_report))
-                            }
-                        }
-                    }
-                     */
                 }
             )
         }
     ) { padding ->
-//        val articleText by feedItemViewModel.getLiveTextMaybeFull(
-//            options = TextOptions(
-//                itemId = itemId,
-//                maxImageSize = maxImageSize,
-//                nightMode = isSystemInDarkTheme() /* TODO should be prefs or something - also in theme */
-//            ),
-//            urlClickListener = null /* TODO */
-//        ).observeAsState(initial = SpannableString("Loading..."))
-
         val author = feedItem?.author
         val pubDate = feedItem?.pubDate
-
-        // TODO some remember action
-        val blob = feedItem?.let { item ->
-            // TODO full article fetch action
-            when (item.fullTextByDefault) {
-                true -> blobFullInputStream(item.id, LocalContext.current.filesDir)
-                false -> blobInputStream(item.id, LocalContext.current.filesDir)
-            }
-        }
         val feedUrl = feedItem?.feedUrl?.toString() ?: ""
+        val context = LocalContext.current
 
         ReaderView(
             modifier = Modifier.padding(padding),
@@ -249,8 +188,29 @@ fun ReaderScreen(
                 else -> null
             }
         ) {
-            blob?.use { inputStream ->
-                htmlFormattedText(inputStream = inputStream, baseUrl = feedUrl)
+            feedItem?.let { item ->
+                when (textToDisplay) {
+                    TextToDisplay.DEFAULT -> {
+                        blobInputStream(item.id, context.filesDir).use {
+                            htmlFormattedText(inputStream = it, baseUrl = feedUrl)
+                        }
+                    }
+                    TextToDisplay.LOADING_FULLTEXT -> {
+                        item {
+                            Text(text = stringResource(id = R.string.fetching_full_article))
+                        }
+                    }
+                    TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> {
+                        item {
+                            Text(text = stringResource(id = R.string.failed_to_fetch_full_article))
+                        }
+                    }
+                    TextToDisplay.FULLTEXT -> {
+                        blobFullInputStream(item.id, context.filesDir).use {
+                            htmlFormattedText(inputStream = it, baseUrl = feedUrl)
+                        }
+                    }
+                }
             }
         }
     }

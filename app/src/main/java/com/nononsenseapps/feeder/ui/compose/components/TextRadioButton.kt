@@ -27,12 +27,7 @@ fun TextRadioButton(
             }
     ) {
         Text(
-            text = text,
-            modifier = Modifier
-                .clickable {
-                    // TODO needed?
-                    onClick()
-                }
+            text = text
         )
         Spacer(modifier = Modifier.width(4.dp))
         RadioButton(

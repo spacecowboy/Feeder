@@ -29,6 +29,9 @@ import com.nononsenseapps.feeder.ui.text.toSpannedWithImages
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
 import com.nononsenseapps.feeder.util.TabletUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -64,6 +67,40 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
         get() = state[KEY_ITEM_ID] ?: ID_UNSET
         set(value) = state.set(KEY_ITEM_ID, value)
 
+    private val textToDisplayState = MutableStateFlow(TextToDisplay.DEFAULT)
+    val textToDisplay: StateFlow<TextToDisplay> = textToDisplayState.asStateFlow()
+    fun displayFullText() {
+        if (blobFullFile(currentItemId, context.filesDir).isFile) {
+            textToDisplayState.value = TextToDisplay.FULLTEXT
+            return
+        }
+
+        textToDisplayState.value = TextToDisplay.LOADING_FULLTEXT
+
+        viewModelScope.launch {
+            val item = dao.loadFeedItem(currentItemId)
+
+            if (item == null) {
+                Log.e("FeederItemViewModel", "No such item: $currentItemId")
+                textToDisplayState.value = TextToDisplay.FAILED_TO_LOAD_FULLTEXT
+            } else {
+                val (result, throwable) = parseFullArticle(
+                    item,
+                    okHttpClient,
+                    context.filesDir
+                )
+
+                if (!result) {
+                    textToDisplayState.value = TextToDisplay.FAILED_TO_LOAD_FULLTEXT
+                    var reason = context.getString(R.string.failed_to_fetch_full_article)
+                    Log.e("FeederItemViewModel", "Failed to load full text", throwable)
+                } else {
+                    textToDisplayState.value = TextToDisplay.FULLTEXT
+                }
+            }
+        }
+    }
+
     private val currentLiveItemId: LiveData<Long> =
         state.getLiveData(KEY_ITEM_ID, ID_UNSET)
 
@@ -92,6 +129,7 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
         return feedItem
     }
 
+    @Deprecated("Use compose instead")
     fun getLiveTextMaybeFull(
         options: TextOptions,
         urlClickListener: UrlClickListener?
@@ -105,6 +143,7 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
                 }
             }
 
+    @Deprecated("Use compose instead")
     fun getLiveDefaultText(
         options: TextOptions,
         urlClickListener: UrlClickListener?
@@ -132,6 +171,7 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
         return liveDefaultText
     }
 
+    @Deprecated("Use compose instead")
     fun getLiveFullText(
         options: TextOptions,
         urlClickListener: UrlClickListener?
@@ -169,6 +209,7 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
 
     suspend fun markAsReadAndNotified(id: Long) = dao.markAsReadAndNotified(id = id)
 
+    @Deprecated("Use compose instead")
     private suspend fun LiveDataScope<Spanned>.loadTextFrom(
         options: TextOptions,
         streamProvider: () -> InputStream
@@ -234,6 +275,7 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
         }
     }
 
+    @Deprecated("Use compose instead")
     private suspend fun LiveDataScope<Spanned>.fetchFullArticleIfMissing(itemId: Long): Boolean {
         return if (blobFullFile(itemId, context.filesDir).isFile) {
             true
@@ -290,3 +332,10 @@ data class TextOptions(
     val maxImageSize: Point,
     val nightMode: Boolean
 )
+
+enum class TextToDisplay {
+    DEFAULT,
+    LOADING_FULLTEXT,
+    FAILED_TO_LOAD_FULLTEXT,
+    FULLTEXT
+}
