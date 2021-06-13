@@ -99,4 +99,12 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="url">url</string>
     <string name="failed_to_parse">Falha ao analisar %1$s</string>
+    <string name="use_app_default">Usar app padrão</string>
+    <string name="failed_to_load_text_to_speech">Falha ao carregar texto para fala</string>
+    <string name="fetching_full_article">Buscando artigo completo…</string>
+    <string name="failed_to_fetch_full_article">Falha ao buscar artigo completo</string>
+    <string name="fetch_full_articles_by_default">Buscar artigo completo por padrão</string>
+    <string name="fetch_full_article">Buscar artigo completo</string>
+    <string name="resume_reading">Retomar leitura</string>
+    <string name="pause_reading">Pausar leitura</string>
 </resources>
