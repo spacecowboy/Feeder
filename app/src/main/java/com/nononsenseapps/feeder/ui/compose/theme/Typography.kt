@@ -2,9 +2,9 @@ package com.nononsenseapps.feeder.ui.compose.theme
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -62,16 +62,19 @@ val Typography = Typography(
     */
 )
 
+@Composable
+fun linkTextStyle(): TextStyle =
+    TextStyle(
+        color = MaterialTheme.colors.secondary,
+        textDecoration = TextDecoration.Underline
+    )
+
 @Immutable
 object FeederTypography {
     val codeBlockBackground = Color.Gray // TODO dark theme change
     val codeInline = TextStyle(
         background = codeBlockBackground,
         fontFamily = FontFamily.Monospace
-    )
-    val link = TextStyle(
-        color = Color.Cyan,
-        textDecoration = TextDecoration.Underline
     )
     val blockQuote = TextStyle(
         color = Color.Red,

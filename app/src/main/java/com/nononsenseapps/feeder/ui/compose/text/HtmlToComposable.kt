@@ -31,6 +31,7 @@ import com.google.accompanist.coil.rememberCoilPainter
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
 import com.nononsenseapps.feeder.ui.compose.theme.Typography
+import com.nononsenseapps.feeder.ui.compose.theme.linkTextStyle
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
 import org.jsoup.Jsoup
@@ -42,18 +43,23 @@ import java.io.InputStream
 
 fun LazyListScope.htmlFormattedText(
     inputStream: InputStream,
-    baseUrl: String
+    baseUrl: String,
+    onLinkClick: (String) -> Unit
 ) {
     Jsoup.parse(inputStream, null, baseUrl)
         ?.body()
         ?.let { body ->
-            formatBody(element = body)
+            formatBody(element = body, onLinkClick = onLinkClick)
         }
 }
 
-private fun LazyListScope.formatBody(element: Element) {
-    val composer = TextComposer { paragraph ->
+private fun LazyListScope.formatBody(
+    element: Element,
+    onLinkClick: (String) -> Unit
+) {
+    val composer = TextComposer { paragraphBuilder ->
         item {
+            val paragraph = paragraphBuilder.toAnnotatedString()
             ClickableText(
                 text = paragraph,
                 style = MaterialTheme.typography.body1
@@ -65,6 +71,7 @@ private fun LazyListScope.formatBody(element: Element) {
                     ?.let {
                         // TODO handle click
                         Log.i("JONAS", "Clicked on ${it.item}")
+                        onLinkClick(it.item)
                     }
             }
         }
@@ -76,7 +83,7 @@ private fun LazyListScope.formatBody(element: Element) {
 }
 
 private fun LazyListScope.formatCodeBlock(element: Element) {
-    val composer = TextComposer { paragraph ->
+    val composer = TextComposer { paragraphBuilder ->
         item {
             val scrollState = rememberScrollState()
             Surface(
@@ -86,7 +93,7 @@ private fun LazyListScope.formatCodeBlock(element: Element) {
                 )
             ) {
                 Text(
-                    text = paragraph,
+                    text = paragraphBuilder.toAnnotatedString(),
                     style = MaterialTheme.typography.body2,
                     color = Color.Green,
                     fontFamily = FontFamily.Monospace,
@@ -237,8 +244,8 @@ private fun TextComposer.appendTextChildren(
                     }
                     "a" -> {
                         // TODO clickable and colors
-                        withStyle(
-                            FeederTypography.link.toSpanStyle()
+                        withComposableStyle(
+                            style = { linkTextStyle().toSpanStyle() }
                         ) {
                             withAnnotation("URL", element.attr("abs:href") ?: "") {
                                 append(element.text())
@@ -384,8 +391,12 @@ private fun testIt() {
     """.trimIndent()
 
     html.byteInputStream().use { stream ->
-        LazyColumn() {
-            htmlFormattedText(inputStream = stream, baseUrl = "https://cowboyprogrammer.org")
+        LazyColumn {
+            htmlFormattedText(
+                inputStream = stream,
+                baseUrl = "https://cowboyprogrammer.org",
+                onLinkClick = {}
+            )
         }
     }
 }

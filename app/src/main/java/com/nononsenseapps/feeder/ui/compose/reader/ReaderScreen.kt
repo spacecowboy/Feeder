@@ -1,5 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.reader
 
+import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -39,10 +41,15 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.model.FeedItemViewModel
+import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToDisplay
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
+import com.nononsenseapps.feeder.ui.compose.theme.linkTextStyle
 import com.nononsenseapps.feeder.ui.unicodeWrap
+import com.nononsenseapps.feeder.util.LinkOpener
+import com.nononsenseapps.feeder.util.openLinkInBrowser
+import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.util.*
@@ -54,8 +61,30 @@ private val dateTimeFormat =
 @Composable
 fun ReaderScreen(
     feedItemViewModel: FeedItemViewModel,
+    settingsViewModel: SettingsViewModel,
     onNavigateUp: () -> Unit
 ) {
+    /*
+    when (prefs.openLinksWith) {
+            PREF_VAL_OPEN_WITH_CUSTOM_TAB -> {
+                openLinkInCustomTab(context, link, null)
+            }
+            PREF_VAL_OPEN_WITH_WEBVIEW -> {
+                findNavController().navigate(
+                    R.id.action_readerFragment_to_readerWebViewFragment,
+                    bundle {
+                        putString(ARG_URL, link)
+                    }
+                )
+            }
+            else -> {
+                openLinkInBrowser(context, link)
+            }
+        }
+     */
+
+    val linkOpener by settingsViewModel.linkOpener.collectAsState()
+
     val feedItem by feedItemViewModel.currentLiveItem.observeAsState()
 
     var showMenu by remember {
@@ -138,7 +167,11 @@ fun ReaderScreen(
                                 }
                             }
 
-                            DropdownMenuItem(onClick = {/* TODO */ }) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    feedItemViewModel.markCurrentItemAsUnread()
+                                }
+                            ) {
                                 Icon(
                                     Icons.Default.MarkAsUnread,
                                     contentDescription = "Mark as unread button"
@@ -171,6 +204,13 @@ fun ReaderScreen(
             modifier = Modifier.padding(padding),
             articleTitle = feedItem?.plainTitle ?: "Could not load",
             feedTitle = feedItem?.feedDisplayTitle ?: "Unknown feed",
+            enclosureName = feedItem?.enclosureFilename,
+            enclosureLink = feedItem?.enclosureLink,
+            onEnclosureClick = {
+                feedItem?.enclosureLink?.let { link ->
+                    openLinkInBrowser(context, link)
+                }
+            },
             authorDate = when {
                 author == null && pubDate != null ->
                     stringResource(
@@ -192,7 +232,17 @@ fun ReaderScreen(
                 when (textToDisplay) {
                     TextToDisplay.DEFAULT -> {
                         blobInputStream(item.id, context.filesDir).use {
-                            htmlFormattedText(inputStream = it, baseUrl = feedUrl)
+                            htmlFormattedText(
+                                inputStream = it,
+                                baseUrl = feedUrl,
+                                onLinkClick = {
+                                    onLinkClick(
+                                        link = it,
+                                        linkOpener = linkOpener,
+                                        context = context
+                                    )
+                                }
+                            )
                         }
                     }
                     TextToDisplay.LOADING_FULLTEXT -> {
@@ -207,7 +257,17 @@ fun ReaderScreen(
                     }
                     TextToDisplay.FULLTEXT -> {
                         blobFullInputStream(item.id, context.filesDir).use {
-                            htmlFormattedText(inputStream = it, baseUrl = feedUrl)
+                            htmlFormattedText(
+                                inputStream = it,
+                                baseUrl = feedUrl,
+                                onLinkClick = {
+                                    onLinkClick(
+                                        link = it,
+                                        linkOpener = linkOpener,
+                                        context = context
+                                    )
+                                }
+                            )
                         }
                     }
                 }
@@ -222,10 +282,11 @@ private fun ReaderView(
     articleTitle: String = "Article title on top",
     feedTitle: String = "Feed Title is here",
     authorDate: String? = "2018-01-02",
+    enclosureName: String? = null,
+    enclosureLink: String? = null,
+    onEnclosureClick: () -> Unit,
     articleBody: LazyListScope.() -> Unit
 ) {
-//    val scrollState = rememberScrollState()
-//    Column(modifier = Modifier.verticalScroll(scrollState)) {
     LazyColumn(
         modifier = modifier
             .padding(horizontal = contentHorizontalPadding)
@@ -251,12 +312,35 @@ private fun ReaderView(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // TODO if any enclosure then show link or something here
+        if (enclosureName != null && enclosureLink != null) {
+            item {
+                Text(
+                    text = enclosureName,
+                    style = MaterialTheme.typography.body1.merge(linkTextStyle()),
+                    modifier = Modifier
+                        .clickable {
+                            onEnclosureClick()
+                        }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
 
         articleBody()
 
         item {
             Spacer(modifier = Modifier.height(92.dp))
+        }
+    }
+}
+
+fun onLinkClick(link: String, linkOpener: LinkOpener, context: Context) {
+    when (linkOpener) {
+        LinkOpener.CUSTOM_TAB -> {
+            openLinkInCustomTab(context, link, null)
+        }
+        LinkOpener.DEFAULT_BROWSER -> {
+            openLinkInBrowser(context, link)
         }
     }
 }

@@ -1,11 +1,13 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 
 class AnnotatedParagraphStringBuilder(
     val builder: AnnotatedString.Builder = AnnotatedString.Builder()
 ) {
+    val composableStyles = mutableListOf<ComposableStyleWithStartEnd>()
     val lastTwoChars: MutableList<Char> = mutableListOf()
 
     fun pushStyle(spanStyle: SpanStyle) {
@@ -14,6 +16,26 @@ class AnnotatedParagraphStringBuilder(
 
     fun pushStringAnnotation(tag: String, annotation: String) {
         builder.pushStringAnnotation(tag = tag, annotation = annotation)
+    }
+
+    fun pushComposableStyle(
+        style: @Composable () -> SpanStyle
+    ): Int {
+        composableStyles.add(
+            ComposableStyleWithStartEnd(
+                style = style,
+                start = builder.length
+            )
+        )
+        return composableStyles.lastIndex
+    }
+
+    fun popComposableStyle(
+        index: Int
+    ) {
+        composableStyles[index].let {
+            composableStyles[index] = it.copy(end = builder.length)
+        }
     }
 
     fun append(text: String) {
@@ -31,7 +53,15 @@ class AnnotatedParagraphStringBuilder(
         builder.append(char)
     }
 
+    @Composable
     fun toAnnotatedString(): AnnotatedString {
+        for (composableStyle in composableStyles) {
+            builder.addStyle(
+                style = composableStyle.style(),
+                start = composableStyle.start,
+                end = if (composableStyle.end < composableStyle.start) builder.length else composableStyle.end
+            )
+        }
         return builder.toAnnotatedString()
     }
 }
@@ -82,6 +112,19 @@ inline fun <R : Any> AnnotatedParagraphStringBuilder.withStyle(
     }
 }
 
+
+inline fun <R : Any> AnnotatedParagraphStringBuilder.withComposableStyle(
+    noinline style: @Composable () -> SpanStyle,
+    crossinline block: AnnotatedParagraphStringBuilder.() -> R
+): R {
+    val index = pushComposableStyle(style)
+    return try {
+        block(this)
+    } finally {
+        popComposableStyle(index)
+    }
+}
+
 inline fun <R : Any> AnnotatedParagraphStringBuilder.withAnnotation(
     tag: String,
     annotation: String,
@@ -119,3 +162,9 @@ private fun <T> List<T>.peekSecondLatest(): T? {
     }
     return this[1]
 }
+
+data class ComposableStyleWithStartEnd(
+    val style: @Composable () -> SpanStyle,
+    val start: Int,
+    val end: Int = -1
+)

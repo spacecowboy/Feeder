@@ -12,7 +12,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.core.text.getSpans
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
+import com.nononsenseapps.feeder.ui.compose.theme.linkTextStyle
 
 @Composable
 @ReadOnlyComposable
@@ -22,7 +22,6 @@ fun resources(): Resources {
 }
 
 @Composable
-@ReadOnlyComposable
 fun annotatedStringResource(@StringRes id: Int): AnnotatedString {
     val resources = resources()
     // TODO update all strings with HTML in them
@@ -47,9 +46,10 @@ fun annotatedStringResource(@StringRes id: Int): AnnotatedString {
     }
 }
 
+@Composable
 private fun getSpanStyle(name: String?): SpanStyle? {
     return when (name) {
-        "link" -> FeederTypography.link.toSpanStyle()
+        "link" -> linkTextStyle().toSpanStyle()
         else -> null
     }
 }

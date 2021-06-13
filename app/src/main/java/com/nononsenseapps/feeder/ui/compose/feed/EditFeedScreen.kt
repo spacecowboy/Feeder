@@ -71,7 +71,9 @@ fun CreateFeedScreen(
         onOk = { result ->
             coroutineScope.launch {
                 val feedId = feedViewModel.save(
-                    Feed().updateFrom(result)
+                    Feed(
+                        title = result.title
+                    ).updateFrom(result)
                 )
                 onSaved(feedId)
             }

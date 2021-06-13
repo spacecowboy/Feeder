@@ -115,6 +115,12 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
         }
     }
 
+    fun markCurrentItemAsUnread() {
+        applicationCoroutineScope.launch {
+            dao.markAsRead(id = currentItemId, unread = true)
+        }
+    }
+
     fun getLiveItem(id: Long): LiveData<FeedItemWithFeed?> {
         if (!this::liveItem.isInitialized) {
             liveItem = dao.loadFeedItemFlow(id).asLiveData()

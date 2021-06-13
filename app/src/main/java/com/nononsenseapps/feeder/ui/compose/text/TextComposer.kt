@@ -2,11 +2,10 @@ package com.nononsenseapps.feeder.ui.compose.text
 
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 
 class TextComposer(
-    val paragraphEmitter: (AnnotatedString) -> Unit
+    val paragraphEmitter: (AnnotatedParagraphStringBuilder) -> Unit
 ) {
     val spanStack: MutableList<Span> = mutableListOf()
     var builder: AnnotatedParagraphStringBuilder = AnnotatedParagraphStringBuilder()
@@ -17,14 +16,18 @@ class TextComposer(
             return
         }
 
-        paragraphEmitter(builder.toAnnotatedString())
+        paragraphEmitter(builder)
 
         builder = AnnotatedParagraphStringBuilder()
 
         for (span in spanStack) {
             when (span) {
                 is SpanWithStyle -> builder.pushStyle(span.spanStyle)
-                is SpanWithAnnotation -> builder.pushStringAnnotation(tag = span.tag, annotation = span.annotation)
+                is SpanWithAnnotation -> builder.pushStringAnnotation(
+                    tag = span.tag,
+                    annotation = span.annotation
+                )
+                is SpanWithComposableStyle -> builder.pushComposableStyle(span.spanStyle)
             }
         }
     }
@@ -89,6 +92,20 @@ inline fun <R : Any> TextComposer.withStyle(
     }
 }
 
+inline fun <R : Any> TextComposer.withComposableStyle(
+    noinline style: @Composable () -> SpanStyle,
+    crossinline block: TextComposer.() -> R
+): R {
+    spanStack.add(SpanWithComposableStyle(style))
+    return try {
+        builder.withComposableStyle(style = style) {
+            block()
+        }
+    } finally {
+        spanStack.removeLast()
+    }
+}
+
 inline fun <R : Any> TextComposer.withAnnotation(
     tag: String,
     annotation: String,
@@ -108,9 +125,13 @@ sealed class Span
 
 data class SpanWithStyle(
     val spanStyle: SpanStyle
-): Span()
+) : Span()
 
 data class SpanWithAnnotation(
     val tag: String,
     val annotation: String
-): Span()
+) : Span()
+
+data class SpanWithComposableStyle(
+    val spanStyle: @Composable () -> SpanStyle
+) : Span()

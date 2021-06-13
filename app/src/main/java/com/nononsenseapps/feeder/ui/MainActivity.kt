@@ -88,7 +88,7 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                     },
                     feedListViewModel = backStackEntry.DIAwareViewModel(),
                     feedItemsViewModel = backStackEntry.DIAwareViewModel(),
-                    settingsViewModel = backStackEntry.DIAwareViewModel()
+                    settingsViewModel = settingsViewModel
                 )
             }
             composable(
@@ -106,7 +106,8 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                 feedItemViewModel.markCurrentItemAsReadAndNotified()
 
                 ReaderScreen(
-                    feedItemViewModel = feedItemViewModel
+                    feedItemViewModel = feedItemViewModel,
+                    settingsViewModel = settingsViewModel
                 ) {
                     navController.popBackStackOrNavigateTo(route = "feed")
                 }

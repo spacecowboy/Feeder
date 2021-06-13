@@ -119,6 +119,7 @@ fun FeedScreen(
         feedsAndTags = feedsAndTags,
         refreshState = refreshState,
         onRefresh = {
+            Log.d("JONAS", "Requesting refresh")
             applicationState.setRefreshing()
             requestFeedSync(
                 di = di,
@@ -271,7 +272,11 @@ fun FeedScreen(
                             )
                         }
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(
+                        onClick = {
+                            onRefresh()
+                        }
+                    ) {
                         Icon(
                             Icons.Default.Refresh,
                             contentDescription = "Sync button"
