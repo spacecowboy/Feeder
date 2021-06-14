@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.blob.blobFullInputStream
@@ -44,12 +46,14 @@ import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToDisplay
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.unicodeWrap
 import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
+import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.util.*
@@ -64,38 +68,105 @@ fun ReaderScreen(
     settingsViewModel: SettingsViewModel,
     onNavigateUp: () -> Unit
 ) {
-    /*
-    when (prefs.openLinksWith) {
-            PREF_VAL_OPEN_WITH_CUSTOM_TAB -> {
-                openLinkInCustomTab(context, link, null)
-            }
-            PREF_VAL_OPEN_WITH_WEBVIEW -> {
-                findNavController().navigate(
-                    R.id.action_readerFragment_to_readerWebViewFragment,
-                    bundle {
-                        putString(ARG_URL, link)
-                    }
-                )
-            }
-            else -> {
-                openLinkInBrowser(context, link)
-            }
-        }
-     */
-
     val linkOpener by settingsViewModel.linkOpener.collectAsState()
-
     val feedItem by feedItemViewModel.currentLiveItem.observeAsState()
-
-    var showMenu by remember {
-        mutableStateOf(false)
-    }
 
     if (feedItem?.fullTextByDefault == true) {
         feedItemViewModel.displayFullText()
     }
 
     val textToDisplay by feedItemViewModel.textToDisplay.collectAsState()
+
+    val enclosure = feedItem?.enclosureLink?.let { link ->
+        feedItem?.enclosureFilename?.let { name ->
+            Enclosure(
+                link = link,
+                name = name
+            )
+        }
+    }
+
+    val feedUrl = feedItem?.feedUrl?.toString() ?: ""
+    val context = LocalContext.current
+
+    ReaderScreen(
+        articleTitle = feedItem?.plainTitle ?: "",
+        feedDisplayTitle = feedItem?.feedDisplayTitle ?: "",
+        author = feedItem?.author,
+        pubDate = feedItem?.pubDate,
+        textToDisplay = textToDisplay,
+        enclosure = enclosure,
+        onFetchFullText = {
+            feedItemViewModel.displayFullText()
+        },
+        onMarkAsUnread = {
+            feedItemViewModel.markCurrentItemAsUnread()
+        },
+        onNavigateUp = onNavigateUp
+    ) {
+        feedItem?.let { item ->
+            when (textToDisplay) {
+                TextToDisplay.DEFAULT -> {
+                    blobInputStream(item.id, context.filesDir).use {
+                        htmlFormattedText(
+                            inputStream = it,
+                            baseUrl = feedUrl,
+                            onLinkClick = { link ->
+                                onLinkClick(
+                                    link = link,
+                                    linkOpener = linkOpener,
+                                    context = context
+                                )
+                            }
+                        )
+                    }
+                }
+                TextToDisplay.LOADING_FULLTEXT -> {
+                    item {
+                        Text(text = stringResource(id = R.string.fetching_full_article))
+                    }
+                }
+                TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> {
+                    item {
+                        Text(text = stringResource(id = R.string.failed_to_fetch_full_article))
+                    }
+                }
+                TextToDisplay.FULLTEXT -> {
+                    blobFullInputStream(item.id, context.filesDir).use {
+                        htmlFormattedText(
+                            inputStream = it,
+                            baseUrl = feedUrl,
+                            onLinkClick = { link ->
+                                onLinkClick(
+                                    link = link,
+                                    linkOpener = linkOpener,
+                                    context = context
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReaderScreen(
+    articleTitle: String,
+    feedDisplayTitle: String,
+    author: String?,
+    pubDate: ZonedDateTime?,
+    enclosure: Enclosure?,
+    textToDisplay: TextToDisplay,
+    onFetchFullText: () -> Unit,
+    onMarkAsUnread: () -> Unit,
+    onNavigateUp: () -> Unit,
+    articleBody: LazyListScope.() -> Unit
+) {
+    var showMenu by remember {
+        mutableStateOf(false)
+    }
 
     val fetchFullButtonVisible = textToDisplay == TextToDisplay.DEFAULT
 
@@ -104,7 +175,7 @@ fun ReaderScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = feedItem?.feedDisplayTitle ?: "",
+                        text = feedDisplayTitle,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -120,9 +191,7 @@ fun ReaderScreen(
                 actions = {
                     if (fetchFullButtonVisible) {
                         IconButton(
-                            onClick = {
-                                feedItemViewModel.displayFullText()
-                            }
+                            onClick = onFetchFullText
                         ) {
                             Icon(
                                 Icons.Default.Article,
@@ -131,7 +200,7 @@ fun ReaderScreen(
                         }
                     }
 
-                    IconButton(onClick = { /*TODO open in custom tab*/ }) {
+                    IconButton(onClick = { /*TODO open in custom tab - from there you can open in browser if you want*/ }) {
                         Icon(
                             Icons.Default.OpenInBrowser,
                             contentDescription = "Switch to browser view button"
@@ -168,9 +237,7 @@ fun ReaderScreen(
                             }
 
                             DropdownMenuItem(
-                                onClick = {
-                                    feedItemViewModel.markCurrentItemAsUnread()
-                                }
+                                onClick = onMarkAsUnread
                             ) {
                                 Icon(
                                     Icons.Default.MarkAsUnread,
@@ -195,19 +262,16 @@ fun ReaderScreen(
             )
         }
     ) { padding ->
-        val author = feedItem?.author
-        val pubDate = feedItem?.pubDate
-        val feedUrl = feedItem?.feedUrl?.toString() ?: ""
         val context = LocalContext.current
 
         ReaderView(
             modifier = Modifier.padding(padding),
-            articleTitle = feedItem?.plainTitle ?: "Could not load",
-            feedTitle = feedItem?.feedDisplayTitle ?: "Unknown feed",
-            enclosureName = feedItem?.enclosureFilename,
-            enclosureLink = feedItem?.enclosureLink,
+            articleTitle = articleTitle,
+            feedTitle = feedDisplayTitle,
+            enclosureName = enclosure?.name,
+            enclosureLink = enclosure?.link,
             onEnclosureClick = {
-                feedItem?.enclosureLink?.let { link ->
+                enclosure?.link?.let { link ->
                     openLinkInBrowser(context, link)
                 }
             },
@@ -222,57 +286,13 @@ fun ReaderScreen(
                         R.string.by_author_on_date,
                         // Must wrap author in unicode marks to ensure it formats
                         // correctly in RTL
-                        LocalContext.current.unicodeWrap(author),
+                        context.unicodeWrap(author),
                         pubDate.format(dateTimeFormat)
                     )
                 else -> null
-            }
-        ) {
-            feedItem?.let { item ->
-                when (textToDisplay) {
-                    TextToDisplay.DEFAULT -> {
-                        blobInputStream(item.id, context.filesDir).use {
-                            htmlFormattedText(
-                                inputStream = it,
-                                baseUrl = feedUrl,
-                                onLinkClick = {
-                                    onLinkClick(
-                                        link = it,
-                                        linkOpener = linkOpener,
-                                        context = context
-                                    )
-                                }
-                            )
-                        }
-                    }
-                    TextToDisplay.LOADING_FULLTEXT -> {
-                        item {
-                            Text(text = stringResource(id = R.string.fetching_full_article))
-                        }
-                    }
-                    TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> {
-                        item {
-                            Text(text = stringResource(id = R.string.failed_to_fetch_full_article))
-                        }
-                    }
-                    TextToDisplay.FULLTEXT -> {
-                        blobFullInputStream(item.id, context.filesDir).use {
-                            htmlFormattedText(
-                                inputStream = it,
-                                baseUrl = feedUrl,
-                                onLinkClick = {
-                                    onLinkClick(
-                                        link = it,
-                                        linkOpener = linkOpener,
-                                        context = context
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
+            },
+            articleBody = articleBody
+        )
     }
 }
 
@@ -341,6 +361,33 @@ fun onLinkClick(link: String, linkOpener: LinkOpener, context: Context) {
         }
         LinkOpener.DEFAULT_BROWSER -> {
             openLinkInBrowser(context, link)
+        }
+    }
+}
+
+@Immutable
+data class Enclosure(
+    val link: String,
+    val name: String
+)
+
+@Composable
+@Preview
+private fun PreviewReader() {
+    FeederTheme {
+        ReaderScreen(
+            articleTitle = "A super cool article",
+            feedDisplayTitle = "Feed plus plus",
+            author = "Bob Marley",
+            pubDate = ZonedDateTime.now(),
+            enclosure = null,
+            textToDisplay = TextToDisplay.DEFAULT,
+            onFetchFullText = { },
+            onMarkAsUnread = { },
+            onNavigateUp = { }) {
+            item {
+                Text("The body")
+            }
         }
     }
 }
