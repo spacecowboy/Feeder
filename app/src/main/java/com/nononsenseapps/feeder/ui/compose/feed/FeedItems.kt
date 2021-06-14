@@ -26,10 +26,10 @@ import com.google.accompanist.coil.rememberCoilPainter
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
-import com.nononsenseapps.feeder.ui.compose.theme.feedListItemDateStyle
-import com.nononsenseapps.feeder.ui.compose.theme.feedListItemFeedTitleStyle
-import com.nononsenseapps.feeder.ui.compose.theme.feedListItemStyle
-import com.nononsenseapps.feeder.ui.compose.theme.feedListItemTitleStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleStyle
 import org.kodein.di.compose.instance
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
@@ -66,7 +66,7 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
             ) {
                 Text(
                     text = item.feedDisplayTitle,
-                    style = feedListItemFeedTitleStyle(),
+                    style = FeedListItemFeedTitleStyle(),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
@@ -75,7 +75,7 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
                 Text(
                     text = item.pubDate?.toLocalDate()?.format(shortDateTimeFormat)
                         ?: "24 September 2021",
-                    style = feedListItemDateStyle(),
+                    style = FeedListItemDateStyle(),
                     maxLines = 1,
                     modifier = Modifier
                         .padding(start = 4.dp)
@@ -85,13 +85,13 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
             Text(
                 text = buildAnnotatedString {
                     withStyle(
-                        feedListItemTitleStyle()
+                        FeedListItemTitleStyle()
                     ) {
                         append(item.plainTitle)
                     }
                     append(" — ${item.plainSnippet}…")
                 },
-                style = feedListItemStyle(),
+                style = FeedListItemStyle(),
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 5
             )

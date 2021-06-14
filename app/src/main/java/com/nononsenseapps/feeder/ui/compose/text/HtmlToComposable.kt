@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
@@ -15,7 +17,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -26,12 +27,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTypography
-import com.nononsenseapps.feeder.ui.compose.theme.Typography
-import com.nononsenseapps.feeder.ui.compose.theme.linkTextStyle
+import com.nononsenseapps.feeder.ui.compose.theme.BlockQuoteStyle
+import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockBackground
+import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockStyle
+import com.nononsenseapps.feeder.ui.compose.theme.CodeInlineStyle
+import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
 import org.jsoup.Jsoup
@@ -87,18 +91,20 @@ private fun LazyListScope.formatCodeBlock(element: Element) {
         item {
             val scrollState = rememberScrollState()
             Surface(
-                color = FeederTypography.codeBlockBackground,
-                modifier = Modifier.horizontalScroll(
-                    state = scrollState
-                )
+                color = CodeBlockBackground(),
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier
+                    .horizontalScroll(
+                        state = scrollState
+                    )
             ) {
-                Text(
-                    text = paragraphBuilder.toAnnotatedString(),
-                    style = MaterialTheme.typography.body2,
-                    color = Color.Green,
-                    fontFamily = FontFamily.Monospace,
-                    softWrap = false
-                )
+                Box(modifier = Modifier.padding(all = 4.dp)) {
+                    Text(
+                        text = paragraphBuilder.toAnnotatedString(),
+                        style = CodeBlockStyle(),
+                        softWrap = false
+                    )
+                }
             }
         }
     }
@@ -135,42 +141,54 @@ private fun TextComposer.appendTextChildren(
                     "br" -> append('\n')
                     "h1" -> {
                         withParagraph {
-                            withStyle(Typography.h1.toSpanStyle()) {
+                            withComposableStyle(
+                                style = { MaterialTheme.typography.h1.toSpanStyle() }
+                            ) {
                                 append(element.text())
                             }
                         }
                     }
                     "h2" -> {
                         withParagraph {
-                            withStyle(Typography.h2.toSpanStyle()) {
+                            withComposableStyle(
+                                style = { MaterialTheme.typography.h2.toSpanStyle() }
+                            ) {
                                 append(element.text())
                             }
                         }
                     }
                     "h3" -> {
                         withParagraph {
-                            withStyle(Typography.h3.toSpanStyle()) {
+                            withComposableStyle(
+                                style = { MaterialTheme.typography.h3.toSpanStyle() }
+                            ) {
                                 append(element.text())
                             }
                         }
                     }
                     "h4" -> {
                         withParagraph {
-                            withStyle(Typography.h4.toSpanStyle()) {
+                            withComposableStyle(
+                                style = { MaterialTheme.typography.h4.toSpanStyle() }
+                            ) {
                                 append(element.text())
                             }
                         }
                     }
                     "h5" -> {
                         withParagraph {
-                            withStyle(Typography.h5.toSpanStyle()) {
+                            withComposableStyle(
+                                style = { MaterialTheme.typography.h5.toSpanStyle() }
+                            ) {
                                 append(element.text())
                             }
                         }
                     }
                     "h6" -> {
                         withParagraph {
-                            withStyle(Typography.h6.toSpanStyle()) {
+                            withComposableStyle(
+                                style = { MaterialTheme.typography.h6.toSpanStyle() }
+                            ) {
                                 append(element.text())
                             }
                         }
@@ -224,7 +242,9 @@ private fun TextComposer.appendTextChildren(
                             lazyListScope.formatCodeBlock(element = element)
                         } else {
                             // inline code
-                            withStyle(FeederTypography.codeInline.toSpanStyle()) {
+                            withComposableStyle(
+                                style = { CodeInlineStyle() }
+                            ) {
                                 appendTextChildren(
                                     element.childNodes(),
                                     preFormatted = preFormatted,
@@ -235,8 +255,8 @@ private fun TextComposer.appendTextChildren(
                     }
                     "blockquote" -> {
                         withParagraph {
-                            withStyle(
-                                FeederTypography.blockQuote.toSpanStyle()
+                            withComposableStyle(
+                                style = { BlockQuoteStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -245,7 +265,7 @@ private fun TextComposer.appendTextChildren(
                     "a" -> {
                         // TODO clickable and colors
                         withComposableStyle(
-                            style = { linkTextStyle().toSpanStyle() }
+                            style = { LinkTextStyle().toSpanStyle() }
                         ) {
                             withAnnotation("URL", element.attr("abs:href") ?: "") {
                                 append(element.text())
@@ -281,7 +301,7 @@ private fun TextComposer.appendTextChildren(
                                     )
 
                                     if (alt.isNotBlank()) {
-                                        Text(alt, style = Typography.caption)
+                                        Text(alt, style = MaterialTheme.typography.caption)
                                     }
                                 }
                             }

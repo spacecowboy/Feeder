@@ -45,7 +45,7 @@ import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToDisplay
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
-import com.nononsenseapps.feeder.ui.compose.theme.linkTextStyle
+import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.unicodeWrap
 import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.openLinkInBrowser
@@ -316,7 +316,7 @@ private fun ReaderView(
             item {
                 Text(
                     text = enclosureName,
-                    style = MaterialTheme.typography.body1.merge(linkTextStyle()),
+                    style = MaterialTheme.typography.body1.merge(LinkTextStyle()),
                     modifier = Modifier
                         .clickable {
                             onEnclosureClick()

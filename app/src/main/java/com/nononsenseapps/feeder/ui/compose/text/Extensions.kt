@@ -12,7 +12,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.core.text.getSpans
-import com.nononsenseapps.feeder.ui.compose.theme.linkTextStyle
+import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 
 @Composable
 @ReadOnlyComposable
@@ -49,7 +49,7 @@ fun annotatedStringResource(@StringRes id: Int): AnnotatedString {
 @Composable
 private fun getSpanStyle(name: String?): SpanStyle? {
     return when (name) {
-        "link" -> linkTextStyle().toSpanStyle()
+        "link" -> LinkTextStyle().toSpanStyle()
         else -> null
     }
 }

@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.ui.compose.theme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -64,14 +63,14 @@ val Typography = Typography(
 )
 
 @Composable
-fun linkTextStyle(): TextStyle =
+fun LinkTextStyle(): TextStyle =
     TextStyle(
         color = MaterialTheme.colors.secondary,
         textDecoration = TextDecoration.Underline
     )
 
 @Composable
-fun feedListItemTitleStyle(): SpanStyle =
+fun FeedListItemTitleStyle(): SpanStyle =
     MaterialTheme.typography.subtitle1.toSpanStyle().merge(
         SpanStyle(
             fontWeight = FontWeight.SemiBold
@@ -79,30 +78,51 @@ fun feedListItemTitleStyle(): SpanStyle =
     )
 
 @Composable
-fun feedListItemStyle(): TextStyle =
+fun FeedListItemStyle(): TextStyle =
     MaterialTheme.typography.body1
 
 @Composable
-fun feedListItemFeedTitleStyle(): TextStyle =
-    feedListItemDateStyle()
+fun FeedListItemFeedTitleStyle(): TextStyle =
+    FeedListItemDateStyle()
 
 @Composable
-fun feedListItemDateStyle(): TextStyle =
+fun FeedListItemDateStyle(): TextStyle =
     MaterialTheme.typography.caption.merge(
         TextStyle(
             fontWeight = FontWeight.Medium
         )
     )
 
-@Immutable
-object FeederTypography {
-    val codeBlockBackground = Color.Gray // TODO dark theme change
-    val codeInline = TextStyle(
-        background = codeBlockBackground,
+@Composable
+fun CodeInlineStyle(): SpanStyle =
+    SpanStyle(
+        background = CodeBlockBackground(),
         fontFamily = FontFamily.Monospace
     )
-    val blockQuote = TextStyle(
-        color = Color.Red,
-        fontWeight = FontWeight.Light
+
+/**
+ * Has no background because it is meant to be put over a Surface which has the proper background.
+ */
+@Composable
+fun CodeBlockStyle(): TextStyle =
+    MaterialTheme.typography.body2.merge(
+        SpanStyle(
+            fontFamily = FontFamily.Monospace
+        )
     )
-}
+
+@Composable
+fun CodeBlockBackground(): Color =
+    when (MaterialTheme.colors.isLight) {
+        true -> Color.LightGray
+        false -> Color.DarkGray
+    }
+
+// TODO finalize this style
+@Composable
+fun BlockQuoteStyle(): SpanStyle =
+    MaterialTheme.typography.body2.toSpanStyle().merge(
+        SpanStyle(
+            fontWeight = FontWeight.Light
+        )
+    )
