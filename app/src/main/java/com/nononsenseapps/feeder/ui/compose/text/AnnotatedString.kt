@@ -39,7 +39,7 @@ class AnnotatedParagraphStringBuilder(
     }
 
     fun append(text: String) {
-        if (text.count() > 2) {
+        if (text.count() >= 2) {
             lastTwoChars.pushMaxTwo(text.secondToLast())
         }
         if (text.isNotEmpty()) {
@@ -71,31 +71,42 @@ fun AnnotatedParagraphStringBuilder.isNotEmpty() = lastTwoChars.isNotEmpty()
 
 fun AnnotatedParagraphStringBuilder.ensureDoubleNewline() {
     when {
-        lastTwoChars.isEmpty() ||
-            lastTwoChars.peekLatest() == '\n' && lastTwoChars.peekSecondLatest() == '\n' -> {
+        lastTwoChars.isEmpty() -> {
+            // Nothing to do
+        }
+        builder.length == 1 && lastTwoChars.peekLatest()?.isWhitespace() == true -> {
+            // Nothing to do
+        }
+        builder.length == 2 &&
+            lastTwoChars.peekLatest()?.isWhitespace() == true &&
+            lastTwoChars.peekSecondLatest()?.isWhitespace() == true -> {
+            // Nothing to do
+        }
+        lastTwoChars.peekLatest() == '\n' && lastTwoChars.peekSecondLatest() == '\n' -> {
             // Nothing to do
         }
         lastTwoChars.peekLatest() == '\n' -> {
-            builder.append('\n')
-            lastTwoChars.pushMaxTwo('\n')
+            append('\n')
         }
         else -> {
-            builder.append("\n\n")
-            lastTwoChars.pushMaxTwo('\n')
-            lastTwoChars.pushMaxTwo('\n')
+            append("\n\n")
         }
     }
 }
 
 private fun AnnotatedParagraphStringBuilder.ensureSingleNewline() {
     when {
-        lastTwoChars.isEmpty() ||
-            lastTwoChars.peekLatest() == '\n' -> {
+        lastTwoChars.isEmpty() -> {
+            // Nothing to do
+        }
+        builder.length == 1 && lastTwoChars.peekLatest()?.isWhitespace() == true -> {
+            // Nothing to do
+        }
+        lastTwoChars.peekLatest() == '\n' -> {
             // Nothing to do
         }
         else -> {
-            builder.append('\n')
-            lastTwoChars.pushMaxTwo('\n')
+            append('\n')
         }
     }
 }
