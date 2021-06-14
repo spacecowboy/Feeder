@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.text.annotatedStringResource
-import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
+import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import kotlinx.coroutines.launch
 
 @Composable
@@ -38,7 +38,7 @@ fun NothingToRead(
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .padding(horizontal = contentHorizontalPadding)
+            .padding(horizontal = keyline1Padding)
             .fillMaxHeight()
             .fillMaxWidth()
     ) {

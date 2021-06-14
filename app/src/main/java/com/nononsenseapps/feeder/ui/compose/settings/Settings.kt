@@ -54,7 +54,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
+import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import com.nononsenseapps.feeder.util.ItemOpener
 import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.SortingOptions
@@ -249,7 +249,6 @@ fun SettingsList(
 
     Column(
         modifier = modifier
-            .padding(horizontal = contentHorizontalPadding)
             .verticalScroll(scrollState)
     ) {
         MenuSetting(
@@ -402,7 +401,8 @@ fun GroupTitle(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(horizontal = keyline1Padding),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -435,7 +435,8 @@ fun ExternalSetting(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .padding(horizontal = keyline1Padding),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -470,7 +471,8 @@ fun <T> MenuSetting(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = !expanded },
+            .clickable { expanded = !expanded }
+            .padding(horizontal = keyline1Padding),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -532,7 +534,8 @@ fun SwitchSetting(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCheckedChanged(!checked) },
+            .clickable { onCheckedChanged(!checked) }
+            .padding(horizontal = keyline1Padding),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(

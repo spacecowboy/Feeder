@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.buildAnnotatedString
@@ -25,11 +28,11 @@ import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleStyle
+import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import org.kodein.di.compose.instance
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
@@ -43,10 +46,12 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier
+            .clickable {
+                onItemClick()
+            }
             .padding(
-                top = 2.dp,
-                bottom = 2.dp,
-                end = if (item.imageUrl?.isNotBlank() != true) contentHorizontalPadding else 0.dp
+                start = keyline1Padding,
+                end = if (item.imageUrl?.isNotBlank() != true) keyline1Padding else 0.dp
             )
             .height(IntrinsicSize.Min)
     ) {
@@ -55,31 +60,31 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
             modifier = Modifier
                 .weight(weight = 1.0f, fill = true)
                 .requiredHeightIn(min = minimumTouchSize)
-                .clickable {
-                    onItemClick()
-                }
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(
-                    text = item.feedDisplayTitle,
-                    style = FeedListItemFeedTitleStyle(),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .weight(weight = 1.0f, fill = true)
-                )
-                Text(
-                    text = item.pubDate?.toLocalDate()?.format(shortDateTimeFormat)
-                        ?: "24 September 2021",
-                    style = FeedListItemDateStyle(),
-                    maxLines = 1,
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                )
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    Text(
+                        text = item.feedDisplayTitle,
+                        style = FeedListItemFeedTitleStyle(),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .weight(weight = 1.0f, fill = true)
+                            .padding(top = 2.dp)
+                    )
+                    Text(
+                        text = item.pubDate?.toLocalDate()?.format(shortDateTimeFormat)
+                            ?: "",
+                        style = FeedListItemDateStyle(),
+                        maxLines = 1,
+                        modifier = Modifier
+                            .padding(top = 2.dp, start = 4.dp)
+                    )
+                }
             }
 
             Text(
@@ -93,7 +98,9 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
                 },
                 style = FeedListItemStyle(),
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 5
+                maxLines = 5,
+                modifier = Modifier
+                    .padding(bottom = 2.dp)
             )
 
         }

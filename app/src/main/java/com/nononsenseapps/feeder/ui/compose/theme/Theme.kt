@@ -19,6 +19,7 @@ val feederLightColorPalette = lightColors(
     secondary = AccentDay
 )
 
+val keyline1Padding = 16.dp
 val contentHorizontalPadding = 8.dp
 val upButtonStartPadding = 4.dp
 

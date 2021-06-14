@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.model.FeedUnreadCount
-import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
 
 const val EXPAND_ANIMATION_DURATION = 300
 const val COLLAPSE_ANIMATION_DURATION = 300
@@ -113,7 +112,7 @@ private fun ExpandableTag(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clickable(onClick = { onItemClick(item) })
-            .padding(top = 2.dp, bottom = 2.dp, end = contentHorizontalPadding)
+            .padding(top = 2.dp, bottom = 2.dp, end = 16.dp)
             .fillMaxWidth()
     ) {
         ExpandArrow(
@@ -206,7 +205,7 @@ private fun Feed(
             .clickable(onClick = onItemClick)
             .padding(
                 start = startPadding,
-                end = contentHorizontalPadding,
+                end = 16.dp,
                 top = 2.dp,
                 bottom = 2.dp
             )

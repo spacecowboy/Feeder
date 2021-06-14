@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,8 +50,8 @@ import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToDisplay
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
+import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import com.nononsenseapps.feeder.ui.unicodeWrap
 import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.openLinkInBrowser
@@ -309,7 +312,7 @@ private fun ReaderView(
 ) {
     LazyColumn(
         modifier = modifier
-            .padding(horizontal = contentHorizontalPadding)
+            .padding(horizontal = keyline1Padding)
     ) {
         item {
             Text(
@@ -324,10 +327,12 @@ private fun ReaderView(
             )
             if (authorDate != null) {
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = authorDate,
-                    style = MaterialTheme.typography.subtitle1
-                )
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    Text(
+                        text = authorDate,
+                        style = MaterialTheme.typography.subtitle1
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(16.dp))
         }

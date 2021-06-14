@@ -156,7 +156,6 @@ fun FeedScreen(
 
         LazyColumn(
             modifier = modifier
-                .padding(start = contentHorizontalPadding)
         ) {
             items(pagedFeedItems) { previewItem ->
                 if (previewItem == null) {
@@ -398,7 +397,6 @@ fun DefaultPreview() {
         ) { modifier, _ ->
             LazyColumn(
                 modifier = modifier
-                    .padding(start = contentHorizontalPadding)
             ) {
                 item {
                     FeedItemPreview(

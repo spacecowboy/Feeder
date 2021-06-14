@@ -43,7 +43,7 @@ import com.nononsenseapps.feeder.model.FeedViewModel
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
 import com.nononsenseapps.feeder.ui.compose.components.TextRadioButton
 import com.nononsenseapps.feeder.ui.compose.components.TextSwitch
-import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
+import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
@@ -174,7 +174,7 @@ fun EditFeedView(
         onCancel = onCancel,
         okEnabled = editableFeed.isOkToSave,
         modifier = modifier
-            .padding(horizontal = contentHorizontalPadding)
+            .padding(horizontal = keyline1Padding)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -308,7 +308,7 @@ data class EditableFeed(
     val tag: String = "",
     val fullTextByDefault: Boolean = false,
     val notify: Boolean = false,
-    val openArticlesWith: String = PREF_VAL_OPEN_WITH_READER,
+    val openArticlesWith: String = "",
 ) {
     val isOpenItemWithBrowser: Boolean
         get() = openArticlesWith == PREF_VAL_OPEN_WITH_BROWSER
