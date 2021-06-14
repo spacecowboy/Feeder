@@ -118,7 +118,6 @@ fun CodeBlockBackground(): Color =
         false -> Color.DarkGray
     }
 
-// TODO finalize this style
 @Composable
 fun BlockQuoteStyle(): SpanStyle =
     MaterialTheme.typography.body2.toSpanStyle().merge(
