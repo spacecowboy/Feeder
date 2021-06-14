@@ -5,6 +5,7 @@ import androidx.compose.material.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -69,6 +70,30 @@ fun linkTextStyle(): TextStyle =
         textDecoration = TextDecoration.Underline
     )
 
+@Composable
+fun feedListItemTitleStyle(): SpanStyle =
+    MaterialTheme.typography.subtitle1.toSpanStyle().merge(
+        SpanStyle(
+            fontWeight = FontWeight.SemiBold
+        )
+    )
+
+@Composable
+fun feedListItemStyle(): TextStyle =
+    MaterialTheme.typography.body1
+
+@Composable
+fun feedListItemFeedTitleStyle(): TextStyle =
+    feedListItemDateStyle()
+
+@Composable
+fun feedListItemDateStyle(): TextStyle =
+    MaterialTheme.typography.caption.merge(
+        TextStyle(
+            fontWeight = FontWeight.Medium
+        )
+    )
+
 @Immutable
 object FeederTypography {
     val codeBlockBackground = Color.Gray // TODO dark theme change
@@ -79,11 +104,5 @@ object FeederTypography {
     val blockQuote = TextStyle(
         color = Color.Red,
         fontWeight = FontWeight.Light
-    )
-    val previewTitle = TextStyle(
-        fontWeight = FontWeight.SemiBold
-    )
-    val previewDate = TextStyle(
-        fontWeight = FontWeight.Medium
     )
 }
