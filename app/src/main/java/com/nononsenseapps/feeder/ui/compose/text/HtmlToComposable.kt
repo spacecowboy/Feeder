@@ -3,6 +3,8 @@ package com.nononsenseapps.feeder.ui.compose.text
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +20,14 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -284,26 +293,50 @@ private fun TextComposer.appendTextChildren(
                             appendImage { onClick ->
                                 lazyListScope.item {
                                     val imageLoader: ImageLoader by instance()
-                                    Image(
-                                        painter = rememberCoilPainter(
-                                            request = imageUrl,
-                                            imageLoader = imageLoader,
-                                            requestBuilder = {
-                                                this.error(R.drawable.placeholder_image_article_day)
-                                            },
-                                            previewPlaceholder = R.drawable.placeholder_image_article_night,
-                                            shouldRefetchOnSizeChange = { _, _ -> false },
-                                        ),
-                                        contentDescription = alt,
-                                        contentScale = ContentScale.FillWidth,
+                                    // TODO rememberSaveable to retain this when scrolled off screen
+                                    val scale = remember { mutableStateOf(1f) }
+                                    Box(
                                         modifier = Modifier
+                                            .clip(RectangleShape)
                                             .clickable(
                                                 enabled = onClick != null
                                             ) {
                                                 onClick?.invoke()
                                             }
                                             .fillMaxWidth()
-                                    )
+                                        // This makes scrolling a pain, find a way to solve that
+//                                            .pointerInput("imgzoom") {
+//                                                detectTransformGestures { centroid, pan, zoom, rotation ->
+//                                                    val z = zoom * scale.value
+//                                                    scale.value = when {
+//                                                        z < 1f -> 1f
+//                                                        z > 3f -> 3f
+//                                                        else -> z
+//                                                    }
+//                                                }
+//                                            }
+                                    ) {
+                                        Image(
+                                            painter = rememberCoilPainter(
+                                                request = imageUrl,
+                                                imageLoader = imageLoader,
+                                                requestBuilder = {
+                                                    this.error(R.drawable.placeholder_image_article_day)
+                                                },
+                                                previewPlaceholder = R.drawable.placeholder_image_article_night,
+                                                shouldRefetchOnSizeChange = { _, _ -> false },
+                                            ),
+                                            contentDescription = alt,
+                                            contentScale = ContentScale.FillWidth,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .graphicsLayer {
+                                                    scaleX = scale.value
+                                                    scaleY = scale.value
+                                                }
+
+                                        )
+                                    }
 
                                     if (alt.isNotBlank()) {
                                         Text(alt, style = MaterialTheme.typography.caption)
