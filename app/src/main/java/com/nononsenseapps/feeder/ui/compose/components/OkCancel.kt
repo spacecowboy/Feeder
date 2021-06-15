@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -25,13 +27,14 @@ fun OkCancelWithContent(
     modifier: Modifier,
     content: @Composable () -> Unit,
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         modifier = modifier.fillMaxWidth()
+            .verticalScroll(scrollState)
     ) {
-        Box {
-           content()
-        }
+        content()
         Spacer(modifier = Modifier.height(24.dp))
         OkCancelButtons(
             onOk = onOk,

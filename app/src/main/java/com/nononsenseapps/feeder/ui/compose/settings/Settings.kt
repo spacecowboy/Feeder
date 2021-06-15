@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
@@ -25,6 +27,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Switch
@@ -48,6 +51,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import com.nononsenseapps.feeder.R
@@ -249,6 +253,7 @@ fun SettingsList(
 
     Column(
         modifier = modifier
+            .padding(horizontal = keyline1Padding)
             .verticalScroll(scrollState)
     ) {
         MenuSetting(
@@ -397,21 +402,25 @@ fun SettingsList(
 
 @Composable
 fun GroupTitle(
+    startingSpace: Boolean = true,
+    height: Dp = 64.dp,
     title: @Composable () -> Unit
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = keyline1Padding),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        if (startingSpace) {
+            Box(
+                modifier = Modifier
+                    .width(64.dp)
+                    .height(height)
+            )
+        }
         Box(
             modifier = Modifier
-                .size(64.dp)
-        )
-        Box(
-            modifier = Modifier
-                .height(64.dp),
+                .height(height),
             contentAlignment = Alignment.CenterStart
         ) {
             ProvideTextStyle(
@@ -435,8 +444,7 @@ fun ExternalSetting(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(horizontal = keyline1Padding),
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -461,18 +469,17 @@ fun ExternalSetting(
 
 @Composable
 fun <T> MenuSetting(
+    title: String,
     currentValue: T,
     values: Iterable<T>,
-    title: String,
-    onSelection: (T) -> Unit,
-    icon: @Composable () -> Unit = {}
+    icon: @Composable () -> Unit = {},
+    onSelection: (T) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = !expanded }
-            .padding(horizontal = keyline1Padding),
+            .clickable { expanded = !expanded },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -525,25 +532,28 @@ fun <T> MenuSetting(
 }
 
 @Composable
-fun SwitchSetting(
-    checked: Boolean,
-    onCheckedChanged: (Boolean) -> Unit,
+fun RadioButtonSetting(
     title: String,
-    icon: @Composable () -> Unit = {}
+    selected: Boolean,
+    icon: (@Composable () -> Unit)? = {},
+    minHeight: Dp = 64.dp,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCheckedChanged(!checked) }
-            .padding(horizontal = keyline1Padding),
+            .heightIn(min = minHeight)
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier.size(64.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                icon()
+        if (icon != null) {
+            Box(
+                modifier = Modifier.size(64.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    icon()
+                }
             }
         }
 
@@ -552,6 +562,48 @@ fun SwitchSetting(
                 Text(title)
             }
         )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        RadioButton(
+            selected = selected,
+            onClick = onClick
+        )
+    }
+}
+
+@Composable
+fun SwitchSetting(
+    title: String,
+    checked: Boolean,
+    icon: (@Composable () -> Unit)? = {},
+    onCheckedChanged: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 64.dp)
+            .clickable { onCheckedChanged(!checked) },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (icon != null) {
+            Box(
+                modifier = Modifier.size(64.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    icon()
+                }
+            }
+        }
+
+        TitleAndSubtitle(
+            title = {
+                Text(title)
+            }
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
 
         Switch(
             checked = checked,

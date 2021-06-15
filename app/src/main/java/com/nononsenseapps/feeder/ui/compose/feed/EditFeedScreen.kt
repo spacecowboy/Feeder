@@ -6,6 +6,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,7 +18,6 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -29,20 +29,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
+import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.FeedViewModel
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
-import com.nononsenseapps.feeder.ui.compose.components.TextRadioButton
-import com.nononsenseapps.feeder.ui.compose.components.TextSwitch
+import com.nononsenseapps.feeder.ui.compose.settings.GroupTitle
+import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
+import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_CUSTOM_TAB
@@ -150,7 +157,7 @@ fun EditFeedScreen(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun EditFeedView(
     initialState: EditableFeed,
@@ -163,7 +170,8 @@ fun EditFeedView(
         mutableStateOf(initialState)
     }
 
-    // TODO Focusorder
+    val (focusTitle, focusTag) = createRefs()
+    val focusManager = LocalFocusManager.current
 
     OkCancelWithContent(
         onOk = {
@@ -174,6 +182,7 @@ fun EditFeedView(
         onCancel = onCancel,
         okEnabled = editableFeed.isOkToSave,
         modifier = modifier
+            .padding(top = 8.dp, bottom = 8.dp)
             .padding(horizontal = keyline1Padding)
     ) {
         Column(
@@ -187,8 +196,6 @@ fun EditFeedView(
                 label = {
                     Text(stringResource(id = R.string.url))
                 },
-                leadingIcon = null,
-                trailingIcon = null,
                 isError = editableFeed.isNotValidUrl,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.None,
@@ -198,14 +205,13 @@ fun EditFeedView(
                 ),
                 keyboardActions = KeyboardActions(
                     onNext = {
-                        // TODO focus order
+                        focusTitle.requestFocus()
                     }
                 ),
-                singleLine = false,
-                maxLines = Int.MAX_VALUE,
-                colors = TextFieldDefaults.textFieldColors(),
+                singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .heightIn(min = 64.dp)
             )
             AnimatedVisibility(visible = editableFeed.isNotValidUrl) {
                 Text(
@@ -225,14 +231,22 @@ fun EditFeedView(
                 label = {
                     Text(stringResource(id = R.string.title))
                 },
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     autoCorrect = true,
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusTag.requestFocus()
+                    }
+                ),
                 modifier = Modifier
+                    .focusOrder(focusTitle)
                     .fillMaxWidth()
+                    .heightIn(min = 64.dp)
             )
             OutlinedTextField(
                 value = editableFeed.tag,
@@ -242,60 +256,88 @@ fun EditFeedView(
                 label = {
                     Text(stringResource(id = R.string.tag))
                 },
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     autoCorrect = true,
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                    }
                 ),
                 modifier = Modifier
+                    .focusOrder(focusTag)
                     .fillMaxWidth()
+                    .heightIn(min = 64.dp)
             )
             Divider(
                 modifier = Modifier.fillMaxWidth()
             )
-            TextSwitch(
-                text = stringResource(id = R.string.fetch_full_articles_by_default),
-                selected = editableFeed.fullTextByDefault
-            ) {
-                editableFeed = editableFeed.copy(fullTextByDefault = it)
-            }
-            TextSwitch(
-                text = stringResource(id = R.string.notify_for_new_items),
-                selected = editableFeed.notify
-            ) {
-                editableFeed = editableFeed.copy(notify = it)
-            }
+            SwitchSetting(
+                title = stringResource(id = R.string.fetch_full_articles_by_default),
+                checked = editableFeed.fullTextByDefault,
+                onCheckedChanged = {
+                    editableFeed = editableFeed.copy(fullTextByDefault = it)
+                },
+                icon = null
+            )
+            SwitchSetting(
+                title = stringResource(id = R.string.notify_for_new_items),
+                checked = editableFeed.notify,
+                onCheckedChanged = {
+                    editableFeed = editableFeed.copy(notify = it)
+                },
+                icon = null
+            )
             Divider(
                 modifier = Modifier.fillMaxWidth()
             )
-            Text(
-                text = stringResource(id = R.string.open_item_by_default_with)
+            GroupTitle(
+                startingSpace = false,
+                height = 48.dp
+            ) {
+                Text(stringResource(id = R.string.open_item_by_default_with))
+            }
+            RadioButtonSetting(
+                title = stringResource(id = R.string.use_app_default),
+                selected = editableFeed.isOpenItemWithAppDefault,
+                minHeight = 48.dp,
+                icon = null,
+                onClick = {
+                    editableFeed = editableFeed.copy(openArticlesWith = "")
+                }
             )
-            TextRadioButton(
-                text = stringResource(id = R.string.use_app_default),
-                selected = editableFeed.isOpenItemWithAppDefault
-            ) {
-                editableFeed = editableFeed.copy(openArticlesWith = "")
-            }
-            TextRadioButton(
-                text = stringResource(id = R.string.open_in_reader),
-                selected = editableFeed.isOpenItemWithReader
-            ) {
-                editableFeed = editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_READER)
-            }
-            TextRadioButton(
-                text = stringResource(id = R.string.open_in_custom_tab),
-                selected = editableFeed.isOpenItemWithCustomTab
-            ) {
-                editableFeed = editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_CUSTOM_TAB)
-            }
-            TextRadioButton(
-                text = stringResource(id = R.string.open_in_default_browser),
-                selected = editableFeed.isOpenItemWithBrowser
-            ) {
-                editableFeed = editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_BROWSER)
-            }
+            RadioButtonSetting(
+                title = stringResource(id = R.string.open_in_reader),
+                selected = editableFeed.isOpenItemWithReader,
+                minHeight = 48.dp,
+                icon = null,
+                onClick = {
+                    editableFeed = editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_READER)
+                }
+            )
+            RadioButtonSetting(
+                title = stringResource(id = R.string.open_in_custom_tab),
+                selected = editableFeed.isOpenItemWithCustomTab,
+                minHeight = 48.dp,
+                icon = null,
+                onClick = {
+                    editableFeed =
+                        editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_CUSTOM_TAB)
+                }
+            )
+            RadioButtonSetting(
+                title = stringResource(id = R.string.open_in_default_browser),
+                selected = editableFeed.isOpenItemWithBrowser,
+                minHeight = 48.dp,
+                icon = null,
+                onClick = {
+                    editableFeed = editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_BROWSER)
+                }
+            )
         }
     }
 }
@@ -346,29 +388,15 @@ data class EditableFeed(
 }
 
 fun Feed.toEditableFeed() =
-    when (this) {
-        null -> EditableFeed(
-            url = "",
-            title = "",
-            customTitle = "",
-            tag = "",
-            fullTextByDefault = false,
-            notify = false,
-            openArticlesWith = "",
-
-            )
-        else -> EditableFeed(
-            url = url.toString(),
-            title = title,
-            customTitle = customTitle,
-            tag = tag,
-            fullTextByDefault = fullTextByDefault,
-            notify = notify,
-            openArticlesWith = openArticlesWith
-        )
-    }.also {
-        Log.d("JONAS", "ToEditable: $this, $it")
-    }
+    EditableFeed(
+        url = url.toString(),
+        title = title,
+        customTitle = customTitle,
+        tag = tag,
+        fullTextByDefault = fullTextByDefault,
+        notify = notify,
+        openArticlesWith = openArticlesWith
+    )
 
 fun Feed.updateFrom(editableFeed: EditableFeed) =
     copy(
@@ -379,3 +407,19 @@ fun Feed.updateFrom(editableFeed: EditableFeed) =
         notify = editableFeed.notify,
         openArticlesWith = editableFeed.openArticlesWith
     )
+
+@Preview
+@Composable
+fun EditFeedScreenPreview() {
+    FeederTheme {
+        EditFeedScreen(
+            onNavigateUp = {},
+            feed = EditableFeed(
+                url = "",
+                title = "Foo Bar"
+            ),
+            onOk = {},
+            onCancel = {}
+        )
+    }
+}
