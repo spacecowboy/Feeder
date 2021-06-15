@@ -168,8 +168,12 @@ open class HtmlToSpannedConverter(
                 // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
                 // so we can safely emit the linebreaks when we handle the close tag.
             }
-            tag.equals("p", ignoreCase = true) -> handleP(spannableStringBuilder)
-            tag.equals("div", ignoreCase = true) -> handleP(spannableStringBuilder)
+            tag.equals("p", ignoreCase = true) -> {
+                // readability4j inserts p tags in divs - ignore some of them
+                if (attributes.getValue("", "class") != "readability-styled") {
+                    handleP(spannableStringBuilder)
+                }
+            }
             tag.equals("strong", ignoreCase = true) -> start(spannableStringBuilder, Bold())
             tag.equals("b", ignoreCase = true) -> start(spannableStringBuilder, Bold())
             tag.equals("em", ignoreCase = true) -> start(spannableStringBuilder, Italic())
@@ -548,8 +552,6 @@ open class HtmlToSpannedConverter(
     private fun handleEndTag(tag: String) {
         when {
             tag.equals("br", ignoreCase = true) -> handleBr(spannableStringBuilder)
-            tag.equals("p", ignoreCase = true) -> handleP(spannableStringBuilder)
-            tag.equals("div", ignoreCase = true) -> handleP(spannableStringBuilder)
             tag.equals("strong", ignoreCase = true) -> end(
                 spannableStringBuilder, Bold::class.java,
                 StyleSpan(Typeface.BOLD)
