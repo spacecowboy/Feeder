@@ -10,6 +10,21 @@ class AnnotatedParagraphStringBuilder(
     val composableStyles = mutableListOf<ComposableStyleWithStartEnd>()
     val lastTwoChars: MutableList<Char> = mutableListOf()
 
+    val endsWithWhitespace: Boolean
+        get() {
+            if (lastTwoChars.isEmpty()) {
+                return true
+            }
+            lastTwoChars.peekLatest()?.let { latest ->
+                // Non-breaking space (160) is not caught by trim or whitespace identification
+                if (latest.isWhitespace() || latest.toInt() == 160) {
+                    return true
+                }
+            }
+
+            return false
+        }
+
     fun pushStyle(spanStyle: SpanStyle) {
         builder.pushStyle(style = spanStyle)
     }

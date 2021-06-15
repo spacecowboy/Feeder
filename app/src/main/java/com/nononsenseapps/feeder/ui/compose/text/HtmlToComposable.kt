@@ -3,8 +3,6 @@ package com.nononsenseapps.feeder.ui.compose.text
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -26,8 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -134,19 +130,41 @@ private fun TextComposer.appendTextChildren(
     var node = nodes.firstOrNull()
     while (node != null) {
         when (node) {
-            is TextNode -> append(
+            is TextNode -> {
                 if (preFormatted) {
-                    node.wholeText
+                    append(node.wholeText)
                 } else {
-                    node.text()
+                    if (builder.endsWithWhitespace) {
+                        node.text().trimStart().let { trimmed ->
+                            if (trimmed.isNotEmpty()) {
+                                append(trimmed)
+                            }
+                        }
+
+                    } else {
+                        node.text().let { text ->
+                            if (text.isNotEmpty()) {
+                                append(text)
+                            }
+                        }
+                    }
                 }
-            )
+            }
             is Element -> {
                 val element = node
                 when (element.tagName()) {
                     "p" -> {
-                        withParagraph {
+                        // Readability4j inserts p-tags in divs for algorithmic purposes.
+                        // They screw up formatting.
+                        if (node.hasClass("readability-styled")) {
                             appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
+                        } else {
+                            withParagraph {
+                                appendTextChildren(
+                                    element.childNodes(),
+                                    lazyListScope = lazyListScope
+                                )
+                            }
                         }
                     }
                     "br" -> append('\n')
