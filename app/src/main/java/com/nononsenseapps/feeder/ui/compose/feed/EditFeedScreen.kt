@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -29,10 +31,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -45,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.FeedViewModel
+import com.nononsenseapps.feeder.ui.compose.components.AutoCompleteFoo
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
 import com.nononsenseapps.feeder.ui.compose.settings.GroupTitle
 import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
@@ -67,14 +73,15 @@ fun CreateFeedScreen(
     onSaved: (Long) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val allTags by feedViewModel.liveAllTags.observeAsState(initial = emptyList())
 
-    // Only compose this when a value has been retrieved
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
         feed = EditableFeed(
             url = feedUrl,
             title = feedTitle
         ),
+        allTags = allTags.filter { it.isNotBlank() },
         onOk = { result ->
             coroutineScope.launch {
                 val feedId = feedViewModel.save(
@@ -97,12 +104,13 @@ fun EditFeedScreen(
     feedViewModel: FeedViewModel
 ) {
     val feed by feedViewModel.currentLiveFeed.observeAsState()
+    val allTags by feedViewModel.liveAllTags.observeAsState(initial = emptyList())
 
     feed?.let { feed ->
-        // Only compose this when a value has been retrieved
         EditFeedScreen(
             onNavigateUp = onNavigateUp,
             feed = feed.toEditableFeed(),
+            allTags = allTags.filter { it.isNotBlank() },
             onOk = { result ->
                 feedViewModel.saveInBackground(
                     feed.updateFrom(result)
@@ -121,6 +129,7 @@ fun EditFeedScreen(
 fun EditFeedScreen(
     onNavigateUp: () -> Unit,
     feed: EditableFeed,
+    allTags: List<String>,
     onOk: (EditableFeed) -> Unit,
     onCancel: () -> Unit
 ) {
@@ -141,15 +150,13 @@ fun EditFeedScreen(
                             contentDescription = "Back button"
                         )
                     }
-                },
-                actions = {
-                    // todo
                 }
             )
         }
     ) { padding ->
         EditFeedView(
             initialState = feed,
+            allTags = allTags,
             onOk = onOk,
             onCancel = onCancel,
             modifier = Modifier.padding(padding)
@@ -161,6 +168,7 @@ fun EditFeedScreen(
 @Composable
 fun EditFeedView(
     initialState: EditableFeed,
+    allTags: List<String>,
     onOk: (EditableFeed) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier
@@ -170,8 +178,18 @@ fun EditFeedView(
         mutableStateOf(initialState)
     }
 
+    var filteredTags by remember {
+        mutableStateOf(
+            allTags.filter { tag ->
+                tag.startsWith(editableFeed.tag, ignoreCase = true)
+            }
+        )
+    }
+
     val (focusTitle, focusTag) = createRefs()
     val focusManager = LocalFocusManager.current
+
+    var tagHasFocus by remember { mutableStateOf(false) }
 
     OkCancelWithContent(
         onOk = {
@@ -248,31 +266,65 @@ fun EditFeedView(
                     .fillMaxWidth()
                     .heightIn(min = 64.dp)
             )
-            OutlinedTextField(
-                value = editableFeed.tag,
-                onValueChange = {
-                    editableFeed = editableFeed.copy(tag = it)
-                },
-                label = {
-                    Text(stringResource(id = R.string.tag))
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words,
-                    autoCorrect = true,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        focusManager.clearFocus()
+
+            AutoCompleteFoo(
+                displaySuggestions = tagHasFocus,
+                suggestions = filteredTags,
+                onSuggestionClicked = { tag ->
+                    editableFeed = editableFeed.copy(tag = tag)
+                    filteredTags = allTags.filter { candidate ->
+                        candidate.startsWith(tag, ignoreCase = true)
                     }
-                ),
-                modifier = Modifier
-                    .focusOrder(focusTag)
-                    .fillMaxWidth()
-                    .heightIn(min = 64.dp)
-            )
+                    focusManager.clearFocus()
+                },
+                suggestionContent = {
+                    Box(
+                        contentAlignment = Alignment.CenterStart,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .height(48.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.subtitle1
+                        )
+                    }
+                }
+            ) {
+                OutlinedTextField(
+                    value = editableFeed.tag,
+                    onValueChange = {
+                        editableFeed = editableFeed.copy(tag = it)
+                        filteredTags = allTags.filter { candidate ->
+                            candidate.startsWith(it, ignoreCase = true)
+                        }
+                    },
+                    label = {
+                        Text(stringResource(id = R.string.tag))
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Words,
+                        autoCorrect = true,
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    ),
+                    modifier = Modifier
+                        .focusOrder(focusTag)
+                        .onFocusChanged {
+                            tagHasFocus = it == FocusState.Active
+                        }
+                        .fillMaxWidth()
+                        .heightIn(min = 64.dp)
+                )
+            }
+
             Divider(
                 modifier = Modifier.fillMaxWidth()
             )
@@ -418,6 +470,7 @@ fun EditFeedScreenPreview() {
                 url = "",
                 title = "Foo Bar"
             ),
+            allTags = emptyList(),
             onOk = {},
             onCancel = {}
         )

@@ -42,6 +42,8 @@ class FeedViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewMo
             dao.loadFeedFlow(feedId).asLiveData()
         }
 
+    val liveAllTags: LiveData<List<String>> = dao.loadLiveTags()
+
     private lateinit var liveFeedsNotify: LiveData<List<Boolean>>
 
     fun getLiveFeedsNotify(id: Long, tag: String): LiveData<List<Boolean>> {
