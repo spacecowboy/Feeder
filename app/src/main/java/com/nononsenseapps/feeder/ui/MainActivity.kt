@@ -177,11 +177,7 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
                     feedViewModel = feedViewModel
                 ) { feedId ->
                     settingsViewModel.setCurrentFeedAndTag(feedId, "")
-                    navController.navigate(
-                        "feed"
-                    ) {
-                        launchSingleTop = true
-                    }
+                    navController.popBackStackOrNavigateTo("feed")
                 }
             }
             composable(
