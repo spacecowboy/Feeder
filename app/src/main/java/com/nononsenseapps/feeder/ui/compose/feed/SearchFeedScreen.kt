@@ -33,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -159,6 +160,8 @@ fun SearchFeedView(
     modifier: Modifier,
     onClick: (SearchResult) -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
@@ -182,11 +185,10 @@ fun SearchFeedView(
                 ),
                 keyboardActions = KeyboardActions(
                     onSearch = {
-                        // TODO also listen for ENTER key press?
                         if (isValidUrl(feedUrl)) {
                             onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                            focusManager.clearFocus()
                         }
-                        // TODO close keyboard
                     }
                 ),
                 singleLine = true,
