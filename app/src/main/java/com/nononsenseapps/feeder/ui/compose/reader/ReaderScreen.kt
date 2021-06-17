@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.reader
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -92,6 +93,21 @@ fun ReaderScreen(
     val feedUrl = feedItem?.feedUrl?.toString() ?: ""
     val context = LocalContext.current
 
+    val onShare = {
+        feedItem?.link?.let { link ->
+            val intent = Intent.createChooser(
+                Intent(Intent.ACTION_SEND).apply {
+                    putExtra(Intent.EXTRA_TEXT, link)
+                    putExtra(Intent.EXTRA_TITLE, feedItem?.plainTitle ?: "")
+                    type = "text/plain"
+                },
+                null
+            )
+            context.startActivity(intent)
+        }
+        Unit
+    }
+
     ReaderScreen(
         articleTitle = feedItem?.plainTitle ?: "",
         feedDisplayTitle = feedItem?.feedDisplayTitle ?: "",
@@ -105,6 +121,7 @@ fun ReaderScreen(
         onMarkAsUnread = {
             feedItemViewModel.markCurrentItemAsUnread()
         },
+        onShare = onShare,
         onNavigateUp = onNavigateUp
     ) {
         feedItem?.let { item ->
@@ -164,6 +181,7 @@ fun ReaderScreen(
     textToDisplay: TextToDisplay,
     onFetchFullText: () -> Unit,
     onMarkAsUnread: () -> Unit,
+    onShare: () -> Unit,
     onNavigateUp: () -> Unit,
     articleBody: LazyListScope.() -> Unit
 ) {
@@ -211,7 +229,7 @@ fun ReaderScreen(
                     }
 
                     if (!fetchFullButtonVisible) {
-                        IconButton(onClick = { /*TODO*/ }) {
+                        IconButton(onClick = onShare) {
                             Icon(
                                 Icons.Default.Share,
                                 contentDescription = "Share button"
@@ -229,7 +247,7 @@ fun ReaderScreen(
                             onDismissRequest = { showMenu = false }
                         ) {
                             if (fetchFullButtonVisible) {
-                                DropdownMenuItem(onClick = {/* TODO */ }) {
+                                DropdownMenuItem(onClick = onShare) {
                                     Icon(
                                         Icons.Default.Share,
                                         contentDescription = "Share button"
@@ -389,6 +407,7 @@ private fun PreviewReader() {
             textToDisplay = TextToDisplay.DEFAULT,
             onFetchFullText = { },
             onMarkAsUnread = { },
+            onShare = {},
             onNavigateUp = { }) {
             item {
                 Text("The body")
