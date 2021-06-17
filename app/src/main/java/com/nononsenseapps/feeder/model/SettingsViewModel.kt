@@ -179,6 +179,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di),
     fun setSyncFrequency(value: SyncFrequency) {
         _syncFrequency.value = value
         prefs.currentSyncFrequency = value
+        configurePeriodicSync(app, forceReplace = true)
     }
 
     init {
