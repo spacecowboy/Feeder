@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -62,9 +63,9 @@ import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.theme.contentHorizontalPadding
 import com.nononsenseapps.feeder.util.SortingOptions
 import com.nononsenseapps.feeder.util.ThemeOptions
+import com.nononsenseapps.feeder.util.openGitlabIssues
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
@@ -112,6 +113,11 @@ fun FeedScreen(
         null
     }
 
+    val context = LocalContext.current
+    val onSendFeedback = {
+        context.startActivity(openGitlabIssues())
+    }
+
     val di = LocalDI.current
 
     FeedScreen(
@@ -142,7 +148,8 @@ fun FeedScreen(
         onDelete = { feeds ->
             feedListViewModel.deleteFeeds(feeds.toList())
         },
-        onSettings = onSettings
+        onSettings = onSettings,
+        onSendFeedback = onSendFeedback
     ) { modifier, openNavDrawer ->
         if (pagedFeedItems.loadState.append.endOfPaginationReached
             && pagedFeedItems.itemCount == 0
@@ -222,6 +229,7 @@ fun FeedScreen(
     onAddFeed: (() -> Unit),
     onEditFeed: (() -> Unit)?,
     onSettings: () -> Unit,
+    onSendFeedback: () -> Unit,
     content: @Composable (Modifier, suspend () -> Unit) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -318,7 +326,7 @@ fun FeedScreen(
                                 Text(stringResource(id = R.string.delete_feed))
                             }
                             Divider()
-                            DropdownMenuItem(onClick = { onSettings() }) {
+                            DropdownMenuItem(onClick = onSettings) {
                                 Icon(
                                     Icons.Default.Settings,
                                     contentDescription = "Settings button"
@@ -327,7 +335,7 @@ fun FeedScreen(
                                 Text(stringResource(id = R.string.action_settings))
                             }
                             Divider()
-                            DropdownMenuItem(onClick = { /* TODO Handle send feedback! */ }) {
+                            DropdownMenuItem(onClick = onSendFeedback) {
                                 Icon(
                                     Icons.Default.Email,
                                     contentDescription = "Send bug report button"
@@ -393,7 +401,8 @@ fun DefaultPreview() {
             onAddFeed = { },
             onEditFeed = null,
             onDelete = {},
-            onSettings = {}
+            onSettings = {},
+            onSendFeedback = {}
         ) { modifier, _ ->
             LazyColumn(
                 modifier = modifier
