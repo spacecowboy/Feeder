@@ -122,6 +122,11 @@ fun ReaderScreen(
             feedItemViewModel.markCurrentItemAsUnread()
         },
         onShare = onShare,
+        onOpenInCustomTab = {
+            feedItem?.link?.let { link ->
+                openLinkInCustomTab(context, link, feedItemViewModel.currentItemId)
+            }
+        },
         onNavigateUp = onNavigateUp
     ) {
         feedItem?.let { item ->
@@ -182,6 +187,7 @@ fun ReaderScreen(
     onFetchFullText: () -> Unit,
     onMarkAsUnread: () -> Unit,
     onShare: () -> Unit,
+    onOpenInCustomTab: () -> Unit,
     onNavigateUp: () -> Unit,
     articleBody: LazyListScope.() -> Unit
 ) {
@@ -221,7 +227,7 @@ fun ReaderScreen(
                         }
                     }
 
-                    IconButton(onClick = { /*TODO open in custom tab - from there you can open in browser if you want*/ }) {
+                    IconButton(onClick = onOpenInCustomTab) {
                         Icon(
                             Icons.Default.OpenInBrowser,
                             contentDescription = "Switch to browser view button"
@@ -408,6 +414,7 @@ private fun PreviewReader() {
             onFetchFullText = { },
             onMarkAsUnread = { },
             onShare = {},
+            onOpenInCustomTab = {},
             onNavigateUp = { }) {
             item {
                 Text("The body")
