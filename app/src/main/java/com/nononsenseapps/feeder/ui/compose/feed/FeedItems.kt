@@ -87,21 +87,28 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
                 }
             }
 
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(
-                        FeedListItemTitleStyle()
-                    ) {
-                        append(item.plainTitle)
-                    }
-                    append(" — ${item.plainSnippet}…")
-                },
-                style = FeedListItemStyle(),
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 5,
-                modifier = Modifier
-                    .padding(bottom = 2.dp)
-            )
+            val alpha = if (item.unread) {
+                ContentAlpha.high
+            } else {
+                ContentAlpha.disabled
+            }
+            CompositionLocalProvider(LocalContentAlpha provides alpha) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            FeedListItemTitleStyle()
+                        ) {
+                            append(item.plainTitle)
+                        }
+                        append(" — ${item.plainSnippet}…")
+                    },
+                    style = FeedListItemStyle(),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 5,
+                    modifier = Modifier
+                        .padding(bottom = 2.dp)
+                )
+            }
 
         }
 
