@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
@@ -50,6 +53,7 @@ import androidx.paging.compose.items
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.model.ApplicationState
@@ -58,6 +62,8 @@ import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.SettingsViewModel
+import com.nononsenseapps.feeder.model.opml.exportOpml
+import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
@@ -69,6 +75,8 @@ import com.nononsenseapps.feeder.util.openGitlabIssues
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
+import org.kodein.di.instance
+import org.threeten.bp.LocalDateTime
 
 @Composable
 fun FeedScreen(
@@ -120,12 +128,33 @@ fun FeedScreen(
 
     val di = LocalDI.current
 
+    val opmlExporter = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument()
+    ) { uri ->
+        if (uri != null) {
+            val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
+            applicationCoroutineScope.launch {
+                exportOpml(di, uri)
+            }
+        }
+    }
+
+    val opmlImporter = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
+            applicationCoroutineScope.launch {
+                importOpml(di, uri)
+            }
+        }
+    }
+
     FeedScreen(
         visibleFeeds = visibleFeeds,
         feedsAndTags = feedsAndTags,
         refreshState = refreshState,
         onRefresh = {
-            Log.d("JONAS", "Requesting refresh")
             applicationState.setRefreshing()
             requestFeedSync(
                 di = di,
@@ -149,7 +178,9 @@ fun FeedScreen(
             feedListViewModel.deleteFeeds(feeds.toList())
         },
         onSettings = onSettings,
-        onSendFeedback = onSendFeedback
+        onSendFeedback = onSendFeedback,
+        onImport = { opmlImporter.launch(arrayOf("text/plain", "text/xml", "text/opml", "*/*")) },
+        onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}") }
     ) { modifier, openNavDrawer ->
         if (pagedFeedItems.loadState.append.endOfPaginationReached
             && pagedFeedItems.itemCount == 0
@@ -230,6 +261,8 @@ fun FeedScreen(
     onEditFeed: (() -> Unit)?,
     onSettings: () -> Unit,
     onSendFeedback: () -> Unit,
+    onImport: () -> Unit,
+    onExport: () -> Unit,
     content: @Composable (Modifier, suspend () -> Unit) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -326,6 +359,24 @@ fun FeedScreen(
                                 Text(stringResource(id = R.string.delete_feed))
                             }
                             Divider()
+                            DropdownMenuItem(onClick = onImport) {
+                                Icon(
+                                    Icons.Default.ImportExport,
+                                    contentDescription = "Import OPML button"
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(id = R.string.import_feeds_from_opml))
+                            }
+                            Divider()
+                            DropdownMenuItem(onClick = onExport) {
+                                Icon(
+                                    Icons.Default.ImportExport,
+                                    contentDescription = "Export OPML button"
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(id = R.string.export_feeds_to_opml))
+                            }
+                            Divider()
                             DropdownMenuItem(onClick = onSettings) {
                                 Icon(
                                     Icons.Default.Settings,
@@ -402,7 +453,9 @@ fun DefaultPreview() {
             onEditFeed = null,
             onDelete = {},
             onSettings = {},
-            onSendFeedback = {}
+            onSendFeedback = {},
+            onImport = {},
+            onExport = {}
         ) { modifier, _ ->
             LazyColumn(
                 modifier = modifier
