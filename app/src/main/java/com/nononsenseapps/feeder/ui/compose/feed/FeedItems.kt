@@ -94,7 +94,7 @@ fun FeedItemPreview(item: FeedListItem, onItemClick: () -> Unit) {
             val alpha = if (item.unread) {
                 ContentAlpha.high
             } else {
-                ContentAlpha.disabled
+                ContentAlpha.medium
             }
             CompositionLocalProvider(LocalContentAlpha provides alpha) {
                 Text(
