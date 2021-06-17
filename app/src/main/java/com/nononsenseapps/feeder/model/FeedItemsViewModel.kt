@@ -1,8 +1,9 @@
 package com.nononsenseapps.feeder.model
 
-import android.util.Log
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
 import androidx.paging.DataSource
@@ -12,24 +13,42 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.map
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
+import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
 import org.kodein.di.instance
 
 const val PAGE_SIZE = 100
+private const val KEY_FEED_ID = "FeedItemsViewModel feedid"
+private const val KEY_TAG = "FeedItemsViewModel tag"
 
-class FeedItemsViewModel(di: DI) : DIAwareViewModel(di) {
+class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
     private val dao: FeedItemDao by instance()
     private val liveOnlyUnread = MutableLiveData<Boolean>()
     private val liveNewestFirst = MutableLiveData<Boolean>()
+
+    private val feedListArgsState = MutableStateFlow(
+        FeedListArgs(
+            feedId = ID_UNSET,
+            tag = "",
+            onlyUnread = false,
+            newestFirst = true
+        )
+    )
+    var feedListArgs
+        get() = feedListArgsState.value
+        set(value) {
+            feedListArgsState.value = value
+        }
 
     init {
         liveOnlyUnread.value = true
@@ -39,8 +58,8 @@ class FeedItemsViewModel(di: DI) : DIAwareViewModel(di) {
     private lateinit var livePagedAll: LiveData<PagedList<PreviewItem>>
     private lateinit var livePagedUnread: LiveData<PagedList<PreviewItem>>
     private lateinit var livePreviews: LiveData<PagedList<PreviewItem>>
-    private var previewPager: PreviewPager? = null
 
+    @Deprecated("Use compose")
     fun getLiveDbPreviews(feedId: Long, tag: String): LiveData<PagedList<PreviewItem>> {
         if (!this::livePreviews.isInitialized) {
             livePagedAll = Transformations.switchMap(liveNewestFirst) { newestFirst ->
@@ -87,75 +106,54 @@ class FeedItemsViewModel(di: DI) : DIAwareViewModel(di) {
         return livePreviews
     }
 
-    fun getPreviewPager(
-        feedId: Long,
-        tag: String,
-        newestFirst: Boolean,
-        onlyUnread: Boolean
-    ): Flow<PagingData<PreviewItem>> {
-        Log.d("JONAS", "Pager with onlyUnread: $onlyUnread")
-
-        val args = PreviewFlowArgs(
-            feedId = feedId,
-            tag = tag,
-            newestFirst = newestFirst,
-            onlyUnread = onlyUnread
-        )
-        previewPager?.let { prev ->
-            if (prev.args == args) {
-                Log.d("JONAS", "Already have a pager which I'm returning")
-                return prev.flow
-            }
-        }
-
-        val flow = Pager(
-            config = PagingConfig(
-                pageSize = PAGE_SIZE,
-                enablePlaceholders = false
-            )
-        ) {
-            when {
-                onlyUnread && newestFirst -> {
-                    when {
-                        feedId > ID_UNSET -> dao.pagingUnreadPreviewsDesc(feedId = feedId)
-                        tag.isNotEmpty() -> dao.pagingUnreadPreviewsDesc(tag = tag)
-                        else -> dao.pagingUnreadPreviewsDesc()
+    val feedListItems: Flow<PagingData<FeedListItem>> by lazy {
+        feedListArgsState.flatMapLatest { args ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = PAGE_SIZE,
+                    enablePlaceholders = false
+                )
+            ) {
+                when {
+                    args.onlyUnread && args.newestFirst -> {
+                        when {
+                            args.feedId > ID_UNSET -> dao.pagingUnreadPreviewsDesc(feedId = args.feedId)
+                            args.tag.isNotEmpty() -> dao.pagingUnreadPreviewsDesc(tag = args.tag)
+                            else -> dao.pagingUnreadPreviewsDesc()
+                        }
                     }
-                }
-                onlyUnread -> {
-                    when {
-                        feedId > ID_UNSET -> dao.pagingUnreadPreviewsAsc(feedId = feedId)
-                        tag.isNotEmpty() -> dao.pagingUnreadPreviewsAsc(tag = tag)
-                        else -> dao.pagingUnreadPreviewsAsc()
+                    args.onlyUnread -> {
+                        when {
+                            args.feedId > ID_UNSET -> dao.pagingUnreadPreviewsAsc(feedId = args.feedId)
+                            args.tag.isNotEmpty() -> dao.pagingUnreadPreviewsAsc(tag = args.tag)
+                            else -> dao.pagingUnreadPreviewsAsc()
+                        }
                     }
-                }
-                newestFirst -> {
-                    when {
-                        feedId > ID_UNSET -> dao.pagingPreviewsDesc(feedId = feedId)
-                        tag.isNotEmpty() -> dao.pagingPreviewsDesc(tag = tag)
-                        else -> dao.pagingPreviewsDesc()
+                    args.newestFirst -> {
+                        when {
+                            args.feedId > ID_UNSET -> dao.pagingPreviewsDesc(feedId = args.feedId)
+                            args.tag.isNotEmpty() -> dao.pagingPreviewsDesc(tag = args.tag)
+                            else -> dao.pagingPreviewsDesc()
+                        }
                     }
-                }
-                else -> {
-                    when {
-                        feedId > ID_UNSET -> dao.pagingPreviewsAsc(feedId = feedId)
-                        tag.isNotEmpty() -> dao.pagingPreviewsAsc(tag = tag)
-                        else -> dao.pagingPreviewsAsc()
+                    else -> {
+                        when {
+                            args.feedId > ID_UNSET -> dao.pagingPreviewsAsc(feedId = args.feedId)
+                            args.tag.isNotEmpty() -> dao.pagingPreviewsAsc(tag = args.tag)
+                            else -> dao.pagingPreviewsAsc()
+                        }
                     }
                 }
             }
+                .flow
+                .map { pagingData ->
+                    pagingData
+                        .map { it.toFeedListItem() }
+                }
         }
-            .flow
             .cachedIn(viewModelScope)
-
-        Log.d("JONAS", "Making new pager from scratch")
-        previewPager = PreviewPager(
-            args = args,
-            flow = flow
-        )
-
-        return flow
     }
+
 
     fun setOnlyUnread(onlyUnread: Boolean) {
         liveOnlyUnread.value = onlyUnread
@@ -250,12 +248,19 @@ class FeedItemsViewModel(di: DI) : DIAwareViewModel(di) {
     }
 }
 
-data class PreviewPager(
-    val args: PreviewFlowArgs,
-    val flow: Flow<PagingData<PreviewItem>>
-)
+private fun PreviewItem.toFeedListItem() =
+    FeedListItem(
+        id = id,
+        title = plainTitle,
+        snippet = plainSnippet,
+        feedTitle = feedDisplayTitle,
+        unread = unread,
+        pubDate = pubDate,
+        imageUrl = imageUrl
+    )
 
-data class PreviewFlowArgs(
+@Immutable
+data class FeedListArgs(
     val feedId: Long,
     val tag: String,
     val newestFirst: Boolean,

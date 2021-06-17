@@ -60,7 +60,6 @@ import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.FeedUnreadCount
-import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
@@ -88,25 +87,28 @@ fun FeedScreen(
     feedItemsViewModel: FeedItemsViewModel,
     settingsViewModel: SettingsViewModel
 ) {
+    val onlyUnread by settingsViewModel.showOnlyUnread.collectAsState()
+    val currentSorting by settingsViewModel.currentSorting.collectAsState()
+    val currentFeedAndTag by settingsViewModel.currentFeedAndTag.collectAsState()
+
     val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts
         .observeAsState(initial = emptyList())
 
-    val onlyUnread by settingsViewModel.showOnlyUnread.collectAsState()
-    val currentSorting by settingsViewModel.currentSorting.collectAsState()
-    val currentFeed by settingsViewModel.currentFeedAndTag.collectAsState()
-
-    // TODO need this to update properly for changes above
-    val pagedFeedItems = feedItemsViewModel.getPreviewPager(
-        feedId = currentFeed.first,
-        tag = currentFeed.second,
+    feedItemsViewModel.feedListArgs = feedItemsViewModel.feedListArgs.copy(
+        feedId = currentFeedAndTag.first,
+        tag = currentFeedAndTag.second,
         onlyUnread = onlyUnread,
-        newestFirst = currentSorting == SortingOptions.NEWEST_FIRST
+        newestFirst = when (currentSorting) {
+            SortingOptions.NEWEST_FIRST -> true
+            SortingOptions.OLDEST_FIRST -> false
+        }
     )
-        .collectAsLazyPagingItems()
+
+    val pagedFeedItems = feedItemsViewModel.feedListItems.collectAsLazyPagingItems()
 
     val visibleFeeds by feedListViewModel.getFeedTitles(
-        feedId = currentFeed.first,
-        tag = currentFeed.second
+        feedId = currentFeedAndTag.first,
+        tag = currentFeedAndTag.second
     ).collectAsState(initial = emptyList())
 
     val applicationState: ApplicationState by instance()
@@ -158,8 +160,8 @@ fun FeedScreen(
             applicationState.setRefreshing()
             requestFeedSync(
                 di = di,
-                feedId = currentFeed.first,
-                feedTag = currentFeed.second,
+                feedId = currentFeedAndTag.first,
+                feedTag = currentFeedAndTag.second,
                 ignoreConnectivitySettings = true,
                 forceNetwork = true,
                 parallell = true
@@ -207,34 +209,34 @@ fun FeedScreen(
 
             when {
                 pagedFeedItems.loadState.prepend is LoadState.Loading -> {
-                    Log.d("JONAS", "Prepend")
+                    Log.d("JONAS", "Prepend pager")
                 }
                 pagedFeedItems.loadState.refresh is LoadState.Loading -> {
-                    Log.d("JONAS", "Refresh")
+                    Log.d("JONAS", "Refreshed pager")
                 }
                 pagedFeedItems.loadState.append is LoadState.Loading -> {
-                    Log.d("JONAS", "Append")
+                    Log.d("JONAS", "Append pager")
                 }
                 pagedFeedItems.loadState.prepend is LoadState.Error -> {
                     item {
-                        Text("Prepend Error! TODO")
+                        Text("pager Prepend Error! TODO")
                     }
                 }
                 pagedFeedItems.loadState.refresh is LoadState.Error -> {
                     item {
-                        Text("Refresh Error! TODO")
+                        Text("pager Refresh Error! TODO")
                     }
                 }
                 pagedFeedItems.loadState.append is LoadState.Error -> {
                     item {
-                        Text("Append Error! TODO")
+                        Text("pager Append Error! TODO")
                     }
                 }
                 pagedFeedItems.loadState.append.endOfPaginationReached -> {
                     // User has reached the end of the list, could insert something here
 
                     if (pagedFeedItems.itemCount == 0) {
-                        Log.d("JONAS", "Nothing")
+                        Log.d("JONAS", "Pager empty")
                     } else {
                         item {
                             Spacer(modifier = Modifier.height(92.dp))
@@ -460,39 +462,39 @@ fun DefaultPreview() {
             LazyColumn(
                 modifier = modifier
             ) {
-                item {
-                    FeedItemPreview(
-                        item = PreviewItem(
-                            id = 1L,
-                            plainTitle = "An interesting story",
-                            plainSnippet = "So this thing happened yesterday",
-                            feedTitle = "The Times"
-                        ),
-                        onItemClick = {}
-                    )
-                }
-                item {
-                    FeedItemPreview(
-                        item = PreviewItem(
-                            id = 2L,
-                            plainTitle = "And this other thing",
-                            plainSnippet = "One two, ".repeat(100),
-                            feedTitle = "The Middle Spread"
-                        ),
-                        onItemClick = {}
-                    )
-                }
-                item {
-                    FeedItemPreview(
-                        item = PreviewItem(
-                            id = 3L,
-                            plainTitle = "Man dies",
-                            plainSnippet = "Got old",
-                            feedTitle = "The Foobar"
-                        ),
-                        onItemClick = {}
-                    )
-                }
+//                item {
+//                    FeedItemPreview(
+//                        item = PreviewItem(
+//                            id = 1L,
+//                            plainTitle = "An interesting story",
+//                            plainSnippet = "So this thing happened yesterday",
+//                            feedTitle = "The Times"
+//                        ),
+//                        onItemClick = {}
+//                    )
+//                }
+//                item {
+//                    FeedItemPreview(
+//                        item = PreviewItem(
+//                            id = 2L,
+//                            plainTitle = "And this other thing",
+//                            plainSnippet = "One two, ".repeat(100),
+//                            feedTitle = "The Middle Spread"
+//                        ),
+//                        onItemClick = {}
+//                    )
+//                }
+//                item {
+//                    FeedItemPreview(
+//                        item = PreviewItem(
+//                            id = 3L,
+//                            plainTitle = "Man dies",
+//                            plainSnippet = "Got old",
+//                            feedTitle = "The Foobar"
+//                        ),
+//                        onItemClick = {}
+//                    )
+//                }
             }
         }
     }

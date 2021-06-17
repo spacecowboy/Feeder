@@ -17,6 +17,7 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.buildAnnotatedString
@@ -26,14 +27,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import org.kodein.di.compose.instance
+import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.util.*
@@ -42,7 +46,7 @@ private val shortDateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
 
 @Composable
-fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
+fun FeedItemPreview(item: FeedListItem, onItemClick: () -> Unit) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier
@@ -68,7 +72,7 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
             ) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
-                        text = item.feedDisplayTitle,
+                        text = item.feedTitle,
                         style = FeedListItemFeedTitleStyle(),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -98,9 +102,9 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
                         withStyle(
                             FeedListItemTitleStyle()
                         ) {
-                            append(item.plainTitle)
+                            append(item.title)
                         }
-                        append(" — ${item.plainSnippet}…")
+                        append(" — ${item.snippet}…")
                     },
                     style = FeedListItemStyle(),
                     overflow = TextOverflow.Ellipsis,
@@ -134,14 +138,29 @@ fun FeedItemPreview(item: PreviewItem, onItemClick: () -> Unit) {
 
 @Composable
 @Preview(showBackground = true)
-private fun preview() =
+private fun preview() {
     FeedItemPreview(
-        item = PreviewItem(
-            plainTitle = "title",
-            plainSnippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+        item = FeedListItem(
+            title = "title",
+            snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
             feedTitle = "Super Duper Feed One two three hup di too dasf",
-            pubDate = null
+            pubDate = null,
+            unread = true,
+            imageUrl = null,
+            id = ID_UNSET
         )
     ) {
 
     }
+}
+
+@Immutable
+data class FeedListItem(
+    val id: Long,
+    val title: String,
+    val snippet: String,
+    val feedTitle: String,
+    val unread: Boolean,
+    val pubDate: ZonedDateTime?,
+    val imageUrl: String?,
+)

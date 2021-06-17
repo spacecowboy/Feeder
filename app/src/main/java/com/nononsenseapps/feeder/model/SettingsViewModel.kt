@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
-import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.lifecycle.LiveData
@@ -75,7 +74,6 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di),
     private val _showOnlyUnread = MutableStateFlow(prefs.showOnlyUnread)
     val showOnlyUnread = _showOnlyUnread.asStateFlow()
     fun setShowOnlyUnread(onlyUnread: Boolean) {
-        Log.d("JONAS", "Setting only unread: $onlyUnread")
         _showOnlyUnread.value = onlyUnread
         prefs.showOnlyUnread = onlyUnread
     }
