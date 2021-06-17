@@ -112,7 +112,7 @@ fun EditFeedScreen(
             feed = feed.toEditableFeed(),
             allTags = allTags.filter { it.isNotBlank() },
             onOk = { result ->
-                feedViewModel.saveInBackground(
+                feedViewModel.saveInBackgroundAndRequestSync(
                     feed.updateFrom(result)
                 )
 

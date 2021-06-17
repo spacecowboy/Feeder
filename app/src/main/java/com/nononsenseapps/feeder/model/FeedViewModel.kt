@@ -125,9 +125,10 @@ class FeedViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewMo
         }
     }
 
-    fun saveInBackground(feed: Feed) {
+    fun saveInBackgroundAndRequestSync(feed: Feed) {
         coroutineScope.launch {
-            dao.upsertFeed(feed)
+            val feedId = dao.upsertFeed(feed)
+            requestFeedSync(di, feedId, ignoreConnectivitySettings = false, forceNetwork = true)
         }
     }
 
