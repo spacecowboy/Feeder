@@ -1,3 +1,16 @@
+# 1.13.3
+Agnieszka C (1):
+  * [029f7af4] Updated Polish translation using Weblate
+
+Jonas Kalderstam (5):
+  * [199e8bf6] Improved formatting - should be less empty space and newlines
+
+Naveen (1):
+  * [eaae183b] Translated using Weblate (Tamil)
+
+Nikhil Kadiyan (1):
+  * [7bed6c84] Translated using Weblate (Hindi)
+
 # 1.13.2
 Drhaal (1):
   * [c4545c2b] Use different colors when swiping to mark article as
