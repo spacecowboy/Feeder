@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -53,32 +55,46 @@ fun NothingToRead(
                 ),
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(32.dp))
-            Text(
-                text = annotatedStringResource(id = R.string.empty_feed_open),
-                style = MaterialTheme.typography.h4.merge(
-                    TextStyle(fontWeight = FontWeight.Light)
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.clickable {
-                    coroutineScope.launch {
-                        onOpenOtherFeed()
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .heightIn(min = TextFieldDefaults.MinHeight)
+                    .fillMaxWidth()
+                    .clickable {
+                        coroutineScope.launch {
+                            onOpenOtherFeed()
+                        }
                     }
-                }
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            Text(
-                text = annotatedStringResource(id = R.string.empty_feed_add),
-                style = MaterialTheme.typography.h4.merge(
-                    TextStyle(fontWeight = FontWeight.Light)
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.clickable {
-                    coroutineScope.launch {
-                        onAddFeed()
+            ) {
+                Text(
+                    text = annotatedStringResource(id = R.string.empty_feed_open),
+                    style = MaterialTheme.typography.h4.merge(
+                        TextStyle(fontWeight = FontWeight.Light)
+                    ),
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .heightIn(min = TextFieldDefaults.MinHeight)
+                    .fillMaxWidth()
+                    .clickable {
+                        coroutineScope.launch {
+                            onAddFeed()
+                        }
                     }
-                }
-            )
+            ) {
+                Text(
+                    text = annotatedStringResource(id = R.string.empty_feed_add),
+                    style = MaterialTheme.typography.h4.merge(
+                        TextStyle(fontWeight = FontWeight.Light)
+                    ),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
