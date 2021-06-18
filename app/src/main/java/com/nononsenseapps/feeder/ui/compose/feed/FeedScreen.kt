@@ -14,6 +14,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
@@ -22,6 +23,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
@@ -182,7 +184,13 @@ fun FeedScreen(
         onSettings = onSettings,
         onSendFeedback = onSendFeedback,
         onImport = { opmlImporter.launch(arrayOf("text/plain", "text/xml", "text/opml", "*/*")) },
-        onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}") }
+        onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}") },
+        onMarkAllAsRead = {
+            feedItemsViewModel.markAllAsReadInBackground(
+                feedId = currentFeedAndTag.first,
+                tag = currentFeedAndTag.second
+            )
+        }
     ) { modifier, openNavDrawer ->
         if (pagedFeedItems.loadState.append.endOfPaginationReached
             && pagedFeedItems.itemCount == 0
@@ -265,6 +273,7 @@ fun FeedScreen(
     onSendFeedback: () -> Unit,
     onImport: () -> Unit,
     onExport: () -> Unit,
+    onMarkAllAsRead: () -> Unit,
     content: @Composable (Modifier, suspend () -> Unit) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -411,6 +420,16 @@ fun FeedScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onMarkAllAsRead
+            ) {
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = "Mark all as read button"
+                )
+            }
         }
     ) { padding ->
         SwipeRefresh(
@@ -457,7 +476,8 @@ fun DefaultPreview() {
             onSettings = {},
             onSendFeedback = {},
             onImport = {},
-            onExport = {}
+            onExport = {},
+            onMarkAllAsRead = {}
         ) { modifier, _ ->
             LazyColumn(
                 modifier = modifier

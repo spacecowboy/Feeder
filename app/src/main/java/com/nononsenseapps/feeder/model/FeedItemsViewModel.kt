@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 
@@ -161,6 +162,10 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
 
     fun setNewestFirst(newestFirst: Boolean) {
         liveNewestFirst.value = newestFirst
+    }
+
+    fun markAllAsReadInBackground(feedId: Long, tag: String) = viewModelScope.launch {
+        markAllAsRead(feedId, tag)
     }
 
     suspend fun markAllAsRead(feedId: Long, tag: String) {
