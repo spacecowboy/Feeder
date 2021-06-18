@@ -103,7 +103,7 @@ class SpannedConverterTest : KodeinAware {
             null
         )
 
-        assertEquals("foo\n\nbar\n\n", builder.toString())
+        assertEquals("foo\n\nbar", builder.toString())
     }
 
     @Test
@@ -119,7 +119,7 @@ class SpannedConverterTest : KodeinAware {
             null
         )
 
-        assertEquals("foo\n\nbar\n\n", builder.toString())
+        assertEquals("foo\n\nbar", builder.toString())
     }
 
     @Test
