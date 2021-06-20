@@ -424,6 +424,92 @@ interface FeedItemDao {
 
     @Query("UPDATE feed_items SET unread = 0, notified = 1 WHERE id IS :id")
     suspend fun markAsReadAndNotified(id: Long)
+
+    @Query(
+        """
+            UPDATE feed_items SET unread = 0, notified = 1
+            WHERE id IN (
+                SELECT feed_items.id
+                FROM feed_items
+                WHERE unread = 1 OR unread = :onlyUnread
+                ORDER BY primary_sort_time DESC, pub_date DESC
+                LIMIT :limit OFFSET :offset
+            )
+        """
+    )
+    suspend fun markAsReadDesc(onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+
+    @Query(
+        """
+            UPDATE feed_items SET unread = 0, notified = 1
+            WHERE id IN (
+                SELECT feed_items.id
+                FROM feed_items
+                WHERE unread = 1 OR unread = :onlyUnread
+                ORDER BY primary_sort_time ASC, pub_date ASC
+                LIMIT :limit OFFSET :offset
+            )
+        """
+    )
+    suspend fun markAsReadAsc(onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+
+    @Query(
+        """
+            UPDATE feed_items SET unread = 0, notified = 1
+            WHERE id IN (
+                SELECT feed_items.id
+                FROM feed_items
+                WHERE feed_id = :feedId AND (unread = 1 OR unread = :onlyUnread)
+                ORDER BY primary_sort_time DESC, pub_date DESC
+                LIMIT :limit OFFSET :offset
+            )
+        """
+    )
+    suspend fun markAsReadDesc(feedId: Long, onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+
+    @Query(
+        """
+            UPDATE feed_items SET unread = 0, notified = 1
+            WHERE id IN (
+                SELECT feed_items.id
+                FROM feed_items
+                WHERE feed_id = :feedId AND (unread = 1 OR unread = :onlyUnread)
+                ORDER BY primary_sort_time ASC, pub_date ASC
+                LIMIT :limit OFFSET :offset
+            )
+        """
+    )
+    suspend fun markAsReadAsc(feedId: Long, onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+
+    @Query(
+        """
+            UPDATE feed_items SET unread = 0, notified = 1
+            WHERE id IN (
+                SELECT feed_items.id
+                FROM feed_items
+                LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+                WHERE tag IS :tag AND (unread = 1 OR unread = :onlyUnread)
+                ORDER BY primary_sort_time DESC, pub_date DESC
+                LIMIT :limit OFFSET :offset
+            )
+        """
+    )
+    suspend fun markAsReadDesc(tag: String, onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+
+    @Query(
+        """
+            UPDATE feed_items SET unread = 0, notified = 1
+            WHERE id IN (
+                SELECT feed_items.id
+                FROM feed_items
+                LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+                WHERE tag IS :tag AND (unread = 1 OR unread = :onlyUnread)
+                ORDER BY primary_sort_time ASC, pub_date ASC
+                LIMIT :limit OFFSET :offset
+            )
+        """
+    )
+    suspend fun markAsReadAsc(tag: String, onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
 }
 
 suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > ID_UNSET) {

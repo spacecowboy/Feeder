@@ -21,11 +21,11 @@ import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
-import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -146,6 +146,180 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
                 // done
                 flowOf(data.sorted())
             }
+
+    fun markBeforeAsRead(index: Int) {
+        viewModelScope.launch {
+            val args = feedListArgsState.value
+            val offset = 0
+            when {
+                args.onlyUnread && args.newestFirst -> {
+                    when {
+                        args.feedId > ID_UNSET -> dao.markAsReadDesc(
+                            offset = offset,
+                            limit = index,
+                            feedId = args.feedId,
+                            onlyUnread = 1
+                        )
+                        args.tag.isNotEmpty() -> dao.markAsReadDesc(
+                            offset = offset,
+                            limit = index,
+                            tag = args.tag,
+                            onlyUnread = 1
+                        )
+                        else -> dao.markAsReadDesc(
+                            offset = offset,
+                            limit = index,
+                            onlyUnread = 1
+                        )
+                    }
+                }
+                args.onlyUnread -> {
+                    when {
+                        args.feedId > ID_UNSET -> dao.markAsReadAsc(
+                            offset = offset,
+                            limit = index,
+                            feedId = args.feedId,
+                            onlyUnread = 1
+                        )
+                        args.tag.isNotEmpty() -> dao.markAsReadAsc(
+                            offset = offset,
+                            limit = index,
+                            tag = args.tag,
+                            onlyUnread = 1
+                        )
+                        else -> dao.markAsReadAsc(
+                            offset = offset,
+                            limit = index,
+                            onlyUnread = 1
+                        )
+                    }
+                }
+                args.newestFirst -> {
+                    when {
+                        args.feedId > ID_UNSET -> dao.markAsReadDesc(
+                            offset = offset,
+                            limit = index,
+                            feedId = args.feedId,
+                            onlyUnread = 0
+                        )
+                        args.tag.isNotEmpty() -> dao.markAsReadDesc(
+                            offset = offset,
+                            limit = index,
+                            tag = args.tag,
+                            onlyUnread = 0
+                        )
+                        else -> dao.markAsReadDesc(
+                            offset = offset,
+                            limit = index,
+                            onlyUnread = 0
+                        )
+                    }
+                }
+                else -> {
+                    when {
+                        args.feedId > ID_UNSET -> dao.markAsReadAsc(
+                            offset = offset,
+                            limit = index,
+                            feedId = args.feedId,
+                            onlyUnread = 0
+                        )
+                        args.tag.isNotEmpty() -> dao.markAsReadAsc(
+                            offset = offset,
+                            limit = index,
+                            tag = args.tag,
+                            onlyUnread = 0
+                        )
+                        else -> dao.markAsReadAsc(
+                            offset = offset,
+                            limit = index,
+                            onlyUnread = 0
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun markAfterAsRead(index: Int) {
+        viewModelScope.launch {
+            val args = feedListArgsState.value
+            val offset = index + 1
+            when {
+                args.onlyUnread && args.newestFirst -> {
+                    when {
+                        args.feedId > ID_UNSET -> dao.markAsReadDesc(
+                            offset = offset,
+                            feedId = args.feedId,
+                            onlyUnread = 1
+                        )
+                        args.tag.isNotEmpty() -> dao.markAsReadDesc(
+                            offset = offset,
+                            tag = args.tag,
+                            onlyUnread = 1
+                        )
+                        else -> dao.markAsReadDesc(
+                            offset = offset,
+                            onlyUnread = 1
+                        )
+                    }
+                }
+                args.onlyUnread -> {
+                    when {
+                        args.feedId > ID_UNSET -> dao.markAsReadAsc(
+                            offset = offset,
+                            feedId = args.feedId,
+                            onlyUnread = 1
+                        )
+                        args.tag.isNotEmpty() -> dao.markAsReadAsc(
+                            offset = offset,
+                            tag = args.tag,
+                            onlyUnread = 1
+                        )
+                        else -> dao.markAsReadAsc(
+                            offset = offset,
+                            onlyUnread = 1
+                        )
+                    }
+                }
+                args.newestFirst -> {
+                    when {
+                        args.feedId > ID_UNSET -> dao.markAsReadDesc(
+                            offset = offset,
+                            feedId = args.feedId,
+                            onlyUnread = 0
+                        )
+                        args.tag.isNotEmpty() -> dao.markAsReadDesc(
+                            offset = offset,
+                            tag = args.tag,
+                            onlyUnread = 0
+                        )
+                        else -> dao.markAsReadDesc(
+                            offset = offset,
+                            onlyUnread = 0
+                        )
+                    }
+                }
+                else -> {
+                    when {
+                        args.feedId > ID_UNSET -> dao.markAsReadAsc(
+                            offset = offset,
+                            feedId = args.feedId,
+                            onlyUnread = 0
+                        )
+                        args.tag.isNotEmpty() -> dao.markAsReadAsc(
+                            offset = offset,
+                            tag = args.tag,
+                            onlyUnread = 0
+                        )
+                        else -> dao.markAsReadAsc(
+                            offset = offset,
+                            onlyUnread = 0
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     val feedListItems: Flow<PagingData<FeedListItem>> by lazy {
         feedListArgsState.flatMapLatest { args ->

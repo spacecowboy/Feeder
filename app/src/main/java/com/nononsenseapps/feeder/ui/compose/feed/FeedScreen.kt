@@ -220,13 +220,11 @@ fun FeedScreen(
                     item = previewItem,
                     onMarkAboveAsRead = {
                         if (itemIndex > 0) {
-                            // TODO
-                            Log.d("JONAS33", "Mark above < $itemIndex")
+                            feedItemsViewModel.markBeforeAsRead(itemIndex)
                         }
                     },
                     onMarkBelowAsRead = {
-                        // TODO
-                        Log.d("JONAS33", "Mark below > $itemIndex")
+                        feedItemsViewModel.markAfterAsRead(itemIndex)
                     },
                     onItemClick = {
                         onItemClick(previewItem.id)
