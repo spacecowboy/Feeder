@@ -92,6 +92,7 @@ fun FeedScreen(
     val onlyUnread by settingsViewModel.showOnlyUnread.collectAsState()
     val currentSorting by settingsViewModel.currentSorting.collectAsState()
     val currentFeedAndTag by settingsViewModel.currentFeedAndTag.collectAsState()
+    val showFloatingActionButton by settingsViewModel.showFab.collectAsState()
 
     val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts
         .observeAsState(initial = emptyList())
@@ -158,6 +159,7 @@ fun FeedScreen(
         visibleFeeds = visibleFeeds,
         feedsAndTags = feedsAndTags,
         refreshState = refreshState,
+        showFloatingActionButton = showFloatingActionButton,
         onRefresh = {
             applicationState.setRefreshing()
             requestFeedSync(
@@ -274,6 +276,7 @@ fun FeedScreen(
     onImport: () -> Unit,
     onExport: () -> Unit,
     onMarkAllAsRead: () -> Unit,
+    showFloatingActionButton: Boolean,
     content: @Composable (Modifier, suspend () -> Unit) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -422,13 +425,15 @@ fun FeedScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onMarkAllAsRead
-            ) {
-                Icon(
-                    Icons.Default.Check,
-                    contentDescription = "Mark all as read button"
-                )
+            if (showFloatingActionButton) {
+                FloatingActionButton(
+                    onClick = onMarkAllAsRead
+                ) {
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = "Mark all as read button"
+                    )
+                }
             }
         }
     ) { padding ->
@@ -468,6 +473,7 @@ fun DefaultPreview() {
             refreshState = rememberSwipeRefreshState(false),
             onRefresh = { },
             onlyUnread = false,
+            showFloatingActionButton = true,
             onToggleOnlyUnread = {},
             onDrawerItemSelected = { _, _ -> },
             onAddFeed = { },
