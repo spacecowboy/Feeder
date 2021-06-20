@@ -50,7 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
+import androidx.paging.compose.itemsIndexed
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -211,14 +211,27 @@ fun FeedScreen(
         LazyColumn(
             modifier = modifier
         ) {
-            items(pagedFeedItems) { previewItem ->
+            itemsIndexed(pagedFeedItems) { itemIndex, previewItem ->
                 if (previewItem == null) {
-                    return@items
+                    return@itemsIndexed
                 }
 
-                FeedItemPreview(item = previewItem, onItemClick = {
-                    onItemClick(previewItem.id)
-                })
+                FeedItemPreview(
+                    item = previewItem,
+                    onMarkAboveAsRead = {
+                        if (itemIndex > 0) {
+                            // TODO
+                            Log.d("JONAS33", "Mark above < $itemIndex")
+                        }
+                    },
+                    onMarkBelowAsRead = {
+                        // TODO
+                        Log.d("JONAS33", "Mark below > $itemIndex")
+                    },
+                    onItemClick = {
+                        onItemClick(previewItem.id)
+                    }
+                )
             }
 
             when {

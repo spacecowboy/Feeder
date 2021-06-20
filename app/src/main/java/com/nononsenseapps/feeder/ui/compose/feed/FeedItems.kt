@@ -1,11 +1,13 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,13 +15,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -27,14 +36,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleStyle
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import org.kodein.di.compose.instance
 import org.threeten.bp.ZonedDateTime
@@ -45,14 +53,26 @@ import java.util.*
 private val shortDateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FeedItemPreview(item: FeedListItem, onItemClick: () -> Unit) {
+fun FeedItemPreview(
+    item: FeedListItem,
+    onMarkAboveAsRead: () -> Unit,
+    onMarkBelowAsRead: () -> Unit,
+    onItemClick: () -> Unit
+) {
+    var dropDownMenuExpanded by remember {
+        mutableStateOf(false)
+    }
+
     Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier
-            .clickable {
-                onItemClick()
-            }
+            .combinedClickable(
+                onLongClick = {
+                    dropDownMenuExpanded = true
+                },
+                onClick = onItemClick
+            )
             .padding(
                 start = keyline1Padding,
                 end = if (item.imageUrl?.isNotBlank() != true) keyline1Padding else 0.dp
@@ -116,6 +136,8 @@ fun FeedItemPreview(item: FeedListItem, onItemClick: () -> Unit) {
 
         }
 
+        Spacer(modifier = Modifier.width(4.dp))
+
         item.imageUrl?.let { imageUrl ->
             val imageLoader: ImageLoader by instance()
 
@@ -133,6 +155,32 @@ fun FeedItemPreview(item: FeedListItem, onItemClick: () -> Unit) {
                     .padding(start = 4.dp)
             )
         }
+
+        DropdownMenu(
+            expanded = dropDownMenuExpanded,
+            onDismissRequest = { dropDownMenuExpanded = !dropDownMenuExpanded }
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    dropDownMenuExpanded = false
+                    onMarkAboveAsRead()
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.mark_items_above_as_read)
+                )
+            }
+            DropdownMenuItem(
+                onClick = {
+                    dropDownMenuExpanded = false
+                    onMarkBelowAsRead()
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.mark_items_below_as_read)
+                )
+            }
+        }
     }
 }
 
@@ -148,7 +196,9 @@ private fun preview() {
             unread = true,
             imageUrl = null,
             id = ID_UNSET
-        )
+        ),
+        onMarkAboveAsRead = {},
+        onMarkBelowAsRead = {}
     ) {
 
     }

@@ -35,10 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
 
 const val COLLAPSE_ANIMATION_DURATION = 300
 

@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.ui.compose.feed
+package com.nononsenseapps.feeder.ui.compose.navdrawer
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
