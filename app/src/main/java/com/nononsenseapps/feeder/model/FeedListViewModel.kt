@@ -25,7 +25,7 @@ import kotlin.collections.set
 class FeedListViewModel(di: DI) : DIAwareViewModel(di) {
     private val dao: FeedDao by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
-    private val feedsWithUnreadCounts = dao.loadLiveFeedsWithUnreadCounts()
+    private val feedsWithUnreadCounts = dao.loadFlowOfFeedsWithUnreadCounts()
 
     val liveFeedsAndTagsWithUnreadCounts: LiveData<List<FeedUnreadCount>> by lazy {
         liveData<List<FeedUnreadCount>>(

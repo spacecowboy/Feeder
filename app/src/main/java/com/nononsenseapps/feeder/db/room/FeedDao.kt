@@ -97,7 +97,7 @@ interface FeedDao {
         ON feeds.id = feed_id
     """
     )
-    fun loadLiveFeedsWithUnreadCounts(): Flow<List<FeedUnreadCount>>
+    fun loadFlowOfFeedsWithUnreadCounts(): Flow<List<FeedUnreadCount>>
 
     @Query("UPDATE feeds SET notify = :notify WHERE id IS :id")
     suspend fun setNotify(id: Long, notify: Boolean)

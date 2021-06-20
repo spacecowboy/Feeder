@@ -39,7 +39,6 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,16 +57,21 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.FeedTitle
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.FeedListViewModel
-import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.SortingOptions
@@ -94,8 +98,8 @@ fun FeedScreen(
     val currentFeedAndTag by settingsViewModel.currentFeedAndTag.collectAsState()
     val showFloatingActionButton by settingsViewModel.showFab.collectAsState()
 
-    val feedsAndTags by feedListViewModel.liveFeedsAndTagsWithUnreadCounts
-        .observeAsState(initial = emptyList())
+    val feedsAndTags by feedItemsViewModel.drawerItemsWithUnreadCounts
+        .collectAsState(initial = emptyList())
 
     feedItemsViewModel.feedListArgs = feedItemsViewModel.feedListArgs.copy(
         feedId = currentFeedAndTag.first,
@@ -262,7 +266,7 @@ fun FeedScreen(
 @Composable
 fun FeedScreen(
     visibleFeeds: List<FeedTitle>,
-    feedsAndTags: List<FeedUnreadCount>,
+    feedsAndTags: List<DrawerItemWithUnreadCount>,
     refreshState: SwipeRefreshState,
     onRefresh: () -> Unit,
     onlyUnread: Boolean,
@@ -418,7 +422,17 @@ fun FeedScreen(
                 feedsAndTags = feedsAndTags,
                 onItemClick = { item ->
                     coroutineScope.launch {
-                        onDrawerItemSelected(item.id, item.tag)
+                        val id = when (item) {
+                            is DrawerFeed -> item.id
+                            is DrawerTag -> ID_UNSET
+                            is DrawerTop -> ID_ALL_FEEDS
+                        }
+                        val tag = when (item) {
+                            is DrawerFeed -> item.tag
+                            is DrawerTag -> item.tag
+                            is DrawerTop -> ""
+                        }
+                        onDrawerItemSelected(id, tag)
                         scaffoldState.drawerState.close()
                     }
                 }

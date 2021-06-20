@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.model
 
+import android.util.ArrayMap
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,18 +16,25 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
+import java.util.*
 
 const val PAGE_SIZE = 100
 private const val KEY_FEED_ID = "FeedItemsViewModel feedid"
@@ -34,6 +42,7 @@ private const val KEY_TAG = "FeedItemsViewModel tag"
 
 class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
     private val dao: FeedItemDao by instance()
+    private val feedDao: FeedDao by instance()
     private val liveOnlyUnread = MutableLiveData<Boolean>()
     private val liveNewestFirst = MutableLiveData<Boolean>()
 
@@ -106,6 +115,37 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
         }
         return livePreviews
     }
+
+    val drawerItemsWithUnreadCounts: Flow<List<DrawerItemWithUnreadCount>> =
+        feedDao.loadFlowOfFeedsWithUnreadCounts()
+            .flatMapLatest { feeds ->
+                var topTag = DrawerTop(unreadCount = 0)
+                val tags: MutableMap<String, DrawerTag> = ArrayMap()
+                val data: MutableList<DrawerItemWithUnreadCount> = ArrayList()
+
+                for (feedDbo in feeds) {
+                    val feed = DrawerFeed(
+                        unreadCount = feedDbo.unreadCount,
+                        tag = feedDbo.tag,
+                        id = feedDbo.id,
+                        displayTitle = feedDbo.displayTitle
+                    )
+
+                    data.add(feed)
+                    topTag = topTag.copy(unreadCount = topTag.unreadCount + feed.unreadCount)
+
+                    if (feed.tag.isNotEmpty()) {
+                        val tag = tags[feed.tag] ?: DrawerTag(tag = feed.tag, unreadCount = 0)
+                        tags[feed.tag] = tag.copy(unreadCount = tag.unreadCount + feed.unreadCount)
+                    }
+                }
+
+                data.add(topTag)
+                data.addAll(tags.values)
+
+                // done
+                flowOf(data.sorted())
+            }
 
     val feedListItems: Flow<PagingData<FeedListItem>> by lazy {
         feedListArgsState.flatMapLatest { args ->
