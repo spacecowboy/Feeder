@@ -98,6 +98,8 @@ fun FeedScreen(
     val currentFeedAndTag by settingsViewModel.currentFeedAndTag.collectAsState()
     val showFloatingActionButton by settingsViewModel.showFab.collectAsState()
 
+    val screenTitle by feedItemsViewModel.currentTitle.collectAsState(initial = "")
+
     val feedsAndTags by feedItemsViewModel.drawerItemsWithUnreadCounts
         .collectAsState(initial = emptyList())
 
@@ -160,16 +162,26 @@ fun FeedScreen(
     }
 
     FeedScreen(
+        screenTitle = screenTitle ?: stringResource(id = R.string.all_feeds),
         visibleFeeds = visibleFeeds,
         feedsAndTags = feedsAndTags,
         refreshState = refreshState,
         showFloatingActionButton = showFloatingActionButton,
-        onRefresh = {
+        onRefreshVisible = {
             applicationState.setRefreshing()
             requestFeedSync(
                 di = di,
                 feedId = currentFeedAndTag.first,
                 feedTag = currentFeedAndTag.second,
+                ignoreConnectivitySettings = true,
+                forceNetwork = true,
+                parallell = true
+            )
+        },
+        onRefreshAll = {
+            applicationState.setRefreshing()
+            requestFeedSync(
+                di = di,
                 ignoreConnectivitySettings = true,
                 forceNetwork = true,
                 parallell = true
@@ -276,10 +288,12 @@ fun FeedScreen(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FeedScreen(
+    screenTitle: String,
     visibleFeeds: List<FeedTitle>,
     feedsAndTags: List<DrawerItemWithUnreadCount>,
     refreshState: SwipeRefreshState,
-    onRefresh: () -> Unit,
+    onRefreshVisible: () -> Unit,
+    onRefreshAll: () -> Unit,
     onlyUnread: Boolean,
     onToggleOnlyUnread: (Boolean) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
@@ -309,7 +323,7 @@ fun FeedScreen(
         scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
-                title = { Text("Feeder") },
+                title = { Text(screenTitle) },
                 navigationIcon = {
                     IconButton(
                         onClick = {
@@ -342,9 +356,7 @@ fun FeedScreen(
                         }
                     }
                     IconButton(
-                        onClick = {
-                            onRefresh()
-                        }
+                        onClick = onRefreshAll
                     ) {
                         Icon(
                             Icons.Default.Refresh,
@@ -464,7 +476,7 @@ fun FeedScreen(
     ) { padding ->
         SwipeRefresh(
             state = refreshState,
-            onRefresh = onRefresh
+            onRefresh = onRefreshVisible
         ) {
             content(
                 Modifier
@@ -493,10 +505,12 @@ fun DefaultPreview() {
         ThemeOptions.DAY
     ) {
         FeedScreen(
+            screenTitle = "FeedScreen",
             visibleFeeds = emptyList(),
             feedsAndTags = listOf(),
             refreshState = rememberSwipeRefreshState(false),
-            onRefresh = { },
+            onRefreshVisible = { },
+            onRefreshAll = {},
             onlyUnread = false,
             showFloatingActionButton = true,
             onToggleOnlyUnread = {},

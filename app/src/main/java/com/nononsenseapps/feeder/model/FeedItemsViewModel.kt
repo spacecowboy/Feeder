@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -321,7 +322,7 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
         }
     }
 
-    val feedListItems: Flow<PagingData<FeedListItem>> by lazy {
+    val feedListItems: Flow<PagingData<FeedListItem>> =
         feedListArgsState.flatMapLatest { args ->
             Pager(
                 config = PagingConfig(
@@ -367,8 +368,19 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
                 }
         }
             .cachedIn(viewModelScope)
-    }
 
+    val currentTitle: Flow<String?> =
+        feedListArgsState.mapLatest { args ->
+            when {
+                args.tag.isNotEmpty() -> args.tag
+                args.feedId > ID_UNSET -> {
+                    feedDao.getFeedTitle(args.feedId)
+                        .firstOrNull()
+                        ?.displayTitle
+                }
+                else -> null
+            }
+        }
 
     fun setOnlyUnread(onlyUnread: Boolean) {
         liveOnlyUnread.value = onlyUnread
