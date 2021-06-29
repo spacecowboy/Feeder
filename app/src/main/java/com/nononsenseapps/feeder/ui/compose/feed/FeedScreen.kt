@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.DropdownMenu
@@ -223,10 +224,14 @@ fun FeedScreen(
         LazyColumn(
             modifier = modifier
         ) {
-            itemsIndexed(pagedFeedItems) { itemIndex, previewItem ->
-                if (previewItem == null) {
-                    return@itemsIndexed
+            items(
+                pagedFeedItems.itemCount,
+                key = { itemIndex ->
+                    pagedFeedItems.snapshot().items[itemIndex].id
                 }
+            ) { itemIndex ->
+                val previewItem = pagedFeedItems.getAsState(index = itemIndex).value
+                    ?: return@items
 
                 FeedItemPreview(
                     item = previewItem,
