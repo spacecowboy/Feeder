@@ -22,20 +22,20 @@ interface FeedDao {
     suspend fun insertFeed(feed: Feed): Long
 
     @Update
-    suspend fun updateFeed(feed: Feed)
+    suspend fun updateFeed(feed: Feed): Int
 
     @Delete
-    suspend fun deleteFeed(feed: Feed)
+    suspend fun deleteFeed(feed: Feed): Int
 
     @Query("DELETE FROM feeds WHERE id IS :feedId")
-    suspend fun deleteFeedWithId(feedId: Long)
+    suspend fun deleteFeedWithId(feedId: Long): Int
 
     @Query(
         """
         DELETE FROM feeds WHERE id IN (:ids)
         """
     )
-    suspend fun deleteFeeds(ids: List<Long>)
+    suspend fun deleteFeeds(ids: List<Long>): Int
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
     fun loadFeedFlow(feedId: Long): Flow<Feed?>

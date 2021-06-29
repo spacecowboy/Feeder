@@ -99,5 +99,9 @@ inline fun <reified T : DIAwareViewModel> SavedStateRegistryOwner.DIAwareViewMod
 ): T {
     val factory = DIAwareSavedStateViewModelFactory(LocalDI.current, this)
 
-    return viewModel(T::class.java, key, factory)
+    return viewModel(
+        modelClass = T::class.java,
+        key = key,
+        factory = factory
+    )
 }

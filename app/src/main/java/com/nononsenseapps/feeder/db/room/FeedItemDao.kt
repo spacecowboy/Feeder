@@ -30,14 +30,14 @@ interface FeedItemDao {
     suspend fun updateFeedItems(items: List<FeedItem>): Int
 
     @Delete
-    suspend fun deleteFeedItem(item: FeedItem)
+    suspend fun deleteFeedItem(item: FeedItem): Int
 
     @Query(
         """
         DELETE FROM feed_items WHERE id IN (:ids)
         """
     )
-    suspend fun deleteFeedItems(ids: List<Long>)
+    suspend fun deleteFeedItems(ids: List<Long>): Int
 
     @Query(
         """

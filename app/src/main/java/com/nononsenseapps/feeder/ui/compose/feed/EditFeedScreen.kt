@@ -318,7 +318,7 @@ fun EditFeedView(
                     modifier = Modifier
                         .focusOrder(focusTag)
                         .onFocusChanged {
-                            tagHasFocus = it == FocusState.Active
+                            tagHasFocus = it.isFocused
                         }
                         .fillMaxWidth()
                         .heightIn(min = 64.dp)
