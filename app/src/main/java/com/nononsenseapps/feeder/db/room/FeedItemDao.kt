@@ -510,6 +510,25 @@ interface FeedItemDao {
         """
     )
     suspend fun markAsReadAsc(tag: String, onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+
+    @Query(
+        """
+            SELECT feeds.open_articles_with
+            FROM feed_items
+            LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+            WHERE feed_items.id IS :itemid
+        """
+    )
+    suspend fun getOpenArticleWith(itemid: Long): String?
+
+    @Query(
+        """
+            SELECT link
+            FROM feed_items
+            WHERE feed_items.id IS :itemid
+        """
+    )
+    suspend fun getLink(itemid: Long): String?
 }
 
 suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > ID_UNSET) {

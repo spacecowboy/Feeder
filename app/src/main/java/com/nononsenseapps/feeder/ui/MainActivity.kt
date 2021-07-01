@@ -7,6 +7,8 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -29,6 +31,11 @@ import com.nononsenseapps.feeder.ui.compose.feed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.util.ItemOpener
+import com.nononsenseapps.feeder.util.PrefValOpenWith
+import com.nononsenseapps.feeder.util.openLinkInBrowser
+import com.nononsenseapps.feeder.util.openLinkInCustomTab
+import kotlinx.coroutines.launch
 import org.kodein.di.compose.withDI
 import org.kodein.di.instance
 
@@ -65,14 +72,37 @@ fun MainActivity.AppContent(maxImageSize: Point) = withDI {
         // TODO implement intent handling for android.intent.action.MANAGE_NETWORK_USAGE
         // TODO implement intent for adding a feed
         // TODO verify currentFeed is updated on delete
+        // TODO add a specific navigation target for opening items from intent where navigation is moved to reader/list and correct custom tab etc is opened
 
         NavHost(navController, startDestination = "feed") {
             composable(
                 "feed"
             ) { backStackEntry ->
+                val feedItemViewModel: FeedItemViewModel = backStackEntry.DIAwareViewModel()
+                val context = LocalContext.current
+                val coroutineScope = rememberCoroutineScope()
+
                 FeedScreen(
                     onItemClick = { itemId ->
-                        navController.navigate("reader/$itemId")
+                        coroutineScope.launch {
+                            val openArticleWith = feedItemViewModel.getOpenArticleWith(itemId)
+                            val link = feedItemViewModel.getLink(itemId)
+                            val openItemsByDefaultWith = settingsViewModel.itemOpener.value
+
+                            when {
+                                link != null && (openArticleWith == PrefValOpenWith.OPEN_WITH_BROWSER
+                                        || openArticleWith == PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith == ItemOpener.DEFAULT_BROWSER) -> {
+                                    openLinkInBrowser(context, link)
+                                }
+                                link != null && (openArticleWith == PrefValOpenWith.OPEN_WITH_CUSTOM_TAB
+                                        || openArticleWith == PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith == ItemOpener.CUSTOM_TAB) -> {
+                                    openLinkInCustomTab(context, link, itemId)
+                                }
+                                else -> {
+                                    navController.navigate("reader/$itemId")
+                                }
+                            }
+                        }
                     },
                     onAddFeed = {
                         navController.navigate("search/feed")

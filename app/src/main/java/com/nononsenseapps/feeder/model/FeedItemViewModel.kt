@@ -27,6 +27,10 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.text.UrlClickListener
 import com.nononsenseapps.feeder.ui.text.toSpannedWithImages
 import com.nononsenseapps.feeder.ui.text.toSpannedWithNoImages
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_CUSTOM_TAB
+import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
+import com.nononsenseapps.feeder.util.PrefValOpenWith
 import com.nononsenseapps.feeder.util.TabletUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,6 +70,17 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
     var currentItemId: Long
         get() = state[KEY_ITEM_ID] ?: ID_UNSET
         set(value) = state.set(KEY_ITEM_ID, value)
+
+    suspend fun getOpenArticleWith(itemId: Long): PrefValOpenWith =
+        when (dao.getOpenArticleWith(itemId)) {
+            PREF_VAL_OPEN_WITH_BROWSER -> PrefValOpenWith.OPEN_WITH_BROWSER
+            PREF_VAL_OPEN_WITH_CUSTOM_TAB -> PrefValOpenWith.OPEN_WITH_CUSTOM_TAB
+            PREF_VAL_OPEN_WITH_READER -> PrefValOpenWith.OPEN_WITH_READER
+            else -> PrefValOpenWith.OPEN_WITH_DEFAULT
+        }
+
+    suspend fun getLink(itemId: Long): String? =
+        dao.getLink(itemId)
 
     private val textToDisplayState = MutableStateFlow(TextToDisplay.DEFAULT)
     val textToDisplay: StateFlow<TextToDisplay> = textToDisplayState.asStateFlow()
