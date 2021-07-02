@@ -1,8 +1,8 @@
-<p>Haben Sie genug von aufgeblähten, nicht freien RSS-Feedreader, die Ihre persönlichen Daten stehlen?<br />
+<p>Haben Sie genug von aufgeblähten, nicht freien RSS-Feedreadern, die Ihre persönlichen Daten stehlen?<br />
 Haben Sie genug von umständlichen Synchronisierungskonfigurationen, die stundenlange Serverkonfigurationen erfordern?<br />
 Sind Sie es leid, überall Konten anlegen zu müssen?<br /></p>
 
-<p>Versuchen Sie stattdessen den Feeder!</p>
+<p>Versuchen Sie stattdessen Feeder!</p>
 
 <p>Feeder ist ein vollständig kostenloser und freier Feedreader. Er unterstützt alle gängigen Feed-Formate, einschließlich JSONFeed. Es verfolgt Sie nicht. Es erfordert keine Einrichtung. Dazu müssen Sie nicht einmal ein Konto anlegen! Richten Sie einfach Ihre Feeds ein oder importieren Sie sie von Ihrem alten Reader über OPML, dann können Sie mit dem Synchronisieren und Lesen beginnen.</p>
 
