@@ -80,7 +80,6 @@ fun SettingsScreen(
     val syncOnlyWhenCharging by settingsViewModel.syncOnlyWhenCharging.collectAsState()
     val loadImageOnlyOnWifi by settingsViewModel.loadImageOnlyOnWifi.collectAsState()
     val showThumbnails by settingsViewModel.showThumbnails.collectAsState()
-    val preloadCustomTab by settingsViewModel.preloadCustomTab.collectAsState()
     val maxItemsPerFeed by settingsViewModel.maximumCountPerFeed.collectAsState()
     val itemOpener by settingsViewModel.itemOpener.collectAsState()
     val linkOpener by settingsViewModel.linkOpener.collectAsState()
@@ -153,10 +152,6 @@ fun SettingsScreen(
             onShowThumbnailsChanged = {
                 settingsViewModel.setShowThumbnails(it)
             },
-            preloadCustomTabValue = preloadCustomTab,
-            onPreloadCustomTabChanged = {
-                settingsViewModel.setPreloadCustomTab(it)
-            },
             maxItemsPerFeedValue = maxItemsPerFeed,
             onMaxItemsPerFeedChanged = {
                 settingsViewModel.setMaxCountPerFeed(it)
@@ -201,8 +196,6 @@ fun SettingsScreenPreview() {
                 onLoadImageOnlyOnWifiChanged = {},
                 showThumbnailsValue = true,
                 onShowThumbnailsChanged = {},
-                preloadCustomTabValue = true,
-                onPreloadCustomTabChanged = {},
                 maxItemsPerFeedValue = 101,
                 onMaxItemsPerFeedChanged = {},
                 currentItemOpenerValue = ItemOpener.CUSTOM_TAB,
@@ -236,8 +229,6 @@ fun SettingsList(
     onLoadImageOnlyOnWifiChanged: (Boolean) -> Unit,
     showThumbnailsValue: Boolean,
     onShowThumbnailsChanged: (Boolean) -> Unit,
-    preloadCustomTabValue: Boolean,
-    onPreloadCustomTabChanged: (Boolean) -> Unit,
     maxItemsPerFeedValue: Int,
     onMaxItemsPerFeedChanged: (Int) -> Unit,
     currentItemOpenerValue: ItemOpener,
@@ -390,12 +381,6 @@ fun SettingsList(
             onSelection = {
                 onLinkOpenerChanged(it.linkOpener)
             }
-        )
-
-        SwitchSetting(
-            checked = preloadCustomTabValue,
-            onCheckedChanged = onPreloadCustomTabChanged,
-            title = stringResource(id = R.string.preload_custom_tab)
         )
     }
 }

@@ -13,6 +13,7 @@ import org.kodein.di.DIAware
 import org.kodein.di.direct
 import org.kodein.di.instance
 
+@Deprecated("Stop using this")
 class CustomTabsWarmer(override val di: DI) : DIAware {
     private var customClient: CustomTabsClient? = null
     private var customSession: CustomTabsSession? = null

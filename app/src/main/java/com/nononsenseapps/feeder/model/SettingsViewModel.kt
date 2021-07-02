@@ -144,13 +144,6 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di),
         prefs.showThumbnails = value
     }
 
-    private val _preloadCustomTab = MutableStateFlow(prefs.preloadCustomTab)
-    val preloadCustomTab = _preloadCustomTab.asStateFlow()
-    fun setPreloadCustomTab(value: Boolean) {
-        _preloadCustomTab.value = value
-        prefs.preloadCustomTab = value
-    }
-
     private val _maximumCountPerFeed = MutableStateFlow(prefs.maximumCountPerFeed)
     val maximumCountPerFeed = _maximumCountPerFeed.asStateFlow()
     fun setMaxCountPerFeed(value: Int) {
