@@ -3,9 +3,12 @@ package com.nononsenseapps.feeder.ui.compose.feed
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -35,16 +38,19 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.runtime.getValue
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,6 +58,8 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
+import coil.ImageLoader
+import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -74,9 +82,11 @@ import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
+import com.nononsenseapps.feeder.ui.compose.state.getImagePlaceholder
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.SortingOptions
 import com.nononsenseapps.feeder.util.ThemeOptions
+import com.nononsenseapps.feeder.util.currentlyUnmetered
 import com.nononsenseapps.feeder.util.openGitlabIssues
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
@@ -138,6 +148,8 @@ fun FeedScreen(
         context.startActivity(openGitlabIssues())
     }
 
+    val showThumbnails by settingsViewModel.showThumbnails.collectAsState()
+
     val di = LocalDI.current
 
     val opmlExporter = rememberLauncherForActivityResult(
@@ -161,6 +173,10 @@ fun FeedScreen(
             }
         }
     }
+    val imageLoader: ImageLoader by instance()
+
+    @DrawableRes
+    val placeHolder: Int = getImagePlaceholder(settingsViewModel)
 
     FeedScreen(
         screenTitle = screenTitle ?: stringResource(id = R.string.all_feeds),
@@ -235,6 +251,7 @@ fun FeedScreen(
 
                 FeedItemPreview(
                     item = previewItem,
+                    showThumbnail = showThumbnails,
                     onMarkAboveAsRead = {
                         if (itemIndex > 0) {
                             feedItemsViewModel.markBeforeAsRead(itemIndex)
@@ -245,6 +262,25 @@ fun FeedScreen(
                     },
                     onItemClick = {
                         onItemClick(previewItem.id)
+                    },
+                    imagePainter = { imageUrl ->
+                        Image(
+                            painter = rememberCoilPainter(
+                                request = imageUrl,
+                                imageLoader = imageLoader,
+                                requestBuilder = {
+                                    this.error(placeHolder)
+                                },
+                                previewPlaceholder = placeHolder,
+                                shouldRefetchOnSizeChange = { _, _ -> false },
+                            ),
+                            contentScale = ContentScale.Crop,
+                            contentDescription = "Thumbnail for the article",
+                            modifier = Modifier
+                                .width(64.dp)
+                                .fillMaxHeight()
+                                .padding(start = 4.dp)
+                        )
                     }
                 )
             }

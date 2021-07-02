@@ -57,6 +57,8 @@ private val shortDateTimeFormat: DateTimeFormatter =
 @Composable
 fun FeedItemPreview(
     item: FeedListItem,
+    showThumbnail: Boolean,
+    imagePainter: @Composable (String) -> Unit,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onItemClick: () -> Unit
@@ -75,7 +77,7 @@ fun FeedItemPreview(
             )
             .padding(
                 start = keyline1Padding,
-                end = if (item.imageUrl?.isNotBlank() != true) keyline1Padding else 0.dp
+                end = if (item.imageUrl?.isNotBlank() != true || !showThumbnail) keyline1Padding else 0.dp
             )
             .height(IntrinsicSize.Min)
     ) {
@@ -136,24 +138,12 @@ fun FeedItemPreview(
 
         }
 
-        Spacer(modifier = Modifier.width(4.dp))
+        if (showThumbnail) {
+            item.imageUrl?.let { imageUrl ->
+                Spacer(modifier = Modifier.width(4.dp))
 
-        item.imageUrl?.let { imageUrl ->
-            val imageLoader: ImageLoader by instance()
-
-            Image(
-                painter = rememberCoilPainter(
-                    request = imageUrl,
-                    imageLoader = imageLoader,
-                    shouldRefetchOnSizeChange = { _, _ -> false },
-                ),
-                contentScale = ContentScale.Crop,
-                contentDescription = "Thumbnail for the article",
-                modifier = Modifier
-                    .width(64.dp)
-                    .fillMaxHeight()
-                    .padding(start = 4.dp)
-            )
+                imagePainter(imageUrl)
+            }
         }
 
         DropdownMenu(
@@ -197,6 +187,8 @@ private fun preview() {
             imageUrl = null,
             id = ID_UNSET
         ),
+        showThumbnail = true,
+        imagePainter = {},
         onMarkAboveAsRead = {},
         onMarkBelowAsRead = {}
     ) {

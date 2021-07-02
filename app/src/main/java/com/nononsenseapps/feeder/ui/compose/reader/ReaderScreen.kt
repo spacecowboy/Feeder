@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.ui.compose.reader
 
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -49,6 +50,7 @@ import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToDisplay
+import com.nononsenseapps.feeder.ui.compose.state.getImagePlaceholder
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
@@ -108,6 +110,9 @@ fun ReaderScreen(
         Unit
     }
 
+    @DrawableRes
+    val placeHolder: Int = getImagePlaceholder(settingsViewModel)
+
     ReaderScreen(
         articleTitle = feedItem?.plainTitle ?: "",
         feedDisplayTitle = feedItem?.feedDisplayTitle ?: "",
@@ -136,6 +141,7 @@ fun ReaderScreen(
                         htmlFormattedText(
                             inputStream = it,
                             baseUrl = feedUrl,
+                            imagePlaceholder = placeHolder,
                             onLinkClick = { link ->
                                 onLinkClick(
                                     link = link,
@@ -161,6 +167,7 @@ fun ReaderScreen(
                         htmlFormattedText(
                             inputStream = it,
                             baseUrl = feedUrl,
+                            imagePlaceholder = placeHolder,
                             onLinkClick = { link ->
                                 onLinkClick(
                                     link = link,

@@ -47,7 +47,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di),
             .conflate()
             .asLiveData()
 
-    @Deprecated("Use currentSorting instead")
+    @Deprecated("Use currentTheme instead")
     val liveIsNightMode: MutableLiveData<Boolean> by lazy { MutableLiveData(prefs.isNightMode) }
 
     @Deprecated("Use currentSorting instead")

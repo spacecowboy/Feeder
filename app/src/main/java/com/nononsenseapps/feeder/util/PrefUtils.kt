@@ -322,6 +322,15 @@ enum class ThemeOptions(
         }
     }
 
+    @Composable
+    fun isDarkTheme(): Boolean {
+        return when (this) {
+            DAY -> false
+            NIGHT -> true
+            SYSTEM -> isSystemInDarkTheme()
+        }
+    }
+
     fun toPrefValue(): String =
         when (this) {
             DAY -> "day"

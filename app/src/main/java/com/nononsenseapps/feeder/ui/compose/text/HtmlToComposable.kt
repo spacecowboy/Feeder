@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
 import android.util.Log
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -55,17 +56,23 @@ import java.io.InputStream
 fun LazyListScope.htmlFormattedText(
     inputStream: InputStream,
     baseUrl: String,
+    @DrawableRes imagePlaceholder: Int,
     onLinkClick: (String) -> Unit
 ) {
     Jsoup.parse(inputStream, null, baseUrl)
         ?.body()
         ?.let { body ->
-            formatBody(element = body, onLinkClick = onLinkClick)
+            formatBody(
+                element = body,
+                imagePlaceholder = imagePlaceholder,
+                onLinkClick = onLinkClick
+            )
         }
 }
 
 private fun LazyListScope.formatBody(
     element: Element,
+    @DrawableRes imagePlaceholder: Int,
     onLinkClick: (String) -> Unit
 ) {
     val composer = TextComposer { paragraphBuilder ->
@@ -88,12 +95,16 @@ private fun LazyListScope.formatBody(
         }
     }
 
-    composer.appendTextChildren(element.childNodes(), lazyListScope = this)
+    composer.appendTextChildren(
+        element.childNodes(),
+        lazyListScope = this,
+        imagePlaceholder = imagePlaceholder
+    )
 
     composer.terminateCurrentText()
 }
 
-private fun LazyListScope.formatCodeBlock(element: Element) {
+private fun LazyListScope.formatCodeBlock(element: Element, @DrawableRes imagePlaceholder: Int) {
     val composer = TextComposer { paragraphBuilder ->
         item {
             val scrollState = rememberScrollState()
@@ -116,7 +127,11 @@ private fun LazyListScope.formatCodeBlock(element: Element) {
         }
     }
 
-    composer.appendTextChildren(element.childNodes(), preFormatted = true, lazyListScope = this)
+    composer.appendTextChildren(
+        element.childNodes(), preFormatted = true,
+        lazyListScope = this,
+        imagePlaceholder = imagePlaceholder
+    )
 
     composer.terminateCurrentText()
 }
@@ -125,7 +140,8 @@ private fun LazyListScope.formatCodeBlock(element: Element) {
 private fun TextComposer.appendTextChildren(
     nodes: List<Node>,
     preFormatted: Boolean = false,
-    lazyListScope: LazyListScope
+    lazyListScope: LazyListScope,
+    @DrawableRes imagePlaceholder: Int
 ) {
     var node = nodes.firstOrNull()
     while (node != null) {
@@ -157,12 +173,16 @@ private fun TextComposer.appendTextChildren(
                         // Readability4j inserts p-tags in divs for algorithmic purposes.
                         // They screw up formatting.
                         if (node.hasClass("readability-styled")) {
-                            appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
+                            appendTextChildren(
+                                element.childNodes(), lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder
+                            )
                         } else {
                             withParagraph {
                                 appendTextChildren(
                                     element.childNodes(),
-                                    lazyListScope = lazyListScope
+                                    lazyListScope = lazyListScope,
+                                    imagePlaceholder = imagePlaceholder
                                 )
                             }
                         }
@@ -224,51 +244,75 @@ private fun TextComposer.appendTextChildren(
                     }
                     "strong", "b" -> {
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
+                            appendTextChildren(
+                                element.childNodes(), lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder
+                            )
                         }
                     }
                     "i", "em", "cite", "dfn" -> {
                         withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                            appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
+                            appendTextChildren(
+                                element.childNodes(), lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder
+                            )
                         }
                     }
                     "tt" -> {
                         withStyle(SpanStyle(fontFamily = FontFamily.Monospace)) {
-                            appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
+                            appendTextChildren(
+                                element.childNodes(), lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder
+                            )
                         }
                     }
                     "u" -> {
                         withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) {
-                            appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
+                            appendTextChildren(
+                                element.childNodes(), lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder
+                            )
                         }
                     }
                     "sup" -> {
                         withStyle(SpanStyle(baselineShift = BaselineShift.Superscript)) {
-                            appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
+                            appendTextChildren(
+                                element.childNodes(), lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder
+                            )
                         }
                     }
                     "sub" -> {
                         withStyle(SpanStyle(baselineShift = BaselineShift.Subscript)) {
-                            appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
+                            appendTextChildren(
+                                element.childNodes(),
+                                lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder
+                            )
                         }
                     }
                     "font" -> {
                         val fontFamily: FontFamily? = element.attr("face")?.asFontFamily()
                         withStyle(SpanStyle(fontFamily = fontFamily)) {
-                            appendTextChildren(element.childNodes(), lazyListScope = lazyListScope)
+                            appendTextChildren(
+                                element.childNodes(),
+                                lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder
+                            )
                         }
                     }
                     "pre" -> {
                         appendTextChildren(
                             element.childNodes(),
                             preFormatted = true,
-                            lazyListScope = lazyListScope
+                            lazyListScope = lazyListScope,
+                            imagePlaceholder = imagePlaceholder
                         )
                     }
                     "code" -> {
                         if (element.parent()?.tagName() == "pre") {
                             terminateCurrentText()
-                            lazyListScope.formatCodeBlock(element = element)
+                            lazyListScope.formatCodeBlock(element = element, imagePlaceholder = imagePlaceholder)
                         } else {
                             // inline code
                             withComposableStyle(
@@ -277,7 +321,8 @@ private fun TextComposer.appendTextChildren(
                                 appendTextChildren(
                                     element.childNodes(),
                                     preFormatted = preFormatted,
-                                    lazyListScope = lazyListScope
+                                    lazyListScope = lazyListScope,
+                                    imagePlaceholder = imagePlaceholder
                                 )
                             }
                         }
@@ -289,13 +334,13 @@ private fun TextComposer.appendTextChildren(
                             ) {
                                 appendTextChildren(
                                     element.childNodes(),
-                                    lazyListScope = lazyListScope
+                                    lazyListScope = lazyListScope,
+                                    imagePlaceholder = imagePlaceholder
                                 )
                             }
                         }
                     }
                     "a" -> {
-                        // TODO clickable and colors
                         withComposableStyle(
                             style = { LinkTextStyle().toSpanStyle() }
                         ) {
@@ -339,9 +384,9 @@ private fun TextComposer.appendTextChildren(
                                                 request = imageUrl,
                                                 imageLoader = imageLoader,
                                                 requestBuilder = {
-                                                    this.error(R.drawable.placeholder_image_article_day)
+                                                    this.error(imagePlaceholder)
                                                 },
-                                                previewPlaceholder = R.drawable.placeholder_image_article_night,
+                                                previewPlaceholder = imagePlaceholder,
                                                 shouldRefetchOnSizeChange = { _, _ -> false },
                                             ),
                                             contentDescription = alt,
@@ -374,7 +419,8 @@ private fun TextComposer.appendTextChildren(
                                     append("• ")
                                     appendTextChildren(
                                         listItem.childNodes(),
-                                        lazyListScope = lazyListScope
+                                        lazyListScope = lazyListScope,
+                                        imagePlaceholder = imagePlaceholder
                                     )
                                 }
                             }
@@ -388,7 +434,8 @@ private fun TextComposer.appendTextChildren(
                                     append("${i + 1}. ")
                                     appendTextChildren(
                                         listItem.childNodes(),
-                                        lazyListScope = lazyListScope
+                                        lazyListScope = lazyListScope,
+                                        imagePlaceholder = imagePlaceholder
                                     )
                                 }
                             }
@@ -442,7 +489,8 @@ private fun TextComposer.appendTextChildren(
                         appendTextChildren(
                             nodes = element.childNodes(),
                             preFormatted = preFormatted,
-                            lazyListScope = lazyListScope
+                            lazyListScope = lazyListScope,
+                            imagePlaceholder = imagePlaceholder
                         )
                     }
                 }
@@ -473,6 +521,7 @@ private fun testIt() {
             htmlFormattedText(
                 inputStream = stream,
                 baseUrl = "https://cowboyprogrammer.org",
+                imagePlaceholder = R.drawable.placeholder_image_article_night,
                 onLinkClick = {}
             )
         }
