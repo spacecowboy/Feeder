@@ -34,44 +34,6 @@
         <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
         <category android:name="android.intent.category.DEFAULT" />
       </intent-filter>
-      <meta-data
-        android:name="android.app.shortcuts"
-        android:resource="@xml/shortcuts" />
-    </activity>
-
-<!--    <activity-->
-<!--      android:name=".ui.FeedActivity"-->
-<!--      android:label="@string/app_name">-->
-
-<!--      <nav-graph android:value="@navigation/nav_graph" />-->
-
-<!--      <intent-filter>-->
-<!--        <action android:name="android.intent.action.MAIN" />-->
-
-<!--        <category android:name="android.intent.category.LAUNCHER" />-->
-<!--      </intent-filter>-->
-
-<!--      <intent-filter>-->
-<!--        <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />-->
-
-<!--        <category android:name="android.intent.category.DEFAULT" />-->
-<!--      </intent-filter>-->
-
-<!--      <meta-data-->
-<!--        android:name="android.app.shortcuts"-->
-<!--        android:resource="@xml/shortcuts" />-->
-<!--    </activity>-->
-
-    <activity
-      android:name=".ui.EditFeedActivity"
-      android:label="@string/title_activity_edit_feed"
-      android:parentActivityName=".ui.FeedActivity"
-      android:theme="@style/EditFeedThemeDay"
-      android:windowSoftInputMode="adjustResize|stateVisible">
-      <meta-data
-        android:name="android.support.PARENT_ACTIVITY"
-        android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
-
       <!-- URLs with feed mimetype can be opened -->
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
@@ -139,7 +101,12 @@
 
         <data android:mimeType="text/plain" />
       </intent-filter>
+      <meta-data
+        android:name="android.app.shortcuts"
+        android:resource="@xml/shortcuts" />
     </activity>
+
+    <!-- TODO update below -->
     <!-- Receiver for notification cancellations and such -->
     <receiver android:name=".model.RssNotificationBroadcastReceiver" />
 
