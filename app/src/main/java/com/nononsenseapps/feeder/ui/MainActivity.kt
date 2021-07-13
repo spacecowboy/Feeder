@@ -22,6 +22,7 @@ import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.ApplicationState
+import com.nononsenseapps.feeder.model.EphemeralState
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.FeedViewModel
 import com.nononsenseapps.feeder.model.NavigationCurrentFeed
@@ -48,6 +49,7 @@ import org.kodein.di.instance
 @ExperimentalAnimationApi
 class MainActivity : DIAwareComponentActivity() {
     private val applicationState: ApplicationState by instance()
+    private val ephemeralState: EphemeralState by instance()
 
     // This reference is only used for intent navigation
     private var navController: NavController? = null
@@ -58,7 +60,7 @@ class MainActivity : DIAwareComponentActivity() {
         intent?.let {
             if (navController?.handleDeepLink(intent) != true) {
                 parseIntentToState(it)?.let { target ->
-                    applicationState.setIntentNavigationTarget(target)
+                    ephemeralState.setIntentNavigationTarget(target)
                     // Navcontroller receives intent automatically on startup but not here
                     // edit: LaunchedEffect should handle this
 //                    navController?.navigate(target.route) {
@@ -79,7 +81,7 @@ class MainActivity : DIAwareComponentActivity() {
 
         intent?.let {
             parseIntentToState(it)?.let { target ->
-                applicationState.setIntentNavigationTarget(target)
+                ephemeralState.setIntentNavigationTarget(target)
             }
         }
 
@@ -118,7 +120,7 @@ class MainActivity : DIAwareComponentActivity() {
                     this.navController = it
                 }
 
-                val intentNavigationTarget by applicationState.intentNavigationTarget
+                val intentNavigationTarget by ephemeralState.intentNavigationTarget
 
                 // TODO implement intent handling for android.intent.action.MANAGE_NETWORK_USAGE
                 // TODO implement intent for adding a feed
@@ -290,6 +292,8 @@ class MainActivity : DIAwareComponentActivity() {
                             intentNavigationTarget.navOptions(this)
                             launchSingleTop = true
                         }
+                        // And then reset it
+                        ephemeralState.setIntentNavigationTarget(NavigationCurrentFeed())
                     }
                 }
             }
