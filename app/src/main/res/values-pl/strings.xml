@@ -105,7 +105,7 @@
     <string name="fetch_full_article">Pobierz cały artykuł</string>
     <string name="failed_to_load_text_to_speech">Nie udało się załadować zamiany tekstu na mowę</string>
     <string name="resume_reading">Wznów czytanie</string>
-    <string name="pause_reading">Zatrzymaj czytanie</string>
+    <string name="pause_reading">Wstrzymaj czytanie</string>
     <string name="read_article">Czytaj na głos</string>
     <string name="use_app_default">Użyj domyślnej aplikacji</string>
 </resources>
