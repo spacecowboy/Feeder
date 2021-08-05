@@ -1,3 +1,31 @@
+# 1.13.4
+Agnieszka C (2):
+  * [098172c1] Updated Polish translation using Weblate
+  * [d8455440] Updated Polish translation using Weblate
+
+Gediminas Murauskas (1):
+  * [8a3df04f] Translated using Weblate (Lithuanian)
+
+Jonas Kalderstam (1):
+  * [b164dece] Added missing title for language lt
+
+PPNplus (1):
+  * [18a39e63] Added Thai translation using Weblate
+
+Thien Bui (1):
+  * [3d4cd189] Updated Vietnamese translation using Weblate
+
+VfBFan (2):
+  * [2ae60832] Translated using Weblate (German)
+  * [368fa8ac] Updated German translation using Weblate
+
+Weblate (1):
+  * [35327cea] Added Slovenian translation using Weblate
+
+daywalk3r666 (2):
+  * [7a22bd67] Updated German translation using Weblate
+  * [1ba9b59f] Updated German translation using Weblate
+
 # 1.13.3
 Agnieszka C (1):
   * [029f7af4] Updated Polish translation using Weblate
