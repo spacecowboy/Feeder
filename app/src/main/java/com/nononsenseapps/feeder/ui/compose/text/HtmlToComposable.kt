@@ -459,12 +459,33 @@ private fun TextComposer.appendTextChildren(
                             followed optionally by a tfoot element
                              */
                             element.children()
-                                .filter { it.tagName() == "tr" }
-                                .forEach { row ->
-                                    lazyListScope.item {
-                                        Text(text = row.text())
-                                    }
+                                .filter { it.tagName() == "caption" }
+                                .forEach {
+                                    appendTextChildren(
+                                        it.childNodes(),
+                                        lazyListScope = lazyListScope,
+                                        imagePlaceholder = imagePlaceholder
+                                    )
+                                    builder.ensureDoubleNewline()
+                                    terminateCurrentText()
                                 }
+
+                            element.children()
+                                .filter { it.tagName() == "thead" || it.tagName() == "tbody" || it.tagName() == "tfoot" }
+                                .flatMap {
+                                    it.children()
+                                        .filter { it.tagName() == "tr" }
+                                }
+                                .forEach { row ->
+                                    appendTextChildren(
+                                        row.childNodes(),
+                                        lazyListScope = lazyListScope,
+                                        imagePlaceholder = imagePlaceholder
+                                    )
+                                    terminateCurrentText()
+                                }
+
+                            builder.append("\n\n")
                         }
                     }
                     "iframe" -> {
