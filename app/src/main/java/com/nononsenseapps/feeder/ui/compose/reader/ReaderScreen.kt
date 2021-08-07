@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -341,51 +342,53 @@ private fun ReaderView(
     onEnclosureClick: () -> Unit,
     articleBody: LazyListScope.() -> Unit
 ) {
-    LazyColumn(
-        modifier = modifier
-            .padding(horizontal = keyline1Padding)
-    ) {
-        item {
-            Text(
-                text = articleTitle,
-                style = MaterialTheme.typography.h1
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            // TODO clickable so you can go direct to the feed
-            Text(
-                text = feedTitle,
-                style = MaterialTheme.typography.subtitle1
-            )
-            if (authorDate != null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    Text(
-                        text = authorDate,
-                        style = MaterialTheme.typography.subtitle1
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        if (enclosureName != null && enclosureLink != null) {
+    SelectionContainer {
+        LazyColumn(
+            modifier = modifier
+                .padding(horizontal = keyline1Padding)
+        ) {
             item {
                 Text(
-                    text = enclosureName,
-                    style = MaterialTheme.typography.body1.merge(LinkTextStyle()),
-                    modifier = Modifier
-                        .clickable {
-                            onEnclosureClick()
-                        }
+                    text = articleTitle,
+                    style = MaterialTheme.typography.h1
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                // TODO clickable so you can go direct to the feed
+                Text(
+                    text = feedTitle,
+                    style = MaterialTheme.typography.subtitle1
+                )
+                if (authorDate != null) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                        Text(
+                            text = authorDate,
+                            style = MaterialTheme.typography.subtitle1
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(16.dp))
             }
-        }
 
-        articleBody()
+            if (enclosureName != null && enclosureLink != null) {
+                item {
+                    Text(
+                        text = enclosureName,
+                        style = MaterialTheme.typography.body1.merge(LinkTextStyle()),
+                        modifier = Modifier
+                            .clickable {
+                                onEnclosureClick()
+                            }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
 
-        item {
-            Spacer(modifier = Modifier.height(92.dp))
+            articleBody()
+
+            item {
+                Spacer(modifier = Modifier.height(92.dp))
+            }
         }
     }
 }

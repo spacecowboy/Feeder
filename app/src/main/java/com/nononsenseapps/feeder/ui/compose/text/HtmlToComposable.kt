@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -312,7 +313,10 @@ private fun TextComposer.appendTextChildren(
                     "code" -> {
                         if (element.parent()?.tagName() == "pre") {
                             terminateCurrentText()
-                            lazyListScope.formatCodeBlock(element = element, imagePlaceholder = imagePlaceholder)
+                            lazyListScope.formatCodeBlock(
+                                element = element,
+                                imagePlaceholder = imagePlaceholder
+                            )
                         } else {
                             // inline code
                             withComposableStyle(
@@ -358,16 +362,17 @@ private fun TextComposer.appendTextChildren(
                                     val imageLoader: ImageLoader by instance()
                                     // TODO rememberSaveable to retain this when scrolled off screen
                                     val scale = remember { mutableStateOf(1f) }
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(RectangleShape)
-                                            .clickable(
-                                                enabled = onClick != null
-                                            ) {
-                                                onClick?.invoke()
-                                            }
-                                            .fillMaxWidth()
-                                        // This makes scrolling a pain, find a way to solve that
+                                    DisableSelection {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RectangleShape)
+                                                .clickable(
+                                                    enabled = onClick != null
+                                                ) {
+                                                    onClick?.invoke()
+                                                }
+                                                .fillMaxWidth()
+                                            // This makes scrolling a pain, find a way to solve that
 //                                            .pointerInput("imgzoom") {
 //                                                detectTransformGestures { centroid, pan, zoom, rotation ->
 //                                                    val z = zoom * scale.value
@@ -378,34 +383,36 @@ private fun TextComposer.appendTextChildren(
 //                                                    }
 //                                                }
 //                                            }
-                                    ) {
-                                        Image(
-                                            painter = rememberCoilPainter(
-                                                request = imageUrl,
-                                                imageLoader = imageLoader,
-                                                requestBuilder = {
-                                                    this.error(imagePlaceholder)
-                                                },
-                                                previewPlaceholder = imagePlaceholder,
-                                                shouldRefetchOnSizeChange = { _, _ -> false },
-                                            ),
-                                            contentDescription = alt,
-                                            contentScale = ContentScale.FillWidth,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .graphicsLayer {
-                                                    scaleX = scale.value
-                                                    scaleY = scale.value
-                                                }
+                                        ) {
+                                            Image(
+                                                painter = rememberCoilPainter(
+                                                    request = imageUrl,
+                                                    imageLoader = imageLoader,
+                                                    requestBuilder = {
+                                                        this.error(imagePlaceholder)
+                                                    },
+                                                    previewPlaceholder = imagePlaceholder,
+                                                    shouldRefetchOnSizeChange = { _, _ -> false },
+                                                ),
+                                                contentDescription = alt,
+                                                contentScale = ContentScale.FillWidth,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .graphicsLayer {
+                                                        scaleX = scale.value
+                                                        scaleY = scale.value
+                                                    }
 
-                                        )
+                                            )
+                                        }
+
+                                        if (alt.isNotBlank()) {
+                                            Text(alt, style = MaterialTheme.typography.caption)
+                                        }
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+
                                     }
-
-                                    if (alt.isNotBlank()) {
-                                        Text(alt, style = MaterialTheme.typography.caption)
-                                    }
-
-                                    Spacer(modifier = Modifier.height(8.dp))
                                 }
                             }
                         }
@@ -467,23 +474,25 @@ private fun TextComposer.appendTextChildren(
                         if (video != null) {
                             appendImage {
                                 lazyListScope.item {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.youtube_icon),
-                                        contentDescription = "Video",
-                                        contentScale = ContentScale.FillWidth,
-                                        modifier = Modifier
-                                            .clickable {
-                                                // TODO this is just temporary
-                                                Log.i("JONAS", "Clicked on iframe ${video.src}")
-                                            }
-                                            .fillMaxWidth()
-                                    )
+                                    DisableSelection {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.youtube_icon),
+                                            contentDescription = "Video",
+                                            contentScale = ContentScale.FillWidth,
+                                            modifier = Modifier
+                                                .clickable {
+                                                    // TODO this is just temporary
+                                                    Log.i("JONAS", "Clicked on iframe ${video.src}")
+                                                }
+                                                .fillMaxWidth()
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                     "video" -> {
-                        // TODO
+                        // TODO and remember to disable selection
                     }
                     else -> {
                         appendTextChildren(
