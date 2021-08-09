@@ -160,7 +160,8 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
             curlAndOnResponse(url) {
                 result = parseFeedResponse(it)
             }
-            return result
+            // Preserve original URL to maintain authentication data and/or tokens in query params
+            return result?.copy(feed_url = url.toString())
         } catch (e: Throwable) {
             throw FeedParsingError(url, e)
         }
@@ -176,7 +177,7 @@ class FeedParser(override val kodein: Kodein) : KodeinAware {
      * Takes body as bytes to handle encoding correctly
      */
     @Throws(FeedParsingError::class)
-    fun parseFeedResponse(response: Response, body: ByteArray): Feed? {
+    fun parseFeedResponse(response: Response, body: ByteArray): Feed {
         try {
             val feed = when ((response.header("content-type") ?: "").contains("json")) {
                 true -> jsonFeedParser.parseJsonBytes(body)

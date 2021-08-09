@@ -216,7 +216,9 @@ private suspend fun syncFeed(
         // for the rare case that the job is cancelled prematurely
         feedSql.responseHash = responseHash
         feedSql.title = feed.title ?: feedSql.title
-        feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
+        // Not changing feed url because I don't want to override auth or token params
+        // See https://gitlab.com/spacecowboy/Feeder/-/issues/390
+//        feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
         feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) }
             ?: feedSql.imageUrl
         db.feedDao().upsertFeed(feedSql)
