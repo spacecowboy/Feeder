@@ -58,6 +58,7 @@ fun SwipeableFeedItemPreview(
     onMarkBelowAsRead: () -> Unit,
     onItemClick: () -> Unit
 ) {
+    // TODO SwipeToDismiss takes RTL into account. Maybe switch?
     val animatedVisibilityState = remember { MutableTransitionState(true) }
     val swipeableState = rememberSwipeableState(initialValue = FeedItemSwipeState.NONE)
 
