@@ -79,6 +79,7 @@ private fun LazyListScope.formatBody(
     val composer = TextComposer { paragraphBuilder ->
         item {
             val paragraph = paragraphBuilder.toAnnotatedString()
+            // TODO compose this prevents taps from deselecting selected text
             ClickableText(
                 text = paragraph,
                 style = MaterialTheme.typography.body1
