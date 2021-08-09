@@ -249,7 +249,11 @@ fun FeedScreen(
                 val previewItem = pagedFeedItems.getAsState(index = itemIndex).value
                     ?: return@items
 
-                FeedItemPreview(
+                SwipeableFeedItemPreview(
+                    onSwipe = {
+                        feedItemsViewModel.markAsRead(previewItem.id, unread = !previewItem.unread)
+                    },
+                    onlyUnread = onlyUnread,
                     item = previewItem,
                     showThumbnail = showThumbnails,
                     onMarkAboveAsRead = {
