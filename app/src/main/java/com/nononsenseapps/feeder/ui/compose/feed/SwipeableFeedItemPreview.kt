@@ -157,17 +157,6 @@ fun SwipeableFeedItemPreview(
                 }
             }
 
-            FeedItemPreview(
-                item = item,
-                showThumbnail = showThumbnail,
-                imagePainter = imagePainter,
-                onMarkAboveAsRead = onMarkAboveAsRead,
-                onMarkBelowAsRead = onMarkBelowAsRead,
-                onItemClick = onItemClick,
-                modifier = Modifier
-                    .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-            )
-
             Row(modifier = Modifier.matchParentSize()) {
                 val swipeSize = 0.7f
                 Box(
@@ -190,6 +179,17 @@ fun SwipeableFeedItemPreview(
                         )
                 )
             }
+
+            FeedItemPreview(
+                item = item,
+                showThumbnail = showThumbnail,
+                imagePainter = imagePainter,
+                onMarkAboveAsRead = onMarkAboveAsRead,
+                onMarkBelowAsRead = onMarkBelowAsRead,
+                onItemClick = onItemClick,
+                modifier = Modifier
+                    .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+            )
         }
     }
 }
