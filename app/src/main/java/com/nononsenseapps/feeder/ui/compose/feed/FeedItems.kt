@@ -69,7 +69,7 @@ fun FeedItemPreview(
                 onLongClick = {
                     dropDownMenuExpanded = true
                 },
-                onClick = onItemClick
+                onClick = onItemClick,
             )
             .padding(
                 start = keyline1Padding,

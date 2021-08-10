@@ -11,8 +11,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -114,7 +112,7 @@ fun SwipeableFeedItemPreview(
     }
 
     var swipeIconAlignment by remember { mutableStateOf(Alignment.CenterStart) }
-    // Launched effect because I don't want a value change to zero to change it variable
+    // Launched effect because I don't want a value change to zero to change the variable
     LaunchedEffect(swipeableState.direction) {
         if (swipeableState.direction == 1f) {
             swipeIconAlignment = Alignment.CenterStart
@@ -134,6 +132,14 @@ fun SwipeableFeedItemPreview(
                 .onGloballyPositioned { layoutCoordinates ->
                     itemSize = layoutCoordinates.size.toSize()
                 }
+                .swipeable(
+                    state = swipeableState,
+                    anchors = anchors,
+                    orientation = Orientation.Horizontal,
+                    thresholds = { _, _ ->
+                        FractionalThreshold(0.25f)
+                    }
+                )
         ) {
             Box(
                 contentAlignment = swipeIconAlignment,
@@ -157,29 +163,6 @@ fun SwipeableFeedItemPreview(
                 }
             }
 
-            Row(modifier = Modifier.matchParentSize()) {
-                val swipeSize = 0.7f
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1.0f - swipeSize)
-                )
-                Box(
-                    modifier = Modifier
-//                        .background(Color(0x77ffffff)) // Uncomment to see touch swipeable area
-                        .fillMaxHeight()
-                        .weight(swipeSize)
-                        .swipeable(
-                            state = swipeableState,
-                            anchors = anchors,
-                            orientation = Orientation.Horizontal,
-                            thresholds = { _, _ ->
-                                FractionalThreshold(0.25f)
-                            }
-                        )
-                )
-            }
-
             FeedItemPreview(
                 item = item,
                 showThumbnail = showThumbnail,
@@ -190,6 +173,29 @@ fun SwipeableFeedItemPreview(
                 modifier = Modifier
                     .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
             )
+
+//            Row(modifier = Modifier.matchParentSize()) {
+//                val swipeSize = 0.7f
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxHeight()
+//                        .weight(1.0f - swipeSize)
+//                )
+//                Box(
+//                    modifier = Modifier
+////                        .background(Color(0x77ffffff)) // Uncomment to see touch swipeable area
+//                        .fillMaxHeight()
+//                        .weight(swipeSize)
+//                        .swipeable(
+//                            state = swipeableState,
+//                            anchors = anchors,
+//                            orientation = Orientation.Horizontal,
+//                            thresholds = { _, _ ->
+//                                FractionalThreshold(0.25f)
+//                            }
+//                        )
+//                )
+//            }
         }
     }
 }
