@@ -372,12 +372,12 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
     val currentTitle: Flow<String?> =
         feedListArgsState.mapLatest { args ->
             when {
-                args.tag.isNotEmpty() -> args.tag
                 args.feedId > ID_UNSET -> {
                     feedDao.getFeedTitle(args.feedId)
                         .firstOrNull()
                         ?.displayTitle
                 }
+                args.tag.isNotEmpty() -> args.tag
                 else -> null
             }
         }
