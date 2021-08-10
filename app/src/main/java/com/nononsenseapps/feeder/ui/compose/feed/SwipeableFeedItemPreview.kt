@@ -11,6 +11,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -77,7 +79,7 @@ fun SwipeableFeedItemPreview(
     }
 
     // Needs to be set once layout is complete
-    var itemSize by remember { mutableStateOf(Size(9999f, 9999f)) }
+    var itemSize by remember { mutableStateOf(Size(1f, 1f)) }
 
     val anchors = mapOf(
         0f to FeedItemSwipeState.NONE,
@@ -132,14 +134,6 @@ fun SwipeableFeedItemPreview(
                 .onGloballyPositioned { layoutCoordinates ->
                     itemSize = layoutCoordinates.size.toSize()
                 }
-                .swipeable(
-                    state = swipeableState,
-                    anchors = anchors,
-                    orientation = Orientation.Horizontal,
-                    thresholds = { from, to ->
-                        FractionalThreshold(0.25f)
-                    }
-                )
         ) {
             Box(
                 contentAlignment = swipeIconAlignment,
@@ -173,6 +167,29 @@ fun SwipeableFeedItemPreview(
                 modifier = Modifier
                     .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
             )
+
+            Row(modifier = Modifier.matchParentSize()) {
+                val swipeSize = 0.7f
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .weight(1.0f - swipeSize)
+                )
+                Box(
+                    modifier = Modifier
+//                        .background(Color(0x77ffffff)) // Uncomment to see touch swipeable area
+                        .fillMaxHeight()
+                        .weight(swipeSize)
+                        .swipeable(
+                            state = swipeableState,
+                            anchors = anchors,
+                            orientation = Orientation.Horizontal,
+                            thresholds = { _, _ ->
+                                FractionalThreshold(0.25f)
+                            }
+                        )
+                )
+            }
         }
     }
 }
