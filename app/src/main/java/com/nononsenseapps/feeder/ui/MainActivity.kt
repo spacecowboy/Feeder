@@ -31,6 +31,7 @@ import com.nononsenseapps.feeder.model.NavigationSettings
 import com.nononsenseapps.feeder.model.NavigationTarget
 import com.nononsenseapps.feeder.model.SearchFeedViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
+import com.nononsenseapps.feeder.model.TextToSpeechViewModel
 import com.nononsenseapps.feeder.ui.compose.feed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
@@ -111,6 +112,7 @@ class MainActivity : DIAwareComponentActivity() {
     fun appContent() {
         withDI {
             val settingsViewModel: SettingsViewModel = DIAwareViewModel()
+            val readAloudViewModel: TextToSpeechViewModel = DIAwareViewModel()
             val currentTheme by settingsViewModel.currentTheme.collectAsState()
 
             FeederTheme(
@@ -147,11 +149,11 @@ class MainActivity : DIAwareComponentActivity() {
 
                                     when {
                                         link != null && (openArticleWith == PrefValOpenWith.OPEN_WITH_BROWSER
-                                                || openArticleWith == PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith == ItemOpener.DEFAULT_BROWSER) -> {
+                                            || openArticleWith == PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith == ItemOpener.DEFAULT_BROWSER) -> {
                                             openLinkInBrowser(context, link)
                                         }
                                         link != null && (openArticleWith == PrefValOpenWith.OPEN_WITH_CUSTOM_TAB
-                                                || openArticleWith == PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith == ItemOpener.CUSTOM_TAB) -> {
+                                            || openArticleWith == PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith == ItemOpener.CUSTOM_TAB) -> {
                                             openLinkInCustomTab(context, link, itemId)
                                         }
                                         else -> {
@@ -171,7 +173,8 @@ class MainActivity : DIAwareComponentActivity() {
                             },
                             feedListViewModel = backStackEntry.DIAwareViewModel(),
                             feedItemsViewModel = backStackEntry.DIAwareViewModel(),
-                            settingsViewModel = settingsViewModel
+                            settingsViewModel = settingsViewModel,
+                            readAloudViewModel = readAloudViewModel,
                         )
                     }
                     composable(
@@ -192,7 +195,8 @@ class MainActivity : DIAwareComponentActivity() {
 
                         ReaderScreen(
                             feedItemViewModel = feedItemViewModel,
-                            settingsViewModel = settingsViewModel
+                            settingsViewModel = settingsViewModel,
+                            readAloudViewModel = readAloudViewModel,
                         ) {
                             navController.popBackStackOrNavigateTo(route = "feed")
                         }

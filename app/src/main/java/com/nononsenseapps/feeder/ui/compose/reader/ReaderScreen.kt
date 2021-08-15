@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui.compose.reader
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -51,6 +52,9 @@ import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToDisplay
+import com.nononsenseapps.feeder.model.TextToSpeechViewModel
+import com.nononsenseapps.feeder.model.getPlainTextOfHtmlStream
+import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
 import com.nononsenseapps.feeder.ui.compose.state.getImagePlaceholder
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
@@ -69,10 +73,12 @@ private val dateTimeFormat =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
         .withLocale(Locale.getDefault())
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ReaderScreen(
     feedItemViewModel: FeedItemViewModel,
     settingsViewModel: SettingsViewModel,
+    readAloudViewModel: TextToSpeechViewModel,
     onNavigateUp: () -> Unit
 ) {
     val linkOpener by settingsViewModel.linkOpener.collectAsState()
@@ -131,6 +137,41 @@ fun ReaderScreen(
         onOpenInCustomTab = {
             feedItem?.link?.let { link ->
                 openLinkInCustomTab(context, link, feedItemViewModel.currentItemId)
+            }
+        },
+        readAloudPlayer = {
+            HideableReadAloudPlayer(readAloudViewModel)
+        },
+        onReadAloudStart = {
+            val fullText = feedItem?.let { item ->
+                when (textToDisplay) {
+                    TextToDisplay.DEFAULT -> {
+                        blobInputStream(item.id, context.filesDir).use {
+                            getPlainTextOfHtmlStream(
+                                inputStream = it,
+                                baseUrl = feedUrl
+                            )
+                        }
+                    }
+                    TextToDisplay.FULLTEXT -> {
+                        blobFullInputStream(item.id, context.filesDir).use {
+                            getPlainTextOfHtmlStream(
+                                inputStream = it,
+                                baseUrl = feedUrl
+                            )
+                        }
+                    }
+                    else -> null
+                }
+            }
+
+            if (fullText == null) {
+                // TODO show error some message
+            } else {
+                readAloudViewModel.readAloud(
+                    title = feedItem?.plainTitle ?: "",
+                    fullText = fullText
+                )
             }
         },
         onNavigateUp = onNavigateUp
@@ -197,6 +238,8 @@ fun ReaderScreen(
     onShare: () -> Unit,
     onOpenInCustomTab: () -> Unit,
     onNavigateUp: () -> Unit,
+    readAloudPlayer: @Composable () -> Unit,
+    onReadAloudStart: () -> Unit,
     articleBody: LazyListScope.() -> Unit
 ) {
     var showMenu by remember {
@@ -261,7 +304,12 @@ fun ReaderScreen(
                             onDismissRequest = { showMenu = false }
                         ) {
                             if (fetchFullButtonVisible) {
-                                DropdownMenuItem(onClick = onShare) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        showMenu = false
+                                        onShare()
+                                    }
+                                ) {
                                     Icon(
                                         Icons.Default.Share,
                                         contentDescription = "Share button"
@@ -272,7 +320,10 @@ fun ReaderScreen(
                             }
 
                             DropdownMenuItem(
-                                onClick = onMarkAsUnread
+                                onClick = {
+                                    showMenu = false
+                                    onMarkAsUnread()
+                                }
                             ) {
                                 Icon(
                                     Icons.Default.MarkAsUnread,
@@ -281,12 +332,15 @@ fun ReaderScreen(
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.mark_as_unread))
                             }
-
-                            // TODO different icon depending on state
-                            DropdownMenuItem(onClick = {/* TODO */ }) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    showMenu = false
+                                    onReadAloudStart()
+                                }
+                            ) {
                                 Icon(
                                     Icons.Default.PlayArrow,
-                                    contentDescription = "Read aloud button"
+                                    contentDescription = "Read aloud"
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.read_article))
@@ -295,7 +349,8 @@ fun ReaderScreen(
                     }
                 }
             )
-        }
+        },
+        bottomBar = readAloudPlayer
     ) { padding ->
         val context = LocalContext.current
 
@@ -425,6 +480,8 @@ private fun PreviewReader() {
             onMarkAsUnread = { },
             onShare = {},
             onOpenInCustomTab = {},
+            readAloudPlayer = {},
+            onReadAloudStart = {},
             onNavigateUp = { }) {
             item {
                 Text("The body")

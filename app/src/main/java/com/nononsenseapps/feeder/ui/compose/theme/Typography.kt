@@ -94,6 +94,10 @@ fun FeedListItemDateStyle(): TextStyle =
     )
 
 @Composable
+fun ReadAloudPlayerStyle(): TextStyle =
+    MaterialTheme.typography.subtitle1
+
+@Composable
 fun CodeInlineStyle(): SpanStyle =
     SpanStyle(
         background = CodeBlockBackground(),

@@ -33,8 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.nononsenseapps.feeder.R
@@ -58,7 +60,7 @@ fun SwipeableFeedItemPreview(
     onMarkBelowAsRead: () -> Unit,
     onItemClick: () -> Unit
 ) {
-    // TODO SwipeToDismiss takes RTL into account. Maybe switch?
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val animatedVisibilityState = remember { MutableTransitionState(true) }
     val swipeableState = rememberSwipeableState(initialValue = FeedItemSwipeState.NONE)
 
@@ -136,6 +138,7 @@ fun SwipeableFeedItemPreview(
                     state = swipeableState,
                     anchors = anchors,
                     orientation = Orientation.Horizontal,
+                    reverseDirection = isRtl,
                     thresholds = { _, _ ->
                         FractionalThreshold(0.25f)
                     }

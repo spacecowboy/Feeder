@@ -316,7 +316,7 @@ class ReaderFragment : DIAwareFragment() {
                         readingState = ReadingState.READING
                     }
                     ReadingState.READING -> {
-                        textToSpeechViewModel.textToSpeechPause()
+                        textToSpeechViewModel.pause()
                         menuItem.title = getString(R.string.resume_reading)
                         readingState = ReadingState.PAUSED
                     }

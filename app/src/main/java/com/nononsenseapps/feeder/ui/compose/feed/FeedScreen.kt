@@ -72,6 +72,7 @@ import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.FeedListViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
+import com.nononsenseapps.feeder.model.TextToSpeechViewModel
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.model.requestFeedSync
@@ -82,6 +83,7 @@ import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
+import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
 import com.nononsenseapps.feeder.ui.compose.state.getImagePlaceholder
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.SortingOptions
@@ -102,7 +104,8 @@ fun FeedScreen(
     onSettings: () -> Unit,
     feedListViewModel: FeedListViewModel,
     feedItemsViewModel: FeedItemsViewModel,
-    settingsViewModel: SettingsViewModel
+    settingsViewModel: SettingsViewModel,
+    readAloudViewModel: TextToSpeechViewModel,
 ) {
     val onlyUnread by settingsViewModel.showOnlyUnread.collectAsState()
     val currentSorting by settingsViewModel.currentSorting.collectAsState()
@@ -218,6 +221,9 @@ fun FeedScreen(
         },
         onSettings = onSettings,
         onSendFeedback = onSendFeedback,
+        readAloudPlayer = {
+            HideableReadAloudPlayer(readAloudViewModel)
+        },
         onImport = { opmlImporter.launch(arrayOf("text/plain", "text/xml", "text/opml", "*/*")) },
         onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}") },
         onMarkAllAsRead = {
@@ -351,6 +357,7 @@ fun FeedScreen(
     onExport: () -> Unit,
     onMarkAllAsRead: () -> Unit,
     showFloatingActionButton: Boolean,
+    readAloudPlayer: @Composable () -> Unit,
     content: @Composable (Modifier, suspend () -> Unit) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -485,6 +492,7 @@ fun FeedScreen(
                 }
             )
         },
+        bottomBar = readAloudPlayer,
         drawerContent = {
             ListOfFeedsAndTags(
                 feedsAndTags = feedsAndTags,
@@ -565,6 +573,7 @@ fun DefaultPreview() {
             onDelete = {},
             onSettings = {},
             onSendFeedback = {},
+            readAloudPlayer = {},
             onImport = {},
             onExport = {},
             onMarkAllAsRead = {}
