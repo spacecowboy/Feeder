@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -20,10 +19,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -57,20 +52,11 @@ fun FeedItemPreview(
     modifier: Modifier = Modifier,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
-    onItemClick: () -> Unit
+    dropDownMenuExpanded: Boolean,
+    onDismissDropdown: () -> Unit,
 ) {
-    var dropDownMenuExpanded by remember {
-        mutableStateOf(false)
-    }
-
     Row(
         modifier = modifier
-            .combinedClickable(
-                onLongClick = {
-                    dropDownMenuExpanded = true
-                },
-                onClick = onItemClick,
-            )
             .padding(
                 start = keyline1Padding,
                 end = if (item.imageUrl?.isNotBlank() != true || !showThumbnail) keyline1Padding else 0.dp
@@ -144,11 +130,11 @@ fun FeedItemPreview(
 
         DropdownMenu(
             expanded = dropDownMenuExpanded,
-            onDismissRequest = { dropDownMenuExpanded = !dropDownMenuExpanded }
+            onDismissRequest = onDismissDropdown
         ) {
             DropdownMenuItem(
                 onClick = {
-                    dropDownMenuExpanded = false
+                    onDismissDropdown()
                     onMarkAboveAsRead()
                 }
             ) {
@@ -158,7 +144,7 @@ fun FeedItemPreview(
             }
             DropdownMenuItem(
                 onClick = {
-                    dropDownMenuExpanded = false
+                    onDismissDropdown()
                     onMarkBelowAsRead()
                 }
             ) {
@@ -186,10 +172,10 @@ private fun preview() {
         showThumbnail = true,
         imagePainter = {},
         onMarkAboveAsRead = {},
-        onMarkBelowAsRead = {}
-    ) {
-
-    }
+        onMarkBelowAsRead = {},
+        dropDownMenuExpanded = false,
+        onDismissDropdown = {}
+    )
 }
 
 @Immutable

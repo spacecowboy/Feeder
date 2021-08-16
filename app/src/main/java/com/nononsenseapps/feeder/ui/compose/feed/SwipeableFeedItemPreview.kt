@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -123,6 +124,10 @@ fun SwipeableFeedItemPreview(
         }
     }
 
+    var dropDownMenuExpanded by remember {
+        mutableStateOf(false)
+    }
+
     AnimatedVisibility(
         visibleState = animatedVisibilityState,
         enter = fadeIn(1f),
@@ -134,16 +139,29 @@ fun SwipeableFeedItemPreview(
                 .onGloballyPositioned { layoutCoordinates ->
                     itemSize = layoutCoordinates.size.toSize()
                 }
-                .swipeable(
-                    state = swipeableState,
-                    anchors = anchors,
-                    orientation = Orientation.Horizontal,
-                    reverseDirection = isRtl,
-                    thresholds = { _, _ ->
-                        FractionalThreshold(0.25f)
-                    }
+                .combinedClickable(
+                    onLongClick = {
+                        dropDownMenuExpanded = true
+                    },
+                    onClick = onItemClick,
                 )
         ) {
+            // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
+            // It's very important than clickable stuff is handled by its parent - or a direct child
+            Box(
+                modifier = Modifier
+                    .padding(start = 48.dp)
+                    .matchParentSize()
+                    .swipeable(
+                        state = swipeableState,
+                        anchors = anchors,
+                        orientation = Orientation.Horizontal,
+                        reverseDirection = isRtl,
+                        thresholds = { _, _ ->
+                            FractionalThreshold(0.25f)
+                        }
+                    )
+            )
             Box(
                 contentAlignment = swipeIconAlignment,
                 modifier = Modifier
@@ -172,33 +190,11 @@ fun SwipeableFeedItemPreview(
                 imagePainter = imagePainter,
                 onMarkAboveAsRead = onMarkAboveAsRead,
                 onMarkBelowAsRead = onMarkBelowAsRead,
-                onItemClick = onItemClick,
+                dropDownMenuExpanded = dropDownMenuExpanded,
+                onDismissDropdown = { dropDownMenuExpanded = false },
                 modifier = Modifier
                     .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
             )
-
-//            Row(modifier = Modifier.matchParentSize()) {
-//                val swipeSize = 0.7f
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxHeight()
-//                        .weight(1.0f - swipeSize)
-//                )
-//                Box(
-//                    modifier = Modifier
-////                        .background(Color(0x77ffffff)) // Uncomment to see touch swipeable area
-//                        .fillMaxHeight()
-//                        .weight(swipeSize)
-//                        .swipeable(
-//                            state = swipeableState,
-//                            anchors = anchors,
-//                            orientation = Orientation.Horizontal,
-//                            thresholds = { _, _ ->
-//                                FractionalThreshold(0.25f)
-//                            }
-//                        )
-//                )
-//            }
         }
     }
 }
