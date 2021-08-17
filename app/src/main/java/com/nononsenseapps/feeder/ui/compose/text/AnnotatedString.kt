@@ -4,11 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 
-class AnnotatedParagraphStringBuilder(
-    val builder: AnnotatedString.Builder = AnnotatedString.Builder()
-) {
+class AnnotatedParagraphStringBuilder {
+    // Private for a reason
+    private val builder: AnnotatedString.Builder = AnnotatedString.Builder()
+
     val composableStyles = mutableListOf<ComposableStyleWithStartEnd>()
     val lastTwoChars: MutableList<Char> = mutableListOf()
+
+    val length: Int
+        get() = builder.length
 
     val endsWithWhitespace: Boolean
         get() {
@@ -25,13 +29,14 @@ class AnnotatedParagraphStringBuilder(
             return false
         }
 
-    fun pushStyle(spanStyle: SpanStyle) {
-        builder.pushStyle(style = spanStyle)
-    }
+    fun pushStyle(style: SpanStyle): Int =
+        builder.pushStyle(style = style)
 
-    fun pushStringAnnotation(tag: String, annotation: String) {
+    fun pop(index: Int) =
+        builder.pop(index)
+
+    fun pushStringAnnotation(tag: String, annotation: String): Int =
         builder.pushStringAnnotation(tag = tag, annotation = annotation)
-    }
 
     fun pushComposableStyle(
         style: @Composable () -> SpanStyle
@@ -89,10 +94,10 @@ fun AnnotatedParagraphStringBuilder.ensureDoubleNewline() {
         lastTwoChars.isEmpty() -> {
             // Nothing to do
         }
-        builder.length == 1 && lastTwoChars.peekLatest()?.isWhitespace() == true -> {
+        length == 1 && lastTwoChars.peekLatest()?.isWhitespace() == true -> {
             // Nothing to do
         }
-        builder.length == 2 &&
+        length == 2 &&
             lastTwoChars.peekLatest()?.isWhitespace() == true &&
             lastTwoChars.peekSecondLatest()?.isWhitespace() == true -> {
             // Nothing to do
@@ -114,7 +119,7 @@ private fun AnnotatedParagraphStringBuilder.ensureSingleNewline() {
         lastTwoChars.isEmpty() -> {
             // Nothing to do
         }
-        builder.length == 1 && lastTwoChars.peekLatest()?.isWhitespace() == true -> {
+        length == 1 && lastTwoChars.peekLatest()?.isWhitespace() == true -> {
             // Nothing to do
         }
         lastTwoChars.peekLatest() == '\n' -> {
@@ -123,44 +128,6 @@ private fun AnnotatedParagraphStringBuilder.ensureSingleNewline() {
         else -> {
             append('\n')
         }
-    }
-}
-
-inline fun <R : Any> AnnotatedParagraphStringBuilder.withStyle(
-    style: SpanStyle,
-    crossinline block: AnnotatedParagraphStringBuilder.() -> R
-): R {
-    val index = builder.pushStyle(style)
-    return try {
-        block(this)
-    } finally {
-        builder.pop(index)
-    }
-}
-
-
-inline fun <R : Any> AnnotatedParagraphStringBuilder.withComposableStyle(
-    noinline style: @Composable () -> SpanStyle,
-    crossinline block: AnnotatedParagraphStringBuilder.() -> R
-): R {
-    val index = pushComposableStyle(style)
-    return try {
-        block(this)
-    } finally {
-        popComposableStyle(index)
-    }
-}
-
-inline fun <R : Any> AnnotatedParagraphStringBuilder.withAnnotation(
-    tag: String,
-    annotation: String,
-    crossinline block: AnnotatedParagraphStringBuilder.() -> R
-): R {
-    val index = builder.pushStringAnnotation(tag, annotation)
-    return try {
-        block(this)
-    } finally {
-        builder.pop(index)
     }
 }
 

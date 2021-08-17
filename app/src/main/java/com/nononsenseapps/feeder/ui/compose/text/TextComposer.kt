@@ -8,7 +8,9 @@ class TextComposer(
     val paragraphEmitter: (AnnotatedParagraphStringBuilder) -> Unit
 ) {
     val spanStack: MutableList<Span> = mutableListOf()
-    var builder: AnnotatedParagraphStringBuilder = AnnotatedParagraphStringBuilder()
+
+    // The identity of this will change - do not reference it in blocks
+    private var builder: AnnotatedParagraphStringBuilder = AnnotatedParagraphStringBuilder()
 
     fun terminateCurrentText() {
         if (builder.isEmpty()) {
@@ -32,13 +34,17 @@ class TextComposer(
         }
     }
 
-    fun append(text: String) {
-        builder.append(text)
-    }
+    val endsWithWhitespace: Boolean
+        get() = builder.endsWithWhitespace
 
-    fun append(char: Char) {
+    fun ensureDoubleNewline() =
+        builder.ensureDoubleNewline()
+
+    fun append(text: String) =
+        builder.append(text)
+
+    fun append(char: Char) =
         builder.append(char)
-    }
 
     fun <R> appendTable(block: () -> R): R {
         builder.ensureDoubleNewline()
@@ -61,6 +67,21 @@ class TextComposer(
         return block(onClick)
     }
 
+    fun pop(index: Int) =
+        builder.pop(index)
+
+    fun pushStyle(style: SpanStyle): Int =
+        builder.pushStyle(style)
+
+    fun pushStringAnnotation(tag: String, annotation: String): Int =
+        builder.pushStringAnnotation(tag = tag, annotation = annotation)
+
+    fun pushComposableStyle(style: @Composable () -> SpanStyle): Int =
+        builder.pushComposableStyle(style)
+
+    fun popComposableStyle(index: Int) =
+        builder.popComposableStyle(index)
+
     private fun findClosestLink(): String? {
         for (span in spanStack.reversed()) {
             if (span is SpanWithAnnotation && span.tag == "URL") {
@@ -74,7 +95,7 @@ class TextComposer(
 inline fun <R : Any> TextComposer.withParagraph(
     crossinline block: TextComposer.() -> R
 ): R {
-    builder.ensureDoubleNewline()
+    ensureDoubleNewline()
     return block(this)
 }
 
@@ -83,11 +104,11 @@ inline fun <R : Any> TextComposer.withStyle(
     crossinline block: TextComposer.() -> R
 ): R {
     spanStack.add(SpanWithStyle(style))
+    val index = pushStyle(style)
     return try {
-        builder.withStyle(style = style) {
-            block()
-        }
+        block()
     } finally {
+        pop(index)
         spanStack.removeLast()
     }
 }
@@ -97,11 +118,11 @@ inline fun <R : Any> TextComposer.withComposableStyle(
     crossinline block: TextComposer.() -> R
 ): R {
     spanStack.add(SpanWithComposableStyle(style))
+    val index = pushComposableStyle(style)
     return try {
-        builder.withComposableStyle(style = style) {
-            block()
-        }
+        block()
     } finally {
+        popComposableStyle(index)
         spanStack.removeLast()
     }
 }
@@ -112,11 +133,11 @@ inline fun <R : Any> TextComposer.withAnnotation(
     crossinline block: TextComposer.() -> R
 ): R {
     spanStack.add(SpanWithAnnotation(tag = tag, annotation = annotation))
+    val index = pushStringAnnotation(tag = tag, annotation = annotation)
     return try {
-        builder.withAnnotation(tag = tag, annotation = annotation) {
-            block()
-        }
+        block()
     } finally {
+        pop(index)
         spanStack.removeLast()
     }
 }

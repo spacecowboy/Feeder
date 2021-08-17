@@ -89,8 +89,6 @@ private fun LazyListScope.formatBody(
                 paragraph.getStringAnnotations("URL", offset, offset)
                     .firstOrNull()
                     ?.let {
-                        // TODO handle click
-                        Log.i("JONAS", "Clicked on ${it.item}")
                         onLinkClick(it.item)
                     }
             }
@@ -152,7 +150,7 @@ private fun TextComposer.appendTextChildren(
                 if (preFormatted) {
                     append(node.wholeText)
                 } else {
-                    if (builder.endsWithWhitespace) {
+                    if (endsWithWhitespace) {
                         node.text().trimStart().let { trimmed ->
                             if (trimmed.isNotEmpty()) {
                                 append(trimmed)
@@ -350,7 +348,11 @@ private fun TextComposer.appendTextChildren(
                             style = { LinkTextStyle().toSpanStyle() }
                         ) {
                             withAnnotation("URL", element.attr("abs:href") ?: "") {
-                                append(element.text())
+                                appendTextChildren(
+                                    element.childNodes(),
+                                    lazyListScope = lazyListScope,
+                                    imagePlaceholder = imagePlaceholder
+                                )
                             }
                         }
                     }
@@ -406,14 +408,14 @@ private fun TextComposer.appendTextChildren(
 
                                             )
                                         }
-
-                                        if (alt.isNotBlank()) {
-                                            Text(alt, style = MaterialTheme.typography.caption)
-                                        }
-
-                                        Spacer(modifier = Modifier.height(8.dp))
-
                                     }
+
+                                    if (alt.isNotBlank()) {
+                                        Text(alt, style = MaterialTheme.typography.caption)
+                                    }
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
                                 }
                             }
                         }
@@ -467,7 +469,7 @@ private fun TextComposer.appendTextChildren(
                                         lazyListScope = lazyListScope,
                                         imagePlaceholder = imagePlaceholder
                                     )
-                                    builder.ensureDoubleNewline()
+                                    ensureDoubleNewline()
                                     terminateCurrentText()
                                 }
 
@@ -486,7 +488,7 @@ private fun TextComposer.appendTextChildren(
                                     terminateCurrentText()
                                 }
 
-                            builder.append("\n\n")
+                            append("\n\n")
                         }
                     }
                     "iframe" -> {
