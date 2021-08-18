@@ -19,7 +19,9 @@
     android:theme="@style/AppThemeDay"
     android:usesCleartextTraffic="true">
 
-    <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true" />
+    <meta-data
+      android:name="android.webkit.WebView.MetricsOptOut"
+      android:value="true" />
 
     <activity
       android:name="com.nononsenseapps.feeder.ui.MainActivity"
@@ -30,10 +32,24 @@
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
+
+      <meta-data
+        android:name="android.app.shortcuts"
+        android:resource="@xml/shortcuts" />
+    </activity>
+
+    <activity
+      android:name=".ui.ManageSettingsActivity"
+      android:parentActivityName=".ui.MainActivity">
       <intent-filter>
         <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
         <category android:name="android.intent.category.DEFAULT" />
       </intent-filter>
+    </activity>
+
+    <activity
+      android:name=".ui.AddFeedFromShareActivity"
+      android:parentActivityName=".ui.MainActivity">
       <!-- URLs with feed mimetype can be opened -->
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
@@ -101,9 +117,6 @@
 
         <data android:mimeType="text/plain" />
       </intent-filter>
-      <meta-data
-        android:name="android.app.shortcuts"
-        android:resource="@xml/shortcuts" />
     </activity>
 
     <!-- TODO update below -->

@@ -1,13 +1,11 @@
 package com.nononsenseapps.feeder.ui
 
 import android.content.Intent
-import android.content.Intent.ACTION_MANAGE_NETWORK_USAGE
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,13 +20,8 @@ import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.ApplicationState
-import com.nononsenseapps.feeder.model.EphemeralState
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.FeedViewModel
-import com.nononsenseapps.feeder.model.NavigationCurrentFeed
-import com.nononsenseapps.feeder.model.NavigationSearch
-import com.nononsenseapps.feeder.model.NavigationSettings
-import com.nononsenseapps.feeder.model.NavigationTarget
 import com.nononsenseapps.feeder.model.SearchFeedViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToSpeechViewModel
@@ -50,7 +43,6 @@ import org.kodein.di.instance
 @ExperimentalAnimationApi
 class MainActivity : DIAwareComponentActivity() {
     private val applicationState: ApplicationState by instance()
-    private val ephemeralState: EphemeralState by instance()
 
     // This reference is only used for intent navigation
     private var navController: NavController? = null
@@ -60,14 +52,7 @@ class MainActivity : DIAwareComponentActivity() {
 
         intent?.let {
             if (navController?.handleDeepLink(intent) != true) {
-                parseIntentToState(it)?.let { target ->
-                    ephemeralState.setIntentNavigationTarget(target)
-                    // Navcontroller receives intent automatically on startup but not here
-                    // edit: LaunchedEffect should handle this
-//                    navController?.navigate(target.route) {
-//                        target.navOptions(this)
-//                    }
-                }
+                Log.e("FeederMainActivity", "In onNewIntent, navController rejected the intent")
             }
         }
     }
@@ -80,31 +65,8 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        intent?.let {
-            parseIntentToState(it)?.let { target ->
-                ephemeralState.setIntentNavigationTarget(target)
-            }
-        }
-
         setContent {
             appContent()
-        }
-    }
-
-    /**
-     * This parses external intents only - deep links are handled directly by navcontroller
-     */
-    fun parseIntentToState(intent: Intent): NavigationTarget? = when (intent.action) {
-        ACTION_MANAGE_NETWORK_USAGE -> NavigationSettings().also {
-            Log.d("JONAS66", "Navigation: ${it.route}")
-        }
-        else -> {
-            (intent.dataString ?: intent.getStringExtra(Intent.EXTRA_TEXT))?.trim()
-                ?.let { feedUrl ->
-                    NavigationSearch(feedUrl).also {
-                        Log.d("JONAS66", "Navigation: ${it.route}")
-                    }
-                }
         }
     }
 
@@ -121,8 +83,6 @@ class MainActivity : DIAwareComponentActivity() {
                 val navController = rememberNavController().also {
                     this.navController = it
                 }
-
-                val intentNavigationTarget by ephemeralState.intentNavigationTarget
 
                 // TODO implement intent handling for android.intent.action.MANAGE_NETWORK_USAGE
                 // TODO implement intent for adding a feed
@@ -283,21 +243,6 @@ class MainActivity : DIAwareComponentActivity() {
                             settingsViewModel = settingsViewModel,
                             applicationState = applicationState
                         )
-                    }
-                }
-
-                LaunchedEffect(key1 = intentNavigationTarget.route) {
-                    Log.d("JONAS66", "Launched navigate to ${intentNavigationTarget.route}")
-                    // This needs to be done after initialization of graph - starting route can't
-                    // take arguments??
-                    if (intentNavigationTarget !is NavigationCurrentFeed) {
-                        // No need to do anything if it's the default route
-                        navController.navigate(intentNavigationTarget.route) {
-                            intentNavigationTarget.navOptions(this)
-                            launchSingleTop = true
-                        }
-                        // And then reset it
-                        ephemeralState.setIntentNavigationTarget(NavigationCurrentFeed())
                     }
                 }
             }

@@ -182,7 +182,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di),
             keyChannel.offer(key)
         }
 
-        // TODO update mutable state - or just force everything through the view model
+        // TODO update mutable state - settings may have been changed in other activity
         when (key) {
 
         }
