@@ -42,6 +42,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -88,8 +90,10 @@ import com.nononsenseapps.feeder.ui.compose.state.getImagePlaceholder
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.SortingOptions
 import com.nononsenseapps.feeder.util.ThemeOptions
+import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.currentlyUnmetered
 import com.nononsenseapps.feeder.util.openGitlabIssues
+import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
@@ -98,10 +102,12 @@ import org.threeten.bp.LocalDateTime
 
 @Composable
 fun FeedScreen(
+    feedOrTag: FeedOrTag,
     onItemClick: (Long) -> Unit,
     onAddFeed: (() -> Unit),
     onFeedEdit: (Long) -> Unit,
     onSettings: () -> Unit,
+    onOpenFeedOrTag: (FeedOrTag) -> Unit,
     feedListViewModel: FeedListViewModel,
     feedItemsViewModel: FeedItemsViewModel,
     settingsViewModel: SettingsViewModel,
@@ -109,17 +115,18 @@ fun FeedScreen(
 ) {
     val onlyUnread by settingsViewModel.showOnlyUnread.collectAsState()
     val currentSorting by settingsViewModel.currentSorting.collectAsState()
-    val currentFeedAndTag by settingsViewModel.currentFeedAndTag.collectAsState()
     val showFloatingActionButton by settingsViewModel.showFab.collectAsState()
 
     val screenTitle by feedItemsViewModel.currentTitle.collectAsState(initial = "")
+
+    val context = LocalContext.current
 
     val feedsAndTags by feedItemsViewModel.drawerItemsWithUnreadCounts
         .collectAsState(initial = emptyList())
 
     feedItemsViewModel.feedListArgs = feedItemsViewModel.feedListArgs.copy(
-        feedId = currentFeedAndTag.first,
-        tag = currentFeedAndTag.second,
+        feedId = feedOrTag.id,
+        tag = feedOrTag.tag,
         onlyUnread = onlyUnread,
         newestFirst = when (currentSorting) {
             SortingOptions.NEWEST_FIRST -> true
@@ -130,8 +137,8 @@ fun FeedScreen(
     val pagedFeedItems = feedItemsViewModel.feedListItems.collectAsLazyPagingItems()
 
     val visibleFeeds by feedListViewModel.getFeedTitles(
-        feedId = currentFeedAndTag.first,
-        tag = currentFeedAndTag.second
+        feedId = feedOrTag.id,
+        tag = feedOrTag.tag
     ).collectAsState(initial = emptyList())
 
     val applicationState: ApplicationState by instance()
@@ -146,7 +153,6 @@ fun FeedScreen(
         null
     }
 
-    val context = LocalContext.current
     val onSendFeedback = {
         context.startActivity(openGitlabIssues())
     }
@@ -191,8 +197,8 @@ fun FeedScreen(
             applicationState.setRefreshing()
             requestFeedSync(
                 di = di,
-                feedId = currentFeedAndTag.first,
-                feedTag = currentFeedAndTag.second,
+                feedId = feedOrTag.id,
+                feedTag = feedOrTag.tag,
                 ignoreConnectivitySettings = true,
                 forceNetwork = true,
                 parallell = true
@@ -212,7 +218,9 @@ fun FeedScreen(
             settingsViewModel.setShowOnlyUnread(value)
         },
         onDrawerItemSelected = { id, tag ->
-            settingsViewModel.setCurrentFeedAndTag(feedId = id, tag = tag)
+            onOpenFeedOrTag(FeedOrTag(id, tag))
+//             TODO set this elsewhere
+//            settingsViewModel.setCurrentFeedAndTag(feedId = id, tag = tag)
         },
         onAddFeed = onAddFeed,
         onEditFeed = onEditFeed,
@@ -228,8 +236,8 @@ fun FeedScreen(
         onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}") },
         onMarkAllAsRead = {
             feedItemsViewModel.markAllAsReadInBackground(
-                feedId = currentFeedAndTag.first,
-                tag = currentFeedAndTag.second
+                feedId = feedOrTag.id,
+                tag = feedOrTag.tag
             )
         }
     ) { modifier, openNavDrawer ->
@@ -618,3 +626,12 @@ fun DefaultPreview() {
         }
     }
 }
+
+@Immutable
+data class FeedOrTag(
+    val id: Long,
+    val tag: String
+)
+
+val FeedOrTag.isFeed
+    get() = id > ID_UNSET

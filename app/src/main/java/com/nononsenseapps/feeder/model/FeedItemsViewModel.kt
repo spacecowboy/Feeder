@@ -382,6 +382,10 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
             }
         }
 
+    suspend fun getFeedDisplayTitle(feedId: Long): String? {
+        return feedDao.getFeedTitle(feedId).firstOrNull()?.displayTitle
+    }
+
     fun setOnlyUnread(onlyUnread: Boolean) {
         liveOnlyUnread.value = onlyUnread
     }

@@ -108,6 +108,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
     style.bigText(text)
     style.setBigContentTitle(title)
 
+    // TODO update for compose
     val contentIntent =
         NavDeepLinkBuilder(context)
             .setGraph(R.navigation.nav_graph)
@@ -189,6 +190,7 @@ internal fun getOpenInDefaultActivityIntent(context: Context, feedItemId: Long, 
  * Use this on platforms older than 24 to bundle notifications together
  */
 private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed>): Notification {
+    // TODO update for compose
     val style = NotificationCompat.InboxStyle()
     val title = context.getString(R.string.updated_feeds)
     val text = feedItems.map { it.feedDisplayTitle }.toSet().joinToString(separator = ", ")
