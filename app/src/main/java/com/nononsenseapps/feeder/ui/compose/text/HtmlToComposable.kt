@@ -83,7 +83,8 @@ private fun LazyListScope.formatBody(
             ClickableText(
                 text = paragraph,
                 style = MaterialTheme.typography.body1
-                    .merge(TextStyle(color = MaterialTheme.colors.onBackground))
+                    .merge(TextStyle(color = MaterialTheme.colors.onBackground)),
+                modifier = Modifier.fillMaxWidth()
             ) { offset ->
                 // TODO("on click with offset / index position")
                 paragraph.getStringAnnotations("URL", offset, offset)
@@ -115,6 +116,7 @@ private fun LazyListScope.formatCodeBlock(element: Element, @DrawableRes imagePl
                     .horizontalScroll(
                         state = scrollState
                     )
+                    .fillMaxWidth()
             ) {
                 Box(modifier = Modifier.padding(all = 4.dp)) {
                     Text(
@@ -411,7 +413,11 @@ private fun TextComposer.appendTextChildren(
                                     }
 
                                     if (alt.isNotBlank()) {
-                                        Text(alt, style = MaterialTheme.typography.caption)
+                                        Text(
+                                            alt,
+                                            style = MaterialTheme.typography.caption,
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
                                     }
 
                                     Spacer(modifier = Modifier.height(8.dp))
