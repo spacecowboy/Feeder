@@ -8,6 +8,7 @@ class AnnotatedParagraphStringBuilder {
     // Private for a reason
     private val builder: AnnotatedString.Builder = AnnotatedString.Builder()
 
+    private val poppedComposableStyles = mutableListOf<ComposableStyleWithStartEnd>()
     val composableStyles = mutableListOf<ComposableStyleWithStartEnd>()
     val lastTwoChars: MutableList<Char> = mutableListOf()
 
@@ -53,9 +54,9 @@ class AnnotatedParagraphStringBuilder {
     fun popComposableStyle(
         index: Int
     ) {
-        composableStyles[index].let {
-            composableStyles[index] = it.copy(end = builder.length)
-        }
+        poppedComposableStyles.add(
+            composableStyles.removeAt(index).copy(end = builder.length)
+        )
     }
 
     fun append(text: String) {
@@ -75,11 +76,18 @@ class AnnotatedParagraphStringBuilder {
 
     @Composable
     fun toAnnotatedString(): AnnotatedString {
+        for (composableStyle in poppedComposableStyles) {
+            builder.addStyle(
+                style = composableStyle.style(),
+                start = composableStyle.start,
+                end = composableStyle.end
+            )
+        }
         for (composableStyle in composableStyles) {
             builder.addStyle(
                 style = composableStyle.style(),
                 start = composableStyle.start,
-                end = if (composableStyle.end < composableStyle.start) builder.length else composableStyle.end
+                end = builder.length
             )
         }
         return builder.toAnnotatedString()
