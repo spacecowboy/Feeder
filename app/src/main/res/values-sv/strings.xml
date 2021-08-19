@@ -107,4 +107,5 @@
     <string name="resume_reading">Återuppta uppläsning</string>
     <string name="pause_reading">Pausa uppläsning</string>
     <string name="read_article">Läs högt</string>
+    <string name="use_app_default">Använd app standard</string>
 </resources>
