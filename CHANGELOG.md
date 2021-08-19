@@ -1,3 +1,12 @@
+# 1.13.5
+Jonas Kalderstam (2):
+  * [b9c97797] Changed so Feeder no longer changes the URL of feeds to
+         canonical selflink
+  * [a01dafc7] Updated Swedish translation using Weblate
+
+Luna Jernberg (1):
+  * [850f411d] Updated Swedish translation using Weblate
+
 # 1.13.4
 Agnieszka C (2):
   * [098172c1] Updated Polish translation using Weblate
