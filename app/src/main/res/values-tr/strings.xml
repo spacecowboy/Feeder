@@ -13,8 +13,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Kaydet</string>
     <string name="empty_feed_top">Burada okuyacak bir şey yok. Arzu edersiniz…</string>
-    <string name="empty_feed_open">Başka bir yayın &lt;font color=#607D8B&gt;açmak&lt;/font&gt; ister misiniz\?</string>
-    <string name="empty_feed_add">Daha fazla yayın &lt;font color=#607D8B&gt;eklemek&lt;/font&gt; ister misiniz\?</string>
+    <string name="empty_feed_open">Başka bir yayın <annotation style="link">açmak</annotation> ister misiniz\?</string>
+    <string name="empty_feed_add">Daha fazla yayın <annotation style="link">eklemek</annotation> ister misiniz\?</string>
     <string name="search_feed_empty_hint">Bir yayın adresi girin</string>
     <string name="mark_as_read">Okundu olarak işaretle</string>
     <string name="mark_as_unread">Okunmadı olarak işaretle</string>

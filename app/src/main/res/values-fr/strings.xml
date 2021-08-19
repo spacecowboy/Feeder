@@ -10,8 +10,8 @@
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">par %1$s, le %2$s</string>
     <string name="save">Enregistrer</string>
     <string name="empty_feed_top">Rien à lire ici. Souhaitez-vous…</string>
-    <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Ouvrir</font> un autre flux ?]]></string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Ajouter&lt;/font&gt; d\'autres flux \?</string>
+    <string name="empty_feed_open"><annotation style="link">Ouvrir</annotation> un autre flux ?</string>
+    <string name="empty_feed_add"><annotation style="link">Ajouter</annotation> d\'autres flux \?</string>
     <string name="search_feed_empty_hint">Saisir l\'adresse d\'un flux</string>
     <string name="mark_all_as_read">Tout marquer comme lu</string>
     <string name="edit_feed">Modifier le flux</string>

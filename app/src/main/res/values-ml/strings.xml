@@ -18,7 +18,7 @@
     <string name="synchronization">സമന്വയം</string>
     <string name="sync">സമന്വയിപ്പിക്കൂ</string>
     <string name="mark_as_unread">വായിക്കാത്തതായി കാണിക്കൂ</string>
-    <string name="empty_feed_open">മറ്റൊരു ഫീഡ് &lt;font color=#607D8B&gt;തുറക്കണോ&lt;/font&gt;\?</string>
+    <string name="empty_feed_open">മറ്റൊരു ഫീഡ് <annotation style="link">തുറക്കണോ</annotation>\?</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="add_feed_search_hint">ഫീഡിനുള്ള URL</string>
     <string name="navigation_drawer_close">നാവിഗേഷൻ ഡ്രോയർ അടയ്‌ക്കൂ</string>
@@ -55,7 +55,7 @@
     <string name="sync_option_every_15min">എല്ലാ 15 മിനിറ്റും</string>
     <string name="no_such_feed">അത്തരം ഫീഡുകളൊന്നും കണ്ടെത്താൻ കഴിഞ്ഞില്ല. ഒരുപക്ഷേ https ഉപയോഗിച്ചു നോക്കൂ.</string>
     <string name="show_fab">ഫ്ലോട്ടിംഗ് ആക്ഷൻ ബട്ടൺ കാണിക്കുക</string>
-    <string name="empty_feed_add">കൂടുതൽ ഫീഡുകൾ &lt;font color=#607D8B&gt; ചേർക്കണോ&lt;/font&gt;\?</string>
+    <string name="empty_feed_add">കൂടുതൽ ഫീഡുകൾ <annotation style="link"> ചേർക്കണോ</annotation>\?</string>
     <string name="updated_feeds">പുതുക്കിയ ഫീഡുകൾ</string>
     <string name="image_loading">ചിത്രം ലഭ്യമാക്കുന്നൂ</string>
     <string name="sort_newest_first">ഏറ്റവും പുതിയത് ആദ്യം</string>

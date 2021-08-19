@@ -13,8 +13,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Spara</string>
     <string name="empty_feed_top">Inget att läsa. Skulle du vilja…</string>
-    <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Öppna</font> annat flöde?]]></string>
-    <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Lägga till</font> nytt flöde?]]></string>
+    <string name="empty_feed_open"><annotation style="link">Öppna</annotation> annat flöde?</string>
+    <string name="empty_feed_add"><annotation style="link">Lägga till</annotation> nytt flöde?</string>
     <string name="search_feed_empty_hint">Skriv adress till flöde</string>
     <string name="mark_as_read">Markera som läst</string>
     <string name="mark_as_unread">Markera som oläst</string>

@@ -93,8 +93,8 @@
     <string name="mark_as_unread">Marcați ca necitit</string>
     <string name="mark_as_read">Marcați ca fiind citit</string>
     <string name="search_feed_empty_hint">Introduceți o adresă de flux</string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Add&lt;/font&gt; mai multe fluxuri\?</string>
-    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Open&lt;/font&gt; alt flux\?</string>
+    <string name="empty_feed_add"><annotation style="link">Add</annotation> mai multe fluxuri\?</string>
+    <string name="empty_feed_open"><annotation style="link">Open</annotation> alt flux\?</string>
     <string name="empty_feed_top">Nimic de citit aici. Doriți să…</string>
     <string name="save">Salvați</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>

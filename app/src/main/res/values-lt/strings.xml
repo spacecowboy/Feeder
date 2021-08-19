@@ -30,8 +30,8 @@
     <string name="notify_for_new_items">Pranešti apie naujus elementus</string>
     <string name="mark_all_as_read">Pažymėti visus kaip skaitytus</string>
     <string name="search_feed_empty_hint">Įveskite kanalo adresą</string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Pridėti&lt;/font&gt; daugiau kanalų\?</string>
-    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Atidaryti&lt;/font&gt; kitą kanalą\?</string>
+    <string name="empty_feed_add"><annotation style="link">Pridėti</annotation> daugiau kanalų\?</string>
+    <string name="empty_feed_open"><annotation style="link">Atidaryti</annotation> kitą kanalą\?</string>
     <string name="preload_custom_tab">Iš anksto įkelti pasirinktinį skirtuką</string>
     <string name="discovered_feeds_list">Atrastų kanalų sąrašas</string>
     <string name="open_links_with">Atidarykite nuorodas su</string>

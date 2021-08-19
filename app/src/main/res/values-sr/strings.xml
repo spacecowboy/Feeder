@@ -88,8 +88,8 @@
     <string name="mark_as_unread">Означи као непрочитано</string>
     <string name="mark_as_read">Означи као прочитано</string>
     <string name="search_feed_empty_hint">Унеси мрежну адресу извора</string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Додати&lt;/font&gt; још извора\?</string>
-    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Отворити&lt;/font&gt; други извор\?</string>
+    <string name="empty_feed_add"><annotation style="link">Додати</annotation> још извора\?</string>
+    <string name="empty_feed_open"><annotation style="link">Отворити</annotation> други извор\?</string>
     <string name="empty_feed_top">Нема ничега за читање овде. Желиш ли…</string>
     <string name="save">Сачувај</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>

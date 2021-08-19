@@ -13,8 +13,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Tallenna</string>
     <string name="empty_feed_top">Täällä ei ole mitään luettavaa. Haluaisitko…</string>
-    <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Avataanko</font> toinen syöte?]]></string>
-    <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Lisää</font> enemmän syötteitä?]]></string>
+    <string name="empty_feed_open"><annotation style="link">Avataanko</annotation> toinen syöte?</string>
+    <string name="empty_feed_add"><annotation style="link">Lisää</annotation> enemmän syötteitä?</string>
     <string name="search_feed_empty_hint">Lisää syötteen osoite</string>
     <string name="mark_as_read">Merkitse luetuksi</string>
     <string name="mark_as_unread">Merkitse lukemattomaksi</string>

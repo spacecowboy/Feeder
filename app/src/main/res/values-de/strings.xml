@@ -13,8 +13,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Speichern</string>
     <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würdest du gerne…</string>
-    <string name="empty_feed_open"><![CDATA[Einen anderen Feed <font color="#607D8B">öffnen</font>?]]></string>
-    <string name="empty_feed_add"><![CDATA[Weitere Feeds <font color="#607D8B">hinzufügen</font>?]]></string>
+    <string name="empty_feed_open">Einen anderen Feed <annotation style="link">öffnen</annotation>?</string>
+    <string name="empty_feed_add">Weitere Feeds <annotation style="link">hinzufügen</annotation>?</string>
     <string name="search_feed_empty_hint">Eingabe einer Feed-Adresse</string>
     <string name="mark_as_read">Als gelesen markieren</string>
     <string name="mark_as_unread">Als ungelesen markieren</string>

@@ -95,8 +95,8 @@
     <string name="mark_as_unread">படிக்காததாக குறியிடு</string>
     <string name="mark_as_read">படித்ததாக குறியிடு</string>
     <string name="search_feed_empty_hint">ஊட்ட முகவரியை உள்ளிடவும்</string>
-    <string name="empty_feed_add">&lt;font color = # 607D8B&gt; சேர் &lt;/ font&gt; மேலும் ஊட்டங்கள்\?</string>
-    <string name="empty_feed_open">&lt;எழுத்துரு வண்ணம்=#607D8B&gt;திற&lt;/font&gt; மற்றொரு ஊட்டம்\?</string>
+    <string name="empty_feed_add"><annotation style="link"> சேர் </annotation> மேலும் ஊட்டங்கள்\?</string>
+    <string name="empty_feed_open"><annotation style="link">திற</annotation> மற்றொரு ஊட்டம்\?</string>
     <string name="empty_feed_top">இங்கே படிக்க எதுவும் இல்லை. நீங்கள் விரும்புகிறீர்களா…</string>
     <string name="save">சேமி</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>

@@ -93,8 +93,8 @@
     <string name="mark_as_unread">Marcar como não lido</string>
     <string name="mark_as_read">Marcar como lido</string>
     <string name="search_feed_empty_hint">Digite um endereço do feed</string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Adicionar&lt;/font&gt; mais feeds\?</string>
-    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Abrir&lt;/font&gt; um outro feed\?</string>
+    <string name="empty_feed_add"><annotation style="link">Adicionar</annotation> mais feeds\?</string>
+    <string name="empty_feed_open"><annotation style="link">Abrir</annotation> um outro feed\?</string>
     <string name="empty_feed_top">Nada para ler. Gostaria de…</string>
     <string name="save">Salvar</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
