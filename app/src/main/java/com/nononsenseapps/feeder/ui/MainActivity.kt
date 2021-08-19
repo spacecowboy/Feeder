@@ -167,6 +167,11 @@ class MainActivity : DIAwareComponentActivity() {
                         "reader/{itemId}",
                         arguments = listOf(
                             navArgument("itemId") { type = NavType.LongType }
+                        ),
+                        deepLinks = listOf(
+                            navDeepLink {
+                                uriPattern = "$DEEP_LINK_BASE_URI/article/{itemId}"
+                            }
                         )
                     ) { backStackEntry ->
                         // Necessary to use the backstackEntry so savedState matches lifecycle

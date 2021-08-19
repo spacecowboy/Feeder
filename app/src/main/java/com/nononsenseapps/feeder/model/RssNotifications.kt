@@ -15,6 +15,7 @@ import android.provider.Browser.EXTRA_CREATE_NEW_TAB
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import androidx.navigation.NavDeepLinkBuilder
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.COL_LINK
@@ -26,7 +27,10 @@ import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_ID
 import com.nononsenseapps.feeder.ui.EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED
+import com.nononsenseapps.feeder.ui.MainActivity
 import com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivity
+import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
+import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.bundle
 import com.nononsenseapps.feeder.util.notificationManager
 import kotlinx.coroutines.Dispatchers
@@ -108,23 +112,25 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
     style.bigText(text)
     style.setBigContentTitle(title)
 
-    // TODO update for compose
-    val contentIntent =
-        NavDeepLinkBuilder(context)
-            .setGraph(R.navigation.nav_graph)
-            .setDestination(R.id.readerFragment)
-            .setArguments(
-                bundle {
-                    putLong(ARG_ID, item.id)
-                }
-            )
-            .createPendingIntent(requestCode = item.id.toInt())
+    val contentIntent = Intent(
+        Intent.ACTION_VIEW,
+        "$DEEP_LINK_BASE_URI/article/${item.id}".toUri(),
+        context,
+        MainActivity::class.java
+    )
+
+    val pendingIntent = PendingIntent.getActivity(
+        context,
+        item.id.toInt(),
+        contentIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT
+    )
 
     val builder = notificationBuilder(context)
 
     builder.setContentText(text)
         .setContentTitle(title)
-        .setContentIntent(contentIntent)
+        .setContentIntent(pendingIntent)
         .setDeleteIntent(getPendingDeleteIntent(context, item))
         .setNumber(1)
 
@@ -200,6 +206,8 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
         style.addLine("${it.feedDisplayTitle} \u2014 ${it.plainTitle}")
     }
 
+    // TODO update to correct deep link
+    // TODO open in other activity to mark as notified first??
     val contentIntent = NavDeepLinkBuilder(context)
         .setGraph(R.navigation.nav_graph)
         .setDestination(R.id.feedFragment)
