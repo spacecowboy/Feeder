@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
@@ -84,7 +83,7 @@ fun CreateFeedScreen(
         allTags = allTags.filter { it.isNotBlank() },
         onOk = { result ->
             coroutineScope.launch {
-                val feedId = feedViewModel.save(
+                val feedId = feedViewModel.saveAndRequestSync(
                     Feed(
                         title = result.title
                     ).updateFrom(result)
@@ -100,29 +99,28 @@ fun CreateFeedScreen(
 
 @Composable
 fun EditFeedScreen(
+    feed: Feed,
     onNavigateUp: () -> Unit,
+    onOk: (Long) -> Unit,
     feedViewModel: FeedViewModel
 ) {
-    val feed by feedViewModel.currentLiveFeed.observeAsState()
     val allTags by feedViewModel.liveAllTags.observeAsState(initial = emptyList())
 
-    feed?.let { feed ->
-        EditFeedScreen(
-            onNavigateUp = onNavigateUp,
-            feed = feed.toEditableFeed(),
-            allTags = allTags.filter { it.isNotBlank() },
-            onOk = { result ->
-                feedViewModel.saveInBackgroundAndRequestSync(
-                    feed.updateFrom(result)
-                )
+    EditFeedScreen(
+        onNavigateUp = onNavigateUp,
+        feed = feed.toEditableFeed(),
+        allTags = allTags.filter { it.isNotBlank() },
+        onOk = { result ->
+            feedViewModel.saveInBackgroundAndRequestSync(
+                feed.updateFrom(result)
+            )
 
-                onNavigateUp()
-            },
-            onCancel = {
-                onNavigateUp()
-            }
-        )
-    }
+            onOk(feed.id)
+        },
+        onCancel = {
+            onNavigateUp()
+        }
+    )
 }
 
 @Composable

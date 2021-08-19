@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -57,13 +58,10 @@ class MainActivity : DIAwareComponentActivity() {
     private var navController: NavController? = null
 
     override fun onNewIntent(intent: Intent?) {
-        Log.i("JONAS98", "OnNewIntent")
         super.onNewIntent(intent)
 
         intent?.let {
-            Log.i("JONAS98", "Got an intent: ${intent.data}")
             if (navController?.handleDeepLink(intent) != true) {
-                Log.i("JONAS98", "FU INTENT")
                 Log.e("FeederMainActivity", "In onNewIntent, navController rejected the intent")
             }
         }
@@ -96,8 +94,8 @@ class MainActivity : DIAwareComponentActivity() {
                     this.navController = it
                 }
 
-                // TODO verify currentFeed is updated on delete
-                // TODO add a specific navigation target for opening items from intent where navigation is moved to reader/list and correct custom tab etc is opened
+                // TODO deleting the currently open feed should open all feeds
+                // TODO handle deep link for item where default is open with custom tab or browser
 
                 NavHost(navController, startDestination = "lastfeed") {
                     composable("lastfeed") { backStackEntry ->
@@ -137,7 +135,8 @@ class MainActivity : DIAwareComponentActivity() {
                             key1 = backStackEntry.arguments?.getLong("id"),
                             key2 = backStackEntry.arguments?.getString("tag")
                         ) {
-                            val feedId = (backStackEntry.arguments?.getLong("id") ?: ID_UNSET).let { feedId ->
+                            val feedId = (backStackEntry.arguments?.getLong("id")
+                                ?: ID_UNSET).let { feedId ->
                                 if (feedId == ID_UNSET) {
                                     settingsViewModel.currentFeedAndTag.value.first
                                 } else {
@@ -145,16 +144,20 @@ class MainActivity : DIAwareComponentActivity() {
                                 }
                             }
 
-                            val tag = (backStackEntry.arguments?.getString("tag") ?: "").let { tag ->
-                                if (tag.isEmpty()) {
-                                    settingsViewModel.currentFeedAndTag.value.second
-                                } else {
-                                    tag
+                            val tag =
+                                (backStackEntry.arguments?.getString("tag") ?: "").let { tag ->
+                                    if (tag.isEmpty()) {
+                                        settingsViewModel.currentFeedAndTag.value.second
+                                    } else {
+                                        tag
+                                    }
                                 }
-                            }
 
+                            settingsViewModel.setCurrentFeedAndTag(feedId, tag)
                             FeedOrTag(feedId, tag)
                         }
+
+
 
                         FeedScreen(
                             feedOrTag = feedOrTag,
@@ -189,7 +192,9 @@ class MainActivity : DIAwareComponentActivity() {
                             settingsViewModel = settingsViewModel,
                             readAloudViewModel = readAloudViewModel,
                         ) {
-                            navController.popBackStackOrNavigateTo(route = "feed")
+                            if (!navController.popBackStack()) {
+                                navController.navigate("lastfeed")
+                            }
                         }
                     }
                     composable(
@@ -201,17 +206,30 @@ class MainActivity : DIAwareComponentActivity() {
                         // Necessary to use the backstackEntry so savedState matches lifecycle
                         val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
 
-                        // TODO change to correct thign in settingsviemodel
-                        feedViewModel.currentFeedId =
-                            backStackEntry.arguments?.getLong("feedId")
-                                ?: ID_UNSET
+                        val feedId = backStackEntry.arguments?.getLong("feedId")
+                            ?: ID_UNSET
 
-                        EditFeedScreen(
-                            onNavigateUp = {
-                                navController.popBackStackOrNavigateTo(route = "feed")
-                            },
-                            feedViewModel = feedViewModel
-                        )
+                        if (feedId <= ID_UNSET) {
+                            error("Can't edit a feed with no id")
+                        }
+
+                        feedViewModel.currentFeedId = feedId
+
+                        val feed by feedViewModel.currentLiveFeed.observeAsState()
+
+                        feed?.let { feed ->
+                            EditFeedScreen(
+                                feed = feed,
+                                onNavigateUp = {
+                                    navController.popBackStack()
+                                },
+                                onOk = { feedId ->
+                                    navController.clearBackstack()
+                                    navController.navigate("feed?id=$feedId")
+                                },
+                                feedViewModel = feedViewModel
+                            )
+                        }
                     }
                     composable(
                         "search/feed?feedUrl={feedUrl}",
@@ -228,11 +246,9 @@ class MainActivity : DIAwareComponentActivity() {
 
                         SearchFeedScreen(
                             onNavigateUp = {
-                                navController.popBackStackOrNavigateTo(route = "feed")
+                                navController.popBackStack()
                             },
-                            initialFeedUrl = backStackEntry.arguments?.getString("feedUrl").also {
-                                Log.d("JONAS66", "arg is $it")
-                            },
+                            initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
                             searchFeedViewModel = searchFeedViewModel
                         ) {
                             navController.navigate("add/feed?feedUrl=${it.url}&feedTitle=${it.title}")
@@ -254,14 +270,14 @@ class MainActivity : DIAwareComponentActivity() {
 
                         CreateFeedScreen(
                             onNavigateUp = {
-                                navController.popBackStackOrNavigateTo(route = "feed")
+                                navController.popBackStack()
                             },
                             feedUrl = backStackEntry.arguments?.getString("feedUrl") ?: "",
                             feedTitle = backStackEntry.arguments?.getString("feedTitle") ?: "",
                             feedViewModel = feedViewModel
                         ) { feedId ->
-                            settingsViewModel.setCurrentFeedAndTag(feedId, "")
-                            navController.popBackStackOrNavigateTo("feed")
+                            navController.clearBackstack()
+                            navController.navigate("feed?id=$feedId")
                         }
                     }
                     composable(
@@ -269,7 +285,7 @@ class MainActivity : DIAwareComponentActivity() {
                     ) {
                         SettingsScreen(
                             onNavigateUp = {
-                                navController.popBackStackOrNavigateTo(route = "feed")
+                                navController.popBackStack()
                             },
                             settingsViewModel = settingsViewModel,
                             applicationState = applicationState
@@ -355,11 +371,9 @@ class MainActivity : DIAwareComponentActivity() {
     }
 }
 
-private fun NavController.popBackStackOrNavigateTo(route: String) {
-    // TODO does not handle the case where an external intent comes
-    if (!popBackStack(route = route, inclusive = false)) {
-        navigate(route = route) {
-            launchSingleTop = true
-        }
+private fun NavController.clearBackstack() {
+    var popped = true
+    while (popped) {
+        popped = popBackStack()
     }
 }
