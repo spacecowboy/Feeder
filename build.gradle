@@ -70,17 +70,6 @@ buildscript {
 }
 
 allprojects {
-//  repositories {
-//    google()
-//    mavenCentral()
-//    jcenter() {
-//      content {
-//        includeModule("org.jetbrains.trove4j", "trove4j")
-//        includeModule("com.linkedin.dexmaker", "dexmaker")
-//      }
-//    }
-//  }
-
   tasks.withType(JavaCompile) {
     options.incremental = true
     options.encoding = 'UTF-8'
