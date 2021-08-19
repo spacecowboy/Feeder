@@ -31,6 +31,7 @@ import java.lang.reflect.InvocationTargetException
 abstract class DIAwareViewModel(override val di: DI) :
     AndroidViewModel(di.direct.instance()), DIAware
 
+@Deprecated("Stop using this", replaceWith = ReplaceWith("DIAwareSavedStateViewModelFactory"))
 class DIAwareViewModelFactory(
     override val di: DI
 ) : ViewModelProvider.AndroidViewModelFactory(di.direct.instance()), DIAware {
@@ -54,7 +55,12 @@ class DIAwareViewModelFactory(
 }
 
 inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithDIAwareViewModelFactory() {
-    bind<T>() with activityViewModelProvider()
+    bind<T>() with factory { activity: DIAwareComponentActivity ->
+        val factory = DIAwareSavedStateViewModelFactory(activity.di, activity)
+
+        ViewModelProvider(activity, factory).get(T::class.java)
+    }
+    // TODO remove this factory
     bind<T>() with factory { fragment: Fragment ->
         ViewModelProvider(fragment, instance<DIAwareViewModelFactory>()).get(T::class.java)
     }

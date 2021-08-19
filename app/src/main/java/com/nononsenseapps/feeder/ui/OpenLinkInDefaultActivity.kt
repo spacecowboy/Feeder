@@ -8,7 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.DIAwareActivity
+import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
@@ -22,7 +22,7 @@ import org.kodein.di.instance
  *
  * If link is null, then item is only marked as read and notified.
  */
-class OpenLinkInDefaultActivity : DIAwareActivity() {
+class OpenLinkInDefaultActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -30,7 +30,7 @@ class OpenLinkInDefaultActivity : DIAwareActivity() {
             val id: Long = intent.data?.lastPathSegment?.toLong() ?: ID_UNSET
             val link: String? = intent.data?.getQueryParameter(COL_LINK)
 
-            val feedItemViewModel: FeedItemViewModel by instance()
+            val feedItemViewModel: FeedItemViewModel by instance(arg = this)
 
             lifecycleScope.launch {
                 feedItemViewModel.markAsReadAndNotified(id)
