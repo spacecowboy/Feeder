@@ -260,7 +260,7 @@ fun FeedScreen(
                     pagedFeedItems.snapshot().items[itemIndex].id
                 }
             ) { itemIndex ->
-                val previewItem = pagedFeedItems.getAsState(index = itemIndex).value
+                val previewItem = pagedFeedItems[itemIndex]
                     ?: return@items
 
                 SwipeableFeedItemPreview(
@@ -433,7 +433,12 @@ fun FeedScreen(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false }
                         ) {
-                            DropdownMenuItem(onClick = onAddFeed) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    showMenu = false
+                                    onAddFeed()
+                                }
+                            ) {
                                 Icon(
                                     Icons.Default.Add,
                                     contentDescription = "Add feed button"
@@ -442,7 +447,12 @@ fun FeedScreen(
                                 Text(stringResource(id = R.string.add_feed))
                             }
                             if (onEditFeed != null) {
-                                DropdownMenuItem(onClick = onEditFeed) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onEditFeed()
+                                        showMenu = false
+                                    }
+                                ) {
                                     Icon(
                                         Icons.Default.Edit,
                                         contentDescription = "Edit feed button"
@@ -451,7 +461,12 @@ fun FeedScreen(
                                     Text(stringResource(id = R.string.edit_feed))
                                 }
                             }
-                            DropdownMenuItem(onClick = { showDeleteDialog = true }) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    showDeleteDialog = true
+                                    showMenu = false
+                                }
+                            ) {
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = "Delete feed button"
@@ -460,7 +475,12 @@ fun FeedScreen(
                                 Text(stringResource(id = R.string.delete_feed))
                             }
                             Divider()
-                            DropdownMenuItem(onClick = onImport) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    showMenu = false
+                                    onImport()
+                                }
+                            ) {
                                 Icon(
                                     Icons.Default.ImportExport,
                                     contentDescription = "Import OPML button"
@@ -469,7 +489,12 @@ fun FeedScreen(
                                 Text(stringResource(id = R.string.import_feeds_from_opml))
                             }
                             Divider()
-                            DropdownMenuItem(onClick = onExport) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    showMenu = false
+                                    onExport()
+                                }
+                            ) {
                                 Icon(
                                     Icons.Default.ImportExport,
                                     contentDescription = "Export OPML button"
@@ -478,7 +503,12 @@ fun FeedScreen(
                                 Text(stringResource(id = R.string.export_feeds_to_opml))
                             }
                             Divider()
-                            DropdownMenuItem(onClick = onSettings) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    showMenu = false
+                                    onSettings()
+                                }
+                            ) {
                                 Icon(
                                     Icons.Default.Settings,
                                     contentDescription = "Settings button"
@@ -487,7 +517,12 @@ fun FeedScreen(
                                 Text(stringResource(id = R.string.action_settings))
                             }
                             Divider()
-                            DropdownMenuItem(onClick = onSendFeedback) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    showMenu = false
+                                    onSendFeedback()
+                                }
+                            ) {
                                 Icon(
                                     Icons.Default.Email,
                                     contentDescription = "Send bug report button"
