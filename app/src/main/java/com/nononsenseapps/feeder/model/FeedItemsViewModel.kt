@@ -15,6 +15,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
@@ -42,6 +43,7 @@ private const val KEY_FEED_ID = "FeedItemsViewModel feedid"
 private const val KEY_TAG = "FeedItemsViewModel tag"
 
 class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
+    private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
     private val dao: FeedItemDao by instance()
     private val feedDao: FeedDao by instance()
     private val liveOnlyUnread = MutableLiveData<Boolean>()
@@ -420,6 +422,11 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
 
     suspend fun markAsNotified(ids: List<Long>, notified: Boolean = true) =
         dao.markAsNotified(ids = ids, notified = notified)
+
+    fun markAsNotifiedInBackground(ids: List<Long>, notified: Boolean = true) =
+        applicationCoroutineScope.launch {
+            markAsNotified(ids, notified)
+        }
 
     suspend fun markAsRead(ids: List<Long>, unread: Boolean = false) =
         dao.markAsRead(ids = ids, unread = unread)

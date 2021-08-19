@@ -118,4 +118,5 @@ fun Context.removeDynamicShortcutToFeed(id: Any) {
     }
 }
 
-const val DEEP_LINK_BASE_URI = "https://feederapp.nononsenseapps.com"
+const val DEEP_LINK_HOST = "feederapp.nononsenseapps.com"
+const val DEEP_LINK_BASE_URI = "https://$DEEP_LINK_HOST"
