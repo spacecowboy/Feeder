@@ -1,3 +1,9 @@
+# 2.0.0-beta.1
+
+Complete rewrite of the UI in Jetpack Compose
+
+Expect bugs, but all features should be present.
+
 # 1.13.5
 Jonas Kalderstam (2):
   * [b9c97797] Changed so Feeder no longer changes the URL of feeds to
