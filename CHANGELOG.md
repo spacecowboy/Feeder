@@ -1,3 +1,8 @@
+# 2.0.0-beta.3
+Jonas Kalderstam (2):
+  * [a97a0257] Fixed some notifications not being cleared when opened
+  * [3f8240f3] Fixed feeds not being possible to add after enabling R8
+
 # 2.0.0-beta.2
 Jonas Kalderstam (5):
   * [60694836] Renamed Norwegian play store metadata
