@@ -124,12 +124,6 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
             dao.loadFeedItemFlow(itemId).asLiveData()
         }
 
-    fun markCurrentItemAsReadAndNotified() {
-        applicationCoroutineScope.launch {
-            dao.markAsReadAndNotified(id = currentItemId)
-        }
-    }
-
     fun markCurrentItemAsUnread() {
         applicationCoroutineScope.launch {
             dao.markAsRead(id = currentItemId, unread = true)
@@ -229,6 +223,7 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
         dao.markAsRead(id = id, unread = unread)
 
     suspend fun markAsReadAndNotified(id: Long) = dao.markAsReadAndNotified(id = id)
+    suspend fun markAsNotified(id: Long) = dao.markAsNotified(id = id)
 
     @Deprecated("Use compose instead")
     private suspend fun LiveDataScope<Spanned>.loadTextFrom(

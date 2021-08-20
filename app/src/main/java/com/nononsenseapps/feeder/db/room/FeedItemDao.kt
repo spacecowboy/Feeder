@@ -375,16 +375,16 @@ interface FeedItemDao {
     )
     suspend fun loadItemsToNotify(feedIds: List<Long>): List<FeedItemWithFeed>
 
-    @Query("UPDATE feed_items SET unread = 0")
+    @Query("UPDATE feed_items SET unread = 0, notified = 1")
     suspend fun markAllAsRead()
 
-    @Query("UPDATE feed_items SET unread = 0 WHERE feed_id IS :feedId")
+    @Query("UPDATE feed_items SET unread = 0, notified = 1 WHERE feed_id IS :feedId")
     suspend fun markAllAsRead(feedId: Long?)
 
     @Query(
         """
         UPDATE feed_items
-        SET unread = 0
+        SET unread = 0, notified = 1
         WHERE id IN (
           SELECT feed_items.id
           FROM feed_items
@@ -394,10 +394,10 @@ interface FeedItemDao {
     )
     suspend fun markAllAsRead(tag: String)
 
-    @Query("UPDATE feed_items SET unread = :unread WHERE id IS :id")
+    @Query("UPDATE feed_items SET unread = :unread, notified = 1 WHERE id IS :id")
     suspend fun markAsRead(id: Long, unread: Boolean = false)
 
-    @Query("UPDATE feed_items SET unread = :unread WHERE id IN (:ids)")
+    @Query("UPDATE feed_items SET unread = :unread, notified = 1 WHERE id IN (:ids)")
     suspend fun markAsRead(ids: List<Long>, unread: Boolean = false)
 
     @Query("UPDATE feed_items SET notified = :notified WHERE id IN (:ids)")

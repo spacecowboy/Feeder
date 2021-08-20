@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -30,6 +31,7 @@ import com.nononsenseapps.feeder.model.FeedViewModel
 import com.nononsenseapps.feeder.model.SearchFeedViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToSpeechViewModel
+import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.ui.compose.feed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
@@ -181,11 +183,17 @@ class MainActivity : DIAwareComponentActivity() {
                         val feedItemViewModel: FeedItemViewModel =
                             backStackEntry.DIAwareViewModel()
 
-                        feedItemViewModel.currentItemId =
-                            backStackEntry.arguments?.getLong("itemId")
-                                ?: ID_UNSET
+                        val itemId = backStackEntry.arguments?.getLong("itemId")
+                            ?: ID_UNSET
 
-                        feedItemViewModel.markCurrentItemAsReadAndNotified()
+                        feedItemViewModel.currentItemId = itemId
+
+                        val context = LocalContext.current
+
+                        LaunchedEffect(key1 = itemId) {
+                            feedItemViewModel.markAsReadAndNotified(itemId)
+                            cancelNotification(context, itemId)
+                        }
 
                         ReaderScreen(
                             feedItemViewModel = feedItemViewModel,
