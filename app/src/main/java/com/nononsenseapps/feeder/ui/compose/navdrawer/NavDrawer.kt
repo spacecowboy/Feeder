@@ -128,7 +128,7 @@ private fun ExpandableTag(
     onItemClick: () -> Unit = {},
 ) {
     val angle: Float by animateFloatAsState(
-        targetValue = if (expanded) 180f else 0f,
+        targetValue = if (expanded) 0f else 180f,
         animationSpec = tween()
     )
 
