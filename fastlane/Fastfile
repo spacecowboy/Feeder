@@ -48,7 +48,7 @@ platform :android do
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do
-    # mapping: "app/build/outputs/mapping/play/mapping.txt",
+    mapping: "app/build/outputs/mapping/play/mapping.txt",
     upload_to_play_store(
       aab: "app/build/outputs/bundle/play/app-play.aab"
     )
@@ -56,7 +56,7 @@ platform :android do
 
   desc "Validate deployment of a new version to the Google Play"
   lane :validate_deploy do
-    # mapping: "app/build/outputs/mapping/play/mapping.txt",
+    mapping: "app/build/outputs/mapping/play/mapping.txt",
     upload_to_play_store(
       aab: "app/build/outputs/bundle/play/app-play.aab",
       validate_only: true
