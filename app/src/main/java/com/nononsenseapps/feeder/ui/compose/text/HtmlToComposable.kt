@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -27,7 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -74,7 +73,7 @@ fun LazyListScope.htmlFormattedText(
 private fun LazyListScope.formatBody(
     element: Element,
     @DrawableRes imagePlaceholder: Int,
-    onLinkClick: (String) -> Unit
+    onLinkClick: (String) -> Unit,
 ) {
     val composer = TextComposer { paragraphBuilder ->
         item {
@@ -99,13 +98,18 @@ private fun LazyListScope.formatBody(
     composer.appendTextChildren(
         element.childNodes(),
         lazyListScope = this,
-        imagePlaceholder = imagePlaceholder
+        imagePlaceholder = imagePlaceholder,
+        onLinkClick = onLinkClick,
     )
 
     composer.terminateCurrentText()
 }
 
-private fun LazyListScope.formatCodeBlock(element: Element, @DrawableRes imagePlaceholder: Int) {
+private fun LazyListScope.formatCodeBlock(
+    element: Element,
+    @DrawableRes imagePlaceholder: Int,
+    onLinkClick: (String) -> Unit,
+) {
     val composer = TextComposer { paragraphBuilder ->
         item {
             val scrollState = rememberScrollState()
@@ -132,7 +136,8 @@ private fun LazyListScope.formatCodeBlock(element: Element, @DrawableRes imagePl
     composer.appendTextChildren(
         element.childNodes(), preFormatted = true,
         lazyListScope = this,
-        imagePlaceholder = imagePlaceholder
+        imagePlaceholder = imagePlaceholder,
+        onLinkClick = onLinkClick,
     )
 
     composer.terminateCurrentText()
@@ -143,7 +148,8 @@ private fun TextComposer.appendTextChildren(
     nodes: List<Node>,
     preFormatted: Boolean = false,
     lazyListScope: LazyListScope,
-    @DrawableRes imagePlaceholder: Int
+    @DrawableRes imagePlaceholder: Int,
+    onLinkClick: (String) -> Unit,
 ) {
     var node = nodes.firstOrNull()
     while (node != null) {
@@ -176,15 +182,18 @@ private fun TextComposer.appendTextChildren(
                         // They screw up formatting.
                         if (node.hasClass("readability-styled")) {
                             appendTextChildren(
-                                element.childNodes(), lazyListScope = lazyListScope,
-                                imagePlaceholder = imagePlaceholder
+                                element.childNodes(),
+                                lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder,
+                                onLinkClick = onLinkClick,
                             )
                         } else {
                             withParagraph {
                                 appendTextChildren(
                                     element.childNodes(),
                                     lazyListScope = lazyListScope,
-                                    imagePlaceholder = imagePlaceholder
+                                    imagePlaceholder = imagePlaceholder,
+                                    onLinkClick = onLinkClick,
                                 )
                             }
                         }
@@ -247,40 +256,50 @@ private fun TextComposer.appendTextChildren(
                     "strong", "b" -> {
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                             appendTextChildren(
-                                element.childNodes(), lazyListScope = lazyListScope,
-                                imagePlaceholder = imagePlaceholder
+                                element.childNodes(),
+                                lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
                     "i", "em", "cite", "dfn" -> {
                         withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
                             appendTextChildren(
-                                element.childNodes(), lazyListScope = lazyListScope,
-                                imagePlaceholder = imagePlaceholder
+                                element.childNodes(),
+                                lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
                     "tt" -> {
                         withStyle(SpanStyle(fontFamily = FontFamily.Monospace)) {
                             appendTextChildren(
-                                element.childNodes(), lazyListScope = lazyListScope,
-                                imagePlaceholder = imagePlaceholder
+                                element.childNodes(),
+                                lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
                     "u" -> {
                         withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) {
                             appendTextChildren(
-                                element.childNodes(), lazyListScope = lazyListScope,
-                                imagePlaceholder = imagePlaceholder
+                                element.childNodes(),
+                                lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
                     "sup" -> {
                         withStyle(SpanStyle(baselineShift = BaselineShift.Superscript)) {
                             appendTextChildren(
-                                element.childNodes(), lazyListScope = lazyListScope,
-                                imagePlaceholder = imagePlaceholder
+                                element.childNodes(),
+                                lazyListScope = lazyListScope,
+                                imagePlaceholder = imagePlaceholder,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
@@ -289,7 +308,8 @@ private fun TextComposer.appendTextChildren(
                             appendTextChildren(
                                 element.childNodes(),
                                 lazyListScope = lazyListScope,
-                                imagePlaceholder = imagePlaceholder
+                                imagePlaceholder = imagePlaceholder,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
@@ -299,7 +319,8 @@ private fun TextComposer.appendTextChildren(
                             appendTextChildren(
                                 element.childNodes(),
                                 lazyListScope = lazyListScope,
-                                imagePlaceholder = imagePlaceholder
+                                imagePlaceholder = imagePlaceholder,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
@@ -308,7 +329,8 @@ private fun TextComposer.appendTextChildren(
                             element.childNodes(),
                             preFormatted = true,
                             lazyListScope = lazyListScope,
-                            imagePlaceholder = imagePlaceholder
+                            imagePlaceholder = imagePlaceholder,
+                            onLinkClick = onLinkClick,
                         )
                     }
                     "code" -> {
@@ -316,7 +338,8 @@ private fun TextComposer.appendTextChildren(
                             terminateCurrentText()
                             lazyListScope.formatCodeBlock(
                                 element = element,
-                                imagePlaceholder = imagePlaceholder
+                                imagePlaceholder = imagePlaceholder,
+                                onLinkClick = onLinkClick,
                             )
                         } else {
                             // inline code
@@ -327,7 +350,8 @@ private fun TextComposer.appendTextChildren(
                                     element.childNodes(),
                                     preFormatted = preFormatted,
                                     lazyListScope = lazyListScope,
-                                    imagePlaceholder = imagePlaceholder
+                                    imagePlaceholder = imagePlaceholder,
+                                    onLinkClick = onLinkClick,
                                 )
                             }
                         }
@@ -340,7 +364,8 @@ private fun TextComposer.appendTextChildren(
                                 appendTextChildren(
                                     element.childNodes(),
                                     lazyListScope = lazyListScope,
-                                    imagePlaceholder = imagePlaceholder
+                                    imagePlaceholder = imagePlaceholder,
+                                    onLinkClick = onLinkClick,
                                 )
                             }
                         }
@@ -353,7 +378,8 @@ private fun TextComposer.appendTextChildren(
                                 appendTextChildren(
                                     element.childNodes(),
                                     lazyListScope = lazyListScope,
-                                    imagePlaceholder = imagePlaceholder
+                                    imagePlaceholder = imagePlaceholder,
+                                    onLinkClick = onLinkClick,
                                 )
                             }
                         }
@@ -362,7 +388,7 @@ private fun TextComposer.appendTextChildren(
                         val imageUrl = element.attr("abs:src") ?: ""
                         if (imageUrl.isNotBlank()) {
                             val alt = element.attr("alt") ?: ""
-                            appendImage { onClick ->
+                            appendImage(onLinkClick = onLinkClick) { onClick ->
                                 lazyListScope.item {
                                     val imageLoader: ImageLoader by instance()
                                     // TODO rememberSaveable to retain this when scrolled off screen
@@ -436,7 +462,8 @@ private fun TextComposer.appendTextChildren(
                                     appendTextChildren(
                                         listItem.childNodes(),
                                         lazyListScope = lazyListScope,
-                                        imagePlaceholder = imagePlaceholder
+                                        imagePlaceholder = imagePlaceholder,
+                                        onLinkClick = onLinkClick,
                                     )
                                 }
                             }
@@ -451,7 +478,8 @@ private fun TextComposer.appendTextChildren(
                                     appendTextChildren(
                                         listItem.childNodes(),
                                         lazyListScope = lazyListScope,
-                                        imagePlaceholder = imagePlaceholder
+                                        imagePlaceholder = imagePlaceholder,
+                                        onLinkClick = onLinkClick,
                                     )
                                 }
                             }
@@ -473,7 +501,8 @@ private fun TextComposer.appendTextChildren(
                                     appendTextChildren(
                                         it.childNodes(),
                                         lazyListScope = lazyListScope,
-                                        imagePlaceholder = imagePlaceholder
+                                        imagePlaceholder = imagePlaceholder,
+                                        onLinkClick = onLinkClick,
                                     )
                                     ensureDoubleNewline()
                                     terminateCurrentText()
@@ -489,7 +518,8 @@ private fun TextComposer.appendTextChildren(
                                     appendTextChildren(
                                         row.childNodes(),
                                         lazyListScope = lazyListScope,
-                                        imagePlaceholder = imagePlaceholder
+                                        imagePlaceholder = imagePlaceholder,
+                                        onLinkClick = onLinkClick,
                                     )
                                     terminateCurrentText()
                                 }
@@ -502,21 +532,36 @@ private fun TextComposer.appendTextChildren(
                         val video: Video? = getVideo(element.attr("abs:src"))
 
                         if (video != null) {
-                            appendImage {
+                            appendImage(onLinkClick = onLinkClick) {
                                 lazyListScope.item {
                                     DisableSelection {
+                                        val imageLoader: ImageLoader by instance()
                                         Image(
-                                            painter = painterResource(id = R.drawable.youtube_icon),
+                                            painter = rememberCoilPainter(
+                                                request = video.imageUrl,
+                                                imageLoader = imageLoader,
+                                                requestBuilder = {
+                                                    this.error(R.drawable.youtube_icon)
+                                                },
+                                                previewPlaceholder = R.drawable.youtube_icon,
+                                            ),
                                             contentDescription = "Video",
                                             contentScale = ContentScale.FillWidth,
                                             modifier = Modifier
                                                 .clickable {
-                                                    // TODO this is just temporary
-                                                    Log.i("JONAS", "Clicked on iframe ${video.src}")
+                                                    onLinkClick(video.link)
                                                 }
                                                 .fillMaxWidth()
                                         )
                                     }
+
+                                    Text(
+                                        text = stringResource(R.string.touch_to_play_video),
+                                        style = MaterialTheme.typography.caption,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
                                 }
                             }
                         }
@@ -529,7 +574,8 @@ private fun TextComposer.appendTextChildren(
                             nodes = element.childNodes(),
                             preFormatted = preFormatted,
                             lazyListScope = lazyListScope,
-                            imagePlaceholder = imagePlaceholder
+                            imagePlaceholder = imagePlaceholder,
+                            onLinkClick = onLinkClick,
                         )
                     }
                 }

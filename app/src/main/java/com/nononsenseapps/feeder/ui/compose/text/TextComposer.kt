@@ -52,14 +52,19 @@ class TextComposer(
         return block()
     }
 
-    fun <R> appendImage(block: (onClick: (() -> Unit)?) -> R): R {
-        val url = findClosestLink()
+    fun <R> appendImage(
+        link: String? = null,
+        onLinkClick: (String) -> Unit,
+        block: (
+            onClick: (() -> Unit)?
+        ) -> R
+    ): R {
+        val url = link ?: findClosestLink()
         builder.ensureDoubleNewline()
         terminateCurrentText()
         val onClick: (() -> Unit)? = if (url?.isNotBlank() == true) {
             {
-                // TODO handle click
-                Log.i("JONAS", "Clicked image with $url")
+                onLinkClick(url)
             }
         } else {
             null
