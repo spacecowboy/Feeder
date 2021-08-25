@@ -34,6 +34,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.insets.statusBarsPadding
 import com.nononsenseapps.feeder.R
 
 const val COLLAPSE_ANIMATION_DURATION = 300
@@ -66,6 +69,11 @@ fun ListOfFeedsAndTags(
     }
 
     LazyColumn(
+        contentPadding = rememberInsetsPaddingValues(
+            insets = LocalWindowInsets.current.systemBars,
+            applyTop = true,
+            applyBottom = true
+        ),
         modifier = Modifier
             .fillMaxSize()
     ) {
