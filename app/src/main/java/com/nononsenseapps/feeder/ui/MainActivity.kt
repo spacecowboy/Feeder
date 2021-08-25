@@ -12,6 +12,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -32,6 +33,8 @@ import com.nononsenseapps.feeder.model.SearchFeedViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToSpeechViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
+import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
+import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
@@ -55,6 +58,7 @@ import org.kodein.di.instance
 class MainActivity : DIAwareComponentActivity() {
     private val applicationState: ApplicationState by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
+    private val settingsViewModel: SettingsViewModel by instance(tag = this)
 
     // This reference is only used for intent navigation
     private var navController: NavController? = null
@@ -72,6 +76,20 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onResume() {
         super.onResume()
         applicationState.setResumeTime()
+        maybeRequestSync()
+    }
+
+    private fun maybeRequestSync() = lifecycleScope.launch {
+        if (settingsViewModel.syncOnResume.value) {
+            if (isOkToSyncAutomatically(applicationContext)) {
+                requestFeedSync(
+                    di = di,
+                    ignoreConnectivitySettings = false,
+                    forceNetwork = false,
+                    parallell = true
+                )
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
