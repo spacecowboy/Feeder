@@ -58,7 +58,7 @@ import org.kodein.di.instance
 class MainActivity : DIAwareComponentActivity() {
     private val applicationState: ApplicationState by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
-    private val settingsViewModel: SettingsViewModel by instance(tag = this)
+    private val settingsViewModel: SettingsViewModel by instance(arg = this)
 
     // This reference is only used for intent navigation
     private var navController: NavController? = null
