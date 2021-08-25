@@ -190,8 +190,11 @@ dependencies {
   implementation "com.google.android.material:material:$material_version"
   implementation "androidx.navigation:navigation-compose:$navigationComposeVersion"
   implementation "androidx.paging:paging-compose:$pagingComposeVersion"
-  implementation "com.google.accompanist:accompanist-coil:$accompanistVersion"
+  implementation "com.google.accompanist:accompanist-coil:$accompanistCoilVersion"
   implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"
+  implementation "com.google.accompanist:accompanist-insets:$accompanistVersion"
+  implementation "com.google.accompanist:accompanist-insets-ui:$accompanistVersion"
+  implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion"
 
   // Better times
   implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"

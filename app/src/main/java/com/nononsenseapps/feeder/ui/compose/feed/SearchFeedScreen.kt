@@ -15,11 +15,9 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -40,6 +38,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.insets.ui.Scaffold
+import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
@@ -67,6 +69,10 @@ fun SearchFeedScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
+                contentPadding = rememberInsetsPaddingValues(
+                    LocalWindowInsets.current.statusBars,
+                    applyBottom = false,
+                ),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -165,7 +171,7 @@ fun SearchFeedView(
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
-            .padding(horizontal = keyline1Padding)
+            .padding(horizontal = keyline1Padding, vertical = 8.dp)
     ) {
         item {
             TextField(

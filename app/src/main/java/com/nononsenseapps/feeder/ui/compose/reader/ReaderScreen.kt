@@ -20,9 +20,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Article
@@ -47,6 +45,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.insets.ui.Scaffold
+import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
@@ -268,6 +270,10 @@ fun ReaderScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
+                contentPadding = rememberInsetsPaddingValues(
+                    LocalWindowInsets.current.statusBars,
+                    applyBottom = false,
+                ),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(

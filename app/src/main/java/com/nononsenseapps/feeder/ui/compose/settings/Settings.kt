@@ -28,11 +28,11 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.RadioButton
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import com.google.accompanist.insets.ui.Scaffold
+import com.google.accompanist.insets.ui.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -54,6 +54,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsHeight
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.ApplicationState
 import com.nononsenseapps.feeder.model.SettingsViewModel
@@ -107,6 +111,10 @@ fun SettingsScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
+                contentPadding = rememberInsetsPaddingValues(
+                    LocalWindowInsets.current.statusBars,
+                    applyBottom = false,
+                ),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -382,6 +390,8 @@ fun SettingsList(
                 onLinkOpenerChanged(it.linkOpener)
             }
         )
+
+        Spacer(modifier = Modifier.navigationBarsHeight())
     }
 }
 

@@ -22,9 +22,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -51,6 +49,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -62,6 +61,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.insets.ui.Scaffold
+import com.google.accompanist.insets.ui.TopAppBar
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -384,6 +388,10 @@ fun FeedScreen(
         topBar = {
             TopAppBar(
                 title = { Text(screenTitle) },
+                contentPadding = rememberInsetsPaddingValues(
+                    LocalWindowInsets.current.statusBars,
+                    applyBottom = false,
+                ),
                 navigationIcon = {
                     IconButton(
                         onClick = {
@@ -560,7 +568,9 @@ fun FeedScreen(
         floatingActionButton = {
             if (showFloatingActionButton) {
                 FloatingActionButton(
-                    onClick = onMarkAllAsRead
+                    onClick = onMarkAllAsRead,
+                    modifier = Modifier
+                        .navigationBarsPadding()
                 ) {
                     Icon(
                         Icons.Default.Check,

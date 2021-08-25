@@ -44,7 +44,8 @@ buildscript {
     navigationComposeVersion = nav_version
     pagingVersion = "3.0.0"
     pagingComposeVersion = "1.0.0-alpha12"
-    accompanistVersion = "0.12.0"
+    accompanistCoilVersion = "0.12.0"
+    accompanistVersion = "0.17.0"
 
     // Tests
     espresso_version = "3.1.0"

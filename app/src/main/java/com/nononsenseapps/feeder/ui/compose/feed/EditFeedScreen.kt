@@ -6,6 +6,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -17,10 +18,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -46,6 +45,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.insets.ui.Scaffold
+import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.FeedViewModel
@@ -141,6 +145,10 @@ fun EditFeedScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
+                contentPadding = rememberInsetsPaddingValues(
+                    LocalWindowInsets.current.statusBars,
+                    applyBottom = false,
+                ),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -198,7 +206,6 @@ fun EditFeedView(
         onCancel = onCancel,
         okEnabled = editableFeed.isOkToSave,
         modifier = modifier
-            .padding(top = 8.dp, bottom = 8.dp)
             .padding(horizontal = keyline1Padding)
     ) {
         Column(

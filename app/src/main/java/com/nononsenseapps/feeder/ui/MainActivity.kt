@@ -4,14 +4,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -21,6 +25,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
@@ -95,237 +101,239 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContent {
-            appContent()
-        }
-    }
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
-    @Composable
-    fun appContent() {
-        withDI {
-            val settingsViewModel: SettingsViewModel = DIAwareViewModel()
-            val readAloudViewModel: TextToSpeechViewModel = DIAwareViewModel()
+        setContent {
             val currentTheme by settingsViewModel.currentTheme.collectAsState()
 
             FeederTheme(
                 currentTheme = currentTheme
             ) {
-                val navController = rememberNavController().also {
-                    this.navController = it
+                withDI {
+                    appContent()
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun appContent() {
+        val readAloudViewModel: TextToSpeechViewModel = DIAwareViewModel()
+
+        val navController = rememberNavController().also {
+            this.navController = it
+        }
+
+        // TODO deleting the currently open feed should open all feeds
+        // TODO handle deep link for item where default is open with custom tab or browser
+
+        NavHost(navController, startDestination = "lastfeed") {
+            composable("lastfeed") { backStackEntry ->
+                val feedOrTag: FeedOrTag = remember {
+                    FeedOrTag(
+                        settingsViewModel.currentFeedAndTag.value.first,
+                        settingsViewModel.currentFeedAndTag.value.second
+                    )
                 }
 
-                // TODO deleting the currently open feed should open all feeds
-                // TODO handle deep link for item where default is open with custom tab or browser
+                FeedScreen(
+                    feedOrTag = feedOrTag,
+                    backStackEntry = backStackEntry,
+                    settingsViewModel = settingsViewModel,
+                    readAloudViewModel = readAloudViewModel
+                )
+            }
+            composable(
+                "feed?id={id}&tag={tag}",
+                arguments = listOf(
+                    navArgument("id") {
+                        type = NavType.LongType
+                        defaultValue = ID_UNSET
+                    },
+                    navArgument("tag") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                ),
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "$DEEP_LINK_BASE_URI/feed?id={id}&tag={tag}"
+                    }
+                )
+            ) { backStackEntry ->
+                val feedOrTag: FeedOrTag = remember(
+                    key1 = backStackEntry.arguments?.getLong("id"),
+                    key2 = backStackEntry.arguments?.getString("tag")
+                ) {
+                    val feedId = (backStackEntry.arguments?.getLong("id")
+                        ?: ID_UNSET).let { feedId ->
+                        if (feedId == ID_UNSET) {
+                            settingsViewModel.currentFeedAndTag.value.first
+                        } else {
+                            feedId
+                        }
+                    }
 
-                NavHost(navController, startDestination = "lastfeed") {
-                    composable("lastfeed") { backStackEntry ->
-                        val feedOrTag: FeedOrTag = remember {
-                            FeedOrTag(
-                                settingsViewModel.currentFeedAndTag.value.first,
+                    val tag =
+                        (backStackEntry.arguments?.getString("tag") ?: "").let { tag ->
+                            if (tag.isEmpty()) {
                                 settingsViewModel.currentFeedAndTag.value.second
-                            )
+                            } else {
+                                tag
+                            }
                         }
 
-                        FeedScreen(
-                            feedOrTag = feedOrTag,
-                            backStackEntry = backStackEntry,
-                            settingsViewModel = settingsViewModel,
-                            readAloudViewModel = readAloudViewModel
-                        )
+                    settingsViewModel.setCurrentFeedAndTag(feedId, tag)
+                    FeedOrTag(feedId, tag)
+                }
+
+
+
+                FeedScreen(
+                    feedOrTag = feedOrTag,
+                    backStackEntry = backStackEntry,
+                    settingsViewModel = settingsViewModel,
+                    readAloudViewModel = readAloudViewModel
+                )
+            }
+            composable(
+                "reader/{itemId}",
+                arguments = listOf(
+                    navArgument("itemId") { type = NavType.LongType }
+                ),
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "$DEEP_LINK_BASE_URI/article/{itemId}"
                     }
-                    composable(
-                        "feed?id={id}&tag={tag}",
-                        arguments = listOf(
-                            navArgument("id") {
-                                type = NavType.LongType
-                                defaultValue = ID_UNSET
-                            },
-                            navArgument("tag") {
-                                type = NavType.StringType
-                                defaultValue = ""
-                            }
-                        ),
-                        deepLinks = listOf(
-                            navDeepLink {
-                                uriPattern = "$DEEP_LINK_BASE_URI/feed?id={id}&tag={tag}"
-                            }
-                        )
-                    ) { backStackEntry ->
-                        val feedOrTag: FeedOrTag = remember(
-                            key1 = backStackEntry.arguments?.getLong("id"),
-                            key2 = backStackEntry.arguments?.getString("tag")
-                        ) {
-                            val feedId = (backStackEntry.arguments?.getLong("id")
-                                ?: ID_UNSET).let { feedId ->
-                                if (feedId == ID_UNSET) {
-                                    settingsViewModel.currentFeedAndTag.value.first
-                                } else {
-                                    feedId
-                                }
-                            }
+                )
+            ) { backStackEntry ->
+                // Necessary to use the backstackEntry so savedState matches lifecycle
+                val feedItemViewModel: FeedItemViewModel =
+                    backStackEntry.DIAwareViewModel()
 
-                            val tag =
-                                (backStackEntry.arguments?.getString("tag") ?: "").let { tag ->
-                                    if (tag.isEmpty()) {
-                                        settingsViewModel.currentFeedAndTag.value.second
-                                    } else {
-                                        tag
-                                    }
-                                }
+                val itemId = backStackEntry.arguments?.getLong("itemId")
+                    ?: ID_UNSET
 
-                            settingsViewModel.setCurrentFeedAndTag(feedId, tag)
-                            FeedOrTag(feedId, tag)
+                feedItemViewModel.currentItemId = itemId
+
+                val context = LocalContext.current
+
+                LaunchedEffect(key1 = itemId) {
+                    feedItemViewModel.markAsReadAndNotified(itemId)
+                    cancelNotification(context, itemId)
+                }
+
+                ReaderScreen(
+                    feedItemViewModel = feedItemViewModel,
+                    settingsViewModel = settingsViewModel,
+                    readAloudViewModel = readAloudViewModel,
+                    onNavigateToFeed = { feedId ->
+                        navController.clearBackstack()
+                        if (feedId != null) {
+                            navController.navigate("feed?id=$feedId")
+                        } else {
+                            navController.navigate("feed")
                         }
-
-
-
-                        FeedScreen(
-                            feedOrTag = feedOrTag,
-                            backStackEntry = backStackEntry,
-                            settingsViewModel = settingsViewModel,
-                            readAloudViewModel = readAloudViewModel
-                        )
+                    },
+                ) {
+                    if (!navController.popBackStack()) {
+                        navController.navigate("lastfeed")
                     }
-                    composable(
-                        "reader/{itemId}",
-                        arguments = listOf(
-                            navArgument("itemId") { type = NavType.LongType }
-                        ),
-                        deepLinks = listOf(
-                            navDeepLink {
-                                uriPattern = "$DEEP_LINK_BASE_URI/article/{itemId}"
-                            }
-                        )
-                    ) { backStackEntry ->
-                        // Necessary to use the backstackEntry so savedState matches lifecycle
-                        val feedItemViewModel: FeedItemViewModel =
-                            backStackEntry.DIAwareViewModel()
+                }
+            }
+            composable(
+                "edit/feed/{feedId}",
+                arguments = listOf(
+                    navArgument("feedId") { type = NavType.LongType }
+                )
+            ) { backStackEntry ->
+                // Necessary to use the backstackEntry so savedState matches lifecycle
+                val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
 
-                        val itemId = backStackEntry.arguments?.getLong("itemId")
-                            ?: ID_UNSET
+                val feedId = backStackEntry.arguments?.getLong("feedId")
+                    ?: ID_UNSET
 
-                        feedItemViewModel.currentItemId = itemId
+                if (feedId <= ID_UNSET) {
+                    error("Can't edit a feed with no id")
+                }
 
-                        val context = LocalContext.current
+                feedViewModel.currentFeedId = feedId
 
-                        LaunchedEffect(key1 = itemId) {
-                            feedItemViewModel.markAsReadAndNotified(itemId)
-                            cancelNotification(context, itemId)
-                        }
+                val feed by feedViewModel.currentLiveFeed.observeAsState()
 
-                        ReaderScreen(
-                            feedItemViewModel = feedItemViewModel,
-                            settingsViewModel = settingsViewModel,
-                            readAloudViewModel = readAloudViewModel,
-                            onNavigateToFeed = { feedId ->
-                                navController.clearBackstack()
-                                if (feedId != null) {
-                                    navController.navigate("feed?id=$feedId")
-                                } else {
-                                    navController.navigate("feed")
-                                }
-                            },
-                        ) {
-                            if (!navController.popBackStack()) {
-                                navController.navigate("lastfeed")
-                            }
-                        }
-                    }
-                    composable(
-                        "edit/feed/{feedId}",
-                        arguments = listOf(
-                            navArgument("feedId") { type = NavType.LongType }
-                        )
-                    ) { backStackEntry ->
-                        // Necessary to use the backstackEntry so savedState matches lifecycle
-                        val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
-
-                        val feedId = backStackEntry.arguments?.getLong("feedId")
-                            ?: ID_UNSET
-
-                        if (feedId <= ID_UNSET) {
-                            error("Can't edit a feed with no id")
-                        }
-
-                        feedViewModel.currentFeedId = feedId
-
-                        val feed by feedViewModel.currentLiveFeed.observeAsState()
-
-                        feed?.let { feed ->
-                            EditFeedScreen(
-                                feed = feed,
-                                onNavigateUp = {
-                                    navController.popBackStack()
-                                },
-                                onOk = { feedId ->
-                                    navController.clearBackstack()
-                                    navController.navigate("feed?id=$feedId")
-                                },
-                                feedViewModel = feedViewModel
-                            )
-                        }
-                    }
-                    composable(
-                        "search/feed?feedUrl={feedUrl}",
-                        arguments = listOf(
-                            navArgument("feedUrl") {
-                                type = NavType.StringType
-                                nullable = true
-                            }
-                        )
-                    ) { backStackEntry ->
-                        // Necessary to use the backstackEntry so savedState matches lifecycle
-                        val searchFeedViewModel: SearchFeedViewModel =
-                            backStackEntry.DIAwareViewModel()
-
-                        SearchFeedScreen(
-                            onNavigateUp = {
-                                navController.popBackStack()
-                            },
-                            initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
-                            searchFeedViewModel = searchFeedViewModel
-                        ) {
-                            navController.navigate("add/feed?feedUrl=${it.url}&feedTitle=${it.title}")
-                        }
-                    }
-                    composable(
-                        "add/feed?feedUrl={feedUrl}&feedTitle={feedTitle}",
-                        arguments = listOf(
-                            navArgument("feedUrl") {
-                                type = NavType.StringType
-                            },
-                            navArgument("feedTitle") {
-                                type = NavType.StringType
-                            }
-                        )
-                    ) { backStackEntry ->
-                        // Necessary to use the backstackEntry so savedState matches lifecycle
-                        val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
-
-                        CreateFeedScreen(
-                            onNavigateUp = {
-                                navController.popBackStack()
-                            },
-                            feedUrl = backStackEntry.arguments?.getString("feedUrl") ?: "",
-                            feedTitle = backStackEntry.arguments?.getString("feedTitle") ?: "",
-                            feedViewModel = feedViewModel
-                        ) { feedId ->
+                feed?.let { feed ->
+                    EditFeedScreen(
+                        feed = feed,
+                        onNavigateUp = {
+                            navController.popBackStack()
+                        },
+                        onOk = { feedId ->
                             navController.clearBackstack()
                             navController.navigate("feed?id=$feedId")
-                        }
-                    }
-                    composable(
-                        "settings"
-                    ) {
-                        SettingsScreen(
-                            onNavigateUp = {
-                                navController.popBackStack()
-                            },
-                            settingsViewModel = settingsViewModel,
-                            applicationState = applicationState
-                        )
-                    }
+                        },
+                        feedViewModel = feedViewModel
+                    )
                 }
+            }
+            composable(
+                "search/feed?feedUrl={feedUrl}",
+                arguments = listOf(
+                    navArgument("feedUrl") {
+                        type = NavType.StringType
+                        nullable = true
+                    }
+                )
+            ) { backStackEntry ->
+                // Necessary to use the backstackEntry so savedState matches lifecycle
+                val searchFeedViewModel: SearchFeedViewModel =
+                    backStackEntry.DIAwareViewModel()
+
+                SearchFeedScreen(
+                    onNavigateUp = {
+                        navController.popBackStack()
+                    },
+                    initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
+                    searchFeedViewModel = searchFeedViewModel
+                ) {
+                    navController.navigate("add/feed?feedUrl=${it.url}&feedTitle=${it.title}")
+                }
+            }
+            composable(
+                "add/feed?feedUrl={feedUrl}&feedTitle={feedTitle}",
+                arguments = listOf(
+                    navArgument("feedUrl") {
+                        type = NavType.StringType
+                    },
+                    navArgument("feedTitle") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                // Necessary to use the backstackEntry so savedState matches lifecycle
+                val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
+
+                CreateFeedScreen(
+                    onNavigateUp = {
+                        navController.popBackStack()
+                    },
+                    feedUrl = backStackEntry.arguments?.getString("feedUrl") ?: "",
+                    feedTitle = backStackEntry.arguments?.getString("feedTitle") ?: "",
+                    feedViewModel = feedViewModel
+                ) { feedId ->
+                    navController.clearBackstack()
+                    navController.navigate("feed?id=$feedId")
+                }
+            }
+            composable(
+                "settings"
+            ) {
+                SettingsScreen(
+                    onNavigateUp = {
+                        navController.popBackStack()
+                    },
+                    settingsViewModel = settingsViewModel,
+                    applicationState = applicationState
+                )
             }
         }
     }
