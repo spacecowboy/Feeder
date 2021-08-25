@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToDisplay
@@ -80,6 +82,7 @@ fun ReaderScreen(
     feedItemViewModel: FeedItemViewModel,
     settingsViewModel: SettingsViewModel,
     readAloudViewModel: TextToSpeechViewModel,
+    onNavigateToFeed: (feedId: Long?) -> Unit,
     onNavigateUp: () -> Unit
 ) {
     val linkOpener by settingsViewModel.linkOpener.collectAsState()
@@ -102,6 +105,8 @@ fun ReaderScreen(
 
     val feedUrl = feedItem?.feedUrl?.toString() ?: ""
     val context = LocalContext.current
+
+    val feedId = feedItem?.feedId
 
     val onShare = {
         feedItem?.link?.let { link ->
@@ -139,6 +144,9 @@ fun ReaderScreen(
             feedItem?.link?.let { link ->
                 openLinkInCustomTab(context, link, feedItemViewModel.currentItemId)
             }
+        },
+        onFeedTitleClick = {
+            onNavigateToFeed(feedId)
         },
         readAloudPlayer = {
             HideableReadAloudPlayer(readAloudViewModel)
@@ -241,6 +249,7 @@ fun ReaderScreen(
     onNavigateUp: () -> Unit,
     readAloudPlayer: @Composable () -> Unit,
     onReadAloudStart: () -> Unit,
+    onFeedTitleClick: () -> Unit,
     articleBody: LazyListScope.() -> Unit
 ) {
     var showMenu by remember {
@@ -366,6 +375,7 @@ fun ReaderScreen(
                     openLinkInBrowser(context, link)
                 }
             },
+            onFeedTitleClick = onFeedTitleClick,
             authorDate = when {
                 author == null && pubDate != null ->
                     stringResource(
@@ -396,6 +406,7 @@ private fun ReaderView(
     enclosureName: String? = null,
     enclosureLink: String? = null,
     onEnclosureClick: () -> Unit,
+    onFeedTitleClick: () -> Unit,
     articleBody: LazyListScope.() -> Unit
 ) {
     SelectionContainer {
@@ -409,10 +420,13 @@ private fun ReaderView(
                     style = MaterialTheme.typography.h1
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                // TODO clickable so you can go direct to the feed
                 Text(
                     text = feedTitle,
-                    style = MaterialTheme.typography.subtitle1
+                    style = MaterialTheme.typography.subtitle1.merge(LinkTextStyle()),
+                    modifier = Modifier
+                        .clickable {
+                            onFeedTitleClick()
+                        }
                 )
                 if (authorDate != null) {
                     Spacer(modifier = Modifier.height(4.dp))
@@ -483,6 +497,7 @@ private fun PreviewReader() {
             onOpenInCustomTab = {},
             readAloudPlayer = {},
             onReadAloudStart = {},
+            onFeedTitleClick = {},
             onNavigateUp = { }) {
             item {
                 Text("The body")

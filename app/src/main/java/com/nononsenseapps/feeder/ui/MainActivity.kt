@@ -217,6 +217,14 @@ class MainActivity : DIAwareComponentActivity() {
                             feedItemViewModel = feedItemViewModel,
                             settingsViewModel = settingsViewModel,
                             readAloudViewModel = readAloudViewModel,
+                            onNavigateToFeed = { feedId ->
+                                navController.clearBackstack()
+                                if (feedId != null) {
+                                    navController.navigate("feed?id=$feedId")
+                                } else {
+                                    navController.navigate("feed")
+                                }
+                            },
                         ) {
                             if (!navController.popBackStack()) {
                                 navController.navigate("lastfeed")
