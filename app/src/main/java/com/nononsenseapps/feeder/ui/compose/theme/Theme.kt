@@ -41,11 +41,9 @@ fun FeederTheme(
         shapes = Shapes
     ) {
         val systemUiController = rememberSystemUiController()
-        val useDarkIcons = MaterialTheme.colors.isLight
         SideEffect {
             systemUiController.setSystemBarsColor(
-                Color.Transparent,
-                darkIcons = useDarkIcons
+                Color.Transparent
             )
         }
         ProvideWindowInsets {
