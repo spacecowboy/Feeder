@@ -1,3 +1,13 @@
+# 2.0.0-beta.4
+Jonas Kalderstam (10):
+  * [fdb700fa] Reversed expansion icons in navigation drawer to match
+         material design
+  * [3e6ce929] Fixed youtube thumbnails and made images clickable
+  * [56a6e464] Sync on startup if set
+  * [b7e74a11] Feed Title clickable in Reader again
+  * [f5ecd777] Fixed color of status bar and navigation bar
+  * [f975fda2] Fixed toolbar color in custom tab
+
 # 2.0.0-beta.3
 Jonas Kalderstam (2):
   * [a97a0257] Fixed some notifications not being cleared when opened
