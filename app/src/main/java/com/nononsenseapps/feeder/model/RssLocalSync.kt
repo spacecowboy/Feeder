@@ -23,6 +23,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import okhttp3.internal.readBomAsCharset
 import org.kodein.di.DI
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
@@ -30,6 +31,7 @@ import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 import java.io.File
 import java.io.IOException
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executors
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
@@ -148,6 +150,10 @@ private suspend fun syncFeed(
 
     val feed: Feed? =
         response.use {
+            val contentType = response.body?.contentType()
+            val charset = response.body?.source()?.readBomAsCharset(
+                contentType?.charset() ?: StandardCharsets.UTF_8
+            )
             val responseBody = it.safeBody()
             responseBody?.let { body ->
                 responseHash = body.contentHashCode()
@@ -156,7 +162,7 @@ private suspend fun syncFeed(
                         throw ResponseFailure("${response.code} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
                     }
                     feedSql.responseHash == responseHash -> null // no change
-                    else -> feedParser.parseFeedResponse(it, body)
+                    else -> feedParser.parseFeedResponse(response.request.url.toUrl(), contentType, charset, body)
                 }
             }
         }?.let {

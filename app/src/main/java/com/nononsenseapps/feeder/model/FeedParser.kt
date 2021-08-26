@@ -14,10 +14,12 @@ import kotlinx.coroutines.withContext
 import okhttp3.Authenticator
 import okhttp3.CacheControl
 import okhttp3.Credentials
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
+import okhttp3.internal.readBomAsCharset
 import okio.Buffer
 import okio.GzipSource
 import org.jsoup.Jsoup
@@ -32,6 +34,7 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLDecoder
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 
 val slashPattern = """<\s*slash:comments\s*/>""".toRegex(RegexOption.IGNORE_CASE)
@@ -87,7 +90,10 @@ class FeedParser(override val di: DI) : DIAware {
     /**
      * Returns all alternate links in the HTML/XML document pointing to feeds.
      */
-    fun getAlternateFeedLinksInHtml(html: String, baseUrl: URL? = null): List<Pair<String, String>> {
+    fun getAlternateFeedLinksInHtml(
+        html: String,
+        baseUrl: URL? = null
+    ): List<Pair<String, String>> {
         val doc = Jsoup.parse(html.byteInputStream(), "UTF-8", "")
 
         val feeds = doc.getElementsByAttributeValue("rel", "alternate")
@@ -117,14 +123,19 @@ class FeedParser(override val di: DI) : DIAware {
             }
             ?.map {
                 when {
-                    baseUrl != null -> relativeLinkIntoAbsolute(base = baseUrl, link = it.attr("href")) to it.attr("type")
+                    baseUrl != null -> relativeLinkIntoAbsolute(
+                        base = baseUrl,
+                        link = it.attr("href")
+                    ) to it.attr("type")
                     else -> sloppyLinkToStrictURL(it.attr("href")).toString() to it.attr("type")
                 }
             } ?: emptyList()
 
         return when {
             feeds.isNotEmpty() -> feeds
-            baseUrl?.host == "www.youtube.com" || baseUrl?.host == "youtube.com" -> findFeedLinksForYoutube(doc)
+            baseUrl?.host == "www.youtube.com" || baseUrl?.host == "youtube.com" -> findFeedLinksForYoutube(
+                doc
+            )
             else -> emptyList()
         }
     }
@@ -166,30 +177,13 @@ class FeedParser(override val di: DI) : DIAware {
     }
 
     @Throws(FeedParsingError::class)
-    fun parseFeedResponse(response: Response): Feed? =
-        response.safeBody()?.let { body ->
-            parseFeedResponse(response, body)
-        }
-
-    /**
-     * Takes body as bytes to handle encoding correctly
-     */
-    @Throws(FeedParsingError::class)
-    fun parseFeedResponse(response: Response, body: ByteArray): Feed {
-        try {
-            val feed = when ((response.header("content-type") ?: "").contains("json")) {
-                true -> jsonFeedParser.parseJsonBytes(body)
-                false -> parseRssAtomBytes(response.request.url.toUrl(), body)
-            }
-
-            return if (feed.feed_url == null) {
-                // Nice to return non-null value here
-                feed.copy(feed_url = response.request.url.toString())
-            } else {
-                feed
-            }
-        } catch (e: Throwable) {
-            throw FeedParsingError(response.request.url.toUrl(), e)
+    fun parseFeedResponse(response: Response): Feed? {
+        val contentType = response.body?.contentType()
+        val charset = response.body?.source()?.readBomAsCharset(
+            contentType?.charset() ?: StandardCharsets.UTF_8
+        )
+        return response.safeBody()?.let { body ->
+            parseFeedResponse(response.request.url.toUrl(), contentType, charset, body)
         }
     }
 
@@ -197,31 +191,56 @@ class FeedParser(override val di: DI) : DIAware {
      * Takes body as bytes to handle encoding correctly
      */
     @Throws(FeedParsingError::class)
-    suspend fun parseFeedResponseOrFallbackToAlternateLink(response: Response): Feed? =
-        response.body?.use { responseBody ->
-            responseBody.bytes().let { body ->
-                // Encoding is not an issue for reading HTML (probably)
-                val alternateFeedLink = findFeedUrl(String(body), preferAtom = true)
+    fun parseFeedResponse(url: URL, contentType: MediaType?, charset: Charset?, body: ByteArray): Feed {
+        try {
+            val feed = when (contentType?.subtype?.contains("json")) {
+                true -> jsonFeedParser.parseJson(body.toString(charset ?: StandardCharsets.UTF_8))
+                else -> parseRssAtomBytes(url, body, charset)
+            }
 
-                return if (alternateFeedLink != null) {
-                    parseFeedUrl(alternateFeedLink)
-                } else {
-                    parseFeedResponse(response, body)
-                }
+            return if (feed.feed_url == null) {
+                // Nice to return non-null value here
+                feed.copy(feed_url = url.toString())
+            } else {
+                feed
+            }
+        } catch (e: Throwable) {
+            throw FeedParsingError(url, e)
+        }
+    }
+
+    /**
+     * Takes body as bytes to handle encoding correctly
+     */
+    @Throws(FeedParsingError::class)
+    suspend fun parseFeedResponseOrFallbackToAlternateLink(response: Response): Feed? {
+        val contentType = response.body?.contentType()
+        val charset = response.body?.source()?.readBomAsCharset(
+            contentType?.charset() ?: StandardCharsets.UTF_8
+        ) ?: StandardCharsets.UTF_8
+
+        return response.safeBody()?.let { bytes ->
+            val alternateFeedLink = findFeedUrl(bytes.toString(charset), preferAtom = true)
+
+            if (alternateFeedLink != null) {
+                parseFeedUrl(alternateFeedLink)
+            } else {
+                parseFeedResponse(response.request.url.toUrl(), contentType, charset, bytes)
             }
         }
+    }
 
     @Throws(FeedParsingError::class)
-    internal fun parseRssAtomBytes(baseUrl: URL, feedXml: ByteArray): Feed {
+    internal fun parseRssAtomBytes(baseUrl: URL, feedXml: ByteArray, charset: Charset?): Feed {
         try {
-            feedXml.inputStream().use { return parseFeedInputStream(baseUrl, it) }
+            feedXml.inputStream().use { return parseFeedInputStream(baseUrl, it, charset) }
         } catch (e: NumberFormatException) {
             try {
                 // Try to work around bug in Rome
-                var encoding: String? = null
+                var encoding: String? = charset?.name()
                 val xml: String = slashPattern.replace(
                     feedXml.inputStream().use {
-                        XmlReader(it).use {
+                        XmlReader(it, true, encoding).use {
                             encoding = it.encoding
                             it.readText()
                         }
@@ -229,8 +248,9 @@ class FeedParser(override val di: DI) : DIAware {
                     ""
                 )
 
-                xml.byteInputStream(Charset.forName(encoding ?: "UTF-8")).use {
-                    return parseFeedInputStream(baseUrl, it)
+                val charsetToUse = Charset.forName(encoding ?: "UTF-8")
+                xml.byteInputStream(charsetToUse).use {
+                    return parseFeedInputStream(baseUrl, it, charsetToUse)
                 }
             } catch (e: Throwable) {
                 throw FeedParsingError(baseUrl, e)
@@ -239,10 +259,10 @@ class FeedParser(override val di: DI) : DIAware {
     }
 
     @Throws(FeedParsingError::class)
-    internal fun parseFeedInputStream(baseUrl: URL, `is`: InputStream): Feed {
+    internal fun parseFeedInputStream(baseUrl: URL, `is`: InputStream, charset: Charset?): Feed {
         `is`.use {
             try {
-                val feed = XmlReader(`is`).use { SyndFeedInput().build(it) }
+                val feed = XmlReader(`is`, true, charset?.name()).use { SyndFeedInput().build(it) }
                 return feed.asFeed(baseUrl = baseUrl)
             } catch (e: NumberFormatException) {
                 throw e
@@ -316,7 +336,7 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
         val decodedPass = URLDecoder.decode(pass, "UTF-8")
         val credentials = Credentials.basic(decodedUser, decodedPass)
         newBuilder()
-            .authenticator(object: Authenticator {
+            .authenticator(object : Authenticator {
                 override fun authenticate(route: Route?, response: Response): Request? {
                     return when {
                         response.request.header("Authorization") != null -> {
@@ -330,7 +350,7 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
                     }
                 }
             })
-            .proxyAuthenticator(object: Authenticator {
+            .proxyAuthenticator(object : Authenticator {
                 override fun authenticate(route: Route?, response: Response): Request? {
                     return when {
                         response.request.header("Proxy-Authorization") != null -> {
