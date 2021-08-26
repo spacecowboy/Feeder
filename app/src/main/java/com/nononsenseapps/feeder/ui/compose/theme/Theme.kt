@@ -11,16 +11,20 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.nononsenseapps.feeder.util.ThemeOptions
 
-val feederDarkColorPalette = darkColors(
+@Composable
+fun FeederDarkColorPalette() = darkColors(
     primary = Green700,
     primaryVariant = Green900,
-    secondary = DarkTealA400
+    secondary = DarkTealA400,
+    onSecondary = Color.White,
 )
 
-val feederLightColorPalette = lightColors(
+@Composable
+fun FeederLightColorPalette() = lightColors(
     primary = Green700,
     primaryVariant = Green900,
-    secondary = AccentDay
+    secondary = AccentDay,
+    onSecondary = Color.White,
 )
 
 val keyline1Padding = 16.dp

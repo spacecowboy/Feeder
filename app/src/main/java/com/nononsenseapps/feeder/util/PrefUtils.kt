@@ -13,8 +13,8 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.ui.compose.theme.feederDarkColorPalette
-import com.nononsenseapps.feeder.ui.compose.theme.feederLightColorPalette
+import com.nononsenseapps.feeder.ui.compose.theme.FeederDarkColorPalette
+import com.nononsenseapps.feeder.ui.compose.theme.FeederLightColorPalette
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -316,9 +316,9 @@ enum class ThemeOptions(
     @Composable
     fun getColors(): Colors {
         return when (this) {
-            DAY -> feederLightColorPalette
-            NIGHT -> feederDarkColorPalette
-            SYSTEM -> if (isSystemInDarkTheme()) feederDarkColorPalette else feederLightColorPalette
+            DAY -> FeederLightColorPalette()
+            NIGHT -> FeederDarkColorPalette()
+            SYSTEM -> if (isSystemInDarkTheme()) FeederDarkColorPalette() else FeederLightColorPalette()
         }
     }
 
