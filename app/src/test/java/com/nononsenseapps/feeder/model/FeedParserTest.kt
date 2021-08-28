@@ -4,7 +4,6 @@ import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.jsonfeed.Author
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import kotlinx.coroutines.runBlocking
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
@@ -60,7 +59,11 @@ class FeedParserTest : DIAware {
     fun dcCreatorEndsUpAsAuthor() {
         javaClass.getResourceAsStream("openstreetmap.xml")!!
             .use {
-                val feed = feedParser.parseFeedInputStream(URL("http://https://www.openstreetmap.org/diary/rss"), it)
+                val feed = feedParser.parseFeedInputStream(
+                    URL("http://https://www.openstreetmap.org/diary/rss"),
+                    it,
+                    null
+                )
                 val item = feed.items!!.first()
 
                 assertEquals(Author(name = "0235"), item.author)
@@ -72,7 +75,11 @@ class FeedParserTest : DIAware {
     fun htmlAtomContentGetsUnescaped() {
         javaClass.getResourceAsStream("atom_hnapp.xml")!!
             .use {
-                val feed = feedParser.parseFeedInputStream(URL("http://hnapp.com/rss?q=type%3Astory%20score%3E36%20-bitcoin%20-ethereum%20-cryptocurrency%20-blockchain%20-snowden%20-hiring%20-ask"), it)
+                val feed = feedParser.parseFeedInputStream(
+                    URL("http://hnapp.com/rss?q=type%3Astory%20score%3E36%20-bitcoin%20-ethereum%20-cryptocurrency%20-blockchain%20-snowden%20-hiring%20-ask"),
+                    it,
+                    null
+                )
 
                 val item = feed.items!![0]
                 assertEquals(
@@ -95,7 +102,11 @@ class FeedParserTest : DIAware {
     fun enclosedImageIsUsedAsThumbnail() {
         javaClass.getResourceAsStream("rss_lemonde.xml")!!
             .use {
-                val feed = feedParser.parseFeedInputStream(URL("http://www.lemonde.fr/rss/une.xml"), it)
+                val feed = feedParser.parseFeedInputStream(
+                    URL("http://www.lemonde.fr/rss/une.xml"),
+                    it,
+                    null
+                )
 
                 val item = feed.items!![0]
                 assertEquals(
@@ -108,7 +119,11 @@ class FeedParserTest : DIAware {
     @Test
     fun parsesYoutubeMediaInfo() {
         val feed = readResource("atom_youtube.xml") {
-            feedParser.parseFeedInputStream(URL("http://www.youtube.com/feeds/videos.xml"), it)
+            feedParser.parseFeedInputStream(
+                URL("http://www.youtube.com/feeds/videos.xml"),
+                it,
+                null
+            )
         }
 
         val item = feed.items!!.first()
@@ -123,13 +138,16 @@ class FeedParserTest : DIAware {
     @Test
     fun parsesPeertubeMediaInfo() {
         val feed = readResource("rss_peertube.xml") {
-            feedParser.parseFeedInputStream(URL("https://framatube.org/feeds/videos.xml"), it)
+            feedParser.parseFeedInputStream(URL("https://framatube.org/feeds/videos.xml"), it, null)
         }
 
         val item = feed.items!!.first()
 
         assertEquals("1.4. Et les réseaux sociaux ?", item.title)
-        assertEquals("https://framatube.org/static/thumbnails/ed5c048d-01f3-4ceb-97db-6e278de512b0.jpg", item.image)
+        assertEquals(
+            "https://framatube.org/static/thumbnails/ed5c048d-01f3-4ceb-97db-6e278de512b0.jpg",
+            item.image
+        )
         assertTrue {
             item.content_text!!.startsWith("MOOC CHATONS#1 - Internet")
         }
@@ -141,7 +159,8 @@ class FeedParserTest : DIAware {
         javaClass.getResourceAsStream("fz.html")!!
             .bufferedReader()
             .use {
-                val alts: List<Pair<String, String>> = feedParser.getAlternateFeedLinksInHtml(it.readText())
+                val alts: List<Pair<String, String>> =
+                    feedParser.getAlternateFeedLinksInHtml(it.readText())
                 assertEquals(emptyList(), alts)
             }
     }
@@ -156,7 +175,10 @@ class FeedParserTest : DIAware {
                     it.readText(),
                     URL("https://nixos.org")
                 )
-                assertEquals(listOf("https://nixos.org/news-rss.xml" to "application/rss+xml"), alts)
+                assertEquals(
+                    listOf("https://nixos.org/news-rss.xml" to "application/rss+xml"),
+                    alts
+                )
             }
     }
 
@@ -226,7 +248,8 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun encodingIsHandledInAtomRss() {
-        val responseBody: ResponseBody = golemDe.toResponseBody("application/xml".toMediaTypeOrNull())
+        val responseBody: ResponseBody =
+            golemDe.toResponseBody("application/xml".toMediaTypeOrNull())
 
         val response: Response = Response.Builder()
             .body(responseBody)
@@ -249,7 +272,8 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun emptySlashCommentsDontCrashParsingAndEncodingIsStillRespected() {
-        val responseBody: ResponseBody = emptySlashComment.toResponseBody("application/xml".toMediaTypeOrNull())
+        val responseBody: ResponseBody =
+            emptySlashComment.toResponseBody("application/xml".toMediaTypeOrNull())
 
         val response: Response = Response.Builder()
             .body(responseBody)
@@ -272,7 +296,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun correctAlternateLinkInAtomIsUsedForUrl() {
-        val feed = feedParser.parseRssAtomBytes(URL("http://utdelningsseglaren.blogspot.com/feeds/posts/default"), utdelningsSeglarenAtom)
+        val feed = feedParser.parseRssAtomBytes(
+            URL("http://utdelningsseglaren.blogspot.com/feeds/posts/default"),
+            utdelningsSeglarenAtom,
+            null
+        )
 
         assertEquals(
             "http://utdelningsseglaren.blogspot.com/2017/12/tips-pa-6-podcasts.html",
@@ -284,7 +312,11 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun relativeLinksAreMadeAbsoluteAtom() {
 
-        val feed = feedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/feed.atom"), atomRelative.byteInputStream())
+        val feed = feedParser.parseFeedInputStream(
+            URL("http://cowboyprogrammer.org/feed.atom"),
+            atomRelative.byteInputStream(),
+            null
+        )
         assertNotNull(feed)
 
         assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
@@ -294,7 +326,11 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun relativeLinksAreMadeAbsoluteAtomNoBase() {
 
-        val feed = feedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/feed.atom"), atomRelativeNoBase.byteInputStream())
+        val feed = feedParser.parseFeedInputStream(
+            URL("http://cowboyprogrammer.org/feed.atom"),
+            atomRelativeNoBase.byteInputStream(),
+            null
+        )
         assertNotNull(feed)
 
         assertEquals("http://cowboyprogrammer.org/feed.atom", feed.feed_url)
@@ -304,7 +340,8 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun relativeFeedLinkInRssIsMadeAbsolute() {
 
-        val feed = feedParser.parseRssAtomBytes(URL("https://lineageos.org/feed.xml"), lineageosRss)
+        val feed =
+            feedParser.parseRssAtomBytes(URL("https://lineageos.org/feed.xml"), lineageosRss, null)
         assertNotNull(feed)
 
         assertEquals("https://lineageos.org/", feed.home_page_url)
@@ -312,13 +349,20 @@ class FeedParserTest : DIAware {
 
         assertEquals("https://lineageos.org/Changelog-16", feed.items?.get(0)?.id)
         assertEquals("https://lineageos.org/Changelog-16/", feed.items?.get(0)?.url)
-        assertEquals("https://lineageos.org/images/2018-02-25/lineageos-15.1-hero.png", feed.items?.get(0)?.image)
+        assertEquals(
+            "https://lineageos.org/images/2018-02-25/lineageos-15.1-hero.png",
+            feed.items?.get(0)?.image
+        )
     }
 
     @Test
     @Throws(Exception::class)
     fun noStyles() {
-        val feed = feedParser.parseFeedInputStream(URL("http://research.swtch.com/feed.atom"), researchRsc)
+        val feed = feedParser.parseFeedInputStream(
+            URL("http://research.swtch.com/feed.atom"),
+            researchRsc,
+            null
+        )
         assertNotNull(feed)
 
         assertEquals("http://research.swtch.com/feed.atom", feed.feed_url)
@@ -344,7 +388,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun feedAuthorIsUsedAsFallback() {
-        val feed = feedParser.parseFeedInputStream(URL("http://research.swtch.com/feed.atom"), researchRsc)
+        val feed = feedParser.parseFeedInputStream(
+            URL("http://research.swtch.com/feed.atom"),
+            researchRsc,
+            null
+        )
         assertNotNull(feed)
 
         assertEquals("http://research.swtch.com/feed.atom", feed.feed_url)
@@ -360,7 +408,8 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun nixos() {
-        val feed = feedParser.parseFeedInputStream(URL("http://nixos.org/news-rss.xml"), nixosRss)
+        val feed =
+            feedParser.parseFeedInputStream(URL("http://nixos.org/news-rss.xml"), nixosRss, null)
         assertNotNull(feed)
 
         assertNull(feed.feed_url)
@@ -378,7 +427,8 @@ class FeedParserTest : DIAware {
     fun nixers() {
         val feed = feedParser.parseFeedInputStream(
             URL("https://newsletter.nixers.net/feed.xml"),
-            nixersRss
+            nixersRss,
+            null
         )
         assertNotNull(feed)
 
@@ -397,7 +447,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun cyklist() {
-        val feed = feedParser.parseFeedInputStream(URL("http://www.cyklistbloggen.se/feed/"), cyklistBloggen)
+        val feed = feedParser.parseFeedInputStream(
+            URL("http://www.cyklistbloggen.se/feed/"),
+            cyklistBloggen,
+            null
+        )
         assertNotNull(feed)
 
         assertNull(feed.feed_url)
@@ -406,7 +460,10 @@ class FeedParserTest : DIAware {
 
         val (_, _, _, title, _, _, summary, image) = feed.items!![0]
 
-        assertEquals("http://www.cyklistbloggen.se/wp-content/uploads/2014/01/Danviksklippan-skyltad.jpg", image)
+        assertEquals(
+            "http://www.cyklistbloggen.se/wp-content/uploads/2014/01/Danviksklippan-skyltad.jpg",
+            image
+        )
 
         assertEquals(
             "Ingen ombyggning av Danvikstull",
@@ -423,7 +480,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun cowboy() {
-        val feed = feedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/index.xml"), cowboyRss)
+        val feed = feedParser.parseFeedInputStream(
+            URL("http://cowboyprogrammer.org/index.xml"),
+            cowboyRss,
+            null
+        )
         assertNotNull(feed)
 
         assertNull(feed.feed_url)
@@ -456,7 +517,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun rss() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("https://cornucopia.cornubot.se/feeds/posts/default?alt=rss"), cornucopiaRss)
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(
+            URL("https://cornucopia.cornubot.se/feeds/posts/default?alt=rss"),
+            cornucopiaRss,
+            null
+        )
 
         assertEquals("http://cornucopia.cornubot.se/", home_page_url)
         assertNull(feed_url)
@@ -489,7 +554,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun atom() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("https://cornucopia.cornubot.se/feeds/posts/default"), cornucopiaAtom)
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(
+            URL("https://cornucopia.cornubot.se/feeds/posts/default"),
+            cornucopiaAtom,
+            null
+        )
 
         assertEquals("http://cornucopia.cornubot.se/", home_page_url)
         assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", feed_url)
@@ -522,7 +591,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun atomCowboy() {
-        val (_, _, _, _, _, _, _, icon, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("http://cowboyprogrammer.org/atom.xml"), cowboyAtom)
+        val (_, _, _, _, _, _, _, icon, _, _, _, _, items) = feedParser.parseFeedInputStream(
+            URL("http://cowboyprogrammer.org/atom.xml"),
+            cowboyAtom,
+            null
+        )
 
         assertEquals(15, items!!.size)
         val (id, _, _, _, _, _, _, image, _, date_published) = items[1]
@@ -540,7 +613,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun morningPaper() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("https://blog.acolyer.org/feed/"), morningPaper)
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(
+            URL("https://blog.acolyer.org/feed/"),
+            morningPaper,
+            null
+        )
 
         assertEquals("https://blog.acolyer.org", home_page_url)
         assertNull(feed_url)
@@ -562,7 +639,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun londoner() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("http://londonist.com/feed"), londoner)
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(
+            URL("http://londonist.com/feed"),
+            londoner,
+            null
+        )
 
         assertEquals("http://londonist.com/", home_page_url)
         assertNull(feed_url)
@@ -584,7 +665,7 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun noLinkShouldBeNull() {
-        val feed = feedParser.parseFeedInputStream(URL("http://ANON.com/rss"), anon)
+        val feed = feedParser.parseFeedInputStream(URL("http://ANON.com/rss"), anon, null)
 
         assertEquals("http://ANON.com/sub", feed.home_page_url)
         assertNull(feed.feed_url)
@@ -608,7 +689,11 @@ class FeedParserTest : DIAware {
 
     @Test
     fun golem2ShouldBeParsedDespiteEmptySlashComments() {
-        val feed = feedParser.parseRssAtomBytes(URL("https://rss.golem.de/rss.php?feed=RSS2.0"), golemDe2)
+        val feed = feedParser.parseRssAtomBytes(
+            URL("https://rss.golem.de/rss.php?feed=RSS2.0"),
+            golemDe2,
+            null
+        )
 
         assertEquals("Golem.de", feed.title)
     }
@@ -617,7 +702,8 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun cowboyAuthenticated() {
         runBlocking {
-            val feed = feedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
+            val feed =
+                feedParser.parseFeedUrl(URL("https://test:test@cowboyprogrammer.org/auth_basic/index.xml"))
             assertEquals("Cowboy Programmer", feed?.title)
         }
     }
@@ -629,24 +715,24 @@ class FeedParserTest : DIAware {
          * This actually tests Chunked-response handling (with Gzip)
          *
          * Headers:
-         Server: nginx
-         Date: Wed, 22 Apr 2020 12:56:13 GMT
-         Content-Type: text/xml; charset=UTF-8
-         Transfer-Encoding: chunked
-         Connection: keep-alive
-         Set-Cookie: PHPSESSID=9fb67188b757d9e61bf2144d701dacae; path=/
-         Expires: Thu, 19 Nov 1981 08:52:00 GMT
-         Pragma: no-cache
-         Set-Cookie: mobile=false; path=/
-         Set-Cookie: user-agent=2af4f0dda4a2cdd367f5b41adcc59f79; path=/
-         Content-Encoding: gzip
-         Vary: Accept-Encoding
-         Expires: Wed, 22 Apr 2020 13:16:13 GMT
-         Last-Modified: Wed, 22 Apr 2020 12:56:13 GMT
-         Pragma: no-cache
-         X-Cache-Status: BYPASS
-         Strict-Transport-Security: max-age=31536000
-         Cache-Control: public, max-age=1200
+        Server: nginx
+        Date: Wed, 22 Apr 2020 12:56:13 GMT
+        Content-Type: text/xml; charset=UTF-8
+        Transfer-Encoding: chunked
+        Connection: keep-alive
+        Set-Cookie: PHPSESSID=9fb67188b757d9e61bf2144d701dacae; path=/
+        Expires: Thu, 19 Nov 1981 08:52:00 GMT
+        Pragma: no-cache
+        Set-Cookie: mobile=false; path=/
+        Set-Cookie: user-agent=2af4f0dda4a2cdd367f5b41adcc59f79; path=/
+        Content-Encoding: gzip
+        Vary: Accept-Encoding
+        Expires: Wed, 22 Apr 2020 13:16:13 GMT
+        Last-Modified: Wed, 22 Apr 2020 12:56:13 GMT
+        Pragma: no-cache
+        X-Cache-Status: BYPASS
+        Strict-Transport-Security: max-age=31536000
+        Cache-Control: public, max-age=1200
          *
          */
         runBlocking {
@@ -659,10 +745,17 @@ class FeedParserTest : DIAware {
     @Test
     fun diskuse() {
         runBlocking {
-            val feed = feedParser.parseFeedInputStream(URL("https://diskuse.jakpsatweb.cz/rss2.php?topic=173233"), diskuse)
+            val feed = feedParser.parseFeedInputStream(
+                URL("https://diskuse.jakpsatweb.cz/rss2.php?topic=173233"),
+                diskuse,
+                null
+            )
             val entry = feed.items!!.first()
 
-            assertEquals("Kajman, O této diskusi: test <pre> in <description> and <b>bold</b> in title", entry.title)
+            assertEquals(
+                "Kajman, O této diskusi: test <pre> in <description> and <b>bold</b> in title",
+                entry.title
+            )
         }
     }
 
@@ -670,7 +763,11 @@ class FeedParserTest : DIAware {
     @Ignore
     @Throws(Exception::class)
     fun fz() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(URL("https://www.fz.se/feeds/nyheter"), fz)
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(
+            URL("https://www.fz.se/feeds/nyheter"),
+            fz,
+            null
+        )
 
         assertEquals("http://www.fz.se/nyheter/", home_page_url)
         assertNull(feed_url)
@@ -691,7 +788,11 @@ class FeedParserTest : DIAware {
 
     @Test
     fun geekpark() {
-        val feed = feedParser.parseFeedInputStream(URL("http://main_test.geekpark.net/rss.rss"), geekpark)
+        val feed = feedParser.parseFeedInputStream(
+            URL("http://main_test.geekpark.net/rss.rss"),
+            geekpark,
+            null
+        )
 
         assertEquals("极客公园（！）", feed.title)
 
@@ -700,7 +801,11 @@ class FeedParserTest : DIAware {
 
     @Test
     fun contentTypeHtmlIsNotUnescapedTwice() {
-        val feed = feedParser.parseFeedInputStream(URL("http://www.zoocoop.com/contentoob/o1.atom"), contentTypeHtml)
+        val feed = feedParser.parseFeedInputStream(
+            URL("http://www.zoocoop.com/contentoob/o1.atom"),
+            contentTypeHtml,
+            null
+        )
 
         val item = feed.items!!.single()
 
@@ -715,7 +820,11 @@ class FeedParserTest : DIAware {
 
     @Test
     fun escapedRssDescriptionIsProperlyUnescaped() {
-        val feed = feedParser.parseRssAtomBytes(URL("http://cowboyprogrammer.org"), rssWithHtmlEscapedDescription.toByteArray())
+        val feed = feedParser.parseRssAtomBytes(
+            URL("http://cowboyprogrammer.org"),
+            rssWithHtmlEscapedDescription.toByteArray(),
+            null
+        )
 
         val item = feed.items!!.single()
 
@@ -731,7 +840,11 @@ class FeedParserTest : DIAware {
 
     @Test
     fun escapedAtomContentIsProperlyUnescaped() {
-        val feed = feedParser.parseRssAtomBytes(URL("http://cowboyprogrammer.org"), atomWithHtmlEscapedContents.toByteArray())
+        val feed = feedParser.parseRssAtomBytes(
+            URL("http://cowboyprogrammer.org"),
+            atomWithHtmlEscapedContents.toByteArray(),
+            null
+        )
 
         val text = feed.items!!.first()
         assertEquals(
