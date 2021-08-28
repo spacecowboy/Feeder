@@ -77,9 +77,15 @@ suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
 }
 
 suspend fun cancelNotification(context: Context, feedItemId: Long) =
+    cancelNotifications(context, listOf(feedItemId))
+
+suspend fun cancelNotifications(context: Context, feedItemIds: List<Long>) =
     withContext(Dispatchers.Default) {
         val nm = context.notificationManager
-        nm.cancel(feedItemId.toInt())
+
+        for (feedItemId in feedItemIds) {
+            nm.cancel(feedItemId.toInt())
+        }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             notify(context)
@@ -167,10 +173,10 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
     builder.addAction(
         R.drawable.notification_check,
         context.getString(R.string.mark_as_read),
-        PendingIntent.getActivity(
+        PendingIntent.getBroadcast(
             context,
             item.id.toInt(),
-            getOpenInDefaultActivityIntent(context, item.id, link = null),
+            getMarkAsReadIntent(context, item.id),
             PendingIntent.FLAG_UPDATE_CURRENT
         )
     )
@@ -194,6 +200,18 @@ internal fun getOpenInDefaultActivityIntent(
         }.build(),
         context,
         OpenLinkInDefaultActivity::class.java
+    )
+
+internal fun getMarkAsReadIntent(
+    context: Context,
+    feedItemId: Long,
+): Intent =
+    Intent(
+        ACTION_MARK_AS_READ,
+        // Important to keep the URI different so PendingIntents don't collide
+        URI_FEEDITEMS.buildUpon().appendPath("$feedItemId").build(),
+        context,
+        RssNotificationBroadcastReceiver::class.java
     )
 
 /**
