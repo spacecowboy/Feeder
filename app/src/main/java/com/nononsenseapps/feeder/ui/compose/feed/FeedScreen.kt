@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.DropdownMenu
@@ -36,20 +35,16 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.getValue
 import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -58,7 +53,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemsIndexed
 import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.LocalWindowInsets
@@ -94,10 +88,7 @@ import com.nononsenseapps.feeder.ui.compose.state.getImagePlaceholder
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.SortingOptions
 import com.nononsenseapps.feeder.util.ThemeOptions
-import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
-import com.nononsenseapps.feeder.util.currentlyUnmetered
 import com.nononsenseapps.feeder.util.openGitlabIssues
-import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.compose.instance
@@ -148,14 +139,6 @@ fun FeedScreen(
     val applicationState: ApplicationState by instance()
     val isRefreshing by applicationState.isRefreshing.collectAsState()
     val refreshState = rememberSwipeRefreshState(isRefreshing)
-
-    val onEditFeed = if (visibleFeeds.size == 1) {
-        {
-            onFeedEdit(visibleFeeds.first().id)
-        }
-    } else {
-        null
-    }
 
     val onSendFeedback = {
         context.startActivity(openGitlabIssues())
@@ -227,7 +210,7 @@ fun FeedScreen(
 //            settingsViewModel.setCurrentFeedAndTag(feedId = id, tag = tag)
         },
         onAddFeed = onAddFeed,
-        onEditFeed = onEditFeed,
+        onEditFeed = onFeedEdit,
         onDelete = { feeds ->
             feedListViewModel.deleteFeeds(feeds.toList())
         },
@@ -362,7 +345,7 @@ fun FeedScreen(
     onDrawerItemSelected: (Long, String) -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
     onAddFeed: (() -> Unit),
-    onEditFeed: (() -> Unit)?,
+    onEditFeed: ((Long) -> Unit),
     onSettings: () -> Unit,
     onSendFeedback: () -> Unit,
     onImport: () -> Unit,
@@ -380,6 +363,9 @@ fun FeedScreen(
         mutableStateOf(false)
     }
     var showDeleteDialog by remember {
+        mutableStateOf(false)
+    }
+    var showEditDialog by remember {
         mutableStateOf(false)
     }
 
@@ -454,20 +440,22 @@ fun FeedScreen(
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.add_feed))
                             }
-                            if (onEditFeed != null) {
-                                DropdownMenuItem(
-                                    onClick = {
-                                        onEditFeed()
-                                        showMenu = false
+                            DropdownMenuItem(
+                                onClick = {
+                                    if (visibleFeeds.size == 1) {
+                                        onEditFeed(visibleFeeds.first().id)
+                                    } else {
+                                        showEditDialog = true
                                     }
-                                ) {
-                                    Icon(
-                                        Icons.Default.Edit,
-                                        contentDescription = "Edit feed button"
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(stringResource(id = R.string.edit_feed))
+                                    showMenu = false
                                 }
+                            ) {
+                                Icon(
+                                    Icons.Default.Edit,
+                                    contentDescription = "Edit feed button"
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(id = R.string.edit_feed))
                             }
                             DropdownMenuItem(
                                 onClick = {
@@ -601,6 +589,14 @@ fun FeedScreen(
                 onDelete = onDelete
             )
         }
+
+        if (showEditDialog) {
+            EditFeedDialog2(
+                feeds = visibleFeeds.map { DeletableFeed(it.id, it.displayTitle) },
+                onDismiss = { showEditDialog = false },
+                onEdit = onEditFeed
+            )
+        }
     }
 }
 
@@ -622,7 +618,7 @@ fun DefaultPreview() {
             onToggleOnlyUnread = {},
             onDrawerItemSelected = { _, _ -> },
             onAddFeed = { },
-            onEditFeed = null,
+            onEditFeed = {},
             onDelete = {},
             onSettings = {},
             onSendFeedback = {},
