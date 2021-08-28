@@ -116,11 +116,12 @@ interface FeedDao {
         SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE
         FROM feeds
         WHERE $COL_TAG IS :feedTag
+        ORDER BY $COL_TITLE COLLATE NOCASE
         """
     )
     suspend fun getFeedTitlesWithTag(feedTag: String): List<FeedTitle>
 
-    @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds")
+    @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds ORDER BY $COL_TITLE COLLATE NOCASE")
     suspend fun getAllFeedTitles(): List<FeedTitle>
 }
 
