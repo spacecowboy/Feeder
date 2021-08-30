@@ -35,6 +35,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -54,8 +55,6 @@ import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
-import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
-import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
 import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToDisplay
@@ -92,18 +91,24 @@ fun ReaderScreen(
     val linkOpener by settingsViewModel.linkOpener.collectAsState()
     val feedItem by feedItemViewModel.currentLiveItem.observeAsState()
 
-    if (feedItem?.fullTextByDefault == true) {
-        feedItemViewModel.displayFullText()
+    LaunchedEffect(feedItem?.fullTextByDefault) {
+        if (feedItem?.fullTextByDefault == true) {
+            feedItemViewModel.displayFullText()
+        }
     }
 
     val textToDisplay by feedItemViewModel.textToDisplay.collectAsState()
 
-    val enclosure = feedItem?.enclosureLink?.let { link ->
-        feedItem?.enclosureFilename?.let { name ->
-            Enclosure(
-                link = link,
-                name = name
-            )
+    val enclosure by remember(feedItem?.enclosureLink, feedItem?.enclosureFilename) {
+        derivedStateOf {
+            feedItem?.enclosureLink?.let { link ->
+                feedItem?.enclosureFilename?.let { name ->
+                    Enclosure(
+                        link = link,
+                        name = name
+                    )
+                }
+            }
         }
     }
 
@@ -137,10 +142,13 @@ fun ReaderScreen(
         feedDisplayTitle = feedItem?.feedDisplayTitle ?: "",
         author = feedItem?.author,
         pubDate = feedItem?.pubDate,
-        textToDisplay = textToDisplay,
         enclosure = enclosure,
         onFetchFullText = {
-            feedItemViewModel.displayFullText()
+            if (textToDisplay == TextToDisplay.FULLTEXT) {
+                feedItemViewModel.displayArticleText()
+            } else {
+                feedItemViewModel.displayFullText()
+            }
         },
         onMarkAsUnread = {
             feedItemViewModel.markCurrentItemAsUnread()
@@ -247,7 +255,6 @@ fun ReaderScreen(
     author: String?,
     pubDate: ZonedDateTime?,
     enclosure: Enclosure?,
-    textToDisplay: TextToDisplay,
     onFetchFullText: () -> Unit,
     onMarkAsUnread: () -> Unit,
     onShare: () -> Unit,
@@ -261,8 +268,6 @@ fun ReaderScreen(
     var showMenu by remember {
         mutableStateOf(false)
     }
-
-    val fetchFullButtonVisible = textToDisplay == TextToDisplay.DEFAULT
 
     Scaffold(
         topBar = {
@@ -287,15 +292,13 @@ fun ReaderScreen(
                     }
                 },
                 actions = {
-                    if (fetchFullButtonVisible) {
-                        IconButton(
-                            onClick = onFetchFullText
-                        ) {
-                            Icon(
-                                Icons.Default.Article,
-                                contentDescription = "Fetch full article button"
-                            )
-                        }
+                    IconButton(
+                        onClick = onFetchFullText
+                    ) {
+                        Icon(
+                            Icons.Default.Article,
+                            contentDescription = "Fetch full article button"
+                        )
                     }
 
                     IconButton(onClick = onOpenInCustomTab) {
@@ -303,15 +306,6 @@ fun ReaderScreen(
                             Icons.Default.OpenInBrowser,
                             contentDescription = "Switch to browser view button"
                         )
-                    }
-
-                    if (!fetchFullButtonVisible) {
-                        IconButton(onClick = onShare) {
-                            Icon(
-                                Icons.Default.Share,
-                                contentDescription = "Share button"
-                            )
-                        }
                     }
 
                     Box {
@@ -323,20 +317,18 @@ fun ReaderScreen(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false }
                         ) {
-                            if (fetchFullButtonVisible) {
-                                DropdownMenuItem(
-                                    onClick = {
-                                        showMenu = false
-                                        onShare()
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Default.Share,
-                                        contentDescription = "Share button"
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(stringResource(id = R.string.share))
+                            DropdownMenuItem(
+                                onClick = {
+                                    showMenu = false
+                                    onShare()
                                 }
+                            ) {
+                                Icon(
+                                    Icons.Default.Share,
+                                    contentDescription = "Share button"
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(id = R.string.share))
                             }
 
                             DropdownMenuItem(
@@ -500,7 +492,6 @@ private fun PreviewReader() {
             author = "Bob Marley",
             pubDate = ZonedDateTime.now(),
             enclosure = null,
-            textToDisplay = TextToDisplay.DEFAULT,
             onFetchFullText = { },
             onMarkAsUnread = { },
             onShare = {},

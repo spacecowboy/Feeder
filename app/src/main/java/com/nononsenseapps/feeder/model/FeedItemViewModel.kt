@@ -84,6 +84,9 @@ class FeedItemViewModel(di: DI, private val state: SavedStateHandle) : DIAwareVi
 
     private val textToDisplayState = MutableStateFlow(TextToDisplay.DEFAULT)
     val textToDisplay: StateFlow<TextToDisplay> = textToDisplayState.asStateFlow()
+    fun displayArticleText() {
+        textToDisplayState.value = TextToDisplay.DEFAULT
+    }
     fun displayFullText() {
         if (blobFullFile(currentItemId, context.filesDir).isFile) {
             textToDisplayState.value = TextToDisplay.FULLTEXT
@@ -353,5 +356,5 @@ enum class TextToDisplay {
     DEFAULT,
     LOADING_FULLTEXT,
     FAILED_TO_LOAD_FULLTEXT,
-    FULLTEXT
+    FULLTEXT,
 }
