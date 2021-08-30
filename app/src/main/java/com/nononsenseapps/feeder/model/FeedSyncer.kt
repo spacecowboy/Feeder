@@ -59,7 +59,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
 
         try {
             if (ignoreConnectivitySettings || isOkToSyncAutomatically(context)) {
-                applicationState.setRefreshing()
+                applicationState.setRefreshing(true)
 
                 if (!currentlySyncing.isClosedForSend) {
                     currentlySyncing.offer(true)

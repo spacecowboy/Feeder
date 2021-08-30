@@ -137,7 +137,7 @@ fun FeedScreen(
     ).collectAsState(initial = emptyList())
 
     val applicationState: ApplicationState by instance()
-    val isRefreshing by applicationState.isRefreshing.collectAsState()
+    val isRefreshing by applicationState.isRefreshing
     val refreshState = rememberSwipeRefreshState(isRefreshing)
 
     val onSendFeedback = {
@@ -181,7 +181,7 @@ fun FeedScreen(
         refreshState = refreshState,
         showFloatingActionButton = showFloatingActionButton,
         onRefreshVisible = {
-            applicationState.setRefreshing()
+            applicationState.setRefreshing(true)
             requestFeedSync(
                 di = di,
                 feedId = feedOrTag.id,
@@ -192,7 +192,6 @@ fun FeedScreen(
             )
         },
         onRefreshAll = {
-            applicationState.setRefreshing()
             requestFeedSync(
                 di = di,
                 ignoreConnectivitySettings = true,
@@ -570,7 +569,8 @@ fun FeedScreen(
     ) { padding ->
         SwipeRefresh(
             state = refreshState,
-            onRefresh = onRefreshVisible
+            onRefresh = onRefreshVisible,
+            indicatorPadding = padding,
         ) {
             content(
                 Modifier
