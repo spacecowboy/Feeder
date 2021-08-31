@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,6 +64,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
@@ -267,6 +269,13 @@ fun FeedScreen(
             visible = !nothingToRead,
         ) {
             LazyColumn(
+                contentPadding = rememberInsetsPaddingValues(
+                    insets = LocalWindowInsets.current.navigationBars,
+                    applyTop = false,
+                    applyStart = false,
+                    applyEnd = false,
+                    applyBottom = true
+                ),
                 modifier = modifier
             ) {
                 items(
@@ -323,38 +332,27 @@ fun FeedScreen(
 
                 when {
                     pagedFeedItems.loadState.prepend is LoadState.Loading -> {
-                        Log.d("JONAS", "Prepend pager")
                     }
                     pagedFeedItems.loadState.refresh is LoadState.Loading -> {
-                        Log.d("JONAS", "Refreshed pager")
                     }
                     pagedFeedItems.loadState.append is LoadState.Loading -> {
-                        Log.d("JONAS", "Append pager")
                     }
                     pagedFeedItems.loadState.prepend is LoadState.Error -> {
+                        // TODO likely not even shown due to visibility
                         item {
                             Text("pager Prepend Error! TODO")
                         }
                     }
                     pagedFeedItems.loadState.refresh is LoadState.Error -> {
+                        // TODO likely not even shown due to visibility
                         item {
                             Text("pager Refresh Error! TODO")
                         }
                     }
                     pagedFeedItems.loadState.append is LoadState.Error -> {
+                        // TODO likely not even shown due to visibility
                         item {
                             Text("pager Append Error! TODO")
-                        }
-                    }
-                    pagedFeedItems.loadState.append.endOfPaginationReached -> {
-                        // User has reached the end of the list, could insert something here
-
-                        if (pagedFeedItems.itemCount == 0) {
-                            Log.d("JONAS", "Pager empty")
-                        } else {
-                            item {
-                                Spacer(modifier = Modifier.height(92.dp))
-                            }
                         }
                     }
                 }
