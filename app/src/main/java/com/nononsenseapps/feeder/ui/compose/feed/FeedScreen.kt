@@ -4,15 +4,21 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.DropdownMenu
@@ -40,6 +46,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -95,6 +102,7 @@ import org.kodein.di.compose.instance
 import org.kodein.di.instance
 import org.threeten.bp.LocalDateTime
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FeedScreen(
     feedOrTag: FeedOrTag,
@@ -130,6 +138,13 @@ fun FeedScreen(
     )
 
     val pagedFeedItems = feedItemsViewModel.feedListItems.collectAsLazyPagingItems()
+
+    val nothingToRead by remember(pagedFeedItems) {
+        derivedStateOf {
+            pagedFeedItems.loadState.append.endOfPaginationReached
+                && pagedFeedItems.itemCount == 0
+        }
+    }
 
     val visibleFeeds by feedListViewModel.getFeedTitles(
         feedId = feedOrTag.id,
@@ -227,8 +242,10 @@ fun FeedScreen(
             )
         }
     ) { modifier, openNavDrawer ->
-        if (pagedFeedItems.loadState.append.endOfPaginationReached
-            && pagedFeedItems.itemCount == 0
+        AnimatedVisibility(
+            enter = fadeIn(),
+            exit = fadeOut(),
+            visible = nothingToRead,
         ) {
             // Keeping the Box behind so the scrollability doesn't override clickable
             // Separate box because scrollable will ignore max size.
@@ -244,91 +261,100 @@ fun FeedScreen(
             )
         }
 
-        LazyColumn(
-            modifier = modifier
+        AnimatedVisibility(
+            enter = fadeIn(),
+            exit = fadeOut(),
+            visible = !nothingToRead,
         ) {
-            items(
-                pagedFeedItems.itemCount,
-                key = { itemIndex ->
-                    pagedFeedItems.snapshot().items[itemIndex].id
-                }
-            ) { itemIndex ->
-                val previewItem = pagedFeedItems[itemIndex]
-                    ?: return@items
+            LazyColumn(
+                modifier = modifier
+            ) {
+                items(
+                    pagedFeedItems.itemCount,
+                    key = { itemIndex ->
+                        pagedFeedItems.snapshot().items[itemIndex].id
+                    }
+                ) { itemIndex ->
+                    val previewItem = pagedFeedItems[itemIndex]
+                        ?: return@items
 
-                SwipeableFeedItemPreview(
-                    onSwipe = {
-                        feedItemsViewModel.markAsRead(previewItem.id, unread = !previewItem.unread)
-                    },
-                    onlyUnread = onlyUnread,
-                    item = previewItem,
-                    showThumbnail = showThumbnails,
-                    onMarkAboveAsRead = {
-                        if (itemIndex > 0) {
-                            feedItemsViewModel.markBeforeAsRead(itemIndex)
+                    SwipeableFeedItemPreview(
+                        onSwipe = {
+                            feedItemsViewModel.markAsRead(
+                                previewItem.id,
+                                unread = !previewItem.unread
+                            )
+                        },
+                        onlyUnread = onlyUnread,
+                        item = previewItem,
+                        showThumbnail = showThumbnails,
+                        onMarkAboveAsRead = {
+                            if (itemIndex > 0) {
+                                feedItemsViewModel.markBeforeAsRead(itemIndex)
+                            }
+                        },
+                        onMarkBelowAsRead = {
+                            feedItemsViewModel.markAfterAsRead(itemIndex)
+                        },
+                        onItemClick = {
+                            onItemClick(previewItem.id)
+                        },
+                        imagePainter = { imageUrl ->
+                            Image(
+                                painter = rememberCoilPainter(
+                                    request = imageUrl,
+                                    imageLoader = imageLoader,
+                                    requestBuilder = {
+                                        this.error(placeHolder)
+                                    },
+                                    previewPlaceholder = placeHolder,
+                                    shouldRefetchOnSizeChange = { _, _ -> false },
+                                ),
+                                contentScale = ContentScale.Crop,
+                                contentDescription = "Thumbnail for the article",
+                                modifier = Modifier
+                                    .width(64.dp)
+                                    .fillMaxHeight()
+                                    .padding(start = 4.dp)
+                            )
                         }
-                    },
-                    onMarkBelowAsRead = {
-                        feedItemsViewModel.markAfterAsRead(itemIndex)
-                    },
-                    onItemClick = {
-                        onItemClick(previewItem.id)
-                    },
-                    imagePainter = { imageUrl ->
-                        Image(
-                            painter = rememberCoilPainter(
-                                request = imageUrl,
-                                imageLoader = imageLoader,
-                                requestBuilder = {
-                                    this.error(placeHolder)
-                                },
-                                previewPlaceholder = placeHolder,
-                                shouldRefetchOnSizeChange = { _, _ -> false },
-                            ),
-                            contentScale = ContentScale.Crop,
-                            contentDescription = "Thumbnail for the article",
-                            modifier = Modifier
-                                .width(64.dp)
-                                .fillMaxHeight()
-                                .padding(start = 4.dp)
-                        )
-                    }
-                )
-            }
+                    )
+                }
 
-            when {
-                pagedFeedItems.loadState.prepend is LoadState.Loading -> {
-                    Log.d("JONAS", "Prepend pager")
-                }
-                pagedFeedItems.loadState.refresh is LoadState.Loading -> {
-                    Log.d("JONAS", "Refreshed pager")
-                }
-                pagedFeedItems.loadState.append is LoadState.Loading -> {
-                    Log.d("JONAS", "Append pager")
-                }
-                pagedFeedItems.loadState.prepend is LoadState.Error -> {
-                    item {
-                        Text("pager Prepend Error! TODO")
+                when {
+                    pagedFeedItems.loadState.prepend is LoadState.Loading -> {
+                        Log.d("JONAS", "Prepend pager")
                     }
-                }
-                pagedFeedItems.loadState.refresh is LoadState.Error -> {
-                    item {
-                        Text("pager Refresh Error! TODO")
+                    pagedFeedItems.loadState.refresh is LoadState.Loading -> {
+                        Log.d("JONAS", "Refreshed pager")
                     }
-                }
-                pagedFeedItems.loadState.append is LoadState.Error -> {
-                    item {
-                        Text("pager Append Error! TODO")
+                    pagedFeedItems.loadState.append is LoadState.Loading -> {
+                        Log.d("JONAS", "Append pager")
                     }
-                }
-                pagedFeedItems.loadState.append.endOfPaginationReached -> {
-                    // User has reached the end of the list, could insert something here
-
-                    if (pagedFeedItems.itemCount == 0) {
-                        Log.d("JONAS", "Pager empty")
-                    } else {
+                    pagedFeedItems.loadState.prepend is LoadState.Error -> {
                         item {
-                            Spacer(modifier = Modifier.height(92.dp))
+                            Text("pager Prepend Error! TODO")
+                        }
+                    }
+                    pagedFeedItems.loadState.refresh is LoadState.Error -> {
+                        item {
+                            Text("pager Refresh Error! TODO")
+                        }
+                    }
+                    pagedFeedItems.loadState.append is LoadState.Error -> {
+                        item {
+                            Text("pager Append Error! TODO")
+                        }
+                    }
+                    pagedFeedItems.loadState.append.endOfPaginationReached -> {
+                        // User has reached the end of the list, could insert something here
+
+                        if (pagedFeedItems.itemCount == 0) {
+                            Log.d("JONAS", "Pager empty")
+                        } else {
+                            item {
+                                Spacer(modifier = Modifier.height(92.dp))
+                            }
                         }
                     }
                 }
