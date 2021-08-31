@@ -230,6 +230,13 @@ fun FeedScreen(
         if (pagedFeedItems.loadState.append.endOfPaginationReached
             && pagedFeedItems.itemCount == 0
         ) {
+            // Keeping the Box behind so the scrollability doesn't override clickable
+            // Separate box because scrollable will ignore max size.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            )
             NothingToRead(
                 modifier = modifier,
                 onOpenOtherFeed = openNavDrawer,
