@@ -545,7 +545,7 @@ private fun TextComposer.appendTextChildren(
                                                 },
                                                 previewPlaceholder = R.drawable.youtube_icon,
                                             ),
-                                            contentDescription = "Video",
+                                            contentDescription = stringResource(R.string.touch_to_play_video),
                                             contentScale = ContentScale.FillWidth,
                                             modifier = Modifier
                                                 .clickable {

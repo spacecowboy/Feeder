@@ -77,7 +77,7 @@ fun SearchFeedScreen(
                     IconButton(onClick = onNavigateUp) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Back button"
+                            contentDescription = stringResource(R.string.go_back)
                         )
                     }
                 },

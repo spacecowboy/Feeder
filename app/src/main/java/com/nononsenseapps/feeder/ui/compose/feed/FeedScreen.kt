@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -10,11 +9,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -64,7 +61,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
@@ -320,7 +316,7 @@ fun FeedScreen(
                                     shouldRefetchOnSizeChange = { _, _ -> false },
                                 ),
                                 contentScale = ContentScale.Crop,
-                                contentDescription = "Thumbnail for the article",
+                                contentDescription = null,
                                 modifier = Modifier
                                     .width(64.dp)
                                     .fillMaxHeight()
@@ -403,7 +399,12 @@ fun FeedScreen(
         scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
-                title = { Text(screenTitle) },
+                title = {
+                    Text(
+                        screenTitle,
+                        maxLines = 2,
+                    )
+                },
                 contentPadding = rememberInsetsPaddingValues(
                     LocalWindowInsets.current.statusBars,
                     applyBottom = false,
@@ -418,7 +419,7 @@ fun FeedScreen(
                     ) {
                         Icon(
                             Icons.Default.Menu,
-                            contentDescription = "Drawer toggle button"
+                            contentDescription = stringResource(R.string.navigation_drawer_open)
                         )
                     }
                 },
@@ -444,13 +445,16 @@ fun FeedScreen(
                     ) {
                         Icon(
                             Icons.Default.Refresh,
-                            contentDescription = "Sync button"
+                            contentDescription = stringResource(R.string.sync)
                         )
                     }
 
                     Box {
                         IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Open menu")
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.open_menu),
+                            )
                         }
                         // TODO make it wider as necessary
                         DropdownMenu(
@@ -465,7 +469,7 @@ fun FeedScreen(
                             ) {
                                 Icon(
                                     Icons.Default.Add,
-                                    contentDescription = "Add feed button"
+                                    contentDescription = null,
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.add_feed))
@@ -482,7 +486,7 @@ fun FeedScreen(
                             ) {
                                 Icon(
                                     Icons.Default.Edit,
-                                    contentDescription = "Edit feed button"
+                                    contentDescription = null,
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.edit_feed))
@@ -495,7 +499,7 @@ fun FeedScreen(
                             ) {
                                 Icon(
                                     Icons.Default.Delete,
-                                    contentDescription = "Delete feed button"
+                                    contentDescription = null,
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.delete_feed))
@@ -509,7 +513,7 @@ fun FeedScreen(
                             ) {
                                 Icon(
                                     Icons.Default.ImportExport,
-                                    contentDescription = "Import OPML button"
+                                    contentDescription = null,
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.import_feeds_from_opml))
@@ -523,7 +527,7 @@ fun FeedScreen(
                             ) {
                                 Icon(
                                     Icons.Default.ImportExport,
-                                    contentDescription = "Export OPML button"
+                                    contentDescription = null,
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.export_feeds_to_opml))
@@ -537,7 +541,7 @@ fun FeedScreen(
                             ) {
                                 Icon(
                                     Icons.Default.Settings,
-                                    contentDescription = "Settings button"
+                                    contentDescription = null,
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.action_settings))
@@ -551,7 +555,7 @@ fun FeedScreen(
                             ) {
                                 Icon(
                                     Icons.Default.Email,
-                                    contentDescription = "Send bug report button"
+                                    contentDescription = null,
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.send_bug_report))
@@ -592,7 +596,7 @@ fun FeedScreen(
                 ) {
                     Icon(
                         Icons.Default.Check,
-                        contentDescription = "Mark all as read button"
+                        contentDescription = stringResource(R.string.mark_all_as_read)
                     )
                 }
             }

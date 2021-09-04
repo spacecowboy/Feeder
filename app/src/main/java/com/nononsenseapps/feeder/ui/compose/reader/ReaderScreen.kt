@@ -287,7 +287,7 @@ fun ReaderScreen(
                     IconButton(onClick = onNavigateUp) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Back button"
+                            contentDescription = stringResource(R.string.go_back)
                         )
                     }
                 },
@@ -297,20 +297,23 @@ fun ReaderScreen(
                     ) {
                         Icon(
                             Icons.Default.Article,
-                            contentDescription = "Fetch full article button"
+                            contentDescription = stringResource(R.string.fetch_full_article)
                         )
                     }
 
                     IconButton(onClick = onOpenInCustomTab) {
                         Icon(
                             Icons.Default.OpenInBrowser,
-                            contentDescription = "Switch to browser view button"
+                            contentDescription = stringResource(id = R.string.open_in_custom_tab)
                         )
                     }
 
                     Box {
                         IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Open menu")
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = stringResource(id = R.string.open_menu),
+                            )
                         }
                         // TODO make it wider as necessary
                         DropdownMenu(
@@ -325,7 +328,7 @@ fun ReaderScreen(
                             ) {
                                 Icon(
                                     Icons.Default.Share,
-                                    contentDescription = "Share button"
+                                    contentDescription = null
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.share))
@@ -339,7 +342,7 @@ fun ReaderScreen(
                             ) {
                                 Icon(
                                     Icons.Default.MarkAsUnread,
-                                    contentDescription = "Mark as unread button"
+                                    contentDescription = null
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.mark_as_unread))
@@ -352,7 +355,7 @@ fun ReaderScreen(
                             ) {
                                 Icon(
                                     Icons.Default.PlayArrow,
-                                    contentDescription = "Read aloud"
+                                    contentDescription = null
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.read_article))

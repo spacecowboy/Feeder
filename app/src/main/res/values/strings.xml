@@ -37,6 +37,7 @@
   <string name="read_article">Read aloud</string>
   <string name="pause_reading">Pause reading</string>
   <string name="resume_reading">Resume reading</string>
+  <string name="stop_reading">Stop reading</string>
   <string name="sync">Sync</string>
   <string name="export_feeds_to_opml">Export feeds to OPML</string>
   <string name="import_feeds_from_opml">Import feeds from OPML</string>
@@ -116,5 +117,7 @@
   <string name="failed_to_fetch_full_article">Failed to fetch full article</string>
   <string name="fetching_full_article">Fetching full article…</string>
   <string name="failed_to_load_text_to_speech">Failed to load text to speech</string>
+  <string name="go_back">Go back</string>
+  <string name="open_menu">Open menu</string>
 
 </resources>
