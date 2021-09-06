@@ -11,16 +11,16 @@ import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import java.io.File
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.dankito.readability4j.Readability4J
+import net.dankito.readability4j.extended.Readability4JExtended
 import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import java.io.File
-import java.net.URL
 
 const val ARG_FEED_ITEM_ID = "feed_item_id"
 const val ARG_FEED_ITEM_LINK = "feed_item_link"
@@ -101,7 +101,7 @@ suspend fun parseFullArticle(
 
         // TODO verify encoding is respected in reader
         Log.i("FeederFullText", "Parsing article ${feedItem.link}")
-        val article = Readability4J(url, html).parse()
+        val article = Readability4JExtended(url, html).parse()
 
         // TODO set image on item if none already
         // naiveFindImageLink(article.content)?.let { Parser.unescapeEntities(it, true) }
