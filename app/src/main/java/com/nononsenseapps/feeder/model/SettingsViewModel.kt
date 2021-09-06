@@ -6,26 +6,15 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
-import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.util.ItemOpener
 import com.nononsenseapps.feeder.util.LinkOpener
-import com.nononsenseapps.feeder.util.PREF_SORT
-import com.nononsenseapps.feeder.util.PREF_THEME
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.SortingOptions
 import com.nononsenseapps.feeder.util.SyncFrequency
 import com.nononsenseapps.feeder.util.ThemeOptions
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
 import org.kodein.di.instance
 
@@ -34,42 +23,6 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di),
     private val app: Application by instance()
     private val prefs: Prefs by instance()
     private val sharedPreferences: SharedPreferences by instance()
-
-    // TODO remove
-    @Deprecated("Use StateFlows instead")
-    private val keyChannel = ConflatedBroadcastChannel<String>()
-    private val keyFlow = keyChannel.asFlow()
-
-    @Deprecated("Use currentSorting instead")
-    val liveThemePreferenceNoInitial: LiveData<ThemeOptions> =
-        keyFlow.filter { it == PREF_THEME }
-            .map { prefs.currentTheme }
-            .conflate()
-            .asLiveData()
-
-    @Deprecated("Use currentTheme instead")
-    val liveIsNightMode: MutableLiveData<Boolean> by lazy { MutableLiveData(prefs.isNightMode) }
-
-    @Deprecated("Use currentSorting instead")
-    val liveIsNewestFirst: LiveData<Boolean> =
-        keyFlow.filter { it == PREF_SORT }
-            .map { prefs.isNewestFirst }
-            .conflate()
-            .asLiveData()
-
-    val backgroundColor: Int
-        get() =
-            when (prefs.isNightMode) {
-                true -> app.getColorCompat(R.color.night_background)
-                false -> app.getColorCompat(R.color.day_background)
-            }
-
-    val accentColor: Int
-        get() =
-            when (prefs.isNightMode) {
-                true -> app.getColorCompat(R.color.accentNight)
-                false -> app.getColorCompat(R.color.accentDay)
-            }
 
     private val _showOnlyUnread = MutableStateFlow(prefs.showOnlyUnread)
     val showOnlyUnread = _showOnlyUnread.asStateFlow()
@@ -178,19 +131,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di),
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (key != null && !keyChannel.isClosedForSend) {
-            keyChannel.offer(key)
-        }
-
         // TODO update mutable state - settings may have been changed in other activity
-        when (key) {
-
-        }
-    }
-
-    override fun onCleared() {
-        keyChannel.close()
-        super.onCleared()
     }
 }
 

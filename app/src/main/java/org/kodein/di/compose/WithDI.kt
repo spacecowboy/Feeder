@@ -11,7 +11,7 @@ import org.kodein.di.DI
  * @param content underlying [Composable] tree that will be able to consume the [DI] container
  */
 @Composable
-public fun withDI(builder: DI.MainBuilder.() -> Unit, content: @Composable () -> Unit): Unit =
+fun withDI(builder: DI.MainBuilder.() -> Unit, content: @Composable () -> Unit): Unit =
     CompositionLocalProvider(LocalDI provides DI { builder() }) { content() }
 
 /**
@@ -21,7 +21,7 @@ public fun withDI(builder: DI.MainBuilder.() -> Unit, content: @Composable () ->
  * @param content underlying [Composable] tree that will be able to consume the [DI] container
  */
 @Composable
-public fun withDI(vararg diModules: DI.Module, content: @Composable () -> Unit): Unit =
+fun withDI(vararg diModules: DI.Module, content: @Composable () -> Unit): Unit =
     CompositionLocalProvider(LocalDI provides DI { importAll(*diModules)}) { content() }
 
 /**
@@ -31,5 +31,5 @@ public fun withDI(vararg diModules: DI.Module, content: @Composable () -> Unit):
  * @param content underlying [Composable] tree that will be able to consume the [DI] container
  */
 @Composable
-public fun withDI(di: DI, content: @Composable () -> Unit): Unit =
+fun withDI(di: DI, content: @Composable () -> Unit): Unit =
     CompositionLocalProvider(LocalDI provides di) { content() }

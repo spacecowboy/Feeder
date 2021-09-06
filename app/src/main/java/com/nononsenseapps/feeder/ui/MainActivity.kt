@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -14,6 +15,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
@@ -351,6 +353,7 @@ class MainActivity : DIAwareComponentActivity() {
         val coroutineScope = rememberCoroutineScope()
 
         val feedItemsViewModel: FeedItemsViewModel = backStackEntry.DIAwareViewModel()
+        val toolbarColor = MaterialTheme.colors.primarySurface.toArgb()
 
         FeedScreen(
             feedOrTag = feedOrTag,
@@ -369,7 +372,7 @@ class MainActivity : DIAwareComponentActivity() {
                         }
                         link != null && (openArticleWith == PrefValOpenWith.OPEN_WITH_CUSTOM_TAB
                             || openArticleWith == PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith == ItemOpener.CUSTOM_TAB) -> {
-                            openLinkInCustomTab(context, link, itemId)
+                            openLinkInCustomTab(context, link, toolbarColor)
                         }
                         else -> {
                             navController?.navigate("reader/$itemId")

@@ -9,6 +9,16 @@ import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.JsonFeedParser
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
+import java.io.EOFException
+import java.io.IOException
+import java.io.InputStream
+import java.net.MalformedURLException
+import java.net.URL
+import java.net.URLDecoder
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
+import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import okhttp3.Authenticator
@@ -27,15 +37,6 @@ import org.jsoup.nodes.Document
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
-import java.io.EOFException
-import java.io.IOException
-import java.io.InputStream
-import java.net.MalformedURLException
-import java.net.URL
-import java.net.URLDecoder
-import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.TimeUnit
 
 val slashPattern = """<\s*slash:comments\s*/>""".toRegex(RegexOption.IGNORE_CASE)
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
@@ -51,12 +52,12 @@ class FeedParser(override val di: DI) : DIAware {
         html: String,
         preferRss: Boolean = false,
         preferAtom: Boolean = false,
-        preferJSON: Boolean = false
+        preferJSON: Boolean = false,
     ): URL? {
 
         val feedLinks = getAlternateFeedLinksInHtml(html)
             .sortedBy {
-                val t = it.second.toLowerCase()
+                val t = it.second.lowercase(Locale.getDefault())
                 when {
                     preferAtom && t.contains("atom") -> "0"
                     preferRss && t.contains("rss") -> "1"
@@ -92,14 +93,14 @@ class FeedParser(override val di: DI) : DIAware {
      */
     fun getAlternateFeedLinksInHtml(
         html: String,
-        baseUrl: URL? = null
+        baseUrl: URL? = null,
     ): List<Pair<String, String>> {
         val doc = Jsoup.parse(html.byteInputStream(), "UTF-8", "")
 
         val feeds = doc.getElementsByAttributeValue("rel", "alternate")
             ?.filter { it.hasAttr("href") && it.hasAttr("type") }
             ?.filter {
-                val t = it.attr("type").toLowerCase()
+                val t = it.attr("type").lowercase(Locale.getDefault())
                 when {
                     t.contains("application/atom") -> true
                     t.contains("application/rss") -> true
@@ -109,7 +110,7 @@ class FeedParser(override val di: DI) : DIAware {
                 }
             }
             ?.filter {
-                val l = it.attr("href").toLowerCase()
+                val l = it.attr("href").lowercase(Locale.getDefault())
                 try {
                     if (baseUrl != null) {
                         relativeLinkIntoAbsoluteOrThrow(base = baseUrl, link = l)
@@ -191,7 +192,12 @@ class FeedParser(override val di: DI) : DIAware {
      * Takes body as bytes to handle encoding correctly
      */
     @Throws(FeedParsingError::class)
-    fun parseFeedResponse(url: URL, contentType: MediaType?, charset: Charset?, body: ByteArray): Feed {
+    fun parseFeedResponse(
+        url: URL,
+        contentType: MediaType?,
+        charset: Charset?,
+        body: ByteArray,
+    ): Feed {
         try {
             val feed = when (contentType?.subtype?.contains("json")) {
                 true -> jsonFeedParser.parseJson(body.toString(charset ?: StandardCharsets.UTF_8))

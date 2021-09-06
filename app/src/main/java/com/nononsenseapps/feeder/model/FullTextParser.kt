@@ -11,9 +11,7 @@ import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.di.CURRENTLY_SYNCING_STATE
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.withContext
 import net.dankito.readability4j.Readability4J
 import okhttp3.OkHttpClient
@@ -48,7 +46,6 @@ class FullTextWorker(
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams), DIAware {
     override val di: DI by closestDI(context)
-    private val currentlySyncing: ConflatedBroadcastChannel<Boolean> by instance(tag = CURRENTLY_SYNCING_STATE)
     private val okHttpClient: OkHttpClient by instance()
 
     override suspend fun doWork(): Result {
@@ -60,10 +57,6 @@ class FullTextWorker(
             val link: String? = inputData.getString(ARG_FEED_ITEM_LINK)
                 ?: throw RuntimeException("No link provided")
 
-            if (!currentlySyncing.isClosedForSend) {
-                currentlySyncing.offer(true)
-            }
-
             Log.i("FeederFullText", "Worker going to parse $feedItemId: $link")
 
             success = parseFullArticleIfMissing(
@@ -74,10 +67,6 @@ class FullTextWorker(
                 okHttpClient = okHttpClient,
                 filesDir = context.filesDir
             )
-
-            if (!currentlySyncing.isClosedForSend) {
-                currentlySyncing.offer(false)
-            }
         }
 
         return when (success) {

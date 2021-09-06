@@ -16,7 +16,7 @@ import org.kodein.di.*
  * @throws DI.DependencyLoopException If the instance construction triggered a dependency loop.
  */
 @Composable
-public inline fun <reified T : Any> instance(tag: Any? = null): DIProperty<T> = with(LocalDI.current) {
+inline fun <reified T : Any> instance(tag: Any? = null): DIProperty<T> = with(LocalDI.current) {
     remember { instance(tag) }
 }
 
@@ -34,7 +34,7 @@ public inline fun <reified T : Any> instance(tag: Any? = null): DIProperty<T> = 
  * @throws DI.DependencyLoopException If the value construction triggered a dependency loop.
  */
 @Composable
-public inline fun <reified A : Any, reified T : Any> instance(tag: Any? = null, arg: A): DIProperty<T> = with(LocalDI.current) {
+inline fun <reified A : Any, reified T : Any> instance(tag: Any? = null, arg: A): DIProperty<T> = with(LocalDI.current) {
     remember { instance(tag, arg) }
 }
 
@@ -51,7 +51,7 @@ public inline fun <reified A : Any, reified T : Any> instance(tag: Any? = null, 
  * @throws DI.DependencyLoopException When calling the factory function, if the instance construction triggered a dependency loop.
  */
 @Composable
-public inline fun <reified A : Any, reified T : Any> factory(tag: Any? = null): DIProperty<(A) -> T> = with(LocalDI.current) {
+inline fun <reified A : Any, reified T : Any> factory(tag: Any? = null): DIProperty<(A) -> T> = with(LocalDI.current) {
     remember { factory(tag) }
 }
 
@@ -67,7 +67,7 @@ public inline fun <reified A : Any, reified T : Any> factory(tag: Any? = null): 
  * @throws DI.DependencyLoopException When calling the provider function, if the instance construction triggered a dependency loop.
  */
 @Composable
-public inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null): DIProperty<() -> T> = with(LocalDI.current) {
+inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null): DIProperty<() -> T> = with(LocalDI.current) {
     remember { provider(tag) }
 }
 
@@ -85,7 +85,7 @@ public inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null):
  * @throws DI.DependencyLoopException When calling the provider, if the value construction triggered a dependency loop.
  */
 @Composable
-public inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null, arg: A): DIProperty<() -> T> = with(LocalDI.current) {
+inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null, arg: A): DIProperty<() -> T> = with(LocalDI.current) {
     remember { provider(tag, arg) }
 }
 
@@ -103,6 +103,6 @@ public inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null, 
  * @throws DI.DependencyLoopException When calling the provider, if the value construction triggered a dependency loop.
  */
 @Composable
-public inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null, noinline fArg: () -> A): DIProperty<() -> T> = with(LocalDI.current) {
+inline fun <reified A : Any, reified T : Any> provider(tag: Any? = null, noinline fArg: () -> A): DIProperty<() -> T> = with(LocalDI.current) {
     remember { provider(tag, fArg) }
 }

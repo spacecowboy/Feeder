@@ -77,11 +77,11 @@ const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
 const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 
-enum class PrefValOpenWith(value: String) {
-    OPEN_WITH_DEFAULT(""),
-    OPEN_WITH_READER(PREF_VAL_OPEN_WITH_READER),
-    OPEN_WITH_CUSTOM_TAB(PREF_VAL_OPEN_WITH_CUSTOM_TAB),
-    OPEN_WITH_BROWSER(PREF_VAL_OPEN_WITH_BROWSER)
+enum class PrefValOpenWith {
+    OPEN_WITH_DEFAULT,
+    OPEN_WITH_READER,
+    OPEN_WITH_CUSTOM_TAB,
+    OPEN_WITH_BROWSER
 }
 
 const val PREF_JAVASCRIPT_ENABLED = "pref_javascript_enabled"
@@ -90,24 +90,6 @@ const val PREF_JAVASCRIPT_ENABLED = "pref_javascript_enabled"
  * Database settings
  */
 const val PREF_MAX_ITEM_COUNT_PER_FEED = "pref_max_item_count_per_feed"
-
-object PreferenceSummaryUpdater : Preference.OnPreferenceChangeListener {
-    override fun onPreferenceChange(preference: Preference?, value: Any?): Boolean {
-        val stringValue = value.toString()
-        if (preference is ListPreference) {
-            // For list preferences, look up the correct display value in
-            // the preference's 'entries' list.
-            val index = preference.findIndexOfValue(stringValue)
-            // Set the summary to reflect the new value.
-            preference.setSummary(if (index >= 0) preference.entries[index] else null)
-        } else {
-            // For all other preferences, set the summary to the value's
-            // simple string representation.
-            preference?.summary = stringValue
-        }
-        return true
-    }
-}
 
 fun SharedPreferences.getStringNonNull(key: String, defaultValue: String): String =
     getString(key, defaultValue) ?: defaultValue

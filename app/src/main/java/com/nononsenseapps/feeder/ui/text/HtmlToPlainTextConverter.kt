@@ -20,7 +20,7 @@ import java.util.Stack
 class HtmlToPlainTextConverter : ContentHandler {
     private val parser: Parser = Parser()
     private var builder: StringBuilder? = null
-    private val listings = Stack<HtmlToSpannedConverter.Listing>()
+    private val listings = Stack<Listing>()
     private var ignoreCount = 0
     private val ignoredTags = listOf("style", "script")
     private var lastImageAlt: String? = null
@@ -111,7 +111,7 @@ class HtmlToPlainTextConverter : ContentHandler {
             tag.equals("ul", ignoreCase = true) -> startUl(builder)
             tag.equals("ol", ignoreCase = true) -> startOl(builder)
             tag.equals("li", ignoreCase = true) -> startLi(builder)
-            ignoredTags.contains(tag.toLowerCase()) -> ignoreCount++
+            ignoredTags.contains(tag.lowercase()) -> ignoreCount++
             tag.equals("img", ignoreCase = true) -> startImg(builder, attributes)
         }
     }
@@ -131,7 +131,7 @@ class HtmlToPlainTextConverter : ContentHandler {
         }
 
         // Remember list type
-        listings.push(HtmlToSpannedConverter.Listing(true))
+        listings.push(Listing(true))
     }
 
     private fun startLi(builder: StringBuilder?) {
@@ -161,7 +161,7 @@ class HtmlToPlainTextConverter : ContentHandler {
         }
 
         // Remember list type
-        listings.push(HtmlToSpannedConverter.Listing(false))
+        listings.push(Listing(false))
     }
 
     private fun endOl(builder: StringBuilder?) {
@@ -200,7 +200,7 @@ class HtmlToPlainTextConverter : ContentHandler {
             tag.equals("ul", ignoreCase = true) -> endUl(builder)
             tag.equals("ol", ignoreCase = true) -> endOl(builder)
             tag.equals("li", ignoreCase = true) -> endLi(builder)
-            ignoredTags.contains(tag.toLowerCase()) -> ignoreCount--
+            ignoredTags.contains(tag.lowercase()) -> ignoreCount--
         }
     }
 
@@ -213,7 +213,7 @@ class HtmlToPlainTextConverter : ContentHandler {
         if (len != 0) {
             val c = text[len - 1]
             // Non-breaking space (160) is not caught by trim or whitespace identification
-            if (Character.isWhitespace(c) || c.toInt() == 160) {
+            if (Character.isWhitespace(c) || c.code == 160) {
                 return
             }
             text.append(" ")
@@ -275,6 +275,46 @@ class HtmlToPlainTextConverter : ContentHandler {
     @Throws(SAXException::class)
     override fun skippedEntity(name: String) {
     }
+
+    private class Bold
+
+    private class Italic
+
+    private class Underline
+
+    private class Big
+
+    private class Small
+
+    private class Monospace
+
+    private class Blockquote
+
+    private class Super
+
+    private class Sub
+
+    class Listing(var ordered: Boolean) {
+        var number: Int = 0
+
+        init {
+            number = 1
+        }
+    }
+
+    private open class Bullet
+
+    private class CountBullet : Bullet()
+
+    private class Pre
+
+    private class Code
+
+    private class Font(var mColor: String, var mFace: String?)
+
+    private class Href(var mHref: String?)
+
+    private class Header(var mLevel: Int)
 }
 
 fun repeated(string: String, count: Int): String {

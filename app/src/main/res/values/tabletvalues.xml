@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Simple values regarding device configuration -->
-    <bool name="isTablet">false</bool>
-    <integer name="feedColumns">1</integer>
-</resources>

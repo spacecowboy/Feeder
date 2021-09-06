@@ -18,7 +18,7 @@ import org.kodein.di.DI
  * @param content underlying [Composable] tree that will be able to consume the [DI] container
  */
 @Composable
-public fun subDI(
+fun subDI(
     parentDI: DI,
     allowSilentOverride: Boolean = false,
     copy: Copy = Copy.NonCached,
@@ -41,7 +41,7 @@ public fun subDI(
  * @param content underlying [Composable] tree that will be able to consume the [DI] container
  */
 @Composable
-public fun subDI(
+fun subDI(
     allowSilentOverride: Boolean = false,
     copy: Copy = Copy.NonCached,
     diBuilder: DI.MainBuilder.() -> Unit,

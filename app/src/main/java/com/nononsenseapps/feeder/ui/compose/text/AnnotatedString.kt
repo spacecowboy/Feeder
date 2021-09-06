@@ -22,7 +22,7 @@ class AnnotatedParagraphStringBuilder {
             }
             lastTwoChars.peekLatest()?.let { latest ->
                 // Non-breaking space (160) is not caught by trim or whitespace identification
-                if (latest.isWhitespace() || latest.toInt() == 160) {
+                if (latest.isWhitespace() || latest.code == 160) {
                     return true
                 }
             }

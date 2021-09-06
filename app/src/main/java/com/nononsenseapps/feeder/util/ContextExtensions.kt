@@ -5,17 +5,14 @@ import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
-import com.nononsenseapps.feeder.db.URI_FEEDS
-import com.nononsenseapps.feeder.ui.ARG_FEED_TITLE
-import com.nononsenseapps.feeder.ui.FeedActivity
+import androidx.core.text.BidiFormatter
 import com.nononsenseapps.feeder.ui.MainActivity
-import java.net.URLEncoder
+import java.util.*
 
 interface ToastMaker {
     suspend fun makeToast(text: String)
@@ -117,6 +114,17 @@ fun Context.removeDynamicShortcutToFeed(id: Any) {
         Log.d("removeDynamicShortcut", "Error during removal of shortcut: ${error.message}")
     }
 }
+
+fun Context.unicodeWrap(text: String): String =
+    BidiFormatter.getInstance(getLocale()).unicodeWrap(text)
+
+fun Context.getLocale(): Locale =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        resources.configuration.locales[0]
+    } else {
+        @Suppress("DEPRECATION")
+        resources.configuration.locale
+    }
 
 const val DEEP_LINK_HOST = "feederapp.nononsenseapps.com"
 const val DEEP_LINK_BASE_URI = "https://$DEEP_LINK_HOST"

@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.ui.compose.reader
 
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
@@ -66,10 +67,10 @@ import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
-import com.nononsenseapps.feeder.ui.unicodeWrap
 import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
+import com.nononsenseapps.feeder.util.unicodeWrap
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
@@ -211,7 +212,8 @@ fun ReaderScreen(
                                 onLinkClick(
                                     link = link,
                                     linkOpener = linkOpener,
-                                    context = context
+                                    context = context,
+                                    toolbarColor = toolbarColor
                                 )
                             }
                         )
@@ -237,7 +239,8 @@ fun ReaderScreen(
                                 onLinkClick(
                                     link = link,
                                     linkOpener = linkOpener,
-                                    context = context
+                                    context = context,
+                                    toolbarColor = toolbarColor
                                 )
                             }
                         )
@@ -468,10 +471,15 @@ private fun ReaderView(
     }
 }
 
-fun onLinkClick(link: String, linkOpener: LinkOpener, context: Context) {
+fun onLinkClick(
+    link: String,
+    linkOpener: LinkOpener,
+    context: Context,
+    @ColorInt toolbarColor: Int
+) {
     when (linkOpener) {
         LinkOpener.CUSTOM_TAB -> {
-            openLinkInCustomTab(context, link, null)
+            openLinkInCustomTab(context, link, toolbarColor)
         }
         LinkOpener.DEFAULT_BROWSER -> {
             openLinkInBrowser(context, link)

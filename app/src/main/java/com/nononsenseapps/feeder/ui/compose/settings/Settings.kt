@@ -68,8 +68,10 @@ import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.SortingOptions
 import com.nononsenseapps.feeder.util.SyncFrequency
 import com.nononsenseapps.feeder.util.ThemeOptions
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun SettingsScreen(
     onNavigateUp: () -> Unit,
