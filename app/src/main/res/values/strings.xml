@@ -34,6 +34,7 @@
   <string name="open_link_in_browser">Open link in browser</string>
   <string name="open_in_browser">Open in browser</string>
   <string name="open_enclosed_media">Open enclosed media</string>
+  <string name="open_enclosed_media_file">Open %1$s</string>
   <string name="read_article">Read aloud</string>
   <string name="pause_reading">Pause reading</string>
   <string name="resume_reading">Resume reading</string>
@@ -71,7 +72,6 @@
   <string name="show_fab">Show floating action button</string>
   <string name="include_mobile_hotspots">Include mobile hotspots</string>
   <string name="updated_feeds">Updated feeds</string>
-  <string name="selected">Selected</string>
   <string name="notification_channel_name">Unread feeds</string>
   <string name="notification_channel_description">Notifications are only shown for unread items in configured feeds</string>
   <string name="open_in_reader">Reader</string>
@@ -104,6 +104,8 @@
   <string name="mark_items_below_as_read">Mark items below as read</string>
   <string name="discovered_feeds_list">Discovered feeds list</string>
   <string name="toggle_tag_expansion">Toggle tag expansion</string>
+  <string name="expanded_tag">Open tag</string>
+  <string name="contracted_tag">Closed tag</string>
 
   <string name="battery_optimization">Battery optimization</string>
   <string name="battery_optimization_disabled">Battery optimization disabled</string>
@@ -119,5 +121,12 @@
   <string name="failed_to_load_text_to_speech">Failed to load text to speech</string>
   <string name="go_back">Go back</string>
   <string name="open_menu">Open menu</string>
+  <string name="go_to_feed">Go to %1$s</string>
+  <string name="n_unread_articles">%1$s unread articles</string>
+  <string name="unread">Unread</string>
+  <string name="already_read">Already read</string>
+  <string name="showing_only_unread_articles">Showing only unread articles</string>
+  <string name="showing_all_articles">Showing all articles</string>
+  <string name="synchronize_feeds">Synchronize feeds</string>
 
 </resources>

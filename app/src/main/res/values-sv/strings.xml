@@ -63,8 +63,7 @@
     <string name="show_fab">Visa flytande åtgärdsknapp</string>
     <string name="include_mobile_hotspots">Inkludera hotspots</string>
     <string name="updated_feeds">Uppdaterade flöden</string>
-    <string name="selected">Markerat</string>
-    <string name="notification_channel_name">Olästa flöden</string>
+  <string name="notification_channel_name">Olästa flöden</string>
     <string name="notification_channel_description">Notifikationer visas endast för olästa flöden</string>
     <string name="open_in_reader">Läsare</string>
     <string name="open_in_webview">Webbvy</string>

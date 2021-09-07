@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -44,6 +49,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 @OptIn(
     ExperimentalFoundationApi::class,
@@ -61,6 +67,7 @@ fun SwipeableFeedItemPreview(
     onMarkBelowAsRead: () -> Unit,
     onItemClick: () -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val animatedVisibilityState = remember { MutableTransitionState(true) }
     val swipeableState = rememberSwipeableState(initialValue = FeedItemSwipeState.NONE)
@@ -128,6 +135,14 @@ fun SwipeableFeedItemPreview(
         mutableStateOf(false)
     }
 
+    val markAboveAsReadLabel = stringResource(R.string.mark_items_above_as_read)
+    val markBelowAsReadLabel = stringResource(R.string.mark_items_below_as_read)
+    val readStatusLabel = if (item.unread) {
+        stringResource(R.string.unread)
+    } else {
+        stringResource(R.string.already_read)
+    }
+
     AnimatedVisibility(
         visibleState = animatedVisibilityState,
         enter = fadeIn(1f),
@@ -145,6 +160,25 @@ fun SwipeableFeedItemPreview(
                     },
                     onClick = onItemClick,
                 )
+                .semantics {
+                    stateDescription = readStatusLabel
+                    customActions = listOf(
+                        CustomAccessibilityAction("toggle read status") {
+                            coroutineScope.launch {
+                                onSwipe()
+                            }
+                            true
+                        },
+                        CustomAccessibilityAction(markAboveAsReadLabel) {
+                            onMarkAboveAsRead()
+                            true
+                        },
+                        CustomAccessibilityAction(markBelowAsReadLabel) {
+                            onMarkBelowAsRead()
+                            true
+                        },
+                    )
+                }
         ) {
             // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
             // It's very important than clickable stuff is handled by its parent - or a direct child
@@ -179,7 +213,7 @@ fun SwipeableFeedItemPreview(
                             true -> Icons.Default.VisibilityOff
                             false -> Icons.Default.Visibility
                         },
-                        contentDescription = stringResource(id = R.string.toggle_read_status)
+                        contentDescription = null,
                     )
                 }
             }

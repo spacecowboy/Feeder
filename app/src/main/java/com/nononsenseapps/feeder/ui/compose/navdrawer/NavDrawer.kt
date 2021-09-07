@@ -31,6 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -140,12 +146,32 @@ private fun ExpandableTag(
         animationSpec = tween()
     )
 
+    val toggleExpandLabel = stringResource(id = R.string.toggle_tag_expansion)
+    val expandedStateLabel = if (expanded) {
+        stringResource(id = R.string.expanded_tag)
+    } else {
+        stringResource(id = R.string.contracted_tag)
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clickable(onClick = onItemClick)
             .padding(top = 2.dp, bottom = 2.dp, end = 16.dp)
             .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                stateDescription = expandedStateLabel
+                customActions = listOf(
+                    CustomAccessibilityAction(toggleExpandLabel) {
+                        if (expanded) {
+                            onContract(title)
+                        } else {
+                            onExpand(title)
+                        }
+                        true
+                    }
+                )
+            }
     ) {
         ExpandArrow(
             degrees = angle,
@@ -164,11 +190,15 @@ private fun ExpandableTag(
                 .padding(end = 2.dp)
                 .weight(1.0f, fill = true)
         )
+        val unreadLabel = stringResource(R.string.n_unread_articles, unreadCount)
         Text(
             text = unreadCount.toString(),
             maxLines = 1,
             modifier = Modifier
                 .padding(start = 2.dp)
+                .semantics {
+                    contentDescription = unreadLabel
+                }
         )
     }
 }
@@ -179,7 +209,8 @@ private fun ExpandArrow(
     onClick: () -> Unit
 ) {
     IconButton(
-        onClick = onClick
+        onClick = onClick,
+        modifier = Modifier.clearAndSetSemantics {  }
     ) {
         Icon(
             Icons.Filled.ExpandLess,
@@ -252,9 +283,13 @@ private fun Feed(
             modifier = Modifier
                 .weight(1.0f, fill = true)
         )
+        val unreadLabel = stringResource(R.string.n_unread_articles, unreadCount)
         Text(
             text = unreadCount.toString(),
-            maxLines = 1
+            maxLines = 1,
+            modifier = Modifier.semantics {
+                contentDescription = unreadLabel
+            }
         )
     }
 }

@@ -51,8 +51,7 @@
     <string name="check_for_updates">Mettre à jour les flux</string>
     <string name="include_mobile_hotspots">Inclure les points d\'accès mobiles</string>
     <string name="updated_feeds">Flux mis à jour</string>
-    <string name="selected">Sélectionné</string>
-    <string name="preload_custom_tab">Précharger l\'onglet personnalisé</string>
+  <string name="preload_custom_tab">Précharger l\'onglet personnalisé</string>
     <string name="battery_optimization_enabled">Optimisation de la batterie activée</string>
     <string name="battery_optimization_disabled">Optimisation de la batterie désactivée</string>
     <string name="battery_optimization">Optimisation de la batterie</string>

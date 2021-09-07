@@ -7,10 +7,10 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -25,11 +25,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Article
-import androidx.compose.material.icons.filled.MarkAsUnread
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -46,6 +43,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -71,10 +73,10 @@ import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import com.nononsenseapps.feeder.util.unicodeWrap
+import java.util.*
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
-import java.util.*
 
 private val dateTimeFormat =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
@@ -307,7 +309,7 @@ fun ReaderScreen(
                     IconButton(onClick = onOpenInCustomTab) {
                         Icon(
                             Icons.Default.OpenInBrowser,
-                            contentDescription = stringResource(id = R.string.open_in_custom_tab)
+                            contentDescription = stringResource(id = R.string.open_in_web_view)
                         )
                     }
 
@@ -318,7 +320,6 @@ fun ReaderScreen(
                                 contentDescription = stringResource(id = R.string.open_menu),
                             )
                         }
-                        // TODO make it wider as necessary
                         DropdownMenu(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false }
@@ -329,11 +330,6 @@ fun ReaderScreen(
                                     onShare()
                                 }
                             ) {
-                                Icon(
-                                    Icons.Default.Share,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.share))
                             }
 
@@ -343,11 +339,6 @@ fun ReaderScreen(
                                     onMarkAsUnread()
                                 }
                             ) {
-                                Icon(
-                                    Icons.Default.MarkAsUnread,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.mark_as_unread))
                             }
                             DropdownMenuItem(
@@ -356,11 +347,6 @@ fun ReaderScreen(
                                     onReadAloudStart()
                                 }
                             ) {
-                                Icon(
-                                    Icons.Default.PlayArrow,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.read_article))
                             }
                         }
@@ -423,39 +409,63 @@ private fun ReaderView(
                 .padding(horizontal = keyline1Padding)
         ) {
             item {
-                Text(
-                    text = articleTitle,
-                    style = MaterialTheme.typography.h1
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = feedTitle,
-                    style = MaterialTheme.typography.subtitle1.merge(LinkTextStyle()),
-                    modifier = Modifier
-                        .clickable {
-                            onFeedTitleClick()
-                        }
-                )
-                if (authorDate != null) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                        Text(
-                            text = authorDate,
-                            style = MaterialTheme.typography.subtitle1
+                val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
+                Column(
+                    modifier = Modifier.semantics(mergeDescendants = true) {
+                        customActions = listOf(
+                            CustomAccessibilityAction(goToFeedLabel) {
+                                onFeedTitleClick()
+                                true
+                            }
                         )
                     }
+                ) {
+                    Text(
+                        text = articleTitle,
+                        style = MaterialTheme.typography.h1
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = feedTitle,
+                        style = MaterialTheme.typography.subtitle1.merge(LinkTextStyle()),
+                        modifier = Modifier
+                            .clearAndSetSemantics {
+                                contentDescription = feedTitle
+                            }
+                            .clickable {
+                                onFeedTitleClick()
+                            }
+                    )
+                    if (authorDate != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                            Text(
+                                text = authorDate,
+                                style = MaterialTheme.typography.subtitle1
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                Spacer(modifier = Modifier.height(16.dp))
             }
 
             if (enclosureName != null && enclosureLink != null) {
                 item {
+                    val openLabel = stringResource(R.string.open_enclosed_media_file, enclosureName)
                     Text(
                         text = enclosureName,
                         style = MaterialTheme.typography.body1.merge(LinkTextStyle()),
                         modifier = Modifier
                             .clickable {
                                 onEnclosureClick()
+                            }
+                            .clearAndSetSemantics {
+                                customActions = listOf(
+                                    CustomAccessibilityAction(openLabel) {
+                                        onEnclosureClick()
+                                        true
+                                    }
+                                )
                             }
                     )
                     Spacer(modifier = Modifier.height(16.dp))

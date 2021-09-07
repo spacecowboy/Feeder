@@ -47,6 +47,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -441,7 +447,10 @@ fun ExternalSetting(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .semantics {
+                role = Role.Button
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -476,7 +485,10 @@ fun <T> MenuSetting(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = !expanded },
+            .clickable { expanded = !expanded }
+            .semantics {
+                role = Role.Button
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -536,11 +548,20 @@ fun RadioButtonSetting(
     minHeight: Dp = 64.dp,
     onClick: () -> Unit
 ) {
+    val stateLabel = if (selected) {
+        stringResource(R.string.selected)
+    } else {
+        stringResource(R.string.not_selected)
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = minHeight)
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .semantics(mergeDescendants = true) {
+                role = Role.RadioButton
+                stateDescription = stateLabel
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
@@ -564,7 +585,8 @@ fun RadioButtonSetting(
 
         RadioButton(
             selected = selected,
-            onClick = onClick
+            onClick = onClick,
+            modifier = Modifier.clearAndSetSemantics { }
         )
     }
 }
@@ -576,11 +598,20 @@ fun SwitchSetting(
     icon: (@Composable () -> Unit)? = {},
     onCheckedChanged: (Boolean) -> Unit,
 ) {
+    val stateLabel = if (checked) {
+        stringResource(R.string.on)
+    } else {
+        stringResource(R.string.off)
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 64.dp)
-            .clickable { onCheckedChanged(!checked) },
+            .clickable { onCheckedChanged(!checked) }
+            .semantics(mergeDescendants = true) {
+                stateDescription = stateLabel
+                role = Role.Switch
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
@@ -604,7 +635,8 @@ fun SwitchSetting(
 
         Switch(
             checked = checked,
-            onCheckedChange = onCheckedChanged
+            onCheckedChange = onCheckedChanged,
+            modifier = Modifier.clearAndSetSemantics { }
         )
     }
 }

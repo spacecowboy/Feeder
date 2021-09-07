@@ -63,8 +63,7 @@
     <string name="show_fab">Kelluva toimintopainike</string>
     <string name="include_mobile_hotspots">Sisällytä mobiili hotspotit</string>
     <string name="updated_feeds">Päivitetyt syötteet</string>
-    <string name="selected">Valitut</string>
-    <string name="notification_channel_name">Lukemattomat syötteet</string>
+  <string name="notification_channel_name">Lukemattomat syötteet</string>
     <string name="notification_channel_description">Ilmoitukset näytetään vain määritellyissä syötteissä oleville lukemattomille kohteille</string>
     <string name="open_in_reader">Lukija</string>
     <string name="open_in_webview">Web-näkymä</string>

@@ -24,8 +24,7 @@
     <string name="navigation_drawer_close">നാവിഗേഷൻ ഡ്രോയർ അടയ്‌ക്കൂ</string>
     <string name="navigation_drawer_open">നാവിഗേഷൻ ഡ്രോയർ തുറക്കൂ</string>
     <string name="open_feed">ഫീഡ് തുറക്കൂ</string>
-    <string name="selected">തിരഞ്ഞെടുത്തു</string>
-    <string name="show_thumbnails">ലഖുചിത്രങ്ങൾ കാണിക്കൂ</string>
+  <string name="show_thumbnails">ലഖുചിത്രങ്ങൾ കാണിക്കൂ</string>
     <string name="only_on_wifi">WiFi-ൽ മാത്രം</string>
     <string name="all_feeds">എല്ലാ ഫീഡുകളും</string>
     <string name="title_activity_settings">ക്രമീകരണങ്ങൾ</string>

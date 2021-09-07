@@ -34,8 +34,7 @@
     <string name="open_in_reader">Lector</string>
     <string name="notification_channel_description">Les notificacions només es mostren per elements no llegits en els canals configurats</string>
     <string name="notification_channel_name">Canals no llegits</string>
-    <string name="selected">Seleccionat</string>
-    <string name="updated_feeds">Canals actualitzats</string>
+  <string name="updated_feeds">Canals actualitzats</string>
     <string name="include_mobile_hotspots">Inclou els punts d\'accés mòbils</string>
     <string name="show_fab">Mostra el botó flotant d\'acció</string>
     <string name="on_startup">En iniciar</string>

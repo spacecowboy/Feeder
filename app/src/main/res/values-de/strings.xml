@@ -63,8 +63,7 @@
     <string name="show_fab">„Alle gelesen“-Schaltfläche</string>
     <string name="include_mobile_hotspots">Mobile Hotspots verwenden</string>
     <string name="updated_feeds">Feeds aktualisiert</string>
-    <string name="selected">Ausgewählt</string>
-    <string name="notification_channel_name">Ungelesene Feeds</string>
+  <string name="notification_channel_name">Ungelesene Feeds</string>
     <string name="notification_channel_description">Benachrichtigungen werden nur für ungelesene Nachrichten in konfigurierten Feeds angezeigt</string>
     <string name="open_in_reader">Feedreader</string>
     <string name="open_in_webview">WebView</string>

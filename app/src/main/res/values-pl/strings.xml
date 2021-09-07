@@ -63,8 +63,7 @@
     <string name="show_fab">Pokazuj pływający przycisk akcji</string>
     <string name="include_mobile_hotspots">Uwzględnij mobilne punkty dostępu</string>
     <string name="updated_feeds">Zaktualizowane kanały</string>
-    <string name="selected">Wybrane</string>
-    <string name="notification_channel_name">Nieprzeczytane kanały</string>
+  <string name="notification_channel_name">Nieprzeczytane kanały</string>
     <string name="notification_channel_description">Powiadomienia są wyświetlane tylko dla nieprzeczytanych artykułów w skonfigurowanych kanałach</string>
     <string name="open_in_reader">Czytnik</string>
     <string name="open_in_webview">WebView</string>

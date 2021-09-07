@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="toggle_tag_expansion">Perjungti žymos išplėtimą</string>
-    <string name="selected">Pasirinkta</string>
-    <string name="include_mobile_hotspots">Įtraukti mobiliuosius taškus</string>
+  <string name="include_mobile_hotspots">Įtraukti mobiliuosius taškus</string>
     <string name="show_fab">Rodyti paslankųjį veiksmo mygtuką</string>
     <string name="indicator_for_mark_as_read">Žymos \"perskaityta\" indikatorius</string>
     <string name="new_based_on_this">Nauja, pagrįsta tai</string>

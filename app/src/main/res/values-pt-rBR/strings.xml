@@ -60,8 +60,7 @@
     <string name="show_fab">Mostrar botão de ação flutuante</string>
     <string name="include_mobile_hotspots">Incluir os pontos de acesso móveis</string>
     <string name="updated_feeds">Os feeds estão atualizados</string>
-    <string name="selected">Selecionado</string>
-    <string name="notification_channel_name">Os feeds não lidos</string>
+  <string name="notification_channel_name">Os feeds não lidos</string>
     <string name="notification_channel_description">Notificações são exibidas apenas para itens não lidos em feeds configurados</string>
     <string name="open_in_reader">Leitor</string>
     <string name="open_in_webview">Vista Web</string>

@@ -61,8 +61,7 @@
     <string name="show_fab">Показывать плавающую кнопку действия</string>
     <string name="include_mobile_hotspots">Включая мобильные точки доступа</string>
     <string name="updated_feeds">Обновлённые ленты</string>
-    <string name="selected">Выбрано</string>
-    <string name="notification_channel_name">Непрочитанные ленты</string>
+  <string name="notification_channel_name">Непрочитанные ленты</string>
     <string name="notification_channel_description">Уведомления показаны только для непрочитанных элементов в настроенных лентах</string>
     <string name="open_in_default_browser">Браузер по умолчанию</string>
     <string name="open_item_by_default_with">По умолчанию открывать элементы с помощью</string>

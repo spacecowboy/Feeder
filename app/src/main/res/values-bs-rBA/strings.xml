@@ -63,8 +63,7 @@
     <string name="show_fab">Prikaži plutajuće dugme aktivnosti</string>
     <string name="include_mobile_hotspots">Uvrsti mobilne hotspotove</string>
     <string name="updated_feeds">Ažuriraj izvore (feedove)</string>
-    <string name="selected">Izabrano</string>
-    <string name="notification_channel_name">Nepročitani izvori (feedovi)</string>
+  <string name="notification_channel_name">Nepročitani izvori (feedovi)</string>
     <string name="notification_channel_description">Obaviještenja se prikazuju samo za nepročitane članke u postavljenim izvorima (feedovima)</string>
     <string name="open_in_reader">Čitač</string>
     <string name="open_in_webview">Web prikaz</string>

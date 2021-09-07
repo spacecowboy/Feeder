@@ -43,8 +43,7 @@
     <string name="open_in_reader">पढ़ने वाला</string>
     <string name="notification_channel_description">सिर्फ अनदेखी फीड की नोटिफिकेशन दिखाए</string>
     <string name="notification_channel_name">अनदेखी फीड</string>
-    <string name="selected">चुने हुए</string>
-    <string name="updated_feeds">फीड अपडेट करे</string>
+  <string name="updated_feeds">फीड अपडेट करे</string>
     <string name="include_mobile_hotspots">मोबाइल हॉटस्पॉट को भी देखे</string>
     <string name="show_fab">हवा में उड़ता बटन दिखाए</string>
     <string name="on_startup">अप्प खोलते वक्त</string>

@@ -19,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -82,13 +84,15 @@ fun EditFeedDialog2(
                                 onEdit(feed.id)
                                 onDismiss()
                             }
+                            .semantics(mergeDescendants = true) {}
                     ) {
                         RadioButton(
                             selected = false,
                             onClick = {
                                 onEdit(feed.id)
                                 onDismiss()
-                            }
+                            },
+                            modifier = Modifier.clearAndSetSemantics {  }
                         )
                         Spacer(modifier = Modifier.width(32.dp))
                         Text(

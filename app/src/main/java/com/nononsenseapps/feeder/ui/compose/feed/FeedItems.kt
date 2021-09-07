@@ -34,10 +34,10 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
+import java.util.*
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
-import java.util.*
 
 private val shortDateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())

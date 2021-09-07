@@ -61,8 +61,7 @@
     <string name="show_fab">Mostra pulsante di azione fluttuante</string>
     <string name="include_mobile_hotspots">Includi hotspot mobili</string>
     <string name="updated_feeds">Flussi aggiornati</string>
-    <string name="selected">Selezionato</string>
-    <string name="notification_channel_name">Flussi non letti</string>
+  <string name="notification_channel_name">Flussi non letti</string>
     <string name="notification_channel_description">Le notifiche sono visualizzate solo per elementi non letti nei flussi configurati</string>
     <string name="open_in_reader">Lettore</string>
     <string name="open_in_webview">Web View</string>

@@ -2,8 +2,7 @@
 <resources>
     <string name="open_in_reader">Legilo</string>
     <string name="notification_channel_name">Nelegitaj fluoj</string>
-    <string name="selected">Elektitaj</string>
-    <string name="updated_feeds">Laste ĝisdatigitaj</string>
+  <string name="updated_feeds">Laste ĝisdatigitaj</string>
     <string name="on_startup">Dum startigado</string>
     <string name="image_loading">Ŝargado de bildo</string>
     <string name="only_when_charging">Nur dum baterioŝargado</string>

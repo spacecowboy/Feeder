@@ -58,8 +58,7 @@
     <string name="show_fab">Zobrazit plovoucí tlačítko akcí</string>
     <string name="include_mobile_hotspots">Zahrnout mobilní hotspoty</string>
     <string name="updated_feeds">Aktualizované zdroje</string>
-    <string name="selected">Vybrané</string>
-    <string name="notification_channel_name">Nepřečtené zdroje</string>
+  <string name="notification_channel_name">Nepřečtené zdroje</string>
     <string name="notification_channel_description">Oznámení se zobrazí pouze u nepřečtených položek v nakonfigurovaných zdrojích</string>
     <string name="open_in_webview">WebView</string>
     <string name="open_in_default_browser">Výchozí prohlížeč</string>

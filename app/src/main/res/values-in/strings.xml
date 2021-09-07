@@ -63,8 +63,7 @@
     <string name="show_fab">Tampilkan tombol mengambang</string>
     <string name="include_mobile_hotspots">Sertakan juga hotspot ponsel</string>
     <string name="updated_feeds">Feed diperbarui</string>
-    <string name="selected">Dipilih</string>
-    <string name="notification_channel_name">Feed belum dibaca</string>
+  <string name="notification_channel_name">Feed belum dibaca</string>
     <string name="notification_channel_description">Notifikasi hanya ditampilkan untuk item yang belum dibaca</string>
     <string name="open_in_reader">Pembaca</string>
     <string name="open_in_webview">Web view</string>

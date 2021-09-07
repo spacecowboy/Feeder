@@ -32,8 +32,7 @@
     <string name="open_in_default_browser">Forvalgt nettleser</string>
     <string name="open_in_webview">Nettvisning</string>
     <string name="notification_channel_name">Uleste informasjonskanaler</string>
-    <string name="selected">Valgt</string>
-    <string name="on_startup">Ved oppstart</string>
+  <string name="on_startup">Ved oppstart</string>
     <string name="no_activity_for_link">Fant ikke noe program å åpne lenken med</string>
     <string name="image_loading">Bildeinnlasting</string>
     <string name="only_when_charging">Kun under lading</string>

@@ -39,8 +39,7 @@
     <string name="open_in_reader">Читач</string>
     <string name="notification_channel_description">Обавести се приказују само за непрочитане ставке у подешеним изворима</string>
     <string name="notification_channel_name">Непрочитани извори</string>
-    <string name="selected">Изабрано</string>
-    <string name="updated_feeds">Обновљени извори</string>
+  <string name="updated_feeds">Обновљени извори</string>
     <string name="include_mobile_hotspots">Уврстити преносна приступна места</string>
     <string name="show_fab">Приказ плутајућег акцијског дугмета</string>
     <string name="on_startup">При покретању</string>

@@ -88,8 +88,7 @@
     <string name="max_feed_items">フィードごとの最大アイテム数</string>
     <string name="notification_channel_description">通知は、構成されたフィードの未読アイテムに対してのみ表示されます</string>
     <string name="notification_channel_name">未読フィード</string>
-    <string name="selected">選択済み</string>
-    <string name="updated_feeds">更新されたフィード</string>
+  <string name="updated_feeds">更新されたフィード</string>
     <string name="may_result_data_charges">モバイルデータ通信の料金がかかる場合があります。</string>
     <string name="open_link_in_web_view">Web viewでリンクを開く</string>
     <string name="reader_settings">リーダー</string>

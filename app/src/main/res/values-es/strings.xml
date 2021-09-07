@@ -63,8 +63,7 @@
     <string name="show_fab">Mostrar botón flotante</string>
     <string name="include_mobile_hotspots">Incluir puntos de acceso móviles</string>
     <string name="updated_feeds">Canales actualizados</string>
-    <string name="selected">Seleccionado</string>
-    <string name="notification_channel_name">Entradas no leídas</string>
+  <string name="notification_channel_name">Entradas no leídas</string>
     <string name="notification_channel_description">Notificaciones solo se muestran para elementos no leídos canales configurados</string>
     <string name="open_in_reader">Lector</string>
     <string name="open_in_webview">Vista Web</string>

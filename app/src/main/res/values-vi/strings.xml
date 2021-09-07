@@ -41,8 +41,7 @@
     <string name="open_in_reader">Trình đọc</string>
     <string name="notification_channel_description">Thông báo chỉ được hiện cho các mục chưa đọc trong các feed được thiết lập</string>
     <string name="notification_channel_name">Feed chưa đọc</string>
-    <string name="selected">Đã chọn</string>
-    <string name="updated_feeds">Feed đã cập nhật</string>
+  <string name="updated_feeds">Feed đã cập nhật</string>
     <string name="include_mobile_hotspots">Bao gồm các điểm phát sóng di động</string>
     <string name="show_fab">Hiện nút hành động nổi (ở góc phải dưới)</string>
     <string name="on_startup">Khi khởi động</string>

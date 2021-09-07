@@ -63,8 +63,7 @@
     <string name="show_fab">Kayan işlem düğmesini göster</string>
     <string name="include_mobile_hotspots">Mobil etkin noktaları dahil et</string>
     <string name="updated_feeds">Güncellenen beslemeler</string>
-    <string name="selected">Seçildi</string>
-    <string name="notification_channel_name">Okunmamış yayınlar</string>
+  <string name="notification_channel_name">Okunmamış yayınlar</string>
     <string name="notification_channel_description">Bildirimler yalnızca yapılandırılan yayınlardaki okunmamış ögeler için gösterilir</string>
     <string name="open_in_reader">Okuyucu içinde</string>
     <string name="open_in_webview">Web görünümünde</string>
