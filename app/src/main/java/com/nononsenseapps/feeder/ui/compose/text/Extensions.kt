@@ -24,7 +24,6 @@ fun resources(): Resources {
 @Composable
 fun annotatedStringResource(@StringRes id: Int): AnnotatedString {
     val resources = resources()
-    // TODO update all strings with HTML in them
     val text = resources.getText(id) as SpannedString
 
     return buildAnnotatedString {

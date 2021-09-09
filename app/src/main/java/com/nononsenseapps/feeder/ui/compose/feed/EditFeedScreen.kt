@@ -1,12 +1,12 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
+import android.os.Parcelable
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -29,6 +29,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -46,7 +47,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
@@ -64,8 +64,9 @@ import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
 import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
-import kotlinx.coroutines.launch
 import java.net.URL
+import kotlinx.android.parcel.Parcelize
+import kotlinx.coroutines.launch
 
 @Composable
 fun CreateFeedScreen(
@@ -179,8 +180,7 @@ fun EditFeedView(
     onCancel: () -> Unit,
     modifier: Modifier
 ) {
-    // TODO rememberSaveable
-    var editableFeed by remember {
+    var editableFeed by rememberSaveable {
         mutableStateOf(initialState)
     }
 
@@ -195,7 +195,7 @@ fun EditFeedView(
     val (focusTitle, focusTag) = createRefs()
     val focusManager = LocalFocusManager.current
 
-    var tagHasFocus by remember { mutableStateOf(false) }
+    var tagHasFocus by rememberSaveable { mutableStateOf(false) }
 
     OkCancelWithContent(
         onOk = {
@@ -400,6 +400,7 @@ fun EditFeedView(
 }
 
 @Immutable
+@Parcelize
 data class EditableFeed(
     val url: String,
     val title: String,
@@ -408,7 +409,7 @@ data class EditableFeed(
     val fullTextByDefault: Boolean = false,
     val notify: Boolean = false,
     val openArticlesWith: String = "",
-) {
+): Parcelable {
     val isOpenItemWithBrowser: Boolean
         get() = openArticlesWith == PREF_VAL_OPEN_WITH_BROWSER
 

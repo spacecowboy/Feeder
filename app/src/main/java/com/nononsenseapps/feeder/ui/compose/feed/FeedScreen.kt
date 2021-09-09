@@ -49,17 +49,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.ImageLoader
 import com.google.accompanist.coil.rememberCoilPainter
@@ -188,7 +187,7 @@ fun FeedScreen(
     val imageLoader: ImageLoader by instance()
 
     @DrawableRes
-    val placeHolder: Int = getImagePlaceholder(settingsViewModel)
+    val placeHolder: Int by getImagePlaceholder(settingsViewModel)
 
     FeedScreen(
         screenTitle = screenTitle ?: stringResource(id = R.string.all_feeds),
@@ -221,8 +220,6 @@ fun FeedScreen(
         },
         onDrawerItemSelected = { id, tag ->
             onOpenFeedOrTag(FeedOrTag(id, tag))
-//             TODO set this elsewhere
-//            settingsViewModel.setCurrentFeedAndTag(feedId = id, tag = tag)
         },
         onAddFeed = onAddFeed,
         onEditFeed = onFeedEdit,
@@ -328,33 +325,6 @@ fun FeedScreen(
                         }
                     )
                 }
-
-                when {
-                    pagedFeedItems.loadState.prepend is LoadState.Loading -> {
-                    }
-                    pagedFeedItems.loadState.refresh is LoadState.Loading -> {
-                    }
-                    pagedFeedItems.loadState.append is LoadState.Loading -> {
-                    }
-                    pagedFeedItems.loadState.prepend is LoadState.Error -> {
-                        // TODO likely not even shown due to visibility
-                        item {
-                            Text("pager Prepend Error! TODO")
-                        }
-                    }
-                    pagedFeedItems.loadState.refresh is LoadState.Error -> {
-                        // TODO likely not even shown due to visibility
-                        item {
-                            Text("pager Refresh Error! TODO")
-                        }
-                    }
-                    pagedFeedItems.loadState.append is LoadState.Error -> {
-                        // TODO likely not even shown due to visibility
-                        item {
-                            Text("pager Append Error! TODO")
-                        }
-                    }
-                }
             }
         }
     }
@@ -388,13 +358,13 @@ fun FeedScreen(
     val scaffoldState = rememberScaffoldState(
         rememberDrawerState(initialValue = DrawerValue.Closed)
     )
-    var showMenu by remember {
+    var showMenu by rememberSaveable {
         mutableStateOf(false)
     }
-    var showDeleteDialog by remember {
+    var showDeleteDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var showEditDialog by remember {
+    var showEditDialog by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -468,7 +438,6 @@ fun FeedScreen(
                                 contentDescription = stringResource(R.string.open_menu),
                             )
                         }
-                        // TODO make it wider as necessary
                         DropdownMenu(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false }

@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
+import android.os.Parcelable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
@@ -27,8 +28,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -51,6 +55,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import java.net.MalformedURLException
 import java.net.URL
+import kotlinx.android.parcel.Parcelize
 
 @Composable
 fun SearchFeedScreen(
@@ -81,9 +86,6 @@ fun SearchFeedScreen(
                         )
                     }
                 },
-                actions = {
-                    // todo
-                }
             )
         }
     ) { padding ->
@@ -114,11 +116,11 @@ fun SearchFeedView(
         mutableStateOf(false)
     }
 
-    // TODO remember saveable?
+    // TODO rememberSaveable
     val results = remember {
         mutableStateListOf<SearchResult>()
     }
-    // TODO remember saveable?
+    // TODO rememberSaveable
     val errors = remember {
         mutableStateListOf<SearchResult>()
     }
@@ -303,9 +305,10 @@ private fun isValidUrl(url: String): Boolean {
 private fun isNotValidUrl(url: String) = !isValidUrl(url)
 
 @Immutable
+@Parcelize
 data class SearchResult(
     val title: String,
     val url: String,
     val description: String,
     val isError: Boolean
-)
+): Parcelable

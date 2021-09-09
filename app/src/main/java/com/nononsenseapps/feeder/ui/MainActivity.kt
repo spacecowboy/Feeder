@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
@@ -163,30 +164,32 @@ class MainActivity : DIAwareComponentActivity() {
                     }
                 )
             ) { backStackEntry ->
-                val feedOrTag: FeedOrTag = remember(
+                val feedOrTag: FeedOrTag by remember(
                     key1 = backStackEntry.arguments?.getLong("id"),
                     key2 = backStackEntry.arguments?.getString("tag")
                 ) {
-                    val feedId = (backStackEntry.arguments?.getLong("id")
-                        ?: ID_UNSET).let { feedId ->
-                        if (feedId == ID_UNSET) {
-                            settingsViewModel.currentFeedAndTag.value.first
-                        } else {
-                            feedId
-                        }
-                    }
-
-                    val tag =
-                        (backStackEntry.arguments?.getString("tag") ?: "").let { tag ->
-                            if (tag.isEmpty()) {
-                                settingsViewModel.currentFeedAndTag.value.second
+                    derivedStateOf {
+                        val feedId = (backStackEntry.arguments?.getLong("id")
+                            ?: ID_UNSET).let { feedId ->
+                            if (feedId == ID_UNSET) {
+                                settingsViewModel.currentFeedAndTag.value.first
                             } else {
-                                tag
+                                feedId
                             }
                         }
 
-                    settingsViewModel.setCurrentFeedAndTag(feedId, tag)
-                    FeedOrTag(feedId, tag)
+                        val tag =
+                            (backStackEntry.arguments?.getString("tag") ?: "").let { tag ->
+                                if (tag.isEmpty()) {
+                                    settingsViewModel.currentFeedAndTag.value.second
+                                } else {
+                                    tag
+                                }
+                            }
+
+                        settingsViewModel.setCurrentFeedAndTag(feedId, tag)
+                        FeedOrTag(feedId, tag)
+                    }
                 }
 
 
@@ -282,6 +285,7 @@ class MainActivity : DIAwareComponentActivity() {
                 arguments = listOf(
                     navArgument("feedUrl") {
                         type = NavType.StringType
+                        defaultValue = null
                         nullable = true
                     }
                 )

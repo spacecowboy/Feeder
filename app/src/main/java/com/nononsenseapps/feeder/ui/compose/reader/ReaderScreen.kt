@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
@@ -136,7 +137,7 @@ fun ReaderScreen(
     }
 
     @DrawableRes
-    val placeHolder: Int = getImagePlaceholder(settingsViewModel)
+    val placeHolder: Int by getImagePlaceholder(settingsViewModel)
 
     val toolbarColor = MaterialTheme.colors.primarySurface.toArgb()
 
@@ -270,7 +271,7 @@ fun ReaderScreen(
     onFeedTitleClick: () -> Unit,
     articleBody: LazyListScope.() -> Unit
 ) {
-    var showMenu by remember {
+    var showMenu by rememberSaveable {
         mutableStateOf(false)
     }
 

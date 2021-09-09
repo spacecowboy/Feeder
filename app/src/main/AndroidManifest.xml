@@ -50,6 +50,7 @@
 
     <activity
       android:name=".ui.ManageSettingsActivity"
+      android:exported="true"
       android:parentActivityName=".ui.MainActivity">
       <intent-filter>
         <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
@@ -59,6 +60,7 @@
 
     <activity
       android:name=".ui.AddFeedFromShareActivity"
+      android:exported="true"
       android:parentActivityName=".ui.MainActivity">
       <!-- URLs with feed mimetype can be opened -->
       <intent-filter>
@@ -129,7 +131,6 @@
       </intent-filter>
     </activity>
 
-    <!-- TODO update below -->
     <!-- Receiver for notification cancellations and such -->
     <receiver android:name=".model.RssNotificationBroadcastReceiver" />
 

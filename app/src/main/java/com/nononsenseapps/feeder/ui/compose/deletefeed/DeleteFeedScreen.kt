@@ -1,9 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.deletefeed
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,10 +21,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextAlign
@@ -41,7 +37,7 @@ fun DeleteFeedDialog(
     onDismiss: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit
 ) {
-    // TODO use remembersaveable
+    // TODO rememberSaveable
     val feedsToDelete = remember {
         feeds.map { feed -> feed.id to false }.toMutableStateMap()
     }

@@ -85,7 +85,6 @@ private fun LazyListScope.formatBody(
                     .merge(TextStyle(color = MaterialTheme.colors.onBackground)),
                 modifier = Modifier.fillMaxWidth()
             ) { offset ->
-                // TODO("on click with offset / index position")
                 paragraph.getStringAnnotations("URL", offset, offset)
                     .firstOrNull()
                     ?.let {
@@ -391,8 +390,7 @@ private fun TextComposer.appendTextChildren(
                             appendImage(onLinkClick = onLinkClick) { onClick ->
                                 lazyListScope.item {
                                     val imageLoader: ImageLoader by instance()
-                                    // TODO rememberSaveable to retain this when scrolled off screen
-                                    val scale = remember { mutableStateOf(1f) }
+//                                    val scale = remember { mutableStateOf(1f) }
                                     DisableSelection {
                                         Box(
                                             modifier = Modifier
@@ -429,10 +427,10 @@ private fun TextComposer.appendTextChildren(
                                                 contentScale = ContentScale.FillWidth,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .graphicsLayer {
-                                                        scaleX = scale.value
-                                                        scaleY = scale.value
-                                                    }
+//                                                    .graphicsLayer {
+//                                                        scaleX = scale.value
+//                                                        scaleY = scale.value
+//                                                    }
 
                                             )
                                         }
@@ -528,7 +526,6 @@ private fun TextComposer.appendTextChildren(
                         }
                     }
                     "iframe" -> {
-                        // TODO actual video player
                         val video: Video? = getVideo(element.attr("abs:src"))
 
                         if (video != null) {
@@ -567,7 +564,7 @@ private fun TextComposer.appendTextChildren(
                         }
                     }
                     "video" -> {
-                        // TODO and remember to disable selection
+                        // not implemented yet. remember to disable selection
                     }
                     else -> {
                         appendTextChildren(
