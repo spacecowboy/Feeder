@@ -24,15 +24,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -50,12 +45,12 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.launch
 import java.net.MalformedURLException
 import java.net.URL
 import kotlinx.android.parcel.Parcelize
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.launch
 
 @Composable
 fun SearchFeedScreen(
@@ -116,13 +111,11 @@ fun SearchFeedView(
         mutableStateOf(false)
     }
 
-    // TODO rememberSaveable
-    val results = remember {
-        mutableStateListOf<SearchResult>()
+    var results by rememberSaveable {
+        mutableStateOf(listOf<SearchResult>())
     }
-    // TODO rememberSaveable
-    val errors = remember {
-        mutableStateListOf<SearchResult>()
+    var errors by rememberSaveable {
+        mutableStateOf(listOf<SearchResult>())
     }
 
     SearchFeedView(
@@ -131,8 +124,8 @@ fun SearchFeedView(
             feedUrl = it
         },
         onSearch = { url ->
-            results.clear()
-            errors.clear()
+            results = emptyList()
+            errors = emptyList()
             currentlySearching = true
             coroutineScope.launch {
                 searchFeedViewModel.searchForFeeds(url)
@@ -141,9 +134,9 @@ fun SearchFeedView(
                     }
                     .collect {
                         if (it.isError) {
-                            errors.add(it)
+                            errors = errors + it
                         } else {
-                            results.add(it)
+                            results = results + it
                         }
                     }
             }
@@ -311,4 +304,4 @@ data class SearchResult(
     val url: String,
     val description: String,
     val isError: Boolean
-): Parcelable
+) : Parcelable

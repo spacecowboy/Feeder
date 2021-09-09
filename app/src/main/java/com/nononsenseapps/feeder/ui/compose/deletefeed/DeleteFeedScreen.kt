@@ -17,8 +17,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.toMutableStateMap
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,9 +39,8 @@ fun DeleteFeedDialog(
     onDismiss: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit
 ) {
-    // TODO rememberSaveable
-    val feedsToDelete = remember {
-        feeds.map { feed -> feed.id to false }.toMutableStateMap()
+    var feedsToDelete by rememberSaveable {
+        mutableStateOf(emptyMap<Long, Boolean>())
     }
 
     DeleteFeedDialog(
@@ -53,7 +54,7 @@ fun DeleteFeedDialog(
             onDismiss()
         },
         onToggleFeed = { feedId, checked ->
-            feedsToDelete[feedId] = checked ?: !feedsToDelete.contains(feedId)
+            feedsToDelete = feedsToDelete + (feedId to (checked ?: !feedsToDelete.contains(feedId)))
         }
     )
 }
