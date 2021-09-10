@@ -122,11 +122,16 @@
   <string name="go_back">Go back</string>
   <string name="open_menu">Open menu</string>
   <string name="go_to_feed">Go to %1$s</string>
-  <string name="n_unread_articles">%1$s unread articles</string>
   <string name="unread">Unread</string>
   <string name="already_read">Already read</string>
   <string name="showing_only_unread_articles">Showing only unread articles</string>
   <string name="showing_all_articles">Showing all articles</string>
   <string name="synchronize_feeds">Synchronize feeds</string>
 
+  <string name="zero_unread_articles">%1$s unread articles</string>
+  <string name="one_unread_article">%1$s unread article</string>
+  <string name="two_unread_articles">%1$s unread articles</string>
+  <string name="few_unread_articles">%1$s unread articles</string>
+  <string name="many_unread_articles">%1$s unread articles</string>
+  <string name="other_unread_articles">%1$s unread articles</string>
 </resources>

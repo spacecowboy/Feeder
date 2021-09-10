@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <plurals name="n_unread_articles">
+    <item quantity="zero">@string/zero_unread_articles</item>
+    <item quantity="one">@string/one_unread_article</item>
+    <item quantity="two">@string/two_unread_articles</item>
+    <item quantity="few">@string/few_unread_articles</item>
+    <item quantity="many">@string/many_unread_articles</item>
+    <item quantity="other">@string/other_unread_articles</item>
+  </plurals>
+</resources>

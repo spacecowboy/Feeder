@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -69,7 +70,7 @@ private fun ListOfFeedsAndTagsPreview() {
 @Composable
 fun ListOfFeedsAndTags(
     feedsAndTags: List<DrawerItemWithUnreadCount>,
-    onItemClick: (DrawerItemWithUnreadCount) -> Unit
+    onItemClick: (DrawerItemWithUnreadCount) -> Unit,
 ) {
     var expandedTags by rememberSaveable {
         mutableStateOf<Set<String>>(emptySet())
@@ -191,7 +192,8 @@ private fun ExpandableTag(
                 .padding(end = 2.dp)
                 .weight(1.0f, fill = true)
         )
-        val unreadLabel = stringResource(R.string.n_unread_articles, unreadCount)
+        val unreadLabel = LocalContext.current.resources
+            .getQuantityString(R.plurals.n_unread_articles, unreadCount, unreadCount)
         Text(
             text = unreadCount.toString(),
             maxLines = 1,
@@ -207,11 +209,11 @@ private fun ExpandableTag(
 @Composable
 private fun ExpandArrow(
     degrees: Float,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     IconButton(
         onClick = onClick,
-        modifier = Modifier.clearAndSetSemantics {  }
+        modifier = Modifier.clearAndSetSemantics { }
     ) {
         Icon(
             Icons.Filled.ExpandLess,
@@ -226,7 +228,7 @@ private fun ExpandArrow(
 private fun TopLevelFeed(
     title: String = "Foo",
     unreadCount: Int = 99,
-    onItemClick: () -> Unit = {}
+    onItemClick: () -> Unit = {},
 ) = Feed(
     title = title,
     unreadCount = unreadCount,
@@ -241,7 +243,7 @@ private fun ChildFeed(
     title: String = "Foo",
     unreadCount: Int = 99,
     visible: Boolean = true,
-    onItemClick: () -> Unit = {}
+    onItemClick: () -> Unit = {},
 ) {
     AnimatedVisibility(
         visible = visible,
@@ -262,7 +264,7 @@ private fun Feed(
     title: String,
     unreadCount: Int,
     startPadding: Dp,
-    onItemClick: () -> Unit
+    onItemClick: () -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -284,7 +286,8 @@ private fun Feed(
             modifier = Modifier
                 .weight(1.0f, fill = true)
         )
-        val unreadLabel = stringResource(R.string.n_unread_articles, unreadCount)
+        val unreadLabel = LocalContext.current.resources
+            .getQuantityString(R.plurals.n_unread_articles, unreadCount, unreadCount)
         Text(
             text = unreadCount.toString(),
             maxLines = 1,
