@@ -12,11 +12,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
-class AsyncImageLoader(override val kodein: Kodein) : KodeinAware {
+class AsyncImageLoader(override val di: DI) : DIAware {
     private val coroutineScope: CoroutineScope by instance()
     private val imageLoader: ImageLoader by instance()
     private val context: Context by instance()

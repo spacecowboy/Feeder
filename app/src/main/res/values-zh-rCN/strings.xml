@@ -13,8 +13,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">保存</string>
     <string name="empty_feed_top">没有可阅读的内容。您是否想要…</string>
-    <string name="empty_feed_open"><![CDATA[<font color="#607D8B">打开</font>另一个订阅？]]></string>
-    <string name="empty_feed_add"><![CDATA[<font color="#607D8B">添加</font>更多订阅？]]></string>
+    <string name="empty_feed_open"><annotation style="link">打开</annotation>另一个订阅？</string>
+    <string name="empty_feed_add"><annotation style="link">添加</annotation>更多订阅？</string>
     <string name="search_feed_empty_hint">输入一个订阅地址</string>
     <string name="mark_as_read">标记为已读</string>
     <string name="mark_as_unread">标记为未读</string>
@@ -63,8 +63,7 @@
     <string name="show_fab">显示浮动操作按钮</string>
     <string name="include_mobile_hotspots">包括移动热点</string>
     <string name="updated_feeds">更新订阅</string>
-    <string name="selected">已选</string>
-    <string name="notification_channel_name">未读订阅</string>
+  <string name="notification_channel_name">未读订阅</string>
     <string name="notification_channel_description">仅对已配置订阅中的未读内容显示通知</string>
     <string name="open_in_reader">阅读器</string>
     <string name="open_in_webview">网页视图</string>

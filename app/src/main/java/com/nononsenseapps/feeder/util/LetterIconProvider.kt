@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.text.TextPaint
+import kotlin.math.abs
 
 private val colors = arrayOf(
     0xffe57373, 0xfff06292, 0xffba68c8, 0xff9575cd,
@@ -42,7 +43,7 @@ fun getLetterIcon(text: String, key: Any, radius: Int = 128): Bitmap {
     firstChar[0] = if (text.isBlank()) {
         'F'
     } else {
-        text[0].toUpperCase()
+        text[0].uppercaseChar()
     }
 
     val fontSize = radius * 0.8f
@@ -61,6 +62,6 @@ fun getLetterIcon(text: String, key: Any, radius: Int = 128): Bitmap {
 }
 
 private fun pickColor(key: Any): Long {
-    val color = Math.abs(key.hashCode()) % NUM_OF_TILE_COLORS
+    val color = abs(key.hashCode()) % NUM_OF_TILE_COLORS
     return colors[color]
 }

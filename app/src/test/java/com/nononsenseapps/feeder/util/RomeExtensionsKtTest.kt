@@ -15,7 +15,6 @@ import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.feed.synd.SyndLink
 import com.rometools.rome.feed.synd.SyndPerson
-import kotlinx.coroutines.FlowPreview
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
@@ -28,7 +27,6 @@ import java.util.Date
 import java.util.Random
 import kotlin.test.assertEquals
 
-@FlowPreview
 class RomeExtensionsKtTest {
     @Test
     fun author() {

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="toggle_tag_expansion">Perjungti žymos išplėtimą</string>
-    <string name="selected">Pasirinkta</string>
-    <string name="include_mobile_hotspots">Įtraukti mobiliuosius taškus</string>
+  <string name="include_mobile_hotspots">Įtraukti mobiliuosius taškus</string>
     <string name="show_fab">Rodyti paslankųjį veiksmo mygtuką</string>
     <string name="indicator_for_mark_as_read">Žymos \"perskaityta\" indikatorius</string>
     <string name="new_based_on_this">Nauja, pagrįsta tai</string>
@@ -30,8 +29,8 @@
     <string name="notify_for_new_items">Pranešti apie naujus elementus</string>
     <string name="mark_all_as_read">Pažymėti visus kaip skaitytus</string>
     <string name="search_feed_empty_hint">Įveskite kanalo adresą</string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Pridėti&lt;/font&gt; daugiau kanalų\?</string>
-    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Atidaryti&lt;/font&gt; kitą kanalą\?</string>
+    <string name="empty_feed_add"><annotation style="link">Pridėti</annotation> daugiau kanalų\?</string>
+    <string name="empty_feed_open"><annotation style="link">Atidaryti</annotation> kitą kanalą\?</string>
     <string name="preload_custom_tab">Iš anksto įkelti pasirinktinį skirtuką</string>
     <string name="discovered_feeds_list">Atrastų kanalų sąrašas</string>
     <string name="open_links_with">Atidarykite nuorodas su</string>

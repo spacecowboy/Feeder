@@ -1,34 +1,45 @@
 package com.nononsenseapps.feeder.model
 
+import android.app.Application
 import androidx.collection.ArrayMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.nononsenseapps.feeder.base.KodeinAwareViewModel
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
+import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.util.removeDynamicShortcutToFeed
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
-import org.kodein.di.Kodein
-import org.kodein.di.generic.instance
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import org.kodein.di.DI
+import org.kodein.di.instance
+import java.util.*
 import kotlin.collections.set
 
-@ExperimentalCoroutinesApi
-class FeedListViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
+class FeedListViewModel(di: DI) : DIAwareViewModel(di) {
     private val dao: FeedDao by instance()
-    private val feedsWithUnreadCounts = dao.loadLiveFeedsWithUnreadCounts()
+    private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
+    private val feedsWithUnreadCounts = dao.loadFlowOfFeedsWithUnreadCounts()
 
     val liveFeedsAndTagsWithUnreadCounts: LiveData<List<FeedUnreadCount>> by lazy {
-        liveData<List<FeedUnreadCount>>(viewModelScope.coroutineContext + Dispatchers.Default, 5000L) {
+        liveData<List<FeedUnreadCount>>(
+            viewModelScope.coroutineContext + Dispatchers.Default,
+            5000L
+        ) {
             feedsWithUnreadCounts.collectLatest { feeds ->
                 val topTag = FeedUnreadCount(id = ID_ALL_FEEDS)
                 val tags: MutableMap<String, FeedUnreadCount> = ArrayMap()
-                val data: MutableList<FeedUnreadCount> = mutableListOf(topTag)
+                val data: SortedSet<FeedUnreadCount> = sortedSetOf(topTag)
 
                 feeds.forEach { feed ->
                     if (feed.tag.isNotEmpty()) {
-                        if (!tags.contains(feed.tag)) {
+                        if (feed.tag !in tags) {
                             val tag = FeedUnreadCount(tag = feed.tag)
                             data.add(tag)
                             tags[feed.tag] = tag
@@ -44,10 +55,30 @@ class FeedListViewModel(kodein: Kodein) : KodeinAwareViewModel(kodein) {
                     data.add(feed)
                 }
 
-                data.sortWith(Comparator { a, b -> a.compareTo(b) })
-
-                emit(data)
+//                data.sortedBy { it }
+                emit(data.toList())
             }
         }
+    }
+
+    fun deleteFeeds(ids: List<Long>) {
+        applicationCoroutineScope.launch {
+            dao.deleteFeeds(ids)
+
+            val application: Application by instance()
+            for (id in ids) {
+                application.removeDynamicShortcutToFeed(id)
+            }
+        }
+    }
+
+    fun getFeedTitles(feedId: Long, tag: String): Flow<List<FeedTitle>> = flow {
+        emit(
+            when {
+                feedId > ID_UNSET -> dao.getFeedTitle(feedId = feedId)
+                tag.isNotEmpty() -> dao.getFeedTitlesWithTag(feedTag = tag)
+                else -> dao.getAllFeedTitles()
+            }
+        )
     }
 }

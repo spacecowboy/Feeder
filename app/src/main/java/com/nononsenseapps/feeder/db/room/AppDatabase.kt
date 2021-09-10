@@ -15,8 +15,6 @@ import com.nononsenseapps.feeder.util.forEach
 import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
 const val DATABASE_NAME = "rssDatabase"
 const val ID_UNSET: Long = 0
@@ -29,16 +27,12 @@ const val ID_ALL_FEEDS: Long = -10
  * 6: Added feed icon field to feeds
  * 7: Migration to Room
  */
-
-@FlowPreview
 @Database(entities = [Feed::class, FeedItem::class], version = 14)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun feedDao(): FeedDao
     abstract fun feedItemDao(): FeedItemDao
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
     companion object {
         // For Singleton instantiation
         @Volatile
@@ -65,8 +59,6 @@ abstract class AppDatabase : RoomDatabase() {
     }
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 val allMigrations = arrayOf(
     MIGRATION_5_7,
     MIGRATION_6_7,
@@ -84,8 +76,6 @@ val allMigrations = arrayOf(
  * 7 represents new Room database
  */
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @Suppress("ClassName")
 object MIGRATION_13_14 : Migration(13, 14) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -97,8 +87,6 @@ object MIGRATION_13_14 : Migration(13, 14) {
     }
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @Suppress("ClassName")
 object MIGRATION_12_13 : Migration(12, 13) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -110,8 +98,6 @@ object MIGRATION_12_13 : Migration(12, 13) {
     }
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @Suppress("ClassName")
 object MIGRATION_11_12 : Migration(11, 12) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -123,8 +109,6 @@ object MIGRATION_11_12 : Migration(11, 12) {
     }
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @Suppress("ClassName")
 object MIGRATION_10_11 : Migration(10, 11) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -136,8 +120,6 @@ object MIGRATION_10_11 : Migration(10, 11) {
     }
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 @Suppress("ClassName")
 object MIGRATION_9_10 : Migration(9, 10) {
     override fun migrate(database: SupportSQLiteDatabase) {

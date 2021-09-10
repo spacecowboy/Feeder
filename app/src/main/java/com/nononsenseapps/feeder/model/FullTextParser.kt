@@ -11,28 +11,22 @@ import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.di.CURRENTLY_SYNCING_STATE
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.withContext
-import net.dankito.readability4j.Readability4J
-import okhttp3.OkHttpClient
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.closestKodein
-import org.kodein.di.generic.instance
 import java.io.File
 import java.net.URL
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import net.dankito.readability4j.extended.Readability4JExtended
+import okhttp3.OkHttpClient
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 
 const val ARG_FEED_ITEM_ID = "feed_item_id"
 const val ARG_FEED_ITEM_LINK = "feed_item_link"
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 fun scheduleFullTextParse(
-    kodein: Kodein,
+    di: DI,
     feedItem: FeedItemForFetching
 ) {
     val workRequest = OneTimeWorkRequestBuilder<FullTextWorker>()
@@ -43,18 +37,15 @@ fun scheduleFullTextParse(
     )
 
     workRequest.setInputData(data)
-    val workManager by kodein.instance<WorkManager>()
+    val workManager by di.instance<WorkManager>()
     workManager.enqueue(workRequest.build())
 }
 
-@FlowPreview
-@ExperimentalCoroutinesApi
 class FullTextWorker(
     val context: Context,
     workerParams: WorkerParameters
-) : CoroutineWorker(context, workerParams), KodeinAware {
-    override val kodein: Kodein by closestKodein(context)
-    private val currentlySyncing: ConflatedBroadcastChannel<Boolean> by instance(tag = CURRENTLY_SYNCING_STATE)
+) : CoroutineWorker(context, workerParams), DIAware {
+    override val di: DI by closestDI(context)
     private val okHttpClient: OkHttpClient by instance()
 
     override suspend fun doWork(): Result {
@@ -66,10 +57,6 @@ class FullTextWorker(
             val link: String? = inputData.getString(ARG_FEED_ITEM_LINK)
                 ?: throw RuntimeException("No link provided")
 
-            if (!currentlySyncing.isClosedForSend) {
-                currentlySyncing.offer(true)
-            }
-
             Log.i("FeederFullText", "Worker going to parse $feedItemId: $link")
 
             success = parseFullArticleIfMissing(
@@ -80,10 +67,6 @@ class FullTextWorker(
                 okHttpClient = okHttpClient,
                 filesDir = context.filesDir
             )
-
-            if (!currentlySyncing.isClosedForSend) {
-                currentlySyncing.offer(false)
-            }
         }
 
         return when (success) {
@@ -118,7 +101,7 @@ suspend fun parseFullArticle(
 
         // TODO verify encoding is respected in reader
         Log.i("FeederFullText", "Parsing article ${feedItem.link}")
-        val article = Readability4J(url, html).parse()
+        val article = Readability4JExtended(url, html).parse()
 
         // TODO set image on item if none already
         // naiveFindImageLink(article.content)?.let { Parser.unescapeEntities(it, true) }

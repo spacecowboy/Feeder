@@ -10,6 +10,7 @@ import okio.buffer
 import okio.source
 import java.io.File
 import java.io.IOException
+import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
 
 // 10 mins
@@ -133,8 +134,11 @@ class JsonFeedParser(
     /**
      * Parse a JSONFeed
      */
-    fun parseJsonBytes(json: ByteArray): Feed =
-        json.inputStream().use { return parseJsonStream(it.source().buffer()) }
+    fun parseJsonBytes(json: ByteArray, charset: Charset = Charset.forName("UTF-8")): Feed {
+
+
+        return json.inputStream().use { parseJsonStream(it.source().buffer()) }
+    }
 
     /**
      * Parse a JSONFeed

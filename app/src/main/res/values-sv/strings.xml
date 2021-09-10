@@ -13,8 +13,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Spara</string>
     <string name="empty_feed_top">Inget att läsa. Skulle du vilja…</string>
-    <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Öppna</font> annat flöde?]]></string>
-    <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Lägga till</font> nytt flöde?]]></string>
+    <string name="empty_feed_open"><annotation style="link">Öppna</annotation> annat flöde?</string>
+    <string name="empty_feed_add"><annotation style="link">Lägga till</annotation> nytt flöde?</string>
     <string name="search_feed_empty_hint">Skriv adress till flöde</string>
     <string name="mark_as_read">Markera som läst</string>
     <string name="mark_as_unread">Markera som oläst</string>
@@ -56,15 +56,14 @@
     <string name="show_thumbnails">Visa miniatyrbilder</string>
     <string name="may_result_data_charges">Kan resultera i datakostnader.</string>
     <string name="only_when_charging">Endast under laddning</string>
-    <string name="image_loading">Bild laddas</string>
+    <string name="image_loading">Bildvisning</string>
     <string name="no_activity_for_link">Kunde inte hitta en app att öppna länken med</string>
     <string name="check_for_updates">Kolla efter uppdateringar</string>
     <string name="on_startup">Vid uppstart</string>
     <string name="show_fab">Visa flytande åtgärdsknapp</string>
     <string name="include_mobile_hotspots">Inkludera hotspots</string>
     <string name="updated_feeds">Uppdaterade flöden</string>
-    <string name="selected">Markerat</string>
-    <string name="notification_channel_name">Olästa flöden</string>
+  <string name="notification_channel_name">Olästa flöden</string>
     <string name="notification_channel_description">Notifikationer visas endast för olästa flöden</string>
     <string name="open_in_reader">Läsare</string>
     <string name="open_in_webview">Webbvy</string>

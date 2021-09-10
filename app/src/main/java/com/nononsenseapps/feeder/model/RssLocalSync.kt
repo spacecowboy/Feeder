@@ -15,7 +15,6 @@ import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -24,13 +23,15 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Response
-import org.kodein.di.Kodein
-import org.kodein.di.android.closestKodein
-import org.kodein.di.generic.instance
+import okhttp3.internal.readBomAsCharset
+import org.kodein.di.DI
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 import java.io.File
 import java.io.IOException
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executors
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
@@ -38,7 +39,6 @@ import kotlin.system.measureTimeMillis
 val singleThreadedSync = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 val syncMutex = Mutex()
 
-@FlowPreview
 suspend fun syncFeeds(
     context: Context,
     feedId: Long = ID_UNSET,
@@ -47,13 +47,13 @@ suspend fun syncFeeds(
     parallel: Boolean = false,
     minFeedAgeMinutes: Int = 15
 ): Boolean {
-    val kodein: Kodein by closestKodein(context)
-    val prefs: Prefs by kodein.instance()
+    val di: DI by closestDI(context)
+    val prefs: Prefs by di.instance()
     Log.d("CoroutineSync", "${Thread.currentThread().name}: Taking sync mutex")
     return syncMutex.withLock {
         withContext(singleThreadedSync) {
             syncFeeds(
-                kodein,
+                di,
                 filesDir = context.filesDir,
                 feedId = feedId,
                 feedTag = feedTag,
@@ -66,9 +66,8 @@ suspend fun syncFeeds(
     }
 }
 
-@FlowPreview
 internal suspend fun syncFeeds(
-    kodein: Kodein,
+    di: DI,
     filesDir: File,
     feedId: Long = ID_UNSET,
     feedTag: String = "",
@@ -77,7 +76,7 @@ internal suspend fun syncFeeds(
     parallel: Boolean = false,
     minFeedAgeMinutes: Int = 15
 ): Boolean {
-    val db: AppDatabase by kodein.instance()
+    val db: AppDatabase by di.instance()
     var result = false
     // Let all new items share download time
     val downloadTime = Instant.now()
@@ -105,7 +104,7 @@ internal suspend fun syncFeeds(
                     launch(coroutineContext) {
                         try {
                             syncFeed(
-                                kodein = kodein,
+                                di = di,
                                 feedSql = it,
                                 filesDir = filesDir,
                                 maxFeedItemCount = maxFeedItemCount,
@@ -132,9 +131,8 @@ internal suspend fun syncFeeds(
     return result
 }
 
-@FlowPreview
 private suspend fun syncFeed(
-    kodein: Kodein,
+    di: DI,
     feedSql: com.nononsenseapps.feeder.db.room.Feed,
     filesDir: File,
     maxFeedItemCount: Int,
@@ -142,9 +140,9 @@ private suspend fun syncFeed(
     downloadTime: Instant
 ) {
     Log.d("CoroutineSync", "Fetching ${feedSql.displayTitle}")
-    val db: AppDatabase by kodein.instance()
-    val feedParser: FeedParser by kodein.instance()
-    val okHttpClient: OkHttpClient by kodein.instance()
+    val db: AppDatabase by di.instance()
+    val feedParser: FeedParser by di.instance()
+    val okHttpClient: OkHttpClient by di.instance()
 
     val response: Response = okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
 
@@ -152,6 +150,10 @@ private suspend fun syncFeed(
 
     val feed: Feed? =
         response.use {
+            val contentType = response.body?.contentType()
+            val charset = response.body?.source()?.readBomAsCharset(
+                contentType?.charset() ?: StandardCharsets.UTF_8
+            )
             val responseBody = it.safeBody()
             responseBody?.let { body ->
                 responseHash = body.contentHashCode()
@@ -160,7 +162,7 @@ private suspend fun syncFeed(
                         throw ResponseFailure("${response.code} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
                     }
                     feedSql.responseHash == responseHash -> null // no change
-                    else -> feedParser.parseFeedResponse(it, body)
+                    else -> feedParser.parseFeedResponse(response.request.url.toUrl(), contentType, charset, body)
                 }
             }
         }?.let {
@@ -200,7 +202,7 @@ private suspend fun syncFeed(
         itemDao.upsertFeedItems(feedItemSqls) { feedItem, text ->
             if (feedSql.fullTextByDefault) {
                 scheduleFullTextParse(
-                    kodein = kodein,
+                    di = di,
                     feedItem = feedItem
                 )
             }

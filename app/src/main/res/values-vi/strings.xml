@@ -41,8 +41,7 @@
     <string name="open_in_reader">Trình đọc</string>
     <string name="notification_channel_description">Thông báo chỉ được hiện cho các mục chưa đọc trong các feed được thiết lập</string>
     <string name="notification_channel_name">Feed chưa đọc</string>
-    <string name="selected">Đã chọn</string>
-    <string name="updated_feeds">Feed đã cập nhật</string>
+  <string name="updated_feeds">Feed đã cập nhật</string>
     <string name="include_mobile_hotspots">Bao gồm các điểm phát sóng di động</string>
     <string name="show_fab">Hiện nút hành động nổi (ở góc phải dưới)</string>
     <string name="on_startup">Khi khởi động</string>
@@ -93,8 +92,8 @@
     <string name="mark_as_unread">Đánh dấu chưa đọc</string>
     <string name="mark_as_read">Đánh dấu đã đọc</string>
     <string name="search_feed_empty_hint">Nhập địa chỉ của feed</string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Thêm&lt;/font&gt; feed khác\?</string>
-    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Mở&lt;/font&gt; một feed khác\?</string>
+    <string name="empty_feed_add"><annotation style="link">Thêm</annotation> feed khác\?</string>
+    <string name="empty_feed_open"><annotation style="link">Mở</annotation> một feed khác\?</string>
     <string name="empty_feed_top">Không có gì để đọc ở đây. Bạn có muốn…</string>
     <string name="save">Lưu</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>

@@ -1,10 +1,10 @@
 package com.nononsenseapps.feeder.base
 
 import android.app.IntentService
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.closestKodein
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.closestDI
 
-abstract class KodeinAwareIntentService(name: String) : IntentService(name), KodeinAware {
-    override val kodein: Kodein by closestKodein()
+abstract class DIAwareIntentService(name: String) : IntentService(name), DIAware {
+    override val di: DI by closestDI()
 }

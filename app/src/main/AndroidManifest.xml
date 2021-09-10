@@ -16,27 +16,31 @@
     android:label="@string/app_name"
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
-    android:theme="@style/AppThemeDay"
+    android:theme="@style/AppThemeDayNoActionBar"
     android:usesCleartextTraffic="true">
 
-    <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true" />
+    <meta-data
+      android:name="android.webkit.WebView.MetricsOptOut"
+      android:value="true" />
 
     <activity
-      android:name=".ui.FeedActivity"
+      android:name="com.nononsenseapps.feeder.ui.MainActivity"
+      android:exported="true"
       android:label="@string/app_name">
-
-      <nav-graph android:value="@navigation/nav_graph" />
-
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
-
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
 
       <intent-filter>
-        <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+        <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+          android:host="feederapp.nononsenseapps.com"
+          android:scheme="https" />
       </intent-filter>
 
       <meta-data
@@ -45,15 +49,19 @@
     </activity>
 
     <activity
-      android:name=".ui.EditFeedActivity"
-      android:label="@string/title_activity_edit_feed"
-      android:parentActivityName=".ui.FeedActivity"
-      android:theme="@style/EditFeedThemeDay"
-      android:windowSoftInputMode="adjustResize|stateVisible">
-      <meta-data
-        android:name="android.support.PARENT_ACTIVITY"
-        android:value="com.nononsenseapps.feeder.ui.FeedActivity" />
+      android:name=".ui.ManageSettingsActivity"
+      android:exported="true"
+      android:parentActivityName=".ui.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+    </activity>
 
+    <activity
+      android:name=".ui.AddFeedFromShareActivity"
+      android:exported="true"
+      android:parentActivityName=".ui.MainActivity">
       <!-- URLs with feed mimetype can be opened -->
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
@@ -122,6 +130,7 @@
         <data android:mimeType="text/plain" />
       </intent-filter>
     </activity>
+
     <!-- Receiver for notification cancellations and such -->
     <receiver android:name=".model.RssNotificationBroadcastReceiver" />
 

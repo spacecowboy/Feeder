@@ -10,8 +10,8 @@
     <string name="title">Název</string>
     <string name="save">Uložit</string>
     <string name="empty_feed_top">Nic ke čtení. Chtěli byste…</string>
-    <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Otevřít</font> jiný zdroj?]]></string>
-    <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Přidat</font> více zdrojů?]]></string>
+    <string name="empty_feed_open"><annotation style="link">Otevřít</annotation> jiný zdroj?</string>
+    <string name="empty_feed_add"><annotation style="link">Přidat</annotation> více zdrojů?</string>
     <string name="search_feed_empty_hint">Zadat adresu zdroje</string>
     <string name="mark_as_read">Označit jako přečtené</string>
     <string name="mark_as_unread">Označit jako nepřečtené</string>
@@ -58,8 +58,7 @@
     <string name="show_fab">Zobrazit plovoucí tlačítko akcí</string>
     <string name="include_mobile_hotspots">Zahrnout mobilní hotspoty</string>
     <string name="updated_feeds">Aktualizované zdroje</string>
-    <string name="selected">Vybrané</string>
-    <string name="notification_channel_name">Nepřečtené zdroje</string>
+  <string name="notification_channel_name">Nepřečtené zdroje</string>
     <string name="notification_channel_description">Oznámení se zobrazí pouze u nepřečtených položek v nakonfigurovaných zdrojích</string>
     <string name="open_in_webview">WebView</string>
     <string name="open_in_default_browser">Výchozí prohlížeč</string>

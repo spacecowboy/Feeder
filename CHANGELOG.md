@@ -1,3 +1,52 @@
+# 2.0.0-beta.6
+Jonas Kalderstam (5):
+  * [08760e63] Fixed sync indicator being rendered behind top app bar
+  * [92e802b0] Added ability to toggle between full text and included
+         article text
+  * [e46f91ff] Fixed so scroll to refresh works on the empty screen again
+  * [47c40796] Adding some fade in/out animations to empty screen
+  * [d1275492] Tweaked some padding in list
+
+# 2.0.0-beta.5
+Jonas Kalderstam (6):
+  * [0ad40b9e] Fixed incorrect decoding during parsing for some feeds
+  * [d0b6ca47] Fixed color of icon in floating action bar to be white
+         (again)
+  * [fe52639e] Made 'Mark as read' from notification less interuptive
+  * [7c24c763] Fixed broken test
+  * [78da415a] Feeds are now sorted alphabetically in dialogs
+  * [1e2fe647] Added dialog for editing feed when viewing a tag (like for
+         delete)
+
+# 2.0.0-beta.4
+Jonas Kalderstam (10):
+  * [fdb700fa] Reversed expansion icons in navigation drawer to match
+         material design
+  * [3e6ce929] Fixed youtube thumbnails and made images clickable
+  * [56a6e464] Sync on startup if set
+  * [b7e74a11] Feed Title clickable in Reader again
+  * [f5ecd777] Fixed color of status bar and navigation bar
+  * [f975fda2] Fixed toolbar color in custom tab
+
+# 2.0.0-beta.3
+Jonas Kalderstam (2):
+  * [a97a0257] Fixed some notifications not being cleared when opened
+  * [3f8240f3] Fixed feeds not being possible to add after enabling R8
+
+# 2.0.0-beta.2
+Jonas Kalderstam (5):
+  * [60694836] Renamed Norwegian play store metadata
+  * [9c8f5e07] Validate fastlane deployment on 2.0.0 branch
+  * [aea58578] Enabled R8 - compose relies heavily on it for performance
+  * [3d2aa645] Fixed mapping directive in Fastlane
+  * [93b8f4c8] Added beta support to fastlane
+
+# 2.0.0-beta.1
+
+Complete rewrite of the UI in Jetpack Compose
+
+Expect bugs, but all features should be present.
+
 # 1.13.5
 Jonas Kalderstam (2):
   * [b9c97797] Changed so Feeder no longer changes the URL of feeds to

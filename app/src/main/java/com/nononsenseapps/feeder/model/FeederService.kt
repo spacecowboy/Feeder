@@ -3,14 +3,14 @@ package com.nononsenseapps.feeder.model
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import com.nononsenseapps.feeder.base.KodeinAwareIntentService
+import com.nononsenseapps.feeder.base.DIAwareIntentService
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import kotlinx.coroutines.runBlocking
-import org.kodein.di.generic.instance
+import org.kodein.di.instance
 
 const val ACTION_MARK_AS_UNREAD = "MARK_AS_READ"
 
-class FeederService : KodeinAwareIntentService("FeederService") {
+class FeederService : DIAwareIntentService("FeederService") {
     private val dao: FeedItemDao by instance()
 
     override fun onHandleIntent(intent: Intent?) {

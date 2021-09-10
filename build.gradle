@@ -2,9 +2,9 @@
 
 buildscript {
   ext {
-    kotlin_version = '1.4.21'
-    gradle_build_version = "4.2.1"
-    build_tools_version = "30.0.2"
+    kotlin_version = "1.5.10"
+    gradle_build_version = "7.0.0"
+    build_tools_version = "30.0.3"
 
     multi_dex_version = "1.0.3"
 
@@ -13,8 +13,9 @@ buildscript {
     okio_version = "2.8.0"
     conscrypt_version = "2.5.1"
 
-    kodein_version = "6.3.3"
-    coroutines_version = "1.4.2"
+    kodeinVersion = "7.5.0"
+//    kodeinComposeVersion = "7.5.0"
+    coroutines_version = "1.5.0"
     rome_version = "1.7.1-f4"
     moshi_version = "1.5.0"
     threetentest_version = "1.2.2"
@@ -22,21 +23,31 @@ buildscript {
     jsoup_version = "1.7.3"
     readability4j_version = "1.0.5"
 
-    androidx_core_version = "1.2.0"
+    androidx_core_version = "1.5.0"
+    androidx_testcore_version = "1.4.0"
     workmanager_version = '2.4.0'
-    constraintlayout_version = "2.0.0-alpha5"
+    constraintlayout_version = "2.0.4"
     recyclerview_version = "1.0.0"
     legacy_support_version = "1.0.0"
-    appcompat_version = "1.1.0"
+    appcompat_version = "1.3.0"
     material_version = "1.1.0"
     preference_version = "1.1.0"
-    test_runner_version = "1.1.0"
-    test_rules_version = "1.1.0"
-    paging_version = '2.1.1'
-    lifecycle_version = "2.2.0"
-    room_version = "2.2.6"
-    nav_version = "2.1.0"
+    test_runner_version = "1.4.0"
+    test_rules_version = "1.4.0"
+    lifecycle_version = "2.3.1"
+    savedstate_version = "1.1.0"
+    room_version = "2.3.0"
+    // Compose related below
+    nav_version = "2.4.0-alpha08"
+    activityComposeVersion = "1.3.0"
+    composeVersion = "1.0.0"
+    navigationComposeVersion = nav_version
+    pagingVersion = "3.0.0"
+    pagingComposeVersion = "1.0.0-alpha12"
+    accompanistCoilVersion = "0.12.0"
+    accompanistVersion = "0.17.0"
 
+    // Tests
     espresso_version = "3.1.0"
     uiautomator_version = "2.2.0"
     test_ext_junit_version = "1.0.0"
@@ -60,19 +71,24 @@ buildscript {
 }
 
 allprojects {
-  repositories {
-    google()
-    mavenCentral()
-    jcenter() {
-      content {
-        includeModule("org.jetbrains.trove4j", "trove4j")
-        includeModule("com.linkedin.dexmaker", "dexmaker")
-      }
-    }
-  }
-
   tasks.withType(JavaCompile) {
     options.incremental = true
     options.encoding = 'UTF-8'
+  }
+}
+
+
+subprojects {
+  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+      // Treat all Kotlin warnings as errors
+      allWarningsAsErrors = false
+
+      freeCompilerArgs += '-Xopt-in=kotlin.RequiresOptIn'
+      freeCompilerArgs += '-Xopt-in=kotlin.Experimental'
+
+      // Set JVM target to 1.8
+      jvmTarget = "1.8"
+    }
   }
 }

@@ -4,13 +4,20 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import androidx.annotation.StringRes
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.Colors
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.generic.instance
+import com.nononsenseapps.feeder.ui.compose.theme.FeederDarkColorPalette
+import com.nononsenseapps.feeder.ui.compose.theme.FeederLightColorPalette
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
 /**
  * Boolean indicating whether we performed the (one-time) welcome flow.
@@ -70,6 +77,13 @@ const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
 const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 
+enum class PrefValOpenWith {
+    OPEN_WITH_DEFAULT,
+    OPEN_WITH_READER,
+    OPEN_WITH_CUSTOM_TAB,
+    OPEN_WITH_BROWSER
+}
+
 const val PREF_JAVASCRIPT_ENABLED = "pref_javascript_enabled"
 
 /**
@@ -77,28 +91,10 @@ const val PREF_JAVASCRIPT_ENABLED = "pref_javascript_enabled"
  */
 const val PREF_MAX_ITEM_COUNT_PER_FEED = "pref_max_item_count_per_feed"
 
-object PreferenceSummaryUpdater : Preference.OnPreferenceChangeListener {
-    override fun onPreferenceChange(preference: Preference?, value: Any?): Boolean {
-        val stringValue = value.toString()
-        if (preference is ListPreference) {
-            // For list preferences, look up the correct display value in
-            // the preference's 'entries' list.
-            val index = preference.findIndexOfValue(stringValue)
-            // Set the summary to reflect the new value.
-            preference.setSummary(if (index >= 0) preference.entries[index] else null)
-        } else {
-            // For all other preferences, set the summary to the value's
-            // simple string representation.
-            preference?.summary = stringValue
-        }
-        return true
-    }
-}
-
 fun SharedPreferences.getStringNonNull(key: String, defaultValue: String): String =
     getString(key, defaultValue) ?: defaultValue
 
-class Prefs(override val kodein: Kodein) : KodeinAware {
+class Prefs(override val di: DI) : DIAware {
     private val sp: SharedPreferences by instance()
     private val app: Application by instance()
 
@@ -114,7 +110,7 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
         get() = sp.getBoolean(PREF_IMG_SHOW_THUMBNAILS, true)
         set(value) = sp.edit().putBoolean(PREF_IMG_SHOW_THUMBNAILS, value).apply()
 
-    var onlySyncOnWIfi: Boolean
+    var onlySyncOnWifi: Boolean
         get() = sp.getBoolean(PREF_SYNC_ONLY_WIFI, false)
         set(value) = sp.edit().putBoolean(PREF_SYNC_ONLY_WIFI, value).apply()
 
@@ -158,56 +154,89 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
         get() = sp.getBoolean(PREF_WELCOME_DONE, false)
         set(value) = sp.edit().putBoolean(PREF_WELCOME_DONE, value).apply()
 
-    var currentTheme: CurrentTheme
-        get() = when (sp.getString(PREF_THEME, app.getString(R.string.pref_theme_value_default))) {
-            app.getString(R.string.pref_theme_value_night) -> CurrentTheme.NIGHT
-            app.getString(R.string.pref_theme_value_day) -> CurrentTheme.DAY
-            else -> CurrentTheme.SYSTEM
-        }
+    var currentTheme: ThemeOptions
+        get() = ThemeOptions.fromString(
+            app,
+            sp.getString(PREF_THEME, app.getString(R.string.pref_theme_value_default))
+        )
         set(value) = sp.edit().putString(
             PREF_THEME,
-            when (value) {
-                CurrentTheme.NIGHT -> app.getString(R.string.pref_theme_value_night)
-                CurrentTheme.DAY -> app.getString(R.string.pref_theme_value_day)
-                CurrentTheme.SYSTEM -> app.getString(R.string.pref_theme_value_system)
-            }
+            value.toPrefValue()
         ).apply()
+
+    var currentItemOpener: ItemOpener
+        get() = when (openItemsWith) {
+            PREF_VAL_OPEN_WITH_BROWSER -> ItemOpener.DEFAULT_BROWSER
+            PREF_VAL_OPEN_WITH_WEBVIEW,
+            PREF_VAL_OPEN_WITH_CUSTOM_TAB -> ItemOpener.CUSTOM_TAB
+            else -> ItemOpener.READER
+        }
+        set(value) {
+            openItemsWith = when (value) {
+                ItemOpener.READER -> PREF_VAL_OPEN_WITH_READER
+                ItemOpener.CUSTOM_TAB -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                ItemOpener.DEFAULT_BROWSER -> PREF_VAL_OPEN_WITH_BROWSER
+            }
+        }
+
+    var currentLinkOpener: LinkOpener
+        get() = when (openLinksWith) {
+            PREF_VAL_OPEN_WITH_BROWSER -> LinkOpener.DEFAULT_BROWSER
+            else -> LinkOpener.CUSTOM_TAB
+        }
+        set(value) {
+            when (value) {
+                LinkOpener.CUSTOM_TAB -> openLinksWith = PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                LinkOpener.DEFAULT_BROWSER -> openLinksWith = PREF_VAL_OPEN_WITH_BROWSER
+            }
+        }
+
+    var currentSyncFrequency: SyncFrequency
+        get() =
+            SyncFrequency.values()
+                .firstOrNull {
+                    it.minutes == synchronizationFrequency
+                }
+                ?: SyncFrequency.MANUAL
+        set(value) {
+            synchronizationFrequency = value.minutes
+        }
 
     var isNightMode: Boolean
         get() = when (currentTheme) {
-            CurrentTheme.NIGHT -> true
-            CurrentTheme.SYSTEM -> app.isSystemThemeNight
+            ThemeOptions.NIGHT -> true
+            ThemeOptions.SYSTEM -> app.isSystemThemeNight
             else -> false
         }
         set(value) {
             currentTheme = when (value) {
-                true -> CurrentTheme.NIGHT
-                false -> CurrentTheme.DAY
+                true -> ThemeOptions.NIGHT
+                false -> ThemeOptions.DAY
             }
         }
 
-    var currentSorting: CurrentSorting
+    var currentSorting: SortingOptions
         get() = when (sp.getString(PREF_SORT, app.getString(R.string.pref_sort_value_default))) {
-            app.getString(R.string.pref_sort_value_oldest_first) -> CurrentSorting.OLDEST_FIRST
-            else -> CurrentSorting.NEWEST_FIRST
+            app.getString(R.string.pref_sort_value_oldest_first) -> SortingOptions.OLDEST_FIRST
+            else -> SortingOptions.NEWEST_FIRST
         }
         set(value) = sp.edit().putString(
             PREF_SORT,
             when (value) {
-                CurrentSorting.NEWEST_FIRST -> app.getString(R.string.pref_sort_value_newest_first)
-                CurrentSorting.OLDEST_FIRST -> app.getString(R.string.pref_sort_value_oldest_first)
+                SortingOptions.NEWEST_FIRST -> app.getString(R.string.pref_sort_value_newest_first)
+                SortingOptions.OLDEST_FIRST -> app.getString(R.string.pref_sort_value_oldest_first)
             }
         ).apply()
 
     var isNewestFirst: Boolean
         get() = when (currentSorting) {
-            CurrentSorting.NEWEST_FIRST -> true
+            SortingOptions.NEWEST_FIRST -> true
             else -> false
         }
         set(value) {
             currentSorting = when (value) {
-                true -> CurrentSorting.NEWEST_FIRST
-                false -> CurrentSorting.OLDEST_FIRST
+                true -> SortingOptions.NEWEST_FIRST
+                false -> SortingOptions.OLDEST_FIRST
             }
         }
 
@@ -256,15 +285,97 @@ class Prefs(override val kodein: Kodein) : KodeinAware {
         get() = preloadCustomTab && openLinksWith == PREF_VAL_OPEN_WITH_CUSTOM_TAB
 }
 
-enum class CurrentTheme {
-    DAY,
-    NIGHT,
-    SYSTEM
+enum class ThemeOptions(
+    @StringRes val stringId: Int
+) {
+    DAY(R.string.theme_day),
+    NIGHT(R.string.theme_night),
+    SYSTEM(R.string.theme_system);
+
+    @Composable
+    fun asString() = stringResource(id = stringId)
+
+    @Composable
+    fun getColors(): Colors {
+        return when (this) {
+            DAY -> FeederLightColorPalette()
+            NIGHT -> FeederDarkColorPalette()
+            SYSTEM -> if (isSystemInDarkTheme()) FeederDarkColorPalette() else FeederLightColorPalette()
+        }
+    }
+
+    @Composable
+    fun isDarkTheme(): Boolean {
+        return when (this) {
+            DAY -> false
+            NIGHT -> true
+            SYSTEM -> isSystemInDarkTheme()
+        }
+    }
+
+    fun toPrefValue(): String =
+        when (this) {
+            DAY -> "day"
+            NIGHT -> "night"
+            SYSTEM -> "system"
+        }
+
+    companion object {
+        fun fromString(context: Context, value: String?): ThemeOptions =
+            when (value) {
+                context.getString(R.string.pref_theme_value_night) -> NIGHT
+                context.getString(R.string.pref_theme_value_day) -> DAY
+                else -> SYSTEM
+            }
+    }
 }
 
-enum class CurrentSorting {
-    NEWEST_FIRST,
-    OLDEST_FIRST
+enum class SortingOptions(
+    @StringRes val stringId: Int
+) {
+    NEWEST_FIRST(R.string.sort_newest_first),
+    OLDEST_FIRST(R.string.sort_oldest_first);
+
+    @Composable
+    fun asString() = stringResource(id = stringId)
+}
+
+enum class ItemOpener(
+    @StringRes val stringId: Int
+) {
+    READER(R.string.open_in_reader),
+    CUSTOM_TAB(R.string.open_in_custom_tab),
+    DEFAULT_BROWSER(R.string.open_in_default_browser);
+
+    @Composable
+    fun asString() = stringResource(id = stringId)
+}
+
+enum class LinkOpener(
+    @StringRes val stringId: Int
+) {
+    CUSTOM_TAB(R.string.open_in_custom_tab),
+    DEFAULT_BROWSER(R.string.open_in_default_browser);
+
+    @Composable
+    fun asString() = stringResource(id = stringId)
+}
+
+enum class SyncFrequency(
+    val minutes: Long,
+    @StringRes val stringId: Int
+) {
+    MANUAL(-1L, R.string.sync_option_manually),
+    EVERY_15_MIN(15L, R.string.sync_option_every_15min),
+    EVERY_30_MIN(30L, R.string.sync_option_every_30min),
+    EVERY_1_HOURS(60L, R.string.sync_option_every_hour),
+    EVERY_3_HOURS(180L, R.string.sync_option_every_3_hours),
+    EVERY_6_HOURS(360L, R.string.sync_option_every_6_hours),
+    EVERY_12_HOURS(720L, R.string.sync_option_every_12_hours),
+    EVERY_DAY(1440L, R.string.sync_option_every_day);
+
+    @Composable
+    fun asString() = stringResource(id = stringId)
 }
 
 val Context.isSystemThemeNight: Boolean

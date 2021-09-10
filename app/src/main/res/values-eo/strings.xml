@@ -2,8 +2,7 @@
 <resources>
     <string name="open_in_reader">Legilo</string>
     <string name="notification_channel_name">Nelegitaj fluoj</string>
-    <string name="selected">Elektitaj</string>
-    <string name="updated_feeds">Laste ĝisdatigitaj</string>
+  <string name="updated_feeds">Laste ĝisdatigitaj</string>
     <string name="on_startup">Dum startigado</string>
     <string name="image_loading">Ŝargado de bildo</string>
     <string name="only_when_charging">Nur dum baterioŝargado</string>
@@ -46,8 +45,8 @@
     <string name="mark_as_read">Marki kiel legitan</string>
     <string name="search_feed_empty_hint">Tajpu adreson de fluo</string>
     <string name="empty_feed_top">Neniu legaĵo ĉi tie. Ĉu vi volas…</string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Aldoni&lt;/font&gt; pli da fluoj\?</string>
-    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Malfermi&lt;/font&gt; alian fluon\?</string>
+    <string name="empty_feed_add"><annotation style="link">Aldoni</annotation> pli da fluoj\?</string>
+    <string name="empty_feed_open"><annotation style="link">Malfermi</annotation> alian fluon\?</string>
     <string name="save">Konservi</string>
     <string name="title">Titolo</string>
     <string name="add_feed_search_hint">URL de fluo</string>

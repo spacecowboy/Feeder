@@ -16,11 +16,14 @@
 default_platform(:android)
 
 platform :android do
-  desc "Fetch latest production version code from Google Play"
-  lane :get_latest_production_version do
+  desc "Fetch latest version code from Google Play"
+  lane :get_latest_version do
+    track_version_codes = []
+
     # Fetch latest codes
-    track_version_codes = google_play_track_version_codes(track: "production")
-    # Return the maximum
+    track_version_codes += google_play_track_version_codes(track: "production")
+    track_version_codes += google_play_track_version_codes(track: "beta")
+
     track_version_codes.max
   end
 
@@ -29,7 +32,7 @@ platform :android do
     path = '../app/build.gradle'
     re = /versionCode\s+(\d+)/
 
-    last_version_code = get_latest_production_version
+    last_version_code = get_latest_version
 
     s = File.read(path)
     if (s[re, 1].to_i <= last_version_code) then
@@ -47,33 +50,37 @@ platform :android do
   end
 
   desc "Deploy a new version to the Google Play"
-  lane :deploy do
-    # mapping: "app/build/outputs/mapping/play/mapping.txt",
+  lane :deploy do |options|
     upload_to_play_store(
-      aab: "app/build/outputs/bundle/play/app-play.aab"
+      mapping: "app/build/outputs/mapping/play/mapping.txt",
+      aab: "app/build/outputs/bundle/play/app-play.aab",
+      track: options[:track]
     )
   end
 
   desc "Validate deployment of a new version to the Google Play"
-  lane :validate_deploy do
-    # mapping: "app/build/outputs/mapping/play/mapping.txt",
+  lane :validate_deploy do |options|
     upload_to_play_store(
+      mapping: "app/build/outputs/mapping/play/mapping.txt",
       aab: "app/build/outputs/bundle/play/app-play.aab",
+      track: options[:track],
       validate_only: true
     )
   end
 
   desc "Build and deploy a new version to the Google Play"
-  lane :build_and_deploy do
-    bump_version_code
+  lane :build_and_deploy do |options|
+    # Keep same version for changelog
+    #bump_version_code
     build_play_bundle
-    deploy
+    deploy(options)
   end
 
   desc "Build and valdidate deployment of a new version to the Google Play"
-  lane :build_and_validate do
+  lane :build_and_validate do |options|
+    # Validation should never fail so bump version
     bump_version_code
     build_play_bundle
-    validate_deploy
+    validate_deploy(options)
   end
 end

@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.db.room
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -21,26 +22,29 @@ interface FeedDao {
     suspend fun insertFeed(feed: Feed): Long
 
     @Update
-    suspend fun updateFeed(feed: Feed)
+    suspend fun updateFeed(feed: Feed): Int
 
     @Delete
-    suspend fun deleteFeed(feed: Feed)
+    suspend fun deleteFeed(feed: Feed): Int
 
     @Query("DELETE FROM feeds WHERE id IS :feedId")
-    suspend fun deleteFeedWithId(feedId: Long)
+    suspend fun deleteFeedWithId(feedId: Long): Int
 
     @Query(
         """
         DELETE FROM feeds WHERE id IN (:ids)
         """
     )
-    suspend fun deleteFeeds(ids: List<Long>)
+    suspend fun deleteFeeds(ids: List<Long>): Int
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
-    fun loadLiveFeed(feedId: Long): Flow<Feed?>
+    fun loadFeedFlow(feedId: Long): Flow<Feed?>
 
     @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
     suspend fun loadTags(): List<String>
+
+    @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
+    fun loadLiveTags(): LiveData<List<String>>
 
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
     suspend fun loadFeed(feedId: Long): Feed?
@@ -93,7 +97,7 @@ interface FeedDao {
         ON feeds.id = feed_id
     """
     )
-    fun loadLiveFeedsWithUnreadCounts(): Flow<List<FeedUnreadCount>>
+    fun loadFlowOfFeedsWithUnreadCounts(): Flow<List<FeedUnreadCount>>
 
     @Query("UPDATE feeds SET notify = :notify WHERE id IS :id")
     suspend fun setNotify(id: Long, notify: Boolean)
@@ -112,11 +116,12 @@ interface FeedDao {
         SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE
         FROM feeds
         WHERE $COL_TAG IS :feedTag
+        ORDER BY $COL_TITLE COLLATE NOCASE
         """
     )
     suspend fun getFeedTitlesWithTag(feedTag: String): List<FeedTitle>
 
-    @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds")
+    @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds ORDER BY $COL_TITLE COLLATE NOCASE")
     suspend fun getAllFeedTitles(): List<FeedTitle>
 }
 

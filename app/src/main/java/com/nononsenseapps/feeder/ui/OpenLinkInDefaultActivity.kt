@@ -8,14 +8,15 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.KodeinAwareActivity
+import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedItemViewModel
+import com.nononsenseapps.feeder.model.FeedItemsViewModel
 import com.nononsenseapps.feeder.model.cancelNotification
-import kotlinx.coroutines.FlowPreview
+import com.nononsenseapps.feeder.util.DEEP_LINK_HOST
 import kotlinx.coroutines.launch
-import org.kodein.di.generic.instance
+import org.kodein.di.instance
 
 /**
  * Proxy activity to mark item as read and notified in database as well as cancelling the
@@ -23,38 +24,60 @@ import org.kodein.di.generic.instance
  *
  * If link is null, then item is only marked as read and notified.
  */
-@FlowPreview
-class OpenLinkInDefaultActivity : KodeinAwareActivity() {
+class OpenLinkInDefaultActivity : DIAwareComponentActivity() {
+    private val feedItemViewModel: FeedItemViewModel by instance(arg = this)
+    private val feedItemsViewModel: FeedItemsViewModel by instance(arg = this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         intent?.let { intent ->
-            val id: Long = intent.data?.lastPathSegment?.toLong() ?: ID_UNSET
-            val link: String? = intent.data?.getQueryParameter(COL_LINK)
+            val uri = intent.data
 
-            val feedItemViewModel: FeedItemViewModel by instance()
+            if (uri?.host == DEEP_LINK_HOST && uri.lastPathSegment == "feed") {
+                val feedItemIds = intent.getLongArrayExtra(EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED)
+                    ?: longArrayOf()
 
-            lifecycleScope.launch {
-                feedItemViewModel.markAsReadAndNotified(id)
-                cancelNotification(this@OpenLinkInDefaultActivity, id)
-            }
+                feedItemsViewModel.markAsNotifiedInBackground(feedItemIds.toList())
 
-            if (link != null) {
-                try {
-                    startActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse(link)).also {
-                            intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
-                        }
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        uri,
+                        this,
+                        MainActivity::class.java
                     )
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                    Toast.makeText(this, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
-                    Log.e("FeederOpenInWebBrowser", "Failed to start browser", e)
-                }
+                )
+            } else {
+                handleNotificationActions(intent)
             }
         }
 
         // Terminate activity immediately
         finish()
+    }
+
+    private fun handleNotificationActions(intent: Intent) {
+        val id: Long = intent.data?.lastPathSegment?.toLong() ?: ID_UNSET
+        val link: String? = intent.data?.getQueryParameter(COL_LINK)
+
+        lifecycleScope.launch {
+            feedItemViewModel.markAsReadAndNotified(id)
+            cancelNotification(this@OpenLinkInDefaultActivity, id)
+        }
+
+        if (link != null) {
+            try {
+                startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse(link)).also {
+                        intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
+                    }
+                )
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                Toast.makeText(this, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
+                Log.e("FeederOpenInWebBrowser", "Failed to start browser", e)
+            }
+        }
     }
 }

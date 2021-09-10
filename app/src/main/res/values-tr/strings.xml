@@ -13,8 +13,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Kaydet</string>
     <string name="empty_feed_top">Burada okuyacak bir şey yok. Arzu edersiniz…</string>
-    <string name="empty_feed_open">Başka bir yayın &lt;font color=#607D8B&gt;açmak&lt;/font&gt; ister misiniz\?</string>
-    <string name="empty_feed_add">Daha fazla yayın &lt;font color=#607D8B&gt;eklemek&lt;/font&gt; ister misiniz\?</string>
+    <string name="empty_feed_open">Başka bir yayın <annotation style="link">açmak</annotation> ister misiniz\?</string>
+    <string name="empty_feed_add">Daha fazla yayın <annotation style="link">eklemek</annotation> ister misiniz\?</string>
     <string name="search_feed_empty_hint">Bir yayın adresi girin</string>
     <string name="mark_as_read">Okundu olarak işaretle</string>
     <string name="mark_as_unread">Okunmadı olarak işaretle</string>
@@ -63,8 +63,7 @@
     <string name="show_fab">Kayan işlem düğmesini göster</string>
     <string name="include_mobile_hotspots">Mobil etkin noktaları dahil et</string>
     <string name="updated_feeds">Güncellenen beslemeler</string>
-    <string name="selected">Seçildi</string>
-    <string name="notification_channel_name">Okunmamış yayınlar</string>
+  <string name="notification_channel_name">Okunmamış yayınlar</string>
     <string name="notification_channel_description">Bildirimler yalnızca yapılandırılan yayınlardaki okunmamış ögeler için gösterilir</string>
     <string name="open_in_reader">Okuyucu içinde</string>
     <string name="open_in_webview">Web görünümünde</string>

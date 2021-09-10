@@ -1,12 +1,10 @@
 package com.nononsenseapps.feeder.db
 
 import com.nononsenseapps.feeder.db.room.FeedItem
-import kotlinx.coroutines.FlowPreview
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-@FlowPreview
 class FeedItemTest {
     @Test
     fun getDomain() {

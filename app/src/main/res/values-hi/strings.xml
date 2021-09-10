@@ -43,8 +43,7 @@
     <string name="open_in_reader">पढ़ने वाला</string>
     <string name="notification_channel_description">सिर्फ अनदेखी फीड की नोटिफिकेशन दिखाए</string>
     <string name="notification_channel_name">अनदेखी फीड</string>
-    <string name="selected">चुने हुए</string>
-    <string name="updated_feeds">फीड अपडेट करे</string>
+  <string name="updated_feeds">फीड अपडेट करे</string>
     <string name="include_mobile_hotspots">मोबाइल हॉटस्पॉट को भी देखे</string>
     <string name="show_fab">हवा में उड़ता बटन दिखाए</string>
     <string name="on_startup">अप्प खोलते वक्त</string>
@@ -95,8 +94,8 @@
     <string name="mark_as_unread">नहीं पढा</string>
     <string name="mark_as_read">पढ़ लिया</string>
     <string name="search_feed_empty_hint">फीड का एड्रेस डालें</string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;नयी&lt;/font&gt; फीड डालें \?</string>
-    <string name="empty_feed_open">&lt;font color=#607D8B&gt;खोले &lt;/font&gt; कोई और फीड\?</string>
+    <string name="empty_feed_add"><annotation style="link">नयी</annotation> फीड डालें \?</string>
+    <string name="empty_feed_open"><annotation style="link">खोले </annotation> कोई और फीड\?</string>
     <string name="empty_feed_top">यहाँ कुछ पढ़ने को नहीं है| क्या आप.…</string>
     <string name="save">बचा कर रखे</string>
     <string name="navigation_drawer_close">नेविगेशन ड्रावर बंद करे</string>

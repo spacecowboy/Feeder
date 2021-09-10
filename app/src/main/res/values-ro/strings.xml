@@ -41,8 +41,7 @@
     <string name="open_in_reader">Cititor</string>
     <string name="notification_channel_description">Notificările sunt afișate numai pentru elementele necitite din fluxurile configurate</string>
     <string name="notification_channel_name">Fluxuri necitite</string>
-    <string name="selected">Selectată</string>
-    <string name="updated_feeds">Fluxuri actualizate</string>
+  <string name="updated_feeds">Fluxuri actualizate</string>
     <string name="include_mobile_hotspots">Includeți hotspoturi mobile</string>
     <string name="show_fab">Afișați butonul de acțiune plutitor</string>
     <string name="on_startup">La pornire</string>
@@ -93,8 +92,8 @@
     <string name="mark_as_unread">Marcați ca necitit</string>
     <string name="mark_as_read">Marcați ca fiind citit</string>
     <string name="search_feed_empty_hint">Introduceți o adresă de flux</string>
-    <string name="empty_feed_add">&lt;font color=#607D8B&gt;Add&lt;/font&gt; mai multe fluxuri\?</string>
-    <string name="empty_feed_open">&lt;font color=#607D8B&gt;Open&lt;/font&gt; alt flux\?</string>
+    <string name="empty_feed_add"><annotation style="link">Add</annotation> mai multe fluxuri\?</string>
+    <string name="empty_feed_open"><annotation style="link">Open</annotation> alt flux\?</string>
     <string name="empty_feed_top">Nimic de citit aici. Doriți să…</string>
     <string name="save">Salvați</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>

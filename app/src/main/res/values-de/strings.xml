@@ -13,8 +13,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Speichern</string>
     <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würdest du gerne…</string>
-    <string name="empty_feed_open"><![CDATA[Einen anderen Feed <font color="#607D8B">öffnen</font>?]]></string>
-    <string name="empty_feed_add"><![CDATA[Weitere Feeds <font color="#607D8B">hinzufügen</font>?]]></string>
+    <string name="empty_feed_open">Einen anderen Feed <annotation style="link">öffnen</annotation>?</string>
+    <string name="empty_feed_add">Weitere Feeds <annotation style="link">hinzufügen</annotation>?</string>
     <string name="search_feed_empty_hint">Eingabe einer Feed-Adresse</string>
     <string name="mark_as_read">Als gelesen markieren</string>
     <string name="mark_as_unread">Als ungelesen markieren</string>
@@ -63,8 +63,7 @@
     <string name="show_fab">„Alle gelesen“-Schaltfläche</string>
     <string name="include_mobile_hotspots">Mobile Hotspots verwenden</string>
     <string name="updated_feeds">Feeds aktualisiert</string>
-    <string name="selected">Ausgewählt</string>
-    <string name="notification_channel_name">Ungelesene Feeds</string>
+  <string name="notification_channel_name">Ungelesene Feeds</string>
     <string name="notification_channel_description">Benachrichtigungen werden nur für ungelesene Nachrichten in konfigurierten Feeds angezeigt</string>
     <string name="open_in_reader">Feedreader</string>
     <string name="open_in_webview">WebView</string>

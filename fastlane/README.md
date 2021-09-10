@@ -16,11 +16,11 @@ or alternatively using `brew install fastlane`
 
 # Available Actions
 ## Android
-### android get_latest_production_version
+### android get_latest_version
 ```
-fastlane android get_latest_production_version
+fastlane android get_latest_version
 ```
-Fetch latest production version code from Google Play
+Fetch latest version code from Google Play
 ### android bump_version_code
 ```
 fastlane android bump_version_code

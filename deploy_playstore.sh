@@ -38,10 +38,22 @@ if [[ "${1:-}" == "--dry-run" ]] && [[ "${LATEST_TAG}" == "${CURRENT_VERSION}" ]
   echo "${CURRENT_VERSION} is a tag but --dry-run was specified - not doing anything"
 elif [[ "${1:-}" == "--dry-run" ]] || [[ "${LATEST_TAG}" != "${CURRENT_VERSION}" ]]; then
   echo "${CURRENT_VERSION} is not tag - validating deployment"
-  fastlane build_and_validate
+  if [[ "${CURRENT_VERSION}" =~ ^[0-9.]*$ ]]; then
+    echo "${CURRENT_VERSION} is a production release"
+    fastlane build_and_validate track:production
+  else
+    echo "${CURRENT_VERSION} is a beta release"
+    fastlane build_and_validate track:beta
+  fi
 else
   echo "${CURRENT_VERSION} is a tag - deploying to store!"
-  fastlane build_and_deploy
+  if [[ "${CURRENT_VERSION}" =~ ^[0-9.]*$ ]]; then
+    echo "${CURRENT_VERSION} is a production release"
+    fastlane build_and_deploy track:production
+  else
+    echo "${CURRENT_VERSION} is a beta release"
+    fastlane build_and_deploy track:beta
+  fi
 fi
 
 git checkout app fastlane gradle.properties

@@ -9,7 +9,6 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
 import com.nononsenseapps.feeder.util.minusMinutes
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -24,15 +23,14 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.kodein.di.android.closestKodein
-import org.kodein.di.generic.instance
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 import org.threeten.bp.Instant
 import java.io.InputStream
 import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class RssLocalSyncKtTest {
@@ -41,7 +39,8 @@ class RssLocalSyncKtTest {
 
     private val filesDir = getApplicationContext<FeederApplication>().filesDir
 
-    private val kodein by closestKodein(getApplicationContext() as Context)
+    private val di by closestDI(getApplicationContext() as Context)
+    private val feedParser: FeedParser by di.instance()
 
     val server = MockWebServer()
 
@@ -92,7 +91,7 @@ class RssLocalSyncKtTest {
 
         runBlocking {
             syncFeeds(
-                kodein = kodein,
+                di = di,
                 filesDir = filesDir,
                 feedId = cowboyJsonId
             )
@@ -114,7 +113,7 @@ class RssLocalSyncKtTest {
 
         runBlocking {
             syncFeeds(
-                kodein = kodein,
+                di = di,
                 filesDir = filesDir,
                 feedId = cowboyAtomId
             )
@@ -140,7 +139,7 @@ class RssLocalSyncKtTest {
 
         runBlocking {
             syncFeeds(
-                kodein = kodein,
+                di = di,
                 filesDir = filesDir,
                 feedId = ID_UNSET,
                 parallel = true
@@ -168,14 +167,14 @@ class RssLocalSyncKtTest {
         )
 
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = cowboyJsonId, forceNetwork = true)
+            syncFeeds(di = di, filesDir = filesDir, feedId = cowboyJsonId, forceNetwork = true)
             testDb.db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
                 assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
                 assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
                 // "Long time" ago, but not unset
                 testDb.db.feedDao().updateFeed(feed.copy(lastSync = Instant.ofEpochMilli(999L)))
             }
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = cowboyJsonId, forceNetwork = true)
+            syncFeeds(di = di, filesDir = filesDir, feedId = cowboyJsonId, forceNetwork = true)
         }
 
         assertEquals("Feed should have been fetched twice", 2, server.requestCount)
@@ -196,7 +195,7 @@ class RssLocalSyncKtTest {
 
         val fourteenMinsAgo = Instant.now().minusMinutes(14)
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = cowboyJsonId, forceNetwork = true)
+            syncFeeds(di = di, filesDir = filesDir, feedId = cowboyJsonId, forceNetwork = true)
             testDb.db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
                 assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
                 assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
@@ -204,7 +203,7 @@ class RssLocalSyncKtTest {
                 testDb.db.feedDao().updateFeed(feed.copy(lastSync = fourteenMinsAgo))
             }
             syncFeeds(
-                kodein = kodein, filesDir = filesDir,
+                di = di, filesDir = filesDir,
                 feedId = cowboyJsonId, forceNetwork = false, minFeedAgeMinutes = 15
             )
         }
@@ -230,7 +229,7 @@ class RssLocalSyncKtTest {
 
         val fourteenMinsAgo = Instant.now().minusMinutes(14)
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = cowboyJsonId, forceNetwork = true)
+            syncFeeds(di = di, filesDir = filesDir, feedId = cowboyJsonId, forceNetwork = true)
             testDb.db.feedDao().loadFeed(cowboyJsonId)!!.let { feed ->
                 assertTrue("Feed should have been synced", feed.lastSync.toEpochMilli() > 0)
                 assertTrue("Feed should have a valid response hash", feed.responseHash > 0)
@@ -238,7 +237,7 @@ class RssLocalSyncKtTest {
                 testDb.db.feedDao().updateFeed(feed.copy(lastSync = fourteenMinsAgo))
             }
             syncFeeds(
-                kodein = kodein, filesDir = filesDir,
+                di = di, filesDir = filesDir,
                 feedId = cowboyJsonId, forceNetwork = true, minFeedAgeMinutes = 15
             )
         }
@@ -270,7 +269,7 @@ class RssLocalSyncKtTest {
         )
 
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = failingJsonId)
+            syncFeeds(di = di, filesDir = filesDir, feedId = failingJsonId)
         }
 
         assertEquals(
@@ -302,7 +301,7 @@ class RssLocalSyncKtTest {
         )
 
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = feedId)
+            syncFeeds(di = di, filesDir = filesDir, feedId = feedId)
         }
 
         // Assert the feed was retrieved
@@ -341,7 +340,7 @@ class RssLocalSyncKtTest {
         val beforeSyncTime = Instant.now()
 
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = feedId)
+            syncFeeds(di = di, filesDir = filesDir, feedId = feedId)
         }
 
         // Assert the feed was retrieved
@@ -397,7 +396,7 @@ class RssLocalSyncKtTest {
 
         // Sync first time
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = feedId)
+            syncFeeds(di = di, filesDir = filesDir, feedId = feedId)
         }
 
         // Assert the feed was retrieved
@@ -414,7 +413,7 @@ class RssLocalSyncKtTest {
 
         // Sync second time
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = feedId, forceNetwork = true)
+            syncFeeds(di = di, filesDir = filesDir, feedId = feedId, forceNetwork = true)
         }
 
         // Assert the feed was retrieved
@@ -463,7 +462,7 @@ class RssLocalSyncKtTest {
         // Sync first time
         runBlocking {
             syncFeeds(
-                kodein = kodein, filesDir = filesDir,
+                di = di, filesDir = filesDir,
                 feedId = feedId,
                 maxFeedItemCount = maxFeedItemCount
             )
@@ -487,7 +486,7 @@ class RssLocalSyncKtTest {
         responses[url]!!.throttleBody(1024 * 100, 29, TimeUnit.SECONDS)
 
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = cowboyAtomId)
+            syncFeeds(di = di, filesDir = filesDir, feedId = cowboyAtomId)
         }
 
         assertEquals(
@@ -504,7 +503,7 @@ class RssLocalSyncKtTest {
         responses[url]!!.throttleBody(1024 * 100, 31, TimeUnit.SECONDS)
 
         runBlocking {
-            syncFeeds(kodein = kodein, filesDir = filesDir, feedId = cowboyAtomId)
+            syncFeeds(di = di, filesDir = filesDir, feedId = cowboyAtomId)
         }
 
         assertEquals(

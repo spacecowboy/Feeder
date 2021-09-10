@@ -13,8 +13,8 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Sačuvaj</string>
     <string name="empty_feed_top">Nema vijesti za čitanje. Želite li…</string>
-    <string name="empty_feed_open"><![CDATA[<font color="#607D8B">Otvoriti</font> drugi izvor (feed)?]]></string>
-    <string name="empty_feed_add"><![CDATA[<font color="#607D8B">Dodati</font> više izvora (feedova)?]]></string>
+    <string name="empty_feed_open"><annotation style="link">Otvoriti</annotation> drugi izvor (feed)?</string>
+    <string name="empty_feed_add"><annotation style="link">Dodati</annotation> više izvora (feedova)?</string>
     <string name="search_feed_empty_hint">Unesi adresu izvora (feeda)</string>
     <string name="mark_as_read">Označi kao pročitano</string>
     <string name="mark_as_unread">Označi kao nepročitano</string>
@@ -63,8 +63,7 @@
     <string name="show_fab">Prikaži plutajuće dugme aktivnosti</string>
     <string name="include_mobile_hotspots">Uvrsti mobilne hotspotove</string>
     <string name="updated_feeds">Ažuriraj izvore (feedove)</string>
-    <string name="selected">Izabrano</string>
-    <string name="notification_channel_name">Nepročitani izvori (feedovi)</string>
+  <string name="notification_channel_name">Nepročitani izvori (feedovi)</string>
     <string name="notification_channel_description">Obaviještenja se prikazuju samo za nepročitane članke u postavljenim izvorima (feedovima)</string>
     <string name="open_in_reader">Čitač</string>
     <string name="open_in_webview">Web prikaz</string>
