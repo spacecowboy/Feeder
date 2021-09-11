@@ -54,11 +54,13 @@ fun LinkTextStyle(): TextStyle =
 
 @Composable
 fun FeedListItemTitleStyle(): SpanStyle =
-    MaterialTheme.typography.subtitle1.toSpanStyle().merge(
-        SpanStyle(
-            fontWeight = FontWeight.SemiBold
+    MaterialTheme.typography.h6.toSpanStyle()
+        .merge(
+            SpanStyle(
+                fontSize = 17.sp,
+//                fontWeight = FontWeight.SemiBold,
+            )
         )
-    )
 
 @Composable
 fun FeedListItemStyle(): TextStyle =
