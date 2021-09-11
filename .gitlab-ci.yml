@@ -29,7 +29,7 @@ test:
 compile:
   stage: build
   script:
-    - source devenv && ./gradlew assembleDebug packageDebugAndroidTest -PdisablePreDex
+    - source devenv && ./gradlew assembleDebugMini packageDebugAndroidTest
   needs: []
   artifacts:
     paths:
