@@ -8,6 +8,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -406,6 +407,7 @@ private fun ReaderView(
 ) {
     SelectionContainer {
         LazyColumn(
+            contentPadding = PaddingValues(bottom = 92.dp),
             modifier = modifier
                 .padding(horizontal = keyline1Padding)
         ) {
@@ -474,10 +476,6 @@ private fun ReaderView(
             }
 
             articleBody()
-
-            item {
-                Spacer(modifier = Modifier.height(92.dp))
-            }
         }
     }
 }

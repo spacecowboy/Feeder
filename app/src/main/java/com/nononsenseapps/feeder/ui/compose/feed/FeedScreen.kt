@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -142,7 +143,7 @@ fun FeedScreen(
     val nothingToRead by remember(pagedFeedItems) {
         derivedStateOf {
             pagedFeedItems.loadState.append.endOfPaginationReached
-                && pagedFeedItems.itemCount == 0
+                    && pagedFeedItems.itemCount==0
         }
     }
 
@@ -166,7 +167,7 @@ fun FeedScreen(
     val opmlExporter = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument()
     ) { uri ->
-        if (uri != null) {
+        if (uri!=null) {
             val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
             applicationCoroutineScope.launch {
                 exportOpml(di, uri)
@@ -177,7 +178,7 @@ fun FeedScreen(
     val opmlImporter = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
-        if (uri != null) {
+        if (uri!=null) {
             val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
             applicationCoroutineScope.launch {
                 importOpml(di, uri)
@@ -188,6 +189,7 @@ fun FeedScreen(
 
     @DrawableRes
     val placeHolder: Int by getImagePlaceholder(settingsViewModel)
+    val bottomBarVisible by readAloudViewModel.notStopped
 
     FeedScreen(
         screenTitle = screenTitle ?: stringResource(id = R.string.all_feeds),
@@ -214,6 +216,7 @@ fun FeedScreen(
                 parallell = true
             )
         },
+        bottomBarVisible = bottomBarVisible,
         onlyUnread = onlyUnread,
         onToggleOnlyUnread = { value ->
             settingsViewModel.setShowOnlyUnread(value)
@@ -259,19 +262,24 @@ fun FeedScreen(
             )
         }
 
+        val bottomPadding by remember(bottomBarVisible) {
+            derivedStateOf {
+                if (bottomBarVisible) {
+                    80.dp
+                } else {
+                    // Navigation bar is 48dp high
+                    (80 + 48).dp
+                }
+            }
+        }
+
         AnimatedVisibility(
             enter = fadeIn(),
             exit = fadeOut(),
             visible = !nothingToRead,
         ) {
             LazyColumn(
-                contentPadding = rememberInsetsPaddingValues(
-                    insets = LocalWindowInsets.current.navigationBars,
-                    applyTop = false,
-                    applyStart = false,
-                    applyEnd = false,
-                    applyBottom = true
-                ),
+                contentPadding = PaddingValues(bottom = bottomPadding),
                 modifier = modifier
             ) {
                 items(
@@ -351,8 +359,9 @@ fun FeedScreen(
     onExport: () -> Unit,
     onMarkAllAsRead: () -> Unit,
     showFloatingActionButton: Boolean,
+    bottomBarVisible: Boolean,
     readAloudPlayer: @Composable () -> Unit,
-    content: @Composable (Modifier, suspend () -> Unit) -> Unit
+    content: @Composable (Modifier, suspend () -> Unit) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState(
@@ -457,7 +466,7 @@ fun FeedScreen(
                             }
                             DropdownMenuItem(
                                 onClick = {
-                                    if (visibleFeeds.size == 1) {
+                                    if (visibleFeeds.size==1) {
                                         onEditFeed(visibleFeeds.first().id)
                                     } else {
                                         showEditDialog = true
@@ -573,7 +582,13 @@ fun FeedScreen(
                 FloatingActionButton(
                     onClick = onMarkAllAsRead,
                     modifier = Modifier
-                        .navigationBarsPadding()
+                        .let {
+                            if (bottomBarVisible) {
+                                it
+                            } else {
+                                it.navigationBarsPadding()
+                            }
+                        }
                 ) {
                     Icon(
                         Icons.Default.Check,
@@ -631,6 +646,7 @@ fun DefaultPreview() {
             onRefreshAll = {},
             onlyUnread = false,
             showFloatingActionButton = true,
+            bottomBarVisible = false,
             onToggleOnlyUnread = {},
             onDrawerItemSelected = { _, _ -> },
             onAddFeed = { },
@@ -687,7 +703,7 @@ fun DefaultPreview() {
 @Immutable
 data class FeedOrTag(
     val id: Long,
-    val tag: String
+    val tag: String,
 )
 
 val FeedOrTag.isFeed

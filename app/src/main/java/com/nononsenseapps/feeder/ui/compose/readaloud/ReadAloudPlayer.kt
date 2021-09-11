@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.navigationBarsPadding
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TextToSpeechViewModel
@@ -37,10 +38,10 @@ import com.nononsenseapps.feeder.ui.compose.theme.ReadAloudPlayerStyle
 fun HideableReadAloudPlayer(
     readAloudViewModel: TextToSpeechViewModel
 ) {
-    val readAloudState by readAloudViewModel.readAloudState
+    val visible by readAloudViewModel.notStopped
 
     AnimatedVisibility(
-        visible = readAloudState != PlaybackStatus.STOPPED,
+        visible = visible,
         enter = fadeIn() + slideInVertically(initialOffsetY = { it * 2 }),
         exit = slideOutVertically(targetOffsetY = { it * 2 }) + fadeOut()
     ) {
@@ -77,6 +78,7 @@ fun ReadAloudPlayer(
         modifier = Modifier
             .fillMaxWidth()
             .height(intrinsicSize = IntrinsicSize.Max)
+            .navigationBarsPadding()
     ) {
         Text(
             title,

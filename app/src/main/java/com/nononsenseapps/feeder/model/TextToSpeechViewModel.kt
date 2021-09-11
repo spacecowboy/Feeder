@@ -9,6 +9,7 @@ import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.R
@@ -57,6 +58,9 @@ class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitL
 
     private val _readAloudState = mutableStateOf(PlaybackStatus.STOPPED)
     val readAloudState: State<PlaybackStatus> = _readAloudState
+    val notStopped: State<Boolean> = derivedStateOf {
+        _readAloudState.value != PlaybackStatus.STOPPED
+    }
 
     private val _title = mutableStateOf("")
     val title: State<String> = _title
