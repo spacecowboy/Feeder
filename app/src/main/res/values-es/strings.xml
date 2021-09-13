@@ -112,7 +112,6 @@
     <string name="showing_only_unread_articles">Mostrar solo artículos no leídos</string>
     <string name="already_read">Ya leídos</string>
     <string name="unread">No leídos</string>
-    <string name="n_unread_articles">%1$s artículos no leídos</string>
     <string name="go_to_feed">Ir a %1$s</string>
     <string name="open_menu">Abrir menú</string>
     <string name="go_back">Ir hacía atrás</string>

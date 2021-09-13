@@ -112,7 +112,6 @@
     <string name="showing_only_unread_articles">Wyświetlanie tylko nieprzeczytanych artykułów</string>
     <string name="already_read">Już przeczytane</string>
     <string name="unread">Nieprzeczytane</string>
-    <string name="n_unread_articles">Nieprzeczytane artykuły: %1$s</string>
     <string name="go_to_feed">Przejdź do %1$s</string>
     <string name="open_menu">Otwórz menu</string>
     <string name="go_back">Wstecz</string>

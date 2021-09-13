@@ -112,7 +112,6 @@
     <string name="showing_only_unread_articles">Yalnızca okunmayan makaleler gösteriliyor</string>
     <string name="already_read">Okundu</string>
     <string name="unread">Okunmadı</string>
-    <string name="n_unread_articles">%1$s okunmayan makale</string>
     <string name="go_to_feed">%1$s\'e git</string>
     <string name="open_menu">Menüyü aç</string>
     <string name="go_back">Geri git</string>
