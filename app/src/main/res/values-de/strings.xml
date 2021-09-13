@@ -63,7 +63,7 @@
     <string name="show_fab">„Alle gelesen“-Schaltfläche</string>
     <string name="include_mobile_hotspots">Mobile Hotspots verwenden</string>
     <string name="updated_feeds">Feeds aktualisiert</string>
-  <string name="notification_channel_name">Ungelesene Feeds</string>
+    <string name="notification_channel_name">Ungelesene Feeds</string>
     <string name="notification_channel_description">Benachrichtigungen werden nur für ungelesene Nachrichten in konfigurierten Feeds angezeigt</string>
     <string name="open_in_reader">Feedreader</string>
     <string name="open_in_webview">WebView</string>
@@ -107,4 +107,22 @@
     <string name="pause_reading">Vorlesen pausieren</string>
     <string name="read_article">Vorlesen</string>
     <string name="use_app_default">Standardeinstellung verwenden</string>
+    <string name="other_unread_articles">%1$s ungelesene Artikel</string>
+    <string name="many_unread_articles">%1$s ungelesene Artikel</string>
+    <string name="few_unread_articles">%1$s ungelesene Artikel</string>
+    <string name="two_unread_articles">%1$s ungelesene Artikel</string>
+    <string name="one_unread_article">%1$s ungelesener Artikel</string>
+    <string name="zero_unread_articles">%1$s ungelesener Artikel</string>
+    <string name="synchronize_feeds">Feeds synchronisieren</string>
+    <string name="showing_all_articles">Alle Artikel werden angezeigt</string>
+    <string name="showing_only_unread_articles">Nur ungelesene Artikel werden angezeigt</string>
+    <string name="already_read">Schon gelesen</string>
+    <string name="unread">Nicht gelesen</string>
+    <string name="go_to_feed">Weiter zu %1$s</string>
+    <string name="open_menu">Menü öffnen</string>
+    <string name="go_back">Zurück</string>
+    <string name="contracted_tag">Geschlossene Gruppe</string>
+    <string name="expanded_tag">Geöffnete Gruppe</string>
+    <string name="stop_reading">Lesen beenden</string>
+    <string name="open_enclosed_media_file">Öffnen %1$s</string>
 </resources>
