@@ -63,7 +63,7 @@
     <string name="show_fab">Pokazuj pływający przycisk akcji</string>
     <string name="include_mobile_hotspots">Uwzględnij mobilne punkty dostępu</string>
     <string name="updated_feeds">Zaktualizowane kanały</string>
-  <string name="notification_channel_name">Nieprzeczytane kanały</string>
+    <string name="notification_channel_name">Nieprzeczytane kanały</string>
     <string name="notification_channel_description">Powiadomienia są wyświetlane tylko dla nieprzeczytanych artykułów w skonfigurowanych kanałach</string>
     <string name="open_in_reader">Czytnik</string>
     <string name="open_in_webview">WebView</string>
@@ -107,4 +107,23 @@
     <string name="pause_reading">Wstrzymaj czytanie</string>
     <string name="read_article">Czytaj na głos</string>
     <string name="use_app_default">Użyj domyślnej aplikacji</string>
+    <string name="synchronize_feeds">Synchronizuj kanały</string>
+    <string name="showing_all_articles">Wyświetlanie wszystkich artykułów</string>
+    <string name="showing_only_unread_articles">Wyświetlanie tylko nieprzeczytanych artykułów</string>
+    <string name="already_read">Już przeczytane</string>
+    <string name="unread">Nieprzeczytane</string>
+    <string name="n_unread_articles">Nieprzeczytane artykuły: %1$s</string>
+    <string name="go_to_feed">Przejdź do %1$s</string>
+    <string name="open_menu">Otwórz menu</string>
+    <string name="go_back">Wstecz</string>
+    <string name="contracted_tag">Grupa zamknięta</string>
+    <string name="expanded_tag">Grupa otwarta</string>
+    <string name="stop_reading">Przestań czytać</string>
+    <string name="open_enclosed_media_file">Otwórz %1$s</string>
+    <string name="many_unread_articles">%1$s nieprzeczytanych artykułów</string>
+    <string name="other_unread_articles">%1$s nieprzeczytanych artykułów</string>
+    <string name="few_unread_articles">%1$s nieprzeczytane artykuły</string>
+    <string name="two_unread_articles">%1$s nieprzeczytane artykuły</string>
+    <string name="one_unread_article">%1$s nieprzeczytany artykuł</string>
+    <string name="zero_unread_articles">%1$s nieprzeczytanych artykułów</string>
 </resources>
