@@ -61,7 +61,7 @@
     <string name="show_fab">Mostra pulsante di azione fluttuante</string>
     <string name="include_mobile_hotspots">Includi hotspot mobili</string>
     <string name="updated_feeds">Flussi aggiornati</string>
-  <string name="notification_channel_name">Flussi non letti</string>
+    <string name="notification_channel_name">Flussi non letti</string>
     <string name="notification_channel_description">Le notifiche sono visualizzate solo per elementi non letti nei flussi configurati</string>
     <string name="open_in_reader">Lettore</string>
     <string name="open_in_webview">Web View</string>
@@ -107,4 +107,22 @@
     <string name="pause_reading">Metti in pausa la lettura</string>
     <string name="read_article">Leggi ad alta voce</string>
     <string name="use_app_default">Usa i predefiniti dell\'app</string>
+    <string name="other_unread_articles">%1$s articoli non letti</string>
+    <string name="many_unread_articles">%1$s articoli non letti</string>
+    <string name="few_unread_articles">%1$s articoli non letti</string>
+    <string name="two_unread_articles">%1$s articoli non letti</string>
+    <string name="one_unread_article">%1$s articoli non letti</string>
+    <string name="zero_unread_articles">%1$s articolo non letto</string>
+    <string name="synchronize_feeds">Sincronizzare i flussi</string>
+    <string name="showing_all_articles">Visualizzazione di tutti gli articoli</string>
+    <string name="showing_only_unread_articles">Visualizzazione solo degli articoli non letti</string>
+    <string name="already_read">Già letto</string>
+    <string name="unread">Non letto</string>
+    <string name="go_to_feed">Vai a %1$s</string>
+    <string name="open_menu">Apri il menù</string>
+    <string name="go_back">Indietro</string>
+    <string name="contracted_tag">Etichetta chiusa</string>
+    <string name="expanded_tag">Etichetta aperta</string>
+    <string name="stop_reading">Smetti la lettura</string>
+    <string name="open_enclosed_media_file">Apri %1$s</string>
 </resources>

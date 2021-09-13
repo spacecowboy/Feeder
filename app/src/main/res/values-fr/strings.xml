@@ -51,7 +51,7 @@
     <string name="check_for_updates">Mettre à jour les flux</string>
     <string name="include_mobile_hotspots">Inclure les points d\'accès mobiles</string>
     <string name="updated_feeds">Flux mis à jour</string>
-  <string name="preload_custom_tab">Précharger l\'onglet personnalisé</string>
+    <string name="preload_custom_tab">Précharger l\'onglet personnalisé</string>
     <string name="battery_optimization_enabled">Optimisation de la batterie activée</string>
     <string name="battery_optimization_disabled">Optimisation de la batterie désactivée</string>
     <string name="battery_optimization">Optimisation de la batterie</string>
@@ -107,4 +107,22 @@
     <string name="pause_reading">Mettre la lecture en pause</string>
     <string name="read_article">Lire à haute voix</string>
     <string name="use_app_default">Utiliser les valeurs par défaut</string>
+    <string name="zero_unread_articles">%1$s article non lu</string>
+    <string name="other_unread_articles">%1$s articles non lus</string>
+    <string name="many_unread_articles">%1$s articles non lus</string>
+    <string name="few_unread_articles">%1$s articles non lus</string>
+    <string name="two_unread_articles">%1$s articles non lus</string>
+    <string name="one_unread_article">%1$s article non lu</string>
+    <string name="synchronize_feeds">Synchroniser les flux</string>
+    <string name="showing_all_articles">Tous les articles sont affichés</string>
+    <string name="showing_only_unread_articles">Uniquement les articles non lus sont affichés</string>
+    <string name="already_read">Déjà lu</string>
+    <string name="unread">Non lu</string>
+    <string name="go_to_feed">Aller à %1$s</string>
+    <string name="open_menu">Ouvrir le menu</string>
+    <string name="go_back">Retour</string>
+    <string name="contracted_tag">Étiquette fermée</string>
+    <string name="expanded_tag">Étiquette ouverte</string>
+    <string name="stop_reading">Arrêter la lecture</string>
+    <string name="open_enclosed_media_file">Ouvrir %1$s</string>
 </resources>

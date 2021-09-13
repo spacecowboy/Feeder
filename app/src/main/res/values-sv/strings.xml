@@ -63,7 +63,7 @@
     <string name="show_fab">Visa flytande åtgärdsknapp</string>
     <string name="include_mobile_hotspots">Inkludera hotspots</string>
     <string name="updated_feeds">Uppdaterade flöden</string>
-  <string name="notification_channel_name">Olästa flöden</string>
+    <string name="notification_channel_name">Olästa flöden</string>
     <string name="notification_channel_description">Notifikationer visas endast för olästa flöden</string>
     <string name="open_in_reader">Läsare</string>
     <string name="open_in_webview">Webbvy</string>
@@ -107,4 +107,22 @@
     <string name="pause_reading">Pausa uppläsning</string>
     <string name="read_article">Läs högt</string>
     <string name="use_app_default">Använd standardinställning</string>
+    <string name="synchronize_feeds">Synkronisera flöden</string>
+    <string name="showing_all_articles">Visar alla artiklar</string>
+    <string name="showing_only_unread_articles">Visar bara olästa artiklar</string>
+    <string name="already_read">Redan läst</string>
+    <string name="unread">Oläst</string>
+    <string name="go_to_feed">Öppna %1$s</string>
+    <string name="open_menu">Öppna meny</string>
+    <string name="go_back">Gå tillbaka</string>
+    <string name="contracted_tag">Stängd tagg</string>
+    <string name="expanded_tag">Öppen tagg</string>
+    <string name="stop_reading">Stoppa läsning</string>
+    <string name="open_enclosed_media_file">Öppna %1$s</string>
+    <string name="other_unread_articles">%1$s olästa artiklar</string>
+    <string name="many_unread_articles">%1$s olästa artiklar</string>
+    <string name="few_unread_articles">%1$s olästa artiklar</string>
+    <string name="two_unread_articles">%1$s olästa artiklar</string>
+    <string name="one_unread_article">%1$s oläst artikel</string>
+    <string name="zero_unread_articles">%1$s olästa artiklar</string>
 </resources>

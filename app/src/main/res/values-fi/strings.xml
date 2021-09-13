@@ -63,7 +63,7 @@
     <string name="show_fab">Kelluva toimintopainike</string>
     <string name="include_mobile_hotspots">Sisällytä mobiili hotspotit</string>
     <string name="updated_feeds">Päivitetyt syötteet</string>
-  <string name="notification_channel_name">Lukemattomat syötteet</string>
+    <string name="notification_channel_name">Lukemattomat syötteet</string>
     <string name="notification_channel_description">Ilmoitukset näytetään vain määritellyissä syötteissä oleville lukemattomille kohteille</string>
     <string name="open_in_reader">Lukija</string>
     <string name="open_in_webview">Web-näkymä</string>
@@ -105,4 +105,24 @@
     <string name="resume_reading">Jatka lukemista</string>
     <string name="pause_reading">Keskeytä lukeminen</string>
     <string name="read_article">Lue ääneen</string>
+    <string name="failed_to_parse">Parseeraus epäonnistui %1$s</string>
+    <string name="zero_unread_articles">%1$s lukematon artikkeli</string>
+    <string name="synchronize_feeds">Synkronoi syötteet</string>
+    <string name="showing_only_unread_articles">Vain lukemattomat artikkelit näytetään</string>
+    <string name="showing_all_articles">Kaikki artikkelit näytetään</string>
+    <string name="already_read">Jo luettu</string>
+    <string name="unread">Lukematon</string>
+    <string name="other_unread_articles">%1$s lukematonta artikkelia</string>
+    <string name="many_unread_articles">%1$s lukematonta artikkelia</string>
+    <string name="few_unread_articles">%1$s lukematonta artikkelia</string>
+    <string name="two_unread_articles">%1$s lukematonta artikkelia</string>
+    <string name="one_unread_article">%1$s lukematon artikkeli</string>
+    <string name="go_to_feed">Siirry kohtaan %1$s</string>
+    <string name="open_menu">Avaa valikko</string>
+    <string name="go_back">Palaa takaisin</string>
+    <string name="contracted_tag">Suljettu tunniste</string>
+    <string name="expanded_tag">Avattu tunniste</string>
+    <string name="use_app_default">Käytä sovelluksen oletusarvoa</string>
+    <string name="stop_reading">Lopeta lukeminen</string>
+    <string name="open_enclosed_media_file">Avaa %1$s</string>
 </resources>

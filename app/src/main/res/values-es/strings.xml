@@ -63,7 +63,7 @@
     <string name="show_fab">Mostrar botón flotante</string>
     <string name="include_mobile_hotspots">Incluir puntos de acceso móviles</string>
     <string name="updated_feeds">Canales actualizados</string>
-  <string name="notification_channel_name">Entradas no leídas</string>
+    <string name="notification_channel_name">Entradas no leídas</string>
     <string name="notification_channel_description">Notificaciones solo se muestran para elementos no leídos canales configurados</string>
     <string name="open_in_reader">Lector</string>
     <string name="open_in_webview">Vista Web</string>
@@ -107,4 +107,22 @@
     <string name="pause_reading">Pausar lectura</string>
     <string name="read_article">Leer en voz alta</string>
     <string name="use_app_default">Usar aplicación por defecto</string>
+    <string name="synchronize_feeds">Sincronizar orígenes</string>
+    <string name="showing_all_articles">Mostrar todos los artículos</string>
+    <string name="showing_only_unread_articles">Mostrar solo artículos no leídos</string>
+    <string name="already_read">Ya leídos</string>
+    <string name="unread">No leídos</string>
+    <string name="go_to_feed">Ir a %1$s</string>
+    <string name="open_menu">Abrir menú</string>
+    <string name="go_back">Ir hacía atrás</string>
+    <string name="contracted_tag">Etiqueta cerrada</string>
+    <string name="expanded_tag">Abrir etiqueta</string>
+    <string name="stop_reading">Detener lectura</string>
+    <string name="open_enclosed_media_file">Abrir %1$s</string>
+    <string name="other_unread_articles">%1$s artículos no leídos</string>
+    <string name="many_unread_articles">%1$s artículos no leídos</string>
+    <string name="few_unread_articles">%1$s artículos no leídos</string>
+    <string name="two_unread_articles">%1$s artículos no leídos</string>
+    <string name="one_unread_article">%1$s artículo no leído</string>
+    <string name="zero_unread_articles">%1$s artículos no leídos</string>
 </resources>
