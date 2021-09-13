@@ -63,7 +63,7 @@
     <string name="show_fab">Kayan işlem düğmesini göster</string>
     <string name="include_mobile_hotspots">Mobil etkin noktaları dahil et</string>
     <string name="updated_feeds">Güncellenen beslemeler</string>
-  <string name="notification_channel_name">Okunmamış yayınlar</string>
+    <string name="notification_channel_name">Okunmamış yayınlar</string>
     <string name="notification_channel_description">Bildirimler yalnızca yapılandırılan yayınlardaki okunmamış ögeler için gösterilir</string>
     <string name="open_in_reader">Okuyucu içinde</string>
     <string name="open_in_webview">Web görünümünde</string>
@@ -107,4 +107,23 @@
     <string name="pause_reading">Okumayı duraklat</string>
     <string name="read_article">Yüksek sesle oku</string>
     <string name="use_app_default">Uygulama öntanımlı değerini kullan</string>
+    <string name="synchronize_feeds">Yayınları eşzamanla</string>
+    <string name="showing_all_articles">Tüm makaleler gösteriliyor</string>
+    <string name="showing_only_unread_articles">Yalnızca okunmayan makaleler gösteriliyor</string>
+    <string name="already_read">Okundu</string>
+    <string name="unread">Okunmadı</string>
+    <string name="n_unread_articles">%1$s okunmayan makale</string>
+    <string name="go_to_feed">%1$s\'e git</string>
+    <string name="open_menu">Menüyü aç</string>
+    <string name="go_back">Geri git</string>
+    <string name="contracted_tag">Kapalı etiket</string>
+    <string name="expanded_tag">Açık etiket</string>
+    <string name="stop_reading">Okumayı bırak</string>
+    <string name="open_enclosed_media_file">%1$s aç</string>
+    <string name="other_unread_articles">%1$s okunmayan makale</string>
+    <string name="many_unread_articles">%1$s okunmayan makale</string>
+    <string name="few_unread_articles">%1$s okunmayan makale</string>
+    <string name="two_unread_articles">%1$s okunmayan makale</string>
+    <string name="one_unread_article">%1$s okunmayan makale</string>
+    <string name="zero_unread_articles">%1$s okunmayan makale</string>
 </resources>
