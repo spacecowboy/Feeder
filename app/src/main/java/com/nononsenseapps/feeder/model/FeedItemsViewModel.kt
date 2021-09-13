@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.model
 
 import android.util.ArrayMap
 import androidx.compose.runtime.Immutable
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -11,6 +10,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
+import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
@@ -18,51 +18,65 @@ import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
+import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
+import com.nononsenseapps.feeder.util.SortingOptions
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
+import org.kodein.di.direct
 import org.kodein.di.instance
-import java.util.*
 
 const val PAGE_SIZE = 100
-private const val KEY_FEED_ID = "FeedItemsViewModel feedid"
-private const val KEY_TAG = "FeedItemsViewModel tag"
 
 class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
+    private val settingsViewModel: SettingsViewModel by instance(arg = di.direct.instance<DIAwareComponentActivity>())
     private val dao: FeedItemDao by instance()
     private val feedDao: FeedDao by instance()
-    private val liveOnlyUnread = MutableLiveData<Boolean>()
-    private val liveNewestFirst = MutableLiveData<Boolean>()
 
-    private val feedListArgsState = MutableStateFlow(
-        FeedListArgs(
-            feedId = ID_UNSET,
-            tag = "",
-            onlyUnread = false,
-            newestFirst = true
-        )
-    )
-    var feedListArgs
-        get() = feedListArgsState.value
+    private val _currentFeedOrTag = MutableStateFlow(FeedOrTag(-1, ""))
+
+    var feedOrTag: FeedOrTag
+        get() = _currentFeedOrTag.value
         set(value) {
-            feedListArgsState.value = value
+            _currentFeedOrTag.value = value
         }
 
-    init {
-        liveOnlyUnread.value = true
-        liveNewestFirst.value = true
-    }
+    private val feedListArgsState = combine(
+        _currentFeedOrTag,
+        settingsViewModel.showOnlyUnread,
+        settingsViewModel.currentSorting
+    ) { feedOrTag, onlyUnread, sorting ->
+        FeedListArgs(
+            feedId = feedOrTag.id,
+            tag = feedOrTag.tag,
+            onlyUnread = onlyUnread,
+            newestFirst = sorting==SortingOptions.NEWEST_FIRST,
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        FeedListArgs(
+            feedId = settingsViewModel.currentFeedAndTag.value.first,
+            tag = settingsViewModel.currentFeedAndTag.value.second,
+            onlyUnread = true,
+            newestFirst = true,
+        )
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val drawerItemsWithUnreadCounts: Flow<List<DrawerItemWithUnreadCount>> =
@@ -270,6 +284,7 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val feedListItems: Flow<PagingData<FeedListItem>> =
         feedListArgsState.flatMapLatest { args ->
             Pager(
@@ -317,6 +332,7 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
         }
             .cachedIn(viewModelScope)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val currentTitle: Flow<String?> =
         feedListArgsState.mapLatest { args ->
             when {
@@ -334,10 +350,6 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
         return feedDao.getFeedTitle(feedId).firstOrNull()?.displayTitle
     }
 
-    fun setNewestFirst(newestFirst: Boolean) {
-        liveNewestFirst.value = newestFirst
-    }
-
     fun markAllAsReadInBackground(feedId: Long, tag: String) = viewModelScope.launch {
         markAllAsRead(feedId, tag)
     }
@@ -345,7 +357,7 @@ class FeedItemsViewModel(di: DI, private val state: SavedStateHandle) : DIAwareV
     suspend fun markAllAsRead(feedId: Long, tag: String) {
         when {
             feedId > ID_UNSET -> dao.markAllAsRead(feedId)
-            feedId == ID_ALL_FEEDS -> dao.markAllAsRead()
+            feedId==ID_ALL_FEEDS -> dao.markAllAsRead()
             tag.isNotEmpty() -> dao.markAllAsRead(tag)
         }
     }
@@ -392,5 +404,5 @@ data class FeedListArgs(
     val feedId: Long,
     val tag: String,
     val newestFirst: Boolean,
-    val onlyUnread: Boolean
+    val onlyUnread: Boolean,
 )

@@ -25,7 +25,6 @@ import org.kodein.di.instance
 abstract class DIAwareViewModel(override val di: DI) :
     AndroidViewModel(di.direct.instance()), DIAware
 
-@Deprecated("Stop using this", replaceWith = ReplaceWith("DIAwareSavedStateViewModelFactory"))
 class DIAwareViewModelFactory(
     override val di: DI
 ) : ViewModelProvider.AndroidViewModelFactory(di.direct.instance()), DIAware {
@@ -48,7 +47,15 @@ class DIAwareViewModelFactory(
     }
 }
 
-inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithDIAwareViewModelFactory() {
+inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithActivityViewModelScope() {
+    bind<T>() with factory { activity: DIAwareComponentActivity ->
+        val factory = DIAwareViewModelFactory(activity.di)
+
+        ViewModelProvider(activity, factory).get(T::class.java)
+    }
+}
+
+inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithComposableViewModelScope() {
     bind<T>() with factory { activity: DIAwareComponentActivity ->
         val factory = DIAwareSavedStateViewModelFactory(activity.di, activity)
 

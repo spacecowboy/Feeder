@@ -219,7 +219,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND unread IS :unread
-        ORDER BY primary_sort_time DESC, pub_date ASC
+        ORDER BY primary_sort_time ASC, pub_date ASC
         """
     )
     fun pagingUnreadPreviewsAsc(feedId: Long, unread: Boolean = true): PagingSource<Int, PreviewItem>
@@ -230,7 +230,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag AND unread IS :unread
-        ORDER BY primary_sort_time DESC, pub_date ASC
+        ORDER BY primary_sort_time ASC, pub_date ASC
         """
     )
     fun pagingUnreadPreviewsAsc(tag: String, unread: Boolean = true): PagingSource<Int, PreviewItem>
@@ -241,7 +241,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE unread IS :unread
-        ORDER BY primary_sort_time DESC, pub_date ASC
+        ORDER BY primary_sort_time ASC, pub_date ASC
         """
     )
     fun pagingUnreadPreviewsAsc(unread: Boolean = true): PagingSource<Int, PreviewItem>
@@ -284,7 +284,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-        ORDER BY primary_sort_time DESC, pub_date ASC
+        ORDER BY primary_sort_time ASC, pub_date ASC
         """
     )
     fun pagingPreviewsAsc(feedId: Long): PagingSource<Int, PreviewItem>
@@ -295,7 +295,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
-        ORDER BY primary_sort_time DESC, pub_date ASC
+        ORDER BY primary_sort_time ASC, pub_date ASC
         """
     )
     fun pagingPreviewsAsc(tag: String): PagingSource<Int, PreviewItem>
@@ -305,7 +305,7 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        ORDER BY primary_sort_time DESC, pub_date ASC
+        ORDER BY primary_sort_time ASC, pub_date ASC
         """
     )
     fun pagingPreviewsAsc(): PagingSource<Int, PreviewItem>

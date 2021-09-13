@@ -44,6 +44,7 @@ import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -94,7 +95,6 @@ import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
 import com.nononsenseapps.feeder.ui.compose.state.getImagePlaceholder
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.util.SortingOptions
 import com.nononsenseapps.feeder.util.ThemeOptions
 import com.nononsenseapps.feeder.util.openGitlabIssues
 import kotlinx.coroutines.launch
@@ -118,7 +118,6 @@ fun FeedScreen(
     readAloudViewModel: TextToSpeechViewModel,
 ) {
     val onlyUnread by settingsViewModel.showOnlyUnread.collectAsState()
-    val currentSorting by settingsViewModel.currentSorting.collectAsState()
     val showFloatingActionButton by settingsViewModel.showFab.collectAsState()
 
     val screenTitle by feedItemsViewModel.currentTitle.collectAsState(initial = "")
@@ -128,15 +127,9 @@ fun FeedScreen(
     val feedsAndTags by feedItemsViewModel.drawerItemsWithUnreadCounts
         .collectAsState(initial = emptyList())
 
-    feedItemsViewModel.feedListArgs = feedItemsViewModel.feedListArgs.copy(
-        feedId = feedOrTag.id,
-        tag = feedOrTag.tag,
-        onlyUnread = onlyUnread,
-        newestFirst = when (currentSorting) {
-            SortingOptions.NEWEST_FIRST -> true
-            SortingOptions.OLDEST_FIRST -> false
-        }
-    )
+    LaunchedEffect(feedOrTag) {
+        feedItemsViewModel.feedOrTag = feedOrTag
+    }
 
     val pagedFeedItems = feedItemsViewModel.feedListItems.collectAsLazyPagingItems()
 
