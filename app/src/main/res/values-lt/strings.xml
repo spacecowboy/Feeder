@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="toggle_tag_expansion">Perjungti žymos išplėtimą</string>
-  <string name="include_mobile_hotspots">Įtraukti mobiliuosius taškus</string>
+    <string name="include_mobile_hotspots">Įtraukti mobiliuosius taškus</string>
     <string name="show_fab">Rodyti paslankųjį veiksmo mygtuką</string>
     <string name="indicator_for_mark_as_read">Žymos \"perskaityta\" indikatorius</string>
     <string name="new_based_on_this">Nauja, pagrįsta tai</string>
@@ -107,4 +107,22 @@
     <string name="fetch_full_articles_by_default">Parsiųsti pilnus straipsnius automatiškai</string>
     <string name="failed_to_fetch_full_article">Pilno straipsnio parsiųsti nepavyko</string>
     <string name="fetching_full_article">Parsiunčiamas pilnas straipsnis…</string>
+    <string name="few_unread_articles">%1$s neskaityti straipsniai</string>
+    <string name="other_unread_articles">%1$s neskaitytų straipsnių</string>
+    <string name="many_unread_articles">%1$s neskaitytų straipsnių</string>
+    <string name="two_unread_articles">%1$s neskaityti straipsniai</string>
+    <string name="zero_unread_articles">%1$s neskaitytų straipsnių</string>
+    <string name="one_unread_article">%1$s neskaitytas straipsnis</string>
+    <string name="synchronize_feeds">Sinchronizuoti kanalus</string>
+    <string name="showing_all_articles">Rodomi visi straipsniai</string>
+    <string name="showing_only_unread_articles">Rodomi tik neskaityti straipsniai</string>
+    <string name="already_read">Jau skaityta</string>
+    <string name="unread">Neskaityta</string>
+    <string name="go_to_feed">Eiti į %1$s</string>
+    <string name="open_menu">Atidaryti meniu</string>
+    <string name="go_back">Grįžti atgal</string>
+    <string name="contracted_tag">Uždaryti žymą</string>
+    <string name="expanded_tag">Atidaryti žymą</string>
+    <string name="stop_reading">Baigti skaitymą</string>
+    <string name="open_enclosed_media_file">Atidaryti %1$s</string>
 </resources>
