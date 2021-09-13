@@ -41,7 +41,7 @@
     <string name="open_in_reader">Trình đọc</string>
     <string name="notification_channel_description">Thông báo chỉ được hiện cho các mục chưa đọc trong các feed được thiết lập</string>
     <string name="notification_channel_name">Feed chưa đọc</string>
-  <string name="updated_feeds">Feed đã cập nhật</string>
+    <string name="updated_feeds">Feed đã cập nhật</string>
     <string name="include_mobile_hotspots">Bao gồm các điểm phát sóng di động</string>
     <string name="show_fab">Hiện nút hành động nổi (ở góc phải dưới)</string>
     <string name="on_startup">Khi khởi động</string>
@@ -107,4 +107,22 @@
     <string name="action_settings">Cài đặt</string>
     <string name="navigation_drawer_close">Đóng ngăn điều hướng</string>
     <string name="navigation_drawer_open">Mở ngăn điều hướng</string>
+    <string name="other_unread_articles">%1$s bài viết chưa đọc</string>
+    <string name="many_unread_articles">%1$s bài viết chưa đọc</string>
+    <string name="few_unread_articles">%1$s bài viết chưa đọc</string>
+    <string name="two_unread_articles">%1$s bài viết chưa đọc</string>
+    <string name="one_unread_article">%1$s bài viết chưa đọc</string>
+    <string name="zero_unread_articles">%1$s bài viết chưa đọc</string>
+    <string name="synchronize_feeds">Đồng bộ hóa các nguồn dữ liệu</string>
+    <string name="showing_all_articles">Đang hiện tất cả bài viết</string>
+    <string name="showing_only_unread_articles">Đang hiện chỉ những bài viết chưa đọc</string>
+    <string name="already_read">Đã đọc</string>
+    <string name="unread">Chưa đọc</string>
+    <string name="go_to_feed">Đi đến %1$s</string>
+    <string name="open_menu">Mở menu</string>
+    <string name="go_back">Quay lại</string>
+    <string name="contracted_tag">Thẻ đóng</string>
+    <string name="expanded_tag">Thẻ mở</string>
+    <string name="stop_reading">Dừng đọc</string>
+    <string name="open_enclosed_media_file">Mở %1$s</string>
 </resources>
