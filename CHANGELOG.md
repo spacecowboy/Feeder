@@ -1,3 +1,35 @@
+# 2.0.0-rc.2
+Agnieszka C (1):
+  * [b36db45a] Updated Polish translation using Weblate
+
+El Pirujo (1):
+  * [5c5a3c91] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [76e9eba5] Updated Chinese (Simplified) translation using Weblate
+
+Gediminas Murauskas (1):
+  * [0d802855] Updated Lithuanian translation using Weblate
+
+J. Lavoie (1):
+  * [0aa39250] Updated Italian translation using Weblate
+
+Jonas Kalderstam (7):
+  * [d94de6a7] Fixed so TextToSpeech is not initialized as part of App
+         startup
+  * [e717ab31] Added plural forms for n_unread_articles string
+  * [fe8faac4] Changed so CI pipeline builds APK with R8 optimizations
+  * [d4792743] Slightly increased size of title in list
+  * [3e00725f] Fixed so read aloud player is not behind navigation bars
+  * [302da01a] Fixed inconsistent behavior with different sort options
+  * [214e6660] Updated Swedish translation using Weblate
+
+Oğuz Ersen (1):
+  * [03f2be20] Updated Turkish translation using Weblate
+
+bruh (1):
+  * [5d3998ec] Updated Vietnamese translation using Weblate
+
 # 2.0.0-rc.1
 Jonas Kalderstam (10):
   * [f0e87b8a] Fixed accessibility descriptions
