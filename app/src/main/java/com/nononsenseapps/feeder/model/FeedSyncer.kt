@@ -1,15 +1,12 @@
 package com.nononsenseapps.feeder.model
 
 import android.content.Context
-import androidx.work.Constraints
 import androidx.work.CoroutineWorker
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
@@ -17,12 +14,10 @@ import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.currentlyCharging
 import com.nononsenseapps.feeder.util.currentlyConnected
 import com.nononsenseapps.feeder.util.currentlyUnmetered
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import java.util.concurrent.TimeUnit
 
 const val ARG_FORCE_NETWORK = "force_network"
 
@@ -51,11 +46,11 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
 
         var success = false
 
-        val applicationState by di.instance<ApplicationState>()
+        val repository by di.instance<Repository>()
 
         try {
             if (ignoreConnectivitySettings || isOkToSyncAutomatically(context)) {
-                applicationState.setRefreshing(true)
+                repository.setRefreshing(true)
 
                 val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
                 val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
@@ -74,7 +69,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
                 notify(applicationContext)
             }
         } finally {
-            applicationState.setRefreshing(false)
+            repository.setRefreshing(false)
         }
 
         return when (success) {
@@ -105,55 +100,4 @@ fun requestFeedSync(
     workRequest.setInputData(data)
     val workManager by di.instance<WorkManager>()
     workManager.enqueue(workRequest.build())
-}
-
-fun configurePeriodicSync(context: Context, forceReplace: Boolean = false) {
-    val di by closestDI(context)
-    val workManager: WorkManager by di.instance()
-    val prefs: Prefs by di.instance()
-    val shouldSync = prefs.shouldSync()
-
-    if (shouldSync) {
-        val constraints = Constraints.Builder()
-            .setRequiresBatteryNotLow(true)
-            .setRequiresCharging(prefs.onlySyncWhileCharging)
-
-        if (prefs.onlySyncOnWifi) {
-            constraints.setRequiredNetworkType(NetworkType.UNMETERED)
-        } else {
-            constraints.setRequiredNetworkType(NetworkType.CONNECTED)
-        }
-
-        var timeInterval = prefs.synchronizationFrequency
-
-        if (timeInterval in 1..12 || timeInterval == 24L) {
-            // Old value for periodic sync was in hours, convert it to minutes
-            timeInterval *= 60
-            prefs.synchronizationFrequency = timeInterval
-        }
-
-        val workRequestBuilder = PeriodicWorkRequestBuilder<FeedSyncer>(
-            timeInterval, TimeUnit.MINUTES,
-            timeInterval / 2, TimeUnit.MINUTES
-        )
-
-        val syncWork = workRequestBuilder
-            .setConstraints(constraints.build())
-            .addTag("periodic_sync")
-            .build()
-
-        val existingWorkPolicy = if (forceReplace) {
-            ExistingPeriodicWorkPolicy.REPLACE
-        } else {
-            ExistingPeriodicWorkPolicy.KEEP
-        }
-
-        workManager.enqueueUniquePeriodicWork(
-            UNIQUE_PERIODIC_NAME,
-            existingWorkPolicy,
-            syncWork
-        )
-    } else {
-        workManager.cancelUniqueWork(UNIQUE_PERIODIC_NAME)
-    }
 }

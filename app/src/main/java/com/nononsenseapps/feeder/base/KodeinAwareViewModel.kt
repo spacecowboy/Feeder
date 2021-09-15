@@ -5,9 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.SavedStateViewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.savedstate.SavedStateRegistryOwner
 import java.lang.reflect.InvocationTargetException
 import org.kodein.di.DI
@@ -65,8 +67,8 @@ inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithComposableViewModel
 
 class DIAwareSavedStateViewModelFactory(
     override val di: DI,
-    owner: SavedStateRegistryOwner,
-    defaultArgs: Bundle? = null
+    val owner: SavedStateRegistryOwner,
+    val defaultArgs: Bundle? = null
 ) : AbstractSavedStateViewModelFactory(owner, defaultArgs), DIAware {
     override fun <T : ViewModel> create(
         key: String,
@@ -95,6 +97,19 @@ inline fun <reified T : DIAwareViewModel> SavedStateRegistryOwner.DIAwareViewMod
     key: String? = null
 ): T {
     val factory = DIAwareSavedStateViewModelFactory(LocalDI.current, this)
+
+    return viewModel(
+        modelClass = T::class.java,
+        key = key,
+        factory = factory
+    )
+}
+
+@Composable
+inline fun <reified T : DIAwareViewModel> NavBackStackEntry.DIAwareViewModel(
+    key: String? = null
+): T {
+    val factory = DIAwareSavedStateViewModelFactory(LocalDI.current, this, arguments)
 
     return viewModel(
         modelClass = T::class.java,

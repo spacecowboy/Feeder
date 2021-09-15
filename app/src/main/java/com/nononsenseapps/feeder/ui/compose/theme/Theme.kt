@@ -1,5 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
@@ -9,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.nononsenseapps.feeder.util.ThemeOptions
+import com.nononsenseapps.feeder.archmodel.ThemeOptions
 
 @Composable
 fun FeederDarkColorPalette() = darkColors(
@@ -55,3 +57,17 @@ fun FeederTheme(
         }
     }
 }
+
+@Composable
+private fun ThemeOptions.getColors(): Colors =
+    when (this) {
+        ThemeOptions.DAY -> FeederLightColorPalette()
+        ThemeOptions.NIGHT -> FeederDarkColorPalette()
+        ThemeOptions.SYSTEM -> {
+            if (isSystemInDarkTheme()) {
+                FeederDarkColorPalette()
+            } else {
+                FeederLightColorPalette()
+            }
+        }
+    }

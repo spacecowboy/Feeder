@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.navdrawer
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
@@ -24,10 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -44,7 +41,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.google.accompanist.insets.statusBarsPadding
 import com.nononsenseapps.feeder.R
 
 const val COLLAPSE_ANIMATION_DURATION = 300
@@ -62,7 +58,9 @@ private fun ListOfFeedsAndTagsPreview() {
             DrawerTag(tag = "Funny tag", unreadCount = 6),
             DrawerFeed(id = 3, displayTitle = "Hidden", tag = "Funny tag", unreadCount = 6),
             DrawerFeed(id = 4, displayTitle = "Top Dog", unreadCount = 99, tag = "")
-        )
+        ),
+        emptySet(),
+        {},
     ) {}
 }
 
@@ -70,12 +68,10 @@ private fun ListOfFeedsAndTagsPreview() {
 @Composable
 fun ListOfFeedsAndTags(
     feedsAndTags: List<DrawerItemWithUnreadCount>,
+    expandedTags: Set<String>,
+    onToggleTagExpansion: (String) -> Unit,
     onItemClick: (DrawerItemWithUnreadCount) -> Unit,
 ) {
-    var expandedTags by rememberSaveable {
-        mutableStateOf<Set<String>>(emptySet())
-    }
-
     LazyColumn(
         contentPadding = rememberInsetsPaddingValues(
             insets = LocalWindowInsets.current.systemBars,
@@ -90,8 +86,7 @@ fun ListOfFeedsAndTags(
                 is DrawerTag -> {
                     ExpandableTag(
                         expanded = item.tag in expandedTags,
-                        onExpand = { expandedTags = expandedTags + item.tag },
-                        onContract = { expandedTags = expandedTags - item.tag },
+                        onToggleExpansion = onToggleTagExpansion,
                         unreadCount = item.unreadCount,
                         title = item.title(),
                         onItemClick = {
@@ -139,8 +134,7 @@ private fun ExpandableTag(
     title: String = "Foo",
     unreadCount: Int = 99,
     expanded: Boolean = true,
-    onExpand: (String) -> Unit = {},
-    onContract: (String) -> Unit = {},
+    onToggleExpansion: (String) -> Unit = {},
     onItemClick: () -> Unit = {},
 ) {
     val angle: Float by animateFloatAsState(
@@ -149,11 +143,8 @@ private fun ExpandableTag(
     )
 
     val toggleExpandLabel = stringResource(id = R.string.toggle_tag_expansion)
-    val expandedStateLabel = if (expanded) {
-        stringResource(id = R.string.expanded_tag)
-    } else {
-        stringResource(id = R.string.contracted_tag)
-    }
+    val expandedLabel = stringResource(id = R.string.expanded_tag)
+    val contractedLabel = stringResource(id = R.string.contracted_tag)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -162,14 +153,15 @@ private fun ExpandableTag(
             .padding(top = 2.dp, bottom = 2.dp, end = 16.dp)
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                stateDescription = expandedStateLabel
+                Log.d("JONAS", "Semantics for $this")
+                stateDescription = if (expanded) {
+                    expandedLabel
+                } else {
+                    contractedLabel
+                }
                 customActions = listOf(
                     CustomAccessibilityAction(toggleExpandLabel) {
-                        if (expanded) {
-                            onContract(title)
-                        } else {
-                            onExpand(title)
-                        }
+                        onToggleExpansion(title)
                         true
                     }
                 )
@@ -178,11 +170,7 @@ private fun ExpandableTag(
         ExpandArrow(
             degrees = angle,
             onClick = {
-                if (expanded) {
-                    onContract(title)
-                } else {
-                    onExpand(title)
-                }
+                onToggleExpansion(title)
             }
         )
         Text(

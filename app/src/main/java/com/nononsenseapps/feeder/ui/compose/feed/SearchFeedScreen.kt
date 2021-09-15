@@ -42,7 +42,6 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.model.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.MalformedURLException
@@ -57,7 +56,7 @@ fun SearchFeedScreen(
     onNavigateUp: () -> Unit,
     initialFeedUrl: String? = null,
     searchFeedViewModel: SearchFeedViewModel,
-    onClick: (SearchResult) -> Unit
+    onClick: (SearchResult) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -99,7 +98,7 @@ fun SearchFeedView(
     initialFeedUrl: String = "",
     modifier: Modifier,
     searchFeedViewModel: SearchFeedViewModel,
-    onClick: (SearchResult) -> Unit
+    onClick: (SearchResult) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -159,7 +158,7 @@ fun SearchFeedView(
     errors: List<SearchResult>,
     currentlySearching: Boolean,
     modifier: Modifier,
-    onClick: (SearchResult) -> Unit
+    onClick: (SearchResult) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -248,7 +247,7 @@ fun SearchResultView(
     title: String,
     url: String,
     description: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -270,16 +269,6 @@ fun SearchResultView(
         )
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun SearchFeedScreenPreview() {
-//    FeederTheme {
-//        SearchFeedScreen(
-//            onNavigateUp = {}
-//        )
-//    }
-//}
 
 private fun isValidUrl(url: String): Boolean {
     return try {
@@ -303,5 +292,5 @@ data class SearchResult(
     val title: String,
     val url: String,
     val description: String,
-    val isError: Boolean
+    val isError: Boolean,
 ) : Parcelable

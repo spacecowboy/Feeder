@@ -8,14 +8,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
@@ -28,34 +23,27 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import coil.ImageLoader
+import coil.compose.LocalImageLoader
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
+import com.nononsenseapps.feeder.archmodel.ItemOpener
+import com.nononsenseapps.feeder.archmodel.PrefValOpenWith
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.ApplicationState
-import com.nononsenseapps.feeder.model.FeedItemViewModel
-import com.nononsenseapps.feeder.model.FeedItemsViewModel
-import com.nononsenseapps.feeder.model.FeedViewModel
-import com.nononsenseapps.feeder.model.SearchFeedViewModel
-import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToSpeechViewModel
-import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.requestFeedSync
-import com.nononsenseapps.feeder.ui.compose.feed.CreateFeedScreen
-import com.nononsenseapps.feeder.ui.compose.feed.EditFeedScreen
-import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
+import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
+import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
+import com.nononsenseapps.feeder.ui.compose.feed.FeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.isFeed
 import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
-import com.nononsenseapps.feeder.util.ItemOpener
-import com.nononsenseapps.feeder.util.PrefValOpenWith
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
@@ -65,9 +53,8 @@ import org.kodein.di.compose.withDI
 import org.kodein.di.instance
 
 class MainActivity : DIAwareComponentActivity() {
-    private val applicationState: ApplicationState by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
-    private val settingsViewModel: SettingsViewModel by instance(arg = this)
+    private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
 
     // This reference is only used for intent navigation
     private var navController: NavController? = null
@@ -76,7 +63,7 @@ class MainActivity : DIAwareComponentActivity() {
         super.onNewIntent(intent)
 
         intent?.let {
-            if (navController?.handleDeepLink(intent) != true) {
+            if (navController?.handleDeepLink(intent)!=true) {
                 Log.e("FeederMainActivity", "In onNewIntent, navController rejected the intent")
             }
         }
@@ -84,12 +71,12 @@ class MainActivity : DIAwareComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        applicationState.setResumeTime()
+        mainActivityViewModel.setResumeTime()
         maybeRequestSync()
     }
 
     private fun maybeRequestSync() = lifecycleScope.launch {
-        if (settingsViewModel.syncOnResume.value) {
+        if (mainActivityViewModel.shouldSyncOnResume) {
             if (isOkToSyncAutomatically(applicationContext)) {
                 requestFeedSync(
                     di = di,
@@ -107,12 +94,14 @@ class MainActivity : DIAwareComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val currentTheme by settingsViewModel.currentTheme.collectAsState()
+            val currentTheme by mainActivityViewModel.currentTheme.collectAsState()
 
             FeederTheme(
                 currentTheme = currentTheme
             ) {
                 withDI {
+                    val imageLoader: ImageLoader by instance()
+                    LocalImageLoader.provides(imageLoader)
                     appContent()
                 }
             }
@@ -132,19 +121,8 @@ class MainActivity : DIAwareComponentActivity() {
 
         NavHost(navController, startDestination = "lastfeed") {
             composable("lastfeed") { backStackEntry ->
-                val feedOrTag: FeedOrTag = remember {
-                    FeedOrTag(
-                        settingsViewModel.currentFeedAndTag.value.first,
-                        settingsViewModel.currentFeedAndTag.value.second
-                    )
-                }
-
-                FeedScreen(
-                    feedOrTag = feedOrTag,
-                    backStackEntry = backStackEntry,
-                    settingsViewModel = settingsViewModel,
-                    readAloudViewModel = readAloudViewModel
-                )
+                navController.popBackStack()
+                navController.navigate("feed?id=${mainActivityViewModel.currentFeedId}&tag=${mainActivityViewModel.currentFeedTag}")
             }
             composable(
                 "feed?id={id}&tag={tag}",
@@ -164,41 +142,21 @@ class MainActivity : DIAwareComponentActivity() {
                     }
                 )
             ) { backStackEntry ->
-                val feedOrTag: FeedOrTag by remember(
+                LaunchedEffect(
                     key1 = backStackEntry.arguments?.getLong("id"),
                     key2 = backStackEntry.arguments?.getString("tag")
                 ) {
-                    derivedStateOf {
-                        val feedId = (backStackEntry.arguments?.getLong("id")
-                            ?: ID_UNSET).let { feedId ->
-                            if (feedId == ID_UNSET) {
-                                settingsViewModel.currentFeedAndTag.value.first
-                            } else {
-                                feedId
-                            }
-                        }
+                    val feedId = backStackEntry.arguments?.getLong("id")
+                        ?: mainActivityViewModel.currentFeedId
+                    val tag = backStackEntry.arguments?.getString("tag")
+                        ?: mainActivityViewModel.currentFeedTag
 
-                        val tag =
-                            (backStackEntry.arguments?.getString("tag") ?: "").let { tag ->
-                                if (tag.isEmpty()) {
-                                    settingsViewModel.currentFeedAndTag.value.second
-                                } else {
-                                    tag
-                                }
-                            }
-
-                        settingsViewModel.setCurrentFeedAndTag(feedId, tag)
-                        FeedOrTag(feedId, tag)
-                    }
+                    mainActivityViewModel.setCurrentFeedAndTag(feedId, tag)
                 }
 
-
-
                 FeedScreen(
-                    feedOrTag = feedOrTag,
                     backStackEntry = backStackEntry,
-                    settingsViewModel = settingsViewModel,
-                    readAloudViewModel = readAloudViewModel
+                    textToSpeechViewModel = readAloudViewModel
                 )
             }
             composable(
@@ -212,29 +170,12 @@ class MainActivity : DIAwareComponentActivity() {
                     }
                 )
             ) { backStackEntry ->
-                // Necessary to use the backstackEntry so savedState matches lifecycle
-                val feedItemViewModel: FeedItemViewModel =
-                    backStackEntry.DIAwareViewModel()
-
-                val itemId = backStackEntry.arguments?.getLong("itemId")
-                    ?: ID_UNSET
-
-                feedItemViewModel.currentItemId = itemId
-
-                val context = LocalContext.current
-
-                LaunchedEffect(key1 = itemId) {
-                    feedItemViewModel.markAsReadAndNotified(itemId)
-                    cancelNotification(context, itemId)
-                }
-
                 ReaderScreen(
-                    feedItemViewModel = feedItemViewModel,
-                    settingsViewModel = settingsViewModel,
+                    readerScreenViewModel = backStackEntry.DIAwareViewModel(),
                     readAloudViewModel = readAloudViewModel,
                     onNavigateToFeed = { feedId ->
                         navController.clearBackstack()
-                        if (feedId != null) {
+                        if (feedId!=null) {
                             navController.navigate("feed?id=$feedId")
                         } else {
                             navController.navigate("feed")
@@ -252,33 +193,16 @@ class MainActivity : DIAwareComponentActivity() {
                     navArgument("feedId") { type = NavType.LongType }
                 )
             ) { backStackEntry ->
-                // Necessary to use the backstackEntry so savedState matches lifecycle
-                val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
-
-                val feedId = backStackEntry.arguments?.getLong("feedId")
-                    ?: ID_UNSET
-
-                if (feedId <= ID_UNSET) {
-                    error("Can't edit a feed with no id")
-                }
-
-                feedViewModel.currentFeedId = feedId
-
-                val feed by feedViewModel.currentLiveFeed.observeAsState()
-
-                feed?.let { feed ->
-                    EditFeedScreen(
-                        feed = feed,
-                        onNavigateUp = {
-                            navController.popBackStack()
-                        },
-                        onOk = { feedId ->
-                            navController.clearBackstack()
-                            navController.navigate("feed?id=$feedId")
-                        },
-                        feedViewModel = feedViewModel
-                    )
-                }
+                EditFeedScreen(
+                    onNavigateUp = {
+                        navController.popBackStack()
+                    },
+                    onOk = { feedId ->
+                        navController.clearBackstack()
+                        navController.navigate("feed?id=$feedId")
+                    },
+                    editFeedScreenViewModel = backStackEntry.DIAwareViewModel()
+                )
             }
             composable(
                 "search/feed?feedUrl={feedUrl}",
@@ -290,16 +214,12 @@ class MainActivity : DIAwareComponentActivity() {
                     }
                 )
             ) { backStackEntry ->
-                // Necessary to use the backstackEntry so savedState matches lifecycle
-                val searchFeedViewModel: SearchFeedViewModel =
-                    backStackEntry.DIAwareViewModel()
-
                 SearchFeedScreen(
                     onNavigateUp = {
                         navController.popBackStack()
                     },
                     initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
-                    searchFeedViewModel = searchFeedViewModel
+                    searchFeedViewModel = backStackEntry.DIAwareViewModel()
                 ) {
                     navController.navigate("add/feed?feedUrl=${it.url}&feedTitle=${it.title}")
                 }
@@ -315,16 +235,11 @@ class MainActivity : DIAwareComponentActivity() {
                     }
                 )
             ) { backStackEntry ->
-                // Necessary to use the backstackEntry so savedState matches lifecycle
-                val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
-
                 CreateFeedScreen(
                     onNavigateUp = {
                         navController.popBackStack()
                     },
-                    feedUrl = backStackEntry.arguments?.getString("feedUrl") ?: "",
-                    feedTitle = backStackEntry.arguments?.getString("feedTitle") ?: "",
-                    feedViewModel = feedViewModel
+                    createFeedScreenViewModel = backStackEntry.DIAwareViewModel(),
                 ) { feedId ->
                     navController.clearBackstack()
                     navController.navigate("feed?id=$feedId")
@@ -332,13 +247,12 @@ class MainActivity : DIAwareComponentActivity() {
             }
             composable(
                 "settings"
-            ) {
+            ) { backStackEntry ->
                 SettingsScreen(
                     onNavigateUp = {
                         navController.popBackStack()
                     },
-                    settingsViewModel = settingsViewModel,
-                    applicationState = applicationState
+                    settingsViewModel = backStackEntry.DIAwareViewModel(),
                 )
             }
         }
@@ -346,36 +260,29 @@ class MainActivity : DIAwareComponentActivity() {
 
     @Composable
     fun FeedScreen(
-        feedOrTag: FeedOrTag,
         backStackEntry: NavBackStackEntry,
-        settingsViewModel: SettingsViewModel,
-        readAloudViewModel: TextToSpeechViewModel,
+        textToSpeechViewModel: TextToSpeechViewModel,
     ) {
-        val feedItemViewModel: FeedItemViewModel =
-            backStackEntry.DIAwareViewModel()
         val context = LocalContext.current
         val coroutineScope = rememberCoroutineScope()
 
-        val feedItemsViewModel: FeedItemsViewModel = backStackEntry.DIAwareViewModel()
+        val feedScreenViewModel: FeedScreenViewModel = backStackEntry.DIAwareViewModel()
         val toolbarColor = MaterialTheme.colors.primarySurface.toArgb()
 
         FeedScreen(
-            feedOrTag = feedOrTag,
             onItemClick = { itemId ->
                 coroutineScope.launch {
-                    val openArticleWith =
-                        feedItemViewModel.getOpenArticleWith(itemId)
-                    val link = feedItemViewModel.getLink(itemId)
-                    val openItemsByDefaultWith =
-                        settingsViewModel.itemOpener.value
+                    val openArticleWith = feedScreenViewModel.getArticleOpener(itemId)
+                    val link = feedScreenViewModel.getLink(itemId)
+                    val openItemsByDefaultWith = feedScreenViewModel.itemOpener
 
                     when {
-                        link != null && (openArticleWith == PrefValOpenWith.OPEN_WITH_BROWSER
-                            || openArticleWith == PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith == ItemOpener.DEFAULT_BROWSER) -> {
+                        link!=null && (openArticleWith==PrefValOpenWith.OPEN_WITH_BROWSER
+                                || openArticleWith==PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith==ItemOpener.DEFAULT_BROWSER) -> {
                             openLinkInBrowser(context, link)
                         }
-                        link != null && (openArticleWith == PrefValOpenWith.OPEN_WITH_CUSTOM_TAB
-                            || openArticleWith == PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith == ItemOpener.CUSTOM_TAB) -> {
+                        link!=null && (openArticleWith==PrefValOpenWith.OPEN_WITH_CUSTOM_TAB
+                                || openArticleWith==PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith==ItemOpener.CUSTOM_TAB) -> {
                             openLinkInCustomTab(context, link, toolbarColor)
                         }
                         else -> {
@@ -399,11 +306,9 @@ class MainActivity : DIAwareComponentActivity() {
                     launchSingleTop = true
                 }
                 applicationCoroutineScope.launch {
-                    settingsViewModel.setCurrentFeedAndTag(feedOrTag.id, feedOrTag.tag)
-
                     if (feedOrTag.isFeed) {
                         addDynamicShortcutToFeed(
-                            feedItemsViewModel.getFeedDisplayTitle(feedOrTag.id) ?: "",
+                            feedScreenViewModel.getFeedDisplayTitle() ?: "",
                             feedOrTag.id,
                             null
                         )
@@ -412,10 +317,8 @@ class MainActivity : DIAwareComponentActivity() {
                     }
                 }
             },
-            feedListViewModel = backStackEntry.DIAwareViewModel(),
-            feedItemsViewModel = feedItemsViewModel,
-            settingsViewModel = settingsViewModel,
-            readAloudViewModel = readAloudViewModel,
+            feedScreenViewModel = feedScreenViewModel,
+            textToSpeechViewModel = textToSpeechViewModel,
         )
     }
 }

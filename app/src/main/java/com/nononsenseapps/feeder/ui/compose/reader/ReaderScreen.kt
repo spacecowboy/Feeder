@@ -36,7 +36,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -58,20 +57,18 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
-import com.nononsenseapps.feeder.model.FeedItemViewModel
-import com.nononsenseapps.feeder.model.SettingsViewModel
-import com.nononsenseapps.feeder.model.TextToDisplay
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.TextToSpeechViewModel
+import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.getPlainTextOfHtmlStream
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
-import com.nononsenseapps.feeder.ui.compose.state.getImagePlaceholder
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
-import com.nononsenseapps.feeder.util.LinkOpener
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import com.nononsenseapps.feeder.util.unicodeWrap
@@ -87,27 +84,23 @@ private val dateTimeFormat =
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ReaderScreen(
-    feedItemViewModel: FeedItemViewModel,
-    settingsViewModel: SettingsViewModel,
+    readerScreenViewModel: ReaderScreenViewModel,
     readAloudViewModel: TextToSpeechViewModel,
     onNavigateToFeed: (feedId: Long?) -> Unit,
-    onNavigateUp: () -> Unit
+    onNavigateUp: () -> Unit,
 ) {
-    val linkOpener by settingsViewModel.linkOpener.collectAsState()
-    val feedItem by feedItemViewModel.currentLiveItem.observeAsState()
+    val viewState by readerScreenViewModel.viewState.collectAsState()
 
-    LaunchedEffect(feedItem?.fullTextByDefault) {
-        if (feedItem?.fullTextByDefault == true) {
-            feedItemViewModel.displayFullText()
-        }
+    val context = LocalContext.current
+    LaunchedEffect(key1 = readerScreenViewModel.currentItemId) {
+        readerScreenViewModel.markAsReadAndNotified()
+        cancelNotification(context, readerScreenViewModel.currentItemId)
     }
 
-    val textToDisplay by feedItemViewModel.textToDisplay.collectAsState()
-
-    val enclosure by remember(feedItem?.enclosureLink, feedItem?.enclosureFilename) {
+    val enclosure by remember(viewState.currentItem.enclosureLink, viewState.currentItem.enclosureFilename) {
         derivedStateOf {
-            feedItem?.enclosureLink?.let { link ->
-                feedItem?.enclosureFilename?.let { name ->
+            viewState.currentItem.enclosureLink?.let { link ->
+                viewState.currentItem.enclosureFilename?.let { name ->
                     Enclosure(
                         link = link,
                         name = name
@@ -117,97 +110,105 @@ fun ReaderScreen(
         }
     }
 
-    val feedUrl = feedItem?.feedUrl?.toString() ?: ""
-    val context = LocalContext.current
-
-    val feedId = feedItem?.feedId
-
-    val onShare = {
-        feedItem?.link?.let { link ->
-            val intent = Intent.createChooser(
-                Intent(Intent.ACTION_SEND).apply {
-                    putExtra(Intent.EXTRA_TEXT, link)
-                    putExtra(Intent.EXTRA_TITLE, feedItem?.plainTitle ?: "")
-                    type = "text/plain"
-                },
-                null
-            )
-            context.startActivity(intent)
+    val feedUrl by remember(viewState.currentItem.feedUrl) {
+        derivedStateOf {
+            viewState.currentItem.feedUrl.toString()
         }
-        Unit
     }
 
+    val onShare = {
+        val intent = Intent.createChooser(
+            Intent(Intent.ACTION_SEND).apply {
+                putExtra(Intent.EXTRA_TEXT, viewState.currentItem.feedUrl.toString())
+                putExtra(Intent.EXTRA_TITLE, viewState.currentItem.plainTitle)
+                type = "text/plain"
+            },
+            null
+        )
+        context.startActivity(intent)
+    }
+
+    val isLightTheme = MaterialTheme.colors.isLight
+
     @DrawableRes
-    val placeHolder: Int by getImagePlaceholder(settingsViewModel)
+    val placeHolder: Int by remember(isLightTheme) {
+        derivedStateOf {
+            if (isLightTheme) {
+                R.drawable.placeholder_image_article_day
+            } else {
+                R.drawable.placeholder_image_article_night
+            }
+        }
+    }
 
     val toolbarColor = MaterialTheme.colors.primarySurface.toArgb()
 
     ReaderScreen(
-        articleTitle = feedItem?.plainTitle ?: "",
-        feedDisplayTitle = feedItem?.feedDisplayTitle ?: "",
-        author = feedItem?.author,
-        pubDate = feedItem?.pubDate,
+        articleTitle = viewState.currentItem.plainTitle,
+        feedDisplayTitle = viewState.currentItem.feedDisplayTitle,
+        author = viewState.currentItem.author,
+        pubDate = viewState.currentItem.pubDate,
         enclosure = enclosure,
         onFetchFullText = {
-            if (textToDisplay == TextToDisplay.FULLTEXT) {
-                feedItemViewModel.displayArticleText()
+            if (viewState.textToDisplay==TextToDisplay.FULLTEXT) {
+                readerScreenViewModel.displayArticleText()
             } else {
-                feedItemViewModel.displayFullText()
+                readerScreenViewModel.displayFullText()
             }
         },
         onMarkAsUnread = {
-            feedItemViewModel.markCurrentItemAsUnread()
+            readerScreenViewModel.markCurrentItemAsUnreadInBackground()
         },
         onShare = onShare,
         onOpenInCustomTab = {
-            feedItem?.link?.let { link ->
+            viewState.currentItem.link?.let { link ->
                 openLinkInCustomTab(context, link, toolbarColor)
             }
         },
         onFeedTitleClick = {
-            onNavigateToFeed(feedId)
+            onNavigateToFeed(viewState.currentItem.feedId)
         },
         readAloudPlayer = {
             HideableReadAloudPlayer(readAloudViewModel)
         },
         onReadAloudStart = {
-            val fullText = feedItem?.let { item ->
-                when (textToDisplay) {
-                    TextToDisplay.DEFAULT -> {
-                        blobInputStream(item.id, context.filesDir).use {
-                            getPlainTextOfHtmlStream(
-                                inputStream = it,
-                                baseUrl = feedUrl
-                            )
-                        }
+            val fullText = when (viewState.textToDisplay) {
+                TextToDisplay.DEFAULT -> {
+                    blobInputStream(viewState.currentItem.id, context.filesDir).use {
+                        getPlainTextOfHtmlStream(
+                            inputStream = it,
+                            baseUrl = feedUrl
+                        )
                     }
-                    TextToDisplay.FULLTEXT -> {
-                        blobFullInputStream(item.id, context.filesDir).use {
-                            getPlainTextOfHtmlStream(
-                                inputStream = it,
-                                baseUrl = feedUrl
-                            )
-                        }
-                    }
-                    else -> null
                 }
+                TextToDisplay.FULLTEXT -> {
+                    blobFullInputStream(viewState.currentItem.id, context.filesDir).use {
+                        getPlainTextOfHtmlStream(
+                            inputStream = it,
+                            baseUrl = feedUrl
+                        )
+                    }
+                }
+                TextToDisplay.LOADING_FULLTEXT -> null
+                TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> null
             }
 
-            if (fullText == null) {
+            if (fullText==null) {
                 // TODO show error some message
             } else {
                 readAloudViewModel.readAloud(
-                    title = feedItem?.plainTitle ?: "",
+                    title = viewState.currentItem.plainTitle,
                     fullText = fullText
                 )
             }
         },
         onNavigateUp = onNavigateUp
     ) {
-        feedItem?.let { item ->
-            when (textToDisplay) {
+        // Can take a composition or two before viewstate is set to its actual values
+        if (viewState.currentItem.id > ID_UNSET) {
+            when (viewState.textToDisplay) {
                 TextToDisplay.DEFAULT -> {
-                    blobInputStream(item.id, context.filesDir).use {
+                    blobInputStream(viewState.currentItem.id, context.filesDir).use {
                         htmlFormattedText(
                             inputStream = it,
                             baseUrl = feedUrl,
@@ -215,7 +216,7 @@ fun ReaderScreen(
                             onLinkClick = { link ->
                                 onLinkClick(
                                     link = link,
-                                    linkOpener = linkOpener,
+                                    linkOpener = viewState.linkOpener,
                                     context = context,
                                     toolbarColor = toolbarColor
                                 )
@@ -234,7 +235,7 @@ fun ReaderScreen(
                     }
                 }
                 TextToDisplay.FULLTEXT -> {
-                    blobFullInputStream(item.id, context.filesDir).use {
+                    blobFullInputStream(viewState.currentItem.id, context.filesDir).use {
                         htmlFormattedText(
                             inputStream = it,
                             baseUrl = feedUrl,
@@ -242,7 +243,7 @@ fun ReaderScreen(
                             onLinkClick = { link ->
                                 onLinkClick(
                                     link = link,
-                                    linkOpener = linkOpener,
+                                    linkOpener = viewState.linkOpener,
                                     context = context,
                                     toolbarColor = toolbarColor
                                 )
@@ -270,7 +271,7 @@ fun ReaderScreen(
     readAloudPlayer: @Composable () -> Unit,
     onReadAloudStart: () -> Unit,
     onFeedTitleClick: () -> Unit,
-    articleBody: LazyListScope.() -> Unit
+    articleBody: LazyListScope.() -> Unit,
 ) {
     var showMenu by rememberSaveable {
         mutableStateOf(false)
@@ -373,12 +374,12 @@ fun ReaderScreen(
             },
             onFeedTitleClick = onFeedTitleClick,
             authorDate = when {
-                author == null && pubDate != null ->
+                author==null && pubDate!=null ->
                     stringResource(
                         R.string.on_date,
                         pubDate.format(dateTimeFormat)
                     )
-                author != null && pubDate != null ->
+                author!=null && pubDate!=null ->
                     stringResource(
                         R.string.by_author_on_date,
                         // Must wrap author in unicode marks to ensure it formats
@@ -403,7 +404,7 @@ private fun ReaderView(
     enclosureLink: String? = null,
     onEnclosureClick: () -> Unit,
     onFeedTitleClick: () -> Unit,
-    articleBody: LazyListScope.() -> Unit
+    articleBody: LazyListScope.() -> Unit,
 ) {
     SelectionContainer {
         LazyColumn(
@@ -439,7 +440,7 @@ private fun ReaderView(
                                 onFeedTitleClick()
                             }
                     )
-                    if (authorDate != null) {
+                    if (authorDate!=null) {
                         Spacer(modifier = Modifier.height(4.dp))
                         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                             Text(
@@ -452,7 +453,7 @@ private fun ReaderView(
                 }
             }
 
-            if (enclosureName != null && enclosureLink != null) {
+            if (enclosureName!=null && enclosureLink!=null) {
                 item {
                     val openLabel = stringResource(R.string.open_enclosed_media_file, enclosureName)
                     Text(
@@ -484,7 +485,7 @@ fun onLinkClick(
     link: String,
     linkOpener: LinkOpener,
     context: Context,
-    @ColorInt toolbarColor: Int
+    @ColorInt toolbarColor: Int,
 ) {
     when (linkOpener) {
         LinkOpener.CUSTOM_TAB -> {
@@ -499,7 +500,7 @@ fun onLinkClick(
 @Immutable
 data class Enclosure(
     val link: String,
-    val name: String
+    val name: String,
 )
 
 @Composable

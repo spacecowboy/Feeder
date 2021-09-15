@@ -190,7 +190,6 @@ dependencies {
   implementation "com.google.android.material:material:$material_version"
   implementation "androidx.navigation:navigation-compose:$navigationComposeVersion"
   implementation "androidx.paging:paging-compose:$pagingComposeVersion"
-  implementation "com.google.accompanist:accompanist-coil:$accompanistCoilVersion"
   implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-insets:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-insets-ui:$accompanistVersion"
@@ -211,9 +210,10 @@ dependencies {
   // For supporting TLSv1.3 on pre Android-10
   implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
   // Image loading
-  implementation("io.coil-kt:coil-base:1.1.1")
-  implementation("io.coil-kt:coil-gif:1.1.1")
-  implementation("io.coil-kt:coil-svg:1.1.1")
+  implementation("io.coil-kt:coil-base:$coilVersion")
+  implementation("io.coil-kt:coil-gif:$coilVersion")
+  implementation("io.coil-kt:coil-svg:$coilVersion")
+  implementation("io.coil-kt:coil-compose:$coilVersion")
 
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   // Coroutines

@@ -516,10 +516,20 @@ interface FeedItemDao {
             SELECT feeds.open_articles_with
             FROM feed_items
             LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-            WHERE feed_items.id IS :itemid
+            WHERE feed_items.id IS :itemId
         """
     )
-    suspend fun getOpenArticleWith(itemid: Long): String?
+    suspend fun getOpenArticleWith(itemId: Long): String?
+
+    @Query(
+        """
+            SELECT feeds.fulltext_by_default
+            FROM feed_items
+            LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+            WHERE feed_items.id IS :itemId
+        """
+    )
+    suspend fun getFullTextByDefault(itemId: Long): Boolean?
 
     @Query(
         """

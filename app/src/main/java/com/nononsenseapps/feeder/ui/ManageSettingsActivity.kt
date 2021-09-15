@@ -8,19 +8,14 @@ import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
-import com.nononsenseapps.feeder.model.ApplicationState
-import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import org.kodein.di.compose.withDI
-import org.kodein.di.instance
 
 /**
  * Should only be opened from the MANAGE SETTINGS INTENT
  */
 class ManageSettingsActivity : DIAwareComponentActivity() {
-    private val applicationState: ApplicationState by instance()
-
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,9 +24,8 @@ class ManageSettingsActivity : DIAwareComponentActivity() {
 
         setContent {
             withDI {
-                val settingsViewModel: SettingsViewModel = DIAwareViewModel()
-
-                val currentTheme by settingsViewModel.currentTheme.collectAsState()
+                val manageSettingsViewModel: ManageSettingsViewModel = DIAwareViewModel()
+                val currentTheme by manageSettingsViewModel.currentTheme.collectAsState()
 
                 FeederTheme(
                     currentTheme = currentTheme
@@ -40,8 +34,7 @@ class ManageSettingsActivity : DIAwareComponentActivity() {
                         onNavigateUp = {
                             onNavigateUpFromIntentActivities()
                         },
-                        settingsViewModel = settingsViewModel,
-                        applicationState = applicationState
+                        settingsViewModel = DIAwareViewModel(),
                     )
                 }
             }

@@ -1,7 +1,5 @@
-package com.nononsenseapps.feeder.ui.compose.feed
+package com.nononsenseapps.feeder.ui.compose.editfeed
 
-import android.os.Parcelable
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -23,12 +21,11 @@ import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,8 +48,9 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.db.room.Feed
-import com.nononsenseapps.feeder.model.FeedViewModel
+import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_BROWSER
+import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
+import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_READER
 import com.nononsenseapps.feeder.ui.compose.components.AutoCompleteFoo
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
 import com.nononsenseapps.feeder.ui.compose.settings.GroupTitle
@@ -60,41 +58,27 @@ import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
 import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
-import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_BROWSER
-import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_CUSTOM_TAB
-import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_READER
-import com.nononsenseapps.feeder.util.PREF_VAL_OPEN_WITH_WEBVIEW
-import java.net.URL
-import kotlinx.android.parcel.Parcelize
-import kotlinx.coroutines.launch
 
 @Composable
 fun CreateFeedScreen(
     onNavigateUp: () -> Unit,
-    feedUrl: String,
-    feedTitle: String,
-    feedViewModel: FeedViewModel,
-    onSaved: (Long) -> Unit
+    createFeedScreenViewModel: CreateFeedScreenViewModel,
+    onSaved: (Long) -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val allTags by feedViewModel.liveAllTags.observeAsState(initial = emptyList())
+    val viewState by createFeedScreenViewModel.viewState.collectAsState()
 
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
-        feed = EditableFeed(
-            url = feedUrl,
-            title = feedTitle
-        ),
-        allTags = allTags.filter { it.isNotBlank() },
-        onOk = { result ->
-            coroutineScope.launch {
-                val feedId = feedViewModel.saveAndRequestSync(
-                    Feed(
-                        title = result.title
-                    ).updateFrom(result)
-                )
-                onSaved(feedId)
-            }
+        viewState = viewState,
+        setUrl = createFeedScreenViewModel::setUrl,
+        setTitle = createFeedScreenViewModel::setTitle,
+        setTag = createFeedScreenViewModel::setTag,
+        setFullTextByDefault = createFeedScreenViewModel::setFullTextByDefault,
+        setNotify = createFeedScreenViewModel::setNotify,
+        setArticleOpener = createFeedScreenViewModel::setArticleOpener,
+        onOk = {
+            val feedId = createFeedScreenViewModel.saveAndRequestSync()
+            onSaved(feedId)
         },
         onCancel = {
             onNavigateUp()
@@ -104,23 +88,24 @@ fun CreateFeedScreen(
 
 @Composable
 fun EditFeedScreen(
-    feed: Feed,
     onNavigateUp: () -> Unit,
     onOk: (Long) -> Unit,
-    feedViewModel: FeedViewModel
+    editFeedScreenViewModel: EditFeedScreenViewModel,
 ) {
-    val allTags by feedViewModel.liveAllTags.observeAsState(initial = emptyList())
+    val viewState by editFeedScreenViewModel.viewState.collectAsState()
 
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
-        feed = feed.toEditableFeed(),
-        allTags = allTags.filter { it.isNotBlank() },
-        onOk = { result ->
-            feedViewModel.saveInBackgroundAndRequestSync(
-                feed.updateFrom(result)
-            )
-
-            onOk(feed.id)
+        viewState = viewState,
+        setUrl = editFeedScreenViewModel::setUrl,
+        setTitle = editFeedScreenViewModel::setTitle,
+        setTag = editFeedScreenViewModel::setTag,
+        setFullTextByDefault = editFeedScreenViewModel::setFullTextByDefault,
+        setNotify = editFeedScreenViewModel::setNotify,
+        setArticleOpener = editFeedScreenViewModel::setArticleOpener,
+        onOk = {
+            editFeedScreenViewModel.saveInBackgroundAndRequestSync()
+            onOk(editFeedScreenViewModel.feedId)
         },
         onCancel = {
             onNavigateUp()
@@ -131,10 +116,15 @@ fun EditFeedScreen(
 @Composable
 fun EditFeedScreen(
     onNavigateUp: () -> Unit,
-    feed: EditableFeed,
-    allTags: List<String>,
-    onOk: (EditableFeed) -> Unit,
-    onCancel: () -> Unit
+    viewState: EditFeedViewState,
+    setUrl: (String) -> Unit,
+    setTitle: (String) -> Unit,
+    setTag: (String) -> Unit,
+    setFullTextByDefault: (Boolean) -> Unit,
+    setNotify: (Boolean) -> Unit,
+    setArticleOpener: (String) -> Unit,
+    onOk: () -> Unit,
+    onCancel: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -162,8 +152,13 @@ fun EditFeedScreen(
         }
     ) { padding ->
         EditFeedView(
-            initialState = feed,
-            allTags = allTags,
+            viewState = viewState,
+            setUrl = setUrl,
+            setTitle = setTitle,
+            setTag = setTag,
+            setFullTextByDefault = setFullTextByDefault,
+            setNotify = setNotify,
+            setArticleOpener = setArticleOpener,
             onOk = onOk,
             onCancel = onCancel,
             modifier = Modifier.padding(padding)
@@ -174,22 +169,23 @@ fun EditFeedScreen(
 @OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun EditFeedView(
-    initialState: EditableFeed,
-    allTags: List<String>,
-    onOk: (EditableFeed) -> Unit,
+    viewState: EditFeedViewState,
+    setUrl: (String) -> Unit,
+    setTitle: (String) -> Unit,
+    setTag: (String) -> Unit,
+    setFullTextByDefault: (Boolean) -> Unit,
+    setNotify: (Boolean) -> Unit,
+    setArticleOpener: (String) -> Unit,
+    onOk: () -> Unit,
     onCancel: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
-    var editableFeed by rememberSaveable {
-        mutableStateOf(initialState)
-    }
-
-    var filteredTags by remember {
-        mutableStateOf(
-            allTags.filter { tag ->
-                tag.startsWith(editableFeed.tag, ignoreCase = true)
+    val filteredTags by remember(viewState.allTags, viewState.tag) {
+        derivedStateOf {
+            viewState.allTags.filter { tag ->
+                tag.isNotBlank() && tag.startsWith(viewState.tag, ignoreCase = true)
             }
-        )
+        }
     }
 
     val (focusTitle, focusTag) = createRefs()
@@ -199,12 +195,10 @@ fun EditFeedView(
 
     OkCancelWithContent(
         onOk = {
-            if (editableFeed.isOkToSave) {
-                onOk(editableFeed)
-            }
+            onOk()
         },
         onCancel = onCancel,
-        okEnabled = editableFeed.isOkToSave,
+        okEnabled = viewState.isOkToSave,
         modifier = modifier
             .padding(horizontal = keyline1Padding)
     ) {
@@ -212,14 +206,12 @@ fun EditFeedView(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             TextField(
-                value = editableFeed.url,
-                onValueChange = {
-                    editableFeed = editableFeed.copy(url = it)
-                },
+                value = viewState.url,
+                onValueChange = setUrl,
                 label = {
                     Text(stringResource(id = R.string.url))
                 },
-                isError = editableFeed.isNotValidUrl,
+                isError = viewState.isNotValidUrl,
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.None,
                     autoCorrect = false,
@@ -236,7 +228,7 @@ fun EditFeedView(
                     .fillMaxWidth()
                     .heightIn(min = 64.dp)
             )
-            AnimatedVisibility(visible = editableFeed.isNotValidUrl) {
+            AnimatedVisibility(visible = viewState.isNotValidUrl) {
                 Text(
                     textAlign = TextAlign.Center,
                     text = "Not a valid URL (TODO resource)",
@@ -244,12 +236,10 @@ fun EditFeedView(
                 )
             }
             OutlinedTextField(
-                value = editableFeed.customTitle,
-                onValueChange = {
-                    editableFeed = editableFeed.copy(customTitle = it)
-                },
+                value = viewState.title,
+                onValueChange = setTitle,
                 placeholder = {
-                    Text(editableFeed.title)
+                    Text(viewState.defaultTitle)
                 },
                 label = {
                     Text(stringResource(id = R.string.title))
@@ -276,10 +266,7 @@ fun EditFeedView(
                 displaySuggestions = tagHasFocus,
                 suggestions = filteredTags,
                 onSuggestionClicked = { tag ->
-                    editableFeed = editableFeed.copy(tag = tag)
-                    filteredTags = allTags.filter { candidate ->
-                        candidate.startsWith(tag, ignoreCase = true)
-                    }
+                    setTag(tag)
                     focusManager.clearFocus()
                 },
                 suggestionContent = {
@@ -298,13 +285,8 @@ fun EditFeedView(
                 }
             ) {
                 OutlinedTextField(
-                    value = editableFeed.tag,
-                    onValueChange = {
-                        editableFeed = editableFeed.copy(tag = it)
-                        filteredTags = allTags.filter { candidate ->
-                            candidate.startsWith(it, ignoreCase = true)
-                        }
-                    },
+                    value = viewState.tag,
+                    onValueChange = setTag,
                     label = {
                         Text(stringResource(id = R.string.tag))
                     },
@@ -335,18 +317,14 @@ fun EditFeedView(
             )
             SwitchSetting(
                 title = stringResource(id = R.string.fetch_full_articles_by_default),
-                checked = editableFeed.fullTextByDefault,
-                onCheckedChanged = {
-                    editableFeed = editableFeed.copy(fullTextByDefault = it)
-                },
+                checked = viewState.fullTextByDefault,
+                onCheckedChanged = setFullTextByDefault,
                 icon = null
             )
             SwitchSetting(
                 title = stringResource(id = R.string.notify_for_new_items),
-                checked = editableFeed.notify,
-                onCheckedChanged = {
-                    editableFeed = editableFeed.copy(notify = it)
-                },
+                checked = viewState.notify,
+                onCheckedChanged = setNotify,
                 icon = null
             )
             Divider(
@@ -360,111 +338,43 @@ fun EditFeedView(
             }
             RadioButtonSetting(
                 title = stringResource(id = R.string.use_app_default),
-                selected = editableFeed.isOpenItemWithAppDefault,
+                selected = viewState.isOpenItemWithAppDefault,
                 minHeight = 48.dp,
                 icon = null,
                 onClick = {
-                    editableFeed = editableFeed.copy(openArticlesWith = "")
+                    setArticleOpener("")
                 }
             )
             RadioButtonSetting(
                 title = stringResource(id = R.string.open_in_reader),
-                selected = editableFeed.isOpenItemWithReader,
+                selected = viewState.isOpenItemWithReader,
                 minHeight = 48.dp,
                 icon = null,
                 onClick = {
-                    editableFeed = editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_READER)
+                    setArticleOpener(PREF_VAL_OPEN_WITH_READER)
                 }
             )
             RadioButtonSetting(
                 title = stringResource(id = R.string.open_in_custom_tab),
-                selected = editableFeed.isOpenItemWithCustomTab,
+                selected = viewState.isOpenItemWithCustomTab,
                 minHeight = 48.dp,
                 icon = null,
                 onClick = {
-                    editableFeed =
-                        editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_CUSTOM_TAB)
+                    setArticleOpener(PREF_VAL_OPEN_WITH_CUSTOM_TAB)
                 }
             )
             RadioButtonSetting(
                 title = stringResource(id = R.string.open_in_default_browser),
-                selected = editableFeed.isOpenItemWithBrowser,
+                selected = viewState.isOpenItemWithBrowser,
                 minHeight = 48.dp,
                 icon = null,
                 onClick = {
-                    editableFeed = editableFeed.copy(openArticlesWith = PREF_VAL_OPEN_WITH_BROWSER)
+                    setArticleOpener(PREF_VAL_OPEN_WITH_BROWSER)
                 }
             )
         }
     }
 }
-
-@Immutable
-@Parcelize
-data class EditableFeed(
-    val url: String,
-    val title: String,
-    val customTitle: String = "",
-    val tag: String = "",
-    val fullTextByDefault: Boolean = false,
-    val notify: Boolean = false,
-    val openArticlesWith: String = "",
-): Parcelable {
-    val isOpenItemWithBrowser: Boolean
-        get() = openArticlesWith == PREF_VAL_OPEN_WITH_BROWSER
-
-    val isOpenItemWithCustomTab: Boolean
-        get() = openArticlesWith == PREF_VAL_OPEN_WITH_CUSTOM_TAB
-
-    val isOpenItemWithReader: Boolean
-        get() = openArticlesWith == PREF_VAL_OPEN_WITH_READER
-
-    val isOpenItemWithAppDefault: Boolean
-        get() = when (openArticlesWith) {
-            PREF_VAL_OPEN_WITH_READER,
-            PREF_VAL_OPEN_WITH_WEBVIEW,
-            PREF_VAL_OPEN_WITH_BROWSER,
-            PREF_VAL_OPEN_WITH_CUSTOM_TAB -> false
-            else -> true
-        }
-
-    val isNotValidUrl = !isValidUrl
-
-    private val isValidUrl: Boolean
-        get() {
-            return try {
-                URL(url)
-                true
-            } catch (e: Exception) {
-                Log.d("JONAS", e.message, e)
-                false
-            }
-        }
-
-    val isOkToSave: Boolean
-        get() = isValidUrl
-}
-
-fun Feed.toEditableFeed() =
-    EditableFeed(
-        url = url.toString(),
-        title = title,
-        customTitle = customTitle,
-        tag = tag,
-        fullTextByDefault = fullTextByDefault,
-        notify = notify,
-        openArticlesWith = openArticlesWith
-    )
-
-fun Feed.updateFrom(editableFeed: EditableFeed) =
-    copy(
-        url = URL(editableFeed.url),
-        customTitle = editableFeed.customTitle,
-        tag = editableFeed.tag,
-        fullTextByDefault = editableFeed.fullTextByDefault,
-        notify = editableFeed.notify,
-        openArticlesWith = editableFeed.openArticlesWith
-    )
 
 @Preview
 @Composable
@@ -472,13 +382,15 @@ fun EditFeedScreenPreview() {
     FeederTheme {
         EditFeedScreen(
             onNavigateUp = {},
-            feed = EditableFeed(
-                url = "",
-                title = "Foo Bar"
-            ),
-            allTags = emptyList(),
             onOk = {},
-            onCancel = {}
+            onCancel = {},
+            viewState = EditFeedViewState(),
+            setUrl = {},
+            setTitle = {},
+            setTag = {},
+            setFullTextByDefault = {},
+            setNotify = {},
+            setArticleOpener = {},
         )
     }
 }

@@ -39,6 +39,8 @@ import kotlin.system.measureTimeMillis
 val singleThreadedSync = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 val syncMutex = Mutex()
 
+private const val LOG_TAG = "FeederRssLocalSync"
+
 suspend fun syncFeeds(
     context: Context,
     feedId: Long = ID_UNSET,
@@ -49,7 +51,7 @@ suspend fun syncFeeds(
 ): Boolean {
     val di: DI by closestDI(context)
     val prefs: Prefs by di.instance()
-    Log.d("CoroutineSync", "${Thread.currentThread().name}: Taking sync mutex")
+    Log.d(LOG_TAG, "${Thread.currentThread().name}: Taking sync mutex")
     return syncMutex.withLock {
         withContext(singleThreadedSync) {
             syncFeeds(
@@ -91,13 +93,13 @@ internal suspend fun syncFeeds(
                 }
                 val feedsToFetch = feedsToSync(db.feedDao(), feedId, feedTag, staleTime = staleTime)
 
-                Log.d("CoroutineSync", "Syncing ${feedsToFetch.size} feeds")
+                Log.d(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
 
                 val coroutineContext = when (parallel) {
                     true -> Dispatchers.Default
                     false -> this.coroutineContext
                 } + CoroutineExceptionHandler { _, throwable ->
-                    Log.e("CoroutineSync", "Error during sync", throwable)
+                    Log.e(LOG_TAG, "Error during sync", throwable)
                 }
 
                 feedsToFetch.forEach {
@@ -113,7 +115,7 @@ internal suspend fun syncFeeds(
                             )
                         } catch (e: Throwable) {
                             Log.e(
-                                "CoroutineSync",
+                                LOG_TAG,
                                 "Failed to sync ${it.displayTitle}: ${it.url}",
                                 e
                             )
@@ -124,10 +126,10 @@ internal suspend fun syncFeeds(
                 result = true
             }
         } catch (e: Throwable) {
-            Log.e("CoroutineSync", "Outer error", e)
+            Log.e(LOG_TAG, "Outer error", e)
         }
     }
-    Log.d("CoroutineSync", "Completed in $time ms")
+    Log.d(LOG_TAG, "Completed in $time ms")
     return result
 }
 
@@ -139,7 +141,7 @@ private suspend fun syncFeed(
     forceNetwork: Boolean = false,
     downloadTime: Instant
 ) {
-    Log.d("CoroutineSync", "Fetching ${feedSql.displayTitle}")
+    Log.d(LOG_TAG, "Fetching ${feedSql.displayTitle}")
     val db: AppDatabase by di.instance()
     val feedParser: FeedParser by di.instance()
     val okHttpClient: OkHttpClient by di.instance()
@@ -238,7 +240,7 @@ private suspend fun syncFeed(
                     file.delete()
                 }
             } catch (e: IOException) {
-                Log.e("CoroutineSync", "Failed to delete $file", e)
+                Log.e(LOG_TAG, "Failed to delete $file", e)
             }
         }
 

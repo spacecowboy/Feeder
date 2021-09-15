@@ -26,6 +26,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -44,7 +45,6 @@ import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -63,7 +63,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.ImageLoader
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.rememberImagePainter
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.rememberInsetsPaddingValues
@@ -74,17 +74,14 @@ import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.ScreenTitle
+import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.ApplicationState
-import com.nononsenseapps.feeder.model.FeedItemsViewModel
-import com.nononsenseapps.feeder.model.FeedListViewModel
-import com.nononsenseapps.feeder.model.SettingsViewModel
 import com.nononsenseapps.feeder.model.TextToSpeechViewModel
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
-import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
@@ -93,9 +90,7 @@ import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
-import com.nononsenseapps.feeder.ui.compose.state.getImagePlaceholder
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.util.ThemeOptions
 import com.nononsenseapps.feeder.util.openGitlabIssues
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
@@ -106,32 +101,23 @@ import org.threeten.bp.LocalDateTime
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FeedScreen(
-    feedOrTag: FeedOrTag,
     onItemClick: (Long) -> Unit,
     onAddFeed: (() -> Unit),
     onFeedEdit: (Long) -> Unit,
     onSettings: () -> Unit,
     onOpenFeedOrTag: (FeedOrTag) -> Unit,
-    feedListViewModel: FeedListViewModel,
-    feedItemsViewModel: FeedItemsViewModel,
-    settingsViewModel: SettingsViewModel,
-    readAloudViewModel: TextToSpeechViewModel,
+    feedScreenViewModel: FeedScreenViewModel,
+    textToSpeechViewModel: TextToSpeechViewModel,
 ) {
-    val onlyUnread by settingsViewModel.showOnlyUnread.collectAsState()
-    val showFloatingActionButton by settingsViewModel.showFab.collectAsState()
+    // Start collecting all flows
+    val viewState: FeedScreenViewState? by feedScreenViewModel.viewState.collectAsState(initial = null)
+    val pagedFeedItems = feedScreenViewModel.currentFeedListItems.collectAsLazyPagingItems()
+    val expandedTags by feedScreenViewModel.expandedTags.collectAsState()
 
-    val screenTitle by feedItemsViewModel.currentTitle.collectAsState(initial = "")
-
-    val context = LocalContext.current
-
-    val feedsAndTags by feedItemsViewModel.drawerItemsWithUnreadCounts
-        .collectAsState(initial = emptyList())
-
-    LaunchedEffect(feedOrTag) {
-        feedItemsViewModel.feedOrTag = feedOrTag
+    // But don't do anything else unless we have a state to render
+    if (viewState==null) {
+        return
     }
-
-    val pagedFeedItems = feedItemsViewModel.feedListItems.collectAsLazyPagingItems()
 
     val nothingToRead by remember(pagedFeedItems) {
         derivedStateOf {
@@ -140,20 +126,12 @@ fun FeedScreen(
         }
     }
 
-    val visibleFeeds by feedListViewModel.getFeedTitles(
-        feedId = feedOrTag.id,
-        tag = feedOrTag.tag
-    ).collectAsState(initial = emptyList())
+    val refreshState = rememberSwipeRefreshState(viewState?.isRefreshing ?: false)
 
-    val applicationState: ApplicationState by instance()
-    val isRefreshing by applicationState.isRefreshing
-    val refreshState = rememberSwipeRefreshState(isRefreshing)
-
+    val context = LocalContext.current
     val onSendFeedback = {
         context.startActivity(openGitlabIssues())
     }
-
-    val showThumbnails by settingsViewModel.showThumbnails.collectAsState()
 
     val di = LocalDI.current
 
@@ -180,60 +158,59 @@ fun FeedScreen(
     }
     val imageLoader: ImageLoader by instance()
 
+    val isLightTheme = MaterialTheme.colors.isLight
+
     @DrawableRes
-    val placeHolder: Int by getImagePlaceholder(settingsViewModel)
-    val bottomBarVisible by readAloudViewModel.notStopped
+    val placeHolder: Int by remember(isLightTheme) {
+        derivedStateOf {
+            if (isLightTheme) {
+                R.drawable.placeholder_image_article_day
+            } else {
+                R.drawable.placeholder_image_article_night
+            }
+        }
+    }
 
     FeedScreen(
-        screenTitle = screenTitle ?: stringResource(id = R.string.all_feeds),
-        visibleFeeds = visibleFeeds,
-        feedsAndTags = feedsAndTags,
+        // Avoiding rendering a title if no state yet, that's why screentitle must never be null
+        screenTitle = (viewState?.screenTitle ?: ScreenTitle("")).title
+            ?: stringResource(id = R.string.all_feeds),
+        visibleFeeds = viewState?.visibleFeeds ?: emptyList(),
+        feedsAndTags = viewState?.drawerItemsWithUnreadCounts ?: emptyList(),
         refreshState = refreshState,
-        showFloatingActionButton = showFloatingActionButton,
         onRefreshVisible = {
-            applicationState.setRefreshing(true)
-            requestFeedSync(
-                di = di,
-                feedId = feedOrTag.id,
-                feedTag = feedOrTag.tag,
-                ignoreConnectivitySettings = true,
-                forceNetwork = true,
-                parallell = true
-            )
+            feedScreenViewModel.requestImmediateSyncOfCurrentFeedOrTag()
         },
         onRefreshAll = {
-            requestFeedSync(
-                di = di,
-                ignoreConnectivitySettings = true,
-                forceNetwork = true,
-                parallell = true
-            )
+            feedScreenViewModel.requestImmediateSyncOfAll()
         },
-        bottomBarVisible = bottomBarVisible,
-        onlyUnread = onlyUnread,
+        onlyUnread = viewState?.onlyUnread ?: true,
         onToggleOnlyUnread = { value ->
-            settingsViewModel.setShowOnlyUnread(value)
+            feedScreenViewModel.setShowOnlyUnread(value)
         },
         onDrawerItemSelected = { id, tag ->
             onOpenFeedOrTag(FeedOrTag(id, tag))
         },
+        onDelete = { feeds ->
+            feedScreenViewModel.deleteFeeds(feeds.toList())
+        },
         onAddFeed = onAddFeed,
         onEditFeed = onFeedEdit,
-        onDelete = { feeds ->
-            feedListViewModel.deleteFeeds(feeds.toList())
-        },
         onSettings = onSettings,
         onSendFeedback = onSendFeedback,
-        readAloudPlayer = {
-            HideableReadAloudPlayer(readAloudViewModel)
-        },
         onImport = { opmlImporter.launch(arrayOf("text/plain", "text/xml", "text/opml", "*/*")) },
         onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}") },
         onMarkAllAsRead = {
-            feedItemsViewModel.markAllAsReadInBackground(
-                feedId = feedOrTag.id,
-                tag = feedOrTag.tag
-            )
+            feedScreenViewModel.markAllAsRead()
+        },
+        showFloatingActionButton = viewState?.showFab ?: true,
+        bottomBarVisible = textToSpeechViewModel.notStopped.value,
+        expandedTags = expandedTags,
+        onToggleTagExpansion = {
+            feedScreenViewModel.toggleTagExpansion(it)
+        },
+        readAloudPlayer = {
+            HideableReadAloudPlayer(textToSpeechViewModel)
         }
     ) { modifier, openNavDrawer ->
         AnimatedVisibility(
@@ -255,9 +232,9 @@ fun FeedScreen(
             )
         }
 
-        val bottomPadding by remember(bottomBarVisible) {
+        val bottomPadding by remember(textToSpeechViewModel.notStopped.value) {
             derivedStateOf {
-                if (bottomBarVisible) {
+                if (textToSpeechViewModel.notStopped.value) {
                     80.dp
                 } else {
                     // Navigation bar is 48dp high
@@ -286,35 +263,32 @@ fun FeedScreen(
 
                     SwipeableFeedItemPreview(
                         onSwipe = {
-                            feedItemsViewModel.markAsRead(
+                            feedScreenViewModel.markAsUnread(
                                 previewItem.id,
                                 unread = !previewItem.unread
                             )
                         },
-                        onlyUnread = onlyUnread,
+                        onlyUnread = viewState?.onlyUnread ?: true,
                         item = previewItem,
-                        showThumbnail = showThumbnails,
+                        showThumbnail = viewState?.showThumbnails ?: true,
                         onMarkAboveAsRead = {
                             if (itemIndex > 0) {
-                                feedItemsViewModel.markBeforeAsRead(itemIndex)
+                                feedScreenViewModel.markBeforeAsRead(itemIndex)
                             }
                         },
                         onMarkBelowAsRead = {
-                            feedItemsViewModel.markAfterAsRead(itemIndex)
+                            feedScreenViewModel.markAfterAsRead(itemIndex)
                         },
                         onItemClick = {
                             onItemClick(previewItem.id)
                         },
                         imagePainter = { imageUrl ->
                             Image(
-                                painter = rememberCoilPainter(
-                                    request = imageUrl,
-                                    imageLoader = imageLoader,
-                                    requestBuilder = {
+                                painter = rememberImagePainter(
+                                    data = imageUrl,
+                                    builder = {
                                         this.error(placeHolder)
                                     },
-                                    previewPlaceholder = placeHolder,
-                                    shouldRefetchOnSizeChange = { _, _ -> false },
                                 ),
                                 contentScale = ContentScale.Crop,
                                 contentDescription = null,
@@ -344,8 +318,8 @@ fun FeedScreen(
     onToggleOnlyUnread: (Boolean) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
-    onAddFeed: (() -> Unit),
-    onEditFeed: ((Long) -> Unit),
+    onAddFeed: () -> Unit,
+    onEditFeed: (Long) -> Unit,
     onSettings: () -> Unit,
     onSendFeedback: () -> Unit,
     onImport: () -> Unit,
@@ -353,6 +327,8 @@ fun FeedScreen(
     onMarkAllAsRead: () -> Unit,
     showFloatingActionButton: Boolean,
     bottomBarVisible: Boolean,
+    expandedTags: Set<String>,
+    onToggleTagExpansion: (String) -> Unit,
     readAloudPlayer: @Composable () -> Unit,
     content: @Composable (Modifier, suspend () -> Unit) -> Unit,
 ) {
@@ -552,6 +528,8 @@ fun FeedScreen(
         drawerContent = {
             ListOfFeedsAndTags(
                 feedsAndTags = feedsAndTags,
+                expandedTags = expandedTags,
+                onToggleTagExpansion = onToggleTagExpansion,
                 onItemClick = { item ->
                     coroutineScope.launch {
                         val id = when (item) {
@@ -638,19 +616,21 @@ fun DefaultPreview() {
             onRefreshVisible = { },
             onRefreshAll = {},
             onlyUnread = false,
-            showFloatingActionButton = true,
-            bottomBarVisible = false,
             onToggleOnlyUnread = {},
             onDrawerItemSelected = { _, _ -> },
+            onDelete = {},
             onAddFeed = { },
             onEditFeed = {},
-            onDelete = {},
             onSettings = {},
             onSendFeedback = {},
-            readAloudPlayer = {},
             onImport = {},
             onExport = {},
-            onMarkAllAsRead = {}
+            onMarkAllAsRead = {},
+            showFloatingActionButton = true,
+            bottomBarVisible = false,
+            expandedTags = emptySet(),
+            onToggleTagExpansion = {},
+            readAloudPlayer = {}
         ) { modifier, _ ->
             LazyColumn(
                 modifier = modifier
@@ -701,3 +681,4 @@ data class FeedOrTag(
 
 val FeedOrTag.isFeed
     get() = id > ID_UNSET
+
