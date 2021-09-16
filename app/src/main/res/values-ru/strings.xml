@@ -52,7 +52,7 @@
     <string name="synchronization">Синхронизация</string>
     <string name="only_on_wifi">Только по Wi-Fi</string>
     <string name="show_thumbnails">Показывать миниатюры</string>
-    <string name="may_result_data_charges">Может привести к расходам на мобильные данные.</string>
+    <string name="may_result_data_charges">Может привести к расходу мобильных данных.</string>
     <string name="only_when_charging">Только при зарядке</string>
     <string name="image_loading">Загрузка изображений</string>
     <string name="no_activity_for_link">Не удалось найти приложение, чтобы открыть ссылку</string>
@@ -75,8 +75,8 @@
     <string name="theme_day">День</string>
     <string name="theme_night">Ночь</string>
     <string name="theme">Тема</string>
-    <string name="sort_newest_first">Новые первыми</string>
-    <string name="sort_oldest_first">Старые первыми</string>
+    <string name="sort_newest_first">Сначала новые</string>
+    <string name="sort_oldest_first">Сначала старые</string>
     <string name="sort">Сортировать</string>
     <string name="send_bug_report">Отправить отчёт об ошибке</string>
     <string name="no_email_client">Не удаётся открыть email-клиент</string>
