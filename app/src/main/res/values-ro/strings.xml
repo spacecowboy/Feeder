@@ -41,7 +41,7 @@
     <string name="open_in_reader">Cititor</string>
     <string name="notification_channel_description">Notificările sunt afișate numai pentru elementele necitite din fluxurile configurate</string>
     <string name="notification_channel_name">Fluxuri necitite</string>
-  <string name="updated_feeds">Fluxuri actualizate</string>
+    <string name="updated_feeds">Fluxuri actualizate</string>
     <string name="include_mobile_hotspots">Includeți hotspoturi mobile</string>
     <string name="show_fab">Afișați butonul de acțiune plutitor</string>
     <string name="on_startup">La pornire</string>
@@ -107,4 +107,22 @@
     <string name="action_settings">Setări</string>
     <string name="navigation_drawer_close">Închideți panoul de navigare</string>
     <string name="navigation_drawer_open">Deschideți panoul de navigare</string>
+    <string name="other_unread_articles">%1$s articole necitite</string>
+    <string name="many_unread_articles">%1$s articole necitite</string>
+    <string name="few_unread_articles">%1$s articole necitite</string>
+    <string name="two_unread_articles">%1$s articole necitite</string>
+    <string name="one_unread_article">%1$s articol necitit</string>
+    <string name="zero_unread_articles">%1$s articole necitite</string>
+    <string name="synchronize_feeds">Sincronizarea fluxurilor</string>
+    <string name="showing_all_articles">Afișarea tuturor articolelor</string>
+    <string name="showing_only_unread_articles">Afișarea numai a articolelor necitite</string>
+    <string name="already_read">Deja citit</string>
+    <string name="unread">Necitite</string>
+    <string name="go_to_feed">Mergeți la %1$s</string>
+    <string name="open_menu">Deschideți meniul</string>
+    <string name="go_back">Înapoi</string>
+    <string name="contracted_tag">Etichetă închisă</string>
+    <string name="expanded_tag">Etichetă deschisă</string>
+    <string name="stop_reading">Opriți citirea</string>
+    <string name="open_enclosed_media_file">Deschideți %1$s</string>
 </resources>
