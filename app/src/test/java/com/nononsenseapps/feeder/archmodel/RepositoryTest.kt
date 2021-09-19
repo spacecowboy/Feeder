@@ -4,9 +4,12 @@ import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.reader.TextToDisplay
 import io.mockk.MockKAnnotations
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import io.mockk.just
+import io.mockk.verify
 import kotlin.test.assertEquals
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -33,12 +36,16 @@ class RepositoryTest : DIAware {
     @MockK
     private lateinit var feedStore: FeedStore
 
+    @MockK
+    private lateinit var androidSystemStore: AndroidSystemStore
+
     override val di by DI.lazy {
         bind<Repository>() with singleton { Repository(di) }
         bind<FeedItemStore>() with instance(feedItemStore)
         bind<SettingsStore>() with instance(settingsStore)
         bind<SessionStore>() with instance(sessionStore)
         bind<FeedStore>() with instance(feedStore)
+        bind<AndroidSystemStore>() with instance(androidSystemStore)
     }
 
     @Before
@@ -144,5 +151,23 @@ class RepositoryTest : DIAware {
         coVerify {
             feedStore.getDisplayTitle(5L)
         }
+    }
+
+    @Test
+    fun deleteFeeds() {
+        coEvery { feedStore.deleteFeeds(any()) } just Runs
+
+        runBlocking {
+            repository.deleteFeeds(listOf(1, 2))
+        }
+
+        coVerify {
+            feedStore.deleteFeeds(listOf(1, 2))
+        }
+
+        verify {
+            androidSystemStore.removeDynamicShortcuts(listOf(1, 2))
+        }
+
     }
 }

@@ -26,6 +26,7 @@ class Repository(override val di: DI) : DIAware {
     private val sessionStore: SessionStore by instance()
     private val feedItemStore: FeedItemStore by instance()
     private val feedStore: FeedStore by instance()
+    private val androidSystemStore: AndroidSystemStore by instance()
 
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
@@ -143,6 +144,7 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun deleteFeeds(feedIds: List<Long>) {
         feedStore.deleteFeeds(feedIds)
+        androidSystemStore.removeDynamicShortcuts(feedIds)
     }
 
     suspend fun markAllAsReadInFeedOrTag(feedId: Long, tag: String) {

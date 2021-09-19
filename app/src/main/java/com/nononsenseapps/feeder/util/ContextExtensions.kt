@@ -59,22 +59,22 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null
 
             if (current.map { it.id }.contains(shortcut.id)) {
                 // Just update existing one
-                shortcutManager.updateShortcuts(mutableListOf(shortcut))
+                shortcutManager.updateShortcuts(listOf(shortcut))
             } else {
                 // Ensure we do not exceed max limits
                 if (current.size >= shortcutManager.maxShortcutCountPerActivity.coerceAtMost(3)) {
                     current.sortBy { it.rank }
                     current.lastOrNull()?.let {
-                        removeDynamicShortcutToFeed(it.id)
+                        shortcutManager.removeDynamicShortcuts(listOf(it.id))
                     }
                 }
 
                 // It's new!
-                shortcutManager.addDynamicShortcuts(mutableListOf(shortcut))
+                shortcutManager.addDynamicShortcuts(listOf(shortcut))
             }
         }
     } catch (error: Throwable) {
-        Log.d("addDynamicShortCut", "Error during add of shortcut: ${error.message}")
+        Log.d("FeederDynamicShortcut", "Error during add of shortcut: ${error.message}")
     }
 }
 
@@ -89,21 +89,7 @@ fun Context.reportShortcutToFeedUsed(id: Any) {
             shortcutManager.reportShortcutUsed("$id")
         }
     } catch (error: Throwable) {
-        Log.d("reportShortcutUsed", "Error during report use of shortcut: ${error.message}")
-    }
-}
-
-/**
- * Remove a shortcut to feed. Should be called when feed is deleted.
- */
-fun Context.removeDynamicShortcutToFeed(id: Any) {
-    try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
-            shortcutManager.removeDynamicShortcuts(mutableListOf("$id"))
-        }
-    } catch (error: Throwable) {
-        Log.d("removeDynamicShortcut", "Error during removal of shortcut: ${error.message}")
+        Log.d("FeederDynamicShortcut", "Error during report use of shortcut: ${error.message}")
     }
 }
 

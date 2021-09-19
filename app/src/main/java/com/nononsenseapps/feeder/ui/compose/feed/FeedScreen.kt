@@ -104,7 +104,7 @@ fun FeedScreen(
     onFeedEdit: (Long) -> Unit,
     onSettings: () -> Unit,
     onOpenFeedOrTag: (FeedOrTag) -> Unit,
-    navigateToAllFeeds: () -> Unit,
+    onDelete: (Iterable<Long>) -> Unit,
     feedScreenViewModel: FeedScreenViewModel,
     textToSpeechViewModel: TextToSpeechViewModel,
 ) {
@@ -189,10 +189,7 @@ fun FeedScreen(
         onDrawerItemSelected = { id, tag ->
             onOpenFeedOrTag(FeedOrTag(id, tag))
         },
-        onDelete = { feeds ->
-            feedScreenViewModel.deleteFeeds(feeds.toList())
-            navigateToAllFeeds()
-        },
+        onDelete = onDelete,
         onAddFeed = onAddFeed,
         onEditFeed = onFeedEdit,
         onSettings = onSettings,

@@ -17,6 +17,7 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.di.androidModule
 import com.nononsenseapps.feeder.di.archModelModule
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
@@ -51,6 +52,8 @@ class FeederApplication : MultiDexApplication(), DIAware {
         bind<AppDatabase>() with singleton { AppDatabase.getInstance(this@FeederApplication) }
         bind<FeedDao>() with singleton { instance<AppDatabase>().feedDao() }
         bind<FeedItemDao>() with singleton { instance<AppDatabase>().feedItemDao() }
+
+        import(androidModule)
 
         import(archModelModule)
 

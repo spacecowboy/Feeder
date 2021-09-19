@@ -334,7 +334,8 @@ class MainActivity : DIAwareComponentActivity() {
                     }
                 }
             },
-            navigateToAllFeeds = {
+            onDelete = { feeds ->
+                feedScreenViewModel.deleteFeeds(feeds.toList())
                 navController.popEntireBackStack()
                 navController.navigate(
                     "feed?id=$ID_ALL_FEEDS"
