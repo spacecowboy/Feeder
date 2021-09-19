@@ -62,7 +62,6 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
-import coil.ImageLoader
 import coil.compose.rememberImagePainter
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
@@ -94,7 +93,6 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.openGitlabIssues
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
-import org.kodein.di.compose.instance
 import org.kodein.di.instance
 import org.threeten.bp.LocalDateTime
 
@@ -106,6 +104,7 @@ fun FeedScreen(
     onFeedEdit: (Long) -> Unit,
     onSettings: () -> Unit,
     onOpenFeedOrTag: (FeedOrTag) -> Unit,
+    navigateToAllFeeds: () -> Unit,
     feedScreenViewModel: FeedScreenViewModel,
     textToSpeechViewModel: TextToSpeechViewModel,
 ) {
@@ -156,7 +155,6 @@ fun FeedScreen(
             }
         }
     }
-    val imageLoader: ImageLoader by instance()
 
     val isLightTheme = MaterialTheme.colors.isLight
 
@@ -193,6 +191,7 @@ fun FeedScreen(
         },
         onDelete = { feeds ->
             feedScreenViewModel.deleteFeeds(feeds.toList())
+            navigateToAllFeeds()
         },
         onAddFeed = onAddFeed,
         onEditFeed = onFeedEdit,

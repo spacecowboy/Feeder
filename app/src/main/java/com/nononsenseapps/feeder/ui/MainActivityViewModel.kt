@@ -21,8 +21,7 @@ class MainActivityViewModel(di: DI) : DIAwareViewModel(di) {
     val currentTheme: StateFlow<ThemeOptions> =
         repository.currentTheme
 
-    val currentFeedId = repository.currentFeedAndTag.value.first
-    val currentFeedTag = repository.currentFeedAndTag.value.second
+    val currentFeedAndTag: StateFlow<Pair<Long, String>> = repository.currentFeedAndTag
     fun setCurrentFeedAndTag(feedId: Long, tag: String) {
         repository.setCurrentFeedAndTag(feedId, tag)
     }

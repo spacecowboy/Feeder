@@ -116,16 +116,18 @@ fun ReaderScreen(
         }
     }
 
-    val onShare = {
-        val intent = Intent.createChooser(
-            Intent(Intent.ACTION_SEND).apply {
-                putExtra(Intent.EXTRA_TEXT, viewState.currentItem.feedUrl.toString())
-                putExtra(Intent.EXTRA_TITLE, viewState.currentItem.plainTitle)
-                type = "text/plain"
-            },
-            null
-        )
-        context.startActivity(intent)
+    val onShare = remember(viewState) {
+        {
+            val intent = Intent.createChooser(
+                Intent(Intent.ACTION_SEND).apply {
+                    putExtra(Intent.EXTRA_TEXT, viewState.currentItem.feedUrl.toString())
+                    putExtra(Intent.EXTRA_TITLE, viewState.currentItem.plainTitle)
+                    type = "text/plain"
+                },
+                null
+            )
+            context.startActivity(intent)
+        }
     }
 
     val isLightTheme = MaterialTheme.colors.isLight

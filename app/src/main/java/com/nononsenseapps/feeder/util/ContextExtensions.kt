@@ -35,20 +35,12 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
 
-//            val intent = Intent(this, FeedActivity::class.java)
-//            intent.action = Intent.ACTION_VIEW
-//            intent.data = Uri.withAppendedPath(URI_FEEDS, "$id")
-//            intent.putExtra(ARG_FEED_TITLE, label)
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-
             val intent = Intent(
                 Intent.ACTION_VIEW,
                 "$DEEP_LINK_BASE_URI/feed?id=$id".toUri(),
                 this,
                 MainActivity::class.java
-            ).also {
-                it.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            }
+            )
 
             val current = shortcutManager.dynamicShortcuts.toMutableList()
 

@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.navdrawer
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
@@ -153,7 +152,6 @@ private fun ExpandableTag(
             .padding(top = 2.dp, bottom = 2.dp, end = 16.dp)
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                Log.d("JONAS", "Semantics for $this")
                 stateDescription = if (expanded) {
                     expandedLabel
                 } else {

@@ -41,7 +41,7 @@ class FeedScreenViewModel(di: DI, state: SavedStateHandle) : DIAwareViewModel(di
     suspend fun getArticleOpener(itemId: Long): PrefValOpenWith =
         repository.getArticleOpener(itemId)
 
-    suspend fun getFeedDisplayTitle(): String? = repository.getDisplayTitleForFeed(feedId)
+    suspend fun getFeedDisplayTitle(feedId: Long): String? = repository.getDisplayTitleForFeed(feedId)
 
     fun setShowOnlyUnread(value: Boolean) = viewModelScope.launch {
         repository.setShowOnlyUnread(value)

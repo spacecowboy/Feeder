@@ -11,8 +11,8 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
@@ -87,10 +87,7 @@ fun Activity.onNavigateUpFromIntentActivities() {
         Intent(
             this,
             MainActivity::class.java
-        ).apply {
-            // Open existing app task and activity if it exists - otherwise start a new task
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        }
+        )
     )
     finish()
 }

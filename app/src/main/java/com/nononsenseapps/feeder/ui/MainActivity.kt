@@ -20,8 +20,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import coil.ImageLoader
 import coil.compose.LocalImageLoader
@@ -30,6 +30,7 @@ import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.PrefValOpenWith
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.TextToSpeechViewModel
 import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
@@ -113,16 +114,23 @@ class MainActivity : DIAwareComponentActivity() {
         val readAloudViewModel: TextToSpeechViewModel = DIAwareViewModel()
 
         val navController = rememberNavController().also {
-            this.navController = it
+            if (this.navController==null) {
+                this.navController = it
+            }
         }
 
-        // TODO deleting the currently open feed should open all feeds
         // TODO handle deep link for item where default is open with custom tab or browser
 
+        val currentFeedAndTag by mainActivityViewModel.currentFeedAndTag.collectAsState()
+
         NavHost(navController, startDestination = "lastfeed") {
-            composable("lastfeed") { backStackEntry ->
-                navController.popBackStack()
-                navController.navigate("feed?id=${mainActivityViewModel.currentFeedId}&tag=${mainActivityViewModel.currentFeedTag}")
+            composable("lastfeed") {
+                LaunchedEffect(null) {
+                    navController.popEntireBackStack()
+                    navController.navigate(
+                        "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second}"
+                    )
+                }
             }
             composable(
                 "feed?id={id}&tag={tag}",
@@ -142,19 +150,17 @@ class MainActivity : DIAwareComponentActivity() {
                     }
                 )
             ) { backStackEntry ->
-                LaunchedEffect(
-                    key1 = backStackEntry.arguments?.getLong("id"),
-                    key2 = backStackEntry.arguments?.getString("tag")
-                ) {
-                    val feedId = backStackEntry.arguments?.getLong("id")
-                        ?: mainActivityViewModel.currentFeedId
-                    val tag = backStackEntry.arguments?.getString("tag")
-                        ?: mainActivityViewModel.currentFeedTag
+                val feedId = backStackEntry.arguments?.getLong("id")
+                    ?: error("Missing mandatory argument: id")
+                val tag = backStackEntry.arguments?.getString("tag")
+                    ?: error("Missing mandatory argument: tag")
 
+                LaunchedEffect(feedId, tag) {
                     mainActivityViewModel.setCurrentFeedAndTag(feedId, tag)
                 }
 
                 FeedScreen(
+                    navController = navController,
                     backStackEntry = backStackEntry,
                     textToSpeechViewModel = readAloudViewModel
                 )
@@ -174,17 +180,23 @@ class MainActivity : DIAwareComponentActivity() {
                     readerScreenViewModel = backStackEntry.DIAwareViewModel(),
                     readAloudViewModel = readAloudViewModel,
                     onNavigateToFeed = { feedId ->
-                        navController.clearBackstack()
                         if (feedId!=null) {
-                            navController.navigate("feed?id=$feedId")
+                            navController.popEntireBackStack()
+                            navController.navigate(
+                                "feed?id=$feedId"
+                            )
                         } else {
-                            navController.navigate("feed")
+                            navController.popEntireBackStack()
+                            navController.navigate(
+                                "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second}"
+                            )
                         }
                     },
                 ) {
-                    if (!navController.popBackStack()) {
-                        navController.navigate("lastfeed")
-                    }
+                    navController.popEntireBackStack()
+                    navController.navigate(
+                        "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second}"
+                    )
                 }
             }
             composable(
@@ -198,8 +210,10 @@ class MainActivity : DIAwareComponentActivity() {
                         navController.popBackStack()
                     },
                     onOk = { feedId ->
-                        navController.clearBackstack()
-                        navController.navigate("feed?id=$feedId")
+                        navController.popEntireBackStack()
+                        navController.navigate(
+                            "feed?id=$feedId"
+                        )
                     },
                     editFeedScreenViewModel = backStackEntry.DIAwareViewModel()
                 )
@@ -241,8 +255,10 @@ class MainActivity : DIAwareComponentActivity() {
                     },
                     createFeedScreenViewModel = backStackEntry.DIAwareViewModel(),
                 ) { feedId ->
-                    navController.clearBackstack()
-                    navController.navigate("feed?id=$feedId")
+                    navController.popEntireBackStack()
+                    navController.navigate(
+                        "feed?id=$feedId"
+                    )
                 }
             }
             composable(
@@ -260,6 +276,7 @@ class MainActivity : DIAwareComponentActivity() {
 
     @Composable
     fun FeedScreen(
+        navController: NavController,
         backStackEntry: NavBackStackEntry,
         textToSpeechViewModel: TextToSpeechViewModel,
     ) {
@@ -286,29 +303,29 @@ class MainActivity : DIAwareComponentActivity() {
                             openLinkInCustomTab(context, link, toolbarColor)
                         }
                         else -> {
-                            navController?.navigate("reader/$itemId")
+                            navController.navigate("reader/$itemId")
                         }
                     }
                 }
             },
             onAddFeed = {
-                navController?.navigate("search/feed")
+                navController.navigate("search/feed")
             },
             onFeedEdit = { feedId ->
-                navController?.navigate("edit/feed/$feedId")
+                navController.navigate("edit/feed/$feedId")
             },
             onSettings = {
-                navController?.navigate("settings")
+                navController.navigate("settings")
             },
             onOpenFeedOrTag = { feedOrTag ->
-                navController?.popBackStack()
-                navController?.navigate("feed?id=${feedOrTag.id}&tag=${feedOrTag.tag}") {
-                    launchSingleTop = true
-                }
+                navController.popEntireBackStack()
+                navController.navigate(
+                    "feed?id=${feedOrTag.id}&tag=${feedOrTag.tag}"
+                )
                 applicationCoroutineScope.launch {
                     if (feedOrTag.isFeed) {
                         addDynamicShortcutToFeed(
-                            feedScreenViewModel.getFeedDisplayTitle() ?: "",
+                            feedScreenViewModel.getFeedDisplayTitle(feedOrTag.id) ?: "",
                             feedOrTag.id,
                             null
                         )
@@ -317,13 +334,19 @@ class MainActivity : DIAwareComponentActivity() {
                     }
                 }
             },
+            navigateToAllFeeds = {
+                navController.popEntireBackStack()
+                navController.navigate(
+                    "feed?id=$ID_ALL_FEEDS"
+                )
+            },
             feedScreenViewModel = feedScreenViewModel,
             textToSpeechViewModel = textToSpeechViewModel,
         )
     }
 }
 
-private fun NavController.clearBackstack() {
+private fun NavController.popEntireBackStack() {
     var popped = true
     while (popped) {
         popped = popBackStack()
