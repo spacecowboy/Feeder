@@ -283,7 +283,8 @@ fun FeedScreen(
                                 painter = rememberImagePainter(
                                     data = imageUrl,
                                     builder = {
-                                        this.error(placeHolder)
+                                        this.placeholder(placeHolder)
+                                            .error(placeHolder)
                                     },
                                 ),
                                 contentScale = ContentScale.Crop,
