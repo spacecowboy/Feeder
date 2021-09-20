@@ -11,8 +11,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -290,9 +292,11 @@ fun FeedScreen(
                                 contentScale = ContentScale.Crop,
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .width(64.dp)
-                                    .fillMaxHeight()
-                                    .padding(start = 4.dp)
+//                                    .width(64.dp)
+//                                    .fillMaxHeight()
+//                                    .padding(start = 4.dp)
+                                    .fillMaxWidth()
+                                    .aspectRatio(16.0f/9.0f)
                             )
                         }
                     )

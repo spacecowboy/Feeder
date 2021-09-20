@@ -39,7 +39,7 @@ import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 
-private val shortDateTimeFormat: DateTimeFormatter =
+val shortDateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
 
 
