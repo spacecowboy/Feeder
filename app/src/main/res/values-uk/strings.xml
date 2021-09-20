@@ -12,7 +12,7 @@
     <string name="open_in_web_view">Відкрити у Вебперегляді</string>
     <string name="open_link_in_web_view">Відкрити посилання у Вебперегляді</string>
     <string name="use_app_default">Викор. типову програму</string>
-    <string name="notification_channel_description">Сповіщення показуватимуться лише для непрочитаних елементів у налаштованих стрічках</string>
+    <string name="notification_channel_description">Сповіщення показуватимуться лише для непрочитаних записів у налаштованих стрічках</string>
     <string name="notification_channel_name">Непрочитані стрічки</string>
     <string name="updated_feeds">Оновлені стрічки</string>
     <string name="include_mobile_hotspots">Враховувати мобільні точки доступу</string>
@@ -42,8 +42,8 @@
     <string name="mark_as_read">Позначити як прочитане</string>
     <string name="empty_feed_top">Тут нема нічого. Бажаєте…</string>
     <string name="title">Заголовок</string>
-    <string name="navigation_drawer_close">Закрити меню пересування</string>
-    <string name="navigation_drawer_open">Відкрити меню пересування</string>
+    <string name="navigation_drawer_close">Закрити шторку переміщення</string>
+    <string name="navigation_drawer_open">Відкрити шторку переміщення</string>
     <string name="other_unread_articles">%1$s непрочитаних статей</string>
     <string name="many_unread_articles">%1$s непрочитаних статей</string>
     <string name="zero_unread_articles">%1$s непрочитаних статей</string>
@@ -64,8 +64,8 @@
     <string name="contracted_tag">Закриті мітки</string>
     <string name="expanded_tag">Відкрити мітку</string>
     <string name="discovered_feeds_list">Список виявлених стрічок</string>
-    <string name="mark_items_below_as_read">Позначити елементи нижче прочитаними</string>
-    <string name="mark_items_above_as_read">Позначити елементи вище прочитаними</string>
+    <string name="mark_items_below_as_read">Позначити записи нижче прочитаними</string>
+    <string name="mark_items_above_as_read">Позначити записи вище прочитаними</string>
     <string name="open_feed">Відкрити стрічку</string>
     <string name="javascript">Javascript</string>
     <string name="touch_to_play_video">Натисніть, щоб відтворити відео</string>
@@ -80,10 +80,10 @@
     <string name="theme_automatic">Автоматична</string>
     <string name="theme_system">Системна</string>
     <string name="could_not_load_url">Не можливо завантажити URL</string>
-    <string name="max_feed_items">Найбільша кількість елементів на стрічку</string>
+    <string name="max_feed_items">Найбільша кількість записів на стрічку</string>
     <string name="reader_settings">Читанка</string>
     <string name="open_links_with">Відкривати посилання через</string>
-    <string name="open_item_by_default_with">Відкривати елементи типово в</string>
+    <string name="open_item_by_default_with">Відкривати записи типово через</string>
     <string name="open_in_custom_tab">Власна вкладка</string>
     <string name="open_in_default_browser">Типовий оглядач</string>
     <string name="open_in_webview">Вебперегляд</string>
@@ -108,9 +108,9 @@
     <string name="export_feeds_to_opml">Експортувати в OPML</string>
     <string name="open_enclosed_media_file">Відкрити %1$s</string>
     <string name="open_in_browser">Відкрити в оглядачі</string>
-    <string name="new_items_available">Доступні нові елементи</string>
-    <string name="show_unread_items">Показати непрочитані елементи</string>
-    <string name="show_all_items">Показати всі елементи</string>
+    <string name="new_items_available">Доступні нові записи</string>
+    <string name="show_unread_items">Показати непрочитані записи</string>
+    <string name="show_all_items">Показати всі записи</string>
     <string name="delete_feed">Видалити стрічку</string>
     <string name="edit_feed">Змінити стрічку</string>
     <string name="search_feed_empty_hint">Уведіть адресу стрічки</string>
