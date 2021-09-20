@@ -189,22 +189,6 @@ fun SwipeableFeedItemPreview(
                     )
                 }
         ) {
-            // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
-            // It's very important than clickable stuff is handled by its parent - or a direct child
-            Box(
-                modifier = Modifier
-                    .padding(start = 48.dp)
-                    .matchParentSize()
-                    .swipeable(
-                        state = swipeableState,
-                        anchors = anchors,
-                        orientation = Orientation.Horizontal,
-                        reverseDirection = isRtl,
-                        thresholds = { _, _ ->
-                            FractionalThreshold(0.25f)
-                        }
-                    )
-            )
             Box(
                 contentAlignment = swipeIconAlignment,
                 modifier = Modifier
@@ -238,6 +222,25 @@ fun SwipeableFeedItemPreview(
                 modifier = Modifier
                     .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
             )
+
+            // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
+            // It's very important than clickable stuff is handled by its parent - or a direct child
+            Box(
+                modifier = Modifier
+                    .padding(start = 48.dp)
+                    .matchParentSize()
+                    .swipeable(
+                        state = swipeableState,
+                        anchors = anchors,
+                        orientation = Orientation.Horizontal,
+                        reverseDirection = isRtl,
+                        thresholds = { _, _ ->
+                            FractionalThreshold(0.25f)
+                        }
+                    )
+            )
+
+
         }
     }
 }
