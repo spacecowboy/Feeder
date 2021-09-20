@@ -5,6 +5,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
@@ -129,7 +130,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
         context,
         item.id.toInt(),
         contentIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
     )
 
     val builder = notificationBuilder(context)
@@ -152,7 +153,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
                 context,
                 item.id.toInt(),
                 getOpenInDefaultActivityIntent(context, item.id, enclosureLink),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
             )
         )
     }
@@ -165,7 +166,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
                 context,
                 item.id.toInt(),
                 getOpenInDefaultActivityIntent(context, item.id, link),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
             )
         )
     }
@@ -177,7 +178,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
             context,
             item.id.toInt(),
             getMarkAsReadIntent(context, item.id),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
         )
     )
 
@@ -268,7 +269,7 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
         context,
         notificationId,
         contentIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
     )
 
     val builder = notificationBuilder(context)
@@ -290,7 +291,12 @@ private fun getDeleteIntent(context: Context, feedItems: List<FeedItemWithFeed>)
     val ids = LongArray(feedItems.size) { i -> feedItems[i].id }
     intent.putExtra(EXTRA_FEEDITEM_ID_ARRAY, ids)
 
-    return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    return PendingIntent.getBroadcast(
+        context,
+        0,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
+    )
 }
 
 internal fun getDeleteIntent(context: Context, feedItem: FeedItemWithFeed): Intent {
@@ -308,7 +314,7 @@ private fun getPendingDeleteIntent(context: Context, feedItem: FeedItemWithFeed)
         context,
         0,
         getDeleteIntent(context, feedItem),
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
     )
 
 private fun notificationBuilder(context: Context): NotificationCompat.Builder {

@@ -25,9 +25,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.DI
 
 class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitListener {
-    private val textToSpeech by lazy {
-        TextToSpeech(getApplication<Application>().applicationContext, this)
-    }
+    private var textToSpeech: TextToSpeech? = null
     private val speechListener: UtteranceProgressListener by lazy {
         object : UtteranceProgressListener() {
             override fun onDone(utteranceId: String) {
@@ -53,7 +51,7 @@ class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitL
     }
     private val textToSpeechQueue = mutableMapOf<String, String>()
     private var textToSpeechId: Int = 0
-    private var initialized: Boolean = false
+    private var initializedState: Int? = null
     private var startJob: Job? = null
 
     private val _readAloudState = mutableStateOf(PlaybackStatus.STOPPED)
@@ -81,44 +79,58 @@ class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitL
     fun play() {
         startJob?.cancel()
         startJob = viewModelScope.launch {
-            // Access object to initialize it
-            while (textToSpeech.defaultVoice==null || !initialized) {
+            val context = getApplication<Application>().applicationContext
+            if (textToSpeech == null) {
+                initializedState = null
+                textToSpeech = TextToSpeech(
+                    context,
+                    this@TextToSpeechViewModel
+                )
+            }
+            while (initializedState == null) {
+                Log.d(LOG_TAG, "Delaying a little")
                 delay(100)
+            }
+            if (initializedState != TextToSpeech.SUCCESS) {
+                Toast.makeText(context, R.string.failed_to_load_text_to_speech, Toast.LENGTH_SHORT)
+                    .show()
+                return@launch
             }
             _readAloudState.value = PlaybackStatus.PLAYING
             // Can only set this once engine has been initialized
-            textToSpeech.setOnUtteranceProgressListener(speechListener)
+            textToSpeech?.setOnUtteranceProgressListener(speechListener)
             for ((utteranceId, text) in textToSpeechQueue) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, null, utteranceId)
+                    textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, null, utteranceId)
                 } else {
                     val params = HashMap<String, String>()
                     params[KEY_PARAM_UTTERANCE_ID] = utteranceId
                     @Suppress("DEPRECATION")
-                    textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, params)
+                    textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, params)
                 }
             }
         }
     }
 
     fun pause() {
-        textToSpeech.stop()
+        textToSpeech?.stop()
         _readAloudState.value = PlaybackStatus.PAUSED
     }
 
     fun stop() {
-        textToSpeech.stop()
+        textToSpeech?.stop()
         textToSpeechQueue.clear()
         _readAloudState.value = PlaybackStatus.STOPPED
     }
 
     override fun onInit(status: Int) {
+        initializedState = status
         val context = getApplication<Application>().applicationContext
 
         if (status==TextToSpeech.SUCCESS) {
             val selectedLocale = context.getLocales()
                 .firstOrNull { locale ->
-                    when (textToSpeech.setLanguage(locale)) {
+                    when (textToSpeech?.setLanguage(locale)) {
                         TextToSpeech.LANG_MISSING_DATA, TextToSpeech.LANG_NOT_SUPPORTED -> {
                             Log.e(LOG_TAG, "${locale.displayLanguage} is not supported!")
                             false
@@ -128,21 +140,18 @@ class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitL
                         }
                     }
                 }
-            initialized = true
 
             if (selectedLocale==null) {
                 Log.e(LOG_TAG, "None of the user's locales was supported by text to speech")
             }
         } else {
-            Log.e(LOG_TAG, "Failed to load TextToSpeech object.")
-            Toast.makeText(context, R.string.failed_to_load_text_to_speech, Toast.LENGTH_SHORT)
-                .show()
+            Log.e(LOG_TAG, "Failed to load TextToSpeech object: $status")
         }
     }
 
     override fun onCleared() {
         super.onCleared()
-        textToSpeech.shutdown()
+        textToSpeech?.shutdown()
     }
 
     companion object {

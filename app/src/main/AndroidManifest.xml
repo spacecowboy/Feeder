@@ -9,6 +9,12 @@
   <uses-permission android:name="android.permission.INTERNET" /> <!-- To limit syncing to only WiFi -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.TTS_SERVICE" />
+    </intent>
+  </queries>
+
   <application
     android:name=".FeederApplication"
     android:allowBackup="true"
@@ -145,5 +151,4 @@
       android:name=".model.FeederService"
       android:exported="true" />
   </application>
-
 </manifest>
