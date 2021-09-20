@@ -25,6 +25,7 @@ import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -138,10 +139,17 @@ fun SwipeableFeedItemPreview(
 
     val markAboveAsReadLabel = stringResource(R.string.mark_items_above_as_read)
     val markBelowAsReadLabel = stringResource(R.string.mark_items_below_as_read)
-    val readStatusLabel = if (item.unread) {
-        stringResource(R.string.unread)
-    } else {
-        stringResource(R.string.already_read)
+
+    val unreadLabel = stringResource(R.string.unread)
+    val alreadyReadLabel = stringResource(R.string.already_read)
+    val readStatusLabel by remember(item.unread) {
+        derivedStateOf {
+            if (item.unread) {
+                unreadLabel
+            } else {
+                alreadyReadLabel
+            }
+        }
     }
 
     AnimatedVisibility(

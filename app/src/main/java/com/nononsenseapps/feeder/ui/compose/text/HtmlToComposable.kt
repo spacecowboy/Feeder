@@ -411,7 +411,8 @@ private fun TextComposer.appendTextChildren(
                                                 painter = rememberImagePainter(
                                                     data = imageUrl,
                                                     builder = {
-                                                        this.error(imagePlaceholder)
+                                                        this.placeholder(imagePlaceholder)
+                                                        .error(imagePlaceholder)
                                                     },
                                                 ),
                                                 contentDescription = alt,
