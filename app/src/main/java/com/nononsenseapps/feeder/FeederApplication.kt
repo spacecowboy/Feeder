@@ -110,6 +110,7 @@ class FeederApplication : MultiDexApplication(), DIAware {
 
             ImageLoader.Builder(instance())
                 .okHttpClient(okHttpClient = okHttpClient)
+                .dispatcher(Dispatchers.Default) // This slightly improves scrolling performance
                 .componentRegistry {
                     add(SvgDecoder(applicationContext))
                     if (SDK_INT >= 28) {

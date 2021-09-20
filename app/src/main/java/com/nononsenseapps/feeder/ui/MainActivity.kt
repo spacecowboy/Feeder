@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -102,8 +103,9 @@ class MainActivity : DIAwareComponentActivity() {
             ) {
                 withDI {
                     val imageLoader: ImageLoader by instance()
-                    LocalImageLoader.provides(imageLoader)
-                    appContent()
+                    CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+                        appContent()
+                    }
                 }
             }
         }
