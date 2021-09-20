@@ -296,7 +296,7 @@ fun FeedScreen(
 //                                    .fillMaxHeight()
 //                                    .padding(start = 4.dp)
                                     .fillMaxWidth()
-                                    .aspectRatio(16.0f/9.0f)
+                                    .aspectRatio(16.0f / 9.0f)
                             )
                         }
                     )

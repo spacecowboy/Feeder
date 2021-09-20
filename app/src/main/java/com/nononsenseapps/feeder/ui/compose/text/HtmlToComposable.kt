@@ -6,9 +6,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
@@ -35,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.BlockQuoteStyle
 import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockBackground
 import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockStyle
@@ -419,6 +424,7 @@ private fun TextComposer.appendTextChildren(
                                                 contentScale = ContentScale.FillWidth,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
+                                                    .aspectRatio(16.0f/9.0f) // NOT IDEAL
 //                                                    .graphicsLayer {
 //                                                        scaleX = scale.value
 //                                                        scaleY = scale.value
