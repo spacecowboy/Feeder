@@ -19,12 +19,9 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -36,8 +33,7 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.ImageLoader
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.rememberImagePainter
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.theme.BlockQuoteStyle
 import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockBackground
@@ -46,18 +42,17 @@ import com.nononsenseapps.feeder.ui.compose.theme.CodeInlineStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
+import java.io.InputStream
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
-import org.kodein.di.compose.instance
-import java.io.InputStream
 
 fun LazyListScope.htmlFormattedText(
     inputStream: InputStream,
     baseUrl: String,
     @DrawableRes imagePlaceholder: Int,
-    onLinkClick: (String) -> Unit
+    onLinkClick: (String) -> Unit,
 ) {
     Jsoup.parse(inputStream, null, baseUrl)
         ?.body()
@@ -151,7 +146,7 @@ private fun TextComposer.appendTextChildren(
     onLinkClick: (String) -> Unit,
 ) {
     var node = nodes.firstOrNull()
-    while (node != null) {
+    while (node!=null) {
         when (node) {
             is TextNode -> {
                 if (preFormatted) {
@@ -333,7 +328,7 @@ private fun TextComposer.appendTextChildren(
                         )
                     }
                     "code" -> {
-                        if (element.parent()?.tagName() == "pre") {
+                        if (element.parent()?.tagName()=="pre") {
                             terminateCurrentText()
                             lazyListScope.formatCodeBlock(
                                 element = element,
@@ -389,14 +384,13 @@ private fun TextComposer.appendTextChildren(
                             val alt = element.attr("alt") ?: ""
                             appendImage(onLinkClick = onLinkClick) { onClick ->
                                 lazyListScope.item {
-                                    val imageLoader: ImageLoader by instance()
 //                                    val scale = remember { mutableStateOf(1f) }
                                     DisableSelection {
                                         Box(
                                             modifier = Modifier
                                                 .clip(RectangleShape)
                                                 .clickable(
-                                                    enabled = onClick != null
+                                                    enabled = onClick!=null
                                                 ) {
                                                     onClick?.invoke()
                                                 }
@@ -414,14 +408,11 @@ private fun TextComposer.appendTextChildren(
 //                                            }
                                         ) {
                                             Image(
-                                                painter = rememberCoilPainter(
-                                                    request = imageUrl,
-                                                    imageLoader = imageLoader,
-                                                    requestBuilder = {
+                                                painter = rememberImagePainter(
+                                                    data = imageUrl,
+                                                    builder = {
                                                         this.error(imagePlaceholder)
                                                     },
-                                                    previewPlaceholder = imagePlaceholder,
-                                                    shouldRefetchOnSizeChange = { _, _ -> false },
                                                 ),
                                                 contentDescription = alt,
                                                 contentScale = ContentScale.FillWidth,
@@ -452,7 +443,7 @@ private fun TextComposer.appendTextChildren(
                     }
                     "ul" -> {
                         element.children()
-                            .filter { it.tagName() == "li" }
+                            .filter { it.tagName()=="li" }
                             .forEach { listItem ->
                                 withParagraph {
                                     // no break space
@@ -468,7 +459,7 @@ private fun TextComposer.appendTextChildren(
                     }
                     "ol" -> {
                         element.children()
-                            .filter { it.tagName() == "li" }
+                            .filter { it.tagName()=="li" }
                             .forEachIndexed { i, listItem ->
                                 withParagraph {
                                     // no break space
@@ -494,7 +485,7 @@ private fun TextComposer.appendTextChildren(
                             followed optionally by a tfoot element
                              */
                             element.children()
-                                .filter { it.tagName() == "caption" }
+                                .filter { it.tagName()=="caption" }
                                 .forEach {
                                     appendTextChildren(
                                         it.childNodes(),
@@ -507,10 +498,10 @@ private fun TextComposer.appendTextChildren(
                                 }
 
                             element.children()
-                                .filter { it.tagName() == "thead" || it.tagName() == "tbody" || it.tagName() == "tfoot" }
+                                .filter { it.tagName()=="thead" || it.tagName()=="tbody" || it.tagName()=="tfoot" }
                                 .flatMap {
                                     it.children()
-                                        .filter { it.tagName() == "tr" }
+                                        .filter { it.tagName()=="tr" }
                                 }
                                 .forEach { row ->
                                     appendTextChildren(
@@ -528,19 +519,16 @@ private fun TextComposer.appendTextChildren(
                     "iframe" -> {
                         val video: Video? = getVideo(element.attr("abs:src"))
 
-                        if (video != null) {
+                        if (video!=null) {
                             appendImage(onLinkClick = onLinkClick) {
                                 lazyListScope.item {
                                     DisableSelection {
-                                        val imageLoader: ImageLoader by instance()
                                         Image(
-                                            painter = rememberCoilPainter(
-                                                request = video.imageUrl,
-                                                imageLoader = imageLoader,
-                                                requestBuilder = {
+                                            painter = rememberImagePainter(
+                                                data = video.imageUrl,
+                                                builder = {
                                                     this.error(R.drawable.youtube_icon)
                                                 },
-                                                previewPlaceholder = R.drawable.youtube_icon,
                                             ),
                                             contentDescription = stringResource(R.string.touch_to_play_video),
                                             contentScale = ContentScale.FillWidth,

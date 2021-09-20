@@ -17,14 +17,17 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.di.androidModule
+import com.nononsenseapps.feeder.di.archModelModule
 import com.nononsenseapps.feeder.di.networkModule
-import com.nononsenseapps.feeder.di.stateModule
-import com.nononsenseapps.feeder.di.viewModelModule
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
 import com.nononsenseapps.feeder.util.AsyncImageLoader
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.jsonfeed.cachingHttpClient
+import java.io.File
+import java.security.Security
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
@@ -37,9 +40,6 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
-import java.io.File
-import java.security.Security
-import java.util.concurrent.TimeUnit
 
 @Suppress("unused")
 class FeederApplication : MultiDexApplication(), DIAware {
@@ -53,7 +53,9 @@ class FeederApplication : MultiDexApplication(), DIAware {
         bind<FeedDao>() with singleton { instance<AppDatabase>().feedDao() }
         bind<FeedItemDao>() with singleton { instance<AppDatabase>().feedItemDao() }
 
-        import(viewModelModule)
+        import(androidModule)
+
+        import(archModelModule)
 
         bind<WorkManager>() with singleton { WorkManager.getInstance(this@FeederApplication) }
         bind<ContentResolver>() with singleton { contentResolver }
@@ -111,7 +113,7 @@ class FeederApplication : MultiDexApplication(), DIAware {
                 .componentRegistry {
                     add(SvgDecoder(applicationContext))
                     if (SDK_INT >= 28) {
-                        add(ImageDecoderDecoder())
+                        add(ImageDecoderDecoder(this@FeederApplication))
                     } else {
                         add(GifDecoder())
                     }
@@ -121,7 +123,6 @@ class FeederApplication : MultiDexApplication(), DIAware {
         bind<AsyncImageLoader>() with singleton { AsyncImageLoader(di) }
         bind<ApplicationCoroutineScope>() with instance(applicationCoroutineScope)
         import(networkModule)
-        import(stateModule)
     }
 
     init {

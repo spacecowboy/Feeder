@@ -46,6 +46,9 @@ interface FeedDao {
     @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
     fun loadLiveTags(): LiveData<List<String>>
 
+    @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
+    fun loadAllTags(): Flow<List<String>>
+
     @Query("SELECT * FROM feeds WHERE id IS :feedId")
     suspend fun loadFeed(feedId: Long): Feed?
 
@@ -109,7 +112,10 @@ interface FeedDao {
     suspend fun setAllNotify(notify: Boolean)
 
     @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds WHERE id IS :feedId")
-    suspend fun getFeedTitle(feedId: Long): List<FeedTitle>
+    suspend fun getFeedTitle(feedId: Long): FeedTitle?
+
+    @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds WHERE id IS :feedId")
+    fun getFeedTitlesWithId(feedId: Long): Flow<List<FeedTitle>>
 
     @Query(
         """
@@ -119,10 +125,10 @@ interface FeedDao {
         ORDER BY $COL_TITLE COLLATE NOCASE
         """
     )
-    suspend fun getFeedTitlesWithTag(feedTag: String): List<FeedTitle>
+    fun getFeedTitlesWithTag(feedTag: String): Flow<List<FeedTitle>>
 
     @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds ORDER BY $COL_TITLE COLLATE NOCASE")
-    suspend fun getAllFeedTitles(): List<FeedTitle>
+    fun getAllFeedTitles(): Flow<List<FeedTitle>>
 }
 
 /**

@@ -38,14 +38,14 @@ buildscript {
     savedstate_version = "1.1.0"
     room_version = "2.3.0"
     // Compose related below
-    nav_version = "2.4.0-alpha08"
+    nav_version = "2.4.0-alpha09"
     activityComposeVersion = "1.3.0"
     composeVersion = "1.0.0"
     navigationComposeVersion = nav_version
     pagingVersion = "3.0.0"
     pagingComposeVersion = "1.0.0-alpha12"
-    accompanistCoilVersion = "0.12.0"
     accompanistVersion = "0.17.0"
+    coilVersion = "1.3.2"
 
     // Tests
     espresso_version = "3.1.0"

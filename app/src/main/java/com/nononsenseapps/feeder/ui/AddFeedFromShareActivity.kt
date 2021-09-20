@@ -11,14 +11,11 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
-import com.nononsenseapps.feeder.model.FeedViewModel
-import com.nononsenseapps.feeder.model.SearchFeedViewModel
-import com.nononsenseapps.feeder.model.SettingsViewModel
-import com.nononsenseapps.feeder.ui.compose.feed.CreateFeedScreen
+import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import org.kodein.di.compose.withDI
@@ -38,8 +35,8 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
 
         setContent {
             withDI {
-                val settingsViewModel: SettingsViewModel = DIAwareViewModel()
-                val currentTheme by settingsViewModel.currentTheme.collectAsState()
+                val viewModel: AddFeedFromShareActivityViewModel = DIAwareViewModel()
+                val currentTheme by viewModel.currentTheme.collectAsState()
 
                 FeederTheme(
                     currentTheme = currentTheme
@@ -47,15 +44,12 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController, startDestination = "search") {
                         composable("search") { backStackEntry ->
-                            val searchFeedViewModel: SearchFeedViewModel =
-                                backStackEntry.DIAwareViewModel()
-
                             SearchFeedScreen(
                                 onNavigateUp = {
                                     onNavigateUpFromIntentActivities()
                                 },
                                 initialFeedUrl = initialFeedUrl,
-                                searchFeedViewModel = searchFeedViewModel
+                                searchFeedViewModel = backStackEntry.DIAwareViewModel()
                             ) {
                                 navController.navigate("add/feed?feedUrl=${it.url}&feedTitle=${it.title}")
                             }
@@ -71,15 +65,11 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                                 }
                             )
                         ) { backStackEntry ->
-                            val feedViewModel: FeedViewModel = backStackEntry.DIAwareViewModel()
-
                             CreateFeedScreen(
                                 onNavigateUp = {
                                     navController.popBackStack()
                                 },
-                                feedUrl = backStackEntry.arguments?.getString("feedUrl") ?: "",
-                                feedTitle = backStackEntry.arguments?.getString("feedTitle") ?: "",
-                                feedViewModel = feedViewModel
+                                createFeedScreenViewModel = backStackEntry.DIAwareViewModel(),
                             ) {
                                 finish()
                             }
@@ -97,10 +87,7 @@ fun Activity.onNavigateUpFromIntentActivities() {
         Intent(
             this,
             MainActivity::class.java
-        ).apply {
-            // Open existing app task and activity if it exists - otherwise start a new task
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        }
+        )
     )
     finish()
 }

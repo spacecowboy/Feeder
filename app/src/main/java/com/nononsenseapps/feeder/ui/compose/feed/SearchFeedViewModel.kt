@@ -1,15 +1,15 @@
-package com.nononsenseapps.feeder.model
+package com.nononsenseapps.feeder.ui.compose.feed
 
 import com.nononsenseapps.feeder.base.DIAwareViewModel
-import com.nononsenseapps.feeder.ui.compose.feed.SearchResult
+import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import org.kodein.di.DI
 import org.kodein.di.instance
-import java.net.URL
 
 class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
     private val feedParser: FeedParser by instance()
