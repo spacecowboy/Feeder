@@ -219,7 +219,7 @@ fun SwipeableFeedItemPreview(
                 }
             }
 
-            FeedItemPreview(
+            FeedItemCard(
                 item = item,
                 showThumbnail = showThumbnail,
                 imagePainter = imagePainter,

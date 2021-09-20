@@ -54,9 +54,13 @@ fun LinkTextStyle(): TextStyle =
 
 @Composable
 fun FeedListItemTitleStyle(): SpanStyle =
-    MaterialTheme.typography.h6.toSpanStyle()
+    FeedListItemTitleTextStyle().toSpanStyle()
+
+@Composable
+fun FeedListItemTitleTextStyle(): TextStyle =
+    MaterialTheme.typography.h6
         .merge(
-            SpanStyle(
+            TextStyle(
                 fontSize = 17.sp,
 //                fontWeight = FontWeight.SemiBold,
             )
