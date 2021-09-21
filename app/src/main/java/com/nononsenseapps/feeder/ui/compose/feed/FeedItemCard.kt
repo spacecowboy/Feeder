@@ -17,7 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
@@ -76,20 +78,19 @@ fun FeedItemCard(
                 ) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         Text(
-                            text = item.feedTitle,
-                            style = FeedListItemFeedTitleStyle(),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .weight(weight = 1.0f, fill = true)
-                                .padding(start = 8.dp, end = 8.dp)
-                        )
-                        Text(
-                            text = item.pubDate?.toLocalDate()?.format(shortDateTimeFormat)
-                                ?: "",
+                            text = buildAnnotatedString {
+                                item.pubDate?.toLocalDate()?.format(shortDateTimeFormat)?.let { date ->
+                                    append("$date ‧ ")
+                                }
+                                withStyle(FeedListItemFeedTitleStyle().toSpanStyle()) {
+                                    append(item.feedTitle)
+                                }
+                            },
                             style = FeedListItemDateStyle(),
                             maxLines = 1,
+                            overflow = TextOverflow.Clip,
                             modifier = Modifier
+                                .fillMaxWidth()
                                 .padding(start = 8.dp, end = 8.dp)
                         )
                     }
