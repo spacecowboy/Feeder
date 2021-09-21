@@ -61,7 +61,7 @@
     <string name="show_fab">Показывать плавающую кнопку действия</string>
     <string name="include_mobile_hotspots">Включая мобильные точки доступа</string>
     <string name="updated_feeds">Обновлённые ленты</string>
-  <string name="notification_channel_name">Непрочитанные ленты</string>
+    <string name="notification_channel_name">Непрочитанные ленты</string>
     <string name="notification_channel_description">Уведомления показаны только для непрочитанных элементов в настроенных лентах</string>
     <string name="open_in_default_browser">Браузер по умолчанию</string>
     <string name="open_item_by_default_with">По умолчанию открывать элементы с помощью</string>
@@ -107,4 +107,22 @@
     <string name="resume_reading">Возобновить чтение</string>
     <string name="pause_reading">Приостановить чтение</string>
     <string name="use_app_default">Использовать приложение по умолчанию</string>
+    <string name="other_unread_articles">%1$s непрочитанных статей</string>
+    <string name="many_unread_articles">%1$s непрочитанных статей</string>
+    <string name="few_unread_articles">%1$s непрочитанных статей</string>
+    <string name="two_unread_articles">%1$s непрочитанных статей</string>
+    <string name="zero_unread_articles">%1$s непрочитанных статей</string>
+    <string name="one_unread_article">%1$s непрочитанная статья</string>
+    <string name="synchronize_feeds">Синхронизировать каналы</string>
+    <string name="showing_all_articles">Отображать все статьи</string>
+    <string name="showing_only_unread_articles">Отображать только непрочитанные статьи</string>
+    <string name="already_read">Прочитанное</string>
+    <string name="unread">Непрочитанное</string>
+    <string name="go_to_feed">Перейти к %1$s</string>
+    <string name="open_menu">Открыть меню</string>
+    <string name="go_back">Назад</string>
+    <string name="contracted_tag">Закрытая метка</string>
+    <string name="expanded_tag">Открытая метка</string>
+    <string name="stop_reading">Прекратить чтение</string>
+    <string name="open_enclosed_media_file">Открыть %1$s</string>
 </resources>
