@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="action_settings">設置</string>
+    <string name="navigation_drawer_close">關閉導航菜單</string>
+    <string name="navigation_drawer_open">打開導航菜單</string>
 </resources>
