@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.material.Card
@@ -66,7 +64,7 @@ fun FeedItemCard(
                     text = item.title,
                     style = FeedListItemTitleTextStyle(),
                     modifier = Modifier
-                        .padding(bottom = 2.dp, start = 8.dp, end = 8.dp, top = 8.dp)
+                        .padding(start = 8.dp, end = 8.dp, top = 8.dp)
                 )
             }
             // Want the dropdown to center on the middle text row
@@ -84,7 +82,7 @@ fun FeedItemCard(
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
                                 .weight(weight = 1.0f, fill = true)
-                                .padding(top = 2.dp, start = 8.dp, end = 8.dp)
+                                .padding(start = 8.dp, end = 8.dp)
                         )
                         Text(
                             text = item.pubDate?.toLocalDate()?.format(shortDateTimeFormat)
@@ -92,7 +90,7 @@ fun FeedItemCard(
                             style = FeedListItemDateStyle(),
                             maxLines = 1,
                             modifier = Modifier
-                                .padding(top = 2.dp, start = 8.dp, end = 8.dp)
+                                .padding(start = 8.dp, end = 8.dp)
                         )
                     }
                 }

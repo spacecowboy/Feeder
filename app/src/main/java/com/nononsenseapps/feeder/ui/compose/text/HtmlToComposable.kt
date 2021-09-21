@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -419,6 +420,7 @@ private fun TextComposer.appendTextChildren(
                                                 contentScale = ContentScale.FillWidth,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
+                                                    .aspectRatio(16.0f/9.0f) // NOT IDEAL
 //                                                    .graphicsLayer {
 //                                                        scaleX = scale.value
 //                                                        scaleY = scale.value
