@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,6 +34,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import coil.size.OriginalSize
+import coil.size.Precision
+import coil.size.SizeResolver
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.theme.BlockQuoteStyle
 import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockBackground
@@ -413,19 +415,15 @@ private fun TextComposer.appendTextChildren(
                                                     data = imageUrl,
                                                     builder = {
                                                         this.placeholder(imagePlaceholder)
-                                                        .error(imagePlaceholder)
+                                                            .error(imagePlaceholder)
+                                                            .precision(Precision.INEXACT)
+                                                            .size(SizeResolver(OriginalSize))
                                                     },
                                                 ),
                                                 contentDescription = alt,
                                                 contentScale = ContentScale.FillWidth,
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .aspectRatio(16.0f/9.0f) // NOT IDEAL
-//                                                    .graphicsLayer {
-//                                                        scaleX = scale.value
-//                                                        scaleY = scale.value
-//                                                    }
-
                                             )
                                         }
                                     }
@@ -530,7 +528,10 @@ private fun TextComposer.appendTextChildren(
                                             painter = rememberImagePainter(
                                                 data = video.imageUrl,
                                                 builder = {
-                                                    this.error(R.drawable.youtube_icon)
+                                                    this.placeholder(R.drawable.youtube_icon)
+                                                        .error(R.drawable.youtube_icon)
+                                                        .precision(Precision.INEXACT)
+                                                        .size(SizeResolver(OriginalSize))
                                                 },
                                             ),
                                             contentDescription = stringResource(R.string.touch_to_play_video),
