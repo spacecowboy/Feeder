@@ -2,15 +2,14 @@ package com.nononsenseapps.feeder.ui.compose.feed
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -32,10 +31,9 @@ import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
-import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import java.util.*
-import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 
@@ -45,7 +43,7 @@ val shortDateTimeFormat: DateTimeFormatter =
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FeedItemPreview(
+fun FeedItemCompact(
     item: FeedListItem,
     showThumbnail: Boolean,
     imagePainter: @Composable (String) -> Unit,
@@ -56,6 +54,7 @@ fun FeedItemPreview(
     onDismissDropdown: () -> Unit,
 ) {
     Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
             .padding(
                 start = keyline1Padding,
@@ -68,89 +67,88 @@ fun FeedItemPreview(
             modifier = Modifier
                 .weight(weight = 1.0f, fill = true)
                 .requiredHeightIn(min = minimumTouchSize)
+                .padding(vertical = 4.dp)
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    Text(
-                        text = item.feedTitle,
-                        style = FeedListItemFeedTitleStyle(),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .weight(weight = 1.0f, fill = true)
-                            .padding(top = 2.dp)
-                    )
-                    Text(
-                        text = item.pubDate?.toLocalDate()?.format(shortDateTimeFormat)
-                            ?: "",
-                        style = FeedListItemDateStyle(),
-                        maxLines = 1,
-                        modifier = Modifier
-                            .padding(top = 2.dp, start = 4.dp)
-                    )
-                }
-            }
-
-            val alpha = if (item.unread) {
+            val titleAlpha = if (item.unread) {
                 ContentAlpha.high
             } else {
                 ContentAlpha.medium
             }
-            CompositionLocalProvider(LocalContentAlpha provides alpha) {
+            CompositionLocalProvider(LocalContentAlpha provides titleAlpha) {
                 Text(
-                    text = buildAnnotatedString {
-                        withStyle(
-                            FeedListItemTitleStyle()
-                        ) {
-                            append(item.title)
-                        }
-                        append(" — ${item.snippet}…")
-                    },
-                    style = FeedListItemStyle(),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 5,
+                    text = item.title,
+                    style = FeedListItemTitleTextStyle(),
                     modifier = Modifier
-                        .padding(bottom = 2.dp)
+                        .padding(start = 4.dp, end = 4.dp)
                 )
             }
-
+            // Want the dropdown to center on the middle text row
+            Box {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                        Text(
+                            text = buildAnnotatedString {
+                                if (item.pubDate.isNotBlank()) {
+                                    append("${item.pubDate} ‧ ")
+                                }
+                                withStyle(FeedListItemFeedTitleStyle().toSpanStyle()) {
+                                    append(item.feedTitle)
+                                }
+                            },
+                            style = FeedListItemDateStyle(),
+                            maxLines = 1,
+                            overflow = TextOverflow.Clip,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 4.dp, end = 4.dp)
+                        )
+                    }
+                }
+                DropdownMenu(
+                    expanded = dropDownMenuExpanded,
+                    onDismissRequest = onDismissDropdown
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            onDismissDropdown()
+                            onMarkAboveAsRead()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.mark_items_above_as_read)
+                        )
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            onDismissDropdown()
+                            onMarkBelowAsRead()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.mark_items_below_as_read)
+                        )
+                    }
+                }
+            }
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Text(
+                    text = item.snippet,
+                    style = FeedListItemStyle(),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 4,
+                    modifier = Modifier
+                        .padding(start = 4.dp, end = 4.dp, bottom = 8.dp)
+                )
+            }
         }
 
         if (showThumbnail) {
             item.imageUrl?.let { imageUrl ->
-                Spacer(modifier = Modifier.width(4.dp))
-
                 imagePainter(imageUrl)
-            }
-        }
-
-        DropdownMenu(
-            expanded = dropDownMenuExpanded,
-            onDismissRequest = onDismissDropdown
-        ) {
-            DropdownMenuItem(
-                onClick = {
-                    onDismissDropdown()
-                    onMarkAboveAsRead()
-                }
-            ) {
-                Text(
-                    text = stringResource(id = R.string.mark_items_above_as_read)
-                )
-            }
-            DropdownMenuItem(
-                onClick = {
-                    onDismissDropdown()
-                    onMarkBelowAsRead()
-                }
-            ) {
-                Text(
-                    text = stringResource(id = R.string.mark_items_below_as_read)
-                )
             }
         }
     }
@@ -159,12 +157,12 @@ fun FeedItemPreview(
 @Composable
 @Preview(showBackground = true)
 private fun preview() {
-    FeedItemPreview(
+    FeedItemCompact(
         item = FeedListItem(
             title = "title",
             snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
             feedTitle = "Super Duper Feed One two three hup di too dasf",
-            pubDate = null,
+            pubDate = "Jun 9, 2021",
             unread = true,
             imageUrl = null,
             id = ID_UNSET
@@ -185,6 +183,6 @@ data class FeedListItem(
     val snippet: String,
     val feedTitle: String,
     val unread: Boolean,
-    val pubDate: ZonedDateTime?,
+    val pubDate: String,
     val imageUrl: String?,
 )

@@ -9,6 +9,7 @@ import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
+import com.nononsenseapps.feeder.ui.compose.feed.shortDateTimeFormat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
@@ -297,6 +298,6 @@ private fun PreviewItem.toFeedListItem() =
         snippet = plainSnippet,
         feedTitle = feedDisplayTitle,
         unread = unread,
-        pubDate = pubDate,
+        pubDate = pubDate?.toLocalDate()?.format(shortDateTimeFormat) ?: "",
         imageUrl = imageUrl
     )

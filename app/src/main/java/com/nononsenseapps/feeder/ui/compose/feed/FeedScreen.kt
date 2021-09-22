@@ -56,6 +56,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -75,6 +76,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ScreenTitle
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.db.room.FeedTitle
@@ -269,6 +271,7 @@ fun FeedScreen(
                         onlyUnread = viewState?.onlyUnread ?: true,
                         item = previewItem,
                         showThumbnail = viewState?.showThumbnails ?: true,
+                        feedItemStyle = viewState?.feedItemStyle ?: FeedItemStyle.CARD,
                         onMarkAboveAsRead = {
                             if (itemIndex > 0) {
                                 feedScreenViewModel.markBeforeAsRead(itemIndex)
@@ -281,23 +284,38 @@ fun FeedScreen(
                             onItemClick(previewItem.id)
                         },
                         imagePainter = { imageUrl ->
-                            Image(
-                                painter = rememberImagePainter(
-                                    data = imageUrl,
-                                    builder = {
-                                        this.placeholder(placeHolder)
-                                            .error(placeHolder)
-                                    },
-                                ),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = null,
-                                modifier = Modifier
-//                                    .width(64.dp)
-//                                    .fillMaxHeight()
-//                                    .padding(start = 4.dp)
-                                    .fillMaxWidth()
-                                    .aspectRatio(16.0f / 9.0f)
-                            )
+                            val alpha: Float = if (previewItem.unread) {
+                                1.0f
+                            } else {
+                                0.5f
+                            }
+                            Box {
+                                Image(
+                                    painter = rememberImagePainter(
+                                        data = imageUrl,
+                                        builder = {
+                                            this.placeholder(placeHolder)
+                                                .error(placeHolder)
+                                        },
+                                    ),
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .run {
+                                            when (viewState?.feedItemStyle ?: FeedItemStyle.CARD) {
+                                                FeedItemStyle.CARD -> this
+                                                    .fillMaxWidth()
+                                                    .aspectRatio(16.0f / 9.0f)
+                                                FeedItemStyle.COMPACT,
+                                                FeedItemStyle.SUPER_COMPACT,
+                                                -> this
+                                                    .width(64.dp)
+                                                    .fillMaxHeight()
+                                            }
+                                        }
+                                        .alpha(alpha)
+                                )
+                            }
                         }
                     )
                 }

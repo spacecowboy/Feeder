@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.PrefValOpenWith
 import com.nononsenseapps.feeder.archmodel.Repository
@@ -110,6 +111,7 @@ class FeedScreenViewModel(di: DI, state: SavedStateHandle) : DIAwareViewModel(di
                 repository.getScreenTitleForFeedOrTag(feedId, feedTag),
                 repository.getVisibleFeedTitles(feedId, feedTag),
                 repository.drawerItemsWithUnreadCounts,
+                repository.feedItemStyle,
             ) { params: Array<Any> ->
                 FeedScreenViewState(
                     onlyUnread = params[0] as Boolean,
@@ -119,7 +121,8 @@ class FeedScreenViewModel(di: DI, state: SavedStateHandle) : DIAwareViewModel(di
                     isRefreshing = params[4] as Boolean,
                     screenTitle = params[5] as ScreenTitle,
                     visibleFeeds = params[6] as List<FeedTitle>,
-                    drawerItemsWithUnreadCounts = params[7] as List<DrawerItemWithUnreadCount>
+                    drawerItemsWithUnreadCounts = params[7] as List<DrawerItemWithUnreadCount>,
+                    feedItemStyle = params[8] as FeedItemStyle,
                 )
             }.collect {
                 _viewState.value = it
@@ -139,4 +142,5 @@ data class FeedScreenViewState(
     val screenTitle: ScreenTitle = ScreenTitle(""),
     val visibleFeeds: List<FeedTitle> = emptyList(),
     val drawerItemsWithUnreadCounts: List<DrawerItemWithUnreadCount> = emptyList(),
+    val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
 )

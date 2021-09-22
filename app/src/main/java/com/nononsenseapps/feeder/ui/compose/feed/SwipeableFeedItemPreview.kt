@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
 import kotlin.math.roundToInt
@@ -64,6 +65,7 @@ fun SwipeableFeedItemPreview(
     onlyUnread: Boolean,
     item: FeedListItem,
     showThumbnail: Boolean,
+    feedItemStyle: FeedItemStyle,
     imagePainter: @Composable (String) -> Unit,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
@@ -211,17 +213,48 @@ fun SwipeableFeedItemPreview(
                 }
             }
 
-            FeedItemCard(
-                item = item,
-                showThumbnail = showThumbnail,
-                imagePainter = imagePainter,
-                onMarkAboveAsRead = onMarkAboveAsRead,
-                onMarkBelowAsRead = onMarkBelowAsRead,
-                dropDownMenuExpanded = dropDownMenuExpanded,
-                onDismissDropdown = { dropDownMenuExpanded = false },
-                modifier = Modifier
-                    .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-            )
+            when (feedItemStyle) {
+                FeedItemStyle.CARD -> {
+                    FeedItemCard(
+                        item = item,
+                        showThumbnail = showThumbnail,
+                        imagePainter = imagePainter,
+                        onMarkAboveAsRead = onMarkAboveAsRead,
+                        onMarkBelowAsRead = onMarkBelowAsRead,
+                        dropDownMenuExpanded = dropDownMenuExpanded,
+                        onDismissDropdown = { dropDownMenuExpanded = false },
+                        modifier = Modifier
+                            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                    )
+                }
+                FeedItemStyle.COMPACT -> {
+                    FeedItemCompact(
+                        item = item,
+                        showThumbnail = showThumbnail,
+                        imagePainter = imagePainter,
+                        onMarkAboveAsRead = onMarkAboveAsRead,
+                        onMarkBelowAsRead = onMarkBelowAsRead,
+                        dropDownMenuExpanded = dropDownMenuExpanded,
+                        onDismissDropdown = { dropDownMenuExpanded = false },
+                        modifier = Modifier
+                            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                    )
+                }
+                FeedItemStyle.SUPER_COMPACT -> {
+                    FeedItemSuperCompact(
+                        item = item,
+                        showThumbnail = showThumbnail,
+                        imagePainter = imagePainter,
+                        onMarkAboveAsRead = onMarkAboveAsRead,
+                        onMarkBelowAsRead = onMarkBelowAsRead,
+                        dropDownMenuExpanded = dropDownMenuExpanded,
+                        onDismissDropdown = { dropDownMenuExpanded = false },
+                        modifier = Modifier
+                            .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                    )
+                }
+            }
+
 
             // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
             // It's very important than clickable stuff is handled by its parent - or a direct child

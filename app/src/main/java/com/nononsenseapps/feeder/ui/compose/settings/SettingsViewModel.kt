@@ -5,6 +5,7 @@ import android.os.PowerManager
 import androidx.compose.runtime.Immutable
 import androidx.core.content.getSystemService
 import androidx.lifecycle.viewModelScope
+import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.Repository
@@ -76,6 +77,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setSyncFrequency(value)
     }
 
+    fun setFeedItemStyle(value: FeedItemStyle) {
+        repository.setFeedItemStyle(value)
+    }
+
     private val batteryOptimizationIgnoredFlow: Flow<Boolean> = repository.resumeTime.map {
         val powerManager: PowerManager? = context.getSystemService()
         powerManager?.isIgnoringBatteryOptimizations(context.packageName)==true
@@ -101,6 +106,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.linkOpener,
                 repository.syncFrequency,
                 batteryOptimizationIgnoredFlow,
+                repository.feedItemStyle,
             ) { params: Array<Any> ->
                 SettingsViewState(
                     currentTheme = params[0] as ThemeOptions,
@@ -116,6 +122,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     linkOpener = params[10] as LinkOpener,
                     syncFrequency = params[11] as SyncFrequency,
                     batteryOptimizationIgnored = params[12] as Boolean,
+                    feedItemStyle = params[13] as FeedItemStyle,
                 )
             }.collect {
                 _viewState.value = it
@@ -129,6 +136,7 @@ data class SettingsViewState(
     val currentTheme: ThemeOptions = ThemeOptions.SYSTEM,
     val currentSorting: SortingOptions = SortingOptions.NEWEST_FIRST,
     val showFab: Boolean = true,
+    val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
     val syncOnResume: Boolean = false,
     val syncOnlyOnWifi: Boolean = false,
     val syncOnlyWhenCharging: Boolean = false,

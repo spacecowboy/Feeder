@@ -44,6 +44,9 @@ class Repository(override val di: DI) : DIAware {
     val showFab: StateFlow<Boolean> = settingsStore.showFab
     fun setShowFab(value: Boolean) = settingsStore.setShowFab(value)
 
+    val feedItemStyle: StateFlow<FeedItemStyle> = settingsStore.feedItemStyle
+    fun setFeedItemStyle(value: FeedItemStyle) = settingsStore.setFeedItemStyle(value)
+
     val syncOnResume: StateFlow<Boolean> = settingsStore.syncOnResume
     fun setSyncOnResume(value: Boolean) = settingsStore.setSyncOnResume(value)
 

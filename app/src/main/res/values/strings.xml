@@ -134,4 +134,9 @@
   <string name="few_unread_articles">%1$s unread articles</string>
   <string name="many_unread_articles">%1$s unread articles</string>
   <string name="other_unread_articles">%1$s unread articles</string>
+
+  <string name="feed_item_style">Article style</string>
+  <string name="feed_item_style_card">Card</string>
+  <string name="feed_item_style_compact">Compact</string>
+  <string name="feed_item_style_super_compact">Super compact</string>
 </resources>

@@ -61,6 +61,7 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.SortingOptions
@@ -117,6 +118,10 @@ fun SettingsScreen(
             onShowFabChanged = { value ->
                 settingsViewModel.setShowFab(value)
             },
+            feedItemStyleValue = viewState.feedItemStyle,
+            onFeedItemStyleChanged = { value ->
+                settingsViewModel.setFeedItemStyle(value)
+            },
             syncOnStartupValue = viewState.syncOnResume,
             onSyncOnStartupChanged = {
                 settingsViewModel.setSyncOnResume(it)
@@ -171,6 +176,8 @@ fun SettingsScreenPreview() {
                 onSortingChanged = {},
                 showFabValue = true,
                 onShowFabChanged = {},
+                feedItemStyleValue = FeedItemStyle.CARD,
+                onFeedItemStyleChanged = {},
                 syncOnStartupValue = true,
                 onSyncOnStartupChanged = {},
                 syncOnlyOnWifiValue = true,
@@ -204,6 +211,8 @@ fun SettingsList(
     onSortingChanged: (SortOption) -> Unit,
     showFabValue: Boolean,
     onShowFabChanged: (Boolean) -> Unit,
+    feedItemStyleValue: FeedItemStyle,
+    onFeedItemStyleChanged: (FeedItemStyle) -> Unit,
     syncOnStartupValue: Boolean,
     onSyncOnStartupChanged: (Boolean) -> Unit,
     syncOnlyOnWifiValue: Boolean,
@@ -257,6 +266,15 @@ fun SettingsList(
             checked = showFabValue,
             onCheckedChanged = onShowFabChanged,
             title = stringResource(id = R.string.show_fab)
+        )
+
+        MenuSetting(
+            title = stringResource(id = R.string.feed_item_style),
+            currentValue = feedItemStyleValue.asFeedItemStyleOption(),
+            values = FeedItemStyle.values().map { it.asFeedItemStyleOption() },
+            onSelection = {
+                onFeedItemStyleChanged(it.feedItemStyle)
+            },
         )
 
         Divider()
@@ -665,6 +683,14 @@ data class SortOption(
 }
 
 @Immutable
+data class FeedItemStyleOption(
+    val feedItemStyle: FeedItemStyle,
+    val name: String,
+) {
+    override fun toString() = name
+}
+
+@Immutable
 data class SyncFreqOption(
     val syncFrequency: SyncFrequency,
     val name: String,
@@ -706,5 +732,12 @@ data class LinkOpenerOption(
 fun LinkOpener.asLinkOpenerOption() =
     LinkOpenerOption(
         linkOpener = this,
+        name = stringResource(id = stringId)
+    )
+
+@Composable
+fun FeedItemStyle.asFeedItemStyleOption() =
+    FeedItemStyleOption(
+        feedItemStyle = this,
         name = stringResource(id = stringId)
     )

@@ -148,7 +148,23 @@ class SettingsStore(override val di: DI) : DIAware {
                 LinkOpener.DEFAULT_BROWSER -> PREF_VAL_OPEN_WITH_BROWSER
             }
         ).apply()
+    }
 
+    private val _feedItemStyle = MutableStateFlow(
+        when (sp.getStringNonNull(PREF_FEED_ITEM_STYLE, FeedItemStyle.CARD.name)) {
+            FeedItemStyle.CARD.name -> FeedItemStyle.CARD
+            FeedItemStyle.COMPACT.name -> FeedItemStyle.COMPACT
+            FeedItemStyle.SUPER_COMPACT.name -> FeedItemStyle.SUPER_COMPACT
+            else -> FeedItemStyle.CARD
+        }
+    )
+    val feedItemStyle = _feedItemStyle.asStateFlow()
+    fun setFeedItemStyle(value: FeedItemStyle) {
+        _feedItemStyle.value = value
+        sp.edit().putString(
+            PREF_FEED_ITEM_STYLE,
+            value.name
+        ).apply()
     }
 
     private val _syncFrequency by lazy {
@@ -237,6 +253,8 @@ const val PREF_SORT = "pref_sort"
  */
 const val PREF_SHOW_FAB = "pref_show_fab"
 
+const val PREF_FEED_ITEM_STYLE = "pref_feed_item_style"
+
 /**
  * Sync settings
  */
@@ -312,4 +330,12 @@ enum class SyncFrequency(
     EVERY_6_HOURS(360L, R.string.sync_option_every_6_hours),
     EVERY_12_HOURS(720L, R.string.sync_option_every_12_hours),
     EVERY_DAY(1440L, R.string.sync_option_every_day);
+}
+
+enum class FeedItemStyle(
+    @StringRes val stringId: Int,
+) {
+    CARD(R.string.feed_item_style_card),
+    COMPACT(R.string.feed_item_style_compact),
+    SUPER_COMPACT(R.string.feed_item_style_super_compact)
 }
