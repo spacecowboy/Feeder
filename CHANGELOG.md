@@ -1,3 +1,28 @@
+# 2.0.0-rc.3
+Andrij Mizyk (2):
+  * [4615622f] Updated Ukrainian translation using Weblate
+
+Jam Jam (2):
+  * [e2cd1132] Translated using Weblate (Ukrainian)
+
+Jonas Kalderstam (15):
+  * [5b0892ff] Fixed infinite loop issue if for example a notification was
+         clicked then back
+  * [0b35343c] Fixed app shortcuts not being cleared after delete
+  * [5b0badf8] Fixed TTS (and rest of app) not working on Android S
+  * [afdca651] Fixed image placeholders
+  * [95118fa6] Fixed images in reader view
+  * [4669d4d3] Added a new setting: style of articles in list
+
+Mixter (2):
+  * [12ce17fd] Updated Chinese (Traditional) translation using Weblate
+
+Simona Iacob (1):
+  * [16520c88] Updated Romanian translation using Weblate
+
+VfBFan (1):
+  * [575e1dc0] Updated German translation using Weblate
+
 # 2.0.0-rc.2
 Agnieszka C (1):
   * [b36db45a] Updated Polish translation using Weblate
