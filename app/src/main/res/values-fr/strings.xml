@@ -125,4 +125,8 @@
     <string name="expanded_tag">Étiquette ouverte</string>
     <string name="stop_reading">Arrêter la lecture</string>
     <string name="open_enclosed_media_file">Ouvrir %1$s</string>
+    <string name="feed_item_style_super_compact">Super compact</string>
+    <string name="feed_item_style_compact">Compact</string>
+    <string name="feed_item_style_card">Carte</string>
+    <string name="feed_item_style">Style d\'article</string>
 </resources>

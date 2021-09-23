@@ -125,4 +125,8 @@
     <string name="use_app_default">Käytä sovelluksen oletusarvoa</string>
     <string name="stop_reading">Lopeta lukeminen</string>
     <string name="open_enclosed_media_file">Avaa %1$s</string>
+    <string name="feed_item_style_super_compact">Erittäin kompakti</string>
+    <string name="feed_item_style_compact">Kompakti</string>
+    <string name="feed_item_style_card">Kortti</string>
+    <string name="feed_item_style">Artikkelin tyyli</string>
 </resources>

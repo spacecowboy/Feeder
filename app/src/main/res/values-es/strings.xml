@@ -126,4 +126,7 @@
     <string name="one_unread_article">%1$s artículo no leído</string>
     <string name="zero_unread_articles">%1$s artículos no leídos</string>
     <string name="feed_item_style_card">Tarjeta</string>
+    <string name="feed_item_style_super_compact">Supercompacto</string>
+    <string name="feed_item_style_compact">Compacto</string>
+    <string name="feed_item_style">Estilo de artículo</string>
 </resources>
