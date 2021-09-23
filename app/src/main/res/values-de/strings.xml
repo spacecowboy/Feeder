@@ -125,4 +125,8 @@
     <string name="expanded_tag">Geöffnete Gruppe</string>
     <string name="stop_reading">Lesen beenden</string>
     <string name="open_enclosed_media_file">Öffne %1$s</string>
+    <string name="feed_item_style_super_compact">Super kompakt</string>
+    <string name="feed_item_style_compact">Kompakt</string>
+    <string name="feed_item_style_card">Karte</string>
+    <string name="feed_item_style">Artikelstil</string>
 </resources>
