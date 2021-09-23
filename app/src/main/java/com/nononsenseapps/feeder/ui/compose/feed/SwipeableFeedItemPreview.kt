@@ -261,8 +261,9 @@ fun SwipeableFeedItemPreview(
                         ),
                         orientation = Orientation.Horizontal,
                         reverseDirection = isRtl,
+                        velocityThreshold = 1000.dp,
                         thresholds = { _, _ ->
-                            FractionalThreshold(0.25f)
+                            FractionalThreshold(0.50f)
                         }
                     )
             )
