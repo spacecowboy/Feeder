@@ -131,6 +131,7 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
                 _articleOpener.asFlow(),
                 feedDefaultTitleFlow,
             ) { params: Array<Any> ->
+                @Suppress("UNCHECKED_CAST")
                 EditFeedViewState(
                     allTags = params[0] as List<String>,
                     tag = params[1] as String,

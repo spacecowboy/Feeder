@@ -113,6 +113,7 @@ class FeedScreenViewModel(di: DI, state: SavedStateHandle) : DIAwareViewModel(di
                 repository.drawerItemsWithUnreadCounts,
                 repository.feedItemStyle,
             ) { params: Array<Any> ->
+                @Suppress("UNCHECKED_CAST")
                 FeedScreenViewState(
                     onlyUnread = params[0] as Boolean,
                     showFab = params[1] as Boolean,
