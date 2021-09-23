@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -34,9 +35,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -46,7 +46,6 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
@@ -89,15 +88,6 @@ fun SwipeableFeedItemPreview(
         animatedVisibilityState.targetState = true
         swipeableState.animateTo(FeedItemSwipeState.NONE)
     }
-
-    // Needs to be set once layout is complete
-    var itemSize by remember { mutableStateOf(Size(1f, 1f)) }
-
-    val anchors = mapOf(
-        0f to FeedItemSwipeState.NONE,
-        -itemSize.width to FeedItemSwipeState.LEFT,
-        itemSize.width to FeedItemSwipeState.RIGHT
-    )
 
     if (swipeableState.currentValue!=FeedItemSwipeState.NONE) {
         LaunchedEffect(swipeableState.currentValue) {
@@ -159,12 +149,9 @@ fun SwipeableFeedItemPreview(
         enter = fadeIn(1f),
         exit = shrinkVertically(Alignment.CenterVertically) + fadeOut()
     ) {
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
-                .onGloballyPositioned { layoutCoordinates ->
-                    itemSize = layoutCoordinates.size.toSize()
-                }
                 .combinedClickable(
                     onLongClick = {
                         dropDownMenuExpanded = true
@@ -191,6 +178,9 @@ fun SwipeableFeedItemPreview(
                     )
                 }
         ) {
+            val maxWidthPx = with(LocalDensity.current) {
+                maxWidth.toPx()
+            }
             Box(
                 contentAlignment = swipeIconAlignment,
                 modifier = Modifier
@@ -264,7 +254,11 @@ fun SwipeableFeedItemPreview(
                     .matchParentSize()
                     .swipeable(
                         state = swipeableState,
-                        anchors = anchors,
+                        anchors = mapOf(
+                            0f to FeedItemSwipeState.NONE,
+                            -maxWidthPx to FeedItemSwipeState.LEFT,
+                            maxWidthPx to FeedItemSwipeState.RIGHT
+                        ),
                         orientation = Orientation.Horizontal,
                         reverseDirection = isRtl,
                         thresholds = { _, _ ->
