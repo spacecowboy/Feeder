@@ -125,4 +125,8 @@
     <string name="expanded_tag">Thẻ mở</string>
     <string name="stop_reading">Dừng đọc</string>
     <string name="open_enclosed_media_file">Mở %1$s</string>
+    <string name="feed_item_style_super_compact">Siêu thu gọn</string>
+    <string name="feed_item_style_compact">Thu gọn</string>
+    <string name="feed_item_style_card">Thẻ</string>
+    <string name="feed_item_style">Kiểu bài viết</string>
 </resources>
