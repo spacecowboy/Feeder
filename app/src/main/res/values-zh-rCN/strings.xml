@@ -125,4 +125,8 @@
     <string name="two_unread_articles">%1$s 篇未读文章</string>
     <string name="one_unread_article">%1$s 篇未读文章</string>
     <string name="zero_unread_articles">%1$s 篇未读文章</string>
+    <string name="feed_item_style_super_compact">超紧凑</string>
+    <string name="feed_item_style_compact">紧凑</string>
+    <string name="feed_item_style_card">卡片</string>
+    <string name="feed_item_style">文章样式</string>
 </resources>
