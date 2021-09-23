@@ -125,4 +125,8 @@
     <string name="two_unread_articles">%1$s nieprzeczytane artykuły</string>
     <string name="one_unread_article">%1$s nieprzeczytany artykuł</string>
     <string name="zero_unread_articles">%1$s nieprzeczytanych artykułów</string>
+    <string name="feed_item_style_super_compact">Super kompaktowy</string>
+    <string name="feed_item_style_compact">Kompaktowy</string>
+    <string name="feed_item_style_card">Karta</string>
+    <string name="feed_item_style">Styl artykułów</string>
 </resources>
