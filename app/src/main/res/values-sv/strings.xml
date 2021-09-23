@@ -125,4 +125,8 @@
     <string name="two_unread_articles">%1$s olästa artiklar</string>
     <string name="one_unread_article">%1$s oläst artikel</string>
     <string name="zero_unread_articles">%1$s olästa artiklar</string>
+    <string name="feed_item_style_super_compact">Superkompakt</string>
+    <string name="feed_item_style_compact">Kompakt</string>
+    <string name="feed_item_style_card">Kort</string>
+    <string name="feed_item_style">Artikelstil</string>
 </resources>
