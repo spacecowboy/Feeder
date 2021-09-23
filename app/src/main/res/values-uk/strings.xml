@@ -61,7 +61,7 @@
     <string name="battery_optimization_enabled">Оптимізацію батареї дозволено</string>
     <string name="battery_optimization_disabled">Оптимізацію батареї вимкнено</string>
     <string name="battery_optimization">Оптимізація батареї</string>
-    <string name="contracted_tag">Закриті мітки</string>
+    <string name="contracted_tag">Закрита мітка</string>
     <string name="expanded_tag">Відкрити мітку</string>
     <string name="discovered_feeds_list">Список виявлених стрічок</string>
     <string name="mark_items_below_as_read">Позначити записи нижче прочитаними</string>
@@ -125,4 +125,8 @@
     <string name="title_activity_edit_feed">Підписатися на стрічку</string>
     <string name="add_feed">Додати стрічку</string>
     <string name="action_settings">Налаштування</string>
+    <string name="feed_item_style_super_compact">Дуже компактний</string>
+    <string name="feed_item_style_compact">Компактний</string>
+    <string name="feed_item_style_card">Картка</string>
+    <string name="feed_item_style">Стиль статті</string>
 </resources>
