@@ -125,4 +125,8 @@
     <string name="two_unread_articles">%1$s okunmayan makale</string>
     <string name="one_unread_article">%1$s okunmayan makale</string>
     <string name="zero_unread_articles">%1$s okunmayan makale</string>
+    <string name="feed_item_style_super_compact">Çok sıkı</string>
+    <string name="feed_item_style_compact">Sıkı</string>
+    <string name="feed_item_style_card">Kart</string>
+    <string name="feed_item_style">Makale tarzı</string>
 </resources>

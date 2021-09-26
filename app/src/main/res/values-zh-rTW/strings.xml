@@ -3,4 +3,54 @@
     <string name="action_settings">設置</string>
     <string name="navigation_drawer_close">關閉導航菜單</string>
     <string name="navigation_drawer_open">打開導航菜單</string>
+    <string name="may_result_data_charges">可能會產生移動數據費用。</string>
+    <string name="show_thumbnails">顯示縮略圖</string>
+    <string name="only_on_wifi">僅在 WiFi 上</string>
+    <string name="synchronization">同步</string>
+    <string name="sync_option_every_day">每天</string>
+    <string name="sync_option_every_12_hours">每 12 小時</string>
+    <string name="sync_option_every_6_hours">每 6 小時</string>
+    <string name="sync_option_every_3_hours">每 3 小時</string>
+    <string name="sync_option_every_hour">每小時</string>
+    <string name="sync_option_every_30min">每 30 分鐘</string>
+    <string name="sync_option_every_15min">每 15 分鐘</string>
+    <string name="share">分享</string>
+    <string name="view_debug_log">查看調試日誌</string>
+    <string name="import_feeds_from_opml">從 OPML 導入訂閱</string>
+    <string name="export_feeds_to_opml">將訂閱導出為 OPML</string>
+    <string name="sync">同步</string>
+    <string name="stop_reading">停止朗讀</string>
+    <string name="resume_reading">恢復朗讀</string>
+    <string name="pause_reading">暫停朗讀</string>
+    <string name="read_article">大聲朗讀</string>
+    <string name="open_enclosed_media_file">打開 %1$s</string>
+    <string name="open_enclosed_media">打開內嵌媒體</string>
+    <string name="open_in_browser">在瀏覽器中打開</string>
+    <string name="open_link_in_browser">在瀏覽器中打開連結</string>
+    <string name="toggle_read_status">切換閱讀狀態</string>
+    <string name="dont_notify_for_new_items">停止通知</string>
+    <string name="notify_for_new_items">新內容通知</string>
+    <string name="no_tag">無標籤</string>
+    <string name="view">查看</string>
+    <string name="new_items_available">有新的內容</string>
+    <string name="show_unread_items">顯示未讀內容</string>
+    <string name="show_all_items">顯示所有內容</string>
+    <string name="delete_feed">刪除訂閱</string>
+    <string name="edit_feed">更改訂閱</string>
+    <string name="mark_all_as_read">全部標記為已讀</string>
+    <string name="mark_as_unread">標記為未讀</string>
+    <string name="mark_as_read">標記為已讀</string>
+    <string name="search_feed_empty_hint">輸入一個訂閱地址</string>
+    <string name="empty_feed_add"><annotation style="link">新增</annotation>更多訂閱？</string>
+    <string name="empty_feed_open"><annotation style="link">打開 </annotation> 另一個訂閱？</string>
+    <string name="empty_feed_top">沒有可閱讀的內容。您是否想要…</string>
+    <string name="save">儲存</string>
+    <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
+    <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
+    <string name="title">標題</string>
+    <string name="add_feed_search_hint">訂閱 URL</string>
+    <string name="tag">標籤</string>
+    <string name="url">URL</string>
+    <string name="title_activity_edit_feed">訂閱 Feed</string>
+    <string name="add_feed">新增訂閱</string>
 </resources>

@@ -125,4 +125,8 @@
     <string name="expanded_tag">Atidaryti žymą</string>
     <string name="stop_reading">Baigti skaitymą</string>
     <string name="open_enclosed_media_file">Atidaryti %1$s</string>
+    <string name="feed_item_style_super_compact">Itin kompaktiškas</string>
+    <string name="feed_item_style_compact">Kompaktiškas</string>
+    <string name="feed_item_style_card">Kortelė</string>
+    <string name="feed_item_style">Straipsnio stilius</string>
 </resources>
