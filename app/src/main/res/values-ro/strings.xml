@@ -125,4 +125,8 @@
     <string name="expanded_tag">Etichetă deschisă</string>
     <string name="stop_reading">Opriți citirea</string>
     <string name="open_enclosed_media_file">Deschideți %1$s</string>
+    <string name="feed_item_style_super_compact">Super compactă</string>
+    <string name="feed_item_style_compact">Compactă</string>
+    <string name="feed_item_style_card">Cardul</string>
+    <string name="feed_item_style">Stilul articolului</string>
 </resources>
