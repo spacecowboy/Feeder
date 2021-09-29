@@ -5,10 +5,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
@@ -43,6 +45,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockBackground
 import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockStyle
 import com.nononsenseapps.feeder.ui.compose.theme.CodeInlineStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
 import java.io.InputStream
@@ -75,13 +78,14 @@ private fun LazyListScope.formatBody(
 ) {
     val composer = TextComposer { paragraphBuilder ->
         item {
+            val dimens = LocalDimens.current
             val paragraph = paragraphBuilder.toAnnotatedString()
             // TODO compose this prevents taps from deselecting selected text
             ClickableText(
                 text = paragraph,
                 style = MaterialTheme.typography.body1
                     .merge(TextStyle(color = MaterialTheme.colors.onBackground)),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.width(dimens.maxContentWidth)
             ) { offset ->
                 paragraph.getStringAnnotations("URL", offset, offset)
                     .firstOrNull()
@@ -109,6 +113,7 @@ private fun LazyListScope.formatCodeBlock(
 ) {
     val composer = TextComposer { paragraphBuilder ->
         item {
+            val dimens = LocalDimens.current
             val scrollState = rememberScrollState()
             Surface(
                 color = CodeBlockBackground(),
@@ -117,7 +122,7 @@ private fun LazyListScope.formatCodeBlock(
                     .horizontalScroll(
                         state = scrollState
                     )
-                    .fillMaxWidth()
+                    .width(dimens.maxContentWidth)
             ) {
                 Box(modifier = Modifier.padding(all = 4.dp)) {
                     Text(
@@ -387,18 +392,22 @@ private fun TextComposer.appendTextChildren(
                             val alt = element.attr("alt") ?: ""
                             appendImage(onLinkClick = onLinkClick) { onClick ->
                                 lazyListScope.item {
+                                    val dimens = LocalDimens.current
 //                                    val scale = remember { mutableStateOf(1f) }
-                                    DisableSelection {
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(RectangleShape)
-                                                .clickable(
-                                                    enabled = onClick!=null
-                                                ) {
-                                                    onClick?.invoke()
-                                                }
-                                                .fillMaxWidth()
-                                            // This makes scrolling a pain, find a way to solve that
+                                    Column(
+                                        modifier = Modifier.width(dimens.maxContentWidth)
+                                    ) {
+                                        DisableSelection {
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RectangleShape)
+                                                    .clickable(
+                                                        enabled = onClick!=null
+                                                    ) {
+                                                        onClick?.invoke()
+                                                    }
+                                                    .fillMaxWidth()
+                                                // This makes scrolling a pain, find a way to solve that
 //                                            .pointerInput("imgzoom") {
 //                                                detectTransformGestures { centroid, pan, zoom, rotation ->
 //                                                    val z = zoom * scale.value
@@ -409,35 +418,37 @@ private fun TextComposer.appendTextChildren(
 //                                                    }
 //                                                }
 //                                            }
-                                        ) {
-                                            Image(
-                                                painter = rememberImagePainter(
-                                                    data = imageUrl,
-                                                    builder = {
-                                                        this.placeholder(imagePlaceholder)
-                                                            .error(imagePlaceholder)
-                                                            .precision(Precision.INEXACT)
-                                                            .size(SizeResolver(OriginalSize))
-                                                    },
-                                                ),
-                                                contentDescription = alt,
-                                                contentScale = ContentScale.FillWidth,
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
+                                            ) {
+                                                Image(
+                                                    painter = rememberImagePainter(
+                                                        data = imageUrl,
+                                                        builder = {
+                                                            this.placeholder(imagePlaceholder)
+                                                                .error(imagePlaceholder)
+                                                                .precision(Precision.INEXACT)
+                                                                .size(SizeResolver(OriginalSize))
+                                                        },
+                                                    ),
+                                                    contentDescription = alt,
+                                                    contentScale = ContentScale.FillWidth,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                )
+                                            }
+                                        }
+
+                                        if (alt.isNotBlank()) {
+                                            Spacer(modifier = Modifier.height(dimens.margin / 2))
+
+                                            Text(
+                                                alt,
+                                                style = MaterialTheme.typography.caption,
+                                                modifier = Modifier.fillMaxWidth()
                                             )
                                         }
+
+                                        Spacer(modifier = Modifier.height(dimens.margin))
                                     }
-
-                                    if (alt.isNotBlank()) {
-                                        Text(
-                                            alt,
-                                            style = MaterialTheme.typography.caption,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-
-                                    Spacer(modifier = Modifier.height(8.dp))
-
                                 }
                             }
                         }
@@ -523,34 +534,41 @@ private fun TextComposer.appendTextChildren(
                         if (video!=null) {
                             appendImage(onLinkClick = onLinkClick) {
                                 lazyListScope.item {
-                                    DisableSelection {
-                                        Image(
-                                            painter = rememberImagePainter(
-                                                data = video.imageUrl,
-                                                builder = {
-                                                    this.placeholder(R.drawable.youtube_icon)
-                                                        .error(R.drawable.youtube_icon)
-                                                        .precision(Precision.INEXACT)
-                                                        .size(SizeResolver(OriginalSize))
-                                                },
-                                            ),
-                                            contentDescription = stringResource(R.string.touch_to_play_video),
-                                            contentScale = ContentScale.FillWidth,
-                                            modifier = Modifier
-                                                .clickable {
-                                                    onLinkClick(video.link)
-                                                }
-                                                .fillMaxWidth()
+                                    val dimens = LocalDimens.current
+                                    Column(
+                                        modifier = Modifier.width(dimens.maxContentWidth)
+                                    ) {
+                                        DisableSelection {
+                                            Image(
+                                                painter = rememberImagePainter(
+                                                    data = video.imageUrl,
+                                                    builder = {
+                                                        this.placeholder(R.drawable.youtube_icon)
+                                                            .error(R.drawable.youtube_icon)
+                                                            .precision(Precision.INEXACT)
+                                                            .size(SizeResolver(OriginalSize))
+                                                    },
+                                                ),
+                                                contentDescription = stringResource(R.string.touch_to_play_video),
+                                                contentScale = ContentScale.FillWidth,
+                                                modifier = Modifier
+                                                    .clickable {
+                                                        onLinkClick(video.link)
+                                                    }
+                                                    .fillMaxWidth()
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.height(dimens.margin / 2))
+
+                                        Text(
+                                            text = stringResource(R.string.touch_to_play_video),
+                                            style = MaterialTheme.typography.caption,
+                                            modifier = Modifier.fillMaxWidth()
                                         )
+
+                                        Spacer(modifier = Modifier.height(dimens.margin))
                                     }
-
-                                    Text(
-                                        text = stringResource(R.string.touch_to_play_video),
-                                        style = MaterialTheme.typography.caption,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-
-                                    Spacer(modifier = Modifier.height(8.dp))
                                 }
                             }
                         }

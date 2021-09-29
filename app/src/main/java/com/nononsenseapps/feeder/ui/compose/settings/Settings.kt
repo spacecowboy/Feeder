@@ -68,6 +68,7 @@ import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -235,10 +236,13 @@ fun SettingsList(
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
+    val dimens = LocalDimens.current
 
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .padding(horizontal = keyline1Padding)
+            .fillMaxWidth()
             .verticalScroll(scrollState)
     ) {
         MenuSetting(
@@ -277,7 +281,7 @@ fun SettingsList(
             },
         )
 
-        Divider()
+        Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
         GroupTitle {
             Text(stringResource(id = R.string.synchronization))
@@ -337,7 +341,7 @@ fun SettingsList(
             )
         }
 
-        Divider()
+        Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
         GroupTitle {
             Text(stringResource(id = R.string.image_loading))
@@ -355,7 +359,7 @@ fun SettingsList(
             title = stringResource(id = R.string.show_thumbnails)
         )
 
-        Divider()
+        Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
         GroupTitle {
             Text(stringResource(id = R.string.reader_settings))
@@ -396,9 +400,10 @@ fun GroupTitle(
     height: Dp = 64.dp,
     title: @Composable () -> Unit,
 ) {
+    val dimens = LocalDimens.current
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .width(dimens.maxContentWidth),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (startingSpace) {
@@ -431,9 +436,10 @@ fun ExternalSetting(
     icon: @Composable () -> Unit = {},
     onClick: () -> Unit,
 ) {
+    val dimens = LocalDimens.current
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(dimens.maxContentWidth)
             .clickable { onClick() }
             .semantics {
                 role = Role.Button
@@ -469,9 +475,10 @@ fun <T> MenuSetting(
     onSelection: (T) -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    val dimens = LocalDimens.current
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(dimens.maxContentWidth)
             .clickable { expanded = !expanded }
             .semantics {
                 role = Role.Button
@@ -540,9 +547,10 @@ fun RadioButtonSetting(
     } else {
         stringResource(R.string.not_selected)
     }
+    val dimens = LocalDimens.current
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(dimens.maxContentWidth)
             .heightIn(min = minHeight)
             .clickable { onClick() }
             .semantics(mergeDescendants = true) {
@@ -590,9 +598,10 @@ fun SwitchSetting(
     } else {
         stringResource(R.string.off)
     }
+    val dimens = LocalDimens.current
     Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(dimens.maxContentWidth)
             .heightIn(min = 64.dp)
             .clickable { onCheckedChanged(!checked) }
             .semantics(mergeDescendants = true) {

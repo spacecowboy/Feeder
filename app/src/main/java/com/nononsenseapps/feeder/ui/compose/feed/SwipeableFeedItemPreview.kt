@@ -13,9 +13,9 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
 import kotlin.math.roundToInt
@@ -144,6 +145,8 @@ fun SwipeableFeedItemPreview(
         }
     }
 
+    val dimens = LocalDimens.current
+
     AnimatedVisibility(
         visibleState = animatedVisibilityState,
         enter = fadeIn(1f),
@@ -151,7 +154,7 @@ fun SwipeableFeedItemPreview(
     ) {
         BoxWithConstraints(
             modifier = Modifier
-                .fillMaxWidth()
+                .width(dimens.maxContentWidth)
                 .combinedClickable(
                     onLongClick = {
                         dropDownMenuExpanded = true

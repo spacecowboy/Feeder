@@ -29,8 +29,11 @@ fun FeederLightColorPalette() = lightColors(
     onSecondary = Color.White,
 )
 
+@Deprecated("")
 val keyline1Padding = 16.dp
+@Deprecated("")
 val contentHorizontalPadding = 8.dp
+@Deprecated("")
 val upButtonStartPadding = 4.dp
 
 /**
@@ -39,7 +42,7 @@ val upButtonStartPadding = 4.dp
 @Composable
 fun FeederTheme(
     currentTheme: ThemeOptions = ThemeOptions.DAY,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     MaterialTheme(
         colors = currentTheme.getColors(),
@@ -53,7 +56,9 @@ fun FeederTheme(
             )
         }
         ProvideWindowInsets {
-            content()
+            ProvideDimens {
+                content()
+            }
         }
     }
 }

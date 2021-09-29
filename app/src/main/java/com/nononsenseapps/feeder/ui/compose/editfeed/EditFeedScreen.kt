@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
@@ -57,6 +58,7 @@ import com.nononsenseapps.feeder.ui.compose.settings.GroupTitle
 import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
 import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 
 @Composable
@@ -193,6 +195,8 @@ fun EditFeedView(
 
     var tagHasFocus by rememberSaveable { mutableStateOf(false) }
 
+    val dimens = LocalDimens.current
+
     OkCancelWithContent(
         onOk = {
             onOk()
@@ -203,7 +207,8 @@ fun EditFeedView(
             .padding(horizontal = keyline1Padding)
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.width(dimens.maxContentWidth)
         ) {
             TextField(
                 value = viewState.url,

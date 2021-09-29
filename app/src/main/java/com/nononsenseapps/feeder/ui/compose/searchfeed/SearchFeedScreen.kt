@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -42,6 +43,7 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.MalformedURLException
@@ -161,11 +163,14 @@ fun SearchFeedView(
     onClick: (SearchResult) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
+    val dimens = LocalDimens.current
 
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .padding(horizontal = keyline1Padding, vertical = 8.dp)
+            .fillMaxWidth()
     ) {
         item {
             TextField(
@@ -194,7 +199,7 @@ fun SearchFeedView(
                 singleLine = true,
                 colors = TextFieldDefaults.textFieldColors(),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .width(dimens.maxContentWidth)
             )
         }
         if (results.isEmpty()) {
@@ -249,10 +254,11 @@ fun SearchResultView(
     description: String,
     onClick: () -> Unit,
 ) {
+    val dimens = LocalDimens.current
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier
-            .fillMaxWidth()
+            .width(dimens.maxContentWidth)
             .clickable(onClick = onClick)
     ) {
         Text(

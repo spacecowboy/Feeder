@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -23,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsPadding
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
 @Composable
 fun OkCancelWithContent(
@@ -36,6 +38,7 @@ fun OkCancelWithContent(
 
         Column(
             verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
                 .fillMaxWidth()
                 .verticalScroll(scrollState)
@@ -61,9 +64,10 @@ fun OkCancelButtons(
     okEnabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
+    val dimens = LocalDimens.current
     Row(
         horizontalArrangement = Arrangement.End,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.width(dimens.maxContentWidth)
     ) {
         TextButton(onClick = onCancel) {
             Text(
