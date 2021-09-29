@@ -14,8 +14,8 @@ import com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivityViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreenViewModel
-import com.nononsenseapps.feeder.ui.compose.feed.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreenViewModel
+import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsViewModel
 import org.kodein.di.DI
 import org.kodein.di.bind

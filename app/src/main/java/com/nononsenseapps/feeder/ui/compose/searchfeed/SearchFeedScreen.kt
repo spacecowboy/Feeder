@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.ui.compose.feed
+package com.nononsenseapps.feeder.ui.compose.searchfeed
 
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedVisibility

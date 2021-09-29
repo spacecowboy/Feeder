@@ -16,7 +16,7 @@ import androidx.navigation.navArgument
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
-import com.nononsenseapps.feeder.ui.compose.feed.SearchFeedScreen
+import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import org.kodein.di.compose.withDI
 

@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.ui.compose.feed
+package com.nononsenseapps.feeder.ui.compose.searchfeed
 
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.FeedParser

@@ -40,9 +40,9 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreenViewModel
-import com.nononsenseapps.feeder.ui.compose.feed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.isFeed
 import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreen
+import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
