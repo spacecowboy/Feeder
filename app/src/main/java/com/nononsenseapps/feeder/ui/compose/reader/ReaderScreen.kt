@@ -120,7 +120,7 @@ fun ReaderScreen(
         {
             val intent = Intent.createChooser(
                 Intent(Intent.ACTION_SEND).apply {
-                    putExtra(Intent.EXTRA_TEXT, viewState.currentItem.feedUrl.toString())
+                    putExtra(Intent.EXTRA_TEXT, viewState.currentItem.link.toString())
                     putExtra(Intent.EXTRA_TITLE, viewState.currentItem.plainTitle)
                     type = "text/plain"
                 },
