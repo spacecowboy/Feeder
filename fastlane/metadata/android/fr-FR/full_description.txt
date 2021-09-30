@@ -1,19 +1,19 @@
-<p>En avez-vous assez des lecteurs non libres gonflés qui volent vos informations personnelles ?<br/>
-Êtes-vous fatigué·e des configurations de synchronisation compliquées nécessitant des heures de configuration de serveur ?<br/>
-Vous en avez assez de devoir créer des comptes partout ?<br/> </p>
+<p>En avez-vous assez des lecteurs non libres boursoufflés qui volent vos informations personnelles ?<br/>
+Êtes-vous fatigué des réglages de synchronisation alambiqués nécessitant des heures de configuration de serveur ?<br/>
+En avez-vous marre d’avoir à créer des comptes partout ?<br/> </p>
 
-<p>Essayez plutôt Feeder !</p>
+<p>Essayez plutôt Feeder !</p>
 
-<p>Feeder est un lecteur de flux entièrement libre. Il prend en charge tous les formats de flux courants, y compris JSONFeed. Il ne vous traque pas. Il ne nécessite aucune configuration. Vous n'avez même pas besoin de créer de compte ! Configurez simplement vos flux ou importez-les depuis votre ancien lecteur via OPML, puis poursuivez la synchronisation et la lecture.</p>
+<p>Feeder est un lecteur de flux entièrement libre. Il prend en charge tous les formats de flux courants, y compris JSONFeed. Il ne vous piste pas. Il ne nécessite aucune configuration. Vous n’avez même pas besoin de créer de compte ! Configurez simplement vos flux ou importez-les depuis votre ancien lecteur via OPML, puis commencez l’actualisation et la lecture.</p>
 
 <p><b>Fonctionnalités</b></p>
 
 <ul>
-<li>Analyse le code HTML et l'affiche dans un TextView natif</li>
+<li>Analyse le code HTML et l’affiche dans un TextView natif</li>
 <li>Lecture hors ligne</li>
-<li>Synchronisation en arrière-plan</li>
+<li>Actualisation en arrière-plan</li>
 <li>Notifications</li>
 <li>Importation/exportation OPML</li>
-<li>Accès pratique aux liens enclosure links</li>
-<li>Material design</li>
+<li>Accès pratique aux médias inclus</li>
+<li>Material Design</li>
 </ul>
