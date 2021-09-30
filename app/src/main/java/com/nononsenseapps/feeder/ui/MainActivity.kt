@@ -295,6 +295,8 @@ class MainActivity : DIAwareComponentActivity() {
                     val link = feedScreenViewModel.getLink(itemId)
                     val openItemsByDefaultWith = feedScreenViewModel.itemOpener
 
+                    feedScreenViewModel.markAsReadAndNotified(itemId)
+
                     when {
                         link!=null && (openArticleWith==PrefValOpenWith.OPEN_WITH_BROWSER
                                 || openArticleWith==PrefValOpenWith.OPEN_WITH_DEFAULT && openItemsByDefaultWith==ItemOpener.DEFAULT_BROWSER) -> {

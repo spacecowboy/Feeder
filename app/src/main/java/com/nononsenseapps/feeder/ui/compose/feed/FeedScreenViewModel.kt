@@ -68,6 +68,10 @@ class FeedScreenViewModel(di: DI, state: SavedStateHandle) : DIAwareViewModel(di
         repository.markAfterAsRead(itemIndex, feedId, feedTag)
     }
 
+    fun markAsReadAndNotified(itemId: Long) = viewModelScope.launch {
+        repository.markAsReadAndNotified(itemId)
+    }
+
     fun requestImmediateSyncOfCurrentFeedOrTag() {
         requestFeedSync(
             di = di,
