@@ -1,3 +1,52 @@
+# 2.0.0-rc.4
+Agnieszka C (1):
+  * [89ba5aef] Updated Polish translation using Weblate
+
+Andrij Mizyk (1):
+  * [38b0167b] Updated Ukrainian translation using Weblate
+
+El Pirujo (1):
+  * [34edcbc3] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [97085761] Updated Chinese (Simplified) translation using Weblate
+
+Gediminas Murauskas (1):
+  * [12b100a1] Updated Lithuanian translation using Weblate
+
+J. Lavoie (2):
+  * [f4e87145] Updated German translation using Weblate
+  * [a032ba03] Updated Italian translation using Weblate
+
+Jim (1):
+  * [8a252911] Updated Chinese (Traditional) translation using Weblate
+
+Jonas Kalderstam (9):
+  * [b9a627d4] Use BoxWithConstraints instead of onLayout Callback
+  * [f59c5dc5] Increased swipable thresholds to mitigate mistaken swipes
+  * [d4138a7a] Suppress some warnings
+  * [d0498ff0] Fixed so list scrolls to top after mark above as read
+  * [bcfa2e7b] Updated Swedish translation using Weblate
+  * [6c96cdc2] Fixed sharing article link
+  * [777be597] Fixed customtab/browser not marking articles as read
+  * [980af280] Moved SearchFeed to own package
+  * [4e87becf] Made UI not so wide on tablets
+
+Nikita Epifanov (1):
+  * [9b3e4bbd] Updated Russian translation using Weblate
+
+Oğuz Ersen (1):
+  * [3157b54c] Updated Turkish translation using Weblate
+
+Simona Iacob (1):
+  * [991f1204] Updated Romanian translation using Weblate
+
+bruh (1):
+  * [1e442a3c] Updated Vietnamese translation using Weblate
+
+Éfrit (1):
+  * [8780fab4] Translated using Weblate (French)
+
 # 2.0.0-rc.3
 Andrij Mizyk (2):
   * [4615622f] Updated Ukrainian translation using Weblate
