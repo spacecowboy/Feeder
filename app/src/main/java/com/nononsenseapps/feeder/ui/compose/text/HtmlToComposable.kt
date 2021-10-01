@@ -80,18 +80,31 @@ private fun LazyListScope.formatBody(
         item {
             val dimens = LocalDimens.current
             val paragraph = paragraphBuilder.toAnnotatedString()
-            // TODO compose this prevents taps from deselecting selected text
-            ClickableText(
-                text = paragraph,
-                style = MaterialTheme.typography.body1
-                    .merge(TextStyle(color = MaterialTheme.colors.onBackground)),
-                modifier = Modifier.width(dimens.maxContentWidth)
-            ) { offset ->
-                paragraph.getStringAnnotations("URL", offset, offset)
-                    .firstOrNull()
-                    ?.let {
-                        onLinkClick(it.item)
-                    }
+
+            // ClickableText prevents taps from deselecting selected text
+            // So use regular Text if possible
+            if (paragraph.getStringAnnotations("URL", 0, paragraph.length)
+                    .isNotEmpty()
+            ) {
+                ClickableText(
+                    text = paragraph,
+                    style = MaterialTheme.typography.body1
+                        .merge(TextStyle(color = MaterialTheme.colors.onBackground)),
+                    modifier = Modifier.width(dimens.maxContentWidth)
+                ) { offset ->
+                    paragraph.getStringAnnotations("URL", offset, offset)
+                        .firstOrNull()
+                        ?.let {
+                            onLinkClick(it.item)
+                        }
+                }
+            } else {
+                Text(
+                    text = paragraph,
+                    style = MaterialTheme.typography.body1
+                        .merge(TextStyle(color = MaterialTheme.colors.onBackground)),
+                    modifier = Modifier.width(dimens.maxContentWidth)
+                )
             }
         }
     }
