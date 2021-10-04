@@ -1,3 +1,11 @@
+# 2.0.0
+
+* UI layer of Feeder has been rewritten in Jetpack Compose
+* Improved accessibility
+* Added choice of style for articles in list
+* Added a playback interface for TextToSpeech
+* Translation updates by the community
+
 # 2.0.0-rc.4
 Agnieszka C (1):
   * [89ba5aef] Updated Polish translation using Weblate
