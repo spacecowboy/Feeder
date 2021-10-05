@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.navdrawer
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
@@ -152,17 +153,23 @@ private fun ExpandableTag(
             .padding(top = 2.dp, bottom = 2.dp, end = 16.dp)
             .fillMaxWidth()
             .semantics(mergeDescendants = true) {
-                stateDescription = if (expanded) {
-                    expandedLabel
-                } else {
-                    contractedLabel
-                }
-                customActions = listOf(
-                    CustomAccessibilityAction(toggleExpandLabel) {
-                        onToggleExpansion(title)
-                        true
+                try {
+                    stateDescription = if (expanded) {
+                        expandedLabel
+                    } else {
+                        contractedLabel
                     }
-                )
+                    customActions = listOf(
+                        CustomAccessibilityAction(toggleExpandLabel) {
+                            onToggleExpansion(title)
+                            true
+                        }
+                    )
+                } catch (e: Exception) {
+                    // Observed nullpointer exception when setting customActions
+                    // No clue why it could be null
+                    Log.e("FeederNavDrawer", "Exception in semantics", e)
+                }
             }
     ) {
         ExpandArrow(
