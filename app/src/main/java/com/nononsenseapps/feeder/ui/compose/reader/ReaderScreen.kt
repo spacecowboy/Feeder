@@ -104,12 +104,10 @@ fun ReaderScreen(
     val enclosure by remember(viewState.currentItem.enclosureLink, viewState.currentItem.enclosureFilename) {
         derivedStateOf {
             viewState.currentItem.enclosureLink?.let { link ->
-                viewState.currentItem.enclosureFilename?.let { name ->
-                    Enclosure(
-                        link = link,
-                        name = name
-                    )
-                }
+                Enclosure(
+                    link = link,
+                    name = viewState.currentItem.enclosureFilename ?: ""
+                )
             }
         }
     }
@@ -371,8 +369,7 @@ fun ReaderScreen(
             modifier = Modifier.padding(padding),
             articleTitle = articleTitle,
             feedTitle = feedDisplayTitle,
-            enclosureName = enclosure?.name,
-            enclosureLink = enclosure?.link,
+            enclosure = enclosure,
             onEnclosureClick = {
                 enclosure?.link?.let { link ->
                     openLinkInBrowser(context, link)
@@ -406,8 +403,7 @@ private fun ReaderView(
     articleTitle: String = "Article title on top",
     feedTitle: String = "Feed Title is here",
     authorDate: String? = "2018-01-02",
-    enclosureName: String? = null,
-    enclosureLink: String? = null,
+    enclosure: Enclosure? = null,
     onEnclosureClick: () -> Unit,
     onFeedTitleClick: () -> Unit,
     articleBody: LazyListScope.() -> Unit,
@@ -465,14 +461,18 @@ private fun ReaderView(
                 }
             }
 
-            if (enclosureName!=null && enclosureLink!=null) {
+            if (enclosure!=null) {
                 item {
-                    val openLabel = stringResource(R.string.open_enclosed_media_file, enclosureName)
+                    val openLabel = if (enclosure.name.isBlank()) {
+                        stringResource(R.string.open_enclosed_media)
+                    } else {
+                        stringResource(R.string.open_enclosed_media_file, enclosure.name)
+                    }
                     Column(
                         modifier = Modifier.width(dimens.maxContentWidth)
                     ) {
                         Text(
-                            text = enclosureName,
+                            text = openLabel,
                             style = MaterialTheme.typography.body1.merge(LinkTextStyle()),
                             modifier = Modifier
                                 .clickable {
