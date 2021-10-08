@@ -186,7 +186,7 @@ private suspend fun syncFeed(
         val feedItemSqls =
             feed.items
                 ?.map {
-                    val guid = it.id ?: "${it.title}-${it.summary}"
+                    val guid = it.id ?: "${it.date_published}|${it.title}"
                     it to guid
                 }
                 ?.reversed()

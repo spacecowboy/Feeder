@@ -7,6 +7,7 @@ import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
 import com.rometools.modules.mediarss.MediaEntryModule
 import com.rometools.modules.mediarss.MediaModule
+import com.rometools.rome.feed.atom.Entry
 import com.rometools.rome.feed.synd.SyndContent
 import com.rometools.rome.feed.synd.SyndEnclosure
 import com.rometools.rome.feed.synd.SyndEntry
@@ -63,8 +64,19 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
         true -> Author(name = author)
         else -> feedAuthor
     }
+
+    val fromRss = when (this.wireEntry) {
+        is Entry -> false // Trust Atom feeds to have correct ids until proven otherwise
+        else -> true
+    }
+
+    val rssSafeId = when (fromRss || this.uri == null) {
+        true -> "${relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri)}|${publishedRFC3339Date()}|${plainTitle()}"
+        false -> relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri)
+    }
+
     return Item(
-        id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
+        id = rssSafeId,
         url = linkToHtml(baseUrl),
         title = plainTitle(),
         content_text = contentText,

@@ -268,7 +268,13 @@ class FeedParser(override val di: DI) : DIAware {
     internal fun parseFeedInputStream(baseUrl: URL, `is`: InputStream, charset: Charset?): Feed {
         `is`.use {
             try {
-                val feed = XmlReader(`is`, true, charset?.name()).use { SyndFeedInput().build(it) }
+                val feed = XmlReader(`is`, true, charset?.name()).use {
+                    SyndFeedInput()
+                        .apply {
+                            isPreserveWireFeed = true
+                        }
+                        .build(it)
+                }
                 return feed.asFeed(baseUrl = baseUrl)
             } catch (e: NumberFormatException) {
                 throw e
