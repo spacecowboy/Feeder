@@ -22,6 +22,15 @@ fun FeederBlackColorPalette() = darkColors(
 )
 
 @Composable
+fun FeederDarkColorPalette() = darkColors(
+    primary = Green700,
+    primaryVariant = Green900,
+    secondary = DarkTealA400,
+    onSecondary = Color.White,
+    background = DarkBackground
+)
+
+@Composable
 fun FeederLightColorPalette() = lightColors(
     primary = Green700,
     primaryVariant = Green900,
