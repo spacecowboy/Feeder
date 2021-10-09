@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 
 @Composable
@@ -51,10 +52,11 @@ val upButtonStartPadding = 4.dp
 @Composable
 fun FeederTheme(
     currentTheme: ThemeOptions = ThemeOptions.DAY,
+    darkThemePreference: DarkThemePreferences = DarkThemePreferences.BLACK,
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
-        colors = currentTheme.getColors(),
+        colors = currentTheme.getColors(darkThemePreference),
         typography = Typography,
         shapes = Shapes
     ) {
@@ -73,15 +75,23 @@ fun FeederTheme(
 }
 
 @Composable
-private fun ThemeOptions.getColors(): Colors =
+private fun ThemeOptions.getColors(darkThemePreference: DarkThemePreferences): Colors =
     when (this) {
         ThemeOptions.DAY -> FeederLightColorPalette()
-        ThemeOptions.NIGHT -> FeederBlackColorPalette()
+        ThemeOptions.NIGHT -> getPreferredDarkTheme(darkThemePreference)
         ThemeOptions.SYSTEM -> {
             if (isSystemInDarkTheme()) {
-                FeederBlackColorPalette()
+                getPreferredDarkTheme(darkThemePreference)
             } else {
                 FeederLightColorPalette()
             }
         }
     }
+
+@Composable
+private fun getPreferredDarkTheme(darkThemePreference: DarkThemePreferences) : Colors {
+    return when(darkThemePreference) {
+        DarkThemePreferences.BLACK -> FeederBlackColorPalette()
+        DarkThemePreferences.DARK -> FeederDarkColorPalette()
+    }
+}

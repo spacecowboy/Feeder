@@ -38,9 +38,11 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
             withDI {
                 val viewModel: AddFeedFromShareActivityViewModel = DIAwareViewModel()
                 val currentTheme by viewModel.currentTheme.collectAsState()
+                val darkThemePreference by viewModel.darkThemePreference.collectAsState()
 
                 FeederTheme(
-                    currentTheme = currentTheme
+                    currentTheme = currentTheme,
+                    darkThemePreference = darkThemePreference
                 ) {
                     val navController = rememberNavController()
                     NavHost(navController, startDestination = "search") {
