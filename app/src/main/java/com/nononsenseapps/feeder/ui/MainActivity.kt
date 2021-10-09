@@ -50,6 +50,9 @@ import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
+import com.nononsenseapps.feeder.util.urlEncode
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.withDI
 import org.kodein.di.instance
@@ -128,9 +131,8 @@ class MainActivity : DIAwareComponentActivity() {
         NavHost(navController, startDestination = "lastfeed") {
             composable("lastfeed") {
                 LaunchedEffect(null) {
-                    navController.popEntireBackStack()
                     navController.navigate(
-                        "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second}"
+                        "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second.urlEncode()}"
                     )
                 }
             }
@@ -158,6 +160,7 @@ class MainActivity : DIAwareComponentActivity() {
                     ?: error("Missing mandatory argument: tag")
 
                 LaunchedEffect(feedId, tag) {
+                    Log.d("JONAS56", "Received tag: '$tag'")
                     mainActivityViewModel.setCurrentFeedAndTag(feedId, tag)
                 }
 
@@ -190,14 +193,14 @@ class MainActivity : DIAwareComponentActivity() {
                         } else {
                             navController.popEntireBackStack()
                             navController.navigate(
-                                "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second}"
+                                "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second.urlEncode()}"
                             )
                         }
                     },
                 ) {
                     navController.popEntireBackStack()
                     navController.navigate(
-                        "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second}"
+                        "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second.urlEncode()}"
                     )
                 }
             }
@@ -237,7 +240,7 @@ class MainActivity : DIAwareComponentActivity() {
                     initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
                     searchFeedViewModel = backStackEntry.DIAwareViewModel()
                 ) {
-                    navController.navigate("add/feed?feedUrl=${it.url}&feedTitle=${it.title}")
+                    navController.navigate("add/feed?feedUrl=${it.url.urlEncode()}&feedTitle=${it.title.urlEncode()}")
                 }
             }
             composable(
@@ -324,7 +327,7 @@ class MainActivity : DIAwareComponentActivity() {
             onOpenFeedOrTag = { feedOrTag ->
                 navController.popEntireBackStack()
                 navController.navigate(
-                    "feed?id=${feedOrTag.id}&tag=${feedOrTag.tag}"
+                    "feed?id=${feedOrTag.id}&tag=${feedOrTag.tag.urlEncode()}"
                 )
                 applicationCoroutineScope.launch {
                     if (feedOrTag.isFeed) {

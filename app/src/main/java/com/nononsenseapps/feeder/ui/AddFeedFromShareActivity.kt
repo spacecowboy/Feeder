@@ -18,6 +18,7 @@ import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.util.urlEncode
 import org.kodein.di.compose.withDI
 
 /**
@@ -51,7 +52,9 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                                 initialFeedUrl = initialFeedUrl,
                                 searchFeedViewModel = backStackEntry.DIAwareViewModel()
                             ) {
-                                navController.navigate("add/feed?feedUrl=${it.url}&feedTitle=${it.title}")
+                                navController.navigate(
+                                    "add/feed?feedUrl=${it.url.urlEncode()}&feedTitle=${it.title.urlEncode()}"
+                                )
                             }
                         }
                         composable(

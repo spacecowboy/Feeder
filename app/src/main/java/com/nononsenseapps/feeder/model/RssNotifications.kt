@@ -31,12 +31,12 @@ import com.nononsenseapps.feeder.ui.MainActivity
 import com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivity
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.notificationManager
+import com.nononsenseapps.feeder.util.urlEncode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import java.net.URLEncoder
 
 const val notificationId = 73583
 const val channelId = "feederNotifications"
@@ -251,7 +251,7 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
     }
 
     val deepLinkUri =
-        "$DEEP_LINK_BASE_URI/feed?id=$deepLinkId&tag=${URLEncoder.encode(deepLinkTag, "utf8")}"
+        "$DEEP_LINK_BASE_URI/feed?id=$deepLinkId&tag=${deepLinkTag.urlEncode()}"
 
     val contentIntent = Intent(
         Intent.ACTION_VIEW,

@@ -6,6 +6,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.BatteryManager
 import android.os.Build
+import java.net.URLEncoder
 
 /**
  * Note that cellular typically is metered - it is NOT the same as hotspot
@@ -50,3 +51,6 @@ fun currentlyConnected(context: Context): Boolean {
             result || (connected ?: false)
         } ?: false
 }
+
+fun String.urlEncode(): String =
+    URLEncoder.encode(this, "UTF-8")
