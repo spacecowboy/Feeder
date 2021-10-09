@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.ui.compose.reader
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -424,12 +425,18 @@ private fun ReaderView(
                     modifier = Modifier
                         .width(dimens.maxContentWidth)
                         .semantics(mergeDescendants = true) {
-                            customActions = listOf(
-                                CustomAccessibilityAction(goToFeedLabel) {
-                                    onFeedTitleClick()
-                                    true
-                                }
-                            )
+                            try {
+                                customActions = listOf(
+                                    CustomAccessibilityAction(goToFeedLabel) {
+                                        onFeedTitleClick()
+                                        true
+                                    }
+                                )
+                            } catch (e: Exception) {
+                                // Observed nullpointer exception when setting customActions
+                                // No clue why it could be null
+                                Log.e("FeederReaderScreen", "Exception in semantics", e)
+                            }
                         }
                 ) {
                     Text(
@@ -479,12 +486,18 @@ private fun ReaderView(
                                     onEnclosureClick()
                                 }
                                 .clearAndSetSemantics {
-                                    customActions = listOf(
-                                        CustomAccessibilityAction(openLabel) {
-                                            onEnclosureClick()
-                                            true
-                                        }
-                                    )
+                                    try {
+                                        customActions = listOf(
+                                            CustomAccessibilityAction(openLabel) {
+                                                onEnclosureClick()
+                                                true
+                                            }
+                                        )
+                                    } catch (e: Exception) {
+                                        // Observed nullpointer exception when setting customActions
+                                        // No clue why it could be null
+                                        Log.e("FeederReaderScreen", "Exception in semantics", e)
+                                    }
                                 }
                         )
                         Spacer(modifier = Modifier.height(16.dp))

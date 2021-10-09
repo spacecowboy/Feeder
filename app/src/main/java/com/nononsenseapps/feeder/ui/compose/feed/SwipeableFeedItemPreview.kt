@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -162,23 +163,29 @@ fun SwipeableFeedItemPreview(
                     onClick = onItemClick,
                 )
                 .semantics {
-                    stateDescription = readStatusLabel
-                    customActions = listOf(
-                        CustomAccessibilityAction("toggle read status") {
-                            coroutineScope.launch {
-                                onSwipe()
-                            }
-                            true
-                        },
-                        CustomAccessibilityAction(markAboveAsReadLabel) {
-                            onMarkAboveAsRead()
-                            true
-                        },
-                        CustomAccessibilityAction(markBelowAsReadLabel) {
-                            onMarkBelowAsRead()
-                            true
-                        },
-                    )
+                    try {
+                        stateDescription = readStatusLabel
+                        customActions = listOf(
+                            CustomAccessibilityAction("toggle read status") {
+                                coroutineScope.launch {
+                                    onSwipe()
+                                }
+                                true
+                            },
+                            CustomAccessibilityAction(markAboveAsReadLabel) {
+                                onMarkAboveAsRead()
+                                true
+                            },
+                            CustomAccessibilityAction(markBelowAsReadLabel) {
+                                onMarkBelowAsRead()
+                                true
+                            },
+                        )
+                    } catch (e: Exception) {
+                        // Observed nullpointer exception when setting customActions
+                        // No clue why it could be null
+                        Log.e("FeederSwipeableFIP", "Exception in semantics", e)
+                    }
                 }
         ) {
             val maxWidthPx = with(LocalDensity.current) {
