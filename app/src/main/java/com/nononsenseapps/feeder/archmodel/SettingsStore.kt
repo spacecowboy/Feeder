@@ -51,6 +51,16 @@ class SettingsStore(override val di: DI) : DIAware {
         sp.edit().putString(PREF_THEME, value.name.lowercase()).apply()
     }
 
+    private val _darkThemePreference = MutableStateFlow(
+        DarkThemePreferences.valueOf(sp.getString(PREF_DARK_THEME, null)?.uppercase()
+            ?: DarkThemePreferences.BLACK.name)
+    )
+    val darkThemePreference = _darkThemePreference.asStateFlow()
+    fun setDarkThemePreference(value: DarkThemePreferences) {
+        _darkThemePreference.value = value
+        sp.edit().putString(PREF_DARK_THEME, value.name.lowercase()).apply()
+    }
+
     private val _currentSorting = MutableStateFlow(
         SortingOptions.valueOf(sp.getString(PREF_SORT, null)?.uppercase()
             ?: SortingOptions.NEWEST_FIRST.name)
@@ -244,6 +254,11 @@ const val PREF_LAST_FEED_ID = "pref_last_feed_id"
 const val PREF_THEME = "pref_theme"
 
 /**
+ * Dark theme settings
+ */
+const val PREF_DARK_THEME = "pref_theme"
+
+/**
  * Sort settings
  */
 const val PREF_SORT = "pref_sort"
@@ -294,6 +309,13 @@ enum class ThemeOptions(
     DAY(R.string.theme_day),
     NIGHT(R.string.theme_night),
     SYSTEM(R.string.theme_system),
+}
+
+enum class DarkThemePreferences(
+    @StringRes val stringId: Int,
+) {
+    BLACK(R.string.dark_theme_preference_black),
+    DARK(R.string.dark_theme_preference_dark)
 }
 
 enum class SortingOptions(

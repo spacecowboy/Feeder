@@ -78,6 +78,17 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
+    fun darkThemePreference() {
+        store.setDarkThemePreference(DarkThemePreferences.DARK)
+
+        verify {
+            sp.edit().putString(PREF_DARK_THEME, "Dark").apply()
+        }
+
+        assertEquals(DarkThemePreferences.DARK, store.darkThemePreference.value)
+    }
+
+    @Test
     fun currentSorting() {
         store.setCurrentSorting(SortingOptions.OLDEST_FIRST)
 

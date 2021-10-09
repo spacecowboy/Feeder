@@ -38,6 +38,10 @@ class Repository(override val di: DI) : DIAware {
     val currentTheme: StateFlow<ThemeOptions> = settingsStore.currentTheme
     fun setCurrentTheme(value: ThemeOptions) = settingsStore.setCurrentTheme(value)
 
+    val preferredDarkTheme: StateFlow<DarkThemePreferences> = settingsStore.darkThemePreference
+    fun setPreferredDarkTheme(value: DarkThemePreferences) =
+        settingsStore.setDarkThemePreference(value)
+
     val currentSorting: StateFlow<SortingOptions> = settingsStore.currentSorting
     fun setCurrentSorting(value: SortingOptions) = settingsStore.setCurrentSorting(value)
 
