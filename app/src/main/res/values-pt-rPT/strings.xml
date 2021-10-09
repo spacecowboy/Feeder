@@ -42,7 +42,7 @@
     <string name="open_in_reader">Leitor</string>
     <string name="notification_channel_description">Notificações são exibidas apenas para itens não lidos em feeds configurados</string>
     <string name="notification_channel_name">Os feeds não lidos</string>
-  <string name="updated_feeds">Os feeds estão atualizados</string>
+    <string name="updated_feeds">Os feeds estão atualizados</string>
     <string name="include_mobile_hotspots">Incluir os pontos de acesso móveis</string>
     <string name="show_fab">Mostrar botão de ação flutuante</string>
     <string name="on_startup">Ao iniciar</string>
@@ -107,4 +107,5 @@
     <string name="action_settings">Configurações</string>
     <string name="navigation_drawer_close">Fechar a gaveta de navegação</string>
     <string name="navigation_drawer_open">Abrir a gaveta de navegação</string>
+    <string name="open_enclosed_media_file">Abrir %1$s</string>
 </resources>
