@@ -94,9 +94,10 @@ class ReaderScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAwa
                 _textToDisplay.asFlow(),
                 repository.getFeedItem(currentItemId),
             ) { textToDisplay, feedItem ->
+                // Should not be null but don't crash if it is
                 ReaderScreenViewState(
                     textToDisplay = textToDisplay,
-                    currentItem = feedItem ?: error("Missing feed item?!"),
+                    currentItem = feedItem ?: FeedItemWithFeed(),
                 )
             }.collect {
                 _viewState.value = it
