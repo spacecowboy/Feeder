@@ -14,7 +14,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 
 @Composable
-fun FeederDarkColorPalette() = darkColors(
+fun FeederBlackColorPalette() = darkColors(
     primary = Green700,
     primaryVariant = Green900,
     secondary = DarkTealA400,
@@ -67,10 +67,10 @@ fun FeederTheme(
 private fun ThemeOptions.getColors(): Colors =
     when (this) {
         ThemeOptions.DAY -> FeederLightColorPalette()
-        ThemeOptions.NIGHT -> FeederDarkColorPalette()
+        ThemeOptions.NIGHT -> FeederBlackColorPalette()
         ThemeOptions.SYSTEM -> {
             if (isSystemInDarkTheme()) {
-                FeederDarkColorPalette()
+                FeederBlackColorPalette()
             } else {
                 FeederLightColorPalette()
             }
