@@ -5,6 +5,7 @@ import android.os.PowerManager
 import androidx.compose.runtime.Immutable
 import androidx.core.content.getSystemService
 import androidx.lifecycle.viewModelScope
+import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
@@ -31,6 +32,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
 
     fun setCurrentTheme(value: ThemeOptions) {
         repository.setCurrentTheme(value)
+    }
+
+    fun setPreferredDarkTheme(value: DarkThemePreferences) {
+        repository.setPreferredDarkTheme(value)
     }
 
     fun setCurrentSorting(value: SortingOptions) {
@@ -94,6 +99,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         viewModelScope.launch {
             combine(
                 repository.currentTheme,
+                repository.preferredDarkTheme,
                 repository.currentSorting,
                 repository.showFab,
                 repository.syncOnResume,
@@ -110,19 +116,20 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
             ) { params: Array<Any> ->
                 SettingsViewState(
                     currentTheme = params[0] as ThemeOptions,
-                    currentSorting = params[1] as SortingOptions,
-                    showFab = params[2] as Boolean,
-                    syncOnResume = params[3] as Boolean,
-                    syncOnlyOnWifi = params[4] as Boolean,
-                    syncOnlyWhenCharging = params[5] as Boolean,
-                    loadImageOnlyOnWifi = params[6] as Boolean,
-                    showThumbnails = params[7] as Boolean,
-                    maximumCountPerFeed = params[8] as Int,
-                    itemOpener = params[9] as ItemOpener,
-                    linkOpener = params[10] as LinkOpener,
-                    syncFrequency = params[11] as SyncFrequency,
-                    batteryOptimizationIgnored = params[12] as Boolean,
-                    feedItemStyle = params[13] as FeedItemStyle,
+                    darkThemePreference = params[1] as DarkThemePreferences,
+                    currentSorting = params[2] as SortingOptions,
+                    showFab = params[3] as Boolean,
+                    syncOnResume = params[4] as Boolean,
+                    syncOnlyOnWifi = params[5] as Boolean,
+                    syncOnlyWhenCharging = params[6] as Boolean,
+                    loadImageOnlyOnWifi = params[7] as Boolean,
+                    showThumbnails = params[8] as Boolean,
+                    maximumCountPerFeed = params[9] as Int,
+                    itemOpener = params[10] as ItemOpener,
+                    linkOpener = params[11] as LinkOpener,
+                    syncFrequency = params[12] as SyncFrequency,
+                    batteryOptimizationIgnored = params[13] as Boolean,
+                    feedItemStyle = params[14] as FeedItemStyle,
                 )
             }.collect {
                 _viewState.value = it
@@ -134,6 +141,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
 @Immutable
 data class SettingsViewState(
     val currentTheme: ThemeOptions = ThemeOptions.SYSTEM,
+    val darkThemePreference: DarkThemePreferences = DarkThemePreferences.BLACK,
     val currentSorting: SortingOptions = SortingOptions.NEWEST_FIRST,
     val showFab: Boolean = true,
     val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,

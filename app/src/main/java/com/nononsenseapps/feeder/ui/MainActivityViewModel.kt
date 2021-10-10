@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui
 
+import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
@@ -20,6 +21,9 @@ class MainActivityViewModel(di: DI) : DIAwareViewModel(di) {
 
     val currentTheme: StateFlow<ThemeOptions> =
         repository.currentTheme
+
+    val darkThemePreference: StateFlow<DarkThemePreferences> =
+        repository.preferredDarkTheme
 
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = repository.currentFeedAndTag
     fun setCurrentFeedAndTag(feedId: Long, tag: String) {

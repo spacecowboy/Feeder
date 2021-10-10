@@ -61,6 +61,7 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
@@ -111,6 +112,10 @@ fun SettingsScreen(
             onThemeChanged = { value ->
                 settingsViewModel.setCurrentTheme(value.currentTheme)
             },
+            currentDarkThemePreference = viewState.darkThemePreference.asDarkThemeOption(),
+            onDarkThemePreferenceChanged = { value ->
+                settingsViewModel.setPreferredDarkTheme(value.darkThemePreferences)
+            },
             currentSortingValue = viewState.currentSorting.asSortOption(),
             onSortingChanged = { value ->
                 settingsViewModel.setCurrentSorting(value.currentSorting)
@@ -159,7 +164,7 @@ fun SettingsScreen(
             onSyncFrequencyChanged = {
                 settingsViewModel.setSyncFrequency(it)
             },
-            batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored,
+            batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored
         )
     }
 }
@@ -173,6 +178,8 @@ fun SettingsScreenPreview() {
                 modifier = Modifier,
                 currentThemeValue = ThemeOptions.SYSTEM.asThemeOption(),
                 onThemeChanged = {},
+                currentDarkThemePreference = DarkThemePreferences.BLACK.asDarkThemeOption(),
+                onDarkThemePreferenceChanged = {},
                 currentSortingValue = SortingOptions.NEWEST_FIRST.asSortOption(),
                 onSortingChanged = {},
                 showFabValue = true,
@@ -197,7 +204,7 @@ fun SettingsScreenPreview() {
                 onLinkOpenerChanged = {},
                 currentSyncFrequencyValue = SyncFrequency.EVERY_12_HOURS,
                 onSyncFrequencyChanged = {},
-                batteryOptimizationIgnoredValue = false
+                batteryOptimizationIgnoredValue = false,
             )
         }
     }
@@ -208,6 +215,8 @@ fun SettingsList(
     modifier: Modifier,
     currentThemeValue: ThemeOption,
     onThemeChanged: (ThemeOption) -> Unit,
+    currentDarkThemePreference: DarkThemeOption,
+    onDarkThemePreferenceChanged: (DarkThemeOption) -> Unit,
     currentSortingValue: SortOption,
     onSortingChanged: (SortOption) -> Unit,
     showFabValue: Boolean,
@@ -254,6 +263,16 @@ fun SettingsList(
             ),
             title = stringResource(id = R.string.theme),
             onSelection = onThemeChanged
+        )
+
+        MenuSetting(
+            title = stringResource(id = R.string.dark_theme_preference),
+            currentValue = currentDarkThemePreference,
+            values = listOf(
+                DarkThemePreferences.BLACK.asDarkThemeOption(),
+                DarkThemePreferences.DARK.asDarkThemeOption()
+            ),
+            onSelection = onDarkThemePreferenceChanged
         )
 
         MenuSetting(
@@ -671,6 +690,21 @@ fun ThemeOptions.asThemeOption() =
 @Immutable
 data class ThemeOption(
     val currentTheme: ThemeOptions,
+    val name: String,
+) {
+    override fun toString() = name
+}
+
+@Composable
+fun DarkThemePreferences.asDarkThemeOption() =
+    DarkThemeOption(
+        darkThemePreferences = this,
+        name = stringResource(id = stringId)
+    )
+
+@Immutable
+data class DarkThemeOption(
+    val darkThemePreferences: DarkThemePreferences,
     val name: String,
 ) {
     override fun toString() = name

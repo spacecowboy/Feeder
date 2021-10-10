@@ -38,6 +38,7 @@ class SettingsStoreTest : DIAware {
 
         // Necessary globally for enum conversion
         every { sp.getString(PREF_THEME, null) } returns null
+        every { sp.getString(PREF_DARK_THEME, null) } returns null
         every { sp.getString(PREF_SORT, null) } returns null
         every { sp.getString(PREF_MAX_ITEM_COUNT_PER_FEED, "100") } returns null
         every { sp.getString(PREF_SYNC_FREQ, "60") } returns null
@@ -75,6 +76,17 @@ class SettingsStoreTest : DIAware {
         }
 
         assertEquals(ThemeOptions.NIGHT, store.currentTheme.value)
+    }
+
+    @Test
+    fun darkThemePreference() {
+        store.setDarkThemePreference(DarkThemePreferences.DARK)
+
+        verify {
+            sp.edit().putString(PREF_DARK_THEME, "dark").apply()
+        }
+
+        assertEquals(DarkThemePreferences.DARK, store.darkThemePreference.value)
     }
 
     @Test

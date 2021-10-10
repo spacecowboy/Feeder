@@ -9,3 +9,5 @@ val AccentDay = Color(0xff009688)
 
 val SwipingItemToReadColor = Color(0xffff5252)
 val SwipingItemToUnreadColor = Color(0xff1C9255)
+
+val DarkBackground = Color(0xff171c21)
