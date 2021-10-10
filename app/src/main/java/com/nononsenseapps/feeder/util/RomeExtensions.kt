@@ -71,7 +71,7 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
     }
 
     val rssSafeId = when (fromRss || this.uri == null) {
-        true -> "${relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri)}|${publishedRFC3339Date()}|${plainTitle()}"
+        true -> "${relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri)}|${publishedRFC3339ZonedDateTime()?.toInstant()}|${plainTitle()}"
         false -> relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri)
     }
 
@@ -238,14 +238,20 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     }
 }
 
-fun SyndEntry.publishedRFC3339Date(): String? =
+fun SyndEntry.publishedRFC3339ZonedDateTime(): ZonedDateTime? =
     when (publishedDate != null) {
-        true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(publishedDate.time), ZoneOffset.systemDefault()).toString()
-        else -> modifiedRFC3339Date() // This is the required element in atom feeds so it is a good fallback
+        true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(publishedDate.time), ZoneOffset.systemDefault())
+        else -> modifiedRFC3339ZonedDateTime() // This is the required element in atom feeds so it is a good fallback
     }
 
-fun SyndEntry.modifiedRFC3339Date(): String? =
+fun SyndEntry.modifiedRFC3339ZonedDateTime(): ZonedDateTime? =
     when (updatedDate != null) {
-        true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(updatedDate.time), ZoneOffset.systemDefault()).toString()
+        true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(updatedDate.time), ZoneOffset.systemDefault())
         else -> null
     }
+
+fun SyndEntry.publishedRFC3339Date(): String? =
+    publishedRFC3339ZonedDateTime()?.toString()
+
+fun SyndEntry.modifiedRFC3339Date(): String? =
+    modifiedRFC3339ZonedDateTime()?.toString()

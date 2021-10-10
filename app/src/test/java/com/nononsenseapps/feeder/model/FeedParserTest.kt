@@ -678,7 +678,7 @@ class FeedParserTest : DIAware {
         assertNull(item.url)
 
         assertEquals("ANON", item.title)
-        assertEquals("http://ANON.com/sub/##|2018-12-13T00:00+01:00[Europe/Stockholm]|ANON", item.id)
+        assertEquals("http://ANON.com/sub/##|2018-12-12T23:00:00Z|ANON", item.id)
         assertEquals("ANON", item.content_text)
         assertEquals("ANON", item.content_html)
         assertEquals("ANON", item.summary)
