@@ -29,12 +29,14 @@ fun FeederLightColorPalette() = lightColors(
     onSecondary = Color.White,
 )
 
-@Deprecated("")
+@Deprecated(
+    "Use dimens.margin instead",
+    ReplaceWith(
+        "LocalDimens.current.margin",
+        "com.nononsenseapps.feeder.ui.compose.theme.LocalDimens"
+    )
+)
 val keyline1Padding = 16.dp
-@Deprecated("")
-val contentHorizontalPadding = 8.dp
-@Deprecated("")
-val upButtonStartPadding = 4.dp
 
 /**
  * Only use this in the root of the activity
