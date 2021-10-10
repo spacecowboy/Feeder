@@ -25,6 +25,9 @@ test:
   script:
     - source devenv && ./gradlew test :jsonfeed-parser:check
   needs: []
+  artifacts:
+    paths:
+    - app/build/reports/
 
 compile:
   stage: build
