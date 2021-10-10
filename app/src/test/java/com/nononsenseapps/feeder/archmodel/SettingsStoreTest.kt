@@ -83,7 +83,7 @@ class SettingsStoreTest : DIAware {
         store.setDarkThemePreference(DarkThemePreferences.DARK)
 
         verify {
-            sp.edit().putString(PREF_DARK_THEME, "Dark").apply()
+            sp.edit().putString(PREF_DARK_THEME, "dark").apply()
         }
 
         assertEquals(DarkThemePreferences.DARK, store.darkThemePreference.value)
