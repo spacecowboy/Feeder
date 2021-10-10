@@ -38,6 +38,7 @@ class SettingsStoreTest : DIAware {
 
         // Necessary globally for enum conversion
         every { sp.getString(PREF_THEME, null) } returns null
+        every { sp.getString(PREF_DARK_THEME, null) } returns null
         every { sp.getString(PREF_SORT, null) } returns null
         every { sp.getString(PREF_MAX_ITEM_COUNT_PER_FEED, "100") } returns null
         every { sp.getString(PREF_SYNC_FREQ, "60") } returns null

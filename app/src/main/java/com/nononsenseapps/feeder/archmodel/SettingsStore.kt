@@ -256,7 +256,7 @@ const val PREF_THEME = "pref_theme"
 /**
  * Dark theme settings
  */
-const val PREF_DARK_THEME = "pref_theme"
+const val PREF_DARK_THEME = "pref_dark_theme"
 
 /**
  * Sort settings
