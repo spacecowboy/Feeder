@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="delete_feed">Διαγραφή ροής</string>
+    <string name="sync">Συγχρονισμός</string>
+    <string name="sync_option_every_15min">Κάθε 15 λεπτά</string>
+    <string name="all_feeds">Όλες η ροές</string>
+    <string name="title_activity_settings">Ρυθμίσεις</string>
+    <string name="sync_option_every_12_hours">Κάθε 12 ώρες</string>
+    <string name="sync_option_every_6_hours">Κάθε 6 ώρες</string>
+    <string name="sync_option_every_30min">Κάθε 30 λεπτά</string>
+    <string name="open_in_reader">Αναγνώστης</string>
+    <string name="updated_feeds">Ενημερωμένες ροές</string>
+    <string name="check_for_updates">Έλεγχος για ενημερώσεις</string>
+    <string name="title_activity_edit_feed">Εγγραφή στην ροή</string>
+    <string name="tag">Ετικέτα</string>
+    <string name="title">Τίτλος</string>
+    <string name="save">Αποθήκευση</string>
+    <string name="import_feeds_from_opml">Εισαγωγή ροών από OPML</string>
+    <string name="action_settings">Ρυθμίσεις</string>
+    <string name="export_feeds_to_opml">Εξαγωγή ροών σε OPML</string>
+    <string name="sync_option_every_hour">Κάθε ώρα</string>
+    <string name="add_feed">Προσθήκη ροής</string>
+    <string name="sync_option_manually">Χειροκίνητα</string>
+    <string name="sync_option_every_3_hours">Κάθε 3 ώρες</string>
+    <string name="open_in_browser">Άνοιγμα σε περιηγητή</string>
+</resources>
