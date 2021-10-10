@@ -92,7 +92,7 @@
   <string name="theme_day">Day</string>
   <string name="theme_night">Night</string>
   <string name="theme">Theme</string>
-  <string name="dark_theme_preference">Dark theme preference</string>
+  <string name="dark_theme_preference">Preferred dark theme</string>
   <string name="dark_theme_preference_black">Black</string>
   <string name="dark_theme_preference_dark">Dark</string>
   <string name="sort_newest_first">Newest first</string>

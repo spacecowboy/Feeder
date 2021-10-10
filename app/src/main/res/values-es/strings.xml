@@ -81,6 +81,9 @@
     <string name="theme_day">Día</string>
     <string name="theme_night">Noche</string>
     <string name="theme">Tema</string>
+    <string name="dark_theme_preference">Tema oscuro preferido</string>
+    <string name="dark_theme_preference_black">Negro</string>
+    <string name="dark_theme_preference_dark">Oscuro</string>
     <string name="sort_newest_first">El más nuevo primero</string>
     <string name="sort_oldest_first">El más antiguo primero</string>
     <string name="sort">Ordenar por</string>
