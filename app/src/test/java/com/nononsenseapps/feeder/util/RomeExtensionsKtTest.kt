@@ -9,6 +9,7 @@ import com.rometools.modules.mediarss.MediaModule
 import com.rometools.modules.mediarss.types.MediaContent
 import com.rometools.modules.mediarss.types.Reference
 import com.rometools.modules.mediarss.types.Thumbnail
+import com.rometools.rome.feed.atom.Entry
 import com.rometools.rome.feed.synd.SyndContent
 import com.rometools.rome.feed.synd.SyndEnclosure
 import com.rometools.rome.feed.synd.SyndEntry
@@ -571,6 +572,8 @@ class RomeExtensionsKtTest {
         titleEx: SyndContent? = null
     ): SyndEntry {
         val mock = mock(SyndEntry::class.java)
+
+        `when`(mock.wireEntry).thenReturn(Entry())
 
         `when`(mock.uri).thenReturn(uri)
         if (author != null) {
