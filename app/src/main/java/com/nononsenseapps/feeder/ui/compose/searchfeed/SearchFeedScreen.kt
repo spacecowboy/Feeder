@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.searchfeed
 
+import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -17,6 +18,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +40,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
@@ -44,7 +49,6 @@ import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
-import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.MalformedURLException
 import java.net.URL
@@ -165,11 +169,18 @@ fun SearchFeedView(
     val focusManager = LocalFocusManager.current
     val dimens = LocalDimens.current
 
+    // If screen is opened from intent with pre-filled URL, trigger search directly
+    LaunchedEffect(Unit) {
+        if (feedUrl.isNotBlank() && isValidUrl(feedUrl)) {
+            onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+        }
+    }
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .padding(horizontal = keyline1Padding, vertical = 8.dp)
+            .padding(horizontal = dimens.margin, vertical = 8.dp)
             .fillMaxWidth()
     ) {
         item {
@@ -201,6 +212,21 @@ fun SearchFeedView(
                 modifier = Modifier
                     .width(dimens.maxContentWidth)
             )
+        }
+        item {
+            OutlinedButton(
+                enabled = isValidUrl(feedUrl),
+                onClick = {
+                    if (isValidUrl(feedUrl)) {
+                        onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                        focusManager.clearFocus()
+                    }
+                }
+            ) {
+                Text(
+                    stringResource(android.R.string.search_go)
+                )
+            }
         }
         if (results.isEmpty()) {
             for (error in errors) {
@@ -276,7 +302,39 @@ fun SearchResultView(
     }
 }
 
+@Preview(
+    name = "Search with results",
+    showBackground = true,
+    backgroundColor = 0xffffff,
+    showSystemUi = true,
+    device = Devices.NEXUS_5,
+    uiMode = UI_MODE_NIGHT_NO,
+)
+@Composable
+fun SearchPreview() {
+    SearchFeedView(
+        feedUrl = "https://cowboyprogrammer.org",
+        currentlySearching = false,
+        errors = emptyList(),
+        results = listOf(
+            SearchResult(
+                title = "Atom feed",
+                url = "https://cowboyprogrammer.org/atom",
+                description = "An atom feed",
+                isError = false,
+            )
+        ),
+        modifier = Modifier,
+        onClick = {},
+        onSearch = {},
+        onUrlChanged = {},
+    )
+}
+
 private fun isValidUrl(url: String): Boolean {
+    if (url.isBlank()) {
+        return false
+    }
     return try {
         try {
             URL(url)
