@@ -63,7 +63,7 @@
     <string name="show_fab">Tampilkan tombol mengambang</string>
     <string name="include_mobile_hotspots">Sertakan juga hotspot ponsel</string>
     <string name="updated_feeds">Feed diperbarui</string>
-  <string name="notification_channel_name">Feed belum dibaca</string>
+    <string name="notification_channel_name">Feed belum dibaca</string>
     <string name="notification_channel_description">Notifikasi hanya ditampilkan untuk item yang belum dibaca</string>
     <string name="open_in_reader">Pembaca</string>
     <string name="open_in_webview">Web view</string>
@@ -107,4 +107,26 @@
     <string name="pause_reading">Jeda membaca</string>
     <string name="read_article">Baca lantang</string>
     <string name="use_app_default">Bawaan aplikasi</string>
+    <string name="go_back">Kembali</string>
+    <string name="feed_item_style">Gaya artikel</string>
+    <string name="feed_item_style_compact">Ringkas</string>
+    <string name="expanded_tag">Buka tag</string>
+    <string name="contracted_tag">Tutup tag</string>
+    <string name="go_to_feed">Kunjungi %1$s</string>
+    <string name="unread">Belum dibaca</string>
+    <string name="already_read">Sudah dibaca</string>
+    <string name="showing_only_unread_articles">Hanya menampilkan artikel belum dibaca</string>
+    <string name="showing_all_articles">Menampilkan semua artikel</string>
+    <string name="one_unread_article">%1$s artikel belum dibaca</string>
+    <string name="few_unread_articles">%1$s artikel belum dibaca</string>
+    <string name="many_unread_articles">%1$s artikel belum dibaca</string>
+    <string name="other_unread_articles">%1$s artikel belum dibaca</string>
+    <string name="feed_item_style_card">Kartu</string>
+    <string name="feed_item_style_super_compact">Sangat ringkas</string>
+    <string name="open_enclosed_media_file">Buka %1$s</string>
+    <string name="stop_reading">Berhenti membaca</string>
+    <string name="open_menu">Buka menu</string>
+    <string name="synchronize_feeds">Sinkronkan umpan</string>
+    <string name="zero_unread_articles">%1$s artikel belum dibaca</string>
+    <string name="two_unread_articles">%1$s artikel belum dibaca</string>
 </resources>
