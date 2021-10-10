@@ -70,6 +70,7 @@ fun SwipeableFeedItemPreview(
     imagePainter: @Composable (String) -> Unit,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
+    onShareItem: () -> Unit,
     onItemClick: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -133,6 +134,7 @@ fun SwipeableFeedItemPreview(
 
     val markAboveAsReadLabel = stringResource(R.string.mark_items_above_as_read)
     val markBelowAsReadLabel = stringResource(R.string.mark_items_below_as_read)
+    val shareLabel = stringResource(R.string.share)
 
     val unreadLabel = stringResource(R.string.unread)
     val alreadyReadLabel = stringResource(R.string.already_read)
@@ -180,6 +182,10 @@ fun SwipeableFeedItemPreview(
                                 onMarkBelowAsRead()
                                 true
                             },
+                            CustomAccessibilityAction(shareLabel) {
+                                onShareItem()
+                                true
+                            },
                         )
                     } catch (e: Exception) {
                         // Observed nullpointer exception when setting customActions
@@ -221,6 +227,7 @@ fun SwipeableFeedItemPreview(
                         imagePainter = imagePainter,
                         onMarkAboveAsRead = onMarkAboveAsRead,
                         onMarkBelowAsRead = onMarkBelowAsRead,
+                        onShareItem = onShareItem,
                         dropDownMenuExpanded = dropDownMenuExpanded,
                         onDismissDropdown = { dropDownMenuExpanded = false },
                         modifier = Modifier
@@ -234,6 +241,7 @@ fun SwipeableFeedItemPreview(
                         imagePainter = imagePainter,
                         onMarkAboveAsRead = onMarkAboveAsRead,
                         onMarkBelowAsRead = onMarkBelowAsRead,
+                        onShareItem = onShareItem,
                         dropDownMenuExpanded = dropDownMenuExpanded,
                         onDismissDropdown = { dropDownMenuExpanded = false },
                         modifier = Modifier
@@ -247,6 +255,7 @@ fun SwipeableFeedItemPreview(
                         imagePainter = imagePainter,
                         onMarkAboveAsRead = onMarkAboveAsRead,
                         onMarkBelowAsRead = onMarkBelowAsRead,
+                        onShareItem = onShareItem,
                         dropDownMenuExpanded = dropDownMenuExpanded,
                         onDismissDropdown = { dropDownMenuExpanded = false },
                         modifier = Modifier

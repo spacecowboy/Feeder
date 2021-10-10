@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -289,6 +290,19 @@ fun FeedScreen(
                         },
                         onMarkBelowAsRead = {
                             feedScreenViewModel.markAfterAsRead(itemIndex)
+                        },
+                        onShareItem = {
+                            val intent = Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).apply {
+                                    if (previewItem.link != null) {
+                                        putExtra(Intent.EXTRA_TEXT, previewItem.link)
+                                    }
+                                    putExtra(Intent.EXTRA_TITLE, previewItem.title)
+                                    type = "text/plain"
+                                },
+                                null
+                            )
+                            context.startActivity(intent)
                         },
                         onItemClick = {
                             onItemClick(previewItem.id)

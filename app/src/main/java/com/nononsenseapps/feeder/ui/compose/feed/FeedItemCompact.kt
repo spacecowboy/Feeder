@@ -50,6 +50,7 @@ fun FeedItemCompact(
     modifier: Modifier = Modifier,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
+    onShareItem : () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
 ) {
@@ -132,6 +133,16 @@ fun FeedItemCompact(
                             text = stringResource(id = R.string.mark_items_below_as_read)
                         )
                     }
+                    DropdownMenuItem(
+                        onClick = {
+                            onDismissDropdown()
+                            onShareItem()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.share)
+                        )
+                    }
                 }
             }
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
@@ -165,12 +176,14 @@ private fun preview() {
             pubDate = "Jun 9, 2021",
             unread = true,
             imageUrl = null,
+            link = null,
             id = ID_UNSET
         ),
         showThumbnail = true,
         imagePainter = {},
         onMarkAboveAsRead = {},
         onMarkBelowAsRead = {},
+        onShareItem = {},
         dropDownMenuExpanded = false,
         onDismissDropdown = {}
     )
@@ -185,4 +198,5 @@ data class FeedListItem(
     val unread: Boolean,
     val pubDate: String,
     val imageUrl: String?,
+    val link: String?,
 )

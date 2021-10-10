@@ -299,5 +299,6 @@ private fun PreviewItem.toFeedListItem() =
         feedTitle = feedDisplayTitle,
         unread = unread,
         pubDate = pubDate?.toLocalDate()?.format(shortDateTimeFormat) ?: "",
-        imageUrl = imageUrl
+        imageUrl = imageUrl,
+        link = link,
     )

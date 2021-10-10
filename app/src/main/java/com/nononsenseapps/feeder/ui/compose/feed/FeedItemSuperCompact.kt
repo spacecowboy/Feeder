@@ -50,6 +50,7 @@ fun FeedItemSuperCompact(
     modifier: Modifier = Modifier,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
+    onShareItem: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
 ) {
@@ -132,6 +133,16 @@ fun FeedItemSuperCompact(
                             text = stringResource(id = R.string.mark_items_below_as_read)
                         )
                     }
+                    DropdownMenuItem(
+                        onClick = {
+                            onDismissDropdown()
+                            onShareItem()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.share)
+                        )
+                    }
                 }
             }
         }
@@ -155,12 +166,14 @@ private fun preview() {
             pubDate = "Jun 9, 2021",
             unread = true,
             imageUrl = null,
+            link = null,
             id = ID_UNSET
         ),
         showThumbnail = true,
         imagePainter = {},
         onMarkAboveAsRead = {},
         onMarkBelowAsRead = {},
+        onShareItem = {},
         dropDownMenuExpanded = false,
         onDismissDropdown = {}
     )
