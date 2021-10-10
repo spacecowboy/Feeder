@@ -1,3 +1,29 @@
+# 2.0.1
+Felipe Alvarez (7):
+  * [656a276a] Added new dark theme
+
+Jonas Kalderstam (16):
+  * [204f854d] Fixed some reported crashes
+  * [7324a25c] Fixed possible crashes in semantics
+  * [3d21a700] Fixed possible crash reported in play store
+  * [81b81aa1] Fixed tags with certain characters not working correctly
+  * [63fa3b54] Added a search button to the search screen
+  * [c896bba0] Fixed handling of ids in RSS feeds where guid is not unique
+  * [8b860ae9] Added share action to long press menu in FeedScreen
+  * [c95053ef] Updated swedish translation
+
+Nuno Araújo (1):
+  * [d4a8d9ff] Updated Portuguese (Portugal) translation using Weblate
+
+THANOS SIOURDAKIS (1):
+  * [e688797f] Updated Greek translation using Weblate
+
+VfBFan (1):
+  * [25966dc2] Updated German translation using Weblate
+
+zmni (1):
+  * [18fcb357] Updated Indonesian translation using Weblate
+
 # 2.0.0
 
 * UI layer of Feeder has been rewritten in Jetpack Compose
