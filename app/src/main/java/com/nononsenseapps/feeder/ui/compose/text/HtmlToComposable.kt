@@ -90,7 +90,9 @@ private fun LazyListScope.formatBody(
                     text = paragraph,
                     style = MaterialTheme.typography.body1
                         .merge(TextStyle(color = MaterialTheme.colors.onBackground)),
-                    modifier = Modifier.width(dimens.maxContentWidth)
+                    modifier = Modifier
+                        .padding(horizontal = dimens.margin)
+                        .width(dimens.maxContentWidth)
                 ) { offset ->
                     paragraph.getStringAnnotations("URL", offset, offset)
                         .firstOrNull()
@@ -103,7 +105,9 @@ private fun LazyListScope.formatBody(
                     text = paragraph,
                     style = MaterialTheme.typography.body1
                         .merge(TextStyle(color = MaterialTheme.colors.onBackground)),
-                    modifier = Modifier.width(dimens.maxContentWidth)
+                    modifier = Modifier
+                        .padding(horizontal = dimens.margin)
+                        .width(dimens.maxContentWidth)
                 )
             }
         }
@@ -132,6 +136,7 @@ private fun LazyListScope.formatCodeBlock(
                 color = CodeBlockBackground(),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
+                    .padding(horizontal = dimens.margin)
                     .horizontalScroll(
                         state = scrollState
                     )
@@ -408,7 +413,9 @@ private fun TextComposer.appendTextChildren(
                                     val dimens = LocalDimens.current
 //                                    val scale = remember { mutableStateOf(1f) }
                                     Column(
-                                        modifier = Modifier.width(dimens.maxContentWidth)
+                                        modifier = Modifier
+                                            .padding(horizontal = dimens.margin)
+                                            .width(dimens.maxContentWidth)
                                     ) {
                                         DisableSelection {
                                             Box(
@@ -549,7 +556,9 @@ private fun TextComposer.appendTextChildren(
                                 lazyListScope.item {
                                     val dimens = LocalDimens.current
                                     Column(
-                                        modifier = Modifier.width(dimens.maxContentWidth)
+                                        modifier = Modifier
+                                            .padding(horizontal = dimens.margin)
+                                            .width(dimens.maxContentWidth)
                                     ) {
                                         DisableSelection {
                                             Image(

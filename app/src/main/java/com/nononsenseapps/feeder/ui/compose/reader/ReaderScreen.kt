@@ -73,7 +73,6 @@ import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
-import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import com.nononsenseapps.feeder.util.unicodeWrap
@@ -123,7 +122,7 @@ fun ReaderScreen(
         {
             val intent = Intent.createChooser(
                 Intent(Intent.ACTION_SEND).apply {
-                    if (viewState.currentItem.link != null) {
+                    if (viewState.currentItem.link!=null) {
                         putExtra(Intent.EXTRA_TEXT, viewState.currentItem.link)
                     }
                     putExtra(Intent.EXTRA_TITLE, viewState.currentItem.plainTitle)
@@ -418,13 +417,13 @@ private fun ReaderView(
             contentPadding = PaddingValues(bottom = 92.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
-                .padding(horizontal = keyline1Padding)
                 .fillMaxWidth()
         ) {
             item {
                 val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
                 Column(
                     modifier = Modifier
+                        .padding(horizontal = dimens.margin)
                         .width(dimens.maxContentWidth)
                         .semantics(mergeDescendants = true) {
                             try {
@@ -478,7 +477,9 @@ private fun ReaderView(
                         stringResource(R.string.open_enclosed_media_file, enclosure.name)
                     }
                     Column(
-                        modifier = Modifier.width(dimens.maxContentWidth)
+                        modifier = Modifier
+                            .padding(horizontal = dimens.margin)
+                            .width(dimens.maxContentWidth)
                     ) {
                         Text(
                             text = openLabel,
