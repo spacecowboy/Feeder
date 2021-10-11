@@ -250,16 +250,8 @@ dependencies {
 
   androidTestImplementation "androidx.test:core:$androidx_testcore_version"
   androidTestImplementation "androidx.test:runner:$test_runner_version"
-  androidTestImplementation "androidx.test:rules:$test_rules_version"
-  androidTestImplementation "androidx.test.ext:junit:$test_ext_junit_version"
-  androidTestImplementation "androidx.recyclerview:recyclerview:$recyclerview_version"
-  androidTestImplementation "androidx.legacy:legacy-support-v4:$legacy_support_version"
-  androidTestImplementation "androidx.appcompat:appcompat:$appcompat_version"
-  androidTestImplementation "com.google.android.material:material:$material_version"
   androidTestImplementation "androidx.room:room-testing:$room_version"
   androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
-  androidTestImplementation "androidx.test.espresso:espresso-contrib:$espresso_version"
-  androidTestImplementation "androidx.test.uiautomator:uiautomator:$uiautomator_version"
-
   androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
+  debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
 }

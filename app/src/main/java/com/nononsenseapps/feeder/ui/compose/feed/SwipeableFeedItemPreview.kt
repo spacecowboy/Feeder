@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -58,7 +59,8 @@ import kotlinx.coroutines.launch
 @OptIn(
     ExperimentalFoundationApi::class,
     ExperimentalMaterialApi::class,
-    ExperimentalAnimationApi::class
+    ExperimentalAnimationApi::class,
+    ExperimentalTransitionApi::class
 )
 @Composable
 fun SwipeableFeedItemPreview(

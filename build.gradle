@@ -2,7 +2,7 @@
 
 buildscript {
   ext {
-    kotlin_version = "1.5.10"
+    kotlin_version = "1.5.30"
     gradle_build_version = "7.0.0"
     build_tools_version = "30.0.3"
 
@@ -40,7 +40,7 @@ buildscript {
     // Compose related below
     nav_version = "2.4.0-alpha09"
     activityComposeVersion = "1.3.0"
-    composeVersion = "1.0.0"
+    composeVersion = "1.0.3"
     navigationComposeVersion = nav_version
     pagingVersion = "3.0.0"
     pagingComposeVersion = "1.0.0-alpha12"
@@ -48,9 +48,7 @@ buildscript {
     coilVersion = "1.3.2"
 
     // Tests
-    espresso_version = "3.1.0"
-    uiautomator_version = "2.2.0"
-    test_ext_junit_version = "1.0.0"
+    espresso_version = "3.3.0"
 
     mockk_version = "1.9.3"
     mockito_version = "2.13.0"

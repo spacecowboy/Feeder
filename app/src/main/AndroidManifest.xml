@@ -150,6 +150,7 @@
       android:name=".ui.OpenLinkInDefaultActivity"
       android:label="@string/open_link_in_browser"
       android:launchMode="singleInstance"
+      android:exported="true"
       android:taskAffinity="${applicationId}.OpenLinkTask" />
 
     <service

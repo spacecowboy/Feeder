@@ -56,7 +56,7 @@ class RssLocalSyncKtTest {
         server.start()
     }
 
-    suspend fun insertFeed(title: String, url: URL, raw: String, isJson: Boolean = true): Long {
+    private suspend fun insertFeed(title: String, url: URL, raw: String, isJson: Boolean = true): Long {
         val id = testDb.db.feedDao().insertFeed(
             Feed(
                 title = title,
