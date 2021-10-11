@@ -227,7 +227,7 @@ class MigrationFromLegacy6ToLatest {
             items.forEachIndexed { index, it ->
                 assertEquals(feed.id, it.feedId)
                 assertEquals("guid$index", it.guid)
-                assertEquals("title$index", it.plainTitle)
+                assertEquals("plain$index", it.plainTitle)
                 assertEquals("plain$index", it.plainTitle)
                 assertEquals("snippet$index", it.plainSnippet)
                 assertTrue(it.unread)
@@ -258,7 +258,7 @@ class MigrationFromLegacy6ToLatest {
             items.forEachIndexed { index, it ->
                 assertEquals(feed.id, it.feedId)
                 assertEquals("guid$index", it.guid)
-                assertEquals("title$index", it.plainTitle)
+                assertEquals("plain$index", it.plainTitle)
                 assertEquals("plain$index", it.plainTitle)
                 assertEquals("snippet$index", it.plainSnippet)
                 assertFalse(it.unread)
