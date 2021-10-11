@@ -132,7 +132,8 @@ class MainActivity : DIAwareComponentActivity() {
 
         NavHost(navController, startDestination = "lastfeed") {
             composable("lastfeed") {
-                LaunchedEffect(null) {
+                LaunchedEffect(Unit) {
+                    navController.popEntireBackStack()
                     navController.navigate(
                         "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second.urlEncode()}"
                     )
