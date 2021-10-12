@@ -129,4 +129,7 @@
     <string name="feed_item_style_compact">Компактный</string>
     <string name="feed_item_style_card">Карточка</string>
     <string name="feed_item_style">Стиль статьи</string>
+    <string name="dark_theme_preference_black">Чёрная</string>
+    <string name="dark_theme_preference_dark">Тёмная</string>
+    <string name="dark_theme_preference">Предпочтительная темная тема</string>
 </resources>
