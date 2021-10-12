@@ -129,4 +129,7 @@
     <string name="feed_item_style_compact">Kompakti</string>
     <string name="feed_item_style_card">Kortti</string>
     <string name="feed_item_style">Artikkelin tyyli</string>
+    <string name="dark_theme_preference_black">Musta</string>
+    <string name="dark_theme_preference_dark">Tumma</string>
+    <string name="dark_theme_preference">Suosittu tumma teema</string>
 </resources>
