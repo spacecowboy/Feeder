@@ -129,4 +129,7 @@
     <string name="feed_item_style_compact">紧凑</string>
     <string name="feed_item_style_card">卡片</string>
     <string name="feed_item_style">文章样式</string>
+    <string name="dark_theme_preference_black">黑色</string>
+    <string name="dark_theme_preference_dark">深色</string>
+    <string name="dark_theme_preference">偏好深色主题</string>
 </resources>
