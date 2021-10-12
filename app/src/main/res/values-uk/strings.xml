@@ -6,7 +6,7 @@
     <string name="failed_to_load_text_to_speech">Не вдалося завантажити текст у голос</string>
     <string name="fetching_full_article">Отримання повної статті…</string>
     <string name="failed_to_fetch_full_article">Не вдалося отримати повну статтю</string>
-    <string name="fetch_full_articles_by_default">Отримати повну статтю типово</string>
+    <string name="fetch_full_articles_by_default">Отримувати повну статтю типово</string>
     <string name="fetch_full_article">Отримати повну статтю</string>
     <string name="toggle_tag_expansion">Змінити розгортання міток</string>
     <string name="open_in_web_view">Відкрити у Вебперегляді</string>
@@ -20,7 +20,7 @@
     <string name="no_activity_for_link">Не можливо знайти активність для відкривання цього посилання через</string>
     <string name="only_when_charging">Лише під час зарядки</string>
     <string name="may_result_data_charges">Може спричинити стягнення мобільних даних.</string>
-    <string name="show_thumbnails">Показувати ескізи</string>
+    <string name="show_thumbnails">Показувати мініатюри</string>
     <string name="only_on_wifi">Лише через WiFi</string>
     <string name="nothing_to_display">Нема нічого для відображення!</string>
     <string name="no_such_feed">Не знайдено таких стрічок. Спробуйте змінити на https, можливо.</string>
@@ -40,7 +40,7 @@
     <string name="mark_all_as_read">Позначити все як прочитане</string>
     <string name="mark_as_unread">Позначити як непрочитане</string>
     <string name="mark_as_read">Позначити як прочитане</string>
-    <string name="empty_feed_top">Тут нема нічого. Бажаєте…</string>
+    <string name="empty_feed_top">Тут нема що читати. Бажаєте…</string>
     <string name="title">Заголовок</string>
     <string name="navigation_drawer_close">Закрити шторку переміщення</string>
     <string name="navigation_drawer_open">Відкрити шторку переміщення</string>
@@ -81,9 +81,9 @@
     <string name="theme_system">Системна</string>
     <string name="could_not_load_url">Не можливо завантажити URL</string>
     <string name="max_feed_items">Найбільша кількість записів на стрічку</string>
-    <string name="reader_settings">Читанка</string>
+    <string name="reader_settings">Читання</string>
     <string name="open_links_with">Відкривати посилання через</string>
-    <string name="open_item_by_default_with">Відкривати записи типово через</string>
+    <string name="open_item_by_default_with">Типово відкривати записи через</string>
     <string name="open_in_custom_tab">Власна вкладка</string>
     <string name="open_in_default_browser">Типовий оглядач</string>
     <string name="open_in_webview">Вебперегляд</string>
@@ -92,13 +92,13 @@
     <string name="check_for_updates">Перевіряти оновлення</string>
     <string name="image_loading">Завантаження зображень</string>
     <string name="synchronization">Синхронізація</string>
-    <string name="sync_option_every_day">Кожного дня</string>
-    <string name="sync_option_every_12_hours">Кожних 12 годин</string>
-    <string name="sync_option_every_6_hours">Кожних 6 годин</string>
-    <string name="sync_option_every_3_hours">Кожних 3 години</string>
-    <string name="sync_option_every_hour">Кожну годину</string>
-    <string name="sync_option_every_30min">Кожні 30 хвилин</string>
-    <string name="sync_option_every_15min">Кожні 15 хвилин</string>
+    <string name="sync_option_every_day">Щодня</string>
+    <string name="sync_option_every_12_hours">Що 12 годин</string>
+    <string name="sync_option_every_6_hours">Що 6 годин</string>
+    <string name="sync_option_every_3_hours">Що 3 години</string>
+    <string name="sync_option_every_hour">Щогодини</string>
+    <string name="sync_option_every_30min">Що 30 хвилин</string>
+    <string name="sync_option_every_15min">Що 15 хвилин</string>
     <string name="sync_option_manually">Вручну</string>
     <string name="all_feeds">Усі стрічки</string>
     <string name="title_activity_settings">Налаштування</string>
@@ -128,5 +128,8 @@
     <string name="feed_item_style_super_compact">Дуже компактний</string>
     <string name="feed_item_style_compact">Компактний</string>
     <string name="feed_item_style_card">Картка</string>
-    <string name="feed_item_style">Стиль статті</string>
+    <string name="feed_item_style">Стиль статей</string>
+    <string name="dark_theme_preference_black">Чорна</string>
+    <string name="dark_theme_preference">Надається перевага темній темі</string>
+    <string name="dark_theme_preference_dark">Темна</string>
 </resources>
