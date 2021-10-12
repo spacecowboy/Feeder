@@ -20,6 +20,7 @@ fun FeederBlackColorPalette() = darkColors(
     primaryVariant = Green900,
     secondary = DarkTealA400,
     onSecondary = Color.White,
+    background = Color.Black,
 )
 
 @Composable
@@ -28,7 +29,7 @@ fun FeederDarkColorPalette() = darkColors(
     primaryVariant = Green900,
     secondary = DarkTealA400,
     onSecondary = Color.White,
-    background = DarkBackground
+    background = DarkBackground,
 )
 
 @Composable
@@ -91,8 +92,8 @@ private fun ThemeOptions.getColors(darkThemePreference: DarkThemePreferences): C
     }
 
 @Composable
-private fun getPreferredDarkTheme(darkThemePreference: DarkThemePreferences) : Colors {
-    return when(darkThemePreference) {
+private fun getPreferredDarkTheme(darkThemePreference: DarkThemePreferences): Colors {
+    return when (darkThemePreference) {
         DarkThemePreferences.BLACK -> FeederBlackColorPalette()
         DarkThemePreferences.DARK -> FeederDarkColorPalette()
     }
