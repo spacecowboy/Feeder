@@ -5,6 +5,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -37,7 +40,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
+import coil.size.PixelSize
 import coil.size.Precision
+import coil.size.Scale
 import coil.size.SizeResolver
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.theme.BlockQuoteStyle
@@ -49,6 +54,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
 import java.io.InputStream
+import kotlin.math.roundToInt
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
@@ -418,7 +424,7 @@ private fun TextComposer.appendTextChildren(
                                             .width(dimens.maxContentWidth)
                                     ) {
                                         DisableSelection {
-                                            Box(
+                                            BoxWithConstraints(
                                                 modifier = Modifier
                                                     .clip(RectangleShape)
                                                     .clickable(
@@ -439,14 +445,16 @@ private fun TextComposer.appendTextChildren(
 //                                                }
 //                                            }
                                             ) {
+                                                val imageSize = maxImageSize()
                                                 Image(
                                                     painter = rememberImagePainter(
                                                         data = imageUrl,
                                                         builder = {
                                                             this.placeholder(imagePlaceholder)
                                                                 .error(imagePlaceholder)
+                                                                .scale(Scale.FIT)
                                                                 .precision(Precision.INEXACT)
-                                                                .size(SizeResolver(OriginalSize))
+                                                                .size(imageSize)
                                                         },
                                                     ),
                                                     contentDescription = alt,
@@ -561,24 +569,30 @@ private fun TextComposer.appendTextChildren(
                                             .width(dimens.maxContentWidth)
                                     ) {
                                         DisableSelection {
-                                            Image(
-                                                painter = rememberImagePainter(
-                                                    data = video.imageUrl,
-                                                    builder = {
-                                                        this.placeholder(R.drawable.youtube_icon)
-                                                            .error(R.drawable.youtube_icon)
-                                                            .precision(Precision.INEXACT)
-                                                            .size(SizeResolver(OriginalSize))
-                                                    },
-                                                ),
-                                                contentDescription = stringResource(R.string.touch_to_play_video),
-                                                contentScale = ContentScale.FillWidth,
-                                                modifier = Modifier
-                                                    .clickable {
-                                                        onLinkClick(video.link)
-                                                    }
-                                                    .fillMaxWidth()
-                                            )
+                                            BoxWithConstraints(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                val imageSize = maxImageSize()
+                                                Image(
+                                                    painter = rememberImagePainter(
+                                                        data = video.imageUrl,
+                                                        builder = {
+                                                            this.placeholder(R.drawable.youtube_icon)
+                                                                .error(R.drawable.youtube_icon)
+                                                                .scale(Scale.FIT)
+                                                                .precision(Precision.INEXACT)
+                                                                .size(imageSize)
+                                                        },
+                                                    ),
+                                                    contentDescription = stringResource(R.string.touch_to_play_video),
+                                                    contentScale = ContentScale.FillWidth,
+                                                    modifier = Modifier
+                                                        .clickable {
+                                                            onLinkClick(video.link)
+                                                        }
+                                                        .fillMaxWidth()
+                                                )
+                                            }
                                         }
 
                                         Spacer(modifier = Modifier.height(dimens.margin / 2))
@@ -640,4 +654,17 @@ private fun testIt() {
             )
         }
     }
+}
+
+@Composable
+private fun BoxWithConstraintsScope.maxImageSize() = with(LocalDensity.current) {
+    val maxWidthPx = maxWidth.toPx().roundToInt()
+
+    PixelSize(
+        width = maxWidth.toPx().roundToInt(),
+        height = maxHeight
+            .toPx()
+            .roundToInt()
+            .coerceAtMost(10 * maxWidthPx),
+    )
 }

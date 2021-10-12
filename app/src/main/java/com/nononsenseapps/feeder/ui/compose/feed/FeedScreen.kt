@@ -69,6 +69,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.rememberImagePainter
+import coil.size.PixelSize
+import coil.size.Precision
+import coil.size.Scale
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.rememberInsetsPaddingValues
@@ -294,7 +297,7 @@ fun FeedScreen(
                         onShareItem = {
                             val intent = Intent.createChooser(
                                 Intent(Intent.ACTION_SEND).apply {
-                                    if (previewItem.link != null) {
+                                    if (previewItem.link!=null) {
                                         putExtra(Intent.EXTRA_TEXT, previewItem.link)
                                     }
                                     putExtra(Intent.EXTRA_TITLE, previewItem.title)
@@ -320,6 +323,9 @@ fun FeedScreen(
                                         builder = {
                                             this.placeholder(placeHolder)
                                                 .error(placeHolder)
+                                                .scale(Scale.FILL)
+                                                .precision(Precision.INEXACT)
+                                                .size(PixelSize(1000, 1000))
                                         },
                                     ),
                                     contentScale = ContentScale.Crop,

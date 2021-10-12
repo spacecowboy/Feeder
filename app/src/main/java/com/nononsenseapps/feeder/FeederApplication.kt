@@ -21,7 +21,6 @@ import com.nononsenseapps.feeder.di.androidModule
 import com.nononsenseapps.feeder.di.archModelModule
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
-import com.nononsenseapps.feeder.util.AsyncImageLoader
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.jsonfeed.cachingHttpClient
@@ -121,7 +120,6 @@ class FeederApplication : MultiDexApplication(), DIAware {
                 }
                 .build()
         }
-        bind<AsyncImageLoader>() with singleton { AsyncImageLoader(di) }
         bind<ApplicationCoroutineScope>() with instance(applicationCoroutineScope)
         import(networkModule)
     }
