@@ -206,7 +206,7 @@ fun FeedScreen(
         onMarkAllAsRead = {
             feedScreenViewModel.markAllAsRead()
         },
-        showFloatingActionButton = viewState?.showFab ?: true && !nothingToRead,
+        showFloatingActionButton = !nothingToRead && (viewState?.showFab ?: true),
         bottomBarVisible = textToSpeechViewModel.notStopped.value,
         expandedTags = expandedTags,
         onToggleTagExpansion = {
