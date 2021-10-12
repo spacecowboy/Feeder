@@ -129,4 +129,7 @@
     <string name="feed_item_style_compact">Kompaktiškas</string>
     <string name="feed_item_style_card">Kortelė</string>
     <string name="feed_item_style">Straipsnio stilius</string>
+    <string name="dark_theme_preference">Pageidaujama tamsi tema</string>
+    <string name="dark_theme_preference_black">Juoda</string>
+    <string name="dark_theme_preference_dark">Tamsi</string>
 </resources>
