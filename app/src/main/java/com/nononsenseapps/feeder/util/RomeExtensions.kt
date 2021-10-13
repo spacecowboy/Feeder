@@ -71,7 +71,7 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
     }
 
     val rssSafeId = when (fromRss || this.uri == null) {
-        true -> "${relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri)}|${publishedRFC3339ZonedDateTime()?.toInstant()}|${plainTitle()}"
+        true -> "${relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri)}|${plainTitle()}"
         false -> relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri)
     }
 
