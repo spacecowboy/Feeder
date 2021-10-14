@@ -8,17 +8,15 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
+import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.util.urlEncode
 import org.kodein.di.compose.withDI
 
 /**
@@ -54,21 +52,17 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                                 initialFeedUrl = initialFeedUrl,
                                 searchFeedViewModel = backStackEntry.DIAwareViewModel()
                             ) {
-                                navController.navigate(
-                                    "add/feed?feedUrl=${it.url.urlEncode()}&feedTitle=${it.title.urlEncode()}"
+                                AddFeedDestination.navigate(
+                                    navController,
+                                    feedUrl = it.url,
+                                    feedTitle = it.title
                                 )
                             }
                         }
                         composable(
-                            "add/feed?feedUrl={feedUrl}&feedTitle={feedTitle}",
-                            arguments = listOf(
-                                navArgument("feedUrl") {
-                                    type = NavType.StringType
-                                },
-                                navArgument("feedTitle") {
-                                    type = NavType.StringType
-                                }
-                            )
+                            route = AddFeedDestination.route,
+                            arguments = AddFeedDestination.arguments,
+                            deepLinks = AddFeedDestination.deepLinks,
                         ) { backStackEntry ->
                             CreateFeedScreen(
                                 onNavigateUp = {

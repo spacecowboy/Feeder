@@ -18,12 +18,9 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import coil.ImageLoader
 import coil.compose.LocalImageLoader
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
@@ -32,7 +29,6 @@ import com.nononsenseapps.feeder.archmodel.PrefValOpenWith
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
-import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.TextToSpeechViewModel
 import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.requestFeedSync
@@ -41,18 +37,20 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feed.isFeed
+import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.FeedDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.ReaderDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
 import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreen
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
-import com.nononsenseapps.feeder.util.urlEncode
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.withDI
 import org.kodein.di.instance
@@ -134,28 +132,17 @@ class MainActivity : DIAwareComponentActivity() {
             composable("lastfeed") {
                 LaunchedEffect(Unit) {
                     navController.popEntireBackStack()
-                    navController.navigate(
-                        "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second.urlEncode()}"
+                    FeedDestination.navigate(
+                        navController,
+                        currentFeedAndTag.first,
+                        currentFeedAndTag.second
                     )
                 }
             }
             composable(
-                "feed?id={id}&tag={tag}",
-                arguments = listOf(
-                    navArgument("id") {
-                        type = NavType.LongType
-                        defaultValue = ID_UNSET
-                    },
-                    navArgument("tag") {
-                        type = NavType.StringType
-                        defaultValue = ""
-                    }
-                ),
-                deepLinks = listOf(
-                    navDeepLink {
-                        uriPattern = "$DEEP_LINK_BASE_URI/feed?id={id}&tag={tag}"
-                    }
-                )
+                route = FeedDestination.route,
+                arguments = FeedDestination.arguments,
+                deepLinks = FeedDestination.deepLinks,
             ) { backStackEntry ->
                 val feedId = backStackEntry.arguments?.getLong("id")
                     ?: error("Missing mandatory argument: id")
@@ -174,15 +161,9 @@ class MainActivity : DIAwareComponentActivity() {
                 )
             }
             composable(
-                "reader/{itemId}",
-                arguments = listOf(
-                    navArgument("itemId") { type = NavType.LongType }
-                ),
-                deepLinks = listOf(
-                    navDeepLink {
-                        uriPattern = "$DEEP_LINK_BASE_URI/article/{itemId}"
-                    }
-                )
+                route = ReaderDestination.route,
+                arguments = ReaderDestination.arguments,
+                deepLinks = ReaderDestination.deepLinks,
             ) { backStackEntry ->
                 ReaderScreen(
                     readerScreenViewModel = backStackEntry.DIAwareViewModel(),
@@ -190,28 +171,32 @@ class MainActivity : DIAwareComponentActivity() {
                     onNavigateToFeed = { feedId ->
                         if (feedId!=null) {
                             navController.popEntireBackStack()
-                            navController.navigate(
-                                "feed?id=$feedId"
+                            FeedDestination.navigate(
+                                navController,
+                                feedId
                             )
                         } else {
                             navController.popEntireBackStack()
-                            navController.navigate(
-                                "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second.urlEncode()}"
+                            FeedDestination.navigate(
+                                navController,
+                                currentFeedAndTag.first,
+                                currentFeedAndTag.second
                             )
                         }
                     },
                 ) {
                     navController.popEntireBackStack()
-                    navController.navigate(
-                        "feed?id=${currentFeedAndTag.first}&tag=${currentFeedAndTag.second.urlEncode()}"
+                    FeedDestination.navigate(
+                        navController,
+                        currentFeedAndTag.first,
+                        currentFeedAndTag.second
                     )
                 }
             }
             composable(
-                "edit/feed/{feedId}",
-                arguments = listOf(
-                    navArgument("feedId") { type = NavType.LongType }
-                )
+                route = EditFeedDestination.route,
+                arguments = EditFeedDestination.arguments,
+                deepLinks = EditFeedDestination.deepLinks,
             ) { backStackEntry ->
                 EditFeedScreen(
                     onNavigateUp = {
@@ -219,22 +204,18 @@ class MainActivity : DIAwareComponentActivity() {
                     },
                     onOk = { feedId ->
                         navController.popEntireBackStack()
-                        navController.navigate(
-                            "feed?id=$feedId"
+                        FeedDestination.navigate(
+                            navController,
+                            feedId
                         )
                     },
                     editFeedScreenViewModel = backStackEntry.DIAwareViewModel()
                 )
             }
             composable(
-                "search/feed?feedUrl={feedUrl}",
-                arguments = listOf(
-                    navArgument("feedUrl") {
-                        type = NavType.StringType
-                        defaultValue = null
-                        nullable = true
-                    }
-                )
+                route = SearchFeedDestination.route,
+                arguments = SearchFeedDestination.arguments,
+                deepLinks = SearchFeedDestination.deepLinks,
             ) { backStackEntry ->
                 SearchFeedScreen(
                     onNavigateUp = {
@@ -243,19 +224,17 @@ class MainActivity : DIAwareComponentActivity() {
                     initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
                     searchFeedViewModel = backStackEntry.DIAwareViewModel()
                 ) {
-                    navController.navigate("add/feed?feedUrl=${it.url.urlEncode()}&feedTitle=${it.title.urlEncode()}")
+                    AddFeedDestination.navigate(
+                        navController,
+                        feedUrl = it.url,
+                        feedTitle = it.title
+                    )
                 }
             }
             composable(
-                "add/feed?feedUrl={feedUrl}&feedTitle={feedTitle}",
-                arguments = listOf(
-                    navArgument("feedUrl") {
-                        type = NavType.StringType
-                    },
-                    navArgument("feedTitle") {
-                        type = NavType.StringType
-                    }
-                )
+                route = AddFeedDestination.route,
+                arguments = AddFeedDestination.arguments,
+                deepLinks = AddFeedDestination.deepLinks,
             ) { backStackEntry ->
                 CreateFeedScreen(
                     onNavigateUp = {
@@ -264,13 +243,16 @@ class MainActivity : DIAwareComponentActivity() {
                     createFeedScreenViewModel = backStackEntry.DIAwareViewModel(),
                 ) { feedId ->
                     navController.popEntireBackStack()
-                    navController.navigate(
-                        "feed?id=$feedId"
+                    FeedDestination.navigate(
+                        navController,
+                        feedId
                     )
                 }
             }
             composable(
-                "settings"
+                route = SettingsDestination.route,
+                arguments = SettingsDestination.arguments,
+                deepLinks = SettingsDestination.deepLinks,
             ) { backStackEntry ->
                 SettingsScreen(
                     onNavigateUp = {
@@ -313,24 +295,26 @@ class MainActivity : DIAwareComponentActivity() {
                             openLinkInCustomTab(context, link, toolbarColor)
                         }
                         else -> {
-                            navController.navigate("reader/$itemId")
+                            ReaderDestination.navigate(navController, itemId)
                         }
                     }
                 }
             },
             onAddFeed = {
-                navController.navigate("search/feed")
+                SearchFeedDestination.navigate(navController)
             },
             onFeedEdit = { feedId ->
-                navController.navigate("edit/feed/$feedId")
+                EditFeedDestination.navigate(navController, feedId)
             },
             onSettings = {
-                navController.navigate("settings")
+                SettingsDestination.navigate(navController)
             },
             onOpenFeedOrTag = { feedOrTag ->
                 navController.popEntireBackStack()
-                navController.navigate(
-                    "feed?id=${feedOrTag.id}&tag=${feedOrTag.tag.urlEncode()}"
+                FeedDestination.navigate(
+                    navController,
+                    feedOrTag.id,
+                    feedOrTag.tag
                 )
                 applicationCoroutineScope.launch {
                     if (feedOrTag.isFeed) {
@@ -347,8 +331,9 @@ class MainActivity : DIAwareComponentActivity() {
             onDelete = { feeds ->
                 feedScreenViewModel.deleteFeeds(feeds.toList())
                 navController.popEntireBackStack()
-                navController.navigate(
-                    "feed?id=$ID_ALL_FEEDS"
+                FeedDestination.navigate(
+                    navController,
+                    ID_ALL_FEEDS
                 )
             },
             feedScreenViewModel = feedScreenViewModel,
