@@ -47,7 +47,7 @@ class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : D
         state["notify"] = value
     }
 
-    private val _articleOpener = state.getLiveData("articleOpener", PREF_VAL_OPEN_WITH_READER)
+    private val _articleOpener = state.getLiveData("articleOpener", "")
     fun setArticleOpener(value: String) {
         state["articleOpener"] = value
     }
