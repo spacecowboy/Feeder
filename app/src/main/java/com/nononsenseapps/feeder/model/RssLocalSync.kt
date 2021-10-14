@@ -8,6 +8,7 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.MAX_TITLE_LENGTH
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.db.room.upsertFeedItems
 import com.nononsenseapps.feeder.util.Prefs
@@ -47,7 +48,7 @@ suspend fun syncFeeds(
     feedTag: String = "",
     forceNetwork: Boolean = false,
     parallel: Boolean = false,
-    minFeedAgeMinutes: Int = 15
+    minFeedAgeMinutes: Int = 15,
 ): Boolean {
     val di: DI by closestDI(context)
     val prefs: Prefs by di.instance()
@@ -76,7 +77,7 @@ internal suspend fun syncFeeds(
     maxFeedItemCount: Int = 100,
     forceNetwork: Boolean = false,
     parallel: Boolean = false,
-    minFeedAgeMinutes: Int = 15
+    minFeedAgeMinutes: Int = 15,
 ): Boolean {
     val db: AppDatabase by di.instance()
     var result = false
@@ -139,7 +140,7 @@ private suspend fun syncFeed(
     filesDir: File,
     maxFeedItemCount: Int,
     forceNetwork: Boolean = false,
-    downloadTime: Instant
+    downloadTime: Instant,
 ) {
     Log.d(LOG_TAG, "Fetching ${feedSql.displayTitle}")
     val db: AppDatabase by di.instance()
@@ -163,14 +164,14 @@ private suspend fun syncFeed(
                     !response.isSuccessful -> {
                         throw ResponseFailure("${response.code} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
                     }
-                    feedSql.responseHash == responseHash -> null // no change
+                    feedSql.responseHash==responseHash -> null // no change
                     else -> feedParser.parseFeedResponse(response.request.url.toUrl(), contentType, charset, body)
                 }
             }
         }?.let {
             // Double check that icon is not base64
             when {
-                it.icon?.startsWith("data") == true -> it.copy(icon = null)
+                it.icon?.startsWith("data")==true -> it.copy(icon = null)
                 else -> it
             }
         }
@@ -178,7 +179,7 @@ private suspend fun syncFeed(
     // Always update the feeds last sync field
     feedSql.lastSync = Instant.now()
 
-    if (feed == null) {
+    if (feed==null) {
         db.feedDao().upsertFeed(feedSql)
     } else {
         val itemDao = db.feedItemDao()
@@ -191,7 +192,20 @@ private suspend fun syncFeed(
                 }
                 ?.reversed()
                 ?.map { (item, guid) ->
-                    val feedItemSql = itemDao.loadFeedItem(
+                    val splitGuid = guid.split("|")
+
+                    val initialItem = if (splitGuid.size==2) {
+                        // Sucky RSS ID, migrating away from pubdate in ID because it tends to change
+                        // and generate duplicates
+                        itemDao.loadFeedItemWithAlmostId(
+                            guidPattern = "${splitGuid.first()}%${splitGuid.last()}",
+                            feedId = feedSql.id
+                        )
+                    } else {
+                        null
+                    }
+
+                    val feedItemSql = initialItem ?: itemDao.loadFeedItem(
                         guid = guid,
                         feedId = feedSql.id
                     ) ?: FeedItem(firstSyncedTime = downloadTime)
@@ -252,7 +266,7 @@ internal suspend fun feedsToSync(feedDao: FeedDao, feedId: Long, tag: String, st
     return when {
         feedId > 0 -> {
             val feed = if (staleTime > 0) feedDao.loadFeedIfStale(feedId, staleTime = staleTime) else feedDao.loadFeed(feedId)
-            if (feed != null) {
+            if (feed!=null) {
                 listOf(feed)
             } else {
                 emptyList()
