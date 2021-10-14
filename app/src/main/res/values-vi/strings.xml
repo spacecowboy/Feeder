@@ -129,4 +129,7 @@
     <string name="feed_item_style_compact">Thu gọn</string>
     <string name="feed_item_style_card">Thẻ</string>
     <string name="feed_item_style">Kiểu bài viết</string>
+    <string name="dark_theme_preference_black">Đen</string>
+    <string name="dark_theme_preference_dark">Tối</string>
+    <string name="dark_theme_preference">Chủ đề tối được ưu tiên</string>
 </resources>

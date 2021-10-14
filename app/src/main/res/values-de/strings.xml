@@ -80,7 +80,7 @@
     <string name="theme_automatic">Automatisch</string>
     <string name="theme_day">Hell</string>
     <string name="theme_night">Dunkel</string>
-    <string name="theme">Design</string>
+    <string name="theme">Farbschema</string>
     <string name="sort_newest_first">Neueste zuerst</string>
     <string name="sort_oldest_first">Älteste zuerst</string>
     <string name="sort">Sortieren nach</string>
@@ -129,4 +129,7 @@
     <string name="feed_item_style_compact">Kompakt</string>
     <string name="feed_item_style_card">Kartei</string>
     <string name="feed_item_style">Artikelstil</string>
+    <string name="dark_theme_preference_black">Schwarz</string>
+    <string name="dark_theme_preference_dark">Dunkel</string>
+    <string name="dark_theme_preference">Bevorzugtes dunkles Farbschema</string>
 </resources>

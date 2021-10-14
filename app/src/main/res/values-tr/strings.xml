@@ -129,4 +129,7 @@
     <string name="feed_item_style_compact">Sıkı</string>
     <string name="feed_item_style_card">Kart</string>
     <string name="feed_item_style">Makale tarzı</string>
+    <string name="dark_theme_preference">Tercih edilen koyu tema</string>
+    <string name="dark_theme_preference_black">Siyah</string>
+    <string name="dark_theme_preference_dark">Koyu</string>
 </resources>

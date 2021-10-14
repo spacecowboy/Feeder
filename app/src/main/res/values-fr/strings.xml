@@ -129,4 +129,7 @@
     <string name="feed_item_style_compact">Compact</string>
     <string name="feed_item_style_card">Carte</string>
     <string name="feed_item_style">Style d’article</string>
+    <string name="dark_theme_preference">Thème sombre préféré</string>
+    <string name="dark_theme_preference_black">Noir</string>
+    <string name="dark_theme_preference_dark">Sombre</string>
 </resources>
