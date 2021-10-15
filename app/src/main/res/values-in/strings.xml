@@ -129,4 +129,7 @@
     <string name="synchronize_feeds">Sinkronkan umpan</string>
     <string name="zero_unread_articles">%1$s artikel belum dibaca</string>
     <string name="two_unread_articles">%1$s artikel belum dibaca</string>
+    <string name="dark_theme_preference_black">Hitam</string>
+    <string name="dark_theme_preference_dark">Gelap</string>
+    <string name="dark_theme_preference">Preferensi mode malam</string>
 </resources>
