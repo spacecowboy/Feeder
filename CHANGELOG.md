@@ -1,3 +1,48 @@
+# 2.0.2
+Agnieszka C (1):
+  * [2530f074] Updated Polish translation using Weblate
+
+Andrij Mizyk (1):
+  * [dc7b2c8f] Translated using Weblate (Ukrainian)
+
+Eric (1):
+  * [99457a1a] Updated Chinese (Simplified) translation using Weblate
+
+Felipe Alvarez (2):
+  * [aed89f36] Hide FAB when feed is empty
+  * [3154cf7a] Swap booleans order
+
+Gediminas Murauskas (1):
+  * [0bd119ca] Updated Lithuanian translation using Weblate
+
+J. Lavoie (1):
+  * [02c90a84] Updated Italian translation using Weblate
+
+Jonas Kalderstam (11):
+  * [0dce0373] Fixed back button not exiting app
+  * [47e48e54] Added Compose test for back button exiting the app
+  * [bb113d33] Fixed some broken tests
+  * [20517a02] Disabled broken sync test
+  * [4b3e83f9] Fixed scrolling in Reader not working close to screen edges
+  * [7eb2d0f8] Fixed crash if loading very large (50MB+) images
+  * [941b3341] Fixed black theme not having true black as background
+  * [31851c94] Fixed crash when adding feed with empty title
+  * [96d13aef] Fixed Open Items By Default not defauling to system default
+  * [a74c8664] Change RSS ID generation again to avoid some duplicates
+  * [dca107a1] Fixed links always opening in custom tab
+
+Nikita Epifanov (1):
+  * [972a4a75] Updated Russian translation using Weblate
+
+Oğuz Ersen (1):
+  * [6b8ec48f] Updated Turkish translation using Weblate
+
+bruh (1):
+  * [02d0b027] Updated Vietnamese translation using Weblate
+
+zmni (1):
+  * [83b12cb6] Updated Indonesian translation using Weblate
+
 # 2.0.1
 Felipe Alvarez (7):
   * [656a276a] Added new dark theme
