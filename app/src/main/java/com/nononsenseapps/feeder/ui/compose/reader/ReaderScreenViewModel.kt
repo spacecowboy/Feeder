@@ -12,12 +12,9 @@ import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.model.parseFullArticleIfMissing
-import com.nononsenseapps.feeder.ui.compose.feed.FeedScreenViewState
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -86,18 +83,20 @@ class ReaderScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAwa
             if (!state.contains("textToDisplay")) {
                 // Set initial state according to item
                 val itemPreferredText = repository.getTextToDisplayForItem(currentItemId)
-                if (itemPreferredText==TextToDisplay.FULLTEXT) {
+                if (itemPreferredText == TextToDisplay.FULLTEXT) {
                     loadFullTextThenDisplayIt()
                 }
             }
             combine(
                 _textToDisplay.asFlow(),
                 repository.getFeedItem(currentItemId),
-            ) { textToDisplay, feedItem ->
+                repository.linkOpener,
+            ) { textToDisplay, feedItem, linkOpener ->
                 // Should not be null but don't crash if it is
                 ReaderScreenViewState(
                     textToDisplay = textToDisplay,
                     currentItem = feedItem ?: FeedItemWithFeed(),
+                    linkOpener = linkOpener
                 )
             }.collect {
                 _viewState.value = it
@@ -110,7 +109,7 @@ class ReaderScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAwa
 data class ReaderScreenViewState(
     val currentItem: FeedItemWithFeed = FeedItemWithFeed(),
     val linkOpener: LinkOpener = LinkOpener.CUSTOM_TAB,
-    // Set by default by item itself - but has a state set in SavedState whihc overrides it
+    // Set by default by item itself - but has a state set in SavedState which overrides it
     val textToDisplay: TextToDisplay = TextToDisplay.DEFAULT,
 )
 
