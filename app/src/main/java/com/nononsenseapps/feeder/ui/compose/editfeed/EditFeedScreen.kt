@@ -78,6 +78,7 @@ fun CreateFeedScreen(
         setFullTextByDefault = createFeedScreenViewModel::setFullTextByDefault,
         setNotify = createFeedScreenViewModel::setNotify,
         setArticleOpener = createFeedScreenViewModel::setArticleOpener,
+        setAlternateId = createFeedScreenViewModel::setAlternateId,
         onOk = {
             val feedId = createFeedScreenViewModel.saveAndRequestSync()
             onSaved(feedId)
@@ -105,6 +106,7 @@ fun EditFeedScreen(
         setFullTextByDefault = editFeedScreenViewModel::setFullTextByDefault,
         setNotify = editFeedScreenViewModel::setNotify,
         setArticleOpener = editFeedScreenViewModel::setArticleOpener,
+        setAlternateId = editFeedScreenViewModel::setAlternateId,
         onOk = {
             editFeedScreenViewModel.saveInBackgroundAndRequestSync()
             onOk(editFeedScreenViewModel.feedId)
@@ -125,6 +127,7 @@ fun EditFeedScreen(
     setFullTextByDefault: (Boolean) -> Unit,
     setNotify: (Boolean) -> Unit,
     setArticleOpener: (String) -> Unit,
+    setAlternateId: (Boolean) -> Unit,
     onOk: () -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -161,6 +164,7 @@ fun EditFeedScreen(
             setFullTextByDefault = setFullTextByDefault,
             setNotify = setNotify,
             setArticleOpener = setArticleOpener,
+            setAlternateId = setAlternateId,
             onOk = onOk,
             onCancel = onCancel,
             modifier = Modifier.padding(padding)
@@ -178,6 +182,7 @@ fun EditFeedView(
     setFullTextByDefault: (Boolean) -> Unit,
     setNotify: (Boolean) -> Unit,
     setArticleOpener: (String) -> Unit,
+    setAlternateId: (Boolean) -> Unit,
     onOk: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier,
@@ -332,6 +337,13 @@ fun EditFeedView(
                 onCheckedChanged = setNotify,
                 icon = null
             )
+            SwitchSetting(
+                title = stringResource(id = R.string.generate_extra_unique_ids),
+                description = "Only enable for feeds with bad IDs",
+                checked = viewState.alternateId,
+                onCheckedChanged = setAlternateId,
+                icon = null
+            )
             Divider(
                 modifier = Modifier.fillMaxWidth()
             )
@@ -396,6 +408,7 @@ fun EditFeedScreenPreview() {
             setFullTextByDefault = {},
             setNotify = {},
             setArticleOpener = {},
+            setAlternateId = {},
         )
     }
 }

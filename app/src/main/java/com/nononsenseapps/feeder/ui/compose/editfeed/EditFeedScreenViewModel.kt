@@ -60,6 +60,11 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
         state["articleOpener"] = value
     }
 
+    private val _alternateId = state.getLiveData("alternateId", false)
+    fun setAlternateId(value: Boolean) {
+        state["alternateId"] = value
+    }
+
     fun saveInBackgroundAndRequestSync() {
         val url = _url.value
             ?: error("Missing url in state!!!")
@@ -76,11 +81,13 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
                     fullTextByDefault = _fullTextByDefault.value ?: false,
                     notify = _notify.value ?: false,
                     openArticlesWith = _articleOpener.value ?: PREF_VAL_OPEN_WITH_READER,
+                    alternateId = _alternateId.value ?: false,
                 )
             )
             requestFeedSync(
                 di,
-                feedId = savedId
+                feedId = savedId,
+                forceNetwork = true,
             )
         }
     }
@@ -120,6 +127,9 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
             if (!state.contains("articleOpener")) {
                 setArticleOpener(feed.openArticlesWith)
             }
+            if (!state.contains("alternateId")) {
+                setAlternateId(feed.alternateId)
+            }
 
             combine(
                 repository.allTags,
@@ -130,6 +140,7 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
                 _notify.asFlow(),
                 _articleOpener.asFlow(),
                 feedDefaultTitleFlow,
+                _alternateId.asFlow(),
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 EditFeedViewState(
@@ -141,6 +152,7 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
                     notify = params[5] as Boolean,
                     articleOpener = params[6] as String,
                     defaultTitle = params[7] as String,
+                    alternateId = params[8] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -161,6 +173,7 @@ data class EditFeedViewState(
     val notify: Boolean = false,
     val articleOpener: String = "",
     val defaultTitle: String = "",
+    val alternateId: Boolean = false,
 ) {
     val isOpenItemWithBrowser: Boolean
         get() = articleOpener==PREF_VAL_OPEN_WITH_BROWSER
