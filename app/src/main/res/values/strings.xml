@@ -8,7 +8,7 @@
   <string name="title_activity_edit_feed">Subscribe to feed</string>
   <string name="url">URL</string>
   <string name="tag">Tag</string>
-  <string name="add_feed_search_hint">URL to feed</string>
+  <string name="add_feed_search_hint">Feed URL</string>
   <string name="title">Title</string>
 
   <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
@@ -31,8 +31,8 @@
   <string name="notify_for_new_items">Notify for new items</string>
   <string name="dont_notify_for_new_items">Stop notifications</string>
   <string name="toggle_read_status">Toggle read status</string>
-  <string name="open_link_in_browser">Open link in browser</string>
-  <string name="open_in_browser">Open in browser</string>
+  <string name="open_link_in_browser">Open link in web browser</string>
+  <string name="open_in_browser">Open in web browser</string>
   <string name="open_enclosed_media">Open enclosed media</string>
   <string name="open_enclosed_media_file">Open %1$s</string>
   <string name="read_article">Read aloud</string>
@@ -46,7 +46,7 @@
   <string name="new_based_on_this">New based on this</string>
   <string name="indicator_for_mark_as_read">Indicator for mark as read</string>
   <string name="share">Share</string>
-  <string name="no_such_feed">No such feed could be found. Try using https maybe.</string>
+  <string name="no_such_feed">No such feed could be found. Try using HTTPS maybe?</string>
   <string name="nothing_to_display">Nothing to display!</string>
   <string name="title_activity_settings">Settings</string>
   <string name="all_feeds">All feeds</string>
@@ -60,15 +60,15 @@
   <string name="sync_option_every_12_hours">Every 12 hours</string>
   <string name="sync_option_every_day">Every day</string>
 
-  <string name="synchronization">Synchronization</string>
-  <string name="only_on_wifi">Only on WiFi</string>
+  <string name="synchronization">Syncing</string>
+  <string name="only_on_wifi">Only on Wi-Fi</string>
   <string name="show_thumbnails">Show thumbnails</string>
   <string name="may_result_data_charges">May result in mobile data charges.</string>
   <string name="only_when_charging">Only when charging</string>
   <string name="image_loading">Image loading</string>
-  <string name="no_activity_for_link">Couldn\'t find an activity to open that link with</string>
-  <string name="check_for_updates">Check for updates</string>
-  <string name="on_startup">On startup</string>
+  <string name="no_activity_for_link">Install something to open this link with first</string>
+  <string name="check_for_updates">Look for new articles…</string>
+  <string name="on_startup">Upon app start</string>
   <string name="show_fab">Show floating action button</string>
   <string name="include_mobile_hotspots">Include mobile hotspots</string>
   <string name="updated_feeds">Updated feeds</string>
@@ -82,13 +82,13 @@
   <string name="open_item_by_default_with">Open items by default with</string>
   <string name="open_links_with">Open links with</string>
   <string name="reader_settings">Reader</string>
-  <string name="open_link_in_web_view">Open link in Web view</string>
+  <string name="open_link_in_web_view">Open link in web view</string>
   <string name="open_in_web_view">Open in Web view</string>
-  <string name="max_feed_items">Maximum number of items per feed</string>
+  <string name="max_feed_items">Max items per feed</string>
   <string name="could_not_load_url">Could not load URL</string>
 
-  <string name="theme_system">Follow system</string>
-  <string name="theme_automatic">Automatic</string>
+  <string name="theme_system">System</string>
+  <string name="theme_automatic">Auto</string>
   <string name="theme_day">Day</string>
   <string name="theme_night">Night</string>
   <string name="theme">Theme</string>
@@ -98,30 +98,30 @@
   <string name="sort_newest_first">Newest first</string>
   <string name="sort_oldest_first">Oldest first</string>
   <string name="sort">Sort by</string>
-  <string name="send_bug_report">Send bug report</string>
-  <string name="no_email_client">Could not open email client</string>
+  <string name="send_bug_report">Send bug-report</string>
+  <string name="no_email_client">Could not open e-mail client</string>
   <string name="touch_to_play_video">Touch to play video</string>
-  <string name="javascript">Javascript</string>
+  <string name="javascript">JavaScript</string>
   <string name="open_feed">Open feed</string>
-  <string name="mark_items_above_as_read">Mark items above as read</string>
-  <string name="mark_items_below_as_read">Mark items below as read</string>
+  <string name="mark_items_above_as_read">Mark the above as read</string>
+  <string name="mark_items_below_as_read">Mark the below as read</string>
   <string name="discovered_feeds_list">Discovered feeds list</string>
   <string name="toggle_tag_expansion">Toggle tag expansion</string>
   <string name="expanded_tag">Open tag</string>
   <string name="contracted_tag">Closed tag</string>
 
   <string name="battery_optimization">Battery optimization</string>
-  <string name="battery_optimization_disabled">Battery optimization disabled</string>
-  <string name="battery_optimization_enabled">Battery optimization enabled</string>
+  <string name="battery_optimization_disabled">Off</string>
+  <string name="battery_optimization_enabled">On</string>
   <string name="preload_custom_tab">Preload custom tab</string>
 
-  <string name="failed_to_parse">Failed to parse %1$s</string>
+  <string name="failed_to_parse">Could not parse %1$s</string>
 
   <string name="fetch_full_article">Fetch full article</string>
   <string name="fetch_full_articles_by_default">Fetch full articles by default</string>
-  <string name="failed_to_fetch_full_article">Failed to fetch full article</string>
+  <string name="failed_to_fetch_full_article">Could not fetch full article</string>
   <string name="fetching_full_article">Fetching full article…</string>
-  <string name="failed_to_load_text_to_speech">Failed to load text to speech</string>
+  <string name="failed_to_load_text_to_speech">Could not load text to speech</string>
   <string name="go_back">Go back</string>
   <string name="open_menu">Open menu</string>
   <string name="go_to_feed">Go to %1$s</string>
@@ -129,7 +129,7 @@
   <string name="already_read">Already read</string>
   <string name="showing_only_unread_articles">Showing only unread articles</string>
   <string name="showing_all_articles">Showing all articles</string>
-  <string name="synchronize_feeds">Synchronize feeds</string>
+  <string name="synchronize_feeds">Sync feeds</string>
 
   <string name="zero_unread_articles">%1$s unread articles</string>
   <string name="one_unread_article">%1$s unread article</string>
