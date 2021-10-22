@@ -23,4 +23,32 @@
     <string name="sync_option_manually">Χειροκίνητα</string>
     <string name="sync_option_every_3_hours">Κάθε 3 ώρες</string>
     <string name="open_in_browser">Άνοιγμα σε περιηγητή</string>
+    <string name="url">URL</string>
+    <string name="navigation_drawer_open">Άνοιγμα συρταριού πλοήγησης</string>
+    <string name="navigation_drawer_close">Κλείσιμο συρταριού πλοήγησης</string>
+    <string name="open_enclosed_media_file">Άνοιγμα %1$s</string>
+    <string name="share">Μοίρασμα</string>
+    <string name="sort">Ταξινόμηση κατά</string>
+    <string name="javascript">JavaScript</string>
+    <string name="go_back">Επιστροφή</string>
+    <string name="feed_item_style">Στυλ άρθρου</string>
+    <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
+    <string name="mark_as_unread">Σημείωση ως μη διαβασμένο</string>
+    <string name="mark_all_as_read">Σημείωση όλων ως αναγνωσμένα</string>
+    <string name="edit_feed">Επεξεργασία ροής</string>
+    <string name="view">Προβολή</string>
+    <string name="no_tag">Καμία ετικέτα</string>
+    <string name="open_link_in_browser">Άνοιγμα συνδέσμου σε περιηγητή</string>
+    <string name="sync_option_every_day">Κάθε ημέρα</string>
+    <string name="only_on_wifi">Μόνο μέσω Wi-Fi</string>
+    <string name="reader_settings">Αναγνώστης</string>
+    <string name="theme_day">Ημέρα</string>
+    <string name="theme_night">Νύχτα</string>
+    <string name="theme">Θέμα</string>
+    <string name="dark_theme_preference_black">Μαύρο</string>
+    <string name="dark_theme_preference_dark">Σκούρο</string>
+    <string name="open_feed">Άνοιγμα ροής</string>
+    <string name="open_menu">Άνοιγμα μενού</string>
+    <string name="unread">Αδιάβαστα</string>
+    <string name="feed_item_style_card">Κάρτα</string>
 </resources>
