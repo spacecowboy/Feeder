@@ -129,4 +129,7 @@
     <string name="feed_item_style_compact">Compactă</string>
     <string name="feed_item_style_card">Cardul</string>
     <string name="feed_item_style">Stilul articolului</string>
+    <string name="dark_theme_preference">Tema întunecată preferată</string>
+    <string name="dark_theme_preference_black">Negru</string>
+    <string name="dark_theme_preference_dark">Întunecat</string>
 </resources>
