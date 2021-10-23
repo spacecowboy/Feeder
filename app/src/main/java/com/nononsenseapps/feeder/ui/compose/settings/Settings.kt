@@ -608,6 +608,7 @@ fun RadioButtonSetting(
 @Composable
 fun SwitchSetting(
     title: String,
+    description: String? = null,
     checked: Boolean,
     icon: (@Composable () -> Unit)? = {},
     onCheckedChanged: (Boolean) -> Unit,
@@ -643,6 +644,9 @@ fun SwitchSetting(
         TitleAndSubtitle(
             title = {
                 Text(title)
+            },
+            subtitle = description?.let {
+                { Text(it) }
             }
         )
 

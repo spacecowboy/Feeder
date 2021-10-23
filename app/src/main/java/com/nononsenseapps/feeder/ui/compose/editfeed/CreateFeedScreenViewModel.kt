@@ -52,6 +52,11 @@ class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : D
         state["articleOpener"] = value
     }
 
+    private val _alternateId = state.getLiveData("alternateId", false)
+    fun setAlternateId(value: Boolean) {
+        state["alternateId"] = value
+    }
+
     fun saveAndRequestSync(): Long {
         val url = _url.value
             ?: error("Missing url in state!!!")
@@ -66,6 +71,7 @@ class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : D
                     fullTextByDefault = _fullTextByDefault.value ?: false,
                     notify = _notify.value ?: false,
                     openArticlesWith = _articleOpener.value ?: PREF_VAL_OPEN_WITH_READER,
+                    alternateId = _alternateId.value ?: false,
                 )
             )
         }
@@ -90,6 +96,7 @@ class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : D
                 _fullTextByDefault.asFlow(),
                 _notify.asFlow(),
                 _articleOpener.asFlow(),
+                _alternateId.asFlow(),
             )
             { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
@@ -101,6 +108,7 @@ class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : D
                     fullTextByDefault = params[4] as Boolean,
                     notify = params[5] as Boolean,
                     articleOpener = params[6] as String,
+                    alternateId = params[7] as Boolean,
                     defaultTitle = "",
                 )
             }.collect {

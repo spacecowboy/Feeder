@@ -5,10 +5,18 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.nononsenseapps.feeder.FeederApplication
+import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.Feeds.Companion.cowboyAtom
+import com.nononsenseapps.feeder.model.Feeds.Companion.cowboyJson
+import com.nononsenseapps.feeder.model.Feeds.Companion.nixosRss
+import com.nononsenseapps.feeder.model.Feeds.Companion.rssWithDuplicateGuids
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
 import com.nononsenseapps.feeder.util.minusMinutes
+import java.net.URL
+import java.util.concurrent.TimeUnit
+import kotlin.test.assertTrue
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -24,25 +32,22 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.kodein.di.android.closestDI
+import org.kodein.di.android.subDI
+import org.kodein.di.bind
 import org.kodein.di.instance
 import org.threeten.bp.Instant
-import java.io.InputStream
-import java.net.URL
-import java.util.concurrent.TimeUnit
-import kotlin.test.assertTrue
-import org.junit.Ignore
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@Ignore("Needs some love")
 class RssLocalSyncKtTest {
     @get:Rule
     val testDb = TestDatabaseRule(getApplicationContext())
 
     private val filesDir = getApplicationContext<FeederApplication>().filesDir
 
-    private val di by closestDI(getApplicationContext() as Context)
-    private val feedParser: FeedParser by di.instance()
+    private val di by subDI(closestDI(getApplicationContext() as Context)) {
+        bind<AppDatabase>(overrides = true) with instance(testDb.db)
+    }
 
     val server = MockWebServer()
 
@@ -58,18 +63,28 @@ class RssLocalSyncKtTest {
         server.start()
     }
 
-    private suspend fun insertFeed(title: String, url: URL, raw: String, isJson: Boolean = true): Long {
+    private suspend fun insertFeed(
+        title: String,
+        url: URL,
+        raw: String,
+        isJson: Boolean = true,
+        useAlternateId: Boolean = false,
+    ): Long {
         val id = testDb.db.feedDao().insertFeed(
             Feed(
                 title = title,
                 url = url,
-                tag = ""
+                tag = "",
+                alternateId = useAlternateId,
             )
         )
 
-        server.dispatcher = object: Dispatcher() {
+        server.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest): MockResponse {
-                return responses.getOrDefault(request.requestUrl?.toUrl(), MockResponse().setResponseCode(404))
+                return responses.getOrDefault(
+                    request.requestUrl?.toUrl(),
+                    MockResponse().setResponseCode(404)
+                )
             }
         }
 
@@ -125,6 +140,31 @@ class RssLocalSyncKtTest {
             "Unexpected number of items in feed",
             15,
             testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyAtomId).size
+        )
+    }
+
+    @Test
+    fun alternateIdMitigatesRssFeedsWithNonUniqueGuids() = runBlocking {
+        val duplicateIdRss = insertFeed(
+            "aussieWeather",
+            server.url("/IDZ00059.warnings_vic.xml").toUrl(),
+            rssWithDuplicateGuids,
+            isJson = false,
+            useAlternateId = true
+        )
+
+        runBlocking {
+            syncFeeds(
+                di = di,
+                filesDir = filesDir,
+                feedId = duplicateIdRss
+            )
+        }
+
+        assertEquals(
+            "Expected duplicate guids to be mitigated by alternate id",
+            13,
+            testDb.db.feedItemDao().loadFeedItemsInFeedDesc(duplicateIdRss).size
         )
     }
 
@@ -303,7 +343,11 @@ class RssLocalSyncKtTest {
         )
 
         runBlocking {
-            syncFeeds(di = di, filesDir = filesDir, feedId = feedId)
+            syncFeeds(
+                di = di,
+                filesDir = filesDir,
+                feedId = feedId
+            )
         }
 
         // Assert the feed was retrieved
@@ -312,15 +356,14 @@ class RssLocalSyncKtTest {
         val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
         assertEquals(
             "Unique IDs should have been generated for items",
-            99, items.size
+            99,
+            items.size
         )
 
         // Should be unique to item so that it stays the same after updates
-        assertEquals(
-            "Unexpected ID",
-            "NixOS 18.09 released-NixOS 18.09 “Jellyfish” has been released, the tenth stable release branch. See the release notes for details. You can get NixOS 18.09 ISOs and VirtualBox appliances from the download page. For inform",
-            items.first().guid
-        )
+        assertTrue {
+            items.first().guid.startsWith("https://nixos.org/news.html|")
+        }
     }
 
     @Test
@@ -368,8 +411,8 @@ class RssLocalSyncKtTest {
         // Compare ID to compare insertion order (and thus pubdate compared to raw feed)
         assertTrue("The pubDates' magnitude should match descending iteration order") {
             items[0].guid == "https://foo.bar/1" &&
-                items[1].guid == "https://foo.bar/2" &&
-                items[0].pubDate!! > items[1].pubDate!!
+                    items[1].guid == "https://foo.bar/2" &&
+                    items[0].pubDate!! > items[1].pubDate!!
         }
     }
 
@@ -515,15 +558,6 @@ class RssLocalSyncKtTest {
         )
     }
 
-    val nixosRss: InputStream
-        get() = javaClass.getResourceAsStream("rss_nixos.xml")!!
-
-    val cowboyJson: String
-        get() = String(javaClass.getResourceAsStream("cowboyprogrammer_feed.json")!!.use { it.readBytes() })
-
-    val cowboyAtom: String
-        get() = String(javaClass.getResourceAsStream("cowboyprogrammer_atom.xml")!!.use { it.readBytes() })
-
     fun fooRss(itemsCount: Int = 1): String {
         return """
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -532,17 +566,17 @@ class RssLocalSyncKtTest {
                 <title>Foo Feed</title>
                 <link>https://foo.bar</link>
                 ${
-        (1..itemsCount).map {
-            """
+            (1..itemsCount).map {
+                """
                 <item>
                   <title>Foo Item $it</title>
                   <link>https://foo.bar/$it</link>
                   <description>Woop woop $it</description>
                 </item>
             """.trimIndent()
-        }.fold("") { acc, s ->
-            "$acc\n$s"
-        }
+            }.fold("") { acc, s ->
+                "$acc\n$s"
+            }
         }
                 </channel>
                 </rss>

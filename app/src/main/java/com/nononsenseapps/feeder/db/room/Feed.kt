@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.nononsenseapps.feeder.db.COL_ALTERNATE_ID
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_FULLTEXT_BY_DEFAULT
 import com.nononsenseapps.feeder.db.COL_ID
@@ -42,7 +43,8 @@ data class Feed @Ignore constructor(
     @ColumnInfo(name = COL_LASTSYNC, typeAffinity = ColumnInfo.INTEGER) var lastSync: Instant = Instant.EPOCH,
     @ColumnInfo(name = COL_RESPONSEHASH) var responseHash: Int = 0,
     @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
-    @ColumnInfo(name = COL_OPEN_ARTICLES_WITH) var openArticlesWith: String = ""
+    @ColumnInfo(name = COL_OPEN_ARTICLES_WITH) var openArticlesWith: String = OPEN_ARTICLE_WITH_APPLICATION_DEFAULT,
+    @ColumnInfo(name = COL_ALTERNATE_ID) var alternateId: Boolean = false,
 ) {
     constructor() : this(id = ID_UNSET)
 

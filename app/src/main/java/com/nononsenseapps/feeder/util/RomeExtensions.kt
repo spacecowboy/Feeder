@@ -65,18 +65,8 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
         else -> feedAuthor
     }
 
-    val fromRss = when (this.wireEntry) {
-        is Entry -> false // Trust Atom feeds to have correct ids until proven otherwise
-        else -> true
-    }
-
-    val rssSafeId = when (fromRss || this.uri == null) {
-        true -> "${relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri)}|${plainTitle()}"
-        false -> relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri)
-    }
-
     return Item(
-        id = rssSafeId,
+        id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
         url = linkToHtml(baseUrl),
         title = plainTitle(),
         content_text = contentText,

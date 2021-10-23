@@ -8,12 +8,18 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.db.room.MAX_TITLE_LENGTH
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.db.room.upsertFeedItems
 import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
+import com.nononsenseapps.jsonfeed.Item
+import java.io.File
+import java.io.IOException
+import java.nio.charset.StandardCharsets
+import java.util.concurrent.Executors
+import kotlin.math.max
+import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -30,12 +36,6 @@ import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
-import java.io.File
-import java.io.IOException
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.Executors
-import kotlin.math.max
-import kotlin.system.measureTimeMillis
 
 val singleThreadedSync = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 val syncMutex = Mutex()
@@ -164,14 +164,19 @@ private suspend fun syncFeed(
                     !response.isSuccessful -> {
                         throw ResponseFailure("${response.code} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
                     }
-                    feedSql.responseHash==responseHash -> null // no change
-                    else -> feedParser.parseFeedResponse(response.request.url.toUrl(), contentType, charset, body)
+                    feedSql.responseHash == responseHash -> null // no change
+                    else -> feedParser.parseFeedResponse(
+                        response.request.url.toUrl(),
+                        contentType,
+                        charset,
+                        body
+                    )
                 }
             }
         }?.let {
             // Double check that icon is not base64
             when {
-                it.icon?.startsWith("data")==true -> it.copy(icon = null)
+                it.icon?.startsWith("data") == true -> it.copy(icon = null)
                 else -> it
             }
         }
@@ -179,36 +184,40 @@ private suspend fun syncFeed(
     // Always update the feeds last sync field
     feedSql.lastSync = Instant.now()
 
-    if (feed==null) {
+    if (feed == null) {
         db.feedDao().upsertFeed(feedSql)
     } else {
         val itemDao = db.feedItemDao()
 
+        val uniqueIdCount = feed.items?.map { it.id }?.toSet()?.size
+        // This can only detect between items present in one feed. See NIXOS
+        val isNotUniqueIds = uniqueIdCount != feed.items?.size
+
         val feedItemSqls =
             feed.items
                 ?.map {
-                    val guid = it.id ?: "${it.date_published}|${it.title}"
+                    val guid = when (isNotUniqueIds || feedSql.alternateId) {
+                        true -> it.alternateId
+                        else -> it.id ?: it.alternateId
+                    }
+
                     it to guid
                 }
                 ?.reversed()
                 ?.map { (item, guid) ->
-                    val splitGuid = guid.split("|")
-
-                    val initialItem = if (splitGuid.size==2) {
-                        // Sucky RSS ID, migrating away from pubdate in ID because it tends to change
-                        // and generate duplicates
-                        itemDao.loadFeedItemWithAlmostId(
-                            guidPattern = "${splitGuid.first()}%${splitGuid.last()}",
+                    // Always attempt to load existing items using both id schemes
+                    // Id is rewritten to preferred on update
+                    val feedItemSql =
+                        itemDao.loadFeedItem(
+                            guid = item.alternateId,
                             feedId = feedSql.id
-                        )
-                    } else {
-                        null
-                    }
-
-                    val feedItemSql = initialItem ?: itemDao.loadFeedItem(
-                        guid = guid,
-                        feedId = feedSql.id
-                    ) ?: FeedItem(firstSyncedTime = downloadTime)
+                        ) ?: itemDao.loadFeedItemWithAlmostId(
+                            guidPattern = "${item.id}%${item.title}",
+                            feedId = feedSql.id
+                        ) ?: itemDao.loadFeedItem(
+                            guid = item.id ?: item.alternateId,
+                            feedId = feedSql.id
+                        ) ?: FeedItem(firstSyncedTime = downloadTime)
 
                     feedItemSql.updateFromParsedEntry(item, guid, feed)
                     feedItemSql.feedId = feedSql.id
@@ -262,19 +271,33 @@ private suspend fun syncFeed(
     }
 }
 
-internal suspend fun feedsToSync(feedDao: FeedDao, feedId: Long, tag: String, staleTime: Long = -1L): List<com.nononsenseapps.feeder.db.room.Feed> {
+internal suspend fun feedsToSync(
+    feedDao: FeedDao,
+    feedId: Long,
+    tag: String,
+    staleTime: Long = -1L
+): List<com.nononsenseapps.feeder.db.room.Feed> {
     return when {
         feedId > 0 -> {
-            val feed = if (staleTime > 0) feedDao.loadFeedIfStale(feedId, staleTime = staleTime) else feedDao.loadFeed(feedId)
-            if (feed!=null) {
+            val feed = if (staleTime > 0) feedDao.loadFeedIfStale(
+                feedId,
+                staleTime = staleTime
+            ) else feedDao.loadFeed(feedId)
+            if (feed != null) {
                 listOf(feed)
             } else {
                 emptyList()
             }
         }
-        tag.isNotEmpty() -> if (staleTime > 0) feedDao.loadFeedsIfStale(tag = tag, staleTime = staleTime) else feedDao.loadFeeds(tag)
+        tag.isNotEmpty() -> if (staleTime > 0) feedDao.loadFeedsIfStale(
+            tag = tag,
+            staleTime = staleTime
+        ) else feedDao.loadFeeds(tag)
         else -> if (staleTime > 0) feedDao.loadFeedsIfStale(staleTime) else feedDao.loadFeeds()
     }
 }
 
 class ResponseFailure(message: String?) : Exception(message)
+
+private val Item.alternateId: String
+    get() = "$id|${content_text?.hashCode()}|$title"
