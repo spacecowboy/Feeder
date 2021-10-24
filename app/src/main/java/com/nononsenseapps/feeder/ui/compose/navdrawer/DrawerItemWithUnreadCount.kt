@@ -11,12 +11,7 @@ sealed class DrawerItemWithUnreadCount(
     open val title: @Composable () -> String,
     open val unreadCount: Int
 ) : Comparable<DrawerItemWithUnreadCount> {
-    val uiId: Long
-        get() = when (this) {
-            is DrawerFeed -> id
-            is DrawerTag -> tag.hashCode().toLong()
-            is DrawerTop -> ID_ALL_FEEDS
-        }
+    abstract val uiId: Long
 
     override fun compareTo(other: DrawerItemWithUnreadCount): Int = when (this) {
         is DrawerFeed -> {
@@ -57,7 +52,9 @@ sealed class DrawerItemWithUnreadCount(
 data class DrawerTop(
     override val title: @Composable () -> String = { stringResource(id = R.string.all_feeds) },
     override val unreadCount: Int
-) : DrawerItemWithUnreadCount(title, unreadCount)
+) : DrawerItemWithUnreadCount(title, unreadCount) {
+    override val uiId: Long = ID_ALL_FEEDS
+}
 
 @Immutable
 data class DrawerFeed(
@@ -65,10 +62,13 @@ data class DrawerFeed(
     val tag: String,
     val displayTitle: String,
     override val unreadCount: Int
-) : DrawerItemWithUnreadCount(title = { displayTitle }, unreadCount)
+) : DrawerItemWithUnreadCount(title = { displayTitle }, unreadCount) {
+    override val uiId: Long = id
+}
 
 @Immutable
 data class DrawerTag(
     val tag: String,
-    override val unreadCount: Int
+    override val unreadCount: Int,
+    override val uiId: Long,
 ) : DrawerItemWithUnreadCount(title = { tag }, unreadCount)

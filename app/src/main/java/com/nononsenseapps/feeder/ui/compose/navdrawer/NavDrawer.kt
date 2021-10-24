@@ -52,10 +52,10 @@ private fun ListOfFeedsAndTagsPreview() {
     ListOfFeedsAndTags(
         listOf(
             DrawerTop(unreadCount = 100),
-            DrawerTag(tag = "News tag", unreadCount = 3),
+            DrawerTag(tag = "News tag", unreadCount = 3, -1111),
             DrawerFeed(id = 1, displayTitle = "Times", tag = "News tag", unreadCount = 1),
             DrawerFeed(id = 2, displayTitle = "Post", tag = "News tag", unreadCount = 2),
-            DrawerTag(tag = "Funny tag", unreadCount = 6),
+            DrawerTag(tag = "Funny tag", unreadCount = 6, -2222),
             DrawerFeed(id = 3, displayTitle = "Hidden", tag = "Funny tag", unreadCount = 6),
             DrawerFeed(id = 4, displayTitle = "Top Dog", unreadCount = 99, tag = "")
         ),
@@ -72,6 +72,8 @@ fun ListOfFeedsAndTags(
     onToggleTagExpansion: (String) -> Unit,
     onItemClick: (DrawerItemWithUnreadCount) -> Unit,
 ) {
+    Log.d("JONAS9", "hash of +: ${"+".hashCode()}")
+    Log.d("JONAS9", feedsAndTags.map { it.uiId }.joinToString(","))
     LazyColumn(
         contentPadding = rememberInsetsPaddingValues(
             insets = LocalWindowInsets.current.systemBars,
