@@ -58,7 +58,7 @@
     <string name="only_when_charging">Nur beim Aufladen</string>
     <string name="image_loading">Bilder herunterladen</string>
     <string name="no_activity_for_link">Konnte keine Aktivität finden, mit dem der Link geöffnet werden kann</string>
-    <string name="check_for_updates">Nach Aktualisierungen suchen …</string>
+    <string name="check_for_updates">Nach neuen Artikeln suchen …</string>
     <string name="on_startup">Beim Start</string>
     <string name="show_fab">„Alle gelesen“-Schaltfläche</string>
     <string name="include_mobile_hotspots">Mobile Hotspots verwenden</string>
