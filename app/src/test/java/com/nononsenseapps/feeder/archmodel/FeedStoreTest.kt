@@ -138,10 +138,10 @@ class FeedStoreTest : DIAware {
         assertEquals(
             listOf(
                 DrawerTop(unreadCount = 19),
-                DrawerTag("alpha", 12),
+                DrawerTag("alpha", 12, -1002),
                 DrawerFeed(3, "alpha", "alice", 5),
                 DrawerFeed(4, "alpha", "argh", 7),
-                DrawerTag("zork", 4),
+                DrawerTag("zork", 4, -1001),
                 DrawerFeed(2, "zork", "bob", 4),
                 DrawerFeed(1, "", "zob", 3),
             ),

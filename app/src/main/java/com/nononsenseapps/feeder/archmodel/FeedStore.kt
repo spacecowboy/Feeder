@@ -19,6 +19,19 @@ import org.kodein.di.instance
 class FeedStore(override val di: DI) : DIAware {
     private val feedDao: FeedDao by instance()
 
+    // Need only be internally consistent within the composition
+    // this object outlives all compositions
+    private var nextTagUiId: Long = -1000
+
+    // But IDs need to be consistent even if tags come and go
+    private val tagUiIds = mutableMapOf<String, Long>()
+
+    private fun getTagUiId(tag: String): Long {
+        return tagUiIds.getOrPut(tag) {
+            --nextTagUiId
+        }
+    }
+
     suspend fun getFeed(feedId: Long): Feed? = feedDao.loadFeed(feedId)
 
     suspend fun saveFeed(feed: Feed): Long {
@@ -65,7 +78,11 @@ class FeedStore(override val di: DI) : DIAware {
             topTag = topTag.copy(unreadCount = topTag.unreadCount + feed.unreadCount)
 
             if (feed.tag.isNotEmpty()) {
-                val tag = tags[feed.tag] ?: DrawerTag(tag = feed.tag, unreadCount = 0)
+                val tag = tags[feed.tag] ?: DrawerTag(
+                    tag = feed.tag,
+                    unreadCount = 0,
+                    uiId = getTagUiId(feed.tag),
+                )
                 tags[feed.tag] = tag.copy(unreadCount = tag.unreadCount + feed.unreadCount)
             }
         }
