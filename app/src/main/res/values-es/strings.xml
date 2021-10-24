@@ -39,7 +39,7 @@
     <string name="new_based_on_this">Nuevo basado en este</string>
     <string name="indicator_for_mark_as_read">Indicador para marcar como leído</string>
     <string name="share">Compartir</string>
-    <string name="no_such_feed">No se puedo encontrar el canal. Pruebe usando https.</string>
+    <string name="no_such_feed">No se pudo encontrar el canal. ¿Puedes probar con HTTPS\?</string>
     <string name="nothing_to_display">¡Nada que mostrar!</string>
     <string name="title_activity_settings">Configuraciones</string>
     <string name="all_feeds">Todos los canales</string>
@@ -58,7 +58,7 @@
     <string name="only_when_charging">Solo cuando se está cargando</string>
     <string name="image_loading">Cargando imagen</string>
     <string name="no_activity_for_link">No se encontró ninguna actividad con la que abrir el enlace</string>
-    <string name="check_for_updates">Comprobar actualizaciones</string>
+    <string name="check_for_updates">Buscar nuevos artículos…</string>
     <string name="on_startup">Al arrancar</string>
     <string name="show_fab">Mostrar botón flotante</string>
     <string name="include_mobile_hotspots">Incluir puntos de acceso móviles</string>
@@ -132,4 +132,5 @@
     <string name="feed_item_style_super_compact">Supercompacto</string>
     <string name="feed_item_style_compact">Compacto</string>
     <string name="feed_item_style">Estilo de artículo</string>
+    <string name="generate_extra_unique_ids">Generar identificadores únicos extra</string>
 </resources>
