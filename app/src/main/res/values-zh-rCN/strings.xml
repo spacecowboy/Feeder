@@ -132,4 +132,5 @@
     <string name="dark_theme_preference_black">黑色</string>
     <string name="dark_theme_preference_dark">深色</string>
     <string name="dark_theme_preference">偏好深色主题</string>
+    <string name="generate_extra_unique_ids">生成附加的唯一 ID</string>
 </resources>

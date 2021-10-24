@@ -39,7 +39,7 @@
     <string name="new_based_on_this">Dodaj nowy kanał na podstawie tego</string>
     <string name="indicator_for_mark_as_read">Wskaźnik oznaczenia jako przeczytane</string>
     <string name="share">Udostępnij</string>
-    <string name="no_such_feed">Nie udało się znaleźć kanału. Spróbuj użyć HTTPS.</string>
+    <string name="no_such_feed">Nie znaleziono takiego kanału. Może spróbujesz użyć HTTPS\?</string>
     <string name="nothing_to_display">Nie ma nic do wyświetlenia!</string>
     <string name="title_activity_settings">Ustawienia</string>
     <string name="all_feeds">Wszystkie kanały</string>
@@ -58,7 +58,7 @@
     <string name="only_when_charging">Tylko podczas ładowania</string>
     <string name="image_loading">Wczytywanie obrazków</string>
     <string name="no_activity_for_link">Nie udało się znaleźć aktywności mogącej otworzyć link</string>
-    <string name="check_for_updates">Sprawdzaj aktualizacje</string>
+    <string name="check_for_updates">Szukaj nowych artykułów…</string>
     <string name="on_startup">Przy uruchamianiu</string>
     <string name="show_fab">Pokazuj pływający przycisk akcji</string>
     <string name="include_mobile_hotspots">Uwzględnij mobilne punkty dostępu</string>
@@ -132,4 +132,5 @@
     <string name="dark_theme_preference">Preferowany ciemny motyw</string>
     <string name="dark_theme_preference_black">Czarny</string>
     <string name="dark_theme_preference_dark">Ciemny</string>
+    <string name="generate_extra_unique_ids">Generuj dodatkowe unikalne identyfikatory</string>
 </resources>

@@ -42,18 +42,18 @@
     <string name="sync_option_every_6_hours">Toutes les 6 heures</string>
     <string name="sync_option_every_12_hours">Toutes les 12 heures</string>
     <string name="sync_option_every_day">Tous les jours</string>
-    <string name="synchronization">Actualisation</string>
+    <string name="synchronization">Synchronisation</string>
     <string name="only_on_wifi">Seulement en Wi-Fi</string>
     <string name="may_result_data_charges">Peut entraîner des frais de données mobiles.</string>
     <string name="only_when_charging">Seulement pendant le chargement de l’appareil</string>
     <string name="image_loading">Chargement d’images</string>
-    <string name="no_activity_for_link">Aucune application n’a été trouvée pour ouvrir ce lien</string>
-    <string name="check_for_updates">Vérifier les mises à jour</string>
+    <string name="no_activity_for_link">Installez d’abord quelque chose pour ouvrir ce lien</string>
+    <string name="check_for_updates">Cherchez de nouveaux articles…</string>
     <string name="include_mobile_hotspots">Inclure les points d’accès mobiles</string>
     <string name="updated_feeds">Flux mis à jour</string>
     <string name="preload_custom_tab">Précharger l’onglet personnalisé</string>
-    <string name="battery_optimization_enabled">Optimisation de la batterie activée</string>
-    <string name="battery_optimization_disabled">Optimisation de la batterie désactivée</string>
+    <string name="battery_optimization_enabled">Activé</string>
+    <string name="battery_optimization_disabled">Désactivé</string>
     <string name="battery_optimization">Optimisation de la batterie</string>
     <string name="toggle_tag_expansion">Basculer l’expansion des étiquettes</string>
     <string name="discovered_feeds_list">Liste des flux découverts</string>
@@ -71,10 +71,10 @@
     <string name="theme_night">Nuit</string>
     <string name="theme_day">Jour</string>
     <string name="theme_automatic">Automatique</string>
-    <string name="theme_system">Suivre le système</string>
+    <string name="theme_system">Système</string>
     <string name="could_not_load_url">Impossible de charger l’URL</string>
-    <string name="max_feed_items">Nombre maximal d’éléments par flux</string>
-    <string name="open_link_in_web_view">Ouvrir le lien dans WebView</string>
+    <string name="max_feed_items">Nombre max. d\'éléments par flux</string>
+    <string name="open_link_in_web_view">Ouvrir le lien en vue web</string>
     <string name="open_in_web_view">Ouvrir dans WebView</string>
     <string name="reader_settings">Lecteur</string>
     <string name="open_links_with">Ouvrir les liens avec</string>
@@ -86,7 +86,7 @@
     <string name="notification_channel_description">Les notifications ne sont affichées que pour les éléments non lus dans les flux configurés</string>
     <string name="notification_channel_name">Flux non lus</string>
     <string name="show_fab">Afficher le bouton d’action flottant</string>
-    <string name="on_startup">Au démarrage</string>
+    <string name="on_startup">Au démarrage de l’appli</string>
     <string name="show_thumbnails">Afficher les miniatures</string>
     <string name="sync_option_every_30min">Toutes les 30 minutes</string>
     <string name="sync_option_every_15min">Toutes les 15 minutes</string>
@@ -97,12 +97,12 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="tag">Étiquette</string>
     <string name="url">URL</string>
-    <string name="failed_to_parse">Échec de l’analyse de %1$s</string>
+    <string name="failed_to_parse">Impossible d’analyser %1$s</string>
     <string name="fetching_full_article">Récupération de l’article entier…</string>
-    <string name="failed_to_fetch_full_article">Échec de la récupération de l’article entier</string>
+    <string name="failed_to_fetch_full_article">Impossible de récupérer l’article complet</string>
     <string name="fetch_full_articles_by_default">Récupérer les articles entiers par défaut</string>
     <string name="fetch_full_article">Récupérer l’article entier</string>
-    <string name="failed_to_load_text_to_speech">Échec du chargement de la synthèse vocale</string>
+    <string name="failed_to_load_text_to_speech">Impossible de charger la synthèse vocale</string>
     <string name="resume_reading">Reprendre la lecture</string>
     <string name="pause_reading">Mettre la lecture en pause</string>
     <string name="read_article">Lire à haute voix</string>
@@ -113,7 +113,7 @@
     <string name="few_unread_articles">%1$s articles non lus</string>
     <string name="two_unread_articles">%1$s articles non lus</string>
     <string name="one_unread_article">%1$s article non lu</string>
-    <string name="synchronize_feeds">Actualiser les flux</string>
+    <string name="synchronize_feeds">Synchroniser les flux</string>
     <string name="showing_all_articles">Tous les articles sont affichés</string>
     <string name="showing_only_unread_articles">Seuls les articles non lus sont affichés</string>
     <string name="already_read">Déjà lu</string>
@@ -132,4 +132,5 @@
     <string name="dark_theme_preference">Thème sombre préféré</string>
     <string name="dark_theme_preference_black">Noir</string>
     <string name="dark_theme_preference_dark">Sombre</string>
+    <string name="generate_extra_unique_ids">Générer des identifiants uniques supplémentaires</string>
 </resources>
