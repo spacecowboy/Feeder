@@ -39,7 +39,7 @@
     <string name="new_based_on_this">Buna göre yeni</string>
     <string name="indicator_for_mark_as_read">Okundu olarak işaretleme göstergesi</string>
     <string name="share">Paylaş</string>
-    <string name="no_such_feed">Böyle bir besleme bulunamadı. Https kullanmayı deneyin.</string>
+    <string name="no_such_feed">Böyle bir yayın bulunamadı. HTTPS kullanmayı deneyebilir misiniz\?</string>
     <string name="nothing_to_display">Gösterilecek bir şey yok!</string>
     <string name="title_activity_settings">Ayarlar</string>
     <string name="all_feeds">Tüm yayınlar</string>
@@ -58,7 +58,7 @@
     <string name="only_when_charging">Sadece şarj olurken</string>
     <string name="image_loading">Görsel yükleniyor</string>
     <string name="no_activity_for_link">Bu bağlantıyı açacak bir etkinlik bulunamadı</string>
-    <string name="check_for_updates">Güncellemeleri kontrol et</string>
+    <string name="check_for_updates">Yeni makaleler ara…</string>
     <string name="on_startup">Başlangıçta</string>
     <string name="show_fab">Kayan işlem düğmesini göster</string>
     <string name="include_mobile_hotspots">Mobil etkin noktaları dahil et</string>
@@ -132,4 +132,5 @@
     <string name="dark_theme_preference">Tercih edilen koyu tema</string>
     <string name="dark_theme_preference_black">Siyah</string>
     <string name="dark_theme_preference_dark">Koyu</string>
+    <string name="generate_extra_unique_ids">Fazla benzersiz kimlikler oluştur</string>
 </resources>
