@@ -50,14 +50,14 @@
     <string name="sync_option_every_12_hours">Ogni 12 ore</string>
     <string name="sync_option_every_day">Ogni giorno</string>
     <string name="synchronization">Sincronizzazione</string>
-    <string name="only_on_wifi">Solo con WiFi</string>
+    <string name="only_on_wifi">Solo con Wi-Fi</string>
     <string name="show_thumbnails">Mostra le miniature</string>
     <string name="may_result_data_charges">Può portare costi aggiuntivi.</string>
     <string name="only_when_charging">Solo durante la ricarica</string>
     <string name="image_loading">Scaricamento delle immagini</string>
-    <string name="no_activity_for_link">Impossibile trovare un\'applicazione per aprire questo link con</string>
-    <string name="check_for_updates">Controlla per aggiornamenti</string>
-    <string name="on_startup">All\'avvio</string>
+    <string name="no_activity_for_link">Installa prima qualcosa per aprire questo collegamento</string>
+    <string name="check_for_updates">Cerca nuovi articoli…</string>
+    <string name="on_startup">All’avvio dell’app</string>
     <string name="show_fab">Mostra pulsante di azione fluttuante</string>
     <string name="include_mobile_hotspots">Includi hotspot mobili</string>
     <string name="updated_feeds">Flussi aggiornati</string>
@@ -70,9 +70,9 @@
     <string name="open_item_by_default_with">Apri gli elementi con</string>
     <string name="open_links_with">Apri i link con</string>
     <string name="reader_settings">Lettore</string>
-    <string name="open_link_in_web_view">Apri i link nella Web View</string>
+    <string name="open_link_in_web_view">Apri il collegamento in visualizzazione web</string>
     <string name="open_in_web_view">Apri in una Web View</string>
-    <string name="max_feed_items">Numero massimo di elementi per flusso</string>
+    <string name="max_feed_items">Numero massimo di articoli per flusso</string>
     <string name="could_not_load_url">Impossibile caricare l\'URL</string>
     <string name="theme_system">Sistema</string>
     <string name="theme_automatic">Automatico</string>
@@ -90,16 +90,16 @@
     <string name="discovered_feeds_list">Lista dei flussi trovati</string>
     <string name="toggle_tag_expansion">Attiva l\'espansione delle etichette</string>
     <string name="battery_optimization">Ottimizzazione della batteria</string>
-    <string name="battery_optimization_disabled">Ottimizzazione disabilitata</string>
-    <string name="battery_optimization_enabled">Ottimizzazione abilitata</string>
+    <string name="battery_optimization_disabled">Disabilitata</string>
+    <string name="battery_optimization_enabled">Abilitata</string>
     <string name="preload_custom_tab">Precarica la scheda personalizzata</string>
     <string name="mark_items_above_as_read">Segna gli elementi sopra come letti</string>
-    <string name="javascript">Javascript</string>
+    <string name="javascript">JavaScript</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="url">URL</string>
     <string name="failed_to_parse">Impossibile analizzare %1$s</string>
     <string name="fetching_full_article">Recupero dell\'articolo completo…</string>
-    <string name="failed_to_fetch_full_article">Impossibile recuperare l\'articolo completo</string>
+    <string name="failed_to_fetch_full_article">Impossibile recuperare l’articolo completo</string>
     <string name="fetch_full_articles_by_default">Recupera articoli completi per impostazione predefinita</string>
     <string name="fetch_full_article">Recupera l\'articolo completo</string>
     <string name="failed_to_load_text_to_speech">Impossibile caricare la sintesi vocale</string>
@@ -113,7 +113,7 @@
     <string name="two_unread_articles">%1$s articoli non letti</string>
     <string name="one_unread_article">%1$s articoli non letti</string>
     <string name="zero_unread_articles">%1$s articolo non letto</string>
-    <string name="synchronize_feeds">Sincronizzare i flussi</string>
+    <string name="synchronize_feeds">Sincronizza i flussi</string>
     <string name="showing_all_articles">Visualizzazione di tutti gli articoli</string>
     <string name="showing_only_unread_articles">Visualizzazione solo degli articoli non letti</string>
     <string name="already_read">Già letto</string>
@@ -132,4 +132,5 @@
     <string name="dark_theme_preference">Tema scuro preferito</string>
     <string name="dark_theme_preference_black">Nero</string>
     <string name="dark_theme_preference_dark">Scuro</string>
+    <string name="generate_extra_unique_ids">Genera ID unici extra</string>
 </resources>
