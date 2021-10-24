@@ -1,3 +1,31 @@
+# 2.0.4
+Agnieszka C (1):
+  * [625596b8] Updated Polish translation using Weblate
+
+Andrij Mizyk (1):
+  * [d46b883b] Updated Ukrainian translation using Weblate
+
+El Pirujo (1):
+  * [cc83e248] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [b83579fa] Updated Chinese (Simplified) translation using Weblate
+
+Gediminas Murauskas (1):
+  * [9d469462] Updated Lithuanian translation using Weblate
+
+J. Lavoie (1):
+  * [214dff39] Updated Italian translation using Weblate
+
+Jonas Kalderstam (1):
+  * [d0486040] Fixed crash with certain tag names
+
+Oğuz Ersen (1):
+  * [4bed2875] Updated Turkish translation using Weblate
+
+VfBFan (1):
+  * [481dbcd5] Updated German translation using Weblate
+
 # 2.0.3
 Allan Nordhøy (4):
   * [6f5418e3] Crowdin integration removed
