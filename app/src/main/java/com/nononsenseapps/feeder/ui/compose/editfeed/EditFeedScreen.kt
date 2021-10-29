@@ -339,7 +339,7 @@ fun EditFeedView(
             )
             SwitchSetting(
                 title = stringResource(id = R.string.generate_extra_unique_ids),
-                description = "Only enable for feeds with bad IDs",
+                description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
                 checked = viewState.alternateId,
                 onCheckedChanged = setAlternateId,
                 icon = null
