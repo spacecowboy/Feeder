@@ -7,12 +7,12 @@
     <string name="title_activity_edit_feed">Feed abonnieren</string>
     <string name="url">Adresse</string>
     <string name="tag">Gruppe</string>
-    <string name="add_feed_search_hint">Adresse zum Feed</string>
+    <string name="add_feed_search_hint">Feed-Adresse</string>
     <string name="title">Name</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">von %1$s, %2$s</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Speichern</string>
-    <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würdest du gerne…</string>
+    <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würdest du gerne …</string>
     <string name="empty_feed_open">Einen anderen Feed <annotation style="link">öffnen</annotation>?</string>
     <string name="empty_feed_add">Weitere Feeds <annotation style="link">hinzufügen</annotation>?</string>
     <string name="search_feed_empty_hint">Eingabe einer Feed-Adresse</string>
@@ -29,8 +29,8 @@
     <string name="notify_for_new_items">Benachrichtigungen einschalten</string>
     <string name="dont_notify_for_new_items">Benachrichtigungen ausschalten</string>
     <string name="toggle_read_status">Lesestatus verändern</string>
-    <string name="open_link_in_browser">Link im Browser öffnen</string>
-    <string name="open_in_browser">Im Browser öffnen</string>
+    <string name="open_link_in_browser">Link im Webbrowser öffnen</string>
+    <string name="open_in_browser">Im Webbrowser öffnen</string>
     <string name="open_enclosed_media">Öffne eingebettete Medien</string>
     <string name="sync">Synchronisieren</string>
     <string name="export_feeds_to_opml">Feeds als OPML exportieren</string>
@@ -39,7 +39,7 @@
     <string name="new_based_on_this">Neu darauf basierend</string>
     <string name="indicator_for_mark_as_read">Indikator für Lesemarkierung</string>
     <string name="share">Teilen</string>
-    <string name="no_such_feed">Es wurde kein Feed gefunden. Versuche HTTPS zu benutzen.</string>
+    <string name="no_such_feed">Es wurde kein Feed gefunden. Versuchen HTTPS zu verwenden\?</string>
     <string name="nothing_to_display">Nichts zu sehen!</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="all_feeds">Alle Feeds</string>
@@ -57,27 +57,27 @@
     <string name="may_result_data_charges">Könnte zu mobiler Datennutzung führen.</string>
     <string name="only_when_charging">Nur beim Aufladen</string>
     <string name="image_loading">Bilder herunterladen</string>
-    <string name="no_activity_for_link">Konnte keine Aktivität finden, mit dem der Link geöffnet werden kann</string>
+    <string name="no_activity_for_link">Installiere zuerst etwas, mit dem du diesen Link öffnen kannst</string>
     <string name="check_for_updates">Nach neuen Artikeln suchen …</string>
-    <string name="on_startup">Beim Start</string>
+    <string name="on_startup">Beim App-Start</string>
     <string name="show_fab">„Alle gelesen“-Schaltfläche</string>
     <string name="include_mobile_hotspots">Mobile Hotspots verwenden</string>
     <string name="updated_feeds">Feeds aktualisiert</string>
     <string name="notification_channel_name">Ungelesene Feeds</string>
     <string name="notification_channel_description">Benachrichtigungen werden nur für ungelesene Nachrichten in konfigurierten Feeds angezeigt</string>
     <string name="open_in_reader">Feedreader</string>
-    <string name="open_in_webview">WebView</string>
+    <string name="open_in_webview">Webansicht</string>
     <string name="open_in_default_browser">Standard-Browser</string>
     <string name="open_in_custom_tab">Standard-Registerkarte</string>
     <string name="open_item_by_default_with">Nachrichten lesen mit</string>
     <string name="open_links_with">Links öffnen mit</string>
     <string name="reader_settings">Feedreader</string>
-    <string name="open_link_in_web_view">Link mit Webview öffnen</string>
-    <string name="open_in_web_view">In Webview öffnen</string>
+    <string name="open_link_in_web_view">Link in Webansicht öffnen</string>
+    <string name="open_in_web_view">In Webansicht öffnen</string>
     <string name="max_feed_items">Nachrichtenlimit pro Feed</string>
     <string name="could_not_load_url">Adresse konnte nicht geladen werden</string>
     <string name="theme_system">System</string>
-    <string name="theme_automatic">Automatisch</string>
+    <string name="theme_automatic">Auto</string>
     <string name="theme_day">Hell</string>
     <string name="theme_night">Dunkel</string>
     <string name="theme">Farbschema</string>
@@ -89,20 +89,20 @@
     <string name="touch_to_play_video">Berühren, um Video abzuspielen</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Feed öffnen</string>
-    <string name="mark_items_above_as_read">Obere Einträge als gelesen markieren</string>
-    <string name="mark_items_below_as_read">Untere Einträge als gelesen markieren</string>
+    <string name="mark_items_above_as_read">Obere als gelesen markieren</string>
+    <string name="mark_items_below_as_read">Untere als gelesen markieren</string>
     <string name="discovered_feeds_list">Liste der entdeckten Feeds</string>
     <string name="toggle_tag_expansion">Gruppe-Erweiterung ein-/ausschalten</string>
     <string name="battery_optimization">Batterieoptimierung</string>
-    <string name="battery_optimization_disabled">Nicht optimiert</string>
-    <string name="battery_optimization_enabled">Optimiert</string>
+    <string name="battery_optimization_disabled">Aus</string>
+    <string name="battery_optimization_enabled">Ein</string>
     <string name="preload_custom_tab">Standard-Registerkarte vorladen</string>
-    <string name="failed_to_parse">Fehler beim Analysieren %1$s</string>
-    <string name="fetching_full_article">Vollständiger Artikel wird abgerufen…</string>
-    <string name="failed_to_fetch_full_article">Fehler beim Abrufen des vollständigen Artikels</string>
+    <string name="failed_to_parse">%1$s konnte nicht analysiert werden</string>
+    <string name="fetching_full_article">Vollständiger Artikel wird abgerufen …</string>
+    <string name="failed_to_fetch_full_article">Vollständiger Artikels konnte nicht abgerufen werden</string>
     <string name="fetch_full_articles_by_default">Vollständige Artikel abrufen</string>
     <string name="fetch_full_article">Vollständigen Artikel abrufen</string>
-    <string name="failed_to_load_text_to_speech">Fehler beim Laden der Sprachsynthese</string>
+    <string name="failed_to_load_text_to_speech">Sprachsynthese konnte nicht geladen werden</string>
     <string name="resume_reading">Vorlesen fortsetzen</string>
     <string name="pause_reading">Vorlesen pausieren</string>
     <string name="read_article">Vorlesen</string>
@@ -133,4 +133,5 @@
     <string name="dark_theme_preference_dark">Dunkel</string>
     <string name="dark_theme_preference">Bevorzugtes dunkles Farbschema</string>
     <string name="generate_extra_unique_ids">Zusätzliche eindeutige IDs generieren</string>
+    <string name="only_enable_for_bad_id_feeds">Nur für Feeds mit fehlerhaften IDs aktivieren</string>
 </resources>
