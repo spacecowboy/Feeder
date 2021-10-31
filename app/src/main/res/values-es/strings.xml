@@ -133,4 +133,5 @@
     <string name="feed_item_style_compact">Compacto</string>
     <string name="feed_item_style">Estilo de artículo</string>
     <string name="generate_extra_unique_ids">Generar identificadores únicos extra</string>
+    <string name="only_enable_for_bad_id_feeds">Habilitar solo para orígenes con identificadores incorrectos</string>
 </resources>

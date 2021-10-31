@@ -7,7 +7,7 @@
     <string name="title_activity_edit_feed">Prenumerera på flöde</string>
     <string name="url">URL</string>
     <string name="tag">Tagg</string>
-    <string name="add_feed_search_hint">Flödets address</string>
+    <string name="add_feed_search_hint">FlödesURL</string>
     <string name="title">Titel</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">av %1$s, %2$s</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
@@ -39,7 +39,7 @@
     <string name="new_based_on_this">Nytt flöde baserad på detta</string>
     <string name="indicator_for_mark_as_read">Indikator för markera som läst</string>
     <string name="share">Dela</string>
-    <string name="no_such_feed">Kunde inte hitta flöde.</string>
+    <string name="no_such_feed">Kunde inte hitta flöde. Försök med HTTPS kanske\?</string>
     <string name="nothing_to_display">Inget att visa!</string>
     <string name="title_activity_settings">Inställningar</string>
     <string name="all_feeds">Alla flöden</string>
@@ -52,14 +52,14 @@
     <string name="sync_option_every_12_hours">Var 12e timme</string>
     <string name="sync_option_every_day">Varje dag</string>
     <string name="synchronization">Synkronisering</string>
-    <string name="only_on_wifi">Endast på WiFi</string>
+    <string name="only_on_wifi">Endast på Wi-Fi</string>
     <string name="show_thumbnails">Visa miniatyrbilder</string>
     <string name="may_result_data_charges">Kan resultera i datakostnader.</string>
     <string name="only_when_charging">Endast under laddning</string>
     <string name="image_loading">Bildvisning</string>
-    <string name="no_activity_for_link">Kunde inte hitta en app att öppna länken med</string>
-    <string name="check_for_updates">Kolla efter uppdateringar</string>
-    <string name="on_startup">Vid uppstart</string>
+    <string name="no_activity_for_link">Installera något som kan öppna länken först</string>
+    <string name="check_for_updates">Kolla efter nya artiklar…</string>
+    <string name="on_startup">Vid app start</string>
     <string name="show_fab">Visa flytande åtgärdsknapp</string>
     <string name="include_mobile_hotspots">Inkludera hotspots</string>
     <string name="updated_feeds">Uppdaterade flöden</string>
@@ -76,12 +76,12 @@
     <string name="open_in_web_view">Öppna med webbvy</string>
     <string name="max_feed_items">Maxantal per flöde</string>
     <string name="could_not_load_url">Kunde inte öppna webbadressen</string>
-    <string name="theme_system">Samma som systemet</string>
-    <string name="theme_automatic">Automatiskt</string>
+    <string name="theme_system">System</string>
+    <string name="theme_automatic">Auto</string>
     <string name="theme_day">Dag</string>
     <string name="theme_night">Natt</string>
     <string name="theme">Tema</string>
-    <string name="dark_theme_preference">Valt natt-\tema</string>
+    <string name="dark_theme_preference">Valt natt-tema</string>
     <string name="dark_theme_preference_black">Svart</string>
     <string name="dark_theme_preference_dark">Mörk</string>
     <string name="sort_newest_first">Senaste först</string>
@@ -90,15 +90,15 @@
     <string name="send_bug_report">Skicka felrapport</string>
     <string name="no_email_client">Kunde inte öppna e-postklient</string>
     <string name="touch_to_play_video">Tryck för att spela upp video</string>
-    <string name="javascript">Javascript</string>
+    <string name="javascript">JavaScript</string>
     <string name="open_feed">Öppna flöde</string>
-    <string name="mark_items_above_as_read">Markera objekt ovanför som lästa</string>
-    <string name="mark_items_below_as_read">Markera objekt nedanför som lästa</string>
+    <string name="mark_items_above_as_read">Markera objekten ovanför som lästa</string>
+    <string name="mark_items_below_as_read">Markera objekten nedanför som lästa</string>
     <string name="discovered_feeds_list">Lista över hittade flöden</string>
     <string name="toggle_tag_expansion">Växla taggexpansion</string>
     <string name="battery_optimization">Batterioptimering</string>
-    <string name="battery_optimization_disabled">Batterioptimering avstängd</string>
-    <string name="battery_optimization_enabled">Batterioptimering aktiverad</string>
+    <string name="battery_optimization_disabled">Avstängd</string>
+    <string name="battery_optimization_enabled">Aktiverad</string>
     <string name="preload_custom_tab">Förladda integerad tabb</string>
     <string name="fetching_full_article">Hämtar hela artikeln…</string>
     <string name="failed_to_fetch_full_article">Kunde inte hämta hela artikeln</string>
@@ -110,7 +110,7 @@
     <string name="pause_reading">Pausa uppläsning</string>
     <string name="read_article">Läs högt</string>
     <string name="use_app_default">Använd standardinställning</string>
-    <string name="synchronize_feeds">Synkronisera flöden</string>
+    <string name="synchronize_feeds">Synka flöden</string>
     <string name="showing_all_articles">Visar alla artiklar</string>
     <string name="showing_only_unread_articles">Visar bara olästa artiklar</string>
     <string name="already_read">Redan läst</string>
@@ -132,4 +132,6 @@
     <string name="feed_item_style_compact">Kompakt</string>
     <string name="feed_item_style_card">Kort</string>
     <string name="feed_item_style">Artikelstil</string>
+    <string name="only_enable_for_bad_id_feeds">Använd endast för flöden med dåliga IDn</string>
+    <string name="generate_extra_unique_ids">Skapa extraunika IDn</string>
 </resources>
