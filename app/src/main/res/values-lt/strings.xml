@@ -133,4 +133,5 @@
     <string name="dark_theme_preference_black">Juoda</string>
     <string name="dark_theme_preference_dark">Tamsi</string>
     <string name="generate_extra_unique_ids">Generuoti papildomus unikalius ID</string>
+    <string name="only_enable_for_bad_id_feeds">Įgalinti tik sklaidos kanalams su netinkamais ID</string>
 </resources>
