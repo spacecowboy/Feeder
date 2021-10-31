@@ -39,7 +39,7 @@
     <string name="new_based_on_this">在此基础上新建</string>
     <string name="indicator_for_mark_as_read">标记为已读的标志</string>
     <string name="share">分享</string>
-    <string name="no_such_feed">找不到此订阅。尝试使用 https 。</string>
+    <string name="no_such_feed">找不到这样的订阅。也许可以试试 HTTPS？</string>
     <string name="nothing_to_display">没有可显示内容！</string>
     <string name="title_activity_settings">设置</string>
     <string name="all_feeds">全部订阅</string>
@@ -58,7 +58,7 @@
     <string name="only_when_charging">仅在充电时</string>
     <string name="image_loading">图片加载</string>
     <string name="no_activity_for_link">无法找到打开该链接的应用</string>
-    <string name="check_for_updates">检查更新</string>
+    <string name="check_for_updates">查找新文章…</string>
     <string name="on_startup">启动时</string>
     <string name="show_fab">显示浮动操作按钮</string>
     <string name="include_mobile_hotspots">包括移动热点</string>
@@ -133,4 +133,5 @@
     <string name="dark_theme_preference_dark">深色</string>
     <string name="dark_theme_preference">偏好深色主题</string>
     <string name="generate_extra_unique_ids">生成附加的唯一 ID</string>
+    <string name="only_enable_for_bad_id_feeds">只对坏 ID 源启用</string>
 </resources>
