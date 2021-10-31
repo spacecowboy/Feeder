@@ -1,3 +1,41 @@
+# 2.0.5
+Agnieszka C (1):
+  * [7bc1efe6] Updated Polish translation using Weblate
+
+Allan Nordhøy (1):
+  * [9ce82f0e] Updated Norwegian Bokmål translation using Weblate
+
+Andrij Mizyk (1):
+  * [dfb5c4b6] Updated Ukrainian translation using Weblate
+
+El Pirujo (1):
+  * [97fde55f] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [9bd20bd3] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [2d4e241b] Updated Italian translation using Weblate
+
+Jonas Kalderstam (2):
+  * [e83489e2] Added missing string resource
+  * [6fcd11d9] Updated Swedish translation using Weblate
+
+Nikita Epifanov (1):
+  * [68defb93] Updated Russian translation using Weblate
+
+Oğuz Ersen (1):
+  * [fb3b4b82] Updated Turkish translation using Weblate
+
+VfBFan (1):
+  * [5f7ae0c7] Updated German translation using Weblate
+
+g (1):
+  * [9bfaa162] Updated Lithuanian translation using Weblate
+
+zmni (1):
+  * [12554068] Updated Indonesian translation using Weblate
+
 # 2.0.4
 Agnieszka C (1):
   * [625596b8] Updated Polish translation using Weblate
