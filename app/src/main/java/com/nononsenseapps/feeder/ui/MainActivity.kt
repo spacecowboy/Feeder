@@ -185,12 +185,20 @@ class MainActivity : DIAwareComponentActivity() {
                         }
                     },
                 ) {
-                    navController.popEntireBackStack()
-                    FeedDestination.navigate(
-                        navController,
-                        currentFeedAndTag.first,
-                        currentFeedAndTag.second
+                    val navigated = navController.popBackStack(
+                        FeedDestination.route,
+                        inclusive = false,
                     )
+                    if (!navigated) {
+                        // Only do this if we failed to go "back". Otherwise the scroll
+                        // state is cleared
+                        navController.popEntireBackStack()
+                        FeedDestination.navigate(
+                            navController,
+                            currentFeedAndTag.first,
+                            currentFeedAndTag.second
+                        )
+                    }
                 }
             }
             composable(
