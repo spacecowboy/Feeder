@@ -189,6 +189,7 @@ dependencies {
   implementation "androidx.compose.runtime:runtime:$composeVersion"
   implementation "androidx.compose.runtime:runtime-livedata:$composeVersion"
   implementation "androidx.compose.ui:ui-tooling:$composeVersion"
+  implementation "androidx.window:window:$androidWindowVersion"
   implementation "com.google.android.material:material:$material_version"
   implementation "androidx.navigation:navigation-compose:$navigationComposeVersion"
   implementation "androidx.paging:paging-compose:$pagingComposeVersion"
