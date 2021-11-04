@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
@@ -58,6 +59,7 @@ fun FeederTheme(
     darkThemePreference: DarkThemePreferences = DarkThemePreferences.BLACK,
     content: @Composable () -> Unit,
 ) {
+    val darkIcons = currentTheme.isDarkSystemIcons()
     MaterialTheme(
         colors = currentTheme.getColors(darkThemePreference),
         typography = Typography,
@@ -65,8 +67,13 @@ fun FeederTheme(
     ) {
         val systemUiController = rememberSystemUiController()
         SideEffect {
-            systemUiController.setSystemBarsColor(
-                Color.Transparent
+            systemUiController.setStatusBarColor(
+                Color.Transparent,
+                darkIcons = false,
+            )
+            systemUiController.setNavigationBarColor(
+                if (darkIcons) NavBarScrimLight else NavBarScrimDark,
+                darkIcons = darkIcons,
             )
         }
         ProvideWindowInsets {
@@ -75,6 +82,18 @@ fun FeederTheme(
             }
         }
     }
+}
+
+@Composable
+private fun ThemeOptions.isDarkSystemIcons(): Boolean {
+    val isDarkTheme = when (this) {
+        ThemeOptions.DAY -> false
+        ThemeOptions.NIGHT -> true
+        ThemeOptions.SYSTEM -> isSystemInDarkTheme()
+    }
+
+    // Only Api 27+ supports dark nav bar icons
+    return (Build.VERSION.SDK_INT >= 27) && !isDarkTheme
 }
 
 @Composable
