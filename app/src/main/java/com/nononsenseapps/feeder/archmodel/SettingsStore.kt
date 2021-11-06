@@ -42,6 +42,15 @@ class SettingsStore(override val di: DI) : DIAware {
         sp.edit().putString(PREF_LAST_FEED_TAG, tag).apply()
     }
 
+    private val _currentArticle = MutableStateFlow(
+        sp.getLong(PREF_LAST_ARTICLE_ID, ID_UNSET)
+    )
+    val currentArticleId = _currentArticle.asStateFlow()
+    fun setCurrentArticle(articleId: Long) {
+        _currentArticle.value = articleId
+        sp.edit().putLong(PREF_LAST_ARTICLE_ID, articleId).apply()
+    }
+
     private val _currentTheme = MutableStateFlow(
         ThemeOptions.valueOf(
             sp.getString(PREF_THEME, null)?.uppercase()
@@ -265,6 +274,7 @@ const val PREF_SHOW_ONLY_UNREAD = "pref_show_only_unread"
  */
 const val PREF_LAST_FEED_TAG = "pref_last_feed_tag"
 const val PREF_LAST_FEED_ID = "pref_last_feed_id"
+const val PREF_LAST_ARTICLE_ID = "pref_last_article_id"
 
 /**
  * Theme settings

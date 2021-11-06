@@ -71,6 +71,17 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
+    fun currentArticle() {
+        store.setCurrentArticle(8L)
+
+        verify {
+            sp.edit().putLong(PREF_LAST_ARTICLE_ID, 8L).apply()
+        }
+
+        assertEquals(8L, store.currentArticleId.value)
+    }
+
+    @Test
     fun currentTheme() {
         store.setCurrentTheme(ThemeOptions.NIGHT)
 

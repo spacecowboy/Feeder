@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,49 +28,41 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsPadding
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.model.PlaybackStatus
-import com.nononsenseapps.feeder.model.TextToSpeechViewModel
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.ReadAloudPlayerStyle
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HideableReadAloudPlayer(
-    readAloudViewModel: TextToSpeechViewModel
+    visible: Boolean,
+    currentlyPlaying: Boolean,
+    title: String,
+    onPlay: () -> Unit,
+    onPause: () -> Unit,
+    onStop: () -> Unit,
 ) {
-    val visible by readAloudViewModel.notStopped
-
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn() + slideInVertically(initialOffsetY = { it * 2 }),
         exit = slideOutVertically(targetOffsetY = { it * 2 }) + fadeOut()
     ) {
-        ReadAloudPlayer(readAloudViewModel = readAloudViewModel)
+        ReadAloudPlayer(
+            currentlyPlaying = currentlyPlaying,
+            title = title,
+            onPlay = onPlay,
+            onPause = onPause,
+            onStop = onStop,
+        )
     }
 }
 
 @Composable
 fun ReadAloudPlayer(
-    readAloudViewModel: TextToSpeechViewModel
-) {
-    val title by readAloudViewModel.title
-    val playbackStatus by readAloudViewModel.readAloudState
-    ReadAloudPlayer(
-        currentlyPlaying = playbackStatus == PlaybackStatus.PLAYING,
-        title = title,
-        onPlay = readAloudViewModel::play,
-        onPause = readAloudViewModel::pause,
-        onStop = readAloudViewModel::stop
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ReadAloudPlayer(
-    currentlyPlaying: Boolean = true,
-    title: String = "Article title",
-    onPlay: () -> Unit = {},
-    onPause: () -> Unit = {},
-    onStop: () -> Unit = {},
+    currentlyPlaying: Boolean,
+    title: String,
+    onPlay: () -> Unit,
+    onPause: () -> Unit,
+    onStop: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -112,5 +103,19 @@ fun ReadAloudPlayer(
                 contentDescription = stringResource(R.string.stop_reading)
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun PlayerPreview() {
+    FeederTheme {
+        ReadAloudPlayer(
+            currentlyPlaying = true,
+            title = "Article Title",
+            onPlay = {},
+            onPause = {},
+            onStop = {},
+        )
     }
 }

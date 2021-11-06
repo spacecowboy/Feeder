@@ -13,8 +13,7 @@ import com.nononsenseapps.feeder.ui.ManageSettingsViewModel
 import com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivityViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
-import com.nononsenseapps.feeder.ui.compose.feed.FeedScreenViewModel
-import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreenViewModel
+import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleViewModel
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedViewModel
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsViewModel
 import org.kodein.di.DI
@@ -34,9 +33,8 @@ val archModelModule = DI.Module(name = "arch models") {
     bindWithActivityViewModelScope<AddFeedFromShareActivityViewModel>()
 
     bindWithComposableViewModelScope<SettingsViewModel>()
-    bindWithComposableViewModelScope<ReaderScreenViewModel>()
-    bindWithComposableViewModelScope<FeedScreenViewModel>()
     bindWithComposableViewModelScope<EditFeedScreenViewModel>()
     bindWithComposableViewModelScope<CreateFeedScreenViewModel>()
     bindWithComposableViewModelScope<SearchFeedViewModel>()
+    bindWithComposableViewModelScope<FeedArticleViewModel>()
 }

@@ -551,6 +551,63 @@ interface FeedItemDao {
         """
     )
     fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>>
+
+    @Query(
+        """
+            SELECT count(*)
+            FROM feed_items fi
+        """
+    )
+    fun getFeedItemCount(): Flow<Int>
+
+    @Query(
+        """
+            SELECT count(*)
+            FROM feed_items fi
+            JOIN feeds f ON feed_id = f.id
+            WHERE f.tag IS :tag
+        """
+    )
+    fun getFeedItemCount(tag: String): Flow<Int>
+
+    @Query(
+        """
+            SELECT count(*)
+            FROM feed_items fi
+            WHERE fi.feed_id IS :feedId
+        """
+    )
+    fun getFeedItemCount(feedId: Long): Flow<Int>
+
+    ////
+
+    @Query(
+        """
+            SELECT count(*)
+            FROM feed_items fi
+            WHERE fi.unread IS 1
+        """
+    )
+    fun getUnreadFeedItemCount(): Flow<Int>
+
+    @Query(
+        """
+            SELECT count(*)
+            FROM feed_items fi
+            JOIN feeds f ON feed_id = f.id
+            WHERE f.tag IS :tag AND fi.unread IS 1
+        """
+    )
+    fun getUnreadFeedItemCount(tag: String): Flow<Int>
+
+    @Query(
+        """
+            SELECT count(*)
+            FROM feed_items fi
+            WHERE fi.feed_id IS :feedId AND fi.unread IS 1
+        """
+    )
+    fun getUnreadFeedItemCount(feedId: Long): Flow<Int>
 }
 
 suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > ID_UNSET) {

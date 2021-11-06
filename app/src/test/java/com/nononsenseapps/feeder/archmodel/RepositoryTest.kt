@@ -1,8 +1,12 @@
 package com.nononsenseapps.feeder.archmodel
 
+import android.app.Application
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
+import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.ui.compose.reader.TextToDisplay
+import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
+import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -10,6 +14,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
+import io.mockk.mockkStatic
 import io.mockk.verify
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -44,6 +49,9 @@ class RepositoryTest : DIAware {
     @MockK
     private lateinit var androidSystemStore: AndroidSystemStore
 
+    @MockK
+    private lateinit var application: FeederApplication
+
     override val di by DI.lazy {
         bind<Repository>() with singleton { Repository(di) }
         bind<FeedItemStore>() with instance(feedItemStore)
@@ -51,11 +59,48 @@ class RepositoryTest : DIAware {
         bind<SessionStore>() with instance(sessionStore)
         bind<FeedStore>() with instance(feedStore)
         bind<AndroidSystemStore>() with instance(androidSystemStore)
+        bind<Application>() with instance(application)
+        bind<ApplicationCoroutineScope>() with singleton { ApplicationCoroutineScope() }
     }
 
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true, relaxed = true)
+    }
+
+    @Test
+    fun setCurrentFeedAndTagTagDoesNotReportFeedShortcut() {
+        mockkStatic("com.nononsenseapps.feeder.util.ContextExtensionsKt")
+
+        repository.setCurrentFeedAndTag(ID_UNSET, "foo")
+
+        coVerify(timeout = 500L, exactly = 0) {
+            application.addDynamicShortcutToFeed(
+                "fooFeed",
+                10L,
+                null
+            )
+            application.reportShortcutToFeedUsed(10L)
+        }
+    }
+
+    @Test
+    fun setCurrentFeedAndTagFeedReportsShortcut() {
+        coEvery { feedStore.getDisplayTitle(10L) } returns "fooFeed"
+        coEvery { settingsStore.setCurrentFeedAndTag(any(), any()) } just Runs
+
+        mockkStatic("com.nononsenseapps.feeder.util.ContextExtensionsKt")
+
+        repository.setCurrentFeedAndTag(10L, "")
+
+        coVerify(timeout = 500L) {
+            application.addDynamicShortcutToFeed(
+                "fooFeed",
+                10L,
+                null
+            )
+            application.reportShortcutToFeedUsed(10L)
+        }
     }
 
     @Test

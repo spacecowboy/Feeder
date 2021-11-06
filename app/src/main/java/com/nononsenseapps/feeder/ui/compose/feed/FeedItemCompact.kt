@@ -28,11 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
-import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
-import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
-import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
-import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
+import com.nononsenseapps.feeder.ui.compose.theme.*
 import java.util.*
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
@@ -58,8 +54,8 @@ fun FeedItemCompact(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
             .padding(
-                start = keyline1Padding,
-                end = if (item.imageUrl?.isNotBlank() != true || !showThumbnail) keyline1Padding else 0.dp
+                start = LocalDimens.current.margin,
+                end = if (item.imageUrl?.isNotBlank() != true || !showThumbnail) LocalDimens.current.margin else 0.dp
             )
             .height(IntrinsicSize.Min)
     ) {

@@ -25,11 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
-import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
-import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
-import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
-import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
+import com.nononsenseapps.feeder.ui.compose.theme.*
 
 @Composable
 fun FeedItemCard(
@@ -45,7 +41,7 @@ fun FeedItemCard(
 ) {
     Card(
         modifier = modifier
-            .padding(top = 8.dp, bottom = 8.dp, start = keyline1Padding, end = keyline1Padding)
+            .padding(top = 8.dp, bottom = 8.dp, start = LocalDimens.current.margin, end = LocalDimens.current.margin)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),

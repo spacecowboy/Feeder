@@ -25,7 +25,6 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +39,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -52,6 +52,7 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
@@ -226,6 +227,9 @@ fun SearchFeedView(
                     .interceptKey(Key.Escape) {
                         focusManager.clearFocus()
                     }
+                    .safeSemantics {
+                        testTag = "urlField"
+                    }
             )
         }
         item {
@@ -282,7 +286,11 @@ fun SearchFeedView(
 fun SearchingIndicator() {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .safeSemantics {
+                testTag = "searchingIndicator"
+            }
     ) {
         CircularProgressIndicator()
     }
@@ -301,6 +309,9 @@ fun SearchResultView(
         modifier = Modifier
             .width(dimens.maxContentWidth)
             .clickable(onClick = onClick)
+            .safeSemantics {
+                testTag = "searchResult"
+            }
     ) {
         Text(
             title,

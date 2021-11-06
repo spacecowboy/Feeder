@@ -1,7 +1,9 @@
 package com.nononsenseapps.feeder.archmodel
 
+import android.app.Application
 import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
@@ -9,7 +11,8 @@ import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
-import com.nononsenseapps.feeder.ui.compose.reader.TextToDisplay
+import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
+import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,24 +21,48 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 import org.threeten.bp.Instant
+import org.threeten.bp.ZonedDateTime
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class Repository(override val di: DI) : DIAware {
     private val settingsStore: SettingsStore by instance()
     private val sessionStore: SessionStore by instance()
     private val feedItemStore: FeedItemStore by instance()
     private val feedStore: FeedStore by instance()
     private val androidSystemStore: AndroidSystemStore by instance()
+    private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
+    private val application: Application by instance()
 
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
 
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentFeedAndTag
-    fun setCurrentFeedAndTag(feedId: Long, tag: String) =
+    fun setCurrentFeedAndTag(feedId: Long, tag: String) {
+        if (feedId > ID_UNSET) {
+            applicationCoroutineScope.launch {
+                application.apply {
+                    addDynamicShortcutToFeed(
+                        feedStore.getDisplayTitle(feedId) ?: "",
+                        feedId,
+                        null
+                    )
+                    // Report shortcut usage
+                    reportShortcutToFeedUsed(feedId)
+                }
+            }
+        }
         settingsStore.setCurrentFeedAndTag(feedId, tag)
+    }
+
+    val currentArticleId: StateFlow<Long> = settingsStore.currentArticleId
+    fun setCurrentArticle(articleId: Long) =
+        settingsStore.setCurrentArticle(articleId)
 
     val currentTheme: StateFlow<ThemeOptions> = settingsStore.currentTheme
     fun setCurrentTheme(value: ThemeOptions) = settingsStore.setCurrentTheme(value)
@@ -60,7 +87,8 @@ class Repository(override val di: DI) : DIAware {
     suspend fun setSyncOnlyOnWifi(value: Boolean) = settingsStore.setSyncOnlyOnWifi(value)
 
     val syncOnlyWhenCharging: StateFlow<Boolean> = settingsStore.syncOnlyWhenCharging
-    suspend fun setSyncOnlyWhenCharging(value: Boolean) = settingsStore.setSyncOnlyWhenCharging(value)
+    suspend fun setSyncOnlyWhenCharging(value: Boolean) =
+        settingsStore.setSyncOnlyWhenCharging(value)
 
     val loadImageOnlyOnWifi = settingsStore.loadImageOnlyOnWifi
     fun setLoadImageOnlyOnWifi(value: Boolean) = settingsStore.setLoadImageOnlyOnWifi(value)
@@ -87,7 +115,7 @@ class Repository(override val di: DI) : DIAware {
 
     val currentlySyncingLatestTimestamp: Flow<Instant> =
         feedStore.getCurrentlySyncingLatestTimestamp()
-            .map {  value ->
+            .map { value ->
                 value ?: Instant.EPOCH
             }
 
@@ -100,7 +128,7 @@ class Repository(override val di: DI) : DIAware {
             feedId = feedId,
             tag = tag,
             onlyUnread = showOnlyUnread,
-            newestFirst = currentSorting==SortingOptions.NEWEST_FIRST,
+            newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
         )
     }.flatMapLatest {
         feedItemStore.getPagedFeedItems(
@@ -110,6 +138,57 @@ class Repository(override val di: DI) : DIAware {
             newestFirst = it.newestFirst,
         )
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getCurrentFeedListItems(): Flow<PagingData<FeedListItem>> = combine(
+        currentFeedAndTag,
+        showOnlyUnread,
+        currentSorting,
+    ) { feedAndTag, showOnlyUnread, currentSorting ->
+        val (feedId, tag) = feedAndTag
+        FeedListArgs(
+            feedId = feedId,
+            tag = tag,
+            onlyUnread = showOnlyUnread,
+            newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
+        )
+    }.flatMapLatest {
+        feedItemStore.getPagedFeedItems(
+            feedId = it.feedId,
+            tag = it.tag,
+            onlyUnread = it.onlyUnread,
+            newestFirst = it.newestFirst,
+        )
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getCurrentFeedListVisibleItemCount(): Flow<Int> = combine(
+        currentFeedAndTag,
+        showOnlyUnread,
+        currentSorting,
+    ) { feedAndTag, showOnlyUnread, currentSorting ->
+        val (feedId, tag) = feedAndTag
+        FeedListArgs(
+            feedId = feedId,
+            tag = tag,
+            onlyUnread = showOnlyUnread,
+            newestFirst = false,
+        )
+    }.flatMapLatest {
+        feedItemStore.getVisibleFeedItemCount(
+            feedId = it.feedId,
+            tag = it.tag,
+            onlyUnread = it.onlyUnread,
+        )
+    }
+
+    val currentArticle: Flow<Article> = currentArticleId
+        .flatMapLatest { itemId ->
+            feedItemStore.getFeedItem(itemId)
+        }
+        .mapLatest { item ->
+            Article(item = item)
+        }
 
     suspend fun getFeed(feedId: Long): Feed? = feedStore.getFeed(feedId)
 
@@ -150,7 +229,19 @@ class Repository(override val di: DI) : DIAware {
                 }
             )
         )
-    }.buffer(1)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getScreenTitleForCurrentFeedOrTag(): Flow<ScreenTitle> =
+        currentFeedAndTag.mapLatest { (feedId, tag) ->
+            ScreenTitle(
+                title = when {
+                    feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
+                    tag.isNotBlank() -> tag
+                    else -> null
+                }
+            )
+        }
 
     suspend fun deleteFeeds(feedIds: List<Long>) {
         feedStore.deleteFeeds(feedIds)
@@ -171,7 +262,7 @@ class Repository(override val di: DI) : DIAware {
             feedId = feedId,
             tag = tag,
             onlyUnread = showOnlyUnread.value,
-            newestFirst = SortingOptions.NEWEST_FIRST==currentSorting.value,
+            newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
         )
     }
 
@@ -181,7 +272,7 @@ class Repository(override val di: DI) : DIAware {
             feedId = feedId,
             tag = tag,
             onlyUnread = showOnlyUnread.value,
-            newestFirst = SortingOptions.NEWEST_FIRST==currentSorting.value,
+            newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
         )
     }
 
@@ -193,11 +284,18 @@ class Repository(override val di: DI) : DIAware {
     fun getVisibleFeedTitles(feedId: Long, tag: String): Flow<List<FeedTitle>> =
         feedStore.getFeedTitles(feedId, tag).buffer(1)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getCurrentlyVisibleFeedTitles(): Flow<List<FeedTitle>> =
+        currentFeedAndTag.flatMapLatest { (feedId, tag) ->
+            feedStore.getFeedTitles(feedId, tag)
+        }
+
     val expandedTags: StateFlow<Set<String>> = sessionStore.expandedTags
 
     fun toggleTagExpansion(tag: String) = sessionStore.toggleTagExpansion(tag)
 
-    suspend fun ensurePeriodicSyncConfigured() = settingsStore.configurePeriodicSync(replace = false)
+    suspend fun ensurePeriodicSyncConfigured() =
+        settingsStore.configurePeriodicSync(replace = false)
 
     suspend fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>> =
         feedItemStore.getFeedsItemsWithDefaultFullTextParse()
@@ -210,8 +308,45 @@ private data class FeedListArgs(
     val onlyUnread: Boolean,
 )
 
-// Wrapper class because flow combine doensn't like nulls
+// Wrapper class because flow combine doesn't like nulls
 @Immutable
 data class ScreenTitle(
     val title: String?,
 )
+
+@Immutable
+data class Enclosure(
+    val present: Boolean = false,
+    val link: String = "",
+    val name: String = "",
+)
+
+@Immutable
+data class Article(
+    val item: FeedItemWithFeed?
+) {
+    val id: Long = item?.id ?: ID_UNSET
+    val link: String? = item?.link
+    val feedDisplayTitle: String = item?.feedDisplayTitle ?: ""
+    val title: String = item?.plainTitle ?: ""
+    val enclosure: Enclosure = item?.enclosureLink?.let { link ->
+        Enclosure(
+            present = true,
+            link = link,
+            name = item.enclosureFilename ?: ""
+        )
+    } ?: Enclosure(
+        present = false,
+    )
+    val author: String? = item?.author
+    val pubDate: ZonedDateTime? = item?.pubDate
+    val feedId: Long = item?.feedId ?: ID_UNSET
+    val feedUrl: String? = item?.feedUrl?.toString()
+}
+
+enum class TextToDisplay {
+    DEFAULT,
+    LOADING_FULLTEXT,
+    FAILED_TO_LOAD_FULLTEXT,
+    FULLTEXT,
+}

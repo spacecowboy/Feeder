@@ -20,6 +20,27 @@ import org.kodein.di.instance
 class FeedItemStore(override val di: DI) : DIAware {
     private val dao: FeedItemDao by instance()
 
+    fun getVisibleFeedItemCount(
+        feedId: Long,
+        tag: String,
+        onlyUnread: Boolean,
+    ): Flow<Int> = when {
+        onlyUnread -> {
+            when {
+                feedId > ID_UNSET -> dao.getUnreadFeedItemCount(feedId = feedId)
+                tag.isNotEmpty() -> dao.getUnreadFeedItemCount(tag = tag)
+                else -> dao.getUnreadFeedItemCount()
+            }
+        }
+        else -> {
+            when {
+                feedId > ID_UNSET -> dao.getFeedItemCount(feedId = feedId)
+                tag.isNotEmpty() -> dao.getFeedItemCount(tag = tag)
+                else -> dao.getFeedItemCount()
+            }
+        }
+    }
+
     fun getPagedFeedItems(
         feedId: Long,
         tag: String,

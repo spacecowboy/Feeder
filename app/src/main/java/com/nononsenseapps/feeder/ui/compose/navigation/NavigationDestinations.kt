@@ -4,6 +4,7 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavArgumentBuilder
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
@@ -33,7 +34,7 @@ sealed class NavigationDestination(
             .map { "${it.name}={${it.name}}" }
             .joinToString(prefix = "?", separator = "&")
 
-        route = if (queryParams=="?") {
+        route = if (queryParams == "?") {
             completePath
         } else {
             completePath + queryParams
@@ -127,21 +128,18 @@ object SettingsDestination : NavigationDestination(
     }
 }
 
-object ReaderDestination : NavigationDestination(
-    path = "reader",
-    navArguments = listOf(
-        PathParamArgument("itemId") {
-            type = NavType.LongType
-        }
-    ),
-    deepLinks = listOf(
-        navDeepLink {
-            uriPattern = "$DEEP_LINK_BASE_URI/article/{itemId}"
-        }
-    ),
+object FeedArticleDestination : NavigationDestination(
+    path = "feedarticle",
+    navArguments = emptyList(),
+    deepLinks = emptyList(),
 ) {
-    fun navigate(navController: NavController, itemId: Long) {
-        navController.navigate("$path/$itemId")
+    fun navigate(
+        navController: NavController
+    ) {
+        navController.navigate(path) {
+            popUpTo(path)
+            launchSingleTop = true
+        }
     }
 }
 
@@ -175,6 +173,24 @@ object FeedDestination : NavigationDestination(
     }
 }
 
+object ArticleDestination : NavigationDestination(
+    path = "reader",
+    navArguments = listOf(
+        PathParamArgument("itemId") {
+            type = NavType.LongType
+        }
+    ),
+    deepLinks = listOf(
+        navDeepLink {
+            uriPattern = "$DEEP_LINK_BASE_URI/article/{itemId}"
+        }
+    ),
+) {
+    fun navigate(navController: NavController, itemId: Long) {
+        navController.navigate("$path/$itemId")
+    }
+}
+
 fun queryParams(block: QueryParamsBuilder.() -> Unit): String {
     return QueryParamsBuilder().apply { block() }.toString()
 }
@@ -187,7 +203,7 @@ class QueryParamsBuilder {
     }
 
     private fun appendIfNotEmpty(name: String, value: String?) {
-        if (value?.isNotEmpty()!=true) {
+        if (value?.isNotEmpty() != true) {
             return
         }
 
