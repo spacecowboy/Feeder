@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="failed_to_load_text_to_speech">Nu a reușit să încarce text to speech</string>
+    <string name="failed_to_load_text_to_speech">Nu s-a putut încărca text to speech</string>
     <string name="fetching_full_article">Obținerea articolului complet…</string>
-    <string name="failed_to_fetch_full_article">Nu a reușit să obțină articolul complet</string>
+    <string name="failed_to_fetch_full_article">Nu s-a putut obține articolul complet</string>
     <string name="fetch_full_articles_by_default">Preluarea articolelor complete în mod implicit</string>
     <string name="fetch_full_article">Obțineți articolul complet</string>
-    <string name="failed_to_parse">Nu a reușit să analizeze %1$s</string>
+    <string name="failed_to_parse">Nu s-a putut analiza %1$s</string>
     <string name="preload_custom_tab">Preîncărcați fila personalizată</string>
-    <string name="battery_optimization_enabled">Optimizarea bateriei activată</string>
-    <string name="battery_optimization_disabled">Optimizarea bateriei dezactivată</string>
+    <string name="battery_optimization_enabled">Deschis</string>
+    <string name="battery_optimization_disabled">Închideți</string>
     <string name="battery_optimization">Optimizarea bateriei</string>
     <string name="toggle_tag_expansion">Comutați extinderea etichetei</string>
     <string name="discovered_feeds_list">Lista de fluxuri descoperite</string>
-    <string name="mark_items_below_as_read">Marcați punctele de mai jos ca fiind citite</string>
-    <string name="mark_items_above_as_read">Marcați punctele de mai sus ca fiind citite</string>
+    <string name="mark_items_below_as_read">Marcați cele de mai jos ca fiind citite</string>
+    <string name="mark_items_above_as_read">Marcați cele de mai sus ca fiind citite</string>
     <string name="open_feed">Deschideți flux</string>
-    <string name="javascript">Javascript</string>
+    <string name="javascript">JavaScript</string>
     <string name="touch_to_play_video">Atingeți pentru a reda video</string>
     <string name="no_email_client">Nu s-a putut deschide clientul de e-mail</string>
-    <string name="send_bug_report">Trimiteți un raport de eroare</string>
+    <string name="send_bug_report">Trimiteți un raport-de eroare</string>
     <string name="sort">Sortează după</string>
     <string name="sort_oldest_first">Mai întâi cel mai vechi</string>
     <string name="sort_newest_first">Mai întâi cel mai nou</string>
     <string name="theme">Tema</string>
     <string name="theme_night">Noapte</string>
     <string name="theme_day">Zi</string>
-    <string name="theme_automatic">Automat</string>
-    <string name="theme_system">Urmăriți sistemul</string>
+    <string name="theme_automatic">Auto</string>
+    <string name="theme_system">Sistem</string>
     <string name="could_not_load_url">Nu s-a putut încărca URL-ul</string>
-    <string name="max_feed_items">Numărul maxim de articole pe flux</string>
+    <string name="max_feed_items">Numărul maxim de articole pe feed</string>
     <string name="open_in_web_view">Deschidere în vizualizare Web</string>
-    <string name="open_link_in_web_view">Deschidere link în vizualizare Web</string>
+    <string name="open_link_in_web_view">Deschidere link în vizualizare web</string>
     <string name="reader_settings">Cititor</string>
     <string name="open_links_with">Deschideți legături cu</string>
     <string name="open_item_by_default_with">Deschideți elementele în mod implicit cu</string>
@@ -44,14 +44,14 @@
     <string name="updated_feeds">Fluxuri actualizate</string>
     <string name="include_mobile_hotspots">Includeți hotspoturi mobile</string>
     <string name="show_fab">Afișați butonul de acțiune plutitor</string>
-    <string name="on_startup">La pornire</string>
-    <string name="check_for_updates">Verificați dacă există actualizări</string>
-    <string name="no_activity_for_link">Nu am reușit să găsesc o activitate cu care să deschid acest link</string>
+    <string name="on_startup">La pornirea aplicației</string>
+    <string name="check_for_updates">Căutați articole noi…</string>
+    <string name="no_activity_for_link">Instalați mai întâi ceva cu care să deschideți acest link</string>
     <string name="image_loading">Încărcarea imaginii</string>
     <string name="only_when_charging">Numai la încărcare</string>
     <string name="may_result_data_charges">Poate avea ca rezultat taxe de date mobile.</string>
     <string name="show_thumbnails">Afișați miniaturi</string>
-    <string name="only_on_wifi">Numai pe WiFi</string>
+    <string name="only_on_wifi">Numai pe Wi-Fi</string>
     <string name="synchronization">Sincronizare</string>
     <string name="sync_option_every_day">În fiecare zi</string>
     <string name="sync_option_every_12_hours">La fiecare 12 ore</string>
@@ -64,7 +64,7 @@
     <string name="all_feeds">Toate fluxurile</string>
     <string name="title_activity_settings">Setări</string>
     <string name="nothing_to_display">Nu este nimic de afișat!</string>
-    <string name="no_such_feed">Nu a fost găsit un astfel de flux. Poate încercați să folosiți https.</string>
+    <string name="no_such_feed">Nu a fost găsit un astfel de feed. Încercați să folosiți HTTPS, poate\?</string>
     <string name="share">Distribuiți</string>
     <string name="indicator_for_mark_as_read">Indicator pentru marcare ca citit</string>
     <string name="new_based_on_this">Nou pe baza acestui</string>
@@ -76,8 +76,8 @@
     <string name="pause_reading">Pauză de citire</string>
     <string name="read_article">Citiți cu voce tare</string>
     <string name="open_enclosed_media">Deschideți mediile închise</string>
-    <string name="open_in_browser">Deschideți în browser</string>
-    <string name="open_link_in_browser">Deschideți link-ul în browser</string>
+    <string name="open_in_browser">Deschideți în browserul web</string>
+    <string name="open_link_in_browser">Deschideți link-ul în browserul web</string>
     <string name="toggle_read_status">Comutați starea de citire</string>
     <string name="dont_notify_for_new_items">Opriți notificările</string>
     <string name="notify_for_new_items">Notificare pentru articole noi</string>
@@ -99,7 +99,7 @@
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="title">Titlu</string>
-    <string name="add_feed_search_hint">URL către flux</string>
+    <string name="add_feed_search_hint">URL de alimentare</string>
     <string name="tag">Etichetă</string>
     <string name="url">URL</string>
     <string name="title_activity_edit_feed">Abonează-te la flux</string>
@@ -113,7 +113,7 @@
     <string name="two_unread_articles">%1$s articole necitite</string>
     <string name="one_unread_article">%1$s articol necitit</string>
     <string name="zero_unread_articles">%1$s articole necitite</string>
-    <string name="synchronize_feeds">Sincronizarea fluxurilor</string>
+    <string name="synchronize_feeds">Sincronizare feed-uri</string>
     <string name="showing_all_articles">Afișarea tuturor articolelor</string>
     <string name="showing_only_unread_articles">Afișarea numai a articolelor necitite</string>
     <string name="already_read">Deja citit</string>
@@ -132,4 +132,6 @@
     <string name="dark_theme_preference">Tema întunecată preferată</string>
     <string name="dark_theme_preference_black">Negru</string>
     <string name="dark_theme_preference_dark">Întunecat</string>
+    <string name="only_enable_for_bad_id_feeds">Activați numai pentru fluxurile cu ID-uri greșite</string>
+    <string name="generate_extra_unique_ids">Generarea de ID-uri unice suplimentare</string>
 </resources>
