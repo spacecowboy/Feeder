@@ -93,7 +93,7 @@
     <string name="mark_items_below_as_read">Untere als gelesen markieren</string>
     <string name="discovered_feeds_list">Liste der entdeckten Feeds</string>
     <string name="toggle_tag_expansion">Gruppe-Erweiterung ein-/ausschalten</string>
-    <string name="battery_optimization">Batterieoptimierung</string>
+    <string name="battery_optimization">Akkuoptimierung</string>
     <string name="battery_optimization_disabled">Aus</string>
     <string name="battery_optimization_enabled">Ein</string>
     <string name="preload_custom_tab">Standard-Registerkarte vorladen</string>
