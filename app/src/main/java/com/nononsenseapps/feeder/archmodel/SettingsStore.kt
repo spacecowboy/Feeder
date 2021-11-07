@@ -221,8 +221,8 @@ class SettingsStore(override val di: DI) : DIAware {
             val timeInterval = syncFrequency.value.minutes
 
             val workRequestBuilder = PeriodicWorkRequestBuilder<FeedSyncer>(
-                timeInterval, TimeUnit.MINUTES,
-                timeInterval / 2, TimeUnit.MINUTES
+                timeInterval,
+                TimeUnit.MINUTES,
             )
 
             val syncWork = workRequestBuilder

@@ -181,7 +181,7 @@ class RepositoryTest : DIAware {
         }
 
         coVerify {
-            settingsStore.configurePeriodicSync(false)
+            settingsStore.configurePeriodicSync(true)
         }
     }
 }

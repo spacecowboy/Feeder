@@ -194,7 +194,7 @@ class Repository(override val di: DI) : DIAware {
 
     fun toggleTagExpansion(tag: String) = sessionStore.toggleTagExpansion(tag)
 
-    suspend fun ensurePeriodicSyncConfigured() = settingsStore.configurePeriodicSync(replace = false)
+    suspend fun ensurePeriodicSyncConfigured() = settingsStore.configurePeriodicSync(replace = true)
 }
 
 private data class FeedListArgs(

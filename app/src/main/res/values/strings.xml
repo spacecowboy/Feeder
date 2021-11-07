@@ -61,6 +61,7 @@
   <string name="sync_option_every_day">Every day</string>
 
   <string name="synchronization">Syncing</string>
+  <string name="syncing">Syncing</string>
   <string name="only_on_wifi">Only on Wi-Fi</string>
   <string name="show_thumbnails">Show thumbnails</string>
   <string name="may_result_data_charges">May result in mobile data charges.</string>
@@ -74,6 +75,7 @@
   <string name="updated_feeds">Updated feeds</string>
   <string name="notification_channel_name">Unread feeds</string>
   <string name="notification_channel_description">Notifications are only shown for unread items in configured feeds</string>
+  <string name="sync_status">Sync status</string>
   <string name="open_in_reader">Reader</string>
   <string name="open_in_webview">Web view</string>
   <string name="open_in_default_browser">Default browser</string>

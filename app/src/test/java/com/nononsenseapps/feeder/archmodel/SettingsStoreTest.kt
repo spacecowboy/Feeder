@@ -6,10 +6,12 @@ import androidx.work.WorkManager
 import com.nononsenseapps.feeder.model.UNIQUE_PERIODIC_NAME
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import io.mockk.MockKAnnotations
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlin.test.assertEquals
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.kodein.di.DI
@@ -124,9 +126,10 @@ class SettingsStoreTest : DIAware {
 
     @Test
     fun syncOnlyOnWifi() {
-        store.setSyncOnlyOnWifi(true)
-
-        verify {
+        runBlocking {
+            store.setSyncOnlyOnWifi(true)
+        }
+        coVerify {
             sp.edit().putBoolean(PREF_SYNC_ONLY_WIFI, true).apply()
         }
 
@@ -135,9 +138,10 @@ class SettingsStoreTest : DIAware {
 
     @Test
     fun syncOnlyWhenCharging() {
-        store.setSyncOnlyWhenCharging(true)
-
-        verify {
+        runBlocking {
+            store.setSyncOnlyWhenCharging(true)
+        }
+        coVerify {
             sp.edit().putBoolean(PREF_SYNC_ONLY_CHARGING, true).apply()
         }
 
@@ -201,9 +205,10 @@ class SettingsStoreTest : DIAware {
 
     @Test
     fun syncFrequency() {
-        store.setSyncFrequency(SyncFrequency.EVERY_3_HOURS)
-
-        verify {
+        runBlocking {
+            store.setSyncFrequency(SyncFrequency.EVERY_3_HOURS)
+        }
+        coVerify {
             sp.edit().putString(PREF_SYNC_FREQ, "180").apply()
             workManager.enqueueUniquePeriodicWork(
                 UNIQUE_PERIODIC_NAME,

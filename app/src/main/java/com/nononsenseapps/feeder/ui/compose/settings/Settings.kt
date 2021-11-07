@@ -250,7 +250,7 @@ fun SettingsList(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .padding(horizontal = keyline1Padding)
+            .padding(horizontal = dimens.margin)
             .fillMaxWidth()
             .verticalScroll(scrollState)
     ) {

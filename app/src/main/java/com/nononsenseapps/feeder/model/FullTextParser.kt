@@ -13,6 +13,7 @@ import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import java.io.File
 import java.net.URL
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.dankito.readability4j.extended.Readability4JExtended
@@ -30,6 +31,8 @@ fun scheduleFullTextParse(
     feedItem: FeedItemForFetching
 ) {
     val workRequest = OneTimeWorkRequestBuilder<FullTextWorker>()
+        .addTag("feeder")
+        .keepResultsForAtLeast(1, TimeUnit.MINUTES)
 
     val data = workDataOf(
         ARG_FEED_ITEM_ID to feedItem.id,
@@ -49,25 +52,22 @@ class FullTextWorker(
     private val okHttpClient: OkHttpClient by instance()
 
     override suspend fun doWork(): Result {
-        val ignoreConnectivitySettings = inputData.getBoolean(IGNORE_CONNECTIVITY_SETTINGS, false)
-        var success = false
+        val success: Boolean
 
-        if (ignoreConnectivitySettings || isOkToSyncAutomatically(context)) {
-            val feedItemId: Long = inputData.getLong(ARG_FEED_ITEM_ID, ID_UNSET)
-            val link: String? = inputData.getString(ARG_FEED_ITEM_LINK)
-                ?: throw RuntimeException("No link provided")
+        val feedItemId: Long = inputData.getLong(ARG_FEED_ITEM_ID, ID_UNSET)
+        val link: String = inputData.getString(ARG_FEED_ITEM_LINK)
+            ?: throw RuntimeException("No link provided")
 
-            Log.i("FeederFullText", "Worker going to parse $feedItemId: $link")
+        Log.i("FeederFullText", "Worker going to parse $feedItemId: $link")
 
-            success = parseFullArticleIfMissing(
-                feedItem = object : FeedItemForFetching {
-                    override val id = feedItemId
-                    override val link = link
-                },
-                okHttpClient = okHttpClient,
-                filesDir = context.filesDir
-            )
-        }
+        success = parseFullArticleIfMissing(
+            feedItem = object : FeedItemForFetching {
+                override val id = feedItemId
+                override val link = link
+            },
+            okHttpClient = okHttpClient,
+            filesDir = context.filesDir
+        )
 
         return when (success) {
             true -> Result.success()
