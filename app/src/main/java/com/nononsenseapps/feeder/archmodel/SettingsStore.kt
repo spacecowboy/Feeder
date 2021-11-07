@@ -90,6 +90,7 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setSyncOnlyOnWifi(value: Boolean) {
         _syncOnlyOnWifi.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_WIFI, value).apply()
+        configurePeriodicSync()
     }
 
     private val _syncOnlyWhenCharging = MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_CHARGING, false))
@@ -97,6 +98,7 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setSyncOnlyWhenCharging(value: Boolean) {
         _syncOnlyWhenCharging.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_CHARGING, value).apply()
+        configurePeriodicSync()
     }
 
     private val _loadImageOnlyOnWifi = MutableStateFlow(sp.getBoolean(PREF_IMG_ONLY_WIFI, false))
