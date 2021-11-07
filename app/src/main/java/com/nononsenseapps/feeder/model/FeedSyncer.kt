@@ -10,7 +10,6 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
-import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.currentlyCharging
 import com.nononsenseapps.feeder.util.currentlyConnected
 import com.nononsenseapps.feeder.util.currentlyUnmetered
@@ -28,11 +27,11 @@ const val IGNORE_CONNECTIVITY_SETTINGS = "ignore_connectivity_settings"
 
 fun isOkToSyncAutomatically(context: Context): Boolean {
     val di: DI by closestDI(context)
-    val prefs: Prefs by di.instance()
+    val repository: Repository by di.instance()
     return (
         currentlyConnected(context) &&
-            (!prefs.onlySyncWhileCharging || currentlyCharging(context)) &&
-            (!prefs.onlySyncOnWifi || currentlyUnmetered(context))
+            (!repository.syncOnlyWhenCharging.value || currentlyCharging(context)) &&
+            (!repository.syncOnlyOnWifi.value || currentlyUnmetered(context))
         )
 }
 

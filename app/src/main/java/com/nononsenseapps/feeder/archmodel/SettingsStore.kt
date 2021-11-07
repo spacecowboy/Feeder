@@ -202,7 +202,6 @@ class SettingsStore(override val di: DI) : DIAware {
 
         if (shouldSync) {
             val constraints = Constraints.Builder()
-                .setRequiresBatteryNotLow(true)
                 .setRequiresCharging(syncOnlyWhenCharging.value)
 
             if (syncOnlyOnWifi.value) {

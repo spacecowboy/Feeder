@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.util.Log
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.db.room.AppDatabase
@@ -10,7 +11,6 @@ import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.db.room.upsertFeedItems
-import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
@@ -51,7 +51,7 @@ suspend fun syncFeeds(
     minFeedAgeMinutes: Int = 15,
 ): Boolean {
     val di: DI by closestDI(context)
-    val prefs: Prefs by di.instance()
+    val repository: Repository by di.instance()
     Log.d(LOG_TAG, "${Thread.currentThread().name}: Taking sync mutex")
     return syncMutex.withLock {
         withContext(singleThreadedSync) {
@@ -60,7 +60,7 @@ suspend fun syncFeeds(
                 filesDir = context.filesDir,
                 feedId = feedId,
                 feedTag = feedTag,
-                maxFeedItemCount = prefs.maximumCountPerFeed,
+                maxFeedItemCount = repository.maximumCountPerFeed.value,
                 forceNetwork = forceNetwork,
                 parallel = parallel,
                 minFeedAgeMinutes = minFeedAgeMinutes
