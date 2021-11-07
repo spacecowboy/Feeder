@@ -7,6 +7,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.verify
@@ -169,5 +170,18 @@ class RepositoryTest : DIAware {
             androidSystemStore.removeDynamicShortcuts(listOf(1, 2))
         }
 
+    }
+
+    @Test
+    fun ensurePeriodicSyncConfigured() {
+        coEvery { settingsStore.configurePeriodicSync(any()) } just Runs
+
+        runBlocking {
+            repository.ensurePeriodicSyncConfigured()
+        }
+
+        coVerify {
+            settingsStore.configurePeriodicSync(false)
+        }
     }
 }

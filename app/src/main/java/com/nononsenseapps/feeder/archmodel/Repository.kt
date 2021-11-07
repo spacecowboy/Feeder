@@ -55,10 +55,10 @@ class Repository(override val di: DI) : DIAware {
     fun setSyncOnResume(value: Boolean) = settingsStore.setSyncOnResume(value)
 
     val syncOnlyOnWifi: StateFlow<Boolean> = settingsStore.syncOnlyOnWifi
-    fun setSyncOnlyOnWifi(value: Boolean) = settingsStore.setSyncOnlyOnWifi(value)
+    suspend fun setSyncOnlyOnWifi(value: Boolean) = settingsStore.setSyncOnlyOnWifi(value)
 
     val syncOnlyWhenCharging: StateFlow<Boolean> = settingsStore.syncOnlyWhenCharging
-    fun setSyncOnlyWhenCharging(value: Boolean) = settingsStore.setSyncOnlyWhenCharging(value)
+    suspend fun setSyncOnlyWhenCharging(value: Boolean) = settingsStore.setSyncOnlyWhenCharging(value)
 
     val loadImageOnlyOnWifi = settingsStore.loadImageOnlyOnWifi
     fun setLoadImageOnlyOnWifi(value: Boolean) = settingsStore.setLoadImageOnlyOnWifi(value)
@@ -76,7 +76,7 @@ class Repository(override val di: DI) : DIAware {
     fun setLinkOpener(value: LinkOpener) = settingsStore.setLinkOpener(value)
 
     val syncFrequency = settingsStore.syncFrequency
-    fun setSyncFrequency(value: SyncFrequency) = settingsStore.setSyncFrequency(value)
+    suspend fun setSyncFrequency(value: SyncFrequency) = settingsStore.setSyncFrequency(value)
 
     val resumeTime: StateFlow<Instant> = sessionStore.resumeTime
     fun setResumeTime(value: Instant) {
@@ -193,6 +193,8 @@ class Repository(override val di: DI) : DIAware {
     val expandedTags: StateFlow<Set<String>> = sessionStore.expandedTags
 
     fun toggleTagExpansion(tag: String) = sessionStore.toggleTagExpansion(tag)
+
+    suspend fun ensurePeriodicSyncConfigured() = settingsStore.configurePeriodicSync(replace = false)
 }
 
 private data class FeedListArgs(

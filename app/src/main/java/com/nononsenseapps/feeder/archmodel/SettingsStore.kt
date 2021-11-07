@@ -42,8 +42,10 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _currentTheme = MutableStateFlow(
-        ThemeOptions.valueOf(sp.getString(PREF_THEME, null)?.uppercase()
-            ?: ThemeOptions.SYSTEM.name)
+        ThemeOptions.valueOf(
+            sp.getString(PREF_THEME, null)?.uppercase()
+                ?: ThemeOptions.SYSTEM.name
+        )
     )
     val currentTheme = _currentTheme.asStateFlow()
     fun setCurrentTheme(value: ThemeOptions) {
@@ -52,8 +54,10 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _darkThemePreference = MutableStateFlow(
-        DarkThemePreferences.valueOf(sp.getString(PREF_DARK_THEME, null)?.uppercase()
-            ?: DarkThemePreferences.BLACK.name)
+        DarkThemePreferences.valueOf(
+            sp.getString(PREF_DARK_THEME, null)?.uppercase()
+                ?: DarkThemePreferences.BLACK.name
+        )
     )
     val darkThemePreference = _darkThemePreference.asStateFlow()
     fun setDarkThemePreference(value: DarkThemePreferences) {
@@ -62,8 +66,10 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _currentSorting = MutableStateFlow(
-        SortingOptions.valueOf(sp.getString(PREF_SORT, null)?.uppercase()
-            ?: SortingOptions.NEWEST_FIRST.name)
+        SortingOptions.valueOf(
+            sp.getString(PREF_SORT, null)?.uppercase()
+                ?: SortingOptions.NEWEST_FIRST.name
+        )
     )
     val currentSorting = _currentSorting.asStateFlow()
     fun setCurrentSorting(value: SortingOptions) {
@@ -87,18 +93,19 @@ class SettingsStore(override val di: DI) : DIAware {
 
     private val _syncOnlyOnWifi = MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_WIFI, false))
     val syncOnlyOnWifi = _syncOnlyOnWifi.asStateFlow()
-    fun setSyncOnlyOnWifi(value: Boolean) {
+    suspend fun setSyncOnlyOnWifi(value: Boolean) {
         _syncOnlyOnWifi.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_WIFI, value).apply()
-        configurePeriodicSync()
+        configurePeriodicSync(replace = true)
     }
 
-    private val _syncOnlyWhenCharging = MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_CHARGING, false))
+    private val _syncOnlyWhenCharging =
+        MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_CHARGING, false))
     val syncOnlyWhenCharging = _syncOnlyWhenCharging.asStateFlow()
-    fun setSyncOnlyWhenCharging(value: Boolean) {
+    suspend fun setSyncOnlyWhenCharging(value: Boolean) {
         _syncOnlyWhenCharging.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_CHARGING, value).apply()
-        configurePeriodicSync()
+        configurePeriodicSync(replace = true)
     }
 
     private val _loadImageOnlyOnWifi = MutableStateFlow(sp.getBoolean(PREF_IMG_ONLY_WIFI, false))
@@ -115,7 +122,8 @@ class SettingsStore(override val di: DI) : DIAware {
         sp.edit().putBoolean(PREF_IMG_SHOW_THUMBNAILS, value).apply()
     }
 
-    private val _maximumCountPerFeed = MutableStateFlow(sp.getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt())
+    private val _maximumCountPerFeed =
+        MutableStateFlow(sp.getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt())
     val maximumCountPerFeed = _maximumCountPerFeed.asStateFlow()
     fun setMaxCountPerFeed(value: Int) {
         _maximumCountPerFeed.value = value
@@ -184,19 +192,19 @@ class SettingsStore(override val di: DI) : DIAware {
         MutableStateFlow(
             SyncFrequency.values()
                 .firstOrNull {
-                    it.minutes==savedValue
+                    it.minutes == savedValue
                 }
                 ?: SyncFrequency.MANUAL
         )
     }
     val syncFrequency = _syncFrequency.asStateFlow()
-    fun setSyncFrequency(value: SyncFrequency) {
+    suspend fun setSyncFrequency(value: SyncFrequency) {
         _syncFrequency.value = value
         sp.edit().putString(PREF_SYNC_FREQ, "${value.minutes}").apply()
-        configurePeriodicSync()
+        configurePeriodicSync(replace = true)
     }
 
-    internal fun configurePeriodicSync() {
+    suspend fun configurePeriodicSync(replace: Boolean) {
         val workManager: WorkManager by instance()
         val shouldSync = syncFrequency.value.minutes > 0
 
@@ -219,12 +227,15 @@ class SettingsStore(override val di: DI) : DIAware {
 
             val syncWork = workRequestBuilder
                 .setConstraints(constraints.build())
-                .addTag("periodic_sync")
+                .addTag("feeder")
                 .build()
 
             workManager.enqueueUniquePeriodicWork(
                 UNIQUE_PERIODIC_NAME,
-                ExistingPeriodicWorkPolicy.REPLACE,
+                when (replace) {
+                    true -> ExistingPeriodicWorkPolicy.REPLACE
+                    false -> ExistingPeriodicWorkPolicy.KEEP
+                },
                 syncWork
             )
         } else {

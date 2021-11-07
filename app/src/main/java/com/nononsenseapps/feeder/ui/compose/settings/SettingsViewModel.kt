@@ -50,11 +50,11 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setSyncOnResume(value)
     }
 
-    fun setSyncOnlyOnWifi(value: Boolean) {
+    fun setSyncOnlyOnWifi(value: Boolean) = viewModelScope.launch {
         repository.setSyncOnlyOnWifi(value)
     }
 
-    fun setSyncOnlyWhenCharging(value: Boolean) {
+    fun setSyncOnlyWhenCharging(value: Boolean) = viewModelScope.launch {
         repository.setSyncOnlyWhenCharging(value)
     }
 
@@ -78,7 +78,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setLinkOpener(value)
     }
 
-    fun setSyncFrequency(value: SyncFrequency) {
+    fun setSyncFrequency(value: SyncFrequency) = viewModelScope.launch {
         repository.setSyncFrequency(value)
     }
 
@@ -88,7 +88,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
 
     private val batteryOptimizationIgnoredFlow: Flow<Boolean> = repository.resumeTime.map {
         val powerManager: PowerManager? = context.getSystemService()
-        powerManager?.isIgnoringBatteryOptimizations(context.packageName)==true
+        powerManager?.isIgnoringBatteryOptimizations(context.packageName) == true
     }.buffer(1)
 
     private val _viewState = MutableStateFlow(SettingsViewState())

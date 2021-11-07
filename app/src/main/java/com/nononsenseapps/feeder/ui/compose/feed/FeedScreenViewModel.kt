@@ -77,18 +77,16 @@ class FeedScreenViewModel(di: DI, state: SavedStateHandle) : DIAwareViewModel(di
             di = di,
             feedId = feedId,
             feedTag = feedTag,
-            ignoreConnectivitySettings = true,
             forceNetwork = true,
-            parallell = true
+            parallel = true
         )
     }
 
     fun requestImmediateSyncOfAll() {
         requestFeedSync(
             di = di,
-            ignoreConnectivitySettings = true,
             forceNetwork = true,
-            parallell = true
+            parallel = true
         )
     }
 

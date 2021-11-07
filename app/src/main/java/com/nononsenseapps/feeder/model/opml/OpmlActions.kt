@@ -52,7 +52,7 @@ suspend fun importOpml(di: DI, uri: Uri) = withContext(Dispatchers.IO) {
                     parser.parseInputStream(stream)
                 }
             }
-            requestFeedSync(di = di, ignoreConnectivitySettings = false, parallell = true)
+            requestFeedSync(di = di, parallel = true)
         }
         Log.d("OPML", "Imported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
