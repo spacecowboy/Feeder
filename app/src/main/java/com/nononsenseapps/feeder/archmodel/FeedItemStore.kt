@@ -5,6 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.PreviewItem
@@ -285,6 +286,9 @@ class FeedItemStore(override val di: DI) : DIAware {
             }
         }
     }
+
+    suspend fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>> =
+        dao.getFeedsItemsWithDefaultFullTextParse()
 
     companion object {
         private const val PAGE_SIZE = 100

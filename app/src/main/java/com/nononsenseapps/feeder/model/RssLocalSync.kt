@@ -81,6 +81,7 @@ internal suspend fun syncFeeds(
 ): Boolean {
     val db: AppDatabase by di.instance()
     var result = false
+    var needFullTextSync = false
     // Let all new items share download time
     val downloadTime = Instant.now()
     val time = measureTimeMillis {
@@ -103,7 +104,9 @@ internal suspend fun syncFeeds(
                     Log.e(LOG_TAG, "Error during sync", throwable)
                 }
 
+
                 feedsToFetch.forEach {
+                    needFullTextSync = needFullTextSync || it.fullTextByDefault
                     launch(coroutineContext) {
                         try {
                             syncFeed(
@@ -128,6 +131,12 @@ internal suspend fun syncFeeds(
             }
         } catch (e: Throwable) {
             Log.e(LOG_TAG, "Outer error", e)
+        } finally {
+            if (needFullTextSync) {
+                scheduleFullTextParse(
+                    di = di,
+                )
+            }
         }
     }
     Log.d(LOG_TAG, "Completed in $time ms")
@@ -225,13 +234,6 @@ private suspend fun syncFeed(
                 } ?: emptyList()
 
         itemDao.upsertFeedItems(feedItemSqls) { feedItem, text ->
-            if (feedSql.fullTextByDefault) {
-                scheduleFullTextParse(
-                    di = di,
-                    feedItem = feedItem
-                )
-            }
-
             withContext(Dispatchers.IO) {
                 blobOutputStream(feedItem.id, filesDir).bufferedWriter().use {
                     it.write(text)

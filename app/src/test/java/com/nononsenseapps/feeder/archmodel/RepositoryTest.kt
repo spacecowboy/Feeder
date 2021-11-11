@@ -7,11 +7,13 @@ import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.verify
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -181,7 +183,24 @@ class RepositoryTest : DIAware {
         }
 
         coVerify {
-            settingsStore.configurePeriodicSync(true)
+            settingsStore.configurePeriodicSync(false)
+        }
+    }
+
+    @Test
+    fun getFeedsItemsWithDefaultFullTextParse() {
+        coEvery { feedItemStore.getFeedsItemsWithDefaultFullTextParse() } returns flowOf(emptyList())
+
+        val result = runBlocking {
+            repository.getFeedsItemsWithDefaultFullTextParse().first()
+        }
+
+        assertTrue {
+            result.isEmpty()
+        }
+
+        coVerify {
+            feedItemStore.getFeedsItemsWithDefaultFullTextParse()
         }
     }
 }

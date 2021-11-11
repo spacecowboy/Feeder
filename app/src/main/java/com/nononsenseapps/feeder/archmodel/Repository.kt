@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.archmodel
 import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -194,7 +195,10 @@ class Repository(override val di: DI) : DIAware {
 
     fun toggleTagExpansion(tag: String) = sessionStore.toggleTagExpansion(tag)
 
-    suspend fun ensurePeriodicSyncConfigured() = settingsStore.configurePeriodicSync(replace = true)
+    suspend fun ensurePeriodicSyncConfigured() = settingsStore.configurePeriodicSync(replace = false)
+
+    suspend fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>> =
+        feedItemStore.getFeedsItemsWithDefaultFullTextParse()
 }
 
 private data class FeedListArgs(

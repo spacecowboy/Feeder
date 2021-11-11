@@ -33,7 +33,9 @@ import org.kodein.di.instance
 
 const val ARG_FORCE_NETWORK = "force_network"
 
-const val UNIQUE_PERIODIC_NAME = "feeder_periodic"
+const val UNIQUE_PERIODIC_NAME = "feeder_periodic_2"
+// Clear this for scheduler
+const val UNIQUE_PERIODIC_NAME_OLD = "feeder_periodic"
 const val UNIQUE_ONETIME_NAME = "feeder_sync_onetime"
 const val PARALLEL_SYNC = "parallel_sync"
 const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
