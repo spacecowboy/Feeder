@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.R
@@ -227,6 +228,7 @@ class SettingsStore(override val di: DI) : DIAware {
 
             val syncWork = workRequestBuilder
                 .setConstraints(constraints.build())
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 .addTag("feeder")
                 .build()
 
