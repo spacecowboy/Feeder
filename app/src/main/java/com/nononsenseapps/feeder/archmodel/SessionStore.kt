@@ -13,22 +13,35 @@ class SessionStore {
      */
     val resumeTime: StateFlow<Instant> = _resumeTime.asStateFlow()
     fun setResumeTime(instant: Instant) {
-        _resumeTime.value = instant
+        _resumeTime.atomicSet {
+            instant
+        }
     }
 
     private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
     fun setRefreshing(refreshing: Boolean) {
-        _isRefreshing.value = refreshing
+        _isRefreshing.atomicSet {
+            refreshing
+        }
     }
 
     private val _expandedTags = MutableStateFlow(emptySet<String>())
-    val expandedTags: StateFlow<Set<String>> = _expandedTags
+    val expandedTags: StateFlow<Set<String>> = _expandedTags.asStateFlow()
     fun toggleTagExpansion(tag: String) {
-        _expandedTags.value = if (tag in expandedTags.value) {
-            _expandedTags.value - tag
-        } else {
-            _expandedTags.value + tag
+        _expandedTags.atomicSet {
+            if (tag in expandedTags.value) {
+                _expandedTags.value - tag
+            } else {
+                _expandedTags.value + tag
+            }
         }
+    }
+}
+
+fun <T> MutableStateFlow<T>.atomicSet(value: () -> T) {
+    var success = false
+    while (!success) {
+        success = compareAndSet(this.value, value())
     }
 }

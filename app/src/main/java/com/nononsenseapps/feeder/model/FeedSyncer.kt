@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -107,11 +108,12 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
     override suspend fun doWork(): Result {
         val goParallel = inputData.getBoolean(PARALLEL_SYNC, false)
 
-        val success: Boolean
+        var success: Boolean
 
         val repository by di.instance<Repository>()
 
         try {
+            Log.d("FeederFeedSyncer", "Setting refreshing to true")
             repository.setRefreshing(true)
 
             val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
@@ -127,10 +129,14 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
                 parallel = goParallel,
                 minFeedAgeMinutes = minFeedAgeMinutes
             )
+        } catch (e: Exception) {
+            success = false
+            Log.e("FeederFeedSyncer", "Failure during sync", e)
+        } finally {
+            Log.d("FeederFeedSyncer", "Setting refreshing to false")
+            repository.setRefreshing(false)
             // Send notifications for configured feeds
             notify(applicationContext)
-        } finally {
-            repository.setRefreshing(false)
         }
 
         return when (success) {
