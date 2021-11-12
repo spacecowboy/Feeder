@@ -220,9 +220,6 @@ private suspend fun syncFeed(
                         itemDao.loadFeedItem(
                             guid = item.alternateId,
                             feedId = feedSql.id
-                        ) ?: itemDao.loadFeedItemWithAlmostId(
-                            guidPattern = "${item.id}%${item.title}",
-                            feedId = feedSql.id
                         ) ?: itemDao.loadFeedItem(
                             guid = item.id ?: item.alternateId,
                             feedId = feedSql.id
@@ -301,5 +298,9 @@ internal suspend fun feedsToSync(
 
 class ResponseFailure(message: String?) : Exception(message)
 
+/**
+ * Remember that text or title literally can mean injection problems if the contain % or similar,
+ * so do NOT use them literally
+ */
 private val Item.alternateId: String
-    get() = "$id|${content_text?.hashCode()}|$title"
+    get() = "$id|${content_text.hashCode()}|${title.hashCode()}"

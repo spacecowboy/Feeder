@@ -54,12 +54,6 @@ interface FeedItemDao {
     @Query("SELECT * FROM feed_items WHERE guid IS :guid AND feed_id IS :feedId")
     suspend fun loadFeedItem(guid: String, feedId: Long?): FeedItem?
 
-    /**
-     * Used during migration from RSS ID with (guid|pubdate|title) to (guid|title)
-     */
-    @Query("SELECT * FROM feed_items WHERE guid LIKE :guidPattern AND feed_id IS :feedId")
-    suspend fun loadFeedItemWithAlmostId(guidPattern: String, feedId: Long?): FeedItem?
-
     @Query("SELECT * FROM feed_items WHERE id IS :id")
     suspend fun loadFeedItem(id: Long): FeedItem?
 
