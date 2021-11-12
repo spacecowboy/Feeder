@@ -133,4 +133,5 @@
     <string name="dark_theme_preference_dark">Тёмная</string>
     <string name="dark_theme_preference">Предпочтительная темная тема</string>
     <string name="generate_extra_unique_ids">Создать дополнительные уникальные ID</string>
+    <string name="only_enable_for_bad_id_feeds">Включать только для каналов с плохими ID</string>
 </resources>
