@@ -38,8 +38,8 @@ import org.kodein.di.DI
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 
-const val notificationId = 73583
-const val channelId = "feederNotifications"
+private const val notificationId = 73583
+private const val channelId = "feederNotifications"
 
 suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

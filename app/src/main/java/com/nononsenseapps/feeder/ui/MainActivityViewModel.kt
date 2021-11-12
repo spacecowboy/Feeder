@@ -1,10 +1,12 @@
 package com.nononsenseapps.feeder.ui
 
+import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 import org.threeten.bp.Instant
@@ -28,5 +30,9 @@ class MainActivityViewModel(di: DI) : DIAwareViewModel(di) {
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = repository.currentFeedAndTag
     fun setCurrentFeedAndTag(feedId: Long, tag: String) {
         repository.setCurrentFeedAndTag(feedId, tag)
+    }
+
+    fun ensurePeriodicSyncConfigured() = viewModelScope.launch {
+        repository.ensurePeriodicSyncConfigured()
     }
 }

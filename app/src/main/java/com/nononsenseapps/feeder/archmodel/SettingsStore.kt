@@ -5,12 +5,14 @@ import androidx.annotation.StringRes
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedSyncer
 import com.nononsenseapps.feeder.model.UNIQUE_PERIODIC_NAME
+import com.nononsenseapps.feeder.model.UNIQUE_PERIODIC_NAME_OLD
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.nononsenseapps.feeder.util.getStringNonNull
 import java.util.concurrent.TimeUnit
@@ -42,8 +44,10 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _currentTheme = MutableStateFlow(
-        ThemeOptions.valueOf(sp.getString(PREF_THEME, null)?.uppercase()
-            ?: ThemeOptions.SYSTEM.name)
+        ThemeOptions.valueOf(
+            sp.getString(PREF_THEME, null)?.uppercase()
+                ?: ThemeOptions.SYSTEM.name
+        )
     )
     val currentTheme = _currentTheme.asStateFlow()
     fun setCurrentTheme(value: ThemeOptions) {
@@ -52,8 +56,10 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _darkThemePreference = MutableStateFlow(
-        DarkThemePreferences.valueOf(sp.getString(PREF_DARK_THEME, null)?.uppercase()
-            ?: DarkThemePreferences.BLACK.name)
+        DarkThemePreferences.valueOf(
+            sp.getString(PREF_DARK_THEME, null)?.uppercase()
+                ?: DarkThemePreferences.BLACK.name
+        )
     )
     val darkThemePreference = _darkThemePreference.asStateFlow()
     fun setDarkThemePreference(value: DarkThemePreferences) {
@@ -62,8 +68,10 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _currentSorting = MutableStateFlow(
-        SortingOptions.valueOf(sp.getString(PREF_SORT, null)?.uppercase()
-            ?: SortingOptions.NEWEST_FIRST.name)
+        SortingOptions.valueOf(
+            sp.getString(PREF_SORT, null)?.uppercase()
+                ?: SortingOptions.NEWEST_FIRST.name
+        )
     )
     val currentSorting = _currentSorting.asStateFlow()
     fun setCurrentSorting(value: SortingOptions) {
@@ -87,16 +95,19 @@ class SettingsStore(override val di: DI) : DIAware {
 
     private val _syncOnlyOnWifi = MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_WIFI, false))
     val syncOnlyOnWifi = _syncOnlyOnWifi.asStateFlow()
-    fun setSyncOnlyOnWifi(value: Boolean) {
+    suspend fun setSyncOnlyOnWifi(value: Boolean) {
         _syncOnlyOnWifi.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_WIFI, value).apply()
+        configurePeriodicSync(replace = true)
     }
 
-    private val _syncOnlyWhenCharging = MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_CHARGING, false))
+    private val _syncOnlyWhenCharging =
+        MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_CHARGING, false))
     val syncOnlyWhenCharging = _syncOnlyWhenCharging.asStateFlow()
-    fun setSyncOnlyWhenCharging(value: Boolean) {
+    suspend fun setSyncOnlyWhenCharging(value: Boolean) {
         _syncOnlyWhenCharging.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_CHARGING, value).apply()
+        configurePeriodicSync(replace = true)
     }
 
     private val _loadImageOnlyOnWifi = MutableStateFlow(sp.getBoolean(PREF_IMG_ONLY_WIFI, false))
@@ -113,7 +124,8 @@ class SettingsStore(override val di: DI) : DIAware {
         sp.edit().putBoolean(PREF_IMG_SHOW_THUMBNAILS, value).apply()
     }
 
-    private val _maximumCountPerFeed = MutableStateFlow(sp.getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt())
+    private val _maximumCountPerFeed =
+        MutableStateFlow(sp.getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt())
     val maximumCountPerFeed = _maximumCountPerFeed.asStateFlow()
     fun setMaxCountPerFeed(value: Int) {
         _maximumCountPerFeed.value = value
@@ -182,25 +194,27 @@ class SettingsStore(override val di: DI) : DIAware {
         MutableStateFlow(
             SyncFrequency.values()
                 .firstOrNull {
-                    it.minutes==savedValue
+                    it.minutes == savedValue
                 }
                 ?: SyncFrequency.MANUAL
         )
     }
     val syncFrequency = _syncFrequency.asStateFlow()
-    fun setSyncFrequency(value: SyncFrequency) {
+    suspend fun setSyncFrequency(value: SyncFrequency) {
         _syncFrequency.value = value
         sp.edit().putString(PREF_SYNC_FREQ, "${value.minutes}").apply()
-        configurePeriodicSync()
+        configurePeriodicSync(replace = true)
     }
 
-    internal fun configurePeriodicSync() {
+    suspend fun configurePeriodicSync(replace: Boolean) {
         val workManager: WorkManager by instance()
         val shouldSync = syncFrequency.value.minutes > 0
 
+        // Clear old job always to replace with new one
+        workManager.cancelUniqueWork(UNIQUE_PERIODIC_NAME_OLD)
+
         if (shouldSync) {
             val constraints = Constraints.Builder()
-                .setRequiresBatteryNotLow(true)
                 .setRequiresCharging(syncOnlyWhenCharging.value)
 
             if (syncOnlyOnWifi.value) {
@@ -212,18 +226,28 @@ class SettingsStore(override val di: DI) : DIAware {
             val timeInterval = syncFrequency.value.minutes
 
             val workRequestBuilder = PeriodicWorkRequestBuilder<FeedSyncer>(
-                timeInterval, TimeUnit.MINUTES,
-                timeInterval / 2, TimeUnit.MINUTES
+                timeInterval,
+                TimeUnit.MINUTES,
             )
 
             val syncWork = workRequestBuilder
                 .setConstraints(constraints.build())
-                .addTag("periodic_sync")
+                .run {
+                    // Expedited jobs do not support charging constraints
+                    when {
+                        syncOnlyWhenCharging.value -> this
+                        else -> setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                    }
+                }
+                .addTag("feeder")
                 .build()
 
             workManager.enqueueUniquePeriodicWork(
                 UNIQUE_PERIODIC_NAME,
-                ExistingPeriodicWorkPolicy.REPLACE,
+                when (replace) {
+                    true -> ExistingPeriodicWorkPolicy.REPLACE
+                    false -> ExistingPeriodicWorkPolicy.KEEP
+                },
                 syncWork
             )
         } else {

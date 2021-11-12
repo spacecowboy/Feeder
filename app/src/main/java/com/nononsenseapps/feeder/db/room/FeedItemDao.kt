@@ -8,6 +8,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.nononsenseapps.feeder.db.COL_ID
+import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PreviewItem
@@ -545,6 +547,16 @@ interface FeedItemDao {
         """
     )
     suspend fun getLink(itemid: Long): String?
+
+    @Query(
+        """
+            SELECT fi.id, fi.link
+            FROM feed_items fi
+            JOIN feeds f ON feed_id = f.id
+            WHERE f.fulltext_by_default = 1
+        """
+    )
+    fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>>
 }
 
 suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > ID_UNSET) {

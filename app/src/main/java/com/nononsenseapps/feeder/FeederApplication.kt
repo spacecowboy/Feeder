@@ -14,6 +14,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
@@ -21,8 +22,8 @@ import com.nononsenseapps.feeder.di.androidModule
 import com.nononsenseapps.feeder.di.archModelModule
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
-import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.ToastMaker
+import com.nononsenseapps.feeder.util.currentlyUnmetered
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import java.io.File
 import java.security.Security
@@ -71,7 +72,6 @@ class FeederApplication : MultiDexApplication(), DIAware {
                 this@FeederApplication
             )
         }
-        bind<Prefs>() with singleton { Prefs(di) }
 
         bind<OkHttpClient>() with singleton {
             cachingHttpClient(
@@ -81,14 +81,14 @@ class FeederApplication : MultiDexApplication(), DIAware {
                 .build()
         }
         bind<ImageLoader>() with singleton {
-            val prefs = instance<Prefs>()
+            val repository = instance<Repository>()
             val okHttpClient = instance<OkHttpClient>()
                 .newBuilder()
                 // Use separate image cache or images will quickly evict feed caches
                 .cache(Cache((externalCacheDir ?: filesDir).resolve("img"), 20L * 1024L * 1024L))
                 .addInterceptor { chain ->
                     chain.proceed(
-                        when (prefs.shouldLoadImages()) {
+                        when (!repository.loadImageOnlyOnWifi.value || currentlyUnmetered(this@FeederApplication)) {
                             true -> chain.request()
                             false -> {
                                 // Forces only cached responses to be used - if no cache then 504 is thrown

@@ -72,8 +72,6 @@ fun ListOfFeedsAndTags(
     onToggleTagExpansion: (String) -> Unit,
     onItemClick: (DrawerItemWithUnreadCount) -> Unit,
 ) {
-    Log.d("JONAS9", "hash of +: ${"+".hashCode()}")
-    Log.d("JONAS9", feedsAndTags.map { it.uiId }.joinToString(","))
     LazyColumn(
         contentPadding = rememberInsetsPaddingValues(
             insets = LocalWindowInsets.current.systemBars,

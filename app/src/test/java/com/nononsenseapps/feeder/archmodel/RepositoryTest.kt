@@ -11,6 +11,9 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.verify
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -169,5 +172,35 @@ class RepositoryTest : DIAware {
             androidSystemStore.removeDynamicShortcuts(listOf(1, 2))
         }
 
+    }
+
+    @Test
+    fun ensurePeriodicSyncConfigured() {
+        coEvery { settingsStore.configurePeriodicSync(any()) } just Runs
+
+        runBlocking {
+            repository.ensurePeriodicSyncConfigured()
+        }
+
+        coVerify {
+            settingsStore.configurePeriodicSync(false)
+        }
+    }
+
+    @Test
+    fun getFeedsItemsWithDefaultFullTextParse() {
+        coEvery { feedItemStore.getFeedsItemsWithDefaultFullTextParse() } returns flowOf(emptyList())
+
+        val result = runBlocking {
+            repository.getFeedsItemsWithDefaultFullTextParse().first()
+        }
+
+        assertTrue {
+            result.isEmpty()
+        }
+
+        coVerify {
+            feedItemStore.getFeedsItemsWithDefaultFullTextParse()
+        }
     }
 }

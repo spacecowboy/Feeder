@@ -83,9 +83,8 @@ class MainActivity : DIAwareComponentActivity() {
             if (isOkToSyncAutomatically(applicationContext)) {
                 requestFeedSync(
                     di = di,
-                    ignoreConnectivitySettings = false,
                     forceNetwork = false,
-                    parallell = true
+                    parallel = true
                 )
             }
         }
@@ -93,6 +92,8 @@ class MainActivity : DIAwareComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        mainActivityViewModel.ensurePeriodicSyncConfigured()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -150,7 +151,6 @@ class MainActivity : DIAwareComponentActivity() {
                     ?: error("Missing mandatory argument: tag")
 
                 LaunchedEffect(feedId, tag) {
-                    Log.d("JONAS56", "Received tag: '$tag'")
                     mainActivityViewModel.setCurrentFeedAndTag(feedId, tag)
                 }
 

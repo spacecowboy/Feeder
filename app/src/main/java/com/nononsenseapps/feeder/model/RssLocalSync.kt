@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.util.Log
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.db.room.AppDatabase
@@ -10,7 +11,6 @@ import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.db.room.upsertFeedItems
-import com.nononsenseapps.feeder.util.Prefs
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
@@ -51,7 +51,7 @@ suspend fun syncFeeds(
     minFeedAgeMinutes: Int = 15,
 ): Boolean {
     val di: DI by closestDI(context)
-    val prefs: Prefs by di.instance()
+    val repository: Repository by di.instance()
     Log.d(LOG_TAG, "${Thread.currentThread().name}: Taking sync mutex")
     return syncMutex.withLock {
         withContext(singleThreadedSync) {
@@ -60,7 +60,7 @@ suspend fun syncFeeds(
                 filesDir = context.filesDir,
                 feedId = feedId,
                 feedTag = feedTag,
-                maxFeedItemCount = prefs.maximumCountPerFeed,
+                maxFeedItemCount = repository.maximumCountPerFeed.value,
                 forceNetwork = forceNetwork,
                 parallel = parallel,
                 minFeedAgeMinutes = minFeedAgeMinutes
@@ -81,6 +81,7 @@ internal suspend fun syncFeeds(
 ): Boolean {
     val db: AppDatabase by di.instance()
     var result = false
+    var needFullTextSync = false
     // Let all new items share download time
     val downloadTime = Instant.now()
     val time = measureTimeMillis {
@@ -103,7 +104,9 @@ internal suspend fun syncFeeds(
                     Log.e(LOG_TAG, "Error during sync", throwable)
                 }
 
+
                 feedsToFetch.forEach {
+                    needFullTextSync = needFullTextSync || it.fullTextByDefault
                     launch(coroutineContext) {
                         try {
                             syncFeed(
@@ -128,6 +131,12 @@ internal suspend fun syncFeeds(
             }
         } catch (e: Throwable) {
             Log.e(LOG_TAG, "Outer error", e)
+        } finally {
+            if (needFullTextSync) {
+                scheduleFullTextParse(
+                    di = di,
+                )
+            }
         }
     }
     Log.d(LOG_TAG, "Completed in $time ms")
@@ -225,13 +234,6 @@ private suspend fun syncFeed(
                 } ?: emptyList()
 
         itemDao.upsertFeedItems(feedItemSqls) { feedItem, text ->
-            if (feedSql.fullTextByDefault) {
-                scheduleFullTextParse(
-                    di = di,
-                    feedItem = feedItem
-                )
-            }
-
             withContext(Dispatchers.IO) {
                 blobOutputStream(feedItem.id, filesDir).bufferedWriter().use {
                     it.write(text)

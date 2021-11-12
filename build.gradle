@@ -23,9 +23,9 @@ buildscript {
     jsoup_version = "1.7.3"
     readability4j_version = "1.0.5"
 
-    androidx_core_version = "1.5.0"
+    androidx_core_version = "1.7.0"
     androidx_testcore_version = "1.4.0"
-    workmanager_version = '2.7.0-beta01'
+    workmanager_version = '2.7.0'
     constraintlayout_version = "2.0.4"
     recyclerview_version = "1.0.0"
     legacy_support_version = "1.0.0"

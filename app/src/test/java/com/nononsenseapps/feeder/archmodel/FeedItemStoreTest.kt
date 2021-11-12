@@ -1,18 +1,17 @@
 package com.nononsenseapps.feeder.archmodel
 
-import androidx.paging.PagingSource
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.confirmVerified
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -718,4 +717,28 @@ class FeedItemStoreTest : DIAware {
         }
     }
 
+    @Test
+    fun getFeedsItemsWithDefaultFullTextParse() {
+        val expected = listOf(
+            FeedItemIdWithLink(5L, "google.com"),
+            FeedItemIdWithLink(6L, "cowboy.com"),
+        )
+        coEvery { dao.getFeedsItemsWithDefaultFullTextParse() } returns flowOf(expected)
+
+        val items = runBlocking {
+            store.getFeedsItemsWithDefaultFullTextParse().first()
+        }
+
+        assertEquals(
+            expected.size,
+            items.size,
+        )
+
+        expected.zip(items) { expectedItem, actualItem ->
+            assertEquals(
+                expectedItem,
+                actualItem,
+            )
+        }
+    }
 }
