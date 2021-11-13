@@ -1,3 +1,27 @@
+# 2.0.6
+I. Musthafa (1):
+  * [f4801944] Translated using Weblate (Indonesian)
+
+Jonas Kalderstam (10):
+  * [60416443] Fixed scroll in Feed being cleared when going back from
+         Reader
+  * [bf7de231] Fixed translucent navigation bar on Android 23-26
+  * [de683726] Fixed reconfiguration of sync when changing sync settings
+  * [5af7f79b] Stopped requiring high battery for sync
+  * [e7a2f364] Added code to ensure sync is configured on app start
+  * [be5d7540] Improved support for background restrictions in Android 12
+  * [4193fd74] Improved reliability of notifications
+  * [5014172b] Fixed a possible collision with article IDs
+
+Nikita Epifanov (1):
+  * [0881dc4a] Updated Russian translation using Weblate
+
+Simona Iacob (1):
+  * [289553fa] Updated Romanian translation using Weblate
+
+VfBFan (1):
+  * [5b073871] Updated German translation using Weblate
+
 # 2.0.5
 Agnieszka C (1):
   * [7bc1efe6] Updated Polish translation using Weblate
