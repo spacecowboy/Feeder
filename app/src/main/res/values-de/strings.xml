@@ -134,4 +134,6 @@
     <string name="dark_theme_preference">Bevorzugtes dunkles Farbschema</string>
     <string name="generate_extra_unique_ids">Zusätzliche eindeutige IDs generieren</string>
     <string name="only_enable_for_bad_id_feeds">Nur für Feeds mit fehlerhaften IDs aktivieren</string>
+    <string name="syncing">Synchronisierung</string>
+    <string name="sync_status">Synchronisierungsstatus</string>
 </resources>

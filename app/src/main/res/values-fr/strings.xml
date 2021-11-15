@@ -134,4 +134,6 @@
     <string name="dark_theme_preference_dark">Sombre</string>
     <string name="generate_extra_unique_ids">Générer des identifiants uniques supplémentaires</string>
     <string name="only_enable_for_bad_id_feeds">Activation uniquement pour les flux avec de mauvais ID</string>
+    <string name="syncing">Synchronisation</string>
+    <string name="sync_status">État de la synchronisation</string>
 </resources>

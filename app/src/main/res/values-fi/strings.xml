@@ -7,7 +7,7 @@
     <string name="title_activity_edit_feed">Tilaa syöte</string>
     <string name="url">URL</string>
     <string name="tag">Tunniste</string>
-    <string name="add_feed_search_hint">URL-osoite josta haetaan syötettä</string>
+    <string name="add_feed_search_hint">Syöte-URL</string>
     <string name="title">Otsikko</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
@@ -39,7 +39,7 @@
     <string name="new_based_on_this">Uusi perustuen tähän</string>
     <string name="indicator_for_mark_as_read">Osoitin luetuksi merkkaamiseen</string>
     <string name="share">Jaa</string>
-    <string name="no_such_feed">Tällaista syötettä ei löytynyt. Kokeile käyttää https.</string>
+    <string name="no_such_feed">Tällaista syötettä ei löytynyt. Kokeile käyttää HTTPS\?</string>
     <string name="nothing_to_display">Ei mitään näytettävää!</string>
     <string name="title_activity_settings">Asetukset</string>
     <string name="all_feeds">Kaikki syötteet</string>
@@ -51,7 +51,7 @@
     <string name="sync_option_every_6_hours">6 tunnin välein</string>
     <string name="sync_option_every_12_hours">12 tunnin välein</string>
     <string name="sync_option_every_day">Päivittäin</string>
-    <string name="synchronization">Synkronointi</string>
+    <string name="synchronization">Synkronoidaan</string>
     <string name="only_on_wifi">Vain Wi-Fi-yhteydellä</string>
     <string name="show_thumbnails">Näytä pikkukuvat</string>
     <string name="may_result_data_charges">Voi johtaa mobiiliverkon tiedonsiirto kuluihin.</string>
@@ -132,4 +132,5 @@
     <string name="dark_theme_preference_black">Musta</string>
     <string name="dark_theme_preference_dark">Tumma</string>
     <string name="dark_theme_preference">Suosittu tumma teema</string>
+    <string name="syncing">Synkronoidaan</string>
 </resources>
