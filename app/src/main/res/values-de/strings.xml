@@ -51,7 +51,7 @@
     <string name="sync_option_every_6_hours">Alle 6 Stunden</string>
     <string name="sync_option_every_12_hours">Alle 12 Stunden</string>
     <string name="sync_option_every_day">Täglich</string>
-    <string name="synchronization">Synchronisation</string>
+    <string name="synchronization">Synchronisierung</string>
     <string name="only_on_wifi">Nur im WLAN</string>
     <string name="show_thumbnails">Vorschaubilder anzeigen</string>
     <string name="may_result_data_charges">Könnte zu mobiler Datennutzung führen.</string>
