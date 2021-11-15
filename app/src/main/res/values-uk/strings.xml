@@ -134,4 +134,6 @@
     <string name="dark_theme_preference_dark">Темна</string>
     <string name="generate_extra_unique_ids">Створити додаткові унікальні ІД</string>
     <string name="only_enable_for_bad_id_feeds">Дозволити лише для стрічок із поганими ІД</string>
+    <string name="syncing">Синхронування</string>
+    <string name="sync_status">Стан синхронування</string>
 </resources>
