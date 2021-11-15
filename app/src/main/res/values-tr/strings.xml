@@ -134,4 +134,6 @@
     <string name="dark_theme_preference_dark">Koyu</string>
     <string name="generate_extra_unique_ids">Fazla benzersiz kimlikler oluştur</string>
     <string name="only_enable_for_bad_id_feeds">Yalnızca hatalı kimliklere sahip yayınlar için etkinleştir</string>
+    <string name="sync_status">Eşzamanlama durumu</string>
+    <string name="syncing">Eşzamanlama</string>
 </resources>

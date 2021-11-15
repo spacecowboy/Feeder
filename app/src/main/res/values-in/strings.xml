@@ -134,4 +134,6 @@
     <string name="dark_theme_preference">Preferensi mode malam</string>
     <string name="generate_extra_unique_ids">Buat ekstra ID unik</string>
     <string name="only_enable_for_bad_id_feeds">Hanya diaktifkan untuk umpan dengan ID yang buruk</string>
+    <string name="syncing">Menyinkronkan</string>
+    <string name="sync_status">Status sinkron</string>
 </resources>

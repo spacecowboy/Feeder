@@ -134,4 +134,6 @@
     <string name="dark_theme_preference_dark">Scuro</string>
     <string name="generate_extra_unique_ids">Genera ID unici extra</string>
     <string name="only_enable_for_bad_id_feeds">Attivare solo per i flussi con ID errati</string>
+    <string name="sync_status">Stato di sincronizzazione</string>
+    <string name="syncing">Sincronizzazione</string>
 </resources>
