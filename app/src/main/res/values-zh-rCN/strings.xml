@@ -134,4 +134,6 @@
     <string name="dark_theme_preference">偏好深色主题</string>
     <string name="generate_extra_unique_ids">生成附加的唯一 ID</string>
     <string name="only_enable_for_bad_id_feeds">只对坏 ID 源启用</string>
+    <string name="syncing">同步中</string>
+    <string name="sync_status">同步状态</string>
 </resources>
