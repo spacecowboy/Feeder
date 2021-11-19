@@ -5,14 +5,13 @@ import androidx.annotation.StringRes
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedSyncer
 import com.nononsenseapps.feeder.model.UNIQUE_PERIODIC_NAME
-import com.nononsenseapps.feeder.model.UNIQUE_PERIODIC_NAME_OLD
+import com.nononsenseapps.feeder.model.oldPeriodics
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.nononsenseapps.feeder.util.getStringNonNull
 import java.util.concurrent.TimeUnit
@@ -211,7 +210,9 @@ class SettingsStore(override val di: DI) : DIAware {
         val shouldSync = syncFrequency.value.minutes > 0
 
         // Clear old job always to replace with new one
-        workManager.cancelUniqueWork(UNIQUE_PERIODIC_NAME_OLD)
+        for (oldPeriodic in oldPeriodics) {
+            workManager.cancelUniqueWork(oldPeriodic)
+        }
 
         if (shouldSync) {
             val constraints = Constraints.Builder()
@@ -232,13 +233,6 @@ class SettingsStore(override val di: DI) : DIAware {
 
             val syncWork = workRequestBuilder
                 .setConstraints(constraints.build())
-                .run {
-                    // Expedited jobs do not support charging constraints
-                    when {
-                        syncOnlyWhenCharging.value -> this
-                        else -> setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                    }
-                }
                 .addTag("feeder")
                 .build()
 
