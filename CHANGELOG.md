@@ -1,3 +1,37 @@
+# 2.0.7
+Agnieszka C (1):
+  * [eccc086f] Updated Polish translation using Weblate
+
+Andrij Mizyk (1):
+  * [5c30def8] Updated Ukrainian translation using Weblate
+
+El Pirujo (1):
+  * [17ae3a97] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [0449b989] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [87cf87f4] Updated Italian translation using Weblate
+
+Jonas Kalderstam (1):
+  * [1001815d] Fixed crash introduced in 2.0.5
+
+Oğuz Ersen (1):
+  * [450919e5] Updated Turkish translation using Weblate
+
+VfBFan (1):
+  * [4b67ae83] Updated German translation using Weblate
+
+Vitor Henrique (1):
+  * [a00177be] Updated Portuguese (Brazil) translation using Weblate
+
+g (1):
+  * [0e94edb6] Updated Lithuanian translation using Weblate
+
+zmni (1):
+  * [9eb6273d] Updated Indonesian translation using Weblate
+
 # 2.0.6
 I. Musthafa (1):
   * [f4801944] Translated using Weblate (Indonesian)
