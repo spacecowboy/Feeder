@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.model.UNIQUE_PERIODIC_NAME
-import com.nononsenseapps.feeder.model.UNIQUE_PERIODIC_NAME_OLD
+import com.nononsenseapps.feeder.model.oldPeriodics
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -211,7 +211,9 @@ class SettingsStoreTest : DIAware {
         }
         coVerify {
             sp.edit().putString(PREF_SYNC_FREQ, "180").apply()
-            workManager.cancelUniqueWork(UNIQUE_PERIODIC_NAME_OLD)
+            for (oldPeriodic in oldPeriodics) {
+                workManager.cancelUniqueWork(oldPeriodic)
+            }
             workManager.enqueueUniquePeriodicWork(
                 UNIQUE_PERIODIC_NAME,
                 ExistingPeriodicWorkPolicy.REPLACE,
