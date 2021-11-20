@@ -91,7 +91,7 @@ interface FeedDao {
 
     @Query(
         """
-        SELECT id, title, url, tag, custom_title, notify, image_url, unread_count
+        SELECT id, title, url, tag, custom_title, notify, currently_syncing, image_url, unread_count
         FROM feeds
         LEFT JOIN (SELECT COUNT(1) AS unread_count, feed_id
           FROM feed_items

@@ -11,7 +11,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
@@ -51,13 +56,37 @@ const val COLLAPSE_ANIMATION_DURATION = 300
 private fun ListOfFeedsAndTagsPreview() {
     ListOfFeedsAndTags(
         listOf(
-            DrawerTop(unreadCount = 100),
-            DrawerTag(tag = "News tag", unreadCount = 3, -1111),
-            DrawerFeed(id = 1, displayTitle = "Times", tag = "News tag", unreadCount = 1),
-            DrawerFeed(id = 2, displayTitle = "Post", tag = "News tag", unreadCount = 2),
-            DrawerTag(tag = "Funny tag", unreadCount = 6, -2222),
-            DrawerFeed(id = 3, displayTitle = "Hidden", tag = "Funny tag", unreadCount = 6),
-            DrawerFeed(id = 4, displayTitle = "Top Dog", unreadCount = 99, tag = "")
+            DrawerTop(unreadCount = 100, syncingChildren = 2, totalChildren = 4),
+            DrawerTag(tag = "News tag", unreadCount = 3, -1111, syncingChildren = 0, totalChildren = 2),
+            DrawerFeed(
+                id = 1,
+                displayTitle = "Times",
+                tag = "News tag",
+                unreadCount = 1,
+                currentlySyncing = false
+            ),
+            DrawerFeed(
+                id = 2,
+                displayTitle = "Post",
+                tag = "News tag",
+                unreadCount = 2,
+                currentlySyncing = false
+            ),
+            DrawerTag(tag = "Funny tag", unreadCount = 6, -2222, syncingChildren = 1, totalChildren = 1),
+            DrawerFeed(
+                id = 3,
+                displayTitle = "Hidden",
+                tag = "Funny tag",
+                unreadCount = 6,
+                currentlySyncing = true
+            ),
+            DrawerFeed(
+                id = 4,
+                displayTitle = "Top Dog",
+                unreadCount = 99,
+                tag = "",
+                currentlySyncing = true
+            )
         ),
         emptySet(),
         {},
@@ -88,6 +117,8 @@ fun ListOfFeedsAndTags(
                         expanded = item.tag in expandedTags,
                         onToggleExpansion = onToggleTagExpansion,
                         unreadCount = item.unreadCount,
+                        currentlySyncing = item.currentlySyncing,
+                        syncProgress = item.syncProgress,
                         title = item.title(),
                         onItemClick = {
                             onItemClick(item)
@@ -98,6 +129,7 @@ fun ListOfFeedsAndTags(
                     when {
                         item.tag.isEmpty() -> TopLevelFeed(
                             unreadCount = item.unreadCount,
+                            currentlySyncing = item.currentlySyncing,
                             title = item.title(),
                             onItemClick = {
                                 onItemClick(item)
@@ -106,6 +138,7 @@ fun ListOfFeedsAndTags(
                         else -> {
                             ChildFeed(
                                 unreadCount = item.unreadCount,
+                                currentlySyncing = item.currentlySyncing,
                                 title = item.title(),
                                 visible = item.tag in expandedTags,
                                 onItemClick = {
@@ -115,8 +148,10 @@ fun ListOfFeedsAndTags(
                         }
                     }
                 }
-                is DrawerTop -> TopLevelFeed(
+                is DrawerTop -> AllFeeds(
                     unreadCount = item.unreadCount,
+                    currentlySyncing = item.currentlySyncing,
+                    syncProgress = item.syncProgress,
                     title = item.title(),
                     onItemClick = {
                         onItemClick(item)
@@ -134,6 +169,8 @@ private fun ExpandableTag(
     title: String = "Foo",
     unreadCount: Int = 99,
     expanded: Boolean = true,
+    currentlySyncing: Boolean = false,
+    syncProgress: Float = 0.0f,
     onToggleExpansion: (String) -> Unit = {},
     onItemClick: () -> Unit = {},
 ) {
@@ -152,6 +189,7 @@ private fun ExpandableTag(
             .clickable(onClick = onItemClick)
             .padding(top = 2.dp, bottom = 2.dp, end = 16.dp)
             .fillMaxWidth()
+            .height(48.dp)
             .semantics(mergeDescendants = true) {
                 try {
                     stateDescription = if (expanded) {
@@ -178,13 +216,31 @@ private fun ExpandableTag(
                 onToggleExpansion(title)
             }
         )
-        Text(
-            text = title,
-            maxLines = 1,
+        Box(
             modifier = Modifier
-                .padding(end = 2.dp)
+                .fillMaxHeight()
                 .weight(1.0f, fill = true)
-        )
+        ) {
+            Text(
+                text = title,
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(end = 2.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart)
+            )
+            this@Row.AnimatedVisibility(
+                visible = currentlySyncing,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+            ) {
+                LinearProgressIndicator(
+                    progress = syncProgress,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+            }
+        }
         val unreadLabel = LocalContext.current.resources
             .getQuantityString(R.plurals.n_unread_articles, unreadCount, unreadCount)
         Text(
@@ -216,25 +272,70 @@ private fun ExpandArrow(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Preview(showBackground = true)
 @Composable
-private fun TopLevelFeed(
+private fun AllFeeds(
     title: String = "Foo",
     unreadCount: Int = 99,
+    currentlySyncing: Boolean = false,
+    syncProgress: Float = 0.0f,
     onItemClick: () -> Unit = {},
 ) = Feed(
     title = title,
     unreadCount = unreadCount,
     startPadding = 16.dp,
-    onItemClick = onItemClick
+    onItemClick = onItemClick,
+    syncIndicator = {
+        AnimatedVisibility(
+            visible = currentlySyncing,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+        ) {
+            LinearProgressIndicator(
+                progress = syncProgress,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomStart)
+            )
+        }
+    },
 )
 
-@ExperimentalAnimationApi
+@OptIn(ExperimentalAnimationApi::class)
+@Preview(showBackground = true)
+@Composable
+private fun TopLevelFeed(
+    title: String = "Foo",
+    unreadCount: Int = 99,
+    currentlySyncing: Boolean = false,
+    onItemClick: () -> Unit = {},
+) = Feed(
+    title = title,
+    unreadCount = unreadCount,
+    startPadding = 16.dp,
+    onItemClick = onItemClick,
+    syncIndicator = {
+        AnimatedVisibility(
+            visible = currentlySyncing,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+        ) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        }
+    },
+)
+
+@OptIn(ExperimentalAnimationApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun ChildFeed(
     title: String = "Foo",
     unreadCount: Int = 99,
+    currentlySyncing: Boolean = false,
     visible: Boolean = true,
     onItemClick: () -> Unit = {},
 ) {
@@ -247,16 +348,30 @@ private fun ChildFeed(
             title = title,
             unreadCount = unreadCount,
             startPadding = 48.dp,
-            onItemClick = onItemClick
+            onItemClick = onItemClick,
+            syncIndicator = {
+                AnimatedVisibility(
+                    visible = currentlySyncing,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                ) {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
+            },
         )
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Feed(
     title: String,
     unreadCount: Int,
     startPadding: Dp,
+    syncIndicator: @Composable BoxScope.() -> Unit,
     onItemClick: () -> Unit,
 ) {
     Row(
@@ -273,12 +388,20 @@ private fun Feed(
             .fillMaxWidth()
             .height(48.dp)
     ) {
-        Text(
-            text = title,
-            maxLines = 1,
+        Box(
             modifier = Modifier
+                .fillMaxHeight()
                 .weight(1.0f, fill = true)
-        )
+        ) {
+            Text(
+                text = title,
+                maxLines = 1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart)
+            )
+            syncIndicator()
+        }
         val unreadLabel = LocalContext.current.resources
             .getQuantityString(R.plurals.n_unread_articles, unreadCount, unreadCount)
         Text(

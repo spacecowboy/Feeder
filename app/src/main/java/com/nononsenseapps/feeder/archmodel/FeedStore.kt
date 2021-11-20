@@ -63,7 +63,7 @@ class FeedStore(override val di: DI) : DIAware {
     private fun mapFeedsToSortedDrawerItems(
         feeds: List<FeedUnreadCount>,
     ): List<DrawerItemWithUnreadCount> {
-        var topTag = DrawerTop(unreadCount = 0)
+        var topTag = DrawerTop(unreadCount = 0, syncingChildren = 0, totalChildren = 0)
         val tags: MutableMap<String, DrawerTag> = mutableMapOf()
         val data: MutableList<DrawerItemWithUnreadCount> = mutableListOf()
 
@@ -72,19 +72,38 @@ class FeedStore(override val di: DI) : DIAware {
                 unreadCount = feedDbo.unreadCount,
                 tag = feedDbo.tag,
                 id = feedDbo.id,
-                displayTitle = feedDbo.displayTitle
+                displayTitle = feedDbo.displayTitle,
+                currentlySyncing = feedDbo.currentlySyncing,
             )
 
             data.add(feed)
-            topTag = topTag.copy(unreadCount = topTag.unreadCount + feed.unreadCount)
+            topTag = topTag.copy(
+                unreadCount = topTag.unreadCount + feed.unreadCount,
+                totalChildren = topTag.totalChildren + 1,
+                syncingChildren = if (feedDbo.currentlySyncing) {
+                    topTag.syncingChildren + 1
+                } else {
+                    topTag.syncingChildren
+                }
+            )
 
             if (feed.tag.isNotEmpty()) {
                 val tag = tags[feed.tag] ?: DrawerTag(
                     tag = feed.tag,
                     unreadCount = 0,
                     uiId = getTagUiId(feed.tag),
+                    syncingChildren = 0,
+                    totalChildren = 0,
                 )
-                tags[feed.tag] = tag.copy(unreadCount = tag.unreadCount + feed.unreadCount)
+                tags[feed.tag] = tag.copy(
+                    unreadCount = tag.unreadCount + feed.unreadCount,
+                    totalChildren = tag.totalChildren + 1,
+                    syncingChildren = if (feedDbo.currentlySyncing) {
+                        tag.syncingChildren + 1
+                    } else {
+                        tag.syncingChildren
+                    },
+                )
             }
         }
 

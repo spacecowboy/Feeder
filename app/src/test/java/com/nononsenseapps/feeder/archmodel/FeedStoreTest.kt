@@ -126,10 +126,10 @@ class FeedStoreTest : DIAware {
         every { dao.loadFlowOfFeedsWithUnreadCounts() } returns flow {
             emit(
                 listOf(
-                    FeedUnreadCount(id = 1, title = "zob", unreadCount = 3),
-                    FeedUnreadCount(id = 2, title = "bob", tag = "zork", unreadCount = 4),
-                    FeedUnreadCount(id = 3, title = "alice", tag = "alpha", unreadCount = 5),
-                    FeedUnreadCount(id = 4, title = "argh", tag = "alpha", unreadCount = 7),
+                    FeedUnreadCount(id = 1, title = "zob", unreadCount = 3, currentlySyncing = true),
+                    FeedUnreadCount(id = 2, title = "bob", tag = "zork", unreadCount = 4, currentlySyncing = false),
+                    FeedUnreadCount(id = 3, title = "alice", tag = "alpha", unreadCount = 5, currentlySyncing = true),
+                    FeedUnreadCount(id = 4, title = "argh", tag = "alpha", unreadCount = 7, currentlySyncing = false),
                 )
             )
         }
@@ -139,13 +139,13 @@ class FeedStoreTest : DIAware {
 
         assertEquals(
             listOf(
-                DrawerTop(unreadCount = 19),
-                DrawerTag("alpha", 12, -1002),
-                DrawerFeed(3, "alpha", "alice", 5),
-                DrawerFeed(4, "alpha", "argh", 7),
-                DrawerTag("zork", 4, -1001),
-                DrawerFeed(2, "zork", "bob", 4),
-                DrawerFeed(1, "", "zob", 3),
+                DrawerTop(unreadCount = 19, syncingChildren = 2, totalChildren = 4),
+                DrawerTag("alpha", 12, -1002, syncingChildren = 1, totalChildren = 2),
+                DrawerFeed(3, "alpha", "alice", 5, currentlySyncing = true),
+                DrawerFeed(4, "alpha", "argh", 7, currentlySyncing = false),
+                DrawerTag("zork", 4, -1001, syncingChildren = 0, totalChildren = 1),
+                DrawerFeed(2, "zork", "bob", 4, currentlySyncing = false),
+                DrawerFeed(1, "", "zob", 3, currentlySyncing = true),
             ),
             drawerItems
         )
