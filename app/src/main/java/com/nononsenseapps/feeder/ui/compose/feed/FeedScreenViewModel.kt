@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
+import org.threeten.bp.Instant
 
 class FeedScreenViewModel(di: DI, state: SavedStateHandle) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
@@ -109,7 +110,7 @@ class FeedScreenViewModel(di: DI, state: SavedStateHandle) : DIAwareViewModel(di
                 repository.showFab,
                 repository.showThumbnails,
                 repository.currentTheme,
-                repository.isRefreshing,
+                repository.currentlySyncingLatestTimestamp,
                 repository.getScreenTitleForFeedOrTag(feedId, feedTag),
                 repository.getVisibleFeedTitles(feedId, feedTag),
                 repository.drawerItemsWithUnreadCounts,
@@ -121,7 +122,7 @@ class FeedScreenViewModel(di: DI, state: SavedStateHandle) : DIAwareViewModel(di
                     showFab = params[1] as Boolean,
                     showThumbnails = params[2] as Boolean,
                     currentTheme = params[3] as ThemeOptions,
-                    isRefreshing = params[4] as Boolean,
+                    currentlySyncingLatestTimestamp = params[4] as Instant,
                     screenTitle = params[5] as ScreenTitle,
                     visibleFeeds = params[6] as List<FeedTitle>,
                     drawerItemsWithUnreadCounts = params[7] as List<DrawerItemWithUnreadCount>,
@@ -140,7 +141,7 @@ data class FeedScreenViewState(
     val showFab: Boolean = true,
     val showThumbnails: Boolean = true,
     val currentTheme: ThemeOptions = ThemeOptions.SYSTEM,
-    val isRefreshing: Boolean = false,
+    val currentlySyncingLatestTimestamp: Instant = Instant.EPOCH,
     // Defaults to empty string to avoid rendering until loading complete
     val screenTitle: ScreenTitle = ScreenTitle(""),
     val visibleFeeds: List<FeedTitle> = emptyList(),

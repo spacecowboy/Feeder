@@ -12,6 +12,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
@@ -24,6 +25,7 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import org.threeten.bp.Instant
 
 class FeedStoreTest : DIAware {
     private val store: FeedStore by instance()
@@ -185,5 +187,32 @@ class FeedStoreTest : DIAware {
             ),
             runBlocking { store.getFeedTitles(-1L, "").toList().first() }
         )
+    }
+
+    @Test
+    fun getCurrentlySyncingLatestTimestamp() {
+        every { dao.getCurrentlySyncingLatestTimestamp() } returns flowOf(null)
+
+        val result = runBlocking {
+            store.getCurrentlySyncingLatestTimestamp().toList()
+        }
+
+        assertEquals(null, result.first())
+
+        verify { dao.getCurrentlySyncingLatestTimestamp() }
+    }
+
+    @Test
+    fun setCurrentlySyncingOn() {
+        val now = Instant.now()
+        runBlocking {
+            store.setCurrentlySyncingOn(5L, true)
+            store.setCurrentlySyncingOn(8L, false, now)
+        }
+
+        coVerify {
+            dao.setCurrentlySyncingOn(5L, true)
+            dao.setCurrentlySyncingOn(8L, false, now)
+        }
     }
 }

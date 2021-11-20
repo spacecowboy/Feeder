@@ -7,6 +7,7 @@ import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.verify
@@ -23,6 +24,7 @@ import org.kodein.di.DIAware
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import org.threeten.bp.Instant
 
 class RepositoryTest : DIAware {
     private val repository: Repository by instance()
@@ -201,6 +203,22 @@ class RepositoryTest : DIAware {
 
         coVerify {
             feedItemStore.getFeedsItemsWithDefaultFullTextParse()
+        }
+    }
+
+    @Test
+    fun currentlySyncingLatestTimestamp() {
+        every { feedStore.getCurrentlySyncingLatestTimestamp() } returns flowOf(null)
+
+        val result = runBlocking {
+            repository.currentlySyncingLatestTimestamp.toList()
+        }
+
+        assertEquals(1, result.size)
+        assertEquals(Instant.EPOCH, result.first())
+
+        verify {
+            feedStore.getCurrentlySyncingLatestTimestamp()
         }
     }
 }

@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import kotlinx.coroutines.flow.Flow
 import java.net.URL
+import org.threeten.bp.Instant
 
 @Dao
 interface FeedDao {
@@ -129,6 +130,33 @@ interface FeedDao {
 
     @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds ORDER BY $COL_TITLE COLLATE NOCASE")
     fun getAllFeedTitles(): Flow<List<FeedTitle>>
+
+    @Query(
+        """
+            SELECT MAX(last_sync)
+            FROM feeds
+            WHERE currently_syncing
+        """
+    )
+    fun getCurrentlySyncingLatestTimestamp(): Flow<Instant?>
+
+    @Query(
+        """
+            UPDATE feeds
+            SET currently_syncing = :syncing
+            WHERE id IS :feedId
+        """
+    )
+    suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean)
+
+    @Query(
+        """
+            UPDATE feeds
+            SET currently_syncing = :syncing, last_sync = :lastSync
+            WHERE id IS :feedId
+        """
+    )
+    suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean, lastSync: Instant)
 }
 
 /**

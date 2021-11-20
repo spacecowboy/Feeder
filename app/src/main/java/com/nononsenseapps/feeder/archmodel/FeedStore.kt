@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.mapLatest
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import org.threeten.bp.Instant
 
 class FeedStore(override val di: DI) : DIAware {
     private val feedDao: FeedDao by instance()
@@ -99,4 +100,15 @@ class FeedStore(override val di: DI) : DIAware {
             tag.isNotBlank() -> feedDao.getFeedTitlesWithTag(tag)
             else -> feedDao.getAllFeedTitles()
         }
+
+    fun getCurrentlySyncingLatestTimestamp(): Flow<Instant?> =
+        feedDao.getCurrentlySyncingLatestTimestamp()
+
+    suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean, lastSync: Instant? = null) {
+        if (lastSync != null) {
+            feedDao.setCurrentlySyncingOn(feedId = feedId, syncing = syncing, lastSync = lastSync)
+        } else {
+            feedDao.setCurrentlySyncingOn(feedId = feedId, syncing = syncing)
+        }
+    }
 }

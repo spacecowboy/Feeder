@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -84,10 +85,11 @@ class Repository(override val di: DI) : DIAware {
         sessionStore.setResumeTime(value)
     }
 
-    val isRefreshing: StateFlow<Boolean> = sessionStore.isRefreshing
-    fun setRefreshing(value: Boolean) {
-        sessionStore.setRefreshing(value)
-    }
+    val currentlySyncingLatestTimestamp: Flow<Instant> =
+        feedStore.getCurrentlySyncingLatestTimestamp()
+            .map {  value ->
+                value ?: Instant.EPOCH
+            }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getFeedListItems(feedId: Long, tag: String): Flow<PagingData<FeedListItem>> = combine(
