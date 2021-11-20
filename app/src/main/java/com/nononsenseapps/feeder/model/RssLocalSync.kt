@@ -49,7 +49,7 @@ suspend fun syncFeeds(
     feedTag: String = "",
     forceNetwork: Boolean = false,
     parallel: Boolean = false,
-    minFeedAgeMinutes: Int = 15,
+    minFeedAgeMinutes: Int = 5,
 ): Boolean {
     val di: DI by closestDI(context)
     val repository: Repository by di.instance()
@@ -78,7 +78,7 @@ internal suspend fun syncFeeds(
     maxFeedItemCount: Int = 100,
     forceNetwork: Boolean = false,
     parallel: Boolean = false,
-    minFeedAgeMinutes: Int = 15,
+    minFeedAgeMinutes: Int = 5,
 ): Boolean {
     val feedStore: FeedStore by di.instance()
     val db: AppDatabase by di.instance()
