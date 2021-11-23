@@ -134,4 +134,5 @@
     <string name="feed_item_style">Artikelstil</string>
     <string name="only_enable_for_bad_id_feeds">Använd endast för flöden med dåliga IDn</string>
     <string name="generate_extra_unique_ids">Skapa extraunika IDn</string>
+    <string name="invalid_url">Felaktig URL</string>
 </resources>

@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.focus.focusOrder
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -54,6 +55,7 @@ import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_READER
 import com.nononsenseapps.feeder.ui.compose.components.AutoCompleteFoo
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
+import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.settings.GroupTitle
 import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
 import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
@@ -237,11 +239,17 @@ fun EditFeedView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 64.dp)
+                    .interceptKey(Key.Enter) {
+                        focusTitle.requestFocus()
+                    }
+                    .interceptKey(Key.Escape) {
+                        focusManager.clearFocus()
+                    }
             )
             AnimatedVisibility(visible = viewState.isNotValidUrl) {
                 Text(
                     textAlign = TextAlign.Center,
-                    text = "Not a valid URL (TODO resource)",
+                    text = stringResource(R.string.invalid_url),
                     style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error),
                 )
             }
@@ -270,6 +278,12 @@ fun EditFeedView(
                     .focusOrder(focusTitle)
                     .fillMaxWidth()
                     .heightIn(min = 64.dp)
+                    .interceptKey(Key.Enter) {
+                        focusTag.requestFocus()
+                    }
+                    .interceptKey(Key.Escape) {
+                        focusManager.clearFocus()
+                    }
             )
 
             AutoCompleteFoo(
@@ -319,6 +333,12 @@ fun EditFeedView(
                         }
                         .fillMaxWidth()
                         .heightIn(min = 64.dp)
+                        .interceptKey(Key.Enter) {
+                            focusManager.clearFocus()
+                        }
+                        .interceptKey(Key.Escape) {
+                            focusManager.clearFocus()
+                        }
                 )
             }
 

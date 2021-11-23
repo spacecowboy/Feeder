@@ -25,6 +25,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,8 +34,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -48,6 +52,7 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.MalformedURLException
@@ -154,7 +159,7 @@ fun SearchFeedView(
     )
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchFeedView(
     feedUrl: String = "",
@@ -168,6 +173,7 @@ fun SearchFeedView(
 ) {
     val focusManager = LocalFocusManager.current
     val dimens = LocalDimens.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // If screen is opened from intent with pre-filled URL, trigger search directly
     LaunchedEffect(Unit) {
@@ -203,7 +209,7 @@ fun SearchFeedView(
                     onSearch = {
                         if (isValidUrl(feedUrl)) {
                             onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
-                            focusManager.clearFocus()
+                            keyboardController?.hide()
                         }
                     }
                 ),
@@ -211,6 +217,15 @@ fun SearchFeedView(
                 colors = TextFieldDefaults.textFieldColors(),
                 modifier = Modifier
                     .width(dimens.maxContentWidth)
+                    .interceptKey(Key.Enter) {
+                        if (isValidUrl(feedUrl)) {
+                            onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                            keyboardController?.hide()
+                        }
+                    }
+                    .interceptKey(Key.Escape) {
+                        focusManager.clearFocus()
+                    }
             )
         }
         item {

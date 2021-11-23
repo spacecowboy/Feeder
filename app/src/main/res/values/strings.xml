@@ -146,4 +146,5 @@
   <string name="feed_item_style_super_compact">Super compact</string>
   <string name="generate_extra_unique_ids">Generate extra unique IDs</string>
   <string name="only_enable_for_bad_id_feeds">Only enable for feeds with bad IDs</string>
+  <string name="invalid_url">Not a valid URL</string>
 </resources>
