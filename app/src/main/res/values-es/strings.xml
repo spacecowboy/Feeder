@@ -136,4 +136,5 @@
     <string name="only_enable_for_bad_id_feeds">Habilitar solo para orígenes con identificadores incorrectos</string>
     <string name="sync_status">Estado de sincronización</string>
     <string name="syncing">Sincronizando</string>
+    <string name="invalid_url">URL no válida</string>
 </resources>
