@@ -37,7 +37,7 @@
     <string name="new_based_on_this">Новая на основе этой</string>
     <string name="indicator_for_mark_as_read">Индикатор прочитанного</string>
     <string name="share">Поделиться</string>
-    <string name="no_such_feed">Не удалось найти такую ленту. Попробуйте с https.</string>
+    <string name="no_such_feed">Не удалось найти такую ленту. Может попробовать с HTTPS\?</string>
     <string name="nothing_to_display">Здесь ничего нет!</string>
     <string name="title_activity_settings">Настройки</string>
     <string name="all_feeds">Все ленты</string>
@@ -134,4 +134,7 @@
     <string name="dark_theme_preference">Предпочтительная темная тема</string>
     <string name="generate_extra_unique_ids">Создать дополнительные уникальные ID</string>
     <string name="only_enable_for_bad_id_feeds">Включать только для каналов с плохими ID</string>
+    <string name="sync_status">Состояние синхронизации</string>
+    <string name="invalid_url">Недопустимый URL-адрес</string>
+    <string name="syncing">Синхронизация</string>
 </resources>
