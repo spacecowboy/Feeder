@@ -136,4 +136,5 @@
     <string name="only_enable_for_bad_id_feeds">Nur für Feeds mit fehlerhaften IDs aktivieren</string>
     <string name="syncing">Synchronisierung</string>
     <string name="sync_status">Synchronisierungsstatus</string>
+    <string name="invalid_url">Keine gültige Adresse</string>
 </resources>
