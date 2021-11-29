@@ -134,4 +134,7 @@
     <string name="dark_theme_preference_dark">Întunecat</string>
     <string name="only_enable_for_bad_id_feeds">Activați numai pentru fluxurile cu ID-uri greșite</string>
     <string name="generate_extra_unique_ids">Generarea de ID-uri unice suplimentare</string>
+    <string name="syncing">Sincronizare</string>
+    <string name="sync_status">Starea sincronizării</string>
+    <string name="invalid_url">Nu este un URL valid</string>
 </resources>
