@@ -136,4 +136,5 @@
     <string name="only_enable_for_bad_id_feeds">Activation uniquement pour les flux avec de mauvais ID</string>
     <string name="syncing">Synchronisation</string>
     <string name="sync_status">État de la synchronisation</string>
+    <string name="invalid_url">URL invalide</string>
 </resources>
