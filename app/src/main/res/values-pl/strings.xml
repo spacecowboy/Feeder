@@ -136,4 +136,5 @@
     <string name="only_enable_for_bad_id_feeds">Włącz tylko dla kanałów z nieprawidłowymi identyfikatorami</string>
     <string name="syncing">Synchronizowanie</string>
     <string name="sync_status">Status synchronizacji</string>
+    <string name="invalid_url">Nieprawidłowy adres URL</string>
 </resources>

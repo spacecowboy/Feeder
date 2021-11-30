@@ -136,4 +136,5 @@
     <string name="only_enable_for_bad_id_feeds">Yalnızca hatalı kimliklere sahip yayınlar için etkinleştir</string>
     <string name="sync_status">Eşzamanlama durumu</string>
     <string name="syncing">Eşzamanlama</string>
+    <string name="invalid_url">Geçerli bir URL değil</string>
 </resources>

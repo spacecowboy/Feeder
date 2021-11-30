@@ -58,7 +58,7 @@
     <string name="only_when_charging">Vain ladattaessa</string>
     <string name="image_loading">Kuvien lataaminen</string>
     <string name="no_activity_for_link">Ei löydetty aktiviteettiä, jolla tämä linkki avattaisiin</string>
-    <string name="check_for_updates">Tarkista päivitykset</string>
+    <string name="check_for_updates">Uusia artikkeleita etsitään…</string>
     <string name="on_startup">Käynnistyksen yhteydessä</string>
     <string name="show_fab">Kelluva toimintopainike</string>
     <string name="include_mobile_hotspots">Sisällytä mobiili hotspotit</string>
@@ -133,4 +133,5 @@
     <string name="dark_theme_preference_dark">Tumma</string>
     <string name="dark_theme_preference">Suosittu tumma teema</string>
     <string name="syncing">Synkronoidaan</string>
+    <string name="invalid_url">Ei kelvollinen URL-osoite</string>
 </resources>

@@ -136,4 +136,5 @@
     <string name="only_enable_for_bad_id_feeds">Įgalinti tik sklaidos kanalams su netinkamais ID</string>
     <string name="sync_status">Sinchronizavimo būsena</string>
     <string name="syncing">Sinchronizuojama</string>
+    <string name="invalid_url">Netinkamas URL adresas</string>
 </resources>

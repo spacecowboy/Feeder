@@ -136,4 +136,5 @@
     <string name="only_enable_for_bad_id_feeds">Дозволити лише для стрічок із поганими ІД</string>
     <string name="syncing">Синхронування</string>
     <string name="sync_status">Стан синхронування</string>
+    <string name="invalid_url">Не правильна URL</string>
 </resources>
