@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.util.Log
+import com.nononsenseapps.feeder.archmodel.FeedStore
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobOutputStream
@@ -48,7 +49,7 @@ suspend fun syncFeeds(
     feedTag: String = "",
     forceNetwork: Boolean = false,
     parallel: Boolean = false,
-    minFeedAgeMinutes: Int = 15,
+    minFeedAgeMinutes: Int = 5,
 ): Boolean {
     val di: DI by closestDI(context)
     val repository: Repository by di.instance()
@@ -77,8 +78,9 @@ internal suspend fun syncFeeds(
     maxFeedItemCount: Int = 100,
     forceNetwork: Boolean = false,
     parallel: Boolean = false,
-    minFeedAgeMinutes: Int = 15,
+    minFeedAgeMinutes: Int = 5,
 ): Boolean {
+    val feedStore: FeedStore by di.instance()
     val db: AppDatabase by di.instance()
     var result = false
     var needFullTextSync = false
@@ -104,11 +106,16 @@ internal suspend fun syncFeeds(
                     Log.e(LOG_TAG, "Error during sync", throwable)
                 }
 
-
                 feedsToFetch.forEach {
                     needFullTextSync = needFullTextSync || it.fullTextByDefault
                     launch(coroutineContext) {
                         try {
+                            // Want unique sync times so UI gets updated state
+                            feedStore.setCurrentlySyncingOn(
+                                feedId = it.id,
+                                syncing = true,
+                                lastSync = Instant.now(),
+                            )
                             syncFeed(
                                 di = di,
                                 feedSql = it,
@@ -123,6 +130,8 @@ internal suspend fun syncFeeds(
                                 "Failed to sync ${it.displayTitle}: ${it.url}",
                                 e
                             )
+                        } finally {
+                            feedStore.setCurrentlySyncingOn(feedId = it.id, syncing = false)
                         }
                     }
                 }

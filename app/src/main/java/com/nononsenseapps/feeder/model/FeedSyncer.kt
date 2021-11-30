@@ -113,16 +113,11 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
 
         var success: Boolean
 
-        val repository by di.instance<Repository>()
-
         try {
-            Log.d("FeederFeedSyncer", "Setting refreshing to true")
-            repository.setRefreshing(true)
-
             val feedId = inputData.getLong(ARG_FEED_ID, ID_UNSET)
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
             val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
-            val minFeedAgeMinutes = inputData.getInt(MIN_FEED_AGE_MINUTES, 15)
+            val minFeedAgeMinutes = inputData.getInt(MIN_FEED_AGE_MINUTES, 5)
 
             success = syncFeeds(
                 context = applicationContext,
@@ -136,8 +131,6 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
             success = false
             Log.e("FeederFeedSyncer", "Failure during sync", e)
         } finally {
-            Log.d("FeederFeedSyncer", "Setting refreshing to false")
-            repository.setRefreshing(false)
             // Send notifications for configured feeds
             notify(applicationContext)
         }

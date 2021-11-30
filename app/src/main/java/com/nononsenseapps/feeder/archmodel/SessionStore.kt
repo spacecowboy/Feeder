@@ -18,14 +18,6 @@ class SessionStore {
         }
     }
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
-    fun setRefreshing(refreshing: Boolean) {
-        _isRefreshing.atomicSet {
-            refreshing
-        }
-    }
-
     private val _expandedTags = MutableStateFlow(emptySet<String>())
     val expandedTags: StateFlow<Set<String>> = _expandedTags.asStateFlow()
     fun toggleTagExpansion(tag: String) {

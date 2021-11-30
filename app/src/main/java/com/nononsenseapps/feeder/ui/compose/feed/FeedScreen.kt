@@ -49,6 +49,7 @@ import androidx.compose.material.rememberDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -68,6 +69,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
+import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import coil.size.PixelSize
 import coil.size.Precision
@@ -83,7 +85,6 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
-import com.nononsenseapps.feeder.archmodel.ScreenTitle
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
@@ -101,12 +102,14 @@ import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.util.openGitlabIssues
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
+import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalCoilApi::class)
 @Composable
 fun FeedScreen(
     onItemClick: (Long) -> Unit,
@@ -119,23 +122,27 @@ fun FeedScreen(
     textToSpeechViewModel: TextToSpeechViewModel,
 ) {
     // Start collecting all flows
-    val viewState: FeedScreenViewState? by feedScreenViewModel.viewState.collectAsState(initial = null)
+    val viewState: FeedScreenViewState by feedScreenViewModel.viewState.collectAsState()
     val pagedFeedItems = feedScreenViewModel.currentFeedListItems.collectAsLazyPagingItems()
     val expandedTags by feedScreenViewModel.expandedTags.collectAsState()
-
-    // But don't do anything else unless we have a state to render
-    if (viewState==null) {
-        return
-    }
 
     val nothingToRead by remember(pagedFeedItems) {
         derivedStateOf {
             pagedFeedItems.loadState.append.endOfPaginationReached
-                    && pagedFeedItems.itemCount==0
+                    && pagedFeedItems.itemCount == 0
         }
     }
 
-    val refreshState = rememberSwipeRefreshState(viewState?.isRefreshing ?: false)
+    val refreshState = rememberSwipeRefreshState(
+        viewState.currentlySyncingLatestTimestamp.isAfter(Instant.now().minusSeconds(20))
+    )
+
+    LaunchedEffect(viewState.currentlySyncingLatestTimestamp) {
+        // GUI will only display refresh indicator for 10 seconds at most.
+        // Fixes an issue where sync was triggered but no feed needed syncing, meaning no DB updates
+        delay(10_000L)
+        refreshState.isRefreshing = false
+    }
 
     val context = LocalContext.current
     val onSendFeedback = {
@@ -147,7 +154,7 @@ fun FeedScreen(
     val opmlExporter = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument()
     ) { uri ->
-        if (uri!=null) {
+        if (uri != null) {
             val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
             applicationCoroutineScope.launch {
                 exportOpml(di, uri)
@@ -158,7 +165,7 @@ fun FeedScreen(
     val opmlImporter = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
-        if (uri!=null) {
+        if (uri != null) {
             val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
             applicationCoroutineScope.launch {
                 importOpml(di, uri)
@@ -181,18 +188,20 @@ fun FeedScreen(
 
     FeedScreen(
         // Avoiding rendering a title if no state yet, that's why screentitle must never be null
-        screenTitle = (viewState?.screenTitle ?: ScreenTitle("")).title
+        screenTitle = viewState.screenTitle.title
             ?: stringResource(id = R.string.all_feeds),
-        visibleFeeds = viewState?.visibleFeeds ?: emptyList(),
-        feedsAndTags = viewState?.drawerItemsWithUnreadCounts ?: emptyList(),
+        visibleFeeds = viewState.visibleFeeds,
+        feedsAndTags = viewState.drawerItemsWithUnreadCounts,
         refreshState = refreshState,
         onRefreshVisible = {
+            refreshState.isRefreshing = true
             feedScreenViewModel.requestImmediateSyncOfCurrentFeedOrTag()
         },
         onRefreshAll = {
+            refreshState.isRefreshing = true
             feedScreenViewModel.requestImmediateSyncOfAll()
         },
-        onlyUnread = viewState?.onlyUnread ?: true,
+        onlyUnread = viewState.onlyUnread,
         onToggleOnlyUnread = { value ->
             feedScreenViewModel.setShowOnlyUnread(value)
         },
@@ -209,7 +218,7 @@ fun FeedScreen(
         onMarkAllAsRead = {
             feedScreenViewModel.markAllAsRead()
         },
-        showFloatingActionButton = !nothingToRead && (viewState?.showFab ?: true),
+        showFloatingActionButton = !nothingToRead && viewState.showFab,
         bottomBarVisible = textToSpeechViewModel.notStopped.value,
         expandedTags = expandedTags,
         onToggleTagExpansion = {
@@ -279,10 +288,10 @@ fun FeedScreen(
                                 unread = !previewItem.unread
                             )
                         },
-                        onlyUnread = viewState?.onlyUnread ?: true,
+                        onlyUnread = viewState.onlyUnread,
                         item = previewItem,
-                        showThumbnail = viewState?.showThumbnails ?: true,
-                        feedItemStyle = viewState?.feedItemStyle ?: FeedItemStyle.CARD,
+                        showThumbnail = viewState.showThumbnails,
+                        feedItemStyle = viewState.feedItemStyle,
                         onMarkAboveAsRead = {
                             if (itemIndex > 0) {
                                 feedScreenViewModel.markBeforeAsRead(itemIndex)
@@ -297,7 +306,7 @@ fun FeedScreen(
                         onShareItem = {
                             val intent = Intent.createChooser(
                                 Intent(Intent.ACTION_SEND).apply {
-                                    if (previewItem.link!=null) {
+                                    if (previewItem.link != null) {
                                         putExtra(Intent.EXTRA_TEXT, previewItem.link)
                                     }
                                     putExtra(Intent.EXTRA_TITLE, previewItem.title)
@@ -332,7 +341,7 @@ fun FeedScreen(
                                     contentDescription = null,
                                     modifier = Modifier
                                         .run {
-                                            when (viewState?.feedItemStyle ?: FeedItemStyle.CARD) {
+                                            when (viewState.feedItemStyle) {
                                                 FeedItemStyle.CARD -> this
                                                     .fillMaxWidth()
                                                     .aspectRatio(16.0f / 9.0f)
@@ -484,7 +493,7 @@ fun FeedScreen(
                             }
                             DropdownMenuItem(
                                 onClick = {
-                                    if (visibleFeeds.size==1) {
+                                    if (visibleFeeds.size == 1) {
                                         onEditFeed(visibleFeeds.first().id)
                                     } else {
                                         showEditDialog = true
