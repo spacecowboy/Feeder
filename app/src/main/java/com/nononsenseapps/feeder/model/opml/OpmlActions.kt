@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.model.opml
 import android.content.ContentResolver
 import android.net.Uri
 import android.util.Log
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.model.requestFeedSync
@@ -33,8 +34,12 @@ suspend fun exportOpml(di: DI, uri: Uri) = withContext(Dispatchers.IO) {
         }
         Log.d("OPML", "Exported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
-        Log.e("OMPL", "Failed to export OMPL", e)
-        di.direct.instance<ToastMaker>().makeToast("Failed to export OMPL")
+        Log.e("OMPL", "Failed to export OPML", e)
+        val toastMaker = di.direct.instance<ToastMaker>()
+        toastMaker.makeToast(R.string.failed_to_export_OPML)
+        (e.localizedMessage ?: e.message)?.let { message ->
+            toastMaker.makeToast(message)
+        }
     }
 }
 
@@ -56,7 +61,11 @@ suspend fun importOpml(di: DI, uri: Uri) = withContext(Dispatchers.IO) {
         }
         Log.d("OPML", "Imported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
-        Log.e("OMPL", "Failed to import OMPL", e)
-        di.direct.instance<ToastMaker>().makeToast("Failed to import OMPL")
+        Log.e("OMPL", "Failed to import OPML", e)
+        val toastMaker = di.direct.instance<ToastMaker>()
+        toastMaker.makeToast(R.string.failed_to_import_OPML)
+        (e.localizedMessage ?: e.message)?.let { message ->
+            toastMaker.makeToast(message)
+        }
     }
 }

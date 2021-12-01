@@ -147,4 +147,6 @@
   <string name="generate_extra_unique_ids">Generate extra unique IDs</string>
   <string name="only_enable_for_bad_id_feeds">Only enable for feeds with bad IDs</string>
   <string name="invalid_url">Not a valid URL</string>
+  <string name="failed_to_import_OPML">"Failed to import OPML"</string>
+  <string name="failed_to_export_OPML">"Failed to export OPML"</string>
 </resources>

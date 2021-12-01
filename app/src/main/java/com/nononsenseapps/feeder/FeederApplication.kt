@@ -64,6 +64,10 @@ class FeederApplication : MultiDexApplication(), DIAware {
                 override suspend fun makeToast(text: String) = withContext(Dispatchers.Main) {
                     Toast.makeText(this@FeederApplication, text, Toast.LENGTH_SHORT).show()
                 }
+
+                override suspend fun makeToast(resId: Int) {
+                    Toast.makeText(this@FeederApplication, resId, Toast.LENGTH_SHORT).show()
+                }
             }
         }
         bind<NotificationManagerCompat>() with singleton { NotificationManagerCompat.from(this@FeederApplication) }

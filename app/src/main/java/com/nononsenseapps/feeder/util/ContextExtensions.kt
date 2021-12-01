@@ -8,6 +8,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.core.text.BidiFormatter
@@ -16,6 +17,7 @@ import java.util.*
 
 interface ToastMaker {
     suspend fun makeToast(text: String)
+    suspend fun makeToast(@StringRes resId: Int)
 }
 
 fun Context.makeToast(text: String) {
