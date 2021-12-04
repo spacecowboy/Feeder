@@ -68,7 +68,7 @@ data class FeedItem @Ignore constructor(
     @ColumnInfo(name = COL_NOTIFIED) var notified: Boolean = false,
     @ColumnInfo(name = COL_FEEDID) var feedId: Long? = null,
     @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH,
-    @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) var primarySortTime: Instant = Instant.EPOCH
+    @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) var primarySortTime: Instant = Instant.EPOCH,
 ) : FeedItemForFetching {
 
     constructor() : this(id = ID_UNSET)

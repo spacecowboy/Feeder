@@ -5,17 +5,20 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.RemoteReadMarkReadyToBeApplied
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.mockkStatic
 import io.mockk.verify
+import java.net.URL
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +51,9 @@ class RepositoryTest : DIAware {
     private lateinit var feedStore: FeedStore
 
     @MockK
+    private lateinit var syncRemoteStore: SyncRemoteStore
+
+    @MockK
     private lateinit var androidSystemStore: AndroidSystemStore
 
     @MockK
@@ -58,6 +64,7 @@ class RepositoryTest : DIAware {
         bind<FeedItemStore>() with instance(feedItemStore)
         bind<SettingsStore>() with instance(settingsStore)
         bind<SessionStore>() with instance(sessionStore)
+        bind<SyncRemoteStore>() with instance(syncRemoteStore)
         bind<FeedStore>() with instance(feedStore)
         bind<AndroidSystemStore>() with instance(androidSystemStore)
         bind<Application>() with instance(application)
@@ -279,5 +286,58 @@ class RepositoryTest : DIAware {
         verify {
             feedStore.getCurrentlySyncingLatestTimestamp()
         }
+    }
+
+    @Test
+    fun applyRemoteReadMarks() {
+        coEvery { syncRemoteStore.getRemoteReadMarksReadyToBeApplied() } returns listOf(
+            RemoteReadMarkReadyToBeApplied(1L, 2L),
+            RemoteReadMarkReadyToBeApplied(3L, 4L)
+        )
+
+        runBlocking {
+            repository.applyRemoteReadMarks()
+        }
+
+        coVerify {
+            syncRemoteStore.getRemoteReadMarksReadyToBeApplied()
+            feedItemStore.markAsRead(listOf(2L, 4L))
+            syncRemoteStore.setSynced(2L)
+            syncRemoteStore.setSynced(4L)
+            syncRemoteStore.deleteReadStatusSyncs(listOf(1L, 3L))
+        }
+        confirmVerified(feedItemStore, syncRemoteStore)
+    }
+
+    @Test
+    fun remoteMarkAsReadExistingItem() {
+        coEvery { feedItemStore.getFeedItemId(URL("https://foo"), "guid") } returns 5L
+
+        runBlocking {
+            repository.remoteMarkAsRead(URL("https://foo"), "guid")
+        }
+
+        coVerify {
+            feedItemStore.getFeedItemId(URL("https://foo"), "guid")
+            syncRemoteStore.setSynced(5L)
+            feedItemStore.markAsReadAndNotified(5L)
+        }
+        confirmVerified(feedItemStore, syncRemoteStore)
+    }
+
+    @Test
+    fun remoteMarkAsReadNonExistingItem() {
+        coEvery { feedItemStore.getFeedItemId(any(), any()) } returns null
+        coEvery { syncRemoteStore.addRemoteReadMark(any(), any()) } just Runs
+
+        runBlocking {
+            repository.remoteMarkAsRead(URL("https://foo"), "guid")
+        }
+
+        coVerify {
+            feedItemStore.getFeedItemId(URL("https://foo"), "guid")
+            syncRemoteStore.addRemoteReadMark(URL("https://foo"), "guid")
+        }
+        confirmVerified(feedItemStore, syncRemoteStore)
     }
 }

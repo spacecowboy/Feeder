@@ -35,6 +35,7 @@ dependencies {
     api(platform("com.squareup.okhttp3:okhttp-bom:$okhttp_version"))
     api("com.squareup.okhttp3:okhttp")
     api("com.squareup.moshi:moshi:$moshi_version")
+    api("com.squareup.moshi:moshi-kotlin:$moshi_version")
 
     // tests
     testImplementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")

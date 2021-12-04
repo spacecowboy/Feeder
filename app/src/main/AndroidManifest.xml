@@ -10,6 +10,8 @@
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
   <queries>
+    <!-- So a barcode scanner can be invoked -->
+    <package android:name="com.google.zxing.client.android" />
     <intent>
       <action android:name="android.intent.action.TTS_SERVICE" />
     </intent>
@@ -44,15 +46,15 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
 
-      <intent-filter>
+      <!-- This filter MUST look like this for Android to automatically open these links -->
+      <intent-filter android:autoVerify="true">
         <action android:name="android.intent.action.VIEW" />
-
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
 
-        <data
-          android:host="feederapp.nononsenseapps.com"
-          android:scheme="https" />
+        <data android:scheme="http" />
+        <data android:scheme="https" />
+        <data android:host="feederapp.nononsenseapps.com" />
       </intent-filter>
 
       <meta-data

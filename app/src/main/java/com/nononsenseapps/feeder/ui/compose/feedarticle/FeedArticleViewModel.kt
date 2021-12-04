@@ -123,7 +123,6 @@ class FeedArticleViewModel(
             feedId = feedId,
             feedTag = feedTag,
             forceNetwork = true,
-            parallel = true
         )
     }
 
@@ -131,7 +130,6 @@ class FeedArticleViewModel(
         requestFeedSync(
             di = di,
             forceNetwork = true,
-            parallel = true
         )
     }
 

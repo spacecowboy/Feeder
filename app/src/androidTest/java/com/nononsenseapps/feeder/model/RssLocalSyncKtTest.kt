@@ -186,7 +186,6 @@ class RssLocalSyncKtTest {
                 di = di,
                 filesDir = filesDir,
                 feedId = ID_UNSET,
-                parallel = true
             )
         }
 

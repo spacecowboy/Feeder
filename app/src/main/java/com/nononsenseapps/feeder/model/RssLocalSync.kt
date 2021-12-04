@@ -10,8 +10,7 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.db.room.upsertFeed
-import com.nononsenseapps.feeder.db.room.upsertFeedItems
+import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
@@ -39,14 +38,13 @@ import org.threeten.bp.temporal.ChronoUnit
 val singleThreadedSync = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 val syncMutex = Mutex()
 
-private const val LOG_TAG = "FeederRssLocalSync"
+private const val LOG_TAG = "FEEDER_RssLocalSync"
 
 suspend fun syncFeeds(
     context: Context,
     feedId: Long = ID_UNSET,
     feedTag: String = "",
     forceNetwork: Boolean = false,
-    parallel: Boolean = false,
     minFeedAgeMinutes: Int = 5,
 ): Boolean {
     val di: DI by closestDI(context)
@@ -61,7 +59,6 @@ suspend fun syncFeeds(
                 feedTag = feedTag,
                 maxFeedItemCount = repository.maximumCountPerFeed.value,
                 forceNetwork = forceNetwork,
-                parallel = parallel,
                 minFeedAgeMinutes = minFeedAgeMinutes
             )
         }
@@ -75,11 +72,11 @@ internal suspend fun syncFeeds(
     feedTag: String = "",
     maxFeedItemCount: Int = 100,
     forceNetwork: Boolean = false,
-    parallel: Boolean = false,
     minFeedAgeMinutes: Int = 5,
 ): Boolean {
     val feedStore: FeedStore by di.instance()
     val db: AppDatabase by di.instance()
+    val syncClient: SyncRestClient by di.instance()
     var result = false
     var needFullTextSync = false
     // Let all new items share download time
@@ -93,15 +90,31 @@ internal suspend fun syncFeeds(
                     Instant.now().minus(minFeedAgeMinutes.toLong(), ChronoUnit.MINUTES)
                         .toEpochMilli()
                 }
+                // Fetch new feeds first
+                try {
+                    syncClient.getFeeds()
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Error when fetching new feeds in sync", e)
+                }
+
                 val feedsToFetch = feedsToSync(db.feedDao(), feedId, feedTag, staleTime = staleTime)
 
                 Log.d(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
 
-                val coroutineContext = when (parallel) {
-                    true -> Dispatchers.Default
-                    false -> this.coroutineContext
-                } + CoroutineExceptionHandler { _, throwable ->
-                    Log.e(LOG_TAG, "Error during sync", throwable)
+                val coroutineContext =
+                    Dispatchers.Default + CoroutineExceptionHandler { _, throwable ->
+                        Log.e(LOG_TAG, "Error during sync", throwable)
+                    }
+
+                // Fetch latest read marks and send possible feed updates
+                launch(coroutineContext) {
+                    try {
+                        syncClient.getRead()
+                        syncClient.getDevices()
+                        syncClient.sendUpdatedFeeds()
+                    } catch (e: Exception) {
+                        Log.e(LOG_TAG, "Error when fetching readmarks in sync", e)
+                    }
                 }
 
                 feedsToFetch.forEach {
@@ -159,7 +172,7 @@ private suspend fun syncFeed(
     downloadTime: Instant,
 ) {
     Log.d(LOG_TAG, "Fetching ${feedSql.displayTitle}")
-    val db: AppDatabase by di.instance()
+    val repository: Repository by di.instance()
     val feedParser: FeedParser by di.instance()
     val okHttpClient: OkHttpClient by di.instance()
 
@@ -192,10 +205,8 @@ private suspend fun syncFeed(
     feedSql.lastSync = Instant.now()
 
     if (feed == null) {
-        db.feedDao().upsertFeed(feedSql)
+        repository.upsertFeed(feedSql)
     } else {
-        val itemDao = db.feedItemDao()
-
         val uniqueIdCount = feed.items?.map { it.id }?.toSet()?.size
         // This can only detect between items present in one feed. See NIXOS
         val isNotUniqueIds = uniqueIdCount != feed.items?.size
@@ -215,26 +226,29 @@ private suspend fun syncFeed(
                     // Always attempt to load existing items using both id schemes
                     // Id is rewritten to preferred on update
                     val feedItemSql =
-                        itemDao.loadFeedItem(
+                        repository.loadFeedItem(
                             guid = item.alternateId,
                             feedId = feedSql.id
-                        ) ?: itemDao.loadFeedItem(
+                        ) ?: repository.loadFeedItem(
                             guid = item.id ?: item.alternateId,
                             feedId = feedSql.id
                         ) ?: FeedItem(firstSyncedTime = downloadTime)
 
                     feedItemSql.updateFromParsedEntry(item, guid, feed)
                     feedItemSql.feedId = feedSql.id
+
                     feedItemSql to (item.content_html ?: item.content_text ?: "")
                 } ?: emptyList()
 
-        itemDao.upsertFeedItems(feedItemSqls) { feedItem, text ->
+        repository.upsertFeedItems(feedItemSqls) { feedItem, text ->
             withContext(Dispatchers.IO) {
                 blobOutputStream(feedItem.id, filesDir).bufferedWriter().use {
                     it.write(text)
                 }
             }
         }
+
+        repository.applyRemoteReadMarks()
 
         // Update feed last so lastsync is only set after all items have been handled
         // for the rare case that the job is cancelled prematurely
@@ -246,10 +260,10 @@ private suspend fun syncFeed(
 //        feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
         feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) }
             ?: feedSql.imageUrl
-        db.feedDao().upsertFeed(feedSql)
+        repository.upsertFeed(feedSql)
 
         // Finally, prune database of old items
-        val ids = db.feedItemDao().getItemsToBeCleanedFromFeed(
+        val ids = repository.getItemsToBeCleanedFromFeed(
             feedId = feedSql.id,
             keepCount = max(maxFeedItemCount, feed.items?.size ?: 0)
         )
@@ -265,7 +279,8 @@ private suspend fun syncFeed(
             }
         }
 
-        db.feedItemDao().deleteFeedItems(ids)
+        repository.deleteFeedItems(ids)
+        repository.deleteStaleRemoteReadMarks()
     }
 }
 

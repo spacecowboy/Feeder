@@ -18,6 +18,11 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.db.room.ReadStatusSyncedDao
+import com.nononsenseapps.feeder.db.room.RemoteFeedDao
+import com.nononsenseapps.feeder.db.room.RemoteReadMarkDao
+import com.nononsenseapps.feeder.db.room.SyncDeviceDao
+import com.nononsenseapps.feeder.db.room.SyncRemoteDao
 import com.nononsenseapps.feeder.di.androidModule
 import com.nononsenseapps.feeder.di.archModelModule
 import com.nononsenseapps.feeder.di.networkModule
@@ -55,6 +60,11 @@ class FeederApplication : MultiDexApplication(), DIAware {
         bind<AppDatabase>() with singleton { AppDatabase.getInstance(this@FeederApplication) }
         bind<FeedDao>() with singleton { instance<AppDatabase>().feedDao() }
         bind<FeedItemDao>() with singleton { instance<AppDatabase>().feedItemDao() }
+        bind<SyncRemoteDao>() with singleton { instance<AppDatabase>().syncRemoteDao() }
+        bind<ReadStatusSyncedDao>() with singleton { instance<AppDatabase>().readStatusSyncedDao() }
+        bind<RemoteReadMarkDao>() with singleton { instance<AppDatabase>().remoteReadMarkDao() }
+        bind<RemoteFeedDao>() with singleton { instance<AppDatabase>().remoteFeedDao() }
+        bind<SyncDeviceDao>() with singleton { instance<AppDatabase>().syncDeviceDao() }
 
         import(androidModule)
 

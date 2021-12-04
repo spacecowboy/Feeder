@@ -19,6 +19,7 @@ import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
+import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
@@ -26,6 +27,7 @@ import com.nononsenseapps.feeder.ui.compose.navigation.FeedArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.FeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
+import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.rememberWindowSizeClass
 import kotlinx.coroutines.launch
@@ -35,6 +37,7 @@ import org.kodein.di.instance
 class MainActivity : DIAwareComponentActivity() {
     private val notificationsWorker: NotificationsWorker by instance()
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
+    private val syncClient: SyncRestClient by instance()
 
     // This reference is only used for intent navigation
     private var navController: NavController? = null
@@ -52,10 +55,12 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onStart() {
         super.onStart()
         notificationsWorker.runForever()
+        syncClient.runForever()
     }
 
     override fun onStop() {
         notificationsWorker.stopForever()
+        syncClient.stopForeverJob()
         super.onStop()
     }
 
@@ -71,7 +76,6 @@ class MainActivity : DIAwareComponentActivity() {
                 requestFeedSync(
                     di = di,
                     forceNetwork = false,
-                    parallel = true
                 )
             }
         }
@@ -123,6 +127,8 @@ class MainActivity : DIAwareComponentActivity() {
             AddFeedDestination.register(this, navController, windowSize)
             // Settings
             SettingsDestination.register(this, navController, windowSize)
+            // Sync settings
+            SyncScreenDestination.register(this, navController, windowSize)
         }
     }
 }

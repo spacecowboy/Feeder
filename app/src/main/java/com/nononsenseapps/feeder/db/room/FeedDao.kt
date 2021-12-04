@@ -157,6 +157,32 @@ interface FeedDao {
         """
     )
     suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean, lastSync: Instant)
+
+    @Query(
+        """
+            SELECT *
+            FROM feeds
+            ORDER BY url
+        """
+    )
+    suspend fun getFeedsOrderedByUrl(): List<Feed>
+
+    @Query(
+        """
+            SELECT *
+            FROM feeds
+            ORDER BY url
+        """
+    )
+    fun getFlowOfFeedsOrderedByUrl(): Flow<List<Feed>>
+
+    @Query(
+        """
+            DELETE FROM feeds
+            WHERE url is :url
+        """
+    )
+    suspend fun deleteFeedWithUrl(url: URL): Int
 }
 
 /**

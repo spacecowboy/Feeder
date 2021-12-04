@@ -39,3 +39,9 @@ fun emailBugReportIntent(context: Context?): Intent = Intent(ACTION_SENDTO).also
 fun openGitlabIssues(): Intent = Intent(ACTION_VIEW).also {
     it.data = Uri.parse("https://gitlab.com/spacecowboy/Feeder/issues")
 }
+
+const val KOFI_URL = "https://ko-fi.com/spacecowboy"
+
+fun openKoFiIntent(): Intent = Intent(ACTION_VIEW).also {
+    it.data = Uri.parse(KOFI_URL)
+}

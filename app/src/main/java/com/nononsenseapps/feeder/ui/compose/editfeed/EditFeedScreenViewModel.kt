@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
+import org.threeten.bp.Instant
 
 class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
@@ -76,23 +77,31 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
         viewModelScope.launch {
             val feed = repository.getFeed(feedId)
                 ?: Feed() // Feed was deleted while being edited?
-            val savedId = repository.saveFeed(
-                feed.copy(
-                    url = URL(url),
-                    title = _title.value ?: "",
-                    customTitle = _title.value ?: "",
-                    tag = _tag.value ?: "",
-                    fullTextByDefault = _fullTextByDefault.value ?: false,
-                    notify = _notify.value ?: false,
-                    openArticlesWith = _articleOpener.value ?: PREF_VAL_OPEN_WITH_READER,
-                    alternateId = _alternateId.value ?: false,
+
+            val updatedFeed = feed.copy(
+                url = URL(url),
+                title = _title.value ?: "",
+                customTitle = _title.value ?: "",
+                tag = _tag.value ?: "",
+                fullTextByDefault = _fullTextByDefault.value ?: false,
+                notify = _notify.value ?: false,
+                openArticlesWith = _articleOpener.value ?: PREF_VAL_OPEN_WITH_READER,
+                alternateId = _alternateId.value ?: false,
+            )
+
+            // No point in doing anything unless they actually differ
+            if (feed != updatedFeed) {
+                // In case clocks between different devices differ don't allow this date to go backwards
+                updatedFeed.whenModified = maxOf(Instant.now(), feed.whenModified.plusMillis(1))
+                val savedId = repository.saveFeed(
+                    updatedFeed
                 )
-            )
-            requestFeedSync(
-                di,
-                feedId = savedId,
-                forceNetwork = true,
-            )
+                requestFeedSync(
+                    di,
+                    feedId = savedId,
+                    forceNetwork = true,
+                )
+            }
         }
     }
 

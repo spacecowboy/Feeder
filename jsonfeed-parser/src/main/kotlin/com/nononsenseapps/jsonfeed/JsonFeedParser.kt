@@ -2,6 +2,7 @@ package com.nononsenseapps.jsonfeed
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -9,10 +10,6 @@ import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.ResponseBody
-
-// 10 mins
-const val MIN_MAXAGE = 600
-val MAX_AGE_PATTERN = """max-age=(\d+)""".toRegex()
 
 fun cachingHttpClient(
     cacheDirectory: File? = null,
@@ -27,32 +24,6 @@ fun cachingHttpClient(
         builder.cache(Cache(cacheDirectory, cacheSize))
     }
 
-    // Not all web servers have good cache settings defined, so overwrite feeds to allow caching
-    // for 20 mins if whatever it says is bad
-    builder.addNetworkInterceptor {
-        val response = it.proceed(it.request())
-
-        try {
-            val cacheHeaders = response.headers("Cache-Control")
-
-            var maxAge = -1
-
-            for (header in cacheHeaders) {
-                MAX_AGE_PATTERN.find(header)?.let {
-                    maxAge = it.groupValues.last().toInt()
-                }
-            }
-
-            maxAge = maxOf(maxAge, MIN_MAXAGE)
-
-            response.newBuilder()
-                .header("Cache-Control", "public, max-age=$maxAge")
-                .build()
-        } catch (ignored: Throwable) {
-            response
-        }
-    }
-
     builder
         .connectTimeout(connectTimeoutSecs, TimeUnit.SECONDS)
         .readTimeout(readTimeoutSecs, TimeUnit.SECONDS)
@@ -65,7 +36,8 @@ fun cachingHttpClient(
     return builder.build()
 }
 
-fun feedAdapter(): JsonAdapter<Feed> = Moshi.Builder().build().adapter(Feed::class.java)
+fun feedAdapter(): JsonAdapter<Feed> =
+    Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build().adapter(Feed::class.java)
 
 /**
  * A parser for JSONFeeds. CacheDirectory and CacheSize are only relevant if feeds are downloaded. They are not used

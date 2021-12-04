@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.kodein.di.DI
 import org.kodein.di.instance
+import org.threeten.bp.Instant
 
 class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
@@ -76,6 +77,7 @@ class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : D
                     notify = _notify.value ?: false,
                     openArticlesWith = _articleOpener.value ?: PREF_VAL_OPEN_WITH_READER,
                     alternateId = _alternateId.value ?: false,
+                    whenModified = Instant.now(),
                 )
             )
         }

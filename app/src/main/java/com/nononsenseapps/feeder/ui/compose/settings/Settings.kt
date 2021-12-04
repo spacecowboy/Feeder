@@ -76,6 +76,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @Composable
 fun SettingsScreen(
     onNavigateUp: () -> Unit,
+    onNavigateToSyncScreen: () -> Unit,
     settingsViewModel: SettingsViewModel,
 ) {
     val viewState by settingsViewModel.viewState.collectAsState()
@@ -163,7 +164,8 @@ fun SettingsScreen(
             onSyncFrequencyChanged = {
                 settingsViewModel.setSyncFrequency(it)
             },
-            batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored
+            batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored,
+            onOpenSyncSettings = onNavigateToSyncScreen,
         )
     }
 }
@@ -204,6 +206,7 @@ fun SettingsScreenPreview() {
                 currentSyncFrequencyValue = SyncFrequency.EVERY_12_HOURS,
                 onSyncFrequencyChanged = {},
                 batteryOptimizationIgnoredValue = false,
+                onOpenSyncSettings = {},
             )
         }
     }
@@ -241,6 +244,7 @@ fun SettingsList(
     currentSyncFrequencyValue: SyncFrequency,
     onSyncFrequencyChanged: (SyncFrequency) -> Unit,
     batteryOptimizationIgnoredValue: Boolean,
+    onOpenSyncSettings: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -357,6 +361,13 @@ fun SettingsList(
             context.startActivity(
                 Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
             )
+        }
+
+        ExternalSetting(
+            currentValue = "",
+            title = stringResource(id = R.string.device_sync)
+        ) {
+            onOpenSyncSettings()
         }
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
