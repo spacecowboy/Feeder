@@ -134,4 +134,5 @@
     <string name="dark_theme_preference">Suosittu tumma teema</string>
     <string name="syncing">Synkronoidaan</string>
     <string name="invalid_url">Ei kelvollinen URL-osoite</string>
+    <string name="sync_status">Synkronoinnin tila</string>
 </resources>
