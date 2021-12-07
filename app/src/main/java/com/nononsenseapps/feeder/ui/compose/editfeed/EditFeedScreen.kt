@@ -61,7 +61,6 @@ import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
 import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
-import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
 
 @Composable
 fun CreateFeedScreen(
@@ -211,7 +210,7 @@ fun EditFeedView(
         onCancel = onCancel,
         okEnabled = viewState.isOkToSave,
         modifier = modifier
-            .padding(horizontal = keyline1Padding)
+            .padding(horizontal = LocalDimens.current.margin)
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),

@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.ui.compose.feed
+package com.nononsenseapps.feeder.ui.compose.empty
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,22 +25,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.text.annotatedStringResource
-import com.nononsenseapps.feeder.ui.compose.theme.keyline1Padding
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import kotlinx.coroutines.launch
 
 @Composable
 @Preview(showBackground = true)
 fun NothingToRead(
     modifier: Modifier = Modifier,
-    onOpenOtherFeed: suspend () -> Unit = {},
+    onOpenOtherFeed: () -> Unit = {},
     onAddFeed: () -> Unit = {}
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .padding(horizontal = keyline1Padding)
+            .padding(horizontal = LocalDimens.current.margin)
             .fillMaxHeight()
             .fillMaxWidth()
     ) {
@@ -62,9 +60,7 @@ fun NothingToRead(
                     .heightIn(min = TextFieldDefaults.MinHeight)
                     .fillMaxWidth()
                     .clickable {
-                        coroutineScope.launch {
-                            onOpenOtherFeed()
-                        }
+                        onOpenOtherFeed()
                     }
             ) {
                 Text(
@@ -82,9 +78,7 @@ fun NothingToRead(
                     .heightIn(min = TextFieldDefaults.MinHeight)
                     .fillMaxWidth()
                     .clickable {
-                        coroutineScope.launch {
-                            onAddFeed()
-                        }
+                        onAddFeed()
                     }
             ) {
                 Text(

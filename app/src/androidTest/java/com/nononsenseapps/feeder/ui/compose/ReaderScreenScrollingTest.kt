@@ -1,21 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose
 
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.centerX
-import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performGesture
-import androidx.compose.ui.test.swipe
-import androidx.compose.ui.test.top
-import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.ui.compose.reader.ReaderScreen
-import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import org.junit.Rule
-import org.junit.Test
-import org.kodein.di.compose.withDI
 
 class ReaderScreenScrollingTest {
 
@@ -27,74 +13,74 @@ class ReaderScreenScrollingTest {
      * This test doesn't really test anything - it's just good documentation
      * of how to test scrolling
      */
-    @OptIn(ExperimentalTestApi::class)
-    @Test
-    fun scrollingWorks() {
-        composeTestRule.setContent {
-            FeederTheme {
-                withDI {
-                    ReaderScreen(
-                        articleTitle = "Title",
-                        feedDisplayTitle = "Feed",
-                        author = "Author",
-                        pubDate = null,
-                        enclosure = null,
-                        onFetchFullText = {},
-                        onMarkAsUnread = {},
-                        onShare = {},
-                        onOpenInCustomTab = {},
-                        onNavigateUp = {},
-                        readAloudPlayer = {},
-                        onReadAloudStart = {},
-                        onFeedTitleClick = {},
-                        articleBody = {
-                            dummyHtml.byteInputStream().use {
-                                htmlFormattedText(
-                                    it,
-                                    baseUrl = "http://google.com",
-                                    imagePlaceholder = R.drawable.placeholder_image_article_day,
-                                    onLinkClick = {},
-                                )
-                            }
-                        }
-                    )
-                }
-            }
-        }
-
-//        composeTestRule.onRoot(useUnmergedTree = false).printToLog("FeederTest")
-
-        // Does not exist until it is rendered
-        composeTestRule
-            .onNodeWithText(
-                "16 paragraph",
-                substring = true,
-                ignoreCase = true,
-                useUnmergedTree = true
-            )
-            .assertDoesNotExist()
-
-        composeTestRule
-            .onNode(hasScrollToIndexAction())
-            .performGesture {
-                val start = Offset(centerX, top)
-                val end = Offset(centerX, -20_000f)
-                swipe(start, end)
-            }
-
-
-//        composeTestRule.onRoot(useUnmergedTree = false).printToLog("FeederTest")
-
-        // If we scrolled, then this node should exist now
-        composeTestRule
-            .onNodeWithText(
-                "16 paragraph",
-                substring = true,
-                ignoreCase = true,
-                useUnmergedTree = true
-            )
-            .assertExists()
-    }
+//    @OptIn(ExperimentalTestApi::class)
+//    @Test
+//    fun scrollingWorks() {
+//        composeTestRule.setContent {
+//            FeederTheme {
+//                withDI {
+//                    ReaderScreen(
+//                        articleTitle = "Title",
+//                        feedDisplayTitle = "Feed",
+//                        author = "Author",
+//                        pubDate = null,
+//                        enclosure = null,
+//                        onFetchFullText = {},
+//                        onMarkAsUnread = {},
+//                        onShare = {},
+//                        onOpenInCustomTab = {},
+//                        onNavigateUp = {},
+//                        readAloudPlayer = {},
+//                        onReadAloudStart = {},
+//                        onFeedTitleClick = {},
+//                        articleBody = {
+//                            dummyHtml.byteInputStream().use {
+//                                htmlFormattedText(
+//                                    it,
+//                                    baseUrl = "http://google.com",
+//                                    imagePlaceholder = R.drawable.placeholder_image_article_day,
+//                                    onLinkClick = {},
+//                                )
+//                            }
+//                        }
+//                    )
+//                }
+//            }
+//        }
+//
+////        composeTestRule.onRoot(useUnmergedTree = false).printToLog("FeederTest")
+//
+//        // Does not exist until it is rendered
+//        composeTestRule
+//            .onNodeWithText(
+//                "16 paragraph",
+//                substring = true,
+//                ignoreCase = true,
+//                useUnmergedTree = true
+//            )
+//            .assertDoesNotExist()
+//
+//        composeTestRule
+//            .onNode(hasScrollToIndexAction())
+//            .performGesture {
+//                val start = Offset(centerX, top)
+//                val end = Offset(centerX, -20_000f)
+//                swipe(start, end)
+//            }
+//
+//
+////        composeTestRule.onRoot(useUnmergedTree = false).printToLog("FeederTest")
+//
+//        // If we scrolled, then this node should exist now
+//        composeTestRule
+//            .onNodeWithText(
+//                "16 paragraph",
+//                substring = true,
+//                ignoreCase = true,
+//                useUnmergedTree = true
+//            )
+//            .assertExists()
+//    }
 }
 
 private const val dummyHtml = """

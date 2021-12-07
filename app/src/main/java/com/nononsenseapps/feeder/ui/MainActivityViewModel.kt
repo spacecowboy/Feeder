@@ -27,9 +27,12 @@ class MainActivityViewModel(di: DI) : DIAwareViewModel(di) {
     val darkThemePreference: StateFlow<DarkThemePreferences> =
         repository.preferredDarkTheme
 
-    val currentFeedAndTag: StateFlow<Pair<Long, String>> = repository.currentFeedAndTag
     fun setCurrentFeedAndTag(feedId: Long, tag: String) {
         repository.setCurrentFeedAndTag(feedId, tag)
+    }
+
+    fun setCurrentArticle(itemId: Long) {
+        repository.setCurrentArticle(itemId)
     }
 
     fun ensurePeriodicSyncConfigured() = viewModelScope.launch {

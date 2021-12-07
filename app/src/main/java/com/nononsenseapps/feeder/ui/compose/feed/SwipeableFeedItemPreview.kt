@@ -76,13 +76,13 @@ fun SwipeableFeedItemPreview(
     onItemClick: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val isRtl = LocalLayoutDirection.current==LayoutDirection.Rtl
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val animatedVisibilityState = remember { MutableTransitionState(true) }
     val swipeableState = rememberSwipeableState(initialValue = FeedItemSwipeState.NONE)
 
     val color by animateColorAsState(
         when {
-            swipeableState.targetValue==FeedItemSwipeState.NONE -> Color.Transparent
+            swipeableState.targetValue == FeedItemSwipeState.NONE -> Color.Transparent
             item.unread -> SwipingItemToReadColor
             else -> SwipingItemToUnreadColor
         }
@@ -94,7 +94,7 @@ fun SwipeableFeedItemPreview(
         swipeableState.animateTo(FeedItemSwipeState.NONE)
     }
 
-    if (swipeableState.currentValue!=FeedItemSwipeState.NONE) {
+    if (swipeableState.currentValue != FeedItemSwipeState.NONE) {
         LaunchedEffect(swipeableState.currentValue) {
             if (onlyUnread) {
                 animatedVisibilityState.targetState = false
@@ -107,11 +107,11 @@ fun SwipeableFeedItemPreview(
     if (
         onlyUnread
         && animatedVisibilityState.isIdle
-        && animatedVisibilityState.currentState!=item.unread
-        && swipeableState.currentValue!=FeedItemSwipeState.NONE
+        && animatedVisibilityState.currentState != item.unread
+        && swipeableState.currentValue != FeedItemSwipeState.NONE
     ) {
         LaunchedEffect(key1 = animatedVisibilityState.currentState, key2 = item.unread) {
-            if (animatedVisibilityState.currentState!=item.unread) {
+            if (animatedVisibilityState.currentState != item.unread) {
                 // Reset swipe state here to avoid a race later since item will not receive update
                 // when removed from list
                 swipeableState.snapTo(FeedItemSwipeState.NONE)
@@ -123,9 +123,9 @@ fun SwipeableFeedItemPreview(
     var swipeIconAlignment by remember { mutableStateOf(Alignment.CenterStart) }
     // Launched effect because I don't want a value change to zero to change the variable
     LaunchedEffect(swipeableState.direction) {
-        if (swipeableState.direction==1f) {
+        if (swipeableState.direction == 1f) {
             swipeIconAlignment = Alignment.CenterStart
-        } else if (swipeableState.direction==-1f) {
+        } else if (swipeableState.direction == -1f) {
             swipeIconAlignment = Alignment.CenterEnd
         }
     }
@@ -154,8 +154,8 @@ fun SwipeableFeedItemPreview(
 
     AnimatedVisibility(
         visibleState = animatedVisibilityState,
-        enter = fadeIn(1f),
-        exit = shrinkVertically(Alignment.CenterVertically) + fadeOut()
+        enter = fadeIn(initialAlpha = 1f),
+        exit = shrinkVertically(shrinkTowards = Alignment.CenterVertically) + fadeOut()
     ) {
         BoxWithConstraints(
             modifier = Modifier
@@ -207,7 +207,7 @@ fun SwipeableFeedItemPreview(
                     .padding(horizontal = 24.dp)
             ) {
                 AnimatedVisibility(
-                    visible = swipeableState.targetValue!=FeedItemSwipeState.NONE,
+                    visible = swipeableState.targetValue != FeedItemSwipeState.NONE,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {

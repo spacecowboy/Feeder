@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.model
 
-import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.speech.tts.TextToSpeech
@@ -8,30 +7,34 @@ import android.speech.tts.TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.base.DIAwareViewModel
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.kodein.di.DI
 
-class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitListener {
+/**
+ * Any callers must call #shutdown when shutting down
+ */
+class ReadAloudStateHolder(
+    val context: Context,
+    val coroutineScope: CoroutineScope,
+) : TextToSpeech.OnInitListener {
     private var textToSpeech: TextToSpeech? = null
     private val speechListener: UtteranceProgressListener by lazy {
         object : UtteranceProgressListener() {
             override fun onDone(utteranceId: String) {
                 textToSpeechQueue.remove(utteranceId)
                 if (textToSpeechQueue.isEmpty()) {
-                    viewModelScope.launch {
+                    coroutineScope.launch {
                         delay(100)
                         if (textToSpeechQueue.isEmpty()) {
                             // If still empty after the delay
@@ -54,14 +57,11 @@ class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitL
     private var initializedState: Int? = null
     private var startJob: Job? = null
 
-    private val _readAloudState = mutableStateOf(PlaybackStatus.STOPPED)
-    val readAloudState: State<PlaybackStatus> = _readAloudState
-    val notStopped: State<Boolean> = derivedStateOf {
-        _readAloudState.value != PlaybackStatus.STOPPED
-    }
+    private val _readAloudState = MutableStateFlow(PlaybackStatus.STOPPED)
+    val readAloudState: StateFlow<PlaybackStatus> = _readAloudState.asStateFlow()
 
-    private val _title = mutableStateOf("")
-    val title: State<String> = _title
+    private val _title = MutableStateFlow("")
+    val title: StateFlow<String> = _title.asStateFlow()
 
     fun readAloud(title: String, fullText: String) {
         val textArray = fullText.split("\n", ". ")
@@ -78,13 +78,12 @@ class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitL
 
     fun play() {
         startJob?.cancel()
-        startJob = viewModelScope.launch {
-            val context = getApplication<Application>().applicationContext
+        startJob = coroutineScope.launch {
             if (textToSpeech == null) {
                 initializedState = null
                 textToSpeech = TextToSpeech(
                     context,
-                    this@TextToSpeechViewModel
+                    this@ReadAloudStateHolder
                 )
             }
             while (initializedState == null) {
@@ -125,9 +124,8 @@ class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitL
 
     override fun onInit(status: Int) {
         initializedState = status
-        val context = getApplication<Application>().applicationContext
 
-        if (status==TextToSpeech.SUCCESS) {
+        if (status == TextToSpeech.SUCCESS) {
             val selectedLocale = context.getLocales()
                 .firstOrNull { locale ->
                     when (textToSpeech?.setLanguage(locale)) {
@@ -141,7 +139,7 @@ class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitL
                     }
                 }
 
-            if (selectedLocale==null) {
+            if (selectedLocale == null) {
                 Log.e(LOG_TAG, "None of the user's locales was supported by text to speech")
             }
         } else {
@@ -149,8 +147,7 @@ class TextToSpeechViewModel(di: DI) : DIAwareViewModel(di), TextToSpeech.OnInitL
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
+    fun shutdown() {
         textToSpeech?.shutdown()
     }
 

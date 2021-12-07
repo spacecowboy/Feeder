@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-class ReaderDestinationTest {
+class ArticleDestinationTest {
     @MockK
     private lateinit var navController: NavController
 
@@ -22,7 +22,7 @@ class ReaderDestinationTest {
     fun readerHasCorrectRoute() {
         assertEquals(
             "reader/{itemId}",
-            ReaderDestination.route
+            ArticleDestination.route
         )
     }
 
@@ -32,13 +32,13 @@ class ReaderDestinationTest {
             listOf(
                 "$DEEP_LINK_BASE_URI/article/{itemId}"
             ),
-            ReaderDestination.deepLinks.map { it.uriPattern }
+            ArticleDestination.deepLinks.map { it.uriPattern }
         )
     }
 
     @Test
     fun readerNavigate() {
-        ReaderDestination.navigate(
+        ArticleDestination.navigate(
             navController,
             55L
         )
