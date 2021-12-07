@@ -137,4 +137,6 @@
     <string name="syncing">同步中</string>
     <string name="sync_status">同步状态</string>
     <string name="invalid_url">无效 URL</string>
+    <string name="failed_to_import_OPML">导入 OPML 失败</string>
+    <string name="failed_to_export_OPML">未能导出 OPML</string>
 </resources>
