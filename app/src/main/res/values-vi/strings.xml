@@ -137,4 +137,6 @@
     <string name="invalid_url">Không phải URL hợp lệ</string>
     <string name="generate_extra_unique_ids">Tạo thêm các ID độc nhất</string>
     <string name="syncing">Đang đồng bộ</string>
+    <string name="failed_to_import_OPML">Nhập OPML thất bại</string>
+    <string name="failed_to_export_OPML">Xuất OPML thất bại</string>
 </resources>

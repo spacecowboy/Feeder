@@ -137,4 +137,6 @@
     <string name="syncing">Synchronisierung</string>
     <string name="sync_status">Synchronisierungsstatus</string>
     <string name="invalid_url">Keine gültige Adresse</string>
+    <string name="failed_to_import_OPML">OPML-Import fehlgeschlagen</string>
+    <string name="failed_to_export_OPML">OPML-Export fehlgeschlagen</string>
 </resources>
