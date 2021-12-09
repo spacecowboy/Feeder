@@ -1,3 +1,50 @@
+# 2.0.8
+Agnieszka C (2):
+  * [b8857312] Updated Polish translation using Weblate
+
+Andrij Mizyk (2):
+  * [7bbed7f1] Updated Ukrainian translation using Weblate
+
+El Pirujo (2):
+  * [3bbb9216] Updated Spanish translation using Weblate
+
+Eric (2):
+  * [e3a59bbe] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (2):
+  * [993a07b8] Updated Italian translation using Weblate
+
+Jonas Kalderstam (7):
+  * [f976af75] Fixed sync indicator getting stuck sometimes
+  * [3d3da496] Added sync progress indicators on individual feeds in nav
+         drawer
+  * [bb505183] Reduced minimum feed age for sync to 5 minutes instead of 15
+  * [c4228d47] Fixed hardware keyboard support: ENTER now works as expected
+  * [df92ffab] Upgraded and added some dependencies
+  * [50aa5e47] Improved error message when OPML import/export fails
+  * [c993b876] Implemented Tablet only interface
+
+Naveen (1):
+  * [2dfed712] Updated Tamil translation using Weblate
+
+Nikita Epifanov (1):
+  * [818745b8] Updated Russian translation using Weblate
+
+Oğuz Ersen (2):
+  * [23354741] Updated Turkish translation using Weblate
+
+Simona Iacob (1):
+  * [1793a4a4] Updated Romanian translation using Weblate
+
+VfBFan (1):
+  * [55006182] Updated German translation using Weblate
+
+bruh (2):
+  * [200be0ce] Updated Vietnamese translation using Weblate
+
+g (1):
+  * [faf4d7d3] Updated Lithuanian translation using Weblate
+
 # 2.0.7
 Agnieszka C (1):
   * [eccc086f] Updated Polish translation using Weblate
