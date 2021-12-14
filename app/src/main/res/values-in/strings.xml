@@ -136,4 +136,7 @@
     <string name="only_enable_for_bad_id_feeds">Hanya diaktifkan untuk umpan dengan ID yang buruk</string>
     <string name="syncing">Menyinkronkan</string>
     <string name="sync_status">Status sinkron</string>
+    <string name="invalid_url">URL tidak valid</string>
+    <string name="failed_to_import_OPML">Gagal mengimpor OPML</string>
+    <string name="failed_to_export_OPML">Gagal mengekspor OPML</string>
 </resources>
