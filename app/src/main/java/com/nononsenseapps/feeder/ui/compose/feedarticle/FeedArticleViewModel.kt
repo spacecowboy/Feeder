@@ -9,6 +9,7 @@ import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.Article
 import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
+import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.ScreenTitle
@@ -174,6 +175,27 @@ class FeedArticleViewModel(
         }
         state["articleOpen"] = true
         repository.setCurrentArticle(itemId)
+    }
+
+    fun openArticle(
+        itemId: Long,
+        articleLink: String?,
+        openInCustomTab: (String) -> Unit,
+        openInBrowser: (String) -> Unit,
+    ) = viewModelScope.launch {
+        val itemOpener = repository.getArticleOpener(itemId = itemId)
+        when {
+            ItemOpener.CUSTOM_TAB == itemOpener && articleLink != null -> {
+                openInCustomTab(articleLink)
+            }
+            ItemOpener.DEFAULT_BROWSER == itemOpener && articleLink != null -> {
+                openInBrowser(articleLink)
+            }
+            else -> {
+                setCurrentArticle(itemId)
+            }
+        }
+        markAsUnread(itemId, false)
     }
 
     private val currentArticle: MutableStateFlow<CurrentArticle> =
