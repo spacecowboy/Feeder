@@ -208,12 +208,12 @@ class Repository(override val di: DI) : DIAware {
     fun getFeedItem(itemId: Long): Flow<FeedItemWithFeed?> = feedItemStore.getFeedItem(itemId)
 
     suspend fun getLink(itemId: Long): String? = feedItemStore.getLink(itemId)
-    suspend fun getArticleOpener(itemId: Long): PrefValOpenWith =
+    suspend fun getArticleOpener(itemId: Long): ItemOpener =
         when (feedItemStore.getArticleOpener(itemId)) {
-            PREF_VAL_OPEN_WITH_BROWSER -> PrefValOpenWith.OPEN_WITH_BROWSER
-            PREF_VAL_OPEN_WITH_CUSTOM_TAB -> PrefValOpenWith.OPEN_WITH_CUSTOM_TAB
-            PREF_VAL_OPEN_WITH_READER -> PrefValOpenWith.OPEN_WITH_READER
-            else -> PrefValOpenWith.OPEN_WITH_DEFAULT
+            PREF_VAL_OPEN_WITH_BROWSER -> ItemOpener.DEFAULT_BROWSER
+            PREF_VAL_OPEN_WITH_CUSTOM_TAB -> ItemOpener.CUSTOM_TAB
+            PREF_VAL_OPEN_WITH_READER -> ItemOpener.READER
+            else -> itemOpener.value // Global default
         }
 
     suspend fun getDisplayTitleForFeed(feedId: Long): String? =

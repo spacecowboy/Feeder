@@ -18,6 +18,7 @@ import io.mockk.mockkStatic
 import io.mockk.verify
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
@@ -129,7 +130,20 @@ class RepositoryTest : DIAware {
         coEvery { feedItemStore.getArticleOpener(5L) } returns PREF_VAL_OPEN_WITH_CUSTOM_TAB
 
         assertEquals(
-            PrefValOpenWith.OPEN_WITH_CUSTOM_TAB,
+            ItemOpener.CUSTOM_TAB,
+            runBlocking {
+                repository.getArticleOpener(5L)
+            }
+        )
+    }
+
+    @Test
+    fun getArticleOpenerDefaultFallback() {
+        coEvery { feedItemStore.getArticleOpener(5L) } returns ""
+        every { settingsStore.itemOpener } returns MutableStateFlow(ItemOpener.DEFAULT_BROWSER)
+
+        assertEquals(
+            ItemOpener.DEFAULT_BROWSER,
             runBlocking {
                 repository.getArticleOpener(5L)
             }

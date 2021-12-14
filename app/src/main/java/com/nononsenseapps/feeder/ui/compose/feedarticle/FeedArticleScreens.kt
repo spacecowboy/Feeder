@@ -224,8 +224,16 @@ fun FeedArticleScreen(
             viewModel.markAfterAsRead(index)
         },
         onOpenFeedItem = { itemId ->
-            viewModel.setCurrentArticle(itemId)
-            viewModel.markAsUnread(itemId, false)
+            viewModel.openArticle(
+                itemId = itemId,
+                articleLink = viewState.articleLink,
+                openInBrowser = { articleLink ->
+                    openLinkInBrowser(context, articleLink)
+                },
+                openInCustomTab = { articleLink ->
+                    openLinkInCustomTab(context, articleLink, toolbarColor)
+                }
+            )
         },
         onInteractWithList = {
             viewModel.setArticleOpen(false)
