@@ -21,6 +21,7 @@ import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.requestFeedSync
+import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleScreen
@@ -40,6 +41,7 @@ import org.kodein.di.compose.withDI
 import org.kodein.di.instance
 
 class MainActivity : DIAwareComponentActivity() {
+    private val notificationsWorker: NotificationsWorker by instance()
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
 
     // This reference is only used for intent navigation
@@ -53,6 +55,16 @@ class MainActivity : DIAwareComponentActivity() {
                 Log.e("FeederMainActivity", "In onNewIntent, navController rejected the intent")
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        notificationsWorker.runForever()
+    }
+
+    override fun onStop() {
+        notificationsWorker.stopForever()
+        super.onStop()
     }
 
     override fun onResume() {

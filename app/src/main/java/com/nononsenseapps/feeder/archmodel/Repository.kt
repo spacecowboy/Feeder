@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.FeedTitle
@@ -297,8 +298,12 @@ class Repository(override val di: DI) : DIAware {
     suspend fun ensurePeriodicSyncConfigured() =
         settingsStore.configurePeriodicSync(replace = false)
 
-    suspend fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>> =
+    fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>> =
         feedItemStore.getFeedsItemsWithDefaultFullTextParse()
+
+    fun getFeedItemsNeedingNotifying(): Flow<List<Long>> {
+        return feedItemStore.getFeedItemsNeedingNotifying()
+    }
 }
 
 private data class FeedListArgs(

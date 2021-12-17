@@ -7,10 +7,10 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
@@ -723,10 +723,32 @@ class FeedItemStoreTest : DIAware {
             FeedItemIdWithLink(5L, "google.com"),
             FeedItemIdWithLink(6L, "cowboy.com"),
         )
-        coEvery { dao.getFeedsItemsWithDefaultFullTextParse() } returns flowOf(expected)
+        every { dao.getFeedsItemsWithDefaultFullTextParse() } returns flowOf(expected)
 
         val items = runBlocking {
             store.getFeedsItemsWithDefaultFullTextParse().first()
+        }
+
+        assertEquals(
+            expected.size,
+            items.size,
+        )
+
+        expected.zip(items) { expectedItem, actualItem ->
+            assertEquals(
+                expectedItem,
+                actualItem,
+            )
+        }
+    }
+
+    @Test
+    fun getFeedItemsNeedingNotifying() {
+        val expected = listOf(1L, 2L)
+        every { dao.getFeedItemsNeedingNotifying() } returns flowOf(expected)
+
+        val items = runBlocking {
+            store.getFeedItemsNeedingNotifying().first()
         }
 
         assertEquals(
