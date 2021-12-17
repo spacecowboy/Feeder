@@ -308,8 +308,12 @@ class FeedItemStore(override val di: DI) : DIAware {
         }
     }
 
-    suspend fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>> =
+    fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>> =
         dao.getFeedsItemsWithDefaultFullTextParse()
+
+    fun getFeedItemsNeedingNotifying(): Flow<List<Long>> {
+        return dao.getFeedItemsNeedingNotifying()
+    }
 
     companion object {
         private const val PAGE_SIZE = 100

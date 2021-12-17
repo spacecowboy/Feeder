@@ -608,6 +608,16 @@ interface FeedItemDao {
         """
     )
     fun getUnreadFeedItemCount(feedId: Long): Flow<Int>
+
+    @Query(
+        """
+            SELECT fi.id
+            FROM feed_items fi
+            JOIN feeds f ON feed_id = f.id
+            WHERE f.notify IS 1 AND fi.notified IS 0 AND fi.unread is 1
+        """
+    )
+    fun getFeedItemsNeedingNotifying(): Flow<List<Long>>
 }
 
 suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > ID_UNSET) {

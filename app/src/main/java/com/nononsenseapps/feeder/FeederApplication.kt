@@ -23,6 +23,7 @@ import com.nononsenseapps.feeder.di.archModelModule
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.ReadAloudStateHolder
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
+import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.currentlyUnmetered
 import com.nononsenseapps.jsonfeed.cachingHttpClient
@@ -129,6 +130,7 @@ class FeederApplication : MultiDexApplication(), DIAware {
         bind<ApplicationCoroutineScope>() with instance(applicationCoroutineScope)
         import(networkModule)
         bind<ReadAloudStateHolder>() with instance(readAloudStateHolder)
+        bind<NotificationsWorker>() with singleton { NotificationsWorker(di) }
     }
 
     init {
