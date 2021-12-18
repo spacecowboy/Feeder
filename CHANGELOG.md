@@ -1,3 +1,14 @@
+# 2.0.9
+Jonas Kalderstam (2):
+  * [5c9259cc] Fixed app not respecting what to open articles with
+  * [28618bc9] Fixed notifications not dismissing when reading articles
+
+mm4c (1):
+  * [b85fd95c] Updated Dutch translation using Weblate
+
+zmni (1):
+  * [1600cb79] Updated Indonesian translation using Weblate
+
 # 2.0.8
 Agnieszka C (2):
   * [b8857312] Updated Polish translation using Weblate
