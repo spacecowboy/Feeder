@@ -179,11 +179,11 @@ class FeedArticleViewModel(
 
     fun openArticle(
         itemId: Long,
-        articleLink: String?,
         openInCustomTab: (String) -> Unit,
         openInBrowser: (String) -> Unit,
     ) = viewModelScope.launch {
         val itemOpener = repository.getArticleOpener(itemId = itemId)
+        val articleLink = repository.getLink(itemId)
         when {
             ItemOpener.CUSTOM_TAB == itemOpener && articleLink != null -> {
                 openInCustomTab(articleLink)

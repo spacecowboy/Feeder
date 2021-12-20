@@ -226,7 +226,6 @@ fun FeedArticleScreen(
         onOpenFeedItem = { itemId ->
             viewModel.openArticle(
                 itemId = itemId,
-                articleLink = viewState.articleLink,
                 openInBrowser = { articleLink ->
                     openLinkInBrowser(context, articleLink)
                 },
