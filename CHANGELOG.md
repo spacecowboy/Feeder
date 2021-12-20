@@ -1,3 +1,14 @@
+# 2.0.10
+Jonas Kalderstam (2):
+  * [6bbabe68] Fixed open in browser opening wrong link
+  * [696203ea] Renamed folder to match Play store restrictions
+
+Simona Iacob (1):
+  * [b10efbc5] Updated Romanian translation using Weblate
+
+mm4c (1):
+  * [1ac2b331] Translated using Weblate (Dutch)
+
 # 2.0.9
 Jonas Kalderstam (2):
   * [5c9259cc] Fixed app not respecting what to open articles with
