@@ -51,12 +51,12 @@
     <string name="synchronization">Sincronização</string>
     <string name="only_on_wifi">Somente no Wi-Fi</string>
     <string name="show_thumbnails">Mostrar as miniaturas</string>
-    <string name="may_result_data_charges">A taxa pode ser cobrada.</string>
-    <string name="only_when_charging">Enquanto carregar</string>
+    <string name="may_result_data_charges">Taxas de dados móveis podem ser cobradas.</string>
+    <string name="only_when_charging">Somente ao carregar</string>
     <string name="image_loading">Download de imagens</string>
     <string name="no_activity_for_link">Instale algo primeiro para abrir esse link</string>
     <string name="check_for_updates">Procurar novos artigos…</string>
-    <string name="on_startup">Ao iniciar</string>
+    <string name="on_startup">Ao iniciar o app</string>
     <string name="show_fab">Mostrar botão de ação flutuante</string>
     <string name="include_mobile_hotspots">Incluir os pontos de acesso móveis</string>
     <string name="updated_feeds">Os feeds estão atualizados</string>
@@ -85,8 +85,8 @@
     <string name="no_email_client">Não foi possível abrir o e-mail</string>
     <string name="touch_to_play_video">Toque para reproduzir o vídeo</string>
     <string name="open_feed">Abrir o feed</string>
-    <string name="mark_items_above_as_read">Marque os itens acima como lidos</string>
-    <string name="mark_items_below_as_read">Marque os itens abaixo como lidos</string>
+    <string name="mark_items_above_as_read">Marcar os acima como lidos</string>
+    <string name="mark_items_below_as_read">Marcar os abaixo como lidos</string>
     <string name="discovered_feeds_list">Lista de feeds encontrados</string>
     <string name="toggle_tag_expansion">Alternar expansão de categoria</string>
     <string name="battery_optimization">Otimização da bateria</string>
@@ -123,7 +123,7 @@
     <string name="open_enclosed_media_file">Abrir %1$s</string>
     <string name="contracted_tag">Categoria fechada</string>
     <string name="two_unread_articles">%1$s artigos não lidos</string>
-    <string name="feed_item_style_card">Cartão</string>
+    <string name="feed_item_style_card">Cartões</string>
     <string name="syncing">Sincronizando</string>
     <string name="dark_theme_preference">Tema escuro preferido</string>
     <string name="go_back">Voltar</string>
