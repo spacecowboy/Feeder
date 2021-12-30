@@ -71,6 +71,7 @@ import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
+import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
@@ -1171,20 +1172,26 @@ fun ArticleContent(
         if (viewState.articleId > ID_UNSET) {
             when (viewState.textToDisplay) {
                 TextToDisplay.DEFAULT -> {
-                    blobInputStream(viewState.articleId, context.filesDir).use {
-                        htmlFormattedText(
-                            inputStream = it,
-                            baseUrl = viewState.articleFeedUrl ?: "",
-                            imagePlaceholder = placeHolder,
-                            onLinkClick = { link ->
-                                onLinkClick(
-                                    link = link,
-                                    linkOpener = viewState.linkOpener,
-                                    context = context,
-                                    toolbarColor = toolbarColor
-                                )
-                            }
-                        )
+                    if (blobFile(viewState.articleId, context.filesDir).isFile) {
+                        blobInputStream(viewState.articleId, context.filesDir).use {
+                            htmlFormattedText(
+                                inputStream = it,
+                                baseUrl = viewState.articleFeedUrl ?: "",
+                                imagePlaceholder = placeHolder,
+                                onLinkClick = { link ->
+                                    onLinkClick(
+                                        link = link,
+                                        linkOpener = viewState.linkOpener,
+                                        context = context,
+                                        toolbarColor = toolbarColor
+                                    )
+                                }
+                            )
+                        }
+                    } else {
+                        item {
+                            Text(text = stringResource(id = R.string.failed_to_open_article))
+                        }
                     }
                 }
                 TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> {
