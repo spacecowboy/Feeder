@@ -1,3 +1,23 @@
+# 2.0.11
+Jonas Kalderstam (5):
+  * [1e4ecf09] Fixed crash when opening app
+  * [64b0c705] Fixed a reported crash (rare edge case)
+  * [735190fd] Fixed rare crash in case no TextToSpeech engine was installed
+  * [cedbb7ea] Fixed UI getting stuck in a weird empty state
+  * [8a11ce87] Added some handling in case an open article is deleted
+
+Nikita Epifanov (1):
+  * [494e7a56] Updated Russian translation using Weblate
+
+Vitor Henrique (1):
+  * [0d968db5] Updated Portuguese (Brazil) translation using Weblate
+
+gutierri (1):
+  * [9ec9cf6a] Updated Portuguese (Brazil) translation using Weblate
+
+mm4c (1):
+  * [2f4ed127] Updated Dutch translation using Weblate
+
 # 2.0.10
 Jonas Kalderstam (2):
   * [6bbabe68] Fixed open in browser opening wrong link
