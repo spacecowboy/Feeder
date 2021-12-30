@@ -51,12 +51,12 @@
     <string name="synchronization">Sincronização</string>
     <string name="only_on_wifi">Somente no Wi-Fi</string>
     <string name="show_thumbnails">Mostrar as miniaturas</string>
-    <string name="may_result_data_charges">A taxa pode ser cobrada.</string>
-    <string name="only_when_charging">Enquanto carregar</string>
+    <string name="may_result_data_charges">Taxas de dados móveis podem ser cobradas.</string>
+    <string name="only_when_charging">Somente ao carregar</string>
     <string name="image_loading">Download de imagens</string>
     <string name="no_activity_for_link">Instale algo primeiro para abrir esse link</string>
     <string name="check_for_updates">Procurar novos artigos…</string>
-    <string name="on_startup">Ao iniciar</string>
+    <string name="on_startup">Ao iniciar o app</string>
     <string name="show_fab">Mostrar botão de ação flutuante</string>
     <string name="include_mobile_hotspots">Incluir os pontos de acesso móveis</string>
     <string name="updated_feeds">Os feeds estão atualizados</string>
@@ -85,23 +85,23 @@
     <string name="no_email_client">Não foi possível abrir o e-mail</string>
     <string name="touch_to_play_video">Toque para reproduzir o vídeo</string>
     <string name="open_feed">Abrir o feed</string>
-    <string name="mark_items_above_as_read">Marque os itens acima como lidos</string>
-    <string name="mark_items_below_as_read">Marque os itens abaixo como lidos</string>
+    <string name="mark_items_above_as_read">Marcar os acima como lidos</string>
+    <string name="mark_items_below_as_read">Marcar os abaixo como lidos</string>
     <string name="discovered_feeds_list">Lista de feeds encontrados</string>
     <string name="toggle_tag_expansion">Alternar expansão de categoria</string>
     <string name="battery_optimization">Otimização da bateria</string>
-    <string name="battery_optimization_disabled">Otimização da bateria desativada</string>
+    <string name="battery_optimization_disabled">Desativada</string>
     <string name="battery_optimization_enabled">Ativada</string>
     <string name="preload_custom_tab">Pré-carregar a aba personalizada</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="javascript">JavaScript</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="url">url</string>
-    <string name="failed_to_parse">Falha ao analisar %1$s</string>
+    <string name="failed_to_parse">Não foi possível analisar %1$s</string>
     <string name="use_app_default">Usar app padrão</string>
-    <string name="failed_to_load_text_to_speech">Falha ao carregar texto para fala</string>
+    <string name="failed_to_load_text_to_speech">Não foi possível carregar o texto para fala</string>
     <string name="fetching_full_article">Buscando artigo completo…</string>
-    <string name="failed_to_fetch_full_article">Falha ao buscar artigo completo</string>
+    <string name="failed_to_fetch_full_article">Não foi possível buscar o artigo completo</string>
     <string name="fetch_full_articles_by_default">Buscar artigo completo por padrão</string>
     <string name="fetch_full_article">Buscar artigo completo</string>
     <string name="resume_reading">Retomar leitura</string>
@@ -123,7 +123,7 @@
     <string name="open_enclosed_media_file">Abrir %1$s</string>
     <string name="contracted_tag">Categoria fechada</string>
     <string name="two_unread_articles">%1$s artigos não lidos</string>
-    <string name="feed_item_style_card">Cartão</string>
+    <string name="feed_item_style_card">Cartões</string>
     <string name="syncing">Sincronizando</string>
     <string name="dark_theme_preference">Tema escuro preferido</string>
     <string name="go_back">Voltar</string>
@@ -136,4 +136,7 @@
     <string name="showing_only_unread_articles">Mostrar somente artigos não lidos</string>
     <string name="generate_extra_unique_ids">Gerar IDs únicos extra</string>
     <string name="expanded_tag">Abrir categoria</string>
+    <string name="invalid_url">Não é uma URL válida</string>
+    <string name="failed_to_import_OPML">Falha ao importar OPML</string>
+    <string name="failed_to_export_OPML">Falha ao exportar OPML</string>
 </resources>

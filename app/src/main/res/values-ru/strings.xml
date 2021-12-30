@@ -55,9 +55,9 @@
     <string name="may_result_data_charges">Может привести к расходу мобильных данных.</string>
     <string name="only_when_charging">Только при зарядке</string>
     <string name="image_loading">Загрузка изображений</string>
-    <string name="no_activity_for_link">Не удалось найти приложение, чтобы открыть ссылку</string>
-    <string name="check_for_updates">Проверять наличие обновлений</string>
-    <string name="on_startup">При запуске</string>
+    <string name="no_activity_for_link">Сначала установите что-нибудь, чтобы открыть эту ссылку</string>
+    <string name="check_for_updates">Поиск новых статей…</string>
+    <string name="on_startup">При запуске приложения</string>
     <string name="show_fab">Показывать плавающую кнопку действия</string>
     <string name="include_mobile_hotspots">Включая мобильные точки доступа</string>
     <string name="updated_feeds">Обновлённые ленты</string>
@@ -66,7 +66,7 @@
     <string name="open_in_default_browser">Браузер по умолчанию</string>
     <string name="open_item_by_default_with">По умолчанию открывать элементы с помощью</string>
     <string name="open_links_with">Открывать ссылки с помощью</string>
-    <string name="open_link_in_web_view">Открыть ссылку в Web view</string>
+    <string name="open_link_in_web_view">Открыть ссылку в web view</string>
     <string name="open_in_web_view">Открыть в Web view</string>
     <string name="max_feed_items">Максимальное число элементов в ленте</string>
     <string name="could_not_load_url">Не удалось загрузить URL</string>
@@ -82,15 +82,15 @@
     <string name="no_email_client">Не удаётся открыть email-клиент</string>
     <string name="touch_to_play_video">Нажмите для просмотра видео</string>
     <string name="open_feed">Открыть ленту</string>
-    <string name="mark_items_below_as_read">Отметить прочитанными элементы ниже</string>
+    <string name="mark_items_below_as_read">Отметить ниже прочитанными</string>
     <string name="discovered_feeds_list">Список обнаруженных лент</string>
     <string name="toggle_tag_expansion">Переключить расширение меток</string>
     <string name="battery_optimization">Оптимизация использования батареи</string>
-    <string name="battery_optimization_disabled">Оптимизация отключена</string>
-    <string name="battery_optimization_enabled">Оптимизация включена</string>
+    <string name="battery_optimization_disabled">Отключена</string>
+    <string name="battery_optimization_enabled">Включена</string>
     <string name="preload_custom_tab">Предварительная загрузка пользовательской вкладки</string>
-    <string name="mark_items_above_as_read">Отметить элементы выше как прочитанные</string>
-    <string name="javascript">Javascript</string>
+    <string name="mark_items_above_as_read">Отметить выше как прочитанное</string>
+    <string name="javascript">JavaScript</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="url">URL-адрес</string>
     <string name="fetching_full_article">Получение полной статьи…</string>
@@ -113,7 +113,7 @@
     <string name="two_unread_articles">%1$s непрочитанных статей</string>
     <string name="zero_unread_articles">%1$s непрочитанных статей</string>
     <string name="one_unread_article">%1$s непрочитанная статья</string>
-    <string name="synchronize_feeds">Синхронизировать каналы</string>
+    <string name="synchronize_feeds">Синхронизировать ленты</string>
     <string name="showing_all_articles">Отображать все статьи</string>
     <string name="showing_only_unread_articles">Отображать только непрочитанные статьи</string>
     <string name="already_read">Прочитанное</string>
@@ -133,8 +133,10 @@
     <string name="dark_theme_preference_dark">Тёмная</string>
     <string name="dark_theme_preference">Предпочтительная темная тема</string>
     <string name="generate_extra_unique_ids">Создать дополнительные уникальные ID</string>
-    <string name="only_enable_for_bad_id_feeds">Включать только для каналов с плохими ID</string>
+    <string name="only_enable_for_bad_id_feeds">Включать только для лент с плохими ID</string>
     <string name="sync_status">Состояние синхронизации</string>
     <string name="invalid_url">Недопустимый URL-адрес</string>
     <string name="syncing">Синхронизация</string>
+    <string name="failed_to_import_OPML">Не удалось импортировать OPML</string>
+    <string name="failed_to_export_OPML">Не удалось экспортировать OPML</string>
 </resources>

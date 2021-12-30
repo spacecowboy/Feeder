@@ -22,8 +22,8 @@
     <string name="show_unread_items">Ongelezen artikelen tonen</string>
     <string name="show_all_items">Alle artikelen tonen</string>
     <string name="notify_for_new_items">Nieuwe artikelen melden</string>
-    <string name="open_link_in_browser">Link in webbrowser openen</string>
-    <string name="open_in_browser">In webbrowser openen</string>
+    <string name="open_link_in_browser">Link in browser openen</string>
+    <string name="open_in_browser">In browser openen</string>
     <string name="open_enclosed_media_file">Open %1$s</string>
     <string name="read_article">Voorlezen</string>
     <string name="stop_reading">Lezen beëindigen</string>
@@ -32,7 +32,7 @@
     <string name="export_feeds_to_opml">Feeds als OPML exporteren</string>
     <string name="share">Delen</string>
     <string name="view_debug_log">Bekijk de debug log</string>
-    <string name="new_based_on_this">Nieuw gebaseerd op deze</string>
+    <string name="new_based_on_this">Nieuw, gebaseerd op deze</string>
     <string name="indicator_for_mark_as_read">Indicator voor gelezen</string>
     <string name="title_activity_settings">Instellingen</string>
     <string name="sync_option_every_15min">Elke 15 minuten</string>
@@ -49,7 +49,7 @@
     <string name="image_loading">Afbeeldingen downloaden</string>
     <string name="check_for_updates">Naar nieuwe artikelen zoeken…</string>
     <string name="on_startup">Bij start van de app</string>
-    <string name="may_result_data_charges">Kan leiden tot kosten voor mobiele data.</string>
+    <string name="may_result_data_charges">Mogelijk kosten voor mobiele data.</string>
     <string name="show_fab">\'Alles gelezen\' knop tonen</string>
     <string name="include_mobile_hotspots">Mobiele hotspots gebruiken</string>
     <string name="updated_feeds">Geactualiseerde freeds</string>
@@ -80,7 +80,7 @@
     <string name="toggle_tag_expansion">Label uitbreiding aan/uit</string>
     <string name="battery_optimization_disabled">Uit</string>
     <string name="battery_optimization_enabled">Aan</string>
-    <string name="failed_to_parse">Niet gelukt %1$s te ontleden</string>
+    <string name="failed_to_parse">Niet gelukt %1$s te analyseren</string>
     <string name="fetch_full_article">Volledige artikel inlezen</string>
     <string name="failed_to_fetch_full_article">Kon niet volledige artikel inlezen</string>
     <string name="fetching_full_article">Volledige artikel inlezen …</string>
@@ -105,7 +105,7 @@
     <string name="title_activity_edit_feed">Feed abonneren</string>
     <string name="save">Opslaan</string>
     <string name="new_items_available">Er zijn nieuwe artikelen</string>
-    <string name="empty_feed_open">Nog een feed <annotation style="link">openen</annotation>\?</string>
+    <string name="empty_feed_open">Een feed <annotation style="link">openen</annotation>\?</string>
     <string name="mark_as_unread">Als ongelezen markeren</string>
     <string name="toggle_read_status">Gelezen aan/uit</string>
     <string name="open_enclosed_media">Ingesloten media openen</string>
@@ -117,7 +117,7 @@
     <string name="synchronization">Synchroniseert</string>
     <string name="only_on_wifi">Alleen via Wi-Fi</string>
     <string name="notification_channel_name">Ongelezen feeds</string>
-    <string name="open_in_default_browser">Standaard browser</string>
+    <string name="open_in_default_browser">Browser</string>
     <string name="open_item_by_default_with">Artikelen standaard lezen met</string>
     <string name="open_link_in_web_view">Link in webweergave tonen</string>
     <string name="dark_theme_preference_dark">Donker</string>
@@ -137,6 +137,6 @@
     <string name="other_unread_articles">%1$s ongelezen artikelen</string>
     <string name="notification_channel_description">Meldingen alleen getoond voor ongelezen artikelen in geconfigureerde feeds</string>
     <string name="fetch_full_articles_by_default">Standaard volledige artikelen</string>
-    <string name="empty_feed_add">Meer feeds <annotation style="link">toevoegen</annotation>\?</string>
+    <string name="empty_feed_add">of feeds <annotation style="link">toevoegen</annotation>\?</string>
     <string name="nothing_to_display">Niets te tonen!</string>
 </resources>
