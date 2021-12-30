@@ -127,121 +127,123 @@ fun FeedListContent(
         }
     }
 
-    AnimatedVisibility(
-        enter = fadeIn(),
-        exit = fadeOut(),
-        visible = !viewState.haveVisibleFeedItems,
-    ) {
-        // Keeping the Box behind so the scrollability doesn't override clickable
-        // Separate box because scrollable will ignore max size.
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        )
-        NothingToRead(
-            modifier = modifier,
-            onOpenOtherFeed = onOpenNavDrawer,
-            onAddFeed = onAddFeed
-        )
-    }
-
-    AnimatedVisibility(
-        enter = fadeIn(),
-        exit = fadeOut(),
-        visible = viewState.haveVisibleFeedItems,
-    ) {
-        LazyColumn(
-            state = listState,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(bottom = if (viewState.bottomBarVisible) (80 + 40).dp else 80.dp),
-            modifier = modifier.fillMaxSize()
+    Box(modifier = modifier) {
+        AnimatedVisibility(
+            enter = fadeIn(),
+            exit = fadeOut(),
+            visible = !viewState.haveVisibleFeedItems,
         ) {
-            items(
-                pagedFeedItems.itemCount,
-                key = { itemIndex ->
-                    pagedFeedItems.snapshot().items[itemIndex].id
-                }
-            ) { itemIndex ->
-                val previewItem = pagedFeedItems[itemIndex]
-                    ?: return@items
+            // Keeping the Box behind so the scrollability doesn't override clickable
+            // Separate box because scrollable will ignore max size.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            )
+            NothingToRead(
+                modifier = modifier,
+                onOpenOtherFeed = onOpenNavDrawer,
+                onAddFeed = onAddFeed
+            )
+        }
 
-                SwipeableFeedItemPreview(
-                    onSwipe = {
-                        markAsUnread(
-                            previewItem.id,
-                            !previewItem.unread
-                        )
-                    },
-                    onlyUnread = viewState.onlyUnread,
-                    item = previewItem,
-                    showThumbnail = viewState.showThumbnails,
-                    feedItemStyle = viewState.feedItemStyle,
-                    onMarkAboveAsRead = {
-                        if (itemIndex > 0) {
-                            markBeforeAsRead(itemIndex)
-                            coroutineScope.launch {
-                                listState.scrollToItem(0)
+        AnimatedVisibility(
+            enter = fadeIn(),
+            exit = fadeOut(),
+            visible = viewState.haveVisibleFeedItems,
+        ) {
+            LazyColumn(
+                state = listState,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = PaddingValues(bottom = if (viewState.bottomBarVisible) (80 + 40).dp else 80.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(
+                    pagedFeedItems.itemCount,
+                    key = { itemIndex ->
+                        pagedFeedItems.snapshot().items[itemIndex].id
+                    }
+                ) { itemIndex ->
+                    val previewItem = pagedFeedItems[itemIndex]
+                        ?: return@items
+
+                    SwipeableFeedItemPreview(
+                        onSwipe = {
+                            markAsUnread(
+                                previewItem.id,
+                                !previewItem.unread
+                            )
+                        },
+                        onlyUnread = viewState.onlyUnread,
+                        item = previewItem,
+                        showThumbnail = viewState.showThumbnails,
+                        feedItemStyle = viewState.feedItemStyle,
+                        onMarkAboveAsRead = {
+                            if (itemIndex > 0) {
+                                markBeforeAsRead(itemIndex)
+                                coroutineScope.launch {
+                                    listState.scrollToItem(0)
+                                }
+                            }
+                        },
+                        onMarkBelowAsRead = {
+                            markAfterAsRead(itemIndex)
+                        },
+                        onShareItem = {
+                            val intent = Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).apply {
+                                    if (previewItem.link != null) {
+                                        putExtra(Intent.EXTRA_TEXT, previewItem.link)
+                                    }
+                                    putExtra(Intent.EXTRA_TITLE, previewItem.title)
+                                    type = "text/plain"
+                                },
+                                null
+                            )
+                            context.startActivity(intent)
+                        },
+                        onItemClick = {
+                            onItemClick(previewItem.id)
+                        },
+                        imagePainter = { imageUrl ->
+                            val alpha: Float = if (previewItem.unread) {
+                                1.0f
+                            } else {
+                                0.5f
+                            }
+                            Box {
+                                Image(
+                                    painter = rememberImagePainter(
+                                        data = imageUrl,
+                                        builder = {
+                                            this.placeholder(placeHolder)
+                                                .error(placeHolder)
+                                                .scale(Scale.FILL)
+                                                .precision(Precision.INEXACT)
+                                                .size(PixelSize(1000, 1000))
+                                        },
+                                    ),
+                                    contentScale = ContentScale.Crop,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .run {
+                                            when (viewState.feedItemStyle) {
+                                                FeedItemStyle.CARD -> this
+                                                    .fillMaxWidth()
+                                                    .aspectRatio(16.0f / 9.0f)
+                                                FeedItemStyle.COMPACT,
+                                                FeedItemStyle.SUPER_COMPACT,
+                                                -> this
+                                                    .width(64.dp)
+                                                    .fillMaxHeight()
+                                            }
+                                        }
+                                        .alpha(alpha)
+                                )
                             }
                         }
-                    },
-                    onMarkBelowAsRead = {
-                        markAfterAsRead(itemIndex)
-                    },
-                    onShareItem = {
-                        val intent = Intent.createChooser(
-                            Intent(Intent.ACTION_SEND).apply {
-                                if (previewItem.link != null) {
-                                    putExtra(Intent.EXTRA_TEXT, previewItem.link)
-                                }
-                                putExtra(Intent.EXTRA_TITLE, previewItem.title)
-                                type = "text/plain"
-                            },
-                            null
-                        )
-                        context.startActivity(intent)
-                    },
-                    onItemClick = {
-                        onItemClick(previewItem.id)
-                    },
-                    imagePainter = { imageUrl ->
-                        val alpha: Float = if (previewItem.unread) {
-                            1.0f
-                        } else {
-                            0.5f
-                        }
-                        Box {
-                            Image(
-                                painter = rememberImagePainter(
-                                    data = imageUrl,
-                                    builder = {
-                                        this.placeholder(placeHolder)
-                                            .error(placeHolder)
-                                            .scale(Scale.FILL)
-                                            .precision(Precision.INEXACT)
-                                            .size(PixelSize(1000, 1000))
-                                    },
-                                ),
-                                contentScale = ContentScale.Crop,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .run {
-                                        when (viewState.feedItemStyle) {
-                                            FeedItemStyle.CARD -> this
-                                                .fillMaxWidth()
-                                                .aspectRatio(16.0f / 9.0f)
-                                            FeedItemStyle.COMPACT,
-                                            FeedItemStyle.SUPER_COMPACT,
-                                            -> this
-                                                .width(64.dp)
-                                                .fillMaxHeight()
-                                        }
-                                    }
-                                    .alpha(alpha)
-                            )
-                        }
-                    }
-                )
+                    )
+                }
             }
         }
     }
