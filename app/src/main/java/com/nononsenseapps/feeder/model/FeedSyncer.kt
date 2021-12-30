@@ -75,7 +75,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
             .setContentTitle(syncingText)
             .setTicker(syncingText)
 //            .setContentText(progress)
-            .setSmallIcon(R.drawable.ic_stat_f)
+            .setSmallIcon(R.drawable.ic_stat_sync)
             .setOngoing(true)
             // Add the cancel action to the notification which can
             // be used to cancel the worker
