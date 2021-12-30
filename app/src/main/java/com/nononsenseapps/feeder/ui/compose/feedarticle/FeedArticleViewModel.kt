@@ -32,16 +32,17 @@ import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import org.kodein.di.DI
 import org.kodein.di.direct
 import org.kodein.di.instance
@@ -163,18 +164,27 @@ class FeedArticleViewModel(
      * visibility of article on large landscape screens
      */
     fun setArticleOpen(value: Boolean) {
-        currentArticle.update {
-            it.copy(isOpen = value)
+        articleOpen.update {
+            value
         }
         state["articleOpen"] = value
     }
 
-    fun setCurrentArticle(itemId: Long) {
-        currentArticle.update {
-            it.copy(itemId = itemId, isOpen = true)
-        }
-        state["articleOpen"] = true
+    suspend fun setCurrentArticle(itemId: Long) {
         repository.setCurrentArticle(itemId)
+
+        // Now wait until article has been loaded until opening the article view
+        // This is so the reader doesn't open with the previous article briefly visible
+        // until the new one has loaded
+
+        // Naturally, don't let infinite loops be possible even though it shouldn't be infinite
+        withTimeout(100_000L) {
+            while (viewState.value.articleId != itemId) {
+                delay(10)
+            }
+        }
+
+        setArticleOpen(true)
     }
 
     fun openArticle(
@@ -198,12 +208,9 @@ class FeedArticleViewModel(
         markAsUnread(itemId, false)
     }
 
-    private val currentArticle: MutableStateFlow<CurrentArticle> =
+    private val articleOpen: MutableStateFlow<Boolean> =
         MutableStateFlow(
-            CurrentArticle(
-                itemId = repository.currentArticleId.value,
-                isOpen = state["articleOpen"] ?: false
-            )
+            state["articleOpen"] ?: false
         )
 
     // Used to trigger state update
@@ -236,7 +243,7 @@ class FeedArticleViewModel(
             editDialogVisible,
             deleteDialogVisible,
             visibleFeeds,
-            currentArticle,
+            articleOpen,
             repository.linkOpener,
             repository.currentFeedAndTag.map { (feedId, tag) -> FeedOrTag(feedId, tag) },
             repository.currentArticle,
@@ -254,7 +261,7 @@ class FeedArticleViewModel(
             val haveVisibleFeedItems = (params[9] as Int) > 0
 
             @Suppress("UNCHECKED_CAST")
-            val currentArticle = params[14] as CurrentArticle
+            val articleOpen = params[14] as Boolean
 
             @Suppress("UNCHECKED_CAST")
             FeedArticleScreenViewState(
@@ -273,7 +280,6 @@ class FeedArticleViewModel(
                 showDeleteDialog = params[12] as Boolean,
                 visibleFeeds = params[13] as List<FeedTitle>,
                 articleFeedUrl = article.feedUrl,
-                currentArticle = currentArticle,
                 articleFeedId = article.feedId,
                 linkOpener = params[15] as LinkOpener,
                 pubDate = article.pubDate,
@@ -283,15 +289,14 @@ class FeedArticleViewModel(
                 feedDisplayTitle = article.feedDisplayTitle,
                 currentFeedOrTag = params[16] as FeedOrTag,
                 articleLink = article.link,
-                textToDisplay = getTextToDisplayFor(currentArticle.itemId),
+                textToDisplay = getTextToDisplayFor(article.id),
                 readAloudTitle = params[18] as String,
                 isReadAloudPlaying = readAloudState == PlaybackStatus.PLAYING,
                 isReadAloudVisible = readAloudState != PlaybackStatus.STOPPED,
-                articleFlowsInSync = article.id == currentArticle.itemId,
+                articleId = article.id,
+                isArticleOpen = articleOpen,
             )
         }
-            // To avoid some flicker of out of date elements in ArticleView
-            .filter { it.articleFlowsInSync }
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
@@ -350,7 +355,7 @@ class FeedArticleViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val fullText = when (viewState.value.textToDisplay) {
                 TextToDisplay.DEFAULT -> {
-                    blobInputStream(viewState.value.currentArticle.itemId, context.filesDir).use {
+                    blobInputStream(viewState.value.articleId, context.filesDir).use {
                         getPlainTextOfHtmlStream(
                             inputStream = it,
                             baseUrl = viewState.value.articleFeedUrl ?: ""
@@ -359,7 +364,7 @@ class FeedArticleViewModel(
                 }
                 TextToDisplay.FULLTEXT -> {
                     blobFullInputStream(
-                        viewState.value.currentArticle.itemId,
+                        viewState.value.articleId,
                         context.filesDir
                     ).use {
                         getPlainTextOfHtmlStream(
@@ -453,7 +458,6 @@ data class FeedArticleScreenViewState(
     // Defaults to true so empty screen doesn't appear before load
     override val haveVisibleFeedItems: Boolean = true,
     override val articleFeedUrl: String? = null,
-    val currentArticle: CurrentArticle = CurrentArticle(ID_UNSET, false),
     override val articleFeedId: Long = ID_UNSET,
     override val textToDisplay: TextToDisplay = TextToDisplay.DEFAULT,
     override val linkOpener: LinkOpener = LinkOpener.CUSTOM_TAB,
@@ -463,15 +467,7 @@ data class FeedArticleScreenViewState(
     override val articleTitle: String = "",
     override val articleLink: String? = null,
     override val feedDisplayTitle: String = "",
-    val articleFlowsInSync: Boolean = true,
-) : FeedScreenViewState, ArticleScreenViewState {
-    // Need atomic updates on these two fields which is why they are hidden behind a data class
-    override val articleId = currentArticle.itemId
-    val isArticleOpen = currentArticle.isOpen
-}
+    override val articleId: Long = ID_UNSET,
+    val isArticleOpen: Boolean = false,
+) : FeedScreenViewState, ArticleScreenViewState
 
-@Immutable
-data class CurrentArticle(
-    val itemId: Long,
-    val isOpen: Boolean,
-)
