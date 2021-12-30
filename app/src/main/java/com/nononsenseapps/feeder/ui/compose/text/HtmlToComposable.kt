@@ -661,10 +661,11 @@ private fun BoxWithConstraintsScope.maxImageSize() = with(LocalDensity.current) 
     val maxWidthPx = maxWidth.toPx().roundToInt()
 
     PixelSize(
-        width = maxWidth.toPx().roundToInt(),
+        width = maxWidth.toPx().roundToInt().coerceAtLeast(1),
         height = maxHeight
             .toPx()
             .roundToInt()
+            .coerceAtLeast(1)
             .coerceAtMost(10 * maxWidthPx),
     )
 }
