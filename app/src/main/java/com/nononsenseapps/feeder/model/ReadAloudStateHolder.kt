@@ -14,12 +14,14 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Any callers must call #shutdown when shutting down
@@ -91,8 +93,14 @@ class ReadAloudStateHolder(
                 delay(100)
             }
             if (initializedState != TextToSpeech.SUCCESS) {
-                Toast.makeText(context, R.string.failed_to_load_text_to_speech, Toast.LENGTH_SHORT)
-                    .show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context,
+                        R.string.failed_to_load_text_to_speech,
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
                 return@launch
             }
             _readAloudState.value = PlaybackStatus.PLAYING
