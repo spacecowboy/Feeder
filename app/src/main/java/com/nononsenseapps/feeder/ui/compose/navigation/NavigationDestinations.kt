@@ -1,14 +1,28 @@
 package com.nononsenseapps.feeder.ui.compose.navigation
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavArgumentBuilder
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
-import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
+import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.ui.NavigationDeepLinkViewModel
+import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
+import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreenViewModel
+import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
+import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
+import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleScreen
+import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
+import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
+import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.urlEncode
 
@@ -40,6 +54,31 @@ sealed class NavigationDestination(
             completePath + queryParams
         }
     }
+
+    fun register(
+        navGraphBuilder: NavGraphBuilder,
+        navController: NavController,
+        windowSize: WindowSize,
+    ) {
+        navGraphBuilder.composable(
+            route = route,
+            arguments = arguments,
+            deepLinks = deepLinks,
+        ) { backStackEntry ->
+            registerScreen(
+                windowSize = windowSize,
+                navController = navController,
+                backStackEntry = backStackEntry,
+            )
+        }
+    }
+
+    @Composable
+    protected abstract fun registerScreen(
+        navController: NavController,
+        windowSize: WindowSize,
+        backStackEntry: NavBackStackEntry,
+    )
 }
 
 sealed class NavigationArgument(
@@ -78,6 +117,27 @@ object SearchFeedDestination : NavigationDestination(
 
         navController.navigate(path + params)
     }
+
+    @Composable
+    override fun registerScreen(
+        navController: NavController,
+        windowSize: WindowSize,
+        backStackEntry: NavBackStackEntry
+    ) {
+        SearchFeedScreen(
+            onNavigateUp = {
+                navController.popBackStack()
+            },
+            initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
+            searchFeedViewModel = backStackEntry.DIAwareViewModel()
+        ) {
+            AddFeedDestination.navigate(
+                navController,
+                feedUrl = it.url,
+                feedTitle = it.title
+            )
+        }
+    }
 }
 
 object AddFeedDestination : NavigationDestination(
@@ -101,6 +161,25 @@ object AddFeedDestination : NavigationDestination(
 
         navController.navigate("$path/${feedUrl.urlEncode()}${params}")
     }
+
+    @Composable
+    override fun registerScreen(
+        navController: NavController,
+        windowSize: WindowSize,
+        backStackEntry: NavBackStackEntry
+    ) {
+        val createFeedScreenViewModel: CreateFeedScreenViewModel = backStackEntry.DIAwareViewModel()
+
+        CreateFeedScreen(
+            onNavigateUp = {
+                navController.popBackStack()
+            },
+            createFeedScreenViewModel = createFeedScreenViewModel,
+        ) { feedId ->
+            createFeedScreenViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
+            FeedArticleDestination.navigate(navController)
+        }
+    }
 }
 
 object EditFeedDestination : NavigationDestination(
@@ -116,6 +195,25 @@ object EditFeedDestination : NavigationDestination(
     fun navigate(navController: NavController, feedId: Long) {
         navController.navigate("$path/$feedId")
     }
+
+    @Composable
+    override fun registerScreen(
+        navController: NavController,
+        windowSize: WindowSize,
+        backStackEntry: NavBackStackEntry
+    ) {
+        val editFeedScreenViewModel: EditFeedScreenViewModel = backStackEntry.DIAwareViewModel()
+        EditFeedScreen(
+            onNavigateUp = {
+                navController.popBackStack()
+            },
+            onOk = { feedId ->
+                editFeedScreenViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
+                FeedArticleDestination.navigate(navController)
+            },
+            editFeedScreenViewModel = editFeedScreenViewModel
+        )
+    }
 }
 
 object SettingsDestination : NavigationDestination(
@@ -125,6 +223,20 @@ object SettingsDestination : NavigationDestination(
 ) {
     fun navigate(navController: NavController) {
         navController.navigate(path)
+    }
+
+    @Composable
+    override fun registerScreen(
+        navController: NavController,
+        windowSize: WindowSize,
+        backStackEntry: NavBackStackEntry
+    ) {
+        SettingsScreen(
+            onNavigateUp = {
+                navController.popBackStack()
+            },
+            settingsViewModel = backStackEntry.DIAwareViewModel(),
+        )
     }
 }
 
@@ -140,6 +252,19 @@ object FeedArticleDestination : NavigationDestination(
             popUpTo(path)
             launchSingleTop = true
         }
+    }
+
+    @Composable
+    override fun registerScreen(
+        navController: NavController,
+        windowSize: WindowSize,
+        backStackEntry: NavBackStackEntry
+    ) {
+        FeedArticleScreen(
+            windowSize = windowSize,
+            navController = navController,
+            viewModel = backStackEntry.DIAwareViewModel(),
+        )
     }
 }
 
@@ -171,6 +296,26 @@ object FeedDestination : NavigationDestination(
 
         navController.navigate("$path${params}")
     }
+
+    @Composable
+    override fun registerScreen(
+        navController: NavController,
+        windowSize: WindowSize,
+        backStackEntry: NavBackStackEntry
+    ) {
+        val feedId = backStackEntry.arguments?.getLong("id")
+            ?: error("Missing mandatory argument: id")
+        val tag = backStackEntry.arguments?.getString("tag")
+            ?: error("Missing mandatory argument: tag")
+
+        val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
+            backStackEntry.DIAwareViewModel()
+
+        LaunchedEffect(feedId, tag) {
+            navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = tag)
+            FeedArticleDestination.navigate(navController)
+        }
+    }
 }
 
 object ArticleDestination : NavigationDestination(
@@ -188,6 +333,26 @@ object ArticleDestination : NavigationDestination(
 ) {
     fun navigate(navController: NavController, itemId: Long) {
         navController.navigate("$path/$itemId")
+    }
+
+    @Composable
+    override fun registerScreen(
+        navController: NavController,
+        windowSize: WindowSize,
+        backStackEntry: NavBackStackEntry
+    ) {
+        val itemId = backStackEntry.arguments?.getLong("itemId")
+            ?: error("Missing mandatory argument: itemId")
+
+        val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
+            backStackEntry.DIAwareViewModel()
+
+        // TODO should this also set current feed? On tablet it might feel weird that
+        // the article is from one feed and the list displays a different feed
+        LaunchedEffect(itemId) {
+            navigationDeepLinkViewModel.setCurrentArticle(itemId = itemId)
+            FeedArticleDestination.navigate(navController)
+        }
     }
 }
 

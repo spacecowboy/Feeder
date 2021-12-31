@@ -65,6 +65,10 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
         state["alternateId"] = value
     }
 
+    fun setCurrentFeedAndTag(feedId: Long, tag: String) {
+        repository.setCurrentFeedAndTag(feedId, tag)
+    }
+
     fun saveInBackgroundAndRequestSync() {
         val url = _url.value
             ?: error("Missing url in state!!!")

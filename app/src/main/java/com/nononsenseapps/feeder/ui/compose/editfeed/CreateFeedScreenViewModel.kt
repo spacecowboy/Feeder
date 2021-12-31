@@ -57,6 +57,10 @@ class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : D
         state["alternateId"] = value
     }
 
+    fun setCurrentFeedAndTag(feedId: Long, tag: String) {
+        repository.setCurrentFeedAndTag(feedId, tag)
+    }
+
     fun saveAndRequestSync(): Long {
         val url = _url.value
             ?: error("Missing url in state!!!")

@@ -61,6 +61,11 @@ class Repository(override val di: DI) : DIAware {
         settingsStore.setCurrentFeedAndTag(feedId, tag)
     }
 
+    val isArticleOpen: StateFlow<Boolean> = settingsStore.isArticleOpen
+    fun setIsArticleOpen(open: Boolean) {
+        settingsStore.setIsArticleOpen(open)
+    }
+
     val currentArticleId: StateFlow<Long> = settingsStore.currentArticleId
     fun setCurrentArticle(articleId: Long) =
         settingsStore.setCurrentArticle(articleId)

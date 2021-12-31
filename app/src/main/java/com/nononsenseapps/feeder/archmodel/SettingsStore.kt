@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -49,6 +50,15 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setCurrentArticle(articleId: Long) {
         _currentArticle.value = articleId
         sp.edit().putLong(PREF_LAST_ARTICLE_ID, articleId).apply()
+    }
+
+    private val _isArticleOpen = MutableStateFlow(
+        sp.getBoolean(PREF_IS_ARTICLE_OPEN, false)
+    )
+    val isArticleOpen: StateFlow<Boolean> = _isArticleOpen.asStateFlow()
+    fun setIsArticleOpen(open: Boolean) {
+        _isArticleOpen.update { open }
+        sp.edit().putBoolean(PREF_IS_ARTICLE_OPEN, open).apply()
     }
 
     private val _currentTheme = MutableStateFlow(
@@ -275,6 +285,7 @@ const val PREF_SHOW_ONLY_UNREAD = "pref_show_only_unread"
 const val PREF_LAST_FEED_TAG = "pref_last_feed_tag"
 const val PREF_LAST_FEED_ID = "pref_last_feed_id"
 const val PREF_LAST_ARTICLE_ID = "pref_last_article_id"
+const val PREF_IS_ARTICLE_OPEN = "pref_is_article_open"
 
 /**
  * Theme settings
