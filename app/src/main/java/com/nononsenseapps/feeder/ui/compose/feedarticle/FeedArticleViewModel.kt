@@ -164,10 +164,7 @@ class FeedArticleViewModel(
      * visibility of article on large landscape screens
      */
     fun setArticleOpen(value: Boolean) {
-        articleOpen.update {
-            value
-        }
-        state["articleOpen"] = value
+        repository.setIsArticleOpen(value)
     }
 
     suspend fun setCurrentArticle(itemId: Long) {
@@ -208,11 +205,6 @@ class FeedArticleViewModel(
         markAsUnread(itemId, false)
     }
 
-    private val articleOpen: MutableStateFlow<Boolean> =
-        MutableStateFlow(
-            state["articleOpen"] ?: false
-        )
-
     // Used to trigger state update
     private val textToDisplayTrigger: MutableStateFlow<Int> = MutableStateFlow(0)
     private suspend fun getTextToDisplayFor(itemId: Long): TextToDisplay =
@@ -243,7 +235,7 @@ class FeedArticleViewModel(
             editDialogVisible,
             deleteDialogVisible,
             visibleFeeds,
-            articleOpen,
+            repository.isArticleOpen,
             repository.linkOpener,
             repository.currentFeedAndTag.map { (feedId, tag) -> FeedOrTag(feedId, tag) },
             repository.currentArticle,
@@ -259,9 +251,6 @@ class FeedArticleViewModel(
 
             @Suppress("UNCHECKED_CAST")
             val haveVisibleFeedItems = (params[9] as Int) > 0
-
-            @Suppress("UNCHECKED_CAST")
-            val articleOpen = params[14] as Boolean
 
             @Suppress("UNCHECKED_CAST")
             FeedArticleScreenViewState(
@@ -294,7 +283,7 @@ class FeedArticleViewModel(
                 isReadAloudPlaying = readAloudState == PlaybackStatus.PLAYING,
                 isReadAloudVisible = readAloudState != PlaybackStatus.STOPPED,
                 articleId = article.id,
-                isArticleOpen = articleOpen,
+                isArticleOpen = params[14] as Boolean,
             )
         }
             .stateIn(

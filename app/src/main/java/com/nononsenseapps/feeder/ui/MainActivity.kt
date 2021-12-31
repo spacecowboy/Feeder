@@ -6,25 +6,19 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.LocalImageLoader
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
-import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
-import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
-import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
-import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleScreen
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
@@ -32,8 +26,6 @@ import com.nononsenseapps.feeder.ui.compose.navigation.FeedArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.FeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
-import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
-import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.rememberWindowSizeClass
 import kotlinx.coroutines.launch
@@ -121,109 +113,16 @@ class MainActivity : DIAwareComponentActivity() {
         }
 
         NavHost(navController, startDestination = FeedArticleDestination.route) {
-            composable(
-                route = FeedArticleDestination.route,
-                arguments = FeedArticleDestination.arguments,
-                deepLinks = FeedArticleDestination.deepLinks,
-            ) { backStackEntry ->
-                FeedArticleScreen(
-                    windowSize = windowSize,
-                    navController = navController,
-                    viewModel = backStackEntry.DIAwareViewModel(),
-                )
-            }
-            composable(
-                route = FeedDestination.route,
-                arguments = FeedDestination.arguments,
-                deepLinks = FeedDestination.deepLinks,
-            ) { backStackEntry ->
-                val feedId = backStackEntry.arguments?.getLong("id")
-                    ?: error("Missing mandatory argument: id")
-                val tag = backStackEntry.arguments?.getString("tag")
-                    ?: error("Missing mandatory argument: tag")
-
-                LaunchedEffect(feedId, tag) {
-                    mainActivityViewModel.setCurrentFeedAndTag(feedId = feedId, tag = tag)
-                    FeedArticleDestination.navigate(navController)
-                }
-            }
-            composable(
-                route = ArticleDestination.route,
-                arguments = ArticleDestination.arguments,
-                deepLinks = ArticleDestination.deepLinks,
-            ) { backStackEntry ->
-                val itemId = backStackEntry.arguments?.getLong("itemId")
-                    ?: error("Missing mandatory argument: itemId")
-
-                // TODO should this also set current feed? On tablet it might feel weird that
-                // the article is from one feed and the list displays a different feed
-                LaunchedEffect(itemId) {
-                    mainActivityViewModel.setCurrentArticle(itemId = itemId)
-                    FeedArticleDestination.navigate(navController)
-                }
-            }
-            composable(
-                route = EditFeedDestination.route,
-                arguments = EditFeedDestination.arguments,
-                deepLinks = EditFeedDestination.deepLinks,
-            ) { backStackEntry ->
-                EditFeedScreen(
-                    onNavigateUp = {
-                        navController.popBackStack()
-                    },
-                    onOk = { feedId ->
-                        mainActivityViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
-                        FeedArticleDestination.navigate(navController)
-                    },
-                    editFeedScreenViewModel = backStackEntry.DIAwareViewModel()
-                )
-            }
-            composable(
-                route = SearchFeedDestination.route,
-                arguments = SearchFeedDestination.arguments,
-                deepLinks = SearchFeedDestination.deepLinks,
-            ) { backStackEntry ->
-                SearchFeedScreen(
-                    onNavigateUp = {
-                        navController.popBackStack()
-                    },
-                    initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
-                    searchFeedViewModel = backStackEntry.DIAwareViewModel()
-                ) {
-                    AddFeedDestination.navigate(
-                        navController,
-                        feedUrl = it.url,
-                        feedTitle = it.title
-                    )
-                }
-            }
-            composable(
-                route = AddFeedDestination.route,
-                arguments = AddFeedDestination.arguments,
-                deepLinks = AddFeedDestination.deepLinks,
-            ) { backStackEntry ->
-                CreateFeedScreen(
-                    onNavigateUp = {
-                        navController.popBackStack()
-                    },
-                    createFeedScreenViewModel = backStackEntry.DIAwareViewModel(),
-                ) { feedId ->
-                    mainActivityViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
-                    FeedArticleDestination.navigate(navController)
-                }
-            }
-            composable(
-                route = SettingsDestination.route,
-                arguments = SettingsDestination.arguments,
-                deepLinks = SettingsDestination.deepLinks,
-            ) { backStackEntry ->
-                SettingsScreen(
-                    onNavigateUp = {
-                        navController.popBackStack()
-                    },
-                    settingsViewModel = backStackEntry.DIAwareViewModel(),
-                )
-            }
+            FeedArticleDestination.register(this, navController, windowSize)
+            // Deep links
+            FeedDestination.register(this, navController, windowSize)
+            ArticleDestination.register(this, navController, windowSize)
+            // Feed editing
+            EditFeedDestination.register(this, navController, windowSize)
+            SearchFeedDestination.register(this, navController, windowSize)
+            AddFeedDestination.register(this, navController, windowSize)
+            // Settings
+            SettingsDestination.register(this, navController, windowSize)
         }
     }
 }
