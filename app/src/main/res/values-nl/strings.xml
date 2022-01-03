@@ -139,4 +139,5 @@
     <string name="fetch_full_articles_by_default">Standaard volledige artikelen</string>
     <string name="empty_feed_add">of feeds <annotation style="link">toevoegen</annotation>\?</string>
     <string name="nothing_to_display">Niets te tonen!</string>
+    <string name="failed_to_open_article">Kon artikel niet openen</string>
 </resources>
