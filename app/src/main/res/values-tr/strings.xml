@@ -139,4 +139,5 @@
     <string name="invalid_url">Geçerli bir URL değil</string>
     <string name="failed_to_import_OPML">OPML içe aktarılamadı</string>
     <string name="failed_to_export_OPML">OPML dışa aktarılamadı</string>
+    <string name="failed_to_open_article">Makale açılamadı</string>
 </resources>
