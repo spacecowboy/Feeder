@@ -139,4 +139,5 @@
     <string name="invalid_url">Не правильна URL</string>
     <string name="failed_to_import_OPML">Не вдалося імпортувати OPML</string>
     <string name="failed_to_export_OPML">Не вдалося експортувати OPML</string>
+    <string name="failed_to_open_article">Не можливо відкрити статтю</string>
 </resources>
