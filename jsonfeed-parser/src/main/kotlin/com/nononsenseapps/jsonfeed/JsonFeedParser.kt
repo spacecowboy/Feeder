@@ -2,16 +2,13 @@ package com.nononsenseapps.jsonfeed
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import java.io.File
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okio.BufferedSource
-import okio.buffer
-import okio.source
-import java.io.File
-import java.io.IOException
-import java.nio.charset.Charset
-import java.util.concurrent.TimeUnit
+import okhttp3.ResponseBody
 
 // 10 mins
 const val MIN_MAXAGE = 600
@@ -106,7 +103,10 @@ class JsonFeedParser(
                 .url(url)
                 .build()
         } catch (error: Throwable) {
-            throw IllegalArgumentException("Bad URL. Perhaps it is missing an http:// prefix?", error)
+            throw IllegalArgumentException(
+                "Bad URL. Perhaps it is missing an http:// prefix?",
+                error
+            )
         }
 
         val response = httpClient.newCall(request).execute()
@@ -115,43 +115,22 @@ class JsonFeedParser(
             throw IOException("Failed to download feed: $response")
         }
 
-        val body = response.body
-        if (body != null) {
-            body.source().inputStream().use {
-                return parseJsonStream(it.source().buffer())
-            }
-        } else {
-            throw IOException("Failed to parse feed: body was NULL")
-        }
+        return response.body?.let {
+            parseJson(it)
+        } ?: throw IOException("Failed to parse feed: body was NULL")
     }
 
     /**
      * Parse a JSONFeed
      */
-    fun parseJson(json: String): Feed =
-        json.byteInputStream().use { return parseJsonStream(it.source().buffer()) }
+    fun parseJson(responseBody: ResponseBody): Feed =
+        parseJson(responseBody.string())
 
     /**
      * Parse a JSONFeed
      */
-    fun parseJsonBytes(json: ByteArray, charset: Charset = Charset.forName("UTF-8")): Feed {
-
-
-        return json.inputStream().use { parseJsonStream(it.source().buffer()) }
-    }
-
-    /**
-     * Parse a JSONFeed
-     */
-    @Suppress("MemberVisibilityCanPrivate")
-    fun parseJsonStream(json: BufferedSource): Feed {
-        val result = jsonFeedAdapter.fromJson(json)
-
-        when {
-            result != null -> return result
-            else -> throw IOException("Failed to parse JSONFeed")
-        }
-    }
+    fun parseJson(json: String): Feed = jsonFeedAdapter.fromJson(json)
+        ?: throw IOException("Failed to parse JSONFeed")
 }
 
 data class Feed(
