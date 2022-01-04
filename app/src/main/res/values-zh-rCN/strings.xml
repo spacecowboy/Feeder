@@ -139,4 +139,5 @@
     <string name="invalid_url">无效 URL</string>
     <string name="failed_to_import_OPML">导入 OPML 失败</string>
     <string name="failed_to_export_OPML">未能导出 OPML</string>
+    <string name="failed_to_open_article">打不开文章</string>
 </resources>

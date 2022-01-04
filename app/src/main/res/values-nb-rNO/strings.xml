@@ -133,4 +133,11 @@
     <string name="showing_only_unread_articles">Viser kun uleste artikler</string>
     <string name="dark_theme_preference_black">Svart</string>
     <string name="generate_extra_unique_ids">Generer ekstra unike ID-er</string>
+    <string name="syncing">Synkronisering</string>
+    <string name="sync_status">Synkroniseringsstatus</string>
+    <string name="only_enable_for_bad_id_feeds">Kun skru på for informasjonskanaler med feilaktige ID-er</string>
+    <string name="failed_to_export_OPML">Klarte ikke å eksportere OPML</string>
+    <string name="failed_to_import_OPML">Klarte ikke å importere OPML</string>
+    <string name="failed_to_open_article">Kunne ikke åpne artikkel</string>
+    <string name="invalid_url">Ikke en gyldig nettadresse</string>
 </resources>

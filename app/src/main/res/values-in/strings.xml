@@ -139,4 +139,5 @@
     <string name="invalid_url">URL tidak valid</string>
     <string name="failed_to_import_OPML">Gagal mengimpor OPML</string>
     <string name="failed_to_export_OPML">Gagal mengekspor OPML</string>
+    <string name="failed_to_open_article">Tidak dapat membuka artikel</string>
 </resources>

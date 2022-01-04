@@ -99,7 +99,7 @@
     <string name="preload_custom_tab">Standard-Registerkarte vorladen</string>
     <string name="failed_to_parse">%1$s konnte nicht analysiert werden</string>
     <string name="fetching_full_article">Vollständiger Artikel wird abgerufen …</string>
-    <string name="failed_to_fetch_full_article">Vollständiger Artikels konnte nicht abgerufen werden</string>
+    <string name="failed_to_fetch_full_article">Vollständiger Artikel konnte nicht abgerufen werden</string>
     <string name="fetch_full_articles_by_default">Vollständige Artikel abrufen</string>
     <string name="fetch_full_article">Vollständigen Artikel abrufen</string>
     <string name="failed_to_load_text_to_speech">Sprachsynthese konnte nicht geladen werden</string>
@@ -139,4 +139,5 @@
     <string name="invalid_url">Keine gültige Adresse</string>
     <string name="failed_to_import_OPML">OPML-Import fehlgeschlagen</string>
     <string name="failed_to_export_OPML">OPML-Export fehlgeschlagen</string>
+    <string name="failed_to_open_article">Artikel konnte nicht geöffnet werden</string>
 </resources>
