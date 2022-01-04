@@ -9,14 +9,10 @@ import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.JsonFeedParser
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
-import java.io.EOFException
 import java.io.IOException
-import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLDecoder
-import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers.IO
@@ -28,10 +24,8 @@ import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.ResponseBody
 import okhttp3.Route
-import okhttp3.internal.readBomAsCharset
-import okio.Buffer
-import okio.GzipSource
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.kodein.di.DI
@@ -179,12 +173,12 @@ class FeedParser(override val di: DI) : DIAware {
 
     @Throws(FeedParsingError::class)
     fun parseFeedResponse(response: Response): Feed? {
-        val contentType = response.body?.contentType()
-        val charset = response.body?.source()?.readBomAsCharset(
-            contentType?.charset() ?: StandardCharsets.UTF_8
-        )
-        return response.safeBody()?.let { body ->
-            parseFeedResponse(response.request.url.toUrl(), contentType, charset, body)
+        return response.body?.use {
+            // OkHttp string method handles BOM and Content-Type header in request
+            parseFeedResponse(
+                response.request.url.toUrl(),
+                it,
+            )
         }
     }
 
@@ -194,14 +188,38 @@ class FeedParser(override val di: DI) : DIAware {
     @Throws(FeedParsingError::class)
     fun parseFeedResponse(
         url: URL,
+        responseBody: ResponseBody,
+    ): Feed {
+        try {
+            val feed = when (responseBody.contentType()?.subtype?.contains("json")) {
+                true -> jsonFeedParser.parseJson(responseBody)
+                else -> parseRssAtom(url, responseBody)
+            }
+
+            return if (feed.feed_url == null) {
+                // Nice to return non-null value here
+                feed.copy(feed_url = url.toString())
+            } else {
+                feed
+            }
+        } catch (e: Throwable) {
+            throw FeedParsingError(url, e)
+        }
+    }
+
+    /**
+     * Takes body as bytes to handle encoding correctly
+     */
+    @Throws(FeedParsingError::class)
+    fun parseFeedResponse(
+        url: URL,
+        body: String,
         contentType: MediaType?,
-        charset: Charset?,
-        body: ByteArray,
     ): Feed {
         try {
             val feed = when (contentType?.subtype?.contains("json")) {
-                true -> jsonFeedParser.parseJson(body.toString(charset ?: StandardCharsets.UTF_8))
-                else -> parseRssAtomBytes(url, body, charset)
+                true -> jsonFeedParser.parseJson(body)
+                else -> parseRssAtom(url, body)
             }
 
             return if (feed.feed_url == null) {
@@ -220,55 +238,22 @@ class FeedParser(override val di: DI) : DIAware {
      */
     @Throws(FeedParsingError::class)
     suspend fun parseFeedResponseOrFallbackToAlternateLink(response: Response): Feed? {
-        val contentType = response.body?.contentType()
-        val charset = response.body?.source()?.readBomAsCharset(
-            contentType?.charset() ?: StandardCharsets.UTF_8
-        ) ?: StandardCharsets.UTF_8
+        val body = response.body?.string() ?: return null
 
-        return response.safeBody()?.let { bytes ->
-            val alternateFeedLink = findFeedUrl(bytes.toString(charset), preferAtom = true)
+        val alternateFeedLink = findFeedUrl(body, preferAtom = true)
 
-            if (alternateFeedLink != null) {
-                parseFeedUrl(alternateFeedLink)
-            } else {
-                parseFeedResponse(response.request.url.toUrl(), contentType, charset, bytes)
-            }
+        return if (alternateFeedLink != null) {
+            parseFeedUrl(alternateFeedLink)
+        } else {
+            parseFeedResponse(response.request.url.toUrl(), body, response.body?.contentType())
         }
     }
 
     @Throws(FeedParsingError::class)
-    internal fun parseRssAtomBytes(baseUrl: URL, feedXml: ByteArray, charset: Charset?): Feed {
+    internal fun parseRssAtom(baseUrl: URL, responseBody: ResponseBody): Feed {
         try {
-            feedXml.inputStream().use { return parseFeedInputStream(baseUrl, it, charset) }
-        } catch (e: NumberFormatException) {
-            try {
-                // Try to work around bug in Rome
-                var encoding: String? = charset?.name()
-                val xml: String = slashPattern.replace(
-                    feedXml.inputStream().use {
-                        XmlReader(it, true, encoding).use {
-                            encoding = it.encoding
-                            it.readText()
-                        }
-                    },
-                    ""
-                )
-
-                val charsetToUse = Charset.forName(encoding ?: "UTF-8")
-                xml.byteInputStream(charsetToUse).use {
-                    return parseFeedInputStream(baseUrl, it, charsetToUse)
-                }
-            } catch (e: Throwable) {
-                throw FeedParsingError(baseUrl, e)
-            }
-        }
-    }
-
-    @Throws(FeedParsingError::class)
-    internal fun parseFeedInputStream(baseUrl: URL, `is`: InputStream, charset: Charset?): Feed {
-        `is`.use {
-            try {
-                val feed = XmlReader(`is`, true, charset?.name()).use {
+            responseBody.byteStream().use { bs ->
+                val feed = XmlReader(bs, true, responseBody.contentType()?.charset()?.name()).use {
                     SyndFeedInput()
                         .apply {
                             isPreserveWireFeed = true
@@ -276,46 +261,31 @@ class FeedParser(override val di: DI) : DIAware {
                         .build(it)
                 }
                 return feed.asFeed(baseUrl = baseUrl)
-            } catch (e: NumberFormatException) {
-                throw e
-            } catch (e: Throwable) {
-                throw FeedParsingError(baseUrl, e)
             }
+        } catch (t: Throwable) {
+            throw FeedParsingError(baseUrl, t)
+        }
+    }
+
+    @Throws(FeedParsingError::class)
+    internal fun parseRssAtom(baseUrl: URL, body: String): Feed {
+        try {
+            body.byteInputStream().use { bs ->
+                val feed = XmlReader(bs, true).use {
+                    SyndFeedInput()
+                        .apply {
+                            isPreserveWireFeed = true
+                        }
+                        .build(it)
+                }
+                return feed.asFeed(baseUrl = baseUrl)
+            }
+        } catch (t: Throwable) {
+            throw FeedParsingError(baseUrl, t)
         }
     }
 
     class FeedParsingError(val url: URL, e: Throwable) : Exception(e.message, e)
-}
-
-fun Response.safeBody(): ByteArray? {
-    return this.body?.use { body ->
-        if (header("Transfer-Encoding") == "chunked") {
-            val source =
-                if (header("Content-Encoding") == "gzip") {
-                    GzipSource(body.source())
-                } else {
-                    body.source()
-                }
-            val buffer = Buffer()
-            try {
-                var readBytes: Long = 0
-                while (readBytes != -1L) {
-                    readBytes = source.read(buffer, Long.MAX_VALUE)
-                }
-            } catch (e: EOFException) {
-                // This is not always fatal - sometimes the server might have sent the wrong
-                // content-length (I suspect)
-                Log.e(
-                    "FeedParser",
-                    "Encountered EOF exception while parsing response with headers: $headers",
-                    e
-                )
-            }
-            buffer.readByteArray()
-        } else {
-            body.bytes()
-        }
-    }
 }
 
 suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): Response {

@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.searchfeed
 
+import android.util.Log
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.model.FeedParser
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
@@ -33,6 +34,7 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
                         )
                     }
                 } catch (t: Throwable) {
+                    Log.e("FEEDER_SearchFeed", "Failed to parse", t)
                     SearchResult(
                         title = FAILED_TO_PARSE_PLACEHOLDER,
                         url = it.toString(),

@@ -17,7 +17,6 @@ import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
 import java.io.File
 import java.io.IOException
-import java.nio.charset.StandardCharsets
 import java.util.concurrent.Executors
 import kotlin.math.max
 import kotlin.system.measureTimeMillis
@@ -31,7 +30,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Response
-import okhttp3.internal.readBomAsCharset
 import org.kodein.di.DI
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
@@ -167,27 +165,18 @@ private suspend fun syncFeed(
 
     val response: Response = okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
 
-    var responseHash = 0
-
     val feed: Feed? =
         response.use {
-            val contentType = response.body?.contentType()
-            val charset = response.body?.source()?.readBomAsCharset(
-                contentType?.charset() ?: StandardCharsets.UTF_8
-            )
-            val responseBody = it.safeBody()
-            responseBody?.let { body ->
-                responseHash = body.contentHashCode()
+            response.body?.let { responseBody ->
                 when {
                     !response.isSuccessful -> {
                         throw ResponseFailure("${response.code} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
                     }
-                    feedSql.responseHash == responseHash -> null // no change
+                    // TODO WTF is this for again?
+//                    feedSql.responseHash == responseHash -> null // no change
                     else -> feedParser.parseFeedResponse(
                         response.request.url.toUrl(),
-                        contentType,
-                        charset,
-                        body
+                        responseBody
                     )
                 }
             }
@@ -249,7 +238,8 @@ private suspend fun syncFeed(
 
         // Update feed last so lastsync is only set after all items have been handled
         // for the rare case that the job is cancelled prematurely
-        feedSql.responseHash = responseHash
+        // TODO what's this for?
+//        feedSql.responseHash = responseHash
         feedSql.title = feed.title ?: feedSql.title
         // Not changing feed url because I don't want to override auth or token params
         // See https://gitlab.com/spacecowboy/Feeder/-/issues/390

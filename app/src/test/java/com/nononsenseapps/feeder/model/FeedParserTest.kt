@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.model
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.jsonfeed.Author
 import com.nononsenseapps.jsonfeed.cachingHttpClient
+import java.io.BufferedReader
 import java.io.InputStream
 import java.net.URL
 import kotlin.test.Ignore
@@ -57,69 +58,66 @@ class FeedParserTest : DIAware {
 
     @Test
     fun dcCreatorEndsUpAsAuthor() {
-        javaClass.getResourceAsStream("openstreetmap.xml")!!
-            .use {
-                val feed = feedParser.parseFeedInputStream(
-                    URL("http://https://www.openstreetmap.org/diary/rss"),
-                    it,
-                    null
-                )
-                val item = feed.items!!.first()
+        val body = javaClass.getResourceAsStream("openstreetmap.xml")!!.bufferedReader()
+            .use(BufferedReader::readText)
+        val feed = feedParser.parseFeedResponse(
+            URL("http://https://www.openstreetmap.org/diary/rss"),
+            body,
+            null
+        )
+        val item = feed.items!!.first()
 
-                assertEquals(Author(name = "0235"), item.author)
-            }
+        assertEquals(Author(name = "0235"), item.author)
     }
 
     @Test
     @Throws(Exception::class)
     fun htmlAtomContentGetsUnescaped() {
-        javaClass.getResourceAsStream("atom_hnapp.xml")!!
-            .use {
-                val feed = feedParser.parseFeedInputStream(
-                    URL("http://hnapp.com/rss?q=type%3Astory%20score%3E36%20-bitcoin%20-ethereum%20-cryptocurrency%20-blockchain%20-snowden%20-hiring%20-ask"),
-                    it,
-                    null
-                )
+        val body = javaClass.getResourceAsStream("atom_hnapp.xml")!!.bufferedReader()
+            .use(BufferedReader::readText)
+        val feed = feedParser.parseFeedResponse(
+            URL("http://hnapp.com/rss?q=type%3Astory%20score%3E36%20-bitcoin%20-ethereum%20-cryptocurrency%20-blockchain%20-snowden%20-hiring%20-ask"),
+            body,
+            null
+        )
 
-                val item = feed.items!![0]
-                assertEquals(
-                    "37 – Spectre Mitigations in Microsoft's C/C++ Compiler",
-                    item.title
-                )
-                assertEquals(
-                    "37 points, 1 comment",
-                    item.content_text
-                )
-                assertEquals(
-                    "<p>37 points, <a href=\"https://news.ycombinator.com/item?id=16381978\">1 comment</a></p>",
-                    item.content_html
-                )
-            }
+        val item = feed.items!![0]
+        assertEquals(
+            "37 – Spectre Mitigations in Microsoft's C/C++ Compiler",
+            item.title
+        )
+        assertEquals(
+            "37 points, 1 comment",
+            item.content_text
+        )
+        assertEquals(
+            "<p>37 points, <a href=\"https://news.ycombinator.com/item?id=16381978\">1 comment</a></p>",
+            item.content_html
+        )
     }
 
     @Test
     @Throws(Exception::class)
     fun enclosedImageIsUsedAsThumbnail() {
-        javaClass.getResourceAsStream("rss_lemonde.xml")!!
-            .use {
-                val feed = feedParser.parseFeedInputStream(
-                    URL("http://www.lemonde.fr/rss/une.xml"),
-                    it,
-                    null
-                )
+        val body = javaClass.getResourceAsStream("rss_lemonde.xml")!!.bufferedReader()
+            .use(BufferedReader::readText)
+        val feed = feedParser.parseFeedResponse(
+            URL("http://www.lemonde.fr/rss/une.xml"),
+            body,
+            null
+        )
 
-                val item = feed.items!![0]
-                assertEquals(
-                    "http://s1.lemde.fr/image/2018/02/11/644x322/5255112_3_a8dc_martin-fourcade_02be61d126b2da39d977b2e1902c819a.jpg",
-                    item.image
-                )
-            }
+        val item = feed.items!![0]
+        assertEquals(
+            "http://s1.lemde.fr/image/2018/02/11/644x322/5255112_3_a8dc_martin-fourcade_02be61d126b2da39d977b2e1902c819a.jpg",
+            item.image
+        )
     }
 
     @Test
     fun parsesYoutubeMediaInfo() {
         val feed = readResource("atom_youtube.xml") {
-            feedParser.parseFeedInputStream(
+            feedParser.parseFeedResponse(
                 URL("http://www.youtube.com/feeds/videos.xml"),
                 it,
                 null
@@ -138,7 +136,7 @@ class FeedParserTest : DIAware {
     @Test
     fun parsesPeertubeMediaInfo() {
         val feed = readResource("rss_peertube.xml") {
-            feedParser.parseFeedInputStream(URL("https://framatube.org/feeds/videos.xml"), it, null)
+            feedParser.parseFeedResponse(URL("https://framatube.org/feeds/videos.xml"), it, null)
         }
 
         val item = feed.items!!.first()
@@ -248,22 +246,7 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun encodingIsHandledInAtomRss() {
-        val responseBody: ResponseBody =
-            golemDe.toResponseBody("application/xml".toMediaTypeOrNull())
-
-        val response: Response = Response.Builder()
-            .body(responseBody)
-            .protocol(Protocol.HTTP_2)
-            .code(200)
-            .message("Test")
-            .request(
-                Request.Builder()
-                    .url("https://rss.golem.de/rss.php?feed=RSS2.0")
-                    .build()
-            )
-            .build()
-
-        val feed = response.use { feedParser.parseFeedResponse(response) }
+        val feed = golemDe.use { feedParser.parseFeedResponse(it) }
 
         assertEquals(true, feed?.items?.get(0)?.content_text?.contains("größte"))
     }
@@ -272,39 +255,24 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun emptySlashCommentsDontCrashParsingAndEncodingIsStillRespected() {
-        val responseBody: ResponseBody =
-            emptySlashComment.toResponseBody("application/xml".toMediaTypeOrNull())
-
-        val response: Response = Response.Builder()
-            .body(responseBody)
-            .protocol(Protocol.HTTP_2)
-            .code(200)
-            .message("Test")
-            .request(
-                Request.Builder()
-                    .url("https://rss.golem.de/rss.php?feed=RSS2.0")
-                    .build()
-            )
-            .build()
-
-        val feed = response.use { feedParser.parseFeedResponse(response) }
+        val feed = emptySlashComment.use { feedParser.parseFeedResponse(it) }
 
         assertEquals(1, feed?.items?.size)
-        assertEquals(true, feed?.items?.get(0)?.content_text?.contains("größte"))
+        assertEquals(
+            true,
+            feed?.items?.get(0)?.content_text?.contains("größte"),
+            feed?.items?.get(0)?.content_text!!
+        )
     }
 
     @Test
     @Throws(Exception::class)
     fun correctAlternateLinkInAtomIsUsedForUrl() {
-        val feed = feedParser.parseRssAtomBytes(
-            URL("http://utdelningsseglaren.blogspot.com/feeds/posts/default"),
-            utdelningsSeglarenAtom,
-            null
-        )
+        val feed = utdelningsSeglarenAtom.use { feedParser.parseFeedResponse(it) }
 
         assertEquals(
             "http://utdelningsseglaren.blogspot.com/2017/12/tips-pa-6-podcasts.html",
-            feed.items?.get(0)?.url
+            feed?.items?.first()?.url
         )
     }
 
@@ -312,9 +280,9 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun relativeLinksAreMadeAbsoluteAtom() {
 
-        val feed = feedParser.parseFeedInputStream(
+        val feed = feedParser.parseFeedResponse(
             URL("http://cowboyprogrammer.org/feed.atom"),
-            atomRelative.byteInputStream(),
+            atomRelative,
             null
         )
         assertNotNull(feed)
@@ -326,9 +294,9 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun relativeLinksAreMadeAbsoluteAtomNoBase() {
 
-        val feed = feedParser.parseFeedInputStream(
+        val feed = feedParser.parseFeedResponse(
             URL("http://cowboyprogrammer.org/feed.atom"),
-            atomRelativeNoBase.byteInputStream(),
+            atomRelativeNoBase,
             null
         )
         assertNotNull(feed)
@@ -339,9 +307,7 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun relativeFeedLinkInRssIsMadeAbsolute() {
-
-        val feed =
-            feedParser.parseRssAtomBytes(URL("https://lineageos.org/feed.xml"), lineageosRss, null)
+        val feed = lineageosRss.use { feedParser.parseFeedResponse(it) }
         assertNotNull(feed)
 
         assertEquals("https://lineageos.org/", feed.home_page_url)
@@ -358,11 +324,7 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun noStyles() {
-        val feed = feedParser.parseFeedInputStream(
-            URL("http://research.swtch.com/feed.atom"),
-            researchRsc,
-            null
-        )
+        val feed = researchRsc.use { feedParser.parseFeedResponse(it) }
         assertNotNull(feed)
 
         assertEquals("http://research.swtch.com/feed.atom", feed.feed_url)
@@ -388,11 +350,7 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun feedAuthorIsUsedAsFallback() {
-        val feed = feedParser.parseFeedInputStream(
-            URL("http://research.swtch.com/feed.atom"),
-            researchRsc,
-            null
-        )
+        val feed = researchRsc.use { feedParser.parseFeedResponse(it) }
         assertNotNull(feed)
 
         assertEquals("http://research.swtch.com/feed.atom", feed.feed_url)
@@ -408,11 +366,10 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun nixos() {
-        val feed =
-            feedParser.parseFeedInputStream(URL("http://nixos.org/news-rss.xml"), nixosRss, null)
+        val feed = nixosRss.use { feedParser.parseFeedResponse(it) }
         assertNotNull(feed)
 
-        assertNull(feed.feed_url)
+        assertEquals("http://nixos.org/news-rss.xml", feed.feed_url)
 
         assertEquals(99, feed.items!!.size)
 
@@ -425,14 +382,10 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun nixers() {
-        val feed = feedParser.parseFeedInputStream(
-            URL("https://newsletter.nixers.net/feed.xml"),
-            nixersRss,
-            null
-        )
+        val feed = nixersRss.use { feedParser.parseFeedResponse(it) }
         assertNotNull(feed)
 
-        assertNull(feed.feed_url)
+        assertEquals("https://newsletter.nixers.net/feed.xml", feed.feed_url)
 
         assertEquals(111, feed.items!!.size)
 
@@ -447,14 +400,10 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun cyklist() {
-        val feed = feedParser.parseFeedInputStream(
-            URL("http://www.cyklistbloggen.se/feed/"),
-            cyklistBloggen,
-            null
-        )
+        val feed = cyklistBloggen.use { feedParser.parseFeedResponse(it) }
         assertNotNull(feed)
 
-        assertNull(feed.feed_url)
+        assertEquals("http://www.cyklistbloggen.se/feed/", feed.feed_url)
 
         assertEquals(10, feed.items!!.size)
 
@@ -480,14 +429,10 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun cowboy() {
-        val feed = feedParser.parseFeedInputStream(
-            URL("http://cowboyprogrammer.org/index.xml"),
-            cowboyRss,
-            null
-        )
+        val feed = cowboyRss.use { feedParser.parseFeedResponse(it) }
         assertNotNull(feed)
 
-        assertNull(feed.feed_url)
+        assertEquals("http://cowboyprogrammer.org/index.xml", feed.feed_url)
 
         assertEquals(15, feed.items!!.size)
 
@@ -517,14 +462,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun rss() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(
-            URL("https://cornucopia.cornubot.se/feeds/posts/default?alt=rss"),
-            cornucopiaRss,
-            null
-        )
+        val feed = cornucopiaRss.use { feedParser.parseFeedResponse(it) }
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed!!
 
         assertEquals("http://cornucopia.cornubot.se/", home_page_url)
-        assertNull(feed_url)
+        assertEquals("https://cornucopia.cornubot.se/feeds/posts/default?alt=rss", feed_url)
 
         assertEquals(25, items!!.size)
         val (_, _, _, title, content_html, _, summary, image, _, _, _, _, _, attachments) = items[0]
@@ -554,11 +496,8 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun atom() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(
-            URL("https://cornucopia.cornubot.se/feeds/posts/default"),
-            cornucopiaAtom,
-            null
-        )
+        val feed = cornucopiaAtom.use { feedParser.parseFeedResponse(it) }
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed!!
 
         assertEquals("http://cornucopia.cornubot.se/", home_page_url)
         assertEquals("http://www.blogger.com/feeds/8354057230547055221/posts/default", feed_url)
@@ -591,11 +530,8 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun atomCowboy() {
-        val (_, _, _, _, _, _, _, icon, _, _, _, _, items) = feedParser.parseFeedInputStream(
-            URL("http://cowboyprogrammer.org/atom.xml"),
-            cowboyAtom,
-            null
-        )
+        val feed = cowboyAtom.use { feedParser.parseFeedResponse(it) }
+        val (_, _, _, _, _, _, _, icon, _, _, _, _, items) = feed!!
 
         assertEquals(15, items!!.size)
         val (id, _, _, _, _, _, _, image, _, date_published) = items[1]
@@ -613,14 +549,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun morningPaper() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(
-            URL("https://blog.acolyer.org/feed/"),
-            morningPaper,
-            null
-        )
+        val feed = morningPaper.use { feedParser.parseFeedResponse(it) }
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed!!
 
         assertEquals("https://blog.acolyer.org", home_page_url)
-        assertNull(feed_url)
+        assertEquals("https://blog.acolyer.org/feed/", feed_url)
 
         assertEquals(10, items!!.size)
         val (_, _, _, title, _, _, _, image) = items[0]
@@ -639,14 +572,11 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun londoner() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(
-            URL("http://londonist.com/feed"),
-            londoner,
-            null
-        )
+        val feed = londoner.use { feedParser.parseFeedResponse(it) }
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed!!
 
         assertEquals("http://londonist.com/", home_page_url)
-        assertNull(feed_url)
+        assertEquals("http://londonist.com/feed", feed_url)
 
         assertEquals(40, items!!.size)
         val (_, _, _, title, _, _, _, image) = items[0]
@@ -665,10 +595,10 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun noLinkShouldBeNull() {
-        val feed = feedParser.parseFeedInputStream(URL("http://ANON.com/rss"), anon, null)
+        val feed = anon.use { feedParser.parseFeedResponse(it) }!!
 
         assertEquals("http://ANON.com/sub", feed.home_page_url)
-        assertNull(feed.feed_url)
+        assertEquals("http://anon.com/rss", feed.feed_url)
         assertEquals("ANON", feed.title)
         assertEquals("ANON", feed.description)
 
@@ -688,13 +618,9 @@ class FeedParserTest : DIAware {
 
     @Test
     fun golem2ShouldBeParsedDespiteEmptySlashComments() {
-        val feed = feedParser.parseRssAtomBytes(
-            URL("https://rss.golem.de/rss.php?feed=RSS2.0"),
-            golemDe2,
-            null
-        )
+        val feed = golemDe2.use { feedParser.parseFeedResponse(it) }
 
-        assertEquals("Golem.de", feed.title)
+        assertEquals("Golem.de", feed?.title)
     }
 
     @Test
@@ -708,48 +634,10 @@ class FeedParserTest : DIAware {
     }
 
     @Test
-    @Ignore("They made this feed invalid")
-    fun timesnewroman() {
-        /**
-         * This actually tests Chunked-response handling (with Gzip)
-         *
-         * Headers:
-        Server: nginx
-        Date: Wed, 22 Apr 2020 12:56:13 GMT
-        Content-Type: text/xml; charset=UTF-8
-        Transfer-Encoding: chunked
-        Connection: keep-alive
-        Set-Cookie: PHPSESSID=9fb67188b757d9e61bf2144d701dacae; path=/
-        Expires: Thu, 19 Nov 1981 08:52:00 GMT
-        Pragma: no-cache
-        Set-Cookie: mobile=false; path=/
-        Set-Cookie: user-agent=2af4f0dda4a2cdd367f5b41adcc59f79; path=/
-        Content-Encoding: gzip
-        Vary: Accept-Encoding
-        Expires: Wed, 22 Apr 2020 13:16:13 GMT
-        Last-Modified: Wed, 22 Apr 2020 12:56:13 GMT
-        Pragma: no-cache
-        X-Cache-Status: BYPASS
-        Strict-Transport-Security: max-age=31536000
-        Cache-Control: public, max-age=1200
-         *
-         */
-        runBlocking {
-            val feed = feedParser.parseFeedUrl(URL("https://www.timesnewroman.ro/?act=rss"))
-            assertEquals("Times New Roman", feed?.title)
-            assertEquals(15, feed?.items?.size)
-        }
-    }
-
-    @Test
     fun diskuse() {
         runBlocking {
-            val feed = feedParser.parseFeedInputStream(
-                URL("https://diskuse.jakpsatweb.cz/rss2.php?topic=173233"),
-                diskuse,
-                null
-            )
-            val entry = feed.items!!.first()
+            val feed = diskuse.use { feedParser.parseFeedResponse(it) }
+            val entry = feed!!.items!!.first()
 
             assertEquals(
                 "Kajman, O této diskusi: test <pre> in <description> and <b>bold</b> in title",
@@ -762,11 +650,8 @@ class FeedParserTest : DIAware {
     @Ignore
     @Throws(Exception::class)
     fun fz() {
-        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feedParser.parseFeedInputStream(
-            URL("https://www.fz.se/feeds/nyheter"),
-            fz,
-            null
-        )
+        val feed = fz.use { feedParser.parseFeedResponse(it) }
+        val (_, _, home_page_url, feed_url, _, _, _, _, _, _, _, _, items) = feed!!
 
         assertEquals("http://www.fz.se/nyheter/", home_page_url)
         assertNull(feed_url)
@@ -787,11 +672,7 @@ class FeedParserTest : DIAware {
 
     @Test
     fun geekpark() {
-        val feed = feedParser.parseFeedInputStream(
-            URL("http://main_test.geekpark.net/rss.rss"),
-            geekpark,
-            null
-        )
+        val feed = geekpark.use { feedParser.parseFeedResponse(it) }!!
 
         assertEquals("极客公园（！）", feed.title)
 
@@ -800,11 +681,7 @@ class FeedParserTest : DIAware {
 
     @Test
     fun contentTypeHtmlIsNotUnescapedTwice() {
-        val feed = feedParser.parseFeedInputStream(
-            URL("http://www.zoocoop.com/contentoob/o1.atom"),
-            contentTypeHtml,
-            null
-        )
+        val feed = contentTypeHtml.use { feedParser.parseFeedResponse(it) }!!
 
         val item = feed.items!!.single()
 
@@ -819,9 +696,9 @@ class FeedParserTest : DIAware {
 
     @Test
     fun escapedRssDescriptionIsProperlyUnescaped() {
-        val feed = feedParser.parseRssAtomBytes(
+        val feed = feedParser.parseFeedResponse(
             URL("http://cowboyprogrammer.org"),
-            rssWithHtmlEscapedDescription.toByteArray(),
+            rssWithHtmlEscapedDescription,
             null
         )
 
@@ -839,9 +716,9 @@ class FeedParserTest : DIAware {
 
     @Test
     fun escapedAtomContentIsProperlyUnescaped() {
-        val feed = feedParser.parseRssAtomBytes(
+        val feed = feedParser.parseFeedResponse(
             URL("http://cowboyprogrammer.org"),
-            atomWithHtmlEscapedContents.toByteArray(),
+            atomWithHtmlEscapedContents,
             null
         )
 
@@ -875,11 +752,12 @@ class FeedParserTest : DIAware {
         }
     }
 
-    private fun <T> readResource(asdf: String, block: (InputStream) -> T): T {
-        return javaClass.getResourceAsStream(asdf)!!
-            .use {
-                block(it)
-            }
+    private fun <T> readResource(asdf: String, block: (String) -> T): T {
+        val body = javaClass.getResourceAsStream(asdf)!!
+            .bufferedReader()
+            .use(BufferedReader::readText)
+
+        return block(body)
     }
 
     private fun getCowboyHtml(): String =
@@ -889,65 +767,84 @@ class FeedParserTest : DIAware {
                 it.readText()
             }
 
-    private val emptySlashComment: ByteArray
-        get() = javaClass.getResourceAsStream("empty_slash_comment.xml")!!.readBytes()
+    private val emptySlashComment: Response
+        get() = bytesToResponse("empty_slash_comment.xml", "https://rss.golem.de/rss.php?feed=RSS2.0")
 
-    private val golemDe: ByteArray
-        get() = javaClass.getResourceAsStream("golem-de.xml")!!.readBytes()
+    private val golemDe: Response
+        get() = bytesToResponse("golem-de.xml", "https://rss.golem.de/rss.php?feed=RSS2.0")
 
-    private val golemDe2: ByteArray
-        get() = javaClass.getResourceAsStream("rss_golem_2.xml")!!.readBytes()
+    private val golemDe2: Response
+        get() = bytesToResponse("rss_golem_2.xml", "https://rss.golem.de/rss.php?feed=RSS2.0")
 
-    private val utdelningsSeglarenAtom: ByteArray
-        get() = javaClass.getResourceAsStream("atom_utdelningsseglaren.xml")!!.readBytes()
+    private val utdelningsSeglarenAtom: Response
+        get() = bytesToResponse("atom_utdelningsseglaren.xml", "http://utdelningsseglaren.blogspot.com/feeds/posts/default")
 
-    private val lineageosRss: ByteArray
-        get() = javaClass.getResourceAsStream("rss_lineageos.xml")!!.readBytes()
+    private val lineageosRss: Response
+        get() = bytesToResponse("rss_lineageos.xml", "https://lineageos.org/feed.xml")
 
-    private val cornucopiaAtom: InputStream
-        get() = javaClass.getResourceAsStream("atom_cornucopia.xml")!!
+    private val cornucopiaAtom: Response
+        get() = bytesToResponse("atom_cornucopia.xml", "https://cornucopia.cornubot.se/feeds/posts/default")
 
-    private val cornucopiaRss: InputStream
-        get() = javaClass.getResourceAsStream("rss_cornucopia.xml")!!
+    private val cornucopiaRss: Response
+        get() = bytesToResponse("rss_cornucopia.xml", "https://cornucopia.cornubot.se/feeds/posts/default?alt=rss")
 
-    private val cowboyRss: InputStream
-        get() = javaClass.getResourceAsStream("rss_cowboy.xml")!!
+    private val cowboyRss: Response
+        get() = bytesToResponse("rss_cowboy.xml", "http://cowboyprogrammer.org/index.xml")
 
-    private val cowboyAtom: InputStream
-        get() = javaClass.getResourceAsStream("atom_cowboy.xml")!!
+    private val cowboyAtom: Response
+        get() = bytesToResponse("atom_cowboy.xml", "http://cowboyprogrammer.org/atom.xml")
 
-    private val cyklistBloggen: InputStream
-        get() = javaClass.getResourceAsStream("rss_cyklistbloggen.xml")!!
+    private val cyklistBloggen: Response
+        get() = bytesToResponse("rss_cyklistbloggen.xml", "http://www.cyklistbloggen.se/feed/")
 
-    private val researchRsc: InputStream
-        get() = javaClass.getResourceAsStream("atom_research_rsc.xml")!!
+    private val researchRsc: Response
+        get() = bytesToResponse("atom_research_rsc.xml", "http://research.swtch.com/feed.atom")
 
-    private val morningPaper: InputStream
-        get() = javaClass.getResourceAsStream("rss_morningpaper.xml")!!
+    private val morningPaper: Response
+        get() = bytesToResponse("rss_morningpaper.xml", "https://blog.acolyer.org/feed/")
 
-    private val fz: InputStream
-        get() = javaClass.getResourceAsStream("rss_fz.xml")!!
+    private val fz: Response
+        get() = bytesToResponse("rss_fz.xml", "https://www.fz.se/feeds/nyheter")
 
-    private val londoner: InputStream
-        get() = javaClass.getResourceAsStream("rss_londoner.xml")!!
+    private val londoner: Response
+        get() = bytesToResponse("rss_londoner.xml", "http://londonist.com/feed")
 
-    private val anon: InputStream
-        get() = javaClass.getResourceAsStream("rss_anon.xml")!!
+    private val anon: Response
+        get() = bytesToResponse("rss_anon.xml", "http://ANON.com/rss")
 
-    private val nixosRss: InputStream
-        get() = javaClass.getResourceAsStream("rss_nixos.xml")!!
+    private val nixosRss: Response
+        get() = bytesToResponse("rss_nixos.xml", "http://nixos.org/news-rss.xml")
 
-    private val nixersRss: InputStream
-        get() = javaClass.getResourceAsStream("rss_nixers_newsletter.xml")!!
+    private val nixersRss: Response
+        get() = bytesToResponse("rss_nixers_newsletter.xml", "https://newsletter.nixers.net/feed.xml")
 
-    private val diskuse: InputStream
-        get() = javaClass.getResourceAsStream("rss_diskuse.xml")!!
+    private val diskuse: Response
+        get() = bytesToResponse("rss_diskuse.xml", "https://diskuse.jakpsatweb.cz/rss2.php?topic=173233")
 
-    private val geekpark: InputStream
-        get() = javaClass.getResourceAsStream("rss_geekpark.xml")!!
+    private val geekpark: Response
+        get() = bytesToResponse("rss_geekpark.xml", "http://main_test.geekpark.net/rss.rss")
 
-    private val contentTypeHtml: InputStream
-        get() = javaClass.getResourceAsStream("atom_content_type_html.xml")!!
+    private val contentTypeHtml: Response
+        get() = bytesToResponse("atom_content_type_html.xml", "http://www.zoocoop.com/contentoob/o1.atom")
+
+    private fun bytesToResponse(resourceName: String, url: String): Response {
+        val responseBody: ResponseBody =
+            javaClass.getResourceAsStream(resourceName)!!
+                .use { it.readBytes() }
+                .toResponseBody("application/xml".toMediaTypeOrNull())
+
+        return Response.Builder()
+            .body(responseBody)
+            .protocol(Protocol.HTTP_2)
+            .code(200)
+            .message("Test")
+            .request(
+                Request.Builder()
+                    .url(url)
+                    .build()
+            )
+            .build()
+    }
 }
 
 @Language("xml")
