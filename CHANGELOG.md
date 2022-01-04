@@ -1,3 +1,43 @@
+# 2.0.12
+Agnieszka C (1):
+  * [7daeddf9] Updated Polish translation using Weblate
+
+Allan Nordhøy (1):
+  * [ce11cb59] Updated Norwegian Bokmål translation using Weblate
+
+Andrij Mizyk (1):
+  * [750a0665] Updated Ukrainian translation using Weblate
+
+El Pirujo (1):
+  * [00a98173] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [38dcf806] Updated Chinese (Simplified) translation using Weblate
+
+I. Musthafa (1):
+  * [a08922ba] Updated Indonesian translation using Weblate
+
+J. Lavoie (1):
+  * [3cba889d] Updated Italian translation using Weblate
+
+Jonas Kalderstam (3):
+  * [54d33a4f] Changed sync notification icon to a different icon than
+         regular notifications
+  * [72a3d842] Fixed clicking on notifications not opening article
+  * [504d0339] Fixed feed responses being mangled sometimes
+
+Oğuz Ersen (1):
+  * [bbe1a9c0] Updated Turkish translation using Weblate
+
+VfBFan (1):
+  * [f768b9eb] Updated German translation using Weblate
+
+Vitor Henrique (1):
+  * [7d6eb347] Updated Portuguese (Brazil) translation using Weblate
+
+mm4c (1):
+  * [71228fb7] Updated Dutch translation using Weblate
+
 # 2.0.11
 Jonas Kalderstam (5):
   * [1e4ecf09] Fixed crash when opening app
