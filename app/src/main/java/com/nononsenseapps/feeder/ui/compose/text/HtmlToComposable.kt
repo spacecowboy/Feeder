@@ -38,12 +38,11 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
-import coil.size.OriginalSize
 import coil.size.PixelSize
 import coil.size.Precision
 import coil.size.Scale
-import coil.size.SizeResolver
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.theme.BlockQuoteStyle
 import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockBackground
@@ -54,8 +53,10 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
 import java.io.InputStream
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import org.jsoup.Jsoup
+import org.jsoup.helper.StringUtil
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
@@ -72,7 +73,8 @@ fun LazyListScope.htmlFormattedText(
             formatBody(
                 element = body,
                 imagePlaceholder = imagePlaceholder,
-                onLinkClick = onLinkClick
+                onLinkClick = onLinkClick,
+                baseUrl = baseUrl,
             )
         }
 }
@@ -81,6 +83,7 @@ private fun LazyListScope.formatBody(
     element: Element,
     @DrawableRes imagePlaceholder: Int,
     onLinkClick: (String) -> Unit,
+    baseUrl: String,
 ) {
     val composer = TextComposer { paragraphBuilder ->
         item {
@@ -124,6 +127,7 @@ private fun LazyListScope.formatBody(
         lazyListScope = this,
         imagePlaceholder = imagePlaceholder,
         onLinkClick = onLinkClick,
+        baseUrl = baseUrl,
     )
 
     composer.terminateCurrentText()
@@ -133,6 +137,7 @@ private fun LazyListScope.formatCodeBlock(
     element: Element,
     @DrawableRes imagePlaceholder: Int,
     onLinkClick: (String) -> Unit,
+    baseUrl: String,
 ) {
     val composer = TextComposer { paragraphBuilder ->
         item {
@@ -164,21 +169,23 @@ private fun LazyListScope.formatCodeBlock(
         lazyListScope = this,
         imagePlaceholder = imagePlaceholder,
         onLinkClick = onLinkClick,
+        baseUrl = baseUrl,
     )
 
     composer.terminateCurrentText()
 }
 
-@OptIn(ExperimentalComposeApi::class)
+@OptIn(ExperimentalComposeApi::class, ExperimentalCoilApi::class)
 private fun TextComposer.appendTextChildren(
     nodes: List<Node>,
     preFormatted: Boolean = false,
     lazyListScope: LazyListScope,
     @DrawableRes imagePlaceholder: Int,
     onLinkClick: (String) -> Unit,
+    baseUrl: String,
 ) {
     var node = nodes.firstOrNull()
-    while (node!=null) {
+    while (node != null) {
         when (node) {
             is TextNode -> {
                 if (preFormatted) {
@@ -212,6 +219,7 @@ private fun TextComposer.appendTextChildren(
                                 lazyListScope = lazyListScope,
                                 imagePlaceholder = imagePlaceholder,
                                 onLinkClick = onLinkClick,
+                                baseUrl = baseUrl,
                             )
                         } else {
                             withParagraph {
@@ -220,6 +228,7 @@ private fun TextComposer.appendTextChildren(
                                     lazyListScope = lazyListScope,
                                     imagePlaceholder = imagePlaceholder,
                                     onLinkClick = onLinkClick,
+                                    baseUrl = baseUrl,
                                 )
                             }
                         }
@@ -286,6 +295,7 @@ private fun TextComposer.appendTextChildren(
                                 lazyListScope = lazyListScope,
                                 imagePlaceholder = imagePlaceholder,
                                 onLinkClick = onLinkClick,
+                                baseUrl = baseUrl,
                             )
                         }
                     }
@@ -296,6 +306,7 @@ private fun TextComposer.appendTextChildren(
                                 lazyListScope = lazyListScope,
                                 imagePlaceholder = imagePlaceholder,
                                 onLinkClick = onLinkClick,
+                                baseUrl = baseUrl,
                             )
                         }
                     }
@@ -306,6 +317,7 @@ private fun TextComposer.appendTextChildren(
                                 lazyListScope = lazyListScope,
                                 imagePlaceholder = imagePlaceholder,
                                 onLinkClick = onLinkClick,
+                                baseUrl = baseUrl,
                             )
                         }
                     }
@@ -316,6 +328,7 @@ private fun TextComposer.appendTextChildren(
                                 lazyListScope = lazyListScope,
                                 imagePlaceholder = imagePlaceholder,
                                 onLinkClick = onLinkClick,
+                                baseUrl = baseUrl,
                             )
                         }
                     }
@@ -326,6 +339,7 @@ private fun TextComposer.appendTextChildren(
                                 lazyListScope = lazyListScope,
                                 imagePlaceholder = imagePlaceholder,
                                 onLinkClick = onLinkClick,
+                                baseUrl = baseUrl,
                             )
                         }
                     }
@@ -336,6 +350,7 @@ private fun TextComposer.appendTextChildren(
                                 lazyListScope = lazyListScope,
                                 imagePlaceholder = imagePlaceholder,
                                 onLinkClick = onLinkClick,
+                                baseUrl = baseUrl,
                             )
                         }
                     }
@@ -347,6 +362,7 @@ private fun TextComposer.appendTextChildren(
                                 lazyListScope = lazyListScope,
                                 imagePlaceholder = imagePlaceholder,
                                 onLinkClick = onLinkClick,
+                                baseUrl = baseUrl,
                             )
                         }
                     }
@@ -357,15 +373,17 @@ private fun TextComposer.appendTextChildren(
                             lazyListScope = lazyListScope,
                             imagePlaceholder = imagePlaceholder,
                             onLinkClick = onLinkClick,
+                            baseUrl = baseUrl,
                         )
                     }
                     "code" -> {
-                        if (element.parent()?.tagName()=="pre") {
+                        if (element.parent()?.tagName() == "pre") {
                             terminateCurrentText()
                             lazyListScope.formatCodeBlock(
                                 element = element,
                                 imagePlaceholder = imagePlaceholder,
                                 onLinkClick = onLinkClick,
+                                baseUrl = baseUrl,
                             )
                         } else {
                             // inline code
@@ -378,6 +396,7 @@ private fun TextComposer.appendTextChildren(
                                     lazyListScope = lazyListScope,
                                     imagePlaceholder = imagePlaceholder,
                                     onLinkClick = onLinkClick,
+                                    baseUrl = baseUrl,
                                 )
                             }
                         }
@@ -392,6 +411,7 @@ private fun TextComposer.appendTextChildren(
                                     lazyListScope = lazyListScope,
                                     imagePlaceholder = imagePlaceholder,
                                     onLinkClick = onLinkClick,
+                                    baseUrl = baseUrl,
                                 )
                             }
                         }
@@ -406,13 +426,14 @@ private fun TextComposer.appendTextChildren(
                                     lazyListScope = lazyListScope,
                                     imagePlaceholder = imagePlaceholder,
                                     onLinkClick = onLinkClick,
+                                    baseUrl = baseUrl,
                                 )
                             }
                         }
                     }
                     "img" -> {
-                        val imageUrl = element.attr("abs:src") ?: ""
-                        if (imageUrl.isNotBlank()) {
+                        val imageCandidates = getImageSource(baseUrl, element)
+                        if (imageCandidates.hasImage) {
                             val alt = element.attr("alt") ?: ""
                             appendImage(onLinkClick = onLinkClick) { onClick ->
                                 lazyListScope.item {
@@ -428,7 +449,7 @@ private fun TextComposer.appendTextChildren(
                                                 modifier = Modifier
                                                     .clip(RectangleShape)
                                                     .clickable(
-                                                        enabled = onClick!=null
+                                                        enabled = onClick != null
                                                     ) {
                                                         onClick?.invoke()
                                                     }
@@ -448,7 +469,10 @@ private fun TextComposer.appendTextChildren(
                                                 val imageSize = maxImageSize()
                                                 Image(
                                                     painter = rememberImagePainter(
-                                                        data = imageUrl,
+                                                        data = imageCandidates.getBestImageForMaxSize(
+                                                            pixelDensity = pixelDensity(),
+                                                            maxSize = imageSize,
+                                                        ),
                                                         builder = {
                                                             this.placeholder(imagePlaceholder)
                                                                 .error(imagePlaceholder)
@@ -483,7 +507,7 @@ private fun TextComposer.appendTextChildren(
                     }
                     "ul" -> {
                         element.children()
-                            .filter { it.tagName()=="li" }
+                            .filter { it.tagName() == "li" }
                             .forEach { listItem ->
                                 withParagraph {
                                     // no break space
@@ -493,13 +517,14 @@ private fun TextComposer.appendTextChildren(
                                         lazyListScope = lazyListScope,
                                         imagePlaceholder = imagePlaceholder,
                                         onLinkClick = onLinkClick,
+                                        baseUrl = baseUrl,
                                     )
                                 }
                             }
                     }
                     "ol" -> {
                         element.children()
-                            .filter { it.tagName()=="li" }
+                            .filter { it.tagName() == "li" }
                             .forEachIndexed { i, listItem ->
                                 withParagraph {
                                     // no break space
@@ -509,6 +534,7 @@ private fun TextComposer.appendTextChildren(
                                         lazyListScope = lazyListScope,
                                         imagePlaceholder = imagePlaceholder,
                                         onLinkClick = onLinkClick,
+                                        baseUrl = baseUrl,
                                     )
                                 }
                             }
@@ -525,23 +551,24 @@ private fun TextComposer.appendTextChildren(
                             followed optionally by a tfoot element
                              */
                             element.children()
-                                .filter { it.tagName()=="caption" }
+                                .filter { it.tagName() == "caption" }
                                 .forEach {
                                     appendTextChildren(
                                         it.childNodes(),
                                         lazyListScope = lazyListScope,
                                         imagePlaceholder = imagePlaceholder,
                                         onLinkClick = onLinkClick,
+                                        baseUrl = baseUrl,
                                     )
                                     ensureDoubleNewline()
                                     terminateCurrentText()
                                 }
 
                             element.children()
-                                .filter { it.tagName()=="thead" || it.tagName()=="tbody" || it.tagName()=="tfoot" }
+                                .filter { it.tagName() == "thead" || it.tagName() == "tbody" || it.tagName() == "tfoot" }
                                 .flatMap {
                                     it.children()
-                                        .filter { it.tagName()=="tr" }
+                                        .filter { it.tagName() == "tr" }
                                 }
                                 .forEach { row ->
                                     appendTextChildren(
@@ -549,6 +576,7 @@ private fun TextComposer.appendTextChildren(
                                         lazyListScope = lazyListScope,
                                         imagePlaceholder = imagePlaceholder,
                                         onLinkClick = onLinkClick,
+                                        baseUrl = baseUrl,
                                     )
                                     terminateCurrentText()
                                 }
@@ -559,7 +587,7 @@ private fun TextComposer.appendTextChildren(
                     "iframe" -> {
                         val video: Video? = getVideo(element.attr("abs:src"))
 
-                        if (video!=null) {
+                        if (video != null) {
                             appendImage(onLinkClick = onLinkClick) {
                                 lazyListScope.item {
                                     val dimens = LocalDimens.current
@@ -619,6 +647,7 @@ private fun TextComposer.appendTextChildren(
                             lazyListScope = lazyListScope,
                             imagePlaceholder = imagePlaceholder,
                             onLinkClick = onLinkClick,
+                            baseUrl = baseUrl,
                         )
                     }
                 }
@@ -657,6 +686,11 @@ private fun testIt() {
 }
 
 @Composable
+private fun pixelDensity() = with(LocalDensity.current) {
+    density
+}
+
+@Composable
 private fun BoxWithConstraintsScope.maxImageSize() = with(LocalDensity.current) {
     val maxWidthPx = maxWidth.toPx().roundToInt()
 
@@ -669,3 +703,62 @@ private fun BoxWithConstraintsScope.maxImageSize() = with(LocalDensity.current) 
             .coerceAtMost(10 * maxWidthPx),
     )
 }
+
+/**
+ * Gets the url to the image in the <img> tag - could be from srcset or from src
+ */
+internal fun getImageSource(baseUrl: String, element: Element) = ImageCandidates(
+    baseUrl = baseUrl,
+    srcSet = element.attr("srcset") ?: "",
+    absSrc = element.attr("abs:src") ?: "",
+)
+
+internal class ImageCandidates(
+    val baseUrl: String,
+    val srcSet: String,
+    val absSrc: String
+) {
+    val hasImage: Boolean = srcSet.isNotBlank() || absSrc.isNotBlank()
+
+    /**
+     * Might throw if hasImage returns false
+     */
+    fun getBestImageForMaxSize(maxSize: PixelSize, pixelDensity: Float): String {
+        val setCandidate = srcSet.splitToSequence(",")
+            .map { it.trim() }
+            .map { it.split(SpaceRegex).take(2).map { x -> x.trim() } }
+            .fold(100f to "") { acc, candidate ->
+                val candidateSize = if (candidate.size == 1) {
+                    // Assume it corresponds to 1x pixel density
+                    1.0f / pixelDensity
+                } else {
+                    val descriptor = candidate.last()
+                    when {
+                        descriptor.endsWith("w", ignoreCase = true) -> {
+                            descriptor.substringBefore("w").toFloat() / maxSize.width.toFloat()
+                        }
+                        descriptor.endsWith("x", ignoreCase = true) -> {
+                            descriptor.substringBefore("x").toFloat() / pixelDensity
+                        }
+                        else -> {
+                            return@fold acc
+                        }
+                    }
+                }
+
+                if (abs(candidateSize - 1.0f) < abs(acc.first - 1.0f)) {
+                    candidateSize to candidate.first()
+                } else {
+                    acc
+                }
+            }
+            .second
+
+        if (setCandidate.isNotBlank()) {
+            return StringUtil.resolve(baseUrl, setCandidate)
+        }
+        return StringUtil.resolve(baseUrl, absSrc)
+    }
+}
+
+private val SpaceRegex = Regex("\\s+")
