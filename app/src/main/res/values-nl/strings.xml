@@ -47,7 +47,7 @@
     <string name="syncing">Synchroniseren</string>
     <string name="only_when_charging">Alleen tijdens opladen</string>
     <string name="image_loading">Afbeeldingen downloaden</string>
-    <string name="check_for_updates">Naar nieuwe artikelen zoeken…</string>
+    <string name="check_for_updates">Nieuwe artikelen zoeken…</string>
     <string name="on_startup">Bij start van de app</string>
     <string name="may_result_data_charges">Mogelijk kosten voor mobiele data.</string>
     <string name="show_fab">\'Alles gelezen\' knop tonen</string>
@@ -61,7 +61,7 @@
     <string name="open_links_with">Links openen met</string>
     <string name="open_in_web_view">In webweergave openen</string>
     <string name="reader_settings">Lezer</string>
-    <string name="max_feed_items">Artikelen limiet per feed</string>
+    <string name="max_feed_items">Limiet per feed</string>
     <string name="could_not_load_url">URL-adres niet geladen</string>
     <string name="theme_day">Licht</string>
     <string name="theme">Kleurenschema</string>
@@ -81,9 +81,9 @@
     <string name="battery_optimization_disabled">Uit</string>
     <string name="battery_optimization_enabled">Aan</string>
     <string name="failed_to_parse">Niet gelukt %1$s te analyseren</string>
-    <string name="fetch_full_article">Volledige artikel inlezen</string>
-    <string name="failed_to_fetch_full_article">Kon niet volledige artikel inlezen</string>
-    <string name="fetching_full_article">Volledige artikel inlezen …</string>
+    <string name="fetch_full_article">Artikel volledig inlezen</string>
+    <string name="failed_to_fetch_full_article">Kon niet volledig artikel inlezen</string>
+    <string name="fetching_full_article">Volledig artikel inlezen …</string>
     <string name="go_back">Terug</string>
     <string name="preload_custom_tab">Aangepast label voorladen</string>
     <string name="failed_to_load_text_to_speech">Kon \'Tekst naar Spraak\' niet laden</string>
@@ -118,7 +118,7 @@
     <string name="only_on_wifi">Alleen via Wi-Fi</string>
     <string name="notification_channel_name">Ongelezen feeds</string>
     <string name="open_in_default_browser">Browser</string>
-    <string name="open_item_by_default_with">Artikelen standaard lezen met</string>
+    <string name="open_item_by_default_with">Standaard lezen met</string>
     <string name="open_link_in_web_view">Link in webweergave tonen</string>
     <string name="dark_theme_preference_dark">Donker</string>
     <string name="theme_automatic">Auto</string>
@@ -135,7 +135,7 @@
     <string name="zero_unread_articles">%1$s ongelezen artikelen</string>
     <string name="failed_to_export_OPML">OPML export mislukt</string>
     <string name="other_unread_articles">%1$s ongelezen artikelen</string>
-    <string name="notification_channel_description">Meldingen alleen getoond voor ongelezen artikelen in geconfigureerde feeds</string>
+    <string name="notification_channel_description">Alleen meldingen getoond voor niet gelezen artikelen in geconfigureerde feeds</string>
     <string name="fetch_full_articles_by_default">Standaard volledige artikelen</string>
     <string name="empty_feed_add">of feeds <annotation style="link">toevoegen</annotation>\?</string>
     <string name="nothing_to_display">Niets te tonen!</string>

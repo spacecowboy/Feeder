@@ -1,19 +1,19 @@
-<p>Heb je genoeg van opgeblazen, niet-vrije RSS feed readers die persoonlijke gegevens stelen? <br/>
-Heb je genoeg van omslachtige synchronisatieconfiguraties die uren serverconfiguratie vereisen? <br/>
-Heb je er genoeg van om overal een account aan te moeten maken? <br/></p>
+<p>Heb je genoeg van overladen, niet-vrije RSS feedlezers die persoonlijke gegevens stelen?<br/>
+Heb je er genoeg van omslachtig synchronisatie in te stellen en urenlang een server te configureren?<br/>
+Heb je er genoeg van om overal een account aan te moeten maken?<br/></p>
 
-<p>Probeer Feeder in plaats daarvan! </p>
+<p>Probeer Feeder in plaats daarvan!</p>
 
-<p>Feeder is een volledig gratis en open source feed lezer. Het ondersteunt alle populaire feed-formaten, inclusief JSONFeed. Het volgt je niet. Er is geen installatie nodig. Je hoeft niet eens een account aan te maken! Stel gewoon je feeds in of importeer ze van je oude lezer via OPML en begin met synchroniseren en lezen.</p>
+<p>Feeder is een helemaal gratis en open source feed lezer. Het ondersteunt alle populaire feed-formaten, inclusief JSON-feed. Het volgt je niet. Er is geen installatie nodig. Je hoeft zelfs geen account aan te maken! Stel gewoon je feeds in of importeer ze uit je oude lezer via OPML en begin met synchroniseren en lezen.</p>
 
-<p><b>Kenmerken </b></p>
+<p><b>Kenmerken</b></p>
 
 <ul>
-<li>Analyseert HTML en geeft deze weer in een oorspronkelijke tekstweergave</li>.
-<li>Lees offline</li>
+<li>HTML analyseren en weergeven in een oorspronkelijke tekstweergave</li>.
+<li>Offline lezen</li>
 <li>Achtergrond synchronisatie</li>
-<li>Notificaties</li>
+<li>Meldingen</li>
 <li>OPML import/export</li>
-<li>Praktische toegang tot ingevoegde links</li>
+<li>Handige toegang tot ingesloten links</li>
 <li>Material Design</li>
 </ul>
