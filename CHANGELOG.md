@@ -1,3 +1,32 @@
+# 2.0.13
+Anne Onyme 017 (1):
+  * [896b575f] Updated French translation using Weblate
+
+Jonas Kalderstam (4):
+  * [6ee7f869] Fixed open notification not marking it as read or notified
+  * [683da3e0] Fixed images using srcset but no src not showing
+
+Luna Jernberg (1):
+  * [7dd75f18] Updated Swedish translation using Weblate
+
+Nikita Epifanov (1):
+  * [3b4d66fa] Updated Russian translation using Weblate
+
+Simona Iacob (1):
+  * [a69440bd] Updated Romanian translation using Weblate
+
+Tadeáš Erban (1):
+  * [9e4460b1] Translated using Weblate (Czech)
+
+Vitor Henrique (1):
+  * [11630420] Updated Portuguese (Brazil) translation using Weblate
+
+bruh (1):
+  * [60c71749] Updated Vietnamese translation using Weblate
+
+mm4c (1):
+  * [9c1befbd] Updated Dutch translation using Weblate
+
 # 2.0.12
 Agnieszka C (1):
   * [7daeddf9] Updated Polish translation using Weblate
