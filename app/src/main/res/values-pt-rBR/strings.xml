@@ -12,7 +12,7 @@
     <string name="empty_feed_top">Nada para ler. Você gostaria de…</string>
     <string name="empty_feed_open"><annotation style="link">Abrir</annotation> um outro feed?</string>
     <string name="empty_feed_add"><annotation style="link">Adicionar</annotation> mais feeds?</string>
-    <string name="search_feed_empty_hint">Digite um endereço do feed</string>
+    <string name="search_feed_empty_hint">Digite o endereço de um feed</string>
     <string name="mark_as_read">Marcar como lido</string>
     <string name="mark_as_unread">Marcar como não lido</string>
     <string name="mark_all_as_read">Marcar tudo como lido</string>
@@ -23,7 +23,7 @@
     <string name="new_items_available">Novos itens disponíveis</string>
     <string name="view">Ver</string>
     <string name="no_tag">Sem categoria</string>
-    <string name="notify_for_new_items">Notificar sobre os novos itens</string>
+    <string name="notify_for_new_items">Notificar novos itens</string>
     <string name="dont_notify_for_new_items">Parar as notificações</string>
     <string name="toggle_read_status">Alternar o status da leitura</string>
     <string name="open_link_in_browser">Abrir link no navegador</string>
@@ -52,7 +52,7 @@
     <string name="only_on_wifi">Somente no Wi-Fi</string>
     <string name="show_thumbnails">Mostrar as miniaturas</string>
     <string name="may_result_data_charges">Taxas de dados móveis podem ser cobradas.</string>
-    <string name="only_when_charging">Somente ao carregar</string>
+    <string name="only_when_charging">Somente carregando</string>
     <string name="image_loading">Download de imagens</string>
     <string name="no_activity_for_link">Instale algo primeiro para abrir esse link</string>
     <string name="check_for_updates">Procurar novos artigos…</string>
@@ -66,7 +66,7 @@
     <string name="open_in_webview">Vista Web</string>
     <string name="open_in_default_browser">Navegador padrão</string>
     <string name="open_in_custom_tab">Aba personalizada</string>
-    <string name="open_item_by_default_with">Abrir itens por padrão com</string>
+    <string name="open_item_by_default_with">Por padrão, abrir itens com</string>
     <string name="open_links_with">Abrir os links com</string>
     <string name="reader_settings">Leitor</string>
     <string name="open_link_in_web_view">Abrir o link em vista web</string>
