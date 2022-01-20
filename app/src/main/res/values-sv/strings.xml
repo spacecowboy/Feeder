@@ -135,4 +135,9 @@
     <string name="only_enable_for_bad_id_feeds">Använd endast för flöden med dåliga IDn</string>
     <string name="generate_extra_unique_ids">Skapa extraunika IDn</string>
     <string name="invalid_url">Felaktig URL</string>
+    <string name="failed_to_import_OPML">Misslyckades med att importera OPML</string>
+    <string name="failed_to_export_OPML">Misslyckades med att exportera OPML</string>
+    <string name="syncing">Synkroniseras</string>
+    <string name="sync_status">Synkroniseringsstatus</string>
+    <string name="failed_to_open_article">Kunde inte öppna artikel</string>
 </resources>
