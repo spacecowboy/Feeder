@@ -139,4 +139,5 @@
     <string name="syncing">Синхронизация</string>
     <string name="failed_to_import_OPML">Не удалось импортировать OPML</string>
     <string name="failed_to_export_OPML">Не удалось экспортировать OPML</string>
+    <string name="failed_to_open_article">Не удалось открыть статью</string>
 </resources>
