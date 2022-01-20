@@ -32,7 +32,7 @@
     <string name="new_based_on_this">Nouveau flux basé sur ceci</string>
     <string name="indicator_for_mark_as_read">Indicateur pour marquer comme lu</string>
     <string name="share">Partager</string>
-    <string name="no_such_feed">Aucun flux correspondant n’a été trouvé. Veuillez essayer avec HTTPS.</string>
+    <string name="no_such_feed">Aucun flux correspondant n’a été trouvé. Essayez peut-être avec HTTPS \?</string>
     <string name="nothing_to_display">Rien à afficher !</string>
     <string name="title_activity_settings">Paramètres</string>
     <string name="all_feeds">Tous les flux</string>

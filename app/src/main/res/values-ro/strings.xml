@@ -139,4 +139,5 @@
     <string name="invalid_url">Nu este un URL valid</string>
     <string name="failed_to_import_OPML">Nu a reușit să importe OPML</string>
     <string name="failed_to_export_OPML">Nu a reușit să exporte OPML</string>
+    <string name="failed_to_open_article">Nu s-a putut deschide articolul</string>
 </resources>
