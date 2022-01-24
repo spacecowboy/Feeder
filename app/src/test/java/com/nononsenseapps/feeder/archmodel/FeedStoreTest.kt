@@ -3,11 +3,13 @@ package com.nononsenseapps.feeder.archmodel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedTitle
+import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
 import io.mockk.MockKAnnotations
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -213,6 +215,21 @@ class FeedStoreTest : DIAware {
         coVerify {
             dao.setCurrentlySyncingOn(5L, true)
             dao.setCurrentlySyncingOn(8L, false, now)
+        }
+    }
+
+    @Test
+    fun upsertFeed() {
+        coEvery { dao.upsertFeed(any()) } returns 6L
+
+        val result = runBlocking {
+            store.upsertFeed(Feed())
+        }
+
+        assertEquals(6L, result)
+
+        coVerify {
+            dao.upsertFeed(Feed())
         }
     }
 }

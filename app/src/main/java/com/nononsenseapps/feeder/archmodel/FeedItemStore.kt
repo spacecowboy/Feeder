@@ -4,13 +4,16 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.upsertFeedItems
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.shortDateTimeFormat
+import java.net.URL
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.kodein.di.DI
@@ -92,6 +95,10 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.markAsNotified(itemIds)
     }
 
+    suspend fun markAsRead(itemIds: List<Long>) {
+        dao.markAsRead(itemIds)
+    }
+
     suspend fun markAsReadAndNotified(itemId: Long) {
         dao.markAsReadAndNotified(itemId)
     }
@@ -106,6 +113,14 @@ class FeedItemStore(override val di: DI) : DIAware {
 
     fun getFeedItem(itemId: Long): Flow<FeedItemWithFeed?> {
         return dao.loadFeedItemFlow(itemId)
+    }
+
+    suspend fun getFeedItemWithFeed(itemId: Long): FeedItemWithFeed? {
+        return dao.getFeedItem(itemId)
+    }
+
+    suspend fun getFeedItemId(feedUrl: URL, articleGuid: String): Long? {
+        return dao.getItemWith(feedUrl = feedUrl, articleGuid = articleGuid)
     }
 
     suspend fun getLink(itemId: Long): String? {
@@ -313,6 +328,23 @@ class FeedItemStore(override val di: DI) : DIAware {
 
     fun getFeedItemsNeedingNotifying(): Flow<List<Long>> {
         return dao.getFeedItemsNeedingNotifying()
+    }
+
+    suspend fun loadFeedItem(guid: String, feedId: Long): FeedItem? =
+        dao.loadFeedItem(guid = guid, feedId = feedId)
+
+    suspend fun upsertFeedItems(
+        itemsWithText: List<Pair<FeedItem, String>>,
+        block: suspend (FeedItem, String) -> Unit
+    ) {
+        dao.upsertFeedItems(itemsWithText = itemsWithText, block = block)
+    }
+
+    suspend fun getItemsToBeCleanedFromFeed(feedId: Long, keepCount: Int) =
+        dao.getItemsToBeCleanedFromFeed(feedId = feedId, keepCount = keepCount)
+
+    suspend fun deleteFeedItems(ids: List<Long>) {
+        dao.deleteFeedItems(ids)
     }
 
     companion object {

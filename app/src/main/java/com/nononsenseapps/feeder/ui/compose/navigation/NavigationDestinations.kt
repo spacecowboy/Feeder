@@ -22,6 +22,8 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleScreen
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
+import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
+import com.nononsenseapps.feeder.ui.compose.sync.SyncScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.urlEncode
@@ -233,7 +235,16 @@ object SettingsDestination : NavigationDestination(
     ) {
         SettingsScreen(
             onNavigateUp = {
-                navController.popBackStack()
+                if (!navController.popBackStack()) {
+                    FeedArticleDestination.navigate(navController)
+                }
+            },
+            onNavigateToSyncScreen = {
+                SyncScreenDestination.navigate(
+                    navController = navController,
+                    syncCode = "",
+                    secretKey = "",
+                )
             },
             settingsViewModel = backStackEntry.DIAwareViewModel(),
         )
@@ -353,6 +364,57 @@ object ArticleDestination : NavigationDestination(
             navigationDeepLinkViewModel.setCurrentArticle(itemId = itemId)
             FeedArticleDestination.navigate(navController)
         }
+    }
+}
+
+object SyncScreenDestination : NavigationDestination(
+    path = "sync",
+    navArguments = listOf(
+        QueryParamArgument("syncCode") {
+            type = NavType.StringType
+            defaultValue = ""
+        },
+        QueryParamArgument("secretKey") {
+            type = NavType.StringType
+            defaultValue = ""
+        }
+    ),
+    deepLinks = listOf(
+        navDeepLink {
+            uriPattern = "$DEEP_LINK_BASE_URI/sync/join?sync_code={syncCode}&key={secretKey}"
+        },
+    ),
+) {
+    fun navigate(navController: NavController, syncCode: String, secretKey: String) {
+        val params = queryParams {
+            if (syncCode.isNotBlank()) {
+                +("syncCode" to syncCode)
+            }
+            if (secretKey.isNotBlank()) {
+                +("secretKey" to secretKey)
+            }
+        }
+
+        navController.navigate("$path${params}")
+    }
+
+    @Composable
+    override fun registerScreen(
+        navController: NavController,
+        windowSize: WindowSize,
+        backStackEntry: NavBackStackEntry
+    ) {
+        val syncRemoteViewModel = backStackEntry.DIAwareViewModel<SyncScreenViewModel>()
+
+        SyncScreen(
+            windowSize = windowSize,
+            onNavigateUp = {
+                if (!navController.popBackStack()) {
+                    SettingsDestination.navigate(navController)
+                }
+            },
+            viewModel = syncRemoteViewModel,
+        )
     }
 }
 

@@ -208,7 +208,8 @@ dependencies {
   implementation "com.rometools:rome-modules:$rome_version"
   // JSONFeed
   implementation project(":jsonfeed-parser")
-  // For better fetching
+
+    // For better fetching
   implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
   // For supporting TLSv1.3 on pre Android-10
   implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
@@ -230,6 +231,13 @@ dependencies {
   implementation "com.android.support:customtabs:28.0.0"
   // Full text
   implementation "net.dankito.readability4j:readability4j:$readability4j_version"
+  // For feeder-sync
+  implementation("com.squareup.retrofit2:retrofit:$retrofit_version")
+  implementation("com.squareup.retrofit2:converter-moshi:$retrofit_version")
+  implementation("com.squareup.moshi:moshi:$moshi_version")
+  implementation("com.squareup.moshi:moshi-kotlin:$moshi_version")
+  implementation("com.squareup.moshi:moshi-adapters:$moshi_version")
+  implementation("com.github.kenglxn.qrgen:android:$qrgen_version")
   // tests
   testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"

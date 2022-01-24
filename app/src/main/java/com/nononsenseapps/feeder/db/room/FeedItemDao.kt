@@ -109,6 +109,16 @@ interface FeedItemDao {
 
     @Query(
         """
+        SELECT $feedItemColumnsWithFeed
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE feed_items.id IS :id
+        """
+    )
+    suspend fun getFeedItem(id: Long): FeedItemWithFeed?
+
+    @Query(
+        """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
@@ -594,7 +604,7 @@ interface FeedItemDao {
         """
             SELECT count(*)
             FROM feed_items fi
-            JOIN feeds f ON feed_id = f.id
+            JOIN feeds f ON fi.feed_id = f.id
             WHERE f.tag IS :tag AND fi.unread IS 1
         """
     )
@@ -618,6 +628,16 @@ interface FeedItemDao {
         """
     )
     fun getFeedItemsNeedingNotifying(): Flow<List<Long>>
+
+    @Query(
+        """
+            SELECT fi.id
+            FROM feed_items fi
+            JOIN feeds f ON fi.feed_id = f.id
+            where f.url IS :feedUrl AND fi.guid IS :articleGuid
+        """
+    )
+    suspend fun getItemWith(feedUrl: URL, articleGuid: String): Long?
 }
 
 suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > ID_UNSET) {

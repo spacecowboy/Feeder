@@ -9,7 +9,9 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import java.net.URL
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -762,5 +764,55 @@ class FeedItemStoreTest : DIAware {
                 actualItem,
             )
         }
+    }
+
+    @Test
+    fun getFeedItemIdUrlAndGuid() {
+        val url = URL("https://foo.bar")
+        val guid = "foobar"
+        coEvery { dao.getItemWith(url, guid) } returns 5L
+
+        val id = runBlocking {
+            store.getFeedItemId(url, guid)
+        }
+
+        assertEquals(5L, id)
+    }
+
+    @Test
+    fun loadFeedItem() {
+        coEvery { dao.loadFeedItem(any(), any()) } returns null
+
+        val result = runBlocking {
+            store.loadFeedItem("foo", 5L)
+        }
+
+        assertNull(result)
+
+        coVerify { dao.loadFeedItem("foo", 5L) }
+    }
+
+    @Test
+    fun getItemsToBeCleanedFromFeed() {
+        coEvery { dao.getItemsToBeCleanedFromFeed(any(), any()) } returns listOf(5L)
+
+        val result = runBlocking {
+            store.getItemsToBeCleanedFromFeed(6L, 50)
+        }
+
+        assertEquals(5L, result.first())
+
+        coVerify { dao.getItemsToBeCleanedFromFeed(6L, 50) }
+    }
+
+    @Test
+    fun deleteFeedItems() {
+        coEvery { dao.deleteFeedItems(any()) } returns 5
+
+        runBlocking {
+            store.deleteFeedItems(listOf(3L, 5L))
+        }
+
+        coVerify { dao.deleteFeedItems(listOf(3L, 5L)) }
     }
 }

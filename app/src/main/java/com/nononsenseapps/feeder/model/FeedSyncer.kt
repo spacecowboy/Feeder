@@ -41,7 +41,6 @@ val oldPeriodics = listOf(
     "feeder_periodic_2"
 )
 const val UNIQUE_ONETIME_NAME = "feeder_sync_onetime"
-const val PARALLEL_SYNC = "parallel_sync"
 const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
 
 fun isOkToSyncAutomatically(context: Context): Boolean {
@@ -109,8 +108,6 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
     }
 
     override suspend fun doWork(): Result {
-        val goParallel = inputData.getBoolean(PARALLEL_SYNC, false)
-
         var success: Boolean
 
         try {
@@ -124,7 +121,6 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
                 feedId = feedId,
                 feedTag = feedTag,
                 forceNetwork = forceNetwork,
-                parallel = goParallel,
                 minFeedAgeMinutes = minFeedAgeMinutes
             )
         } catch (e: Exception) {
@@ -152,7 +148,6 @@ fun requestFeedSync(
     feedId: Long = ID_UNSET,
     feedTag: String = "",
     forceNetwork: Boolean = false,
-    parallel: Boolean = false
 ) {
     val workRequest = OneTimeWorkRequestBuilder<FeedSyncer>()
         .addTag("feeder")
@@ -162,7 +157,6 @@ fun requestFeedSync(
     val data = workDataOf(
         ARG_FEED_ID to feedId,
         ARG_FEED_TAG to feedTag,
-        PARALLEL_SYNC to parallel,
         ARG_FORCE_NETWORK to forceNetwork
     )
 

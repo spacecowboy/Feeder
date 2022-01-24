@@ -4,11 +4,13 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
+import java.net.URL
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
@@ -34,6 +36,8 @@ class FeedStore(override val di: DI) : DIAware {
     }
 
     suspend fun getFeed(feedId: Long): Feed? = feedDao.loadFeed(feedId)
+
+    suspend fun getFeed(url: URL): Feed? = feedDao.loadFeedWithUrl(url)
 
     suspend fun saveFeed(feed: Feed): Long {
         return if (feed.id > ID_UNSET) {
@@ -129,5 +133,20 @@ class FeedStore(override val di: DI) : DIAware {
         } else {
             feedDao.setCurrentlySyncingOn(feedId = feedId, syncing = syncing)
         }
+    }
+
+    suspend fun upsertFeed(feedSql: Feed) =
+        feedDao.upsertFeed(feed = feedSql)
+
+    suspend fun getFeedsOrderedByUrl(): List<Feed> {
+        return feedDao.getFeedsOrderedByUrl()
+    }
+
+    fun getFlowOfFeedsOrderedByUrl(): Flow<List<Feed>> {
+        return feedDao.getFlowOfFeedsOrderedByUrl()
+    }
+
+    suspend fun deleteFeed(url: URL) {
+        feedDao.deleteFeedWithUrl(url)
     }
 }

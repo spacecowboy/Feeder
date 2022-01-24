@@ -18,6 +18,7 @@ import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.COL_OPEN_ARTICLES_WITH
+import com.nononsenseapps.feeder.db.COL_WHEN_MODIFIED
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import org.threeten.bp.Instant
@@ -47,6 +48,8 @@ data class Feed @Ignore constructor(
     @ColumnInfo(name = COL_OPEN_ARTICLES_WITH) var openArticlesWith: String = OPEN_ARTICLE_WITH_APPLICATION_DEFAULT,
     @ColumnInfo(name = COL_ALTERNATE_ID) var alternateId: Boolean = false,
     @ColumnInfo(name = COL_CURRENTLY_SYNCING) var currentlySyncing: Boolean = false,
+    // Only update this field when user modifies the feed
+    @ColumnInfo(name = COL_WHEN_MODIFIED) var whenModified: Instant = Instant.EPOCH,
 ) {
     constructor() : this(id = ID_UNSET)
 

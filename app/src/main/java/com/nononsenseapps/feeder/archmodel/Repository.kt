@@ -6,14 +6,19 @@ import androidx.paging.PagingData
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.db.room.FeedItemForReadMark
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.RemoteFeed
+import com.nononsenseapps.feeder.db.room.SyncDevice
+import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
+import java.net.URL
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,6 +44,7 @@ class Repository(override val di: DI) : DIAware {
     private val androidSystemStore: AndroidSystemStore by instance()
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
     private val application: Application by instance()
+    private val syncRemoteStore: SyncRemoteStore by instance()
 
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
@@ -197,6 +203,7 @@ class Repository(override val di: DI) : DIAware {
         }
 
     suspend fun getFeed(feedId: Long): Feed? = feedStore.getFeed(feedId)
+    suspend fun getFeed(url: URL): Feed? = feedStore.getFeed(url)
 
     suspend fun saveFeed(feed: Feed): Long = feedStore.saveFeed(feed)
 
@@ -210,8 +217,6 @@ class Repository(override val di: DI) : DIAware {
             true -> TextToDisplay.FULLTEXT
             false -> TextToDisplay.DEFAULT
         }
-
-    fun getFeedItem(itemId: Long): Flow<FeedItemWithFeed?> = feedItemStore.getFeedItem(itemId)
 
     suspend fun getLink(itemId: Long): String? = feedItemStore.getLink(itemId)
     suspend fun getArticleOpener(itemId: Long): ItemOpener =
@@ -308,6 +313,115 @@ class Repository(override val di: DI) : DIAware {
 
     fun getFeedItemsNeedingNotifying(): Flow<List<Long>> {
         return feedItemStore.getFeedItemsNeedingNotifying()
+    }
+
+    suspend fun remoteMarkAsRead(feedUrl: URL, articleGuid: String) {
+        // First try to get an existing ID
+        val itemId = feedItemStore.getFeedItemId(feedUrl = feedUrl, articleGuid = articleGuid)
+        if (itemId != null) {
+            syncRemoteStore.setSynced(itemId)
+            feedItemStore.markAsReadAndNotified(itemId = itemId)
+        } else {
+            syncRemoteStore.addRemoteReadMark(feedUrl = feedUrl, articleGuid = articleGuid)
+        }
+    }
+
+    fun getSyncRemoteFlow(): Flow<SyncRemote?> {
+        return syncRemoteStore.getSyncRemoteFlow()
+    }
+
+    suspend fun getSyncRemote(): SyncRemote {
+        return syncRemoteStore.getSyncRemote()
+    }
+
+    suspend fun updateSyncRemote(syncRemote: SyncRemote) {
+        syncRemoteStore.updateSyncRemote(syncRemote)
+    }
+
+    suspend fun updateSyncRemoteMessageTimestamp(timestamp: Instant) {
+        syncRemoteStore.updateSyncRemoteMessageTimestamp(timestamp)
+    }
+
+    suspend fun deleteAllReadStatusSyncs() {
+        syncRemoteStore.deleteAllReadStatusSyncs()
+    }
+
+    fun getNextFeedItemWithoutSyncedReadMark(): Flow<FeedItemForReadMark?> {
+        return syncRemoteStore.getNextFeedItemWithoutSyncedReadMark()
+    }
+
+    fun getFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>> {
+        return syncRemoteStore.getFeedItemsWithoutSyncedReadMark()
+    }
+
+    suspend fun setSynced(feedItemId: Long) {
+        syncRemoteStore.setSynced(feedItemId)
+    }
+
+    suspend fun upsertFeed(feedSql: Feed) =
+        feedStore.upsertFeed(feedSql)
+
+    suspend fun loadFeedItem(guid: String, feedId: Long): FeedItem? =
+        feedItemStore.loadFeedItem(guid = guid, feedId = feedId)
+
+    suspend fun upsertFeedItems(
+        itemsWithText: List<Pair<FeedItem, String>>,
+        block: suspend (FeedItem, String) -> Unit
+    ) {
+        feedItemStore.upsertFeedItems(itemsWithText, block)
+    }
+
+    suspend fun getItemsToBeCleanedFromFeed(feedId: Long, keepCount: Int) =
+        feedItemStore.getItemsToBeCleanedFromFeed(feedId = feedId, keepCount = keepCount)
+
+    suspend fun deleteFeedItems(ids: List<Long>) {
+        feedItemStore.deleteFeedItems(ids)
+    }
+
+    suspend fun deleteStaleRemoteReadMarks() {
+        syncRemoteStore.deleteStaleRemoteReadMarks(Instant.now())
+    }
+
+    suspend fun applyRemoteReadMarks() {
+        val toBeApplied = syncRemoteStore.getRemoteReadMarksReadyToBeApplied()
+        val itemIds = toBeApplied.map { it.feedItemId }
+        feedItemStore.markAsRead(itemIds)
+        for (itemId in itemIds) {
+            syncRemoteStore.setSynced(itemId)
+        }
+        syncRemoteStore.deleteReadStatusSyncs(toBeApplied.map { it.id })
+    }
+
+    suspend fun replaceWithDefaultSyncRemote() {
+        syncRemoteStore.replaceWithDefaultSyncRemote()
+    }
+
+    fun getDevices(): Flow<List<SyncDevice>> {
+        return syncRemoteStore.getDevices()
+    }
+
+    suspend fun replaceDevices(devices: List<SyncDevice>) {
+        syncRemoteStore.replaceDevices(devices)
+    }
+
+    suspend fun getFeedsOrderedByUrl(): List<Feed> {
+        return feedStore.getFeedsOrderedByUrl()
+    }
+
+    fun getFlowOfFeedsOrderedByUrl(): Flow<List<Feed>> {
+        return feedStore.getFlowOfFeedsOrderedByUrl()
+    }
+
+    suspend fun getRemotelySeenFeeds(): List<URL> {
+        return syncRemoteStore.getRemotelySeenFeeds()
+    }
+
+    suspend fun deleteFeed(url: URL) {
+        feedStore.deleteFeed(url)
+    }
+
+    suspend fun replaceRemoteFeedsWith(remoteFeeds: List<RemoteFeed>) {
+        syncRemoteStore.replaceRemoteFeedsWith(remoteFeeds)
     }
 }
 

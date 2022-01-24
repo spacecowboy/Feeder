@@ -150,4 +150,25 @@
   <string name="invalid_url">Not a valid URL</string>
   <string name="failed_to_import_OPML">"Failed to import OPML"</string>
   <string name="failed_to_export_OPML">"Failed to export OPML"</string>
+  <string name="device_sync">Device sync</string>
+  <string name="add_new_device">Add new device</string>
+  <string name="device_sync_financed_by_community">This service is payed for by the community. Please consider donating if you find it useful.</string>
+  <string name="this_device">%1$s (this device)</string>
+  <string name="disconnect_device_from_sync">Disconnect device from sync chain</string>
+  <string name="devices_on_sync_chain">Devices on sync chain</string>
+  <string name="remove_device">Remove device</string>
+  <string name="remove_device_question">Are you sure you want to delete device %1$s?</string>
+  <string name="press_scan_sync">On your device, navigate to device sync, and press scan sync code.</string>
+  <string name="or_open_device_sync_link">Alternatively, open the link on your device.</string>
+  <string name="treat_like_password">Treat this like a password. Anyone can read your synced data if they have the link.</string>
+  <string name="qr_code">QR Code</string>
+  <string name="feeder_device_sync_code">Feeder device sync code</string>
+  <string name="leave_sync_chain">Leave sync chain</string>
+  <string name="device_sync_description_1">Device sync allows you to sync feed subscriptions and read articles between your various devices.</string>
+  <string name="device_sync_description_2">Simply scan the code from your sync chain that you created on another device, or start a new sync chain.</string>
+  <string name="scan_or_enter_code">Scan or enter sync code</string>
+  <string name="start_new_sync_chain">Start new sync chain</string>
+  <string name="sync_code">Sync code</string>
+  <string name="secret_key">Secret key</string>
+  <string name="join_sync_chain">Join sync chain</string>
 </resources>
