@@ -1,3 +1,10 @@
+# 2.1.0-beta.1
+Jonas Kalderstam (1):
+  * [24c0c8fd] Implemented multi device sync
+
+Meiru (1):
+  * [9957d68b] Updated Japanese translation using Weblate
+
 # 2.0.13
 Anne Onyme 017 (1):
   * [896b575f] Updated French translation using Weblate
