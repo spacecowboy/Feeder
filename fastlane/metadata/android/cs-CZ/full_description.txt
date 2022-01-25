@@ -1,0 +1,19 @@
+<p>Už máte až po krk nesvobodných čteček, které kradou vaše osobní údaje?<br/>
+Už vás nebaví trávit hodiny nastavováním serveru a přehnaně složitých synchronizačních systému?<br/>
+Sere vás muset si vytvářet všude účty?<br/></p>
+
+<p>Vyzkoušejte raději Feeder!</p>
+
+<p>Feeder je plně svobodná čtečka kanálu, podporující všechny často používané formáty kanálů, včetně JSONFeedu. Nesleduje vás, nevyžaduje jakékoliv zázemí ani nastavování, nemusíte si ani vytvářet účet! Stačí vložit vaše kanály nebo je naimportovat že staré čtečky pomocí OPML a už je připraveno pro synchronizaci a vaši četbu.</p>
+
+<p><b>Funkce</b></p>
+
+<ul>
+<li>Zpracuje HTML a vykreslí jej v nativním TextView</li>
+<li>Čtení bez internetu</li>
+<li>Synchronizace na pozadí</li>
+<li>Oznámení</li>
+<li>Import/export OPML</li>
+<li>Pohodlný přístup k odkazům na přílohy</li>
+<li>Material Design</li>
+</ul>
