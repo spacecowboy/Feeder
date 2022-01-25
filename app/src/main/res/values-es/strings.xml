@@ -140,4 +140,25 @@
     <string name="failed_to_import_OPML">Fallo al importar OPML</string>
     <string name="failed_to_export_OPML">Fallo al exportar OPML</string>
     <string name="failed_to_open_article">No se pudo abrir el artículo</string>
+    <string name="device_sync">Sincronizar dispositivo</string>
+    <string name="add_new_device">Añadir nuevo dispositivo</string>
+    <string name="device_sync_financed_by_community">Este servicio está mantenido por la comunidad. Por favor, considera hacer un donativo si lo encuentras útil.</string>
+    <string name="this_device">%1$s (este dispositivo)</string>
+    <string name="disconnect_device_from_sync">Desconectar dispositivo de la cadena de sincronización</string>
+    <string name="press_scan_sync">En tu dispositivo, navegar hasta la sincronización de dispositivo, y pulsar el código de escaneo de sincronización.</string>
+    <string name="qr_code">Código QR</string>
+    <string name="leave_sync_chain">Abandonar la cadena de sincronización</string>
+    <string name="device_sync_description_2">Simplemente escanea el código de tu cadena de sincronización que creaste en otro dispositivo o inicia una nueva cadena de sincronización.</string>
+    <string name="devices_on_sync_chain">Dispositivos en la cadena de sincronización</string>
+    <string name="remove_device">Eliminar dispositivo</string>
+    <string name="remove_device_question">¿Estás seguro de que quieres eliminar el dispositivo %1$s\?</string>
+    <string name="or_open_device_sync_link">Alternativamente, abrir el enlace en tu dispositivo.</string>
+    <string name="treat_like_password">Tratar esto como si fuera una contraseña. Cualquiera puede leer tus datos si tienen en enlace.</string>
+    <string name="feeder_device_sync_code">Código de sincronización de dispositivo Feeder</string>
+    <string name="device_sync_description_1">La sincronización de dispositivos te permite sincronizar suscripciones de fuentes y leer artículos entre tus diversos dispositivos.</string>
+    <string name="scan_or_enter_code">Escanea o entra el código de sincronización</string>
+    <string name="start_new_sync_chain">Crear nueva cadena de sincronización</string>
+    <string name="sync_code">Código de sincronización</string>
+    <string name="secret_key">Clave secreta</string>
+    <string name="join_sync_chain">Unir a cadena de sincronización</string>
 </resources>
