@@ -135,4 +135,6 @@
     <string name="syncing">Synkronoidaan</string>
     <string name="invalid_url">Ei kelvollinen URL-osoite</string>
     <string name="sync_status">Synkronoinnin tila</string>
+    <string name="failed_to_open_article">Artikkelia ei voitu avata</string>
+    <string name="generate_extra_unique_ids">Luo ylimääräisiä yksilöllisiä tunnuksia</string>
 </resources>

@@ -12,7 +12,7 @@
     <string name="save">Salva</string>
     <string name="empty_feed_top">Nulla da leggere. Vorresti…</string>
     <string name="empty_feed_open"><annotation style="link">Aprire</annotation> un altro flusso\?</string>
-    <string name="empty_feed_add"><annotation style="link">Aggiungere</annotation> altri flusso\?</string>
+    <string name="empty_feed_add"><annotation style="link">Aggiungere</annotation> altri flussi\?</string>
     <string name="search_feed_empty_hint">Inserisci l\'indirizzo del flusso</string>
     <string name="mark_as_read">Segna come letto</string>
     <string name="mark_as_unread">Segna come non letto</string>
@@ -34,10 +34,10 @@
     <string name="export_feeds_to_opml">Esporta il flusso come OPML</string>
     <string name="import_feeds_from_opml">Importa il flusso da OPML</string>
     <string name="view_debug_log">Visualizza i log di debug</string>
-    <string name="new_based_on_this">Nuovo basato su questo</string>
+    <string name="new_based_on_this">Novità basate su questo</string>
     <string name="indicator_for_mark_as_read">Indicatore per segna come letto</string>
     <string name="share">Condividi</string>
-    <string name="no_such_feed">Impossibile trovare un flusso. Riprovare utilizzanto HTTPS.</string>
+    <string name="no_such_feed">Impossibile trovare il flusso. Riprova utilizzando HTTPS\?</string>
     <string name="nothing_to_display">Nulla da visualizzare!</string>
     <string name="title_activity_settings">Impostazioni</string>
     <string name="all_feeds">Tutti i flussi</string>
@@ -84,7 +84,7 @@
     <string name="sort">Ordina</string>
     <string name="send_bug_report">Invia una segnalazione errore</string>
     <string name="no_email_client">Impossibile aprire il cliente e-mail</string>
-    <string name="touch_to_play_video">Tocca per far parire i video</string>
+    <string name="touch_to_play_video">Tocca per riprodurre i video</string>
     <string name="open_feed">Apri flusso</string>
     <string name="mark_items_below_as_read">Segna gli elementi in basso come letti</string>
     <string name="discovered_feeds_list">Lista dei flussi trovati</string>
@@ -123,7 +123,7 @@
     <string name="go_back">Indietro</string>
     <string name="contracted_tag">Etichetta chiusa</string>
     <string name="expanded_tag">Etichetta aperta</string>
-    <string name="stop_reading">Smetti la lettura</string>
+    <string name="stop_reading">Concludi la lettura</string>
     <string name="open_enclosed_media_file">Apri %1$s</string>
     <string name="feed_item_style_super_compact">Super compatto</string>
     <string name="feed_item_style_compact">Compatto</string>
@@ -140,4 +140,25 @@
     <string name="failed_to_import_OPML">Impossibile importare OPML</string>
     <string name="failed_to_export_OPML">Impossibile esportare OPML</string>
     <string name="failed_to_open_article">Impossibile aprire l\'articolo</string>
+    <string name="add_new_device">Aggiungi un nuovo dispositivo</string>
+    <string name="disconnect_device_from_sync">Scollega il dispositivo dalla catena di sincronizzazione</string>
+    <string name="devices_on_sync_chain">Dispositivi sulla catena di sincronizzazione</string>
+    <string name="remove_device_question">Sei sicuro/a di voler eliminare il dispositivo %1$s\?</string>
+    <string name="press_scan_sync">Sul tuo dispositivo, vai a Sincronizzazione dispositivo e premi Scansiona codice di sincronizzazione.</string>
+    <string name="qr_code">Codice QR</string>
+    <string name="feeder_device_sync_code">Codice di sincronizzazione del dispositivo di alimentazione</string>
+    <string name="leave_sync_chain">Lascia la catena di sincronizzazione</string>
+    <string name="device_sync_description_1">La sincronizzazione dei dispositivi ti permette di sincronizzare le sottoscrizioni ai feed e di leggere gli articoli tra i tuoi vari dispositivi.</string>
+    <string name="scan_or_enter_code">Scansiona o inserisci il codice di sincronizzazione</string>
+    <string name="device_sync">Sincronizzazione del dispositivo</string>
+    <string name="device_sync_financed_by_community">Questo servizio è pagato dalla comunità. Considera la possibilità di donare se lo trovi utile.</string>
+    <string name="this_device">%1$s (questo dispositivo)</string>
+    <string name="remove_device">Rimuovi il dispositivo</string>
+    <string name="or_open_device_sync_link">In alternativa, apri il collegamento sul tuo dispositivo.</string>
+    <string name="treat_like_password">Trattalo come una password. Chiunque può leggere i tuoi dati sincronizzati se ha il collegamento.</string>
+    <string name="device_sync_description_2">Scannerizza semplicemente il codice della tua catena di sincronizzazione che hai creato su un altro dispositivo, o inizia una nuova catena di sincronizzazione.</string>
+    <string name="start_new_sync_chain">Inizia una nuova catena di sincronizzazione</string>
+    <string name="sync_code">Codice di sincronizzazione</string>
+    <string name="join_sync_chain">Unisciti alla catena di sincronizzazione</string>
+    <string name="secret_key">Chiave segreta</string>
 </resources>
