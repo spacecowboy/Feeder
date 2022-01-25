@@ -140,4 +140,10 @@
     <string name="failed_to_import_OPML">OPML-Import fehlgeschlagen</string>
     <string name="failed_to_export_OPML">OPML-Export fehlgeschlagen</string>
     <string name="failed_to_open_article">Artikel konnte nicht geöffnet werden</string>
+    <string name="this_device">%1$s (dieses Gerät)</string>
+    <string name="add_new_device">Neues Gerät hinzufügen</string>
+    <string name="remove_device">Gerät entfernen</string>
+    <string name="qr_code">QR-Code</string>
+    <string name="device_sync">Geräte-Synchronisierung</string>
+    <string name="device_sync_financed_by_community">Dieser Dienst wird von der Community bezahlt. Bitte denken Sie über eine Spende nach, wenn Sie ihn nützlich finden.</string>
 </resources>
