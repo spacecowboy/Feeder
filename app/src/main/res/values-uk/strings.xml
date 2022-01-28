@@ -140,4 +140,25 @@
     <string name="failed_to_import_OPML">Не вдалося імпортувати OPML</string>
     <string name="failed_to_export_OPML">Не вдалося експортувати OPML</string>
     <string name="failed_to_open_article">Не можливо відкрити статтю</string>
+    <string name="add_new_device">Додати новий пристрій</string>
+    <string name="device_sync">Синхр. пристрою</string>
+    <string name="remove_device">Вилучити пристрій</string>
+    <string name="qr_code">QR-код</string>
+    <string name="press_scan_sync">Перейдіть на своєму пристрої до синхронованих пристроїв і натисніть сканувати код синхронування.</string>
+    <string name="feeder_device_sync_code">Код синхронування пристрою Feeder</string>
+    <string name="device_sync_description_1">Синхронування пристрою дозволяє синхронувати підписані стрічки і читати статті між різними пристроями.</string>
+    <string name="scan_or_enter_code">Відскануйте або введіть код синхронування</string>
+    <string name="sync_code">Код синхронування</string>
+    <string name="secret_key">Секретний ключ</string>
+    <string name="disconnect_device_from_sync">Відʼєднати пристрій від ланцюжка синхронування</string>
+    <string name="leave_sync_chain">Залишити ланцюжок синхронування</string>
+    <string name="start_new_sync_chain">Розпочати новий ланцюжок синхронування</string>
+    <string name="remove_device_question">Ви справді хочете видалити пристрій %1$s\?</string>
+    <string name="this_device">%1$s (цей пристрій)</string>
+    <string name="device_sync_financed_by_community">Цей сервіс оплачується громадою. Будь ласка, подумайте про пожертви, якщо вважаєте його корисним.</string>
+    <string name="device_sync_description_2">Просто відскануйте код Вашого ланцюжка синхронування, який Ви створили на іншому пристрої, або розпочніть новий ланцюжок синхронування.</string>
+    <string name="or_open_device_sync_link">Або відкрийте посилання на своєму пристрої.</string>
+    <string name="treat_like_password">Ставтеся до цього як до пароля. Будь-хто зможе прочитати Ваші синхроновані дані, якщо матиме посилання.</string>
+    <string name="join_sync_chain">Долучити до ланцюжка синхронування</string>
+    <string name="devices_on_sync_chain">Пристрої в ланцюжку синхронування</string>
 </resources>

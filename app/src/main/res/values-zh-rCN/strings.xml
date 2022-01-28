@@ -140,4 +140,25 @@
     <string name="failed_to_import_OPML">导入 OPML 失败</string>
     <string name="failed_to_export_OPML">未能导出 OPML</string>
     <string name="failed_to_open_article">打不开文章</string>
+    <string name="device_sync_financed_by_community">这项服务是由社区支付的。如果你觉得有用，请考虑捐赠。</string>
+    <string name="treat_like_password">把它当作密码。任何有此链接的人都都可以读取你的同步数据。</string>
+    <string name="join_sync_chain">加入同步链</string>
+    <string name="add_new_device">添加新设备</string>
+    <string name="this_device">%1$s（此设备）</string>
+    <string name="disconnect_device_from_sync">将设备从同步链断开</string>
+    <string name="devices_on_sync_chain">同步链上的设备</string>
+    <string name="remove_device">删除设备</string>
+    <string name="remove_device_question">你确定要删除设备 %1$s 吗？</string>
+    <string name="press_scan_sync">在你的设备上，导航到设备同步，并按扫描同步代码。</string>
+    <string name="or_open_device_sync_link">或者，打开设备上的链接。</string>
+    <string name="qr_code">二维码</string>
+    <string name="feeder_device_sync_code">Feeder 设备同步码</string>
+    <string name="leave_sync_chain">离开同步链</string>
+    <string name="device_sync_description_2">只需扫描您在另一个设备上创建的同步链的代码，或启动一个新的同步链。</string>
+    <string name="scan_or_enter_code">扫描或输入同步代码</string>
+    <string name="start_new_sync_chain">启动新的同步链</string>
+    <string name="sync_code">同步码</string>
+    <string name="secret_key">密钥</string>
+    <string name="device_sync">设备同步</string>
+    <string name="device_sync_description_1">设备同步允许你在不同设备之间同步订阅和已读文章。</string>
 </resources>

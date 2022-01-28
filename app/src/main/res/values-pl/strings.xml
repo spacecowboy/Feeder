@@ -140,4 +140,25 @@
     <string name="failed_to_import_OPML">Nie udało się zaimportować OPML</string>
     <string name="failed_to_export_OPML">Nie udało się wyeksportować OPML</string>
     <string name="failed_to_open_article">Nie udało się otworzyć artykułu</string>
+    <string name="add_new_device">Dodaj nowe urządzenie</string>
+    <string name="this_device">%1$s (to urządzenie)</string>
+    <string name="disconnect_device_from_sync">Odłącz urządzenie od łańcucha synchronizacji</string>
+    <string name="devices_on_sync_chain">Urządzenia w łańcuchu synchronizacji</string>
+    <string name="remove_device">Usuń urządzenie</string>
+    <string name="press_scan_sync">Na swoim urządzeniu przejdź do synchronizacji urządzenia i naciśnij Zeskanuj lub wprowadź kod synchronizacji.</string>
+    <string name="or_open_device_sync_link">Alternatywnie otwórz link na swoim urządzeniu.</string>
+    <string name="qr_code">Kod QR</string>
+    <string name="leave_sync_chain">Opuść łańcuch synchronizacji</string>
+    <string name="feeder_device_sync_code">Kod synchronizacji urządzenia Feeder</string>
+    <string name="scan_or_enter_code">Zeskanuj lub wprowadź kod synchronizacji</string>
+    <string name="sync_code">Kod synchronizacji</string>
+    <string name="secret_key">Klucz tajny</string>
+    <string name="device_sync_description_1">Synchronizacja urządzenia pozwala synchronizować subskrypcje kanałów i czytać artykuły między różnymi urządzeniami.</string>
+    <string name="device_sync">Synchronizacja urządzenia</string>
+    <string name="device_sync_financed_by_community">Ta usługa jest opłacana przez społeczność. Rozważ darowiznę, jeśli uznasz ją za przydatną.</string>
+    <string name="remove_device_question">Czy na pewno chcesz usunąć urządzenie %1$s\?</string>
+    <string name="treat_like_password">Traktuj to jak hasło. Każdy może odczytać Twoje zsynchronizowane dane, jeśli ma link.</string>
+    <string name="start_new_sync_chain">Rozpocznij nowy łańcuch synchronizacji</string>
+    <string name="join_sync_chain">Dołącz do łańcucha synchronizacji</string>
+    <string name="device_sync_description_2">Po prostu zeskanuj kod ze swojego łańcucha synchronizacji utworzonego na innym urządzeniu lub rozpocznij nowy łańcuch synchronizacji.</string>
 </resources>
