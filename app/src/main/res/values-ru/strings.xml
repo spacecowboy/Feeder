@@ -140,4 +140,25 @@
     <string name="failed_to_import_OPML">Не удалось импортировать OPML</string>
     <string name="failed_to_export_OPML">Не удалось экспортировать OPML</string>
     <string name="failed_to_open_article">Не удалось открыть статью</string>
+    <string name="add_new_device">Добавить новое устройство</string>
+    <string name="device_sync">Синхр. устройства</string>
+    <string name="device_sync_financed_by_community">Эта служба оплачивается сообществом. Пожалуйста, подумайте о пожертвовании, если вы считаете ее полезной.</string>
+    <string name="devices_on_sync_chain">Устройства в цепи синхронизации</string>
+    <string name="join_sync_chain">Присоединиться к цепочке синхронизации</string>
+    <string name="remove_device_question">Вы уверены, что хотите удалить устройство %1$s\?</string>
+    <string name="press_scan_sync">На устройстве перейдите к пункту \"Синхронизация устройства\" и нажмите \"Сканировать код синхронизации\".</string>
+    <string name="device_sync_description_1">Синхронизация устройств позволяет синхронизировать подписки на ленты и прочитанные статьи между различными устройствами.</string>
+    <string name="start_new_sync_chain">Начать новую цепочку синхронизации</string>
+    <string name="secret_key">Секретный ключ</string>
+    <string name="this_device">%1$s (это устройство)</string>
+    <string name="disconnect_device_from_sync">Отключить устройство от цепи синхронизации</string>
+    <string name="remove_device">Удалить устройство</string>
+    <string name="or_open_device_sync_link">Или же откройте ссылку на своем устройстве.</string>
+    <string name="treat_like_password">Относитесь к этому как к паролю. Любой может прочитать ваши синхронизированные данные, если у него есть ссылка.</string>
+    <string name="qr_code">QR-код</string>
+    <string name="feeder_device_sync_code">Код синхронизации устройства Feeder</string>
+    <string name="leave_sync_chain">Выйти из цепочки синхронизации</string>
+    <string name="device_sync_description_2">Просто отсканируйте код из цепочки синхронизации, созданной на другом устройстве, или создайте новую цепочку синхронизации.</string>
+    <string name="scan_or_enter_code">Отсканируйте или введите код синхронизации</string>
+    <string name="sync_code">Код синхронизации</string>
 </resources>
