@@ -112,7 +112,7 @@ object SearchFeedDestination : NavigationDestination(
 
     fun navigate(navController: NavController, feedUrl: String? = null) {
         val params = queryParams {
-            +("feedUrl" to feedUrl?.urlEncode())
+            +("feedUrl" to feedUrl)
         }
 
         navController.navigate(path + params)
@@ -156,7 +156,7 @@ object AddFeedDestination : NavigationDestination(
 
     fun navigate(navController: NavController, feedUrl: String, feedTitle: String = "") {
         val params = queryParams {
-            +("feedTitle" to feedTitle.urlEncode())
+            +("feedTitle" to feedTitle)
         }
 
         navController.navigate("$path/${feedUrl.urlEncode()}${params}")
