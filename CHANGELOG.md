@@ -5,6 +5,10 @@ Jonas Kalderstam (1):
 Meiru (1):
   * [9957d68b] Updated Japanese translation using Weblate
 
+# 2.0.14
+Jonas Kalderstam (1):
+  * [90e8048c] Fixed spaces getting replaced by + in feed titles
+
 # 2.0.13
 Anne Onyme 017 (1):
   * [896b575f] Updated French translation using Weblate
