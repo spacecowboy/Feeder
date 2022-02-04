@@ -131,7 +131,7 @@
     <string name="already_read">Přečtené</string>
     <string name="showing_only_unread_articles">Zobrazují se pouze nepřečtené články</string>
     <string name="showing_all_articles">Zobrazují se všechny články</string>
-    <string name="zero_unread_articles">Žádné nepřečtené články</string>
+    <string name="zero_unread_articles">%1$s nepřečtených článků</string>
     <string name="feed_item_style">Styl článků</string>
     <string name="feed_item_style_compact">Nahuštěný</string>
     <string name="feed_item_style_card">Jako karty</string>
