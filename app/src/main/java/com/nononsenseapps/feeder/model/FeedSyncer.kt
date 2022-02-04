@@ -73,6 +73,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
         val notification = NotificationCompat.Builder(applicationContext, syncChannelId)
             .setContentTitle(syncingText)
             .setTicker(syncingText)
+            .setGroup(syncNotificationGroup)
 //            .setContentText(progress)
             .setSmallIcon(R.drawable.ic_stat_sync)
             .setOngoing(true)
@@ -140,6 +141,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
     companion object {
         private const val syncNotificationId = 42623
         private const val syncChannelId = "feederSyncNotifications"
+        private const val syncNotificationGroup = "com.nononsenseapps.feeder.SYNC"
     }
 }
 
