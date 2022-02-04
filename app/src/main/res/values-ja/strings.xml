@@ -10,7 +10,7 @@
     <string name="title">タイトル</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">作者 %1$s, %2$s</string>
     <string name="save">保存</string>
-    <string name="empty_feed_top">読むものはありません。 やりたいことは…</string>
+    <string name="empty_feed_top">読むものはありません。やりたいことは…</string>
     <string name="empty_feed_open">別のフィードを<annotation style="link">開く</annotation>\?</string>
     <string name="empty_feed_add">フィードを<annotation style="link">追加</annotation>\?</string>
     <string name="search_feed_empty_hint">フィードのアドレスを入力</string>
@@ -27,8 +27,8 @@
     <string name="open_link_in_browser">リンクをウェブブラウザで開く</string>
     <string name="open_enclosed_media">閉鎖されたメディアを開く</string>
     <string name="sync">同期</string>
-    <string name="export_feeds_to_opml">OPML にフィードをエクスポート</string>
-    <string name="import_feeds_from_opml">OPML からフィードをインポート</string>
+    <string name="export_feeds_to_opml">OPMLでフィードをエクスポート</string>
+    <string name="import_feeds_from_opml">OPMLからフィードをインポート</string>
     <string name="view_debug_log">デバッグログを表示</string>
     <string name="new_based_on_this">これに基づき新規</string>
     <string name="indicator_for_mark_as_read">既読のインジケーター</string>
@@ -48,9 +48,9 @@
     <string name="theme">テーマ</string>
     <string name="theme_night">夜間</string>
     <string name="theme_day">昼間</string>
-    <string name="open_item_by_default_with">アイテムを既定で開く</string>
+    <string name="open_item_by_default_with">アイテムをデフォルトで開く</string>
     <string name="open_in_custom_tab">カスタムタブ</string>
-    <string name="open_in_default_browser">既定のブラウザ</string>
+    <string name="open_in_default_browser">デフォルトのブラウザ</string>
     <string name="open_in_webview">Web view</string>
     <string name="show_fab">フローティングアクションボタンを表示</string>
     <string name="on_startup">アプリ起動時</string>
@@ -140,4 +140,23 @@
     <string name="generate_extra_unique_ids">ユニークなIDを生成する</string>
     <string name="invalid_url">有効なURLではありません</string>
     <string name="failed_to_export_OPML">OPMLのエクスポートに失敗しました</string>
+    <string name="device_sync_financed_by_community">このサービスはコミュニティによって支えられています。便利だと思われましたら寄付をご検討ください。</string>
+    <string name="disconnect_device_from_sync">同期チェーンからデバイスを切断</string>
+    <string name="devices_on_sync_chain">同期チェーン上のデバイス</string>
+    <string name="remove_device_question">デバイス%1$sを削除しますか\?</string>
+    <string name="press_scan_sync">お使いのデバイスで、デバイス同期に移動し、同期コードのスキャンを押します。</string>
+    <string name="or_open_device_sync_link">または、デバイスのリンクを開いてください。</string>
+    <string name="treat_like_password">これはパスワードのようなものです。リンクがあれば、誰でも同期されたデータを読むことができます。</string>
+    <string name="qr_code">QRコード</string>
+    <string name="feeder_device_sync_code">Feederのデバイス同期コード</string>
+    <string name="device_sync_description_1">デバイス同期を使用すると、様々なデバイス間で購読フィードを同期して記事を読むことができます。</string>
+    <string name="device_sync_description_2">他のデバイスで作成した同期チェーンからコードをスキャンするか、新しい同期チェーンを開始します。</string>
+    <string name="scan_or_enter_code">同期コードのスキャンまたは入力</string>
+    <string name="start_new_sync_chain">新しい同期チェーンを開始</string>
+    <string name="sync_code">同期コード</string>
+    <string name="secret_key">秘密鍵</string>
+    <string name="device_sync">デバイス同期</string>
+    <string name="add_new_device">新しいデバイスを追加</string>
+    <string name="this_device">%1$s (このデバイス)</string>
+    <string name="remove_device">デバイスを削除</string>
 </resources>
