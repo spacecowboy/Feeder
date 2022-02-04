@@ -15,6 +15,7 @@ import android.os.Build
 import android.provider.Browser.EXTRA_CREATE_NEW_TAB
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.GROUP_ALERT_SUMMARY
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.navigation.NavDeepLinkBuilder
@@ -38,8 +39,9 @@ import org.kodein.di.DI
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 
-private const val notificationId = 73583
+private const val summaryNotificationId = 73583
 private const val channelId = "feederNotifications"
+private const val articleNotificationGroup = "com.nononsenseapps.feeder.ARTICLE"
 
 suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -52,28 +54,14 @@ suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
 
     val feedItems = getItemsToNotify(di)
 
-    val notifications: List<Pair<Int, Notification>> = if (feedItems.isEmpty()) {
-        emptyList()
-    } else {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N || feedItems.size < 4) {
-            // Cancel inbox notification if present
-            nm.cancel(notificationId)
-            // Platform automatically bundles 4 or more notifications
-            feedItems.map {
-                it.id.toInt() to singleNotification(appContext, it)
-            }
-        } else {
-            // In this case, also cancel any individual notifications
-            feedItems.forEach {
-                nm.cancel(it.id.toInt())
-            }
-            // Use an inbox style notification to bundle many notifications together
-            listOf(notificationId to inboxNotification(appContext, feedItems))
+    if (feedItems.isNotEmpty()) {
+        feedItems.map {
+            it.id.toInt() to singleNotification(appContext, it)
+        }.forEach { (id, notification) ->
+            nm.notify(id, notification)
         }
-    }
-
-    notifications.forEach { (id, notification) ->
-        nm.notify(id, notification)
+        // Shown on API Level < 24
+        nm.notify(summaryNotificationId, inboxNotification(appContext, feedItems))
     }
 }
 
@@ -138,6 +126,8 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
     builder.setContentText(text)
         .setContentTitle(title)
         .setContentIntent(pendingIntent)
+        .setGroup(articleNotificationGroup)
+        .setGroupAlertBehavior(GROUP_ALERT_SUMMARY)
         .setDeleteIntent(getPendingDeleteIntent(context, item))
         .setNumber(1)
 
@@ -267,7 +257,7 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
 
     val pendingIntent = PendingIntent.getActivity(
         context,
-        notificationId,
+        summaryNotificationId,
         contentIntent,
         PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
     )
@@ -277,6 +267,9 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
     builder.setContentText(text)
         .setContentTitle(title)
         .setContentIntent(pendingIntent)
+        .setGroup(articleNotificationGroup)
+        .setGroupAlertBehavior(GROUP_ALERT_SUMMARY)
+        .setGroupSummary(true)
         .setDeleteIntent(getDeleteIntent(context, feedItems))
         .setNumber(feedItems.size)
 
