@@ -1,3 +1,8 @@
+# 2.0.15
+Jonas Kalderstam (1):
+  * [51b9ea9c] Fixed incorrect bundling of notifications and sync
+         notification
+
 # 2.0.14
 Jonas Kalderstam (1):
   * [90e8048c] Fixed spaces getting replaced by + in feed titles
