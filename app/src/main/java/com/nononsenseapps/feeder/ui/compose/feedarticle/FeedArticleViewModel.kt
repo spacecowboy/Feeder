@@ -13,6 +13,7 @@ import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.ScreenTitle
+import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
@@ -239,6 +240,7 @@ class FeedArticleViewModel(
             repository.currentArticle,
             readAloudStateHolder.title,
             readAloudStateHolder.readAloudState,
+            repository.swipeAsRead,
             textToDisplayTrigger, // Never actually read, only used as trigger
         ) { params: Array<Any> ->
             @Suppress("UNCHECKED_CAST")
@@ -282,6 +284,7 @@ class FeedArticleViewModel(
                 isReadAloudVisible = readAloudState != PlaybackStatus.STOPPED,
                 articleId = article.id,
                 isArticleOpen = params[14] as Boolean,
+                swipeAsRead = params[20] as SwipeAsRead,
             )
         }
             .stateIn(
@@ -401,6 +404,7 @@ interface FeedScreenViewState {
     val showDeleteDialog: Boolean
     val showEditDialog: Boolean
     val haveVisibleFeedItems: Boolean
+    val swipeAsRead: SwipeAsRead
 }
 
 interface ArticleScreenViewState {
@@ -455,6 +459,7 @@ data class FeedArticleScreenViewState(
     override val articleLink: String? = null,
     override val feedDisplayTitle: String = "",
     override val articleId: Long = ID_UNSET,
+    override val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState
 

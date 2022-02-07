@@ -15,6 +15,8 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
+import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
@@ -69,6 +72,7 @@ fun SwipeableFeedItemPreview(
     item: FeedListItem,
     showThumbnail: Boolean,
     feedItemStyle: FeedItemStyle,
+    swipeAsRead: SwipeAsRead,
     imagePainter: @Composable (String) -> Unit,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
@@ -268,28 +272,51 @@ fun SwipeableFeedItemPreview(
 
 
             // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
-            // It's very important than clickable stuff is handled by its parent - or a direct child
-            Box(
-                modifier = Modifier
-                    .padding(start = 48.dp)
-                    .matchParentSize()
-                    .swipeable(
-                        state = swipeableState,
-                        anchors = mapOf(
-                            0f to FeedItemSwipeState.NONE,
-                            -maxWidthPx to FeedItemSwipeState.LEFT,
-                            maxWidthPx to FeedItemSwipeState.RIGHT
-                        ),
-                        orientation = Orientation.Horizontal,
-                        reverseDirection = isRtl,
-                        velocityThreshold = 1000.dp,
-                        thresholds = { _, _ ->
-                            FractionalThreshold(0.50f)
-                        }
+            // It's very important that clickable stuff is handled by its parent - or a direct child
+            // Wrapped in an outer box to get the height set properly
+            if (swipeAsRead != SwipeAsRead.DISABLED) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                ) {
+                    val anchors = mutableMapOf(0f to FeedItemSwipeState.NONE)
+                    Box(
+                        modifier = Modifier
+                            .run {
+                                when (swipeAsRead) {
+                                    // This never actually gets called due to outer if
+                                    SwipeAsRead.DISABLED -> this
+                                        .height(0.dp)
+                                        .width(0.dp)
+                                    SwipeAsRead.ONLY_FROM_END -> {
+                                        anchors[-maxWidthPx] = FeedItemSwipeState.LEFT
+                                        this
+                                            .fillMaxHeight()
+                                            .width(this@BoxWithConstraints.maxWidth / 4)
+                                            .align(Alignment.CenterEnd)
+                                    }
+                                    SwipeAsRead.FROM_ANYWHERE -> {
+                                        anchors[-maxWidthPx] = FeedItemSwipeState.LEFT
+                                        anchors[maxWidthPx] = FeedItemSwipeState.RIGHT
+                                        this
+                                            .padding(start = 48.dp)
+                                            .matchParentSize()
+                                    }
+                                }
+                            }
+                            .swipeable(
+                                state = swipeableState,
+                                anchors = anchors,
+                                orientation = Orientation.Horizontal,
+                                reverseDirection = isRtl,
+                                velocityThreshold = 1000.dp,
+                                thresholds = { _, _ ->
+                                    FractionalThreshold(0.50f)
+                                }
+                            )
                     )
-            )
-
-
+                }
+            }
         }
     }
 }

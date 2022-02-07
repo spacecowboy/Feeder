@@ -207,6 +207,24 @@ class SettingsStore(override val di: DI) : DIAware {
         ).apply()
     }
 
+    private val _swipeAsRead = MutableStateFlow(
+        try {
+            SwipeAsRead.valueOf(
+                sp.getStringNonNull(PREF_SWIPE_AS_READ, SwipeAsRead.ONLY_FROM_END.name)
+            )
+        } catch (_: Exception) {
+            SwipeAsRead.ONLY_FROM_END
+        }
+    )
+    val swipeAsRead = _swipeAsRead.asStateFlow()
+    fun setSwipeAsRead(value: SwipeAsRead) {
+        _swipeAsRead.value = value
+        sp.edit().putString(
+            PREF_SWIPE_AS_READ,
+            value.name
+        ).apply()
+    }
+
     private val _syncFrequency by lazy {
         val savedValue = sp.getStringNonNull(PREF_SYNC_FREQ, "60").toLong()
         MutableStateFlow(
@@ -309,6 +327,8 @@ const val PREF_SHOW_FAB = "pref_show_fab"
 
 const val PREF_FEED_ITEM_STYLE = "pref_feed_item_style"
 
+const val PREF_SWIPE_AS_READ = "pref_swipe_as_read"
+
 /**
  * Sync settings
  */
@@ -399,4 +419,12 @@ enum class FeedItemStyle(
     CARD(R.string.feed_item_style_card),
     COMPACT(R.string.feed_item_style_compact),
     SUPER_COMPACT(R.string.feed_item_style_super_compact)
+}
+
+enum class SwipeAsRead(
+    @StringRes val stringId: Int,
+) {
+    DISABLED(R.string.disabled),
+    ONLY_FROM_END(R.string.only_from_end),
+    FROM_ANYWHERE(R.string.from_anywhere)
 }

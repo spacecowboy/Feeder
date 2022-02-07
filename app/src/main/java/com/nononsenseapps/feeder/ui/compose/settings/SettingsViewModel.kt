@@ -11,6 +11,7 @@ import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.archmodel.SortingOptions
+import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
@@ -86,6 +87,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setFeedItemStyle(value)
     }
 
+    fun setSwipeAsRead(value: SwipeAsRead) {
+        repository.setSwipeAsRead(value)
+    }
+
     private val batteryOptimizationIgnoredFlow: Flow<Boolean> = repository.resumeTime.map {
         val powerManager: PowerManager? = context.getSystemService()
         powerManager?.isIgnoringBatteryOptimizations(context.packageName) == true
@@ -113,6 +118,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.syncFrequency,
                 batteryOptimizationIgnoredFlow,
                 repository.feedItemStyle,
+                repository.swipeAsRead,
             ) { params: Array<Any> ->
                 SettingsViewState(
                     currentTheme = params[0] as ThemeOptions,
@@ -130,6 +136,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     syncFrequency = params[12] as SyncFrequency,
                     batteryOptimizationIgnored = params[13] as Boolean,
                     feedItemStyle = params[14] as FeedItemStyle,
+                    swipeAsRead = params[15] as SwipeAsRead,
                 )
             }.collect {
                 _viewState.value = it
@@ -155,4 +162,5 @@ data class SettingsViewState(
     val linkOpener: LinkOpener = LinkOpener.CUSTOM_TAB,
     val syncFrequency: SyncFrequency = SyncFrequency.EVERY_1_HOURS,
     val batteryOptimizationIgnored: Boolean = false,
+    val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
 )

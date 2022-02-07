@@ -45,6 +45,35 @@ class SettingsStoreTest : DIAware {
         every { sp.getString(PREF_SORT, null) } returns null
         every { sp.getString(PREF_MAX_ITEM_COUNT_PER_FEED, "100") } returns null
         every { sp.getString(PREF_SYNC_FREQ, "60") } returns null
+        // Incorrect value by design
+        every {
+            sp.getString(
+                PREF_SWIPE_AS_READ,
+                SwipeAsRead.ONLY_FROM_END.name
+            )
+        } returns SwipeAsRead.DISABLED.name
+    }
+
+    @Test
+    fun swipeAsReadSet() {
+        store.setSwipeAsRead(SwipeAsRead.DISABLED)
+
+        verify {
+            sp.edit().putString(PREF_SWIPE_AS_READ, "DISABLED").apply()
+        }
+
+        assertEquals(SwipeAsRead.DISABLED, store.swipeAsRead.value, "Expected get to match mock")
+    }
+
+    @Test
+    fun swipeAsReadBadValueInPrefs() {
+        every { sp.getString(PREF_SWIPE_AS_READ, any()) } returns "Not an enum value"
+
+        assertEquals(
+            SwipeAsRead.ONLY_FROM_END,
+            store.swipeAsRead.value,
+            "Expected bad value to be ignored"
+        )
     }
 
     @Test
