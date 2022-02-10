@@ -39,11 +39,14 @@ import org.kodein.di.DI
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 
-private const val summaryNotificationId = 73583
+const val summaryNotificationId = 2_147_483_646
 private const val channelId = "feederNotifications"
 private const val articleNotificationGroup = "com.nononsenseapps.feeder.ARTICLE"
 
-suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
+suspend fun notify(
+    appContext: Context,
+    updateSummaryOnly: Boolean = false
+) = withContext(Dispatchers.Default) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         createNotificationChannel(appContext)
     }
@@ -55,10 +58,12 @@ suspend fun notify(appContext: Context) = withContext(Dispatchers.Default) {
     val feedItems = getItemsToNotify(di)
 
     if (feedItems.isNotEmpty()) {
-        feedItems.map {
-            it.id.toInt() to singleNotification(appContext, it)
-        }.forEach { (id, notification) ->
-            nm.notify(id, notification)
+        if (!updateSummaryOnly) {
+            feedItems.map {
+                it.id.toInt() to singleNotification(appContext, it)
+            }.forEach { (id, notification) ->
+                nm.notify(id, notification)
+            }
         }
         // Shown on API Level < 24
         nm.notify(summaryNotificationId, inboxNotification(appContext, feedItems))

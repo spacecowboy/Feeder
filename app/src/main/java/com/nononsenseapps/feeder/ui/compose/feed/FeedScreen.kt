@@ -174,6 +174,7 @@ fun FeedListContent(
                                 !previewItem.unread
                             )
                         },
+                        swipeAsRead = viewState.swipeAsRead,
                         onlyUnread = viewState.onlyUnread,
                         item = previewItem,
                         showThumbnail = viewState.showThumbnails,

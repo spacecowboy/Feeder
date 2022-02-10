@@ -66,6 +66,7 @@ import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.SortingOptions
+import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
@@ -166,6 +167,10 @@ fun SettingsScreen(
             },
             batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored,
             onOpenSyncSettings = onNavigateToSyncScreen,
+            swipeAsReadValue = viewState.swipeAsRead,
+            onSwipeAsReadOptionChanged = {
+                settingsViewModel.setSwipeAsRead(it)
+            }
         )
     }
 }
@@ -207,6 +212,8 @@ fun SettingsScreenPreview() {
                 onSyncFrequencyChanged = {},
                 batteryOptimizationIgnoredValue = false,
                 onOpenSyncSettings = {},
+                onSwipeAsReadOptionChanged = {},
+                swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
             )
         }
     }
@@ -225,6 +232,8 @@ fun SettingsList(
     onShowFabChanged: (Boolean) -> Unit,
     feedItemStyleValue: FeedItemStyle,
     onFeedItemStyleChanged: (FeedItemStyle) -> Unit,
+    swipeAsReadValue: SwipeAsRead,
+    onSwipeAsReadOptionChanged: (SwipeAsRead) -> Unit,
     syncOnStartupValue: Boolean,
     onSyncOnStartupChanged: (Boolean) -> Unit,
     syncOnlyOnWifiValue: Boolean,
@@ -301,6 +310,15 @@ fun SettingsList(
             onSelection = {
                 onFeedItemStyleChanged(it.feedItemStyle)
             },
+        )
+
+        MenuSetting(
+            title = stringResource(id = R.string.swipe_to_mark_as_read),
+            currentValue = swipeAsReadValue.asSwipeAsReadOption(),
+            values = SwipeAsRead.values().map { it.asSwipeAsReadOption() },
+            onSelection = {
+                onSwipeAsReadOptionChanged(it.swipeAsRead)
+            }
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -543,7 +561,7 @@ fun <T> MenuSetting(
                         onSelection(value)
                     }
                 ) {
-                    val style = if (value==currentValue) {
+                    val style = if (value == currentValue) {
                         MaterialTheme.typography.body1.merge(
                             TextStyle(
                                 fontWeight = FontWeight.Bold,
@@ -588,7 +606,7 @@ fun RadioButtonSetting(
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (icon!=null) {
+        if (icon != null) {
             Box(
                 modifier = Modifier.size(64.dp),
                 contentAlignment = Alignment.Center
@@ -640,7 +658,7 @@ fun SwitchSetting(
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (icon!=null) {
+        if (icon != null) {
             Box(
                 modifier = Modifier.size(64.dp),
                 contentAlignment = Alignment.Center
@@ -682,7 +700,7 @@ private fun RowScope.TitleAndSubtitle(
         ProvideTextStyle(value = MaterialTheme.typography.subtitle1) {
             title()
         }
-        if (subtitle!=null) {
+        if (subtitle != null) {
             Spacer(modifier = Modifier.size(2.dp))
             ProvideTextStyle(value = MaterialTheme.typography.caption) {
                 CompositionLocalProvider(
@@ -748,6 +766,14 @@ data class FeedItemStyleOption(
 }
 
 @Immutable
+data class SwipeAsReadOption(
+    val swipeAsRead: SwipeAsRead,
+    val name: String,
+) {
+    override fun toString() = name
+}
+
+@Immutable
 data class SyncFreqOption(
     val syncFrequency: SyncFrequency,
     val name: String,
@@ -796,5 +822,12 @@ fun LinkOpener.asLinkOpenerOption() =
 fun FeedItemStyle.asFeedItemStyleOption() =
     FeedItemStyleOption(
         feedItemStyle = this,
+        name = stringResource(id = stringId)
+    )
+
+@Composable
+fun SwipeAsRead.asSwipeAsReadOption() =
+    SwipeAsReadOption(
+        swipeAsRead = this,
         name = stringResource(id = stringId)
     )

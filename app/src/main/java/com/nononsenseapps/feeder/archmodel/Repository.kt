@@ -92,6 +92,9 @@ class Repository(override val di: DI) : DIAware {
     val feedItemStyle: StateFlow<FeedItemStyle> = settingsStore.feedItemStyle
     fun setFeedItemStyle(value: FeedItemStyle) = settingsStore.setFeedItemStyle(value)
 
+    val swipeAsRead: StateFlow<SwipeAsRead> = settingsStore.swipeAsRead
+    fun setSwipeAsRead(value: SwipeAsRead) = settingsStore.setSwipeAsRead(value)
+
     val syncOnResume: StateFlow<Boolean> = settingsStore.syncOnResume
     fun setSyncOnResume(value: Boolean) = settingsStore.setSyncOnResume(value)
 
