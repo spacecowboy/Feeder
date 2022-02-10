@@ -5,10 +5,14 @@ import android.util.Log
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.model.cancelNotification
+import com.nononsenseapps.feeder.model.notify
+import com.nononsenseapps.feeder.model.summaryNotificationId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.runningReduce
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
@@ -38,8 +42,13 @@ class NotificationsWorker(override val di: DI) : DIAware {
                     // Always pass current on
                     current
                 }
-                .collect {
-                    // Notifications are triggered during sync, not here
+                .collectLatest { items ->
+                    delay(100)
+                    // Individual notifications are triggered during sync, not here
+                    // but the summary notification still needs updating
+                    if (items.isNotEmpty()) {
+                        notify(context, updateSummaryOnly = true)
+                    }
                 }
         }
     }
@@ -49,6 +58,9 @@ class NotificationsWorker(override val di: DI) : DIAware {
     }
 
     internal suspend fun unNotifyForMissingItems(prev: List<Long>, current: List<Long>) {
+        if (current.isEmpty()) {
+            cancelNotification(summaryNotificationId.toLong())
+        }
         prev.filter {
             it !in current
         }.forEach {
