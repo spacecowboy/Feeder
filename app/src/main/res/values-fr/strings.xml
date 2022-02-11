@@ -161,4 +161,8 @@
     <string name="sync_code">Code de synchronisation</string>
     <string name="device_sync_financed_by_community">Ce service est financé par la communauté. Veuillez envisager de faire un don si vous le trouvez utile.</string>
     <string name="join_sync_chain">Rejoindre une chaîne de synchronisation</string>
+    <string name="only_from_end">Seulement à partir de la fin</string>
+    <string name="from_anywhere">À partir de n\'importe où</string>
+    <string name="disabled">Désactivé</string>
+    <string name="swipe_to_mark_as_read">Balayer pour marquer comme lu</string>
 </resources>

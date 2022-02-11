@@ -161,4 +161,8 @@
     <string name="sync_code">Codice di sincronizzazione</string>
     <string name="join_sync_chain">Unisciti alla catena di sincronizzazione</string>
     <string name="secret_key">Chiave segreta</string>
+    <string name="disabled">Disabilitato</string>
+    <string name="from_anywhere">Da qualsiasi luogo</string>
+    <string name="swipe_to_mark_as_read">Scorri per segnare come letto</string>
+    <string name="only_from_end">Solo dalla fine</string>
 </resources>
