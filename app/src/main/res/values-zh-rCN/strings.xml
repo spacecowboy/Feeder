@@ -161,4 +161,8 @@
     <string name="secret_key">密钥</string>
     <string name="device_sync">设备同步</string>
     <string name="device_sync_description_1">设备同步允许你在不同设备之间同步订阅和已读文章。</string>
+    <string name="only_from_end">仅来自结尾</string>
+    <string name="swipe_to_mark_as_read">滑动标记为已读</string>
+    <string name="disabled">已禁用</string>
+    <string name="from_anywhere">来自任何地方</string>
 </resources>
