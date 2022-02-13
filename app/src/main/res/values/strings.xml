@@ -175,4 +175,5 @@
   <string name="only_from_end">Only from end</string>
   <string name="from_anywhere">From anywhere</string>
   <string name="swipe_to_mark_as_read">Swipe to mark as read</string>
+  <string name="are_you_sure_leave_sync_chain">Are you sure you want to leave the sync chain?</string>
 </resources>

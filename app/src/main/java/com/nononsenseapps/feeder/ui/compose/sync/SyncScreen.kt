@@ -174,6 +174,10 @@ fun SyncScreen(
             }
         }
 
+    var showLeaveSyncChainDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     SyncScreen(
         viewState = viewState,
         syncScreenType = syncScreenType,
@@ -198,8 +202,7 @@ fun SyncScreen(
             }
         },
         onLeaveSyncChain = {
-            // TODO the confirmation dialog
-            viewModel.leaveSyncChain()
+            showLeaveSyncChainDialog = true
         },
         onScanSyncCode = {
             viewModel.setScreen(SyncScreenToShow.JOIN)
@@ -224,6 +227,18 @@ fun SyncScreen(
         currentDeviceId = viewState.deviceId,
         devices = viewState.deviceList,
     )
+
+    if (showLeaveSyncChainDialog) {
+        LeaveSyncChainDialog(
+            onDismiss = {
+                showLeaveSyncChainDialog = false
+            },
+            onOk = {
+                showLeaveSyncChainDialog = false
+                viewModel.leaveSyncChain()
+            },
+        )
+    }
 }
 
 @Composable
