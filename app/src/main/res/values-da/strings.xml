@@ -4,7 +4,7 @@
     <string name="mark_all_as_read">Markér alle som læst</string>
     <string name="title_activity_edit_feed">Abonner på feed</string>
     <string name="url">URL</string>
-    <string name="tag">Etikette</string>
+    <string name="tag">Etiket</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="empty_feed_top">Intet at læse her. Vil du …</string>
@@ -129,7 +129,7 @@
     <string name="show_all_items">Vis alle elementer</string>
     <string name="new_items_available">Nye elementer tilgængelige</string>
     <string name="show_unread_items">Vis ulæste elementer</string>
-    <string name="view">Se</string>
+    <string name="view">Vis</string>
     <string name="no_tag">Ingen etikette</string>
     <string name="dont_notify_for_new_items">Stop notifikationer</string>
     <string name="open_enclosed_media">Åbn vedlagte medier</string>
