@@ -1,9 +1,12 @@
 package com.nononsenseapps.feeder.ui.compose.sync
 
+import android.app.Application
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.SyncDevice
@@ -24,6 +27,7 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 
 class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
+    private val context: Application by instance()
     private val repository: Repository by instance()
     private val syncClient: SyncRestClient by instance()
 
@@ -118,6 +122,10 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         }
     }
 
+    fun onMissingBarCodeScanner() {
+        Toast.makeText(context, R.string.no_barcode_scanner_installed, Toast.LENGTH_SHORT).show()
+    }
+
     private val _viewState = MutableStateFlow(SyncScreenViewState())
     val viewState: StateFlow<SyncScreenViewState>
         get() = _viewState.asStateFlow()
@@ -141,6 +149,7 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
                 val syncRemote = params[1] as SyncRemote?
                 val screen = params[2] as SyncScreenToShow
                 val secretKey = params[4] as String
+
                 @Suppress("UNCHECKED_CAST")
                 val deviceList = params[3] as List<SyncDevice>
 

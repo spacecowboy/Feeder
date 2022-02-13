@@ -211,7 +211,7 @@ fun SyncScreen(
                 try {
                     launcher.launch(Intent("com.google.zxing.client.android.SCAN"))
                 } catch (e: ActivityNotFoundException) {
-                    // TODO tell user they don't have a barcode scanner installed
+                    viewModel.onMissingBarCodeScanner()
                 }
             }
         },
