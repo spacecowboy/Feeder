@@ -209,7 +209,7 @@ fun FeedArticleScreen(
             context.startActivity(openGitlabIssues())
         },
         onImport = { opmlImporter.launch(arrayOf("text/plain", "text/xml", "text/opml", "*/*")) },
-        onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}") },
+        onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml") },
         onOpenNavDrawer = {
             coroutineScope.launch {
                 scaffoldState.drawerState.open()
