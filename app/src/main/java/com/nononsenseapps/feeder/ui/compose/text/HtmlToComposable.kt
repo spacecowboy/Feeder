@@ -237,7 +237,7 @@ private fun TextComposer.appendTextChildren(
                     "h1" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h1.toSpanStyle() }
+                                style = { MaterialTheme.typography.h5.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -246,7 +246,7 @@ private fun TextComposer.appendTextChildren(
                     "h2" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h2.toSpanStyle() }
+                                style = { MaterialTheme.typography.h5.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -255,7 +255,7 @@ private fun TextComposer.appendTextChildren(
                     "h3" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h3.toSpanStyle() }
+                                style = { MaterialTheme.typography.h5.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -264,7 +264,7 @@ private fun TextComposer.appendTextChildren(
                     "h4" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h4.toSpanStyle() }
+                                style = { MaterialTheme.typography.h5.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -282,7 +282,7 @@ private fun TextComposer.appendTextChildren(
                     "h6" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h6.toSpanStyle() }
+                                style = { MaterialTheme.typography.h5.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
