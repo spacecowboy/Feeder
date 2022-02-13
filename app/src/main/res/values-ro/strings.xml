@@ -161,4 +161,8 @@
     <string name="sync_code">Cod de sincronizare</string>
     <string name="secret_key">Cheia secretă</string>
     <string name="join_sync_chain">Alăturați-vă lanțului de sincronizare</string>
+    <string name="disabled">Dezactivat</string>
+    <string name="only_from_end">Doar de la capăt</string>
+    <string name="from_anywhere">De oriunde</string>
+    <string name="swipe_to_mark_as_read">Glisați pentru a marca ca citit</string>
 </resources>

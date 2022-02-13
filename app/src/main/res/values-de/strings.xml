@@ -18,7 +18,7 @@
     <string name="search_feed_empty_hint">Eingabe einer Feed-Adresse</string>
     <string name="mark_as_read">Als gelesen markieren</string>
     <string name="mark_as_unread">Als ungelesen markieren</string>
-    <string name="mark_all_as_read">Alles als gelesen markieren</string>
+    <string name="mark_all_as_read">Alle als gelesen markieren</string>
     <string name="edit_feed">Feed bearbeiten</string>
     <string name="delete_feed">Feed löschen</string>
     <string name="show_all_items">Alle Nachrichten anzeigen</string>
@@ -161,4 +161,8 @@
     <string name="start_new_sync_chain">Neue Synchronisierungskette starten</string>
     <string name="sync_code">Synchronisierungscode</string>
     <string name="secret_key">Geheimer Schlüssel</string>
+    <string name="disabled">Deaktiviert</string>
+    <string name="only_from_end">Nur vom Ende</string>
+    <string name="swipe_to_mark_as_read">Wischen, um als gelesen zu markieren</string>
+    <string name="from_anywhere">Von überall</string>
 </resources>

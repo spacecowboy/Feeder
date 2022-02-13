@@ -161,4 +161,8 @@
     <string name="device_sync_description_1">Aygıt eşzamanlaması, yayın aboneliklerini eşzamanlamanıza ve makaleleri çeşitli aygıtlarınız arasında okumanıza olanak tanır.</string>
     <string name="start_new_sync_chain">Yeni eşzamanlama zinciri başlat</string>
     <string name="or_open_device_sync_link">Alternatif olarak, bağlantıyı aygıtınızda açın.</string>
+    <string name="disabled">Devre dışı</string>
+    <string name="only_from_end">Yalnızca sondan</string>
+    <string name="from_anywhere">Her yerden</string>
+    <string name="swipe_to_mark_as_read">Okundu olarak işaretlemek için kaydır</string>
 </resources>

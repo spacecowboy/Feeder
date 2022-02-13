@@ -161,4 +161,8 @@
     <string name="start_new_sync_chain">Rozpocznij nowy łańcuch synchronizacji</string>
     <string name="join_sync_chain">Dołącz do łańcucha synchronizacji</string>
     <string name="device_sync_description_2">Po prostu zeskanuj kod ze swojego łańcucha synchronizacji utworzonego na innym urządzeniu lub rozpocznij nowy łańcuch synchronizacji.</string>
+    <string name="disabled">Wyłączone</string>
+    <string name="from_anywhere">Z dowolnego miejsca</string>
+    <string name="swipe_to_mark_as_read">Przesuwaj, aby oznaczać jako przeczytane</string>
+    <string name="only_from_end">Tylko od prawej strony</string>
 </resources>
