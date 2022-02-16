@@ -159,4 +159,11 @@
     <string name="add_new_device">新しいデバイスを追加</string>
     <string name="this_device">%1$s (このデバイス)</string>
     <string name="remove_device">デバイスを削除</string>
+    <string name="disabled">無効</string>
+    <string name="from_anywhere">どこからでも</string>
+    <string name="swipe_to_mark_as_read">スワイプして既読</string>
+    <string name="are_you_sure_leave_sync_chain">同期チェーンを終了しますか\?</string>
+    <string name="no_barcode_scanner_installed">バーコードスキャナーが見つかりません</string>
+    <string name="leave_sync_chain">同期チェーンを終了</string>
+    <string name="join_sync_chain">同期チェーンを始める</string>
 </resources>
