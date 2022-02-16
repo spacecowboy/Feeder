@@ -165,4 +165,6 @@
     <string name="only_from_end">Yalnızca sondan</string>
     <string name="from_anywhere">Her yerden</string>
     <string name="swipe_to_mark_as_read">Okundu olarak işaretlemek için kaydır</string>
+    <string name="are_you_sure_leave_sync_chain">Eşzamanlama zincirinden ayrılmak istediğinizden emin misiniz\?</string>
+    <string name="no_barcode_scanner_installed">Barkod tarayıcı bulunamadı</string>
 </resources>
