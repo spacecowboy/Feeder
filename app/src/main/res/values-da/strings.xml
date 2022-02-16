@@ -165,4 +165,6 @@
     <string name="other_unread_articles">%1$s ulæste artikler</string>
     <string name="feed_item_style">Artikel-stil</string>
     <string name="device_sync_description_2">Du skal blot scanne koden fra din synkroniseringskæde, som du har oprettet på en anden enhed, eller start en ny synkroniseringskæde.</string>
+    <string name="are_you_sure_leave_sync_chain">Er du sikker på, at du vil forlade synkroniseringskæden\?</string>
+    <string name="no_barcode_scanner_installed">Kunne ikke finde en stregkodescanner</string>
 </resources>
