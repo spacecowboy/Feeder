@@ -165,4 +165,6 @@
     <string name="from_anywhere">Desde cualquier sitio</string>
     <string name="disabled">Deshabilitado</string>
     <string name="swipe_to_mark_as_read">Deslizar para marcar como leído</string>
+    <string name="are_you_sure_leave_sync_chain">¿Estás seguro que quieres abandonar la cadena de sincronización\?</string>
+    <string name="no_barcode_scanner_installed">No se encontró un escáner de código de barras</string>
 </resources>
