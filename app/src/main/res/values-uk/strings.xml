@@ -165,4 +165,6 @@
     <string name="only_from_end">Лише з кінця</string>
     <string name="from_anywhere">З будь-відки</string>
     <string name="swipe_to_mark_as_read">Ковзніть, щоб позначити прочитаним</string>
+    <string name="are_you_sure_leave_sync_chain">Ви дійсно хочете залишити ланцюжок синхронування\?</string>
+    <string name="no_barcode_scanner_installed">Не вдалося знайти сканер штрихкодів</string>
 </resources>
