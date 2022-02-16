@@ -165,4 +165,6 @@
     <string name="from_anywhere">Z dowolnego miejsca</string>
     <string name="swipe_to_mark_as_read">Przesuwaj, aby oznaczać jako przeczytane</string>
     <string name="only_from_end">Tylko od prawej strony</string>
+    <string name="are_you_sure_leave_sync_chain">Czy na pewno chcesz opuścić łańcuch synchronizacji\?</string>
+    <string name="no_barcode_scanner_installed">Nie udało się znaleźć skanera kodów kreskowych</string>
 </resources>
