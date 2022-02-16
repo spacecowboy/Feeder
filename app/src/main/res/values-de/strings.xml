@@ -165,6 +165,6 @@
     <string name="only_from_end">Nur vom Ende</string>
     <string name="swipe_to_mark_as_read">Wischen, um als gelesen zu markieren</string>
     <string name="from_anywhere">Von überall</string>
-    <string name="are_you_sure_leave_sync_chain">Sind Sie sicher, dass Sie die Synchronisationskette verlassen wollen\?</string>
-    <string name="no_barcode_scanner_installed">Kein Strichcode-Scanner konnte gefunden werden</string>
+    <string name="are_you_sure_leave_sync_chain">Möchten Sie die Synchronisierungskette wirklich verlassen\?</string>
+    <string name="no_barcode_scanner_installed">Konnte keinen Barcode-Scanner finden</string>
 </resources>
