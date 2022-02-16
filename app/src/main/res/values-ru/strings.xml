@@ -161,4 +161,10 @@
     <string name="device_sync_description_2">Просто отсканируйте код из цепочки синхронизации, созданной на другом устройстве, или создайте новую цепочку синхронизации.</string>
     <string name="scan_or_enter_code">Отсканируйте или введите код синхронизации</string>
     <string name="sync_code">Код синхронизации</string>
+    <string name="disabled">Выключено</string>
+    <string name="only_from_end">Только с конца</string>
+    <string name="from_anywhere">С любой стороны</string>
+    <string name="swipe_to_mark_as_read">Проведите, чтобы отметить как прочитанное</string>
+    <string name="are_you_sure_leave_sync_chain">Вы уверены, что хотите покинуть цепочку синхронизации\?</string>
+    <string name="no_barcode_scanner_installed">Не удалось найти сканер штрихкодов</string>
 </resources>
