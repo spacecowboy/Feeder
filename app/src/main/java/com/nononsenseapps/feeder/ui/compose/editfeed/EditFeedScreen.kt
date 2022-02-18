@@ -133,6 +133,12 @@ fun EditFeedScreen(
     onCancel: () -> Unit,
 ) {
     Scaffold(
+        // In case device is rotated to landscape and navigation bar ends up on the side
+        contentPadding = rememberInsetsPaddingValues(
+            insets = LocalWindowInsets.current.navigationBars,
+            applyBottom = false,
+            applyTop = false,
+        ),
         topBar = {
             TopAppBar(
                 title = {
@@ -143,7 +149,7 @@ fun EditFeedScreen(
                     )
                 },
                 contentPadding = rememberInsetsPaddingValues(
-                    LocalWindowInsets.current.statusBars,
+                    LocalWindowInsets.current.systemBars,
                     applyBottom = false,
                 ),
                 navigationIcon = {

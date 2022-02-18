@@ -71,6 +71,11 @@ fun SearchFeedScreen(
     onClick: (SearchResult) -> Unit,
 ) {
     Scaffold(
+        contentPadding = rememberInsetsPaddingValues(
+            insets = LocalWindowInsets.current.navigationBars,
+            applyBottom = false,
+            applyTop = false,
+        ),
         topBar = {
             TopAppBar(
                 title = {
@@ -81,7 +86,7 @@ fun SearchFeedScreen(
                     )
                 },
                 contentPadding = rememberInsetsPaddingValues(
-                    LocalWindowInsets.current.statusBars,
+                    LocalWindowInsets.current.systemBars,
                     applyBottom = false,
                 ),
                 navigationIcon = {
