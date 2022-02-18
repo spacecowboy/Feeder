@@ -293,6 +293,11 @@ fun FeedScreen(
 
     Scaffold(
         scaffoldState = scaffoldState,
+        contentPadding = rememberInsetsPaddingValues(
+            insets = LocalWindowInsets.current.navigationBars,
+            applyBottom = false,
+            applyTop = false,
+        ),
         topBar = {
             TopAppBar(
                 title = {
@@ -306,7 +311,7 @@ fun FeedScreen(
                     )
                 },
                 contentPadding = rememberInsetsPaddingValues(
-                    LocalWindowInsets.current.statusBars,
+                    LocalWindowInsets.current.systemBars,
                     applyBottom = false,
                 ),
                 navigationIcon = {
@@ -629,6 +634,11 @@ fun ScreenWithFeedList(
 
     Scaffold(
         scaffoldState = scaffoldState,
+        contentPadding = rememberInsetsPaddingValues(
+            insets = LocalWindowInsets.current.navigationBars,
+            applyBottom = false,
+            applyTop = false,
+        ),
         topBar = {
             TopAppBar(
                 title = {
@@ -638,7 +648,7 @@ fun ScreenWithFeedList(
                     )
                 },
                 contentPadding = rememberInsetsPaddingValues(
-                    LocalWindowInsets.current.statusBars,
+                    LocalWindowInsets.current.systemBars,
                     applyBottom = false,
                 ),
                 navigationIcon = {

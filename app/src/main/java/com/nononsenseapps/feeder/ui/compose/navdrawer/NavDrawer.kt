@@ -105,8 +105,6 @@ fun ListOfFeedsAndTags(
     LazyColumn(
         contentPadding = rememberInsetsPaddingValues(
             insets = LocalWindowInsets.current.systemBars,
-            applyTop = true,
-            applyBottom = true
         ),
         modifier = Modifier
             .fillMaxSize()

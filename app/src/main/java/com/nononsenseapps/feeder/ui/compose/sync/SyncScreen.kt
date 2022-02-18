@@ -89,6 +89,11 @@ private fun SyncScaffold(
         mutableStateOf(false)
     }
     Scaffold(
+        contentPadding = rememberInsetsPaddingValues(
+            insets = LocalWindowInsets.current.navigationBars,
+            applyBottom = false,
+            applyTop = false,
+        ),
         topBar = {
             TopAppBar(
                 title = {
@@ -99,7 +104,7 @@ private fun SyncScaffold(
                     )
                 },
                 contentPadding = rememberInsetsPaddingValues(
-                    LocalWindowInsets.current.statusBars,
+                    LocalWindowInsets.current.systemBars,
                     applyBottom = false,
                 ),
                 navigationIcon = {
