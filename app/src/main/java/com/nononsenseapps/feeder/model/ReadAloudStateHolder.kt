@@ -66,7 +66,7 @@ class ReadAloudStateHolder(
     val title: StateFlow<String> = _title.asStateFlow()
 
     fun readAloud(title: String, fullText: String) {
-        val textArray = fullText.split("\n", ". ")
+        val textArray = fullText.split(*PUNCTUATION)
         for (text in textArray) {
             if (text.isBlank()) {
                 continue
@@ -161,6 +161,60 @@ class ReadAloudStateHolder(
 
     companion object {
         private const val LOG_TAG = "FeederTextToSpeech"
+        private val PUNCTUATION = arrayOf(
+            // New-lines
+            "\n",
+            // Very useful: https://unicodelookup.com/
+            // Full stop
+            ".",
+            "։",
+            "۔",
+            "܁",
+            "܂",
+            "。",
+            "︒",
+            "﹒",
+            "．",
+            "｡",
+            // Question mark
+            "?",
+            ";",
+            "՞",
+            "؟",
+            "⁇",
+            "⁈",
+            "⁉",
+            "︖",
+            "﹖",
+            "？",
+            // Exclamation mark
+            "!",
+            "՜",
+            "‼",
+            "︕",
+            "﹗",
+            "！",
+            // Colon and semi-colon
+            ":",
+            ";",
+            "؛",
+            "︓",
+            "︔",
+            "﹔",
+            "﹕",
+            "：",
+            "；",
+            // Ellipsis
+            "...",
+            "…",
+            "⋯",
+            "⋮",
+            "︙",
+            // Dash
+            "—",
+            "〜",
+            "〰",
+        )
     }
 }
 
