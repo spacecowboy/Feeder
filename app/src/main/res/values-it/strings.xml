@@ -165,4 +165,6 @@
     <string name="from_anywhere">Da qualsiasi luogo</string>
     <string name="swipe_to_mark_as_read">Scorri per segnare come letto</string>
     <string name="only_from_end">Solo dalla fine</string>
+    <string name="no_barcode_scanner_installed">Impossibile trovare uno scanner di codici a barre</string>
+    <string name="are_you_sure_leave_sync_chain">Sei sicuro/a di voler lasciare la catena di sincronizzazione\?</string>
 </resources>

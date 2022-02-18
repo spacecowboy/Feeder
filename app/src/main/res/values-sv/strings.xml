@@ -165,4 +165,6 @@
     <string name="start_new_sync_chain">Starta ny synkkedja</string>
     <string name="sync_code">Synkkod</string>
     <string name="secret_key">Hemlig nyckel</string>
+    <string name="are_you_sure_leave_sync_chain">Är du säker på att du vill lämna synkkedjan\?</string>
+    <string name="no_barcode_scanner_installed">Kunde inte hitta en streckkodsläsare</string>
 </resources>

@@ -143,4 +143,5 @@
     <string name="swipe_to_mark_as_read">Merkitse luettu pyyhkäisemällä</string>
     <string name="secret_key">Salainen avain</string>
     <string name="join_sync_chain">Liity synkronointiketjuun</string>
+    <string name="no_barcode_scanner_installed">Viivakoodiskanneria ei löytynyt</string>
 </resources>
