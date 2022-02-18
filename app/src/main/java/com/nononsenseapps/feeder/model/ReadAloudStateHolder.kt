@@ -9,7 +9,6 @@ import android.util.Log
 import android.widget.Toast
 import com.nononsenseapps.feeder.R
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -21,6 +20,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 /**
@@ -30,6 +31,7 @@ class ReadAloudStateHolder(
     val context: Context,
     val coroutineScope: CoroutineScope,
 ) : TextToSpeech.OnInitListener {
+    private val mutex: Mutex = Mutex()
     private var textToSpeech: TextToSpeech? = null
     private val speechListener: UtteranceProgressListener by lazy {
         object : UtteranceProgressListener() {
@@ -66,7 +68,7 @@ class ReadAloudStateHolder(
     val title: StateFlow<String> = _title.asStateFlow()
 
     fun readAloud(title: String, fullText: String) {
-        val textArray = fullText.split("\n", ". ")
+        val textArray = fullText.split(*PUNCTUATION)
         for (text in textArray) {
             if (text.isBlank()) {
                 continue
@@ -81,50 +83,63 @@ class ReadAloudStateHolder(
     fun play() {
         startJob?.cancel()
         startJob = coroutineScope.launch {
-            if (textToSpeech == null) {
-                initializedState = null
-                textToSpeech = TextToSpeech(
-                    context,
-                    this@ReadAloudStateHolder
-                )
-            }
-            while (initializedState == null) {
-                Log.d(LOG_TAG, "Delaying a little")
-                delay(100)
-            }
-            if (initializedState != TextToSpeech.SUCCESS) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        context,
-                        R.string.failed_to_load_text_to_speech,
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                }
+            if (mutex.isLocked) {
+                // Oops, I was double clicked
                 return@launch
             }
-            _readAloudState.value = PlaybackStatus.PLAYING
-            // Can only set this once engine has been initialized
-            textToSpeech?.setOnUtteranceProgressListener(speechListener)
-            for ((utteranceId, text) in textToSpeechQueue) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, null, utteranceId)
-                } else {
-                    val params = HashMap<String, String>()
-                    params[KEY_PARAM_UTTERANCE_ID] = utteranceId
-                    @Suppress("DEPRECATION")
-                    textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, params)
+            mutex.withLock {
+                if (textToSpeech == null) {
+                    initializedState = null
+                    textToSpeech = TextToSpeech(
+                        context,
+                        this@ReadAloudStateHolder
+                    )
+                }
+                while (initializedState == null) {
+                    Log.d(LOG_TAG, "Delaying a little")
+                    delay(100)
+                }
+                if (initializedState != TextToSpeech.SUCCESS) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            R.string.failed_to_load_text_to_speech,
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                    return@launch
+                }
+                _readAloudState.value = PlaybackStatus.PLAYING
+                // Can only set this once engine has been initialized
+                textToSpeech?.setOnUtteranceProgressListener(speechListener)
+                try {
+                    for ((utteranceId, text) in textToSpeechQueue) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, null, utteranceId)
+                        } else {
+                            val params = HashMap<String, String>()
+                            params[KEY_PARAM_UTTERANCE_ID] = utteranceId
+                            @Suppress("DEPRECATION")
+                            textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, params)
+                        }
+                    }
+                } catch (e: ConcurrentModificationException) {
+                    Log.e("FeederReadAloudState", "User probably double clicked play", e)
+                    // State will be weird. But mutex should prevent it happening
                 }
             }
         }
     }
 
     fun pause() {
+        startJob?.cancel()
         textToSpeech?.stop()
         _readAloudState.value = PlaybackStatus.PAUSED
     }
 
     fun stop() {
+        startJob?.cancel()
         textToSpeech?.stop()
         textToSpeechQueue.clear()
         _readAloudState.value = PlaybackStatus.STOPPED
@@ -161,6 +176,60 @@ class ReadAloudStateHolder(
 
     companion object {
         private const val LOG_TAG = "FeederTextToSpeech"
+        private val PUNCTUATION = arrayOf(
+            // New-lines
+            "\n",
+            // Very useful: https://unicodelookup.com/
+            // Full stop
+            ".",
+            "։",
+            "۔",
+            "܁",
+            "܂",
+            "。",
+            "︒",
+            "﹒",
+            "．",
+            "｡",
+            // Question mark
+            "?",
+            ";",
+            "՞",
+            "؟",
+            "⁇",
+            "⁈",
+            "⁉",
+            "︖",
+            "﹖",
+            "？",
+            // Exclamation mark
+            "!",
+            "՜",
+            "‼",
+            "︕",
+            "﹗",
+            "！",
+            // Colon and semi-colon
+            ":",
+            ";",
+            "؛",
+            "︓",
+            "︔",
+            "﹔",
+            "﹕",
+            "：",
+            "；",
+            // Ellipsis
+            "...",
+            "…",
+            "⋯",
+            "⋮",
+            "︙",
+            // Dash
+            "—",
+            "〜",
+            "〰",
+        )
     }
 }
 

@@ -9,6 +9,4 @@ fun getPlainTextOfHtmlStream(
 ): String? =
     Jsoup.parse(inputStream, null, baseUrl)
         ?.body()
-        ?.let { body ->
-            body.text()
-        }
+        ?.text()
