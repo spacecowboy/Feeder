@@ -140,4 +140,18 @@
     <string name="failed_to_import_OPML">Falha ao importar OPML</string>
     <string name="failed_to_export_OPML">Falha ao exportar OPML</string>
     <string name="failed_to_open_article">Não foi possível abrir o artigo</string>
+    <string name="this_device">%1$s (este dispositivo)</string>
+    <string name="device_sync_financed_by_community">Este serviço é pago pela comunidade. Por favor, considere doar se achar útil.</string>
+    <string name="disconnect_device_from_sync">Desconectar dispositivo da cadeia de sincronização</string>
+    <string name="add_new_device">Adicionar novo dispositivo</string>
+    <string name="devices_on_sync_chain">Dispositivos na cadeia de sincronização</string>
+    <string name="remove_device">Remover dispositivo</string>
+    <string name="remove_device_question">Tem certeza de que deseja excluir o dispositivo %1$s\?</string>
+    <string name="device_sync">Sincronização do dispositivo</string>
+    <string name="press_scan_sync">No seu dispositivo, navegue até sincronização do dispositivo e pressione escanear código de sincronização.</string>
+    <string name="or_open_device_sync_link">Como alternativa, abra o link no seu dispositivo.</string>
+    <string name="treat_like_password">Trate isso como uma senha. Qualquer um pode ler seus dados sincronizados se tiver o link.</string>
+    <string name="qr_code">QR Code</string>
+    <string name="feeder_device_sync_code">Código de sincronização do dispositivo do Feeder</string>
+    <string name="leave_sync_chain">Sair da cadeia de sincronização</string>
 </resources>
