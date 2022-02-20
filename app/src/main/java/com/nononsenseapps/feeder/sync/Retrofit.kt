@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.sync
 import android.util.Log
 import com.nononsenseapps.feeder.db.room.SyncRemote
 import java.net.URL
+import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -17,9 +18,18 @@ fun getFeederSyncClient(
     val retrofit = Retrofit.Builder()
         .client(
             okHttpClient.newBuilder()
+                // Auth only used to prevent automatic scanning of the API
                 .addInterceptor { chain ->
-                    // TODO add authentication header - hardcoded but just so you can't map the API
-                    // without also reading the source code
+                    chain.proceed(
+                        chain.request().newBuilder()
+                            .header(
+                                "Authorization",
+                                Credentials.basic(HARDCODED_USER, HARDCODED_PASSWORD)
+                            )
+                            .build()
+                    )
+                }
+                .addInterceptor { chain ->
                     val response = chain.proceed(chain.request())
                     val isCachedResponse =
                         response.cacheResponse != null && (response.networkResponse == null || response.networkResponse?.code == 304)
@@ -27,17 +37,16 @@ fun getFeederSyncClient(
                         "FEEDER_SYNC_CLIENT",
                         "Response cached: $isCachedResponse, ${response.networkResponse?.code}, cache-Control: ${response.cacheControl}"
                     )
-//                    Log.v(
-//                        "FEEDER_SYNC_CLIENT",
-//                        "${response.headers}"
-//                    )
                     response
                 }
                 .build()
         )
-        .baseUrl(URL(syncRemote.url, "/api/"))
+        .baseUrl(URL(syncRemote.url, "/api/v1/"))
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
 
     return retrofit.create()
 }
+
+private const val HARDCODED_USER = "feeder_user"
+private const val HARDCODED_PASSWORD = "feeder_secret_1234"
