@@ -1,3 +1,75 @@
+# 2.1.0
+Agnieszka C (3):
+  * [c68321b8] Updated Polish translation using Weblate
+
+Andrij Mizyk (3):
+  * [c32113b2] Updated Ukrainian translation using Weblate
+
+ERYpTION (3):
+  * [06039102] Updated Danish translation using Weblate
+
+El Pirujo (3):
+  * [2f615a19] Updated Spanish translation using Weblate
+
+Eric (3):
+  * [a5277f50] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (3):
+  * [81011919] Updated Italian translation using Weblate
+
+Jonas Kalderstam (19):
+  * [24c0c8fd] Implemented multi device sync
+  * [211b1281] Fixed spaces getting replaced by + in feed titles
+  * [4cfd9e2e] Fixed incorrect bundling of notifications and sync
+         notification
+  * [96cd9754] Added setting for swiping to mark as read
+  * [154ad356] Fixed summary notification not getting cleared
+  * [416bb580] Changed all header sizes inside articles to be the same size
+  * [16ef3dc5] Fixed OPML export file lacking .opml suffix
+  * [211bcf43] Fixed Play store locale code for Danish
+  * [231293f4] Updated Swedish translation using Weblate
+  * [1f6a35cc] Added confirmation dialog for leaving sync chain
+  * [b084f454] Added message if barcode scanner could not be opened
+  * [c7e01269] Updated Swedish translation using Weblate
+  * [6364a49b] Fixed navigation bar obscuring UI in landscape
+  * [be6f312d] Improved read aloud by splitting text on more punctuation
+  * [f2f5fcfe] Fixed crash in case Play button in Read Aloud was double
+         clicked
+  * [cbe64e8b] Updated sync code to match server side updates
+
+Meiru (3):
+  * [c3a00180] Updated Japanese translation using Weblate
+
+Nikita Epifanov (2):
+  * [f0fb62af] Updated Russian translation using Weblate
+
+Oğuz Ersen (3):
+  * [84a47963] Updated Turkish translation using Weblate
+
+Simona Iacob (2):
+  * [9b00f1d3] Updated Romanian translation using Weblate
+
+THANOS SIOURDAKIS (1):
+  * [004c6444] Updated Greek translation using Weblate
+
+Tadeáš Erban (2):
+  * [dc307594] Updated Czech translation using Weblate
+
+VfBFan (4):
+  * [6541d7c1] Updated German translation using Weblate
+
+Vitor Henrique (2):
+  * [5aca1d6e] Updated Portuguese (Brazil) translation using Weblate
+
+mm4c (3):
+  * [292e58fa] Updated Dutch translation using Weblate
+
+zmni (1):
+  * [496f8abc] Updated Indonesian translation using Weblate
+
+Éfrit (1):
+  * [5959c512] Updated French translation using Weblate
+
 # 2.1.0-beta.1
 Jonas Kalderstam (1):
   * [24c0c8fd] Implemented multi device sync
