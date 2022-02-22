@@ -147,11 +147,22 @@
     <string name="devices_on_sync_chain">Dispositivos na cadeia de sincronização</string>
     <string name="remove_device">Remover dispositivo</string>
     <string name="remove_device_question">Tem certeza de que deseja excluir o dispositivo %1$s\?</string>
-    <string name="device_sync">Sincronização do dispositivo</string>
-    <string name="press_scan_sync">No seu dispositivo, navegue até sincronização do dispositivo e pressione escanear código de sincronização.</string>
-    <string name="or_open_device_sync_link">Como alternativa, abra o link no seu dispositivo.</string>
+    <string name="device_sync">Sincronização de dispositivos</string>
+    <string name="press_scan_sync">No seu dispositivo, navegue até sincronização de dispositivos e pressione escanear código de sincronização.</string>
+    <string name="or_open_device_sync_link">Alternativamente, abra o link no seu dispositivo.</string>
     <string name="treat_like_password">Trate isso como uma senha. Qualquer um pode ler seus dados sincronizados se tiver o link.</string>
     <string name="qr_code">QR Code</string>
-    <string name="feeder_device_sync_code">Código de sincronização do dispositivo do Feeder</string>
+    <string name="feeder_device_sync_code">Código de sincronização de dispositivos do Feeder</string>
     <string name="leave_sync_chain">Sair da cadeia de sincronização</string>
+    <string name="secret_key">Chave secreta</string>
+    <string name="join_sync_chain">Juntar-se à cadeia de sincronização</string>
+    <string name="disabled">Desativado</string>
+    <string name="swipe_to_mark_as_read">Deslize para marcar como lido</string>
+    <string name="are_you_sure_leave_sync_chain">Quer mesmo sair da cadeia de sincronização\?</string>
+    <string name="no_barcode_scanner_installed">Não foi possível encontrar um leitor de código de barras</string>
+    <string name="device_sync_description_1">A sincronização de dispositivos permite a sincronização das inscrições dos feeds e artigos lidos entre seus vários dispositivos.</string>
+    <string name="device_sync_description_2">Simplesmente escaneie o código da sua cadeia de sincronização que você criou em outro dispositivo ou inicie uma nova cadeia.</string>
+    <string name="scan_or_enter_code">Escaneie ou insira o código de sincornização</string>
+    <string name="start_new_sync_chain">Iniciar nova cadeia de sincronização</string>
+    <string name="sync_code">Código de sincronização</string>
 </resources>
