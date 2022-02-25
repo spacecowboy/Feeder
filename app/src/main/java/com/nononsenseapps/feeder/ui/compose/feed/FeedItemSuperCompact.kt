@@ -6,12 +6,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -19,7 +17,6 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -30,11 +27,10 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.*
-import java.util.*
-import org.threeten.bp.ZonedDateTime
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -46,6 +42,7 @@ fun FeedItemSuperCompact(
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
+    onTogglePinned: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
 ) {
@@ -65,7 +62,7 @@ fun FeedItemSuperCompact(
                 .requiredHeightIn(min = minimumTouchSize)
                 .padding(vertical = 4.dp)
         ) {
-            val titleAlpha = if (item.unread) {
+            val titleAlpha = if (item.shouldBeShownAsUnread) {
                 ContentAlpha.high
             } else {
                 ContentAlpha.medium
@@ -108,6 +105,21 @@ fun FeedItemSuperCompact(
                     expanded = dropDownMenuExpanded,
                     onDismissRequest = onDismissDropdown
                 ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            onDismissDropdown()
+                            onTogglePinned()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(
+                                when (item.pinned) {
+                                    true -> R.string.unpin_article
+                                    false -> R.string.pin_article
+                                }
+                            )
+                        )
+                    }
                     DropdownMenuItem(
                         onClick = {
                             onDismissDropdown()
@@ -162,13 +174,15 @@ private fun preview() {
             unread = true,
             imageUrl = null,
             link = null,
-            id = ID_UNSET
+            id = ID_UNSET,
+            pinned = false,
         ),
         showThumbnail = true,
         imagePainter = {},
         onMarkAboveAsRead = {},
         onMarkBelowAsRead = {},
         onShareItem = {},
+        onTogglePinned = {},
         dropDownMenuExpanded = false,
         onDismissDropdown = {}
     )

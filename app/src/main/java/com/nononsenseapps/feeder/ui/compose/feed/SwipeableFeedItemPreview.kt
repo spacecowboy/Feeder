@@ -76,6 +76,7 @@ fun SwipeableFeedItemPreview(
     imagePainter: @Composable (String) -> Unit,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
+    onTogglePinned: () -> Unit,
     onShareItem: () -> Unit,
     onItemClick: () -> Unit,
 ) {
@@ -138,6 +139,9 @@ fun SwipeableFeedItemPreview(
         mutableStateOf(false)
     }
 
+    val toggleReadStatusLabel = stringResource(R.string.toggle_read_status)
+    val pinArticleLabel = stringResource(R.string.pin_article)
+    val unpinArticleLabel = stringResource(R.string.unpin_article)
     val markAboveAsReadLabel = stringResource(R.string.mark_items_above_as_read)
     val markBelowAsReadLabel = stringResource(R.string.mark_items_below_as_read)
     val shareLabel = stringResource(R.string.share)
@@ -174,10 +178,19 @@ fun SwipeableFeedItemPreview(
                     try {
                         stateDescription = readStatusLabel
                         customActions = listOf(
-                            CustomAccessibilityAction("toggle read status") {
+                            CustomAccessibilityAction(toggleReadStatusLabel) {
                                 coroutineScope.launch {
                                     onSwipe()
                                 }
+                                true
+                            },
+                            CustomAccessibilityAction(
+                                when (item.pinned) {
+                                    true -> unpinArticleLabel
+                                    false -> pinArticleLabel
+                                }
+                            ) {
+                                onTogglePinned()
                                 true
                             },
                             CustomAccessibilityAction(markAboveAsReadLabel) {
@@ -236,6 +249,7 @@ fun SwipeableFeedItemPreview(
                         onShareItem = onShareItem,
                         dropDownMenuExpanded = dropDownMenuExpanded,
                         onDismissDropdown = { dropDownMenuExpanded = false },
+                        onTogglePinned = onTogglePinned,
                         modifier = Modifier
                             .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                     )
@@ -250,6 +264,7 @@ fun SwipeableFeedItemPreview(
                         onShareItem = onShareItem,
                         dropDownMenuExpanded = dropDownMenuExpanded,
                         onDismissDropdown = { dropDownMenuExpanded = false },
+                        onTogglePinned = onTogglePinned,
                         modifier = Modifier
                             .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                     )
@@ -264,6 +279,7 @@ fun SwipeableFeedItemPreview(
                         onShareItem = onShareItem,
                         dropDownMenuExpanded = dropDownMenuExpanded,
                         onDismissDropdown = { dropDownMenuExpanded = false },
+                        onTogglePinned = onTogglePinned,
                         modifier = Modifier
                             .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                     )
@@ -274,7 +290,7 @@ fun SwipeableFeedItemPreview(
             // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
             // It's very important that clickable stuff is handled by its parent - or a direct child
             // Wrapped in an outer box to get the height set properly
-            if (swipeAsRead != SwipeAsRead.DISABLED) {
+            if (swipeAsRead != SwipeAsRead.DISABLED && !item.pinned) {
                 Box(
                     modifier = Modifier
                         .matchParentSize()

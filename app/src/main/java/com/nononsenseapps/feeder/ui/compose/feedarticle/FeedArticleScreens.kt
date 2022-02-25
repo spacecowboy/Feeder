@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
@@ -285,6 +286,12 @@ fun FeedArticleScreen(
         onNavigateUpFromArticle = {
             viewModel.setArticleOpen(false)
         },
+        onToggleCurrentArticlePinned = {
+            viewModel.setPinned(viewState.articleId, !viewState.isPinned)
+        },
+        onSetPinned = { itemId, value ->
+            viewModel.setPinned(itemId, value)
+        },
         feedListState = feedListState,
         articleListState = articleListState,
         pagedFeedItems = pagedFeedItems,
@@ -331,6 +338,8 @@ private fun FeedArticleScreen(
     onOpenInCustomTab: () -> Unit,
     onFeedTitleClick: () -> Unit,
     onNavigateUpFromArticle: () -> Unit,
+    onToggleCurrentArticlePinned: () -> Unit,
+    onSetPinned: (Long, Boolean) -> Unit,
     feedListState: LazyListState,
     articleListState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
@@ -377,6 +386,8 @@ private fun FeedArticleScreen(
                 onFeedTitleClick = onFeedTitleClick,
                 pagedFeedItems = pagedFeedItems,
                 scaffoldState = scaffoldState,
+                onToggleCurrentArticlePinned = onToggleCurrentArticlePinned,
+                onSetPinned = onSetPinned,
             )
         }
         FeedArticleScreenType.Feed -> {
@@ -408,6 +419,7 @@ private fun FeedArticleScreen(
                 markBeforeAsRead = markBeforeAsRead,
                 markAfterAsRead = markAfterAsRead,
                 onOpenFeedItem = onOpenFeedItem,
+                onSetPinned = onSetPinned,
                 feedListState = feedListState,
                 pagedFeedItems = pagedFeedItems,
                 scaffoldState = scaffoldState,
@@ -428,6 +440,7 @@ private fun FeedArticleScreen(
                 readAloudOnPlay = readAloudOnPlay,
                 readAloudOnPause = readAloudOnPause,
                 readAloudOnStop = readAloudOnStop,
+                onTogglePinned = onToggleCurrentArticlePinned,
                 articleListState = articleListState,
                 scaffoldState = scaffoldState,
             )
@@ -471,6 +484,8 @@ fun FeedWithArticleScreen(
     onFeedTitleClick: () -> Unit,
     onToggleFullText: () -> Unit,
     displayFullText: () -> Unit,
+    onToggleCurrentArticlePinned: () -> Unit,
+    onSetPinned: (Long, Boolean) -> Unit,
     feedListState: LazyListState,
     articleListState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
@@ -638,6 +653,27 @@ fun FeedWithArticleScreen(
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
+                            onToggleCurrentArticlePinned()
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.PushPin,
+                            contentDescription = null,
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            stringResource(
+                                if (viewState.isPinned) {
+                                    R.string.unpin_article
+                                } else {
+                                    R.string.pin_article
+                                }
+                            )
+                        )
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            onShowToolbarMenu(false)
                             readAloudOnPlay()
                         }
                     ) {
@@ -718,6 +754,7 @@ fun FeedWithArticleScreen(
                 markAfterAsRead = markAfterAsRead,
                 onItemClick = onOpenFeedItem,
                 listState = feedListState,
+                onSetPinned = onSetPinned,
                 pagedFeedItems = pagedFeedItems,
                 modifier = Modifier
                     .width(334.dp)
@@ -771,6 +808,7 @@ fun FeedListScreen(
     markBeforeAsRead: (Int) -> Unit,
     markAfterAsRead: (Int) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
+    onSetPinned: (Long, Boolean) -> Unit,
     feedListState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
     scaffoldState: ScaffoldState,
@@ -959,6 +997,7 @@ fun FeedListScreen(
             markAfterAsRead = markAfterAsRead,
             onItemClick = onOpenFeedItem,
             listState = feedListState,
+            onSetPinned = onSetPinned,
             pagedFeedItems = pagedFeedItems,
             modifier = modifier,
         )
@@ -979,6 +1018,7 @@ fun ArticleScreen(
     readAloudOnPlay: () -> Unit,
     readAloudOnPause: () -> Unit,
     readAloudOnStop: () -> Unit,
+    onTogglePinned: () -> Unit,
     scaffoldState: ScaffoldState,
     articleListState: LazyListState,
     onNavigateUp: () -> Unit,
@@ -1067,6 +1107,27 @@ fun ArticleScreen(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(stringResource(id = R.string.mark_as_unread))
+                            }
+                            DropdownMenuItem(
+                                onClick = {
+                                    onShowToolbarMenu(false)
+                                    onTogglePinned()
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Default.PushPin,
+                                    contentDescription = null,
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    stringResource(
+                                        if (viewState.isPinned) {
+                                            R.string.unpin_article
+                                        } else {
+                                            R.string.pin_article
+                                        }
+                                    )
+                                )
                             }
                             DropdownMenuItem(
                                 onClick = {

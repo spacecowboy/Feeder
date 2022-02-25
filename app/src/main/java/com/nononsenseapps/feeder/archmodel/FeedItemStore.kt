@@ -107,16 +107,16 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.markAsRead(itemId, unread)
     }
 
+    suspend fun setPinned(itemId: Long, pinned: Boolean) {
+        dao.setPinned(itemId, pinned)
+    }
+
     suspend fun getFullTextByDefault(itemId: Long): Boolean {
         return dao.getFullTextByDefault(itemId) ?: false
     }
 
     fun getFeedItem(itemId: Long): Flow<FeedItemWithFeed?> {
         return dao.loadFeedItemFlow(itemId)
-    }
-
-    suspend fun getFeedItemWithFeed(itemId: Long): FeedItemWithFeed? {
-        return dao.getFeedItem(itemId)
     }
 
     suspend fun getFeedItemId(feedUrl: URL, articleGuid: String): Long? {
@@ -362,4 +362,5 @@ private fun PreviewItem.toFeedListItem() =
         pubDate = pubDate?.toLocalDate()?.format(shortDateTimeFormat) ?: "",
         imageUrl = imageUrl,
         link = link,
+        pinned = pinned,
     )
