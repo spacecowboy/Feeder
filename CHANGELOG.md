@@ -1,3 +1,22 @@
+# 2.1.1
+Julian Chu (1):
+  * [95ea703a] Updated Chinese (Traditional) translation using Weblate
+
+Meiru (1):
+  * [69437712] Updated Japanese translation using Weblate
+
+Simona Iacob (1):
+  * [99636a46] Updated Romanian translation using Weblate
+
+Vitor Henrique (1):
+  * [9a14699f] Updated Portuguese (Brazil) translation using Weblate
+
+bruh (1):
+  * [f2c70991] Updated Vietnamese translation using Weblate
+
+mm4c (1):
+  * [6fe26dc0] Updated Dutch translation using Weblate
+
 # 2.1.0
 Jonas Kalderstam (19):
   * [24c0c8fd] Implemented multi device sync
