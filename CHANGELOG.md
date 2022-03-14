@@ -1,3 +1,10 @@
+# 2.1.2
+Jonas Kalderstam (1):
+  * [d06407a5] Fixed broken test
+
+mm4c (1):
+  * [c7a09365] Updated Dutch translation using Weblate
+
 # 2.1.1
 Julian Chu (1):
   * [95ea703a] Updated Chinese (Traditional) translation using Weblate
