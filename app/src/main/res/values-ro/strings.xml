@@ -165,4 +165,6 @@
     <string name="only_from_end">Doar de la capăt</string>
     <string name="from_anywhere">De oriunde</string>
     <string name="swipe_to_mark_as_read">Glisați pentru a marca ca citit</string>
+    <string name="are_you_sure_leave_sync_chain">Ești sigur că vrei să părăsești lanțul de sincronizare\?</string>
+    <string name="no_barcode_scanner_installed">Nu a putut găsi un cititor de coduri de bare</string>
 </resources>
