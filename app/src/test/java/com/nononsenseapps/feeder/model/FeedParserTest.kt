@@ -625,6 +625,7 @@ class FeedParserTest : DIAware {
 
     @Test
     @Throws(Exception::class)
+    @Ignore
     fun cowboyAuthenticated() {
         runBlocking {
             val feed =
