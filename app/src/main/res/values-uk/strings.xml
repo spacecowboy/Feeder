@@ -124,7 +124,7 @@
     <string name="url">URL-адреса</string>
     <string name="title_activity_edit_feed">Підписатися на стрічку</string>
     <string name="add_feed">Додати стрічку</string>
-    <string name="action_settings">Налаштування</string>
+    <string name="action_settings">Параметри</string>
     <string name="feed_item_style_super_compact">Дуже компактний</string>
     <string name="feed_item_style_compact">Компактний</string>
     <string name="feed_item_style_card">Картка</string>
