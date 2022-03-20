@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="empty_feed_top">Hier valt niets te lezen. Wil je …</string>
-    <string name="navigation_drawer_open">Navigatielade openen</string>
-    <string name="navigation_drawer_close">Navigatielade sluiten</string>
+    <string name="navigation_drawer_open">Navigatiemenu openen</string>
+    <string name="navigation_drawer_close">Navigatiemenu sluiten</string>
     <string name="action_settings">Instellingen</string>
     <string name="add_feed">Feed toevoegen</string>
     <string name="tag">Label</string>
