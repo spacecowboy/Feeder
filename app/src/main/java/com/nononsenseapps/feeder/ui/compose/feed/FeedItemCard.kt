@@ -25,7 +25,11 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.*
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
 @Composable
 fun FeedItemCard(
@@ -36,12 +40,18 @@ fun FeedItemCard(
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
+    onTogglePinned: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
 ) {
     Card(
         modifier = modifier
-            .padding(top = 8.dp, bottom = 8.dp, start = LocalDimens.current.margin, end = LocalDimens.current.margin)
+            .padding(
+                top = 8.dp,
+                bottom = 8.dp,
+                start = LocalDimens.current.margin,
+                end = LocalDimens.current.margin
+            )
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -53,7 +63,7 @@ fun FeedItemCard(
                     imagePainter(imageUrl)
                 }
             }
-            val titleAlpha = if (item.unread) {
+            val titleAlpha = if (item.shouldBeShownAsUnread) {
                 ContentAlpha.high
             } else {
                 ContentAlpha.medium
@@ -96,6 +106,21 @@ fun FeedItemCard(
                     expanded = dropDownMenuExpanded,
                     onDismissRequest = onDismissDropdown
                 ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            onDismissDropdown()
+                            onTogglePinned()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(
+                                when (item.pinned) {
+                                    true -> R.string.unpin_article
+                                    false -> R.string.pin_article
+                                }
+                            )
+                        )
+                    }
                     DropdownMenuItem(
                         onClick = {
                             onDismissDropdown()
@@ -154,13 +179,15 @@ private fun preview() {
             unread = true,
             imageUrl = null,
             link = null,
-            id = ID_UNSET
+            id = ID_UNSET,
+            pinned = false,
         ),
         showThumbnail = true,
         imagePainter = {},
         onMarkAboveAsRead = {},
         onMarkBelowAsRead = {},
         onShareItem = {},
+        onTogglePinned = {},
         dropDownMenuExpanded = false,
         onDismissDropdown = {}
     )

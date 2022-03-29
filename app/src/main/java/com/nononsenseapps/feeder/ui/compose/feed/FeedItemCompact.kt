@@ -28,7 +28,11 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.*
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import java.util.*
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
@@ -46,7 +50,8 @@ fun FeedItemCompact(
     modifier: Modifier = Modifier,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
-    onShareItem : () -> Unit,
+    onShareItem: () -> Unit,
+    onTogglePinned: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
 ) {
@@ -66,7 +71,7 @@ fun FeedItemCompact(
                 .requiredHeightIn(min = minimumTouchSize)
                 .padding(vertical = 4.dp)
         ) {
-            val titleAlpha = if (item.unread) {
+            val titleAlpha = if (item.shouldBeShownAsUnread) {
                 ContentAlpha.high
             } else {
                 ContentAlpha.medium
@@ -109,6 +114,21 @@ fun FeedItemCompact(
                     expanded = dropDownMenuExpanded,
                     onDismissRequest = onDismissDropdown
                 ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            onDismissDropdown()
+                            onTogglePinned()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(
+                                when (item.pinned) {
+                                    true -> R.string.unpin_article
+                                    false -> R.string.pin_article
+                                }
+                            )
+                        )
+                    }
                     DropdownMenuItem(
                         onClick = {
                             onDismissDropdown()
@@ -173,13 +193,15 @@ private fun preview() {
             unread = true,
             imageUrl = null,
             link = null,
-            id = ID_UNSET
+            id = ID_UNSET,
+            pinned = false,
         ),
         showThumbnail = true,
         imagePainter = {},
         onMarkAboveAsRead = {},
         onMarkBelowAsRead = {},
         onShareItem = {},
+        onTogglePinned = {},
         dropDownMenuExpanded = false,
         onDismissDropdown = {}
     )
@@ -195,4 +217,11 @@ data class FeedListItem(
     val pubDate: String,
     val imageUrl: String?,
     val link: String?,
-)
+    val pinned: Boolean,
+) {
+    val shouldBeShownAsUnread: Boolean
+        get() = unread || pinned
+
+    val notPinned: Boolean
+        get() = !pinned
+}

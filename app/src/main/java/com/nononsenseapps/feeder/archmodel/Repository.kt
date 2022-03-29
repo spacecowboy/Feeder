@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import org.jsoup.helper.Validate.fail
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -210,6 +211,7 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun saveFeed(feed: Feed): Long = feedStore.saveFeed(feed)
 
+    suspend fun setPinned(itemId: Long, pinned: Boolean) = feedItemStore.setPinned(itemId = itemId, pinned = pinned)
     suspend fun markAsNotified(itemIds: List<Long>) = feedItemStore.markAsNotified(itemIds)
     suspend fun markAsReadAndNotified(itemId: Long) = feedItemStore.markAsReadAndNotified(itemId)
     suspend fun markAsUnread(itemId: Long, unread: Boolean = true) =
@@ -469,6 +471,7 @@ data class Article(
     val pubDate: ZonedDateTime? = item?.pubDate
     val feedId: Long = item?.feedId ?: ID_UNSET
     val feedUrl: String? = item?.feedUrl?.toString()
+    val pinned: Boolean = item?.pinned ?: throw Exception("null!")
 }
 
 enum class TextToDisplay {

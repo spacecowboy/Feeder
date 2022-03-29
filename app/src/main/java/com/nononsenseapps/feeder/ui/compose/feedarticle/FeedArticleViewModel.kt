@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -115,6 +116,10 @@ class FeedArticleViewModel(
 
     fun markAsReadAndNotified(itemId: Long) = viewModelScope.launch {
         repository.markAsReadAndNotified(itemId)
+    }
+
+    fun setPinned(itemId: Long, pinned: Boolean) = viewModelScope.launch {
+        repository.setPinned(itemId, pinned)
     }
 
     fun requestImmediateSyncOfCurrentFeedOrTag() {
@@ -252,6 +257,8 @@ class FeedArticleViewModel(
             @Suppress("UNCHECKED_CAST")
             val haveVisibleFeedItems = (params[9] as Int) > 0
 
+            Log.d("JONAS", "Flow pinned ${article.pinned}")
+
             @Suppress("UNCHECKED_CAST")
             FeedArticleScreenViewState(
                 onlyUnread = params[0] as Boolean,
@@ -285,6 +292,7 @@ class FeedArticleViewModel(
                 articleId = article.id,
                 isArticleOpen = params[14] as Boolean,
                 swipeAsRead = params[20] as SwipeAsRead,
+                isPinned = article.pinned
             )
         }
             .stateIn(
@@ -423,6 +431,7 @@ interface ArticleScreenViewState {
     val articleTitle: String
     val showToolbarMenu: Boolean
     val feedDisplayTitle: String
+    val isPinned: Boolean
 }
 
 @Immutable
@@ -460,6 +469,7 @@ data class FeedArticleScreenViewState(
     override val feedDisplayTitle: String = "",
     override val articleId: Long = ID_UNSET,
     override val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
+    override val isPinned: Boolean = false,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState
 
