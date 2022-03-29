@@ -1,3 +1,19 @@
+# 2.1.3
+Andrij Mizyk (1):
+  * [059041bc] Updated Ukrainian translation using Weblate
+
+J. Lavoie (1):
+  * [474462cb] Updated French translation using Weblate
+
+Jonas Kalderstam (1):
+  * [4bc528b7] Added ability to pin an article to top of the feed
+
+Julian Chu (1):
+  * [d69a0490] Updated Chinese (Traditional) translation using Weblate
+
+mm4c (1):
+  * [9a91d313] Updated Dutch translation using Weblate
+
 # 2.1.2
 Jonas Kalderstam (1):
   * [d06407a5] Fixed broken test
