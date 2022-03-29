@@ -167,4 +167,6 @@
     <string name="only_from_end">Tylko od prawej strony</string>
     <string name="are_you_sure_leave_sync_chain">Czy na pewno chcesz opuścić łańcuch synchronizacji\?</string>
     <string name="no_barcode_scanner_installed">Nie udało się znaleźć skanera kodów kreskowych</string>
+    <string name="pin_article">Przypnij artykuł</string>
+    <string name="unpin_article">Odepnij artykuł</string>
 </resources>
