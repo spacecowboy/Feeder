@@ -470,7 +470,7 @@ data class Article(
     val pubDate: ZonedDateTime? = item?.pubDate
     val feedId: Long = item?.feedId ?: ID_UNSET
     val feedUrl: String? = item?.feedUrl?.toString()
-    val pinned: Boolean = item?.pinned ?: throw Exception("null!")
+    val pinned: Boolean = item?.pinned ?: false
 }
 
 enum class TextToDisplay {
