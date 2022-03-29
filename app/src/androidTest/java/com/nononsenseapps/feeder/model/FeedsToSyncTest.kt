@@ -6,13 +6,13 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
 import com.nononsenseapps.feeder.util.minusMinutes
+import java.net.URL
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.threeten.bp.Instant
-import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
 class FeedsToSyncTest {
@@ -96,7 +96,11 @@ class FeedsToSyncTest {
         assertEquals(listOf(items[1]), result)
     }
 
-    private suspend fun withFeed(lastSync: Instant = Instant.ofEpochMilli(0), url: URL = URL("http://url"), tag: String = ""): Feed {
+    private suspend fun withFeed(
+        lastSync: Instant = Instant.ofEpochMilli(0),
+        url: URL = URL("http://url"),
+        tag: String = ""
+    ): Feed {
         val feed = Feed(
             lastSync = lastSync,
             url = url,

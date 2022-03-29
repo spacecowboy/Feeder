@@ -1,6 +1,5 @@
 package com.nononsenseapps.jsonfeed
 
-import okhttp3.OkHttpClient
 import java.security.KeyManagementException
 import java.security.NoSuchAlgorithmException
 import java.security.cert.X509Certificate
@@ -8,6 +7,7 @@ import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
+import okhttp3.OkHttpClient
 
 fun OkHttpClient.Builder.trustAllCerts() {
     try {

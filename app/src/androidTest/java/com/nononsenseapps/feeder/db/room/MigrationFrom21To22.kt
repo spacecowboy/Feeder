@@ -5,10 +5,7 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,7 +30,7 @@ class MigrationFrom21To22 {
                 """
                 INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash, fulltext_by_default, open_articles_with, alternate_id, currently_syncing)
                 VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666, 0, '', 0, 0)
-            """.trimIndent()
+                """.trimIndent()
             )
             oldDB.execSQL(
                 """

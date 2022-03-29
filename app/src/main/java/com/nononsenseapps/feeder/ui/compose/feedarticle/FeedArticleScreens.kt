@@ -554,7 +554,6 @@ fun FeedWithArticleScreen(
                 )
             }
 
-
             Box {
                 IconButton(onClick = { onShowToolbarMenu(true) }) {
                     Icon(
@@ -1195,9 +1194,9 @@ fun ArticleContent(
 
     val context = LocalContext.current
 
-    if (viewState.articleId > ID_UNSET
-        && viewState.textToDisplay == TextToDisplay.FULLTEXT
-        && !blobFullFile(viewState.articleId, context.filesDir).isFile
+    if (viewState.articleId > ID_UNSET &&
+        viewState.textToDisplay == TextToDisplay.FULLTEXT &&
+        !blobFullFile(viewState.articleId, context.filesDir).isFile
     ) {
         LaunchedEffect(viewState.articleId, viewState.textToDisplay) {
             // Trigger parse and fetch

@@ -22,7 +22,7 @@ fun withDI(builder: DI.MainBuilder.() -> Unit, content: @Composable () -> Unit):
  */
 @Composable
 fun withDI(vararg diModules: DI.Module, content: @Composable () -> Unit): Unit =
-    CompositionLocalProvider(LocalDI provides DI { importAll(*diModules)}) { content() }
+    CompositionLocalProvider(LocalDI provides DI { importAll(*diModules) }) { content() }
 
 /**
  * Attaches a [DI] container to the underlying [Composable] tree

@@ -16,5 +16,4 @@ class FeedScreenMenuRobot(
 
         return SearchFeedScreenRobot(testRule).apply { block() }
     }
-
 }

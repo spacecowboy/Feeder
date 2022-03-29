@@ -345,7 +345,6 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
                         }
                     }
                 }
-
             })
             .build()
     } else {

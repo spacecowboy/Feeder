@@ -30,7 +30,7 @@ class MigrationFrom19To20 {
                 """
                 INSERT INTO sync_remote(id, url, sync_chain_id, latest_message_timestamp)
                 VALUES (1, '', '', 0)
-            """.trimIndent()
+                """.trimIndent()
             )
         }
 

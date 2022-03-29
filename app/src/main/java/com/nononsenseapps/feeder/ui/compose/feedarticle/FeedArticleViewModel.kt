@@ -472,4 +472,3 @@ data class FeedArticleScreenViewState(
     override val isPinned: Boolean = false,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState
-

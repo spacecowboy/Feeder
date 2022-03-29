@@ -5,9 +5,9 @@ import androidx.room.Ignore
 import com.nononsenseapps.feeder.db.COL_PINNED
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
-import org.threeten.bp.ZonedDateTime
 import java.net.URI
 import java.net.URL
+import org.threeten.bp.ZonedDateTime
 
 const val previewColumns = """
     feed_items.id AS id, guid, plain_title, plain_snippet, feed_items.image_url, enclosure_link,

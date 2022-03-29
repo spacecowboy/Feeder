@@ -56,10 +56,10 @@ object AesCbcWithIntegrity {
     private const val PBE_SALT_LENGTH_BITS = AES_KEY_LENGTH_BITS // same size as key output
     private const val PBE_ALGORITHM = "PBKDF2WithHmacSHA1"
 
-    //Made BASE_64_FLAGS public as it's useful to know for compatibility.
+    // Made BASE_64_FLAGS public as it's useful to know for compatibility.
     const val BASE64_FLAGS = Base64.NO_WRAP
 
-    //default for testing
+    // default for testing
     private const val HMAC_ALGORITHM = "HmacSHA256"
     private const val HMAC_KEY_LENGTH_BITS = 256
 
@@ -128,8 +128,8 @@ object AesCbcWithIntegrity {
         keyGen.init(AES_KEY_LENGTH_BITS)
         val confidentialityKey = keyGen.generateKey()
 
-        //Now make the HMAC key
-        val integrityKeyBytes = randomBytes(HMAC_KEY_LENGTH_BITS / 8) //to get bytes
+        // Now make the HMAC key
+        val integrityKeyBytes = randomBytes(HMAC_KEY_LENGTH_BITS / 8) // to get bytes
         val integrityKey: SecretKey = SecretKeySpec(integrityKeyBytes, HMAC_ALGORITHM)
         return SecretKeys(confidentialityKey, integrityKey)
     }
@@ -146,7 +146,7 @@ object AesCbcWithIntegrity {
      */
     @Throws(GeneralSecurityException::class)
     fun generateKeyFromPassword(password: String, salt: ByteArray): SecretKeys {
-        //Get enough random bytes for both the AES key and the HMAC key:
+        // Get enough random bytes for both the AES key and the HMAC key:
         val keySpec: KeySpec = PBEKeySpec(
             password.toCharArray(),
             salt,
@@ -163,10 +163,10 @@ object AesCbcWithIntegrity {
             AES_KEY_LENGTH_BITS / 8 + HMAC_KEY_LENGTH_BITS / 8
         )
 
-        //Generate the AES key
+        // Generate the AES key
         val confidentialityKey: SecretKey = SecretKeySpec(confidentialityKeyBytes, CIPHER)
 
-        //Generate the HMAC key
+        // Generate the HMAC key
         val integrityKey: SecretKey = SecretKeySpec(integrityKeyBytes, HMAC_ALGORITHM)
         return SecretKeys(confidentialityKey, integrityKey)
     }
@@ -382,7 +382,7 @@ object AesCbcWithIntegrity {
      */
     @Throws(NoSuchAlgorithmException::class, InvalidKeyException::class)
     fun generateMac(byteCipherText: ByteArray, integrityKey: SecretKey): ByteArray {
-        //Now compute the mac for later integrity checking
+        // Now compute the mac for later integrity checking
         val sha256HMAC = Mac.getInstance(HMAC_ALGORITHM)
         sha256HMAC.init(integrityKey)
         return sha256HMAC.doFinal(byteCipherText)
@@ -419,14 +419,16 @@ class SecretKeys(
      * @return base64(confidentialityKey):base64(integrityKey)
      */
     override fun toString(): String {
-        return (Base64.encodeToString(
-            confidentialityKey.encoded,
-            AesCbcWithIntegrity.BASE64_FLAGS
-        )
-                + ":" + Base64.encodeToString(
-            integrityKey.encoded,
-            AesCbcWithIntegrity.BASE64_FLAGS
-        ))
+        return (
+            Base64.encodeToString(
+                confidentialityKey.encoded,
+                AesCbcWithIntegrity.BASE64_FLAGS
+            ) +
+                ":" + Base64.encodeToString(
+                integrityKey.encoded,
+                AesCbcWithIntegrity.BASE64_FLAGS
+            )
+            )
     }
 
     override fun hashCode(): Int {

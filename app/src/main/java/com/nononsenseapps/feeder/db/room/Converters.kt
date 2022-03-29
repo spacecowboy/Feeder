@@ -2,9 +2,9 @@ package com.nononsenseapps.feeder.db.room
 
 import androidx.room.TypeConverter
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
+import java.net.URL
 import org.threeten.bp.Instant
 import org.threeten.bp.ZonedDateTime
-import java.net.URL
 
 class Converters {
 

@@ -2,9 +2,7 @@ package com.nononsenseapps.feeder.ui
 
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.archmodel.Repository
-import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -21,5 +19,4 @@ class OpenLinkInDefaultActivityViewModel(di: DI) : DIAwareViewModel(di) {
     suspend fun markAsReadAndNotified(itemId: Long) {
         repository.markAsReadAndNotified(itemId)
     }
-
 }

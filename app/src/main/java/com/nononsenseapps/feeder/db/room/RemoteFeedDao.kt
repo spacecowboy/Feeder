@@ -31,7 +31,7 @@ interface RemoteFeedDao {
         """
     )
     suspend fun deleteAllRemoteFeeds()
-    
+
     @Transaction
     suspend fun replaceRemoteFeedsWith(remoteFeeds: List<RemoteFeed>) {
         deleteAllRemoteFeeds()

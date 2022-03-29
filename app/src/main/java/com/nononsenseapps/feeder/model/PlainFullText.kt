@@ -1,7 +1,7 @@
 package com.nononsenseapps.feeder.model
 
-import org.jsoup.Jsoup
 import java.io.InputStream
+import org.jsoup.Jsoup
 
 fun getPlainTextOfHtmlStream(
     inputStream: InputStream,

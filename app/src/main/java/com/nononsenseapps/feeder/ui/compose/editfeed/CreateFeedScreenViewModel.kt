@@ -103,8 +103,7 @@ class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : D
                 _notify.asFlow(),
                 _articleOpener.asFlow(),
                 _alternateId.asFlow(),
-            )
-            { params: Array<Any> ->
+            ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 EditFeedViewState(
                     allTags = params[0] as List<String>,

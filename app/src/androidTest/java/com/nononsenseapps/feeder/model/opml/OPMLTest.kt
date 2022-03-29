@@ -8,6 +8,10 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
+import java.io.File
+import java.io.IOException
+import java.net.URL
+import java.util.ArrayList
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -17,10 +21,6 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.File
-import java.io.IOException
-import java.net.URL
-import java.util.ArrayList
 
 private val sampleFile: List<String> = """<?xml version="1.0" encoding="UTF-8"?>
         |<opml version="1.1">
@@ -45,7 +45,8 @@ private val sampleFile: List<String> = """<?xml version="1.0" encoding="UTF-8"?>
         |      <outline title="custom &quot;8&quot;" text="custom &quot;8&quot;" type="rss" xmlUrl="http://somedomain8.com/rss.xml"/>
         |    </outline>
         |  </body>
-        |</opml>""".trimMargin().split("\n")
+        |</opml>
+""".trimMargin().split("\n")
 
 @RunWith(AndroidJUnit4::class)
 class OPMLTest {

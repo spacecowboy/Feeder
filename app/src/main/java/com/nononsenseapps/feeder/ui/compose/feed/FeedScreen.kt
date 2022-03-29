@@ -235,9 +235,10 @@ fun FeedListContent(
                                     modifier = Modifier
                                         .run {
                                             when (viewState.feedItemStyle) {
-                                                FeedItemStyle.CARD -> this
-                                                    .fillMaxWidth()
-                                                    .aspectRatio(16.0f / 9.0f)
+                                                FeedItemStyle.CARD ->
+                                                    this
+                                                        .fillMaxWidth()
+                                                        .aspectRatio(16.0f / 9.0f)
                                                 FeedItemStyle.COMPACT,
                                                 FeedItemStyle.SUPER_COMPACT,
                                                 -> this

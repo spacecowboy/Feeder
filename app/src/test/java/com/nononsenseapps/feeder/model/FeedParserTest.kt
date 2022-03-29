@@ -4,7 +4,6 @@ import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.jsonfeed.Author
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import java.io.BufferedReader
-import java.io.InputStream
 import java.net.URL
 import kotlin.test.Ignore
 import kotlin.test.assertEquals

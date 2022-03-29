@@ -6,11 +6,9 @@ import android.content.Intent.ACTION_SENDTO
 import android.content.Intent.ACTION_VIEW
 import android.content.Intent.EXTRA_EMAIL
 import android.content.Intent.EXTRA_SUBJECT
-import android.content.Intent.EXTRA_TEXT
 import android.net.Uri
 import android.os.Build
 import com.nononsenseapps.feeder.BuildConfig
-import com.nononsenseapps.feeder.R
 
 internal fun emailSubject(): String = "Bug report for Feeder"
 

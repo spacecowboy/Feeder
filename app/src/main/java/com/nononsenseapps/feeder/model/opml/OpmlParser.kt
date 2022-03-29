@@ -3,6 +3,10 @@ package com.nononsenseapps.feeder.model.opml
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.OPMLParserToDatabase
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.util.Stack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.ccil.cowan.tagsoup.Parser
@@ -11,10 +15,6 @@ import org.xml.sax.ContentHandler
 import org.xml.sax.InputSource
 import org.xml.sax.Locator
 import org.xml.sax.SAXException
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.util.Stack
 
 class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
 

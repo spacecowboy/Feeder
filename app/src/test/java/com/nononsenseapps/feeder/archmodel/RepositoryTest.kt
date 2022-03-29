@@ -123,7 +123,6 @@ class RepositoryTest : DIAware {
             }
         )
 
-
         assertEquals(
             TextToDisplay.DEFAULT,
             runBlocking {
@@ -166,7 +165,6 @@ class RepositoryTest : DIAware {
         coVerify {
             feedItemStore.markAllAsReadInFeed(5L)
         }
-
     }
 
     @Test
@@ -239,7 +237,6 @@ class RepositoryTest : DIAware {
         verify {
             androidSystemStore.removeDynamicShortcuts(listOf(1, 2))
         }
-
     }
 
     @Test

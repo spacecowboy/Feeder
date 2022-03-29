@@ -412,8 +412,8 @@ class RssLocalSyncKtTest {
         // Compare ID to compare insertion order (and thus pubdate compared to raw feed)
         assertTrue("The pubDates' magnitude should match descending iteration order") {
             items[0].guid == "https://foo.bar/1" &&
-                    items[1].guid == "https://foo.bar/2" &&
-                    items[0].pubDate!! > items[1].pubDate!!
+                items[1].guid == "https://foo.bar/2" &&
+                items[0].pubDate!! > items[1].pubDate!!
         }
     }
 
@@ -567,17 +567,17 @@ class RssLocalSyncKtTest {
                 <title>Foo Feed</title>
                 <link>https://foo.bar</link>
                 ${
-            (1..itemsCount).map {
-                """
+        (1..itemsCount).map {
+            """
                 <item>
                   <title>Foo Item $it</title>
                   <link>https://foo.bar/$it</link>
                   <description>Woop woop $it</description>
                 </item>
             """.trimIndent()
-            }.fold("") { acc, s ->
-                "$acc\n$s"
-            }
+        }.fold("") { acc, s ->
+            "$acc\n$s"
+        }
         }
                 </channel>
                 </rss>

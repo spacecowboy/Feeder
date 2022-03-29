@@ -159,7 +159,7 @@ object MIGRATION_20_21 : Migration(20, 21) {
                     UPDATE sync_remote
                     SET secret_key = ?
                     WHERE id IS 1
-                """.trimIndent(),
+            """.trimIndent(),
             arrayOf(AesCbcWithIntegrity.generateKey().toString())
         )
     }

@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
 

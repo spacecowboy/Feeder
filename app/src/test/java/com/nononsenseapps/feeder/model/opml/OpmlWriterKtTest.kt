@@ -1,12 +1,12 @@
 package com.nononsenseapps.feeder.model.opml
 
 import com.nononsenseapps.feeder.db.room.Feed
-import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.net.URL
 import java.util.ArrayList
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class OpmlWriterKtTest {
     @Test

@@ -93,7 +93,7 @@ private fun LazyListScope.formatBody(
             // ClickableText prevents taps from deselecting selected text
             // So use regular Text if possible
             if (paragraph.getStringAnnotations("URL", 0, paragraph.length)
-                    .isNotEmpty()
+                .isNotEmpty()
             ) {
                 ClickableText(
                     text = paragraph,
@@ -197,7 +197,6 @@ private fun TextComposer.appendTextChildren(
                                 append(trimmed)
                             }
                         }
-
                     } else {
                         node.text().let { text ->
                             if (text.isNotEmpty()) {

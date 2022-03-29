@@ -9,7 +9,6 @@ import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
 import io.mockk.MockKAnnotations
-import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -155,18 +154,24 @@ class FeedStoreTest : DIAware {
 
     @Test
     fun getFeedTitles() {
-        every { dao.getFeedTitlesWithId(5L) } returns flowOf(listOf(
-            FeedTitle(5L, "fejd")
-        ))
-        every { dao.getFeedTitlesWithTag("foo") } returns flowOf(listOf(
-            FeedTitle(5L, "fejd"),
-            FeedTitle(7L, "axv")
-        ))
-        every { dao.getAllFeedTitles() } returns flowOf(listOf(
-            FeedTitle(5L, "fejd"),
-            FeedTitle(7L, "axv"),
-            FeedTitle(8L, "zzz")
-        ))
+        every { dao.getFeedTitlesWithId(5L) } returns flowOf(
+            listOf(
+                FeedTitle(5L, "fejd")
+            )
+        )
+        every { dao.getFeedTitlesWithTag("foo") } returns flowOf(
+            listOf(
+                FeedTitle(5L, "fejd"),
+                FeedTitle(7L, "axv")
+            )
+        )
+        every { dao.getAllFeedTitles() } returns flowOf(
+            listOf(
+                FeedTitle(5L, "fejd"),
+                FeedTitle(7L, "axv"),
+                FeedTitle(8L, "zzz")
+            )
+        )
 
         assertEquals(
             listOf(FeedTitle(5L, "fejd")),

@@ -110,10 +110,10 @@ fun SwipeableFeedItemPreview(
     }
 
     if (
-        onlyUnread
-        && animatedVisibilityState.isIdle
-        && animatedVisibilityState.currentState != item.unread
-        && swipeableState.currentValue != FeedItemSwipeState.NONE
+        onlyUnread &&
+        animatedVisibilityState.isIdle &&
+        animatedVisibilityState.currentState != item.unread &&
+        swipeableState.currentValue != FeedItemSwipeState.NONE
     ) {
         LaunchedEffect(key1 = animatedVisibilityState.currentState, key2 = item.unread) {
             if (animatedVisibilityState.currentState != item.unread) {
@@ -286,7 +286,6 @@ fun SwipeableFeedItemPreview(
                 }
             }
 
-
             // This box handles swiping - it uses padding to allow the nav drawer to still be dragged
             // It's very important that clickable stuff is handled by its parent - or a direct child
             // Wrapped in an outer box to get the height set properly
@@ -301,9 +300,10 @@ fun SwipeableFeedItemPreview(
                             .run {
                                 when (swipeAsRead) {
                                     // This never actually gets called due to outer if
-                                    SwipeAsRead.DISABLED -> this
-                                        .height(0.dp)
-                                        .width(0.dp)
+                                    SwipeAsRead.DISABLED ->
+                                        this
+                                            .height(0.dp)
+                                            .width(0.dp)
                                     SwipeAsRead.ONLY_FROM_END -> {
                                         anchors[-maxWidthPx] = FeedItemSwipeState.LEFT
                                         this

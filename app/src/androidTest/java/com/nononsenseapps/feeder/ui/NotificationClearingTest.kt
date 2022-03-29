@@ -8,6 +8,7 @@ import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.model.RssNotificationBroadcastReceiver
 import com.nononsenseapps.feeder.model.getDeleteIntent
 import com.nononsenseapps.feeder.model.notify
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -17,7 +18,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.net.URL
 
 @RunWith(AndroidJUnit4::class)
 class NotificationClearingTest {

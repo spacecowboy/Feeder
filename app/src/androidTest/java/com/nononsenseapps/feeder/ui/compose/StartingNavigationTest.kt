@@ -10,7 +10,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.kodein.di.compose.withDI
 
-class StartingNavigationTest: BaseComposeTest {
+class StartingNavigationTest : BaseComposeTest {
 
     @get:Rule
     override val composeTestRule = createAndroidComposeRule<MainActivity>()

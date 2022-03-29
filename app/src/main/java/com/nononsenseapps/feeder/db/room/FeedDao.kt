@@ -12,8 +12,8 @@ import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.model.FeedUnreadCount
-import kotlinx.coroutines.flow.Flow
 import java.net.URL
+import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.Instant
 
 @Dao

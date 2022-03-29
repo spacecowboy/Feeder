@@ -189,13 +189,13 @@ data class EditFeedViewState(
     val alternateId: Boolean = false,
 ) {
     val isOpenItemWithBrowser: Boolean
-        get() = articleOpener==PREF_VAL_OPEN_WITH_BROWSER
+        get() = articleOpener == PREF_VAL_OPEN_WITH_BROWSER
 
     val isOpenItemWithCustomTab: Boolean
-        get() = articleOpener==PREF_VAL_OPEN_WITH_CUSTOM_TAB
+        get() = articleOpener == PREF_VAL_OPEN_WITH_CUSTOM_TAB
 
     val isOpenItemWithReader: Boolean
-        get() = articleOpener==PREF_VAL_OPEN_WITH_READER
+        get() = articleOpener == PREF_VAL_OPEN_WITH_READER
 
     val isOpenItemWithAppDefault: Boolean
         get() = when (articleOpener) {

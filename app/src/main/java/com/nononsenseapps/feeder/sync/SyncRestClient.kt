@@ -95,9 +95,9 @@ class SyncRestClient(override val di: DI) : DIAware {
                     if (value == null) {
                         secretKey = null
                         feederSync = null
-                    } else if (lastValue?.url != value.url
-                        || lastValue?.syncChainId != value.syncChainId
-                        || lastValue?.secretKey != value.secretKey
+                    } else if (lastValue?.url != value.url ||
+                        lastValue?.syncChainId != value.syncChainId ||
+                        lastValue?.secretKey != value.secretKey
                     ) {
                         Log.v(LOG_TAG, "runForever: new client")
                         secretKey = AesCbcWithIntegrity.decodeKey(value.secretKey)
@@ -109,9 +109,9 @@ class SyncRestClient(override val di: DI) : DIAware {
                         syncRemote = value
                     }
 
-                    if (value == null
-                        || lastValue?.url != value.url
-                        || value.syncChainId.length != 64
+                    if (value == null ||
+                        lastValue?.url != value.url ||
+                        value.syncChainId.length != 64
                     ) {
                         Log.v(
                             LOG_TAG,
@@ -169,7 +169,6 @@ class SyncRestClient(override val di: DI) : DIAware {
                 }
         }
     }
-
 
     fun stopForeverJob() {
         Log.v(LOG_TAG, "stopForeverJob")
@@ -458,7 +457,6 @@ class SyncRestClient(override val di: DI) : DIAware {
                     }
                 }
             }
-
         }
 
         repository.replaceRemoteFeedsWith(

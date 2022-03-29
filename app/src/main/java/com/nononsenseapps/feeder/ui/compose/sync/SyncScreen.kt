@@ -992,7 +992,6 @@ fun PreviewDeviceList() {
     }
 }
 
-
 @Preview("Add New Device Phone")
 @Preview("Add New Device Small Tablet", device = Devices.NEXUS_7_2013)
 @Composable

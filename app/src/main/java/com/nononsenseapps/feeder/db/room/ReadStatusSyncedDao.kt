@@ -11,7 +11,6 @@ import com.nononsenseapps.feeder.db.COL_FEEDURL
 import com.nononsenseapps.feeder.db.COL_GUID
 import com.nononsenseapps.feeder.db.COL_ID
 import kotlinx.coroutines.flow.Flow
-import org.threeten.bp.Instant
 
 @Dao
 interface ReadStatusSyncedDao {

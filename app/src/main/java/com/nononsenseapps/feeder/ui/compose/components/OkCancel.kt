@@ -1,9 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.components
 
 import android.R
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,12 +16,10 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsHeight
-import com.google.accompanist.insets.navigationBarsPadding
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
 @Composable
@@ -36,24 +32,24 @@ fun OkCancelWithContent(
 ) {
     val scrollState = rememberScrollState()
 
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
-                .fillMaxWidth()
-                .verticalScroll(scrollState)
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            content()
-            Spacer(modifier = Modifier.height(24.dp))
-            OkCancelButtons(
-                onOk = onOk,
-                onCancel = onCancel,
-                okEnabled = okEnabled,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            Spacer(modifier = Modifier.navigationBarsHeight())
-        }
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(scrollState)
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        content()
+        Spacer(modifier = Modifier.height(24.dp))
+        OkCancelButtons(
+            onOk = onOk,
+            onCancel = onCancel,
+            okEnabled = okEnabled,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        Spacer(modifier = Modifier.navigationBarsHeight())
+    }
 }
 
 @Composable

@@ -40,7 +40,6 @@ import org.threeten.bp.format.FormatStyle
 val shortDateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FeedItemCompact(

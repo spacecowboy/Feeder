@@ -25,7 +25,6 @@ configurations.all {
     }
 }
 
-
 dependencies {
     val kotlin_version: String by project
     val okhttp_version: String by project

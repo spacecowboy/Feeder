@@ -1,8 +1,8 @@
 package com.nononsenseapps.feeder.util
 
-import org.junit.Test
 import java.net.URL
 import kotlin.test.assertEquals
+import org.junit.Test
 
 class LinkUtilsKtTest {
     @Test

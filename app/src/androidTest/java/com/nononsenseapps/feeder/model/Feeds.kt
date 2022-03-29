@@ -12,11 +12,13 @@ class Feeds {
         val cowboyJson: String
             get() = String(
                 javaClass.getResourceAsStream("cowboyprogrammer_feed.json")!!
-                    .use { it.readBytes() })
+                    .use { it.readBytes() }
+            )
 
         val cowboyAtom: String
             get() = String(
-                javaClass.getResourceAsStream("cowboyprogrammer_atom.xml")!!.use { it.readBytes() })
+                javaClass.getResourceAsStream("cowboyprogrammer_atom.xml")!!.use { it.readBytes() }
+            )
 
         /**
          * Reported in https://gitlab.com/spacecowboy/Feeder/-/issues/410

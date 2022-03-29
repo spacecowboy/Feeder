@@ -39,11 +39,11 @@ sealed class NavigationDestination(
 
     init {
         val completePath = (
-                listOf(path) + navArguments.asSequence()
-                    .filterIsInstance<PathParamArgument>()
-                    .map { "{${it.name}}" }
-                    .toList()
-                ).joinToString(separator = "/")
+            listOf(path) + navArguments.asSequence()
+                .filterIsInstance<PathParamArgument>()
+                .map { "{${it.name}}" }
+                .toList()
+            ).joinToString(separator = "/")
 
         val queryParams = navArguments.asSequence()
             .filterIsInstance<QueryParamArgument>()
@@ -161,7 +161,7 @@ object AddFeedDestination : NavigationDestination(
             +("feedTitle" to feedTitle)
         }
 
-        navController.navigate("$path/${feedUrl.urlEncode()}${params}")
+        navController.navigate("$path/${feedUrl.urlEncode()}$params")
     }
 
     @Composable
@@ -305,7 +305,7 @@ object FeedDestination : NavigationDestination(
             +("tag" to tag)
         }
 
-        navController.navigate("$path${params}")
+        navController.navigate("$path$params")
     }
 
     @Composable
@@ -395,7 +395,7 @@ object SyncScreenDestination : NavigationDestination(
             }
         }
 
-        navController.navigate("$path${params}")
+        navController.navigate("$path$params")
     }
 
     @Composable

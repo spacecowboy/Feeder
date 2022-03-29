@@ -14,6 +14,6 @@ data class FeedItemForReadMark @Ignore constructor(
     @ColumnInfo(name = COL_FEEDID) override var feedId: Long = ID_UNSET,
     @ColumnInfo(name = COL_GUID) override var guid: String = "",
     @ColumnInfo(name = COL_FEEDURL) override var feedUrl: URL = sloppyLinkToStrictURL(""),
-): ReadStatusFeedItem {
+) : ReadStatusFeedItem {
     constructor() : this(id = ID_UNSET)
 }

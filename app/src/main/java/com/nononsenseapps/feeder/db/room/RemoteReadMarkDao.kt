@@ -8,7 +8,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.nononsenseapps.feeder.db.COL_ID
-import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.Instant
 
 @Dao

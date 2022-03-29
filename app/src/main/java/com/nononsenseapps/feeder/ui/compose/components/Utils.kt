@@ -15,4 +15,3 @@ fun Modifier.safeSemantics(
             // Bug in framework? This can be null in any case
         }
     }
-

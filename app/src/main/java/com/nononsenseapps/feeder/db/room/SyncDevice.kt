@@ -33,4 +33,3 @@ data class SyncDevice @Ignore constructor(
 ) {
     constructor() : this(id = ID_UNSET)
 }
-

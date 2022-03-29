@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
-import org.jsoup.helper.Validate.fail
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance

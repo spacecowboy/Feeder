@@ -1,5 +1,8 @@
 package com.nononsenseapps.feeder.ui.text
 
+import java.io.IOException
+import java.io.StringReader
+import java.util.Stack
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.ccil.cowan.tagsoup.Parser
 import org.xml.sax.Attributes
@@ -9,9 +12,6 @@ import org.xml.sax.Locator
 import org.xml.sax.SAXException
 import org.xml.sax.SAXNotRecognizedException
 import org.xml.sax.SAXNotSupportedException
-import java.io.IOException
-import java.io.StringReader
-import java.util.Stack
 
 @Suppress("UNUSED_PARAMETER")
 /**

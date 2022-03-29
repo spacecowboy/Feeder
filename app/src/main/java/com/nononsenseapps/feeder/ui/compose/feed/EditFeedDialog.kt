@@ -92,7 +92,7 @@ fun EditFeedDialog2(
                                 onEdit(feed.id)
                                 onDismiss()
                             },
-                            modifier = Modifier.clearAndSetSemantics {  }
+                            modifier = Modifier.clearAndSetSemantics { }
                         )
                         Spacer(modifier = Modifier.width(32.dp))
                         Text(

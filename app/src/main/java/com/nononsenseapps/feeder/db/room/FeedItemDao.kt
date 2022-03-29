@@ -8,14 +8,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.nononsenseapps.feeder.db.COL_ID
-import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
-import kotlinx.coroutines.flow.Flow
 import java.net.URL
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FeedItemDao {
@@ -480,7 +478,12 @@ interface FeedItemDao {
             )
         """
     )
-    suspend fun markAsReadDesc(feedId: Long, onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+    suspend fun markAsReadDesc(
+        feedId: Long,
+        onlyUnread: Int,
+        limit: Int = Int.MAX_VALUE,
+        offset: Int
+    )
 
     @Query(
         """
@@ -494,7 +497,12 @@ interface FeedItemDao {
             )
         """
     )
-    suspend fun markAsReadAsc(feedId: Long, onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+    suspend fun markAsReadAsc(
+        feedId: Long,
+        onlyUnread: Int,
+        limit: Int = Int.MAX_VALUE,
+        offset: Int
+    )
 
     @Query(
         """
@@ -509,7 +517,12 @@ interface FeedItemDao {
             )
         """
     )
-    suspend fun markAsReadDesc(tag: String, onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+    suspend fun markAsReadDesc(
+        tag: String,
+        onlyUnread: Int,
+        limit: Int = Int.MAX_VALUE,
+        offset: Int
+    )
 
     @Query(
         """
@@ -592,7 +605,7 @@ interface FeedItemDao {
     )
     fun getFeedItemCount(feedId: Long): Flow<Int>
 
-    ////
+    // //
 
     @Query(
         """

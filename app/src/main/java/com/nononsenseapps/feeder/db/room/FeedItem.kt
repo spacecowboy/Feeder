@@ -28,11 +28,11 @@ import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.jsonfeed.Item
+import java.net.URI
+import java.net.URL
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
-import java.net.URI
-import java.net.URL
 
 const val MAX_TITLE_LENGTH = 200
 const val MAX_SNIPPET_LENGTH = 200
@@ -75,7 +75,11 @@ data class FeedItem @Ignore constructor(
 
     constructor() : this(id = ID_UNSET)
 
-    fun updateFromParsedEntry(entry: Item, entryGuid: String, feed: com.nononsenseapps.jsonfeed.Feed) {
+    fun updateFromParsedEntry(
+        entry: Item,
+        entryGuid: String,
+        feed: com.nononsenseapps.jsonfeed.Feed
+    ) {
         val converter = HtmlToPlainTextConverter()
         // Be careful about nulls.
         val text = entry.content_html ?: entry.content_text ?: ""

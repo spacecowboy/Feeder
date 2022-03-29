@@ -1,8 +1,7 @@
 package com.nononsenseapps.feeder.ui
 
-
-//@Ignore("Activity rewritten in compose")
-//class OpenLinkInDefaultActivityTest {
+// @Ignore("Activity rewritten in compose")
+// class OpenLinkInDefaultActivityTest {
 //    @get:Rule
 //    val activityTestRule = ActivityTestRule(OpenLinkInDefaultActivity::class.java, false, false)
 //
@@ -123,4 +122,4 @@ package com.nononsenseapps.feeder.ui
 //            assertEquals(expected, item)
 //        }
 //    }
-//}
+// }

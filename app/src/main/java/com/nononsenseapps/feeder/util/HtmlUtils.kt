@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.util
 
-import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -10,7 +9,6 @@ import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.browser.customtabs.CustomTabsIntent
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.model.FeederService
 
 // Using negative lookahead to skip data: urls, being inline base64
 // And capturing original quote to use as ending quote

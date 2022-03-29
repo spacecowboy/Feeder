@@ -1,8 +1,8 @@
 package com.nononsenseapps.feeder.util
 
-import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import org.junit.Test
 
 class HtmlUtilsKtTest {
     @Test
