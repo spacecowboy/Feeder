@@ -167,4 +167,6 @@
     <string name="only_from_end">Solo dalla fine</string>
     <string name="no_barcode_scanner_installed">Impossibile trovare uno scanner di codici a barre</string>
     <string name="are_you_sure_leave_sync_chain">Sei sicuro/a di voler lasciare la catena di sincronizzazione\?</string>
+    <string name="pin_article">Appunta l\'articolo</string>
+    <string name="unpin_article">Rimuovi l\'articolo</string>
 </resources>

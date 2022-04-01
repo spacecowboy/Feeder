@@ -167,4 +167,6 @@
     <string name="from_anywhere">Von überall</string>
     <string name="are_you_sure_leave_sync_chain">Möchten Sie die Synchronisierungskette wirklich verlassen\?</string>
     <string name="no_barcode_scanner_installed">Konnte keinen Barcode-Scanner finden</string>
+    <string name="pin_article">Artikel anheften</string>
+    <string name="unpin_article">Artikel loslösen</string>
 </resources>

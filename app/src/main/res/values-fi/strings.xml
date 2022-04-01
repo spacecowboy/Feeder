@@ -59,7 +59,7 @@
     <string name="image_loading">Kuvien lataaminen</string>
     <string name="no_activity_for_link">Ei löydetty aktiviteettiä, jolla tämä linkki avattaisiin</string>
     <string name="check_for_updates">Uusia artikkeleita etsitään…</string>
-    <string name="on_startup">Käynnistyksen yhteydessä</string>
+    <string name="on_startup">Sovelluksen käynnistyessä</string>
     <string name="show_fab">Kelluva toimintopainike</string>
     <string name="include_mobile_hotspots">Sisällytä mobiili hotspotit</string>
     <string name="updated_feeds">Päivitetyt syötteet</string>
@@ -76,7 +76,7 @@
     <string name="open_in_web_view">Avaa Web-näkymässä</string>
     <string name="max_feed_items">Syötteen sisällön raja</string>
     <string name="could_not_load_url">URL-osoitetta ei voitu ladata</string>
-    <string name="theme_system">Noudata järjestelmän teemaa</string>
+    <string name="theme_system">Järjestelmä</string>
     <string name="theme_automatic">Automaattinen</string>
     <string name="theme_day">Päivä</string>
     <string name="theme_night">Yö</string>
@@ -94,8 +94,8 @@
     <string name="discovered_feeds_list">Löydettyjen syötteiden luettelo</string>
     <string name="toggle_tag_expansion">Vaihda tagin laajennustilaa</string>
     <string name="battery_optimization">Akun optimointi</string>
-    <string name="battery_optimization_disabled">Akun optimointi pois käytöstä</string>
-    <string name="battery_optimization_enabled">Akun optimointi käytössä</string>
+    <string name="battery_optimization_disabled">Pois käytöstä</string>
+    <string name="battery_optimization_enabled">Käytössä</string>
     <string name="preload_custom_tab">Esilataa mukautettu välilehti</string>
     <string name="failed_to_load_text_to_speech">Tekstiä puheeksi -ohjelman lataaminen epäonnistui</string>
     <string name="fetching_full_article">Koko artikkelia haetaan…</string>
@@ -144,4 +144,6 @@
     <string name="secret_key">Salainen avain</string>
     <string name="join_sync_chain">Liity synkronointiketjuun</string>
     <string name="no_barcode_scanner_installed">Viivakoodiskanneria ei löytynyt</string>
+    <string name="pin_article">Kiinnitä artikkeli</string>
+    <string name="unpin_article">Poista artikkelin kiinnitys</string>
 </resources>
