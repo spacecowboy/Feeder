@@ -30,7 +30,7 @@
     <string name="resume_reading">Lezen hervatten</string>
     <string name="pause_reading">Lezen onderbreken</string>
     <string name="export_feeds_to_opml">Feeds als OPML exporteren</string>
-    <string name="share">Delen</string>
+    <string name="share">Artikel delen</string>
     <string name="view_debug_log">Debug log bekijken</string>
     <string name="new_based_on_this">Nieuw op basis hiervan</string>
     <string name="indicator_for_mark_as_read">Indicator om als gelezen te markeren</string>
@@ -40,7 +40,7 @@
     <string name="sync_option_every_hour">Elk uur</string>
     <string name="sync_option_every_day">Dagelijks</string>
     <string name="all_feeds">Alle feeds</string>
-    <string name="sync_option_manually">Met de hand</string>
+    <string name="sync_option_manually">Handmatig</string>
     <string name="sync_option_every_3_hours">Elke 3 uur</string>
     <string name="sync_option_every_6_hours">Elke 6 uur</string>
     <string name="sync_option_every_12_hours">Elke 12 uur</string>
@@ -124,9 +124,9 @@
     <string name="theme_automatic">Auto</string>
     <string name="theme_night">Donker</string>
     <string name="theme_system">Systeem</string>
-    <string name="mark_items_above_as_read">Markeer bovenstaande als gelezen</string>
+    <string name="mark_items_above_as_read">Artikelen hierboven als gelezen markeren</string>
     <string name="no_email_client">Kon geen e-mail client openen</string>
-    <string name="mark_items_below_as_read">Markeer onderstaande als gelezen</string>
+    <string name="mark_items_below_as_read">Artikelen hieronder als gelezen markeren</string>
     <string name="battery_optimization">Batterijoptimalisatie</string>
     <string name="open_menu">Menu openen</string>
     <string name="go_to_feed">Ga naar %1$s</string>
@@ -167,4 +167,6 @@
     <string name="only_from_end">Alleen vanaf het einde</string>
     <string name="are_you_sure_leave_sync_chain">Sync-keten inderdaad verlaten\?</string>
     <string name="no_barcode_scanner_installed">Geen barcodescanner gevonden</string>
+    <string name="unpin_article">Artikel losmaken</string>
+    <string name="pin_article">Artikel vastzetten</string>
 </resources>
