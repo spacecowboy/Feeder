@@ -99,7 +99,11 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
 
     fun removeDevice(deviceId: Long) {
         viewModelScope.launch {
-            syncClient.removeDevice(deviceId = deviceId)
+            try {
+                syncClient.removeDevice(deviceId = deviceId)
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Error when removing device", e)
+            }
         }
     }
 
