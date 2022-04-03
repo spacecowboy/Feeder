@@ -76,9 +76,11 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
         if (block != null) {
             syncRemote?.let { syncRemote ->
-                feederSync?.let { feederSync ->
-                    secretKey?.let { secretKey ->
-                        block(syncRemote, feederSync, secretKey)
+                if (syncRemote.hasSyncChain()) {
+                    feederSync?.let { feederSync ->
+                        secretKey?.let { secretKey ->
+                            block(syncRemote, feederSync, secretKey)
+                        }
                     }
                 }
             }
@@ -111,7 +113,7 @@ class SyncRestClient(override val di: DI) : DIAware {
 
                     if (value == null ||
                         lastValue?.url != value.url ||
-                        value.syncChainId.length != 64
+                        value.notHasSyncChain()
                     ) {
                         Log.v(
                             LOG_TAG,

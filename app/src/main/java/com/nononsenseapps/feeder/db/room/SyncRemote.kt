@@ -36,6 +36,9 @@ data class SyncRemote @Ignore constructor(
     @ColumnInfo(name = COL_LAST_FEEDS_REMOTE_HASH) var lastFeedsRemoteHash: Int = 0,
 ) {
     constructor() : this(id = ID_UNSET)
+
+    fun hasSyncChain(): Boolean = syncChainId.length == 64
+    fun notHasSyncChain() = !hasSyncChain()
 }
 
 private const val DEFAULT_SERVER_HOST = "feederapp.nononsenseapps.com"
