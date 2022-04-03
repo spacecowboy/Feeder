@@ -167,4 +167,6 @@
     <string name="swipe_to_mark_as_read">Balayer pour marquer comme lu</string>
     <string name="are_you_sure_leave_sync_chain">Voulez-vous vraiment quitter la chaîne de synchronisation \?</string>
     <string name="no_barcode_scanner_installed">Impossible de trouver un scanneur de codes-barres</string>
+    <string name="pin_article">Épingler l\'article</string>
+    <string name="unpin_article">Désépingler l\'article</string>
 </resources>

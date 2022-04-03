@@ -167,4 +167,6 @@
     <string name="leave_sync_chain">同期チェーンを終了</string>
     <string name="join_sync_chain">同期チェーンを始める</string>
     <string name="only_from_end">端からのみ</string>
+    <string name="unpin_article">記事のピン留め解除</string>
+    <string name="pin_article">記事をピン留めする</string>
 </resources>
