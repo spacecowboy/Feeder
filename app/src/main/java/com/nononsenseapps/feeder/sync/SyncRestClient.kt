@@ -6,11 +6,14 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
 import com.nononsenseapps.feeder.crypto.SecretKeys
+import com.nononsenseapps.feeder.db.room.DEFAULT_SERVER_ADDRESS
+import com.nononsenseapps.feeder.db.room.DEPRECATED_SYNC_HOSTS
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItemForReadMark
 import com.nononsenseapps.feeder.db.room.RemoteFeed
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -50,6 +53,15 @@ class SyncRestClient(override val di: DI) : DIAware {
                 if (isNotInitialized) {
                     try {
                         syncRemote = repository.getSyncRemote()
+                        if (DEPRECATED_SYNC_HOSTS.any { host -> host in "${syncRemote?.url}" }) {
+                            Log.v(LOG_TAG, "Updating to latest sync host: $DEFAULT_SERVER_ADDRESS")
+                            syncRemote = syncRemote?.copy(
+                                url = URL(DEFAULT_SERVER_ADDRESS)
+                            )
+                            syncRemote?.let {
+                                repository.updateSyncRemote(it)
+                            }
+                        }
                         syncRemote?.let { syncRemote ->
                             if (syncRemote.hasSyncChain()) {
                                 secretKey = AesCbcWithIntegrity.decodeKey(syncRemote.secretKey)
