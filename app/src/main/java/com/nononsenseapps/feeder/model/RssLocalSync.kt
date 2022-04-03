@@ -94,7 +94,7 @@ internal suspend fun syncFeeds(
                 try {
                     syncClient.getFeeds()
                 } catch (e: Exception) {
-                    Log.e(LOG_TAG, "Error when fetching new feeds in sync", e)
+                    Log.e(LOG_TAG, "Error when fetching new feeds in sync. ${e.message}", e)
                 }
 
                 val feedsToFetch = feedsToSync(db.feedDao(), feedId, feedTag, staleTime = staleTime)
@@ -114,7 +114,7 @@ internal suspend fun syncFeeds(
                         syncClient.sendUpdatedFeeds()
                         syncClient.markAsRead()
                     } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Error when syncing readmarks in sync", e)
+                        Log.e(LOG_TAG, "Error when syncing readmarks in sync. ${e.message}", e)
                     }
                 }
 
