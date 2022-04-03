@@ -112,8 +112,9 @@ internal suspend fun syncFeeds(
                         syncClient.getRead()
                         syncClient.getDevices()
                         syncClient.sendUpdatedFeeds()
+                        syncClient.markAsRead()
                     } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Error when fetching readmarks in sync", e)
+                        Log.e(LOG_TAG, "Error when syncing readmarks in sync", e)
                     }
                 }
 

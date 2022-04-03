@@ -76,7 +76,27 @@ interface ReadStatusSyncedDao {
             LIMIT 100
         """
     )
-    fun getFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>>
+    fun getFlowOfFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>>
+
+    @Query(
+        """
+            SELECT
+                fi.id AS $COL_ID,
+                f.id AS $COL_FEEDID,
+                fi.guid AS $COL_GUID,
+                f.url AS $COL_FEEDURL
+            FROM feed_items fi
+            JOIN feeds f ON f.id = fi.feed_id
+            WHERE
+                fi.unread IS 0 AND
+                fi.id NOT IN (
+                    SELECT feed_item
+                    FROM read_status_synced
+                )
+            ORDER BY fi.id DESC
+        """
+    )
+    suspend fun getFeedItemsWithoutSyncedReadMark(): List<FeedItemForReadMark>
 
     @Query(
         """
