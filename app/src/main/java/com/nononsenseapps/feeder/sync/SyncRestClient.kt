@@ -51,11 +51,13 @@ class SyncRestClient(override val di: DI) : DIAware {
                     try {
                         syncRemote = repository.getSyncRemote()
                         syncRemote?.let { syncRemote ->
-                            secretKey = AesCbcWithIntegrity.decodeKey(syncRemote.secretKey)
-                            feederSync = getFeederSyncClient(
-                                syncRemote = syncRemote,
-                                okHttpClient = okHttpClient
-                            )
+                            if (syncRemote.hasSyncChain()) {
+                                secretKey = AesCbcWithIntegrity.decodeKey(syncRemote.secretKey)
+                                feederSync = getFeederSyncClient(
+                                    syncRemote = syncRemote,
+                                    okHttpClient = okHttpClient
+                                )
+                            }
                         }
                     } catch (e: Exception) {
                         Log.e(LOG_TAG, "Failed to initialize", e)
