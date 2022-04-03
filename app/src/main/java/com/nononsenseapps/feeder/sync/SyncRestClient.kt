@@ -133,15 +133,15 @@ class SyncRestClient(override val di: DI) : DIAware {
         readSenderJob = applicationCoroutineScope.launch(Dispatchers.IO) {
             repository.getFeedItemsWithoutSyncedReadMark()
                 .collect { feedItems ->
-                    if (feedItems.isEmpty()) {
-                        return@collect
-                    }
-
                     try {
-                        markAsRead(feedItems)
+                        if (feedItems.isNotEmpty()) {
+                            markAsRead(feedItems)
+                        }
                     } catch (e: Exception) {
                         Log.e(LOG_TAG, "Error in read status push job: ${e.message}", e)
                     }
+                    // Make collection take a while to batch a few items
+                    delay(10_000)
                 }
         }
         readGetterJob?.cancel("runForever invoked")
@@ -248,9 +248,9 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     suspend fun leave() {
-        Log.v(LOG_TAG, "leave")
         try {
             syncRemote?.let { syncRemote ->
+                Log.v(LOG_TAG, "leave")
                 feederSync?.removeDevice(
                     syncChainId = syncRemote.syncChainId,
                     currentDeviceId = syncRemote.deviceId,
@@ -265,9 +265,9 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     suspend fun removeDevice(deviceId: Long) {
-        Log.v(LOG_TAG, "removeDevice")
         syncRemote?.let { syncRemote ->
             secretKey?.let { secretKey ->
+                Log.v(LOG_TAG, "removeDevice")
                 val deviceListResponse = feederSync?.removeDevice(
                     syncChainId = syncRemote.syncChainId,
                     currentDeviceId = syncRemote.deviceId,
@@ -291,8 +291,8 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     internal suspend fun markAsRead(feedItems: List<FeedItemForReadMark>) {
-        Log.v(LOG_TAG, "markAsRead: ${feedItems.size} items")
         initialize { syncRemote, feederSync, secretKey ->
+            Log.v(LOG_TAG, "markAsRead: ${feedItems.size} items")
             feederSync.sendEncryptedReadMarks(
                 currentDeviceId = syncRemote.deviceId,
                 syncChainId = syncRemote.syncChainId,
@@ -324,8 +324,8 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     internal suspend fun getDevices() {
-        Log.v(LOG_TAG, "getDevices. Initialized: $isInitialized")
         initialize { syncRemote, feederSync, secretKey ->
+            Log.v(LOG_TAG, "getDevices. Initialized: $isInitialized")
             val response = feederSync.getDevices(
                 syncChainId = syncRemote.syncChainId,
                 currentDeviceId = syncRemote.deviceId
@@ -348,8 +348,8 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     internal suspend fun getRead() {
-        Log.v(LOG_TAG, "getRead. Initialized: $isInitialized")
         initialize { syncRemote, feederSync, secretKey ->
+            Log.v(LOG_TAG, "getRead. Initialized: $isInitialized")
             val response = feederSync.getEncryptedReadMarks(
                 currentDeviceId = syncRemote.deviceId,
                 syncChainId = syncRemote.syncChainId,
@@ -376,8 +376,8 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     internal suspend fun getFeeds() {
-        Log.v(LOG_TAG, "getFeeds")
         initialize { syncRemote, feederSync, secretKey ->
+            Log.v(LOG_TAG, "getFeeds")
             val response = feederSync.getFeeds(
                 syncChainId = syncRemote.syncChainId,
                 currentDeviceId = syncRemote.deviceId,
@@ -472,8 +472,8 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     suspend fun sendUpdatedFeeds() {
-        Log.v(LOG_TAG, "sendUpdatedFeeds")
         initialize { syncRemote, feederSync, secretKey ->
+            Log.v(LOG_TAG, "sendUpdatedFeeds")
             val lastRemoteHash = syncRemote.lastFeedsRemoteHash
 
             // Only send if hash does not match
