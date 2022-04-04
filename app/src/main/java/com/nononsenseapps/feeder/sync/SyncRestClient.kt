@@ -6,19 +6,15 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
 import com.nononsenseapps.feeder.crypto.SecretKeys
+import com.nononsenseapps.feeder.db.room.DEFAULT_SERVER_ADDRESS
+import com.nononsenseapps.feeder.db.room.DEPRECATED_SYNC_HOSTS
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItemForReadMark
 import com.nononsenseapps.feeder.db.room.RemoteFeed
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.runningReduce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -35,10 +31,6 @@ class SyncRestClient(override val di: DI) : DIAware {
     private var feederSync: FeederSync? = null
     private var syncRemote: SyncRemote? = null
     private var secretKey: SecretKeys? = null
-    private var foreverJob: Job? = null
-    private var readSenderJob: Job? = null
-    private var readGetterJob: Job? = null
-    private var feedSenderJob: Job? = null
     private val initMutex = Mutex()
     private val moshi = getMoshi()
     private val readMarkAdapter = moshi.adapter<ReadMarkContent>()
@@ -61,12 +53,23 @@ class SyncRestClient(override val di: DI) : DIAware {
                 if (isNotInitialized) {
                     try {
                         syncRemote = repository.getSyncRemote()
-                        syncRemote?.let { syncRemote ->
-                            secretKey = AesCbcWithIntegrity.decodeKey(syncRemote.secretKey)
-                            feederSync = getFeederSyncClient(
-                                syncRemote = syncRemote,
-                                okHttpClient = okHttpClient
+                        if (DEPRECATED_SYNC_HOSTS.any { host -> host in "${syncRemote?.url}" }) {
+                            Log.v(LOG_TAG, "Updating to latest sync host: $DEFAULT_SERVER_ADDRESS")
+                            syncRemote = syncRemote?.copy(
+                                url = URL(DEFAULT_SERVER_ADDRESS)
                             )
+                            syncRemote?.let {
+                                repository.updateSyncRemote(it)
+                            }
+                        }
+                        syncRemote?.let { syncRemote ->
+                            if (syncRemote.hasSyncChain()) {
+                                secretKey = AesCbcWithIntegrity.decodeKey(syncRemote.secretKey)
+                                feederSync = getFeederSyncClient(
+                                    syncRemote = syncRemote,
+                                    okHttpClient = okHttpClient
+                                )
+                            }
                         }
                     } catch (e: Exception) {
                         Log.e(LOG_TAG, "Failed to initialize", e)
@@ -76,106 +79,15 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
         if (block != null) {
             syncRemote?.let { syncRemote ->
-                feederSync?.let { feederSync ->
-                    secretKey?.let { secretKey ->
-                        block(syncRemote, feederSync, secretKey)
+                if (syncRemote.hasSyncChain()) {
+                    feederSync?.let { feederSync ->
+                        secretKey?.let { secretKey ->
+                            block(syncRemote, feederSync, secretKey)
+                        }
                     }
                 }
             }
         }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun runForever() {
-        Log.v(LOG_TAG, "runForever")
-        foreverJob?.cancel("runForever invoked")
-        foreverJob = applicationCoroutineScope.launch(Dispatchers.IO) {
-            repository.getSyncRemoteFlow()
-                .runningReduce { lastValue, value ->
-                    if (value == null) {
-                        secretKey = null
-                        feederSync = null
-                    } else if (lastValue?.url != value.url ||
-                        lastValue?.syncChainId != value.syncChainId ||
-                        lastValue?.secretKey != value.secretKey
-                    ) {
-                        Log.v(LOG_TAG, "runForever: new client")
-                        secretKey = AesCbcWithIntegrity.decodeKey(value.secretKey)
-                        feederSync = getFeederSyncClient(
-                            syncRemote = value,
-                            okHttpClient = okHttpClient
-                        )
-                        // Setting it here AS WELL just to make sure correct client is always set
-                        syncRemote = value
-                    }
-
-                    if (value == null ||
-                        lastValue?.url != value.url ||
-                        value.syncChainId.length != 64
-                    ) {
-                        Log.v(
-                            LOG_TAG,
-                            "runForever: deleting read status sync because new sync remote"
-                        )
-                        repository.deleteAllReadStatusSyncs()
-                    }
-
-                    // Always emit the value along
-                    value
-                }
-                .collect { syncRemote ->
-                    this@SyncRestClient.syncRemote = syncRemote
-                }
-        }
-        readSenderJob?.cancel("runForever invoked")
-        readSenderJob = applicationCoroutineScope.launch(Dispatchers.IO) {
-            repository.getFeedItemsWithoutSyncedReadMark()
-                .collect { feedItems ->
-                    if (feedItems.isEmpty()) {
-                        return@collect
-                    }
-
-                    try {
-                        markAsRead(feedItems)
-                    } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Error in read status push job: ${e.message}", e)
-                    }
-                }
-        }
-        readGetterJob?.cancel("runForever invoked")
-        readGetterJob = applicationCoroutineScope.launch(Dispatchers.IO) {
-            while (true) {
-                try {
-                    getDevices()
-                    getFeeds()
-                    getRead()
-                } catch (e: Exception) {
-                    Log.e(LOG_TAG, "Error in readGetterJob", e)
-                }
-                // TODO think about times and place for this
-                delay(60_000L)
-            }
-        }
-        feedSenderJob?.cancel("runForever invoked")
-        feedSenderJob = applicationCoroutineScope.launch(Dispatchers.IO) {
-            repository.getFlowOfFeedsOrderedByUrl()
-                .collectLatest {
-                    delay(1000)
-                    try {
-                        sendUpdatedFeeds()
-                    } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Error in sendFeedsJob", e)
-                    }
-                }
-        }
-    }
-
-    fun stopForeverJob() {
-        Log.v(LOG_TAG, "stopForeverJob")
-        foreverJob?.cancel("stopForever")
-        readSenderJob?.cancel("stopForever")
-        readGetterJob?.cancel("stopForever")
-        feedSenderJob?.cancel("stopForever")
     }
 
     suspend fun create(): String {
@@ -246,9 +158,9 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     suspend fun leave() {
-        Log.v(LOG_TAG, "leave")
         try {
             syncRemote?.let { syncRemote ->
+                Log.v(LOG_TAG, "leave")
                 feederSync?.removeDevice(
                     syncChainId = syncRemote.syncChainId,
                     currentDeviceId = syncRemote.deviceId,
@@ -263,9 +175,9 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     suspend fun removeDevice(deviceId: Long) {
-        Log.v(LOG_TAG, "removeDevice")
         syncRemote?.let { syncRemote ->
             secretKey?.let { secretKey ->
+                Log.v(LOG_TAG, "removeDevice")
                 val deviceListResponse = feederSync?.removeDevice(
                     syncChainId = syncRemote.syncChainId,
                     currentDeviceId = syncRemote.deviceId,
@@ -289,8 +201,8 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     internal suspend fun markAsRead(feedItems: List<FeedItemForReadMark>) {
-        Log.v(LOG_TAG, "markAsRead: ${feedItems.size} items")
         initialize { syncRemote, feederSync, secretKey ->
+            Log.v(LOG_TAG, "markAsRead: ${feedItems.size} items")
             feederSync.sendEncryptedReadMarks(
                 currentDeviceId = syncRemote.deviceId,
                 syncChainId = syncRemote.syncChainId,
@@ -321,9 +233,27 @@ class SyncRestClient(override val di: DI) : DIAware {
         }
     }
 
+    suspend fun markAsRead() {
+        initialize { _, _, _ ->
+            val readItems = repository.getFeedItemsWithoutSyncedReadMark()
+
+            if (readItems.isEmpty()) {
+                return@initialize
+            }
+
+            Log.v(LOG_TAG, "markAsReadBatch: ${readItems.size} items")
+
+            readItems.asSequence()
+                .chunked(100)
+                .forEach { feedItems ->
+                    markAsRead(feedItems)
+                }
+        }
+    }
+
     internal suspend fun getDevices() {
-        Log.v(LOG_TAG, "getDevices. Initialized: $isInitialized")
         initialize { syncRemote, feederSync, secretKey ->
+            Log.v(LOG_TAG, "getDevices. Initialized: $isInitialized")
             val response = feederSync.getDevices(
                 syncChainId = syncRemote.syncChainId,
                 currentDeviceId = syncRemote.deviceId
@@ -346,8 +276,8 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     internal suspend fun getRead() {
-        Log.v(LOG_TAG, "getRead. Initialized: $isInitialized")
         initialize { syncRemote, feederSync, secretKey ->
+            Log.v(LOG_TAG, "getRead. Initialized: $isInitialized")
             val response = feederSync.getEncryptedReadMarks(
                 currentDeviceId = syncRemote.deviceId,
                 syncChainId = syncRemote.syncChainId,
@@ -374,8 +304,8 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     internal suspend fun getFeeds() {
-        Log.v(LOG_TAG, "getFeeds")
         initialize { syncRemote, feederSync, secretKey ->
+            Log.v(LOG_TAG, "getFeeds")
             val response = feederSync.getFeeds(
                 syncChainId = syncRemote.syncChainId,
                 currentDeviceId = syncRemote.deviceId,
@@ -470,8 +400,8 @@ class SyncRestClient(override val di: DI) : DIAware {
     }
 
     suspend fun sendUpdatedFeeds() {
-        Log.v(LOG_TAG, "sendUpdatedFeeds")
         initialize { syncRemote, feederSync, secretKey ->
+            Log.v(LOG_TAG, "sendUpdatedFeeds")
             val lastRemoteHash = syncRemote.lastFeedsRemoteHash
 
             // Only send if hash does not match

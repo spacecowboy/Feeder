@@ -257,8 +257,6 @@ class FeedArticleViewModel(
             @Suppress("UNCHECKED_CAST")
             val haveVisibleFeedItems = (params[9] as Int) > 0
 
-            Log.d("JONAS", "Flow pinned ${article.pinned}")
-
             @Suppress("UNCHECKED_CAST")
             FeedArticleScreenViewState(
                 onlyUnread = params[0] as Boolean,

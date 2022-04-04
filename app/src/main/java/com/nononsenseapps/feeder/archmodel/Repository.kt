@@ -354,7 +354,11 @@ class Repository(override val di: DI) : DIAware {
         return syncRemoteStore.getNextFeedItemWithoutSyncedReadMark()
     }
 
-    fun getFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>> {
+    fun getFlowOfFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>> {
+        return syncRemoteStore.getFlowOfFeedItemsWithoutSyncedReadMark()
+    }
+
+    suspend fun getFeedItemsWithoutSyncedReadMark(): List<FeedItemForReadMark> {
         return syncRemoteStore.getFeedItemsWithoutSyncedReadMark()
     }
 

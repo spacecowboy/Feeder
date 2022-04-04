@@ -60,7 +60,11 @@ class SyncRemoteStore(override val di: DI) : DIAware {
         return readStatusDao.getNextFeedItemWithoutSyncedReadMark()
     }
 
-    fun getFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>> {
+    fun getFlowOfFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>> {
+        return readStatusDao.getFlowOfFeedItemsWithoutSyncedReadMark()
+    }
+
+    suspend fun getFeedItemsWithoutSyncedReadMark(): List<FeedItemForReadMark> {
         return readStatusDao.getFeedItemsWithoutSyncedReadMark()
     }
 

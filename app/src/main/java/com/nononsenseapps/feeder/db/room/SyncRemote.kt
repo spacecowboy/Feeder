@@ -36,14 +36,22 @@ data class SyncRemote @Ignore constructor(
     @ColumnInfo(name = COL_LAST_FEEDS_REMOTE_HASH) var lastFeedsRemoteHash: Int = 0,
 ) {
     constructor() : this(id = ID_UNSET)
+
+    fun hasSyncChain(): Boolean = syncChainId.length == 64
+    fun notHasSyncChain() = !hasSyncChain()
 }
 
-private const val DEFAULT_SERVER_HOST = "feederapp.nononsenseapps.com"
+private const val DEFAULT_SERVER_HOST = "feeder-sync.nononsenseapps.com"
 private const val DEFAULT_SERVER_PORT = 443
-private const val DEFAULT_SERVER_ADDRESS = "https://$DEFAULT_SERVER_HOST:$DEFAULT_SERVER_PORT"
+const val DEFAULT_SERVER_ADDRESS = "https://$DEFAULT_SERVER_HOST:$DEFAULT_SERVER_PORT"
 
 inline fun String?.ifBlankOrNull(defaultValue: () -> String?): String? =
     if (this?.isBlank() != false) defaultValue() else this
 
 fun generateDeviceName(): String =
     Build.PRODUCT.ifBlankOrNull { Build.MODEL.ifBlankOrNull { Build.BRAND } } ?: "${Random.nextInt(100_000)}"
+
+val DEPRECATED_SYNC_HOSTS = listOf(
+    "feederapp.nononsenseapps.com",
+    "feeder-sync.nononsenseapps.workers.dev"
+)
