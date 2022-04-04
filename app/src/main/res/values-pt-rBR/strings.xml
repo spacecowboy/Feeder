@@ -167,4 +167,6 @@
     <string name="sync_code">Código de sincronização</string>
     <string name="only_from_end">Somente do final</string>
     <string name="from_anywhere">De qualquer lugar</string>
+    <string name="pin_article">Fixar o artigo</string>
+    <string name="unpin_article">Desafixar artigo</string>
 </resources>
