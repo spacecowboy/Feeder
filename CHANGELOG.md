@@ -1,3 +1,30 @@
+# 2.1.5
+Andrij Mizyk (1):
+  * [a3a24eb2] Updated Ukrainian translation using Weblate
+
+Belmar Begić (1):
+  * [1f14b005] Updated Bosnian translation using Weblate
+
+El Pirujo (1):
+  * [abb2ed1c] Updated Spanish translation using Weblate
+
+J. Lavoie (1):
+  * [106499ed] Updated Italian translation using Weblate
+
+Jonas Kalderstam (8):
+  * [0692737a] Disabled Sync API request when not configured
+  * [559c5e50] Fixed crash when removing already removed device
+  * [78791758] Moved all syncing of read status to regular sync job
+
+Meiru (1):
+  * [a87e1b91] Updated Japanese translation using Weblate
+
+Oğuz Ersen (1):
+  * [8f5c9838] Updated Turkish translation using Weblate
+
+mm4c (1):
+  * [99518473] Updated Dutch translation using Weblate
+
 # 2.1.4
 Agnieszka C (1):
   * [066ab713] Updated Polish translation using Weblate
