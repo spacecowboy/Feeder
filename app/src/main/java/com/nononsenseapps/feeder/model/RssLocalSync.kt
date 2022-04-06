@@ -46,6 +46,7 @@ suspend fun syncFeeds(
     feedTag: String = "",
     forceNetwork: Boolean = false,
     minFeedAgeMinutes: Int = 5,
+    blockList: Set<String> = emptySet(),
 ): Boolean {
     val di: DI by closestDI(context)
     val repository: Repository by di.instance()
@@ -59,7 +60,8 @@ suspend fun syncFeeds(
                 feedTag = feedTag,
                 maxFeedItemCount = repository.maximumCountPerFeed.value,
                 forceNetwork = forceNetwork,
-                minFeedAgeMinutes = minFeedAgeMinutes
+                minFeedAgeMinutes = minFeedAgeMinutes,
+                blockList = blockList,
             )
         }
     }
@@ -73,6 +75,7 @@ internal suspend fun syncFeeds(
     maxFeedItemCount: Int = 100,
     forceNetwork: Boolean = false,
     minFeedAgeMinutes: Int = 5,
+    blockList: Set<String> = emptySet(),
 ): Boolean {
     val feedStore: FeedStore by di.instance()
     val db: AppDatabase by di.instance()
@@ -134,7 +137,8 @@ internal suspend fun syncFeeds(
                                 filesDir = filesDir,
                                 maxFeedItemCount = maxFeedItemCount,
                                 forceNetwork = forceNetwork,
-                                downloadTime = downloadTime
+                                downloadTime = downloadTime,
+                                blockList = blockList,
                             )
                         } catch (e: Throwable) {
                             Log.e(
@@ -171,6 +175,7 @@ private suspend fun syncFeed(
     maxFeedItemCount: Int,
     forceNetwork: Boolean = false,
     downloadTime: Instant,
+    blockList: Set<String>,
 ) {
     Log.d(LOG_TAG, "Fetching ${feedSql.displayTitle}")
     val repository: Repository by di.instance()
@@ -208,12 +213,13 @@ private suspend fun syncFeed(
     if (feed == null) {
         repository.upsertFeed(feedSql)
     } else {
-        val uniqueIdCount = feed.items?.map { it.id }?.toSet()?.size
+        val items = feed.items?.filterNot { it.isBlockedBy(blockList) }
+        val uniqueIdCount = items?.map { it.id }?.toSet()?.size
         // This can only detect between items present in one feed. See NIXOS
-        val isNotUniqueIds = uniqueIdCount != feed.items?.size
+        val isNotUniqueIds = uniqueIdCount != items?.size
 
         val feedItemSqls =
-            feed.items
+            items
                 ?.map {
                     val guid = when (isNotUniqueIds || feedSql.alternateId) {
                         true -> it.alternateId
@@ -266,7 +272,7 @@ private suspend fun syncFeed(
         // Finally, prune database of old items
         val ids = repository.getItemsToBeCleanedFromFeed(
             feedId = feedSql.id,
-            keepCount = max(maxFeedItemCount, feed.items?.size ?: 0)
+            keepCount = max(maxFeedItemCount, items?.size ?: 0)
         )
 
         for (id in ids) {
@@ -283,6 +289,11 @@ private suspend fun syncFeed(
         repository.deleteFeedItems(ids)
         repository.deleteStaleRemoteReadMarks()
     }
+}
+
+private fun Item.isBlockedBy(blockList: Collection<String>): Boolean {
+    val lowerTitle = title?.lowercase() ?: return false
+    return blockList.any { lowerTitle.contains(it) }
 }
 
 internal suspend fun feedsToSync(

@@ -69,6 +69,7 @@ import com.nononsenseapps.feeder.archmodel.SortingOptions
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
+import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -134,6 +135,10 @@ fun SettingsScreen(
             onFeedItemStyleChanged = { value ->
                 settingsViewModel.setFeedItemStyle(value)
             },
+            blockListValue = viewState.blockList,
+            onBlockListChanged = { value ->
+                settingsViewModel.setBlockList(value)
+            },
             syncOnStartupValue = viewState.syncOnResume,
             onSyncOnStartupChanged = {
                 settingsViewModel.setSyncOnResume(it)
@@ -197,6 +202,8 @@ fun SettingsScreenPreview() {
                 onShowFabChanged = {},
                 feedItemStyleValue = FeedItemStyle.CARD,
                 onFeedItemStyleChanged = {},
+                blockListValue = emptySet(),
+                onBlockListChanged = {},
                 syncOnStartupValue = true,
                 onSyncOnStartupChanged = {},
                 syncOnlyOnWifiValue = true,
@@ -237,6 +244,8 @@ fun SettingsList(
     onShowFabChanged: (Boolean) -> Unit,
     feedItemStyleValue: FeedItemStyle,
     onFeedItemStyleChanged: (FeedItemStyle) -> Unit,
+    blockListValue: Set<String>,
+    onBlockListChanged: (Iterable<String>) -> Unit,
     swipeAsReadValue: SwipeAsRead,
     onSwipeAsReadOptionChanged: (SwipeAsRead) -> Unit,
     syncOnStartupValue: Boolean,
@@ -331,6 +340,12 @@ fun SettingsList(
         GroupTitle {
             Text(stringResource(id = R.string.synchronization))
         }
+
+        ListDialogSetting(
+            currentValue = blockListValue.toList().sorted(),
+            onSelection = onBlockListChanged,
+            title = stringResource(id = R.string.block_list),
+        )
 
         MenuSetting(
             currentValue = currentSyncFrequencyValue.asSyncFreqOption(),
@@ -582,6 +597,59 @@ fun <T> MenuSetting(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ListDialogSetting(
+    title: String,
+    currentValue: List<String>,
+    icon: @Composable () -> Unit = {},
+    onSelection: (Iterable<String>) -> Unit,
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val dimens = LocalDimens.current
+    Row(
+        modifier = Modifier
+            .width(dimens.maxContentWidth)
+            .clickable { expanded = !expanded }
+            .semantics {
+                role = Role.Button
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier.size(64.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                icon()
+            }
+        }
+
+        TitleAndSubtitle(
+            title = {
+                Text(title)
+            },
+            subtitle = {
+                Text(
+                    text = currentValue.joinToString(" "),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
+                )
+            }
+        )
+
+        if (expanded) {
+            EditableListDialog(
+                title = title,
+                initialItems = currentValue,
+                onDismiss = {
+                    expanded = false
+                },
+                onModifiedItems = onSelection,
+            )
         }
     }
 }

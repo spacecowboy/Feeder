@@ -225,6 +225,23 @@ class SettingsStore(override val di: DI) : DIAware {
         ).apply()
     }
 
+    private val _blockListPreference = MutableStateFlow(
+        sp.getStringSet(PREF_BLOCK_LIST, null) ?: emptySet()
+    )
+    val blockListPreference = _blockListPreference.asStateFlow()
+    fun setBlockListPreference(value: Iterable<String>) {
+        val cleanedValue = value.cleanedSet()
+        _blockListPreference.value = cleanedValue
+        sp.edit().putStringSet(PREF_BLOCK_LIST, cleanedValue).apply()
+    }
+
+    private fun Iterable<String>.cleanedSet(): Set<String> {
+        return asSequence()
+            .map { it.lowercase().trim() }
+            .filter { it.isNotBlank() }
+            .toSet()
+    }
+
     private val _syncFrequency by lazy {
         val savedValue = sp.getStringNonNull(PREF_SYNC_FREQ, "60").toLong()
         MutableStateFlow(
@@ -354,6 +371,11 @@ const val PREF_VAL_OPEN_WITH_READER = "0"
 const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
 const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
+
+/**
+ * Block List Settings
+ */
+const val PREF_BLOCK_LIST = "pref_block_list_values"
 
 enum class PrefValOpenWith {
     OPEN_WITH_DEFAULT,

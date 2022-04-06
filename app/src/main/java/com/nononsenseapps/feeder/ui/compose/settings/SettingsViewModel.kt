@@ -87,6 +87,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setFeedItemStyle(value)
     }
 
+    fun setBlockList(value: Iterable<String>) {
+        repository.setBlockList(value)
+    }
+
     fun setSwipeAsRead(value: SwipeAsRead) {
         repository.setSwipeAsRead(value)
     }
@@ -119,6 +123,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 batteryOptimizationIgnoredFlow,
                 repository.feedItemStyle,
                 repository.swipeAsRead,
+                repository.blockList,
             ) { params: Array<Any> ->
                 SettingsViewState(
                     currentTheme = params[0] as ThemeOptions,
@@ -137,6 +142,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     batteryOptimizationIgnored = params[13] as Boolean,
                     feedItemStyle = params[14] as FeedItemStyle,
                     swipeAsRead = params[15] as SwipeAsRead,
+                    blockList = params[16] as Set<String>,
                 )
             }.collect {
                 _viewState.value = it
@@ -152,6 +158,7 @@ data class SettingsViewState(
     val currentSorting: SortingOptions = SortingOptions.NEWEST_FIRST,
     val showFab: Boolean = true,
     val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
+    val blockList: Set<String> = emptySet(),
     val syncOnResume: Boolean = false,
     val syncOnlyOnWifi: Boolean = false,
     val syncOnlyWhenCharging: Boolean = false,
