@@ -58,6 +58,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
     override val di: DI by closestDI(context)
 
     private val notificationManager: NotificationManagerCompat by instance()
+    private val repository: Repository by instance()
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return createForegroundInfo()
@@ -116,13 +117,15 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
             val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
             val minFeedAgeMinutes = inputData.getInt(MIN_FEED_AGE_MINUTES, 5)
+            val blockList = repository.blockList.value
 
             success = syncFeeds(
                 context = applicationContext,
                 feedId = feedId,
                 feedTag = feedTag,
                 forceNetwork = forceNetwork,
-                minFeedAgeMinutes = minFeedAgeMinutes
+                minFeedAgeMinutes = minFeedAgeMinutes,
+                blockList = blockList,
             )
         } catch (e: Exception) {
             success = false
@@ -159,7 +162,7 @@ fun requestFeedSync(
     val data = workDataOf(
         ARG_FEED_ID to feedId,
         ARG_FEED_TAG to feedTag,
-        ARG_FORCE_NETWORK to forceNetwork
+        ARG_FORCE_NETWORK to forceNetwork,
     )
 
     workRequest.setInputData(data)
