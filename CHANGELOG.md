@@ -1,3 +1,47 @@
+# 2.1.6
+Agnieszka C (1):
+  * [0864c9f5] Updated Polish translation using Weblate
+
+Andrij Mizyk (1):
+  * [b2a24f8a] Updated Ukrainian translation using Weblate
+
+ERYpTION (1):
+  * [a045d6bd] Updated Danish translation using Weblate
+
+El Pirujo (1):
+  * [bcaeb600] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [377e36c4] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [53c9a700] Updated Italian translation using Weblate
+
+Jonas Kalderstam (1):
+  * [afa77107] Updated Swedish translation using Weblate
+
+Manapart (1):
+  * [e0288297] Create Block List that filters out feed items with a blocked
+         word
+
+Oğuz Ersen (1):
+  * [47fc2a0a] Updated Turkish translation using Weblate
+
+VfBFan (1):
+  * [ca5e5fce] Updated German translation using Weblate
+
+Vitor Henrique (1):
+  * [17dfc130] Updated Portuguese (Brazil) translation using Weblate
+
+eevan78 (1):
+  * [760e6da0] Updated Serbian translation using Weblate
+
+mm4c (1):
+  * [9376ad3c] Updated Dutch translation using Weblate
+
+zmni (1):
+  * [ce5d1a0d] Updated Indonesian translation using Weblate
+
 # 2.1.5
 Andrij Mizyk (1):
   * [a3a24eb2] Updated Ukrainian translation using Weblate
