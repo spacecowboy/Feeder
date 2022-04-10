@@ -169,4 +169,7 @@
     <string name="no_barcode_scanner_installed">Konnte keinen Barcode-Scanner finden</string>
     <string name="pin_article">Artikel anheften</string>
     <string name="unpin_article">Artikel loslösen</string>
+    <string name="block_list">Sperrliste</string>
+    <string name="add_item">Eintrag hinzufügen</string>
+    <string name="remove">Entfernen</string>
 </resources>
