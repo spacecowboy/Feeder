@@ -146,4 +146,8 @@
     <string name="no_barcode_scanner_installed">Viivakoodiskanneria ei löytynyt</string>
     <string name="pin_article">Kiinnitä artikkeli</string>
     <string name="unpin_article">Poista artikkelin kiinnitys</string>
+    <string name="add_item">Lisää kohde</string>
+    <string name="device_sync">Laitteen synkronointi</string>
+    <string name="add_new_device">Lisää uusi laite</string>
+    <string name="only_enable_for_bad_id_feeds">Ota käyttöön vain syötteille, joilla on huonot tunnukset</string>
 </resources>
