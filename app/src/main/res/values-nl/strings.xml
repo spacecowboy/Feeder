@@ -169,4 +169,7 @@
     <string name="no_barcode_scanner_installed">Geen barcodescanner gevonden</string>
     <string name="unpin_article">Artikel losmaken</string>
     <string name="pin_article">Artikel vastzetten</string>
+    <string name="add_item">Item toevoegen</string>
+    <string name="remove">Verwijderen</string>
+    <string name="block_list">Lijst blokkeren</string>
 </resources>
