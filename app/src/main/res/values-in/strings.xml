@@ -167,4 +167,6 @@
     <string name="device_sync_description_1">Sinkronisasi perangkat memungkinkan Anda menyinkronisasi langganan dan membaca artikel pada perangkat Anda yang lain.</string>
     <string name="scan_or_enter_code">Pindai atau masukkan kode sinkronisasi</string>
     <string name="device_sync_description_2">Cukup pindai kode dari tautan sinkronisasi yang Anda buat pada perangkat yang lain, atau mulai tautan sinkronisasi baru.</string>
+    <string name="pin_article">Pin artikel</string>
+    <string name="unpin_article">Lepas pin artikel</string>
 </resources>
