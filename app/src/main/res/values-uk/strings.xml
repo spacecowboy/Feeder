@@ -169,4 +169,7 @@
     <string name="no_barcode_scanner_installed">Не вдалося знайти сканер штрихкодів</string>
     <string name="pin_article">Закріпити статтю</string>
     <string name="unpin_article">Відкріпити статтю</string>
+    <string name="block_list">Список блокування</string>
+    <string name="add_item">Додати елемент</string>
+    <string name="remove">Вилучити</string>
 </resources>
