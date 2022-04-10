@@ -169,4 +169,7 @@
     <string name="no_barcode_scanner_installed">Barkod tarayıcı bulunamadı</string>
     <string name="pin_article">Makaleyi sabitle</string>
     <string name="unpin_article">Makalenin sabitlemesini kaldır</string>
+    <string name="block_list">Engelleme listesi</string>
+    <string name="add_item">Öge ekle</string>
+    <string name="remove">Kaldır</string>
 </resources>

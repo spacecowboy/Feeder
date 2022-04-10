@@ -169,4 +169,7 @@
     <string name="no_barcode_scanner_installed">No se encontró un escáner de código de barras</string>
     <string name="pin_article">Clavar artículo</string>
     <string name="unpin_article">Desclavar artículo</string>
+    <string name="block_list">Lista de bloqueos</string>
+    <string name="add_item">Añadir elemento</string>
+    <string name="remove">Retirar</string>
 </resources>

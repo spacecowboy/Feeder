@@ -145,7 +145,7 @@
     <string name="remove_device">Gerät entfernen</string>
     <string name="qr_code">QR-Code</string>
     <string name="device_sync">Geräte-Synchronisierung</string>
-    <string name="device_sync_financed_by_community">Dieser Dienst wird von der Community bezahlt. Bitte denken Sie über eine Spende nach, wenn Sie ihn nützlich finden.</string>
+    <string name="device_sync_financed_by_community">Dieser Dienst wird von der Gemeinschaft bezahlt. Bitte denken Sie über eine Spende nach, wenn Sie ihn nützlich finden.</string>
     <string name="disconnect_device_from_sync">Gerät von der Synchronisierungskette trennen</string>
     <string name="devices_on_sync_chain">Geräte in der Synchronisierungskette</string>
     <string name="press_scan_sync">Navigieren Sie auf Ihrem Gerät zu Gerätesynchronisierung und drücken Sie auf Synchronisierungscode scannen.</string>
@@ -169,4 +169,7 @@
     <string name="no_barcode_scanner_installed">Konnte keinen Barcode-Scanner finden</string>
     <string name="pin_article">Artikel anheften</string>
     <string name="unpin_article">Artikel loslösen</string>
+    <string name="block_list">Sperrliste</string>
+    <string name="add_item">Eintrag hinzufügen</string>
+    <string name="remove">Entfernen</string>
 </resources>

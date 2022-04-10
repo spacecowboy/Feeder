@@ -169,4 +169,7 @@
     <string name="no_barcode_scanner_installed">Nie udało się znaleźć skanera kodów kreskowych</string>
     <string name="pin_article">Przypnij artykuł</string>
     <string name="unpin_article">Odepnij artykuł</string>
+    <string name="block_list">Lista zablokowanych</string>
+    <string name="add_item">Dodaj element</string>
+    <string name="remove">Usuń</string>
 </resources>

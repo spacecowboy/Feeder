@@ -167,4 +167,9 @@
     <string name="secret_key">Hemlig nyckel</string>
     <string name="are_you_sure_leave_sync_chain">Är du säker på att du vill lämna synkkedjan\?</string>
     <string name="no_barcode_scanner_installed">Kunde inte hitta en streckkodsläsare</string>
+    <string name="block_list">Blocklista</string>
+    <string name="add_item">Lägg till</string>
+    <string name="remove">Ta bort</string>
+    <string name="pin_article">Fäst artikel</string>
+    <string name="unpin_article">Släpp artikel</string>
 </resources>

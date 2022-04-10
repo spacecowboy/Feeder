@@ -169,4 +169,7 @@
     <string name="no_barcode_scanner_installed">Kunne ikke finde en stregkodescanner</string>
     <string name="pin_article">Fastgør artikel</string>
     <string name="unpin_article">Frigør artikel</string>
+    <string name="block_list">Blokliste</string>
+    <string name="add_item">Tilføj emne</string>
+    <string name="remove">Fjern</string>
 </resources>
