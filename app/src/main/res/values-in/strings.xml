@@ -169,4 +169,7 @@
     <string name="device_sync_description_2">Cukup pindai kode dari tautan sinkronisasi yang Anda buat pada perangkat yang lain, atau mulai tautan sinkronisasi baru.</string>
     <string name="pin_article">Pin artikel</string>
     <string name="unpin_article">Lepas pin artikel</string>
+    <string name="block_list">Daftar blokir</string>
+    <string name="add_item">Tambah item</string>
+    <string name="remove">Hapus</string>
 </resources>
