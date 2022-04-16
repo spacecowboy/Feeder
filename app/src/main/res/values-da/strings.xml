@@ -147,8 +147,8 @@
     <string name="sort">Sorter efter</string>
     <string name="open_feed">Åbn feed</string>
     <string name="javascript">JavaScript</string>
-    <string name="mark_items_above_as_read">Markér ovenstående som læst</string>
-    <string name="mark_items_below_as_read">Markér nedenstående som læst</string>
+    <string name="mark_items_above_as_read">Markér ovenfor som læst</string>
+    <string name="mark_items_below_as_read">Markér nedenfor som læst</string>
     <string name="zero_unread_articles">%1$s ulæste artikler</string>
     <string name="only_enable_for_bad_id_feeds">Kun aktiveret for feeds med dårlige ID\'er</string>
     <string name="fetch_full_articles_by_default">Hent som standard hele artikler</string>
