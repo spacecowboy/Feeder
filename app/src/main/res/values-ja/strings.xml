@@ -169,4 +169,7 @@
     <string name="only_from_end">端からのみ</string>
     <string name="unpin_article">記事のピン留め解除</string>
     <string name="pin_article">記事をピン留めする</string>
+    <string name="block_list">ブロックリスト</string>
+    <string name="add_item">アイテムの追加</string>
+    <string name="remove">削除</string>
 </resources>

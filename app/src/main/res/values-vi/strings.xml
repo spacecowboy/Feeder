@@ -167,4 +167,9 @@
     <string name="scan_or_enter_code">Quét hoặc nhập mã đồng bộ</string>
     <string name="start_new_sync_chain">Bắt đầu chuỗi đồng bộ mới</string>
     <string name="sync_code">Mã đồng bộ</string>
+    <string name="block_list">Danh sách chặn</string>
+    <string name="add_item">Thêm mục</string>
+    <string name="remove">Xoá</string>
+    <string name="pin_article">Ghim bài viết</string>
+    <string name="unpin_article">Bỏ ghim bài viết</string>
 </resources>

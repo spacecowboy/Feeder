@@ -169,4 +169,6 @@
     <string name="from_anywhere">De qualquer lugar</string>
     <string name="pin_article">Fixar o artigo</string>
     <string name="unpin_article">Desafixar artigo</string>
+    <string name="add_item">Adicionar item</string>
+    <string name="remove">Remover</string>
 </resources>
