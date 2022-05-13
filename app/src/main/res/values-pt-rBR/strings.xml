@@ -171,4 +171,5 @@
     <string name="unpin_article">Desafixar artigo</string>
     <string name="add_item">Adicionar item</string>
     <string name="remove">Remover</string>
+    <string name="block_list">Lista de bloqueio</string>
 </resources>
