@@ -32,7 +32,8 @@ fi
 # Delete unsupported google play store languages
 rm -rf fastlane/metadata/android/bs-BA \
    fastlane/metadata/android/eo \
-   fastlane/metadata/android/tok
+   fastlane/metadata/android/tok \
+   app/src/main/res/values-tok
 
 if [[ "${1:-}" == "--dry-run" ]] && [[ "${LATEST_TAG}" == "${CURRENT_VERSION}" ]]; then
   # Gitlab runs master and tag pipelines concurrently and fastlane will conflict if run concurrently
