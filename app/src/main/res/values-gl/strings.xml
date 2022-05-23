@@ -171,4 +171,5 @@
     <string name="disabled">Deshabilitado</string>
     <string name="only_from_end">Só dende o final</string>
     <string name="are_you_sure_leave_sync_chain">Está seguro de querer abandonar a cadea de sincronización\?</string>
+    <string name="open_enclosed_media">Abrir audiovisuales incluídos</string>
 </resources>
