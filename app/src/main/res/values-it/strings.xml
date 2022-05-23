@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="navigation_drawer_open">Apri menù di navigazione</string>
-    <string name="navigation_drawer_close">Chiudi menù di navigazione</string>
+    <string name="navigation_drawer_open">Apri menu di navigazione</string>
+    <string name="navigation_drawer_close">Chiudi menu di navigazione</string>
     <string name="action_settings">Impostazioni</string>
     <string name="add_feed">Aggiungi flusso</string>
     <string name="title_activity_edit_feed">Abbonati a un flusso</string>
@@ -79,10 +79,10 @@
     <string name="theme_day">Giorno</string>
     <string name="theme_night">Notte</string>
     <string name="theme">Tema</string>
-    <string name="sort_newest_first">Dal più recente</string>
-    <string name="sort_oldest_first">Dal più vecchio</string>
+    <string name="sort_newest_first">Prima il più recente</string>
+    <string name="sort_oldest_first">Prima il più vecchio</string>
     <string name="sort">Ordina</string>
-    <string name="send_bug_report">Invia una segnalazione errore</string>
+    <string name="send_bug_report">Invia segnalazione di errore</string>
     <string name="no_email_client">Impossibile aprire il cliente e-mail</string>
     <string name="touch_to_play_video">Tocca per riprodurre i video</string>
     <string name="open_feed">Apri flusso</string>
