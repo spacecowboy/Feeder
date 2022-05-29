@@ -266,9 +266,7 @@ fun FeedListContent(
                                         contentDescription = null,
                                         tint = Color.Yellow.copy(alpha = 0.7f),
                                         modifier = Modifier
-                                            .run {
-                                                this.align(Alignment.TopEnd)
-                                            }
+                                            .align(Alignment.TopEnd)
                                     )
                                 }
                             }
