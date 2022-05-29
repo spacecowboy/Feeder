@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -91,6 +90,10 @@ class FeedArticleViewModel(
         repository.setShowOnlyUnread(value)
     }
 
+    fun setShowOnlyBookmarked(value: Boolean) = viewModelScope.launch {
+        repository.setShowOnlyBookmarked(value)
+    }
+
     fun deleteFeeds(feedIds: List<Long>) = viewModelScope.launch {
         repository.deleteFeeds(feedIds)
     }
@@ -120,6 +123,10 @@ class FeedArticleViewModel(
 
     fun setPinned(itemId: Long, pinned: Boolean) = viewModelScope.launch {
         repository.setPinned(itemId, pinned)
+    }
+
+    fun setBookmarked(itemId: Long, bookmarked: Boolean) = viewModelScope.launch {
+        repository.setBookmarked(itemId, bookmarked)
     }
 
     fun requestImmediateSyncOfCurrentFeedOrTag() {
@@ -247,6 +254,7 @@ class FeedArticleViewModel(
             readAloudStateHolder.readAloudState,
             repository.swipeAsRead,
             textToDisplayTrigger, // Never actually read, only used as trigger
+            repository.showOnlyBookmarked,
         ) { params: Array<Any> ->
             @Suppress("UNCHECKED_CAST")
             val article = params[17] as Article
@@ -290,7 +298,9 @@ class FeedArticleViewModel(
                 articleId = article.id,
                 isArticleOpen = params[14] as Boolean,
                 swipeAsRead = params[20] as SwipeAsRead,
-                isPinned = article.pinned
+                isPinned = article.pinned,
+                isBookmarked = article.bookmarked,
+                onlyBookmarked = params[22] as Boolean,
             )
         }
             .stateIn(
@@ -393,6 +403,7 @@ class FeedArticleViewModel(
 interface FeedScreenViewState {
     val currentFeedOrTag: FeedOrTag
     val onlyUnread: Boolean
+    val onlyBookmarked: Boolean
     val showFab: Boolean
     val showThumbnails: Boolean
     val currentTheme: ThemeOptions
@@ -430,12 +441,14 @@ interface ArticleScreenViewState {
     val showToolbarMenu: Boolean
     val feedDisplayTitle: String
     val isPinned: Boolean
+    val isBookmarked: Boolean
 }
 
 @Immutable
 data class FeedArticleScreenViewState(
     override val currentFeedOrTag: FeedOrTag = FeedOrTag(ID_UNSET, ""),
     override val onlyUnread: Boolean = true,
+    override val onlyBookmarked: Boolean = false,
     override val showFab: Boolean = true,
     override val showThumbnails: Boolean = true,
     override val currentTheme: ThemeOptions = ThemeOptions.SYSTEM,
@@ -468,5 +481,6 @@ data class FeedArticleScreenViewState(
     override val articleId: Long = ID_UNSET,
     override val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
     override val isPinned: Boolean = false,
+    override val isBookmarked: Boolean = false,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState

@@ -26,6 +26,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkRemove
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -169,6 +171,9 @@ fun FeedArticleScreen(
         onToggleOnlyUnread = { value ->
             viewModel.setShowOnlyUnread(value)
         },
+        onToggleOnlyBookmarked = { value ->
+            viewModel.setShowOnlyBookmarked(value)
+        },
         onDrawerItemSelected = { feedId, tag ->
             viewModel.setCurrentFeedAndTag(feedId, tag)
         },
@@ -292,6 +297,12 @@ fun FeedArticleScreen(
         onSetPinned = { itemId, value ->
             viewModel.setPinned(itemId, value)
         },
+        onToggleCurrentArticleBookmarked = {
+            viewModel.setBookmarked(viewState.articleId, !viewState.isBookmarked)
+        },
+        onSetBookmarked = { itemId, value ->
+            viewModel.setBookmarked(itemId, value)
+        },
         feedListState = feedListState,
         articleListState = articleListState,
         pagedFeedItems = pagedFeedItems,
@@ -306,6 +317,7 @@ private fun FeedArticleScreen(
     onRefreshVisible: () -> Unit,
     onRefreshAll: () -> Unit,
     onToggleOnlyUnread: (Boolean) -> Unit,
+    onToggleOnlyBookmarked: (Boolean) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
     onMarkAllAsRead: () -> Unit,
     onToggleTagExpansion: (String) -> Unit,
@@ -340,6 +352,8 @@ private fun FeedArticleScreen(
     onNavigateUpFromArticle: () -> Unit,
     onToggleCurrentArticlePinned: () -> Unit,
     onSetPinned: (Long, Boolean) -> Unit,
+    onToggleCurrentArticleBookmarked: () -> Unit,
+    onSetBookmarked: (Long, Boolean) -> Unit,
     feedListState: LazyListState,
     articleListState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
@@ -352,6 +366,7 @@ private fun FeedArticleScreen(
                 onRefreshVisible = onRefreshVisible,
                 onRefreshAll = onRefreshAll,
                 onToggleOnlyUnread = onToggleOnlyUnread,
+                onToggleOnlyBookmarked = onToggleOnlyBookmarked,
                 onDrawerItemSelected = onDrawerItemSelected,
                 onMarkAllAsRead = onMarkAllAsRead,
                 onToggleTagExpansion = onToggleTagExpansion,
@@ -388,6 +403,8 @@ private fun FeedArticleScreen(
                 scaffoldState = scaffoldState,
                 onToggleCurrentArticlePinned = onToggleCurrentArticlePinned,
                 onSetPinned = onSetPinned,
+                onToggleCurrentArticleBookmarked = onToggleCurrentArticleBookmarked,
+                onSetBookmarked = onSetBookmarked,
             )
         }
         FeedArticleScreenType.Feed -> {
@@ -396,6 +413,7 @@ private fun FeedArticleScreen(
                 onRefreshVisible = onRefreshVisible,
                 onRefreshAll = onRefreshAll,
                 onToggleOnlyUnread = onToggleOnlyUnread,
+                onToggleOnlyBookmarked = onToggleOnlyBookmarked,
                 onDrawerItemSelected = onDrawerItemSelected,
                 onMarkAllAsRead = onMarkAllAsRead,
                 onToggleTagExpansion = onToggleTagExpansion,
@@ -420,6 +438,7 @@ private fun FeedArticleScreen(
                 markAfterAsRead = markAfterAsRead,
                 onOpenFeedItem = onOpenFeedItem,
                 onSetPinned = onSetPinned,
+                onSetBookmarked = onSetBookmarked,
                 feedListState = feedListState,
                 pagedFeedItems = pagedFeedItems,
                 scaffoldState = scaffoldState,
@@ -441,6 +460,7 @@ private fun FeedArticleScreen(
                 readAloudOnPause = readAloudOnPause,
                 readAloudOnStop = readAloudOnStop,
                 onTogglePinned = onToggleCurrentArticlePinned,
+                onToggleBookmarked = onToggleCurrentArticleBookmarked,
                 articleListState = articleListState,
                 scaffoldState = scaffoldState,
             )
@@ -454,6 +474,7 @@ fun FeedWithArticleScreen(
     onRefreshVisible: () -> Unit,
     onRefreshAll: () -> Unit,
     onToggleOnlyUnread: (Boolean) -> Unit,
+    onToggleOnlyBookmarked: (Boolean) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
     onMarkAllAsRead: () -> Unit,
     onToggleTagExpansion: (String) -> Unit,
@@ -486,6 +507,8 @@ fun FeedWithArticleScreen(
     displayFullText: () -> Unit,
     onToggleCurrentArticlePinned: () -> Unit,
     onSetPinned: (Long, Boolean) -> Unit,
+    onToggleCurrentArticleBookmarked: () -> Unit,
+    onSetBookmarked: (Long, Boolean) -> Unit,
     feedListState: LazyListState,
     articleListState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
@@ -493,6 +516,12 @@ fun FeedWithArticleScreen(
 ) {
     val showingUnreadStateLabel = if (viewState.onlyUnread) {
         stringResource(R.string.showing_only_unread_articles)
+    } else {
+        stringResource(R.string.showing_all_articles)
+    }
+
+    val showingBookmarksStateLabel = if (viewState.onlyBookmarked) {
+        stringResource(R.string.showing_only_bookmarked_articles)
     } else {
         stringResource(R.string.showing_all_articles)
     }
@@ -526,6 +555,25 @@ fun FeedWithArticleScreen(
                 } else {
                     Icon(
                         Icons.Default.Visibility,
+                        contentDescription = null,
+                    )
+                }
+            }
+            IconToggleButton(
+                checked = viewState.onlyBookmarked,
+                onCheckedChange = onToggleOnlyBookmarked,
+                modifier = Modifier.semantics {
+                    stateDescription = showingBookmarksStateLabel
+                }
+            ) {
+                if (viewState.onlyBookmarked) {
+                    Icon(
+                        Icons.Default.BookmarkRemove,
+                        contentDescription = null,
+                    )
+                } else {
+                    Icon(
+                        Icons.Default.Bookmark,
                         contentDescription = null,
                     )
                 }
@@ -673,6 +721,27 @@ fun FeedWithArticleScreen(
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
+                            onToggleCurrentArticleBookmarked()
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Bookmark,
+                            contentDescription = null,
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            stringResource(
+                                if (viewState.isBookmarked) {
+                                    R.string.remove_bookmark
+                                } else {
+                                    R.string.bookmark_article
+                                }
+                            )
+                        )
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            onShowToolbarMenu(false)
                             readAloudOnPlay()
                         }
                     ) {
@@ -754,6 +823,7 @@ fun FeedWithArticleScreen(
                 onItemClick = onOpenFeedItem,
                 listState = feedListState,
                 onSetPinned = onSetPinned,
+                onSetBookmarked = onSetBookmarked,
                 pagedFeedItems = pagedFeedItems,
                 modifier = Modifier
                     .width(334.dp)
@@ -784,6 +854,7 @@ fun FeedListScreen(
     onRefreshVisible: () -> Unit,
     onRefreshAll: () -> Unit,
     onToggleOnlyUnread: (Boolean) -> Unit,
+    onToggleOnlyBookmarked: (Boolean) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
     onMarkAllAsRead: () -> Unit,
     onToggleTagExpansion: (String) -> Unit,
@@ -808,12 +879,19 @@ fun FeedListScreen(
     markAfterAsRead: (Int) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
     onSetPinned: (Long, Boolean) -> Unit,
+    onSetBookmarked: (Long, Boolean) -> Unit,
     feedListState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
     scaffoldState: ScaffoldState,
 ) {
     val showingUnreadStateLabel = if (viewState.onlyUnread) {
         stringResource(R.string.showing_only_unread_articles)
+    } else {
+        stringResource(R.string.showing_all_articles)
+    }
+
+    val showingBookmarksStateLabel = if (viewState.onlyBookmarked) {
+        stringResource(R.string.showing_only_bookmarked_articles)
     } else {
         stringResource(R.string.showing_all_articles)
     }
@@ -847,6 +925,25 @@ fun FeedListScreen(
                 } else {
                     Icon(
                         Icons.Default.Visibility,
+                        contentDescription = null,
+                    )
+                }
+            }
+            IconToggleButton(
+                checked = viewState.onlyBookmarked,
+                onCheckedChange = onToggleOnlyBookmarked,
+                modifier = Modifier.semantics {
+                    stateDescription = showingBookmarksStateLabel
+                }
+            ) {
+                if (viewState.onlyBookmarked) {
+                    Icon(
+                        Icons.Default.BookmarkRemove,
+                        contentDescription = null,
+                    )
+                } else {
+                    Icon(
+                        Icons.Default.Bookmark,
                         contentDescription = null,
                     )
                 }
@@ -997,6 +1094,7 @@ fun FeedListScreen(
             onItemClick = onOpenFeedItem,
             listState = feedListState,
             onSetPinned = onSetPinned,
+            onSetBookmarked = onSetBookmarked,
             pagedFeedItems = pagedFeedItems,
             modifier = modifier,
         )
@@ -1018,6 +1116,7 @@ fun ArticleScreen(
     readAloudOnPause: () -> Unit,
     readAloudOnStop: () -> Unit,
     onTogglePinned: () -> Unit,
+    onToggleBookmarked: () -> Unit,
     scaffoldState: ScaffoldState,
     articleListState: LazyListState,
     onNavigateUp: () -> Unit,
@@ -1124,6 +1223,27 @@ fun ArticleScreen(
                                             R.string.unpin_article
                                         } else {
                                             R.string.pin_article
+                                        }
+                                    )
+                                )
+                            }
+                            DropdownMenuItem(
+                                onClick = {
+                                    onShowToolbarMenu(false)
+                                    onToggleBookmarked()
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Default.Bookmark,
+                                    contentDescription = null,
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    stringResource(
+                                        if (viewState.isBookmarked) {
+                                            R.string.remove_bookmark
+                                        } else {
+                                            R.string.bookmark_article
                                         }
                                     )
                                 )

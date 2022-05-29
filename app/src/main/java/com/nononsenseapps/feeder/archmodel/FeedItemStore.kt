@@ -49,6 +49,7 @@ class FeedItemStore(override val di: DI) : DIAware {
         tag: String,
         onlyUnread: Boolean,
         newestFirst: Boolean,
+        onlyBookmarks: Boolean = false
     ): Flow<PagingData<FeedListItem>> =
         Pager(
             config = PagingConfig(
@@ -57,6 +58,9 @@ class FeedItemStore(override val di: DI) : DIAware {
             )
         ) {
             when {
+                onlyBookmarks -> {
+                    dao.pagingBookmarksAsc()
+                }
                 onlyUnread && newestFirst -> {
                     when {
                         feedId > ID_UNSET -> dao.pagingUnreadPreviewsDesc(feedId = feedId)

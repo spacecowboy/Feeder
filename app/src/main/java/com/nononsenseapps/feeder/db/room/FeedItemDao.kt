@@ -42,7 +42,7 @@ interface FeedItemDao {
     @Query(
         """
         SELECT id FROM feed_items
-        WHERE feed_id IS :feedId AND pinned = 0
+        WHERE feed_id IS :feedId AND pinned = 0 AND bookmarked = 0
         ORDER BY primary_sort_time DESC, pub_date DESC
         LIMIT -1 OFFSET :keepCount
         """
@@ -319,6 +319,17 @@ interface FeedItemDao {
         """
     )
     fun pagingPreviewsAsc(): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1
+        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        """
+    )
+    fun pagingBookmarksAsc(): PagingSource<Int, PreviewItem>
 
     @Query(
         """

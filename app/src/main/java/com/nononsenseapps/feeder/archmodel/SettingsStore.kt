@@ -33,6 +33,13 @@ class SettingsStore(override val di: DI) : DIAware {
         _showOnlyUnread.value = value
     }
 
+    private val _showOnlyBookmarked = MutableStateFlow(sp.getBoolean(PREF_SHOW_ONLY_BOOKMARKED, false))
+    val showOnlyBookmarked: StateFlow<Boolean> = _showOnlyBookmarked.asStateFlow()
+    fun setShowOnlyBookmarked(value: Boolean) {
+        sp.edit().putBoolean(PREF_SHOW_ONLY_BOOKMARKED, value).apply()
+        _showOnlyBookmarked.value = value
+    }
+
     private val _currentFeedAndTag = MutableStateFlow(
         sp.getLong(PREF_LAST_FEED_ID, ID_UNSET) to (sp.getString(PREF_LAST_FEED_TAG, null) ?: "")
     )
@@ -313,6 +320,11 @@ const val PREF_WELCOME_DONE = "pref_welcome_done"
  * Boolean indicating if only unread items should be shown
  */
 const val PREF_SHOW_ONLY_UNREAD = "pref_show_only_unread"
+
+/**
+ * Boolean indicating if only bookmarked items should be shown
+ */
+const val PREF_SHOW_ONLY_BOOKMARKED = "pref_show_only_bookmarked"
 
 /**
  * These indicate which fragment to open by default

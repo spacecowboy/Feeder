@@ -33,6 +33,7 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -110,6 +111,7 @@ fun FeedListContent(
     markAfterAsRead: (Int) -> Unit,
     onItemClick: (Long) -> Unit,
     onSetPinned: (Long, Boolean) -> Unit,
+    onSetBookmarked: (Long, Boolean) -> Unit,
     listState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
     modifier: Modifier,
@@ -212,6 +214,9 @@ fun FeedListContent(
                         onTogglePinned = {
                             onSetPinned(previewItem.id, !previewItem.pinned)
                         },
+                        onToggleBookmarked = {
+                            onSetBookmarked(previewItem.id, !previewItem.bookmarked)
+                        },
                         imagePainter = { imageUrl ->
                             val alpha: Float = if (previewItem.shouldBeShownAsUnread) {
                                 1.0f
@@ -255,6 +260,13 @@ fun FeedListContent(
                                         tint = Color.Red.copy(alpha = 0.7f)
                                     )
                                 }
+                                if (previewItem.bookmarked) {
+                                    Icon(
+                                        Icons.Default.Bookmark,
+                                        contentDescription = null,
+                                        tint = Color.Yellow.copy(alpha = 0.7f)
+                                    )
+                                }
                             }
                         }
                     )
@@ -272,6 +284,7 @@ fun FeedScreen(
     onRefreshVisible: () -> Unit,
     onRefreshAll: () -> Unit,
     onToggleOnlyUnread: (Boolean) -> Unit,
+    onToggleOnlyBookmarked: (Boolean) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
     onAddFeed: () -> Unit,
@@ -301,6 +314,12 @@ fun FeedScreen(
 
     val showingUnreadStateLabel = if (viewState.onlyUnread) {
         stringResource(R.string.showing_only_unread_articles)
+    } else {
+        stringResource(R.string.showing_all_articles)
+    }
+
+    val showingBookmarksStateLabel = if (viewState.onlyBookmarked) {
+        stringResource(R.string.showing_only_bookmarked_articles)
     } else {
         stringResource(R.string.showing_all_articles)
     }
@@ -361,6 +380,18 @@ fun FeedScreen(
                                 contentDescription = null,
                             )
                         }
+                    }
+                    IconToggleButton(
+                        checked = viewState.onlyBookmarked,
+                        onCheckedChange = onToggleOnlyBookmarked,
+                        modifier = Modifier.semantics {
+                            stateDescription = showingBookmarksStateLabel
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Bookmark,
+                            contentDescription = null,
+                        )
                     }
                     IconButton(
                         onClick = onRefreshAll

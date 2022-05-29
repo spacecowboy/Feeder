@@ -48,6 +48,8 @@ class Repository(override val di: DI) : DIAware {
 
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
+    val showOnlyBookmarked: StateFlow<Boolean> = settingsStore.showOnlyBookmarked
+    fun setShowOnlyBookmarked(value: Boolean) = settingsStore.setShowOnlyBookmarked(value)
 
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentFeedAndTag
     fun setCurrentFeedAndTag(feedId: Long, tag: String) {
@@ -142,12 +144,14 @@ class Repository(override val di: DI) : DIAware {
     fun getFeedListItems(feedId: Long, tag: String): Flow<PagingData<FeedListItem>> = combine(
         showOnlyUnread,
         currentSorting,
-    ) { showOnlyUnread, currentSorting ->
+        showOnlyBookmarked,
+    ) { showOnlyUnread, currentSorting, showOnlyBookmarked ->
         FeedListArgs(
             feedId = feedId,
             tag = tag,
             onlyUnread = showOnlyUnread,
             newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
+            onlyBookmarks = showOnlyBookmarked
         )
     }.flatMapLatest {
         feedItemStore.getPagedFeedItems(
@@ -155,6 +159,7 @@ class Repository(override val di: DI) : DIAware {
             tag = it.tag,
             onlyUnread = it.onlyUnread,
             newestFirst = it.newestFirst,
+            onlyBookmarks = it.onlyBookmarks,
         )
     }
 
@@ -163,13 +168,15 @@ class Repository(override val di: DI) : DIAware {
         currentFeedAndTag,
         showOnlyUnread,
         currentSorting,
-    ) { feedAndTag, showOnlyUnread, currentSorting ->
+        showOnlyBookmarked,
+    ) { feedAndTag, showOnlyUnread, currentSorting, showOnlyBookmarked ->
         val (feedId, tag) = feedAndTag
         FeedListArgs(
             feedId = feedId,
             tag = tag,
             onlyUnread = showOnlyUnread,
             newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
+            onlyBookmarks = showOnlyBookmarked
         )
     }.flatMapLatest {
         feedItemStore.getPagedFeedItems(
@@ -177,6 +184,7 @@ class Repository(override val di: DI) : DIAware {
             tag = it.tag,
             onlyUnread = it.onlyUnread,
             newestFirst = it.newestFirst,
+            onlyBookmarks = it.onlyBookmarks,
         )
     }
 
@@ -192,12 +200,13 @@ class Repository(override val di: DI) : DIAware {
             tag = tag,
             onlyUnread = showOnlyUnread,
             newestFirst = false,
+            onlyBookmarks = false
         )
     }.flatMapLatest {
         feedItemStore.getVisibleFeedItemCount(
             feedId = it.feedId,
             tag = it.tag,
-            onlyUnread = it.onlyUnread,
+            onlyUnread = it.onlyUnread
         )
     }
 
@@ -443,6 +452,7 @@ private data class FeedListArgs(
     val tag: String,
     val newestFirst: Boolean,
     val onlyUnread: Boolean,
+    val onlyBookmarks: Boolean,
 )
 
 // Wrapper class because flow combine doesn't like nulls

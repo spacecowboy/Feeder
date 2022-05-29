@@ -133,8 +133,10 @@
   <string name="unread">Unread</string>
   <string name="already_read">Already read</string>
   <string name="showing_only_unread_articles">Showing only unread articles</string>
+  <string name="showing_only_bookmarked_articles">Showing only bookmarked articles</string>
   <string name="showing_all_articles">Showing all articles</string>
   <string name="synchronize_feeds">Sync feeds</string>
+  <string name="bookmarks_filter">Bookmarks only</string>
 
   <string name="zero_unread_articles">%1$s unread articles</string>
   <string name="one_unread_article">%1$s unread article</string>
@@ -180,6 +182,8 @@
   <string name="swipe_to_mark_as_read">Swipe to mark as read</string>
   <string name="are_you_sure_leave_sync_chain">Are you sure you want to leave the sync chain?</string>
   <string name="no_barcode_scanner_installed">Could not find a barcode scanner</string>
-    <string name="pin_article">Pin article</string>
+  <string name="pin_article">Pin article</string>
   <string name="unpin_article">Unpin article</string>
+  <string name="bookmark_article">Bookmark article</string>
+  <string name="remove_bookmark">Remove bookmark</string>
 </resources>
