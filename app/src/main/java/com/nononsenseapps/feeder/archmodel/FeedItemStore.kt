@@ -49,6 +49,7 @@ class FeedItemStore(override val di: DI) : DIAware {
         tag: String,
         onlyUnread: Boolean,
         newestFirst: Boolean,
+        onlyBookmarks: Boolean = false
     ): Flow<PagingData<FeedListItem>> =
         Pager(
             config = PagingConfig(
@@ -57,6 +58,20 @@ class FeedItemStore(override val di: DI) : DIAware {
             )
         ) {
             when {
+                onlyBookmarks && newestFirst -> {
+                    when {
+                        feedId > ID_UNSET -> dao.pagingBookmarksDesc(feedId = feedId)
+                        tag.isNotEmpty() -> dao.pagingBookmarksDesc(tag = tag)
+                        else -> dao.pagingBookmarksDesc()
+                    }
+                }
+                onlyBookmarks -> {
+                    when {
+                        feedId > ID_UNSET -> dao.pagingBookmarksAsc(feedId = feedId)
+                        tag.isNotEmpty() -> dao.pagingBookmarksAsc(tag = tag)
+                        else -> dao.pagingBookmarksAsc()
+                    }
+                }
                 onlyUnread && newestFirst -> {
                     when {
                         feedId > ID_UNSET -> dao.pagingUnreadPreviewsDesc(feedId = feedId)
@@ -109,6 +124,10 @@ class FeedItemStore(override val di: DI) : DIAware {
 
     suspend fun setPinned(itemId: Long, pinned: Boolean) {
         dao.setPinned(itemId, pinned)
+    }
+
+    suspend fun setBookmarked(itemId: Long, bookmarked: Boolean) {
+        dao.setBookmarked(itemId, bookmarked)
     }
 
     suspend fun getFullTextByDefault(itemId: Long): Boolean {
@@ -363,4 +382,5 @@ private fun PreviewItem.toFeedListItem() =
         imageUrl = imageUrl,
         link = link,
         pinned = pinned,
+        bookmarked = bookmarked,
     )

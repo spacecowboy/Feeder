@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MigrationFrom21To22 {
+class MigrationFrom22To23 {
     private val dbName = "testDb"
 
     @Rule
@@ -25,7 +25,7 @@ class MigrationFrom21To22 {
 
     @Test
     fun migrate() {
-        testHelper.createDatabase(dbName, 21).let { oldDB ->
+        testHelper.createDatabase(dbName, 22).let { oldDB ->
             oldDB.execSQL(
                 """
                 INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash, fulltext_by_default, open_articles_with, alternate_id, currently_syncing, when_modified)
@@ -34,17 +34,17 @@ class MigrationFrom21To22 {
             )
             oldDB.execSQL(
                 """
-            INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time, primary_sort_time)
-            VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0, 0)
+            INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time, primary_sort_time, pinned)
+            VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0, 0, 0)
                 """.trimIndent()
             )
         }
 
-        val db = testHelper.runMigrationsAndValidate(dbName, 22, true, MIGRATION_21_22)
+        val db = testHelper.runMigrationsAndValidate(dbName, 23, true, MIGRATION_22_23)
 
         db.query(
             """
-            SELECT pinned FROM feed_items
+            SELECT bookmarked FROM feed_items
             """.trimIndent()
         )!!.use {
             assert(it.count == 1)

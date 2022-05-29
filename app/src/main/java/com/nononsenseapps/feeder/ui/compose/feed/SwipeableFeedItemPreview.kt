@@ -77,6 +77,7 @@ fun SwipeableFeedItemPreview(
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onTogglePinned: () -> Unit,
+    onToggleBookmarked: () -> Unit,
     onShareItem: () -> Unit,
     onItemClick: () -> Unit,
 ) {
@@ -142,6 +143,8 @@ fun SwipeableFeedItemPreview(
     val toggleReadStatusLabel = stringResource(R.string.toggle_read_status)
     val pinArticleLabel = stringResource(R.string.pin_article)
     val unpinArticleLabel = stringResource(R.string.unpin_article)
+    val bookmarkArticleLabel = stringResource(R.string.bookmark_article)
+    val removeBookmarkLabel = stringResource(R.string.remove_bookmark)
     val markAboveAsReadLabel = stringResource(R.string.mark_items_above_as_read)
     val markBelowAsReadLabel = stringResource(R.string.mark_items_below_as_read)
     val shareLabel = stringResource(R.string.share)
@@ -191,6 +194,15 @@ fun SwipeableFeedItemPreview(
                                 }
                             ) {
                                 onTogglePinned()
+                                true
+                            },
+                            CustomAccessibilityAction(
+                                when (item.bookmarked) {
+                                    true -> removeBookmarkLabel
+                                    false -> bookmarkArticleLabel
+                                }
+                            ) {
+                                onToggleBookmarked()
                                 true
                             },
                             CustomAccessibilityAction(markAboveAsReadLabel) {
@@ -250,6 +262,7 @@ fun SwipeableFeedItemPreview(
                         dropDownMenuExpanded = dropDownMenuExpanded,
                         onDismissDropdown = { dropDownMenuExpanded = false },
                         onTogglePinned = onTogglePinned,
+                        onToggleBookmarked = onToggleBookmarked,
                         modifier = Modifier
                             .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                     )
@@ -265,6 +278,7 @@ fun SwipeableFeedItemPreview(
                         dropDownMenuExpanded = dropDownMenuExpanded,
                         onDismissDropdown = { dropDownMenuExpanded = false },
                         onTogglePinned = onTogglePinned,
+                        onToggleBookmarked = onToggleBookmarked,
                         modifier = Modifier
                             .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                     )
@@ -280,6 +294,7 @@ fun SwipeableFeedItemPreview(
                         dropDownMenuExpanded = dropDownMenuExpanded,
                         onDismissDropdown = { dropDownMenuExpanded = false },
                         onTogglePinned = onTogglePinned,
+                        onToggleBookmarked = onToggleBookmarked,
                         modifier = Modifier
                             .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                     )

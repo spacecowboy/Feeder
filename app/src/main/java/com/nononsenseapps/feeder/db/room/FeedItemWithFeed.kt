@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.db.room
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import com.nononsenseapps.feeder.db.COL_AUTHOR
+import com.nononsenseapps.feeder.db.COL_BOOKMARKED
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
 import com.nononsenseapps.feeder.db.COL_FEEDCUSTOMTITLE
@@ -37,7 +38,8 @@ const val feedItemColumnsWithFeed = """
     $FEEDS_TABLE_NAME.$COL_CUSTOM_TITLE AS $COL_FEEDCUSTOMTITLE,
     $FEEDS_TABLE_NAME.$COL_URL AS $COL_FEEDURL,
     $FEEDS_TABLE_NAME.$COL_FULLTEXT_BY_DEFAULT AS $COL_FULLTEXT_BY_DEFAULT,
-    $COL_PINNED
+    $COL_PINNED,
+    $COL_BOOKMARKED
 """
 
 data class FeedItemWithFeed @Ignore constructor(
@@ -60,6 +62,7 @@ data class FeedItemWithFeed @Ignore constructor(
     @ColumnInfo(name = COL_FEEDURL) var feedUrl: URL = sloppyLinkToStrictURLNoThrows(""),
     @ColumnInfo(name = COL_FULLTEXT_BY_DEFAULT) var fullTextByDefault: Boolean = false,
     @ColumnInfo(name = COL_PINNED) var pinned: Boolean = false,
+    @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
 ) : FeedItemForFetching {
     constructor() : this(id = ID_UNSET)
 

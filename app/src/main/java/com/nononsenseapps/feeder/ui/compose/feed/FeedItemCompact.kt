@@ -51,6 +51,7 @@ fun FeedItemCompact(
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
     onTogglePinned: () -> Unit,
+    onToggleBookmarked: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
 ) {
@@ -131,6 +132,21 @@ fun FeedItemCompact(
                     DropdownMenuItem(
                         onClick = {
                             onDismissDropdown()
+                            onToggleBookmarked()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(
+                                when (item.bookmarked) {
+                                    true -> R.string.remove_bookmark
+                                    false -> R.string.bookmark_article
+                                }
+                            )
+                        )
+                    }
+                    DropdownMenuItem(
+                        onClick = {
+                            onDismissDropdown()
                             onMarkAboveAsRead()
                         }
                     ) {
@@ -194,6 +210,7 @@ private fun preview() {
             link = null,
             id = ID_UNSET,
             pinned = false,
+            bookmarked = false,
         ),
         showThumbnail = true,
         imagePainter = {},
@@ -201,6 +218,7 @@ private fun preview() {
         onMarkBelowAsRead = {},
         onShareItem = {},
         onTogglePinned = {},
+        onToggleBookmarked = {},
         dropDownMenuExpanded = false,
         onDismissDropdown = {}
     )
@@ -217,6 +235,7 @@ data class FeedListItem(
     val imageUrl: String?,
     val link: String?,
     val pinned: Boolean,
+    val bookmarked: Boolean,
 ) {
     val shouldBeShownAsUnread: Boolean
         get() = unread || pinned

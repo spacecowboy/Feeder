@@ -42,7 +42,7 @@ interface FeedItemDao {
     @Query(
         """
         SELECT id FROM feed_items
-        WHERE feed_id IS :feedId AND pinned = 0
+        WHERE feed_id IS :feedId AND pinned = 0 AND bookmarked = 0
         ORDER BY primary_sort_time DESC, pub_date DESC
         LIMIT -1 OFFSET :keepCount
         """
@@ -325,6 +325,72 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1
+        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        """
+    )
+    fun pagingBookmarksAsc(): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1 AND feed_id IS :feedId
+        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        """
+    )
+    fun pagingBookmarksAsc(feedId: Long): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1 AND tag IS :tag
+        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        """
+    )
+    fun pagingBookmarksAsc(tag: String): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1
+        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingBookmarksDesc(): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1 AND feed_id IS :feedId
+        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingBookmarksDesc(feedId: Long): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1 AND tag IS :tag
+        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingBookmarksDesc(tag: String): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
         ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
         """
@@ -412,6 +478,9 @@ interface FeedItemDao {
 
     @Query("UPDATE feed_items SET pinned = :pinned WHERE id IS :id")
     suspend fun setPinned(id: Long, pinned: Boolean)
+
+    @Query("UPDATE feed_items SET bookmarked = :bookmarked WHERE id IS :id")
+    suspend fun setBookmarked(id: Long, bookmarked: Boolean)
 
     @Query("UPDATE feed_items SET notified = :notified WHERE id IN (:ids)")
     suspend fun markAsNotified(ids: List<Long>, notified: Boolean = true)
