@@ -38,7 +38,7 @@ const val ID_ALL_FEEDS: Long = -10
         RemoteFeed::class,
         SyncDevice::class,
     ],
-    version = 22
+    version = 23
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -95,12 +95,24 @@ val allMigrations = arrayOf(
     MIGRATION_19_20,
     MIGRATION_20_21,
     MIGRATION_21_22,
+    MIGRATION_22_23,
 )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+@Suppress("ClassName")
+object MIGRATION_22_23 : Migration(22, 23) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            ALTER TABLE feed_items ADD COLUMN bookmarked INTEGER NOT NULL DEFAULT 0
+            """.trimIndent()
+        )
+    }
+}
+
 @Suppress("ClassName")
 object MIGRATION_21_22 : Migration(21, 22) {
     override fun migrate(database: SupportSQLiteDatabase) {
