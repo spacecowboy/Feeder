@@ -34,7 +34,8 @@ rm -rf fastlane/metadata/android/bs-BA \
    fastlane/metadata/android/eo \
    fastlane/metadata/android/tok \
    app/src/main/res/values-tok \
-   fastlane/metadata/android/gl
+   fastlane/metadata/android/gl \
+   app/src/main/res/values-gl
 
 if [[ "${1:-}" == "--dry-run" ]] && [[ "${LATEST_TAG}" == "${CURRENT_VERSION}" ]]; then
   # Gitlab runs master and tag pipelines concurrently and fastlane will conflict if run concurrently
