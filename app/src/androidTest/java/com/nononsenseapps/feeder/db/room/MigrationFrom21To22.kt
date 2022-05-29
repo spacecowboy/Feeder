@@ -28,8 +28,8 @@ class MigrationFrom21To22 {
         testHelper.createDatabase(dbName, 21).let { oldDB ->
             oldDB.execSQL(
                 """
-                INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash, fulltext_by_default, open_articles_with, alternate_id, currently_syncing)
-                VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666, 0, '', 0, 0)
+                INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash, fulltext_by_default, open_articles_with, alternate_id, currently_syncing, when_modified)
+                VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666, 0, '', 0, 0, 0)
                 """.trimIndent()
             )
             oldDB.execSQL(
@@ -40,7 +40,7 @@ class MigrationFrom21To22 {
             )
         }
 
-        val db = testHelper.runMigrationsAndValidate(dbName, 21, true, MIGRATION_20_21)
+        val db = testHelper.runMigrationsAndValidate(dbName, 22, true, MIGRATION_21_22)
 
         db.query(
             """
