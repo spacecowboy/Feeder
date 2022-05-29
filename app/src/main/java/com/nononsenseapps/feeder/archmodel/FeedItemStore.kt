@@ -111,6 +111,10 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.setPinned(itemId, pinned)
     }
 
+    suspend fun setBookmarked(itemId: Long, bookmarked: Boolean) {
+        dao.setBookmarked(itemId, bookmarked)
+    }
+
     suspend fun getFullTextByDefault(itemId: Long): Boolean {
         return dao.getFullTextByDefault(itemId) ?: false
     }
@@ -363,4 +367,5 @@ private fun PreviewItem.toFeedListItem() =
         imageUrl = imageUrl,
         link = link,
         pinned = pinned,
+        bookmarked = bookmarked,
     )

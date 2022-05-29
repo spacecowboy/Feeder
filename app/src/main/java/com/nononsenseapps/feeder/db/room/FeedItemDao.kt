@@ -413,6 +413,9 @@ interface FeedItemDao {
     @Query("UPDATE feed_items SET pinned = :pinned WHERE id IS :id")
     suspend fun setPinned(id: Long, pinned: Boolean)
 
+    @Query("UPDATE feed_items SET bookmarked = :bookmarked WHERE id IS :id")
+    suspend fun setBookmarked(id: Long, bookmarked: Boolean)
+
     @Query("UPDATE feed_items SET notified = :notified WHERE id IN (:ids)")
     suspend fun markAsNotified(ids: List<Long>, notified: Boolean = true)
 

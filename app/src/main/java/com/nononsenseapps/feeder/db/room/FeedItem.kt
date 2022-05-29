@@ -17,6 +17,7 @@ import com.nononsenseapps.feeder.db.COL_IMAGEURL
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.COL_NOTIFIED
 import com.nononsenseapps.feeder.db.COL_PINNED
+import com.nononsenseapps.feeder.db.COL_BOOKMARKED
 import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
 import com.nononsenseapps.feeder.db.COL_PLAINTITLE
 import com.nononsenseapps.feeder.db.COL_PRIMARYSORTTIME
@@ -71,6 +72,7 @@ data class FeedItem @Ignore constructor(
     @ColumnInfo(name = COL_FIRSTSYNCEDTIME, typeAffinity = ColumnInfo.INTEGER) var firstSyncedTime: Instant = Instant.EPOCH,
     @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) var primarySortTime: Instant = Instant.EPOCH,
     @ColumnInfo(name = COL_PINNED) var pinned: Boolean = false,
+    @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
 ) : FeedItemForFetching {
 
     constructor() : this(id = ID_UNSET)

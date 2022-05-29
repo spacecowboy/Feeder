@@ -215,6 +215,7 @@ class Repository(override val di: DI) : DIAware {
     suspend fun saveFeed(feed: Feed): Long = feedStore.saveFeed(feed)
 
     suspend fun setPinned(itemId: Long, pinned: Boolean) = feedItemStore.setPinned(itemId = itemId, pinned = pinned)
+    suspend fun setBookmarked(itemId: Long, bookmarked: Boolean) = feedItemStore.setBookmarked(itemId = itemId, bookmarked = bookmarked)
     suspend fun markAsNotified(itemIds: List<Long>) = feedItemStore.markAsNotified(itemIds)
     suspend fun markAsReadAndNotified(itemId: Long) = feedItemStore.markAsReadAndNotified(itemId)
     suspend fun markAsUnread(itemId: Long, unread: Boolean = true) =
@@ -479,6 +480,7 @@ data class Article(
     val feedId: Long = item?.feedId ?: ID_UNSET
     val feedUrl: String? = item?.feedUrl?.toString()
     val pinned: Boolean = item?.pinned ?: false
+    val bookmarked: Boolean = item?.bookmarked ?: false
 }
 
 enum class TextToDisplay {
