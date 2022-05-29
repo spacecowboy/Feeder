@@ -336,6 +336,61 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1 AND feed_id IS :feedId
+        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        """
+    )
+    fun pagingBookmarksAsc(feedId: Long): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1 AND tag IS :tag
+        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        """
+    )
+    fun pagingBookmarksAsc(tag: String): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1
+        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingBookmarksDesc(): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1 AND feed_id IS :feedId
+        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingBookmarksDesc(feedId: Long): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE bookmarked = 1 AND tag IS :tag
+        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun pagingBookmarksDesc(tag: String): PagingSource<Int, PreviewItem>
+
+    @Query(
+        """
+        SELECT $previewColumns
+        FROM feed_items
+        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
         ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
         """

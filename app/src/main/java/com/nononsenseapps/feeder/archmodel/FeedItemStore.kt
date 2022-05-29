@@ -58,8 +58,19 @@ class FeedItemStore(override val di: DI) : DIAware {
             )
         ) {
             when {
+                onlyBookmarks && newestFirst -> {
+                    when {
+                        feedId > ID_UNSET -> dao.pagingBookmarksDesc(feedId = feedId)
+                        tag.isNotEmpty() -> dao.pagingBookmarksDesc(tag = tag)
+                        else -> dao.pagingBookmarksDesc()
+                    }
+                }
                 onlyBookmarks -> {
-                    dao.pagingBookmarksAsc()
+                    when {
+                        feedId > ID_UNSET -> dao.pagingBookmarksAsc(feedId = feedId)
+                        tag.isNotEmpty() -> dao.pagingBookmarksAsc(tag = tag)
+                        else -> dao.pagingBookmarksAsc()
+                    }
                 }
                 onlyUnread && newestFirst -> {
                     when {
