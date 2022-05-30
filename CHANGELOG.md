@@ -1,3 +1,25 @@
+# 2.2.0
+Ady (6):
+  * [6f4bcab2] Update schema to add bookmarked status
+  * [0ab5b1bb] Toggle bookmarks
+  * [a90b04ce] Allow to filter lists per bookmarks
+  * [2ad907ef] Align bookmark icon to the right
+  * [a610cfab] Remove unnecessary code for bookmark's alignement
+  * [132ced2a] Handle bookmarks sorting by date, feed and tag
+
+Jonas Kalderstam (4):
+  * [b8b414a6] Fixed DB test 21->22
+  * [6e79da27] Added DB migration test 22->23
+  * [3ffe84f1] Removed Galician language when deploying to play store; not
+         supported by Google
+  * [fba8c0db] Removed Galician from App; not supported by Android
+
+Simone Dotto (1):
+  * [35eac7c8] Updated Italian translation using Weblate
+
+antonpaidoslalin (1):
+  * [356d1c26] Translated using Weblate (Galician)
+
 # 2.1.8
 Ben Beaver (2):
   * [e0d24b91] Added Toki Pona translation using Weblate
