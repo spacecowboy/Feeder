@@ -172,4 +172,8 @@
     <string name="block_list">Blokliste</string>
     <string name="add_item">Tilføj emne</string>
     <string name="remove">Fjern</string>
+    <string name="bookmarks_filter">Kun bogmærker</string>
+    <string name="showing_only_bookmarked_articles">Viser kun artikler med bogmærke</string>
+    <string name="bookmark_article">Sæt bogmærke på artiklen</string>
+    <string name="remove_bookmark">Fjern bogmærke</string>
 </resources>
