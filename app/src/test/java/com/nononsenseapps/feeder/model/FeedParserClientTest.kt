@@ -122,4 +122,47 @@ class FeedParserClientTest : DIAware {
             )
         }
     }
+
+    @Test
+    fun badProtocolInLinksAreHandled() = runBlocking {
+        server.enqueue(
+            MockResponse().apply {
+                setResponseCode(200)
+                this.setBody(
+                    """
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>QC RSS</title>
+    <link>http://www.questionablecontent.net</link>
+    <description>The Official QC RSS Feed</description>
+    <generator>Feeder 4.3.2(5732); Mac OS X Version 12.4 (Build 21F79)
+      https://reinventedsoftware.com/feeder/
+    </generator>
+    <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+    <language>en</language>
+    <pubDate>Wed, 01 Jun 2022 22:09:29 -0300</pubDate>
+    <lastBuildDate>Wed, 01 Jun 2022 22:09:29 -0300</lastBuildDate>
+    <atom:link href="http://www.questionablecontent.net/QCRSS.xml" rel="self"
+      type="application/rss+xml" />
+    <item>
+      <title>Callout Post</title>
+      <link>ttp://questionablecontent.net/view.php?comic=4776</link>
+      <description>
+        <![CDATA[<img src="http://www.questionablecontent.net/comics/4776.png">]]></description>
+      <pubDate>Sun, 01 May 2022 22:06:19 -0300</pubDate>
+      <guid isPermaLink="false">325BE5B5-8206-4C4A-9E94-828EE3DD7763</guid>
+    </item>
+  </channel>
+</rss>
+                    """.trimIndent()
+                )
+            }
+        )
+
+        val url = server.url("/foo").toUrl()
+        // This should not crash
+        val result = feedParser.parseFeedUrl(url)
+        assertNull(result?.items?.first()?.image)
+    }
 }

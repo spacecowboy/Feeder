@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.util
 
+import android.util.Log
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.jsonfeed.Attachment
 import com.nononsenseapps.jsonfeed.Author
@@ -29,54 +30,62 @@ fun SyndFeed.asFeed(baseUrl: URL): Feed {
         }
     }
 
-    return Feed(
-        title = plainTitle(),
-        home_page_url = relativeLinkIntoAbsoluteOrNull(
-            baseUrl,
-            this.links?.firstOrNull {
-                "alternate" == it.rel && "text/html" == it.type
-            }?.href ?: this.link
-        ),
-        feed_url = relativeLinkIntoAbsoluteOrNull(
-            baseUrl,
-            this.links?.firstOrNull { "self" == it.rel }?.href
-        ),
-        description = this.description,
-        icon = icon,
-        author = feedAuthor,
-        items = this.entries?.map { it.asItem(baseUrl = baseUrl, feedAuthor = feedAuthor) }
-    )
+    try {
+        return Feed(
+            title = plainTitle(),
+            home_page_url = relativeLinkIntoAbsoluteOrNull(
+                baseUrl,
+                this.links?.firstOrNull {
+                    "alternate" == it.rel && "text/html" == it.type
+                }?.href ?: this.link
+            ),
+            feed_url = relativeLinkIntoAbsoluteOrNull(
+                baseUrl,
+                this.links?.firstOrNull { "self" == it.rel }?.href
+            ),
+            description = this.description,
+            icon = icon,
+            author = feedAuthor,
+            items = this.entries?.map { it.asItem(baseUrl = baseUrl, feedAuthor = feedAuthor) }
+        )
+    } catch (t: Throwable) {
+        throw t
+    }
 }
 
 fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
-    val contentText = contentText().orIfBlank {
-        mediaDescription() ?: ""
-    }
-    // Base64 encoded images can be quite large - and crash database cursors
-    val image = thumbnail(baseUrl)?.let { img ->
-        when {
-            img.startsWith("data:") -> null
-            else -> img
+    try {
+        val contentText = contentText().orIfBlank {
+            mediaDescription() ?: ""
         }
-    }
-    val writer = when (author?.isNotBlank()) {
-        true -> Author(name = author)
-        else -> feedAuthor
-    }
+        // Base64 encoded images can be quite large - and crash database cursors
+        val image = thumbnail(baseUrl)?.let { img ->
+            when {
+                img.startsWith("data:") -> null
+                else -> img
+            }
+        }
+        val writer = when (author?.isNotBlank()) {
+            true -> Author(name = author)
+            else -> feedAuthor
+        }
 
-    return Item(
-        id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
-        url = linkToHtml(baseUrl),
-        title = plainTitle(),
-        content_text = contentText,
-        content_html = contentHtml(),
-        summary = contentText.take(200),
-        image = image,
-        date_published = publishedRFC3339Date(),
-        date_modified = modifiedRFC3339Date(),
-        author = writer,
-        attachments = enclosures?.map { it.asAttachment(baseUrl = baseUrl) }
-    )
+        return Item(
+            id = relativeLinkIntoAbsoluteOrNull(baseUrl, this.uri),
+            url = linkToHtml(baseUrl),
+            title = plainTitle(),
+            content_text = contentText,
+            content_html = contentHtml(),
+            summary = contentText.take(200),
+            image = image,
+            date_published = publishedRFC3339Date(),
+            date_modified = modifiedRFC3339Date(),
+            author = writer,
+            attachments = enclosures?.map { it.asAttachment(baseUrl = baseUrl) }
+        )
+    } catch (t: Throwable) {
+        throw t
+    }
 }
 
 fun String.orIfBlank(block: () -> String): String =
@@ -192,8 +201,12 @@ fun SyndEntry.mediaDescription(): String? {
     val media = this.getModule(MediaModule.URI) as MediaEntryModule?
 
     return media?.metadata?.description
-        ?: media?.mediaContents?.firstOrNull { it.metadata?.description?.isNotBlank() == true }?.metadata?.description
-        ?: media?.mediaGroups?.firstOrNull { it.metadata?.description?.isNotBlank() == true }?.metadata?.description
+        ?: media?.mediaContents?.firstOrNull {
+            it.metadata?.description?.isNotBlank() == true
+        }?.metadata?.description
+        ?: media?.mediaGroups?.firstOrNull {
+            it.metadata?.description?.isNotBlank() == true
+        }?.metadata?.description
 }
 
 /**
@@ -204,7 +217,8 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
 
     val thumbnail: String? = media?.metadata?.thumbnail?.firstOrNull()?.url?.toString()
         ?: media?.mediaContents?.firstOrNull { "image" == it.medium }?.reference?.toString()
-        ?: media?.mediaGroups?.mapNotNull { it.metadata?.thumbnail?.firstOrNull() }?.firstOrNull()?.url?.toString()
+        ?: media?.mediaGroups?.mapNotNull { it.metadata?.thumbnail?.firstOrNull() }
+            ?.firstOrNull()?.url?.toString()
         ?: enclosures?.asSequence()
             ?.filterNotNull()
             ?.filter { it.type?.startsWith("image/") == true }
@@ -214,14 +228,23 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     return when {
         thumbnail != null -> relativeLinkIntoAbsolute(feedBaseUrl, thumbnail)
         else -> {
-            val imgLink: String? = naiveFindImageLink(this.contentHtml())?.let { unescapeEntities(it, true) }
+            val imgLink: String? =
+                naiveFindImageLink(this.contentHtml())?.let { unescapeEntities(it, true) }
             // Now we are resolving against original, not the feed
             val siteBaseUrl: String? = this.linkToHtml(feedBaseUrl)
 
-            when {
-                siteBaseUrl != null && imgLink != null -> relativeLinkIntoAbsolute(URL(siteBaseUrl), imgLink)
-                imgLink != null -> relativeLinkIntoAbsolute(feedBaseUrl, imgLink)
-                else -> null
+            try {
+                when {
+                    siteBaseUrl != null && imgLink != null -> relativeLinkIntoAbsolute(
+                        URL(siteBaseUrl),
+                        imgLink
+                    )
+                    imgLink != null -> relativeLinkIntoAbsolute(feedBaseUrl, imgLink)
+                    else -> null
+                }
+            } catch (t: Throwable) {
+                Log.e("FeederRomeExt", "Encountered some bad link: [$siteBaseUrl, $feedBaseUrl]", t)
+                null
             }
         }
     }
@@ -229,13 +252,20 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
 
 fun SyndEntry.publishedRFC3339ZonedDateTime(): ZonedDateTime? =
     when (publishedDate != null) {
-        true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(publishedDate.time), ZoneOffset.systemDefault())
-        else -> modifiedRFC3339ZonedDateTime() // This is the required element in atom feeds so it is a good fallback
+        true -> ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli(publishedDate.time),
+            ZoneOffset.systemDefault()
+        )
+        // This is the required element in atom feeds so it is a good fallback
+        else -> modifiedRFC3339ZonedDateTime()
     }
 
 fun SyndEntry.modifiedRFC3339ZonedDateTime(): ZonedDateTime? =
     when (updatedDate != null) {
-        true -> ZonedDateTime.ofInstant(Instant.ofEpochMilli(updatedDate.time), ZoneOffset.systemDefault())
+        true -> ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli(updatedDate.time),
+            ZoneOffset.systemDefault()
+        )
         else -> null
     }
 
