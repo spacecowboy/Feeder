@@ -172,4 +172,8 @@
     <string name="block_list">Список блокування</string>
     <string name="add_item">Додати елемент</string>
     <string name="remove">Вилучити</string>
+    <string name="showing_only_bookmarked_articles">Показувати лише статті в закладках</string>
+    <string name="bookmarks_filter">Лише закладки</string>
+    <string name="bookmark_article">Додати до закладок</string>
+    <string name="remove_bookmark">Вилучити закладку</string>
 </resources>
