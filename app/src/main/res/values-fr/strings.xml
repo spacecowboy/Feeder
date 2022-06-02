@@ -172,4 +172,8 @@
     <string name="add_item">Ajouter un élément</string>
     <string name="block_list">Liste de blocage</string>
     <string name="remove">Retirer</string>
+    <string name="showing_only_bookmarked_articles">Seuls les articles marqués sont affichés</string>
+    <string name="bookmarks_filter">Tous les marque-pages</string>
+    <string name="bookmark_article">Ajouter un marque-page</string>
+    <string name="remove_bookmark">Supprimer le marque-page</string>
 </resources>
