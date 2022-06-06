@@ -1,3 +1,37 @@
+# 2.2.1
+Ady (1):
+  * [41c33ece] Updated French translation using Weblate
+
+Agnieszka C (1):
+  * [76baedde] Updated Polish translation using Weblate
+
+Andrij Mizyk (1):
+  * [88ebe3cd] Updated Ukrainian translation using Weblate
+
+ERYpTION (1):
+  * [f99360d4] Updated Danish translation using Weblate
+
+El Pirujo (1):
+  * [8355e4b1] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [7247ce08] Updated Chinese (Simplified) translation using Weblate
+
+Jonas Kalderstam (1):
+  * [ed0f3c33] Fixed crash when feeds have items with bad links
+
+Nikita Epifanov (1):
+  * [575fc3b3] Updated Russian translation using Weblate
+
+Oğuz Ersen (1):
+  * [5b1c4f60] Updated Turkish translation using Weblate
+
+Vitor Henrique (1):
+  * [576be0f3] Updated Portuguese (Brazil) translation using Weblate
+
+mm4c (1):
+  * [7980253d] Updated Dutch translation using Weblate
+
 # 2.2.0
 Ady (6):
   * [6f4bcab2] Update schema to add bookmarked status
