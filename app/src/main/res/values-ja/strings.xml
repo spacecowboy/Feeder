@@ -172,4 +172,8 @@
     <string name="block_list">ブロックリスト</string>
     <string name="add_item">アイテムの追加</string>
     <string name="remove">削除</string>
+    <string name="bookmarks_filter">ブックマークのみ</string>
+    <string name="showing_only_bookmarked_articles">ブックマーク記事のみ表示</string>
+    <string name="bookmark_article">ブックマーク記事</string>
+    <string name="remove_bookmark">ブックマークの削除</string>
 </resources>
