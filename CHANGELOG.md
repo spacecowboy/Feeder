@@ -1,3 +1,19 @@
+# 2.2.2
+Andrij Mizyk (1):
+  * [5f9dfafd] Updated Ukrainian translation using Weblate
+
+Jonas Kalderstam (1):
+  * [2bf95ec2] Fixed list incorrectly scrolling up when marking as read
+
+Meiru (1):
+  * [7e74a6d9] Updated Japanese translation using Weblate
+
+VfBFan (1):
+  * [1d9c7dcd] Updated German translation using Weblate
+
+zmni (1):
+  * [40ec8315] Updated Indonesian translation using Weblate
+
 # 2.2.1
 Ady (1):
   * [41c33ece] Updated French translation using Weblate
