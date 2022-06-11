@@ -172,4 +172,8 @@
     <string name="block_list">Sperrliste</string>
     <string name="add_item">Eintrag hinzufügen</string>
     <string name="remove">Entfernen</string>
+    <string name="bookmarks_filter">Nur Lesezeichen</string>
+    <string name="showing_only_bookmarked_articles">Nur mit Lesezeichen versehene Artikel anzeigen</string>
+    <string name="remove_bookmark">Lesezeichen entfernen</string>
+    <string name="bookmark_article">Lesezeichen hinzufügen</string>
 </resources>
