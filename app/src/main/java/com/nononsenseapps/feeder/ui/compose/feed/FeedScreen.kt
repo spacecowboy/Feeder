@@ -160,7 +160,9 @@ fun FeedListContent(
             LazyColumn(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(bottom = if (viewState.bottomBarVisible) (80 + 40).dp else 80.dp),
+                contentPadding = PaddingValues(
+                    bottom = if (viewState.bottomBarVisible) (80 + 40).dp else 80.dp
+                ),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
@@ -187,8 +189,10 @@ fun FeedListContent(
                         onMarkAboveAsRead = {
                             if (itemIndex > 0) {
                                 markBeforeAsRead(itemIndex)
-                                coroutineScope.launch {
-                                    listState.scrollToItem(0)
+                                if (viewState.onlyUnread) {
+                                    coroutineScope.launch {
+                                        listState.scrollToItem(0)
+                                    }
                                 }
                             }
                         },
