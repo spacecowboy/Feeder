@@ -172,4 +172,8 @@
     <string name="only_from_end">Só dende o final</string>
     <string name="are_you_sure_leave_sync_chain">Está seguro de querer abandonar a cadea de sincronización\?</string>
     <string name="open_enclosed_media">Abrir audiovisuales incluídos</string>
+    <string name="showing_only_bookmarked_articles">Amosar só os artigos marcados</string>
+    <string name="bookmarks_filter">Só marcadores</string>
+    <string name="bookmark_article">Artigo marcado</string>
+    <string name="remove_bookmark">Borrar marcador</string>
 </resources>
