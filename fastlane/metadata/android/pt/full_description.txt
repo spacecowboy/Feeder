@@ -1,0 +1,19 @@
+<p>Está cansado de leitores não livres que roubam informações pessoais?<br/>
+Está cansado de configurações complicadas de sincronização que levam horas para configurar o servidor?<br/>
+Não aguenta mais ter que criar contas em todos os lugares?<br/></p>
+
+<p>Tente o Feeder!</p>
+
+<p>Feeder é um leitor completamente livre. Aceita todos os formatos comuns de feeds, incluindo JSONFeed. Não te rastreia. Não necessita de qualquer configuração. Não precisa nem mesmo que você crie uma conta! Apenas adicione seus feeds, ou importe-os de outro leitor através do arquivo OPML, e comece a sincronizar e ler.</p>
+
+<p><b>Características</b></p>
+
+<ul>
+<li>Analisa o HTML e mostra-o em um TextView nativo</li>
+<li>Leitura offline</li>
+<li>Sincronização em segundo plano</li>
+<li>Notificações</li>
+<li>Importar/Exportar em OPML</li>
+<li>Acesso prático aos links</li>
+<li>Material design</li>
+</ul>
