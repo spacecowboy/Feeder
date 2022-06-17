@@ -167,4 +167,13 @@
     <string name="swipe_to_mark_as_read">Glisați pentru a marca ca citit</string>
     <string name="are_you_sure_leave_sync_chain">Ești sigur că vrei să părăsești lanțul de sincronizare\?</string>
     <string name="no_barcode_scanner_installed">Nu a putut găsi un cititor de coduri de bare</string>
+    <string name="block_list">Lista de blocuri</string>
+    <string name="add_item">Adăugați elementul</string>
+    <string name="unpin_article">Anulați pin-ul articolului</string>
+    <string name="showing_only_bookmarked_articles">Afișarea numai a articolelor marcate ca favorite</string>
+    <string name="bookmarks_filter">Numai marcaje</string>
+    <string name="remove">Eliminați</string>
+    <string name="pin_article">Articol cu pin</string>
+    <string name="bookmark_article">Marcați articolul</string>
+    <string name="remove_bookmark">Eliminați marcajul</string>
 </resources>
