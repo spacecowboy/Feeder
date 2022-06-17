@@ -1,3 +1,16 @@
+# 2.2.3
+Athanasios Plastiras (1):
+  * [d3ea05e1] Updated Greek translation using Weblate
+
+Vítor Fernandes Almado (1):
+  * [8c81a0ed] Updated Portuguese translation using Weblate
+
+WB (1):
+  * [4c03fe85] Translated using Weblate (Galician)
+
+Weblate (1):
+  * [6c49bc96] Added Portuguese translation using Weblate
+
 # 2.2.2
 Andrij Mizyk (1):
   * [5f9dfafd] Updated Ukrainian translation using Weblate
