@@ -175,10 +175,10 @@ fun FeedListContent(
                         ?: return@items
 
                     SwipeableFeedItemPreview(
-                        onSwipe = {
+                        onSwipe = { currentState ->
                             markAsUnread(
                                 previewItem.id,
-                                !previewItem.unread
+                                !currentState
                             )
                         },
                         swipeAsRead = viewState.swipeAsRead,

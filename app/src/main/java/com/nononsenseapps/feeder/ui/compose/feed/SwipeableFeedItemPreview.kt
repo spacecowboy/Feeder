@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -50,6 +51,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.SwipeAsRead
@@ -57,8 +59,15 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
 import kotlin.math.roundToInt
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.kodein.di.compose.LocalDI
+import org.kodein.di.instance
 
+/**
+ * OnSwipe takes a boolean parameter of the current read state of the item - so that it can be
+ * called multiple times by several DisposableEffects.
+ */
 @OptIn(
     ExperimentalFoundationApi::class,
     ExperimentalMaterialApi::class,
@@ -67,7 +76,7 @@ import kotlinx.coroutines.launch
 )
 @Composable
 fun SwipeableFeedItemPreview(
-    onSwipe: suspend () -> Unit,
+    onSwipe: suspend (Boolean) -> Unit,
     onlyUnread: Boolean,
     item: FeedListItem,
     showThumbnail: Boolean,
@@ -81,6 +90,8 @@ fun SwipeableFeedItemPreview(
     onShareItem: () -> Unit,
     onItemClick: () -> Unit,
 ) {
+    val di = LocalDI.current
+    val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
     val coroutineScope = rememberCoroutineScope()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val animatedVisibilityState = remember { MutableTransitionState(true) }
@@ -100,28 +111,54 @@ fun SwipeableFeedItemPreview(
         swipeableState.animateTo(FeedItemSwipeState.NONE)
     }
 
-    if (swipeableState.currentValue != FeedItemSwipeState.NONE) {
-        LaunchedEffect(swipeableState.currentValue) {
-            if (onlyUnread) {
-                animatedVisibilityState.targetState = false
-            } else {
-                onSwipe()
+    // Start hide animation as soon as swipe animation beings
+    LaunchedEffect(onlyUnread, swipeableState.targetValue, swipeableState.isAnimationRunning) {
+        if (onlyUnread &&
+            swipeableState.targetValue != FeedItemSwipeState.NONE &&
+            swipeableState.isAnimationRunning
+        ) {
+            animatedVisibilityState.targetState = false
+        }
+    }
+
+    LaunchedEffect(swipeableState.currentValue, onlyUnread) {
+        if (swipeableState.currentValue != FeedItemSwipeState.NONE) {
+            if (!onlyUnread) {
+                // Swipe is complete, toggle read state. If onlyUnread then wait for vertical hide
+                Log.d("JONAS", "Animation onSwipe ${item.unread}")
+                onSwipe(item.unread)
             }
         }
     }
 
-    if (
-        onlyUnread &&
-        animatedVisibilityState.isIdle &&
-        animatedVisibilityState.currentState != item.unread &&
-        swipeableState.currentValue != FeedItemSwipeState.NONE
-    ) {
-        LaunchedEffect(key1 = animatedVisibilityState.currentState, key2 = item.unread) {
-            if (animatedVisibilityState.currentState != item.unread) {
-                // Reset swipe state here to avoid a race later since item will not receive update
-                // when removed from list
-                swipeableState.snapTo(FeedItemSwipeState.NONE)
-                onSwipe()
+    // Once vertical hide animation completes then mark item as read
+    LaunchedEffect(animatedVisibilityState.currentState, animatedVisibilityState.isIdle) {
+        if (!animatedVisibilityState.currentState && animatedVisibilityState.isIdle) {
+            Log.d("JONAS", "Anim: onSwipe ${item.unread}")
+            swipeableState.snapTo(FeedItemSwipeState.NONE)
+            onSwipe(item.unread)
+        }
+    }
+
+    // This disposable effect is used to ensure we call onSwipe
+    // Even if we navigate away from the screen in the middle of the animation
+    DisposableEffect(swipeableState.targetValue, swipeableState.isAnimationRunning) {
+        onDispose {
+            // isAnimationRunning only becomes true when user lifts the finger
+            if (swipeableState.isAnimationRunning &&
+                swipeableState.targetValue != FeedItemSwipeState.NONE
+            ) {
+                val currentState = item.unread
+
+                // Use ApplicationCoroutineScope to ensure this runs even if we navigate away
+                // from the screen
+                applicationCoroutineScope.launch {
+                    Log.d("JONAS", "Dispose: Wait...")
+                    // Wait a little to ensure animations complete
+                    delay(600)
+                    Log.d("JONAS", "Dispose: Calling onSwipe $currentState")
+                    onSwipe(currentState)
+                }
             }
         }
     }
@@ -183,7 +220,7 @@ fun SwipeableFeedItemPreview(
                         customActions = listOf(
                             CustomAccessibilityAction(toggleReadStatusLabel) {
                                 coroutineScope.launch {
-                                    onSwipe()
+                                    onSwipe(item.unread)
                                 }
                                 true
                             },
