@@ -29,8 +29,8 @@
     <string name="notify_for_new_items">Obavijesti za nove članke</string>
     <string name="dont_notify_for_new_items">Zaustavi obaviještenja</string>
     <string name="toggle_read_status">Uključi-isključi status čitanja</string>
-    <string name="open_link_in_browser">Otvori vezu u pregledniku</string>
-    <string name="open_in_browser">Otvori u pregledniku</string>
+    <string name="open_link_in_browser">Otvori vezu u internet pregledniku</string>
+    <string name="open_in_browser">Otvori u internet pregledniku</string>
     <string name="open_enclosed_media">Otvori priložen medij</string>
     <string name="sync">Sinhronizuj</string>
     <string name="export_feeds_to_opml">Izvoz izvora (feedova) u OPML</string>
@@ -39,7 +39,7 @@
     <string name="new_based_on_this">Novi zasnovan na ovom</string>
     <string name="indicator_for_mark_as_read">Indikator oznake \"pročitano\"</string>
     <string name="share">Podijeli</string>
-    <string name="no_such_feed">Nema sličnih izvora (feedova). Pokušajte dodati https.</string>
+    <string name="no_such_feed">Nema sličnih izvora vijesti. Možda da pokušate dodati https\?</string>
     <string name="nothing_to_display">Nema ničega za pregledanje!</string>
     <string name="title_activity_settings">Postavke</string>
     <string name="all_feeds">Svi izvori (feedovi)</string>
@@ -51,14 +51,14 @@
     <string name="sync_option_every_6_hours">Svakih 6 sati</string>
     <string name="sync_option_every_12_hours">Svakih 12 sati</string>
     <string name="sync_option_every_day">Svakog dana</string>
-    <string name="synchronization">Sinhronizacija</string>
+    <string name="synchronization">Sinhroniziranje</string>
     <string name="only_on_wifi">Samo na WiFi mreži</string>
     <string name="show_thumbnails">Prikaži sličice</string>
     <string name="may_result_data_charges">Može povećati trošak mobilnih podataka.</string>
     <string name="only_when_charging">Samo tokom punjenja</string>
     <string name="image_loading">Učitavanje slika</string>
-    <string name="no_activity_for_link">Nema aktivnosti za otvaranje te veze pomoću</string>
-    <string name="check_for_updates">Provjera ažuriranja</string>
+    <string name="no_activity_for_link">Instalirajte nešto pomoću čega se otvara ta veza</string>
+    <string name="check_for_updates">Traži nove članke…</string>
     <string name="on_startup">Pri pokretanju</string>
     <string name="show_fab">Prikaži plutajuće dugme aktivnosti</string>
     <string name="include_mobile_hotspots">Uvrsti mobilne hotspotove</string>
@@ -74,9 +74,9 @@
     <string name="reader_settings">Čitač</string>
     <string name="open_link_in_web_view">Otvori vezu u web prikazu</string>
     <string name="open_in_web_view">Otvori u web prikazu</string>
-    <string name="max_feed_items">Maksimalan broj članaka po izvoru (feedu)</string>
+    <string name="max_feed_items">Maksimalan broj članaka po izvoru</string>
     <string name="could_not_load_url">Nemoguće učitati adresu (URL)</string>
-    <string name="theme_system">Prati sistem</string>
+    <string name="theme_system">Sistemska</string>
     <string name="theme_automatic">Automatska</string>
     <string name="theme_day">Dan</string>
     <string name="theme_night">Noć</string>
@@ -169,4 +169,11 @@
     <string name="feeder_device_sync_code">Feederov sinhro-kod uređaja</string>
     <string name="sync_code">Sinhro-kod</string>
     <string name="disabled">Onemogućeno</string>
+    <string name="block_list">Lista blokiranja</string>
+    <string name="add_item">Dodaj stavku</string>
+    <string name="remove">Ukloni</string>
+    <string name="showing_only_bookmarked_articles">Prikazivanje samo zabilježenih članaka</string>
+    <string name="bookmarks_filter">Samo zabilješke</string>
+    <string name="bookmark_article">Dodaj članak u zabilješke</string>
+    <string name="remove_bookmark">Ukloni zabilješku</string>
 </resources>
