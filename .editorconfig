@@ -4,7 +4,6 @@ end_of_line = lf
 indent_size = 4
 indent_style = space
 insert_final_newline = true
-max_line_length = 100
 tab_width = 4
 ij_continuation_indent_size = 8
 ij_formatter_off_tag = @formatter:off
@@ -13,6 +12,9 @@ ij_formatter_tags_enabled = false
 ij_smart_tabs = false
 ij_visual_guides = none
 ij_wrap_on_typing = false
+
+[*.{kt,kts}]
+ktlint_code_style = official
 
 [*.java]
 ij_java_align_consecutive_assignments = false

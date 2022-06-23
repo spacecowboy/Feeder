@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.db.room
 
+import android.database.Cursor
 import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.Dao
@@ -8,6 +9,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.nononsenseapps.feeder.db.COL_ID
+import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
+import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.model.PreviewItem
@@ -84,6 +88,25 @@ interface FeedItemDao {
         """
     )
     suspend fun loadFeedItemsInFeedDesc(feedId: Long): List<FeedItem>
+
+    @Query(
+        """
+        SELECT $COL_ID as id, $COL_TITLE as title, $COL_PLAINSNIPPET as text
+        FROM feed_items
+        ORDER BY primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun loadFeedItemsForContentProvider(): Cursor
+
+    @Query(
+        """
+        SELECT $COL_ID as id, $COL_TITLE as title, $COL_PLAINSNIPPET as text
+        FROM feed_items
+        WHERE feed_items.feed_id = :feedId
+        ORDER BY primary_sort_time DESC, pub_date DESC
+        """
+    )
+    fun loadFeedItemsInFeedForContentProvider(feedId: Long): Cursor
 
     @Query(
         """
