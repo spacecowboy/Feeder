@@ -1,3 +1,15 @@
+# 2.2.4
+Artem (1):
+  * [3f1e94b0] Translated using Weblate (Ukrainian)
+
+Belmar Begić (1):
+  * [62f9c28f] Updated Bosnian translation using Weblate
+
+Jonas Kalderstam (1):
+  * [1ae8eb07] Improved speed and reliability of swipe
+  * [dea765b9] Implemented content provider so other apps can access data
+         with permission
+
 # 2.2.3
 Athanasios Plastiras (1):
   * [d3ea05e1] Updated Greek translation using Weblate
