@@ -9,17 +9,23 @@
   <uses-permission android:name="android.permission.INTERNET" /> <!-- To limit syncing to only WiFi -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+  <permission
+    android:name="vnd.rssprovider.permission.read"
+    android:description="@string/permission_read_desc"
+    android:label="@string/permission_read_label"
+    android:permissionGroup="android.permission-group.PERSONAL_INFO" />
+
   <queries>
     <!-- So a barcode scanner can be invoked -->
     <package android:name="com.google.zxing.client.android" />
     <intent>
       <action android:name="android.intent.action.TTS_SERVICE" />
     </intent>
-<!--    TODO implement custom text selection actions -->
-<!--    <intent>-->
-<!--      <action android:name="android.intent.action.PROCESS_TEXT" />-->
-<!--      <data android:mimeType="text/plain" />-->
-<!--    </intent>-->
+    <!--    TODO implement custom text selection actions -->
+    <!--    <intent>-->
+    <!--      <action android:name="android.intent.action.PROCESS_TEXT" />-->
+    <!--      <data android:mimeType="text/plain" />-->
+    <!--    </intent>-->
   </queries>
 
   <application
@@ -40,7 +46,7 @@
       android:name="com.nononsenseapps.feeder.ui.MainActivity"
       android:exported="true"
       android:label="@string/app_name"
-      android:launchMode="singleTop" >
+      android:launchMode="singleTop">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
@@ -49,6 +55,7 @@
       <!-- This filter MUST look like this for Android to automatically open these links -->
       <intent-filter android:autoVerify="true">
         <action android:name="android.intent.action.VIEW" />
+
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
 
@@ -150,13 +157,19 @@
 
     <activity
       android:name=".ui.OpenLinkInDefaultActivity"
+      android:exported="true"
       android:label="@string/open_link_in_browser"
       android:launchMode="singleInstance"
-      android:exported="true"
       android:taskAffinity="${applicationId}.OpenLinkTask" />
 
     <service
       android:name=".model.FeederService"
       android:exported="true" />
+
+    <provider
+      android:name=".contentprovider.RSSContentProvider"
+      android:authorities="com.nononsenseapps.feeder.rssprovider"
+      android:exported="true"
+      android:readPermission="vnd.rssprovider.permission.read" />
   </application>
 </manifest>

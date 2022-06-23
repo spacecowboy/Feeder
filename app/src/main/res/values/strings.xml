@@ -186,4 +186,7 @@
   <string name="unpin_article">Unpin article</string>
   <string name="bookmark_article">Bookmark article</string>
   <string name="remove_bookmark">Remove bookmark</string>
+
+  <string name="permission_read_desc">Allows the application to read feeds and articles</string>
+  <string name="permission_read_label">Feeder read-only access</string>
 </resources>

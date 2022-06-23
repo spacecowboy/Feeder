@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.db.room
 
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
@@ -79,6 +80,15 @@ interface FeedDao {
 
     @Query("SELECT * FROM feeds")
     suspend fun loadFeeds(): List<Feed>
+
+    @Query(
+        """
+        SELECT $COL_ID as id, $COL_TITLE as title
+        FROM feeds
+        ORDER BY $COL_TITLE
+    """
+    )
+    fun loadFeedsForContentProvider(): Cursor
 
     @Query("SELECT * FROM feeds WHERE last_sync < :staleTime")
     suspend fun loadFeedsIfStale(staleTime: Long): List<Feed>
