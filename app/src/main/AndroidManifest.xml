@@ -13,7 +13,7 @@
     android:name="vnd.rssprovider.permission.read"
     android:description="@string/permission_read_desc"
     android:label="@string/permission_read_label"
-    android:permissionGroup="android.permission-group.PERSONAL_INFO" />
+    android:permissionGroup="android.permission-group.SOCIAL_INFO" />
 
   <queries>
     <!-- So a barcode scanner can be invoked -->
