@@ -32,7 +32,7 @@ test:
 compile:
   stage: build
   script:
-    - source devenv && ./gradlew assembleDebugMini packageDebugAndroidTest
+    - source devenv && ./gradlew assembleDebugMini packageDebugAndroidTest assemblePlayDebug
   needs: []
   artifacts:
     paths:
