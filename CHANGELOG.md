@@ -1,3 +1,7 @@
+# 2.2.4-1
+Jonas Kalderstam (2):
+  * [b8f4f64e] Fixed content provider preventing installs
+
 # 2.2.4
 Artem (1):
   * [3f1e94b0] Translated using Weblate (Ukrainian)
