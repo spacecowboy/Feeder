@@ -12,9 +12,7 @@
   <permission
     android:name="com.nononsenseapps.feeder.permission.read"
     android:description="@string/permission_read_desc"
-    android:label="@string/permission_read_label"
-    android:protectionLevel="normal"
-    android:permissionGroup="android.permission-group.SOCIAL_INFO" />
+    android:label="@string/permission_read_label" />
 
   <queries>
     <!-- So a barcode scanner can be invoked -->
@@ -171,6 +169,7 @@
       android:name=".contentprovider.RSSContentProvider"
       android:authorities="com.nononsenseapps.feeder.rssprovider"
       android:exported="true"
-      android:readPermission="com.nononsenseapps feeder.permission.read" />
+      android:readPermission="com.nononsenseapps.feeder.permission.read"
+      />
   </application>
 </manifest>
