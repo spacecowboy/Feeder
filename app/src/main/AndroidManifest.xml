@@ -9,6 +9,13 @@
   <uses-permission android:name="android.permission.INTERNET" /> <!-- To limit syncing to only WiFi -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+  <permission
+    android:name="com.nononsenseapps.feeder.permission.read"
+    android:description="@string/permission_read_desc"
+    android:label="@string/permission_read_label"
+    android:protectionLevel="normal"
+    android:permissionGroup="android.permission-group.SOCIAL_INFO" />
+
   <queries>
     <!-- So a barcode scanner can be invoked -->
     <package android:name="com.google.zxing.client.android" />
@@ -160,5 +167,10 @@
       android:name=".model.FeederService"
       android:exported="true" />
 
+    <provider
+      android:name=".contentprovider.RSSContentProvider"
+      android:authorities="com.nononsenseapps.feeder.rssprovider"
+      android:exported="true"
+      android:readPermission="com.nononsenseapps feeder.permission.read" />
   </application>
 </manifest>
