@@ -70,7 +70,7 @@
     <string name="javascript">JavaScript</string>
     <string name="touch_to_play_video">Натисніть, щоб відтворити відео</string>
     <string name="no_email_client">Не можливо відкрити клієнт ел. пошти</string>
-    <string name="send_bug_report">Звіт про ваду</string>
+    <string name="send_bug_report">Звіт про недолік</string>
     <string name="sort">Сортування</string>
     <string name="sort_oldest_first">Спочатку старіші</string>
     <string name="sort_newest_first">Спочатку новіші</string>
@@ -176,4 +176,6 @@
     <string name="bookmarks_filter">Лише закладки</string>
     <string name="bookmark_article">Додати до закладок</string>
     <string name="remove_bookmark">Вилучити закладку</string>
+    <string name="permission_read_desc">Дозволяє програмі читати стрічки і статті</string>
+    <string name="permission_read_label">Доступ лише для читання для Feeder</string>
 </resources>
