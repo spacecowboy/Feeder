@@ -176,4 +176,6 @@
     <string name="showing_only_bookmarked_articles">Viser kun artikler med bogmærke</string>
     <string name="bookmark_article">Sæt bogmærke på artiklen</string>
     <string name="remove_bookmark">Fjern bogmærke</string>
+    <string name="permission_read_label">Feeder skrivebeskyttet adgang</string>
+    <string name="permission_read_desc">Gør det muligt for applikationen at læse feeds og artikler</string>
 </resources>
