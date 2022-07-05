@@ -176,4 +176,6 @@
     <string name="bookmarks_filter">Tous les marque-pages</string>
     <string name="bookmark_article">Ajouter un marque-page</string>
     <string name="remove_bookmark">Supprimer le marque-page</string>
+    <string name="permission_read_desc">Permet à l\'application de lire des flux et des articles</string>
+    <string name="permission_read_label">Accès en lecture seule Feeder</string>
 </resources>
