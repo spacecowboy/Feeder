@@ -176,4 +176,6 @@
     <string name="showing_only_bookmarked_articles">ブックマーク記事のみ表示</string>
     <string name="bookmark_article">ブックマーク記事</string>
     <string name="remove_bookmark">ブックマークの削除</string>
+    <string name="permission_read_label">Feederの読み取り専用アクセス</string>
+    <string name="permission_read_desc">アプリによるフィードと記事の読み取りを許可する</string>
 </resources>
