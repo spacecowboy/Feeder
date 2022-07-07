@@ -1,3 +1,40 @@
+# 2.2.5
+Agnieszka C (1):
+  * [59c9f5d9] Updated Polish translation using Weblate
+
+Andrij Mizyk (1):
+  * [c51289a7] Updated Ukrainian translation using Weblate
+
+ERYpTION (1):
+  * [bf971897] Updated Danish translation using Weblate
+
+El Pirujo (1):
+  * [2b5a0bc7] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [c410021f] Updated Chinese (Simplified) translation using Weblate
+
+H Tamás (1):
+  * [3b2a72d9] Added Hungarian translation using Weblate
+
+J. Lavoie (1):
+  * [2161a18a] Updated Italian translation using Weblate
+
+Meiru (1):
+  * [9a3f100a] Updated Japanese translation using Weblate
+
+Oğuz Ersen (1):
+  * [648e9d5d] Updated Turkish translation using Weblate
+
+VfBFan (1):
+  * [14c66874] Updated German translation using Weblate
+
+mm4c (1):
+  * [48862b19] Updated Dutch translation using Weblate
+
+Егор Ермаков (1):
+  * [7dbee822] Translated using Weblate (Russian)
+
 # 2.2.4-1
 Jonas Kalderstam (2):
   * [b8f4f64e] Fixed content provider preventing installs

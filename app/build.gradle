@@ -22,8 +22,8 @@ android {
 
   defaultConfig {
     applicationId "com.nononsenseapps.feeder"
-    versionCode 246
-    versionName "2.2.4-1"
+    versionCode 247
+    versionName "2.2.5"
     compileSdkVersion 31
     minSdkVersion 23
     targetSdkVersion 31
