@@ -150,4 +150,5 @@
     <string name="device_sync">Laitteen synkronointi</string>
     <string name="add_new_device">Lisää uusi laite</string>
     <string name="only_enable_for_bad_id_feeds">Ota käyttöön vain syötteille, joilla on huonot tunnukset</string>
+    <string name="block_list">Estoluettelo</string>
 </resources>

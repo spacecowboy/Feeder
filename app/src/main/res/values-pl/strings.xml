@@ -176,4 +176,6 @@
     <string name="remove_bookmark">Usuń z zakładek</string>
     <string name="bookmark_article">Dodaj do zakładek</string>
     <string name="showing_only_bookmarked_articles">Wyświetlanie tylko artykułów z zakładek</string>
+    <string name="permission_read_label">Dostęp tylko do odczytu dla Feedera</string>
+    <string name="permission_read_desc">Umożliwia aplikacji odczytywanie kanałów i artykułów</string>
 </resources>

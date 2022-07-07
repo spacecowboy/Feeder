@@ -176,4 +176,6 @@
     <string name="showing_only_bookmarked_articles">Yalnızca yer imlerine eklenen makaleler gösteriliyor</string>
     <string name="bookmark_article">Makaleyi yer imlerine ekle</string>
     <string name="remove_bookmark">Yer imini kaldır</string>
+    <string name="permission_read_desc">Uygulamanın yayınları ve makaleleri okumasına izin verir</string>
+    <string name="permission_read_label">Feeder salt okunur erişim</string>
 </resources>

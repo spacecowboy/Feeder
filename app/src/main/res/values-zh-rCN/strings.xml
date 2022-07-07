@@ -176,4 +176,6 @@
     <string name="remove_bookmark">删除书签</string>
     <string name="showing_only_bookmarked_articles">仅显示已添加书签的文章</string>
     <string name="bookmark_article">将文章加入书签</string>
+    <string name="permission_read_label">Feeder 只读权限</string>
+    <string name="permission_read_desc">允许应用读取源和文章</string>
 </resources>
