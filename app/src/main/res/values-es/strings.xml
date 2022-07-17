@@ -167,15 +167,15 @@
     <string name="swipe_to_mark_as_read">Deslizar para marcar como leído</string>
     <string name="are_you_sure_leave_sync_chain">¿Estás seguro que quieres abandonar la cadena de sincronización\?</string>
     <string name="no_barcode_scanner_installed">No se encontró un escáner de código de barras</string>
-    <string name="pin_article">Clavar artículo</string>
-    <string name="unpin_article">Desclavar artículo</string>
+    <string name="pin_article">Fijar artículo</string>
+    <string name="unpin_article">Desfijar artículo</string>
     <string name="block_list">Lista de bloqueos</string>
     <string name="add_item">Añadir elemento</string>
     <string name="remove">Retirar</string>
-    <string name="showing_only_bookmarked_articles">Mostrando solo lo artículos marcados</string>
+    <string name="showing_only_bookmarked_articles">Mostrando solo los artículos marcados</string>
     <string name="bookmarks_filter">Solo marcadores</string>
     <string name="remove_bookmark">Eliminar marcador</string>
-    <string name="bookmark_article">Artículo marcado</string>
+    <string name="bookmark_article">Añadir artículo a marcadores</string>
     <string name="permission_read_desc">Permite a la aplicación leer fuentes y artículos</string>
     <string name="permission_read_label">Acceso de solo lectura</string>
 </resources>
