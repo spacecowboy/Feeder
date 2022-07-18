@@ -176,4 +176,6 @@
     <string name="bookmarks_filter">Só marcadores</string>
     <string name="bookmark_article">Artigo marcado</string>
     <string name="remove_bookmark">Borrar marcador</string>
+    <string name="permission_read_desc">Permirtir á aplicación ler fontes e artigos</string>
+    <string name="permission_read_label">Acceso de só lectura</string>
 </resources>

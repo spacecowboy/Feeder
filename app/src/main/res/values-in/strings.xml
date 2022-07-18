@@ -176,4 +176,6 @@
     <string name="remove_bookmark">Hapus tanda</string>
     <string name="showing_only_bookmarked_articles">Hanya tampilkan artikel yang ditandai</string>
     <string name="bookmark_article">Tandai artikel</string>
+    <string name="permission_read_desc">Izinkan aplikasi untuk membaca umpan dan artikel</string>
+    <string name="permission_read_label">Akses Feeder hanya-baca</string>
 </resources>
