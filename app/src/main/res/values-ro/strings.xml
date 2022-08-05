@@ -176,4 +176,6 @@
     <string name="pin_article">Articol cu pin</string>
     <string name="bookmark_article">Marcați articolul</string>
     <string name="remove_bookmark">Eliminați marcajul</string>
+    <string name="permission_read_desc">Permite aplicației să citească fluxuri și articole</string>
+    <string name="permission_read_label">Acces numai pentru citire la Feeder</string>
 </resources>
