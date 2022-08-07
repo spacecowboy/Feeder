@@ -1,3 +1,19 @@
+# 2.2.7
+Jonas Kalderstam (1):
+  * [c333c453] Fixed mark above/below as read with pinned items
+
+Luna Jernberg (1):
+  * [27173e02] Updated Swedish translation using Weblate
+
+MkQtS (1):
+  * [379c4329] Updated Chinese (Simplified) translation using Weblate
+
+Simona Iacob (1):
+  * [60817d7b] Updated Romanian translation using Weblate
+
+мачко (1):
+  * [317bdcd5] Added Bulgarian translation using Weblate
+
 # 2.2.6
 D221 (1):
   * [f6445c30] Updated Lithuanian translation using Weblate
