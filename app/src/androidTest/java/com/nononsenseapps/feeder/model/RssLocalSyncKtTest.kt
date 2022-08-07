@@ -116,6 +116,7 @@ class RssLocalSyncKtTest {
             )
         }
 
+        @Suppress("DEPRECATION")
         assertEquals(
             "Unexpected number of items in feed",
             10,
@@ -138,6 +139,7 @@ class RssLocalSyncKtTest {
             )
         }
 
+        @Suppress("DEPRECATION")
         assertEquals(
             "Unexpected number of items in feed",
             15,
@@ -163,6 +165,7 @@ class RssLocalSyncKtTest {
             )
         }
 
+        @Suppress("DEPRECATION")
         assertEquals(
             "Expected duplicate guids to be mitigated by alternate id",
             13,
@@ -189,12 +192,14 @@ class RssLocalSyncKtTest {
             )
         }
 
+        @Suppress("DEPRECATION")
         assertEquals(
             "Unexpected number of items in feed",
             10,
             testDb.db.feedItemDao().loadFeedItemsInFeedDesc(cowboyJsonId).size
         )
 
+        @Suppress("DEPRECATION")
         assertEquals(
             "Unexpected number of items in feed",
             15,
@@ -354,7 +359,7 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/news-rss.xml", server.takeRequest().path)
 
-        val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
+        @Suppress("DEPRECATION") val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
         assertEquals(
             "Unique IDs should have been generated for items",
             99,
@@ -392,7 +397,7 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest().path)
 
-        val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
+        @Suppress("DEPRECATION") val items = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId)
 
         assertNotNull(
             "Item should have gotten a pubDate generated",
@@ -448,7 +453,7 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
-        val firstItem = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
+        @Suppress("DEPRECATION") val firstItem = testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
             assertNotNull(
                 "Item should have gotten a pubDate generated",
                 items[0].pubDate
@@ -465,6 +470,7 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
+        @Suppress("DEPRECATION")
         testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
             assertEquals(
                 "Should be 2 items in feed",
@@ -517,6 +523,7 @@ class RssLocalSyncKtTest {
         // Assert the feed was retrieved
         assertEquals("/rss", server.takeRequest(100, TimeUnit.MILLISECONDS)!!.path)
 
+        @Suppress("DEPRECATION")
         testDb.db.feedItemDao().loadFeedItemsInFeedDesc(feedId).let { items ->
             assertEquals(
                 "Feed should have no less items than in the raw feed even if that's more than cleanup count",
@@ -535,6 +542,7 @@ class RssLocalSyncKtTest {
             syncFeeds(di = di, filesDir = filesDir, feedId = cowboyAtomId)
         }
 
+        @Suppress("DEPRECATION")
         assertEquals(
             "Feed should have been parsed from slow response",
             15,
@@ -552,6 +560,7 @@ class RssLocalSyncKtTest {
             syncFeeds(di = di, filesDir = filesDir, feedId = cowboyAtomId)
         }
 
+        @Suppress("DEPRECATION")
         assertEquals(
             "Feed should not have been parsed from extremely slow response",
             0,
