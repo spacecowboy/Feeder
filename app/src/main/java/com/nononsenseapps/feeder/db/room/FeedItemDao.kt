@@ -79,6 +79,7 @@ interface FeedItemDao {
     )
     suspend fun loadFeedUrlOfFeedItem(id: Long): URL?
 
+    @Deprecated("Only used for migration and in tests")
     @Query(
         """
         SELECT *
@@ -110,16 +111,6 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT *
-        FROM feed_items
-        WHERE feed_items.feed_id = :feedId
-        ORDER BY primary_sort_time ASC, pub_date ASC
-        """
-    )
-    suspend fun loadFeedItemsInFeedAsc(feedId: Long): List<FeedItem>
-
-    @Query(
-        """
         SELECT $feedItemColumnsWithFeed
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
@@ -144,7 +135,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun loadLivePreviewsDesc(feedId: Long): DataSource.Factory<Int, PreviewItem>
@@ -155,7 +146,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun loadLivePreviewsAsc(feedId: Long): DataSource.Factory<Int, PreviewItem>
@@ -166,7 +157,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun loadLivePreviewsDesc(tag: String): DataSource.Factory<Int, PreviewItem>
@@ -177,7 +168,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun loadLivePreviewsAsc(tag: String): DataSource.Factory<Int, PreviewItem>
@@ -187,7 +178,7 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun loadLivePreviewsDesc(): DataSource.Factory<Int, PreviewItem>
@@ -197,7 +188,7 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun loadLivePreviewsAsc(): DataSource.Factory<Int, PreviewItem>
@@ -208,7 +199,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun loadLiveUnreadPreviewsDesc(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
@@ -219,7 +210,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun pagingUnreadPreviewsDesc(feedId: Long, unread: Boolean = true): PagingSource<Int, PreviewItem>
@@ -230,7 +221,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag AND (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun pagingUnreadPreviewsDesc(tag: String, unread: Boolean = true): PagingSource<Int, PreviewItem>
@@ -241,7 +232,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun pagingUnreadPreviewsDesc(unread: Boolean = true): PagingSource<Int, PreviewItem>
@@ -252,7 +243,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun pagingUnreadPreviewsAsc(feedId: Long, unread: Boolean = true): PagingSource<Int, PreviewItem>
@@ -263,7 +254,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag AND (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun pagingUnreadPreviewsAsc(tag: String, unread: Boolean = true): PagingSource<Int, PreviewItem>
@@ -274,7 +265,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun pagingUnreadPreviewsAsc(unread: Boolean = true): PagingSource<Int, PreviewItem>
@@ -285,7 +276,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun pagingPreviewsDesc(feedId: Long): PagingSource<Int, PreviewItem>
@@ -296,7 +287,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun pagingPreviewsDesc(tag: String): PagingSource<Int, PreviewItem>
@@ -306,7 +297,7 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun pagingPreviewsDesc(): PagingSource<Int, PreviewItem>
@@ -317,7 +308,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun pagingPreviewsAsc(feedId: Long): PagingSource<Int, PreviewItem>
@@ -328,7 +319,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun pagingPreviewsAsc(tag: String): PagingSource<Int, PreviewItem>
@@ -338,7 +329,7 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun pagingPreviewsAsc(): PagingSource<Int, PreviewItem>
@@ -349,7 +340,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun pagingBookmarksAsc(): PagingSource<Int, PreviewItem>
@@ -360,7 +351,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1 AND feed_id IS :feedId
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun pagingBookmarksAsc(feedId: Long): PagingSource<Int, PreviewItem>
@@ -371,7 +362,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1 AND tag IS :tag
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun pagingBookmarksAsc(tag: String): PagingSource<Int, PreviewItem>
@@ -382,7 +373,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun pagingBookmarksDesc(): PagingSource<Int, PreviewItem>
@@ -393,7 +384,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1 AND feed_id IS :feedId
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun pagingBookmarksDesc(feedId: Long): PagingSource<Int, PreviewItem>
@@ -404,7 +395,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1 AND tag IS :tag
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun pagingBookmarksDesc(tag: String): PagingSource<Int, PreviewItem>
@@ -415,7 +406,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun loadLiveUnreadPreviewsAsc(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
@@ -426,7 +417,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag AND (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun loadLiveUnreadPreviewsDesc(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
@@ -437,7 +428,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag AND (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun loadLiveUnreadPreviewsAsc(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
@@ -448,7 +439,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time DESC, pub_date DESC
+        ORDER BY $feedItemsListOrderByDesc
         """
     )
     fun loadLiveUnreadPreviewsDesc(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
@@ -459,7 +450,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE (unread IS :unread OR pinned = 1)
-        ORDER BY pinned DESC, primary_sort_time ASC, pub_date ASC
+        ORDER BY $feedItemsListOrderByAsc
         """
     )
     fun loadLiveUnreadPreviewsAsc(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
@@ -537,7 +528,7 @@ interface FeedItemDao {
                 SELECT feed_items.id
                 FROM feed_items
                 WHERE unread = 1 OR unread = :onlyUnread
-                ORDER BY primary_sort_time DESC, pub_date DESC
+                ORDER BY $feedItemsListOrderByDesc
                 LIMIT :limit OFFSET :offset
             )
         """
@@ -551,7 +542,7 @@ interface FeedItemDao {
                 SELECT feed_items.id
                 FROM feed_items
                 WHERE unread = 1 OR unread = :onlyUnread
-                ORDER BY primary_sort_time ASC, pub_date ASC
+                ORDER BY $feedItemsListOrderByAsc
                 LIMIT :limit OFFSET :offset
             )
         """
@@ -565,7 +556,7 @@ interface FeedItemDao {
                 SELECT feed_items.id
                 FROM feed_items
                 WHERE feed_id = :feedId AND (unread = 1 OR unread = :onlyUnread)
-                ORDER BY primary_sort_time DESC, pub_date DESC
+                ORDER BY $feedItemsListOrderByDesc
                 LIMIT :limit OFFSET :offset
             )
         """
@@ -584,7 +575,7 @@ interface FeedItemDao {
                 SELECT feed_items.id
                 FROM feed_items
                 WHERE feed_id = :feedId AND (unread = 1 OR unread = :onlyUnread)
-                ORDER BY primary_sort_time ASC, pub_date ASC
+                ORDER BY $feedItemsListOrderByAsc
                 LIMIT :limit OFFSET :offset
             )
         """
@@ -604,7 +595,7 @@ interface FeedItemDao {
                 FROM feed_items
                 LEFT JOIN feeds ON feed_items.feed_id = feeds.id
                 WHERE tag IS :tag AND (unread = 1 OR unread = :onlyUnread)
-                ORDER BY primary_sort_time DESC, pub_date DESC
+                ORDER BY $feedItemsListOrderByDesc
                 LIMIT :limit OFFSET :offset
             )
         """
@@ -624,7 +615,7 @@ interface FeedItemDao {
                 FROM feed_items
                 LEFT JOIN feeds ON feed_items.feed_id = feeds.id
                 WHERE tag IS :tag AND (unread = 1 OR unread = :onlyUnread)
-                ORDER BY primary_sort_time ASC, pub_date ASC
+                ORDER BY $feedItemsListOrderByAsc
                 LIMIT :limit OFFSET :offset
             )
         """
@@ -746,14 +737,11 @@ interface FeedItemDao {
         """
     )
     suspend fun getItemWith(feedUrl: URL, articleGuid: String): Long?
-}
 
-suspend fun FeedItemDao.upsertFeedItem(item: FeedItem): Long = when (item.id > ID_UNSET) {
-    true -> {
-        updateFeedItem(item)
-        item.id
+    companion object {
+        private const val feedItemsListOrderByDesc = "pinned DESC, primary_sort_time DESC, pub_date DESC"
+        private const val feedItemsListOrderByAsc = "pinned DESC, primary_sort_time ASC, pub_date ASC"
     }
-    false -> insertFeedItem(item)
 }
 
 suspend fun FeedItemDao.upsertFeedItems(
