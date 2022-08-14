@@ -2,7 +2,7 @@
 <resources>
     <string name="navigation_drawer_open">Abrir cajón de navegación</string>
     <string name="navigation_drawer_close">Cerrar cajón de navegación</string>
-    <string name="action_settings">Configuraciones</string>
+    <string name="action_settings">Ajustes</string>
     <string name="add_feed">Añadir canal</string>
     <string name="title_activity_edit_feed">Suscribir a un canal</string>
     <string name="url">URL</string>
