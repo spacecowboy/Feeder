@@ -42,7 +42,7 @@ import java.util.*
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 
-val dateTimeFormat =
+val dateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
         .withLocale(Locale.getDefault())
 

@@ -138,7 +138,7 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         viewModelScope.launch {
             repository.getSyncRemote().let { syncRemote ->
                 if (!state.contains("syncCode")) {
-                    setSyncCode(syncRemote.syncChainId ?: "")
+                    setSyncCode(syncRemote.syncChainId)
                 }
             }
 

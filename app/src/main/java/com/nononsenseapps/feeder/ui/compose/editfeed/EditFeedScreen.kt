@@ -61,6 +61,7 @@ import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
 import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 
 @Composable
 fun CreateFeedScreen(
@@ -196,9 +197,11 @@ fun EditFeedView(
 ) {
     val filteredTags by remember(viewState.allTags, viewState.tag) {
         derivedStateOf {
-            viewState.allTags.filter { tag ->
-                tag.isNotBlank() && tag.startsWith(viewState.tag, ignoreCase = true)
-            }
+            ImmutableHolder(
+                viewState.allTags.filter { tag ->
+                    tag.isNotBlank() && tag.startsWith(viewState.tag, ignoreCase = true)
+                }
+            )
         }
     }
 

@@ -27,23 +27,12 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
 @Composable
 fun EditFeedDialog(
-    feeds: List<DeletableFeed>,
-    onDismiss: () -> Unit,
-    onEdit: (Long) -> Unit
-) {
-    EditFeedDialog2(
-        feeds = feeds,
-        onDismiss = onDismiss,
-        onEdit = onEdit
-    )
-}
-
-@Composable
-fun EditFeedDialog2(
-    feeds: List<DeletableFeed>,
+    feeds: ImmutableHolder<List<DeletableFeed>>,
     onDismiss: () -> Unit,
     onEdit: (Long) -> Unit
 ) {
@@ -73,7 +62,7 @@ fun EditFeedDialog2(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                items(feeds) { feed ->
+                items(feeds.item) { feed ->
                     Row(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically,
@@ -110,7 +99,7 @@ fun EditFeedDialog2(
 @Preview
 private fun preview() =
     EditFeedDialog(
-        feeds = listOf(
+        feeds = immutableListHolderOf(
             DeletableFeed(1, "A Feed"),
             DeletableFeed(2, "Another Feed")
         ),

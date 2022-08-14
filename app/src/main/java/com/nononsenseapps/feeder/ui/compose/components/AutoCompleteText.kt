@@ -23,12 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun <T> AutoCompleteFoo(
     displaySuggestions: Boolean,
-    suggestions: List<T>,
+    suggestions: ImmutableHolder<List<T>>,
     onSuggestionClicked: (T) -> Unit,
     maxHeight: Dp = TextFieldDefaults.MinHeight * 3,
     suggestionContent: @Composable (T) -> Unit,
@@ -49,7 +51,7 @@ fun <T> AutoCompleteFoo(
                         shape = RoundedCornerShape(8.dp)
                     )
             ) {
-                items(suggestions) { suggestion ->
+                items(suggestions.item) { suggestion ->
                     Box(
                         modifier = Modifier
                             .clickable { onSuggestionClicked(suggestion) }
@@ -71,7 +73,7 @@ fun PreviewAutoCompleteOutlinedText() {
         suggestionContent = {
             Text(text = it)
         },
-        suggestions = listOf("One", "Two", "Three")
+        suggestions = immutableListHolderOf("One", "Two", "Three")
     ) {
         OutlinedTextField(value = "Testing", onValueChange = {})
     }

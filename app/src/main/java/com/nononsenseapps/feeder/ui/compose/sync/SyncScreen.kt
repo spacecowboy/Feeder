@@ -70,6 +70,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.BackHandler
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.KOFI_URL
@@ -230,7 +231,7 @@ fun SyncScreen(
             viewModel.setSecretKey(it)
         },
         currentDeviceId = viewState.deviceId,
-        devices = viewState.deviceList,
+        devices = ImmutableHolder(viewState.deviceList),
     )
 
     if (showLeaveSyncChainDialog) {
@@ -261,7 +262,7 @@ fun SyncScreen(
     onSetSyncCode: (String) -> Unit,
     onSetSecretKey: (String) -> Unit,
     currentDeviceId: Long,
-    devices: List<SyncDevice>,
+    devices: ImmutableHolder<List<SyncDevice>>,
     onLeaveSyncChain: () -> Unit,
 ) {
     when (syncScreenType) {
@@ -276,7 +277,7 @@ fun SyncScreen(
                 onDeleteDevice = onDeleteDevice,
                 currentDeviceId = currentDeviceId,
                 devices = devices,
-                addDeviceUrl = viewState.addNewDeviceUrl,
+                addDeviceUrl = ImmutableHolder(viewState.addNewDeviceUrl),
                 onJoinSyncChain = onJoinSyncChain,
                 syncCode = viewState.syncCode,
                 onSetSyncCode = onSetSyncCode,
@@ -306,7 +307,7 @@ fun SyncScreen(
         SyncScreenType.SINGLE_ADD_DEVICE -> {
             SyncAddNewDeviceScreen(
                 onNavigateUp = onLeaveAddDevice,
-                syncUrl = viewState.addNewDeviceUrl,
+                syncUrl = ImmutableHolder(viewState.addNewDeviceUrl),
                 onLeaveSyncChain = onLeaveSyncChain,
             )
         }
@@ -357,8 +358,8 @@ fun DualSyncScreen(
     onAddNewDevice: () -> Unit,
     onDeleteDevice: (Long) -> Unit,
     currentDeviceId: Long,
-    devices: List<SyncDevice>,
-    addDeviceUrl: URL,
+    devices: ImmutableHolder<List<SyncDevice>>,
+    addDeviceUrl: ImmutableHolder<URL>,
     onJoinSyncChain: (String, String) -> Unit,
     syncCode: String,
     onSetSyncCode: (String) -> Unit,
@@ -614,7 +615,7 @@ fun SyncJoinContent(
 fun SyncDeviceListScreen(
     onNavigateUp: () -> Unit,
     currentDeviceId: Long,
-    devices: List<SyncDevice>,
+    devices: ImmutableHolder<List<SyncDevice>>,
     onAddNewDevice: () -> Unit,
     onDeleteDevice: (Long) -> Unit,
     onLeaveSyncChain: () -> Unit,
@@ -640,7 +641,7 @@ fun SyncDeviceListScreen(
 fun SyncDeviceListContent(
     modifier: Modifier,
     currentDeviceId: Long,
-    devices: List<SyncDevice>,
+    devices: ImmutableHolder<List<SyncDevice>>,
     onAddNewDevice: () -> Unit,
     onDeleteDevice: (Long) -> Unit,
     showAddDeviceButton: Boolean,
@@ -670,10 +671,10 @@ fun SyncDeviceListContent(
                 .weight(1f, fill = true)
         ) {
             items(
-                count = devices.count(),
-                key = { devices[it].deviceId }
+                count = devices.item.count(),
+                key = { devices.item[it].deviceId }
             ) { index ->
-                val device = devices[index]
+                val device = devices.item[index]
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -790,7 +791,7 @@ fun DeleteDeviceDialog(
 @Composable
 fun SyncAddNewDeviceScreen(
     onNavigateUp: () -> Unit,
-    syncUrl: URL,
+    syncUrl: ImmutableHolder<URL>,
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
@@ -809,7 +810,7 @@ fun SyncAddNewDeviceScreen(
 @Composable
 fun SyncAddNewDeviceContent(
     modifier: Modifier,
-    syncUrl: URL,
+    syncUrl: ImmutableHolder<URL>,
 ) {
     val context = LocalContext.current
 
@@ -817,7 +818,7 @@ fun SyncAddNewDeviceContent(
         derivedStateOf {
             QRCode.from(
                 Url().also {
-                    it.url = "$syncUrl"
+                    it.url = "${syncUrl.item}"
                 }
             )
                 .withSize(1000, 1000)
@@ -897,12 +898,14 @@ fun PreviewDualSyncScreenDeviceList() {
             onDeleteDevice = {},
             onLeaveSyncChain = {},
             currentDeviceId = 5L,
-            devices = listOf(
-                SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
-                SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
-                SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+            devices = ImmutableHolder(
+                listOf(
+                    SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
+                    SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
+                    SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+                )
             ),
-            addDeviceUrl = URL("$DEEP_LINK_BASE_URI/sync/join?sync_code=123foo"),
+            addDeviceUrl = ImmutableHolder(URL("$DEEP_LINK_BASE_URI/sync/join?sync_code=123foo")),
             onJoinSyncChain = { _, _ -> },
             syncCode = "",
             onSetSyncCode = {},
@@ -926,12 +929,14 @@ fun PreviewDualSyncScreenSetup() {
             onDeleteDevice = {},
             onLeaveSyncChain = {},
             currentDeviceId = 5L,
-            devices = listOf(
-                SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
-                SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
-                SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+            devices = ImmutableHolder(
+                listOf(
+                    SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
+                    SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
+                    SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+                )
             ),
-            addDeviceUrl = URL("$DEEP_LINK_BASE_URI/sync/join?sync_code=123foo&key=123ABF"),
+            addDeviceUrl = ImmutableHolder(URL("$DEEP_LINK_BASE_URI/sync/join?sync_code=123foo&key=123ABF")),
             onJoinSyncChain = { _, _ -> },
             syncCode = "",
             onSetSyncCode = {},
@@ -980,10 +985,12 @@ fun PreviewDeviceList() {
         SyncDeviceListScreen(
             onNavigateUp = {},
             currentDeviceId = 5L,
-            devices = listOf(
-                SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
-                SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
-                SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+            devices = ImmutableHolder(
+                listOf(
+                    SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
+                    SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
+                    SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
+                )
             ),
             onAddNewDevice = {},
             onDeleteDevice = {},
@@ -1000,7 +1007,7 @@ fun PreviewAddNewDeviceContent() {
         SyncAddNewDeviceScreen(
             onNavigateUp = {},
             onLeaveSyncChain = {},
-            syncUrl = URL("https://feeder-sync.nononsenseapps.com/join?sync_code=1234abc572335asdbc&key=123ABF"),
+            syncUrl = ImmutableHolder(URL("https://feeder-sync.nononsenseapps.com/join?sync_code=1234abc572335asdbc&key=123ABF")),
         )
     }
 }

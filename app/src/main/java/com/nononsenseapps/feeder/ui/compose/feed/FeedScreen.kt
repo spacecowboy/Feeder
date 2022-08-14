@@ -96,6 +96,7 @@ import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
@@ -573,8 +574,8 @@ fun FeedScreen(
         },
         drawerContent = {
             ListOfFeedsAndTags(
-                feedsAndTags = viewState.drawerItemsWithUnreadCounts,
-                expandedTags = viewState.expandedTags,
+                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
+                expandedTags = ImmutableHolder(viewState.expandedTags),
                 onToggleTagExpansion = onToggleTagExpansion,
                 onItemClick = { item ->
                     coroutineScope.launch {
@@ -632,17 +633,19 @@ fun FeedScreen(
 
         if (showDeleteDialog) {
             DeleteFeedDialog(
-                feeds = viewState.visibleFeeds.map {
-                    DeletableFeed(it.id, it.displayTitle)
-                },
+                feeds = ImmutableHolder(
+                    viewState.visibleFeeds.map {
+                        DeletableFeed(it.id, it.displayTitle)
+                    }
+                ),
                 onDismiss = { showDeleteDialog = false },
                 onDelete = onDelete
             )
         }
 
         if (showEditDialog) {
-            EditFeedDialog2(
-                feeds = viewState.visibleFeeds.map { DeletableFeed(it.id, it.displayTitle) },
+            EditFeedDialog(
+                feeds = ImmutableHolder(viewState.visibleFeeds.map { DeletableFeed(it.id, it.displayTitle) }),
                 onDismiss = { showEditDialog = false },
                 onEdit = onEditFeed
             )
@@ -731,8 +734,8 @@ fun ScreenWithFeedList(
         },
         drawerContent = {
             ListOfFeedsAndTags(
-                feedsAndTags = viewState.drawerItemsWithUnreadCounts,
-                expandedTags = viewState.expandedTags,
+                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
+                expandedTags = ImmutableHolder(viewState.expandedTags),
                 onToggleTagExpansion = onToggleTagExpansion,
                 onItemClick = { item ->
                     coroutineScope.launch {
@@ -784,17 +787,19 @@ fun ScreenWithFeedList(
 
         if (viewState.showDeleteDialog) {
             DeleteFeedDialog(
-                feeds = viewState.visibleFeeds.map {
-                    DeletableFeed(it.id, it.displayTitle)
-                },
+                feeds = ImmutableHolder(
+                    viewState.visibleFeeds.map {
+                        DeletableFeed(it.id, it.displayTitle)
+                    }
+                ),
                 onDismiss = onDismissDeleteDialog,
                 onDelete = onDelete
             )
         }
 
         if (viewState.showEditDialog) {
-            EditFeedDialog2(
-                feeds = viewState.visibleFeeds.map { DeletableFeed(it.id, it.displayTitle) },
+            EditFeedDialog(
+                feeds = ImmutableHolder(viewState.visibleFeeds.map { DeletableFeed(it.id, it.displayTitle) }),
                 onDismiss = onDismissEditDialog,
                 onEdit = onEditFeed
             )
