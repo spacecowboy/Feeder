@@ -55,6 +55,8 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.stableListHolderOf
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.MalformedURLException
 import java.net.URL
@@ -157,8 +159,8 @@ fun SearchFeedView(
                     }
             }
         },
-        results = results,
-        errors = if (currentlySearching) emptyList() else errors,
+        results = StableHolder(results),
+        errors = if (currentlySearching) StableHolder(emptyList()) else StableHolder(errors),
         currentlySearching = currentlySearching,
         modifier = modifier,
         onClick = onClick
@@ -171,8 +173,8 @@ fun SearchFeedView(
     feedUrl: String = "",
     onUrlChanged: (String) -> Unit,
     onSearch: (URL) -> Unit,
-    results: List<SearchResult>,
-    errors: List<SearchResult>,
+    results: StableHolder<List<SearchResult>>,
+    errors: StableHolder<List<SearchResult>>,
     currentlySearching: Boolean,
     modifier: Modifier,
     onClick: (SearchResult) -> Unit,
@@ -252,8 +254,8 @@ fun SearchFeedView(
                 )
             }
         }
-        if (results.isEmpty()) {
-            for (error in errors) {
+        if (results.item.isEmpty()) {
+            for (error in errors.item) {
                 item {
                     val title = stringResource(
                         R.string.failed_to_parse,
@@ -268,7 +270,7 @@ fun SearchFeedView(
                 }
             }
         }
-        for (result in results) {
+        for (result in results.item) {
             item {
                 SearchResultView(
                     title = result.title,
@@ -346,8 +348,8 @@ fun SearchPreview() {
     SearchFeedView(
         feedUrl = "https://cowboyprogrammer.org",
         currentlySearching = false,
-        errors = emptyList(),
-        results = listOf(
+        errors = stableListHolderOf(),
+        results = stableListHolderOf(
             SearchResult(
                 title = "Atom feed",
                 url = "https://cowboyprogrammer.org/atom",

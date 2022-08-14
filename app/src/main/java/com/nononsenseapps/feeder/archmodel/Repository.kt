@@ -193,7 +193,7 @@ class Repository(override val di: DI) : DIAware {
         currentFeedAndTag,
         showOnlyUnread,
         currentSorting,
-    ) { feedAndTag, showOnlyUnread, currentSorting ->
+    ) { feedAndTag, showOnlyUnread, _ ->
         val (feedId, tag) = feedAndTag
         FeedListArgs(
             feedId = feedId,

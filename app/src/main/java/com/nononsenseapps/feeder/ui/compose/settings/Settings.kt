@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -72,6 +73,8 @@ import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -135,7 +138,7 @@ fun SettingsScreen(
             onFeedItemStyleChanged = { value ->
                 settingsViewModel.setFeedItemStyle(value)
             },
-            blockListValue = viewState.blockList,
+            blockListValue = ImmutableHolder(viewState.blockList),
             onBlockListChanged = { value ->
                 settingsViewModel.setBlockList(value)
             },
@@ -202,7 +205,7 @@ fun SettingsScreenPreview() {
                 onShowFabChanged = {},
                 feedItemStyleValue = FeedItemStyle.CARD,
                 onFeedItemStyleChanged = {},
-                blockListValue = emptySet(),
+                blockListValue = ImmutableHolder(emptySet()),
                 onBlockListChanged = {},
                 syncOnStartupValue = true,
                 onSyncOnStartupChanged = {},
@@ -244,7 +247,7 @@ fun SettingsList(
     onShowFabChanged: (Boolean) -> Unit,
     feedItemStyleValue: FeedItemStyle,
     onFeedItemStyleChanged: (FeedItemStyle) -> Unit,
-    blockListValue: Set<String>,
+    blockListValue: ImmutableHolder<Set<String>>,
     onBlockListChanged: (Iterable<String>) -> Unit,
     swipeAsReadValue: SwipeAsRead,
     onSwipeAsReadOptionChanged: (SwipeAsRead) -> Unit,
@@ -282,7 +285,7 @@ fun SettingsList(
     ) {
         MenuSetting(
             currentValue = currentThemeValue,
-            values = listOf(
+            values = immutableListHolderOf(
                 ThemeOptions.SYSTEM.asThemeOption(),
                 ThemeOptions.DAY.asThemeOption(),
                 ThemeOptions.NIGHT.asThemeOption()
@@ -294,7 +297,7 @@ fun SettingsList(
         MenuSetting(
             title = stringResource(id = R.string.dark_theme_preference),
             currentValue = currentDarkThemePreference,
-            values = listOf(
+            values = immutableListHolderOf(
                 DarkThemePreferences.BLACK.asDarkThemeOption(),
                 DarkThemePreferences.DARK.asDarkThemeOption()
             ),
@@ -303,7 +306,7 @@ fun SettingsList(
 
         MenuSetting(
             currentValue = currentSortingValue,
-            values = listOf(
+            values = immutableListHolderOf(
                 SortingOptions.NEWEST_FIRST.asSortOption(),
                 SortingOptions.OLDEST_FIRST.asSortOption()
             ),
@@ -320,7 +323,7 @@ fun SettingsList(
         MenuSetting(
             title = stringResource(id = R.string.feed_item_style),
             currentValue = feedItemStyleValue.asFeedItemStyleOption(),
-            values = FeedItemStyle.values().map { it.asFeedItemStyleOption() },
+            values = ImmutableHolder(FeedItemStyle.values().map { it.asFeedItemStyleOption() }),
             onSelection = {
                 onFeedItemStyleChanged(it.feedItemStyle)
             },
@@ -329,7 +332,7 @@ fun SettingsList(
         MenuSetting(
             title = stringResource(id = R.string.swipe_to_mark_as_read),
             currentValue = swipeAsReadValue.asSwipeAsReadOption(),
-            values = SwipeAsRead.values().map { it.asSwipeAsReadOption() },
+            values = ImmutableHolder(SwipeAsRead.values().map { it.asSwipeAsReadOption() }),
             onSelection = {
                 onSwipeAsReadOptionChanged(it.swipeAsRead)
             }
@@ -337,21 +340,26 @@ fun SettingsList(
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle {
-            Text(stringResource(id = R.string.synchronization))
+        GroupTitle { modifier ->
+            Text(
+                stringResource(id = R.string.synchronization),
+                modifier = modifier,
+            )
         }
 
         ListDialogSetting(
-            currentValue = blockListValue.toList().sorted(),
+            currentValue = ImmutableHolder(blockListValue.item.sorted()),
             onSelection = onBlockListChanged,
             title = stringResource(id = R.string.block_list),
         )
 
         MenuSetting(
             currentValue = currentSyncFrequencyValue.asSyncFreqOption(),
-            values = SyncFrequency.values().map {
-                it.asSyncFreqOption()
-            },
+            values = ImmutableHolder(
+                SyncFrequency.values().map {
+                    it.asSyncFreqOption()
+                }
+            ),
             title = stringResource(id = R.string.check_for_updates),
             onSelection = {
                 onSyncFrequencyChanged(it.syncFrequency)
@@ -378,7 +386,7 @@ fun SettingsList(
 
         MenuSetting(
             currentValue = maxItemsPerFeedValue,
-            values = listOf(
+            values = immutableListHolderOf(
                 50,
                 100,
                 200,
@@ -410,8 +418,11 @@ fun SettingsList(
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle {
-            Text(stringResource(id = R.string.image_loading))
+        GroupTitle { modifier ->
+            Text(
+                stringResource(id = R.string.image_loading),
+                modifier = modifier,
+            )
         }
 
         SwitchSetting(
@@ -428,13 +439,16 @@ fun SettingsList(
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle {
-            Text(stringResource(id = R.string.reader_settings))
+        GroupTitle { modifier ->
+            Text(
+                stringResource(id = R.string.reader_settings),
+                modifier = modifier,
+            )
         }
 
         MenuSetting(
             currentValue = currentItemOpenerValue.asItemOpenerOption(),
-            values = listOf(
+            values = immutableListHolderOf(
                 ItemOpener.READER.asItemOpenerOption(),
                 ItemOpener.CUSTOM_TAB.asItemOpenerOption(),
                 ItemOpener.DEFAULT_BROWSER.asItemOpenerOption()
@@ -447,7 +461,7 @@ fun SettingsList(
 
         MenuSetting(
             currentValue = currentLinkOpenerValue.asLinkOpenerOption(),
-            values = listOf(
+            values = immutableListHolderOf(
                 LinkOpener.CUSTOM_TAB.asLinkOpenerOption(),
                 LinkOpener.DEFAULT_BROWSER.asLinkOpenerOption()
             ),
@@ -465,7 +479,7 @@ fun SettingsList(
 fun GroupTitle(
     startingSpace: Boolean = true,
     height: Dp = 64.dp,
-    title: @Composable () -> Unit,
+    title: @Composable (Modifier) -> Unit,
 ) {
     val dimens = LocalDimens.current
     Row(
@@ -490,7 +504,7 @@ fun GroupTitle(
                     TextStyle(color = MaterialTheme.colors.primary)
                 )
             ) {
-                title()
+                title(Modifier.semantics { heading() })
             }
         }
     }
@@ -537,7 +551,7 @@ fun ExternalSetting(
 fun <T> MenuSetting(
     title: String,
     currentValue: T,
-    values: Iterable<T>,
+    values: ImmutableHolder<List<T>>,
     icon: @Composable () -> Unit = {},
     onSelection: (T) -> Unit,
 ) {
@@ -574,7 +588,7 @@ fun <T> MenuSetting(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            for (value in values) {
+            for (value in values.item) {
                 DropdownMenuItem(
                     onClick = {
                         expanded = false
@@ -604,7 +618,7 @@ fun <T> MenuSetting(
 @Composable
 fun ListDialogSetting(
     title: String,
-    currentValue: List<String>,
+    currentValue: ImmutableHolder<List<String>>,
     icon: @Composable () -> Unit = {},
     onSelection: (Iterable<String>) -> Unit,
 ) {
@@ -634,7 +648,7 @@ fun ListDialogSetting(
             },
             subtitle = {
                 Text(
-                    text = currentValue.joinToString(" "),
+                    text = currentValue.item.joinToString(" "),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1
                 )
@@ -644,7 +658,7 @@ fun ListDialogSetting(
         if (expanded) {
             EditableListDialog(
                 title = title,
-                initialItems = currentValue,
+                items = currentValue,
                 onDismiss = {
                     expanded = false
                 },

@@ -47,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
 const val COLLAPSE_ANIMATION_DURATION = 300
 
@@ -55,7 +57,7 @@ const val COLLAPSE_ANIMATION_DURATION = 300
 @Preview(showBackground = true)
 private fun ListOfFeedsAndTagsPreview() {
     ListOfFeedsAndTags(
-        listOf(
+        immutableListHolderOf(
             DrawerTop(unreadCount = 100, syncingChildren = 2, totalChildren = 4),
             DrawerTag(tag = "News tag", unreadCount = 3, -1111, syncingChildren = 0, totalChildren = 2),
             DrawerFeed(
@@ -88,7 +90,7 @@ private fun ListOfFeedsAndTagsPreview() {
                 currentlySyncing = true
             )
         ),
-        emptySet(),
+        ImmutableHolder(emptySet()),
         {},
     ) {}
 }
@@ -96,8 +98,8 @@ private fun ListOfFeedsAndTagsPreview() {
 @ExperimentalAnimationApi
 @Composable
 fun ListOfFeedsAndTags(
-    feedsAndTags: List<DrawerItemWithUnreadCount>,
-    expandedTags: Set<String>,
+    feedsAndTags: ImmutableHolder<List<DrawerItemWithUnreadCount>>,
+    expandedTags: ImmutableHolder<Set<String>>,
     onToggleTagExpansion: (String) -> Unit,
     onItemClick: (DrawerItemWithUnreadCount) -> Unit,
 ) {
@@ -111,11 +113,11 @@ fun ListOfFeedsAndTags(
                 testTag = "feedsAndTags"
             }
     ) {
-        items(feedsAndTags, key = { it.uiId }) { item ->
+        items(feedsAndTags.item, key = { it.uiId }) { item ->
             when (item) {
                 is DrawerTag -> {
                     ExpandableTag(
-                        expanded = item.tag in expandedTags,
+                        expanded = item.tag in expandedTags.item,
                         onToggleExpansion = onToggleTagExpansion,
                         unreadCount = item.unreadCount,
                         currentlySyncing = item.currentlySyncing,
@@ -141,7 +143,7 @@ fun ListOfFeedsAndTags(
                                 unreadCount = item.unreadCount,
                                 currentlySyncing = item.currentlySyncing,
                                 title = item.title(),
-                                visible = item.tag in expandedTags,
+                                visible = item.tag in expandedTags.item,
                                 onItemClick = {
                                     onItemClick(item)
                                 }

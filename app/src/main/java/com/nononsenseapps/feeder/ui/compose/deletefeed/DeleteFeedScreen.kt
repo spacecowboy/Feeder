@@ -32,10 +32,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
 @Composable
 fun DeleteFeedDialog(
-    feeds: List<DeletableFeed>,
+    feeds: ImmutableHolder<List<DeletableFeed>>,
     onDismiss: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit
 ) {
@@ -61,7 +63,7 @@ fun DeleteFeedDialog(
 
 @Composable
 fun DeleteFeedDialog(
-    feeds: List<DeletableFeed>,
+    feeds: ImmutableHolder<List<DeletableFeed>>,
     isChecked: (Long) -> Boolean,
     onDismiss: () -> Unit,
     onOk: () -> Unit,
@@ -92,7 +94,7 @@ fun DeleteFeedDialog(
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(feeds) { feed ->
+                items(feeds.item) { feed ->
                     val stateLabel = if (isChecked(feed.id)) {
                         stringResource(R.string.selected)
                     } else {
@@ -140,7 +142,7 @@ data class DeletableFeed(
 @Preview
 private fun preview() =
     DeleteFeedDialog(
-        feeds = listOf(
+        feeds = immutableListHolderOf(
             DeletableFeed(1, "A Feed"),
             DeletableFeed(2, "Another Feed")
         ),

@@ -125,6 +125,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.swipeAsRead,
                 repository.blockList,
             ) { params: Array<Any> ->
+                @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
                     currentTheme = params[0] as ThemeOptions,
                     darkThemePreference = params[1] as DarkThemePreferences,

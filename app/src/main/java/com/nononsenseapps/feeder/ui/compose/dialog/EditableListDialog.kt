@@ -40,32 +40,27 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 
 @Composable
 fun EditableListDialog(
     title: String,
-    initialItems: List<String>,
+    items: ImmutableHolder<List<String>>,
     onDismiss: () -> Unit,
     onModifiedItems: (Iterable<String>) -> Unit
 ) {
-    var items by rememberSaveable {
-        mutableStateOf(initialItems)
-    }
-
     EditableListDialog(
         title = title,
         items = items,
         onDismiss = {
-            onModifiedItems(items)
+            onModifiedItems(items.item)
             onDismiss()
         },
         onRemoveItem = { item ->
-            items = items - item
-            onModifiedItems(items)
+            onModifiedItems(items.item - item)
         },
         onAddItem = { item ->
-            items = items + item
-            onModifiedItems(items)
+            onModifiedItems(items.item + item)
         }
     )
 }
@@ -74,7 +69,7 @@ fun EditableListDialog(
 @Composable
 fun EditableListDialog(
     title: String,
-    items: List<String>,
+    items: ImmutableHolder<List<String>>,
     onDismiss: () -> Unit,
     onRemoveItem: (String) -> Unit,
     onAddItem: (String) -> Unit,
@@ -85,9 +80,9 @@ fun EditableListDialog(
 
     val lazyListState = rememberLazyListState()
 
-    LaunchedEffect(items.lastIndex) {
-        if (items.isNotEmpty()) {
-            lazyListState.scrollToItem(items.lastIndex)
+    LaunchedEffect(items.item.lastIndex) {
+        if (items.item.isNotEmpty()) {
+            lazyListState.scrollToItem(items.item.lastIndex)
         }
     }
 
@@ -147,7 +142,7 @@ fun EditableListDialog(
                     .height(TextFieldDefaults.MinHeight * 3)
                     .padding(vertical = 8.dp),
             ) {
-                items(items.toList()) { item ->
+                items(items.item) { item ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
