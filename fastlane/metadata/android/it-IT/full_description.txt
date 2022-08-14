@@ -1,19 +1,19 @@
-<p>Sei stufo/a dei lettori gonfi e non liberi che rubano le tue informazioni personali?<br/>
-Sei stanco/a di configurazioni di sincronizzazione contorte che richiedono ore di configurazione del server?<br/>
-Sei stufo/a di dover creare account ovunque? <br/> </p>
+<p>Sei stufo di lettori complicati e non liberi che rubano le tue informazioni personali?<br/>
+Sei stanco di complessi sistemi di sincronizzazione che richiedono ore di configurazione del server?<br/>
+Non tolleri più il dover creare account ovunque? <br/> </p>
 
-<p>Prova invece Feeder!</p>
+<p>Prova Feeder!</p>
 
-<p>Feeder è un lettore di flussi completamente libero. Supporta tutti i formati di flussi comuni, incluso JSONFeed. Non ti segue. Non richiede alcuna configurazione. Non è nemmeno necessario che tu crei un account! È sufficiente impostare i flussi o importarli dal vecchio lettore tramite OPML, quindi procedere con la sincronizzazione e la lettura. </p>
+<p>Feeder è un lettore di flussi completamente libero. Supporta tutti i formati di flussi comuni, incluso JSONFeed. Non ti traccia. Non richiede alcuna configurazione. Non è nemmeno richiesta la creazione un account! È sufficiente impostare i flussi o importarli dal vecchio lettore tramite OPML, quindi procedere con la sincronizzazione e la lettura. </p>
 
 <p> <b>Caratteristiche</b> </p>
 
 <ul>
 <li>Analizza l'HTML e lo visualizza in un TextView nativo</li>
-<li>Lettura fuori linea</li>
-<li>Sincronizzazione nello sfondo</li>
+<li>Lettura offline</li>
+<li>Sincronizzazione in background</li>
 <li>Notifiche</li>
 <li>Importazione/esportazione OPML</li>
-<li>Accesso facile ai collegamenti degli allegati </li>
+<li>Comodo accesso ai collegamenti degli allegati </li>
 <li>Material design</li>
 </ul>
