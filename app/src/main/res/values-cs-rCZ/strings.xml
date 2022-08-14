@@ -34,7 +34,7 @@
     <string name="new_based_on_this">Na základě tohoto kanálu</string>
     <string name="indicator_for_mark_as_read">Ukazatel přečtení</string>
     <string name="share">Sdílet</string>
-    <string name="no_such_feed">Nemůžeme najít takový kanál. Možná pomůže použít HTTPS\?</string>
+    <string name="no_such_feed">Kanál nebyl nalezen. Možná pomůže použít HTTPS\?</string>
     <string name="nothing_to_display">Nic k zobrazení!</string>
     <string name="title_activity_settings">Nastavení</string>
     <string name="all_feeds">Všechny zdroje</string>
@@ -53,7 +53,7 @@
     <string name="only_when_charging">Pouze při nabíjení</string>
     <string name="image_loading">Načítání obrázků</string>
     <string name="no_activity_for_link">Žádná aplikace nedokáže otevřít tento odkaz, zkuste první něco nainstalovat</string>
-    <string name="check_for_updates">Zkontrolovat aktualizace…</string>
+    <string name="check_for_updates">Aktualizovat kanály…</string>
     <string name="on_startup">Po spuštění aplikace</string>
     <string name="show_fab">Zobrazit plovoucí tlačítko akcí</string>
     <string name="include_mobile_hotspots">Zahrnout mobilní hotspoty</string>
@@ -102,7 +102,7 @@
     <string name="pause_reading">Pozastavit předčítání</string>
     <string name="read_article">Předčítat článek</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>
-    <string name="toggle_read_status">Přepnout přečtení článku</string>
+    <string name="toggle_read_status">Přepnout stav přečtení</string>
     <string name="open_in_browser">Otevřít v prohlížeči</string>
     <string name="open_in_reader">Ve vnitřní čtečce</string>
     <string name="use_app_default">Použít výchozí</string>
@@ -161,4 +161,21 @@
     <string name="device_sync_financed_by_community">Za tuto službu platí komunita, pokud ji shledávate užitečnou, zvažte prosím příspěvek.</string>
     <string name="disconnect_device_from_sync">Odpojit zařízení ze synchronizačního řetězu</string>
     <string name="device_sync_description_2">Jednoduše naskenujte kód z vašeho synchronizačního řetězu, který jste vytvořili na jiném zařízení nebo vytvořte řetěz nový.</string>
+    <string name="are_you_sure_leave_sync_chain">Opravdu chcete opustit řetěz synchronizace\?</string>
+    <string name="disabled">Zakázáno</string>
+    <string name="permission_read_desc">Umožňuje aplikaci číst kanály a články</string>
+    <string name="permission_read_label">Přístup k Feederu jen pro čtení</string>
+    <string name="only_from_end">Jen od konce</string>
+    <string name="from_anywhere">Odkudkoliv</string>
+    <string name="swipe_to_mark_as_read">Označte jako přečtené posunutím prstem do strany</string>
+    <string name="showing_only_bookmarked_articles">Zobrazovat pouze založené články</string>
+    <string name="bookmarks_filter">Pouze záložky</string>
+    <string name="bookmark_article">Založit článek</string>
+    <string name="remove_bookmark">Odstranit záložku</string>
+    <string name="pin_article">Připnout článek</string>
+    <string name="unpin_article">Odepnout článek</string>
+    <string name="remove">Odstranit</string>
+    <string name="block_list">Černá listina</string>
+    <string name="add_item">Přidat položku</string>
+    <string name="no_barcode_scanner_installed">Nelze najít čtečku čárových kódů</string>
 </resources>
