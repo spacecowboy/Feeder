@@ -117,6 +117,9 @@ class Repository(override val di: DI) : DIAware {
     val showThumbnails = settingsStore.showThumbnails
     fun setShowThumbnails(value: Boolean) = settingsStore.setShowThumbnails(value)
 
+    val useDetectLanguage = settingsStore.useDetectLanguage
+    fun setUseDetectLanguage(value: Boolean) = settingsStore.setUseDetectLanguage(value)
+
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
     fun setMaxCountPerFeed(value: Int) = settingsStore.setMaxCountPerFeed(value)
 

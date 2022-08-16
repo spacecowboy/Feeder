@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.annotation.StringRes
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -147,6 +148,13 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setShowThumbnails(value: Boolean) {
         _showThumbnails.value = value
         sp.edit().putBoolean(PREF_IMG_SHOW_THUMBNAILS, value).apply()
+    }
+
+    private val _useDetectLanguage = MutableStateFlow(sp.getBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, false))
+    val useDetectLanguage = _useDetectLanguage.asStateFlow()
+    fun setUseDetectLanguage(value: Boolean) {
+        _useDetectLanguage.value =  value
+        sp.edit().putBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, value).apply()
     }
 
     private val _maximumCountPerFeed =
@@ -388,6 +396,11 @@ const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
  * Block List Settings
  */
 const val PREF_BLOCK_LIST = "pref_block_list_values"
+
+/**
+ * Read Aloud Settings
+ */
+const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloug_detect_lang"
 
 enum class PrefValOpenWith {
     OPEN_WITH_DEFAULT,
