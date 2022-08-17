@@ -29,6 +29,7 @@ dependencies {
     val kotlin_version: String by project
     val okhttp_version: String by project
     val moshi_version: String by project
+    val junit_version: String by project
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
     api(platform("com.squareup.okhttp3:okhttp-bom:$okhttp_version"))
@@ -39,5 +40,5 @@ dependencies {
     // tests
     testImplementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:$junit_version")
 }

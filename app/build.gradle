@@ -105,7 +105,6 @@ android {
 
   kotlinOptions {
     jvmTarget = "1.8"
-    useIR = true
   }
 
   buildFeatures {
@@ -118,7 +117,7 @@ android {
   }
 
   composeOptions {
-    kotlinCompilerExtensionVersion composeVersion
+    kotlinCompilerExtensionVersion composeCompilerVersion
   }
 
   packagingOptions {
@@ -184,13 +183,11 @@ dependencies {
   implementation "androidx.work:work-runtime-ktx:$workmanager_version"
 
   implementation "androidx.core:core-ktx:$androidx_core_version"
-  implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
-  implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
   implementation "androidx.legacy:legacy-support-v4:$legacy_support_version"
   implementation "androidx.appcompat:appcompat:$appcompat_version"
   implementation "androidx.preference:preference:$preference_version"
-  implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-  implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+  implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
+  implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
 
   // ViewModel and LiveData
   implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
@@ -201,19 +198,20 @@ dependencies {
 
   // Compose
   implementation "androidx.activity:activity-compose:$activityComposeVersion"
-  implementation "androidx.compose.ui:ui:$composeVersion"
-  implementation "androidx.compose.foundation:foundation:$composeVersion"
-  implementation "androidx.compose.foundation:foundation-layout:$composeVersion"
-  implementation "androidx.compose.material:material:$composeVersion"
-  implementation "androidx.compose.material:material-icons-extended:$composeVersion"
-  implementation "androidx.compose.runtime:runtime:$composeVersion"
-  implementation "androidx.compose.runtime:runtime-livedata:$composeVersion"
-  implementation "androidx.compose.ui:ui-tooling:$composeVersion"
+  implementation "androidx.compose.ui:ui:$composeLibraryVersion"
+  implementation "androidx.compose.foundation:foundation:$composeLibraryVersion"
+  implementation "androidx.compose.foundation:foundation-layout:$composeLibraryVersion"
+  implementation "androidx.compose.material:material:$composeLibraryVersion"
+  implementation "androidx.compose.material:material-icons-extended:$composeLibraryVersion"
+  implementation "androidx.compose.runtime:runtime:$composeLibraryVersion"
+  implementation "androidx.compose.runtime:runtime-livedata:$composeLibraryVersion"
+  implementation "androidx.compose.ui:ui-tooling:$composeLibraryVersion"
   implementation "androidx.window:window:$androidWindowVersion"
-  implementation "com.google.android.material:material:$material_version"
+  implementation "com.google.android.material:material:$materialVersion"
   implementation "androidx.navigation:navigation-compose:$navigationComposeVersion"
   implementation "androidx.paging:paging-compose:$pagingComposeVersion"
   implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"
+    // TODO remove these
   implementation "com.google.accompanist:accompanist-insets:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-insets-ui:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion"
@@ -222,8 +220,9 @@ dependencies {
   implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
   // HTML parsing
   implementation "org.jsoup:jsoup:$jsoup_version"
-  implementation "org.ccil.cowan.tagsoup:tagsoup:1.2.1"
+  implementation "org.ccil.cowan.tagsoup:tagsoup:$composeLibraryVersion"
   // RSS
+  // TODO Bump
   implementation "com.rometools:rome:$rome_version"
   implementation "com.rometools:rome-modules:$rome_version"
   // JSONFeed
@@ -262,7 +261,7 @@ dependencies {
   testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
   testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
-  testImplementation "junit:junit:4.12"
+  testImplementation "junit:junit:$junit_version"
   testImplementation "org.mockito:mockito-core:$mockito_version"
   testImplementation "io.mockk:mockk:$mockk_version"
   testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
@@ -274,13 +273,13 @@ dependencies {
   androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
   androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
   androidTestImplementation "io.mockk:mockk-android:1.8.10.kotlin13"
-  androidTestImplementation "junit:junit:4.12"
+  androidTestImplementation "junit:junit:$junit_version"
   androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
 
   androidTestImplementation "androidx.test:core:$androidx_testcore_version"
   androidTestImplementation "androidx.test:runner:$test_runner_version"
   androidTestImplementation "androidx.room:room-testing:$room_version"
   androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
-  androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
-  debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
+  androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeLibraryVersion"
+  debugImplementation("androidx.compose.ui:ui-test-manifest:$composeLibraryVersion")
 }
