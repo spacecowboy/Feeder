@@ -177,5 +177,5 @@ data class SettingsViewState(
     val syncFrequency: SyncFrequency = SyncFrequency.EVERY_1_HOURS,
     val batteryOptimizationIgnored: Boolean = false,
     val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
-    val useDetectLanguage: Boolean = false,
+    val useDetectLanguage: Boolean = true,
 )

@@ -221,7 +221,7 @@ fun SettingsScreenPreview() {
                 loadImageOnlyOnWifiValue = true,
                 onLoadImageOnlyOnWifiChanged = {},
                 showThumbnailsValue = true,
-                useDetectLanguage = false,
+                useDetectLanguage = true,
                 onUseDetectLanguageChanged = {},
                 onShowThumbnailsChanged = {},
                 maxItemsPerFeedValue = 101,

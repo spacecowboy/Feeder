@@ -151,7 +151,7 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _useDetectLanguage =
-        MutableStateFlow(sp.getBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, false))
+        MutableStateFlow(sp.getBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, true))
     val useDetectLanguage = _useDetectLanguage.asStateFlow()
     fun setUseDetectLanguage(value: Boolean) {
         _useDetectLanguage.value = value
