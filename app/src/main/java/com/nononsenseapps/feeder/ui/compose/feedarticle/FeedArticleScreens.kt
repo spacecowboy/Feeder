@@ -117,7 +117,7 @@ fun FeedArticleScreen(
 
     val di = LocalDI.current
     val opmlExporter = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument()
+        ActivityResultContracts.CreateDocument("application/xml")
     ) { uri ->
         if (uri != null) {
             val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()

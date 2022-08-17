@@ -29,7 +29,7 @@ abstract class DIAwareViewModel(override val di: DI) :
 class DIAwareViewModelFactory(
     override val di: DI
 ) : ViewModelProvider.AndroidViewModelFactory(di.direct.instance()), DIAware {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (DIAwareViewModel::class.java.isAssignableFrom(modelClass)) {
             try {
                 modelClass.getConstructor(DI::class.java).newInstance(di)

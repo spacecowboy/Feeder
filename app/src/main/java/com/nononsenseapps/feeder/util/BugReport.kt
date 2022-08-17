@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.util
 
-import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_SENDTO
 import android.content.Intent.ACTION_VIEW
@@ -28,7 +27,7 @@ if (isTablet) {
 
 internal fun emailReportAddress(): String = "jonas.feederbugs@cowboyprogrammer.org"
 
-fun emailBugReportIntent(context: Context?): Intent = Intent(ACTION_SENDTO).also {
+fun emailBugReportIntent(): Intent = Intent(ACTION_SENDTO).also {
     it.putExtra(EXTRA_SUBJECT, emailSubject())
     it.putExtra(EXTRA_EMAIL, emailReportAddress())
     it.data = Uri.parse("mailto:${emailReportAddress()}")

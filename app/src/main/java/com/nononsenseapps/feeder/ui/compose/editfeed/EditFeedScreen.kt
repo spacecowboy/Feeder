@@ -33,7 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
-import androidx.compose.ui.focus.focusOrder
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalFocusManager
@@ -283,7 +283,7 @@ fun EditFeedView(
                     }
                 ),
                 modifier = Modifier
-                    .focusOrder(focusTitle)
+                    .focusRequester(focusTitle)
                     .fillMaxWidth()
                     .heightIn(min = 64.dp)
                     .interceptKey(Key.Enter) {
@@ -335,7 +335,7 @@ fun EditFeedView(
                         }
                     ),
                     modifier = Modifier
-                        .focusOrder(focusTag)
+                        .focusRequester(focusTag)
                         .onFocusChanged {
                             tagHasFocus = it.isFocused
                         }

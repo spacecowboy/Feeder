@@ -169,7 +169,7 @@ fun FeedListContent(
                 items(
                     pagedFeedItems.itemCount,
                     key = { itemIndex ->
-                        pagedFeedItems.snapshot().items[itemIndex].id
+                        pagedFeedItems.itemSnapshotList.items[itemIndex].id
                     }
                 ) { itemIndex ->
                     val previewItem = pagedFeedItems[itemIndex]
