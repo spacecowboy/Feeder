@@ -211,8 +211,6 @@ dependencies {
   implementation "androidx.navigation:navigation-compose:$navigationComposeVersion"
   implementation "androidx.paging:paging-compose:$pagingComposeVersion"
   implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"
-  // TODO remove these
-  implementation "com.google.accompanist:accompanist-insets:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-insets-ui:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion"
 

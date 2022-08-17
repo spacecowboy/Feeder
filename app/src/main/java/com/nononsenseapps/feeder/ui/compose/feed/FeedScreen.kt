@@ -11,11 +11,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -74,9 +81,6 @@ import coil.compose.rememberImagePainter
 import coil.size.PixelSize
 import coil.size.Precision
 import coil.size.Scale
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -333,11 +337,7 @@ fun FeedScreen(
 
     Scaffold(
         scaffoldState = scaffoldState,
-        contentPadding = rememberInsetsPaddingValues(
-            insets = LocalWindowInsets.current.navigationBars,
-            applyBottom = false,
-            applyTop = false,
-        ),
+        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
         topBar = {
             TopAppBar(
                 title = {
@@ -350,10 +350,7 @@ fun FeedScreen(
                             }
                     )
                 },
-                contentPadding = rememberInsetsPaddingValues(
-                    LocalWindowInsets.current.systemBars,
-                    applyBottom = false,
-                ),
+                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(
                         onClick = {
@@ -599,14 +596,7 @@ fun FeedScreen(
             if (viewState.showFab) {
                 FloatingActionButton(
                     onClick = onMarkAllAsRead,
-                    modifier = Modifier
-                        .let {
-                            if (viewState.bottomBarVisible) {
-                                it
-                            } else {
-                                it.navigationBarsPadding()
-                            }
-                        }
+                    modifier = Modifier.navigationBarsPadding(),
                 ) {
                     Icon(
                         Icons.Default.Check,
@@ -688,11 +678,7 @@ fun ScreenWithFeedList(
 
     Scaffold(
         scaffoldState = scaffoldState,
-        contentPadding = rememberInsetsPaddingValues(
-            insets = LocalWindowInsets.current.navigationBars,
-            applyBottom = false,
-            applyTop = false,
-        ),
+        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
         topBar = {
             TopAppBar(
                 title = {
@@ -701,10 +687,7 @@ fun ScreenWithFeedList(
                         maxLines = 2,
                     )
                 },
-                contentPadding = rememberInsetsPaddingValues(
-                    LocalWindowInsets.current.systemBars,
-                    applyBottom = false,
-                ),
+                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(
                         onClick = {
@@ -759,14 +742,7 @@ fun ScreenWithFeedList(
             if (viewState.showFab) {
                 FloatingActionButton(
                     onClick = onMarkAllAsRead,
-                    modifier = Modifier
-                        .let {
-                            if (viewState.bottomBarVisible) {
-                                it
-                            } else {
-                                it.navigationBarsPadding()
-                            }
-                        }
+                    modifier = Modifier.navigationBarsPadding(),
                 ) {
                     Icon(
                         Icons.Default.Check,

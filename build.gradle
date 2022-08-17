@@ -48,7 +48,7 @@ buildscript {
     composeLibraryVersion = "1.2.1"
     pagingVersion = "3.0.0"
     pagingComposeVersion = "1.0.0-alpha16"
-    accompanistVersion = "0.21.0-beta"
+    accompanistVersion = "0.26.1-alpha"
     coilVersion = "1.3.2"
     androidWindowVersion = "1.0.0"
 
