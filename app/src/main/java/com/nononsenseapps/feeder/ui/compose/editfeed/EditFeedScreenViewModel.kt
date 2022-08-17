@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui.compose.editfeed
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -31,39 +31,60 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
     val feedId: Long = state["feedId"]
         ?: throw IllegalArgumentException("Missing feedId in savedState")
 
-    private val _url = state.getLiveData("feedUrl", "")
+    private val _url: MutableStateFlow<String> = MutableStateFlow(
+        state["feedUrl"] ?: ""
+    )
     fun setUrl(value: String) {
         state["feedUrl"] = value
+        _url.update { value }
     }
 
-    private val _tag = state.getLiveData("feedTag", "")
+    private val _tag: MutableStateFlow<String> = MutableStateFlow(
+        state["feedTag"] ?: ""
+    )
     fun setTag(value: String) {
         state["feedTag"] = value
+        _tag.update { value }
     }
 
-    private val _title = state.getLiveData("feedTitle", "")
+    private val _title: MutableStateFlow<String> = MutableStateFlow(
+        state["feedTitle"] ?: ""
+    )
     fun setTitle(value: String) {
         state["feedTitle"] = value
+        _title.update { value }
     }
 
-    private val _fullTextByDefault = state.getLiveData("fullTextByDefault", false)
+    private val _fullTextByDefault: MutableStateFlow<Boolean> = MutableStateFlow(
+        state["fullTextByDefault"] ?: false
+    )
     fun setFullTextByDefault(value: Boolean) {
         state["fullTextByDefault"] = value
+        _fullTextByDefault.update { value }
     }
 
-    private val _notify = state.getLiveData("notify", false)
+    private val _notify: MutableStateFlow<Boolean> = MutableStateFlow(
+        state["notify"] ?: false
+    )
     fun setNotify(value: Boolean) {
         state["notify"] = value
+        _notify.update { value }
     }
 
-    private val _articleOpener = state.getLiveData("articleOpener", PREF_VAL_OPEN_WITH_READER)
+    private val _articleOpener: MutableStateFlow<String> = MutableStateFlow(
+        state["articleOpener"] ?: PREF_VAL_OPEN_WITH_READER
+    )
     fun setArticleOpener(value: String) {
         state["articleOpener"] = value
+        _articleOpener.update { value }
     }
 
-    private val _alternateId = state.getLiveData("alternateId", false)
+    private val _alternateId: MutableStateFlow<Boolean> = MutableStateFlow(
+        state["alternateId"] ?: false
+    )
     fun setAlternateId(value: Boolean) {
         state["alternateId"] = value
+        _alternateId.update { value }
     }
 
     fun setCurrentFeedAndTag(feedId: Long, tag: String) {
@@ -72,7 +93,6 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
 
     fun saveInBackgroundAndRequestSync() {
         val url = _url.value
-            ?: error("Missing url in state!!!")
 
         viewModelScope.launch {
             val feed = repository.getFeed(feedId)
@@ -80,13 +100,13 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
 
             val updatedFeed = feed.copy(
                 url = URL(url),
-                title = _title.value ?: "",
-                customTitle = _title.value ?: "",
-                tag = _tag.value ?: "",
-                fullTextByDefault = _fullTextByDefault.value ?: false,
-                notify = _notify.value ?: false,
-                openArticlesWith = _articleOpener.value ?: PREF_VAL_OPEN_WITH_READER,
-                alternateId = _alternateId.value ?: false,
+                title = _title.value,
+                customTitle = _title.value,
+                tag = _tag.value,
+                fullTextByDefault = _fullTextByDefault.value,
+                notify = _notify.value,
+                openArticlesWith = _articleOpener.value,
+                alternateId = _alternateId.value,
             )
 
             // No point in doing anything unless they actually differ
@@ -146,14 +166,14 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
 
             combine(
                 repository.allTags,
-                _tag.asFlow(),
-                _url.asFlow(),
-                _title.asFlow(),
-                _fullTextByDefault.asFlow(),
-                _notify.asFlow(),
-                _articleOpener.asFlow(),
+                _tag,
+                _url,
+                _title,
+                _fullTextByDefault,
+                _notify,
+                _articleOpener,
                 feedDefaultTitleFlow,
-                _alternateId.asFlow(),
+                _alternateId,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 EditFeedViewState(
