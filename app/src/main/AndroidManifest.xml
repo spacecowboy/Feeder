@@ -4,10 +4,15 @@
   package="com.nononsenseapps.feeder"
   android:installLocation="internalOnly">
   <!-- Import export feeds -->
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- For syncing -->
-  <uses-permission android:name="android.permission.INTERNET" /> <!-- To limit syncing to only WiFi -->
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    android:maxSdkVersion="28" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    android:maxSdkVersion="29" />
+  <!-- For syncing -->
+  <uses-permission android:name="android.permission.INTERNET" />
+  <!-- To limit syncing to only WiFi -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"  />
 
   <permission
     android:name="com.nononsenseapps.feeder.permission.read"

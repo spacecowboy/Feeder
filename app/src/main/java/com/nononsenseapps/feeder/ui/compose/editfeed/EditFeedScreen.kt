@@ -52,12 +52,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.shouldShowRationale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_READER
 import com.nononsenseapps.feeder.ui.compose.components.AutoCompleteFoo
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
+import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.settings.GroupTitle
 import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
@@ -65,7 +69,9 @@ import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CreateFeedScreen(
     onNavigateUp: () -> Unit,
@@ -73,6 +79,23 @@ fun CreateFeedScreen(
     onSaved: (Long) -> Unit,
 ) {
     val viewState by createFeedScreenViewModel.viewState.collectAsState()
+
+    val notificationsPermissionState = rememberApiPermissionState(
+        permission = "android.permission.POST_NOTIFICATIONS",
+        minimumApiLevel = 33,
+    ) { value ->
+        createFeedScreenViewModel.setNotify(value)
+    }
+
+    val shouldShowExplanationForPermission by remember {
+        derivedStateOf {
+            notificationsPermissionState.status.shouldShowRationale
+        }
+    }
+
+    var permissionDismissed by rememberSaveable {
+        mutableStateOf(true)
+    }
 
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
@@ -84,6 +107,13 @@ fun CreateFeedScreen(
         setNotify = createFeedScreenViewModel::setNotify,
         setArticleOpener = createFeedScreenViewModel::setArticleOpener,
         setAlternateId = createFeedScreenViewModel::setAlternateId,
+        showPermissionExplanation = shouldShowExplanationForPermission && !permissionDismissed,
+        onPermissionExplanationDismissed = {
+            permissionDismissed = true
+        },
+        onPermissionExplanationOk = {
+            notificationsPermissionState.launchPermissionRequest()
+        },
         onOk = {
             val feedId = createFeedScreenViewModel.saveAndRequestSync()
             onSaved(feedId)
@@ -94,6 +124,7 @@ fun CreateFeedScreen(
     )
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun EditFeedScreen(
     onNavigateUp: () -> Unit,
@@ -102,6 +133,41 @@ fun EditFeedScreen(
 ) {
     val viewState by editFeedScreenViewModel.viewState.collectAsState()
 
+    val notificationsPermissionState = rememberApiPermissionState(
+        permission = "android.permission.POST_NOTIFICATIONS",
+        minimumApiLevel = 33,
+    ) { value ->
+        editFeedScreenViewModel.setNotify(value)
+    }
+
+    val shouldShowExplanationForPermission by remember {
+        derivedStateOf {
+            notificationsPermissionState.status.shouldShowRationale
+        }
+    }
+
+    var permissionDismissed by rememberSaveable {
+        mutableStateOf(true)
+    }
+
+    fun setNotify(value: Boolean) {
+        if (!value) {
+            editFeedScreenViewModel.setNotify(value)
+        } else {
+            when (notificationsPermissionState.status) {
+                is PermissionStatus.Denied -> {
+                    if (notificationsPermissionState.status.shouldShowRationale) {
+                        // Dialog is shown inside EditFeedScreen with a button
+                        permissionDismissed = false
+                    } else {
+                        notificationsPermissionState.launchPermissionRequest()
+                    }
+                }
+                PermissionStatus.Granted -> editFeedScreenViewModel.setNotify(value)
+            }
+        }
+    }
+
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
         viewState = viewState,
@@ -109,9 +175,16 @@ fun EditFeedScreen(
         setTitle = editFeedScreenViewModel::setTitle,
         setTag = editFeedScreenViewModel::setTag,
         setFullTextByDefault = editFeedScreenViewModel::setFullTextByDefault,
-        setNotify = editFeedScreenViewModel::setNotify,
+        setNotify = ::setNotify,
         setArticleOpener = editFeedScreenViewModel::setArticleOpener,
         setAlternateId = editFeedScreenViewModel::setAlternateId,
+        showPermissionExplanation = shouldShowExplanationForPermission && !permissionDismissed,
+        onPermissionExplanationDismissed = {
+            permissionDismissed = true
+        },
+        onPermissionExplanationOk = {
+            notificationsPermissionState.launchPermissionRequest()
+        },
         onOk = {
             editFeedScreenViewModel.saveInBackgroundAndRequestSync()
             onOk(editFeedScreenViewModel.feedId)
@@ -133,12 +206,16 @@ fun EditFeedScreen(
     setNotify: (Boolean) -> Unit,
     setArticleOpener: (String) -> Unit,
     setAlternateId: (Boolean) -> Unit,
+    showPermissionExplanation: Boolean,
+    onPermissionExplanationDismissed: () -> Unit,
+    onPermissionExplanationOk: () -> Unit,
     onOk: () -> Unit,
     onCancel: () -> Unit,
 ) {
     Scaffold(
         // In case device is rotated to landscape and navigation bar ends up on the side
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
+        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)
+            .asPaddingValues(),
         topBar = {
             TopAppBar(
                 title = {
@@ -148,7 +225,8 @@ fun EditFeedScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
+                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+                    .asPaddingValues(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -173,6 +251,14 @@ fun EditFeedScreen(
             onCancel = onCancel,
             modifier = Modifier.padding(padding)
         )
+
+        if (showPermissionExplanation) {
+            ExplainPermissionDialog(
+                explanation = R.string.explanation_permission_notifications,
+                onDismiss = onPermissionExplanationDismissed,
+                onOk = onPermissionExplanationOk,
+            )
+        }
     }
 }
 
@@ -433,6 +519,9 @@ fun EditFeedScreenPreview() {
             setNotify = {},
             setArticleOpener = {},
             setAlternateId = {},
+            showPermissionExplanation = true,
+            onPermissionExplanationDismissed = {},
+            onPermissionExplanationOk = {},
         )
     }
 }

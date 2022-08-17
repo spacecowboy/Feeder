@@ -105,7 +105,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalCoilApi::class)
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun FeedListContent(
     viewState: FeedScreenViewState,
