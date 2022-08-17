@@ -64,9 +64,9 @@
   <string name="syncing">Syncing</string>
   <string name="only_on_wifi">Only on Wi-Fi</string>
   <string name="show_thumbnails">Show thumbnails</string>
-  <string name="use_detect_language">Use detected language</string>
-  <string name="use_detect_language_not_available">This feature is only available on Android 10 and above</string>
-  <string name="description_for_read_aloud">Always use detected language of the article for read aloud (Android feature, available Android 10 and above)</string>
+  <string name="use_detect_language">Detect language</string>
+  <string name="use_detect_language_not_available">Only available on Android 10 and above</string>
+  <string name="description_for_read_aloud">Automatically detects article language</string>
   <string name="may_result_data_charges">May result in mobile data charges.</string>
   <string name="only_when_charging">Only when charging</string>
   <string name="image_loading">Image loading</string>
