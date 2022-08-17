@@ -59,7 +59,7 @@ class AddFeedDestinationTest {
         )
 
         verify {
-            navController.navigate("add/feed/https%3A%2F%2Fcowboyprogrammer.org?feedTitle=%2B")
+            navController.navigate("add/feed/https%3A%2F%2Fcowboyprogrammer.org?feedTitle=+")
         }
     }
 
@@ -72,7 +72,7 @@ class AddFeedDestinationTest {
         )
 
         verify {
-            navController.navigate("add/feed/https%3A%2F%2Fcowboyprogrammer.org?feedTitle=A%2Bfeed")
+            navController.navigate("add/feed/https%3A%2F%2Fcowboyprogrammer.org?feedTitle=A+feed")
         }
     }
 }
