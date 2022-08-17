@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.settings
 
 import android.content.Intent
+import android.os.Build
 import android.provider.Settings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -158,6 +159,10 @@ fun SettingsScreen(
             onLoadImageOnlyOnWifiChanged = {
                 settingsViewModel.setLoadImageOnlyOnWifi(it)
             },
+            useDetectLanguage = viewState.useDetectLanguage,
+            onUseDetectLanguageChanged = {
+                settingsViewModel.setUseDetectLanguage(it)
+            },
             showThumbnailsValue = viewState.showThumbnails,
             onShowThumbnailsChanged = {
                 settingsViewModel.setShowThumbnails(it)
@@ -216,6 +221,8 @@ fun SettingsScreenPreview() {
                 loadImageOnlyOnWifiValue = true,
                 onLoadImageOnlyOnWifiChanged = {},
                 showThumbnailsValue = true,
+                useDetectLanguage = true,
+                onUseDetectLanguageChanged = {},
                 onShowThumbnailsChanged = {},
                 maxItemsPerFeedValue = 101,
                 onMaxItemsPerFeedChanged = {},
@@ -261,6 +268,8 @@ fun SettingsList(
     onLoadImageOnlyOnWifiChanged: (Boolean) -> Unit,
     showThumbnailsValue: Boolean,
     onShowThumbnailsChanged: (Boolean) -> Unit,
+    useDetectLanguage: Boolean,
+    onUseDetectLanguageChanged: (Boolean) -> Unit,
     maxItemsPerFeedValue: Int,
     onMaxItemsPerFeedChanged: (Int) -> Unit,
     currentItemOpenerValue: ItemOpener,
@@ -275,6 +284,7 @@ fun SettingsList(
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val dimens = LocalDimens.current
+    val isAndroidQAndAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -469,6 +479,28 @@ fun SettingsList(
             onSelection = {
                 onLinkOpenerChanged(it.linkOpener)
             }
+        )
+
+        Divider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        GroupTitle { modifier ->
+            Text(
+                stringResource(id = R.string.read_article),
+                modifier = modifier,
+            )
+        }
+
+        SwitchSetting(
+            checked = useDetectLanguage,
+            onCheckedChanged = onUseDetectLanguageChanged,
+            title = stringResource(id = R.string.use_detect_language),
+            description = when {
+                isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
+                else -> stringResource(
+                    id = R.string.use_detect_language_not_available
+                )
+            },
+            enabled = isAndroidQAndAbove
         )
 
         Spacer(modifier = Modifier.navigationBarsHeight())
@@ -727,6 +759,7 @@ fun SwitchSetting(
     checked: Boolean,
     icon: (@Composable () -> Unit)? = {},
     onCheckedChanged: (Boolean) -> Unit,
+    enabled: Boolean = true
 ) {
     val stateLabel = if (checked) {
         stringResource(R.string.on)
@@ -738,7 +771,10 @@ fun SwitchSetting(
         modifier = Modifier
             .width(dimens.maxContentWidth)
             .heightIn(min = 64.dp)
-            .clickable { onCheckedChanged(!checked) }
+            .clickable(
+                enabled = enabled,
+                onClick = { onCheckedChanged(!checked) }
+            )
             .semantics(mergeDescendants = true) {
                 stateDescription = stateLabel
                 role = Role.Switch
@@ -770,7 +806,8 @@ fun SwitchSetting(
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChanged,
-            modifier = Modifier.clearAndSetSemantics { }
+            modifier = Modifier.clearAndSetSemantics { },
+            enabled = enabled,
         )
     }
 }

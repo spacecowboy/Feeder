@@ -67,6 +67,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setShowThumbnails(value)
     }
 
+    fun setUseDetectLanguage(value: Boolean) {
+        repository.setUseDetectLanguage(value)
+    }
+
     fun setMaxCountPerFeed(value: Int) {
         repository.setMaxCountPerFeed(value)
     }
@@ -124,6 +128,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.feedItemStyle,
                 repository.swipeAsRead,
                 repository.blockList,
+                repository.useDetectLanguage,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -144,6 +149,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     feedItemStyle = params[14] as FeedItemStyle,
                     swipeAsRead = params[15] as SwipeAsRead,
                     blockList = params[16] as Set<String>,
+                    useDetectLanguage = params[17] as Boolean
                 )
             }.collect {
                 _viewState.value = it
@@ -171,4 +177,5 @@ data class SettingsViewState(
     val syncFrequency: SyncFrequency = SyncFrequency.EVERY_1_HOURS,
     val batteryOptimizationIgnored: Boolean = false,
     val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
+    val useDetectLanguage: Boolean = true,
 )

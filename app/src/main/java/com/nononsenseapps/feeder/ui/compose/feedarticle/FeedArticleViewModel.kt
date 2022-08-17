@@ -255,6 +255,7 @@ class FeedArticleViewModel(
             repository.swipeAsRead,
             textToDisplayTrigger, // Never actually read, only used as trigger
             repository.showOnlyBookmarked,
+            repository.useDetectLanguage,
         ) { params: Array<Any> ->
             @Suppress("UNCHECKED_CAST")
             val article = params[17] as Article
@@ -301,6 +302,7 @@ class FeedArticleViewModel(
                 isPinned = article.pinned,
                 isBookmarked = article.bookmarked,
                 onlyBookmarked = params[22] as Boolean,
+                useDetectLanguage = params[23] as Boolean,
             )
         }
             .stateIn(
@@ -388,7 +390,8 @@ class FeedArticleViewModel(
             } else {
                 readAloudStateHolder.readAloud(
                     title = viewState.value.articleTitle,
-                    fullText = fullText
+                    fullText = fullText,
+                    useDetectLanguage = viewState.value.useDetectLanguage
                 )
             }
         }
@@ -425,6 +428,7 @@ interface FeedScreenViewState {
 }
 
 interface ArticleScreenViewState {
+    val useDetectLanguage: Boolean
     val isReadAloudVisible: Boolean
     val isReadAloudPlaying: Boolean
     val readAloudTitle: String
@@ -482,5 +486,6 @@ data class FeedArticleScreenViewState(
     override val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
     override val isPinned: Boolean = false,
     override val isBookmarked: Boolean = false,
+    override val useDetectLanguage: Boolean = false,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState

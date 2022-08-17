@@ -33,7 +33,8 @@ class SettingsStore(override val di: DI) : DIAware {
         _showOnlyUnread.value = value
     }
 
-    private val _showOnlyBookmarked = MutableStateFlow(sp.getBoolean(PREF_SHOW_ONLY_BOOKMARKED, false))
+    private val _showOnlyBookmarked =
+        MutableStateFlow(sp.getBoolean(PREF_SHOW_ONLY_BOOKMARKED, false))
     val showOnlyBookmarked: StateFlow<Boolean> = _showOnlyBookmarked.asStateFlow()
     fun setShowOnlyBookmarked(value: Boolean) {
         sp.edit().putBoolean(PREF_SHOW_ONLY_BOOKMARKED, value).apply()
@@ -147,6 +148,14 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setShowThumbnails(value: Boolean) {
         _showThumbnails.value = value
         sp.edit().putBoolean(PREF_IMG_SHOW_THUMBNAILS, value).apply()
+    }
+
+    private val _useDetectLanguage =
+        MutableStateFlow(sp.getBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, true))
+    val useDetectLanguage = _useDetectLanguage.asStateFlow()
+    fun setUseDetectLanguage(value: Boolean) {
+        _useDetectLanguage.value = value
+        sp.edit().putBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, value).apply()
     }
 
     private val _maximumCountPerFeed =
@@ -388,6 +397,11 @@ const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
  * Block List Settings
  */
 const val PREF_BLOCK_LIST = "pref_block_list_values"
+
+/**
+ * Read Aloud Settings
+ */
+const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloud_detect_lang"
 
 enum class PrefValOpenWith {
     OPEN_WITH_DEFAULT,
