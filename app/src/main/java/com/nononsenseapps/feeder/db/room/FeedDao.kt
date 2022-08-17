@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.db.room
 
 import android.database.Cursor
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -44,9 +43,6 @@ interface FeedDao {
 
     @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
     suspend fun loadTags(): List<String>
-
-    @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
-    fun loadLiveTags(): LiveData<List<String>>
 
     @Query("SELECT DISTINCT tag FROM feeds ORDER BY tag COLLATE NOCASE")
     fun loadAllTags(): Flow<List<String>>

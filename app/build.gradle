@@ -189,9 +189,8 @@ dependencies {
   implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
   implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
 
-  // ViewModel and LiveData
+  // ViewModel
   implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
-  implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
   implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
   implementation "androidx.paging:paging-runtime-ktx:$pagingVersion"
@@ -204,7 +203,6 @@ dependencies {
   implementation "androidx.compose.material:material:$composeLibraryVersion"
   implementation "androidx.compose.material:material-icons-extended:$composeLibraryVersion"
   implementation "androidx.compose.runtime:runtime:$composeLibraryVersion"
-  implementation "androidx.compose.runtime:runtime-livedata:$composeLibraryVersion"
   implementation "androidx.compose.ui:ui-tooling:$composeLibraryVersion"
   implementation "androidx.window:window:$androidWindowVersion"
   implementation "com.google.android.material:material:$materialVersion"
