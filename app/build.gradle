@@ -6,8 +6,6 @@ plugins {
 }
 
 android {
-  buildToolsVersion "$build_tools_version"
-
   defaultConfig {
     applicationId "com.nononsenseapps.feeder"
     versionCode 249
