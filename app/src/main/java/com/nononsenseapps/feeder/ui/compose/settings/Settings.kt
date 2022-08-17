@@ -481,6 +481,15 @@ fun SettingsList(
             }
         )
 
+        Divider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        GroupTitle { modifier ->
+            Text(
+                stringResource(id = R.string.read_article),
+                modifier = modifier,
+            )
+        }
+
         SwitchSetting(
             checked = useDetectLanguage,
             onCheckedChanged = onUseDetectLanguageChanged,
