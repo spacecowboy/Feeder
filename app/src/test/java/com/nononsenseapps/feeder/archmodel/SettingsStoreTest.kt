@@ -212,13 +212,13 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
-    fun useDetectLanguage() {
-        store.setUseDetectLanguage(true)
+    fun useDetectLanguage(){
+        store.setUseDetectLanguage(false)
         verify {
-            sp.edit().putBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, true).apply()
+            sp.edit().putBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, false).apply()
         }
 
-        assertEquals(true, store.useDetectLanguage.value)
+        assertEquals(false, store.useDetectLanguage.value)
     }
 
     @Test
