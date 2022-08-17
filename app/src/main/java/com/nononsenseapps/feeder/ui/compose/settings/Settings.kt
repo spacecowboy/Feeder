@@ -284,6 +284,7 @@ fun SettingsList(
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val dimens = LocalDimens.current
+    val isAndroidQAndAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -484,8 +485,10 @@ fun SettingsList(
             checked = useDetectLanguage,
             onCheckedChanged = onUseDetectLanguageChanged,
             title = stringResource(id = R.string.use_detect_language),
-            description = stringResource(id = R.string.for_read_aloud),
-            enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+            description = if (isAndroidQAndAbove) stringResource(id = R.string.description_for_read_aloud) else stringResource(
+                id = R.string.use_detect_language_not_available
+            ),
+            enabled = isAndroidQAndAbove
         )
 
         Spacer(modifier = Modifier.navigationBarsHeight())
