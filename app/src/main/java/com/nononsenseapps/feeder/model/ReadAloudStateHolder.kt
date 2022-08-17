@@ -63,16 +63,13 @@ class ReadAloudStateHolder(
     private var textToSpeechId: Int = 0
     private var initializedState: Int? = null
     private var startJob: Job? = null
-    private var detectedLanguage: Locale? = null
+    private var localesToUse: Sequence<Locale> = emptySequence()
 
     private val _readAloudState = MutableStateFlow(PlaybackStatus.STOPPED)
     val readAloudState: StateFlow<PlaybackStatus> = _readAloudState.asStateFlow()
 
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title.asStateFlow()
-
-    private val _useDetectLanguage = MutableStateFlow(false)
-    val useDetectLanguage : StateFlow<Boolean> = _useDetectLanguage.asStateFlow()
 
     fun readAloud(title: String, fullText: String, useDetectLanguage: Boolean) {
         val textArray = fullText.split(*PUNCTUATION)
@@ -84,9 +81,10 @@ class ReadAloudStateHolder(
             textToSpeechId++
         }
         _title.value = title
-        _useDetectLanguage.value = useDetectLanguage
-        if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            detectedLanguage = context.detectLocaleFromText(fullText)
+        localesToUse = if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            context.detectLocaleFromText(fullText) + context.getLocales()
+        } else {
+            context.getLocales()
         }
         play()
     }
@@ -123,7 +121,6 @@ class ReadAloudStateHolder(
                 }
                 _readAloudState.value = PlaybackStatus.PLAYING
 
-                if (detectedLanguage != null) textToSpeech?.language = detectedLanguage
                 // Can only set this once engine has been initialized
                 textToSpeech?.setOnUtteranceProgressListener(speechListener)
                 try {
@@ -156,7 +153,7 @@ class ReadAloudStateHolder(
         textToSpeech?.stop()
         textToSpeechQueue.clear()
         _readAloudState.value = PlaybackStatus.STOPPED
-        detectedLanguage = null
+        localesToUse = emptySequence()
         textToSpeech = null
     }
 
@@ -165,11 +162,11 @@ class ReadAloudStateHolder(
 
         if (status == TextToSpeech.SUCCESS) {
             val selectedLocale =
-                (if (detectedLanguage != null) sequenceOf(detectedLanguage) else context.getLocales())
+                localesToUse
                     .firstOrNull { locale ->
                         when (textToSpeech?.setLanguage(locale)) {
                             TextToSpeech.LANG_MISSING_DATA, TextToSpeech.LANG_NOT_SUPPORTED -> {
-                                Log.e(LOG_TAG, "${locale?.displayLanguage} is not supported!")
+                                Log.e(LOG_TAG, "${locale.displayLanguage} is not supported!")
                                 false
                             }
                             else -> {
@@ -264,16 +261,21 @@ fun Context.getLocales(): Sequence<Locale> =
     }
 
 @RequiresApi(Build.VERSION_CODES.Q)
-fun Context.detectLocaleFromText(text: String): Locale {
+fun Context.detectLocaleFromText(text: String): Sequence<Locale> {
     val textClassificationManager = getSystemService(TextClassificationManager::class.java)
     val textClassifier = textClassificationManager.textClassifier
 
     val textRequest = TextLanguage.Request.Builder(text).build()
     val detectedLanguage = textClassifier.detectLanguage(textRequest)
-    val localeDetected = detectedLanguage.getLocale(0)
-    val confidence = detectedLanguage.getConfidenceScore(localeDetected) * 100.0
 
-    return if (confidence >= 80f) localeDetected.toLocale() else Locale.ENGLISH
+    return sequence {
+        for (i in 0 until detectedLanguage.localeHypothesisCount) {
+            val localeDetected = detectedLanguage.getLocale(i)
+//            val confidence = detectedLanguage.getConfidenceScore(localeDetected) * 100.0
+//            if (confidence >= 80f)
+            yield(localeDetected.toLocale())
+        }
+    }
 }
 
 enum class PlaybackStatus {
