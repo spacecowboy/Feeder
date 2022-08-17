@@ -212,6 +212,16 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
+    fun useDetectLanguage(){
+        store.setUseDetectLanguage(true)
+        verify {
+            sp.edit().putBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, true).apply()
+        }
+
+        assertEquals(true, store.useDetectLanguage.value)
+    }
+
+    @Test
     fun maximumCountPerFeed() {
         store.setMaxCountPerFeed(200)
 
