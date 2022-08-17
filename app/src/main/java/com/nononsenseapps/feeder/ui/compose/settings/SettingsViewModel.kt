@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.settings
 
 import android.app.Application
-import android.os.Build
 import android.os.PowerManager
 import androidx.compose.runtime.Immutable
 import androidx.core.content.getSystemService
@@ -68,7 +67,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setShowThumbnails(value)
     }
 
-    fun setUseDetectLanguage(value: Boolean){
+    fun setUseDetectLanguage(value: Boolean) {
         repository.setUseDetectLanguage(value)
     }
 

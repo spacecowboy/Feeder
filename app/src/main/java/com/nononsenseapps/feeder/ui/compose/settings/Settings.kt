@@ -485,9 +485,12 @@ fun SettingsList(
             checked = useDetectLanguage,
             onCheckedChanged = onUseDetectLanguageChanged,
             title = stringResource(id = R.string.use_detect_language),
-            description = if (isAndroidQAndAbove) stringResource(id = R.string.description_for_read_aloud) else stringResource(
-                id = R.string.use_detect_language_not_available
-            ),
+            description = when {
+                isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
+                else -> stringResource(
+                    id = R.string.use_detect_language_not_available
+                )
+            },
             enabled = isAndroidQAndAbove
         )
 
@@ -761,7 +764,8 @@ fun SwitchSetting(
             .heightIn(min = 64.dp)
             .clickable(
                 enabled = enabled,
-                onClick = { onCheckedChanged(!checked) })
+                onClick = { onCheckedChanged(!checked) }
+            )
             .semantics(mergeDescendants = true) {
                 stateDescription = stateLabel
                 role = Role.Switch
