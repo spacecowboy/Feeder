@@ -8,25 +8,13 @@ plugins {
 android {
   buildToolsVersion "$build_tools_version"
 
-  lintOptions {
-    abortOnError true
-    explainIssues true
-    ignoreWarnings true
-    textReport true
-    textOutput 'stdout'
-    // Should try to remove last two here
-    disable "MissingTranslation", "AppCompatCustomView", "InvalidPackage"
-    // I really want some to show as errors
-    error "InlinedApi", "StringEscaping"
-  }
-
   defaultConfig {
     applicationId "com.nononsenseapps.feeder"
     versionCode 249
     versionName "2.2.7"
-    compileSdkVersion 31
+    compileSdkVersion 33
     minSdkVersion 23
-    targetSdkVersion 31
+    targetSdkVersion 33
     multiDexEnabled true
 
     vectorDrawables.useSupportLibrary = true
@@ -119,18 +107,31 @@ android {
   composeOptions {
     kotlinCompilerExtensionVersion composeCompilerVersion
   }
-
   packagingOptions {
-    exclude 'META-INF/DEPENDENCIES'
-    exclude 'META-INF/LICENSE'
-    exclude 'META-INF/LICENSE.txt'
-    exclude 'META-INF/license.txt'
-    exclude 'META-INF/NOTICE'
-    exclude 'META-INF/NOTICE.txt'
-    exclude 'META-INF/notice.txt'
-    exclude 'META-INF/ASL2.0'
-    exclude 'META-INF/AL2.0'
-    exclude 'META-INF/LGPL2.1'
+    resources {
+      excludes += [
+              'META-INF/DEPENDENCIES',
+              'META-INF/LICENSE',
+              'META-INF/LICENSE.txt',
+              'META-INF/license.txt',
+              'META-INF/NOTICE',
+              'META-INF/NOTICE.txt',
+              'META-INF/notice.txt',
+              'META-INF/ASL2.0',
+              'META-INF/AL2.0',
+              'META-INF/LGPL2.1'
+      ]
+    }
+  }
+
+  lint {
+    abortOnError true
+    disable 'MissingTranslation', 'AppCompatCustomView', 'InvalidPackage'
+    error 'InlinedApi', 'StringEscaping'
+    explainIssues true
+    ignoreWarnings true
+    textOutput file('stdout')
+    textReport true
   }
 }
 
@@ -138,20 +139,20 @@ android {
 // gw installDebugMini -Pmyapp.enableComposeCompilerReports=true
 // build/compose_metrics/[...]-composables.txt
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
-            freeCompilerArgs += [
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
-                            project.buildDir.absolutePath + "/compose_metrics"
-            ]
-            freeCompilerArgs += [
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
-                            project.buildDir.absolutePath + "/compose_metrics"
-            ]
-        }
+  kotlinOptions {
+    if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
+      freeCompilerArgs += [
+              "-P",
+              "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+                      project.buildDir.absolutePath + "/compose_metrics"
+      ]
+      freeCompilerArgs += [
+              "-P",
+              "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+                      project.buildDir.absolutePath + "/compose_metrics"
+      ]
     }
+  }
 }
 
 configurations.all {
@@ -160,10 +161,10 @@ configurations.all {
 
     force "com.squareup.okhttp3:okhttp:$okhttp_version"
     force "com.squareup.okio:okio:$okio_version"
-    force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    force "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    force "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    force "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     force "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     force "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
   }
@@ -211,7 +212,7 @@ dependencies {
   implementation "androidx.navigation:navigation-compose:$navigationComposeVersion"
   implementation "androidx.paging:paging-compose:$pagingComposeVersion"
   implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"
-    // TODO remove these
+  // TODO remove these
   implementation "com.google.accompanist:accompanist-insets:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-insets-ui:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion"
@@ -228,7 +229,7 @@ dependencies {
   // JSONFeed
   implementation project(":jsonfeed-parser")
 
-    // For better fetching
+  // For better fetching
   implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
   // For supporting TLSv1.3 on pre Android-10
   implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
@@ -238,7 +239,7 @@ dependencies {
   implementation("io.coil-kt:coil-svg:$coilVersion")
   implementation("io.coil-kt:coil-compose:$coilVersion")
 
-  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   // Coroutines
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
   // For doing coroutines on UI thread
@@ -258,10 +259,10 @@ dependencies {
   implementation("com.squareup.moshi:moshi-adapters:$moshi_version")
   implementation("com.github.kenglxn.qrgen:android:$qrgen_version")
   // tests
-  testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+  testImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
   testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
-  testImplementation "junit:junit:$junit_version"
+  testImplementation "junit:junit:$junitVersion"
   testImplementation "org.mockito:mockito-core:$mockito_version"
   testImplementation "io.mockk:mockk:$mockk_version"
   testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
@@ -269,11 +270,11 @@ dependencies {
   // Needed for unit testing timezone stuff
   testImplementation "org.threeten:threetenbp:$threetentest_version"
 
-  androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+  androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
   androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
   androidTestImplementation "io.mockk:mockk-android:1.8.10.kotlin13"
-  androidTestImplementation "junit:junit:$junit_version"
+  androidTestImplementation "junit:junit:$junitVersion"
   androidTestImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
 
   androidTestImplementation "androidx.test:core:$androidx_testcore_version"
