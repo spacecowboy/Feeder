@@ -40,7 +40,7 @@ buildscript {
     test_rules_version = "1.4.0"
     lifecycle_version = "2.3.1"
     savedstate_version = "1.1.0"
-    room_version = "2.3.0"
+    roomVersion = "2.4.3"
     // Compose related below
     navVersion = "2.5.1"
     activityComposeVersion = "1.5.1"
