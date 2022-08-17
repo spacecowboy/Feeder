@@ -401,7 +401,7 @@ const val PREF_BLOCK_LIST = "pref_block_list_values"
 /**
  * Read Aloud Settings
  */
-const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloug_detect_lang"
+const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloud_detect_lang"
 
 enum class PrefValOpenWith {
     OPEN_WITH_DEFAULT,
