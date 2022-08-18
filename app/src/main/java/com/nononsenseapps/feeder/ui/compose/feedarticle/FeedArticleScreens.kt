@@ -598,7 +598,11 @@ fun FeedWithArticleScreen(
         onRefreshVisible = onRefreshVisible,
         onOpenNavDrawer = {
             coroutineScope.launch {
-                drawerState.open()
+                if (drawerState.isOpen) {
+                    drawerState.close()
+                } else {
+                    drawerState.open()
+                }
             }
         },
         onMarkAllAsRead = onMarkAllAsRead,
@@ -900,7 +904,11 @@ fun FeedWithArticleScreen(
                 viewState = viewState,
                 onOpenNavDrawer = {
                     coroutineScope.launch {
-                        drawerState.open()
+                        if (drawerState.isOpen) {
+                            drawerState.close()
+                        } else {
+                            drawerState.open()
+                        }
                     }
                 },
                 onAddFeed = onAddFeed,
@@ -988,7 +996,11 @@ fun FeedListScreen(
         onRefreshVisible = onRefreshVisible,
         onOpenNavDrawer = {
             coroutineScope.launch {
-                drawerState.open()
+                if (drawerState.isOpen) {
+                    drawerState.close()
+                } else {
+                    drawerState.open()
+                }
             }
         },
         onMarkAllAsRead = onMarkAllAsRead,
@@ -1193,7 +1205,11 @@ fun FeedListScreen(
             viewState = viewState,
             onOpenNavDrawer = {
                 coroutineScope.launch {
-                    drawerState.open()
+                    if (drawerState.isOpen) {
+                        drawerState.close()
+                    } else {
+                        drawerState.open()
+                    }
                 }
             },
             onAddFeed = onAddFeed,
