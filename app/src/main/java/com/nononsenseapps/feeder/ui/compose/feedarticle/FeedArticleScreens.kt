@@ -9,10 +9,15 @@ import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -683,12 +688,13 @@ fun FeedWithArticleScreen(
                             onShowToolbarMenu(false)
                             onAddFeed()
                         },
-                        text = {
+                        leadingIcon = {
                             Icon(
                                 Icons.Default.Add,
                                 contentDescription = null,
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        },
+                        text = {
                             Text(stringResource(id = R.string.add_feed))
                         }
                     )
@@ -1057,12 +1063,13 @@ fun FeedListScreen(
                             onShowToolbarMenu(false)
                             onAddFeed()
                         },
-                        text = {
+                        leadingIcon = {
                             Icon(
                                 Icons.Default.Add,
                                 contentDescription = null,
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        },
+                        text = {
                             Text(stringResource(id = R.string.add_feed))
                         }
                     )
@@ -1075,12 +1082,13 @@ fun FeedListScreen(
                             }
                             onShowToolbarMenu(false)
                         },
-                        text = {
+                        leadingIcon = {
                             Icon(
                                 Icons.Default.Edit,
                                 contentDescription = null,
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        },
+                        text = {
                             Text(stringResource(id = R.string.edit_feed))
                         }
                     )
@@ -1089,12 +1097,13 @@ fun FeedListScreen(
                             onShowDeleteDialog()
                             onShowToolbarMenu(false)
                         },
-                        text = {
+                        leadingIcon = {
                             Icon(
                                 Icons.Default.Delete,
                                 contentDescription = null,
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        },
+                        text = {
                             Text(stringResource(id = R.string.delete_feed))
                         }
                     )
@@ -1103,12 +1112,13 @@ fun FeedListScreen(
                             onMarkAllAsRead()
                             onShowToolbarMenu(false)
                         },
-                        text = {
+                        leadingIcon = {
                             Icon(
                                 Icons.Default.Check,
                                 contentDescription = null,
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        },
+                        text = {
                             Text(stringResource(id = R.string.mark_all_as_read))
                         }
                     )
@@ -1118,12 +1128,13 @@ fun FeedListScreen(
                             onShowToolbarMenu(false)
                             onImport()
                         },
-                        text = {
+                        leadingIcon = {
                             Icon(
                                 Icons.Default.ImportExport,
                                 contentDescription = null,
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        },
+                        text = {
                             Text(stringResource(id = R.string.import_feeds_from_opml))
                         }
                     )
@@ -1132,12 +1143,13 @@ fun FeedListScreen(
                             onShowToolbarMenu(false)
                             onExport()
                         },
-                        text = {
+                        leadingIcon = {
                             Icon(
                                 Icons.Default.ImportExport,
                                 contentDescription = null,
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        },
+                        text = {
                             Text(stringResource(id = R.string.export_feeds_to_opml))
                         }
                     )
@@ -1147,12 +1159,13 @@ fun FeedListScreen(
                             onShowToolbarMenu(false)
                             onSettings()
                         },
-                        text = {
+                        leadingIcon = {
                             Icon(
                                 Icons.Default.Settings,
                                 contentDescription = null,
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        },
+                        text = {
                             Text(stringResource(id = R.string.action_settings))
                         }
                     )
@@ -1162,12 +1175,13 @@ fun FeedListScreen(
                             onShowToolbarMenu(false)
                             onSendFeedback()
                         },
-                        text = {
+                        leadingIcon = {
                             Icon(
                                 Icons.Default.Email,
                                 contentDescription = null,
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                        },
+                        text = {
                             Text(stringResource(id = R.string.send_bug_report))
                         }
                     )
@@ -1225,7 +1239,8 @@ fun ArticleScreen(
     Scaffold(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .statusBarsPadding(),
+            .statusBarsPadding()
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         topBar = {
             SmallTopAppBar(
                 scrollBehavior = scrollBehavior,
@@ -1277,12 +1292,13 @@ fun ArticleScreen(
                                     onShowToolbarMenu(false)
                                     onShare()
                                 },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.Share,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(stringResource(id = R.string.share))
                                 }
                             )
@@ -1292,12 +1308,13 @@ fun ArticleScreen(
                                     onShowToolbarMenu(false)
                                     onMarkAsUnread()
                                 },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.VisibilityOff,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(stringResource(id = R.string.mark_as_unread))
                                 }
                             )
@@ -1306,12 +1323,13 @@ fun ArticleScreen(
                                     onShowToolbarMenu(false)
                                     onTogglePinned()
                                 },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.PushPin,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(
                                         stringResource(
                                             if (viewState.isPinned) {
@@ -1328,12 +1346,13 @@ fun ArticleScreen(
                                     onShowToolbarMenu(false)
                                     onToggleBookmarked()
                                 },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.Bookmark,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(
                                         stringResource(
                                             if (viewState.isBookmarked) {
@@ -1350,12 +1369,13 @@ fun ArticleScreen(
                                     onShowToolbarMenu(false)
                                     readAloudOnPlay()
                                 },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.Speaker,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(stringResource(id = R.string.read_article))
                                 }
                             )

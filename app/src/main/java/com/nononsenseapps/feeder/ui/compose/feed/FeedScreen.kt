@@ -10,15 +10,19 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -303,7 +307,6 @@ fun FeedScreen(
     readAloudOnStop: () -> Unit,
     content: @Composable (Modifier, () -> Unit) -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
     var showMenu by rememberSaveable {
         mutableStateOf(false)
     }
@@ -333,8 +336,10 @@ fun FeedScreen(
     )
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-            .statusBarsPadding(),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .statusBarsPadding()
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         topBar = {
             SmallTopAppBar(
                 scrollBehavior = scrollBehavior,
@@ -429,12 +434,13 @@ fun FeedScreen(
                                     .safeSemantics {
                                         testTag = "menuAddFeed"
                                     },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.Add,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(stringResource(id = R.string.add_feed))
                                 },
                             )
@@ -451,12 +457,13 @@ fun FeedScreen(
                                     .safeSemantics {
                                         testTag = "menuEditFeed"
                                     },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.Edit,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(stringResource(id = R.string.edit_feed))
                                 },
                             )
@@ -469,12 +476,13 @@ fun FeedScreen(
                                     .safeSemantics {
                                         testTag = "menuDeleteFeed"
                                     },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.Delete,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(stringResource(id = R.string.delete_feed))
                                 }
                             )
@@ -488,12 +496,13 @@ fun FeedScreen(
                                     .safeSemantics {
                                         testTag = "menuImportFeeds"
                                     },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.ImportExport,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(stringResource(id = R.string.import_feeds_from_opml))
                                 }
                             )
@@ -507,12 +516,13 @@ fun FeedScreen(
                                     .safeSemantics {
                                         testTag = "menuExportFeeds"
                                     },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.ImportExport,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(stringResource(id = R.string.export_feeds_to_opml))
                                 }
                             )
@@ -526,12 +536,13 @@ fun FeedScreen(
                                     .safeSemantics {
                                         testTag = "menuSettings"
                                     },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.Settings,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(stringResource(id = R.string.action_settings))
                                 }
                             )
@@ -545,12 +556,13 @@ fun FeedScreen(
                                     .safeSemantics {
                                         testTag = "menuSendBugReport"
                                     },
-                                text = {
+                                leadingIcon = {
                                     Icon(
                                         Icons.Default.Email,
                                         contentDescription = null,
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                },
+                                text = {
                                     Text(stringResource(id = R.string.send_bug_report))
                                 }
                             )
@@ -610,7 +622,14 @@ fun FeedScreen(
 
         if (showEditDialog) {
             EditFeedDialog(
-                feeds = ImmutableHolder(viewState.visibleFeeds.map { DeletableFeed(it.id, it.displayTitle) }),
+                feeds = ImmutableHolder(
+                    viewState.visibleFeeds.map {
+                        DeletableFeed(
+                            it.id,
+                            it.displayTitle
+                        )
+                    }
+                ),
                 onDismiss = { showEditDialog = false },
                 onEdit = onEditFeed
             )
@@ -699,8 +718,10 @@ fun ScreenWithFeedList(
                 }
             }
         },
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-            .statusBarsPadding(),
+        modifier = modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .statusBarsPadding()
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
     ) { padding ->
         SwipeRefresh(
             state = refreshState,
@@ -724,7 +745,14 @@ fun ScreenWithFeedList(
 
         if (viewState.showEditDialog) {
             EditFeedDialog(
-                feeds = ImmutableHolder(viewState.visibleFeeds.map { DeletableFeed(it.id, it.displayTitle) }),
+                feeds = ImmutableHolder(
+                    viewState.visibleFeeds.map {
+                        DeletableFeed(
+                            it.id,
+                            it.displayTitle
+                        )
+                    }
+                ),
                 onDismiss = onDismissEditDialog,
                 onEdit = onEditFeed
             )
