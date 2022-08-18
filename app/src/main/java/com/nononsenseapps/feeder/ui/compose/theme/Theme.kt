@@ -9,7 +9,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -86,22 +86,26 @@ fun FeederTheme(
     dynamicColors: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val darkIcons = currentTheme.isDarkSystemIcons()
+    val darkSystemIcons = currentTheme.isDarkSystemIcons()
+    val darkNavIcons = currentTheme.isDarkNavIcons()
     val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
     ) {
         val systemUiController = rememberSystemUiController()
-        SideEffect {
+        val surfaceColor = Color(MaterialTheme.colorScheme.surface.value)
+        DisposableEffect(systemUiController, darkSystemIcons, darkNavIcons) {
             systemUiController.setStatusBarColor(
-                Color.Transparent,
-                darkIcons = false,
+                surfaceColor,
+                darkIcons = darkSystemIcons,
             )
             systemUiController.setNavigationBarColor(
-                colorScheme.scrim,
-                darkIcons = darkIcons,
+                Color.Transparent, // colorScheme.scrim,
+                darkIcons = darkNavIcons,
             )
+
+            onDispose {}
         }
         ProvideDimens {
             content()
@@ -117,8 +121,13 @@ private fun ThemeOptions.isDarkSystemIcons(): Boolean {
         ThemeOptions.SYSTEM -> isSystemInDarkTheme()
     }
 
+    return !isDarkTheme
+}
+
+@Composable
+private fun ThemeOptions.isDarkNavIcons(): Boolean {
     // Only Api 27+ supports dark nav bar icons
-    return (Build.VERSION.SDK_INT >= 27) && !isDarkTheme
+    return (Build.VERSION.SDK_INT >= 27) && isDarkSystemIcons()
 }
 
 @Composable

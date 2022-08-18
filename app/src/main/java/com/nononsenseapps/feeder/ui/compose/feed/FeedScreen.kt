@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -334,7 +334,7 @@ fun FeedScreen(
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-            .systemBarsPadding(),
+            .statusBarsPadding(),
         topBar = {
             SmallTopAppBar(
                 scrollBehavior = scrollBehavior,
@@ -350,11 +350,7 @@ fun FeedScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                // TODO drawer
-                            }
-                        }
+                        onClick = onOpenNavDrawer
                     ) {
                         Icon(
                             Icons.Default.Menu,
@@ -690,30 +686,6 @@ fun ScreenWithFeedList(
                 onStop = readAloudOnStop,
             )
         },
-        // todo drawer
-//        drawerContent = {
-//            ListOfFeedsAndTags(
-//                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
-//                expandedTags = ImmutableHolder(viewState.expandedTags),
-//                onToggleTagExpansion = onToggleTagExpansion,
-//                onItemClick = { item ->
-//                    coroutineScope.launch {
-//                        val id = when (item) {
-//                            is DrawerFeed -> item.id
-//                            is DrawerTag -> ID_UNSET
-//                            is DrawerTop -> ID_ALL_FEEDS
-//                        }
-//                        val tag = when (item) {
-//                            is DrawerFeed -> item.tag
-//                            is DrawerTag -> item.tag
-//                            is DrawerTop -> ""
-//                        }
-//                        onDrawerItemSelected(id, tag)
-//                        scaffoldState.drawerState.close()
-//                    }
-//                }
-//            )
-//        },
         floatingActionButton = {
             if (viewState.showFab) {
                 FloatingActionButton(
@@ -728,7 +700,7 @@ fun ScreenWithFeedList(
             }
         },
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-            .systemBarsPadding(),
+            .statusBarsPadding(),
     ) { padding ->
         SwipeRefresh(
             state = refreshState,
