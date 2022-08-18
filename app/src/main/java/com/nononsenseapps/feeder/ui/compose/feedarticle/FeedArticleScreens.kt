@@ -1551,13 +1551,13 @@ private fun getFeedArticleScreenType(
     windowSize: WindowSize,
     viewState: FeedArticleScreenViewState,
 ): FeedArticleScreenType = when (windowSize) {
-    WindowSize.Compact, WindowSize.Medium -> {
+    WindowSize.Compact -> {
         when {
             viewState.isArticleOpen -> FeedArticleScreenType.ArticleDetails
             else -> FeedArticleScreenType.Feed
         }
     }
-    WindowSize.Expanded -> FeedArticleScreenType.FeedWithArticleDetails
+    WindowSize.Medium, WindowSize.Expanded -> FeedArticleScreenType.FeedWithArticleDetails
 }
 
 /**
