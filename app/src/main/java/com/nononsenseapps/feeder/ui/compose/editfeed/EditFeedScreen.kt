@@ -55,6 +55,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -74,11 +75,15 @@ import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
+import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CreateFeedScreen(
+    windowSize: WindowSize,
     onNavigateUp: () -> Unit,
     createFeedScreenViewModel: CreateFeedScreenViewModel,
     onSaved: (Long) -> Unit,
@@ -102,7 +107,14 @@ fun CreateFeedScreen(
         mutableStateOf(true)
     }
 
+    val screenType by remember(windowSize) {
+        derivedStateOf {
+            getScreenType(windowSize)
+        }
+    }
+
     EditFeedScreen(
+        screenType = screenType,
         onNavigateUp = onNavigateUp,
         viewState = viewState,
         setUrl = createFeedScreenViewModel::setUrl,
@@ -132,6 +144,7 @@ fun CreateFeedScreen(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun EditFeedScreen(
+    windowSize: WindowSize,
     onNavigateUp: () -> Unit,
     onOk: (Long) -> Unit,
     editFeedScreenViewModel: EditFeedScreenViewModel,
@@ -173,7 +186,14 @@ fun EditFeedScreen(
         }
     }
 
+    val screenType by remember(windowSize) {
+        derivedStateOf {
+            getScreenType(windowSize)
+        }
+    }
+
     EditFeedScreen(
+        screenType = screenType,
         onNavigateUp = onNavigateUp,
         viewState = viewState,
         setUrl = editFeedScreenViewModel::setUrl,
@@ -203,6 +223,7 @@ fun EditFeedScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditFeedScreen(
+    screenType: ScreenType,
     onNavigateUp: () -> Unit,
     viewState: EditFeedViewState,
     setUrl: (String) -> Unit,
@@ -250,6 +271,7 @@ fun EditFeedScreen(
         }
     ) { padding ->
         EditFeedView(
+            screenType = screenType,
             viewState = viewState,
             setUrl = setUrl,
             setTitle = setTitle,
@@ -276,6 +298,7 @@ fun EditFeedScreen(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditFeedView(
+    screenType: ScreenType,
     viewState: EditFeedViewState,
     setUrl: (String) -> Unit,
     setTitle: (String) -> Unit,
@@ -514,11 +537,37 @@ fun EditFeedView(
     }
 }
 
-@Preview
+@Preview("Edit Feed Phone")
 @Composable
-fun EditFeedScreenPreview() {
+fun PreviewEditFeedScreenPhone() {
     FeederTheme {
         EditFeedScreen(
+            screenType = ScreenType.SINGLE,
+            onNavigateUp = {},
+            onOk = {},
+            onCancel = {},
+            viewState = EditFeedViewState(),
+            setUrl = {},
+            setTitle = {},
+            setTag = {},
+            setFullTextByDefault = {},
+            setNotify = {},
+            setArticleOpener = {},
+            setAlternateId = {},
+            showPermissionExplanation = true,
+            onPermissionExplanationDismissed = {},
+            onPermissionExplanationOk = {},
+        )
+    }
+}
+
+@Preview("Edit Feed Foldable", device = Devices.FOLDABLE)
+@Preview("Edit Feed Tablet", device = Devices.PIXEL_C)
+@Composable
+fun PreviewEditFeedScreenLarge() {
+    FeederTheme {
+        EditFeedScreen(
+            screenType = ScreenType.DUAL,
             onNavigateUp = {},
             onOk = {},
             onCancel = {},

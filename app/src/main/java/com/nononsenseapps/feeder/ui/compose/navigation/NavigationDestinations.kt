@@ -173,6 +173,7 @@ object AddFeedDestination : NavigationDestination(
         val createFeedScreenViewModel: CreateFeedScreenViewModel = backStackEntry.DIAwareViewModel()
 
         CreateFeedScreen(
+            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
@@ -206,6 +207,7 @@ object EditFeedDestination : NavigationDestination(
     ) {
         val editFeedScreenViewModel: EditFeedScreenViewModel = backStackEntry.DIAwareViewModel()
         EditFeedScreen(
+            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
