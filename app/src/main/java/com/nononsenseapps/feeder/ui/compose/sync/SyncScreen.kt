@@ -337,7 +337,7 @@ fun getSyncScreenType(
     windowSize: WindowSize,
     viewState: SyncScreenViewState
 ): SyncScreenType = when (windowSize) {
-    WindowSize.Compact, WindowSize.Medium -> {
+    WindowSize.Compact -> {
         when (viewState.singleScreenToShow) {
             SyncScreenToShow.SETUP -> SyncScreenType.SINGLE_SETUP
             SyncScreenToShow.DEVICELIST -> SyncScreenType.SINGLE_DEVICELIST
@@ -345,7 +345,7 @@ fun getSyncScreenType(
             SyncScreenToShow.JOIN -> SyncScreenType.SINGLE_JOIN
         }
     }
-    WindowSize.Expanded -> SyncScreenType.DUAL
+    WindowSize.Medium, WindowSize.Expanded -> SyncScreenType.DUAL
 }
 
 @Composable
