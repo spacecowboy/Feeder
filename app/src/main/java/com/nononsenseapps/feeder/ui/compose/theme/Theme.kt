@@ -120,7 +120,9 @@ private fun ThemeOptions.isDarkSystemIcons(): Boolean {
 }
 
 @Composable
-private fun ThemeOptions.getColorScheme(darkThemePreference: DarkThemePreferences): ColorScheme =
+private fun ThemeOptions.getColorScheme(
+    darkThemePreference: DarkThemePreferences
+): ColorScheme =
     when (this) {
         ThemeOptions.DAY -> lightColors
         ThemeOptions.NIGHT -> getPreferredDarkColorScheme(darkThemePreference)
@@ -131,6 +133,21 @@ private fun ThemeOptions.getColorScheme(darkThemePreference: DarkThemePreference
                 lightColors
             }
         }
+//        ThemeOptions.DYNAMIC -> {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                if (isSystemInDarkTheme()) {
+//                    dynamicDarkColorScheme(LocalContext.current)
+//                } else {
+//                    dynamicLightColorScheme(LocalContext.current)
+//                }
+//            } else {
+//                if (isSystemInDarkTheme()) {
+//                    getPreferredDarkColorScheme(darkThemePreference)
+//                } else {
+//                    lightColors
+//                }
+//            }
+//        }
     }
 
 @Composable

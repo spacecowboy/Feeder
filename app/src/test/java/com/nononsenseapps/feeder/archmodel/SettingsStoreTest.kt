@@ -212,13 +212,23 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
-    fun useDetectLanguage(){
+    fun useDetectLanguage() {
         store.setUseDetectLanguage(false)
         verify {
             sp.edit().putBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, false).apply()
         }
 
         assertEquals(false, store.useDetectLanguage.value)
+    }
+
+    @Test
+    fun useDynamicTheme() {
+        store.setUseDynamicTheme(false)
+        verify {
+            sp.edit().putBoolean(PREF_DYNAMIC_THEME, false).apply()
+        }
+
+        assertEquals(false, store.useDynamicTheme.value)
     }
 
     @Test

@@ -65,7 +65,7 @@
   <string name="only_on_wifi">Only on Wi-Fi</string>
   <string name="show_thumbnails">Show thumbnails</string>
   <string name="use_detect_language">Detect language</string>
-  <string name="use_detect_language_not_available">Only available on Android 10 and above</string>
+  <string name="only_available_on_android_n">Only available on Android %1$s and above</string>
   <string name="description_for_read_aloud">Automatically detects article language</string>
   <string name="may_result_data_charges">May result in mobile data charges.</string>
   <string name="only_when_charging">Only when charging</string>
@@ -99,6 +99,7 @@
   <string name="theme_day">Day</string>
   <string name="theme_night">Night</string>
   <string name="theme">Theme</string>
+  <string name="dynamic_theme_use">Dynamic colors</string>
   <string name="dark_theme_preference">Preferred dark theme</string>
   <string name="dark_theme_preference_black">Black</string>
   <string name="dark_theme_preference_dark">Dark</string>

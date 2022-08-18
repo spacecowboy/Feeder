@@ -23,7 +23,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
@@ -33,6 +32,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
@@ -97,7 +97,8 @@ fun SettingsScreen(
     )
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
             .systemBarsPadding(),
         topBar = {
             SmallTopAppBar(
@@ -135,63 +136,37 @@ fun SettingsScreen(
                 settingsViewModel.setCurrentSorting(value.currentSorting)
             },
             showFabValue = viewState.showFab,
-            onShowFabChanged = { value ->
-                settingsViewModel.setShowFab(value)
-            },
+            onShowFabChanged = settingsViewModel::setShowFab,
             feedItemStyleValue = viewState.feedItemStyle,
-            onFeedItemStyleChanged = { value ->
-                settingsViewModel.setFeedItemStyle(value)
-            },
+            onFeedItemStyleChanged = settingsViewModel::setFeedItemStyle,
             blockListValue = ImmutableHolder(viewState.blockList),
-            onBlockListChanged = { value ->
-                settingsViewModel.setBlockList(value)
-            },
+            onBlockListChanged = settingsViewModel::setBlockList,
             syncOnStartupValue = viewState.syncOnResume,
-            onSyncOnStartupChanged = {
-                settingsViewModel.setSyncOnResume(it)
-            },
+            onSyncOnStartupChanged = settingsViewModel::setSyncOnResume,
             syncOnlyOnWifiValue = viewState.syncOnlyOnWifi,
-            onSyncOnlyOnWifiChanged = {
-                settingsViewModel.setSyncOnlyOnWifi(it)
-            },
+            onSyncOnlyOnWifiChanged = settingsViewModel::setSyncOnlyOnWifi,
             syncOnlyWhenChargingValue = viewState.syncOnlyWhenCharging,
-            onSyncOnlyWhenChargingChanged = {
-                settingsViewModel.setSyncOnlyWhenCharging(it)
-            },
+            onSyncOnlyWhenChargingChanged = settingsViewModel::setSyncOnlyWhenCharging,
             loadImageOnlyOnWifiValue = viewState.loadImageOnlyOnWifi,
-            onLoadImageOnlyOnWifiChanged = {
-                settingsViewModel.setLoadImageOnlyOnWifi(it)
-            },
+            onLoadImageOnlyOnWifiChanged = settingsViewModel::setLoadImageOnlyOnWifi,
             useDetectLanguage = viewState.useDetectLanguage,
-            onUseDetectLanguageChanged = {
-                settingsViewModel.setUseDetectLanguage(it)
-            },
+            onUseDetectLanguageChanged = settingsViewModel::setUseDetectLanguage,
             showThumbnailsValue = viewState.showThumbnails,
-            onShowThumbnailsChanged = {
-                settingsViewModel.setShowThumbnails(it)
-            },
+            onShowThumbnailsChanged = settingsViewModel::setShowThumbnails,
             maxItemsPerFeedValue = viewState.maximumCountPerFeed,
-            onMaxItemsPerFeedChanged = {
-                settingsViewModel.setMaxCountPerFeed(it)
-            },
+            onMaxItemsPerFeedChanged = settingsViewModel::setMaxCountPerFeed,
             currentItemOpenerValue = viewState.itemOpener,
-            onItemOpenerChanged = {
-                settingsViewModel.setItemOpener(it)
-            },
+            onItemOpenerChanged = settingsViewModel::setItemOpener,
             currentLinkOpenerValue = viewState.linkOpener,
-            onLinkOpenerChanged = {
-                settingsViewModel.setLinkOpener(it)
-            },
+            onLinkOpenerChanged = settingsViewModel::setLinkOpener,
             currentSyncFrequencyValue = viewState.syncFrequency,
-            onSyncFrequencyChanged = {
-                settingsViewModel.setSyncFrequency(it)
-            },
+            onSyncFrequencyChanged = settingsViewModel::setSyncFrequency,
             batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored,
             onOpenSyncSettings = onNavigateToSyncScreen,
             swipeAsReadValue = viewState.swipeAsRead,
-            onSwipeAsReadOptionChanged = {
-                settingsViewModel.setSwipeAsRead(it)
-            }
+            onSwipeAsReadOptionChanged = settingsViewModel::setSwipeAsRead,
+            useDynamicTheme = viewState.useDynamicTheme,
+            onUseDynamicTheme = settingsViewModel::setUseDynamicTheme
         )
     }
 }
@@ -239,6 +214,8 @@ fun SettingsScreenPreview() {
                 onOpenSyncSettings = {},
                 onSwipeAsReadOptionChanged = {},
                 swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
+                useDynamicTheme = true,
+                onUseDynamicTheme = {},
             )
         }
     }
@@ -283,11 +260,14 @@ fun SettingsList(
     onSyncFrequencyChanged: (SyncFrequency) -> Unit,
     batteryOptimizationIgnoredValue: Boolean,
     onOpenSyncSettings: () -> Unit,
+    useDynamicTheme: Boolean,
+    onUseDynamicTheme: (Boolean) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val dimens = LocalDimens.current
     val isAndroidQAndAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    val isAndroidSAndAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -305,6 +285,24 @@ fun SettingsList(
             ),
             title = stringResource(id = R.string.theme),
             onSelection = onThemeChanged
+        )
+
+        SwitchSetting(
+            checked = useDynamicTheme,
+            onCheckedChanged = onUseDynamicTheme,
+            title = stringResource(id = R.string.dynamic_theme_use),
+            description = when {
+                isAndroidSAndAbove -> {
+                    stringResource(
+                        id = R.string.only_available_on_android_n,
+                        "12"
+                    )
+                }
+                else -> {
+                    ""
+                }
+            },
+            enabled = isAndroidSAndAbove
         )
 
         MenuSetting(
@@ -500,7 +498,8 @@ fun SettingsList(
             description = when {
                 isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
                 else -> stringResource(
-                    id = R.string.use_detect_language_not_available
+                    id = R.string.only_available_on_android_n,
+                    "10"
                 )
             },
             enabled = isAndroidQAndAbove
@@ -830,11 +829,8 @@ private fun RowScope.TitleAndSubtitle(
         }
         if (subtitle != null) {
             Spacer(modifier = Modifier.size(2.dp))
-            ProvideTextStyle(value = MaterialTheme.typography.labelMedium) {
-                CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.medium,
-                    content = subtitle
-                )
+            ProvideTextStyle(value = MaterialTheme.typography.bodyMedium) {
+                subtitle()
             }
         }
     }
