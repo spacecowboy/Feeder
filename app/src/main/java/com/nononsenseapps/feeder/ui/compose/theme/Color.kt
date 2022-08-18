@@ -65,6 +65,9 @@ val md_theme_dark_surfaceTint = Color(0xFF77DB93)
 
 val seed = Green700
 
+val NavBarScrimLight = Color(0xE3ffffff)
+val NavBarScrimDark = Color(0xC3000000)
+
 // OLD Material 2
 // TODO REMOVE
 val SwipingItemToReadColor = Color(0xffff5252)

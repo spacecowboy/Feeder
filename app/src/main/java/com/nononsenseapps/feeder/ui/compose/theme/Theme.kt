@@ -88,6 +88,7 @@ fun FeederTheme(
 ) {
     val darkSystemIcons = currentTheme.isDarkSystemIcons()
     val darkNavIcons = currentTheme.isDarkNavIcons()
+    val navBarColor = currentTheme.getNavBarColor()
     val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
     MaterialTheme(
         colorScheme = colorScheme,
@@ -101,7 +102,7 @@ fun FeederTheme(
                 darkIcons = darkSystemIcons,
             )
             systemUiController.setNavigationBarColor(
-                Color.Transparent, // colorScheme.scrim,
+                navBarColor,
                 darkIcons = darkNavIcons,
             )
 
@@ -127,7 +128,19 @@ private fun ThemeOptions.isDarkSystemIcons(): Boolean {
 @Composable
 private fun ThemeOptions.isDarkNavIcons(): Boolean {
     // Only Api 27+ supports dark nav bar icons
-    return (Build.VERSION.SDK_INT >= 27) && isDarkSystemIcons()
+    return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) && isDarkSystemIcons()
+}
+
+@Composable
+private fun ThemeOptions.getNavBarColor(): Color {
+    // Api 29 handles transparency
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        Color.Transparent
+    } else if (isDarkNavIcons()) {
+        NavBarScrimLight
+    } else {
+        NavBarScrimDark
+    }
 }
 
 @Composable
