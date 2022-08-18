@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
@@ -76,10 +75,8 @@ fun FeederTheme(
                 darkIcons = darkIcons,
             )
         }
-        ProvideWindowInsets {
-            ProvideDimens {
-                content()
-            }
+        ProvideDimens {
+            content()
         }
     }
 }

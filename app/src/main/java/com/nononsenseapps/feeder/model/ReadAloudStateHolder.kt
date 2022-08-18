@@ -54,6 +54,16 @@ class ReadAloudStateHolder(
             override fun onStart(utteranceId: String) {
             }
 
+            override fun onError(utteranceId: String?, errorCode: Int) {
+                if (utteranceId != null) {
+                    textToSpeechQueue.remove(utteranceId)
+                }
+            }
+
+            @Deprecated(
+                "Deprecated in super class",
+                replaceWith = ReplaceWith("onError(utteranceId, errorCode)")
+            )
             override fun onError(utteranceId: String) {
                 textToSpeechQueue.remove(utteranceId)
             }

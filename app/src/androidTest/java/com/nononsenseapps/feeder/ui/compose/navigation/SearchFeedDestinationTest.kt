@@ -44,7 +44,7 @@ class SearchFeedDestinationTest {
         )
 
         verify {
-            navController.navigate("search/feed?feedUrl=https%253A%252F%252Fcowboyprogrammer.org")
+            navController.navigate("search/feed?feedUrl=https%3A%2F%2Fcowboyprogrammer.org")
         }
     }
 }

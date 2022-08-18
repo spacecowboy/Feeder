@@ -36,10 +36,13 @@ fun currentlyConnected(context: Context): Boolean {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         val net = connManager?.activeNetwork
+        @Suppress("DEPRECATION")
         val netInfo = connManager?.getNetworkInfo(net)
+        @Suppress("DEPRECATION")
         return netInfo != null && netInfo.isConnected
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        @Suppress("DEPRECATION")
         return connManager?.allNetworks?.map { connManager.getNetworkInfo(it)?.isConnected }
             ?.fold(false) { result, connected ->
                 result || (connected ?: false)

@@ -32,7 +32,6 @@ import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +49,6 @@ import org.kodein.di.instance
 import org.threeten.bp.Instant
 import org.threeten.bp.ZonedDateTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class FeedArticleViewModel(
     di: DI,
     private val state: SavedStateHandle

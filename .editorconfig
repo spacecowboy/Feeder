@@ -586,6 +586,7 @@ ij_cmake_spaces_within_method_parentheses = false
 ij_cmake_spaces_within_while_parentheses = false
 
 [{*.gant,*.gradle,*.groovy,*.gy}]
+indent_size = 2
 ij_groovy_align_group_field_declarations = false
 ij_groovy_align_multiline_array_initializer_expression = false
 ij_groovy_align_multiline_assignment = false

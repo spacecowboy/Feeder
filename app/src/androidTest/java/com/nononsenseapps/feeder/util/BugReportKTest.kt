@@ -6,7 +6,6 @@ import android.content.Intent.EXTRA_EMAIL
 import android.content.Intent.EXTRA_SUBJECT
 import android.net.Uri
 import android.os.Build
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.nononsenseapps.feeder.BuildConfig
@@ -65,7 +64,7 @@ class BugReportKTest {
 
     @Test
     fun emailIntentIsCorrect() {
-        val intent = emailBugReportIntent(getApplicationContext())
+        val intent = emailBugReportIntent()
 
         assertEquals(ACTION_SENDTO, intent.action)
         assertEquals(Uri.parse("mailto:${emailReportAddress()}"), intent.data)

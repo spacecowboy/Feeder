@@ -7,8 +7,14 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -67,8 +73,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
@@ -117,7 +121,7 @@ fun FeedArticleScreen(
 
     val di = LocalDI.current
     val opmlExporter = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument()
+        ActivityResultContracts.CreateDocument("application/xml")
     ) { uri ->
         if (uri != null) {
             val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
@@ -1125,11 +1129,7 @@ fun ArticleScreen(
     Scaffold(
         scaffoldState = scaffoldState,
         // In case device is rotated to landscape and navigation bar ends up on the side
-        contentPadding = rememberInsetsPaddingValues(
-            insets = LocalWindowInsets.current.navigationBars,
-            applyBottom = false,
-            applyTop = false,
-        ),
+        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
         topBar = {
             TopAppBar(
                 title = {
@@ -1139,10 +1139,7 @@ fun ArticleScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                contentPadding = rememberInsetsPaddingValues(
-                    LocalWindowInsets.current.systemBars,
-                    applyBottom = false,
-                ),
+                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -1416,6 +1413,7 @@ fun ArticleContent(
     }
 }
 
+@Suppress("FunctionName")
 private fun LazyListScope.LoadingItem() {
     item {
         Text(text = stringResource(id = R.string.fetching_full_article))
