@@ -14,34 +14,32 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -62,8 +60,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.BuildConfig
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
@@ -84,6 +80,7 @@ import java.net.URLDecoder
 import net.glxn.qrgen.android.QRCode
 import net.glxn.qrgen.core.scheme.Url
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SyncScaffold(
     onNavigateUp: () -> Unit,
@@ -94,9 +91,9 @@ private fun SyncScaffold(
         mutableStateOf(false)
     }
     Scaffold(
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
+        modifier = Modifier.systemBarsPadding(),
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.device_sync),
@@ -104,7 +101,6 @@ private fun SyncScaffold(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -129,10 +125,11 @@ private fun SyncScaffold(
                                 onClick = {
                                     showToolbar = false
                                     onLeaveSyncChain()
+                                },
+                                text = {
+                                    Text(stringResource(R.string.leave_sync_chain))
                                 }
-                            ) {
-                                Text(stringResource(R.string.leave_sync_chain))
-                            }
+                            )
                         }
                     }
                 }
@@ -457,17 +454,17 @@ fun SyncSetupContent(
     ) {
         Text(
             text = stringResource(R.string.device_sync_description_1),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.device_sync_description_2),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.device_sync_financed_by_community),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.fillMaxWidth(),
         )
         // Google Play does not allow direct donation links
@@ -475,7 +472,7 @@ fun SyncSetupContent(
             val context = LocalContext.current
             Text(
                 text = KOFI_URL,
-                style = MaterialTheme.typography.body1.merge(LinkTextStyle()),
+                style = MaterialTheme.typography.bodyLarge.merge(LinkTextStyle()),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -486,7 +483,7 @@ fun SyncSetupContent(
         // Let this be hard-coded. It should not be localized.
         Text(
             text = "WARNING! This is a Beta feature. Do an OPML-export of all your feeds before and save as a backup.",
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -497,7 +494,7 @@ fun SyncSetupContent(
         ) {
             Text(
                 text = stringResource(R.string.scan_or_enter_code),
-                style = MaterialTheme.typography.button,
+                style = MaterialTheme.typography.labelLarge,
             )
         }
         TextButton(
@@ -505,7 +502,7 @@ fun SyncSetupContent(
         ) {
             Text(
                 text = stringResource(R.string.start_new_sync_chain),
-                style = MaterialTheme.typography.button,
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }
@@ -553,6 +550,7 @@ fun SyncJoinScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SyncJoinContent(
     modifier: Modifier,
@@ -602,7 +600,7 @@ fun SyncJoinContent(
         ) {
             Text(
                 text = stringResource(R.string.join_sync_chain),
-                style = MaterialTheme.typography.button,
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }
@@ -657,7 +655,7 @@ fun SyncDeviceListContent(
     ) {
         Text(
             text = stringResource(R.string.devices_on_sync_chain),
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
                 .padding(top = 8.dp, bottom = 8.dp)
                 .fillMaxWidth()
@@ -687,7 +685,7 @@ fun SyncDeviceListContent(
                     }
                     Text(
                         text = text,
-                        style = MaterialTheme.typography.subtitle1,
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f, fill = true)
                     )
                     IconButton(
@@ -705,7 +703,7 @@ fun SyncDeviceListContent(
         }
         Text(
             text = stringResource(R.string.device_sync_financed_by_community),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),
@@ -715,7 +713,7 @@ fun SyncDeviceListContent(
             val context = LocalContext.current
             Text(
                 text = KOFI_URL,
-                style = MaterialTheme.typography.body1.merge(LinkTextStyle()),
+                style = MaterialTheme.typography.bodyLarge.merge(LinkTextStyle()),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -730,7 +728,7 @@ fun SyncDeviceListContent(
             ) {
                 Text(
                     text = stringResource(R.string.add_new_device),
-                    style = MaterialTheme.typography.button,
+                    style = MaterialTheme.typography.labelLarge,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -770,7 +768,7 @@ fun DeleteDeviceDialog(
         title = {
             Text(
                 text = stringResource(R.string.remove_device),
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(vertical = 8.dp)
@@ -779,7 +777,7 @@ fun DeleteDeviceDialog(
         text = {
             Text(
                 text = stringResource(R.string.remove_device_question, deviceName),
-                style = MaterialTheme.typography.body1,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     )
@@ -838,19 +836,19 @@ fun SyncAddNewDeviceContent(
     ) {
         Text(
             text = stringResource(R.string.press_scan_sync),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier
                 .fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.or_open_device_sync_link),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier
                 .fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.treat_like_password),
-            style = MaterialTheme.typography.body1.copy(color = Color.Red),
+            style = MaterialTheme.typography.bodyLarge.copy(color = Color.Red),
             modifier = Modifier
                 .fillMaxWidth(),
         )

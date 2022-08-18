@@ -26,12 +26,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -50,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
@@ -59,43 +61,59 @@ const val COLLAPSE_ANIMATION_DURATION = 300
 @Composable
 @Preview(showBackground = true)
 private fun ListOfFeedsAndTagsPreview() {
-    ListOfFeedsAndTags(
-        immutableListHolderOf(
-            DrawerTop(unreadCount = 100, syncingChildren = 2, totalChildren = 4),
-            DrawerTag(tag = "News tag", unreadCount = 3, -1111, syncingChildren = 0, totalChildren = 2),
-            DrawerFeed(
-                id = 1,
-                displayTitle = "Times",
-                tag = "News tag",
-                unreadCount = 1,
-                currentlySyncing = false
-            ),
-            DrawerFeed(
-                id = 2,
-                displayTitle = "Post",
-                tag = "News tag",
-                unreadCount = 2,
-                currentlySyncing = false
-            ),
-            DrawerTag(tag = "Funny tag", unreadCount = 6, -2222, syncingChildren = 1, totalChildren = 1),
-            DrawerFeed(
-                id = 3,
-                displayTitle = "Hidden",
-                tag = "Funny tag",
-                unreadCount = 6,
-                currentlySyncing = true
-            ),
-            DrawerFeed(
-                id = 4,
-                displayTitle = "Top Dog",
-                unreadCount = 99,
-                tag = "",
-                currentlySyncing = true
-            )
-        ),
-        ImmutableHolder(emptySet()),
-        {},
-    ) {}
+    FeederTheme {
+        Surface {
+            ListOfFeedsAndTags(
+                immutableListHolderOf(
+                    DrawerTop(unreadCount = 100, syncingChildren = 2, totalChildren = 4),
+                    DrawerTag(
+                        tag = "News tag",
+                        unreadCount = 3,
+                        -1111,
+                        syncingChildren = 0,
+                        totalChildren = 2
+                    ),
+                    DrawerFeed(
+                        id = 1,
+                        displayTitle = "Times",
+                        tag = "News tag",
+                        unreadCount = 1,
+                        currentlySyncing = false
+                    ),
+                    DrawerFeed(
+                        id = 2,
+                        displayTitle = "Post",
+                        tag = "News tag",
+                        unreadCount = 2,
+                        currentlySyncing = false
+                    ),
+                    DrawerTag(
+                        tag = "Funny tag",
+                        unreadCount = 6,
+                        -2222,
+                        syncingChildren = 1,
+                        totalChildren = 1
+                    ),
+                    DrawerFeed(
+                        id = 3,
+                        displayTitle = "Hidden",
+                        tag = "Funny tag",
+                        unreadCount = 6,
+                        currentlySyncing = true
+                    ),
+                    DrawerFeed(
+                        id = 4,
+                        displayTitle = "Top Dog",
+                        unreadCount = 99,
+                        tag = "",
+                        currentlySyncing = true
+                    )
+                ),
+                ImmutableHolder(emptySet()),
+                {},
+            ) {}
+        }
+    }
 }
 
 @ExperimentalAnimationApi
@@ -106,8 +124,13 @@ fun ListOfFeedsAndTags(
     onToggleTagExpansion: (String) -> Unit,
     onItemClick: (DrawerItemWithUnreadCount) -> Unit,
 ) {
+// Use windowInsetsTopHeight() to add a spacer which pushes the drawer content
+    // below the status bar (y-axis)
+//    Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
+
     LazyColumn(
-        contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
+        contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+            .asPaddingValues(),
         modifier = Modifier
             .fillMaxSize()
             .semantics {
@@ -276,7 +299,6 @@ private fun ExpandArrow(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun AllFeeds(
@@ -306,7 +328,6 @@ private fun AllFeeds(
     },
 )
 
-@OptIn(ExperimentalAnimationApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun TopLevelFeed(
@@ -333,7 +354,6 @@ private fun TopLevelFeed(
     },
 )
 
-@OptIn(ExperimentalAnimationApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun ChildFeed(
@@ -369,7 +389,6 @@ private fun ChildFeed(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Feed(
     title: String,

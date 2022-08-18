@@ -4,30 +4,19 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -48,8 +37,23 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Speaker
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.primarySurface
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.DismissibleDrawerSheet
+import androidx.compose.material3.DismissibleNavigationDrawer
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -62,6 +66,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -73,8 +78,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
@@ -82,12 +85,18 @@ import com.nononsenseapps.feeder.blob.blobFile
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListContent
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.ScreenWithFeedList
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
+import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
+import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
@@ -96,7 +105,9 @@ import com.nononsenseapps.feeder.ui.compose.reader.ReaderView
 import com.nononsenseapps.feeder.ui.compose.reader.dateTimeFormat
 import com.nononsenseapps.feeder.ui.compose.reader.onLinkClick
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
+import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.BackHandler
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.util.openGitlabIssues
 import com.nononsenseapps.feeder.util.openLinkInBrowser
@@ -110,6 +121,7 @@ import org.kodein.di.instance
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZonedDateTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedArticleScreen(
     windowSize: WindowSize,
@@ -148,8 +160,6 @@ fun FeedArticleScreen(
 
     val context = LocalContext.current
 
-    val coroutineScope = rememberCoroutineScope()
-    val scaffoldState = rememberScaffoldState()
     // Each feed gets its own scroll state. Persists across device rotations, but is cleared when
     // switching feeds
     val feedListState = key(viewState.currentFeedOrTag) {
@@ -161,7 +171,7 @@ fun FeedArticleScreen(
         rememberLazyListState()
     }
 
-    val toolbarColor = MaterialTheme.colors.primarySurface.toArgb()
+    val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
     FeedArticleScreen(
         feedArticleScreenType = feedArticleScreenType,
@@ -220,11 +230,6 @@ fun FeedArticleScreen(
         },
         onImport = { opmlImporter.launch(arrayOf("text/plain", "text/xml", "text/opml", "*/*")) },
         onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml") },
-        onOpenNavDrawer = {
-            coroutineScope.launch {
-                scaffoldState.drawerState.open()
-            }
-        },
         markAsUnread = { itemId, unread ->
             viewModel.markAsUnread(itemId, unread)
         },
@@ -310,10 +315,10 @@ fun FeedArticleScreen(
         feedListState = feedListState,
         articleListState = articleListState,
         pagedFeedItems = pagedFeedItems,
-        scaffoldState = scaffoldState,
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FeedArticleScreen(
     feedArticleScreenType: FeedArticleScreenType,
@@ -340,7 +345,6 @@ private fun FeedArticleScreen(
     onSendFeedback: () -> Unit,
     onImport: () -> Unit,
     onExport: () -> Unit,
-    onOpenNavDrawer: () -> Unit,
     markAsUnread: (Long, Boolean) -> Unit,
     markBeforeAsRead: (Int) -> Unit,
     markAfterAsRead: (Int) -> Unit,
@@ -361,91 +365,103 @@ private fun FeedArticleScreen(
     feedListState: LazyListState,
     articleListState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
-    scaffoldState: ScaffoldState,
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 ) {
     when (feedArticleScreenType) {
         FeedArticleScreenType.FeedWithArticleDetails -> {
-            FeedWithArticleScreen(
-                viewState = viewState.copy(showFab = false),
-                onRefreshVisible = onRefreshVisible,
-                onRefreshAll = onRefreshAll,
-                onToggleOnlyUnread = onToggleOnlyUnread,
-                onToggleOnlyBookmarked = onToggleOnlyBookmarked,
-                onDrawerItemSelected = onDrawerItemSelected,
-                onMarkAllAsRead = onMarkAllAsRead,
+            ScreenWithNavDrawer(
+                drawerState = drawerState,
+                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
+                expandedTags = ImmutableHolder(viewState.expandedTags),
                 onToggleTagExpansion = onToggleTagExpansion,
-                onShowToolbarMenu = onShowToolbarMenu,
-                readAloudOnPlay = readAloudOnPlay,
-                readAloudOnPause = readAloudOnPause,
-                readAloudOnStop = readAloudOnStop,
-                onOpenInCustomTab = onOpenInCustomTab,
-                onAddFeed = onAddFeed,
-                onEditFeed = onEditFeed,
-                onShowEditDialog = onShowEditDialog,
-                onDismissEditDialog = onDismissEditDialog,
-                onDeleteFeeds = onDeleteFeeds,
-                onShowDeleteDialog = onShowDeleteDialog,
-                onDismissDeleteDialog = onDismissDeleteDialog,
-                onSettings = onSettings,
-                onSendFeedback = onSendFeedback,
-                onImport = onImport,
-                onExport = onExport,
-                onInteractWithList = onInteractWithList,
-                onInteractWithArticle = onInteractWithArticle,
-                onShareArticle = onShareArticle,
-                markAsUnread = markAsUnread,
-                markBeforeAsRead = markBeforeAsRead,
-                markAfterAsRead = markAfterAsRead,
-                onToggleFullText = onToggleFullText,
-                displayFullText = displayFullText,
-                onOpenFeedItem = onOpenFeedItem,
-                onOpenNavDrawer = onOpenNavDrawer,
-                feedListState = feedListState,
-                articleListState = articleListState,
-                onFeedTitleClick = onFeedTitleClick,
-                pagedFeedItems = pagedFeedItems,
-                scaffoldState = scaffoldState,
-                onToggleCurrentArticlePinned = onToggleCurrentArticlePinned,
-                onSetPinned = onSetPinned,
-                onToggleCurrentArticleBookmarked = onToggleCurrentArticleBookmarked,
-                onSetBookmarked = onSetBookmarked,
+                onDrawerItemSelected = onDrawerItemSelected,
+                content = {
+                    FeedWithArticleScreen(
+                        viewState = viewState.copy(showFab = false),
+                        onRefreshVisible = onRefreshVisible,
+                        onRefreshAll = onRefreshAll,
+                        onToggleOnlyUnread = onToggleOnlyUnread,
+                        onToggleOnlyBookmarked = onToggleOnlyBookmarked,
+                        onMarkAllAsRead = onMarkAllAsRead,
+                        onShowToolbarMenu = onShowToolbarMenu,
+                        readAloudOnPlay = readAloudOnPlay,
+                        readAloudOnPause = readAloudOnPause,
+                        readAloudOnStop = readAloudOnStop,
+                        onOpenInCustomTab = onOpenInCustomTab,
+                        onAddFeed = onAddFeed,
+                        onEditFeed = onEditFeed,
+                        onShowEditDialog = onShowEditDialog,
+                        onDismissEditDialog = onDismissEditDialog,
+                        onDeleteFeeds = onDeleteFeeds,
+                        onShowDeleteDialog = onShowDeleteDialog,
+                        onDismissDeleteDialog = onDismissDeleteDialog,
+                        onSettings = onSettings,
+                        onSendFeedback = onSendFeedback,
+                        onImport = onImport,
+                        onExport = onExport,
+                        drawerState = drawerState,
+                        onShareArticle = onShareArticle,
+                        markAsUnread = markAsUnread,
+                        markBeforeAsRead = markBeforeAsRead,
+                        markAfterAsRead = markAfterAsRead,
+                        onOpenFeedItem = onOpenFeedItem,
+                        onInteractWithList = onInteractWithList,
+                        onInteractWithArticle = onInteractWithArticle,
+                        onFeedTitleClick = onFeedTitleClick,
+                        onToggleFullText = onToggleFullText,
+                        displayFullText = displayFullText,
+                        onToggleCurrentArticlePinned = onToggleCurrentArticlePinned,
+                        onSetPinned = onSetPinned,
+                        onToggleCurrentArticleBookmarked = onToggleCurrentArticleBookmarked,
+                        onSetBookmarked = onSetBookmarked,
+                        feedListState = feedListState,
+                        articleListState = articleListState,
+                        pagedFeedItems = pagedFeedItems,
+                    )
+                }
             )
         }
         FeedArticleScreenType.Feed -> {
-            FeedListScreen(
-                viewState = viewState,
-                onRefreshVisible = onRefreshVisible,
-                onRefreshAll = onRefreshAll,
-                onToggleOnlyUnread = onToggleOnlyUnread,
-                onToggleOnlyBookmarked = onToggleOnlyBookmarked,
-                onDrawerItemSelected = onDrawerItemSelected,
-                onMarkAllAsRead = onMarkAllAsRead,
+            ScreenWithNavDrawer(
+                drawerState = drawerState,
+                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
+                expandedTags = ImmutableHolder(viewState.expandedTags),
                 onToggleTagExpansion = onToggleTagExpansion,
-                onShowToolbarMenu = onShowToolbarMenu,
-                readAloudOnPlay = readAloudOnPlay,
-                readAloudOnPause = readAloudOnPause,
-                readAloudOnStop = readAloudOnStop,
-                onAddFeed = onAddFeed,
-                onEditFeed = onEditFeed,
-                onShowEditDialog = onShowEditDialog,
-                onDismissEditDialog = onDismissEditDialog,
-                onDeleteFeeds = onDeleteFeeds,
-                onShowDeleteDialog = onShowDeleteDialog,
-                onDismissDeleteDialog = onDismissDeleteDialog,
-                onSettings = onSettings,
-                onSendFeedback = onSendFeedback,
-                onImport = onImport,
-                onExport = onExport,
-                onOpenNavDrawer = onOpenNavDrawer,
-                markAsUnread = markAsUnread,
-                markBeforeAsRead = markBeforeAsRead,
-                markAfterAsRead = markAfterAsRead,
-                onOpenFeedItem = onOpenFeedItem,
-                onSetPinned = onSetPinned,
-                onSetBookmarked = onSetBookmarked,
-                feedListState = feedListState,
-                pagedFeedItems = pagedFeedItems,
-                scaffoldState = scaffoldState,
+                onDrawerItemSelected = onDrawerItemSelected,
+                content = {
+                    FeedListScreen(
+                        viewState = viewState,
+                        onRefreshVisible = onRefreshVisible,
+                        onRefreshAll = onRefreshAll,
+                        onToggleOnlyUnread = onToggleOnlyUnread,
+                        onToggleOnlyBookmarked = onToggleOnlyBookmarked,
+                        onMarkAllAsRead = onMarkAllAsRead,
+                        onShowToolbarMenu = onShowToolbarMenu,
+                        readAloudOnPlay = readAloudOnPlay,
+                        readAloudOnPause = readAloudOnPause,
+                        readAloudOnStop = readAloudOnStop,
+                        onAddFeed = onAddFeed,
+                        onEditFeed = onEditFeed,
+                        onShowEditDialog = onShowEditDialog,
+                        onDismissEditDialog = onDismissEditDialog,
+                        onDeleteFeeds = onDeleteFeeds,
+                        onShowDeleteDialog = onShowDeleteDialog,
+                        onDismissDeleteDialog = onDismissDeleteDialog,
+                        onSettings = onSettings,
+                        onSendFeedback = onSendFeedback,
+                        onImport = onImport,
+                        onExport = onExport,
+                        drawerState = drawerState,
+                        markAsUnread = markAsUnread,
+                        markBeforeAsRead = markBeforeAsRead,
+                        markAfterAsRead = markAfterAsRead,
+                        onOpenFeedItem = onOpenFeedItem,
+                        onSetPinned = onSetPinned,
+                        onSetBookmarked = onSetBookmarked,
+                        feedListState = feedListState,
+                        pagedFeedItems = pagedFeedItems,
+                    )
+                }
             )
         }
         FeedArticleScreenType.ArticleDetails -> {
@@ -454,24 +470,67 @@ private fun FeedArticleScreen(
                 onToggleFullText = onToggleFullText,
                 onMarkAsUnread = onMarkAsUnread,
                 onShare = onShareArticle,
-                displayFullText = displayFullText,
                 onOpenInCustomTab = onOpenInCustomTab,
                 onFeedTitleClick = onFeedTitleClick,
                 onShowToolbarMenu = onShowToolbarMenu,
                 onInteractWithArticle = onInteractWithArticle,
-                onNavigateUp = onNavigateUpFromArticle,
+                displayFullText = displayFullText,
                 readAloudOnPlay = readAloudOnPlay,
                 readAloudOnPause = readAloudOnPause,
                 readAloudOnStop = readAloudOnStop,
                 onTogglePinned = onToggleCurrentArticlePinned,
                 onToggleBookmarked = onToggleCurrentArticleBookmarked,
                 articleListState = articleListState,
-                scaffoldState = scaffoldState,
+                onNavigateUp = onNavigateUpFromArticle,
             )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@Composable
+fun ScreenWithNavDrawer(
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+    feedsAndTags: ImmutableHolder<List<DrawerItemWithUnreadCount>>,
+    expandedTags: ImmutableHolder<Set<String>>,
+    onToggleTagExpansion: (String) -> Unit,
+    onDrawerItemSelected: (Long, String) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    DismissibleNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DismissibleDrawerSheet {
+                ListOfFeedsAndTags(
+                    feedsAndTags = feedsAndTags,
+                    expandedTags = expandedTags,
+                    onToggleTagExpansion = onToggleTagExpansion,
+                    onItemClick = { item ->
+                        coroutineScope.launch {
+                            val id = when (item) {
+                                is DrawerFeed -> item.id
+                                is DrawerTag -> ID_UNSET
+                                is DrawerTop -> ID_ALL_FEEDS
+                            }
+                            val tag = when (item) {
+                                is DrawerFeed -> item.tag
+                                is DrawerTag -> item.tag
+                                is DrawerTop -> ""
+                            }
+                            onDrawerItemSelected(id, tag)
+                            drawerState.close()
+                        }
+                    }
+                )
+            }
+        },
+        content = content,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedWithArticleScreen(
     viewState: FeedArticleScreenViewState,
@@ -479,9 +538,7 @@ fun FeedWithArticleScreen(
     onRefreshAll: () -> Unit,
     onToggleOnlyUnread: (Boolean) -> Unit,
     onToggleOnlyBookmarked: (Boolean) -> Unit,
-    onDrawerItemSelected: (Long, String) -> Unit,
     onMarkAllAsRead: () -> Unit,
-    onToggleTagExpansion: (String) -> Unit,
     onShowToolbarMenu: (Boolean) -> Unit,
     readAloudOnPlay: () -> Unit,
     readAloudOnPause: () -> Unit,
@@ -498,7 +555,7 @@ fun FeedWithArticleScreen(
     onSendFeedback: () -> Unit,
     onImport: () -> Unit,
     onExport: () -> Unit,
-    onOpenNavDrawer: () -> Unit,
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     onShareArticle: () -> Unit,
     markAsUnread: (Long, Boolean) -> Unit,
     markBeforeAsRead: (Int) -> Unit,
@@ -516,7 +573,6 @@ fun FeedWithArticleScreen(
     feedListState: LazyListState,
     articleListState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
-    scaffoldState: ScaffoldState,
 ) {
     val showingUnreadStateLabel = if (viewState.onlyUnread) {
         stringResource(R.string.showing_only_unread_articles)
@@ -530,12 +586,17 @@ fun FeedWithArticleScreen(
         stringResource(R.string.showing_all_articles)
     }
 
+    val coroutineScope = rememberCoroutineScope()
+
     ScreenWithFeedList(
         viewState = viewState,
         onRefreshVisible = onRefreshVisible,
-        onDrawerItemSelected = onDrawerItemSelected,
+        onOpenNavDrawer = {
+            coroutineScope.launch {
+                drawerState.open()
+            }
+        },
         onMarkAllAsRead = onMarkAllAsRead,
-        onToggleTagExpansion = onToggleTagExpansion,
         readAloudOnPlay = readAloudOnPlay,
         readAloudOnPause = readAloudOnPause,
         readAloudOnStop = readAloudOnStop,
@@ -621,15 +682,16 @@ fun FeedWithArticleScreen(
                         onClick = {
                             onShowToolbarMenu(false)
                             onAddFeed()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.add_feed))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.add_feed))
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             if (viewState.visibleFeeds.size == 1) {
@@ -638,188 +700,203 @@ fun FeedWithArticleScreen(
                                 onShowEditDialog()
                             }
                             onShowToolbarMenu(false)
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.edit_feed))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.edit_feed))
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onShowDeleteDialog()
                             onShowToolbarMenu(false)
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.delete_feed))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.delete_feed))
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onMarkAllAsRead()
                             onShowToolbarMenu(false)
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Check,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.mark_all_as_read))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.mark_all_as_read))
-                    }
+                    )
                     Divider()
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onShareArticle()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.share))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Share,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.share))
-                    }
+                    )
 
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             markAsUnread(viewState.articleId, true)
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.VisibilityOff,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.mark_as_unread))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.VisibilityOff,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.mark_as_unread))
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onToggleCurrentArticlePinned()
-                        }
-                    ) {
-                        Icon(
-                            Icons.Default.PushPin,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            stringResource(
-                                if (viewState.isPinned) {
-                                    R.string.unpin_article
-                                } else {
-                                    R.string.pin_article
-                                }
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.PushPin,
+                                contentDescription = null,
                             )
-                        )
-                    }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                stringResource(
+                                    if (viewState.isPinned) {
+                                        R.string.unpin_article
+                                    } else {
+                                        R.string.pin_article
+                                    }
+                                )
+                            )
+                        }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onToggleCurrentArticleBookmarked()
-                        }
-                    ) {
-                        Icon(
-                            Icons.Default.Bookmark,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            stringResource(
-                                if (viewState.isBookmarked) {
-                                    R.string.remove_bookmark
-                                } else {
-                                    R.string.bookmark_article
-                                }
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Bookmark,
+                                contentDescription = null,
                             )
-                        )
-                    }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                stringResource(
+                                    if (viewState.isBookmarked) {
+                                        R.string.remove_bookmark
+                                    } else {
+                                        R.string.bookmark_article
+                                    }
+                                )
+                            )
+                        }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             readAloudOnPlay()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Speaker,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.read_article))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Speaker,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.read_article))
-                    }
+                    )
                     Divider()
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onImport()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.ImportExport,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.import_feeds_from_opml))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.ImportExport,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.import_feeds_from_opml))
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onExport()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.ImportExport,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.export_feeds_to_opml))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.ImportExport,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.export_feeds_to_opml))
-                    }
+                    )
                     Divider()
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onSettings()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Settings,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.action_settings))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Settings,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.action_settings))
-                    }
+                    )
                     Divider()
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onSendFeedback()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Email,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.send_bug_report))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Email,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.send_bug_report))
-                    }
+                    )
                 }
             }
         },
-        scaffoldState = scaffoldState,
     ) { modifier ->
         Row(modifier) {
             FeedListContent(
                 viewState = viewState,
-                onOpenNavDrawer = onOpenNavDrawer,
+                onOpenNavDrawer = {
+                    coroutineScope.launch {
+                        drawerState.open()
+                    }
+                },
                 onAddFeed = onAddFeed,
                 markAsUnread = markAsUnread,
                 markBeforeAsRead = markBeforeAsRead,
@@ -852,6 +929,7 @@ fun FeedWithArticleScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedListScreen(
     viewState: FeedScreenViewState,
@@ -859,9 +937,7 @@ fun FeedListScreen(
     onRefreshAll: () -> Unit,
     onToggleOnlyUnread: (Boolean) -> Unit,
     onToggleOnlyBookmarked: (Boolean) -> Unit,
-    onDrawerItemSelected: (Long, String) -> Unit,
     onMarkAllAsRead: () -> Unit,
-    onToggleTagExpansion: (String) -> Unit,
     onShowToolbarMenu: (Boolean) -> Unit,
     readAloudOnPlay: () -> Unit,
     readAloudOnPause: () -> Unit,
@@ -877,7 +953,7 @@ fun FeedListScreen(
     onSendFeedback: () -> Unit,
     onImport: () -> Unit,
     onExport: () -> Unit,
-    onOpenNavDrawer: () -> Unit,
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     markAsUnread: (Long, Boolean) -> Unit,
     markBeforeAsRead: (Int) -> Unit,
     markAfterAsRead: (Int) -> Unit,
@@ -886,7 +962,6 @@ fun FeedListScreen(
     onSetBookmarked: (Long, Boolean) -> Unit,
     feedListState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
-    scaffoldState: ScaffoldState,
 ) {
     val showingUnreadStateLabel = if (viewState.onlyUnread) {
         stringResource(R.string.showing_only_unread_articles)
@@ -900,12 +975,17 @@ fun FeedListScreen(
         stringResource(R.string.showing_all_articles)
     }
 
+    val coroutineScope = rememberCoroutineScope()
+
     ScreenWithFeedList(
         viewState = viewState,
         onRefreshVisible = onRefreshVisible,
-        onDrawerItemSelected = onDrawerItemSelected,
+        onOpenNavDrawer = {
+            coroutineScope.launch {
+                drawerState.open()
+            }
+        },
         onMarkAllAsRead = onMarkAllAsRead,
-        onToggleTagExpansion = onToggleTagExpansion,
         readAloudOnPlay = readAloudOnPlay,
         readAloudOnPause = readAloudOnPause,
         readAloudOnStop = readAloudOnStop,
@@ -976,15 +1056,16 @@ fun FeedListScreen(
                         onClick = {
                             onShowToolbarMenu(false)
                             onAddFeed()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.add_feed))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.add_feed))
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             if (viewState.visibleFeeds.size == 1) {
@@ -993,104 +1074,114 @@ fun FeedListScreen(
                                 onShowEditDialog()
                             }
                             onShowToolbarMenu(false)
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.edit_feed))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.edit_feed))
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onShowDeleteDialog()
                             onShowToolbarMenu(false)
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.delete_feed))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.delete_feed))
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onMarkAllAsRead()
                             onShowToolbarMenu(false)
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Check,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.mark_all_as_read))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.mark_all_as_read))
-                    }
+                    )
                     Divider()
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onImport()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.ImportExport,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.import_feeds_from_opml))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.ImportExport,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.import_feeds_from_opml))
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onExport()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.ImportExport,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.export_feeds_to_opml))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.ImportExport,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.export_feeds_to_opml))
-                    }
+                    )
                     Divider()
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onSettings()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Settings,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.action_settings))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Settings,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.action_settings))
-                    }
+                    )
                     Divider()
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
                             onSendFeedback()
+                        },
+                        text = {
+                            Icon(
+                                Icons.Default.Email,
+                                contentDescription = null,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(stringResource(id = R.string.send_bug_report))
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Email,
-                            contentDescription = null,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(stringResource(id = R.string.send_bug_report))
-                    }
+                    )
                 }
             }
         },
-        scaffoldState = scaffoldState,
     ) { modifier ->
         FeedListContent(
             viewState = viewState,
-            onOpenNavDrawer = onOpenNavDrawer,
+            onOpenNavDrawer = {
+                coroutineScope.launch {
+                    drawerState.open()
+                }
+            },
             onAddFeed = onAddFeed,
             markAsUnread = markAsUnread,
             markBeforeAsRead = markBeforeAsRead,
@@ -1105,6 +1196,7 @@ fun FeedListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleScreen(
     viewState: ArticleScreenViewState,
@@ -1121,17 +1213,23 @@ fun ArticleScreen(
     readAloudOnStop: () -> Unit,
     onTogglePinned: () -> Unit,
     onToggleBookmarked: () -> Unit,
-    scaffoldState: ScaffoldState,
     articleListState: LazyListState,
     onNavigateUp: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
+    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        decayAnimationSpec,
+        rememberTopAppBarState()
+    )
     Scaffold(
-        scaffoldState = scaffoldState,
-        // In case device is rotated to landscape and navigation bar ends up on the side
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .systemBarsPadding(),
         topBar = {
-            TopAppBar(
+            MediumTopAppBar(
+                scrollBehavior = scrollBehavior,
+//                modifier = Modifier.systemBarsPadding(),
                 title = {
                     Text(
                         text = viewState.feedDisplayTitle,
@@ -1139,7 +1237,6 @@ fun ArticleScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -1180,84 +1277,89 @@ fun ArticleScreen(
                                 onClick = {
                                     onShowToolbarMenu(false)
                                     onShare()
+                                },
+                                text = {
+                                    Icon(
+                                        Icons.Default.Share,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.share))
                                 }
-                            ) {
-                                Icon(
-                                    Icons.Default.Share,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.share))
-                            }
+                            )
 
                             DropdownMenuItem(
                                 onClick = {
                                     onShowToolbarMenu(false)
                                     onMarkAsUnread()
+                                },
+                                text = {
+                                    Icon(
+                                        Icons.Default.VisibilityOff,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.mark_as_unread))
                                 }
-                            ) {
-                                Icon(
-                                    Icons.Default.VisibilityOff,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.mark_as_unread))
-                            }
+                            )
                             DropdownMenuItem(
                                 onClick = {
                                     onShowToolbarMenu(false)
                                     onTogglePinned()
-                                }
-                            ) {
-                                Icon(
-                                    Icons.Default.PushPin,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    stringResource(
-                                        if (viewState.isPinned) {
-                                            R.string.unpin_article
-                                        } else {
-                                            R.string.pin_article
-                                        }
+                                },
+                                text = {
+                                    Icon(
+                                        Icons.Default.PushPin,
+                                        contentDescription = null,
                                     )
-                                )
-                            }
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        stringResource(
+                                            if (viewState.isPinned) {
+                                                R.string.unpin_article
+                                            } else {
+                                                R.string.pin_article
+                                            }
+                                        )
+                                    )
+                                }
+                            )
                             DropdownMenuItem(
                                 onClick = {
                                     onShowToolbarMenu(false)
                                     onToggleBookmarked()
-                                }
-                            ) {
-                                Icon(
-                                    Icons.Default.Bookmark,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    stringResource(
-                                        if (viewState.isBookmarked) {
-                                            R.string.remove_bookmark
-                                        } else {
-                                            R.string.bookmark_article
-                                        }
+                                },
+                                text = {
+                                    Icon(
+                                        Icons.Default.Bookmark,
+                                        contentDescription = null,
                                     )
-                                )
-                            }
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        stringResource(
+                                            if (viewState.isBookmarked) {
+                                                R.string.remove_bookmark
+                                            } else {
+                                                R.string.bookmark_article
+                                            }
+                                        )
+                                    )
+                                }
+                            )
                             DropdownMenuItem(
                                 onClick = {
                                     onShowToolbarMenu(false)
                                     readAloudOnPlay()
+                                },
+                                text = {
+                                    Icon(
+                                        Icons.Default.Speaker,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.read_article))
                                 }
-                            ) {
-                                Icon(
-                                    Icons.Default.Speaker,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.read_article))
-                            }
+                            )
                         }
                     }
                 }
@@ -1294,7 +1396,7 @@ fun ArticleContent(
     displayFullText: () -> Unit,
     modifier: Modifier,
 ) {
-    val isLightTheme = MaterialTheme.colors.isLight
+    val isLightTheme = MaterialTheme.colorScheme.isLight
 
     @DrawableRes
     val placeHolder: Int by remember(isLightTheme) {
@@ -1307,7 +1409,7 @@ fun ArticleContent(
         }
     }
 
-    val toolbarColor = MaterialTheme.colors.primarySurface.toArgb()
+    val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
     val context = LocalContext.current
 

@@ -3,10 +3,10 @@ package com.nononsenseapps.feeder.ui.compose.components
 import android.R
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -35,7 +35,7 @@ fun ConfirmDialog(
         title = {
             Text(
                 text = stringResource(id = title),
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(vertical = 8.dp)
@@ -44,7 +44,7 @@ fun ConfirmDialog(
         text = {
             Text(
                 text = stringResource(id = body),
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyLarge
             )
         },
     )

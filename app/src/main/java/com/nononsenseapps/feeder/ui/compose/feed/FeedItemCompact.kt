@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.Text
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -40,7 +39,6 @@ import org.threeten.bp.format.FormatStyle
 val shortDateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FeedItemCompact(
     item: FeedListItem,
@@ -118,62 +116,67 @@ fun FeedItemCompact(
                         onClick = {
                             onDismissDropdown()
                             onTogglePinned()
-                        }
-                    ) {
-                        Text(
-                            text = stringResource(
-                                when (item.pinned) {
-                                    true -> R.string.unpin_article
-                                    false -> R.string.pin_article
-                                }
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(
+                                    when (item.pinned) {
+                                        true -> R.string.unpin_article
+                                        false -> R.string.pin_article
+                                    }
+                                )
                             )
-                        )
-                    }
+                        }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onDismissDropdown()
                             onToggleBookmarked()
-                        }
-                    ) {
-                        Text(
-                            text = stringResource(
-                                when (item.bookmarked) {
-                                    true -> R.string.remove_bookmark
-                                    false -> R.string.bookmark_article
-                                }
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(
+                                    when (item.bookmarked) {
+                                        true -> R.string.remove_bookmark
+                                        false -> R.string.bookmark_article
+                                    }
+                                )
                             )
-                        )
-                    }
+                        }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onDismissDropdown()
                             onMarkAboveAsRead()
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(id = R.string.mark_items_above_as_read)
+                            )
                         }
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.mark_items_above_as_read)
-                        )
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onDismissDropdown()
                             onMarkBelowAsRead()
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(id = R.string.mark_items_below_as_read)
+                            )
                         }
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.mark_items_below_as_read)
-                        )
-                    }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onDismissDropdown()
                             onShareItem()
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(R.string.share)
+                            )
                         }
-                    ) {
-                        Text(
-                            text = stringResource(R.string.share)
-                        )
-                    }
+                    )
                 }
             }
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {

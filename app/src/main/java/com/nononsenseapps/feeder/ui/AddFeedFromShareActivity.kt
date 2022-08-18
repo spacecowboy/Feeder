@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
@@ -23,7 +22,6 @@ import org.kodein.di.compose.withDI
  * This activity should only be started via a Send (share) or Open URL/Text intent.
  */
 class AddFeedFromShareActivity : DIAwareComponentActivity() {
-    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -80,7 +78,6 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 fun Activity.onNavigateUpFromIntentActivities() {
     startActivity(
         Intent(

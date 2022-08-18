@@ -3,33 +3,30 @@ package com.nononsenseapps.feeder.ui.compose.searchfeed
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,8 +50,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
@@ -69,6 +64,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchFeedScreen(
     onNavigateUp: () -> Unit,
@@ -77,9 +73,9 @@ fun SearchFeedScreen(
     onClick: (SearchResult) -> Unit,
 ) {
     Scaffold(
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
+        modifier = Modifier.systemBarsPadding(),
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.add_feed),
@@ -87,7 +83,6 @@ fun SearchFeedScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -108,7 +103,6 @@ fun SearchFeedScreen(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SearchFeedView(
     initialFeedUrl: String = "",
@@ -164,7 +158,10 @@ fun SearchFeedView(
     )
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun SearchFeedView(
     feedUrl: String = "",
@@ -319,15 +316,15 @@ fun SearchResultView(
     ) {
         Text(
             title,
-            style = MaterialTheme.typography.subtitle2
+            style = MaterialTheme.typography.titleSmall
         )
         Text(
             url,
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
         Text(
             description,
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }

@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Checkbox
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -84,7 +84,7 @@ fun DeleteFeedDialog(
         title = {
             Text(
                 text = stringResource(id = R.string.delete_feed),
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(vertical = 8.dp)
@@ -123,7 +123,7 @@ fun DeleteFeedDialog(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = feed.title,
-                            style = MaterialTheme.typography.subtitle1
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
                 }

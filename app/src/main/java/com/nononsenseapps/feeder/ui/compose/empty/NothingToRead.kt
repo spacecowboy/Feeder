@@ -10,9 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.text.annotatedStringResource
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview(showBackground = true)
 fun NothingToRead(
@@ -46,7 +48,7 @@ fun NothingToRead(
         ) {
             Text(
                 text = stringResource(id = R.string.empty_feed_top),
-                style = MaterialTheme.typography.h4.merge(
+                style = MaterialTheme.typography.displaySmall.merge(
                     TextStyle(fontWeight = FontWeight.Light)
                 ),
                 textAlign = TextAlign.Center
@@ -63,7 +65,7 @@ fun NothingToRead(
             ) {
                 Text(
                     text = annotatedStringResource(id = R.string.empty_feed_open),
-                    style = MaterialTheme.typography.h4.merge(
+                    style = MaterialTheme.typography.displaySmall.merge(
                         TextStyle(fontWeight = FontWeight.Light)
                     ),
                     textAlign = TextAlign.Center
@@ -81,7 +83,7 @@ fun NothingToRead(
             ) {
                 Text(
                     text = annotatedStringResource(id = R.string.empty_feed_add),
-                    style = MaterialTheme.typography.h4.merge(
+                    style = MaterialTheme.typography.displaySmall.merge(
                         TextStyle(fontWeight = FontWeight.Light)
                     ),
                     textAlign = TextAlign.Center

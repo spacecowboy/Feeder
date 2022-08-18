@@ -211,7 +211,6 @@ dependencies {
   implementation "androidx.paging:paging-compose:$pagingComposeVersion"
   implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-permissions:$accompanistVersion"
-  implementation "com.google.accompanist:accompanist-insets-ui:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion"
 
   // Better times
@@ -220,7 +219,6 @@ dependencies {
   implementation "org.jsoup:jsoup:$jsoup_version"
   implementation "org.ccil.cowan.tagsoup:tagsoup:$composeLibraryVersion"
   // RSS
-  // TODO Bump
   implementation "com.rometools:rome:$rome_version"
   implementation "com.rometools:rome-modules:$rome_version"
   // JSONFeed

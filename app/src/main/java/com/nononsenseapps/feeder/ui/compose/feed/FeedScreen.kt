@@ -3,41 +3,27 @@ package com.nononsenseapps.feeder.ui.compose.feed
 import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bookmark
@@ -53,7 +39,19 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,6 +66,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -81,25 +80,19 @@ import coil.compose.rememberImagePainter
 import coil.size.PixelSize
 import coil.size.Precision
 import coil.size.Scale
-import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
-import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
-import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
+import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -124,7 +117,7 @@ fun FeedListContent(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val isLightTheme = MaterialTheme.colors.isLight
+    val isLightTheme = MaterialTheme.colorScheme.isLight
 
     @DrawableRes
     val placeHolder: Int by remember(isLightTheme) {
@@ -287,7 +280,7 @@ fun FeedListContent(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(
     viewState: FeedScreenViewState,
@@ -296,7 +289,7 @@ fun FeedScreen(
     onRefreshAll: () -> Unit,
     onToggleOnlyUnread: (Boolean) -> Unit,
     onToggleOnlyBookmarked: (Boolean) -> Unit,
-    onDrawerItemSelected: (Long, String) -> Unit,
+    onOpenNavDrawer: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
     onAddFeed: () -> Unit,
     onEditFeed: (Long) -> Unit,
@@ -305,11 +298,9 @@ fun FeedScreen(
     onImport: () -> Unit,
     onExport: () -> Unit,
     onMarkAllAsRead: () -> Unit,
-    onToggleTagExpansion: (String) -> Unit,
     readAloudOnPlay: () -> Unit,
     readAloudOnPause: () -> Unit,
     readAloudOnStop: () -> Unit,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
     content: @Composable (Modifier, () -> Unit) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -335,11 +326,18 @@ fun FeedScreen(
         stringResource(R.string.showing_all_articles)
     }
 
+    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        decayAnimationSpec,
+        rememberTopAppBarState()
+    )
+
     Scaffold(
-        scaffoldState = scaffoldState,
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            .systemBarsPadding(),
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
+                scrollBehavior = scrollBehavior,
                 title = {
                     Text(
                         viewState.feedScreenTitle.title ?: stringResource(id = R.string.all_feeds),
@@ -350,12 +348,11 @@ fun FeedScreen(
                             }
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(
                         onClick = {
                             coroutineScope.launch {
-                                scaffoldState.drawerState.open()
+                                // TODO drawer
                             }
                         }
                     ) {
@@ -435,15 +432,16 @@ fun FeedScreen(
                                 modifier = Modifier
                                     .safeSemantics {
                                         testTag = "menuAddFeed"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.Add,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.add_feed))
-                            }
+                                    },
+                                text = {
+                                    Icon(
+                                        Icons.Default.Add,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.add_feed))
+                                },
+                            )
                             DropdownMenuItem(
                                 onClick = {
                                     if (viewState.visibleFeeds.size == 1) {
@@ -456,15 +454,16 @@ fun FeedScreen(
                                 modifier = Modifier
                                     .safeSemantics {
                                         testTag = "menuEditFeed"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.Edit,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.edit_feed))
-                            }
+                                    },
+                                text = {
+                                    Icon(
+                                        Icons.Default.Edit,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.edit_feed))
+                                },
+                            )
                             DropdownMenuItem(
                                 onClick = {
                                     showDeleteDialog = true
@@ -473,15 +472,16 @@ fun FeedScreen(
                                 modifier = Modifier
                                     .safeSemantics {
                                         testTag = "menuDeleteFeed"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.delete_feed))
-                            }
+                                    },
+                                text = {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.delete_feed))
+                                }
+                            )
                             Divider()
                             DropdownMenuItem(
                                 onClick = {
@@ -491,15 +491,16 @@ fun FeedScreen(
                                 modifier = Modifier
                                     .safeSemantics {
                                         testTag = "menuImportFeeds"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.ImportExport,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.import_feeds_from_opml))
-                            }
+                                    },
+                                text = {
+                                    Icon(
+                                        Icons.Default.ImportExport,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.import_feeds_from_opml))
+                                }
+                            )
                             Divider()
                             DropdownMenuItem(
                                 onClick = {
@@ -509,15 +510,16 @@ fun FeedScreen(
                                 modifier = Modifier
                                     .safeSemantics {
                                         testTag = "menuExportFeeds"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.ImportExport,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.export_feeds_to_opml))
-                            }
+                                    },
+                                text = {
+                                    Icon(
+                                        Icons.Default.ImportExport,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.export_feeds_to_opml))
+                                }
+                            )
                             Divider()
                             DropdownMenuItem(
                                 onClick = {
@@ -527,15 +529,16 @@ fun FeedScreen(
                                 modifier = Modifier
                                     .safeSemantics {
                                         testTag = "menuSettings"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.Settings,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.action_settings))
-                            }
+                                    },
+                                text = {
+                                    Icon(
+                                        Icons.Default.Settings,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.action_settings))
+                                }
+                            )
                             Divider()
                             DropdownMenuItem(
                                 onClick = {
@@ -545,15 +548,16 @@ fun FeedScreen(
                                 modifier = Modifier
                                     .safeSemantics {
                                         testTag = "menuSendBugReport"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.Email,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.send_bug_report))
-                            }
+                                    },
+                                text = {
+                                    Icon(
+                                        Icons.Default.Email,
+                                        contentDescription = null,
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(stringResource(id = R.string.send_bug_report))
+                                }
+                            )
                         }
                     }
                 }
@@ -567,29 +571,6 @@ fun FeedScreen(
                 onPlay = readAloudOnPlay,
                 onPause = readAloudOnPause,
                 onStop = readAloudOnStop,
-            )
-        },
-        drawerContent = {
-            ListOfFeedsAndTags(
-                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
-                expandedTags = ImmutableHolder(viewState.expandedTags),
-                onToggleTagExpansion = onToggleTagExpansion,
-                onItemClick = { item ->
-                    coroutineScope.launch {
-                        val id = when (item) {
-                            is DrawerFeed -> item.id
-                            is DrawerTag -> ID_UNSET
-                            is DrawerTop -> ID_ALL_FEEDS
-                        }
-                        val tag = when (item) {
-                            is DrawerFeed -> item.tag
-                            is DrawerTag -> item.tag
-                            is DrawerTop -> ""
-                        }
-                        onDrawerItemSelected(id, tag)
-                        scaffoldState.drawerState.close()
-                    }
-                }
             )
         },
         floatingActionButton = {
@@ -615,9 +596,7 @@ fun FeedScreen(
                 Modifier
                     .padding(padding)
             ) {
-                coroutineScope.launch {
-                    scaffoldState.drawerState.open()
-                }
+                onOpenNavDrawer()
             }
         }
 
@@ -643,14 +622,13 @@ fun FeedScreen(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenWithFeedList(
     viewState: FeedScreenViewState,
     onRefreshVisible: () -> Unit,
-    onDrawerItemSelected: (Long, String) -> Unit,
+    onOpenNavDrawer: () -> Unit,
     onMarkAllAsRead: () -> Unit,
-    onToggleTagExpansion: (String) -> Unit,
     readAloudOnPlay: () -> Unit,
     readAloudOnPause: () -> Unit,
     readAloudOnStop: () -> Unit,
@@ -660,11 +638,8 @@ fun ScreenWithFeedList(
     onEditFeed: (Long) -> Unit,
     toolbarActions: @Composable() (RowScope.() -> Unit),
     modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
     content: @Composable (Modifier) -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     val refreshState = rememberSwipeRefreshState(
         viewState.latestSyncTimestamp.isAfter(Instant.now().minusSeconds(20))
     )
@@ -676,25 +651,25 @@ fun ScreenWithFeedList(
         refreshState.isRefreshing = false
     }
 
+    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        decayAnimationSpec,
+        rememberTopAppBarState()
+    )
+
     Scaffold(
-        scaffoldState = scaffoldState,
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
+                scrollBehavior = scrollBehavior,
                 title = {
                     Text(
                         viewState.feedScreenTitle.title ?: stringResource(id = R.string.all_feeds),
                         maxLines = 2,
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                scaffoldState.drawerState.open()
-                            }
-                        }
+                        onClick = onOpenNavDrawer
                     ) {
                         Icon(
                             Icons.Default.Menu,
@@ -715,29 +690,30 @@ fun ScreenWithFeedList(
                 onStop = readAloudOnStop,
             )
         },
-        drawerContent = {
-            ListOfFeedsAndTags(
-                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
-                expandedTags = ImmutableHolder(viewState.expandedTags),
-                onToggleTagExpansion = onToggleTagExpansion,
-                onItemClick = { item ->
-                    coroutineScope.launch {
-                        val id = when (item) {
-                            is DrawerFeed -> item.id
-                            is DrawerTag -> ID_UNSET
-                            is DrawerTop -> ID_ALL_FEEDS
-                        }
-                        val tag = when (item) {
-                            is DrawerFeed -> item.tag
-                            is DrawerTag -> item.tag
-                            is DrawerTop -> ""
-                        }
-                        onDrawerItemSelected(id, tag)
-                        scaffoldState.drawerState.close()
-                    }
-                }
-            )
-        },
+        // todo drawer
+//        drawerContent = {
+//            ListOfFeedsAndTags(
+//                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
+//                expandedTags = ImmutableHolder(viewState.expandedTags),
+//                onToggleTagExpansion = onToggleTagExpansion,
+//                onItemClick = { item ->
+//                    coroutineScope.launch {
+//                        val id = when (item) {
+//                            is DrawerFeed -> item.id
+//                            is DrawerTag -> ID_UNSET
+//                            is DrawerTop -> ID_ALL_FEEDS
+//                        }
+//                        val tag = when (item) {
+//                            is DrawerFeed -> item.tag
+//                            is DrawerTag -> item.tag
+//                            is DrawerTop -> ""
+//                        }
+//                        onDrawerItemSelected(id, tag)
+//                        scaffoldState.drawerState.close()
+//                    }
+//                }
+//            )
+//        },
         floatingActionButton = {
             if (viewState.showFab) {
                 FloatingActionButton(
@@ -751,7 +727,8 @@ fun ScreenWithFeedList(
                 }
             }
         },
-        modifier = modifier,
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            .systemBarsPadding(),
     ) { padding ->
         SwipeRefresh(
             state = refreshState,

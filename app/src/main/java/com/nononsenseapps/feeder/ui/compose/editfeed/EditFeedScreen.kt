@@ -1,31 +1,32 @@
 package com.nononsenseapps.feeder.ui.compose.editfeed
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -41,6 +42,7 @@ import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -50,8 +52,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.shouldShowRationale
@@ -195,6 +195,7 @@ fun EditFeedScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditFeedScreen(
     onNavigateUp: () -> Unit,
@@ -212,12 +213,17 @@ fun EditFeedScreen(
     onOk: () -> Unit,
     onCancel: () -> Unit,
 ) {
+    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        decayAnimationSpec,
+        rememberTopAppBarState()
+    )
+
     Scaffold(
-        // In case device is rotated to landscape and navigation bar ends up on the side
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)
-            .asPaddingValues(),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection).systemBarsPadding(),
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
+                scrollBehavior = scrollBehavior,
                 title = {
                     Text(
                         text = stringResource(id = R.string.edit_feed),
@@ -225,8 +231,6 @@ fun EditFeedScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
-                    .asPaddingValues(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -234,7 +238,7 @@ fun EditFeedScreen(
                             contentDescription = stringResource(R.string.go_back),
                         )
                     }
-                }
+                },
             )
         }
     ) { padding ->
@@ -262,7 +266,7 @@ fun EditFeedScreen(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditFeedView(
     viewState: EditFeedViewState,
@@ -340,7 +344,7 @@ fun EditFeedView(
                 Text(
                     textAlign = TextAlign.Center,
                     text = stringResource(R.string.invalid_url),
-                    style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error),
+                    style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.error),
                 )
             }
             OutlinedTextField(
@@ -393,7 +397,7 @@ fun EditFeedView(
                     ) {
                         Text(
                             text = it,
-                            style = MaterialTheme.typography.subtitle1
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
                 }

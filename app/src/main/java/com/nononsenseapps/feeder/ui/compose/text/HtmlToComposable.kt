@@ -18,9 +18,9 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.DisableSelection
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.Modifier
@@ -97,8 +97,8 @@ private fun LazyListScope.formatBody(
             ) {
                 ClickableText(
                     text = paragraph,
-                    style = MaterialTheme.typography.body1
-                        .merge(TextStyle(color = MaterialTheme.colors.onBackground)),
+                    style = MaterialTheme.typography.bodyLarge
+                        .merge(TextStyle(color = MaterialTheme.colorScheme.onBackground)),
                     modifier = Modifier
                         .padding(horizontal = dimens.margin)
                         .width(dimens.maxContentWidth)
@@ -112,8 +112,8 @@ private fun LazyListScope.formatBody(
             } else {
                 Text(
                     text = paragraph,
-                    style = MaterialTheme.typography.body1
-                        .merge(TextStyle(color = MaterialTheme.colors.onBackground)),
+                    style = MaterialTheme.typography.bodyLarge
+                        .merge(TextStyle(color = MaterialTheme.colorScheme.onBackground)),
                     modifier = Modifier
                         .padding(horizontal = dimens.margin)
                         .width(dimens.maxContentWidth)
@@ -236,7 +236,7 @@ private fun TextComposer.appendTextChildren(
                     "h1" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h5.toSpanStyle() }
+                                style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -245,7 +245,7 @@ private fun TextComposer.appendTextChildren(
                     "h2" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h5.toSpanStyle() }
+                                style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -254,7 +254,7 @@ private fun TextComposer.appendTextChildren(
                     "h3" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h5.toSpanStyle() }
+                                style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -263,7 +263,7 @@ private fun TextComposer.appendTextChildren(
                     "h4" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h5.toSpanStyle() }
+                                style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -272,7 +272,7 @@ private fun TextComposer.appendTextChildren(
                     "h5" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h5.toSpanStyle() }
+                                style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -281,7 +281,7 @@ private fun TextComposer.appendTextChildren(
                     "h6" -> {
                         withParagraph {
                             withComposableStyle(
-                                style = { MaterialTheme.typography.h5.toSpanStyle() }
+                                style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
                                 append(element.text())
                             }
@@ -493,7 +493,7 @@ private fun TextComposer.appendTextChildren(
 
                                             Text(
                                                 alt,
-                                                style = MaterialTheme.typography.caption,
+                                                style = MaterialTheme.typography.labelMedium,
                                                 modifier = Modifier.fillMaxWidth()
                                             )
                                         }
@@ -626,7 +626,7 @@ private fun TextComposer.appendTextChildren(
 
                                         Text(
                                             text = stringResource(R.string.touch_to_play_video),
-                                            style = MaterialTheme.typography.caption,
+                                            style = MaterialTheme.typography.labelMedium,
                                             modifier = Modifier.fillMaxWidth()
                                         )
 
