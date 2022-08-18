@@ -16,4 +16,7 @@ class AddFeedFromShareActivityViewModel(di: DI) : DIAwareViewModel(di) {
 
     val darkThemePreference: StateFlow<DarkThemePreferences> =
         repository.preferredDarkTheme
+
+    val dynamicColors: StateFlow<Boolean> =
+        repository.useDynamicTheme
 }

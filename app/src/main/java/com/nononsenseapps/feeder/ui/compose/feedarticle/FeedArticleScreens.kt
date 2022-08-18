@@ -112,7 +112,9 @@ import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.BackHandler
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.util.openGitlabIssues
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
@@ -1577,14 +1579,14 @@ private enum class FeedArticleScreenType {
 private fun getFeedArticleScreenType(
     windowSize: WindowSize,
     viewState: FeedArticleScreenViewState,
-): FeedArticleScreenType = when (windowSize) {
-    WindowSize.Compact -> {
+): FeedArticleScreenType = when (getScreenType(windowSize)) {
+    ScreenType.SINGLE -> {
         when {
             viewState.isArticleOpen -> FeedArticleScreenType.ArticleDetails
             else -> FeedArticleScreenType.Feed
         }
     }
-    WindowSize.Medium, WindowSize.Expanded -> FeedArticleScreenType.FeedWithArticleDetails
+    ScreenType.DUAL -> FeedArticleScreenType.FeedWithArticleDetails
 }
 
 /**

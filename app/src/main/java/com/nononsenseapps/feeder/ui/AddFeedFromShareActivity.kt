@@ -16,6 +16,7 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.utils.rememberWindowSizeClass
 import org.kodein.di.compose.withDI
 
 /**
@@ -35,10 +36,12 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                 val viewModel: AddFeedFromShareActivityViewModel = DIAwareViewModel()
                 val currentTheme by viewModel.currentTheme.collectAsState()
                 val darkThemePreference by viewModel.darkThemePreference.collectAsState()
+                val dynamicColors by viewModel.dynamicColors.collectAsState()
 
                 FeederTheme(
                     currentTheme = currentTheme,
-                    darkThemePreference = darkThemePreference
+                    darkThemePreference = darkThemePreference,
+                    dynamicColors = dynamicColors,
                 ) {
                     val navController = rememberNavController()
                     NavHost(navController, startDestination = "search") {
@@ -62,14 +65,18 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                             arguments = AddFeedDestination.arguments,
                             deepLinks = AddFeedDestination.deepLinks,
                         ) { backStackEntry ->
+                            val windowSize = rememberWindowSizeClass()
+
                             CreateFeedScreen(
+                                windowSize = windowSize,
                                 onNavigateUp = {
                                     navController.popBackStack()
                                 },
                                 createFeedScreenViewModel = backStackEntry.DIAwareViewModel(),
-                            ) {
-                                finish()
-                            }
+                                {
+                                    finish()
+                                },
+                            )
                         }
                     }
                 }

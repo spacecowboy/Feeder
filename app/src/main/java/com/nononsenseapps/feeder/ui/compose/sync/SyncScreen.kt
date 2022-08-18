@@ -76,7 +76,9 @@ import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.BackHandler
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.KOFI_URL
 import com.nononsenseapps.feeder.util.openKoFiIntent
@@ -336,8 +338,8 @@ enum class SyncScreenType {
 fun getSyncScreenType(
     windowSize: WindowSize,
     viewState: SyncScreenViewState
-): SyncScreenType = when (windowSize) {
-    WindowSize.Compact -> {
+): SyncScreenType = when (getScreenType(windowSize)) {
+    ScreenType.SINGLE -> {
         when (viewState.singleScreenToShow) {
             SyncScreenToShow.SETUP -> SyncScreenType.SINGLE_SETUP
             SyncScreenToShow.DEVICELIST -> SyncScreenType.SINGLE_DEVICELIST
@@ -345,7 +347,7 @@ fun getSyncScreenType(
             SyncScreenToShow.JOIN -> SyncScreenType.SINGLE_JOIN
         }
     }
-    WindowSize.Medium, WindowSize.Expanded -> SyncScreenType.DUAL
+    ScreenType.DUAL -> SyncScreenType.DUAL
 }
 
 @Composable
