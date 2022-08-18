@@ -48,7 +48,7 @@ fun NothingToRead(
         ) {
             Text(
                 text = stringResource(id = R.string.empty_feed_top),
-                style = MaterialTheme.typography.displaySmall.merge(
+                style = MaterialTheme.typography.headlineMedium.merge(
                     TextStyle(fontWeight = FontWeight.Light)
                 ),
                 textAlign = TextAlign.Center
@@ -65,7 +65,7 @@ fun NothingToRead(
             ) {
                 Text(
                     text = annotatedStringResource(id = R.string.empty_feed_open),
-                    style = MaterialTheme.typography.displaySmall.merge(
+                    style = MaterialTheme.typography.headlineMedium.merge(
                         TextStyle(fontWeight = FontWeight.Light)
                     ),
                     textAlign = TextAlign.Center
@@ -83,7 +83,7 @@ fun NothingToRead(
             ) {
                 Text(
                     text = annotatedStringResource(id = R.string.empty_feed_add),
-                    style = MaterialTheme.typography.displaySmall.merge(
+                    style = MaterialTheme.typography.headlineMedium.merge(
                         TextStyle(fontWeight = FontWeight.Light)
                     ),
                     textAlign = TextAlign.Center
