@@ -37,6 +37,7 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                 val currentTheme by viewModel.currentTheme.collectAsState()
                 val darkThemePreference by viewModel.darkThemePreference.collectAsState()
                 val dynamicColors by viewModel.dynamicColors.collectAsState()
+                val windowSize = rememberWindowSizeClass()
 
                 FeederTheme(
                     currentTheme = currentTheme,
@@ -47,6 +48,7 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                     NavHost(navController, startDestination = "search") {
                         composable("search") { backStackEntry ->
                             SearchFeedScreen(
+                                windowSize = windowSize,
                                 onNavigateUp = {
                                     onNavigateUpFromIntentActivities()
                                 },
@@ -65,8 +67,6 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                             arguments = AddFeedDestination.arguments,
                             deepLinks = AddFeedDestination.deepLinks,
                         ) { backStackEntry ->
-                            val windowSize = rememberWindowSizeClass()
-
                             CreateFeedScreen(
                                 windowSize = windowSize,
                                 onNavigateUp = {

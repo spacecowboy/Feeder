@@ -127,6 +127,7 @@ object SearchFeedDestination : NavigationDestination(
         backStackEntry: NavBackStackEntry
     ) {
         SearchFeedScreen(
+            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
