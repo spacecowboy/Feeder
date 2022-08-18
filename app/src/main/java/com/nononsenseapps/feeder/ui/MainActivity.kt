@@ -87,10 +87,12 @@ class MainActivity : DIAwareComponentActivity() {
         setContent {
             val currentTheme by mainActivityViewModel.currentTheme.collectAsState()
             val darkThemePreference by mainActivityViewModel.darkThemePreference.collectAsState()
+            val dynamicColors by mainActivityViewModel.dynamicColors.collectAsState()
 
             FeederTheme(
                 currentTheme = currentTheme,
-                darkThemePreference = darkThemePreference
+                darkThemePreference = darkThemePreference,
+                dynamicColors = dynamicColors,
             ) {
                 withDI {
                     val imageLoader: ImageLoader by instance()

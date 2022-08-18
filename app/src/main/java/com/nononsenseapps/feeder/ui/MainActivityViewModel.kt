@@ -30,4 +30,7 @@ class MainActivityViewModel(di: DI) : DIAwareViewModel(di) {
     fun ensurePeriodicSyncConfigured() = viewModelScope.launch {
         repository.ensurePeriodicSyncConfigured()
     }
+
+    val dynamicColors: StateFlow<Boolean> =
+        repository.useDynamicTheme
 }

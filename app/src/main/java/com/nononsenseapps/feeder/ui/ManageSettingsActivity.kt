@@ -28,10 +28,12 @@ class ManageSettingsActivity : DIAwareComponentActivity() {
                 val manageSettingsViewModel: ManageSettingsViewModel = DIAwareViewModel()
                 val currentTheme by manageSettingsViewModel.currentTheme.collectAsState()
                 val darkThemePreference by manageSettingsViewModel.darkThemePreference.collectAsState()
+                val dynamicColors by manageSettingsViewModel.dynamicColors.collectAsState()
 
                 FeederTheme(
                     currentTheme = currentTheme,
-                    darkThemePreference = darkThemePreference
+                    darkThemePreference = darkThemePreference,
+                    dynamicColors = dynamicColors,
                 ) {
                     SettingsScreen(
                         onNavigateUp = {

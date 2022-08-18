@@ -293,13 +293,13 @@ fun SettingsList(
             title = stringResource(id = R.string.dynamic_theme_use),
             description = when {
                 isAndroidSAndAbove -> {
+                    null
+                }
+                else -> {
                     stringResource(
                         id = R.string.only_available_on_android_n,
                         "12"
                     )
-                }
-                else -> {
-                    ""
                 }
             },
             enabled = isAndroidSAndAbove

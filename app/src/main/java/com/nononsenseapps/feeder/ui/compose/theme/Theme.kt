@@ -5,10 +5,13 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
@@ -80,10 +83,11 @@ private val darkColors = darkColorScheme(
 fun FeederTheme(
     currentTheme: ThemeOptions = ThemeOptions.DAY,
     darkThemePreference: DarkThemePreferences = DarkThemePreferences.BLACK,
+    dynamicColors: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val darkIcons = currentTheme.isDarkSystemIcons()
-    val colorScheme = currentTheme.getColorScheme(darkThemePreference)
+    val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
@@ -96,8 +100,6 @@ fun FeederTheme(
             )
             systemUiController.setNavigationBarColor(
                 colorScheme.scrim,
-//                TODO
-//                if (darkIcons) NavBarScrimLight else NavBarScrimDark,
                 darkIcons = darkIcons,
             )
         }
@@ -121,40 +123,29 @@ private fun ThemeOptions.isDarkSystemIcons(): Boolean {
 
 @Composable
 private fun ThemeOptions.getColorScheme(
-    darkThemePreference: DarkThemePreferences
-): ColorScheme =
-    when (this) {
-        ThemeOptions.DAY -> lightColors
-        ThemeOptions.NIGHT -> getPreferredDarkColorScheme(darkThemePreference)
+    darkThemePreference: DarkThemePreferences,
+    dynamicColors: Boolean,
+): ColorScheme {
+    val dark = when (this) {
+        ThemeOptions.DAY -> false
+        ThemeOptions.NIGHT -> true
         ThemeOptions.SYSTEM -> {
-            if (isSystemInDarkTheme()) {
-                getPreferredDarkColorScheme(darkThemePreference)
-            } else {
-                lightColors
-            }
+            isSystemInDarkTheme()
         }
-//        ThemeOptions.DYNAMIC -> {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-//                if (isSystemInDarkTheme()) {
-//                    dynamicDarkColorScheme(LocalContext.current)
-//                } else {
-//                    dynamicLightColorScheme(LocalContext.current)
-//                }
-//            } else {
-//                if (isSystemInDarkTheme()) {
-//                    getPreferredDarkColorScheme(darkThemePreference)
-//                } else {
-//                    lightColors
-//                }
-//            }
-//        }
     }
 
-@Composable
-private fun getPreferredDarkColorScheme(darkThemePreference: DarkThemePreferences): ColorScheme {
-    return when (darkThemePreference) {
-        // TODO
-        DarkThemePreferences.BLACK -> darkColors
-        DarkThemePreferences.DARK -> darkColors
+    val colorScheme = when {
+        dynamicColors && dark -> dynamicDarkColorScheme(LocalContext.current)
+        dynamicColors && !dark -> dynamicLightColorScheme(LocalContext.current)
+        dark -> darkColors
+        else -> lightColors
+    }
+
+    return if (dark && darkThemePreference == DarkThemePreferences.BLACK) {
+        colorScheme.copy(
+            background = Color.Black,
+        )
+    } else {
+        colorScheme
     }
 }

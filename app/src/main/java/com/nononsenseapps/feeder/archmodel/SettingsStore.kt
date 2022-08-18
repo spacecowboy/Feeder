@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.annotation.StringRes
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -163,10 +164,10 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _useDynamicTheme =
-        MutableStateFlow(sp.getBoolean(PREF_DYNAMIC_THEME, true))
+        MutableStateFlow(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && sp.getBoolean(PREF_DYNAMIC_THEME, true))
     val useDynamicTheme = _useDynamicTheme.asStateFlow()
     fun setUseDynamicTheme(value: Boolean) {
-        _useDynamicTheme.value = value
+        _useDynamicTheme.value = value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
         sp.edit().putBoolean(PREF_DYNAMIC_THEME, value).apply()
     }
 
