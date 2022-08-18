@@ -20,7 +20,7 @@ buildscript {
     kodeinVersion = "7.5.0"
 //    kodeinComposeVersion = "7.5.0"
     coroutines_version = "1.5.2"
-    rome_version = "1.7.1-f6"
+    rome_version = "1.7.1-f7"
     moshi_version = "1.12.0"
     threetentest_version = "1.2.2"
     threetenabp_version = "1.2.2"
