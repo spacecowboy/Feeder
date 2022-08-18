@@ -5,6 +5,8 @@ import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -246,7 +248,8 @@ fun EditFeedScreen(
     )
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
             .statusBarsPadding()
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         topBar = {
@@ -295,7 +298,6 @@ fun EditFeedScreen(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditFeedView(
     screenType: ScreenType,
@@ -310,6 +312,84 @@ fun EditFeedView(
     onOk: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier,
+) {
+    val dimens = LocalDimens.current
+
+    OkCancelWithContent(
+        onOk = {
+            onOk()
+        },
+        onCancel = onCancel,
+        okEnabled = viewState.isOkToSave,
+        modifier = modifier
+            .padding(horizontal = LocalDimens.current.margin)
+    ) {
+        if (screenType == ScreenType.DUAL) {
+            Row(
+                modifier = Modifier.width(dimens.maxContentWidth),
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.weight(1f, fill = true)
+                        .padding(horizontal = dimens.margin, vertical = 8.dp)
+                ) {
+                    leftContent(
+                        viewState = viewState,
+                        setUrl = setUrl,
+                        setTitle = setTitle,
+                        setTag = setTag
+                    )
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.weight(1f, fill = true)
+                        .padding(horizontal = dimens.margin, vertical = 8.dp)
+                ) {
+                    rightContent(
+                        viewState = viewState,
+                        setFullTextByDefault = setFullTextByDefault,
+                        setNotify = setNotify,
+                        setArticleOpener = setArticleOpener,
+                        setAlternateId = setAlternateId
+                    )
+                }
+            }
+        } else {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.width(dimens.maxContentWidth)
+            ) {
+                leftContent(
+                    viewState = viewState,
+                    setUrl = setUrl,
+                    setTitle = setTitle,
+                    setTag = setTag
+                )
+
+                Divider(
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                rightContent(
+                    viewState = viewState,
+                    setFullTextByDefault = setFullTextByDefault,
+                    setNotify = setNotify,
+                    setArticleOpener = setArticleOpener,
+                    setAlternateId = setAlternateId
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun ColumnScope.leftContent(
+    viewState: EditFeedViewState,
+    setUrl: (String) -> Unit,
+    setTitle: (String) -> Unit,
+    setTag: (String) -> Unit,
 ) {
     val filteredTags by remember(viewState.allTags, viewState.tag) {
         derivedStateOf {
@@ -326,215 +406,204 @@ fun EditFeedView(
 
     var tagHasFocus by rememberSaveable { mutableStateOf(false) }
 
-    val dimens = LocalDimens.current
-
-    OkCancelWithContent(
-        onOk = {
-            onOk()
+    TextField(
+        value = viewState.url,
+        onValueChange = setUrl,
+        label = {
+            Text(stringResource(id = R.string.url))
         },
-        onCancel = onCancel,
-        okEnabled = viewState.isOkToSave,
-        modifier = modifier
-            .padding(horizontal = LocalDimens.current.margin)
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.width(dimens.maxContentWidth)
-        ) {
-            TextField(
-                value = viewState.url,
-                onValueChange = setUrl,
-                label = {
-                    Text(stringResource(id = R.string.url))
-                },
-                isError = viewState.isNotValidUrl,
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.None,
-                    autoCorrect = false,
-                    keyboardType = KeyboardType.Uri,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = {
-                        focusTitle.requestFocus()
-                    }
-                ),
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 64.dp)
-                    .interceptKey(Key.Enter) {
-                        focusTitle.requestFocus()
-                    }
-                    .interceptKey(Key.Escape) {
-                        focusManager.clearFocus()
-                    }
-            )
-            AnimatedVisibility(visible = viewState.isNotValidUrl) {
-                Text(
-                    textAlign = TextAlign.Center,
-                    text = stringResource(R.string.invalid_url),
-                    style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.error),
-                )
+        isError = viewState.isNotValidUrl,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrect = false,
+            keyboardType = KeyboardType.Uri,
+            imeAction = ImeAction.Next
+        ),
+        keyboardActions = KeyboardActions(
+            onNext = {
+                focusTitle.requestFocus()
             }
-            OutlinedTextField(
-                value = viewState.title,
-                onValueChange = setTitle,
-                placeholder = {
-                    Text(viewState.defaultTitle)
-                },
-                label = {
-                    Text(stringResource(id = R.string.title))
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words,
-                    autoCorrect = true,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = {
-                        focusTag.requestFocus()
-                    }
-                ),
-                modifier = Modifier
-                    .focusRequester(focusTitle)
-                    .fillMaxWidth()
-                    .heightIn(min = 64.dp)
-                    .interceptKey(Key.Enter) {
-                        focusTag.requestFocus()
-                    }
-                    .interceptKey(Key.Escape) {
-                        focusManager.clearFocus()
-                    }
-            )
-
-            AutoCompleteFoo(
-                displaySuggestions = tagHasFocus,
-                suggestions = filteredTags,
-                onSuggestionClicked = { tag ->
-                    setTag(tag)
-                    focusManager.clearFocus()
-                },
-                suggestionContent = {
-                    Box(
-                        contentAlignment = Alignment.CenterStart,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .height(48.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            text = it,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                }
-            ) {
-                OutlinedTextField(
-                    value = viewState.tag,
-                    onValueChange = setTag,
-                    label = {
-                        Text(stringResource(id = R.string.tag))
-                    },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Words,
-                        autoCorrect = true,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            focusManager.clearFocus()
-                        }
-                    ),
-                    modifier = Modifier
-                        .focusRequester(focusTag)
-                        .onFocusChanged {
-                            tagHasFocus = it.isFocused
-                        }
-                        .fillMaxWidth()
-                        .heightIn(min = 64.dp)
-                        .interceptKey(Key.Enter) {
-                            focusManager.clearFocus()
-                        }
-                        .interceptKey(Key.Escape) {
-                            focusManager.clearFocus()
-                        }
-                )
+        ),
+        singleLine = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 64.dp)
+            .interceptKey(Key.Enter) {
+                focusTitle.requestFocus()
             }
-
-            Divider(
-                modifier = Modifier.fillMaxWidth()
-            )
-            SwitchSetting(
-                title = stringResource(id = R.string.fetch_full_articles_by_default),
-                checked = viewState.fullTextByDefault,
-                onCheckedChanged = setFullTextByDefault,
-                icon = null
-            )
-            SwitchSetting(
-                title = stringResource(id = R.string.notify_for_new_items),
-                checked = viewState.notify,
-                onCheckedChanged = setNotify,
-                icon = null
-            )
-            SwitchSetting(
-                title = stringResource(id = R.string.generate_extra_unique_ids),
-                description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
-                checked = viewState.alternateId,
-                onCheckedChanged = setAlternateId,
-                icon = null
-            )
-            Divider(
-                modifier = Modifier.fillMaxWidth()
-            )
-            GroupTitle(
-                startingSpace = false,
-                height = 48.dp
-            ) {
-                Text(stringResource(id = R.string.open_item_by_default_with))
+            .interceptKey(Key.Escape) {
+                focusManager.clearFocus()
             }
-            RadioButtonSetting(
-                title = stringResource(id = R.string.use_app_default),
-                selected = viewState.isOpenItemWithAppDefault,
-                minHeight = 48.dp,
-                icon = null,
-                onClick = {
-                    setArticleOpener("")
-                }
-            )
-            RadioButtonSetting(
-                title = stringResource(id = R.string.open_in_reader),
-                selected = viewState.isOpenItemWithReader,
-                minHeight = 48.dp,
-                icon = null,
-                onClick = {
-                    setArticleOpener(PREF_VAL_OPEN_WITH_READER)
-                }
-            )
-            RadioButtonSetting(
-                title = stringResource(id = R.string.open_in_custom_tab),
-                selected = viewState.isOpenItemWithCustomTab,
-                minHeight = 48.dp,
-                icon = null,
-                onClick = {
-                    setArticleOpener(PREF_VAL_OPEN_WITH_CUSTOM_TAB)
-                }
-            )
-            RadioButtonSetting(
-                title = stringResource(id = R.string.open_in_default_browser),
-                selected = viewState.isOpenItemWithBrowser,
-                minHeight = 48.dp,
-                icon = null,
-                onClick = {
-                    setArticleOpener(PREF_VAL_OPEN_WITH_BROWSER)
-                }
-            )
-        }
+    )
+    AnimatedVisibility(visible = viewState.isNotValidUrl) {
+        Text(
+            textAlign = TextAlign.Center,
+            text = stringResource(R.string.invalid_url),
+            style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.error),
+        )
     }
+    OutlinedTextField(
+        value = viewState.title,
+        onValueChange = setTitle,
+        placeholder = {
+            Text(viewState.defaultTitle)
+        },
+        label = {
+            Text(stringResource(id = R.string.title))
+        },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Words,
+            autoCorrect = true,
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Next
+        ),
+        keyboardActions = KeyboardActions(
+            onNext = {
+                focusTag.requestFocus()
+            }
+        ),
+        modifier = Modifier
+            .focusRequester(focusTitle)
+            .fillMaxWidth()
+            .heightIn(min = 64.dp)
+            .interceptKey(Key.Enter) {
+                focusTag.requestFocus()
+            }
+            .interceptKey(Key.Escape) {
+                focusManager.clearFocus()
+            }
+    )
+
+    AutoCompleteFoo(
+        displaySuggestions = tagHasFocus,
+        suggestions = filteredTags,
+        onSuggestionClicked = { tag ->
+            setTag(tag)
+            focusManager.clearFocus()
+        },
+        suggestionContent = {
+            Box(
+                contentAlignment = Alignment.CenterStart,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .height(48.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        }
+    ) {
+        OutlinedTextField(
+            value = viewState.tag,
+            onValueChange = setTag,
+            label = {
+                Text(stringResource(id = R.string.tag))
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Words,
+                autoCorrect = true,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }
+            ),
+            modifier = Modifier
+                .focusRequester(focusTag)
+                .onFocusChanged {
+                    tagHasFocus = it.isFocused
+                }
+                .fillMaxWidth()
+                .heightIn(min = 64.dp)
+                .interceptKey(Key.Enter) {
+                    focusManager.clearFocus()
+                }
+                .interceptKey(Key.Escape) {
+                    focusManager.clearFocus()
+                }
+        )
+    }
+}
+
+@Composable
+fun ColumnScope.rightContent(
+    viewState: EditFeedViewState,
+    setFullTextByDefault: (Boolean) -> Unit,
+    setNotify: (Boolean) -> Unit,
+    setArticleOpener: (String) -> Unit,
+    setAlternateId: (Boolean) -> Unit,
+) {
+    SwitchSetting(
+        title = stringResource(id = R.string.fetch_full_articles_by_default),
+        checked = viewState.fullTextByDefault,
+        onCheckedChanged = setFullTextByDefault,
+        icon = null
+    )
+    SwitchSetting(
+        title = stringResource(id = R.string.notify_for_new_items),
+        checked = viewState.notify,
+        onCheckedChanged = setNotify,
+        icon = null
+    )
+    SwitchSetting(
+        title = stringResource(id = R.string.generate_extra_unique_ids),
+        description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
+        checked = viewState.alternateId,
+        onCheckedChanged = setAlternateId,
+        icon = null
+    )
+    Divider(
+        modifier = Modifier.fillMaxWidth()
+    )
+    GroupTitle(
+        startingSpace = false,
+        height = 48.dp
+    ) {
+        Text(stringResource(id = R.string.open_item_by_default_with))
+    }
+    RadioButtonSetting(
+        title = stringResource(id = R.string.use_app_default),
+        selected = viewState.isOpenItemWithAppDefault,
+        minHeight = 48.dp,
+        icon = null,
+        onClick = {
+            setArticleOpener("")
+        }
+    )
+    RadioButtonSetting(
+        title = stringResource(id = R.string.open_in_reader),
+        selected = viewState.isOpenItemWithReader,
+        minHeight = 48.dp,
+        icon = null,
+        onClick = {
+            setArticleOpener(PREF_VAL_OPEN_WITH_READER)
+        }
+    )
+    RadioButtonSetting(
+        title = stringResource(id = R.string.open_in_custom_tab),
+        selected = viewState.isOpenItemWithCustomTab,
+        minHeight = 48.dp,
+        icon = null,
+        onClick = {
+            setArticleOpener(PREF_VAL_OPEN_WITH_CUSTOM_TAB)
+        }
+    )
+    RadioButtonSetting(
+        title = stringResource(id = R.string.open_in_default_browser),
+        selected = viewState.isOpenItemWithBrowser,
+        minHeight = 48.dp,
+        icon = null,
+        onClick = {
+            setArticleOpener(PREF_VAL_OPEN_WITH_BROWSER)
+        }
+    )
 }
 
 @Preview("Edit Feed Phone")
