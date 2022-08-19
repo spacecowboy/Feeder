@@ -48,7 +48,7 @@ val Typography = Typography(
 @Composable
 fun LinkTextStyle(): TextStyle =
     TextStyle(
-        color = MaterialTheme.colorScheme.secondary,
+        color = MaterialTheme.colorScheme.primary,
         textDecoration = TextDecoration.Underline
     )
 
