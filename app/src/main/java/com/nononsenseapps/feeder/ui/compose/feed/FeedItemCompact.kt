@@ -1,23 +1,31 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,6 +39,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import java.util.*
 import org.threeten.bp.format.DateTimeFormatter
@@ -58,7 +67,6 @@ fun FeedItemCompact(
         modifier = modifier
             .padding(
                 start = LocalDimens.current.margin,
-                end = if (item.imageUrl?.isNotBlank() != true || !showThumbnail) LocalDimens.current.margin else 0.dp
             )
             .height(IntrinsicSize.Min)
     ) {
@@ -69,19 +77,12 @@ fun FeedItemCompact(
                 .requiredHeightIn(min = minimumTouchSize)
                 .padding(vertical = 4.dp)
         ) {
-            val titleAlpha = if (item.shouldBeShownAsUnread) {
-                ContentAlpha.high
-            } else {
-                ContentAlpha.medium
-            }
-            CompositionLocalProvider(LocalContentAlpha provides titleAlpha) {
-                Text(
-                    text = item.title,
-                    style = FeedListItemTitleTextStyle(),
-                    modifier = Modifier
-                        .padding(start = 4.dp, end = 4.dp)
-                )
-            }
+            Text(
+                text = item.title,
+                style = FeedListItemTitleTextStyle(),
+                modifier = Modifier
+                    .padding(start = 4.dp, end = 4.dp)
+            )
             // Want the dropdown to center on the middle text row
             Box {
                 Row(
@@ -191,40 +192,33 @@ fun FeedItemCompact(
             }
         }
 
-        if (showThumbnail) {
-            item.imageUrl?.let { imageUrl ->
-                imagePainter(imageUrl, Modifier)
+        if (showThumbnail && item.imageUrl != null || item.unread || item.bookmarked || item.pinned) {
+            Box(
+                modifier = Modifier
+                    .width(64.dp),
+                contentAlignment = Alignment.TopEnd,
+            ) {
+                item.imageUrl?.let { imageUrl ->
+                    if (showThumbnail) {
+                        imagePainter(imageUrl, Modifier)
+                    }
+                }
+                FeedItemIndicatorColumn(
+                    unread = item.unread,
+                    bookmarked = item.bookmarked,
+                    pinned = item.pinned,
+                    modifier = Modifier.padding(
+                        top = 8.dp,
+                        bottom = 8.dp,
+                        end = 8.dp,
+                    ),
+                )
             }
+        } else {
+            // Taking Row spacing into account
+            Spacer(modifier = Modifier.width(LocalDimens.current.margin - 4.dp))
         }
     }
-}
-
-@Composable
-@Preview(showBackground = true)
-private fun preview() {
-    FeedItemCompact(
-        item = FeedListItem(
-            title = "title",
-            snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-            feedTitle = "Super Duper Feed One two three hup di too dasf",
-            pubDate = "Jun 9, 2021",
-            unread = true,
-            imageUrl = null,
-            link = null,
-            id = ID_UNSET,
-            pinned = false,
-            bookmarked = false,
-        ),
-        showThumbnail = true,
-        imagePainter = { _, _ -> },
-        onMarkAboveAsRead = {},
-        onMarkBelowAsRead = {},
-        onShareItem = {},
-        onTogglePinned = {},
-        onToggleBookmarked = {},
-        dropDownMenuExpanded = false,
-        onDismissDropdown = {}
-    )
 }
 
 @Immutable
@@ -245,4 +239,111 @@ data class FeedListItem(
 
     val notPinned: Boolean
         get() = !pinned
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun previewRead() {
+    FeederTheme {
+        Surface {
+            FeedItemCompact(
+                item = FeedListItem(
+                    title = "title",
+                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                    feedTitle = "Super Duper Feed One two three hup di too dasf",
+                    pubDate = "Jun 9, 2021",
+                    unread = false,
+                    imageUrl = null,
+                    link = null,
+                    id = ID_UNSET,
+                    pinned = false,
+                    bookmarked = false,
+                ),
+                showThumbnail = true,
+                imagePainter = { _, _ -> },
+                onMarkAboveAsRead = {},
+                onMarkBelowAsRead = {},
+                onShareItem = {},
+                onTogglePinned = {},
+                onToggleBookmarked = {},
+                dropDownMenuExpanded = false,
+                onDismissDropdown = {}
+            )
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun previewUnread() {
+    FeederTheme {
+        Surface {
+            FeedItemCompact(
+                item = FeedListItem(
+                    title = "title",
+                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                    feedTitle = "Super Duper Feed One two three hup di too dasf",
+                    pubDate = "Jun 9, 2021",
+                    unread = true,
+                    imageUrl = null,
+                    link = null,
+                    id = ID_UNSET,
+                    pinned = false,
+                    bookmarked = false,
+                ),
+                showThumbnail = true,
+                imagePainter = { _, _ -> },
+                onMarkAboveAsRead = {},
+                onMarkBelowAsRead = {},
+                onShareItem = {},
+                onTogglePinned = {},
+                onToggleBookmarked = {},
+                dropDownMenuExpanded = false,
+                onDismissDropdown = {}
+            )
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun previewWithImage() {
+    FeederTheme {
+        Surface {
+            FeedItemCompact(
+                item = FeedListItem(
+                    title = "title",
+                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                    feedTitle = "Super Duper Feed One two three hup di too dasf",
+                    pubDate = "Jun 9, 2021",
+                    unread = true,
+                    imageUrl = "blabla",
+                    link = null,
+                    id = ID_UNSET,
+                    pinned = true,
+                    bookmarked = true,
+                ),
+                showThumbnail = true,
+                onMarkAboveAsRead = {},
+                onMarkBelowAsRead = {},
+                onShareItem = {},
+                onTogglePinned = {},
+                onToggleBookmarked = {},
+                dropDownMenuExpanded = false,
+                onDismissDropdown = {},
+                imagePainter = { _, modifier ->
+                    Box {
+                        Image(
+                            painter = painterResource(id = R.drawable.placeholder_image_list_day_64dp),
+                            contentScale = ContentScale.Crop,
+                            contentDescription = null,
+                            modifier = modifier
+                                .width(64.dp)
+                                .fillMaxHeight()
+                        )
+                    }
+                }
+            )
+        }
+    }
 }

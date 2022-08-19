@@ -38,7 +38,6 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
@@ -68,8 +67,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -224,11 +221,6 @@ fun FeedListContent(
                             onSetBookmarked(previewItem.id, !previewItem.bookmarked)
                         },
                         imagePainter = { imageUrl, modifier ->
-                            val alpha: Float = if (previewItem.shouldBeShownAsUnread) {
-                                1.0f
-                            } else {
-                                0.5f
-                            }
                             Box {
                                 Image(
                                     painter = rememberImagePainter(
@@ -257,24 +249,7 @@ fun FeedListContent(
                                                     .fillMaxHeight()
                                             }
                                         }
-                                        .alpha(alpha)
                                 )
-                                if (previewItem.pinned) {
-                                    Icon(
-                                        Icons.Default.PushPin,
-                                        contentDescription = null,
-                                        tint = Color.Red.copy(alpha = 0.7f)
-                                    )
-                                }
-                                if (previewItem.bookmarked) {
-                                    Icon(
-                                        Icons.Default.Bookmark,
-                                        contentDescription = null,
-                                        tint = Color.Yellow.copy(alpha = 0.7f),
-                                        modifier = Modifier
-                                            .align(Alignment.TopEnd)
-                                    )
-                                }
                             }
                         }
                     )

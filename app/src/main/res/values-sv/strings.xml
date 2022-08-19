@@ -178,4 +178,12 @@
     <string name="bookmarks_filter">Bokmärken endast</string>
     <string name="bookmark_article">Bokmärk artikel</string>
     <string name="remove_bookmark">Ta bort bokmärke</string>
+    <string name="bookmarked">Bokmärkad</string>
+  <string name="pinned">Fäst</string>
+  <string name="new_indicator">Ny</string>
+  <string name="explanation_permission_notifications">Innan notiser kan aktiveras måste de tillåtas.</string>
+  <string name="dynamic_theme_use">Dynamiska färger</string>
+  <string name="use_detect_language">Identifiera språk</string>
+  <string name="only_available_on_android_n">Endast tillgänlig på Android %1$s eller senare</string>
+  <string name="description_for_read_aloud">Identifierar artikelspråk automatiskt</string>
 </resources>
