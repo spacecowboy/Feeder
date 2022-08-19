@@ -223,7 +223,7 @@ fun FeedListContent(
                         onToggleBookmarked = {
                             onSetBookmarked(previewItem.id, !previewItem.bookmarked)
                         },
-                        imagePainter = { imageUrl ->
+                        imagePainter = { imageUrl, modifier ->
                             val alpha: Float = if (previewItem.shouldBeShownAsUnread) {
                                 1.0f
                             } else {
@@ -243,7 +243,7 @@ fun FeedListContent(
                                     ),
                                     contentScale = ContentScale.Crop,
                                     contentDescription = null,
-                                    modifier = Modifier
+                                    modifier = modifier
                                         .run {
                                             when (viewState.feedItemStyle) {
                                                 FeedItemStyle.CARD ->

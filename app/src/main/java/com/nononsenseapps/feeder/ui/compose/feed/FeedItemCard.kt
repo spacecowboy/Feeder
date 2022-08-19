@@ -7,15 +7,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,7 +37,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 fun FeedItemCard(
     item: FeedListItem,
     showThumbnail: Boolean,
-    imagePainter: @Composable (String) -> Unit,
+    imagePainter: @Composable (String, Modifier) -> Unit,
     modifier: Modifier = Modifier,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
@@ -45,7 +47,7 @@ fun FeedItemCard(
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
 ) {
-    Card(
+    ElevatedCard(
         modifier = modifier
             .padding(
                 top = 8.dp,
@@ -61,7 +63,7 @@ fun FeedItemCard(
         ) {
             if (showThumbnail) {
                 item.imageUrl?.let { imageUrl ->
-                    imagePainter(imageUrl)
+                    imagePainter(imageUrl, Modifier.clip(RoundedCornerShape(12.dp)))
                 }
             }
             val titleAlpha = if (item.shouldBeShownAsUnread) {
@@ -205,7 +207,7 @@ private fun preview() {
             bookmarked = false,
         ),
         showThumbnail = true,
-        imagePainter = {},
+        imagePainter = { _, _ -> },
         onMarkAboveAsRead = {},
         onMarkBelowAsRead = {},
         onShareItem = {},

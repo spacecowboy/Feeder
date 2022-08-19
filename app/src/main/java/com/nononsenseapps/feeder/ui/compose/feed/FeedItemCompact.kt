@@ -43,7 +43,7 @@ val shortDateTimeFormat: DateTimeFormatter =
 fun FeedItemCompact(
     item: FeedListItem,
     showThumbnail: Boolean,
-    imagePainter: @Composable (String) -> Unit,
+    imagePainter: @Composable (String, Modifier) -> Unit,
     modifier: Modifier = Modifier,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
@@ -193,7 +193,7 @@ fun FeedItemCompact(
 
         if (showThumbnail) {
             item.imageUrl?.let { imageUrl ->
-                imagePainter(imageUrl)
+                imagePainter(imageUrl, Modifier)
             }
         }
     }
@@ -216,7 +216,7 @@ private fun preview() {
             bookmarked = false,
         ),
         showThumbnail = true,
-        imagePainter = {},
+        imagePainter = { _, _ -> },
         onMarkAboveAsRead = {},
         onMarkBelowAsRead = {},
         onShareItem = {},

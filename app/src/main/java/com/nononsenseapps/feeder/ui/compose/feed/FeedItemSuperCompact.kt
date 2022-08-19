@@ -35,7 +35,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 fun FeedItemSuperCompact(
     item: FeedListItem,
     showThumbnail: Boolean,
-    imagePainter: @Composable (String) -> Unit,
+    imagePainter: @Composable (String, Modifier) -> Unit,
     modifier: Modifier = Modifier,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
@@ -175,7 +175,7 @@ fun FeedItemSuperCompact(
 
         if (showThumbnail) {
             item.imageUrl?.let { imageUrl ->
-                imagePainter(imageUrl)
+                imagePainter(imageUrl, Modifier)
             }
         }
     }
@@ -198,7 +198,7 @@ private fun preview() {
             bookmarked = false,
         ),
         showThumbnail = true,
-        imagePainter = {},
+        imagePainter = { _, _ -> },
         onMarkAboveAsRead = {},
         onMarkBelowAsRead = {},
         onShareItem = {},
