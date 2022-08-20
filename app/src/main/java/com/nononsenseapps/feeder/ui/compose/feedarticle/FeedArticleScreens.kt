@@ -95,7 +95,7 @@ import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListContent
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
-import com.nononsenseapps.feeder.ui.compose.feed.ScreenWithFeedList
+import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
@@ -594,7 +594,7 @@ fun FeedWithArticleScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    ScreenWithFeedList(
+    FeedScreen(
         viewState = viewState,
         onRefreshVisible = onRefreshVisible,
         onOpenNavDrawer = {
@@ -1004,7 +1004,7 @@ fun FeedListScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    ScreenWithFeedList(
+    FeedScreen(
         viewState = viewState,
         onRefreshVisible = onRefreshVisible,
         onOpenNavDrawer = {

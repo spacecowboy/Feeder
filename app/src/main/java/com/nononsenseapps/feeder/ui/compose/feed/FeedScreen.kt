@@ -5,7 +5,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,24 +26,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.IconToggleButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -60,10 +44,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,9 +53,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import coil.annotation.ExperimentalCoilApi
@@ -82,12 +61,10 @@ import coil.size.PixelSize
 import coil.size.Precision
 import coil.size.Scale
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
@@ -263,359 +240,6 @@ fun FeedListContent(
 @Composable
 fun FeedScreen(
     viewState: FeedScreenViewState,
-    refreshState: SwipeRefreshState,
-    onRefreshVisible: () -> Unit,
-    onRefreshAll: () -> Unit,
-    onToggleOnlyUnread: (Boolean) -> Unit,
-    onToggleOnlyBookmarked: (Boolean) -> Unit,
-    onOpenNavDrawer: () -> Unit,
-    onDelete: (Iterable<Long>) -> Unit,
-    onAddFeed: () -> Unit,
-    onEditFeed: (Long) -> Unit,
-    onSettings: () -> Unit,
-    onSendFeedback: () -> Unit,
-    onImport: () -> Unit,
-    onExport: () -> Unit,
-    onMarkAllAsRead: () -> Unit,
-    readAloudOnPlay: () -> Unit,
-    readAloudOnPause: () -> Unit,
-    readAloudOnStop: () -> Unit,
-    content: @Composable (Modifier, () -> Unit) -> Unit,
-) {
-    var showMenu by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showDeleteDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showEditDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    val showingUnreadStateLabel = if (viewState.onlyUnread) {
-        stringResource(R.string.showing_only_unread_articles)
-    } else {
-        stringResource(R.string.showing_all_articles)
-    }
-
-    val showingBookmarksStateLabel = if (viewState.onlyBookmarked) {
-        stringResource(R.string.showing_only_bookmarked_articles)
-    } else {
-        stringResource(R.string.showing_all_articles)
-    }
-
-    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-        decayAnimationSpec,
-        rememberTopAppBarState()
-    )
-
-    Scaffold(
-        modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .statusBarsPadding()
-            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
-        topBar = {
-            SmallTopAppBar(
-                scrollBehavior = scrollBehavior,
-                title = {
-                    Text(
-                        viewState.feedScreenTitle.title ?: stringResource(id = R.string.all_feeds),
-                        maxLines = 2,
-                        modifier = Modifier
-                            .safeSemantics {
-                                testTag = "appBarTitle"
-                            }
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onOpenNavDrawer
-                    ) {
-                        Icon(
-                            Icons.Default.Menu,
-                            contentDescription = stringResource(R.string.navigation_drawer_open)
-                        )
-                    }
-                },
-                actions = {
-                    IconToggleButton(
-                        checked = viewState.onlyUnread,
-                        onCheckedChange = onToggleOnlyUnread,
-                        modifier = Modifier.semantics {
-                            stateDescription = showingUnreadStateLabel
-                        }
-                    ) {
-                        if (viewState.onlyUnread) {
-                            Icon(
-                                Icons.Default.VisibilityOff,
-                                contentDescription = null,
-                            )
-                        } else {
-                            Icon(
-                                Icons.Default.Visibility,
-                                contentDescription = null,
-                            )
-                        }
-                    }
-                    IconToggleButton(
-                        checked = viewState.onlyBookmarked,
-                        onCheckedChange = onToggleOnlyBookmarked,
-                        modifier = Modifier.semantics {
-                            stateDescription = showingBookmarksStateLabel
-                        }
-                    ) {
-                        Icon(
-                            Icons.Default.Bookmark,
-                            contentDescription = null,
-                        )
-                    }
-                    IconButton(
-                        onClick = onRefreshAll
-                    ) {
-                        Icon(
-                            Icons.Default.Refresh,
-                            contentDescription = stringResource(R.string.synchronize_feeds)
-                        )
-                    }
-
-                    Box {
-                        IconButton(
-                            onClick = { showMenu = true },
-                            modifier = Modifier
-                                .safeSemantics {
-                                    testTag = "menuButton"
-                                }
-                        ) {
-                            Icon(
-                                Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.open_menu),
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false },
-                            modifier = Modifier
-                                .safeSemantics {
-                                    testTag = "menu"
-                                }
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    showMenu = false
-                                    onAddFeed()
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuAddFeed"
-                                    },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Add,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.add_feed))
-                                },
-                            )
-                            DropdownMenuItem(
-                                onClick = {
-                                    if (viewState.visibleFeeds.size == 1) {
-                                        onEditFeed(viewState.visibleFeeds.first().id)
-                                    } else {
-                                        showEditDialog = true
-                                    }
-                                    showMenu = false
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuEditFeed"
-                                    },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Edit,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.edit_feed))
-                                },
-                            )
-                            DropdownMenuItem(
-                                onClick = {
-                                    showDeleteDialog = true
-                                    showMenu = false
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuDeleteFeed"
-                                    },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.delete_feed))
-                                }
-                            )
-                            Divider()
-                            DropdownMenuItem(
-                                onClick = {
-                                    showMenu = false
-                                    onImport()
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuImportFeeds"
-                                    },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.ImportExport,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.import_feeds_from_opml))
-                                }
-                            )
-                            Divider()
-                            DropdownMenuItem(
-                                onClick = {
-                                    showMenu = false
-                                    onExport()
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuExportFeeds"
-                                    },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.ImportExport,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.export_feeds_to_opml))
-                                }
-                            )
-                            Divider()
-                            DropdownMenuItem(
-                                onClick = {
-                                    showMenu = false
-                                    onSettings()
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuSettings"
-                                    },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Settings,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.action_settings))
-                                }
-                            )
-                            Divider()
-                            DropdownMenuItem(
-                                onClick = {
-                                    showMenu = false
-                                    onSendFeedback()
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuSendBugReport"
-                                    },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Email,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.send_bug_report))
-                                }
-                            )
-                        }
-                    }
-                }
-            )
-        },
-        bottomBar = {
-            HideableReadAloudPlayer(
-                visible = viewState.isReadAloudVisible,
-                currentlyPlaying = viewState.isReadAloudPlaying,
-                title = viewState.readAloudTitle,
-                onPlay = readAloudOnPlay,
-                onPause = readAloudOnPause,
-                onStop = readAloudOnStop,
-            )
-        },
-        floatingActionButton = {
-            if (viewState.showFab) {
-                FloatingActionButton(
-                    onClick = onMarkAllAsRead,
-                    modifier = Modifier.navigationBarsPadding(),
-                ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = stringResource(R.string.mark_all_as_read)
-                    )
-                }
-            }
-        }
-    ) { padding ->
-        SwipeRefresh(
-            state = refreshState,
-            onRefresh = onRefreshVisible,
-            indicatorPadding = padding,
-        ) {
-            content(
-                Modifier
-                    .padding(padding)
-            ) {
-                onOpenNavDrawer()
-            }
-        }
-
-        if (showDeleteDialog) {
-            DeleteFeedDialog(
-                feeds = ImmutableHolder(
-                    viewState.visibleFeeds.map {
-                        DeletableFeed(it.id, it.displayTitle)
-                    }
-                ),
-                onDismiss = { showDeleteDialog = false },
-                onDelete = onDelete
-            )
-        }
-
-        if (showEditDialog) {
-            EditFeedDialog(
-                feeds = ImmutableHolder(
-                    viewState.visibleFeeds.map {
-                        DeletableFeed(
-                            it.id,
-                            it.displayTitle
-                        )
-                    }
-                ),
-                onDismiss = { showEditDialog = false },
-                onEdit = onEditFeed
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ScreenWithFeedList(
-    viewState: FeedScreenViewState,
     onRefreshVisible: () -> Unit,
     onOpenNavDrawer: () -> Unit,
     onMarkAllAsRead: () -> Unit,
@@ -641,9 +265,7 @@ fun ScreenWithFeedList(
         refreshState.isRefreshing = false
     }
 
-    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-        decayAnimationSpec,
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         rememberTopAppBarState()
     )
 
