@@ -5,6 +5,10 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -91,20 +95,23 @@ import net.glxn.qrgen.core.scheme.Url
 @Composable
 private fun SyncScaffold(
     onNavigateUp: () -> Unit,
+    leaveSyncVisible: Boolean,
     onLeaveSyncChain: () -> Unit,
+    title: String,
     content: @Composable (Modifier) -> Unit
 ) {
     var showToolbar by rememberSaveable {
         mutableStateOf(false)
     }
     Scaffold(
-        modifier = Modifier.statusBarsPadding()
+        modifier = Modifier
+            .statusBarsPadding()
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         topBar = {
             SmallTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.device_sync),
+                        text = title,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -118,26 +125,28 @@ private fun SyncScaffold(
                     }
                 },
                 actions = {
-                    Box {
-                        IconButton(onClick = { showToolbar = true }) {
-                            Icon(
-                                Icons.Default.MoreVert,
-                                contentDescription = stringResource(id = R.string.open_menu),
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showToolbar,
-                            onDismissRequest = { showToolbar = false }
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    showToolbar = false
-                                    onLeaveSyncChain()
-                                },
-                                text = {
-                                    Text(stringResource(R.string.leave_sync_chain))
-                                }
-                            )
+                    if (leaveSyncVisible) {
+                        Box {
+                            IconButton(onClick = { showToolbar = true }) {
+                                Icon(
+                                    Icons.Default.MoreVert,
+                                    contentDescription = stringResource(id = R.string.open_menu),
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showToolbar,
+                                onDismissRequest = { showToolbar = false }
+                            ) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        showToolbar = false
+                                        onLeaveSyncChain()
+                                    },
+                                    text = {
+                                        Text(stringResource(R.string.leave_sync_chain))
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -166,6 +175,10 @@ fun SyncScreen(
         viewState = viewState,
     )
 
+    var previousScreen: SyncScreenType? by remember {
+        mutableStateOf(null)
+    }
+
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -188,18 +201,22 @@ fun SyncScreen(
 
     SyncScreen(
         viewState = viewState,
-        syncScreenType = syncScreenType,
+        targetScreen = syncScreenType,
+        previousScreen = previousScreen,
         onLeaveSyncSettings = onNavigateUp,
         onLeaveAddDevice = {
+            previousScreen = SyncScreenType.SINGLE_ADD_DEVICE
             viewModel.setScreen(SyncScreenToShow.DEVICELIST)
         },
         onLeaveSyncJoin = {
+            previousScreen = SyncScreenType.SINGLE_JOIN
             viewModel.setScreen(SyncScreenToShow.SETUP)
         },
         onJoinSyncChain = { syncCode, secretKey ->
             viewModel.joinSyncChain(syncCode = syncCode, secretKey = secretKey)
         },
         onAddNewDevice = {
+            previousScreen = SyncScreenType.SINGLE_DEVICELIST
             viewModel.setScreen(SyncScreenToShow.ADD_DEVICE)
         },
         onDeleteDevice = {
@@ -210,6 +227,7 @@ fun SyncScreen(
             }
         },
         onLeaveSyncChain = {
+            previousScreen = SyncScreenType.SINGLE_DEVICELIST
             showLeaveSyncChainDialog = true
         },
         onScanSyncCode = {
@@ -252,7 +270,8 @@ fun SyncScreen(
 @Composable
 fun SyncScreen(
     viewState: SyncScreenViewState,
-    syncScreenType: SyncScreenType,
+    targetScreen: SyncScreenType,
+    previousScreen: SyncScreenType?,
     onLeaveSyncSettings: () -> Unit,
     onLeaveAddDevice: () -> Unit,
     onLeaveSyncJoin: () -> Unit,
@@ -267,63 +286,99 @@ fun SyncScreen(
     devices: ImmutableHolder<List<SyncDevice>>,
     onLeaveSyncChain: () -> Unit,
 ) {
-    when (syncScreenType) {
-        SyncScreenType.DUAL -> {
-            DualSyncScreen(
-                onNavigateUp = onLeaveSyncSettings,
-                leftScreenToShow = viewState.leftScreenToShow,
-                rightScreenToShow = viewState.rightScreenToShow,
-                onScanSyncCode = onScanSyncCode,
-                onStartNewSyncChain = onStartNewSyncChain,
-                onAddNewDevice = onAddNewDevice,
-                onDeleteDevice = onDeleteDevice,
-                currentDeviceId = currentDeviceId,
-                devices = devices,
-                addDeviceUrl = ImmutableHolder(viewState.addNewDeviceUrl),
-                onJoinSyncChain = onJoinSyncChain,
-                syncCode = viewState.syncCode,
-                onSetSyncCode = onSetSyncCode,
-                onLeaveSyncChain = onLeaveSyncChain,
-                secretKey = viewState.secretKey,
-                onSetSecretKey = onSetSecretKey,
-            )
-        }
-        SyncScreenType.SINGLE_SETUP -> {
-            SyncSetupScreen(
-                onNavigateUp = onLeaveSyncSettings,
-                onScanSyncCode = onScanSyncCode,
-                onStartNewSyncChain = onStartNewSyncChain,
-                onLeaveSyncChain = onLeaveSyncChain,
-            )
-        }
-        SyncScreenType.SINGLE_DEVICELIST -> {
-            SyncDeviceListScreen(
-                onNavigateUp = onLeaveSyncSettings,
-                currentDeviceId = currentDeviceId,
-                devices = devices,
-                onAddNewDevice = onAddNewDevice,
-                onDeleteDevice = onDeleteDevice,
-                onLeaveSyncChain = onLeaveSyncChain,
-            )
-        }
-        SyncScreenType.SINGLE_ADD_DEVICE -> {
-            SyncAddNewDeviceScreen(
-                onNavigateUp = onLeaveAddDevice,
-                syncUrl = ImmutableHolder(viewState.addNewDeviceUrl),
-                onLeaveSyncChain = onLeaveSyncChain,
-            )
-        }
-        SyncScreenType.SINGLE_JOIN -> {
-            SyncJoinScreen(
-                onNavigateUp = onLeaveSyncJoin,
-                onJoinSyncChain = onJoinSyncChain,
-                syncCode = viewState.syncCode,
-                onSetSyncCode = onSetSyncCode,
-                onLeaveSyncChain = onLeaveSyncChain,
-                secretKey = viewState.secretKey,
-                onSetSecretKey = onSetSecretKey,
-            )
-        }
+    // TODO leave sync screen menu option should only be present if already in a sync chain
+    // TODO make screens scrollable
+
+    if (targetScreen == SyncScreenType.DUAL) {
+        DualSyncScreen(
+            onNavigateUp = onLeaveSyncSettings,
+            leftScreenToShow = viewState.leftScreenToShow,
+            rightScreenToShow = viewState.rightScreenToShow,
+            onScanSyncCode = onScanSyncCode,
+            onStartNewSyncChain = onStartNewSyncChain,
+            onAddNewDevice = onAddNewDevice,
+            onDeleteDevice = onDeleteDevice,
+            currentDeviceId = currentDeviceId,
+            devices = devices,
+            addDeviceUrl = ImmutableHolder(viewState.addNewDeviceUrl),
+            onJoinSyncChain = onJoinSyncChain,
+            syncCode = viewState.syncCode,
+            onSetSyncCode = onSetSyncCode,
+            onLeaveSyncChain = onLeaveSyncChain,
+            secretKey = viewState.secretKey,
+            onSetSecretKey = onSetSecretKey,
+        )
+    }
+
+    AnimatedVisibility(
+        visible = targetScreen == SyncScreenType.SINGLE_SETUP,
+        enter = slideInHorizontally(tween(256), initialOffsetX = { -it }),
+        exit = slideOutHorizontally(tween(256), targetOffsetX = { -it }),
+    ) {
+        SyncSetupScreen(
+            onNavigateUp = onLeaveSyncSettings,
+            onScanSyncCode = onScanSyncCode,
+            onStartNewSyncChain = onStartNewSyncChain,
+            onLeaveSyncChain = onLeaveSyncChain,
+        )
+    }
+
+    AnimatedVisibility(
+        visible = targetScreen == SyncScreenType.SINGLE_JOIN,
+        enter = slideInHorizontally(tween(256), initialOffsetX = { it }),
+        exit = slideOutHorizontally(tween(256), targetOffsetX = {
+            when (targetScreen) {
+                SyncScreenType.SINGLE_DEVICELIST -> -it
+                else -> it
+            }
+        }),
+    ) {
+        SyncJoinScreen(
+            onNavigateUp = onLeaveSyncJoin,
+            onJoinSyncChain = onJoinSyncChain,
+            syncCode = viewState.syncCode,
+            onSetSyncCode = onSetSyncCode,
+            onLeaveSyncChain = onLeaveSyncChain,
+            secretKey = viewState.secretKey,
+            onSetSecretKey = onSetSecretKey,
+        )
+    }
+
+    AnimatedVisibility(
+        visible = targetScreen == SyncScreenType.SINGLE_DEVICELIST,
+        enter = slideInHorizontally(tween(256), initialOffsetX = {
+            when (previousScreen) {
+                SyncScreenType.SINGLE_ADD_DEVICE -> -it
+                else -> it
+            }
+        }),
+        exit = slideOutHorizontally(tween(256), targetOffsetX = {
+            when (targetScreen) {
+                SyncScreenType.SINGLE_ADD_DEVICE -> -it
+                else -> it
+            }
+        }),
+    ) {
+        SyncDeviceListScreen(
+            onNavigateUp = onLeaveSyncSettings,
+            currentDeviceId = currentDeviceId,
+            devices = devices,
+            onAddNewDevice = onAddNewDevice,
+            onDeleteDevice = onDeleteDevice,
+            onLeaveSyncChain = onLeaveSyncChain,
+        )
+    }
+
+    AnimatedVisibility(
+        visible = targetScreen == SyncScreenType.SINGLE_ADD_DEVICE,
+        enter = slideInHorizontally(tween(256), initialOffsetX = { it }),
+        exit = slideOutHorizontally(tween(256), targetOffsetX = { it }),
+    ) {
+        SyncAddNewDeviceScreen(
+            onNavigateUp = onLeaveAddDevice,
+            syncUrl = ImmutableHolder(viewState.addNewDeviceUrl),
+            onLeaveSyncChain = onLeaveSyncChain,
+        )
     }
 }
 
@@ -372,6 +427,8 @@ fun DualSyncScreen(
     BackHandler(onBack = onNavigateUp)
 
     SyncScaffold(
+        leaveSyncVisible = leftScreenToShow == LeftScreenToShow.DEVICELIST,
+        title = stringResource(id = R.string.device_sync),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
@@ -434,6 +491,8 @@ fun SyncSetupScreen(
     BackHandler(onBack = onNavigateUp)
 
     SyncScaffold(
+        leaveSyncVisible = false,
+        title = stringResource(id = R.string.device_sync),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
@@ -544,6 +603,8 @@ fun SyncJoinScreen(
     BackHandler(onBack = onNavigateUp)
 
     SyncScaffold(
+        leaveSyncVisible = false,
+        title = stringResource(id = R.string.join_sync_chain),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
@@ -626,6 +687,8 @@ fun SyncDeviceListScreen(
     BackHandler(onBack = onNavigateUp)
 
     SyncScaffold(
+        leaveSyncVisible = true,
+        title = stringResource(id = R.string.device_sync),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
@@ -800,8 +863,10 @@ fun SyncAddNewDeviceScreen(
     BackHandler(onBack = onNavigateUp)
 
     SyncScaffold(
+        leaveSyncVisible = false,
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
+        title = stringResource(id = R.string.add_new_device),
     ) { modifier ->
         SyncAddNewDeviceContent(
             modifier = modifier,
