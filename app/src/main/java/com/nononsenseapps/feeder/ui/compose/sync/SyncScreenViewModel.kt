@@ -93,6 +93,7 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         viewModelScope.launch {
             syncClient.leave()
             setSyncCode("")
+            setSecretKey("")
             setScreen(SyncScreenToShow.SETUP)
         }
     }

@@ -7,12 +7,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +31,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -49,7 +49,10 @@ import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -61,6 +64,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -103,12 +107,19 @@ private fun SyncScaffold(
     var showToolbar by rememberSaveable {
         mutableStateOf(false)
     }
+    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        decayAnimationSpec,
+        rememberTopAppBarState()
+    )
     Scaffold(
         modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
             .statusBarsPadding()
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         topBar = {
             SmallTopAppBar(
+                scrollBehavior = scrollBehavior,
                 title = {
                     Text(
                         text = title,
@@ -286,9 +297,6 @@ fun SyncScreen(
     devices: ImmutableHolder<List<SyncDevice>>,
     onLeaveSyncChain: () -> Unit,
 ) {
-    // TODO leave sync screen menu option should only be present if already in a sync chain
-    // TODO make screens scrollable
-
     if (targetScreen == SyncScreenType.DUAL) {
         DualSyncScreen(
             onNavigateUp = onLeaveSyncSettings,
@@ -426,6 +434,12 @@ fun DualSyncScreen(
 ) {
     BackHandler(onBack = onNavigateUp)
 
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(key1 = leftScreenToShow) {
+        scrollState.scrollTo(0)
+    }
+
     SyncScaffold(
         leaveSyncVisible = leftScreenToShow == LeftScreenToShow.DEVICELIST,
         title = stringResource(id = R.string.device_sync),
@@ -433,7 +447,8 @@ fun DualSyncScreen(
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
         Row(
-            modifier = modifier,
+            modifier = modifier
+                .verticalScroll(scrollState),
         ) {
             when (leftScreenToShow) {
                 LeftScreenToShow.SETUP -> {
@@ -489,6 +504,7 @@ fun SyncSetupScreen(
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
+    val scrollState = rememberScrollState()
 
     SyncScaffold(
         leaveSyncVisible = false,
@@ -497,7 +513,7 @@ fun SyncSetupScreen(
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
         SyncSetupContent(
-            modifier = modifier,
+            modifier = modifier.verticalScroll(scrollState),
             onScanSyncCode = onScanSyncCode,
             onStartNewSyncChain = onStartNewSyncChain,
         )
@@ -601,6 +617,7 @@ fun SyncJoinScreen(
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
+    val scrollState = rememberScrollState()
 
     SyncScaffold(
         leaveSyncVisible = false,
@@ -609,7 +626,7 @@ fun SyncJoinScreen(
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
         SyncJoinContent(
-            modifier = modifier,
+            modifier = modifier.verticalScroll(scrollState),
             onJoinSyncChain = onJoinSyncChain,
             syncCode = syncCode,
             onSetSyncCode = onSetSyncCode,
@@ -685,6 +702,7 @@ fun SyncDeviceListScreen(
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
+    val scrollState = rememberScrollState()
 
     SyncScaffold(
         leaveSyncVisible = true,
@@ -693,7 +711,7 @@ fun SyncDeviceListScreen(
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
         SyncDeviceListContent(
-            modifier = modifier,
+            modifier = modifier.verticalScroll(scrollState),
             currentDeviceId = currentDeviceId,
             devices = devices,
             onAddNewDevice = onAddNewDevice,
@@ -861,6 +879,7 @@ fun SyncAddNewDeviceScreen(
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
+    val scrollState = rememberScrollState()
 
     SyncScaffold(
         leaveSyncVisible = false,
@@ -869,7 +888,7 @@ fun SyncAddNewDeviceScreen(
         title = stringResource(id = R.string.add_new_device),
     ) { modifier ->
         SyncAddNewDeviceContent(
-            modifier = modifier,
+            modifier = modifier.verticalScroll(scrollState),
             syncUrl = syncUrl,
         )
     }
@@ -902,10 +921,10 @@ fun SyncAddNewDeviceContent(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = dimens.margin, vertical = 8.dp)
-            .scrollable(
-                state = rememberScrollState(),
-                orientation = Orientation.Vertical,
-            )
+//            .scrollable(
+//                state = rememberScrollState(),
+//                orientation = Orientation.Vertical,
+//            )
     ) {
         Text(
             text = stringResource(R.string.press_scan_sync),
@@ -984,6 +1003,7 @@ fun PreviewDualSyncScreenDeviceList() {
 }
 
 @Preview("Setup Tablet", device = Devices.PIXEL_C)
+@Preview("Setup Foldable", device = Devices.FOLDABLE, widthDp = 720, heightDp = 360)
 @Composable
 fun PreviewDualSyncScreenSetup() {
     FeederTheme {
