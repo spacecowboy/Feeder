@@ -7,6 +7,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -320,8 +322,20 @@ fun SyncScreen(
 
     AnimatedVisibility(
         visible = targetScreen == SyncScreenType.SINGLE_SETUP,
-        enter = slideInHorizontally(tween(256), initialOffsetX = { -it }),
-        exit = slideOutHorizontally(tween(256), targetOffsetX = { -it }),
+        enter = when (previousScreen) {
+            null -> fadeIn(initialAlpha = 1.0f)
+            else -> slideInHorizontally(tween(256), initialOffsetX = { -it })
+        },
+        /*
+        This may seem weird - but it's a special case. This exit animation actually runs
+        when the first screen is device list. So to prevent a flicker effect it's important to block
+        sideways movement. The setup screen will be momentarily on screen because it takes
+        a few millis to fetch the sync remote.
+         */
+        exit = when (previousScreen) {
+            null -> fadeOut(targetAlpha = 1.0f)
+            else -> slideOutHorizontally(tween(256), targetOffsetX = { -it })
+        },
     ) {
         SyncSetupScreen(
             onNavigateUp = onLeaveSyncSettings,
@@ -354,12 +368,14 @@ fun SyncScreen(
 
     AnimatedVisibility(
         visible = targetScreen == SyncScreenType.SINGLE_DEVICELIST,
-        enter = slideInHorizontally(tween(256), initialOffsetX = {
-            when (previousScreen) {
-                SyncScreenType.SINGLE_ADD_DEVICE -> -it
-                else -> it
-            }
-        }),
+        enter = when (previousScreen) {
+            SyncScreenType.SINGLE_ADD_DEVICE -> slideInHorizontally(
+                tween(256),
+                initialOffsetX = { -it }
+            )
+            null -> fadeIn(initialAlpha = 1.0f)
+            else -> slideInHorizontally(tween(256), initialOffsetX = { it })
+        },
         exit = slideOutHorizontally(tween(256), targetOffsetX = {
             when (targetScreen) {
                 SyncScreenType.SINGLE_ADD_DEVICE -> -it
