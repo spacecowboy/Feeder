@@ -4,12 +4,15 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
@@ -23,6 +26,7 @@ import org.kodein.di.compose.withDI
  * This activity should only be started via a Send (share) or Open URL/Text intent.
  */
 class AddFeedFromShareActivity : DIAwareComponentActivity() {
+    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,9 +48,35 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                     darkThemePreference = darkThemePreference,
                     dynamicColors = dynamicColors,
                 ) {
-                    val navController = rememberNavController()
-                    NavHost(navController, startDestination = "search") {
-                        composable("search") { backStackEntry ->
+                    val navController = rememberAnimatedNavController()
+                    AnimatedNavHost(navController, startDestination = "search") {
+                        composable(
+                            "search",
+                            enterTransition = {
+                                slideIntoContainer(
+                                    AnimatedContentScope.SlideDirection.Left,
+                                    animationSpec = tween(256)
+                                )
+                            },
+                            exitTransition = {
+                                slideOutOfContainer(
+                                    AnimatedContentScope.SlideDirection.Left,
+                                    animationSpec = tween(256)
+                                )
+                            },
+                            popEnterTransition = {
+                                slideIntoContainer(
+                                    AnimatedContentScope.SlideDirection.Right,
+                                    animationSpec = tween(256)
+                                )
+                            },
+                            popExitTransition = {
+                                slideOutOfContainer(
+                                    AnimatedContentScope.SlideDirection.Right,
+                                    animationSpec = tween(256)
+                                )
+                            },
+                        ) { backStackEntry ->
                             SearchFeedScreen(
                                 windowSize = windowSize,
                                 onNavigateUp = {
@@ -66,6 +96,30 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                             route = AddFeedDestination.route,
                             arguments = AddFeedDestination.arguments,
                             deepLinks = AddFeedDestination.deepLinks,
+                            enterTransition = {
+                                slideIntoContainer(
+                                    AnimatedContentScope.SlideDirection.Left,
+                                    animationSpec = tween(256)
+                                )
+                            },
+                            exitTransition = {
+                                slideOutOfContainer(
+                                    AnimatedContentScope.SlideDirection.Left,
+                                    animationSpec = tween(256)
+                                )
+                            },
+                            popEnterTransition = {
+                                slideIntoContainer(
+                                    AnimatedContentScope.SlideDirection.Right,
+                                    animationSpec = tween(256)
+                                )
+                            },
+                            popExitTransition = {
+                                slideOutOfContainer(
+                                    AnimatedContentScope.SlideDirection.Right,
+                                    animationSpec = tween(256)
+                                )
+                            },
                         ) { backStackEntry ->
                             CreateFeedScreen(
                                 windowSize = windowSize,
