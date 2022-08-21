@@ -178,4 +178,8 @@
     <string name="bookmark_article">Añadir artículo a marcadores</string>
     <string name="permission_read_desc">Permite a la aplicación leer fuentes y artículos</string>
     <string name="permission_read_label">Acceso de solo lectura</string>
+    <string name="use_detect_language">Detectar idioma</string>
+    <string name="use_detect_language_not_available">Disponible solo en Android 10 y superior</string>
+    <string name="description_for_read_aloud">Detecta automáticamente el idioma del artículo</string>
+    <string name="explanation_permission_notifications">Se debe otorgar permiso antes de habilitar las notificaciones.</string>
 </resources>
