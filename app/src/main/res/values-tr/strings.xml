@@ -178,4 +178,8 @@
     <string name="remove_bookmark">Yer imini kaldır</string>
     <string name="permission_read_desc">Uygulamanın yayınları ve makaleleri okumasına izin verir</string>
     <string name="permission_read_label">Feeder salt okunur erişim</string>
+    <string name="use_detect_language">Dili algıla</string>
+    <string name="use_detect_language_not_available">Yalnızca Android 10 ve üzerinde kullanılabilir</string>
+    <string name="description_for_read_aloud">Makale dilini otomatik olarak algılar</string>
+    <string name="explanation_permission_notifications">Bildirimlerin etkinleştirilebilmesi için önce izin verilmelidir.</string>
 </resources>
