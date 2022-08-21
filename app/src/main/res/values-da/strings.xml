@@ -178,4 +178,8 @@
     <string name="remove_bookmark">Fjern bogmærke</string>
     <string name="permission_read_label">Feeder skrivebeskyttet adgang</string>
     <string name="permission_read_desc">Gør det muligt for applikationen at læse feeds og artikler</string>
+    <string name="use_detect_language">Registrer sprog</string>
+    <string name="description_for_read_aloud">Registrerer artiklens sprog automatisk</string>
+    <string name="use_detect_language_not_available">Kun tilgængelig på Android 10 og nyere</string>
+    <string name="explanation_permission_notifications">Der skal gives tilladelse, før notifikationer kan aktiveres.</string>
 </resources>
