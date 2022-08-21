@@ -157,8 +157,12 @@ private fun ThemeOptions.getColorScheme(
     }
 
     val colorScheme = when {
-        dynamicColors && dark -> dynamicDarkColorScheme(LocalContext.current)
-        dynamicColors && !dark -> dynamicLightColorScheme(LocalContext.current)
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && dynamicColors && dark -> {
+            dynamicDarkColorScheme(LocalContext.current)
+        }
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && dynamicColors && !dark -> {
+            dynamicLightColorScheme(LocalContext.current)
+        }
         dark -> darkColors
         else -> lightColors
     }
