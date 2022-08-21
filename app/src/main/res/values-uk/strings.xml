@@ -178,4 +178,8 @@
     <string name="remove_bookmark">Вилучити закладку</string>
     <string name="permission_read_desc">Дозволяє програмі читати стрічки і статті</string>
     <string name="permission_read_label">Доступ лише для читання для Feeder</string>
+    <string name="use_detect_language">Визначити мову</string>
+    <string name="description_for_read_aloud">Автоматично визначати мову статті</string>
+    <string name="use_detect_language_not_available">Можливо лише на Android 10 і вище</string>
+    <string name="explanation_permission_notifications">Дозвіл має бути наданий перед увімкненням сповіщень.</string>
 </resources>
