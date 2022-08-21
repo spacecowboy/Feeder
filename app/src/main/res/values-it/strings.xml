@@ -178,4 +178,7 @@
     <string name="showing_only_bookmarked_articles">Mostra solo gli articoli inseriti nei segnalibri</string>
     <string name="bookmark_article">Aggiungi un segnalibro</string>
     <string name="remove_bookmark">Rimuovi il segnalibro</string>
+    <string name="use_detect_language_not_available">Disponibile solo su Android 10 e versioni successive</string>
+    <string name="description_for_read_aloud">Rileva automaticamente la lingua dell\'articolo</string>
+    <string name="use_detect_language">Rilevare la lingua</string>
 </resources>
