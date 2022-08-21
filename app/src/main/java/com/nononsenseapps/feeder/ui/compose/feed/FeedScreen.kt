@@ -3,14 +3,19 @@ package com.nononsenseapps.feeder.ui.compose.feed
 import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,12 +51,12 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
@@ -72,6 +77,7 @@ import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
@@ -136,9 +142,7 @@ fun FeedListContent(
             LazyColumn(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(
-                    bottom = if (viewState.bottomBarVisible) (80 + 40).dp else 80.dp
-                ),
+                contentPadding = if (viewState.isBottomBarVisible) PaddingValues(0.dp) else WindowInsets.navigationBars.asPaddingValues(),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
@@ -269,6 +273,22 @@ fun FeedScreen(
         rememberTopAppBarState()
     )
 
+    val floatingActionButton: @Composable () -> Unit = {
+        FloatingActionButton(
+            onClick = onMarkAllAsRead,
+            modifier = Modifier.navigationBarsPadding(),
+        ) {
+            Icon(
+                Icons.Default.Check,
+                contentDescription = stringResource(R.string.mark_all_as_read)
+            )
+        }
+    }
+    val bottomBarVisibleState = remember { MutableTransitionState(viewState.isBottomBarVisible) }
+    LaunchedEffect(viewState.isBottomBarVisible) {
+        bottomBarVisibleState.targetState = viewState.isBottomBarVisible
+    }
+
     Scaffold(
         topBar = {
             SmallTopAppBar(
@@ -294,24 +314,28 @@ fun FeedScreen(
         },
         bottomBar = {
             HideableReadAloudPlayer(
-                visible = viewState.isReadAloudVisible,
+                visibleState = bottomBarVisibleState,
                 currentlyPlaying = viewState.isReadAloudPlaying,
-                title = viewState.readAloudTitle,
                 onPlay = readAloudOnPlay,
                 onPause = readAloudOnPause,
                 onStop = readAloudOnStop,
+                floatingActionButton = when (viewState.showFab) {
+                    true -> floatingActionButton
+                    false -> null
+                }
             )
         },
         floatingActionButton = {
             if (viewState.showFab) {
-                FloatingActionButton(
-                    onClick = onMarkAllAsRead,
-                    modifier = Modifier.navigationBarsPadding(),
+                val pixelPadding = with(LocalDensity.current) {
+                    16.dp.toPx().roundToInt() + WindowInsets.navigationBars.getBottom(this)
+                }
+                AnimatedVisibility(
+                    visible = bottomBarVisibleState.isIdle && !bottomBarVisibleState.targetState,
+                    enter = slideInVertically(initialOffsetY = { it + pixelPadding }, animationSpec = tween(256)),
+                    exit = slideOutVertically(targetOffsetY = { it + pixelPadding }, animationSpec = tween(256)),
                 ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = stringResource(R.string.mark_all_as_read)
-                    )
+                    floatingActionButton()
                 }
             }
         },

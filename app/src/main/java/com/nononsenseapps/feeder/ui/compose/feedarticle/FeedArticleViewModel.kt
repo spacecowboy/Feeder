@@ -293,7 +293,7 @@ class FeedArticleViewModel(
                 textToDisplay = getTextToDisplayFor(article.id),
                 readAloudTitle = params[18] as String,
                 isReadAloudPlaying = readAloudState == PlaybackStatus.PLAYING,
-                isReadAloudVisible = readAloudState != PlaybackStatus.STOPPED,
+                isBottomBarVisible = readAloudState != PlaybackStatus.STOPPED,
                 articleId = article.id,
                 isArticleOpen = params[14] as Boolean,
                 swipeAsRead = params[20] as SwipeAsRead,
@@ -414,8 +414,7 @@ interface FeedScreenViewState {
     val drawerItemsWithUnreadCounts: List<DrawerItemWithUnreadCount>
     val feedItemStyle: FeedItemStyle
     val expandedTags: Set<String>
-    val bottomBarVisible: Boolean
-    val isReadAloudVisible: Boolean
+    val isBottomBarVisible: Boolean
     val isReadAloudPlaying: Boolean
     val readAloudTitle: String
     val showToolbarMenu: Boolean
@@ -427,7 +426,7 @@ interface FeedScreenViewState {
 
 interface ArticleScreenViewState {
     val useDetectLanguage: Boolean
-    val isReadAloudVisible: Boolean
+    val isBottomBarVisible: Boolean
     val isReadAloudPlaying: Boolean
     val readAloudTitle: String
     val articleFeedUrl: String?
@@ -461,8 +460,7 @@ data class FeedArticleScreenViewState(
     override val drawerItemsWithUnreadCounts: List<DrawerItemWithUnreadCount> = emptyList(),
     override val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
     override val expandedTags: Set<String> = emptySet(),
-    override val bottomBarVisible: Boolean = false,
-    override val isReadAloudVisible: Boolean = false,
+    override val isBottomBarVisible: Boolean = false,
     override val isReadAloudPlaying: Boolean = false,
     override val readAloudTitle: String = "",
     override val showToolbarMenu: Boolean = false,

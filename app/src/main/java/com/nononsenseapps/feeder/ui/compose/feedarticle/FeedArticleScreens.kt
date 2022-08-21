@@ -4,8 +4,13 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.rememberSplineBasedDecay
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -373,123 +378,131 @@ private fun FeedArticleScreen(
     pagedFeedItems: LazyPagingItems<FeedListItem>,
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 ) {
-    when (feedArticleScreenType) {
-        FeedArticleScreenType.FeedWithArticleDetails -> {
-            ScreenWithNavDrawer(
-                drawerState = drawerState,
-                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
-                expandedTags = ImmutableHolder(viewState.expandedTags),
-                onToggleTagExpansion = onToggleTagExpansion,
-                onDrawerItemSelected = onDrawerItemSelected,
-                content = {
-                    FeedWithArticleScreen(
-                        viewState = viewState.copy(showFab = false),
-                        onRefreshVisible = onRefreshVisible,
-                        onRefreshAll = onRefreshAll,
-                        onToggleOnlyUnread = onToggleOnlyUnread,
-                        onToggleOnlyBookmarked = onToggleOnlyBookmarked,
-                        onMarkAllAsRead = onMarkAllAsRead,
-                        onShowToolbarMenu = onShowToolbarMenu,
-                        readAloudOnPlay = readAloudOnPlay,
-                        readAloudOnPause = readAloudOnPause,
-                        readAloudOnStop = readAloudOnStop,
-                        onOpenInCustomTab = onOpenInCustomTab,
-                        onAddFeed = onAddFeed,
-                        onEditFeed = onEditFeed,
-                        onShowEditDialog = onShowEditDialog,
-                        onDismissEditDialog = onDismissEditDialog,
-                        onDeleteFeeds = onDeleteFeeds,
-                        onShowDeleteDialog = onShowDeleteDialog,
-                        onDismissDeleteDialog = onDismissDeleteDialog,
-                        onSettings = onSettings,
-                        onSendFeedback = onSendFeedback,
-                        onImport = onImport,
-                        onExport = onExport,
-                        drawerState = drawerState,
-                        onShareArticle = onShareArticle,
-                        markAsUnread = markAsUnread,
-                        markBeforeAsRead = markBeforeAsRead,
-                        markAfterAsRead = markAfterAsRead,
-                        onOpenFeedItem = onOpenFeedItem,
-                        onInteractWithList = onInteractWithList,
-                        onInteractWithArticle = onInteractWithArticle,
-                        onFeedTitleClick = onFeedTitleClick,
-                        onToggleFullText = onToggleFullText,
-                        displayFullText = displayFullText,
-                        onToggleCurrentArticlePinned = onToggleCurrentArticlePinned,
-                        onSetPinned = onSetPinned,
-                        onToggleCurrentArticleBookmarked = onToggleCurrentArticleBookmarked,
-                        onSetBookmarked = onSetBookmarked,
-                        feedListState = feedListState,
-                        articleListState = articleListState,
-                        pagedFeedItems = pagedFeedItems,
-                    )
-                }
-            )
-        }
-        FeedArticleScreenType.Feed -> {
-            ScreenWithNavDrawer(
-                drawerState = drawerState,
-                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
-                expandedTags = ImmutableHolder(viewState.expandedTags),
-                onToggleTagExpansion = onToggleTagExpansion,
-                onDrawerItemSelected = onDrawerItemSelected,
-                content = {
-                    FeedListScreen(
-                        viewState = viewState,
-                        onRefreshVisible = onRefreshVisible,
-                        onRefreshAll = onRefreshAll,
-                        onToggleOnlyUnread = onToggleOnlyUnread,
-                        onToggleOnlyBookmarked = onToggleOnlyBookmarked,
-                        onMarkAllAsRead = onMarkAllAsRead,
-                        onShowToolbarMenu = onShowToolbarMenu,
-                        readAloudOnPlay = readAloudOnPlay,
-                        readAloudOnPause = readAloudOnPause,
-                        readAloudOnStop = readAloudOnStop,
-                        onAddFeed = onAddFeed,
-                        onEditFeed = onEditFeed,
-                        onShowEditDialog = onShowEditDialog,
-                        onDismissEditDialog = onDismissEditDialog,
-                        onDeleteFeeds = onDeleteFeeds,
-                        onShowDeleteDialog = onShowDeleteDialog,
-                        onDismissDeleteDialog = onDismissDeleteDialog,
-                        onSettings = onSettings,
-                        onSendFeedback = onSendFeedback,
-                        onImport = onImport,
-                        onExport = onExport,
-                        drawerState = drawerState,
-                        markAsUnread = markAsUnread,
-                        markBeforeAsRead = markBeforeAsRead,
-                        markAfterAsRead = markAfterAsRead,
-                        onOpenFeedItem = onOpenFeedItem,
-                        onSetPinned = onSetPinned,
-                        onSetBookmarked = onSetBookmarked,
-                        feedListState = feedListState,
-                        pagedFeedItems = pagedFeedItems,
-                    )
-                }
-            )
-        }
-        FeedArticleScreenType.ArticleDetails -> {
-            ArticleScreen(
-                viewState = viewState,
-                onToggleFullText = onToggleFullText,
-                onMarkAsUnread = onMarkAsUnread,
-                onShare = onShareArticle,
-                onOpenInCustomTab = onOpenInCustomTab,
-                onFeedTitleClick = onFeedTitleClick,
-                onShowToolbarMenu = onShowToolbarMenu,
-                onInteractWithArticle = onInteractWithArticle,
-                displayFullText = displayFullText,
-                readAloudOnPlay = readAloudOnPlay,
-                readAloudOnPause = readAloudOnPause,
-                readAloudOnStop = readAloudOnStop,
-                onTogglePinned = onToggleCurrentArticlePinned,
-                onToggleBookmarked = onToggleCurrentArticleBookmarked,
-                articleListState = articleListState,
-                onNavigateUp = onNavigateUpFromArticle,
-            )
-        }
+    AnimatedVisibility(
+        visible = feedArticleScreenType == FeedArticleScreenType.Feed,
+        enter = slideInHorizontally(tween(256), initialOffsetX = { -it }),
+        exit = slideOutHorizontally(tween(256), targetOffsetX = { -it }),
+    ) {
+        ScreenWithNavDrawer(
+            drawerState = drawerState,
+            feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
+            expandedTags = ImmutableHolder(viewState.expandedTags),
+            onToggleTagExpansion = onToggleTagExpansion,
+            onDrawerItemSelected = onDrawerItemSelected,
+            content = {
+                FeedListScreen(
+                    viewState = viewState,
+                    onRefreshVisible = onRefreshVisible,
+                    onRefreshAll = onRefreshAll,
+                    onToggleOnlyUnread = onToggleOnlyUnread,
+                    onToggleOnlyBookmarked = onToggleOnlyBookmarked,
+                    onMarkAllAsRead = onMarkAllAsRead,
+                    onShowToolbarMenu = onShowToolbarMenu,
+                    readAloudOnPlay = readAloudOnPlay,
+                    readAloudOnPause = readAloudOnPause,
+                    readAloudOnStop = readAloudOnStop,
+                    onAddFeed = onAddFeed,
+                    onEditFeed = onEditFeed,
+                    onShowEditDialog = onShowEditDialog,
+                    onDismissEditDialog = onDismissEditDialog,
+                    onDeleteFeeds = onDeleteFeeds,
+                    onShowDeleteDialog = onShowDeleteDialog,
+                    onDismissDeleteDialog = onDismissDeleteDialog,
+                    onSettings = onSettings,
+                    onSendFeedback = onSendFeedback,
+                    onImport = onImport,
+                    onExport = onExport,
+                    drawerState = drawerState,
+                    markAsUnread = markAsUnread,
+                    markBeforeAsRead = markBeforeAsRead,
+                    markAfterAsRead = markAfterAsRead,
+                    onOpenFeedItem = onOpenFeedItem,
+                    onSetPinned = onSetPinned,
+                    onSetBookmarked = onSetBookmarked,
+                    feedListState = feedListState,
+                    pagedFeedItems = pagedFeedItems,
+                )
+            }
+        )
+    }
+
+    AnimatedVisibility(
+        visible = feedArticleScreenType == FeedArticleScreenType.ArticleDetails,
+        enter = slideInHorizontally(tween(256), initialOffsetX = { it }),
+        exit = slideOutHorizontally(tween(256), targetOffsetX = { it }),
+    ) {
+        ArticleScreen(
+            viewState = viewState,
+            onToggleFullText = onToggleFullText,
+            onMarkAsUnread = onMarkAsUnread,
+            onShare = onShareArticle,
+            onOpenInCustomTab = onOpenInCustomTab,
+            onFeedTitleClick = onFeedTitleClick,
+            onShowToolbarMenu = onShowToolbarMenu,
+            onInteractWithArticle = onInteractWithArticle,
+            displayFullText = displayFullText,
+            readAloudOnPlay = readAloudOnPlay,
+            readAloudOnPause = readAloudOnPause,
+            readAloudOnStop = readAloudOnStop,
+            onTogglePinned = onToggleCurrentArticlePinned,
+            onToggleBookmarked = onToggleCurrentArticleBookmarked,
+            articleListState = articleListState,
+            onNavigateUp = onNavigateUpFromArticle,
+        )
+    }
+
+    if (feedArticleScreenType == FeedArticleScreenType.FeedWithArticleDetails) {
+        ScreenWithNavDrawer(
+            drawerState = drawerState,
+            feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
+            expandedTags = ImmutableHolder(viewState.expandedTags),
+            onToggleTagExpansion = onToggleTagExpansion,
+            onDrawerItemSelected = onDrawerItemSelected,
+            content = {
+                FeedWithArticleScreen(
+                    viewState = viewState.copy(showFab = false),
+                    onRefreshVisible = onRefreshVisible,
+                    onRefreshAll = onRefreshAll,
+                    onToggleOnlyUnread = onToggleOnlyUnread,
+                    onToggleOnlyBookmarked = onToggleOnlyBookmarked,
+                    onMarkAllAsRead = onMarkAllAsRead,
+                    onShowToolbarMenu = onShowToolbarMenu,
+                    readAloudOnPlay = readAloudOnPlay,
+                    readAloudOnPause = readAloudOnPause,
+                    readAloudOnStop = readAloudOnStop,
+                    onOpenInCustomTab = onOpenInCustomTab,
+                    onAddFeed = onAddFeed,
+                    onEditFeed = onEditFeed,
+                    onShowEditDialog = onShowEditDialog,
+                    onDismissEditDialog = onDismissEditDialog,
+                    onDeleteFeeds = onDeleteFeeds,
+                    onShowDeleteDialog = onShowDeleteDialog,
+                    onDismissDeleteDialog = onDismissDeleteDialog,
+                    onSettings = onSettings,
+                    onSendFeedback = onSendFeedback,
+                    onImport = onImport,
+                    onExport = onExport,
+                    drawerState = drawerState,
+                    onShareArticle = onShareArticle,
+                    markAsUnread = markAsUnread,
+                    markBeforeAsRead = markBeforeAsRead,
+                    markAfterAsRead = markAfterAsRead,
+                    onOpenFeedItem = onOpenFeedItem,
+                    onInteractWithList = onInteractWithList,
+                    onInteractWithArticle = onInteractWithArticle,
+                    onFeedTitleClick = onFeedTitleClick,
+                    onToggleFullText = onToggleFullText,
+                    displayFullText = displayFullText,
+                    onToggleCurrentArticlePinned = onToggleCurrentArticlePinned,
+                    onSetPinned = onSetPinned,
+                    onToggleCurrentArticleBookmarked = onToggleCurrentArticleBookmarked,
+                    onSetBookmarked = onSetBookmarked,
+                    feedListState = feedListState,
+                    articleListState = articleListState,
+                    pagedFeedItems = pagedFeedItems,
+                )
+            }
+        )
     }
 }
 
@@ -1265,6 +1278,12 @@ fun ArticleScreen(
         decayAnimationSpec,
         rememberTopAppBarState()
     )
+
+    val bottomBarVisibleState = remember { MutableTransitionState(viewState.isBottomBarVisible) }
+    LaunchedEffect(viewState.isBottomBarVisible) {
+        bottomBarVisibleState.targetState = viewState.isBottomBarVisible
+    }
+
     Scaffold(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -1415,9 +1434,8 @@ fun ArticleScreen(
         },
         bottomBar = {
             HideableReadAloudPlayer(
-                visible = viewState.isReadAloudVisible,
+                visibleState = bottomBarVisibleState,
                 currentlyPlaying = viewState.isReadAloudPlaying,
-                title = viewState.readAloudTitle,
                 onPlay = readAloudOnPlay,
                 onPause = readAloudOnPause,
                 onStop = readAloudOnStop,

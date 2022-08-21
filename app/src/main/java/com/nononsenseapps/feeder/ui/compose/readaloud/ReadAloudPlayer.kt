@@ -2,51 +2,52 @@ package com.nononsenseapps.feeder.ui.compose.readaloud
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.bottomBarHeight
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.theme.ReadAloudPlayerStyle
 
 @Composable
 fun HideableReadAloudPlayer(
-    visible: Boolean,
+    visibleState: MutableTransitionState<Boolean>,
     currentlyPlaying: Boolean,
-    title: String,
+    floatingActionButton: @Composable (() -> Unit)? = null,
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onStop: () -> Unit,
 ) {
     AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn() + slideInVertically(initialOffsetY = { it * 2 }),
-        exit = slideOutVertically(targetOffsetY = { it * 2 }) + fadeOut()
+        visibleState = visibleState,
+        enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(256)),
+        exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(256)),
     ) {
         ReadAloudPlayer(
             currentlyPlaying = currentlyPlaying,
-            title = title,
+            floatingActionButton = floatingActionButton,
             onPlay = onPlay,
             onPause = onPause,
             onStop = onStop,
@@ -57,51 +58,59 @@ fun HideableReadAloudPlayer(
 @Composable
 fun ReadAloudPlayer(
     currentlyPlaying: Boolean,
-    title: String,
+    floatingActionButton: @Composable (() -> Unit)? = null,
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onStop: () -> Unit,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(intrinsicSize = IntrinsicSize.Max)
-            .navigationBarsPadding()
-    ) {
-        Text(
-            title,
-            style = ReadAloudPlayerStyle(),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .weight(weight = 1.0f, fill = true)
-                .padding(top = 4.dp, end = 4.dp, bottom = 4.dp, start = 16.dp)
-        )
-        Crossfade(targetState = currentlyPlaying) { playing ->
-            if (playing) {
-                IconButton(onClick = onPause) {
-                    Icon(
-                        Icons.Default.Pause,
-                        contentDescription = stringResource(R.string.pause_reading)
-                    )
-                }
-            } else {
-                IconButton(onClick = onPlay) {
-                    Icon(
-                        Icons.Default.PlayArrow,
-                        contentDescription = stringResource(R.string.resume_reading)
-                    )
+    BottomAppBar(
+        floatingActionButton = floatingActionButton,
+        actions = {
+            Crossfade(targetState = currentlyPlaying) { playing ->
+                if (playing) {
+                    IconButton(
+                        onClick = onPause
+                    ) {
+                        Icon(
+                            Icons.Default.Pause,
+                            contentDescription = stringResource(R.string.pause_reading)
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = onPlay
+                    ) {
+                        Icon(
+                            // TextToSpeech
+                            Icons.Default.PlayArrow,
+                            contentDescription = stringResource(R.string.resume_reading)
+                        )
+                    }
                 }
             }
+            IconButton(
+                onClick = onStop
+            ) {
+                Icon(
+                    Icons.Default.Stop,
+                    contentDescription = stringResource(R.string.stop_reading)
+                )
+            }
+            // Make app bar as high as normally plus navigation bar
+            Column {
+                Spacer(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .height(bottomBarHeight - (2 * 4).dp) // top and bottom padding
+                )
+                Spacer(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .windowInsetsBottomHeight(WindowInsets.navigationBars)
+                )
+            }
         }
-        IconButton(onClick = onStop) {
-            Icon(
-                Icons.Default.Stop,
-                contentDescription = stringResource(R.string.stop_reading)
-            )
-        }
-    }
+    )
 }
 
 @Preview
@@ -110,10 +119,32 @@ fun PlayerPreview() {
     FeederTheme {
         ReadAloudPlayer(
             currentlyPlaying = true,
-            title = "Article Title",
             onPlay = {},
             onPause = {},
             onStop = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PlayerPreviewWithFab() {
+    FeederTheme {
+        ReadAloudPlayer(
+            currentlyPlaying = true,
+            onPlay = {},
+            onPause = {},
+            onStop = {},
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {},
+                ) {
+                    Icon(
+                        Icons.Default.Check,
+                        contentDescription = stringResource(R.string.mark_all_as_read)
+                    )
+                }
+            }
         )
     }
 }
