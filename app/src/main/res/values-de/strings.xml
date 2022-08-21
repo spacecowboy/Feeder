@@ -178,4 +178,8 @@
     <string name="bookmark_article">Lesezeichen hinzufügen</string>
     <string name="permission_read_desc">Ermöglicht es der Anwendung, Feeds und Artikel zu lesen</string>
     <string name="permission_read_label">Feeder Nur-Lese-Zugriff</string>
+    <string name="use_detect_language">Sprache erkennen</string>
+    <string name="use_detect_language_not_available">Nur auf Android 10 und höher verfügbar</string>
+    <string name="explanation_permission_notifications">Die Berechtigung muss erteilt werden, bevor Benachrichtigungen aktiviert werden können.</string>
+    <string name="description_for_read_aloud">Erkennt automatisch die Sprache des Artikels</string>
 </resources>
