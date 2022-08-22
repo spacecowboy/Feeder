@@ -111,7 +111,7 @@ fun FeedItemIndicator(
         value = MaterialTheme.typography.labelMedium
     ) {
         Surface(
-            color = MaterialTheme.colorScheme.tertiary,
+            color = MaterialTheme.colorScheme.tertiaryContainer,
             shape = MaterialTheme.shapes.medium,
         ) {
             Box(
