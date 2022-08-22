@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.bottomBarHeight
+import com.nononsenseapps.feeder.ui.compose.components.PaddedBottomAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 
 @Composable
@@ -63,7 +63,7 @@ fun ReadAloudPlayer(
     onPause: () -> Unit,
     onStop: () -> Unit,
 ) {
-    BottomAppBar(
+    PaddedBottomAppBar(
         floatingActionButton = floatingActionButton,
         actions = {
             Crossfade(targetState = currentlyPlaying) { playing ->
