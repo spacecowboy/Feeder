@@ -1,10 +1,14 @@
-package com.nononsenseapps.feeder.ui.compose
+package com.nononsenseapps.feeder.ui.compose.icons
 
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
 import androidx.compose.ui.graphics.vector.ImageVector
 
-val TextToSpeech: ImageVector
+@Suppress("ObjectPropertyName")
+private var _textToSpeech: ImageVector? = null
+
+@Suppress("unused")
+val CustomFilledIcons.TextToSpeech: ImageVector
     get() {
         return _textToSpeech ?: materialIcon(name = "Filled.TextToSpeech") {
             materialPath {
@@ -80,5 +84,3 @@ val TextToSpeech: ImageVector
             }
         }.also { _textToSpeech = it }
     }
-
-private var _textToSpeech: ImageVector? = null

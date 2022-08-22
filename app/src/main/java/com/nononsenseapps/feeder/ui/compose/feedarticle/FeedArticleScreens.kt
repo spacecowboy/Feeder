@@ -43,7 +43,6 @@ import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Speaker
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.DismissibleDrawerSheet
@@ -98,10 +97,11 @@ import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
-import com.nononsenseapps.feeder.ui.compose.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListContent
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
+import com.nononsenseapps.feeder.ui.compose.icons.CustomFilled
+import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
@@ -874,7 +874,7 @@ fun FeedWithArticleScreen(
                         },
                         leadingIcon = {
                             Icon(
-                                Icons.Default.Speaker,
+                                Icons.CustomFilled.TextToSpeech,
                                 contentDescription = null,
                             )
                         },
@@ -1451,13 +1451,9 @@ fun ArticleScreen(
                                 },
                                 leadingIcon = {
                                     Icon(
-                                        TextToSpeech,
+                                        Icons.CustomFilled.TextToSpeech,
                                         contentDescription = null,
                                     )
-//                                    Icon(
-//                                        Icons.Default.Speaker,
-//                                        contentDescription = null,
-//                                    )
                                 },
                                 text = {
                                     Text(stringResource(id = R.string.read_article))
