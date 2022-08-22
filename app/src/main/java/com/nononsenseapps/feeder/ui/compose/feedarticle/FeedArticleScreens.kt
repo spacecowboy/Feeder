@@ -98,6 +98,7 @@ import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
+import com.nononsenseapps.feeder.ui.compose.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListContent
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
@@ -1450,9 +1451,13 @@ fun ArticleScreen(
                                 },
                                 leadingIcon = {
                                     Icon(
-                                        Icons.Default.Speaker,
+                                        TextToSpeech,
                                         contentDescription = null,
                                     )
+//                                    Icon(
+//                                        Icons.Default.Speaker,
+//                                        contentDescription = null,
+//                                    )
                                 },
                                 text = {
                                     Text(stringResource(id = R.string.read_article))
