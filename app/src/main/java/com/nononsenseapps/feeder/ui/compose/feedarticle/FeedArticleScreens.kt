@@ -666,29 +666,6 @@ fun FeedWithArticleScreen(
                     )
                 }
             }
-            IconButton(
-                onClick = onRefreshAll
-            ) {
-                Icon(
-                    Icons.Default.Refresh,
-                    contentDescription = stringResource(R.string.synchronize_feeds)
-                )
-            }
-            IconButton(
-                onClick = onToggleFullText
-            ) {
-                Icon(
-                    Icons.Default.Article,
-                    contentDescription = stringResource(R.string.fetch_full_article)
-                )
-            }
-
-            IconButton(onClick = onOpenInCustomTab) {
-                Icon(
-                    Icons.Default.OpenInBrowser,
-                    contentDescription = stringResource(id = R.string.open_in_web_view)
-                )
-            }
 
             Box {
                 IconButton(onClick = { onShowToolbarMenu(true) }) {
@@ -701,6 +678,22 @@ fun FeedWithArticleScreen(
                     expanded = viewState.showToolbarMenu,
                     onDismissRequest = { onShowToolbarMenu(false) }
                 ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            onRefreshAll()
+                            onShowToolbarMenu(false)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.synchronize_feeds),
+                            )
+                        },
+                        text = {
+                            Text(stringResource(id = R.string.synchronize_feeds))
+                        }
+                    )
+                    Divider()
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
@@ -766,6 +759,36 @@ fun FeedWithArticleScreen(
                         }
                     )
                     Divider()
+                    DropdownMenuItem(
+                        onClick = {
+                            onToggleFullText()
+                            onShowToolbarMenu(false)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Article,
+                                contentDescription = stringResource(R.string.fetch_full_article),
+                            )
+                        },
+                        text = {
+                            Text(stringResource(id = R.string.fetch_full_article))
+                        }
+                    )
+                    DropdownMenuItem(
+                        onClick = {
+                            onOpenInCustomTab()
+                            onShowToolbarMenu(false)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.OpenInBrowser,
+                                contentDescription = stringResource(R.string.open_in_web_view),
+                            )
+                        },
+                        text = {
+                            Text(stringResource(id = R.string.open_in_web_view))
+                        }
+                    )
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
@@ -1076,14 +1099,6 @@ fun FeedListScreen(
                     )
                 }
             }
-            IconButton(
-                onClick = onRefreshAll
-            ) {
-                Icon(
-                    Icons.Default.Refresh,
-                    contentDescription = stringResource(R.string.synchronize_feeds)
-                )
-            }
 
             Box {
                 IconButton(onClick = { onShowToolbarMenu(true) }) {
@@ -1096,6 +1111,22 @@ fun FeedListScreen(
                     expanded = viewState.showToolbarMenu,
                     onDismissRequest = { onShowToolbarMenu(false) }
                 ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            onRefreshAll()
+                            onShowToolbarMenu(false)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.synchronize_feeds),
+                            )
+                        },
+                        text = {
+                            Text(stringResource(id = R.string.synchronize_feeds))
+                        }
+                    )
+                    Divider()
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
