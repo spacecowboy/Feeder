@@ -259,7 +259,7 @@ fun EditFeedScreen(
                     Text(
                         text = stringResource(id = R.string.edit_feed),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 },
                 navigationIcon = {
