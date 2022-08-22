@@ -30,7 +30,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -124,10 +123,6 @@ fun ListOfFeedsAndTags(
     onToggleTagExpansion: (String) -> Unit,
     onItemClick: (DrawerItemWithUnreadCount) -> Unit,
 ) {
-// Use windowInsetsTopHeight() to add a spacer which pushes the drawer content
-    // below the status bar (y-axis)
-//    Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
-
     LazyColumn(
         contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
             .asPaddingValues(),
@@ -256,17 +251,17 @@ private fun ExpandableTag(
                     .fillMaxWidth()
                     .align(Alignment.CenterStart)
             )
-            this@Row.AnimatedVisibility(
-                visible = currentlySyncing,
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-            ) {
-                LinearProgressIndicator(
-                    progress = syncProgress,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            }
+//            this@Row.AnimatedVisibility(
+//                visible = currentlySyncing,
+//                modifier = Modifier
+//                    .align(Alignment.BottomStart)
+//            ) {
+//                LinearProgressIndicator(
+//                    progress = syncProgress,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                )
+//            }
         }
         val unreadLabel = LocalContext.current.resources
             .getQuantityString(R.plurals.n_unread_articles, unreadCount, unreadCount)
@@ -313,18 +308,18 @@ private fun AllFeeds(
     startPadding = 16.dp,
     onItemClick = onItemClick,
     syncIndicator = {
-        AnimatedVisibility(
-            visible = currentlySyncing,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-        ) {
-            LinearProgressIndicator(
-                progress = syncProgress,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomStart)
-            )
-        }
+//        AnimatedVisibility(
+//            visible = currentlySyncing,
+//            modifier = Modifier
+//                .align(Alignment.BottomStart)
+//        ) {
+//            LinearProgressIndicator(
+//                progress = syncProgress,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .align(Alignment.BottomStart)
+//            )
+//        }
     },
 )
 
@@ -341,16 +336,16 @@ private fun TopLevelFeed(
     startPadding = 16.dp,
     onItemClick = onItemClick,
     syncIndicator = {
-        AnimatedVisibility(
-            visible = currentlySyncing,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-        ) {
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-        }
+//        AnimatedVisibility(
+//            visible = currentlySyncing,
+//            modifier = Modifier
+//                .align(Alignment.BottomStart)
+//        ) {
+//            LinearProgressIndicator(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//            )
+//        }
     },
 )
 
@@ -374,16 +369,16 @@ private fun ChildFeed(
             startPadding = 48.dp,
             onItemClick = onItemClick,
             syncIndicator = {
-                AnimatedVisibility(
-                    visible = currentlySyncing,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                ) {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-                }
+//                AnimatedVisibility(
+//                    visible = currentlySyncing,
+//                    modifier = Modifier
+//                        .align(Alignment.BottomStart)
+//                ) {
+//                    LinearProgressIndicator(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                    )
+//                }
             },
         )
     }
