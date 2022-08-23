@@ -178,4 +178,8 @@
     <string name="remove_bookmark">ブックマークの削除</string>
     <string name="permission_read_label">Feederの読み取り専用アクセス</string>
     <string name="permission_read_desc">アプリによるフィードと記事の読み取りを許可する</string>
+    <string name="use_detect_language">言語の検出</string>
+    <string name="description_for_read_aloud">記事の言語を自動的に検出</string>
+    <string name="use_detect_language_not_available">Android 10以降でのみ利用可能</string>
+    <string name="explanation_permission_notifications">通知を有効にするには、アクセス許可を付与する必要があります。</string>
 </resources>

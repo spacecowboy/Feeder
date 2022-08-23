@@ -178,4 +178,8 @@
     <string name="bookmark_article">Tandai artikel</string>
     <string name="permission_read_desc">Izinkan aplikasi untuk membaca umpan dan artikel</string>
     <string name="permission_read_label">Akses Feeder hanya-baca</string>
+    <string name="description_for_read_aloud">Secara otomatis mendeteksi bahasa artikel</string>
+    <string name="use_detect_language">Deteksi bahasa</string>
+    <string name="use_detect_language_not_available">Hanya tersedia pada Android 10 dan terbaru</string>
+    <string name="explanation_permission_notifications">Perizinan harus diberikan sebelum notifikasi diaktifkan.</string>
 </resources>
