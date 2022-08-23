@@ -25,12 +25,12 @@ import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.ReadAloudStateHolder
-import com.nononsenseapps.feeder.model.getPlainTextOfHtmlStream
 import com.nononsenseapps.feeder.model.parseFullArticleIfMissing
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
+import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -362,7 +362,7 @@ class FeedArticleViewModel(
             val fullText = when (viewState.value.textToDisplay) {
                 TextToDisplay.DEFAULT -> {
                     blobInputStream(viewState.value.articleId, context.filesDir).use {
-                        getPlainTextOfHtmlStream(
+                        htmlToAnnotatedString(
                             inputStream = it,
                             baseUrl = viewState.value.articleFeedUrl ?: ""
                         )
@@ -373,7 +373,7 @@ class FeedArticleViewModel(
                         viewState.value.articleId,
                         context.filesDir
                     ).use {
-                        getPlainTextOfHtmlStream(
+                        htmlToAnnotatedString(
                             inputStream = it,
                             baseUrl = viewState.value.articleFeedUrl ?: ""
                         )
@@ -388,7 +388,7 @@ class FeedArticleViewModel(
             } else {
                 readAloudStateHolder.readAloud(
                     title = viewState.value.articleTitle,
-                    fullText = fullText,
+                    textArray = fullText,
                     useDetectLanguage = viewState.value.useDetectLanguage
                 )
             }

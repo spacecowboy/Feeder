@@ -22,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
@@ -90,7 +89,7 @@ private fun LazyListScope.formatBody(
     val composer = TextComposer { paragraphBuilder ->
         item {
             val dimens = LocalDimens.current
-            val paragraph = paragraphBuilder.toAnnotatedString()
+            val paragraph = paragraphBuilder.toComposableAnnotatedString()
 
             // ClickableText prevents taps from deselecting selected text
             // So use regular Text if possible
@@ -154,7 +153,7 @@ private fun LazyListScope.formatCodeBlock(
             ) {
                 Box(modifier = Modifier.padding(all = 4.dp)) {
                     Text(
-                        text = paragraphBuilder.toAnnotatedString(),
+                        text = paragraphBuilder.toComposableAnnotatedString(),
                         style = CodeBlockStyle(),
                         softWrap = false
                     )
@@ -174,7 +173,7 @@ private fun LazyListScope.formatCodeBlock(
     composer.terminateCurrentText()
 }
 
-@OptIn(ExperimentalComposeApi::class, ExperimentalCoilApi::class)
+@OptIn(ExperimentalCoilApi::class)
 private fun TextComposer.appendTextChildren(
     nodes: List<Node>,
     preFormatted: Boolean = false,

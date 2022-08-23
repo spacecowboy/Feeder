@@ -30,6 +30,7 @@ class TextComposer(
                 )
                 is SpanWithComposableStyle -> builder.pushComposableStyle(span.spanStyle)
                 is SpanWithUrl -> builder.pushUrlAnnotation(span.url)
+                is SpanWithVerbatim -> builder.pushVerbatimTtsAnnotation(span.verbatim)
             }
         }
     }
@@ -181,4 +182,8 @@ data class SpanWithComposableStyle(
 
 data class SpanWithUrl(
     val url: String
+) : Span()
+
+data class SpanWithVerbatim(
+    val verbatim: String
 ) : Span()

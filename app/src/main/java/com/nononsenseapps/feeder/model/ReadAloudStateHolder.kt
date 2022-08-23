@@ -2,14 +2,15 @@ package com.nononsenseapps.feeder.model
 
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import android.speech.tts.TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextLanguage
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.text.AnnotatedString
 import com.nononsenseapps.feeder.R
 import java.util.*
 import kotlin.collections.component1
@@ -69,7 +70,7 @@ class ReadAloudStateHolder(
             }
         }
     }
-    private val textToSpeechQueue = mutableMapOf<String, String>()
+    private val textToSpeechQueue = mutableMapOf<String, CharSequence>()
     private var textToSpeechId: Int = 0
     private var initializedState: Int? = null
     private var startJob: Job? = null
@@ -81,8 +82,8 @@ class ReadAloudStateHolder(
     private val _title = MutableStateFlow("")
     val title: StateFlow<String> = _title.asStateFlow()
 
-    fun readAloud(title: String, fullText: String, useDetectLanguage: Boolean) {
-        val textArray = fullText.split(*PUNCTUATION)
+    fun readAloud(title: String, textArray: List<AnnotatedString>, useDetectLanguage: Boolean) {
+//        val textArray = fullText.split(*PUNCTUATION)
         for (text in textArray) {
             if (text.isBlank()) {
                 continue
@@ -92,7 +93,7 @@ class ReadAloudStateHolder(
         }
         _title.value = title
         localesToUse = if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            context.detectLocaleFromText(fullText) + context.getLocales()
+            context.detectLocaleFromText(textArray.joinToString("\n\n")) + context.getLocales()
         } else {
             context.getLocales()
         }
@@ -138,10 +139,7 @@ class ReadAloudStateHolder(
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, null, utteranceId)
                         } else {
-                            val params = HashMap<String, String>()
-                            params[KEY_PARAM_UTTERANCE_ID] = utteranceId
-                            @Suppress("DEPRECATION")
-                            textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, params)
+                            textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, Bundle.EMPTY, utteranceId)
                         }
                     }
                 } catch (e: ConcurrentModificationException) {

@@ -5,6 +5,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.UrlAnnotation
+import androidx.compose.ui.text.VerbatimTtsAnnotation
 
 @OptIn(ExperimentalTextApi::class)
 class AnnotatedParagraphStringBuilder {
@@ -35,6 +36,9 @@ class AnnotatedParagraphStringBuilder {
 
     fun pushUrlAnnotation(url: String) =
         builder.pushUrlAnnotation(UrlAnnotation(url = url))
+
+    fun pushVerbatimTtsAnnotation(verbatim: String) =
+        builder.pushTtsAnnotation(VerbatimTtsAnnotation(verbatim))
 
     fun pushStyle(style: SpanStyle): Int =
         builder.pushStyle(style = style)
@@ -81,7 +85,7 @@ class AnnotatedParagraphStringBuilder {
     }
 
     @Composable
-    fun toAnnotatedString(): AnnotatedString {
+    fun toComposableAnnotatedString(): AnnotatedString {
         for (composableStyle in poppedComposableStyles) {
             builder.addStyle(
                 style = composableStyle.style(),
@@ -96,6 +100,10 @@ class AnnotatedParagraphStringBuilder {
                 end = builder.length
             )
         }
+        return builder.toAnnotatedString()
+    }
+
+    fun toAnnotatedString(): AnnotatedString {
         return builder.toAnnotatedString()
     }
 }
