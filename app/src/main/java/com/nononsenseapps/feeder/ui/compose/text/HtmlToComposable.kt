@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -79,7 +78,6 @@ fun LazyListScope.htmlFormattedText(
         }
 }
 
-@OptIn(ExperimentalTextApi::class)
 private fun LazyListScope.formatBody(
     element: Element,
     @DrawableRes imagePlaceholder: Int,
@@ -93,7 +91,7 @@ private fun LazyListScope.formatBody(
 
             // ClickableText prevents taps from deselecting selected text
             // So use regular Text if possible
-            if (paragraph.getUrlAnnotations(0, paragraph.length)
+            if (paragraph.getStringAnnotations("URL", 0, paragraph.length)
                 .isNotEmpty()
             ) {
                 ClickableText(
@@ -103,10 +101,10 @@ private fun LazyListScope.formatBody(
                     modifier = Modifier
                         .width(dimens.maxContentWidth)
                 ) { offset ->
-                    paragraph.getUrlAnnotations(offset, offset)
+                    paragraph.getStringAnnotations("URL", offset, offset)
                         .firstOrNull()
                         ?.let {
-                            onLinkClick(it.item.url)
+                            onLinkClick(it.item)
                         }
                 }
             } else {
@@ -417,7 +415,7 @@ private fun TextComposer.appendTextChildren(
                         withComposableStyle(
                             style = { LinkTextStyle().toSpanStyle() }
                         ) {
-                            withUrlAnnotation(element.attr("abs:href") ?: "") {
+                            withAnnotation("URL", element.attr("abs:href") ?: "") {
                                 appendTextChildren(
                                     element.childNodes(),
                                     lazyListScope = lazyListScope,

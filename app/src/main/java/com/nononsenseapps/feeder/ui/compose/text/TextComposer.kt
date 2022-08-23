@@ -29,7 +29,6 @@ class TextComposer(
                     annotation = span.annotation
                 )
                 is SpanWithComposableStyle -> builder.pushComposableStyle(span.spanStyle)
-                is SpanWithUrl -> builder.pushUrlAnnotation(span.url)
                 is SpanWithVerbatim -> builder.pushVerbatimTtsAnnotation(span.verbatim)
             }
         }
@@ -82,9 +81,6 @@ class TextComposer(
     fun pushStringAnnotation(tag: String, annotation: String): Int =
         builder.pushStringAnnotation(tag = tag, annotation = annotation)
 
-    fun pushUrlAnnotation(url: String): Int =
-        builder.pushUrlAnnotation(url = url)
-
     fun pushComposableStyle(style: @Composable () -> SpanStyle): Int =
         builder.pushComposableStyle(style)
 
@@ -93,8 +89,8 @@ class TextComposer(
 
     private fun findClosestLink(): String? {
         for (span in spanStack.reversed()) {
-            if (span is SpanWithUrl) {
-                return span.url
+            if (span is SpanWithAnnotation && span.tag == "URL") {
+                return span.annotation
             }
         }
         return null
@@ -151,20 +147,6 @@ inline fun <R : Any> TextComposer.withAnnotation(
     }
 }
 
-inline fun <R : Any> TextComposer.withUrlAnnotation(
-    url: String,
-    crossinline block: TextComposer.() -> R
-): R {
-    spanStack.add(SpanWithUrl(url = url))
-    val index = pushUrlAnnotation(url = url)
-    return try {
-        block()
-    } finally {
-        pop(index)
-        spanStack.removeLast()
-    }
-}
-
 sealed class Span
 
 data class SpanWithStyle(
@@ -178,10 +160,6 @@ data class SpanWithAnnotation(
 
 data class SpanWithComposableStyle(
     val spanStyle: @Composable () -> SpanStyle
-) : Span()
-
-data class SpanWithUrl(
-    val url: String
 ) : Span()
 
 data class SpanWithVerbatim(

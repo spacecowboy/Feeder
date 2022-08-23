@@ -214,7 +214,7 @@ private fun TextComposer.appendTextChildren(
                         terminateCurrentText()
                     }
                     "a" -> {
-                        withUrlAnnotation(element.attr("abs:href") ?: "") {
+                        withAnnotation("URL", element.attr("abs:href") ?: "") {
                             appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
