@@ -10,6 +10,7 @@ import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextLanguage
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.AnnotatedString
 import com.nononsenseapps.feeder.R
 import java.util.*
@@ -114,7 +115,9 @@ class TTSStateHolder(
                                 .map { it.locale }
                                 .plus(_availableLanguages.value)
                         } else {
-                            _availableLanguages.value.asSequence()
+                            // User has requested un-dynamic so for context locales first
+                            context.getLocales()
+                                .plus(_availableLanguages.value)
                         }
                     }
                 }
@@ -252,24 +255,21 @@ class TTSStateHolder(
                 .map { it.locale }
                 .plus(
                     context.getLocales()
-                        .sortedBy { it.displayName }
+                        .sortedBy { it.getDisplayName(it).lowercase(it) }
                 )
                 .plus(
                     allAvailableLanguages.asSequence()
-                        .sortedBy { it.displayName }
+                        .sortedBy { it.getDisplayName(it).lowercase(it) }
                 )
         } else {
             context.getLocales()
                 .sortedBy { it.displayName }
                 .plus(
                     allAvailableLanguages.asSequence()
-                        .sortedBy { it.displayName }
+                        .sortedBy { it.getDisplayName(it).lowercase(it) }
                 )
         }
             .distinctBy { it.toLanguageTag() }
-            // People can set strange regions like en-SE - which are not listed as available
-            // but will work regardless
-//                .filter { it in allAvailableLanguages }
             .toList()
 
         _availableLanguages.update {
@@ -283,12 +283,19 @@ class TTSStateHolder(
                 .firstOrNull { locale ->
                     when (textToSpeech?.setLanguage(locale)) {
                         TextToSpeech.SUCCESS -> {
-                            Log.e(LOG_TAG, "${locale.toLanguageTag()} IS supported!")
                             true
                         }
                         else -> {
-                            Log.e(LOG_TAG, "${locale.toLanguageTag()} is not supported!")
-                            false
+                            // In this case, try without region because the TTS engine lies about
+                            // what locales are available
+                            when (textToSpeech?.setLanguage(Locale.forLanguageTag(locale.language))) {
+                                TextToSpeech.SUCCESS -> {
+                                    true
+                                } else -> {
+                                    Log.e(LOG_TAG, "${locale.toLanguageTag()} is not supported")
+                                    false
+                                }
+                            }
                         }
                     }
                 }
@@ -413,10 +420,14 @@ enum class PlaybackStatus {
     PLAYING
 }
 
+@Immutable
 sealed class LocaleOverride
 
+@Immutable
 object AppSetting : LocaleOverride()
 
+@Immutable
 object ForcedAuto : LocaleOverride()
 
+@Immutable
 data class ForcedLocale(val locale: Locale) : LocaleOverride()

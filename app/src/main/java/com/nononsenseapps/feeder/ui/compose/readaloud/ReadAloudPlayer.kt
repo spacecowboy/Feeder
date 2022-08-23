@@ -167,7 +167,7 @@ fun TTSPlayer(
                                 showMenu = false
                             },
                             text = {
-                                Text(text = lang.displayName)
+                                Text(text = lang.getDisplayName(lang))
                             }
                         )
                     }
