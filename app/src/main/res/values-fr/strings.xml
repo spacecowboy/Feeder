@@ -178,4 +178,8 @@
     <string name="remove_bookmark">Supprimer le marque-page</string>
     <string name="permission_read_desc">Permet à l\'application de lire des flux et des articles</string>
     <string name="permission_read_label">Accès en lecture seule Feeder</string>
+    <string name="use_detect_language">Détecter la langue</string>
+    <string name="use_detect_language_not_available">Disponible uniquement sur Android 10 et plus</string>
+    <string name="description_for_read_aloud">Détection automatique de la langue de l\'article</string>
+    <string name="explanation_permission_notifications">L\'autorisation doit être accordée avant que les notifications puissent être activées.</string>
 </resources>
