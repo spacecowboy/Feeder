@@ -2,8 +2,11 @@ package com.nononsenseapps.feeder.ui.compose.text
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.UrlAnnotation
 
+@OptIn(ExperimentalTextApi::class)
 class AnnotatedParagraphStringBuilder {
     // Private for a reason
     private val builder: AnnotatedString.Builder = AnnotatedString.Builder()
@@ -29,6 +32,9 @@ class AnnotatedParagraphStringBuilder {
 
             return false
         }
+
+    fun pushUrlAnnotation(url: String) =
+        builder.pushUrlAnnotation(UrlAnnotation(url = url))
 
     fun pushStyle(style: SpanStyle): Int =
         builder.pushStyle(style = style)
