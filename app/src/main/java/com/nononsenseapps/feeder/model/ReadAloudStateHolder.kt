@@ -13,9 +13,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.text.AnnotatedString
 import com.nononsenseapps.feeder.R
 import java.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -40,7 +37,7 @@ class ReadAloudStateHolder(
     private val speechListener: UtteranceProgressListener by lazy {
         object : UtteranceProgressListener() {
             override fun onDone(utteranceId: String) {
-                textToSpeechQueue.remove(utteranceId)
+                textToSpeechQueue.removeFirstOrNull()
                 if (textToSpeechQueue.isEmpty()) {
                     coroutineScope.launch {
                         delay(100)
@@ -56,8 +53,10 @@ class ReadAloudStateHolder(
             }
 
             override fun onError(utteranceId: String?, errorCode: Int) {
+                Log.e(LOG_TAG, "onError utteranceId $utteranceId, errorCode $errorCode")
+
                 if (utteranceId != null) {
-                    textToSpeechQueue.remove(utteranceId)
+                    textToSpeechQueue.removeFirstOrNull()
                 }
             }
 
@@ -66,12 +65,12 @@ class ReadAloudStateHolder(
                 replaceWith = ReplaceWith("onError(utteranceId, errorCode)")
             )
             override fun onError(utteranceId: String) {
-                textToSpeechQueue.remove(utteranceId)
+                Log.e(LOG_TAG, "onError utteranceId $utteranceId")
+                textToSpeechQueue.removeFirstOrNull()
             }
         }
     }
-    private val textToSpeechQueue = mutableMapOf<String, CharSequence>()
-    private var textToSpeechId: Int = 0
+    private val textToSpeechQueue = mutableListOf<CharSequence>()
     private var initializedState: Int? = null
     private var startJob: Job? = null
     private var localesToUse: Sequence<Locale> = emptySequence()
@@ -88,8 +87,7 @@ class ReadAloudStateHolder(
             if (text.isBlank()) {
                 continue
             }
-            textToSpeechQueue[textToSpeechId.toString()] = text
-            textToSpeechId++
+            textToSpeechQueue.add(text)
         }
         _title.value = title
         localesToUse = if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -116,7 +114,6 @@ class ReadAloudStateHolder(
                     )
                 }
                 while (initializedState == null) {
-                    Log.d(LOG_TAG, "Delaying a little")
                     delay(100)
                 }
                 if (initializedState != TextToSpeech.SUCCESS) {
@@ -135,15 +132,25 @@ class ReadAloudStateHolder(
                 // Can only set this once engine has been initialized
                 textToSpeech?.setOnUtteranceProgressListener(speechListener)
                 try {
-                    for ((utteranceId, text) in textToSpeechQueue) {
+                    textToSpeechQueue.forEachIndexed { index, text ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, null, utteranceId)
+                            textToSpeech?.speak(
+                                text,
+                                TextToSpeech.QUEUE_ADD,
+                                null,
+                                index.toString()
+                            )
                         } else {
-                            textToSpeech?.speak(text, TextToSpeech.QUEUE_ADD, Bundle.EMPTY, utteranceId)
+                            textToSpeech?.speak(
+                                text,
+                                TextToSpeech.QUEUE_ADD,
+                                Bundle.EMPTY,
+                                index.toString()
+                            )
                         }
                     }
                 } catch (e: ConcurrentModificationException) {
-                    Log.e("FeederReadAloudState", "User probably double clicked play", e)
+                    Log.e(LOG_TAG, "User probably double clicked play", e)
                     // State will be weird. But mutex should prevent it happening
                 }
             }
@@ -163,6 +170,19 @@ class ReadAloudStateHolder(
         _readAloudState.value = PlaybackStatus.STOPPED
         localesToUse = emptySequence()
         textToSpeech = null
+    }
+
+    fun skipNext() {
+        coroutineScope.launch {
+            startJob?.cancel()
+            textToSpeech?.stop()
+            startJob?.join()
+            textToSpeechQueue.removeFirstOrNull()
+            when (textToSpeechQueue.isEmpty()) {
+                true -> stop()
+                false -> play()
+            }
+        }
     }
 
     override fun onInit(status: Int) {

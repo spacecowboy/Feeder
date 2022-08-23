@@ -39,6 +39,7 @@
   <string name="pause_reading">Pause reading</string>
   <string name="resume_reading">Resume reading</string>
   <string name="stop_reading">Stop reading</string>
+  <string name="skip_to_next">Skip to next</string>
   <string name="sync">Sync</string>
   <string name="export_feeds_to_opml">Export feeds to OPML</string>
   <string name="import_feeds_from_opml">Import feeds from OPML</string>

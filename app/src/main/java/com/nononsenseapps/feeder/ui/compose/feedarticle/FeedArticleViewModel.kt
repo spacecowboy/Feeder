@@ -356,6 +356,10 @@ class FeedArticleViewModel(
         readAloudStateHolder.pause()
     }
 
+    fun readAloudSkipNext() {
+        readAloudStateHolder.skipNext()
+    }
+
     fun readAloudPlay() {
         val context = getApplication<FeederApplication>()
         viewModelScope.launch(Dispatchers.IO) {

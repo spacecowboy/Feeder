@@ -251,6 +251,7 @@ fun FeedScreen(
     readAloudOnPlay: () -> Unit,
     readAloudOnPause: () -> Unit,
     readAloudOnStop: () -> Unit,
+    readAloudOnSkipNext: () -> Unit,
     onDismissDeleteDialog: () -> Unit,
     onDismissEditDialog: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
@@ -321,6 +322,7 @@ fun FeedScreen(
                 onPlay = readAloudOnPlay,
                 onPause = readAloudOnPause,
                 onStop = readAloudOnStop,
+                onSkipNext = readAloudOnSkipNext,
                 floatingActionButton = when (viewState.showFab) {
                     true -> floatingActionButton
                     false -> null

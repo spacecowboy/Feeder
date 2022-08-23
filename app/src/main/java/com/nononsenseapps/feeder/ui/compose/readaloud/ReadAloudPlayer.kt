@@ -6,28 +6,19 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.ui.compose.bottomBarHeight
 import com.nononsenseapps.feeder.ui.compose.components.PaddedBottomAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 
@@ -39,6 +30,7 @@ fun HideableReadAloudPlayer(
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onStop: () -> Unit,
+    onSkipNext: () -> Unit,
 ) {
     AnimatedVisibility(
         visibleState = visibleState,
@@ -51,6 +43,7 @@ fun HideableReadAloudPlayer(
             onPlay = onPlay,
             onPause = onPause,
             onStop = onStop,
+            onSkipNext = onSkipNext,
         )
     }
 }
@@ -62,6 +55,7 @@ fun ReadAloudPlayer(
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onStop: () -> Unit,
+    onSkipNext: () -> Unit,
 ) {
     PaddedBottomAppBar(
         floatingActionButton = floatingActionButton,
@@ -96,17 +90,12 @@ fun ReadAloudPlayer(
                     contentDescription = stringResource(R.string.stop_reading)
                 )
             }
-            // Make app bar as high as normally plus navigation bar
-            Column {
-                Spacer(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .height(bottomBarHeight - (2 * 4).dp) // top and bottom padding
-                )
-                Spacer(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .windowInsetsBottomHeight(WindowInsets.navigationBars)
+            IconButton(
+                onClick = onSkipNext
+            ) {
+                Icon(
+                    Icons.Default.SkipNext,
+                    contentDescription = stringResource(R.string.skip_to_next)
                 )
             }
         }
@@ -122,6 +111,7 @@ fun PlayerPreview() {
             onPlay = {},
             onPause = {},
             onStop = {},
+            onSkipNext = {},
         )
     }
 }
@@ -135,6 +125,7 @@ fun PlayerPreviewWithFab() {
             onPlay = {},
             onPause = {},
             onStop = {},
+            onSkipNext = {},
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {},

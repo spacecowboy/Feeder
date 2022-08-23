@@ -75,6 +75,7 @@ private fun TextComposer.appendTextChildren(
                 val element = node
                 when (element.tagName()) {
                     "p" -> {
+                        terminateCurrentText()
                         // Readability4j inserts p-tags in divs for algorithmic purposes.
                         // They screw up formatting.
                         if (node.hasClass("readability-styled")) {
@@ -90,37 +91,51 @@ private fun TextComposer.appendTextChildren(
                                 )
                             }
                         }
+
+                        terminateCurrentText()
                     }
                     "br" -> append('\n')
                     "h1" -> {
+                        terminateCurrentText()
                         withParagraph {
                             append(element.text())
                         }
+                        terminateCurrentText()
                     }
                     "h2" -> {
+                        terminateCurrentText()
                         withParagraph {
                             append(element.text())
                         }
+                        terminateCurrentText()
                     }
                     "h3" -> {
+                        terminateCurrentText()
                         withParagraph {
                             append(element.text())
                         }
+                        terminateCurrentText()
                     }
                     "h4" -> {
+                        terminateCurrentText()
                         withParagraph {
                             append(element.text())
                         }
+                        terminateCurrentText()
                     }
                     "h5" -> {
+                        terminateCurrentText()
                         withParagraph {
                             append(element.text())
                         }
+                        terminateCurrentText()
                     }
                     "h6" -> {
+                        terminateCurrentText()
                         withParagraph {
                             append(element.text())
                         }
+                        terminateCurrentText()
                     }
                     "strong", "b" -> {
                         appendTextChildren(
@@ -169,28 +184,34 @@ private fun TextComposer.appendTextChildren(
                         )
                     }
                     "pre" -> {
+                        terminateCurrentText()
                         // TODO some TTS annotation?
                         appendTextChildren(
                             element.childNodes(),
                             preFormatted = true,
                             baseUrl = baseUrl,
                         )
+                        terminateCurrentText()
                     }
                     "code" -> {
+                        terminateCurrentText()
                         // TODO some TTS annotation?
                         appendTextChildren(
                             element.childNodes(),
                             preFormatted = preFormatted,
                             baseUrl = baseUrl,
                         )
+                        terminateCurrentText()
                     }
                     "blockquote" -> {
+                        terminateCurrentText()
                         withParagraph {
                             appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                             )
                         }
+                        terminateCurrentText()
                     }
                     "a" -> {
                         withUrlAnnotation(element.attr("abs:href") ?: "") {
@@ -201,10 +222,12 @@ private fun TextComposer.appendTextChildren(
                         }
                     }
                     "img" -> {
+                        terminateCurrentText()
                         val alt = element.attr("alt") ?: ""
                         if (alt.isNotEmpty()) {
                             append(alt)
                         }
+                        terminateCurrentText()
                     }
                     "ul" -> {
                         element.children()
