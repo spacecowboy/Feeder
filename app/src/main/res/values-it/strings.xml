@@ -181,4 +181,5 @@
     <string name="use_detect_language_not_available">Disponibile solo su Android 10 e versioni successive</string>
     <string name="description_for_read_aloud">Rileva automaticamente la lingua dell\'articolo</string>
     <string name="use_detect_language">Rilevare la lingua</string>
+    <string name="explanation_permission_notifications">L\'autorizzazione deve essere concessa prima di poter attivare le notifiche.</string>
 </resources>
