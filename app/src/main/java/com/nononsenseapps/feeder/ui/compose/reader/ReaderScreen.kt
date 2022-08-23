@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -36,6 +35,7 @@ import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import java.util.*
@@ -49,6 +49,7 @@ val dateTimeFormat: DateTimeFormatter =
 @Composable
 fun ReaderView(
     modifier: Modifier = Modifier,
+    screenType: ScreenType,
     articleListState: LazyListState = rememberLazyListState(),
     articleTitle: String = "Article title on top",
     feedTitle: String = "Feed Title is here",
@@ -63,7 +64,14 @@ fun ReaderView(
     SelectionContainer {
         LazyColumn(
             state = articleListState,
-            contentPadding = PaddingValues(bottom = 92.dp),
+            contentPadding = PaddingValues(
+                bottom = 92.dp,
+                start = when (screenType) {
+                    ScreenType.DUAL -> 0.dp // List items have enough padding
+                    ScreenType.SINGLE -> dimens.margin
+                },
+                end = dimens.margin
+            ),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
                 .fillMaxWidth()
@@ -72,7 +80,6 @@ fun ReaderView(
                 val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = dimens.margin)
                         .width(dimens.maxContentWidth)
                         .semantics(mergeDescendants = true) {
                             try {
@@ -127,7 +134,6 @@ fun ReaderView(
                     }
                     Column(
                         modifier = Modifier
-                            .padding(horizontal = dimens.margin)
                             .width(dimens.maxContentWidth)
                     ) {
                         Text(

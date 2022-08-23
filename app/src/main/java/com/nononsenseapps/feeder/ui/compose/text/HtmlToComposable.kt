@@ -100,7 +100,6 @@ private fun LazyListScope.formatBody(
                     style = MaterialTheme.typography.bodyLarge
                         .merge(TextStyle(color = MaterialTheme.colorScheme.onBackground)),
                     modifier = Modifier
-                        .padding(horizontal = dimens.margin)
                         .width(dimens.maxContentWidth)
                 ) { offset ->
                     paragraph.getStringAnnotations("URL", offset, offset)
@@ -115,7 +114,6 @@ private fun LazyListScope.formatBody(
                     style = MaterialTheme.typography.bodyLarge
                         .merge(TextStyle(color = MaterialTheme.colorScheme.onBackground)),
                     modifier = Modifier
-                        .padding(horizontal = dimens.margin)
                         .width(dimens.maxContentWidth)
                 )
             }
@@ -147,7 +145,6 @@ private fun LazyListScope.formatCodeBlock(
                 color = CodeBlockBackground(),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
-                    .padding(horizontal = dimens.margin)
                     .horizontalScroll(
                         state = scrollState
                     )
@@ -440,7 +437,6 @@ private fun TextComposer.appendTextChildren(
 //                                    val scale = remember { mutableStateOf(1f) }
                                     Column(
                                         modifier = Modifier
-                                            .padding(horizontal = dimens.margin)
                                             .width(dimens.maxContentWidth)
                                     ) {
                                         DisableSelection {
@@ -489,7 +485,7 @@ private fun TextComposer.appendTextChildren(
                                         }
 
                                         if (alt.isNotBlank()) {
-                                            Spacer(modifier = Modifier.height(dimens.margin / 2))
+                                            Spacer(modifier = Modifier.height(16.dp))
 
                                             Text(
                                                 alt,
@@ -498,7 +494,7 @@ private fun TextComposer.appendTextChildren(
                                             )
                                         }
 
-                                        Spacer(modifier = Modifier.height(dimens.margin))
+                                        Spacer(modifier = Modifier.height(16.dp))
                                     }
                                 }
                             }
@@ -592,7 +588,6 @@ private fun TextComposer.appendTextChildren(
                                     val dimens = LocalDimens.current
                                     Column(
                                         modifier = Modifier
-                                            .padding(horizontal = dimens.margin)
                                             .width(dimens.maxContentWidth)
                                     ) {
                                         DisableSelection {
@@ -622,7 +617,7 @@ private fun TextComposer.appendTextChildren(
                                             }
                                         }
 
-                                        Spacer(modifier = Modifier.height(dimens.margin / 2))
+                                        Spacer(modifier = Modifier.height(16.dp))
 
                                         Text(
                                             text = stringResource(R.string.touch_to_play_video),
@@ -630,7 +625,7 @@ private fun TextComposer.appendTextChildren(
                                             modifier = Modifier.fillMaxWidth()
                                         )
 
-                                        Spacer(modifier = Modifier.height(dimens.margin))
+                                        Spacer(modifier = Modifier.height(16.dp))
                                     }
                                 }
                             }

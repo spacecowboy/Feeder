@@ -979,6 +979,7 @@ fun FeedWithArticleScreen(
                 key(viewState.articleId) {
                     ArticleContent(
                         viewState = viewState,
+                        screenType = ScreenType.DUAL,
                         onFeedTitleClick = onFeedTitleClick,
                         articleListState = articleListState,
                         displayFullText = displayFullText,
@@ -1476,6 +1477,7 @@ fun ArticleScreen(
     ) { padding ->
         ArticleContent(
             viewState = viewState,
+            screenType = ScreenType.SINGLE,
             articleListState = articleListState,
             onFeedTitleClick = onFeedTitleClick,
             displayFullText = displayFullText,
@@ -1489,6 +1491,7 @@ fun ArticleScreen(
 @Composable
 fun ArticleContent(
     viewState: ArticleScreenViewState,
+    screenType: ScreenType,
     onFeedTitleClick: () -> Unit,
     articleListState: LazyListState,
     displayFullText: () -> Unit,
@@ -1523,6 +1526,7 @@ fun ArticleContent(
 
     ReaderView(
         modifier = modifier,
+        screenType = screenType,
         articleListState = articleListState,
         articleTitle = viewState.articleTitle,
         feedTitle = viewState.feedDisplayTitle,
