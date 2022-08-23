@@ -60,6 +60,14 @@ fun ReadAloudPlayer(
     PaddedBottomAppBar(
         floatingActionButton = floatingActionButton,
         actions = {
+            IconButton(
+                onClick = onStop
+            ) {
+                Icon(
+                    Icons.Default.Stop,
+                    contentDescription = stringResource(R.string.stop_reading)
+                )
+            }
             Crossfade(targetState = currentlyPlaying) { playing ->
                 if (playing) {
                     IconButton(
@@ -81,14 +89,6 @@ fun ReadAloudPlayer(
                         )
                     }
                 }
-            }
-            IconButton(
-                onClick = onStop
-            ) {
-                Icon(
-                    Icons.Default.Stop,
-                    contentDescription = stringResource(R.string.stop_reading)
-                )
             }
             IconButton(
                 onClick = onSkipNext
