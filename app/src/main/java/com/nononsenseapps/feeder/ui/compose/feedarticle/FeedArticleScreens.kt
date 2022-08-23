@@ -32,8 +32,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkRemove
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ImportExport
@@ -751,7 +751,7 @@ fun FeedWithArticleScreen(
                         },
                         leadingIcon = {
                             Icon(
-                                Icons.Default.Check,
+                                Icons.Default.DoneAll,
                                 contentDescription = null,
                             )
                         },
@@ -1184,7 +1184,7 @@ fun FeedListScreen(
                         },
                         leadingIcon = {
                             Icon(
-                                Icons.Default.Check,
+                                Icons.Default.DoneAll,
                                 contentDescription = null,
                             )
                         },

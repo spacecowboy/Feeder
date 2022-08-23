@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
@@ -140,7 +140,7 @@ fun PlayerPreviewWithFab() {
                     onClick = {},
                 ) {
                     Icon(
-                        Icons.Default.Check,
+                        Icons.Default.DoneAll,
                         contentDescription = stringResource(R.string.mark_all_as_read)
                     )
                 }
