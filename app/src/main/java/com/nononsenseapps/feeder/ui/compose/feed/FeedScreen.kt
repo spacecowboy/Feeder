@@ -71,11 +71,12 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
-import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
+import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import kotlin.math.roundToInt
@@ -248,10 +249,11 @@ fun FeedScreen(
     onRefreshVisible: () -> Unit,
     onOpenNavDrawer: () -> Unit,
     onMarkAllAsRead: () -> Unit,
-    readAloudOnPlay: () -> Unit,
-    readAloudOnPause: () -> Unit,
-    readAloudOnStop: () -> Unit,
-    readAloudOnSkipNext: () -> Unit,
+    ttsOnPlay: () -> Unit,
+    ttsOnPause: () -> Unit,
+    ttsOnStop: () -> Unit,
+    ttsOnSkipNext: () -> Unit,
+    ttsOnSelectLanguage: (LocaleOverride) -> Unit,
     onDismissDeleteDialog: () -> Unit,
     onDismissEditDialog: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
@@ -316,13 +318,15 @@ fun FeedScreen(
             )
         },
         bottomBar = {
-            HideableReadAloudPlayer(
+            HideableTTSPlayer(
                 visibleState = bottomBarVisibleState,
-                currentlyPlaying = viewState.isReadAloudPlaying,
-                onPlay = readAloudOnPlay,
-                onPause = readAloudOnPause,
-                onStop = readAloudOnStop,
-                onSkipNext = readAloudOnSkipNext,
+                currentlyPlaying = viewState.isTTSPlaying,
+                onPlay = ttsOnPlay,
+                onPause = ttsOnPause,
+                onStop = ttsOnStop,
+                onSkipNext = ttsOnSkipNext,
+                onSelectLanguage = ttsOnSelectLanguage,
+                languages = ImmutableHolder(viewState.ttsLanguages),
                 floatingActionButton = when (viewState.showFab) {
                     true -> floatingActionButton
                     false -> null

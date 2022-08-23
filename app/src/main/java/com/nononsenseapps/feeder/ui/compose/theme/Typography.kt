@@ -73,7 +73,7 @@ fun FeedListItemDateStyle(): TextStyle =
     MaterialTheme.typography.labelMedium
 
 @Composable
-fun ReadAloudPlayerStyle(): TextStyle =
+fun TTSPlayerStyle(): TextStyle =
     MaterialTheme.typography.titleMedium
 
 @Composable

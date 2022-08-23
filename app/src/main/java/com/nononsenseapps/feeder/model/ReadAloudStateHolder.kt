@@ -20,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -28,7 +29,7 @@ import kotlinx.coroutines.withContext
 /**
  * Any callers must call #shutdown when shutting down
  */
-class ReadAloudStateHolder(
+class TTSStateHolder(
     val context: Context,
     val coroutineScope: CoroutineScope,
 ) : TextToSpeech.OnInitListener {
@@ -43,7 +44,7 @@ class ReadAloudStateHolder(
                         delay(100)
                         if (textToSpeechQueue.isEmpty()) {
                             // If still empty after the delay
-                            _readAloudState.value = PlaybackStatus.STOPPED
+                            _ttsState.value = PlaybackStatus.STOPPED
                         }
                     }
                 } else {
@@ -75,22 +76,47 @@ class ReadAloudStateHolder(
     private val textToSpeechQueue = mutableListOf<CharSequence>()
     private var initializedState: Int? = null
     private var startJob: Job? = null
-    private var localesToUse: Sequence<Locale> = emptySequence()
+
     private var useDetectLanguage: Boolean = true
 
-    private val _readAloudState = MutableStateFlow(PlaybackStatus.STOPPED)
-    val readAloudState: StateFlow<PlaybackStatus> = _readAloudState.asStateFlow()
+    private val _ttsState = MutableStateFlow(PlaybackStatus.STOPPED)
+    val ttsState: StateFlow<PlaybackStatus> = _ttsState.asStateFlow()
 
-    private val _title = MutableStateFlow("")
-    val title: StateFlow<String> = _title.asStateFlow()
+    private val _lang = MutableStateFlow<LocaleOverride>(AppSetting)
+    val language: StateFlow<LocaleOverride> = _lang.asStateFlow()
+
+    private val _availableLanguages = MutableStateFlow<List<Locale>>(emptyList())
+    val availableLanguages: StateFlow<List<Locale>> = _availableLanguages.asStateFlow()
+
+    private var allAvailableLanguages: Set<Locale> = emptySet()
 
     private fun speakNext() {
         textToSpeechQueue.firstOrNull()?.let { text ->
-            val localesToUse =
-                if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    context.detectLocaleFromText(text) + context.getLocales()
-                } else {
-                    localesToUse
+            val lang = _lang.value
+            val localesToUse: Sequence<Locale> =
+                when {
+                    lang is ForcedAuto && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                        context.detectLocaleFromText(text)
+                            .sortedByDescending { it.confidence }
+                            .map { it.locale }
+                            .plus(_availableLanguages.value)
+                    }
+                    lang is ForcedLocale -> {
+                        sequenceOf(
+                            lang.locale
+                        )
+                    }
+                    else -> {
+                        // Use app setting
+                        if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            context.detectLocaleFromText(text)
+                                .sortedByDescending { it.confidence }
+                                .map { it.locale }
+                                .plus(_availableLanguages.value)
+                        } else {
+                            _availableLanguages.value.asSequence()
+                        }
+                    }
                 }
 
             setFirstBestLocale(localesToUse)
@@ -113,7 +139,7 @@ class ReadAloudStateHolder(
         }
     }
 
-    fun readAloud(title: String, textArray: List<AnnotatedString>, useDetectLanguage: Boolean) {
+    fun tts(textArray: List<AnnotatedString>, useDetectLanguage: Boolean) {
         this.useDetectLanguage = useDetectLanguage
 //        val textArray = fullText.split(*PUNCTUATION)
         for (text in textArray) {
@@ -121,12 +147,6 @@ class ReadAloudStateHolder(
                 continue
             }
             textToSpeechQueue.add(text)
-        }
-        _title.value = title
-        localesToUse = if (useDetectLanguage && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            context.detectLocaleFromText(textArray.joinToString("\n\n")) + context.getLocales()
-        } else {
-            context.getLocales()
         }
         play()
     }
@@ -143,7 +163,7 @@ class ReadAloudStateHolder(
                     initializedState = null
                     textToSpeech = TextToSpeech(
                         context,
-                        this@ReadAloudStateHolder
+                        this@TTSStateHolder
                     )
                 }
                 while (initializedState == null) {
@@ -160,11 +180,12 @@ class ReadAloudStateHolder(
                     }
                     return@launch
                 }
-                _readAloudState.value = PlaybackStatus.PLAYING
+                _ttsState.value = PlaybackStatus.PLAYING
 
                 // Can only set this once engine has been initialized
                 textToSpeech?.setOnUtteranceProgressListener(speechListener)
                 try {
+                    updateAvailableLanguages()
                     speakNext()
                 } catch (e: ConcurrentModificationException) {
                     Log.e(LOG_TAG, "User probably double clicked play", e)
@@ -177,15 +198,14 @@ class ReadAloudStateHolder(
     fun pause() {
         startJob?.cancel()
         textToSpeech?.stop()
-        _readAloudState.value = PlaybackStatus.PAUSED
+        _ttsState.value = PlaybackStatus.PAUSED
     }
 
     fun stop() {
         startJob?.cancel()
         textToSpeech?.stop()
         textToSpeechQueue.clear()
-        _readAloudState.value = PlaybackStatus.STOPPED
-        localesToUse = emptySequence()
+        _ttsState.value = PlaybackStatus.STOPPED
         textToSpeech = null
     }
 
@@ -202,13 +222,58 @@ class ReadAloudStateHolder(
         }
     }
 
+    fun setLanguage(lang: LocaleOverride) {
+        coroutineScope.launch {
+            startJob?.cancel()
+            textToSpeech?.stop()
+            startJob?.join()
+            _lang.update { lang }
+            play()
+        }
+    }
+
     override fun onInit(status: Int) {
         initializedState = status
 
-        if (status == TextToSpeech.SUCCESS) {
-            setFirstBestLocale(localesToUse)
-        } else {
+        if (status != TextToSpeech.SUCCESS) {
             Log.e(LOG_TAG, "Failed to load TextToSpeech object: $status")
+        }
+    }
+
+    fun updateAvailableLanguages() {
+        allAvailableLanguages = textToSpeech?.availableLanguages ?: emptySet()
+
+        val sortedLanguages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            context.detectLocaleFromText(
+                textToSpeechQueue.joinToString("\n\n"),
+                minConfidence = 0f,
+            )
+                .sortedByDescending { it.confidence }
+                .map { it.locale }
+                .plus(
+                    context.getLocales()
+                        .sortedBy { it.displayName }
+                )
+                .plus(
+                    allAvailableLanguages.asSequence()
+                        .sortedBy { it.displayName }
+                )
+        } else {
+            context.getLocales()
+                .sortedBy { it.displayName }
+                .plus(
+                    allAvailableLanguages.asSequence()
+                        .sortedBy { it.displayName }
+                )
+        }
+            .distinctBy { it.toLanguageTag() }
+            // People can set strange regions like en-SE - which are not listed as available
+            // but will work regardless
+//                .filter { it in allAvailableLanguages }
+            .toList()
+
+        _availableLanguages.update {
+            sortedLanguages
         }
     }
 
@@ -217,12 +282,13 @@ class ReadAloudStateHolder(
             localesToUse
                 .firstOrNull { locale ->
                     when (textToSpeech?.setLanguage(locale)) {
-                        TextToSpeech.LANG_MISSING_DATA, TextToSpeech.LANG_NOT_SUPPORTED -> {
-                            Log.e(LOG_TAG, "${locale.displayLanguage} is not supported!")
-                            false
+                        TextToSpeech.SUCCESS -> {
+                            Log.e(LOG_TAG, "${locale.toLanguageTag()} IS supported!")
+                            true
                         }
                         else -> {
-                            true
+                            Log.e(LOG_TAG, "${locale.toLanguageTag()} is not supported!")
+                            false
                         }
                     }
                 }
@@ -300,7 +366,7 @@ fun Context.getLocales(): Sequence<Locale> =
         sequence {
             val locales = resources.configuration.locales
 
-            for (i in 0..locales.size()) {
+            for (i in 0 until locales.size()) {
                 yield(locales[i])
             }
         }
@@ -310,7 +376,10 @@ fun Context.getLocales(): Sequence<Locale> =
     }
 
 @RequiresApi(Build.VERSION_CODES.Q)
-fun Context.detectLocaleFromText(text: CharSequence): Sequence<Locale> {
+fun Context.detectLocaleFromText(
+    text: CharSequence,
+    minConfidence: Float = 80.0f,
+): Sequence<LocaleWithConfidence> {
     val textClassificationManager = getSystemService(TextClassificationManager::class.java)
     val textClassifier = textClassificationManager.textClassifier
 
@@ -320,16 +389,34 @@ fun Context.detectLocaleFromText(text: CharSequence): Sequence<Locale> {
     return sequence {
         for (i in 0 until detectedLanguage.localeHypothesisCount) {
             val localeDetected = detectedLanguage.getLocale(i)
-            val confidence = detectedLanguage.getConfidenceScore(localeDetected) * 100.0
-            if (confidence >= 80f) {
-                yield(localeDetected.toLocale())
+            val confidence = detectedLanguage.getConfidenceScore(localeDetected) * 100.0f
+            if (confidence >= minConfidence) {
+                yield(
+                    LocaleWithConfidence(
+                        locale = localeDetected.toLocale(),
+                        confidence = confidence,
+                    )
+                )
             }
         }
     }
 }
+
+data class LocaleWithConfidence(
+    val locale: Locale,
+    val confidence: Float,
+)
 
 enum class PlaybackStatus {
     STOPPED,
     PAUSED,
     PLAYING
 }
+
+sealed class LocaleOverride
+
+object AppSetting : LocaleOverride()
+
+object ForcedAuto : LocaleOverride()
+
+data class ForcedLocale(val locale: Locale) : LocaleOverride()

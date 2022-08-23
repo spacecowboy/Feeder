@@ -23,14 +23,16 @@ import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
-import com.nononsenseapps.feeder.model.ReadAloudStateHolder
+import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.parseFullArticleIfMissing
 import com.nononsenseapps.feeder.model.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -54,7 +56,7 @@ class FeedArticleViewModel(
     private val state: SavedStateHandle
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
-    private val readAloudStateHolder: ReadAloudStateHolder by instance()
+    private val ttsStateHolder: TTSStateHolder by instance()
 
     val currentFeedListItems: Flow<PagingData<FeedListItem>> =
         repository.getCurrentFeedListItems()
@@ -248,18 +250,18 @@ class FeedArticleViewModel(
             repository.linkOpener,
             repository.currentFeedAndTag.map { (feedId, tag) -> FeedOrTag(feedId, tag) },
             repository.currentArticle,
-            readAloudStateHolder.title,
-            readAloudStateHolder.readAloudState,
+            ttsStateHolder.ttsState,
             repository.swipeAsRead,
             textToDisplayTrigger, // Never actually read, only used as trigger
             repository.showOnlyBookmarked,
             repository.useDetectLanguage,
+            ttsStateHolder.availableLanguages,
         ) { params: Array<Any> ->
             @Suppress("UNCHECKED_CAST")
             val article = params[17] as Article
 
             @Suppress("UNCHECKED_CAST")
-            val readAloudState = params[19] as PlaybackStatus
+            val ttsState = params[18] as PlaybackStatus
 
             @Suppress("UNCHECKED_CAST")
             val haveVisibleFeedItems = (params[9] as Int) > 0
@@ -291,16 +293,16 @@ class FeedArticleViewModel(
                 currentFeedOrTag = params[16] as FeedOrTag,
                 articleLink = article.link,
                 textToDisplay = getTextToDisplayFor(article.id),
-                readAloudTitle = params[18] as String,
-                isReadAloudPlaying = readAloudState == PlaybackStatus.PLAYING,
-                isBottomBarVisible = readAloudState != PlaybackStatus.STOPPED,
+                isTTSPlaying = ttsState == PlaybackStatus.PLAYING,
+                isBottomBarVisible = ttsState != PlaybackStatus.STOPPED,
                 articleId = article.id,
                 isArticleOpen = params[14] as Boolean,
-                swipeAsRead = params[20] as SwipeAsRead,
+                swipeAsRead = params[19] as SwipeAsRead,
                 isPinned = article.pinned,
                 isBookmarked = article.bookmarked,
-                onlyBookmarked = params[22] as Boolean,
-                useDetectLanguage = params[23] as Boolean,
+                onlyBookmarked = params[21] as Boolean,
+                useDetectLanguage = params[22] as Boolean,
+                ttsLanguages = params[23] as List<Locale>,
             )
         }
             .stateIn(
@@ -348,19 +350,23 @@ class FeedArticleViewModel(
         )
     }
 
-    fun readAloudStop() {
-        readAloudStateHolder.stop()
+    fun ttsStop() {
+        ttsStateHolder.stop()
     }
 
-    fun readAloudPause() {
-        readAloudStateHolder.pause()
+    fun ttsPause() {
+        ttsStateHolder.pause()
     }
 
-    fun readAloudSkipNext() {
-        readAloudStateHolder.skipNext()
+    fun ttsSkipNext() {
+        ttsStateHolder.skipNext()
     }
 
-    fun readAloudPlay() {
+    fun ttsOnSelectLanguage(lang: LocaleOverride) {
+        ttsStateHolder.setLanguage(lang)
+    }
+
+    fun ttsPlay() {
         val context = getApplication<FeederApplication>()
         viewModelScope.launch(Dispatchers.IO) {
             val fullText = when (viewState.value.textToDisplay) {
@@ -390,8 +396,7 @@ class FeedArticleViewModel(
             if (fullText == null) {
                 // TODO show error some message
             } else {
-                readAloudStateHolder.readAloud(
-                    title = viewState.value.articleTitle,
+                ttsStateHolder.tts(
                     textArray = fullText,
                     useDetectLanguage = viewState.value.useDetectLanguage
                 )
@@ -401,7 +406,7 @@ class FeedArticleViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        readAloudStateHolder.shutdown()
+        ttsStateHolder.shutdown()
     }
 }
 
@@ -419,8 +424,8 @@ interface FeedScreenViewState {
     val feedItemStyle: FeedItemStyle
     val expandedTags: Set<String>
     val isBottomBarVisible: Boolean
-    val isReadAloudPlaying: Boolean
-    val readAloudTitle: String
+    val isTTSPlaying: Boolean
+    val ttsLanguages: List<Locale>
     val showToolbarMenu: Boolean
     val showDeleteDialog: Boolean
     val showEditDialog: Boolean
@@ -431,8 +436,8 @@ interface FeedScreenViewState {
 interface ArticleScreenViewState {
     val useDetectLanguage: Boolean
     val isBottomBarVisible: Boolean
-    val isReadAloudPlaying: Boolean
-    val readAloudTitle: String
+    val isTTSPlaying: Boolean
+    val ttsLanguages: List<Locale>
     val articleFeedUrl: String?
     val articleId: Long
     val articleLink: String?
@@ -465,8 +470,8 @@ data class FeedArticleScreenViewState(
     override val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
     override val expandedTags: Set<String> = emptySet(),
     override val isBottomBarVisible: Boolean = false,
-    override val isReadAloudPlaying: Boolean = false,
-    override val readAloudTitle: String = "",
+    override val isTTSPlaying: Boolean = false,
+    override val ttsLanguages: List<Locale> = emptyList(),
     override val showToolbarMenu: Boolean = false,
     override val showDeleteDialog: Boolean = false,
     override val showEditDialog: Boolean = false,

@@ -95,6 +95,7 @@ import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListContent
@@ -110,7 +111,7 @@ import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
-import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
+import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
 import com.nononsenseapps.feeder.ui.compose.reader.ReaderView
 import com.nononsenseapps.feeder.ui.compose.reader.dateTimeFormat
 import com.nononsenseapps.feeder.ui.compose.reader.onLinkClick
@@ -212,10 +213,11 @@ fun FeedArticleScreen(
         onShowToolbarMenu = { visible ->
             viewModel.setToolbarMenuVisible(visible)
         },
-        readAloudOnPlay = viewModel::readAloudPlay,
-        readAloudOnPause = viewModel::readAloudPause,
-        readAloudOnStop = viewModel::readAloudStop,
-        readAloudOnSkipNext = viewModel::readAloudSkipNext,
+        ttsOnPlay = viewModel::ttsPlay,
+        ttsOnPause = viewModel::ttsPause,
+        ttsOnStop = viewModel::ttsStop,
+        ttsOnSkipNext = viewModel::ttsSkipNext,
+        ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
         onAddFeed = { SearchFeedDestination.navigate(navController) },
         onEditFeed = { feedId ->
             EditFeedDestination.navigate(navController, feedId)
@@ -344,10 +346,11 @@ private fun FeedArticleScreen(
     onMarkAllAsRead: () -> Unit,
     onToggleTagExpansion: (String) -> Unit,
     onShowToolbarMenu: (Boolean) -> Unit,
-    readAloudOnPlay: () -> Unit,
-    readAloudOnPause: () -> Unit,
-    readAloudOnStop: () -> Unit,
-    readAloudOnSkipNext: () -> Unit,
+    ttsOnPlay: () -> Unit,
+    ttsOnPause: () -> Unit,
+    ttsOnStop: () -> Unit,
+    ttsOnSkipNext: () -> Unit,
+    ttsOnSelectLanguage: (LocaleOverride) -> Unit,
     onAddFeed: () -> Unit,
     onEditFeed: (Long) -> Unit,
     onShowEditDialog: () -> Unit,
@@ -401,10 +404,11 @@ private fun FeedArticleScreen(
                     onToggleOnlyBookmarked = onToggleOnlyBookmarked,
                     onMarkAllAsRead = onMarkAllAsRead,
                     onShowToolbarMenu = onShowToolbarMenu,
-                    readAloudOnPlay = readAloudOnPlay,
-                    readAloudOnPause = readAloudOnPause,
-                    readAloudOnStop = readAloudOnStop,
-                    readAloudOnSkipNext = readAloudOnSkipNext,
+                    ttsOnPlay = ttsOnPlay,
+                    ttsOnPause = ttsOnPause,
+                    ttsOnStop = ttsOnStop,
+                    ttsOnSkipNext = ttsOnSkipNext,
+                    ttsOnSelectLanguage = ttsOnSelectLanguage,
                     onAddFeed = onAddFeed,
                     onEditFeed = onEditFeed,
                     onShowEditDialog = onShowEditDialog,
@@ -445,10 +449,11 @@ private fun FeedArticleScreen(
             onShowToolbarMenu = onShowToolbarMenu,
             onInteractWithArticle = onInteractWithArticle,
             displayFullText = displayFullText,
-            readAloudOnPlay = readAloudOnPlay,
-            readAloudOnPause = readAloudOnPause,
-            readAloudOnStop = readAloudOnStop,
-            readAloudOnSkipNext = readAloudOnSkipNext,
+            ttsOnPlay = ttsOnPlay,
+            ttsOnPause = ttsOnPause,
+            ttsOnStop = ttsOnStop,
+            ttsOnSkipNext = ttsOnSkipNext,
+            ttsOnSelectLanguage = ttsOnSelectLanguage,
             onTogglePinned = onToggleCurrentArticlePinned,
             onToggleBookmarked = onToggleCurrentArticleBookmarked,
             articleListState = articleListState,
@@ -472,10 +477,11 @@ private fun FeedArticleScreen(
                     onToggleOnlyBookmarked = onToggleOnlyBookmarked,
                     onMarkAllAsRead = onMarkAllAsRead,
                     onShowToolbarMenu = onShowToolbarMenu,
-                    readAloudOnPlay = readAloudOnPlay,
-                    readAloudOnPause = readAloudOnPause,
-                    readAloudOnStop = readAloudOnStop,
-                    readAloudOnSkipNext = readAloudOnSkipNext,
+                    ttsOnPlay = ttsOnPlay,
+                    ttsOnPause = ttsOnPause,
+                    ttsOnStop = ttsOnStop,
+                    ttsOnSkipNext = ttsOnSkipNext,
+                    ttsOnSelectLanguage = ttsOnSelectLanguage,
                     onOpenInCustomTab = onOpenInCustomTab,
                     onAddFeed = onAddFeed,
                     onEditFeed = onEditFeed,
@@ -565,10 +571,11 @@ fun FeedWithArticleScreen(
     onToggleOnlyBookmarked: (Boolean) -> Unit,
     onMarkAllAsRead: () -> Unit,
     onShowToolbarMenu: (Boolean) -> Unit,
-    readAloudOnPlay: () -> Unit,
-    readAloudOnPause: () -> Unit,
-    readAloudOnStop: () -> Unit,
-    readAloudOnSkipNext: () -> Unit,
+    ttsOnPlay: () -> Unit,
+    ttsOnPause: () -> Unit,
+    ttsOnStop: () -> Unit,
+    ttsOnSkipNext: () -> Unit,
+    ttsOnSelectLanguage: (LocaleOverride) -> Unit,
     onOpenInCustomTab: () -> Unit,
     onAddFeed: () -> Unit,
     onEditFeed: (Long) -> Unit,
@@ -627,10 +634,11 @@ fun FeedWithArticleScreen(
             }
         },
         onMarkAllAsRead = onMarkAllAsRead,
-        readAloudOnPlay = readAloudOnPlay,
-        readAloudOnPause = readAloudOnPause,
-        readAloudOnStop = readAloudOnStop,
-        readAloudOnSkipNext = readAloudOnSkipNext,
+        ttsOnPlay = ttsOnPlay,
+        ttsOnPause = ttsOnPause,
+        ttsOnStop = ttsOnStop,
+        ttsOnSkipNext = ttsOnSkipNext,
+        ttsOnSelectLanguage = ttsOnSelectLanguage,
         onDismissDeleteDialog = onDismissDeleteDialog,
         onDismissEditDialog = onDismissEditDialog,
         onDelete = onDeleteFeeds,
@@ -877,7 +885,7 @@ fun FeedWithArticleScreen(
                     DropdownMenuItem(
                         onClick = {
                             onShowToolbarMenu(false)
-                            readAloudOnPlay()
+                            ttsOnPlay()
                         },
                         leadingIcon = {
                             Icon(
@@ -1011,10 +1019,11 @@ fun FeedListScreen(
     onToggleOnlyBookmarked: (Boolean) -> Unit,
     onMarkAllAsRead: () -> Unit,
     onShowToolbarMenu: (Boolean) -> Unit,
-    readAloudOnPlay: () -> Unit,
-    readAloudOnPause: () -> Unit,
-    readAloudOnStop: () -> Unit,
-    readAloudOnSkipNext: () -> Unit,
+    ttsOnPlay: () -> Unit,
+    ttsOnPause: () -> Unit,
+    ttsOnStop: () -> Unit,
+    ttsOnSkipNext: () -> Unit,
+    ttsOnSelectLanguage: (LocaleOverride) -> Unit,
     onAddFeed: () -> Unit,
     onEditFeed: (Long) -> Unit,
     onShowEditDialog: () -> Unit,
@@ -1063,10 +1072,11 @@ fun FeedListScreen(
             }
         },
         onMarkAllAsRead = onMarkAllAsRead,
-        readAloudOnPlay = readAloudOnPlay,
-        readAloudOnPause = readAloudOnPause,
-        readAloudOnStop = readAloudOnStop,
-        readAloudOnSkipNext = readAloudOnSkipNext,
+        ttsOnPlay = ttsOnPlay,
+        ttsOnPause = ttsOnPause,
+        ttsOnStop = ttsOnStop,
+        ttsOnSkipNext = ttsOnSkipNext,
+        ttsOnSelectLanguage = ttsOnSelectLanguage,
         onDismissDeleteDialog = onDismissDeleteDialog,
         onDismissEditDialog = onDismissEditDialog,
         onDelete = onDeleteFeeds,
@@ -1306,10 +1316,11 @@ fun ArticleScreen(
     onShowToolbarMenu: (Boolean) -> Unit,
     onInteractWithArticle: () -> Unit,
     displayFullText: () -> Unit,
-    readAloudOnPlay: () -> Unit,
-    readAloudOnPause: () -> Unit,
-    readAloudOnStop: () -> Unit,
-    readAloudOnSkipNext: () -> Unit,
+    ttsOnPlay: () -> Unit,
+    ttsOnPause: () -> Unit,
+    ttsOnStop: () -> Unit,
+    ttsOnSkipNext: () -> Unit,
+    ttsOnSelectLanguage: (LocaleOverride) -> Unit,
     onTogglePinned: () -> Unit,
     onToggleBookmarked: () -> Unit,
     articleListState: LazyListState,
@@ -1458,7 +1469,7 @@ fun ArticleScreen(
                             DropdownMenuItem(
                                 onClick = {
                                     onShowToolbarMenu(false)
-                                    readAloudOnPlay()
+                                    ttsOnPlay()
                                 },
                                 leadingIcon = {
                                     Icon(
@@ -1476,13 +1487,15 @@ fun ArticleScreen(
             )
         },
         bottomBar = {
-            HideableReadAloudPlayer(
+            HideableTTSPlayer(
                 visibleState = bottomBarVisibleState,
-                currentlyPlaying = viewState.isReadAloudPlaying,
-                onPlay = readAloudOnPlay,
-                onPause = readAloudOnPause,
-                onStop = readAloudOnStop,
-                onSkipNext = readAloudOnSkipNext,
+                currentlyPlaying = viewState.isTTSPlaying,
+                onPlay = ttsOnPlay,
+                onPause = ttsOnPause,
+                onStop = ttsOnStop,
+                onSkipNext = ttsOnSkipNext,
+                languages = ImmutableHolder(viewState.ttsLanguages),
+                onSelectLanguage = ttsOnSelectLanguage,
             )
         },
     ) { padding ->
