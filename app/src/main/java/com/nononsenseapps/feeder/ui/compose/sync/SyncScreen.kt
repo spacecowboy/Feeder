@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -48,6 +47,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -765,46 +765,14 @@ fun SyncDeviceListContent(
                 .padding(top = 8.dp, bottom = 8.dp)
                 .fillMaxWidth()
         )
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f, fill = true)
-        ) {
-            items(
-                count = devices.item.count(),
-                key = { devices.item[it].deviceId }
-            ) { index ->
-                val device = devices.item[index]
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = minimumTouchSize)
-                ) {
-                    val text = if (device.deviceId == currentDeviceId) {
-                        stringResource(id = R.string.this_device, device.deviceName)
-                    } else {
-                        device.deviceName
-                    }
-                    Text(
-                        text = text,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.weight(1f, fill = true)
-                    )
-                    IconButton(
-                        onClick = {
-                            itemToDelete = device
-                        },
-                    ) {
-                        Icon(
-                            Icons.Filled.Delete,
-                            contentDescription = stringResource(R.string.disconnect_device_from_sync),
-                        )
-                    }
+        for (device in devices.item) {
+            DeviceEntry(
+                currentDeviceId = currentDeviceId,
+                device = device,
+                onDelete = {
+                    itemToDelete = device
                 }
-            }
+            )
         }
         Text(
             text = stringResource(R.string.device_sync_financed_by_community),
@@ -848,6 +816,52 @@ fun SyncDeviceListContent(
         ) {
             onDeleteDevice(itemToDelete.deviceId)
             itemToDelete = SyncDevice(deviceId = ID_UNSET, deviceName = "")
+        }
+    }
+}
+
+@Composable
+fun DeviceEntry(
+    currentDeviceId: Long,
+    device: SyncDevice,
+    onDelete: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = minimumTouchSize)
+    ) {
+        val text = if (device.deviceId == currentDeviceId) {
+            stringResource(id = R.string.this_device, device.deviceName)
+        } else {
+            device.deviceName
+        }
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.weight(1f, fill = true)
+        )
+        IconButton(onClick = onDelete) {
+            Icon(
+                Icons.Filled.Delete,
+                contentDescription = stringResource(R.string.disconnect_device_from_sync),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewDeviceEntry() {
+    FeederTheme {
+        Surface {
+            DeviceEntry(
+                currentDeviceId = 77L,
+                device = SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
+                onDelete = {},
+            )
         }
     }
 }
