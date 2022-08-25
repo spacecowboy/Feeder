@@ -3,12 +3,13 @@ package com.nononsenseapps.feeder.ui.compose.feed
 import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -56,7 +57,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -79,7 +79,6 @@ import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
-import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
@@ -242,7 +241,7 @@ fun FeedListContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun FeedScreen(
     viewState: FeedScreenViewState,
@@ -335,13 +334,10 @@ fun FeedScreen(
         },
         floatingActionButton = {
             if (viewState.showFab) {
-                val pixelPadding = with(LocalDensity.current) {
-                    16.dp.toPx().roundToInt() + WindowInsets.navigationBars.getBottom(this)
-                }
                 AnimatedVisibility(
                     visible = bottomBarVisibleState.isIdle && !bottomBarVisibleState.targetState,
-                    enter = slideInVertically(initialOffsetY = { it + pixelPadding }, animationSpec = tween(256)),
-                    exit = slideOutVertically(targetOffsetY = { it + pixelPadding }, animationSpec = tween(256)),
+                    enter = scaleIn(animationSpec = tween(256)),
+                    exit = scaleOut(animationSpec = tween(256)),
                 ) {
                     floatingActionButton()
                 }
