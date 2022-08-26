@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui.compose.settings
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -21,25 +21,31 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.RadioButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -50,6 +56,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -64,8 +71,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
@@ -80,9 +85,8 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onNavigateUp: () -> Unit,
@@ -91,10 +95,20 @@ fun SettingsScreen(
 ) {
     val viewState by settingsViewModel.viewState.collectAsState()
 
+    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        decayAnimationSpec,
+        rememberTopAppBarState()
+    )
+
     Scaffold(
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .statusBarsPadding()
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
+                scrollBehavior = scrollBehavior,
                 title = {
                     Text(
                         text = stringResource(id = R.string.title_activity_settings),
@@ -102,7 +116,6 @@ fun SettingsScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -129,63 +142,37 @@ fun SettingsScreen(
                 settingsViewModel.setCurrentSorting(value.currentSorting)
             },
             showFabValue = viewState.showFab,
-            onShowFabChanged = { value ->
-                settingsViewModel.setShowFab(value)
-            },
+            onShowFabChanged = settingsViewModel::setShowFab,
             feedItemStyleValue = viewState.feedItemStyle,
-            onFeedItemStyleChanged = { value ->
-                settingsViewModel.setFeedItemStyle(value)
-            },
+            onFeedItemStyleChanged = settingsViewModel::setFeedItemStyle,
             blockListValue = ImmutableHolder(viewState.blockList),
-            onBlockListChanged = { value ->
-                settingsViewModel.setBlockList(value)
-            },
+            onBlockListChanged = settingsViewModel::setBlockList,
             syncOnStartupValue = viewState.syncOnResume,
-            onSyncOnStartupChanged = {
-                settingsViewModel.setSyncOnResume(it)
-            },
+            onSyncOnStartupChanged = settingsViewModel::setSyncOnResume,
             syncOnlyOnWifiValue = viewState.syncOnlyOnWifi,
-            onSyncOnlyOnWifiChanged = {
-                settingsViewModel.setSyncOnlyOnWifi(it)
-            },
+            onSyncOnlyOnWifiChanged = settingsViewModel::setSyncOnlyOnWifi,
             syncOnlyWhenChargingValue = viewState.syncOnlyWhenCharging,
-            onSyncOnlyWhenChargingChanged = {
-                settingsViewModel.setSyncOnlyWhenCharging(it)
-            },
+            onSyncOnlyWhenChargingChanged = settingsViewModel::setSyncOnlyWhenCharging,
             loadImageOnlyOnWifiValue = viewState.loadImageOnlyOnWifi,
-            onLoadImageOnlyOnWifiChanged = {
-                settingsViewModel.setLoadImageOnlyOnWifi(it)
-            },
+            onLoadImageOnlyOnWifiChanged = settingsViewModel::setLoadImageOnlyOnWifi,
             useDetectLanguage = viewState.useDetectLanguage,
-            onUseDetectLanguageChanged = {
-                settingsViewModel.setUseDetectLanguage(it)
-            },
+            onUseDetectLanguageChanged = settingsViewModel::setUseDetectLanguage,
             showThumbnailsValue = viewState.showThumbnails,
-            onShowThumbnailsChanged = {
-                settingsViewModel.setShowThumbnails(it)
-            },
+            onShowThumbnailsChanged = settingsViewModel::setShowThumbnails,
             maxItemsPerFeedValue = viewState.maximumCountPerFeed,
-            onMaxItemsPerFeedChanged = {
-                settingsViewModel.setMaxCountPerFeed(it)
-            },
+            onMaxItemsPerFeedChanged = settingsViewModel::setMaxCountPerFeed,
             currentItemOpenerValue = viewState.itemOpener,
-            onItemOpenerChanged = {
-                settingsViewModel.setItemOpener(it)
-            },
+            onItemOpenerChanged = settingsViewModel::setItemOpener,
             currentLinkOpenerValue = viewState.linkOpener,
-            onLinkOpenerChanged = {
-                settingsViewModel.setLinkOpener(it)
-            },
+            onLinkOpenerChanged = settingsViewModel::setLinkOpener,
             currentSyncFrequencyValue = viewState.syncFrequency,
-            onSyncFrequencyChanged = {
-                settingsViewModel.setSyncFrequency(it)
-            },
+            onSyncFrequencyChanged = settingsViewModel::setSyncFrequency,
             batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored,
             onOpenSyncSettings = onNavigateToSyncScreen,
             swipeAsReadValue = viewState.swipeAsRead,
-            onSwipeAsReadOptionChanged = {
-                settingsViewModel.setSwipeAsRead(it)
-            }
+            onSwipeAsReadOptionChanged = settingsViewModel::setSwipeAsRead,
+            useDynamicTheme = viewState.useDynamicTheme,
+            onUseDynamicTheme = settingsViewModel::setUseDynamicTheme
         )
     }
 }
@@ -233,6 +220,8 @@ fun SettingsScreenPreview() {
                 onOpenSyncSettings = {},
                 onSwipeAsReadOptionChanged = {},
                 swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
+                useDynamicTheme = true,
+                onUseDynamicTheme = {},
             )
         }
     }
@@ -277,11 +266,14 @@ fun SettingsList(
     onSyncFrequencyChanged: (SyncFrequency) -> Unit,
     batteryOptimizationIgnoredValue: Boolean,
     onOpenSyncSettings: () -> Unit,
+    useDynamicTheme: Boolean,
+    onUseDynamicTheme: (Boolean) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val dimens = LocalDimens.current
     val isAndroidQAndAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    val isAndroidSAndAbove = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -299,6 +291,24 @@ fun SettingsList(
             ),
             title = stringResource(id = R.string.theme),
             onSelection = onThemeChanged
+        )
+
+        SwitchSetting(
+            checked = useDynamicTheme,
+            onCheckedChanged = onUseDynamicTheme,
+            title = stringResource(id = R.string.dynamic_theme_use),
+            description = when {
+                isAndroidSAndAbove -> {
+                    null
+                }
+                else -> {
+                    stringResource(
+                        id = R.string.only_available_on_android_n,
+                        "12"
+                    )
+                }
+            },
+            enabled = isAndroidSAndAbove
         )
 
         MenuSetting(
@@ -494,7 +504,8 @@ fun SettingsList(
             description = when {
                 isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
                 else -> stringResource(
-                    id = R.string.use_detect_language_not_available
+                    id = R.string.only_available_on_android_n,
+                    "10"
                 )
             },
             enabled = isAndroidQAndAbove
@@ -529,8 +540,8 @@ fun GroupTitle(
             contentAlignment = Alignment.CenterStart
         ) {
             ProvideTextStyle(
-                value = MaterialTheme.typography.caption.merge(
-                    TextStyle(color = MaterialTheme.colors.primary)
+                value = MaterialTheme.typography.labelMedium.merge(
+                    TextStyle(color = MaterialTheme.colorScheme.primary)
                 )
             ) {
                 title(Modifier.semantics { heading() })
@@ -622,23 +633,24 @@ fun <T> MenuSetting(
                     onClick = {
                         expanded = false
                         onSelection(value)
-                    }
-                ) {
-                    val style = if (value == currentValue) {
-                        MaterialTheme.typography.body1.merge(
-                            TextStyle(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colors.secondary
+                    },
+                    text = {
+                        val style = if (value == currentValue) {
+                            MaterialTheme.typography.bodyLarge.merge(
+                                TextStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
                             )
+                        } else {
+                            MaterialTheme.typography.bodyLarge
+                        }
+                        Text(
+                            value.toString(),
+                            style = style
                         )
-                    } else {
-                        MaterialTheme.typography.body1
                     }
-                    Text(
-                        value.toString(),
-                        style = style
-                    )
-                }
+                )
             }
         }
     }
@@ -818,16 +830,13 @@ private fun RowScope.TitleAndSubtitle(
         modifier = Modifier.weight(1f),
         verticalArrangement = Arrangement.Center
     ) {
-        ProvideTextStyle(value = MaterialTheme.typography.subtitle1) {
+        ProvideTextStyle(value = MaterialTheme.typography.titleMedium) {
             title()
         }
         if (subtitle != null) {
             Spacer(modifier = Modifier.size(2.dp))
-            ProvideTextStyle(value = MaterialTheme.typography.caption) {
-                CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.medium,
-                    content = subtitle
-                )
+            ProvideTextStyle(value = MaterialTheme.typography.bodyMedium) {
+                subtitle()
             }
         }
     }

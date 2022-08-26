@@ -39,6 +39,8 @@
   <string name="pause_reading">Pause reading</string>
   <string name="resume_reading">Resume reading</string>
   <string name="stop_reading">Stop reading</string>
+  <string name="skip_to_next">Skip to next</string>
+  <string name="set_language">Set language</string>
   <string name="sync">Sync</string>
   <string name="export_feeds_to_opml">Export feeds to OPML</string>
   <string name="import_feeds_from_opml">Import feeds from OPML</string>
@@ -65,7 +67,7 @@
   <string name="only_on_wifi">Only on Wi-Fi</string>
   <string name="show_thumbnails">Show thumbnails</string>
   <string name="use_detect_language">Detect language</string>
-  <string name="use_detect_language_not_available">Only available on Android 10 and above</string>
+  <string name="only_available_on_android_n">Only available on Android %1$s and above</string>
   <string name="description_for_read_aloud">Automatically detects article language</string>
   <string name="may_result_data_charges">May result in mobile data charges.</string>
   <string name="only_when_charging">Only when charging</string>
@@ -99,6 +101,7 @@
   <string name="theme_day">Day</string>
   <string name="theme_night">Night</string>
   <string name="theme">Theme</string>
+  <string name="dynamic_theme_use">Dynamic colors</string>
   <string name="dark_theme_preference">Preferred dark theme</string>
   <string name="dark_theme_preference_black">Black</string>
   <string name="dark_theme_preference_dark">Dark</string>
@@ -187,8 +190,11 @@
   <string name="no_barcode_scanner_installed">Could not find a barcode scanner</string>
   <string name="pin_article">Pin article</string>
   <string name="unpin_article">Unpin article</string>
+  <string name="pinned">Pinned</string>
   <string name="bookmark_article">Bookmark article</string>
   <string name="remove_bookmark">Remove bookmark</string>
+  <string name="bookmarked">Bookmarked</string>
+  <string name="new_indicator">New</string>
 
   <string name="permission_read_desc">Allows the application to read feeds and articles</string>
   <string name="permission_read_label">Feeder read-only access</string>

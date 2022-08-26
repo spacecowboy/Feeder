@@ -30,8 +30,8 @@ class ReaderScreenScrollingTest {
 //                        onShare = {},
 //                        onOpenInCustomTab = {},
 //                        onNavigateUp = {},
-//                        readAloudPlayer = {},
-//                        onReadAloudStart = {},
+//                        ttsPlayer = {},
+//                        onTTSStart = {},
 //                        onFeedTitleClick = {},
 //                        articleBody = {
 //                            dummyHtml.byteInputStream().use {

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -18,8 +17,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -36,6 +35,7 @@ import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import java.util.*
@@ -49,6 +49,7 @@ val dateTimeFormat: DateTimeFormatter =
 @Composable
 fun ReaderView(
     modifier: Modifier = Modifier,
+    screenType: ScreenType,
     articleListState: LazyListState = rememberLazyListState(),
     articleTitle: String = "Article title on top",
     feedTitle: String = "Feed Title is here",
@@ -63,7 +64,14 @@ fun ReaderView(
     SelectionContainer {
         LazyColumn(
             state = articleListState,
-            contentPadding = PaddingValues(bottom = 92.dp),
+            contentPadding = PaddingValues(
+                bottom = 92.dp,
+                start = when (screenType) {
+                    ScreenType.DUAL -> 0.dp // List items have enough padding
+                    ScreenType.SINGLE -> dimens.margin
+                },
+                end = dimens.margin
+            ),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
                 .fillMaxWidth()
@@ -72,7 +80,6 @@ fun ReaderView(
                 val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = dimens.margin)
                         .width(dimens.maxContentWidth)
                         .semantics(mergeDescendants = true) {
                             try {
@@ -91,12 +98,12 @@ fun ReaderView(
                 ) {
                     Text(
                         text = articleTitle,
-                        style = MaterialTheme.typography.h1
+                        style = MaterialTheme.typography.headlineLarge
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = feedTitle,
-                        style = MaterialTheme.typography.subtitle1.merge(LinkTextStyle()),
+                        style = MaterialTheme.typography.titleMedium.merge(LinkTextStyle()),
                         modifier = Modifier
                             .clearAndSetSemantics {
                                 contentDescription = feedTitle
@@ -110,7 +117,7 @@ fun ReaderView(
                         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                             Text(
                                 text = authorDate,
-                                style = MaterialTheme.typography.subtitle1
+                                style = MaterialTheme.typography.titleMedium
                             )
                         }
                     }
@@ -127,12 +134,11 @@ fun ReaderView(
                     }
                     Column(
                         modifier = Modifier
-                            .padding(horizontal = dimens.margin)
                             .width(dimens.maxContentWidth)
                     ) {
                         Text(
                             text = openLabel,
-                            style = MaterialTheme.typography.body1.merge(LinkTextStyle()),
+                            style = MaterialTheme.typography.bodyLarge.merge(LinkTextStyle()),
                             modifier = Modifier
                                 .clickable {
                                     onEnclosureClick()

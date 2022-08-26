@@ -72,7 +72,7 @@ class EditFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIA
     }
 
     private val _articleOpener: MutableStateFlow<String> = MutableStateFlow(
-        state["articleOpener"] ?: PREF_VAL_OPEN_WITH_READER
+        state["articleOpener"] ?: ""
     )
     fun setArticleOpener(value: String) {
         state["articleOpener"] = value

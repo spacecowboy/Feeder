@@ -26,7 +26,7 @@ import com.nononsenseapps.feeder.db.room.SyncRemoteDao
 import com.nononsenseapps.feeder.di.androidModule
 import com.nononsenseapps.feeder.di.archModelModule
 import com.nononsenseapps.feeder.di.networkModule
-import com.nononsenseapps.feeder.model.ReadAloudStateHolder
+import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.util.ToastMaker
@@ -51,7 +51,7 @@ import org.kodein.di.singleton
 @Suppress("unused")
 class FeederApplication : MultiDexApplication(), DIAware {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
-    private val readAloudStateHolder = ReadAloudStateHolder(this, applicationCoroutineScope)
+    private val ttsStateHolder = TTSStateHolder(this, applicationCoroutineScope)
 
     override val di by DI.lazy {
         // import(androidXModule(this@FeederApplication))
@@ -139,7 +139,7 @@ class FeederApplication : MultiDexApplication(), DIAware {
         }
         bind<ApplicationCoroutineScope>() with instance(applicationCoroutineScope)
         import(networkModule)
-        bind<ReadAloudStateHolder>() with instance(readAloudStateHolder)
+        bind<TTSStateHolder>() with instance(ttsStateHolder)
         bind<NotificationsWorker>() with singleton { NotificationsWorker(di) }
     }
 
@@ -156,7 +156,7 @@ class FeederApplication : MultiDexApplication(), DIAware {
 
     override fun onTerminate() {
         applicationCoroutineScope.cancel("Application is being terminated")
-        readAloudStateHolder.shutdown()
+        ttsStateHolder.shutdown()
         super.onTerminate()
     }
 

@@ -29,6 +29,7 @@ class TextComposer(
                     annotation = span.annotation
                 )
                 is SpanWithComposableStyle -> builder.pushComposableStyle(span.spanStyle)
+                is SpanWithVerbatim -> builder.pushVerbatimTtsAnnotation(span.verbatim)
             }
         }
     }
@@ -159,4 +160,8 @@ data class SpanWithAnnotation(
 
 data class SpanWithComposableStyle(
     val spanStyle: @Composable () -> SpanStyle
+) : Span()
+
+data class SpanWithVerbatim(
+    val verbatim: String
 ) : Span()

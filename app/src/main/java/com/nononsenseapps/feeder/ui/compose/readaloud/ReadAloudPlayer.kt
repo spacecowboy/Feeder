@@ -1,121 +1,220 @@
 package com.nononsenseapps.feeder.ui.compose.readaloud
 
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.model.AppSetting
+import com.nononsenseapps.feeder.model.ForcedAuto
+import com.nononsenseapps.feeder.model.ForcedLocale
+import com.nononsenseapps.feeder.model.LocaleOverride
+import com.nononsenseapps.feeder.ui.compose.components.PaddedBottomAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.theme.ReadAloudPlayerStyle
+import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import java.util.*
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun HideableReadAloudPlayer(
-    visible: Boolean,
+fun HideableTTSPlayer(
+    visibleState: MutableTransitionState<Boolean>,
     currentlyPlaying: Boolean,
-    title: String,
+    floatingActionButton: @Composable (() -> Unit)? = null,
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onStop: () -> Unit,
+    onSkipNext: () -> Unit,
+    languages: ImmutableHolder<List<Locale>>,
+    onSelectLanguage: (LocaleOverride) -> Unit,
 ) {
     AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn() + slideInVertically(initialOffsetY = { it * 2 }),
-        exit = slideOutVertically(targetOffsetY = { it * 2 }) + fadeOut()
+        visibleState = visibleState,
+        enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(256)),
+        exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(256)),
     ) {
-        ReadAloudPlayer(
+        TTSPlayer(
             currentlyPlaying = currentlyPlaying,
-            title = title,
+            floatingActionButton = floatingActionButton,
             onPlay = onPlay,
             onPause = onPause,
             onStop = onStop,
+            onSkipNext = onSkipNext,
+            languages = languages,
+            onSelectLanguage = onSelectLanguage,
         )
     }
 }
 
 @Composable
-fun ReadAloudPlayer(
+fun TTSPlayer(
     currentlyPlaying: Boolean,
-    title: String,
+    floatingActionButton: @Composable (() -> Unit)? = null,
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onStop: () -> Unit,
+    onSkipNext: () -> Unit,
+    languages: ImmutableHolder<List<Locale>>,
+    onSelectLanguage: (LocaleOverride) -> Unit,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(intrinsicSize = IntrinsicSize.Max)
-            .navigationBarsPadding()
-    ) {
-        Text(
-            title,
-            style = ReadAloudPlayerStyle(),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .weight(weight = 1.0f, fill = true)
-                .padding(top = 4.dp, end = 4.dp, bottom = 4.dp, start = 16.dp)
-        )
-        Crossfade(targetState = currentlyPlaying) { playing ->
-            if (playing) {
-                IconButton(onClick = onPause) {
+    var showMenu by remember {
+        mutableStateOf(false)
+    }
+    PaddedBottomAppBar(
+        floatingActionButton = floatingActionButton,
+        actions = {
+            IconButton(
+                onClick = onStop
+            ) {
+                Icon(
+                    Icons.Default.Stop,
+                    contentDescription = stringResource(R.string.stop_reading)
+                )
+            }
+            Crossfade(targetState = currentlyPlaying) { playing ->
+                if (playing) {
+                    IconButton(
+                        onClick = onPause
+                    ) {
+                        Icon(
+                            Icons.Default.Pause,
+                            contentDescription = stringResource(R.string.pause_reading)
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = onPlay
+                    ) {
+                        Icon(
+                            // TextToSpeech
+                            Icons.Default.PlayArrow,
+                            contentDescription = stringResource(R.string.resume_reading)
+                        )
+                    }
+                }
+            }
+            IconButton(
+                onClick = onSkipNext
+            ) {
+                Icon(
+                    Icons.Default.SkipNext,
+                    contentDescription = stringResource(R.string.skip_to_next)
+                )
+            }
+            Box {
+                IconButton(
+                    onClick = {
+                        showMenu = true
+                    }
+                ) {
                     Icon(
-                        Icons.Default.Pause,
-                        contentDescription = stringResource(R.string.pause_reading)
+                        Icons.Default.Translate,
+                        contentDescription = stringResource(R.string.set_language)
                     )
                 }
-            } else {
-                IconButton(onClick = onPlay) {
-                    Icon(
-                        Icons.Default.PlayArrow,
-                        contentDescription = stringResource(R.string.resume_reading)
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        onClick = {
+                            onSelectLanguage(AppSetting)
+                            showMenu = false
+                        },
+                        text = {
+                            Text(stringResource(id = R.string.use_app_default))
+                        }
                     )
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        DropdownMenuItem(
+                            onClick = {
+                                onSelectLanguage(ForcedAuto)
+                                showMenu = false
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.use_detect_language))
+                            }
+                        )
+                    }
+                    Divider()
+                    for (lang in languages.item) {
+                        DropdownMenuItem(
+                            onClick = {
+                                onSelectLanguage(ForcedLocale(lang))
+                                showMenu = false
+                            },
+                            text = {
+                                Text(text = lang.getDisplayName(lang))
+                            }
+                        )
+                    }
                 }
             }
         }
-        IconButton(onClick = onStop) {
-            Icon(
-                Icons.Default.Stop,
-                contentDescription = stringResource(R.string.stop_reading)
-            )
-        }
-    }
+    )
 }
 
 @Preview
 @Composable
 fun PlayerPreview() {
     FeederTheme {
-        ReadAloudPlayer(
+        TTSPlayer(
             currentlyPlaying = true,
-            title = "Article Title",
             onPlay = {},
             onPause = {},
             onStop = {},
+            onSkipNext = {},
+            onSelectLanguage = {},
+            languages = ImmutableHolder(emptyList()),
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PlayerPreviewWithFab() {
+    FeederTheme {
+        TTSPlayer(
+            currentlyPlaying = true,
+            onPlay = {},
+            onPause = {},
+            onStop = {},
+            onSkipNext = {},
+            onSelectLanguage = {},
+            languages = ImmutableHolder(emptyList()),
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {},
+                ) {
+                    Icon(
+                        Icons.Default.DoneAll,
+                        contentDescription = stringResource(R.string.mark_all_as_read)
+                    )
+                }
+            }
         )
     }
 }

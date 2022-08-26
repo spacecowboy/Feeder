@@ -3,47 +3,55 @@ package com.nononsenseapps.feeder.ui.compose.searchfeed
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.input.ImeAction
@@ -53,13 +61,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
+import com.nononsenseapps.feeder.ui.compose.theme.Dimensions
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.stableListHolderOf
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.MalformedURLException
@@ -69,17 +80,27 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchFeedScreen(
+    windowSize: WindowSize,
     onNavigateUp: () -> Unit,
     initialFeedUrl: String? = null,
     searchFeedViewModel: SearchFeedViewModel,
     onClick: (SearchResult) -> Unit,
 ) {
+    val screenType by remember(windowSize) {
+        derivedStateOf {
+            getScreenType(windowSize)
+        }
+    }
+
     Scaffold(
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
+        modifier = Modifier
+            .statusBarsPadding()
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.add_feed),
@@ -87,7 +108,6 @@ fun SearchFeedScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -100,6 +120,7 @@ fun SearchFeedScreen(
         }
     ) { padding ->
         SearchFeedView(
+            screenType = screenType,
             initialFeedUrl = initialFeedUrl ?: "",
             modifier = Modifier.padding(padding),
             searchFeedViewModel = searchFeedViewModel,
@@ -108,9 +129,9 @@ fun SearchFeedScreen(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SearchFeedView(
+    screenType: ScreenType,
     initialFeedUrl: String = "",
     modifier: Modifier,
     searchFeedViewModel: SearchFeedViewModel,
@@ -134,6 +155,7 @@ fun SearchFeedView(
     }
 
     SearchFeedView(
+        screenType = screenType,
         feedUrl = feedUrl,
         onUrlChanged = {
             feedUrl = it
@@ -164,9 +186,10 @@ fun SearchFeedView(
     )
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchFeedView(
+    screenType: ScreenType,
     feedUrl: String = "",
     onUrlChanged: (String) -> Unit,
     onSearch: (URL) -> Unit,
@@ -182,107 +205,180 @@ fun SearchFeedView(
 
     // If screen is opened from intent with pre-filled URL, trigger search directly
     LaunchedEffect(Unit) {
-        if (feedUrl.isNotBlank() && isValidUrl(feedUrl)) {
+        if (results.item.isEmpty() && errors.item.isEmpty() && feedUrl.isNotBlank() && isValidUrl(
+                feedUrl
+            )
+        ) {
             onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
         }
     }
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .padding(horizontal = dimens.margin, vertical = 8.dp)
-            .fillMaxWidth()
-    ) {
-        item {
-            TextField(
-                value = feedUrl,
-                onValueChange = onUrlChanged,
-                label = {
-                    Text(stringResource(id = R.string.add_feed_search_hint))
-                },
-                leadingIcon = null,
-                trailingIcon = null,
-                isError = feedUrl.isNotEmpty() && isNotValidUrl(feedUrl),
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.None,
-                    autoCorrect = false,
-                    keyboardType = KeyboardType.Uri,
-                    imeAction = ImeAction.Search
-                ),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        if (isValidUrl(feedUrl)) {
-                            onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
-                            keyboardController?.hide()
-                        }
-                    }
-                ),
-                singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(),
+    if (screenType == ScreenType.DUAL) {
+        Row(
+            modifier = modifier.width(dimens.maxContentWidth),
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .width(dimens.maxContentWidth)
-                    .interceptKey(Key.Enter) {
-                        if (isValidUrl(feedUrl)) {
-                            onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
-                            keyboardController?.hide()
-                        }
-                    }
-                    .interceptKey(Key.Escape) {
-                        focusManager.clearFocus()
-                    }
-                    .safeSemantics {
-                        testTag = "urlField"
-                    }
-            )
-        }
-        item {
-            OutlinedButton(
-                enabled = isValidUrl(feedUrl),
-                onClick = {
-                    if (isValidUrl(feedUrl)) {
-                        onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
-                        focusManager.clearFocus()
-                    }
-                }
+                    .weight(1f, fill = true)
+                    .padding(horizontal = dimens.margin, vertical = 8.dp)
             ) {
-                Text(
-                    stringResource(android.R.string.search_go)
+                leftContent(
+                    feedUrl = feedUrl,
+                    focusManager = focusManager,
+                    dimens = dimens,
+                    keyboardController = keyboardController,
+                    onUrlChanged = onUrlChanged,
+                    onSearch = onSearch
+                )
+            }
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .weight(1f, fill = true)
+                    .padding(horizontal = dimens.margin, vertical = 8.dp)
+            ) {
+                rightContent(
+                    results = results,
+                    errors = errors,
+                    currentlySearching = currentlySearching,
+                    onClick = onClick
                 )
             }
         }
-        if (results.item.isEmpty()) {
-            for (error in errors.item) {
-                item {
-                    val title = stringResource(
-                        R.string.failed_to_parse,
-                        error.url
-                    )
-                    SearchResultView(
-                        title = title,
-                        url = error.url,
-                        description = error.description
-                    ) {
-                    }
+    } else {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier
+                .padding(horizontal = dimens.margin, vertical = 8.dp)
+                .width(dimens.maxContentWidth)
+        ) {
+            leftContent(
+                feedUrl = feedUrl,
+                onUrlChanged = onUrlChanged,
+                onSearch = onSearch,
+                focusManager = focusManager,
+                dimens = dimens,
+                keyboardController = keyboardController
+            )
+            rightContent(
+                results = results,
+                errors = errors,
+                currentlySearching = currentlySearching,
+                onClick = onClick
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun ColumnScope.leftContent(
+    feedUrl: String,
+    onUrlChanged: (String) -> Unit,
+    onSearch: (URL) -> Unit,
+    focusManager: FocusManager,
+    dimens: Dimensions,
+    keyboardController: SoftwareKeyboardController?,
+) {
+    val isNotValidUrl by remember(feedUrl) {
+        derivedStateOf {
+            feedUrl.isNotEmpty() && isNotValidUrl(feedUrl)
+        }
+    }
+    val isValidUrl by remember(feedUrl) {
+        derivedStateOf {
+            isValidUrl(feedUrl)
+        }
+    }
+    TextField(
+        value = feedUrl,
+        onValueChange = onUrlChanged,
+        label = {
+            Text(stringResource(id = R.string.add_feed_search_hint))
+        },
+        isError = isNotValidUrl,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrect = false,
+            keyboardType = KeyboardType.Uri,
+            imeAction = ImeAction.Search
+        ),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                if (isValidUrl) {
+                    onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                    keyboardController?.hide()
                 }
             }
-        }
-        for (result in results.item) {
-            item {
-                SearchResultView(
-                    title = result.title,
-                    url = result.url,
-                    description = result.description
-                ) {
-                    onClick(result)
+        ),
+        singleLine = true,
+        colors = TextFieldDefaults.textFieldColors(),
+        modifier = Modifier
+            .width(dimens.maxContentWidth)
+            .interceptKey(Key.Enter) {
+                if (isValidUrl(feedUrl)) {
+                    onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                    keyboardController?.hide()
                 }
             }
-        }
-        item {
-            AnimatedVisibility(visible = currentlySearching) {
-                SearchingIndicator()
+            .interceptKey(Key.Escape) {
+                focusManager.clearFocus()
+            }
+            .safeSemantics {
+                testTag = "urlField"
+            }
+    )
+
+    OutlinedButton(
+        enabled = isValidUrl,
+        onClick = {
+            if (isValidUrl) {
+                onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                focusManager.clearFocus()
             }
         }
+    ) {
+        Text(
+            stringResource(android.R.string.search_go)
+        )
+    }
+}
+
+@Composable
+fun ColumnScope.rightContent(
+    results: StableHolder<List<SearchResult>>,
+    errors: StableHolder<List<SearchResult>>,
+    currentlySearching: Boolean,
+    onClick: (SearchResult) -> Unit,
+) {
+    if (results.item.isEmpty()) {
+        for (error in errors.item) {
+            val title = stringResource(
+                R.string.failed_to_parse,
+                error.url
+            )
+            ErrorResultView(
+                title = title,
+                description = error.description
+            )
+        }
+    }
+    for (result in results.item) {
+        SearchResultView(
+            title = result.title,
+            url = result.url,
+            description = result.description
+        ) {
+            onClick(result)
+        }
+    }
+    AnimatedVisibility(visible = currentlySearching) {
+        SearchingIndicator()
     }
 }
 
@@ -300,6 +396,7 @@ fun SearchingIndicator() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultView(
     title: String,
@@ -308,57 +405,181 @@ fun SearchResultView(
     onClick: () -> Unit,
 ) {
     val dimens = LocalDimens.current
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+    Card(
+        onClick = onClick,
         modifier = Modifier
             .width(dimens.maxContentWidth)
-            .clickable(onClick = onClick)
             .safeSemantics {
                 testTag = "searchResult"
             }
     ) {
-        Text(
-            title,
-            style = MaterialTheme.typography.subtitle2
-        )
-        Text(
-            url,
-            style = MaterialTheme.typography.body2
-        )
-        Text(
-            description,
-            style = MaterialTheme.typography.body2
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .width(dimens.maxContentWidth)
+                .padding(8.dp)
+        ) {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleSmall
+            )
+            Text(
+                url,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                description,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun ErrorResultView(
+    title: String,
+    description: String,
+) {
+    val dimens = LocalDimens.current
+
+    Card(
+        modifier = Modifier
+            .width(dimens.maxContentWidth)
+            .safeSemantics {
+                testTag = "errorResult"
+            }
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .width(dimens.maxContentWidth)
+                .padding(8.dp)
+        ) {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleSmall
+                    .copy(color = MaterialTheme.colorScheme.error)
+            )
+            Text(
+                description,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
 
 @Preview(
-    name = "Search with results",
-    showBackground = true,
-    backgroundColor = 0xffffff,
+    name = "Search with results Phone",
     showSystemUi = true,
     device = Devices.NEXUS_5,
     uiMode = UI_MODE_NIGHT_NO,
 )
 @Composable
 fun SearchPreview() {
-    SearchFeedView(
-        feedUrl = "https://cowboyprogrammer.org",
-        currentlySearching = false,
-        errors = stableListHolderOf(),
-        results = stableListHolderOf(
-            SearchResult(
-                title = "Atom feed",
-                url = "https://cowboyprogrammer.org/atom",
-                description = "An atom feed",
-                isError = false,
+    FeederTheme {
+        Surface {
+            SearchFeedView(
+                screenType = ScreenType.SINGLE,
+                feedUrl = "https://cowboyprogrammer.org",
+                currentlySearching = false,
+                errors = stableListHolderOf(),
+                results = stableListHolderOf(
+                    SearchResult(
+                        title = "Atom feed",
+                        url = "https://cowboyprogrammer.org/atom",
+                        description = "An atom feed",
+                        isError = false,
+                    ),
+                    SearchResult(
+                        title = "RSS feed",
+                        url = "https://cowboyprogrammer.org/rss",
+                        description = "An RSS feed",
+                        isError = false,
+                    ),
+                ),
+                modifier = Modifier,
+                onClick = {},
+                onSearch = {},
+                onUrlChanged = {},
             )
-        ),
-        modifier = Modifier,
-        onClick = {},
-        onSearch = {},
-        onUrlChanged = {},
-    )
+        }
+    }
+}
+
+@Preview(
+    name = "Search with error Phone",
+    showSystemUi = true,
+    device = Devices.NEXUS_5,
+    uiMode = UI_MODE_NIGHT_NO,
+)
+@Composable
+fun ErrorPreview() {
+    FeederTheme {
+        Surface {
+            SearchFeedView(
+                screenType = ScreenType.SINGLE,
+                feedUrl = "https://cowboyprogrammer.org",
+                currentlySearching = false,
+                errors = stableListHolderOf(
+                    SearchResult(
+                        title = "Unknown Error",
+                        url = "https://cowboyprogrammer.org/bad",
+                        description = "Who knows what happened really",
+                        isError = true,
+                    ),
+                ),
+                results = stableListHolderOf(),
+                modifier = Modifier,
+                onClick = {},
+                onSearch = {},
+                onUrlChanged = {},
+            )
+        }
+    }
+}
+
+@Preview(
+    name = "Search with results Foldable",
+    showSystemUi = true,
+    device = Devices.FOLDABLE,
+    uiMode = UI_MODE_NIGHT_NO,
+)
+@Preview(
+    name = "Search with results Tablet",
+    showSystemUi = true,
+    device = Devices.PIXEL_C,
+    uiMode = UI_MODE_NIGHT_NO,
+)
+@Composable
+fun SearchPreviewLarge() {
+    FeederTheme {
+        Surface {
+            SearchFeedView(
+                screenType = ScreenType.DUAL,
+                feedUrl = "https://cowboyprogrammer.org",
+                currentlySearching = false,
+                errors = stableListHolderOf(),
+                results = stableListHolderOf(
+                    SearchResult(
+                        title = "Atom feed",
+                        url = "https://cowboyprogrammer.org/atom",
+                        description = "An atom feed",
+                        isError = false,
+                    ),
+                    SearchResult(
+                        title = "RSS feed",
+                        url = "https://cowboyprogrammer.org/rss",
+                        description = "An RSS feed",
+                        isError = false,
+                    ),
+                ),
+                modifier = Modifier,
+                onClick = {},
+                onSearch = {},
+                onUrlChanged = {},
+            )
+        }
+    }
 }
 
 private fun isValidUrl(url: String): Boolean {

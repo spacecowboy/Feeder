@@ -4,13 +4,16 @@ import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
@@ -22,58 +25,40 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.IconToggleButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.ImportExport
+import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.PushPin
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import coil.annotation.ExperimentalCoilApi
@@ -81,25 +66,18 @@ import coil.compose.rememberImagePainter
 import coil.size.PixelSize
 import coil.size.Precision
 import coil.size.Scale
-import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
-import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
+import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
-import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTop
-import com.nononsenseapps.feeder.ui.compose.navdrawer.ListOfFeedsAndTags
-import com.nononsenseapps.feeder.ui.compose.readaloud.HideableReadAloudPlayer
+import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
+import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -124,7 +102,7 @@ fun FeedListContent(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val isLightTheme = MaterialTheme.colors.isLight
+    val isLightTheme = MaterialTheme.colorScheme.isLight
 
     @DrawableRes
     val placeHolder: Int by remember(isLightTheme) {
@@ -165,9 +143,7 @@ fun FeedListContent(
             LazyColumn(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(
-                    bottom = if (viewState.bottomBarVisible) (80 + 40).dp else 80.dp
-                ),
+                contentPadding = if (viewState.isBottomBarVisible) PaddingValues(0.dp) else WindowInsets.navigationBars.asPaddingValues(),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
@@ -226,12 +202,7 @@ fun FeedListContent(
                         onToggleBookmarked = {
                             onSetBookmarked(previewItem.id, !previewItem.bookmarked)
                         },
-                        imagePainter = { imageUrl ->
-                            val alpha: Float = if (previewItem.shouldBeShownAsUnread) {
-                                1.0f
-                            } else {
-                                0.5f
-                            }
+                        imagePainter = { imageUrl, modifier ->
                             Box {
                                 Image(
                                     painter = rememberImagePainter(
@@ -246,7 +217,7 @@ fun FeedListContent(
                                     ),
                                     contentScale = ContentScale.Crop,
                                     contentDescription = null,
-                                    modifier = Modifier
+                                    modifier = modifier
                                         .run {
                                             when (viewState.feedItemStyle) {
                                                 FeedItemStyle.CARD ->
@@ -260,24 +231,7 @@ fun FeedListContent(
                                                     .fillMaxHeight()
                                             }
                                         }
-                                        .alpha(alpha)
                                 )
-                                if (previewItem.pinned) {
-                                    Icon(
-                                        Icons.Default.PushPin,
-                                        contentDescription = null,
-                                        tint = Color.Red.copy(alpha = 0.7f)
-                                    )
-                                }
-                                if (previewItem.bookmarked) {
-                                    Icon(
-                                        Icons.Default.Bookmark,
-                                        contentDescription = null,
-                                        tint = Color.Yellow.copy(alpha = 0.7f),
-                                        modifier = Modifier
-                                            .align(Alignment.TopEnd)
-                                    )
-                                }
                             }
                         }
                     )
@@ -287,384 +241,26 @@ fun FeedListContent(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun FeedScreen(
     viewState: FeedScreenViewState,
-    refreshState: SwipeRefreshState,
     onRefreshVisible: () -> Unit,
-    onRefreshAll: () -> Unit,
-    onToggleOnlyUnread: (Boolean) -> Unit,
-    onToggleOnlyBookmarked: (Boolean) -> Unit,
-    onDrawerItemSelected: (Long, String) -> Unit,
-    onDelete: (Iterable<Long>) -> Unit,
-    onAddFeed: () -> Unit,
-    onEditFeed: (Long) -> Unit,
-    onSettings: () -> Unit,
-    onSendFeedback: () -> Unit,
-    onImport: () -> Unit,
-    onExport: () -> Unit,
+    onOpenNavDrawer: () -> Unit,
     onMarkAllAsRead: () -> Unit,
-    onToggleTagExpansion: (String) -> Unit,
-    readAloudOnPlay: () -> Unit,
-    readAloudOnPause: () -> Unit,
-    readAloudOnStop: () -> Unit,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
-    content: @Composable (Modifier, () -> Unit) -> Unit,
-) {
-    val coroutineScope = rememberCoroutineScope()
-    var showMenu by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showDeleteDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-    var showEditDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-
-    val showingUnreadStateLabel = if (viewState.onlyUnread) {
-        stringResource(R.string.showing_only_unread_articles)
-    } else {
-        stringResource(R.string.showing_all_articles)
-    }
-
-    val showingBookmarksStateLabel = if (viewState.onlyBookmarked) {
-        stringResource(R.string.showing_only_bookmarked_articles)
-    } else {
-        stringResource(R.string.showing_all_articles)
-    }
-
-    Scaffold(
-        scaffoldState = scaffoldState,
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        viewState.feedScreenTitle.title ?: stringResource(id = R.string.all_feeds),
-                        maxLines = 2,
-                        modifier = Modifier
-                            .safeSemantics {
-                                testTag = "appBarTitle"
-                            }
-                    )
-                },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                scaffoldState.drawerState.open()
-                            }
-                        }
-                    ) {
-                        Icon(
-                            Icons.Default.Menu,
-                            contentDescription = stringResource(R.string.navigation_drawer_open)
-                        )
-                    }
-                },
-                actions = {
-                    IconToggleButton(
-                        checked = viewState.onlyUnread,
-                        onCheckedChange = onToggleOnlyUnread,
-                        modifier = Modifier.semantics {
-                            stateDescription = showingUnreadStateLabel
-                        }
-                    ) {
-                        if (viewState.onlyUnread) {
-                            Icon(
-                                Icons.Default.VisibilityOff,
-                                contentDescription = null,
-                            )
-                        } else {
-                            Icon(
-                                Icons.Default.Visibility,
-                                contentDescription = null,
-                            )
-                        }
-                    }
-                    IconToggleButton(
-                        checked = viewState.onlyBookmarked,
-                        onCheckedChange = onToggleOnlyBookmarked,
-                        modifier = Modifier.semantics {
-                            stateDescription = showingBookmarksStateLabel
-                        }
-                    ) {
-                        Icon(
-                            Icons.Default.Bookmark,
-                            contentDescription = null,
-                        )
-                    }
-                    IconButton(
-                        onClick = onRefreshAll
-                    ) {
-                        Icon(
-                            Icons.Default.Refresh,
-                            contentDescription = stringResource(R.string.synchronize_feeds)
-                        )
-                    }
-
-                    Box {
-                        IconButton(
-                            onClick = { showMenu = true },
-                            modifier = Modifier
-                                .safeSemantics {
-                                    testTag = "menuButton"
-                                }
-                        ) {
-                            Icon(
-                                Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.open_menu),
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false },
-                            modifier = Modifier
-                                .safeSemantics {
-                                    testTag = "menu"
-                                }
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    showMenu = false
-                                    onAddFeed()
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuAddFeed"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.Add,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.add_feed))
-                            }
-                            DropdownMenuItem(
-                                onClick = {
-                                    if (viewState.visibleFeeds.size == 1) {
-                                        onEditFeed(viewState.visibleFeeds.first().id)
-                                    } else {
-                                        showEditDialog = true
-                                    }
-                                    showMenu = false
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuEditFeed"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.Edit,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.edit_feed))
-                            }
-                            DropdownMenuItem(
-                                onClick = {
-                                    showDeleteDialog = true
-                                    showMenu = false
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuDeleteFeed"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.delete_feed))
-                            }
-                            Divider()
-                            DropdownMenuItem(
-                                onClick = {
-                                    showMenu = false
-                                    onImport()
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuImportFeeds"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.ImportExport,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.import_feeds_from_opml))
-                            }
-                            Divider()
-                            DropdownMenuItem(
-                                onClick = {
-                                    showMenu = false
-                                    onExport()
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuExportFeeds"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.ImportExport,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.export_feeds_to_opml))
-                            }
-                            Divider()
-                            DropdownMenuItem(
-                                onClick = {
-                                    showMenu = false
-                                    onSettings()
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuSettings"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.Settings,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.action_settings))
-                            }
-                            Divider()
-                            DropdownMenuItem(
-                                onClick = {
-                                    showMenu = false
-                                    onSendFeedback()
-                                },
-                                modifier = Modifier
-                                    .safeSemantics {
-                                        testTag = "menuSendBugReport"
-                                    }
-                            ) {
-                                Icon(
-                                    Icons.Default.Email,
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(id = R.string.send_bug_report))
-                            }
-                        }
-                    }
-                }
-            )
-        },
-        bottomBar = {
-            HideableReadAloudPlayer(
-                visible = viewState.isReadAloudVisible,
-                currentlyPlaying = viewState.isReadAloudPlaying,
-                title = viewState.readAloudTitle,
-                onPlay = readAloudOnPlay,
-                onPause = readAloudOnPause,
-                onStop = readAloudOnStop,
-            )
-        },
-        drawerContent = {
-            ListOfFeedsAndTags(
-                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
-                expandedTags = ImmutableHolder(viewState.expandedTags),
-                onToggleTagExpansion = onToggleTagExpansion,
-                onItemClick = { item ->
-                    coroutineScope.launch {
-                        val id = when (item) {
-                            is DrawerFeed -> item.id
-                            is DrawerTag -> ID_UNSET
-                            is DrawerTop -> ID_ALL_FEEDS
-                        }
-                        val tag = when (item) {
-                            is DrawerFeed -> item.tag
-                            is DrawerTag -> item.tag
-                            is DrawerTop -> ""
-                        }
-                        onDrawerItemSelected(id, tag)
-                        scaffoldState.drawerState.close()
-                    }
-                }
-            )
-        },
-        floatingActionButton = {
-            if (viewState.showFab) {
-                FloatingActionButton(
-                    onClick = onMarkAllAsRead,
-                    modifier = Modifier.navigationBarsPadding(),
-                ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = stringResource(R.string.mark_all_as_read)
-                    )
-                }
-            }
-        }
-    ) { padding ->
-        SwipeRefresh(
-            state = refreshState,
-            onRefresh = onRefreshVisible,
-            indicatorPadding = padding,
-        ) {
-            content(
-                Modifier
-                    .padding(padding)
-            ) {
-                coroutineScope.launch {
-                    scaffoldState.drawerState.open()
-                }
-            }
-        }
-
-        if (showDeleteDialog) {
-            DeleteFeedDialog(
-                feeds = ImmutableHolder(
-                    viewState.visibleFeeds.map {
-                        DeletableFeed(it.id, it.displayTitle)
-                    }
-                ),
-                onDismiss = { showDeleteDialog = false },
-                onDelete = onDelete
-            )
-        }
-
-        if (showEditDialog) {
-            EditFeedDialog(
-                feeds = ImmutableHolder(viewState.visibleFeeds.map { DeletableFeed(it.id, it.displayTitle) }),
-                onDismiss = { showEditDialog = false },
-                onEdit = onEditFeed
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun ScreenWithFeedList(
-    viewState: FeedScreenViewState,
-    onRefreshVisible: () -> Unit,
-    onDrawerItemSelected: (Long, String) -> Unit,
-    onMarkAllAsRead: () -> Unit,
-    onToggleTagExpansion: (String) -> Unit,
-    readAloudOnPlay: () -> Unit,
-    readAloudOnPause: () -> Unit,
-    readAloudOnStop: () -> Unit,
+    ttsOnPlay: () -> Unit,
+    ttsOnPause: () -> Unit,
+    ttsOnStop: () -> Unit,
+    ttsOnSkipNext: () -> Unit,
+    ttsOnSelectLanguage: (LocaleOverride) -> Unit,
     onDismissDeleteDialog: () -> Unit,
     onDismissEditDialog: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
     onEditFeed: (Long) -> Unit,
     toolbarActions: @Composable() (RowScope.() -> Unit),
     modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
     content: @Composable (Modifier) -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     val refreshState = rememberSwipeRefreshState(
         viewState.latestSyncTimestamp.isAfter(Instant.now().minusSeconds(20))
     )
@@ -676,25 +272,40 @@ fun ScreenWithFeedList(
         refreshState.isRefreshing = false
     }
 
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+        rememberTopAppBarState()
+    )
+
+    val floatingActionButton: @Composable () -> Unit = {
+        FloatingActionButton(
+            onClick = onMarkAllAsRead,
+            modifier = Modifier.navigationBarsPadding(),
+        ) {
+            Icon(
+                Icons.Default.DoneAll,
+                contentDescription = stringResource(R.string.mark_all_as_read)
+            )
+        }
+    }
+    val bottomBarVisibleState = remember { MutableTransitionState(viewState.isBottomBarVisible) }
+    LaunchedEffect(viewState.isBottomBarVisible) {
+        bottomBarVisibleState.targetState = viewState.isBottomBarVisible
+    }
+
     Scaffold(
-        scaffoldState = scaffoldState,
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
+                scrollBehavior = scrollBehavior,
                 title = {
                     Text(
                         viewState.feedScreenTitle.title ?: stringResource(id = R.string.all_feeds),
-                        maxLines = 2,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                scaffoldState.drawerState.open()
-                            }
-                        }
+                        onClick = onOpenNavDrawer
                     ) {
                         Icon(
                             Icons.Default.Menu,
@@ -706,52 +317,36 @@ fun ScreenWithFeedList(
             )
         },
         bottomBar = {
-            HideableReadAloudPlayer(
-                visible = viewState.isReadAloudVisible,
-                currentlyPlaying = viewState.isReadAloudPlaying,
-                title = viewState.readAloudTitle,
-                onPlay = readAloudOnPlay,
-                onPause = readAloudOnPause,
-                onStop = readAloudOnStop,
-            )
-        },
-        drawerContent = {
-            ListOfFeedsAndTags(
-                feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
-                expandedTags = ImmutableHolder(viewState.expandedTags),
-                onToggleTagExpansion = onToggleTagExpansion,
-                onItemClick = { item ->
-                    coroutineScope.launch {
-                        val id = when (item) {
-                            is DrawerFeed -> item.id
-                            is DrawerTag -> ID_UNSET
-                            is DrawerTop -> ID_ALL_FEEDS
-                        }
-                        val tag = when (item) {
-                            is DrawerFeed -> item.tag
-                            is DrawerTag -> item.tag
-                            is DrawerTop -> ""
-                        }
-                        onDrawerItemSelected(id, tag)
-                        scaffoldState.drawerState.close()
-                    }
+            HideableTTSPlayer(
+                visibleState = bottomBarVisibleState,
+                currentlyPlaying = viewState.isTTSPlaying,
+                onPlay = ttsOnPlay,
+                onPause = ttsOnPause,
+                onStop = ttsOnStop,
+                onSkipNext = ttsOnSkipNext,
+                onSelectLanguage = ttsOnSelectLanguage,
+                languages = ImmutableHolder(viewState.ttsLanguages),
+                floatingActionButton = when (viewState.showFab) {
+                    true -> floatingActionButton
+                    false -> null
                 }
             )
         },
         floatingActionButton = {
             if (viewState.showFab) {
-                FloatingActionButton(
-                    onClick = onMarkAllAsRead,
-                    modifier = Modifier.navigationBarsPadding(),
+                AnimatedVisibility(
+                    visible = bottomBarVisibleState.isIdle && !bottomBarVisibleState.targetState,
+                    enter = scaleIn(animationSpec = tween(256)),
+                    exit = scaleOut(animationSpec = tween(256)),
                 ) {
-                    Icon(
-                        Icons.Default.Check,
-                        contentDescription = stringResource(R.string.mark_all_as_read)
-                    )
+                    floatingActionButton()
                 }
             }
         },
-        modifier = modifier,
+        modifier = modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .statusBarsPadding()
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
     ) { padding ->
         SwipeRefresh(
             state = refreshState,
@@ -775,7 +370,14 @@ fun ScreenWithFeedList(
 
         if (viewState.showEditDialog) {
             EditFeedDialog(
-                feeds = ImmutableHolder(viewState.visibleFeeds.map { DeletableFeed(it.id, it.displayTitle) }),
+                feeds = ImmutableHolder(
+                    viewState.visibleFeeds.map {
+                        DeletableFeed(
+                            it.id,
+                            it.displayTitle
+                        )
+                    }
+                ),
                 onDismiss = onDismissEditDialog,
                 onEdit = onEditFeed
             )

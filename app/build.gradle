@@ -200,6 +200,7 @@ dependencies {
   implementation "androidx.compose.ui:ui:$composeLibraryVersion"
   implementation "androidx.compose.foundation:foundation:$composeLibraryVersion"
   implementation "androidx.compose.foundation:foundation-layout:$composeLibraryVersion"
+  implementation "androidx.compose.material3:material3:$material3Version"
   implementation "androidx.compose.material:material:$composeLibraryVersion"
   implementation "androidx.compose.material:material-icons-extended:$composeLibraryVersion"
   implementation "androidx.compose.runtime:runtime:$composeLibraryVersion"
@@ -210,8 +211,8 @@ dependencies {
   implementation "androidx.paging:paging-compose:$pagingComposeVersion"
   implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-permissions:$accompanistVersion"
-  implementation "com.google.accompanist:accompanist-insets-ui:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion"
+  implementation "com.google.accompanist:accompanist-navigation-animation:$accompanistVersion"
 
   // Better times
   implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
@@ -219,7 +220,6 @@ dependencies {
   implementation "org.jsoup:jsoup:$jsoup_version"
   implementation "org.ccil.cowan.tagsoup:tagsoup:$composeLibraryVersion"
   // RSS
-  // TODO Bump
   implementation "com.rometools:rome:$rome_version"
   implementation "com.rometools:rome-modules:$rome_version"
   // JSONFeed

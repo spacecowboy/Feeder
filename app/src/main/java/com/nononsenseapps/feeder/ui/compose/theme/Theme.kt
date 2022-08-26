@@ -2,52 +2,79 @@ package com.nononsenseapps.feeder.ui.compose.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 
-@Composable
-fun FeederBlackColorPalette() = darkColors(
-    primary = Green700,
-    primaryVariant = Green900,
-    secondary = DarkTealA400,
-    onSecondary = Color.White,
-    background = Color.Black,
+private val lightColors = lightColorScheme(
+    primary = md_theme_light_primary,
+    onPrimary = md_theme_light_onPrimary,
+    primaryContainer = md_theme_light_primaryContainer,
+    onPrimaryContainer = md_theme_light_onPrimaryContainer,
+    secondary = md_theme_light_secondary,
+    onSecondary = md_theme_light_onSecondary,
+    secondaryContainer = md_theme_light_secondaryContainer,
+    onSecondaryContainer = md_theme_light_onSecondaryContainer,
+    tertiary = md_theme_light_tertiary,
+    onTertiary = md_theme_light_onTertiary,
+    tertiaryContainer = md_theme_light_tertiaryContainer,
+    onTertiaryContainer = md_theme_light_onTertiaryContainer,
+    error = md_theme_light_error,
+    errorContainer = md_theme_light_errorContainer,
+    onError = md_theme_light_onError,
+    onErrorContainer = md_theme_light_onErrorContainer,
+    background = md_theme_light_background,
+    onBackground = md_theme_light_onBackground,
+    surface = md_theme_light_surface,
+    onSurface = md_theme_light_onSurface,
+    surfaceVariant = md_theme_light_surfaceVariant,
+    onSurfaceVariant = md_theme_light_onSurfaceVariant,
+    outline = md_theme_light_outline,
+    inverseOnSurface = md_theme_light_inverseOnSurface,
+    inverseSurface = md_theme_light_inverseSurface,
+    inversePrimary = md_theme_light_inversePrimary,
+    surfaceTint = md_theme_light_surfaceTint,
 )
 
-@Composable
-fun FeederDarkColorPalette() = darkColors(
-    primary = Green700,
-    primaryVariant = Green900,
-    secondary = DarkTealA400,
-    onSecondary = Color.White,
-    background = DarkBackground,
+private val darkColors = darkColorScheme(
+    primary = md_theme_dark_primary,
+    onPrimary = md_theme_dark_onPrimary,
+    primaryContainer = md_theme_dark_primaryContainer,
+    onPrimaryContainer = md_theme_dark_onPrimaryContainer,
+    secondary = md_theme_dark_secondary,
+    onSecondary = md_theme_dark_onSecondary,
+    secondaryContainer = md_theme_dark_secondaryContainer,
+    onSecondaryContainer = md_theme_dark_onSecondaryContainer,
+    tertiary = md_theme_dark_tertiary,
+    onTertiary = md_theme_dark_onTertiary,
+    tertiaryContainer = md_theme_dark_tertiaryContainer,
+    onTertiaryContainer = md_theme_dark_onTertiaryContainer,
+    error = md_theme_dark_error,
+    errorContainer = md_theme_dark_errorContainer,
+    onError = md_theme_dark_onError,
+    onErrorContainer = md_theme_dark_onErrorContainer,
+    background = md_theme_dark_background,
+    onBackground = md_theme_dark_onBackground,
+    surface = md_theme_dark_surface,
+    onSurface = md_theme_dark_onSurface,
+    surfaceVariant = md_theme_dark_surfaceVariant,
+    onSurfaceVariant = md_theme_dark_onSurfaceVariant,
+    outline = md_theme_dark_outline,
+    inverseOnSurface = md_theme_dark_inverseOnSurface,
+    inverseSurface = md_theme_dark_inverseSurface,
+    inversePrimary = md_theme_dark_inversePrimary,
+    surfaceTint = md_theme_dark_surfaceTint,
 )
-
-@Composable
-fun FeederLightColorPalette() = lightColors(
-    primary = Green700,
-    primaryVariant = Green900,
-    secondary = AccentDay,
-    onSecondary = Color.White,
-)
-
-@Deprecated(
-    "Use dimens.margin instead",
-    ReplaceWith(
-        "LocalDimens.current.margin",
-        "com.nononsenseapps.feeder.ui.compose.theme.LocalDimens"
-    )
-)
-val keyline1Padding = 16.dp
 
 /**
  * Only use this in the root of the activity
@@ -56,24 +83,30 @@ val keyline1Padding = 16.dp
 fun FeederTheme(
     currentTheme: ThemeOptions = ThemeOptions.DAY,
     darkThemePreference: DarkThemePreferences = DarkThemePreferences.BLACK,
+    dynamicColors: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val darkIcons = currentTheme.isDarkSystemIcons()
+    val darkSystemIcons = currentTheme.isDarkSystemIcons()
+    val darkNavIcons = currentTheme.isDarkNavIcons()
+    val navBarColor = currentTheme.getNavBarColor()
+    val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
     MaterialTheme(
-        colors = currentTheme.getColors(darkThemePreference),
+        colorScheme = colorScheme,
         typography = Typography,
-        shapes = Shapes
     ) {
         val systemUiController = rememberSystemUiController()
-        SideEffect {
+        val surfaceColor = Color(MaterialTheme.colorScheme.surface.value)
+        DisposableEffect(systemUiController, darkSystemIcons, darkNavIcons) {
             systemUiController.setStatusBarColor(
-                Color.Transparent,
-                darkIcons = false,
+                surfaceColor,
+                darkIcons = darkSystemIcons,
             )
             systemUiController.setNavigationBarColor(
-                if (darkIcons) NavBarScrimLight else NavBarScrimDark,
-                darkIcons = darkIcons,
+                navBarColor,
+                darkIcons = darkNavIcons,
             )
+
+            onDispose {}
         }
         ProvideDimens {
             content()
@@ -89,28 +122,56 @@ private fun ThemeOptions.isDarkSystemIcons(): Boolean {
         ThemeOptions.SYSTEM -> isSystemInDarkTheme()
     }
 
-    // Only Api 27+ supports dark nav bar icons
-    return (Build.VERSION.SDK_INT >= 27) && !isDarkTheme
+    return !isDarkTheme
 }
 
 @Composable
-private fun ThemeOptions.getColors(darkThemePreference: DarkThemePreferences): Colors =
-    when (this) {
-        ThemeOptions.DAY -> FeederLightColorPalette()
-        ThemeOptions.NIGHT -> getPreferredDarkTheme(darkThemePreference)
+private fun ThemeOptions.isDarkNavIcons(): Boolean {
+    // Only Api 27+ supports dark nav bar icons
+    return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) && isDarkSystemIcons()
+}
+
+@Composable
+private fun ThemeOptions.getNavBarColor(): Color {
+    // Api 29 handles transparency
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        Color.Transparent
+    } else if (isDarkNavIcons()) {
+        NavBarScrimLight
+    } else {
+        NavBarScrimDark
+    }
+}
+
+@Composable
+private fun ThemeOptions.getColorScheme(
+    darkThemePreference: DarkThemePreferences,
+    dynamicColors: Boolean,
+): ColorScheme {
+    val dark = when (this) {
+        ThemeOptions.DAY -> false
+        ThemeOptions.NIGHT -> true
         ThemeOptions.SYSTEM -> {
-            if (isSystemInDarkTheme()) {
-                getPreferredDarkTheme(darkThemePreference)
-            } else {
-                FeederLightColorPalette()
-            }
+            isSystemInDarkTheme()
         }
     }
 
-@Composable
-private fun getPreferredDarkTheme(darkThemePreference: DarkThemePreferences): Colors {
-    return when (darkThemePreference) {
-        DarkThemePreferences.BLACK -> FeederBlackColorPalette()
-        DarkThemePreferences.DARK -> FeederDarkColorPalette()
+    val colorScheme = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && dynamicColors && dark -> {
+            dynamicDarkColorScheme(LocalContext.current)
+        }
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && dynamicColors && !dark -> {
+            dynamicLightColorScheme(LocalContext.current)
+        }
+        dark -> darkColors
+        else -> lightColors
+    }
+
+    return if (dark && darkThemePreference == DarkThemePreferences.BLACK) {
+        colorScheme.copy(
+            background = Color.Black,
+        )
+    } else {
+        colorScheme
     }
 }

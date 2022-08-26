@@ -180,6 +180,8 @@
     <string name="permission_read_desc">アプリによるフィードと記事の読み取りを許可する</string>
     <string name="use_detect_language">言語の検出</string>
     <string name="description_for_read_aloud">記事の言語を自動的に検出</string>
-    <string name="use_detect_language_not_available">Android 10以降でのみ利用可能</string>
+    <string name="only_available_on_android_n">Android %1$s以降でのみ利用可能</string>
     <string name="explanation_permission_notifications">通知を有効にするには、アクセス許可を付与する必要があります。</string>
+    <string name="dynamic_theme_use">動的な色</string>
+    <string name="new_indicator">新</string>
 </resources>

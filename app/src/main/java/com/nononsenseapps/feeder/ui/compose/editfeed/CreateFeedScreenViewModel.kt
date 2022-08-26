@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui.compose.editfeed
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_READER
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
@@ -64,7 +63,7 @@ class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : D
     }
 
     private val _articleOpener: MutableStateFlow<String> = MutableStateFlow(
-        state["articleOpener"] ?: PREF_VAL_OPEN_WITH_READER
+        state["articleOpener"] ?: ""
     )
     fun setArticleOpener(value: String) {
         state["articleOpener"] = value

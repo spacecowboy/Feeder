@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -11,10 +12,10 @@ import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.LocalImageLoader
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.requestFeedSync
@@ -87,10 +88,12 @@ class MainActivity : DIAwareComponentActivity() {
         setContent {
             val currentTheme by mainActivityViewModel.currentTheme.collectAsState()
             val darkThemePreference by mainActivityViewModel.darkThemePreference.collectAsState()
+            val dynamicColors by mainActivityViewModel.dynamicColors.collectAsState()
 
             FeederTheme(
                 currentTheme = currentTheme,
-                darkThemePreference = darkThemePreference
+                darkThemePreference = darkThemePreference,
+                dynamicColors = dynamicColors,
             ) {
                 withDI {
                     val imageLoader: ImageLoader by instance()
@@ -102,17 +105,18 @@ class MainActivity : DIAwareComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun appContent() {
         val windowSize = rememberWindowSizeClass()
 
-        val navController = rememberNavController().also {
+        val navController = rememberAnimatedNavController().also {
             if (this.navController == null) {
                 this.navController = it
             }
         }
 
-        NavHost(navController, startDestination = FeedArticleDestination.route) {
+        AnimatedNavHost(navController, startDestination = FeedArticleDestination.route) {
             FeedArticleDestination.register(this, navController, windowSize)
             // Deep links
             FeedDestination.register(this, navController, windowSize)

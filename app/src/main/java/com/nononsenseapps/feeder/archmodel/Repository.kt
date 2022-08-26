@@ -120,6 +120,9 @@ class Repository(override val di: DI) : DIAware {
     val useDetectLanguage = settingsStore.useDetectLanguage
     fun setUseDetectLanguage(value: Boolean) = settingsStore.setUseDetectLanguage(value)
 
+    val useDynamicTheme = settingsStore.useDynamicTheme
+    fun setUseDynamicTheme(value: Boolean) = settingsStore.setUseDynamicTheme(value)
+
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
     fun setMaxCountPerFeed(value: Int) = settingsStore.setMaxCountPerFeed(value)
 

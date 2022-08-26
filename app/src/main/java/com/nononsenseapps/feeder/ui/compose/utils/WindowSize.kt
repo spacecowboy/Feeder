@@ -63,3 +63,14 @@ fun getWindowSizeClass(windowDpSize: DpSize): WindowSize = when {
     windowDpSize.width < 840.dp -> WindowSize.Medium
     else -> WindowSize.Expanded
 }
+
+enum class ScreenType {
+    DUAL,
+    SINGLE,
+}
+
+fun getScreenType(windowSize: WindowSize) =
+    when (windowSize) {
+        WindowSize.Compact -> ScreenType.SINGLE
+        WindowSize.Medium, WindowSize.Expanded -> ScreenType.DUAL
+    }

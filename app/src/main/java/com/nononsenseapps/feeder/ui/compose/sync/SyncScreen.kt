@@ -5,10 +5,15 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.rememberSplineBasedDecay
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +21,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -25,24 +29,32 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -54,6 +66,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -62,8 +75,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.nononsenseapps.feeder.BuildConfig
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
@@ -75,7 +86,9 @@ import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.BackHandler
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.KOFI_URL
 import com.nononsenseapps.feeder.util.openKoFiIntent
@@ -84,27 +97,38 @@ import java.net.URLDecoder
 import net.glxn.qrgen.android.QRCode
 import net.glxn.qrgen.core.scheme.Url
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SyncScaffold(
     onNavigateUp: () -> Unit,
+    leaveSyncVisible: Boolean,
     onLeaveSyncChain: () -> Unit,
+    title: String,
     content: @Composable (Modifier) -> Unit
 ) {
     var showToolbar by rememberSaveable {
         mutableStateOf(false)
     }
+    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+        decayAnimationSpec,
+        rememberTopAppBarState()
+    )
     Scaffold(
-        contentPadding = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal).asPaddingValues(),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .statusBarsPadding()
+            .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
+                scrollBehavior = scrollBehavior,
                 title = {
                     Text(
-                        text = stringResource(id = R.string.device_sync),
+                        text = title,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -114,24 +138,27 @@ private fun SyncScaffold(
                     }
                 },
                 actions = {
-                    Box {
-                        IconButton(onClick = { showToolbar = true }) {
-                            Icon(
-                                Icons.Default.MoreVert,
-                                contentDescription = stringResource(id = R.string.open_menu),
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showToolbar,
-                            onDismissRequest = { showToolbar = false }
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    showToolbar = false
-                                    onLeaveSyncChain()
-                                }
+                    if (leaveSyncVisible) {
+                        Box {
+                            IconButton(onClick = { showToolbar = true }) {
+                                Icon(
+                                    Icons.Default.MoreVert,
+                                    contentDescription = stringResource(id = R.string.open_menu),
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showToolbar,
+                                onDismissRequest = { showToolbar = false }
                             ) {
-                                Text(stringResource(R.string.leave_sync_chain))
+                                DropdownMenuItem(
+                                    onClick = {
+                                        showToolbar = false
+                                        onLeaveSyncChain()
+                                    },
+                                    text = {
+                                        Text(stringResource(R.string.leave_sync_chain))
+                                    }
+                                )
                             }
                         }
                     }
@@ -161,6 +188,10 @@ fun SyncScreen(
         viewState = viewState,
     )
 
+    var previousScreen: SyncScreenType? by remember {
+        mutableStateOf(null)
+    }
+
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -183,18 +214,22 @@ fun SyncScreen(
 
     SyncScreen(
         viewState = viewState,
-        syncScreenType = syncScreenType,
+        targetScreen = syncScreenType,
+        previousScreen = previousScreen,
         onLeaveSyncSettings = onNavigateUp,
         onLeaveAddDevice = {
+            previousScreen = SyncScreenType.SINGLE_ADD_DEVICE
             viewModel.setScreen(SyncScreenToShow.DEVICELIST)
         },
         onLeaveSyncJoin = {
+            previousScreen = SyncScreenType.SINGLE_JOIN
             viewModel.setScreen(SyncScreenToShow.SETUP)
         },
         onJoinSyncChain = { syncCode, secretKey ->
             viewModel.joinSyncChain(syncCode = syncCode, secretKey = secretKey)
         },
         onAddNewDevice = {
+            previousScreen = SyncScreenType.SINGLE_DEVICELIST
             viewModel.setScreen(SyncScreenToShow.ADD_DEVICE)
         },
         onDeleteDevice = {
@@ -205,6 +240,7 @@ fun SyncScreen(
             }
         },
         onLeaveSyncChain = {
+            previousScreen = SyncScreenType.SINGLE_DEVICELIST
             showLeaveSyncChainDialog = true
         },
         onScanSyncCode = {
@@ -247,7 +283,8 @@ fun SyncScreen(
 @Composable
 fun SyncScreen(
     viewState: SyncScreenViewState,
-    syncScreenType: SyncScreenType,
+    targetScreen: SyncScreenType,
+    previousScreen: SyncScreenType?,
     onLeaveSyncSettings: () -> Unit,
     onLeaveAddDevice: () -> Unit,
     onLeaveSyncJoin: () -> Unit,
@@ -262,63 +299,110 @@ fun SyncScreen(
     devices: ImmutableHolder<List<SyncDevice>>,
     onLeaveSyncChain: () -> Unit,
 ) {
-    when (syncScreenType) {
-        SyncScreenType.DUAL -> {
-            DualSyncScreen(
-                onNavigateUp = onLeaveSyncSettings,
-                leftScreenToShow = viewState.leftScreenToShow,
-                rightScreenToShow = viewState.rightScreenToShow,
-                onScanSyncCode = onScanSyncCode,
-                onStartNewSyncChain = onStartNewSyncChain,
-                onAddNewDevice = onAddNewDevice,
-                onDeleteDevice = onDeleteDevice,
-                currentDeviceId = currentDeviceId,
-                devices = devices,
-                addDeviceUrl = ImmutableHolder(viewState.addNewDeviceUrl),
-                onJoinSyncChain = onJoinSyncChain,
-                syncCode = viewState.syncCode,
-                onSetSyncCode = onSetSyncCode,
-                onLeaveSyncChain = onLeaveSyncChain,
-                secretKey = viewState.secretKey,
-                onSetSecretKey = onSetSecretKey,
+    if (targetScreen == SyncScreenType.DUAL) {
+        DualSyncScreen(
+            onNavigateUp = onLeaveSyncSettings,
+            leftScreenToShow = viewState.leftScreenToShow,
+            rightScreenToShow = viewState.rightScreenToShow,
+            onScanSyncCode = onScanSyncCode,
+            onStartNewSyncChain = onStartNewSyncChain,
+            onAddNewDevice = onAddNewDevice,
+            onDeleteDevice = onDeleteDevice,
+            currentDeviceId = currentDeviceId,
+            devices = devices,
+            addDeviceUrl = ImmutableHolder(viewState.addNewDeviceUrl),
+            onJoinSyncChain = onJoinSyncChain,
+            syncCode = viewState.syncCode,
+            onSetSyncCode = onSetSyncCode,
+            onLeaveSyncChain = onLeaveSyncChain,
+            secretKey = viewState.secretKey,
+            onSetSecretKey = onSetSecretKey,
+        )
+    }
+
+    AnimatedVisibility(
+        visible = targetScreen == SyncScreenType.SINGLE_SETUP,
+        enter = when (previousScreen) {
+            null -> fadeIn(initialAlpha = 1.0f)
+            else -> slideInHorizontally(tween(256), initialOffsetX = { -it })
+        },
+        /*
+        This may seem weird - but it's a special case. This exit animation actually runs
+        when the first screen is device list. So to prevent a flicker effect it's important to block
+        sideways movement. The setup screen will be momentarily on screen because it takes
+        a few millis to fetch the sync remote.
+         */
+        exit = when (previousScreen) {
+            null -> fadeOut(targetAlpha = 1.0f)
+            else -> slideOutHorizontally(tween(256), targetOffsetX = { -it })
+        },
+    ) {
+        SyncSetupScreen(
+            onNavigateUp = onLeaveSyncSettings,
+            onScanSyncCode = onScanSyncCode,
+            onStartNewSyncChain = onStartNewSyncChain,
+            onLeaveSyncChain = onLeaveSyncChain,
+        )
+    }
+
+    AnimatedVisibility(
+        visible = targetScreen == SyncScreenType.SINGLE_JOIN,
+        enter = slideInHorizontally(tween(256), initialOffsetX = { it }),
+        exit = slideOutHorizontally(tween(256), targetOffsetX = {
+            when (targetScreen) {
+                SyncScreenType.SINGLE_DEVICELIST -> -it
+                else -> it
+            }
+        }),
+    ) {
+        SyncJoinScreen(
+            onNavigateUp = onLeaveSyncJoin,
+            onJoinSyncChain = onJoinSyncChain,
+            syncCode = viewState.syncCode,
+            onSetSyncCode = onSetSyncCode,
+            onLeaveSyncChain = onLeaveSyncChain,
+            secretKey = viewState.secretKey,
+            onSetSecretKey = onSetSecretKey,
+        )
+    }
+
+    AnimatedVisibility(
+        visible = targetScreen == SyncScreenType.SINGLE_DEVICELIST,
+        enter = when (previousScreen) {
+            SyncScreenType.SINGLE_ADD_DEVICE -> slideInHorizontally(
+                tween(256),
+                initialOffsetX = { -it }
             )
-        }
-        SyncScreenType.SINGLE_SETUP -> {
-            SyncSetupScreen(
-                onNavigateUp = onLeaveSyncSettings,
-                onScanSyncCode = onScanSyncCode,
-                onStartNewSyncChain = onStartNewSyncChain,
-                onLeaveSyncChain = onLeaveSyncChain,
-            )
-        }
-        SyncScreenType.SINGLE_DEVICELIST -> {
-            SyncDeviceListScreen(
-                onNavigateUp = onLeaveSyncSettings,
-                currentDeviceId = currentDeviceId,
-                devices = devices,
-                onAddNewDevice = onAddNewDevice,
-                onDeleteDevice = onDeleteDevice,
-                onLeaveSyncChain = onLeaveSyncChain,
-            )
-        }
-        SyncScreenType.SINGLE_ADD_DEVICE -> {
-            SyncAddNewDeviceScreen(
-                onNavigateUp = onLeaveAddDevice,
-                syncUrl = ImmutableHolder(viewState.addNewDeviceUrl),
-                onLeaveSyncChain = onLeaveSyncChain,
-            )
-        }
-        SyncScreenType.SINGLE_JOIN -> {
-            SyncJoinScreen(
-                onNavigateUp = onLeaveSyncJoin,
-                onJoinSyncChain = onJoinSyncChain,
-                syncCode = viewState.syncCode,
-                onSetSyncCode = onSetSyncCode,
-                onLeaveSyncChain = onLeaveSyncChain,
-                secretKey = viewState.secretKey,
-                onSetSecretKey = onSetSecretKey,
-            )
-        }
+            null -> fadeIn(initialAlpha = 1.0f)
+            else -> slideInHorizontally(tween(256), initialOffsetX = { it })
+        },
+        exit = slideOutHorizontally(tween(256), targetOffsetX = {
+            when (targetScreen) {
+                SyncScreenType.SINGLE_ADD_DEVICE -> -it
+                else -> it
+            }
+        }),
+    ) {
+        SyncDeviceListScreen(
+            onNavigateUp = onLeaveSyncSettings,
+            currentDeviceId = currentDeviceId,
+            devices = devices,
+            onAddNewDevice = onAddNewDevice,
+            onDeleteDevice = onDeleteDevice,
+            onLeaveSyncChain = onLeaveSyncChain,
+        )
+    }
+
+    AnimatedVisibility(
+        visible = targetScreen == SyncScreenType.SINGLE_ADD_DEVICE,
+        enter = slideInHorizontally(tween(256), initialOffsetX = { it }),
+        exit = slideOutHorizontally(tween(256), targetOffsetX = { it }),
+    ) {
+        SyncAddNewDeviceScreen(
+            onNavigateUp = onLeaveAddDevice,
+            syncUrl = ImmutableHolder(viewState.addNewDeviceUrl),
+            onLeaveSyncChain = onLeaveSyncChain,
+        )
     }
 }
 
@@ -333,8 +417,8 @@ enum class SyncScreenType {
 fun getSyncScreenType(
     windowSize: WindowSize,
     viewState: SyncScreenViewState
-): SyncScreenType = when (windowSize) {
-    WindowSize.Compact, WindowSize.Medium -> {
+): SyncScreenType = when (getScreenType(windowSize)) {
+    ScreenType.SINGLE -> {
         when (viewState.singleScreenToShow) {
             SyncScreenToShow.SETUP -> SyncScreenType.SINGLE_SETUP
             SyncScreenToShow.DEVICELIST -> SyncScreenType.SINGLE_DEVICELIST
@@ -342,7 +426,7 @@ fun getSyncScreenType(
             SyncScreenToShow.JOIN -> SyncScreenType.SINGLE_JOIN
         }
     }
-    WindowSize.Expanded -> SyncScreenType.DUAL
+    ScreenType.DUAL -> SyncScreenType.DUAL
 }
 
 @Composable
@@ -366,12 +450,21 @@ fun DualSyncScreen(
 ) {
     BackHandler(onBack = onNavigateUp)
 
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(key1 = leftScreenToShow) {
+        scrollState.scrollTo(0)
+    }
+
     SyncScaffold(
+        leaveSyncVisible = leftScreenToShow == LeftScreenToShow.DEVICELIST,
+        title = stringResource(id = R.string.device_sync),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
         Row(
-            modifier = modifier,
+            modifier = modifier
+                .verticalScroll(scrollState),
         ) {
             when (leftScreenToShow) {
                 LeftScreenToShow.SETUP -> {
@@ -427,13 +520,16 @@ fun SyncSetupScreen(
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
+    val scrollState = rememberScrollState()
 
     SyncScaffold(
+        leaveSyncVisible = false,
+        title = stringResource(id = R.string.device_sync),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
         SyncSetupContent(
-            modifier = modifier,
+            modifier = modifier.verticalScroll(scrollState),
             onScanSyncCode = onScanSyncCode,
             onStartNewSyncChain = onStartNewSyncChain,
         )
@@ -457,17 +553,17 @@ fun SyncSetupContent(
     ) {
         Text(
             text = stringResource(R.string.device_sync_description_1),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.device_sync_description_2),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.device_sync_financed_by_community),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.fillMaxWidth(),
         )
         // Google Play does not allow direct donation links
@@ -475,7 +571,7 @@ fun SyncSetupContent(
             val context = LocalContext.current
             Text(
                 text = KOFI_URL,
-                style = MaterialTheme.typography.body1.merge(LinkTextStyle()),
+                style = MaterialTheme.typography.bodyLarge.merge(LinkTextStyle()),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -486,7 +582,7 @@ fun SyncSetupContent(
         // Let this be hard-coded. It should not be localized.
         Text(
             text = "WARNING! This is a Beta feature. Do an OPML-export of all your feeds before and save as a backup.",
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -497,7 +593,7 @@ fun SyncSetupContent(
         ) {
             Text(
                 text = stringResource(R.string.scan_or_enter_code),
-                style = MaterialTheme.typography.button,
+                style = MaterialTheme.typography.labelLarge,
             )
         }
         TextButton(
@@ -505,7 +601,7 @@ fun SyncSetupContent(
         ) {
             Text(
                 text = stringResource(R.string.start_new_sync_chain),
-                style = MaterialTheme.typography.button,
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }
@@ -537,13 +633,16 @@ fun SyncJoinScreen(
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
+    val scrollState = rememberScrollState()
 
     SyncScaffold(
+        leaveSyncVisible = false,
+        title = stringResource(id = R.string.join_sync_chain),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
         SyncJoinContent(
-            modifier = modifier,
+            modifier = modifier.verticalScroll(scrollState),
             onJoinSyncChain = onJoinSyncChain,
             syncCode = syncCode,
             onSetSyncCode = onSetSyncCode,
@@ -553,6 +652,7 @@ fun SyncJoinScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SyncJoinContent(
     modifier: Modifier,
@@ -602,7 +702,7 @@ fun SyncJoinContent(
         ) {
             Text(
                 text = stringResource(R.string.join_sync_chain),
-                style = MaterialTheme.typography.button,
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }
@@ -618,13 +718,16 @@ fun SyncDeviceListScreen(
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
+    val scrollState = rememberScrollState()
 
     SyncScaffold(
+        leaveSyncVisible = true,
+        title = stringResource(id = R.string.device_sync),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
     ) { modifier ->
         SyncDeviceListContent(
-            modifier = modifier,
+            modifier = modifier.verticalScroll(scrollState),
             currentDeviceId = currentDeviceId,
             devices = devices,
             onAddNewDevice = onAddNewDevice,
@@ -657,55 +760,23 @@ fun SyncDeviceListContent(
     ) {
         Text(
             text = stringResource(R.string.devices_on_sync_chain),
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
                 .padding(top = 8.dp, bottom = 8.dp)
                 .fillMaxWidth()
         )
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f, fill = true)
-        ) {
-            items(
-                count = devices.item.count(),
-                key = { devices.item[it].deviceId }
-            ) { index ->
-                val device = devices.item[index]
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = minimumTouchSize)
-                ) {
-                    val text = if (device.deviceId == currentDeviceId) {
-                        stringResource(id = R.string.this_device, device.deviceName)
-                    } else {
-                        device.deviceName
-                    }
-                    Text(
-                        text = text,
-                        style = MaterialTheme.typography.subtitle1,
-                        modifier = Modifier.weight(1f, fill = true)
-                    )
-                    IconButton(
-                        onClick = {
-                            itemToDelete = device
-                        },
-                    ) {
-                        Icon(
-                            Icons.Filled.Delete,
-                            contentDescription = stringResource(R.string.disconnect_device_from_sync),
-                        )
-                    }
+        for (device in devices.item) {
+            DeviceEntry(
+                currentDeviceId = currentDeviceId,
+                device = device,
+                onDelete = {
+                    itemToDelete = device
                 }
-            }
+            )
         }
         Text(
             text = stringResource(R.string.device_sync_financed_by_community),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),
@@ -715,7 +786,7 @@ fun SyncDeviceListContent(
             val context = LocalContext.current
             Text(
                 text = KOFI_URL,
-                style = MaterialTheme.typography.body1.merge(LinkTextStyle()),
+                style = MaterialTheme.typography.bodyLarge.merge(LinkTextStyle()),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
@@ -730,7 +801,7 @@ fun SyncDeviceListContent(
             ) {
                 Text(
                     text = stringResource(R.string.add_new_device),
-                    style = MaterialTheme.typography.button,
+                    style = MaterialTheme.typography.labelLarge,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -745,6 +816,52 @@ fun SyncDeviceListContent(
         ) {
             onDeleteDevice(itemToDelete.deviceId)
             itemToDelete = SyncDevice(deviceId = ID_UNSET, deviceName = "")
+        }
+    }
+}
+
+@Composable
+fun DeviceEntry(
+    currentDeviceId: Long,
+    device: SyncDevice,
+    onDelete: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = minimumTouchSize)
+    ) {
+        val text = if (device.deviceId == currentDeviceId) {
+            stringResource(id = R.string.this_device, device.deviceName)
+        } else {
+            device.deviceName
+        }
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.weight(1f, fill = true)
+        )
+        IconButton(onClick = onDelete) {
+            Icon(
+                Icons.Filled.Delete,
+                contentDescription = stringResource(R.string.disconnect_device_from_sync),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewDeviceEntry() {
+    FeederTheme {
+        Surface {
+            DeviceEntry(
+                currentDeviceId = 77L,
+                device = SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
+                onDelete = {},
+            )
         }
     }
 }
@@ -770,7 +887,7 @@ fun DeleteDeviceDialog(
         title = {
             Text(
                 text = stringResource(R.string.remove_device),
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(vertical = 8.dp)
@@ -779,7 +896,7 @@ fun DeleteDeviceDialog(
         text = {
             Text(
                 text = stringResource(R.string.remove_device_question, deviceName),
-                style = MaterialTheme.typography.body1,
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     )
@@ -792,13 +909,16 @@ fun SyncAddNewDeviceScreen(
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
+    val scrollState = rememberScrollState()
 
     SyncScaffold(
+        leaveSyncVisible = false,
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
+        title = stringResource(id = R.string.add_new_device),
     ) { modifier ->
         SyncAddNewDeviceContent(
-            modifier = modifier,
+            modifier = modifier.verticalScroll(scrollState),
             syncUrl = syncUrl,
         )
     }
@@ -831,26 +951,26 @@ fun SyncAddNewDeviceContent(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = dimens.margin, vertical = 8.dp)
-            .scrollable(
-                state = rememberScrollState(),
-                orientation = Orientation.Vertical,
-            )
+//            .scrollable(
+//                state = rememberScrollState(),
+//                orientation = Orientation.Vertical,
+//            )
     ) {
         Text(
             text = stringResource(R.string.press_scan_sync),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier
                 .fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.or_open_device_sync_link),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier
                 .fillMaxWidth(),
         )
         Text(
             text = stringResource(R.string.treat_like_password),
-            style = MaterialTheme.typography.body1.copy(color = Color.Red),
+            style = MaterialTheme.typography.bodyLarge.copy(color = Color.Red),
             modifier = Modifier
                 .fillMaxWidth(),
         )
@@ -913,6 +1033,7 @@ fun PreviewDualSyncScreenDeviceList() {
 }
 
 @Preview("Setup Tablet", device = Devices.PIXEL_C)
+@Preview("Setup Foldable", device = Devices.FOLDABLE, widthDp = 720, heightDp = 360)
 @Composable
 fun PreviewDualSyncScreenSetup() {
     FeederTheme {

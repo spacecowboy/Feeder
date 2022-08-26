@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.annotation.StringRes
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -70,10 +71,14 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _currentTheme = MutableStateFlow(
-        ThemeOptions.valueOf(
-            sp.getString(PREF_THEME, null)?.uppercase()
-                ?: ThemeOptions.SYSTEM.name
-        )
+        try {
+            ThemeOptions.valueOf(
+                sp.getString(PREF_THEME, null)?.uppercase()
+                    ?: ThemeOptions.SYSTEM.name
+            )
+        } catch (_: Exception) {
+            ThemeOptions.SYSTEM
+        }
     )
     val currentTheme = _currentTheme.asStateFlow()
     fun setCurrentTheme(value: ThemeOptions) {
@@ -156,6 +161,14 @@ class SettingsStore(override val di: DI) : DIAware {
     fun setUseDetectLanguage(value: Boolean) {
         _useDetectLanguage.value = value
         sp.edit().putBoolean(PREF_READALOUD_USE_DETECT_LANGUAGE, value).apply()
+    }
+
+    private val _useDynamicTheme =
+        MutableStateFlow(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && sp.getBoolean(PREF_DYNAMIC_THEME, true))
+    val useDynamicTheme = _useDynamicTheme.asStateFlow()
+    fun setUseDynamicTheme(value: Boolean) {
+        _useDynamicTheme.value = value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+        sp.edit().putBoolean(PREF_DYNAMIC_THEME, value).apply()
     }
 
     private val _maximumCountPerFeed =
@@ -352,6 +365,7 @@ const val PREF_THEME = "pref_theme"
  * Dark theme settings
  */
 const val PREF_DARK_THEME = "pref_dark_theme"
+const val PREF_DYNAMIC_THEME = "pref_dynamic_theme"
 
 /**
  * Sort settings

@@ -1,5 +1,10 @@
 package com.nononsenseapps.feeder.ui.compose.navigation
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NamedNavArgument
@@ -9,9 +14,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
-import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.google.accompanist.navigation.animation.composable
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.NavigationDeepLinkViewModel
@@ -28,10 +33,23 @@ import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.urlEncode
 
+@OptIn(ExperimentalAnimationApi::class)
 sealed class NavigationDestination(
     protected val path: String,
     protected val navArguments: List<NavigationArgument>,
     val deepLinks: List<NavDeepLink>,
+    private val enterTransition: (AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition?)? = {
+        slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(256))
+    },
+    private val exitTransition: (AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition?)? = {
+        slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(256))
+    },
+    private val popEnterTransition: (AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition?)? = {
+        slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(256))
+    },
+    private val popExitTransition: (AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition?)? = {
+        slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(256))
+    },
 ) {
     val arguments: List<NamedNavArgument> = navArguments.map { it.namedNavArgument }
 
@@ -57,6 +75,7 @@ sealed class NavigationDestination(
         }
     }
 
+    @OptIn(ExperimentalAnimationApi::class)
     fun register(
         navGraphBuilder: NavGraphBuilder,
         navController: NavController,
@@ -66,6 +85,10 @@ sealed class NavigationDestination(
             route = route,
             arguments = arguments,
             deepLinks = deepLinks,
+            enterTransition = enterTransition,
+            exitTransition = exitTransition,
+            popEnterTransition = popEnterTransition,
+            popExitTransition = popExitTransition,
         ) { backStackEntry ->
             registerScreen(
                 windowSize = windowSize,
@@ -127,6 +150,7 @@ object SearchFeedDestination : NavigationDestination(
         backStackEntry: NavBackStackEntry
     ) {
         SearchFeedScreen(
+            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
@@ -173,6 +197,7 @@ object AddFeedDestination : NavigationDestination(
         val createFeedScreenViewModel: CreateFeedScreenViewModel = backStackEntry.DIAwareViewModel()
 
         CreateFeedScreen(
+            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
@@ -206,6 +231,7 @@ object EditFeedDestination : NavigationDestination(
     ) {
         val editFeedScreenViewModel: EditFeedScreenViewModel = backStackEntry.DIAwareViewModel()
         EditFeedScreen(
+            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
@@ -218,6 +244,7 @@ object EditFeedDestination : NavigationDestination(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 object SettingsDestination : NavigationDestination(
     path = "settings",
     navArguments = emptyList(),
@@ -251,6 +278,7 @@ object SettingsDestination : NavigationDestination(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 object FeedArticleDestination : NavigationDestination(
     path = "feedarticle",
     navArguments = emptyList(),
@@ -329,6 +357,7 @@ object FeedDestination : NavigationDestination(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 object ArticleDestination : NavigationDestination(
     path = "reader",
     navArguments = listOf(

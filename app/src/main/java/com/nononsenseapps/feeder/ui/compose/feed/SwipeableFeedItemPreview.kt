@@ -2,9 +2,7 @@ package com.nononsenseapps.feeder.ui.compose.feed
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,12 +20,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -71,8 +69,6 @@ import org.kodein.di.instance
 @OptIn(
     ExperimentalFoundationApi::class,
     ExperimentalMaterialApi::class,
-    ExperimentalAnimationApi::class,
-    ExperimentalTransitionApi::class
 )
 @Composable
 fun SwipeableFeedItemPreview(
@@ -82,7 +78,7 @@ fun SwipeableFeedItemPreview(
     showThumbnail: Boolean,
     feedItemStyle: FeedItemStyle,
     swipeAsRead: SwipeAsRead,
-    imagePainter: @Composable (String) -> Unit,
+    imagePainter: @Composable (String, Modifier) -> Unit,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onTogglePinned: () -> Unit,

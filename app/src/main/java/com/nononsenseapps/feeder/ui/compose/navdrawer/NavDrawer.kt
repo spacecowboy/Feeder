@@ -26,12 +26,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -50,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
@@ -59,43 +60,59 @@ const val COLLAPSE_ANIMATION_DURATION = 300
 @Composable
 @Preview(showBackground = true)
 private fun ListOfFeedsAndTagsPreview() {
-    ListOfFeedsAndTags(
-        immutableListHolderOf(
-            DrawerTop(unreadCount = 100, syncingChildren = 2, totalChildren = 4),
-            DrawerTag(tag = "News tag", unreadCount = 3, -1111, syncingChildren = 0, totalChildren = 2),
-            DrawerFeed(
-                id = 1,
-                displayTitle = "Times",
-                tag = "News tag",
-                unreadCount = 1,
-                currentlySyncing = false
-            ),
-            DrawerFeed(
-                id = 2,
-                displayTitle = "Post",
-                tag = "News tag",
-                unreadCount = 2,
-                currentlySyncing = false
-            ),
-            DrawerTag(tag = "Funny tag", unreadCount = 6, -2222, syncingChildren = 1, totalChildren = 1),
-            DrawerFeed(
-                id = 3,
-                displayTitle = "Hidden",
-                tag = "Funny tag",
-                unreadCount = 6,
-                currentlySyncing = true
-            ),
-            DrawerFeed(
-                id = 4,
-                displayTitle = "Top Dog",
-                unreadCount = 99,
-                tag = "",
-                currentlySyncing = true
-            )
-        ),
-        ImmutableHolder(emptySet()),
-        {},
-    ) {}
+    FeederTheme {
+        Surface {
+            ListOfFeedsAndTags(
+                immutableListHolderOf(
+                    DrawerTop(unreadCount = 100, syncingChildren = 2, totalChildren = 4),
+                    DrawerTag(
+                        tag = "News tag",
+                        unreadCount = 3,
+                        -1111,
+                        syncingChildren = 0,
+                        totalChildren = 2
+                    ),
+                    DrawerFeed(
+                        id = 1,
+                        displayTitle = "Times",
+                        tag = "News tag",
+                        unreadCount = 1,
+                        currentlySyncing = false
+                    ),
+                    DrawerFeed(
+                        id = 2,
+                        displayTitle = "Post",
+                        tag = "News tag",
+                        unreadCount = 2,
+                        currentlySyncing = false
+                    ),
+                    DrawerTag(
+                        tag = "Funny tag",
+                        unreadCount = 6,
+                        -2222,
+                        syncingChildren = 1,
+                        totalChildren = 1
+                    ),
+                    DrawerFeed(
+                        id = 3,
+                        displayTitle = "Hidden",
+                        tag = "Funny tag",
+                        unreadCount = 6,
+                        currentlySyncing = true
+                    ),
+                    DrawerFeed(
+                        id = 4,
+                        displayTitle = "Top Dog",
+                        unreadCount = 99,
+                        tag = "",
+                        currentlySyncing = true
+                    )
+                ),
+                ImmutableHolder(emptySet()),
+                {},
+            ) {}
+        }
+    }
 }
 
 @ExperimentalAnimationApi
@@ -107,7 +124,8 @@ fun ListOfFeedsAndTags(
     onItemClick: (DrawerItemWithUnreadCount) -> Unit,
 ) {
     LazyColumn(
-        contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top).asPaddingValues(),
+        contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+            .asPaddingValues(),
         modifier = Modifier
             .fillMaxSize()
             .semantics {
@@ -233,17 +251,17 @@ private fun ExpandableTag(
                     .fillMaxWidth()
                     .align(Alignment.CenterStart)
             )
-            this@Row.AnimatedVisibility(
-                visible = currentlySyncing,
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-            ) {
-                LinearProgressIndicator(
-                    progress = syncProgress,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            }
+//            this@Row.AnimatedVisibility(
+//                visible = currentlySyncing,
+//                modifier = Modifier
+//                    .align(Alignment.BottomStart)
+//            ) {
+//                LinearProgressIndicator(
+//                    progress = syncProgress,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                )
+//            }
         }
         val unreadLabel = LocalContext.current.resources
             .getQuantityString(R.plurals.n_unread_articles, unreadCount, unreadCount)
@@ -276,7 +294,6 @@ private fun ExpandArrow(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun AllFeeds(
@@ -291,22 +308,21 @@ private fun AllFeeds(
     startPadding = 16.dp,
     onItemClick = onItemClick,
     syncIndicator = {
-        AnimatedVisibility(
-            visible = currentlySyncing,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-        ) {
-            LinearProgressIndicator(
-                progress = syncProgress,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomStart)
-            )
-        }
+//        AnimatedVisibility(
+//            visible = currentlySyncing,
+//            modifier = Modifier
+//                .align(Alignment.BottomStart)
+//        ) {
+//            LinearProgressIndicator(
+//                progress = syncProgress,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .align(Alignment.BottomStart)
+//            )
+//        }
     },
 )
 
-@OptIn(ExperimentalAnimationApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun TopLevelFeed(
@@ -320,20 +336,19 @@ private fun TopLevelFeed(
     startPadding = 16.dp,
     onItemClick = onItemClick,
     syncIndicator = {
-        AnimatedVisibility(
-            visible = currentlySyncing,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-        ) {
-            LinearProgressIndicator(
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-        }
+//        AnimatedVisibility(
+//            visible = currentlySyncing,
+//            modifier = Modifier
+//                .align(Alignment.BottomStart)
+//        ) {
+//            LinearProgressIndicator(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//            )
+//        }
     },
 )
 
-@OptIn(ExperimentalAnimationApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun ChildFeed(
@@ -354,22 +369,21 @@ private fun ChildFeed(
             startPadding = 48.dp,
             onItemClick = onItemClick,
             syncIndicator = {
-                AnimatedVisibility(
-                    visible = currentlySyncing,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                ) {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-                }
+//                AnimatedVisibility(
+//                    visible = currentlySyncing,
+//                    modifier = Modifier
+//                        .align(Alignment.BottomStart)
+//                ) {
+//                    LinearProgressIndicator(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                    )
+//                }
             },
         )
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Feed(
     title: String,
