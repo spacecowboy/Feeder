@@ -492,7 +492,7 @@ fun SettingsList(
 
         GroupTitle { modifier ->
             Text(
-                stringResource(id = R.string.read_article),
+                stringResource(id = R.string.text_to_speech),
                 modifier = modifier,
             )
         }
