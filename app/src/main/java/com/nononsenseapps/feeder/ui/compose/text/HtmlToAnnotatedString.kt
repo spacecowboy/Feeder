@@ -296,6 +296,10 @@ private fun TextComposer.appendTextChildren(
                             append("\n\n")
                         }
                     }
+                    "rt", "rp" -> {
+                        // Ruby text elements. TTS has no need for furigana and similar
+                        // so ignore
+                    }
                     "iframe" -> {
                         // not implemented
                     }

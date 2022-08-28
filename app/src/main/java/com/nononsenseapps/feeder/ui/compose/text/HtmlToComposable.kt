@@ -630,6 +630,10 @@ private fun TextComposer.appendTextChildren(
                             }
                         }
                     }
+                    "rt", "rp" -> {
+                        // Ruby text elements. Not rendering them might be better than not
+                        // handling them well
+                    }
                     "video" -> {
                         // not implemented yet. remember to disable selection
                     }
