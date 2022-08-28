@@ -102,7 +102,7 @@
     <string name="failed_to_fetch_full_article">Makalenin tamamı alınamadı</string>
     <string name="fetch_full_articles_by_default">Öntanımlı olarak makalelerin tamamını al</string>
     <string name="fetch_full_article">Makalenin tamamını al</string>
-    <string name="failed_to_load_text_to_speech">Metinden konuşmaya yüklenemedi</string>
+    <string name="failed_to_load_text_to_speech">Metin okuma yüklenemedi</string>
     <string name="resume_reading">Okumaya devam et</string>
     <string name="pause_reading">Okumayı duraklat</string>
     <string name="read_article">Yüksek sesle oku</string>
@@ -182,4 +182,11 @@
     <string name="only_available_on_android_n">Yalnızca Android %1$s ve üzerinde kullanılabilir</string>
     <string name="description_for_read_aloud">Makale dilini otomatik olarak algılar</string>
     <string name="explanation_permission_notifications">Bildirimlerin etkinleştirilebilmesi için önce izin verilmelidir.</string>
+    <string name="text_to_speech">Metin okuma</string>
+    <string name="dynamic_theme_use">Değişken renkler</string>
+    <string name="pinned">Sabitlendi</string>
+    <string name="bookmarked">Yer imlerine eklendi</string>
+    <string name="set_language">Dili ayarla</string>
+    <string name="skip_to_next">Sonrakine atla</string>
+    <string name="new_indicator">Yeni</string>
 </resources>
