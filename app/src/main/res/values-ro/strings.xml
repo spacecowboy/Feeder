@@ -178,4 +178,15 @@
     <string name="remove_bookmark">Eliminați marcajul</string>
     <string name="permission_read_desc">Permite aplicației să citească fluxuri și articole</string>
     <string name="permission_read_label">Acces numai pentru citire la Feeder</string>
+    <string name="use_detect_language">Detectarea limbii</string>
+    <string name="text_to_speech">Text la vorbire</string>
+    <string name="skip_to_next">Treci la următorul</string>
+    <string name="set_language">Setați limba</string>
+    <string name="description_for_read_aloud">Detectează automat limba articolului</string>
+    <string name="dynamic_theme_use">Culori dinamice</string>
+    <string name="pinned">Fixat</string>
+    <string name="bookmarked">Marcat în favorite</string>
+    <string name="new_indicator">Nou</string>
+    <string name="explanation_permission_notifications">Trebuie să se acorde permisiunea înainte de a activa notificările.</string>
+    <string name="only_available_on_android_n">Disponibil numai pe Android %1$s și mai sus</string>
 </resources>
