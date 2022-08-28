@@ -182,4 +182,11 @@
     <string name="description_for_read_aloud">Registrerer artiklens sprog automatisk</string>
     <string name="only_available_on_android_n">Kun tilgængelig på Android %1$s og nyere</string>
     <string name="explanation_permission_notifications">Der skal gives tilladelse, før notifikationer kan aktiveres.</string>
+    <string name="text_to_speech">Tekst til tale</string>
+    <string name="skip_to_next">Spring til næste</string>
+    <string name="set_language">Indstil sprog</string>
+    <string name="dynamic_theme_use">Dynamiske farver</string>
+    <string name="pinned">Fastgjort</string>
+    <string name="bookmarked">Bogmærket</string>
+    <string name="new_indicator">Ny</string>
 </resources>
