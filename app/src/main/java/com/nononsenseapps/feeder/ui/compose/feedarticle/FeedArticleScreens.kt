@@ -116,6 +116,7 @@ import com.nononsenseapps.feeder.ui.compose.reader.ReaderView
 import com.nononsenseapps.feeder.ui.compose.reader.dateTimeFormat
 import com.nononsenseapps.feeder.ui.compose.reader.onLinkClick
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
+import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.BackHandler
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
@@ -1347,11 +1348,13 @@ fun ArticleScreen(
             SmallTopAppBar(
                 scrollBehavior = scrollBehavior,
                 title = {
-                    Text(
-                        text = viewState.feedDisplayTitle,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    withBidiDeterminedLayoutDirection(paragraph = viewState.feedDisplayTitle) {
+                        Text(
+                            text = viewState.feedDisplayTitle,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {

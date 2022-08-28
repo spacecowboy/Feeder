@@ -77,6 +77,7 @@ import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
+import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import kotlinx.coroutines.delay
@@ -297,11 +298,15 @@ fun FeedScreen(
             SmallTopAppBar(
                 scrollBehavior = scrollBehavior,
                 title = {
-                    Text(
-                        viewState.feedScreenTitle.title ?: stringResource(id = R.string.all_feeds),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                    val text = viewState.feedScreenTitle.title
+                        ?: stringResource(id = R.string.all_feeds)
+                    withBidiDeterminedLayoutDirection(paragraph = text) {
+                        Text(
+                            text,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(
