@@ -1,12 +1,12 @@
-<p>Czy masz już dość ciężkich, niewolnych czytników, które kradną Twoje dane osobowe?<br/>
-Czy męczą Cię skomplikowane ustawienia synchronizacji wymagające wielu godzin konfiguracji serwera?<br/>
-Czy masz dość tworzenia wszędzie nowych kont?<br/></p>
+<p>Masz już dość ciężkich, niewolnych czytników, które kradną Twoje dane osobowe?<br/>
+Męczą Cię skomplikowane ustawienia synchronizacji wymagające wielu godzin konfiguracji serwera?<br/>
+Masz dość tworzenia wszędzie nowych kont?<br/></p>
 
 <p>Zamiast tego wypróbuj Feeder!</p>
 
 <p>Feeder to w pełni wolny i darmowy czytnik kanałów RSS. Obsługuje wszystkie popularne formaty kanałów, w tym JSONFeed. Nie śledzi Cię. Nie wymaga żadnych konfiguracji. Nie musisz nawet zakładać konta! Po prostu skonfiguruj swoje kanały lub zaimportuj je ze starego czytnika przez OPML, a następnie zacznij synchronizować i czytać.</p>
 
-<p><b>Cechy</b></p>
+<p><b>Cechy:</b></p>
 
 <ul>
 <li>Przetwarza HTML i wyświetla go w natywnym widoku tekstowym (TextView)</li>
