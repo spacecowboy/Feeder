@@ -1,1 +1,1 @@
-Un fantastico lettore di flussi RSS gratuito e con un codice aperto
+Un fantastico lettore di feed RSS gratuito e a codice aperto
