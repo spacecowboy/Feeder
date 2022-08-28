@@ -89,32 +89,35 @@ private fun LazyListScope.formatBody(
             val dimens = LocalDimens.current
             val paragraph = paragraphBuilder.toComposableAnnotatedString()
 
-            // ClickableText prevents taps from deselecting selected text
-            // So use regular Text if possible
-            if (paragraph.getStringAnnotations("URL", 0, paragraph.length)
-                .isNotEmpty()
-            ) {
-                ClickableText(
-                    text = paragraph,
-                    style = MaterialTheme.typography.bodyLarge
-                        .merge(TextStyle(color = MaterialTheme.colorScheme.onBackground)),
-                    modifier = Modifier
-                        .width(dimens.maxContentWidth)
-                ) { offset ->
-                    paragraph.getStringAnnotations("URL", offset, offset)
-                        .firstOrNull()
-                        ?.let {
-                            onLinkClick(it.item)
-                        }
+            withBidiDeterminedLayoutDirection(paragraph.text) {
+                // ClickableText prevents taps from deselecting selected text
+                // So use regular Text if possible
+                if (
+                    paragraph.getStringAnnotations("URL", 0, paragraph.length)
+                        .isNotEmpty()
+                ) {
+                    ClickableText(
+                        text = paragraph,
+                        style = MaterialTheme.typography.bodyLarge
+                            .merge(TextStyle(color = MaterialTheme.colorScheme.onBackground)),
+                        modifier = Modifier
+                            .width(dimens.maxContentWidth)
+                    ) { offset ->
+                        paragraph.getStringAnnotations("URL", offset, offset)
+                            .firstOrNull()
+                            ?.let {
+                                onLinkClick(it.item)
+                            }
+                    }
+                } else {
+                    Text(
+                        text = paragraph,
+                        style = MaterialTheme.typography.bodyLarge
+                            .merge(TextStyle(color = MaterialTheme.colorScheme.onBackground)),
+                        modifier = Modifier
+                            .width(dimens.maxContentWidth)
+                    )
                 }
-            } else {
-                Text(
-                    text = paragraph,
-                    style = MaterialTheme.typography.bodyLarge
-                        .merge(TextStyle(color = MaterialTheme.colorScheme.onBackground)),
-                    modifier = Modifier
-                        .width(dimens.maxContentWidth)
-                )
             }
         }
     }
@@ -655,7 +658,6 @@ private fun TextComposer.appendTextChildren(
     }
 }
 
-@OptIn(ExperimentalStdlibApi::class)
 private fun String.asFontFamily(): FontFamily? = when (this.lowercase()) {
     "monospace" -> FontFamily.Monospace
     "serif" -> FontFamily.Serif

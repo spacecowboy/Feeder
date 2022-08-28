@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.LinkOpener
+import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -96,29 +97,40 @@ fun ReaderView(
                             }
                         }
                 ) {
-                    Text(
-                        text = articleTitle,
-                        style = MaterialTheme.typography.headlineLarge
-                    )
+                    withBidiDeterminedLayoutDirection(paragraph = articleTitle) {
+                        Text(
+                            text = articleTitle,
+                            style = MaterialTheme.typography.headlineLarge,
+                            modifier = Modifier
+                                .width(dimens.maxContentWidth)
+                        )
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = feedTitle,
-                        style = MaterialTheme.typography.titleMedium.merge(LinkTextStyle()),
-                        modifier = Modifier
-                            .clearAndSetSemantics {
-                                contentDescription = feedTitle
-                            }
-                            .clickable {
-                                onFeedTitleClick()
-                            }
-                    )
+                    withBidiDeterminedLayoutDirection(paragraph = feedTitle) {
+                        Text(
+                            text = feedTitle,
+                            style = MaterialTheme.typography.titleMedium.merge(LinkTextStyle()),
+                            modifier = Modifier
+                                .width(dimens.maxContentWidth)
+                                .clearAndSetSemantics {
+                                    contentDescription = feedTitle
+                                }
+                                .clickable {
+                                    onFeedTitleClick()
+                                }
+                        )
+                    }
                     if (authorDate != null) {
                         Spacer(modifier = Modifier.height(4.dp))
                         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                            Text(
-                                text = authorDate,
-                                style = MaterialTheme.typography.titleMedium
-                            )
+                            withBidiDeterminedLayoutDirection(paragraph = authorDate) {
+                                Text(
+                                    text = authorDate,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier
+                                        .width(dimens.maxContentWidth)
+                                )
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))

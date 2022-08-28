@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
+import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
@@ -70,12 +71,15 @@ fun FeedItemSuperCompact(
                 .requiredHeightIn(min = minimumTouchSize)
                 .padding(vertical = 4.dp)
         ) {
-            Text(
-                text = item.title,
-                style = FeedListItemTitleTextStyle(),
-                modifier = Modifier
-                    .padding(start = 4.dp, end = 4.dp)
-            )
+            withBidiDeterminedLayoutDirection(paragraph = item.title) {
+                Text(
+                    text = item.title,
+                    style = FeedListItemTitleTextStyle(),
+                    modifier = Modifier
+                        .padding(start = 4.dp, end = 4.dp)
+                        .fillMaxWidth()
+                )
+            }
             // Want the dropdown to center on the middle text row
             Box {
                 Row(
@@ -84,22 +88,25 @@ fun FeedItemSuperCompact(
                         .fillMaxWidth()
                 ) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                        Text(
-                            text = buildAnnotatedString {
-                                if (item.pubDate.isNotBlank()) {
-                                    append("${item.pubDate} ‧ ")
-                                }
-                                withStyle(FeedListItemFeedTitleStyle().toSpanStyle()) {
-                                    append(item.feedTitle)
-                                }
-                            },
-                            style = FeedListItemDateStyle(),
-                            maxLines = 1,
-                            overflow = TextOverflow.Clip,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 4.dp, end = 4.dp)
-                        )
+                        val text = buildAnnotatedString {
+                            if (item.pubDate.isNotBlank()) {
+                                append("${item.pubDate} ‧ ")
+                            }
+                            withStyle(FeedListItemFeedTitleStyle().toSpanStyle()) {
+                                append(item.feedTitle)
+                            }
+                        }
+                        withBidiDeterminedLayoutDirection(paragraph = text.text) {
+                            Text(
+                                text = text,
+                                style = FeedListItemDateStyle(),
+                                maxLines = 1,
+                                overflow = TextOverflow.Clip,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 4.dp, end = 4.dp)
+                            )
+                        }
                     }
                 }
                 DropdownMenu(
