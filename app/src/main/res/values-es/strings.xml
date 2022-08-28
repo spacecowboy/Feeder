@@ -182,4 +182,11 @@
     <string name="only_available_on_android_n">Disponible solo en Android %1$s y superior</string>
     <string name="description_for_read_aloud">Detecta automáticamente el idioma del artículo</string>
     <string name="explanation_permission_notifications">Se debe otorgar permiso antes de habilitar las notificaciones.</string>
+    <string name="text_to_speech">Texto a voz</string>
+    <string name="skip_to_next">Saltar al siguiente</string>
+    <string name="set_language">Establecer idioma</string>
+    <string name="dynamic_theme_use">Colores dinámicos</string>
+    <string name="pinned">Anclado</string>
+    <string name="bookmarked">Marcado</string>
+    <string name="new_indicator">Nuevo</string>
 </resources>
