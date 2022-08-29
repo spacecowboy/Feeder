@@ -56,19 +56,10 @@ private fun TextComposer.appendTextChildren(
                 if (preFormatted) {
                     append(node.wholeText)
                 } else {
-                    if (endsWithWhitespace) {
-                        node.text().trimStart().let { trimmed ->
-                            if (trimmed.isNotEmpty()) {
-                                append(trimmed)
-                            }
-                        }
-                    } else {
-                        node.text().let { text ->
-                            if (text.isNotEmpty()) {
-                                append(text)
-                            }
-                        }
-                    }
+                    node.appendCorrectlyNormalizedWhiteSpace(
+                        this,
+                        stripLeading = endsWithWhitespace
+                    )
                 }
             }
             is Element -> {

@@ -190,19 +190,10 @@ private fun TextComposer.appendTextChildren(
                 if (preFormatted) {
                     append(node.wholeText)
                 } else {
-                    if (endsWithWhitespace) {
-                        node.text().trimStart().let { trimmed ->
-                            if (trimmed.isNotEmpty()) {
-                                append(trimmed)
-                            }
-                        }
-                    } else {
-                        node.text().let { text ->
-                            if (text.isNotEmpty()) {
-                                append(text)
-                            }
-                        }
-                    }
+                    node.appendCorrectlyNormalizedWhiteSpace(
+                        this,
+                        stripLeading = endsWithWhitespace
+                    )
                 }
             }
             is Element -> {
@@ -761,3 +752,39 @@ internal class ImageCandidates(
 }
 
 private val SpaceRegex = Regex("\\s+")
+
+/**
+ * Can't use JSoup's text() method because that strips invisible characters
+ * such as ZWNJ which are crucial for several languages.
+ */
+fun TextNode.appendCorrectlyNormalizedWhiteSpace(
+    builder: TextComposer,
+    stripLeading: Boolean
+) {
+    val string = wholeText
+
+    var reachedNonWhite = false
+    var lastWasWhite = false
+    var i = 0
+    while (i < string.length) {
+        val code = string.codePointAt(i)
+        val char = code.toChar()
+        i += Character.charCount(code)
+
+        lastWasWhite = if (isCollapsableWhiteSpace(char)) {
+            if (!(stripLeading && !reachedNonWhite || lastWasWhite)) {
+                builder.append(' ')
+            }
+            true
+        } else {
+            reachedNonWhite = true
+            builder.append(char)
+            false
+        }
+    }
+}
+
+// 12 is form feed which as no escape in kotlin
+// 160 is &nbsp; (non-breaking space). Not in the spec but expected.
+private fun isCollapsableWhiteSpace(c: Char) =
+    c == ' ' || c == '\t' || c == '\n' || c == 12.toChar() || c == '\r' || c == 160.toChar()
