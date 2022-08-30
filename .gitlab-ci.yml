@@ -29,10 +29,30 @@ test:
     paths:
     - app/build/reports/
 
-compile:
+compileTest:
   stage: build
   script:
-    - source devenv && ./gradlew assembleDebugMini packageDebugAndroidTest assemble
+    - source devenv && ./gradlew packageDebugAndroidTest
+  needs: []
+  artifacts:
+    paths:
+    - app/build/outputs/
+    - build/logs/
+
+compilePlay:
+  stage: build
+  script:
+    - source devenv && ./gradlew assemblePlay
+  needs: []
+  artifacts:
+    paths:
+    - app/build/outputs/
+    - build/logs/
+
+compileRelease:
+  stage: build
+  script:
+    - source devenv && ./gradlew assembleRelease
   needs: []
   artifacts:
     paths:
