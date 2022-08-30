@@ -73,7 +73,7 @@ deploy_playstore:
   stage: deploy
   script:
     - source devenv && ./deploy_playstore.sh
-  needs: ["validate_deployment", "compile", "lint", "test"]
+  needs: ["validate_deployment", "compilePlay", "compileRelease", "compileTest", "lint", "test"]
   only:
     - tags
   environment:
