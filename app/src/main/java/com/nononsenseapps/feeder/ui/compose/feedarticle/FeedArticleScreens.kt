@@ -697,6 +697,22 @@ fun FeedWithArticleScreen(
                 ) {
                     DropdownMenuItem(
                         onClick = {
+                            onMarkAllAsRead()
+                            onShowToolbarMenu(false)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.DoneAll,
+                                contentDescription = null,
+                            )
+                        },
+                        text = {
+                            Text(stringResource(id = R.string.mark_all_as_read))
+                        }
+                    )
+                    Divider()
+                    DropdownMenuItem(
+                        onClick = {
                             onRefreshAll()
                             onShowToolbarMenu(false)
                         },
@@ -758,21 +774,6 @@ fun FeedWithArticleScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.delete_feed))
-                        }
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onMarkAllAsRead()
-                            onShowToolbarMenu(false)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.DoneAll,
-                                contentDescription = null,
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.mark_all_as_read))
                         }
                     )
                     Divider()
@@ -1135,6 +1136,22 @@ fun FeedListScreen(
                 ) {
                     DropdownMenuItem(
                         onClick = {
+                            onMarkAllAsRead()
+                            onShowToolbarMenu(false)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.DoneAll,
+                                contentDescription = null,
+                            )
+                        },
+                        text = {
+                            Text(stringResource(id = R.string.mark_all_as_read))
+                        }
+                    )
+                    Divider()
+                    DropdownMenuItem(
+                        onClick = {
                             onRefreshAll()
                             onShowToolbarMenu(false)
                         },
@@ -1196,21 +1213,6 @@ fun FeedListScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.delete_feed))
-                        }
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onMarkAllAsRead()
-                            onShowToolbarMenu(false)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.DoneAll,
-                                contentDescription = null,
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.mark_all_as_read))
                         }
                     )
                     Divider()
