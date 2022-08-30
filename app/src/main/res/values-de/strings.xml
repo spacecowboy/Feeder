@@ -182,4 +182,11 @@
     <string name="only_available_on_android_n">Nur auf Android %1$s und höher verfügbar</string>
     <string name="explanation_permission_notifications">Die Berechtigung muss erteilt werden, bevor Benachrichtigungen aktiviert werden können.</string>
     <string name="description_for_read_aloud">Erkennt automatisch die Sprache des Artikels</string>
+    <string name="pinned">Angeheftet</string>
+    <string name="text_to_speech">Text in Sprache</string>
+    <string name="set_language">Sprache einstellen</string>
+    <string name="skip_to_next">Weiter zum Nächsten</string>
+    <string name="bookmarked">Lesezeichen</string>
+    <string name="new_indicator">Neu</string>
+    <string name="dynamic_theme_use">Dynamische Farben</string>
 </resources>

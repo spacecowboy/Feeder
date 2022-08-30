@@ -182,4 +182,11 @@
     <string name="description_for_read_aloud">自动检测文章语言</string>
     <string name="only_available_on_android_n">仅在 Android %1$s 及以上系统版本可用</string>
     <string name="explanation_permission_notifications">必须先授予权限才能启用通知。</string>
+    <string name="text_to_speech">文本转语音</string>
+    <string name="dynamic_theme_use">动态颜色</string>
+    <string name="pinned">已固定</string>
+    <string name="bookmarked">已加书签</string>
+    <string name="skip_to_next">跳到下一篇</string>
+    <string name="set_language">设置语言</string>
+    <string name="new_indicator">新建</string>
 </resources>

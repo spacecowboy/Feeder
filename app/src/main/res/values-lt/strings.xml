@@ -178,4 +178,15 @@
     <string name="failed_to_export_OPML">Nepavyko eksportuoti OPML</string>
     <string name="pin_article">Prisegti straipsnį</string>
     <string name="unpin_article">Atsegti straipsnį</string>
+    <string name="use_detect_language">Aptikti kalbą</string>
+    <string name="description_for_read_aloud">Automatiškai nustato straipsnio kalbą</string>
+    <string name="text_to_speech">Tekstas į kalbą</string>
+    <string name="skip_to_next">Pereiti prie kito</string>
+    <string name="set_language">Nustatyti kalbą</string>
+    <string name="dynamic_theme_use">Dinaminės spalvos</string>
+    <string name="pinned">Prisegta</string>
+    <string name="bookmarked">Pažymėta</string>
+    <string name="new_indicator">Nauja</string>
+    <string name="explanation_permission_notifications">Prieš įjungiant pranešimus turi būti suteiktas leidimas.</string>
+    <string name="only_available_on_android_n">Pasiekiama tik \"Android\" %1$s ir naujesnėse versijose</string>
 </resources>

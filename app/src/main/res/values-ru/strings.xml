@@ -177,4 +177,5 @@
     <string name="bookmark_article">Добавить в закладки</string>
     <string name="remove_bookmark">Удалить закладку</string>
     <string name="permission_read_desc">Позволяет приложению читать каналы и статьи</string>
+    <string name="text_to_speech">Текст в речь</string>
 </resources>
