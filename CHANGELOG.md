@@ -1,3 +1,143 @@
+# 2.3.0
+
+* Upgraded to follow Material3 guidelines including dynamic colors
+* Big improvements to TTS with the help of Kevin Jiang
+* App is now tablet friendly on all screens
+
+Kevin Jiang (7):
+  * [65eb5d73] feat(settings): added detect language to settings
+  * [0444b16a] feat(readaloud): detect language of the article for readaloud
+  * [7295d5c7] test: test newly added detect language setting
+  * [a4a3f843] Use separate description if language detect feature is not
+         available
+  * [45a63db4] Minor formatting change
+  * [c047a0dd] Fix typo
+  * [b8b73ab1] Updating test
+
+Agnieszka C (2):
+  * [0ec50961] Updated Polish translation using Weblate
+
+Andrij Mizyk (2):
+  * [464661bf] Updated Ukrainian translation using Weblate
+
+D221 (1):
+  * [13777023] Updated Lithuanian translation using Weblate
+
+ERYpTION (2):
+  * [8d2291d2] Updated Danish translation using Weblate
+
+El Pirujo (3):
+  * [addd743a] Updated Spanish translation using Weblate
+
+Eric (2):
+  * [ca0895a4] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [7dbc8c85] Updated French translation using Weblate
+
+Meiru (1):
+  * [f6c5e8e7] Updated Japanese translation using Weblate
+
+Oğuz Ersen (2):
+  * [fd60a78e] Updated Turkish translation using Weblate
+
+Simona Iacob (1):
+  * [a664e174] Translated using Weblate (Romanian)
+
+Tadeáš Erban (1):
+  * [ace40142] Updated Czech translation using Weblate
+
+VfBFan (2):
+  * [1105f0da] Updated German translation using Weblate
+
+atilluF (4):
+  * [37e9840b] Translated using Weblate (Italian)
+
+bruh (1):
+  * [2a89025b] Updated Vietnamese translation using Weblate
+
+zmni (1):
+  * [991fce3e] Updated Indonesian translation using Weblate
+
+Егор Ермаков (1):
+  * [4f4d9a4c] Updated Russian translation using Weblate
+
+Jonas Kalderstam (74):
+  * [bb2f8226] Fixed all restartable but not skippable functions
+  * [517efd70] Fixed some code formatting
+  * [d2828981] Modified strings to be shorter
+  * [fca6176f] Changed detect language settings to default to true
+  * [942c3dd0] Created new read aloud settings group
+  * [b892765e] Made detectLanguage slightly more robust for TTS failures
+  * [bc36a663] Bumped some dependencies
+  * [a442e159] Upgraded Android Gradle Plugin and such
+  * [c343a4b7] Builds tools version doesn't need to be specified anymore
+  * [28022f25] Bump rome version
+  * [360b1d12] Fixed deprecation warnings and api changes
+  * [eff41771] Removed accompanist insets - no longer needed
+  * [e7c9af4f] Implemented runtime permission for notifications
+  * [25d649fe] Some test fixes
+  * [0677cf1c] Fixed regression in edit feed view
+  * [5ab974b7] Removed all uses of live data since it seems buggy
+  * [f49cf9c6] Bumped rome version
+  * [361617d5] Theme
+  * [ada5c099] Upgraded to Material3 - seems to work even
+  * [9860a501] Implemented dynamic color scheme
+  * [a10b77e1] Theme respects black again
+  * [aaee2b64] Fixed color of status bar and padding
+  * [5799cc1a] More sensible size
+  * [f07a65a3] Fixed nav bar coloring on all versions
+  * [7dbf7f26] Handle navigation bar padding in horizontal
+  * [8598f2cd] Try giving foldables more usable space
+  * [a9392955] NavBar button becomes toggleable now on tablets
+  * [497c387c] Fixed more menu icons
+  * [5a7c7850] More foldable use
+  * [7aba6892] Forgot an activity
+  * [ef0958d1] Pre split
+  * [b3067123] Edit feed is dual now
+  * [9f9dc5e1] Search feed is dual now
+  * [8c7e8dee] Fixed color of cards and spec says image should be rounded
+  * [1a0f6c93] Fixed link color to something more pleasing
+  * [89f7cdf2] Updated indicators on feed items
+  * [92339e7d] Removed unused overload and fixed FeedListScrollbehavior
+  * [3ee4296f] Some animated navigation
+  * [3f875378] Fixed animated transitions in sync screens
+  * [73b71df2] Fixed scroll behavior for sync screens
+  * [d1d4761b] Fixed a bug in animation
+  * [75fe24b0] All screens animated and bottom bar fixed
+  * [12c1468e] Fixed lint check
+  * [5b87b130] Fixed bottom bar padding for navigation bar
+  * [6000b1f6] Fix text lines in app bar
+  * [365e902c] Fixed actions in top app bar to follow guidelines number
+  * [feed23d4] Fixed incorrect default value in edit feed screen
+  * [9b489168] Removed buggy sync indicators in navigation drawer
+  * [489f3bde] Updated fastlane metadata with new screenshots
+  * [4ad56535] Fixed color of indicator
+  * [a6419890] Changed to canonical text to speech icon
+  * [bbf0104b] Cleaned up custom icons
+  * [2adfbac7] Changed to original done all icon for FAB
+  * [af4a2dd1] Adjusted middle margin on tablets
+  * [405d680b] Updated to official URL annotation
+  * [a81a1b3c] Text given to TTS engine now has annotations
+  * [433a8bb1] Fixed device list screen not showing devices
+  * [87a068a5] Added a skip next button for TTS
+  * [4b461392] TTS now detect language for each paragraph
+  * [25449bb3] Moved stop icon to start
+  * [85d7ddf3] Added ability to force Locale on TTS
+  * [2458d2f5] Respect user locale order if set
+  * [2ecad20d] Revert "Updated to official URL annotation"
+  * [61486f13] Changed FAB to scaleIn animation as per guidelines
+  * [fb431fa2] Added string for Text to speech
+  * [2e67ac5b] Ignore RT tags in Ruby tags for now
+  * [9a391a1b] Improved handling of RTL text
+  * [2666f294] Improved RTL support in title bar
+  * [1f0e2da9] Translated using Weblate (Swedish)
+  * [8ae209c3] Further RTL improvements - now don't strip ZWNJ chars
+  * [5a9ab235] Split pipeline so timeout is not hit
+  * [e6b9aba6] Updated screenshots in README
+  * [af05221c] Fixed pipeline deps
+  * [38401846] Moved Mark All As Read to top of the menu
+
 # 2.2.7
 Jonas Kalderstam (1):
   * [c333c453] Fixed mark above/below as read with pinned items
