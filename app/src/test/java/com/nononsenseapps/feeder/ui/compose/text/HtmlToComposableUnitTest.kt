@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
-import coil.size.PixelSize
 import io.mockk.every
 import io.mockk.mockk
 import kotlin.test.assertEquals
@@ -31,7 +30,7 @@ class HtmlToComposableUnitTest {
         val result = getImageSource("http://foo", element)
 
         assertTrue(result.hasImage)
-        assertEquals("http://foo/image.jpg", result.getBestImageForMaxSize(PixelSize(1, 1), 1.0f))
+        assertEquals("http://foo/image.jpg", result.getBestImageForMaxSize(1, 1.0f))
     }
 
     @Test
@@ -42,7 +41,7 @@ class HtmlToComposableUnitTest {
         val result = getImageSource("http://foo", element)
 
         assertTrue(result.hasImage)
-        assertEquals("http://foo/image.jpg", result.getBestImageForMaxSize(PixelSize(1, 1), 1.0f))
+        assertEquals("http://foo/image.jpg", result.getBestImageForMaxSize(1, 1.0f))
     }
 
     @Test
@@ -54,7 +53,7 @@ class HtmlToComposableUnitTest {
 
         assertTrue(result.hasImage)
 
-        val maxSize = PixelSize(1, 1)
+        val maxSize = 1
         assertEquals("http://foo/header.png", result.getBestImageForMaxSize(maxSize, 1.0f))
     }
 
@@ -67,7 +66,7 @@ class HtmlToComposableUnitTest {
 
         assertTrue(result.hasImage)
 
-        val maxSize = PixelSize(640, 1)
+        val maxSize = 640
         assertEquals("http://foo/header640.png", result.getBestImageForMaxSize(maxSize, 1.0f))
     }
 
@@ -80,7 +79,7 @@ class HtmlToComposableUnitTest {
 
         assertTrue(result.hasImage)
 
-        val maxSize = PixelSize(900, 1)
+        val maxSize = 900
         assertEquals("http://foo/header960.png", result.getBestImageForMaxSize(maxSize, 8.0f))
     }
 
@@ -93,7 +92,7 @@ class HtmlToComposableUnitTest {
 
         assertTrue(result.hasImage)
 
-        val maxSize = PixelSize(650, 1)
+        val maxSize = 650
         assertEquals("http://foo/header640.png", result.getBestImageForMaxSize(maxSize, 7.0f))
     }
 
@@ -106,7 +105,7 @@ class HtmlToComposableUnitTest {
 
         assertTrue(result.hasImage)
 
-        val maxSize = PixelSize(950, 1)
+        val maxSize = 950
         assertEquals("http://foo/header960.png", result.getBestImageForMaxSize(maxSize, 7.0f))
     }
 
@@ -119,7 +118,7 @@ class HtmlToComposableUnitTest {
 
         assertTrue(result.hasImage)
 
-        val maxSize = PixelSize(1500, 1)
+        val maxSize = 1500
         assertEquals("http://foo/header960.png", result.getBestImageForMaxSize(maxSize, 8.0f))
     }
 
@@ -132,7 +131,7 @@ class HtmlToComposableUnitTest {
 
         assertTrue(result.hasImage)
 
-        val maxSize = PixelSize(1, 1)
+        val maxSize = 1
         assertEquals("http://foo/header3.0x.png", result.getBestImageForMaxSize(maxSize, 3.0f))
     }
 
@@ -145,7 +144,7 @@ class HtmlToComposableUnitTest {
 
         assertTrue(result.hasImage)
 
-        val maxSize = PixelSize(1, 1)
+        val maxSize = 1
         assertEquals("http://foo/header.png", result.getBestImageForMaxSize(maxSize, 1.0f))
     }
 
@@ -158,7 +157,7 @@ class HtmlToComposableUnitTest {
 
         assertTrue(result.hasImage)
 
-        val maxSize = PixelSize(1, 1)
+        val maxSize = 1
         assertEquals("http://foo/header.png", result.getBestImageForMaxSize(maxSize, 1.0f))
     }
 }

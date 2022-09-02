@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import android.content.Intent
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -10,7 +11,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -61,9 +61,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
-import coil.size.PixelSize
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -84,7 +83,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun FeedListContent(
     viewState: FeedScreenViewState,
@@ -206,36 +204,37 @@ fun FeedListContent(
                             onSetBookmarked(previewItem.id, !previewItem.bookmarked)
                         },
                         imagePainter = { imageUrl, modifier ->
-                            Box {
-                                Image(
-                                    painter = rememberImagePainter(
-                                        data = imageUrl,
-                                        builder = {
-                                            this.placeholder(placeHolder)
-                                                .error(placeHolder)
-                                                .scale(Scale.FILL)
-                                                .precision(Precision.INEXACT)
-                                                .size(PixelSize(1000, 1000))
-                                        },
-                                    ),
-                                    contentScale = ContentScale.Crop,
-                                    contentDescription = null,
-                                    modifier = modifier
-                                        .run {
-                                            when (viewState.feedItemStyle) {
-                                                FeedItemStyle.CARD ->
-                                                    this
-                                                        .fillMaxWidth()
-                                                        .aspectRatio(16.0f / 9.0f)
-                                                FeedItemStyle.COMPACT,
-                                                FeedItemStyle.SUPER_COMPACT,
-                                                -> this
-                                                    .width(64.dp)
-                                                    .fillMaxHeight()
-                                            }
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(imageUrl)
+                                    .listener(
+                                        onError = { a, b ->
+                                            Log.e("FEEDER_FEEDSCREEN", "error ${a.data}", b.throwable)
                                         }
-                                )
-                            }
+                                    )
+                                    .scale(Scale.FIT)
+                                    .placeholder(placeHolder)
+                                    .size(1000)
+                                    .error(placeHolder)
+                                    .precision(Precision.INEXACT)
+                                    .build(),
+                                contentDescription = stringResource(id = R.string.article_image),
+                                contentScale = ContentScale.Crop,
+                                modifier = modifier
+                                    .run {
+                                        when (viewState.feedItemStyle) {
+                                            FeedItemStyle.CARD ->
+                                                this
+                                                    .fillMaxWidth()
+                                                    .aspectRatio(16.0f / 9.0f)
+                                            FeedItemStyle.COMPACT,
+                                            FeedItemStyle.SUPER_COMPACT,
+                                            -> this
+                                                .width(64.dp)
+                                                .fillMaxHeight()
+                                        }
+                                    }
+                            )
                         }
                     )
                 }

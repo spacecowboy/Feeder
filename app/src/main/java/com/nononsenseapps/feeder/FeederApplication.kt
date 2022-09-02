@@ -10,9 +10,11 @@ import androidx.multidex.MultiDexApplication
 import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
 import coil.ImageLoader
+import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
+import coil.disk.DiskCache
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.AppDatabase
@@ -29,6 +31,7 @@ import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
+import com.nononsenseapps.feeder.ui.compose.coil.TooLargeImageInterceptor
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.currentlyUnmetered
 import com.nononsenseapps.jsonfeed.cachingHttpClient
@@ -45,11 +48,12 @@ import org.conscrypt.Conscrypt
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.bind
+import org.kodein.di.direct
 import org.kodein.di.instance
 import org.kodein.di.singleton
 
 @Suppress("unused")
-class FeederApplication : MultiDexApplication(), DIAware {
+class FeederApplication : MultiDexApplication(), DIAware, ImageLoaderFactory {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
     private val ttsStateHolder = TTSStateHolder(this, applicationCoroutineScope)
 
@@ -101,8 +105,8 @@ class FeederApplication : MultiDexApplication(), DIAware {
             val repository = instance<Repository>()
             val okHttpClient = instance<OkHttpClient>()
                 .newBuilder()
-                // Use separate image cache or images will quickly evict feed caches
-                .cache(Cache((externalCacheDir ?: filesDir).resolve("img"), 20L * 1024L * 1024L))
+                // This is not used by Coil but no need to risk evicting the real cache
+                .cache(Cache((externalCacheDir ?: filesDir).resolve("dummy_img"), 1024L))
                 .addInterceptor { chain ->
                     chain.proceed(
                         when (!repository.loadImageOnlyOnWifi.value || currentlyUnmetered(this@FeederApplication)) {
@@ -126,13 +130,19 @@ class FeederApplication : MultiDexApplication(), DIAware {
 
             ImageLoader.Builder(instance())
                 .okHttpClient(okHttpClient = okHttpClient)
-                .dispatcher(Dispatchers.Default) // This slightly improves scrolling performance
-                .componentRegistry {
-                    add(SvgDecoder(applicationContext))
+                .diskCache(
+                    DiskCache.Builder()
+                        .directory((externalCacheDir ?: filesDir).resolve("image_cache"))
+                        .maxSizeBytes(250L * 1024 * 1024)
+                        .build()
+                )
+                .components {
+                    add(TooLargeImageInterceptor())
+                    add(SvgDecoder.Factory())
                     if (SDK_INT >= 28) {
-                        add(ImageDecoderDecoder(this@FeederApplication))
+                        add(ImageDecoderDecoder.Factory())
                     } else {
-                        add(GifDecoder())
+                        add(GifDecoder.Factory())
                     }
                 }
                 .build()
@@ -163,5 +173,9 @@ class FeederApplication : MultiDexApplication(), DIAware {
     companion object {
         // Needed for database migration
         lateinit var staticFilesDir: File
+    }
+
+    override fun newImageLoader(): ImageLoader {
+        return di.direct.instance()
     }
 }

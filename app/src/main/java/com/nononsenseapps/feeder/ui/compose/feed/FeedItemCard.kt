@@ -29,7 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -38,7 +37,9 @@ import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirecti
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 
 @Composable
 fun FeedItemCard(
@@ -237,68 +238,72 @@ fun FeedItemCard(
 }
 
 @Composable
-@Preview(showBackground = true)
+@PreviewThemes
 private fun preview() {
-    FeedItemCard(
-        item = FeedListItem(
-            title = "title",
-            snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-            feedTitle = "Super Duper Feed One two three hup di too dasf",
-            pubDate = "Jun 9, 2021",
-            unread = true,
-            imageUrl = null,
-            link = null,
-            id = ID_UNSET,
-            pinned = false,
-            bookmarked = false,
-        ),
-        showThumbnail = true,
-        imagePainter = { _, _ -> },
-        onMarkAboveAsRead = {},
-        onMarkBelowAsRead = {},
-        onShareItem = {},
-        onTogglePinned = {},
-        onToggleBookmarked = {},
-        dropDownMenuExpanded = false,
-        onDismissDropdown = {}
-    )
+    FeederTheme {
+        FeedItemCard(
+            item = FeedListItem(
+                title = "title",
+                snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                feedTitle = "Super Duper Feed One two three hup di too dasf",
+                pubDate = "Jun 9, 2021",
+                unread = true,
+                imageUrl = null,
+                link = null,
+                id = ID_UNSET,
+                pinned = false,
+                bookmarked = false,
+            ),
+            showThumbnail = true,
+            imagePainter = { _, _ -> },
+            onMarkAboveAsRead = {},
+            onMarkBelowAsRead = {},
+            onShareItem = {},
+            onTogglePinned = {},
+            onToggleBookmarked = {},
+            dropDownMenuExpanded = false,
+            onDismissDropdown = {}
+        )
+    }
 }
 
 @Composable
-@Preview(showBackground = true)
+@PreviewThemes
 private fun previewWithImage() {
-    FeedItemCard(
-        item = FeedListItem(
-            title = "title",
-            snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-            feedTitle = "Super Duper Feed One two three hup di too dasf",
-            pubDate = "Jun 9, 2021",
-            unread = true,
-            imageUrl = "blabla",
-            link = null,
-            id = ID_UNSET,
-            pinned = true,
-            bookmarked = true,
-        ),
-        showThumbnail = true,
-        onMarkAboveAsRead = {},
-        onMarkBelowAsRead = {},
-        onShareItem = {},
-        onTogglePinned = {},
-        onToggleBookmarked = {},
-        dropDownMenuExpanded = false,
-        onDismissDropdown = {},
-        imagePainter = { _, modifier ->
-            Box {
-                Image(
-                    painter = painterResource(id = R.drawable.placeholder_image_article_day),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .aspectRatio(16.0f / 9.0f)
-                )
+    FeederTheme {
+        FeedItemCard(
+            item = FeedListItem(
+                title = "title",
+                snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                feedTitle = "Super Duper Feed One two three hup di too dasf",
+                pubDate = "Jun 9, 2021",
+                unread = true,
+                imageUrl = "blabla",
+                link = null,
+                id = ID_UNSET,
+                pinned = true,
+                bookmarked = true,
+            ),
+            showThumbnail = true,
+            onMarkAboveAsRead = {},
+            onMarkBelowAsRead = {},
+            onShareItem = {},
+            onTogglePinned = {},
+            onToggleBookmarked = {},
+            dropDownMenuExpanded = false,
+            onDismissDropdown = {},
+            imagePainter = { _, modifier ->
+                Box {
+                    Image(
+                        painter = painterResource(id = R.drawable.placeholder_image_article_day),
+                        contentScale = ContentScale.FillBounds,
+                        contentDescription = null,
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .aspectRatio(16.0f / 9.0f)
+                    )
+                }
             }
-        }
-    )
+        )
+    }
 }

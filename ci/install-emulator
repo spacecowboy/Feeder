@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+
+pkg="system-images;android-30;aosp_atd;x86"
+
+echo >&2 "Updating the emulator..."
+echo y | sdkmanager --sdk_root="${ANDROID_HOME}" "emulator"
+
+echo >&2 "Installing emulator image"
+echo y | sdkmanager --sdk_root="${ANDROID_HOME}" "${pkg}"

@@ -6,14 +6,11 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import coil.ImageLoader
-import coil.compose.LocalImageLoader
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
@@ -96,10 +93,7 @@ class MainActivity : DIAwareComponentActivity() {
                 dynamicColors = dynamicColors,
             ) {
                 withDI {
-                    val imageLoader: ImageLoader by instance()
-                    CompositionLocalProvider(LocalImageLoader provides imageLoader) {
-                        appContent()
-                    }
+                    appContent()
                 }
             }
         }

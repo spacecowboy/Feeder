@@ -7,19 +7,19 @@ buildscript {
     composeCompilerVersion = "1.3.0"
     kotlinVersion = "1.7.10"
 
-    gradleBuildVersion = '7.2.1'
+    androidGradlePluginVersion = '7.3.0-rc01'
     build_tools_version = "30.0.3"
 
     multi_dex_version = "1.0.3"
 
     // These should be upgraded in unison
-    okhttp_version = "4.9.1"
-    okio_version = "2.8.0"
-    conscrypt_version = "2.5.1"
+    okhttp_version = "4.10.0"
+    okio_version = "3.2.0"
+    conscrypt_version = "2.5.2"
 
     kodeinVersion = "7.5.0"
 //    kodeinComposeVersion = "7.5.0"
-    coroutines_version = "1.5.2"
+    coroutines_version = "1.6.4"
     rome_version = "1.7.1-f7"
     moshi_version = "1.12.0"
     threetentest_version = "1.2.2"
@@ -50,7 +50,7 @@ buildscript {
     pagingVersion = "3.0.0"
     pagingComposeVersion = "1.0.0-alpha16"
     accompanistVersion = "0.26.1-alpha"
-    coilVersion = "1.3.2"
+    coilVersion = "2.2.0"
     androidWindowVersion = "1.0.0"
 
     // Tests
@@ -67,7 +67,7 @@ buildscript {
     google()
   }
   dependencies {
-    classpath "com.android.tools.build:gradle:$gradleBuildVersion"
+    classpath "com.android.tools.build:gradle:$androidGradlePluginVersion"
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 
     // NOTE: Do not place your application dependencies here; they belong
