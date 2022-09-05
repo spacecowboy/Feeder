@@ -89,42 +89,60 @@ private fun TextComposer.appendTextChildren(
                     "h1" -> {
                         terminateCurrentText()
                         withParagraph {
-                            append(element.text())
+                            element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                this,
+                                stripLeading = endsWithWhitespace
+                            )
                         }
                         terminateCurrentText()
                     }
                     "h2" -> {
                         terminateCurrentText()
                         withParagraph {
-                            append(element.text())
+                            element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                this,
+                                stripLeading = endsWithWhitespace
+                            )
                         }
                         terminateCurrentText()
                     }
                     "h3" -> {
                         terminateCurrentText()
                         withParagraph {
-                            append(element.text())
+                            element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                this,
+                                stripLeading = endsWithWhitespace
+                            )
                         }
                         terminateCurrentText()
                     }
                     "h4" -> {
                         terminateCurrentText()
                         withParagraph {
-                            append(element.text())
+                            element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                this,
+                                stripLeading = endsWithWhitespace
+                            )
                         }
                         terminateCurrentText()
                     }
                     "h5" -> {
                         terminateCurrentText()
                         withParagraph {
-                            append(element.text())
+                            element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                this,
+                                stripLeading = endsWithWhitespace
+                            )
                         }
                         terminateCurrentText()
                     }
                     "h6" -> {
                         terminateCurrentText()
                         withParagraph {
-                            append(element.text())
+                            element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                this,
+                                stripLeading = endsWithWhitespace
+                            )
                         }
                         terminateCurrentText()
                     }

@@ -228,7 +228,10 @@ private fun TextComposer.appendTextChildren(
                             withComposableStyle(
                                 style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
-                                append(element.text())
+                                element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                    this,
+                                    stripLeading = endsWithWhitespace
+                                )
                             }
                         }
                     }
@@ -237,7 +240,10 @@ private fun TextComposer.appendTextChildren(
                             withComposableStyle(
                                 style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
-                                append(element.text())
+                                element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                    this,
+                                    stripLeading = endsWithWhitespace
+                                )
                             }
                         }
                     }
@@ -246,7 +252,10 @@ private fun TextComposer.appendTextChildren(
                             withComposableStyle(
                                 style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
-                                append(element.text())
+                                element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                    this,
+                                    stripLeading = endsWithWhitespace
+                                )
                             }
                         }
                     }
@@ -255,7 +264,10 @@ private fun TextComposer.appendTextChildren(
                             withComposableStyle(
                                 style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
-                                append(element.text())
+                                element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                    this,
+                                    stripLeading = endsWithWhitespace
+                                )
                             }
                         }
                     }
@@ -264,7 +276,10 @@ private fun TextComposer.appendTextChildren(
                             withComposableStyle(
                                 style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
-                                append(element.text())
+                                element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                    this,
+                                    stripLeading = endsWithWhitespace
+                                )
                             }
                         }
                     }
@@ -273,7 +288,10 @@ private fun TextComposer.appendTextChildren(
                             withComposableStyle(
                                 style = { MaterialTheme.typography.headlineSmall.toSpanStyle() }
                             ) {
-                                append(element.text())
+                                element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                                    this,
+                                    stripLeading = endsWithWhitespace
+                                )
                             }
                         }
                     }
@@ -780,6 +798,18 @@ fun TextNode.appendCorrectlyNormalizedWhiteSpace(
             reachedNonWhite = true
             builder.append(char)
             false
+        }
+    }
+}
+
+fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(
+    builder: TextComposer,
+    stripLeading: Boolean
+) {
+    for (child in childNodes()) {
+        when (child) {
+            is TextNode -> child.appendCorrectlyNormalizedWhiteSpace(builder, stripLeading)
+            is Element -> child.appendCorrectlyNormalizedWhiteSpaceRecursively(builder, stripLeading)
         }
     }
 }
