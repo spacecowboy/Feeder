@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -213,34 +215,66 @@ fun SearchFeedView(
         }
     }
 
-    if (screenType == ScreenType.DUAL) {
-        Row(
-            modifier = modifier.width(dimens.maxContentWidth),
-        ) {
+    val scrollState = rememberScrollState()
+
+    Box(
+        contentAlignment = Alignment.TopCenter,
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(scrollState)
+    ) {
+        if (screenType == ScreenType.DUAL) {
+            Row(
+                modifier = Modifier.width(dimens.maxContentWidth),
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .weight(1f, fill = true)
+                        .padding(horizontal = dimens.margin, vertical = 8.dp)
+                ) {
+                    leftContent(
+                        feedUrl = feedUrl,
+                        focusManager = focusManager,
+                        dimens = dimens,
+                        keyboardController = keyboardController,
+                        onUrlChanged = onUrlChanged,
+                        onSearch = onSearch
+                    )
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .weight(1f, fill = true)
+                        .padding(horizontal = dimens.margin, vertical = 8.dp)
+                ) {
+                    rightContent(
+                        results = results,
+                        errors = errors,
+                        currentlySearching = currentlySearching,
+                        onClick = onClick
+                    )
+                }
+            }
+        } else {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .weight(1f, fill = true)
                     .padding(horizontal = dimens.margin, vertical = 8.dp)
+                    .width(dimens.maxContentWidth)
             ) {
                 leftContent(
                     feedUrl = feedUrl,
+                    onUrlChanged = onUrlChanged,
+                    onSearch = onSearch,
                     focusManager = focusManager,
                     dimens = dimens,
-                    keyboardController = keyboardController,
-                    onUrlChanged = onUrlChanged,
-                    onSearch = onSearch
+                    keyboardController = keyboardController
                 )
-            }
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .weight(1f, fill = true)
-                    .padding(horizontal = dimens.margin, vertical = 8.dp)
-            ) {
                 rightContent(
                     results = results,
                     errors = errors,
@@ -248,29 +282,6 @@ fun SearchFeedView(
                     onClick = onClick
                 )
             }
-        }
-    } else {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier
-                .padding(horizontal = dimens.margin, vertical = 8.dp)
-                .width(dimens.maxContentWidth)
-        ) {
-            leftContent(
-                feedUrl = feedUrl,
-                onUrlChanged = onUrlChanged,
-                onSearch = onSearch,
-                focusManager = focusManager,
-                dimens = dimens,
-                keyboardController = keyboardController
-            )
-            rightContent(
-                results = results,
-                errors = errors,
-                currentlySearching = currentlySearching,
-                onClick = onClick
-            )
         }
     }
 }

@@ -216,9 +216,9 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     val media = this.getModule(MediaModule.URI) as MediaEntryModule?
 
     val thumbnail: String? = media?.metadata?.thumbnail?.firstOrNull()?.url?.toString()
+        ?: media?.mediaContents?.firstNotNullOfOrNull { it.metadata?.thumbnail?.firstOrNull()?.url?.toString() }
         ?: media?.mediaContents?.firstOrNull { "image" == it.medium }?.reference?.toString()
-        ?: media?.mediaGroups?.mapNotNull { it.metadata?.thumbnail?.firstOrNull() }
-            ?.firstOrNull()?.url?.toString()
+        ?: media?.mediaGroups?.firstNotNullOfOrNull { it.metadata?.thumbnail?.firstOrNull()?.url?.toString() }
         ?: enclosures?.asSequence()
             ?.filterNotNull()
             ?.filter { it.type?.startsWith("image/") == true }

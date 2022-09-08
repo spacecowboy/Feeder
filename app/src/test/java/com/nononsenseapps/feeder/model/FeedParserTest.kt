@@ -151,6 +151,21 @@ class FeedParserTest : DIAware {
     }
 
     @Test
+    fun parsesYahooMediaRss() {
+        val feed = readResource("rss_mediarss.xml") {
+            feedParser.parseFeedResponse(URL("https://rutube.ru/mrss/video/person/11234072/"), it, null)
+        }
+
+        val item = feed.items!!.first()
+
+        assertEquals("Камеди Клаб: «3 сентября»", item.title)
+        assertEquals(
+            "https://pic.rutubelist.ru/video/93/24/93245691f0e18d063da5fa5cd60fa6de.jpg?size=l",
+            item.image
+        )
+    }
+
+    @Test
     @Throws(Exception::class)
     fun getAlternateFeedLinksDoesNotReturnRelativeLinks() {
         javaClass.getResourceAsStream("fz.html")!!
