@@ -144,7 +144,9 @@ fun FeedListContent(
             LazyColumn(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = if (viewState.isBottomBarVisible) PaddingValues(0.dp) else WindowInsets.navigationBars.asPaddingValues(),
+                contentPadding = if (viewState.isBottomBarVisible) PaddingValues(0.dp) else WindowInsets.navigationBars.only(
+                    WindowInsetsSides.Bottom
+                ).asPaddingValues(),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
