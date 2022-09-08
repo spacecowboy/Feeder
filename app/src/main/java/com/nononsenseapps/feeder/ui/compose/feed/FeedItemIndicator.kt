@@ -77,15 +77,14 @@ fun FeedItemIndicatorColumn(
     ) {
         if (unread) {
             FeedItemIndicator {
-                Text("New")
+                Text(stringResource(id = R.string.new_indicator))
             }
         }
         if (bookmarked) {
             FeedItemIndicator {
                 Icon(
                     Icons.Default.Bookmark,
-                    // TODO localized
-                    contentDescription = "Bookmarked",
+                    contentDescription = stringResource(id = R.string.bookmark_article),
                     modifier = Modifier.size(16.dp),
                 )
             }
@@ -94,8 +93,7 @@ fun FeedItemIndicatorColumn(
             FeedItemIndicator {
                 Icon(
                     Icons.Default.PushPin,
-                    // TODO localized
-                    contentDescription = "Pinned",
+                    contentDescription = stringResource(id = R.string.pinned),
                     modifier = Modifier.size(16.dp),
                 )
             }
