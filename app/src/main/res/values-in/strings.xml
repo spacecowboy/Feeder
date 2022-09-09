@@ -182,4 +182,6 @@
     <string name="use_detect_language">Deteksi bahasa</string>
     <string name="only_available_on_android_n">Hanya tersedia pada Android %1$s dan terbaru</string>
     <string name="explanation_permission_notifications">Perizinan harus diberikan sebelum notifikasi diaktifkan.</string>
+    <string name="dynamic_theme_use">Warna dinamis</string>
+    <string name="new_indicator">Baru</string>
 </resources>
