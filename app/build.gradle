@@ -8,8 +8,8 @@ plugins {
 android {
   defaultConfig {
     applicationId "com.nononsenseapps.feeder"
-    versionCode 250
-    versionName "2.3.0"
+    versionCode 251
+    versionName "2.3.1"
     compileSdkVersion 33
     minSdkVersion 23
     targetSdkVersion 33
