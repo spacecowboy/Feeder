@@ -19,8 +19,15 @@ import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
 
-fun SyndFeed.asFeed(baseUrl: URL): Feed {
+suspend fun SyndFeed.asFeed(baseUrl: URL, feedIconFinder: suspend (URL) -> String?): Feed {
     val feedAuthor: Author? = this.authors?.firstOrNull()?.asAuthor()
+
+    val siteUrl = relativeLinkIntoAbsoluteOrNull(
+        baseUrl,
+        this.links?.firstOrNull {
+            "alternate" == it.rel && "text/html" == it.type
+        }?.href ?: this.link
+    )
 
     // Base64 encoded images can be quite large - and crash database cursors
     val icon = image?.url?.let { url ->
@@ -28,17 +35,14 @@ fun SyndFeed.asFeed(baseUrl: URL): Feed {
             url.startsWith("data:") -> null
             else -> url
         }
+    } ?: siteUrl?.let {
+        feedIconFinder(URL(it))
     }
 
     try {
         return Feed(
             title = plainTitle(),
-            home_page_url = relativeLinkIntoAbsoluteOrNull(
-                baseUrl,
-                this.links?.firstOrNull {
-                    "alternate" == it.rel && "text/html" == it.type
-                }?.href ?: this.link
-            ),
+            home_page_url = siteUrl,
             feed_url = relativeLinkIntoAbsoluteOrNull(
                 baseUrl,
                 this.links?.firstOrNull { "self" == it.rel }?.href

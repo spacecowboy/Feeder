@@ -14,7 +14,8 @@ const val previewColumns = """
     feed_items.id AS id, guid, plain_title, plain_snippet, feed_items.image_url, enclosure_link,
     author, pub_date, link, unread, feeds.tag AS tag, feeds.id AS feed_id, feeds.title AS feed_title,
     feeds.custom_title as feed_customtitle, feeds.url AS feed_url,
-    feeds.open_articles_with AS feed_open_articles_with, pinned, bookmarked
+    feeds.open_articles_with AS feed_open_articles_with, pinned, bookmarked,
+    feeds.image_url as feed_image_url
 """
 
 data class PreviewItem @Ignore constructor(
@@ -36,6 +37,7 @@ data class PreviewItem @Ignore constructor(
     @ColumnInfo(name = "feed_open_articles_with") var feedOpenArticlesWith: String = "",
     @ColumnInfo(name = COL_PINNED) var pinned: Boolean = false,
     @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
+    @ColumnInfo(name = "feed_image_url") var feedImageUrl: URL? = null,
 ) {
     constructor() : this(id = ID_UNSET)
 

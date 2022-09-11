@@ -78,7 +78,6 @@ fun SwipeableFeedItemPreview(
     showThumbnail: Boolean,
     feedItemStyle: FeedItemStyle,
     swipeAsRead: SwipeAsRead,
-    imagePainter: @Composable (String, Modifier) -> Unit,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onTogglePinned: () -> Unit,
@@ -288,7 +287,6 @@ fun SwipeableFeedItemPreview(
                     FeedItemCard(
                         item = item,
                         showThumbnail = showThumbnail,
-                        imagePainter = imagePainter,
                         onMarkAboveAsRead = onMarkAboveAsRead,
                         onMarkBelowAsRead = onMarkBelowAsRead,
                         onShareItem = onShareItem,
@@ -304,7 +302,6 @@ fun SwipeableFeedItemPreview(
                     FeedItemCompact(
                         item = item,
                         showThumbnail = showThumbnail,
-                        imagePainter = imagePainter,
                         onMarkAboveAsRead = onMarkAboveAsRead,
                         onMarkBelowAsRead = onMarkBelowAsRead,
                         onShareItem = onShareItem,
@@ -320,7 +317,6 @@ fun SwipeableFeedItemPreview(
                     FeedItemSuperCompact(
                         item = item,
                         showThumbnail = showThumbnail,
-                        imagePainter = imagePainter,
                         onMarkAboveAsRead = onMarkAboveAsRead,
                         onMarkBelowAsRead = onMarkBelowAsRead,
                         onShareItem = onShareItem,

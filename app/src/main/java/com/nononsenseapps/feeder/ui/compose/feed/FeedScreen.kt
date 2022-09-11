@@ -1,8 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import android.content.Intent
-import android.util.Log
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
@@ -17,16 +15,12 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -39,7 +33,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
@@ -48,27 +41,20 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import coil.size.Precision
-import coil.size.Scale
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.R
-import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
@@ -77,7 +63,6 @@ import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
 import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
-import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -100,19 +85,6 @@ fun FeedListContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-
-    val isLightTheme = MaterialTheme.colorScheme.isLight
-
-    @DrawableRes
-    val placeHolder: Int by remember(isLightTheme) {
-        derivedStateOf {
-            if (isLightTheme) {
-                R.drawable.placeholder_image_article_day
-            } else {
-                R.drawable.placeholder_image_article_night
-            }
-        }
-    }
 
     Box(modifier = modifier) {
         AnimatedVisibility(
@@ -203,39 +175,6 @@ fun FeedListContent(
                         onToggleBookmarked = {
                             onSetBookmarked(previewItem.id, !previewItem.bookmarked)
                         },
-                        imagePainter = { imageUrl, modifier ->
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(imageUrl)
-                                    .listener(
-                                        onError = { a, b ->
-                                            Log.e("FEEDER_FEEDSCREEN", "error ${a.data}", b.throwable)
-                                        }
-                                    )
-                                    .scale(Scale.FIT)
-                                    .placeholder(placeHolder)
-                                    .size(1000)
-                                    .error(placeHolder)
-                                    .precision(Precision.INEXACT)
-                                    .build(),
-                                contentDescription = stringResource(id = R.string.article_image),
-                                contentScale = ContentScale.Crop,
-                                modifier = modifier
-                                    .run {
-                                        when (viewState.feedItemStyle) {
-                                            FeedItemStyle.CARD ->
-                                                this
-                                                    .fillMaxWidth()
-                                                    .aspectRatio(16.0f / 9.0f)
-                                            FeedItemStyle.COMPACT,
-                                            FeedItemStyle.SUPER_COMPACT,
-                                            -> this
-                                                .width(64.dp)
-                                                .fillMaxHeight()
-                                        }
-                                    }
-                            )
-                        }
                     )
                 }
             }

@@ -1,6 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
-import androidx.compose.foundation.Image
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,12 +24,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Precision
+import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
@@ -39,13 +43,13 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.PlaceholderImage
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 
 @Composable
 fun FeedItemCard(
     item: FeedListItem,
     showThumbnail: Boolean,
-    imagePainter: @Composable (String, Modifier) -> Unit,
     modifier: Modifier = Modifier,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
@@ -70,12 +74,33 @@ fun FeedItemCard(
                 .requiredHeightIn(min = minimumTouchSize)
         ) {
             if (showThumbnail) {
+                val placeholder = PlaceholderImage()
                 item.imageUrl?.let { imageUrl ->
                     Box(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.TopEnd,
                     ) {
-                        imagePainter(imageUrl, Modifier.clip(MaterialTheme.shapes.medium))
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(imageUrl)
+                                .listener(
+                                    onError = { a, b ->
+                                        Log.e("FEEDER_CARD", "error ${a.data}", b.throwable)
+                                    }
+                                )
+                                .scale(Scale.FIT)
+                                .placeholder(placeholder)
+                                .size(1000)
+                                .error(placeholder)
+                                .precision(Precision.INEXACT)
+                                .build(),
+                            contentDescription = stringResource(id = R.string.article_image),
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.medium)
+                                .fillMaxWidth()
+                                .aspectRatio(16.0f / 9.0f)
+                        )
                         FeedItemIndicatorRow(
                             unread = item.unread,
                             bookmarked = item.bookmarked,
@@ -253,9 +278,9 @@ private fun preview() {
                 id = ID_UNSET,
                 pinned = false,
                 bookmarked = false,
+                feedImageUrl = null,
             ),
             showThumbnail = true,
-            imagePainter = { _, _ -> },
             onMarkAboveAsRead = {},
             onMarkBelowAsRead = {},
             onShareItem = {},
@@ -283,6 +308,7 @@ private fun previewWithImage() {
                 id = ID_UNSET,
                 pinned = true,
                 bookmarked = true,
+                feedImageUrl = null,
             ),
             showThumbnail = true,
             onMarkAboveAsRead = {},
@@ -292,18 +318,6 @@ private fun previewWithImage() {
             onToggleBookmarked = {},
             dropDownMenuExpanded = false,
             onDismissDropdown = {},
-            imagePainter = { _, modifier ->
-                Box {
-                    Image(
-                        painter = painterResource(id = R.drawable.placeholder_image_article_day),
-                        contentScale = ContentScale.FillBounds,
-                        contentDescription = null,
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .aspectRatio(16.0f / 9.0f)
-                    )
-                }
-            }
         )
     }
 }

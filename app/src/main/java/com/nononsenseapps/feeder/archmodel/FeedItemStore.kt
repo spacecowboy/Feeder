@@ -383,4 +383,5 @@ private fun PreviewItem.toFeedListItem() =
         link = link,
         pinned = pinned,
         bookmarked = bookmarked,
+        feedImageUrl = feedImageUrl,
     )

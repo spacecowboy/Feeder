@@ -66,6 +66,42 @@ class FeedParser(override val di: DI) : DIAware {
         return feedLinks.firstOrNull()?.first
     }
 
+    private suspend fun getFeedIconAtUrl(url: URL): String? {
+        return try {
+            val html = curl(url)
+            when {
+                html != null -> getFeedIconInHtml(html, baseUrl = url)
+                else -> null
+            }
+        } catch (t: Throwable) {
+            Log.e("FeedParser", "Error when fetching feed icon", t)
+            null
+        }
+    }
+
+    fun getFeedIconInHtml(
+        html: String,
+        baseUrl: URL? = null,
+    ): String? {
+        val doc = Jsoup.parse(html.byteInputStream(), "UTF-8", "")
+
+        return (
+            doc.getElementsByAttributeValue("rel", "apple-touch-icon") +
+                doc.getElementsByAttributeValue("rel", "icon") +
+                doc.getElementsByAttributeValue("rel", "shortcut icon")
+            )
+            .filter { it.hasAttr("href") }
+            .map {
+                when {
+                    baseUrl != null -> relativeLinkIntoAbsolute(
+                        base = baseUrl,
+                        link = it.attr("href")
+                    )
+                    else -> sloppyLinkToStrictURL(it.attr("href")).toString()
+                }
+            }.firstOrNull()
+    }
+
     /**
      * Returns all alternate links in the header of an HTML/XML document pointing to feeds.
      */
@@ -172,7 +208,7 @@ class FeedParser(override val di: DI) : DIAware {
     }
 
     @Throws(FeedParsingError::class)
-    fun parseFeedResponse(response: Response): Feed? {
+    suspend fun parseFeedResponse(response: Response): Feed? {
         return response.body?.use {
             // OkHttp string method handles BOM and Content-Type header in request
             parseFeedResponse(
@@ -186,7 +222,7 @@ class FeedParser(override val di: DI) : DIAware {
      * Takes body as bytes to handle encoding correctly
      */
     @Throws(FeedParsingError::class)
-    fun parseFeedResponse(
+    suspend fun parseFeedResponse(
         url: URL,
         responseBody: ResponseBody,
     ): Feed {
@@ -211,7 +247,7 @@ class FeedParser(override val di: DI) : DIAware {
      * Takes body as bytes to handle encoding correctly
      */
     @Throws(FeedParsingError::class)
-    fun parseFeedResponse(
+    suspend fun parseFeedResponse(
         url: URL,
         body: String,
         contentType: MediaType?,
@@ -250,7 +286,7 @@ class FeedParser(override val di: DI) : DIAware {
     }
 
     @Throws(FeedParsingError::class)
-    internal fun parseRssAtom(baseUrl: URL, responseBody: ResponseBody): Feed {
+    internal suspend fun parseRssAtom(baseUrl: URL, responseBody: ResponseBody): Feed {
         try {
             responseBody.byteStream().use { bs ->
                 val feed = XmlReader(bs, true, responseBody.contentType()?.charset()?.name()).use {
@@ -260,7 +296,9 @@ class FeedParser(override val di: DI) : DIAware {
                         }
                         .build(it)
                 }
-                return feed.asFeed(baseUrl = baseUrl)
+                return feed.asFeed(baseUrl = baseUrl) { siteUrl ->
+                    getFeedIconAtUrl(siteUrl)
+                }
             }
         } catch (t: Throwable) {
             throw FeedParsingError(baseUrl, t)
@@ -268,7 +306,7 @@ class FeedParser(override val di: DI) : DIAware {
     }
 
     @Throws(FeedParsingError::class)
-    internal fun parseRssAtom(baseUrl: URL, body: String): Feed {
+    internal suspend fun parseRssAtom(baseUrl: URL, body: String): Feed {
         try {
             body.byteInputStream().use { bs ->
                 val feed = XmlReader(bs, true).use {
@@ -278,7 +316,9 @@ class FeedParser(override val di: DI) : DIAware {
                         }
                         .build(it)
                 }
-                return feed.asFeed(baseUrl = baseUrl)
+                return feed.asFeed(baseUrl = baseUrl) { siteUrl ->
+                    getFeedIconAtUrl(siteUrl)
+                }
             }
         } catch (t: Throwable) {
             throw FeedParsingError(baseUrl, t)
