@@ -12,6 +12,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
@@ -122,6 +123,13 @@ fun FeedListContent(
                 ).asPaddingValues(),
                 modifier = Modifier.fillMaxSize()
             ) {
+                /*
+                This is a trick to make the list stay at item 0 when updates come in IF it is
+                scrolled to the top.
+                 */
+                item {
+                    Spacer(modifier = Modifier.fillMaxWidth())
+                }
                 items(
                     pagedFeedItems.itemCount,
                     key = { itemIndex ->
