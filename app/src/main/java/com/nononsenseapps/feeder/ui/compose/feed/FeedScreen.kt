@@ -198,6 +198,18 @@ fun FeedListContent(
                         }
                     }
                 }
+                /*
+                This item is provide padding for the FAB
+                 */
+                if (viewState.showFab) {
+                    item {
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height((56 + 16).dp)
+                        )
+                    }
+                }
             }
         }
     }
