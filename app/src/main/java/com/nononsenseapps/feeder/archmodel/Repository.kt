@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.RemoteFeed
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
+import com.nononsenseapps.feeder.model.workmanager.scheduleSendRead
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
@@ -126,7 +127,9 @@ class Repository(override val di: DI) : DIAware {
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
     fun setMaxCountPerFeed(value: Int) = settingsStore.setMaxCountPerFeed(value)
 
-    val itemOpener = settingsStore.itemOpener
+    val itemOpener
+        get() = settingsStore.itemOpener
+
     fun setItemOpener(value: ItemOpener) = settingsStore.setItemOpener(value)
 
     val linkOpener = settingsStore.linkOpener
@@ -140,11 +143,12 @@ class Repository(override val di: DI) : DIAware {
         sessionStore.setResumeTime(value)
     }
 
-    val currentlySyncingLatestTimestamp: Flow<Instant> =
-        feedStore.getCurrentlySyncingLatestTimestamp()
-            .map { value ->
-                value ?: Instant.EPOCH
-            }
+    val currentlySyncingLatestTimestamp: Flow<Instant>
+        get() =
+            feedStore.getCurrentlySyncingLatestTimestamp()
+                .map { value ->
+                    value ?: Instant.EPOCH
+                }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getFeedListItems(feedId: Long, tag: String): Flow<PagingData<FeedListItem>> = combine(
@@ -225,16 +229,32 @@ class Repository(override val di: DI) : DIAware {
         }
 
     suspend fun getFeed(feedId: Long): Feed? = feedStore.getFeed(feedId)
+
     suspend fun getFeed(url: URL): Feed? = feedStore.getFeed(url)
 
     suspend fun saveFeed(feed: Feed): Long = feedStore.saveFeed(feed)
 
-    suspend fun setPinned(itemId: Long, pinned: Boolean) = feedItemStore.setPinned(itemId = itemId, pinned = pinned)
-    suspend fun setBookmarked(itemId: Long, bookmarked: Boolean) = feedItemStore.setBookmarked(itemId = itemId, bookmarked = bookmarked)
+    suspend fun setPinned(itemId: Long, pinned: Boolean) =
+        feedItemStore.setPinned(itemId = itemId, pinned = pinned)
+
+    suspend fun setBookmarked(itemId: Long, bookmarked: Boolean) =
+        feedItemStore.setBookmarked(itemId = itemId, bookmarked = bookmarked)
+
     suspend fun markAsNotified(itemIds: List<Long>) = feedItemStore.markAsNotified(itemIds)
-    suspend fun markAsReadAndNotified(itemId: Long) = feedItemStore.markAsReadAndNotified(itemId)
-    suspend fun markAsUnread(itemId: Long, unread: Boolean = true) =
+
+    suspend fun markAsReadAndNotified(itemId: Long) {
+        feedItemStore.markAsReadAndNotified(itemId)
+        scheduleSendRead(di)
+    }
+
+    suspend fun markAsUnread(itemId: Long, unread: Boolean = true) {
         feedItemStore.markAsUnread(itemId, unread)
+        if (unread) {
+            syncRemoteStore.setNotSynced(itemId)
+        } else {
+            scheduleSendRead(di)
+        }
+    }
 
     suspend fun getTextToDisplayForItem(itemId: Long): TextToDisplay =
         when (feedItemStore.getFullTextByDefault(itemId)) {
@@ -243,6 +263,7 @@ class Repository(override val di: DI) : DIAware {
         }
 
     suspend fun getLink(itemId: Long): String? = feedItemStore.getLink(itemId)
+
     suspend fun getArticleOpener(itemId: Long): ItemOpener =
         when (feedItemStore.getArticleOpener(itemId)) {
             PREF_VAL_OPEN_WITH_BROWSER -> ItemOpener.DEFAULT_BROWSER
@@ -289,6 +310,7 @@ class Repository(override val di: DI) : DIAware {
             tag.isNotBlank() -> feedItemStore.markAllAsReadInTag(tag)
             else -> feedItemStore.markAllAsRead()
         }
+        scheduleSendRead(di)
     }
 
     suspend fun markBeforeAsRead(itemIndex: Int, feedId: Long, tag: String) {
@@ -299,6 +321,7 @@ class Repository(override val di: DI) : DIAware {
             onlyUnread = showOnlyUnread.value,
             newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
         )
+        scheduleSendRead(di)
     }
 
     suspend fun markAfterAsRead(itemIndex: Int, feedId: Long, tag: String) {
@@ -309,6 +332,7 @@ class Repository(override val di: DI) : DIAware {
             onlyUnread = showOnlyUnread.value,
             newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
         )
+        scheduleSendRead(di)
     }
 
     val allTags: Flow<List<String>> = feedStore.allTags
@@ -340,13 +364,12 @@ class Repository(override val di: DI) : DIAware {
     }
 
     suspend fun remoteMarkAsRead(feedUrl: URL, articleGuid: String) {
-        // First try to get an existing ID
-        val itemId = feedItemStore.getFeedItemId(feedUrl = feedUrl, articleGuid = articleGuid)
-        if (itemId != null) {
+        // Always write a remoteReadMark - this is part of concurrency mitigation
+        syncRemoteStore.addRemoteReadMark(feedUrl = feedUrl, articleGuid = articleGuid)
+        // But also try to get an existing ID and set
+        feedItemStore.getFeedItemId(feedUrl = feedUrl, articleGuid = articleGuid)?.let { itemId ->
             syncRemoteStore.setSynced(itemId)
             feedItemStore.markAsReadAndNotified(itemId = itemId)
-        } else {
-            syncRemoteStore.addRemoteReadMark(feedUrl = feedUrl, articleGuid = articleGuid)
         }
     }
 
@@ -409,6 +432,9 @@ class Repository(override val di: DI) : DIAware {
     suspend fun deleteStaleRemoteReadMarks() {
         syncRemoteStore.deleteStaleRemoteReadMarks(Instant.now())
     }
+
+    suspend fun getGuidsWhichAreSyncedAsReadInFeed(feed: Feed) =
+        syncRemoteStore.getGuidsWhichAreSyncedAsReadInFeed(feed.url)
 
     suspend fun applyRemoteReadMarks() {
         val toBeApplied = syncRemoteStore.getRemoteReadMarksReadyToBeApplied()

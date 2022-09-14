@@ -246,7 +246,11 @@ fun FeedArticleScreen(
         onImport = { opmlImporter.launch(arrayOf("text/plain", "text/xml", "text/opml", "*/*")) },
         onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml") },
         markAsUnread = { itemId, unread ->
-            viewModel.markAsUnread(itemId, unread)
+            if (unread) {
+                viewModel.markAsUnread(itemId)
+            } else {
+                viewModel.markAsRead(itemId)
+            }
         },
         markBeforeAsRead = { index ->
             viewModel.markBeforeAsRead(index)
@@ -280,10 +284,7 @@ fun FeedArticleScreen(
         },
         displayFullText = viewModel::displayFullText,
         onMarkAsUnread = {
-            viewModel.markAsUnread(
-                viewState.articleId,
-                unread = true
-            )
+            viewModel.markAsUnread(viewState.articleId)
         },
         onShareArticle = {
             if (viewState.articleId > ID_UNSET) {

@@ -27,7 +27,7 @@ import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.parseFullArticleIfMissing
-import com.nononsenseapps.feeder.model.requestFeedSync
+import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
@@ -103,8 +103,12 @@ class FeedArticleViewModel(
         repository.markAllAsReadInFeedOrTag(feedId, feedTag)
     }
 
-    fun markAsUnread(itemId: Long, unread: Boolean) = viewModelScope.launch {
-        repository.markAsUnread(itemId, unread)
+    fun markAsUnread(itemId: Long) = viewModelScope.launch {
+        repository.markAsUnread(itemId)
+    }
+
+    fun markAsRead(itemId: Long) = viewModelScope.launch {
+        repository.markAsReadAndNotified(itemId)
     }
 
     fun markBeforeAsRead(itemIndex: Int) = viewModelScope.launch {
@@ -213,7 +217,7 @@ class FeedArticleViewModel(
                 setCurrentArticle(itemId)
             }
         }
-        markAsUnread(itemId, false)
+        markAsRead(itemId)
     }
 
     // Used to trigger state update

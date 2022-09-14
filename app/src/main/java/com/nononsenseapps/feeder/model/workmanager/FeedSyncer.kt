@@ -1,14 +1,7 @@
-package com.nononsenseapps.feeder.model
+package com.nononsenseapps.feeder.model.workmanager
 
-import android.annotation.TargetApi
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
-import android.content.pm.ServiceInfo
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
@@ -18,9 +11,10 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.notify
+import com.nononsenseapps.feeder.model.syncFeeds
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
 import com.nononsenseapps.feeder.util.currentlyCharging
@@ -40,8 +34,8 @@ val oldPeriodics = listOf(
     "feeder_periodic",
     "feeder_periodic_2"
 )
-const val UNIQUE_ONETIME_NAME = "feeder_sync_onetime"
-const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
+private const val UNIQUE_FEEDSYNC_NAME = "feeder_sync_onetime"
+private const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
 
 fun isOkToSyncAutomatically(context: Context): Boolean {
     val di: DI by closestDI(context)
@@ -61,52 +55,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
     private val repository: Repository by instance()
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        return createForegroundInfo()
-    }
-
-    private fun createForegroundInfo(): ForegroundInfo {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel()
-        }
-
-        val syncingText = context.getString(R.string.syncing)
-
-        val notification = NotificationCompat.Builder(applicationContext, syncChannelId)
-            .setContentTitle(syncingText)
-            .setTicker(syncingText)
-            .setGroup(syncNotificationGroup)
-//            .setContentText(progress)
-            .setSmallIcon(R.drawable.ic_stat_sync)
-            .setOngoing(true)
-            // Add the cancel action to the notification which can
-            // be used to cancel the worker
-//            .addAction(android.R.drawable.ic_delete, cancel, intent)
-            .build()
-
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ForegroundInfo(
-                syncNotificationId,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
-            )
-        } else {
-            ForegroundInfo(syncNotificationId, notification)
-        }
-    }
-
-    /**
-     * This is safe to call multiple times
-     */
-    @TargetApi(Build.VERSION_CODES.O)
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel() {
-        val name = context.getString(R.string.sync_status)
-        val description = context.getString(R.string.sync_status)
-
-        val channel = NotificationChannel(syncChannelId, name, NotificationManager.IMPORTANCE_LOW)
-        channel.description = description
-
-        notificationManager.createNotificationChannel(channel)
+        return createForegroundInfo(context, notificationManager)
     }
 
     override suspend fun doWork(): Result {
@@ -140,12 +89,6 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
             false -> Result.failure()
         }
     }
-
-    companion object {
-        private const val syncNotificationId = 42623
-        private const val syncChannelId = "feederSyncNotifications"
-        private const val syncNotificationGroup = "com.nononsenseapps.feeder.SYNC"
-    }
 }
 
 fun requestFeedSync(
@@ -168,7 +111,7 @@ fun requestFeedSync(
     workRequest.setInputData(data)
     val workManager by di.instance<WorkManager>()
     workManager.enqueueUniqueWork(
-        UNIQUE_ONETIME_NAME,
+        UNIQUE_FEEDSYNC_NAME,
         ExistingWorkPolicy.KEEP,
         workRequest.build()
     )

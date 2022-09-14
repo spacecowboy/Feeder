@@ -10,7 +10,7 @@ import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_WEBVIEW
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
-import com.nononsenseapps.feeder.model.requestFeedSync
+import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import java.net.URL
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

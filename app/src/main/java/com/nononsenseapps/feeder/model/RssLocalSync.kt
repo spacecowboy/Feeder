@@ -22,6 +22,7 @@ import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Mutex
@@ -93,6 +94,14 @@ internal suspend fun syncFeeds(
                     Instant.now().minus(minFeedAgeMinutes.toLong(), ChronoUnit.MINUTES)
                         .toEpochMilli()
                 }
+                // Get read marks in background - this blocks sync until done
+                val getReadMarksJob = launch(coroutineContext) {
+                    try {
+                        syncClient.getRead()
+                    } catch (e: Exception) {
+                        Log.e(LOG_TAG, "Error when syncing readmarks in sync. ${e.message}", e)
+                    }
+                }
                 // Fetch new feeds first
                 try {
                     syncClient.getFeeds()
@@ -112,18 +121,18 @@ internal suspend fun syncFeeds(
                 // Fetch latest read marks and send possible feed updates
                 launch(coroutineContext) {
                     try {
-                        syncClient.getRead()
                         syncClient.getDevices()
                         syncClient.sendUpdatedFeeds()
                         syncClient.markAsRead()
                     } catch (e: Exception) {
-                        Log.e(LOG_TAG, "Error when syncing readmarks in sync. ${e.message}", e)
+                        Log.e(LOG_TAG, "Error when syncing data in sync. ${e.message}", e)
                     }
                 }
 
-                feedsToFetch.forEach {
+                val jobs = feedsToFetch.map {
                     needFullTextSync = needFullTextSync || it.fullTextByDefault
                     launch(coroutineContext) {
+                        getReadMarksJob.join()
                         try {
                             // Want unique sync times so UI gets updated state
                             feedStore.setCurrentlySyncingOn(
@@ -150,6 +159,15 @@ internal suspend fun syncFeeds(
                             feedStore.setCurrentlySyncingOn(feedId = it.id, syncing = false)
                         }
                     }
+                }
+
+                jobs.joinAll()
+                try {
+                    val repository: Repository by di.instance()
+
+                    repository.applyRemoteReadMarks()
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Error on final apply", e)
                 }
 
                 result = true
@@ -218,6 +236,8 @@ private suspend fun syncFeed(
         // This can only detect between items present in one feed. See NIXOS
         val isNotUniqueIds = uniqueIdCount != items?.size
 
+        val alreadyReadGuids = repository.getGuidsWhichAreSyncedAsReadInFeed(feedSql)
+
         val feedItemSqls =
             items
                 ?.map {
@@ -244,6 +264,11 @@ private suspend fun syncFeed(
                     feedItemSql.updateFromParsedEntry(item, guid, feed)
                     feedItemSql.feedId = feedSql.id
 
+                    if (feedItemSql.guid in alreadyReadGuids) {
+                        feedItemSql.unread = false
+                        feedItemSql.notified = true
+                    }
+
                     feedItemSql to (item.content_html ?: item.content_text ?: "")
                 } ?: emptyList()
 
@@ -254,8 +279,6 @@ private suspend fun syncFeed(
                 }
             }
         }
-
-        repository.applyRemoteReadMarks()
 
         // Update feed last so lastsync is only set after all items have been handled
         // for the rare case that the job is cancelled prematurely

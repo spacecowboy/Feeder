@@ -14,8 +14,9 @@ import androidx.navigation.NavController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
-import com.nononsenseapps.feeder.model.isOkToSyncAutomatically
-import com.nononsenseapps.feeder.model.requestFeedSync
+import com.nononsenseapps.feeder.model.workmanager.isOkToSyncAutomatically
+import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
+import com.nononsenseapps.feeder.model.workmanager.scheduleGetUpdates
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
@@ -61,6 +62,7 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onResume() {
         super.onResume()
         mainActivityViewModel.setResumeTime()
+        scheduleGetUpdates(di)
         maybeRequestSync()
     }
 

@@ -78,6 +78,11 @@ class SyncRemoteStore(override val di: DI) : DIAware {
         )
     }
 
+    suspend fun setNotSynced(feedItemId: Long) {
+        // Ignores duplicates
+        readStatusDao.deleteReadStatusSyncForItem(feedItemId)
+    }
+
     suspend fun addRemoteReadMark(feedUrl: URL, articleGuid: String) {
         // Ignores duplicates
         remoteReadMarkDao.insert(
@@ -97,6 +102,9 @@ class SyncRemoteStore(override val di: DI) : DIAware {
 
     suspend fun getRemoteReadMarksReadyToBeApplied() =
         remoteReadMarkDao.getRemoteReadMarksReadyToBeApplied()
+
+    suspend fun getGuidsWhichAreSyncedAsReadInFeed(feedUrl: URL) =
+        remoteReadMarkDao.getGuidsWhichAreSyncedAsReadInFeed(feedUrl = feedUrl)
 
     suspend fun replaceWithDefaultSyncRemote() {
         dao.replaceWithDefaultSyncRemote()

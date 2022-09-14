@@ -6,7 +6,7 @@ import android.util.Log
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
-import com.nononsenseapps.feeder.model.requestFeedSync
+import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.util.ToastMaker
 import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.Dispatchers
