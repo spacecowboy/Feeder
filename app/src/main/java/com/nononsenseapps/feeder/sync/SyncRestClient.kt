@@ -44,7 +44,8 @@ class SyncRestClient(override val di: DI) : DIAware {
 
     val isInitialized: Boolean
         get() = syncRemote != null && feederSync != null && secretKey != null
-    val isNotInitialized = !isInitialized
+    val isNotInitialized
+        get() = !isInitialized
 
     internal suspend fun initialize(block: (suspend (SyncRemote, FeederSync, SecretKeys) -> Unit)?) {
         if (isNotInitialized) {
