@@ -187,7 +187,7 @@ dependencies {
   kapt "androidx.room:room-compiler:$roomVersion"
 
   // BOMS
-  api(platform("com.squareup.okhttp3:okhttp-bom:$okhttp_version"))
+  implementation(platform("com.squareup.okhttp3:okhttp-bom:$okhttp_version"))
   implementation("io.coil-kt:coil-bom:$coilVersion")
 
   // Needed pre SDK21
@@ -234,7 +234,7 @@ dependencies {
   implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
   // HTML parsing
   implementation "org.jsoup:jsoup:$jsoup_version"
-  implementation "org.ccil.cowan.tagsoup:tagsoup:$composeLibraryVersion"
+  implementation "org.ccil.cowan.tagsoup:tagsoup:$tagsoup_version"
   // RSS
   implementation "com.rometools:rome:$rome_version"
   implementation "com.rometools:rome-modules:$rome_version"

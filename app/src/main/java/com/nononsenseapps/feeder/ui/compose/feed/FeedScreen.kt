@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -38,8 +38,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -112,6 +112,10 @@ fun FeedListContent(
             exit = fadeOut(),
             visible = viewState.haveVisibleFeedItems,
         ) {
+//            LazyVerticalStaggeredGrid(
+//                columns = StaggeredGridCells.Adaptive(350.dp),
+//                modifier = Modifier.fillMaxSize(),
+//            )
             LazyColumn(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -198,7 +202,7 @@ fun FeedListContent(
                 /*
                 This item is provide padding for the FAB
                  */
-                if (viewState.showFab) {
+                if (viewState.showFab && !viewState.isBottomBarVisible) {
                     item {
                         Spacer(
                             modifier = Modifier
@@ -261,7 +265,7 @@ fun FeedScreen(
 
     Scaffold(
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 title = {
                     val text = viewState.feedScreenTitle.title
                         ?: stringResource(id = R.string.all_feeds)
@@ -314,8 +318,8 @@ fun FeedScreen(
             }
         },
         modifier = modifier
-            .statusBarsPadding()
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+        contentWindowInsets = WindowInsets.statusBars,
     ) { padding ->
         SwipeRefresh(
             state = refreshState,
