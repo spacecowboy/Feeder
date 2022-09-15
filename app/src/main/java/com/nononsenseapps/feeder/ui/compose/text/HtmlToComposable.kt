@@ -439,7 +439,8 @@ private fun TextComposer.appendTextChildren(
                     "img" -> {
                         val imageCandidates = getImageSource(baseUrl, element)
                         if (imageCandidates.hasImage) {
-                            val alt = element.attr("alt") ?: ""
+                            // Some sites are silly and insert formatting in alt text
+                            val alt = stripHtml(element.attr("alt") ?: "")
                             appendImage(onLinkClick = onLinkClick) { onClick ->
                                 lazyListScope.item {
                                     val dimens = LocalDimens.current
@@ -808,3 +809,30 @@ fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(
 // 160 is &nbsp; (non-breaking space). Not in the spec but expected.
 private fun isCollapsableWhiteSpace(c: Char) =
     c == ' ' || c == '\t' || c == '\n' || c == 12.toChar() || c == '\r' || c == 160.toChar()
+
+/**
+ * Super basic function to strip html formatting from alt-texts.
+ */
+fun stripHtml(html: String): String {
+    val result = StringBuilder()
+
+    var skipping = false
+
+    for (char in html) {
+        if (!skipping) {
+            if (char == '<') {
+                skipping = true
+            } else {
+                result.append(char)
+            }
+        } else {
+            if (char == '>') {
+                skipping = false
+            } else {
+                // Skipping char
+            }
+        }
+    }
+
+    return result.toString()
+}
