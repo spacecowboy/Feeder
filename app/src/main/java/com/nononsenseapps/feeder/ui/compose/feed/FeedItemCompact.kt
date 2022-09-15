@@ -210,7 +210,7 @@ fun FeedItemCompact(
         if (showThumbnail && (item.imageUrl != null || item.feedImageUrl != null) || item.unread || item.bookmarked || item.pinned) {
             Box(
                 modifier = Modifier.fillMaxHeight(),
-                contentAlignment = Alignment.CenterEnd,
+                contentAlignment = Alignment.TopEnd,
             ) {
                 (item.imageUrl ?: item.feedImageUrl?.toString())?.let { imageUrl ->
                     if (showThumbnail) {
@@ -230,28 +230,25 @@ fun FeedItemCompact(
                                 .precision(Precision.INEXACT)
                                 .build(),
                             contentDescription = stringResource(id = R.string.article_image),
-                            contentScale = ContentScale.Inside,
+                            contentScale = ContentScale.Crop,
                             modifier = modifier
                                 .width(64.dp)
-                                .height(64.dp)
+                                .fillMaxHeight()
                         )
                     }
                 }
-                Box(
-                    modifier = Modifier.fillMaxHeight(),
-                    contentAlignment = Alignment.TopEnd,
-                ) {
-                    FeedItemIndicatorColumn(
-                        unread = item.unread,
-                        bookmarked = item.bookmarked,
-                        pinned = item.pinned,
-                        modifier = Modifier.padding(
-                            top = 8.dp,
-                            bottom = 8.dp,
-                            end = 8.dp,
-                        ),
-                    )
-                }
+                FeedItemIndicatorColumn(
+                    unread = item.unread,
+                    bookmarked = item.bookmarked,
+                    pinned = item.pinned,
+                    spacing = 4.dp,
+                    iconSize = 12.dp,
+                    modifier = Modifier.padding(
+                        top = 4.dp,
+                        bottom = 4.dp,
+                        end = 4.dp,
+                    ),
+                )
             }
         } else {
             // Taking Row spacing into account
