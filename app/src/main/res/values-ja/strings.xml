@@ -184,4 +184,8 @@
     <string name="explanation_permission_notifications">通知を有効にするには、アクセス許可を付与する必要があります。</string>
     <string name="dynamic_theme_use">動的な色</string>
     <string name="new_indicator">新</string>
+    <string name="text_to_speech">テキスト読み上げ</string>
+    <string name="skip_to_next">次へスキップ</string>
+    <string name="set_language">言語の設定</string>
+    <string name="pinned"></string>
 </resources>
