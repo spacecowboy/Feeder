@@ -178,4 +178,15 @@
     <string name="remove_bookmark">Borrar marcador</string>
     <string name="permission_read_desc">Permirtir á aplicación ler fontes e artigos</string>
     <string name="permission_read_label">Acceso de só lectura</string>
+    <string name="skip_to_next">Saltar ao seguinte</string>
+    <string name="use_detect_language">Detectar lingua</string>
+    <string name="only_available_on_android_n">Só dispoñíbel no Android %1$s e superior</string>
+    <string name="description_for_read_aloud">Detecta automaticamente a lingua do artigo</string>
+    <string name="text_to_speech">Texto a voz</string>
+    <string name="set_language">Estabelecer lingua</string>
+    <string name="dynamic_theme_use">Cores dinámicos</string>
+    <string name="pinned">Prendido</string>
+    <string name="bookmarked">Marcado</string>
+    <string name="new_indicator">Novo</string>
+    <string name="explanation_permission_notifications">O permiso debe ser garantido antes de habilitar as notificacións.</string>
 </resources>
