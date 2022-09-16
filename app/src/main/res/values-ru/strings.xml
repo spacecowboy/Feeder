@@ -178,4 +178,9 @@
     <string name="remove_bookmark">Удалить закладку</string>
     <string name="permission_read_desc">Позволяет приложению читать каналы и статьи</string>
     <string name="text_to_speech">Текст в речь</string>
+    <string name="only_available_on_android_n">Доступно только на Android %1$s и выше</string>
+    <string name="use_detect_language">Определение языка</string>
+    <string name="dynamic_theme_use">Динамические цвета</string>
+    <string name="description_for_read_aloud">Автоматически определяет язык статьи</string>
+    <string name="explanation_permission_notifications">Разрешение должно быть предоставлено перед включением уведомлений.</string>
 </resources>
