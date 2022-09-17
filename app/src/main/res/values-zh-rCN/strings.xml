@@ -81,8 +81,8 @@
     <string name="theme_day">日间</string>
     <string name="theme_night">夜间</string>
     <string name="theme">主题</string>
-    <string name="sort_newest_first">时间升序</string>
-    <string name="sort_oldest_first">时间降序</string>
+    <string name="sort_newest_first">时间降序</string>
+    <string name="sort_oldest_first">时间升序</string>
     <string name="sort">排序</string>
     <string name="send_bug_report">发送错误报告</string>
     <string name="no_email_client">无法打开电子邮件客户端</string>
@@ -188,5 +188,5 @@
     <string name="bookmarked">已加书签</string>
     <string name="skip_to_next">跳到下一篇</string>
     <string name="set_language">设置语言</string>
-    <string name="new_indicator">新建</string>
+    <string name="new_indicator">新</string>
 </resources>

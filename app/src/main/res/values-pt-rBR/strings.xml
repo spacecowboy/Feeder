@@ -178,4 +178,15 @@
     <string name="remove_bookmark">Remover dos salvos</string>
     <string name="permission_read_label">Acesso somente leitura</string>
     <string name="permission_read_desc">Permite que o aplicativo leia feeds e artigos</string>
+    <string name="skip_to_next">Pular para o próximo</string>
+    <string name="set_language">Definir idioma</string>
+    <string name="use_detect_language">Detectar idioma</string>
+    <string name="only_available_on_android_n">Disponível apenas no Android %1$s e superior</string>
+    <string name="text_to_speech">Texto para fala</string>
+    <string name="description_for_read_aloud">Detecta o idioma do artigo automaticamente</string>
+    <string name="dynamic_theme_use">Cores dinâmicas</string>
+    <string name="pinned">Fixado</string>
+    <string name="bookmarked">Salvo</string>
+    <string name="new_indicator">Novo</string>
+    <string name="explanation_permission_notifications">A permissão deve ser concedida antes que as notificações possam ser habilitadas.</string>
 </resources>
