@@ -97,15 +97,10 @@ fun CodeBlockStyle(): TextStyle =
 @Composable
 fun CodeBlockBackground(): Color =
     MaterialTheme.colorScheme.surfaceVariant
-// TODO
-//    when (MaterialTheme.colorScheme.background) {
-//        true -> Color.LightGray
-//        false -> Color.DarkGray
-//    }
 
 @Composable
 fun BlockQuoteStyle(): SpanStyle =
-    MaterialTheme.typography.bodyMedium.toSpanStyle().merge(
+    MaterialTheme.typography.bodyLarge.toSpanStyle().merge(
         SpanStyle(
             fontWeight = FontWeight.Light
         )

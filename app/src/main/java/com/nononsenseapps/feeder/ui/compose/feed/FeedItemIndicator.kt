@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
@@ -68,12 +69,14 @@ fun FeedItemIndicatorColumn(
     unread: Boolean,
     bookmarked: Boolean,
     pinned: Boolean,
+    spacing: Dp = 8.dp,
+    iconSize: Dp = 16.dp,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(spacing),
+        horizontalAlignment = Alignment.End,
     ) {
         if (unread) {
             FeedItemIndicator {
@@ -85,7 +88,7 @@ fun FeedItemIndicatorColumn(
                 Icon(
                     Icons.Default.Bookmark,
                     contentDescription = stringResource(id = R.string.bookmark_article),
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(iconSize),
                 )
             }
         }
@@ -94,7 +97,7 @@ fun FeedItemIndicatorColumn(
                 Icon(
                     Icons.Default.PushPin,
                     contentDescription = stringResource(id = R.string.pinned),
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(iconSize),
                 )
             }
         }

@@ -8,6 +8,7 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.nononsenseapps.feeder.db.COL_AUTHOR
+import com.nononsenseapps.feeder.db.COL_BOOKMARKED
 import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
 import com.nononsenseapps.feeder.db.COL_FEEDID
 import com.nononsenseapps.feeder.db.COL_FIRSTSYNCEDTIME
@@ -17,7 +18,6 @@ import com.nononsenseapps.feeder.db.COL_IMAGEURL
 import com.nononsenseapps.feeder.db.COL_LINK
 import com.nononsenseapps.feeder.db.COL_NOTIFIED
 import com.nononsenseapps.feeder.db.COL_PINNED
-import com.nononsenseapps.feeder.db.COL_BOOKMARKED
 import com.nononsenseapps.feeder.db.COL_PLAINSNIPPET
 import com.nononsenseapps.feeder.db.COL_PLAINTITLE
 import com.nononsenseapps.feeder.db.COL_PRIMARYSORTTIME
@@ -85,7 +85,7 @@ data class FeedItem @Ignore constructor(
         val converter = HtmlToPlainTextConverter()
         // Be careful about nulls.
         val text = entry.content_html ?: entry.content_text ?: ""
-        val summary: String? = (
+        val summary: String = (
             entry.summary ?: entry.content_text
                 ?: converter.convert(text)
             ).take(MAX_SNIPPET_LENGTH)
@@ -107,7 +107,7 @@ data class FeedItem @Ignore constructor(
         entry.title?.let { this.plainTitle = it.take(MAX_TITLE_LENGTH) }
         @Suppress("DEPRECATION")
         this.title = this.plainTitle
-        summary?.let { this.plainSnippet = it }
+        this.plainSnippet = summary
 
         this.imageUrl = absoluteImage
         this.enclosureLink = entry.attachments?.firstOrNull()?.url
@@ -134,7 +134,7 @@ data class FeedItem @Ignore constructor(
                 var fname: String? = null
                 try {
                     fname = URI(enclosureLink).path.split("/").last()
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                 }
                 return if (fname == null || fname.isEmpty()) {
                     null
@@ -151,7 +151,7 @@ data class FeedItem @Ignore constructor(
             if (l != null) {
                 try {
                     return URL(l).host.replace("www.", "")
-                } catch (e: Throwable) {
+                } catch (_: Throwable) {
                 }
             }
             return null

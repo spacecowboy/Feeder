@@ -81,7 +81,7 @@ private val darkColors = darkColorScheme(
  */
 @Composable
 fun FeederTheme(
-    currentTheme: ThemeOptions = ThemeOptions.DAY,
+    currentTheme: ThemeOptions = ThemeOptions.SYSTEM,
     darkThemePreference: DarkThemePreferences = DarkThemePreferences.BLACK,
     dynamicColors: Boolean = false,
     content: @Composable () -> Unit,

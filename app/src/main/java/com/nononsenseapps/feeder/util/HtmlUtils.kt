@@ -16,7 +16,12 @@ private val regexImgSrc = """img.*?src=(["'])((?!data).*?)\1""".toRegex(RegexOpt
 
 fun naiveFindImageLink(text: String?): String? =
     if (text != null) {
-        regexImgSrc.find(text)?.groupValues?.get(2)
+        val imgLink = regexImgSrc.find(text)?.groupValues?.get(2)
+        if (imgLink?.contains("twitter_icon", ignoreCase = true) == true) {
+            null
+        } else {
+            imgLink
+        }
     } else {
         null
     }

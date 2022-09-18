@@ -8,6 +8,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.nononsenseapps.feeder.db.COL_ID
+import java.net.URL
 import org.threeten.bp.Instant
 
 @Dao
@@ -30,12 +31,21 @@ interface RemoteReadMarkDao {
         """
             SELECT remote_read_mark.id as id, fi.id as feed_item_id
             FROM remote_read_mark
-            JOIN feed_items fi ON remote_read_mark.guid = fi.guid
-            JOIN feeds f on f.id = fi.feed_id
-            WHERE f.url IS remote_read_mark.feed_url
+            INNER JOIN feed_items fi ON remote_read_mark.guid = fi.guid
+            INNER JOIN feeds f on f.id = fi.feed_id
+            WHERE f.url IS remote_read_mark.feed_url AND fi.unread = 1
         """
     )
     suspend fun getRemoteReadMarksReadyToBeApplied(): List<RemoteReadMarkReadyToBeApplied>
+
+    @Query(
+        """
+            SELECT remote_read_mark.guid
+            FROM remote_read_mark
+            WHERE remote_read_mark.feed_url = :feedUrl
+        """
+    )
+    suspend fun getGuidsWhichAreSyncedAsReadInFeed(feedUrl: URL): List<String>
 }
 
 data class RemoteReadMarkReadyToBeApplied @Ignore constructor(

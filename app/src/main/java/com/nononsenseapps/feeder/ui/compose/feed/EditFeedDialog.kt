@@ -22,12 +22,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.deletefeed.DeletableFeed
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
 @Composable
@@ -96,13 +97,16 @@ fun EditFeedDialog(
 }
 
 @Composable
-@Preview
-private fun preview() =
-    EditFeedDialog(
-        feeds = immutableListHolderOf(
-            DeletableFeed(1, "A Feed"),
-            DeletableFeed(2, "Another Feed")
-        ),
-        onDismiss = {},
-        onEdit = {}
-    )
+@PreviewThemes
+private fun preview() {
+    FeederTheme {
+        EditFeedDialog(
+            feeds = immutableListHolderOf(
+                DeletableFeed(1, "A Feed"),
+                DeletableFeed(2, "Another Feed")
+            ),
+            onDismiss = {},
+            onEdit = {}
+        )
+    }
+}

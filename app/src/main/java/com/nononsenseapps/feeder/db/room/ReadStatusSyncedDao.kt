@@ -105,4 +105,12 @@ interface ReadStatusSyncedDao {
         """
     )
     suspend fun deleteReadStatusSyncs(ids: List<Long>): Int
+
+    @Query(
+        """
+            DELETE FROM read_status_synced
+            WHERE feed_item = :feedItemId
+        """
+    )
+    suspend fun deleteReadStatusSyncForItem(feedItemId: Long): Int
 }

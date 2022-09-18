@@ -6,6 +6,7 @@ plugins {
 }
 
 android {
+  namespace "com.nononsenseapps.feeder"
   defaultConfig {
     applicationId "com.nononsenseapps.feeder"
     versionCode 251
@@ -87,6 +88,20 @@ android {
 
   testOptions {
     unitTests.returnDefaultValues = true
+    managedDevices {
+      devices {
+        pixel2api30 (com.android.build.api.dsl.ManagedVirtualDevice) {
+          // Use device profiles you typically see in Android Studio.
+          device = "Pixel 2"
+          // ATD currently support only API level 30.
+          apiLevel = 30
+          // You can also specify "google-atd" if you require Google Play Services.
+          systemImageSource = "aosp-atd"
+          // Whether the image must be a 64 bit image.
+          require64Bit = false
+        }
+      }
+    }
   }
 
   kotlinOptions {
@@ -172,7 +187,8 @@ dependencies {
   kapt "androidx.room:room-compiler:$roomVersion"
 
   // BOMS
-  api(platform("com.squareup.okhttp3:okhttp-bom:$okhttp_version"))
+  implementation(platform("com.squareup.okhttp3:okhttp-bom:$okhttp_version"))
+  implementation("io.coil-kt:coil-bom:$coilVersion")
 
   // Needed pre SDK21
   implementation "com.android.support:multidex:$multi_dex_version"
@@ -218,7 +234,7 @@ dependencies {
   implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
   // HTML parsing
   implementation "org.jsoup:jsoup:$jsoup_version"
-  implementation "org.ccil.cowan.tagsoup:tagsoup:$composeLibraryVersion"
+  implementation "org.ccil.cowan.tagsoup:tagsoup:$tagsoup_version"
   // RSS
   implementation "com.rometools:rome:$rome_version"
   implementation "com.rometools:rome-modules:$rome_version"
@@ -226,14 +242,14 @@ dependencies {
   implementation project(":jsonfeed-parser")
 
   // For better fetching
-  implementation("com.squareup.okhttp3:okhttp:$okhttp_version")
+  implementation("com.squareup.okhttp3:okhttp")
   // For supporting TLSv1.3 on pre Android-10
   implementation "org.conscrypt:conscrypt-android:$conscrypt_version"
   // Image loading
-  implementation("io.coil-kt:coil-base:$coilVersion")
-  implementation("io.coil-kt:coil-gif:$coilVersion")
-  implementation("io.coil-kt:coil-svg:$coilVersion")
-  implementation("io.coil-kt:coil-compose:$coilVersion")
+  implementation("io.coil-kt:coil-base")
+  implementation("io.coil-kt:coil-gif")
+  implementation("io.coil-kt:coil-svg")
+  implementation("io.coil-kt:coil-compose")
 
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   // Coroutines

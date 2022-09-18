@@ -201,4 +201,5 @@
   <string name="permission_read_label">Feeder read-only access</string>
 
   <string name="explanation_permission_notifications">Permission must be granted before notifications can be enabled.</string>
+    <string name="article_image">Article image</string>
 </resources>

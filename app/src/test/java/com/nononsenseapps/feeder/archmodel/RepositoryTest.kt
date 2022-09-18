@@ -1,11 +1,15 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.app.Application
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.RemoteReadMarkReadyToBeApplied
+import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import io.mockk.MockKAnnotations
@@ -17,6 +21,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
 import io.mockk.mockkStatic
+import io.mockk.spyk
 import io.mockk.verify
 import java.net.URL
 import kotlin.test.assertEquals
@@ -59,13 +64,17 @@ class RepositoryTest : DIAware {
     @MockK
     private lateinit var application: FeederApplication
 
+    @MockK
+    private lateinit var workManager: WorkManager
+
     override val di by DI.lazy {
-        bind<Repository>() with singleton { Repository(di) }
+        bind<Repository>() with singleton { spyk(Repository(di)) }
         bind<FeedItemStore>() with instance(feedItemStore)
         bind<SettingsStore>() with instance(settingsStore)
         bind<SessionStore>() with instance(sessionStore)
         bind<SyncRemoteStore>() with instance(syncRemoteStore)
         bind<FeedStore>() with instance(feedStore)
+        bind<WorkManager>() with instance(workManager)
         bind<AndroidSystemStore>() with instance(androidSystemStore)
         bind<Application>() with instance(application)
         bind<ApplicationCoroutineScope>() with singleton { ApplicationCoroutineScope() }
@@ -74,6 +83,9 @@ class RepositoryTest : DIAware {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true, relaxed = true)
+
+        every { repository.syncOnlyWhenCharging } returns MutableStateFlow(false)
+        every { repository.syncOnlyOnWifi } returns MutableStateFlow(false)
     }
 
     @Test
@@ -316,10 +328,28 @@ class RepositoryTest : DIAware {
 
         coVerify {
             feedItemStore.getFeedItemId(URL("https://foo"), "guid")
+            syncRemoteStore.addRemoteReadMark(feedUrl = URL("https://foo"), articleGuid = "guid")
             syncRemoteStore.setSynced(5L)
             feedItemStore.markAsReadAndNotified(5L)
         }
         confirmVerified(feedItemStore, syncRemoteStore)
+    }
+
+    @Test
+    fun markAsReadSchedulesSend() {
+        runBlocking {
+            repository.markAsReadAndNotified(1L)
+        }
+
+        coVerify {
+            feedItemStore.markAsReadAndNotified(1L)
+            workManager.enqueueUniqueWork(
+                SyncServiceSendReadWorker.UNIQUE_SENDREAD_NAME,
+                ExistingWorkPolicy.REPLACE,
+                any<OneTimeWorkRequest>(),
+            )
+        }
+        confirmVerified(feedItemStore, workManager)
     }
 
     @Test

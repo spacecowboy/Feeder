@@ -10,9 +10,9 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.model.FeedSyncer
-import com.nononsenseapps.feeder.model.UNIQUE_PERIODIC_NAME
-import com.nononsenseapps.feeder.model.oldPeriodics
+import com.nononsenseapps.feeder.model.workmanager.FeedSyncer
+import com.nononsenseapps.feeder.model.workmanager.UNIQUE_PERIODIC_NAME
+import com.nononsenseapps.feeder.model.workmanager.oldPeriodics
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.nononsenseapps.feeder.util.getStringNonNull
 import java.util.concurrent.TimeUnit
@@ -164,7 +164,12 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _useDynamicTheme =
-        MutableStateFlow(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && sp.getBoolean(PREF_DYNAMIC_THEME, true))
+        MutableStateFlow(
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && sp.getBoolean(
+                PREF_DYNAMIC_THEME,
+                true
+            )
+        )
     val useDynamicTheme = _useDynamicTheme.asStateFlow()
     fun setUseDynamicTheme(value: Boolean) {
         _useDynamicTheme.value = value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S

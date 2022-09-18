@@ -8,7 +8,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
@@ -19,7 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListScope
@@ -57,8 +56,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
@@ -247,7 +246,11 @@ fun FeedArticleScreen(
         onImport = { opmlImporter.launch(arrayOf("text/plain", "text/xml", "text/opml", "*/*")) },
         onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml") },
         markAsUnread = { itemId, unread ->
-            viewModel.markAsUnread(itemId, unread)
+            if (unread) {
+                viewModel.markAsUnread(itemId)
+            } else {
+                viewModel.markAsRead(itemId)
+            }
         },
         markBeforeAsRead = { index ->
             viewModel.markBeforeAsRead(index)
@@ -281,10 +284,7 @@ fun FeedArticleScreen(
         },
         displayFullText = viewModel::displayFullText,
         onMarkAsUnread = {
-            viewModel.markAsUnread(
-                viewState.articleId,
-                unread = true
-            )
+            viewModel.markAsUnread(viewState.articleId)
         },
         onShareArticle = {
             if (viewState.articleId > ID_UNSET) {
@@ -1330,9 +1330,7 @@ fun ArticleScreen(
     onNavigateUp: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
-    val decayAnimationSpec = rememberSplineBasedDecay<Float>()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-        decayAnimationSpec,
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         rememberTopAppBarState()
     )
 
@@ -1344,10 +1342,10 @@ fun ArticleScreen(
     Scaffold(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .statusBarsPadding()
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
+        contentWindowInsets = WindowInsets.statusBars,
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 scrollBehavior = scrollBehavior,
                 title = {
                     withBidiDeterminedLayoutDirection(paragraph = viewState.feedDisplayTitle) {

@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -26,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -37,9 +37,8 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.annotation.ExperimentalCoilApi
-import coil.compose.rememberImagePainter
-import coil.size.PixelSize
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
 import com.nononsenseapps.feeder.R
@@ -174,7 +173,6 @@ private fun LazyListScope.formatCodeBlock(
     composer.terminateCurrentText()
 }
 
-@OptIn(ExperimentalCoilApi::class)
 private fun TextComposer.appendTextChildren(
     nodes: List<Node>,
     preFormatted: Boolean = false,
@@ -441,7 +439,8 @@ private fun TextComposer.appendTextChildren(
                     "img" -> {
                         val imageCandidates = getImageSource(baseUrl, element)
                         if (imageCandidates.hasImage) {
-                            val alt = element.attr("alt") ?: ""
+                            // Some sites are silly and insert formatting in alt text
+                            val alt = stripHtml(element.attr("alt") ?: "")
                             appendImage(onLinkClick = onLinkClick) { onClick ->
                                 lazyListScope.item {
                                     val dimens = LocalDimens.current
@@ -472,23 +471,23 @@ private fun TextComposer.appendTextChildren(
 //                                                }
 //                                            }
                                             ) {
-                                                val imageSize = maxImageSize()
-                                                Image(
-                                                    painter = rememberImagePainter(
-                                                        data = imageCandidates.getBestImageForMaxSize(
-                                                            pixelDensity = pixelDensity(),
-                                                            maxSize = imageSize,
-                                                        ),
-                                                        builder = {
-                                                            this.placeholder(imagePlaceholder)
-                                                                .error(imagePlaceholder)
-                                                                .scale(Scale.FIT)
-                                                                .precision(Precision.INEXACT)
-                                                                .size(imageSize)
-                                                        },
-                                                    ),
-                                                    contentDescription = alt,
+                                                val imageWidth = maxImageWidth()
+                                                AsyncImage(
+                                                    model = ImageRequest.Builder(LocalContext.current)
+                                                        .data(
+                                                            imageCandidates.getBestImageForMaxSize(
+                                                                pixelDensity = pixelDensity(),
+                                                                maxWidth = imageWidth,
+                                                            )
+                                                        )
+                                                        .placeholder(imagePlaceholder)
+                                                        .error(imagePlaceholder)
+                                                        .scale(Scale.FIT)
+                                                        .size(imageWidth)
+                                                        .precision(Precision.INEXACT)
+                                                        .build(),
                                                     contentScale = ContentScale.FillWidth,
+                                                    contentDescription = alt,
                                                     modifier = Modifier
                                                         .fillMaxWidth()
                                                 )
@@ -605,20 +604,17 @@ private fun TextComposer.appendTextChildren(
                                             BoxWithConstraints(
                                                 modifier = Modifier.fillMaxWidth()
                                             ) {
-                                                val imageSize = maxImageSize()
-                                                Image(
-                                                    painter = rememberImagePainter(
-                                                        data = video.imageUrl,
-                                                        builder = {
-                                                            this.placeholder(R.drawable.youtube_icon)
-                                                                .error(R.drawable.youtube_icon)
-                                                                .scale(Scale.FIT)
-                                                                .precision(Precision.INEXACT)
-                                                                .size(imageSize)
-                                                        },
-                                                    ),
-                                                    contentDescription = stringResource(R.string.touch_to_play_video),
+                                                val imageWidth = maxImageWidth()
+                                                AsyncImage(
+                                                    model = ImageRequest.Builder(LocalContext.current)
+                                                        .placeholder(R.drawable.youtube_icon)
+                                                        .error(R.drawable.youtube_icon)
+                                                        .scale(Scale.FIT)
+                                                        .size(imageWidth)
+                                                        .precision(Precision.INEXACT)
+                                                        .build(),
                                                     contentScale = ContentScale.FillWidth,
+                                                    contentDescription = stringResource(R.string.touch_to_play_video),
                                                     modifier = Modifier
                                                         .clickable {
                                                             onLinkClick(video.link)
@@ -699,17 +695,8 @@ private fun pixelDensity() = with(LocalDensity.current) {
 }
 
 @Composable
-private fun BoxWithConstraintsScope.maxImageSize() = with(LocalDensity.current) {
-    val maxWidthPx = maxWidth.toPx().roundToInt()
-
-    PixelSize(
-        width = maxWidth.toPx().roundToInt().coerceAtLeast(1),
-        height = maxHeight
-            .toPx()
-            .roundToInt()
-            .coerceAtLeast(1)
-            .coerceAtMost(10 * maxWidthPx),
-    )
+fun BoxWithConstraintsScope.maxImageWidth() = with(LocalDensity.current) {
+    maxWidth.toPx().roundToInt().coerceAtMost(2000)
 }
 
 /**
@@ -731,7 +718,7 @@ internal class ImageCandidates(
     /**
      * Might throw if hasImage returns false
      */
-    fun getBestImageForMaxSize(maxSize: PixelSize, pixelDensity: Float): String {
+    fun getBestImageForMaxSize(maxWidth: Int, pixelDensity: Float): String {
         val setCandidate = srcSet.splitToSequence(",")
             .map { it.trim() }
             .map { it.split(SpaceRegex).take(2).map { x -> x.trim() } }
@@ -743,7 +730,8 @@ internal class ImageCandidates(
                     val descriptor = candidate.last()
                     when {
                         descriptor.endsWith("w", ignoreCase = true) -> {
-                            descriptor.substringBefore("w").toFloat() / maxSize.width.toFloat()
+                            descriptor.substringBefore("w").toFloat() / maxWidth
+                                .toFloat()
                         }
                         descriptor.endsWith("x", ignoreCase = true) -> {
                             descriptor.substringBefore("x").toFloat() / pixelDensity
@@ -809,7 +797,10 @@ fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(
     for (child in childNodes()) {
         when (child) {
             is TextNode -> child.appendCorrectlyNormalizedWhiteSpace(builder, stripLeading)
-            is Element -> child.appendCorrectlyNormalizedWhiteSpaceRecursively(builder, stripLeading)
+            is Element -> child.appendCorrectlyNormalizedWhiteSpaceRecursively(
+                builder,
+                stripLeading
+            )
         }
     }
 }
@@ -818,3 +809,30 @@ fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(
 // 160 is &nbsp; (non-breaking space). Not in the spec but expected.
 private fun isCollapsableWhiteSpace(c: Char) =
     c == ' ' || c == '\t' || c == '\n' || c == 12.toChar() || c == '\r' || c == 160.toChar()
+
+/**
+ * Super basic function to strip html formatting from alt-texts.
+ */
+fun stripHtml(html: String): String {
+    val result = StringBuilder()
+
+    var skipping = false
+
+    for (char in html) {
+        if (!skipping) {
+            if (char == '<') {
+                skipping = true
+            } else {
+                result.append(char)
+            }
+        } else {
+            if (char == '>') {
+                skipping = false
+            } else {
+                // Skipping char
+            }
+        }
+    }
+
+    return result.toString()
+}

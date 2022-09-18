@@ -21,6 +21,7 @@ import java.net.URL
 import java.util.Date
 import java.util.Random
 import kotlin.test.assertEquals
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
@@ -38,15 +39,17 @@ class RomeExtensionsKtTest {
     }
 
     @Test
-    fun feedLinkButNoLinks() {
+    fun feedLinkButNoLinks() = runBlocking {
         assertEquals(
             Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
-            mockSyndFeed(link = "homepage").asFeed(baseUrl)
+            mockSyndFeed(link = "homepage").asFeed(baseUrl) {
+                null
+            }
         )
     }
 
     @Test
-    fun feedLinks() {
+    fun feedLinks() = runBlocking {
         assertEquals(
             Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
             mockSyndFeed(
@@ -56,12 +59,14 @@ class RomeExtensionsKtTest {
                         rel = "alternate", type = "text/html"
                     )
                 )
-            ).asFeed(baseUrl)
+            ).asFeed(baseUrl) {
+                null
+            }
         )
     }
 
     @Test
-    fun itemFallsBackToFeedAuthor() {
+    fun itemFallsBackToFeedAuthor() = runBlocking {
         assertEquals(
             Feed(
                 author = Author(name = "bob"),
@@ -83,14 +88,16 @@ class RomeExtensionsKtTest {
                 entries = listOf(
                     mockSyndEntry(uri = "id")
                 )
-            ).asFeed(baseUrl)
+            ).asFeed(baseUrl) {
+                null
+            }
         )
     }
 
     // Essentially a test for XKCD
     @Test
     fun descriptionWithOnlyImageDoesNotReturnBlankSummaryAndGetsImageSet() {
-        var expectedSummary = "[An image]"
+        val expectedSummary = "[An image]"
         val html = "  <img src='http://google.com/image.png' alt='An image'/> "
 
         assertEquals(
