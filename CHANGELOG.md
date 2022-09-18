@@ -1,3 +1,47 @@
+# 2.3.2
+Allan Nordhøy (1):
+  * [9c947b4c] Updated Norwegian Bokmål translation using Weblate
+
+Andrij Mizyk (1):
+  * [e50de95c] Updated Ukrainian translation using Weblate
+
+ERYpTION (1):
+  * [6162c9e7] Translated using Weblate (Danish)
+
+Jonas Kalderstam (14):
+  * [4ee8790e] Fixed padding in tag list
+  * [8cce8c0d] Fixed images rendering too large causing crashes
+  * [c660a688] Added fallback to feed icon in compact views
+  * [2b91e13f] Added blacklist for twitter icon as article icon
+  * [d4817632] Added dividers in list for compact and superCompact styles
+  * [605f9be2] Fixed so list stays at top when updating if already at top
+  * [a7b032a1] Added padding in list so FAB doesn't cover last article
+  * [54a1168f] Adjusted TopAppBar scroll behavior
+  * [3613b758] Fixed syncclient re-initializing unnecessarily
+  * [a20f65e6] Fixed reliability of read status sync
+  * [5a45015d] Fixed image size in Compact item layouts
+  * [7ba2253b] Fixed HTML not getting stripped from alt texts
+  * [738495a2] Increased text size of block quotes in reader view
+  * [925824de] Upgraded dependency versions and insets handling
+
+Meiru (1):
+  * [383bd23c] Updated Japanese translation using Weblate
+
+MkQtS (1):
+  * [1d6ea396] Updated Chinese (Simplified) translation using Weblate
+
+Vitor Henrique (1):
+  * [863c8327] Updated Portuguese (Brazil) translation using Weblate
+
+WB (1):
+  * [257dfed6] Translated using Weblate (Galician)
+
+kak mi (1):
+  * [89cb8b85] Updated Chinese (Simplified) translation using Weblate
+
+Егор Ермаков (1):
+  * [11505e3b] Updated Russian translation using Weblate
+
 # 2.3.1
 Ady (1):
   * [65b669ec] Updated French translation using Weblate
