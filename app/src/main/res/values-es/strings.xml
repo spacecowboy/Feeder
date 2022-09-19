@@ -189,4 +189,5 @@
     <string name="pinned">Anclado</string>
     <string name="bookmarked">Marcado</string>
     <string name="new_indicator">Nuevo</string>
+    <string name="article_image">Imagen del artículo</string>
 </resources>
