@@ -189,4 +189,5 @@
     <string name="dynamic_theme_use">Couleurs dynamiques</string>
     <string name="bookmarked">Ajouté aux marque-pages</string>
     <string name="new_indicator">Nouveau</string>
+    <string name="article_image">Image de l\'article</string>
 </resources>
