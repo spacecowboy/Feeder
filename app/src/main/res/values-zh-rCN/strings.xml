@@ -189,4 +189,5 @@
     <string name="skip_to_next">跳到下一篇</string>
     <string name="set_language">设置语言</string>
     <string name="new_indicator">新</string>
+    <string name="article_image">文章图片</string>
 </resources>
