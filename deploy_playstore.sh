@@ -3,7 +3,7 @@
 LATEST_TAG="$(git describe --tags "$(git rev-list --tags --max-count=1)")"
 CURRENT_VERSION="$(git describe --tags)"
 
-if [ ! -z "${SERVICEACCOUNTJSON:-}" ]; then
+if [ -n "${SERVICEACCOUNTJSON:-}" ]; then
   cat > app/creds.b64 <<EOF
 ${SERVICEACCOUNTJSON}
 EOF
@@ -13,7 +13,7 @@ base64 --ignore-garbage --decode app/creds.b64 > app/creds.json
 
 sed -i "s|/home/jonas/.ssh/service.json|$(pwd)/app/creds.json|" fastlane/Appfile
 
-if [ ! -z "${KEYSTORE:-}" ]; then
+if [ -n "${KEYSTORE:-}" ]; then
   cat > keystore.b64 <<EOF
 ${KEYSTORE}
 EOF

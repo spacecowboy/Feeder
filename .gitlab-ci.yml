@@ -62,7 +62,7 @@ compileRelease:
 validate_deployment:
   stage: validate_deploy
   script:
-    - source devenv && ./deploy_playstore.sh --dry-run
+    - source devenv && ci/run-if-not-release ./deploy_playstore.sh --dry-run
   needs: []
   only:
     - compose
