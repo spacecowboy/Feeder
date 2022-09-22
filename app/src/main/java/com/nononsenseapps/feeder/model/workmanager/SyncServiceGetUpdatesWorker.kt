@@ -9,7 +9,6 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.nononsenseapps.feeder.archmodel.Repository
@@ -57,6 +56,7 @@ fun scheduleGetUpdates(di: DI) {
     val repository by di.instance<Repository>()
 
     val constraints = Constraints.Builder()
+        // This prevents expedited if true
         .setRequiresCharging(repository.syncOnlyWhenCharging.value)
 
     if (repository.syncOnlyOnWifi.value) {
@@ -67,7 +67,6 @@ fun scheduleGetUpdates(di: DI) {
 
     val workRequest = OneTimeWorkRequestBuilder<SyncServiceGetUpdatesWorker>()
         .addTag("feeder")
-        .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
         .keepResultsForAtLeast(5, TimeUnit.MINUTES)
         .setConstraints(constraints.build())
 
