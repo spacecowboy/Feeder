@@ -65,7 +65,6 @@ validate_deployment:
     - source devenv && ci/run-if-not-release ./deploy_playstore.sh --dry-run
   needs: []
   only:
-    - compose
     - master
     - tags
 

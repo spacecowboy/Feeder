@@ -66,6 +66,7 @@ fun scheduleSendRead(di: DI) {
         .addTag("feeder")
         .keepResultsForAtLeast(5, TimeUnit.MINUTES)
         .setConstraints(constraints.build())
+        .setInitialDelay(10, TimeUnit.SECONDS)
 
     val workManager by di.instance<WorkManager>()
     workManager.enqueueUniqueWork(

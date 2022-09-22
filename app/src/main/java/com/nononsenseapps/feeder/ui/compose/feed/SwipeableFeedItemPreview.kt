@@ -27,7 +27,6 @@ import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -57,7 +56,6 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
 import kotlin.math.roundToInt
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
@@ -132,29 +130,6 @@ fun SwipeableFeedItemPreview(
             Log.d("JONAS", "Anim: onSwipe ${item.unread}")
             swipeableState.snapTo(FeedItemSwipeState.NONE)
             onSwipe(item.unread)
-        }
-    }
-
-    // This disposable effect is used to ensure we call onSwipe
-    // Even if we navigate away from the screen in the middle of the animation
-    DisposableEffect(swipeableState.targetValue, swipeableState.isAnimationRunning) {
-        onDispose {
-            // isAnimationRunning only becomes true when user lifts the finger
-            if (swipeableState.isAnimationRunning &&
-                swipeableState.targetValue != FeedItemSwipeState.NONE
-            ) {
-                val currentState = item.unread
-
-                // Use ApplicationCoroutineScope to ensure this runs even if we navigate away
-                // from the screen
-                applicationCoroutineScope.launch {
-                    Log.d("JONAS", "Dispose: Wait...")
-                    // Wait a little to ensure animations complete
-                    delay(600)
-                    Log.d("JONAS", "Dispose: Calling onSwipe $currentState")
-                    onSwipe(currentState)
-                }
-            }
         }
     }
 

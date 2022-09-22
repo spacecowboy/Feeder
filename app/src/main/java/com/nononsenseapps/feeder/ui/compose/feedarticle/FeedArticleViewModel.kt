@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.Article
 import com.nononsenseapps.feeder.archmodel.Enclosure
@@ -57,6 +58,8 @@ class FeedArticleViewModel(
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
+    // Use this for actions which should complete even if app goes off screen
+    val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
     val currentFeedListItems: Flow<PagingData<FeedListItem>> =
         repository.getCurrentFeedListItems()
@@ -94,42 +97,38 @@ class FeedArticleViewModel(
         repository.setShowOnlyBookmarked(value)
     }
 
-    fun deleteFeeds(feedIds: List<Long>) = viewModelScope.launch {
+    fun deleteFeeds(feedIds: List<Long>) = applicationCoroutineScope.launch {
         repository.deleteFeeds(feedIds)
     }
 
-    fun markAllAsRead() = viewModelScope.launch {
+    fun markAllAsRead() = applicationCoroutineScope.launch {
         val (feedId, feedTag) = repository.currentFeedAndTag.value
         repository.markAllAsReadInFeedOrTag(feedId, feedTag)
     }
 
-    fun markAsUnread(itemId: Long) = viewModelScope.launch {
+    fun markAsUnread(itemId: Long) = applicationCoroutineScope.launch {
         repository.markAsUnread(itemId)
     }
 
-    fun markAsRead(itemId: Long) = viewModelScope.launch {
+    fun markAsRead(itemId: Long) = applicationCoroutineScope.launch {
         repository.markAsReadAndNotified(itemId)
     }
 
-    fun markBeforeAsRead(itemIndex: Int) = viewModelScope.launch {
+    fun markBeforeAsRead(itemIndex: Int) = applicationCoroutineScope.launch {
         val (feedId, feedTag) = repository.currentFeedAndTag.value
         repository.markBeforeAsRead(itemIndex, feedId, feedTag)
     }
 
-    fun markAfterAsRead(itemIndex: Int) = viewModelScope.launch {
+    fun markAfterAsRead(itemIndex: Int) = applicationCoroutineScope.launch {
         val (feedId, feedTag) = repository.currentFeedAndTag.value
         repository.markAfterAsRead(itemIndex, feedId, feedTag)
     }
 
-    fun markAsReadAndNotified(itemId: Long) = viewModelScope.launch {
-        repository.markAsReadAndNotified(itemId)
-    }
-
-    fun setPinned(itemId: Long, pinned: Boolean) = viewModelScope.launch {
+    fun setPinned(itemId: Long, pinned: Boolean) = applicationCoroutineScope.launch {
         repository.setPinned(itemId, pinned)
     }
 
-    fun setBookmarked(itemId: Long, bookmarked: Boolean) = viewModelScope.launch {
+    fun setBookmarked(itemId: Long, bookmarked: Boolean) = applicationCoroutineScope.launch {
         repository.setBookmarked(itemId, bookmarked)
     }
 
