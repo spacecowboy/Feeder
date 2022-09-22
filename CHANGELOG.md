@@ -1,3 +1,36 @@
+# 2.3.3
+Agnieszka C (1):
+  * [6145fb2a] Updated Polish translation using Weblate
+
+Andrij Mizyk (1):
+  * [9d72357f] Updated Ukrainian translation using Weblate
+
+ERYpTION (1):
+  * [38f8e2fd] Updated Danish translation using Weblate
+
+El Pirujo (1):
+  * [88b815b0] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [4039f577] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [819789ec] Updated French translation using Weblate
+
+Jonas Kalderstam (3):
+  * [88391f35] Added monochrome app icon
+  * [52a2e030] Added a debug-only app icon
+  * [b003d5ec] Fixed crash when sync on when charging was true
+
+Oğuz Ersen (1):
+  * [2d229786] Updated Turkish translation using Weblate
+
+atilluF (1):
+  * [e5b6191e] Updated Italian translation using Weblate
+
+zmni (1):
+  * [1a9efa68] Updated Indonesian translation using Weblate
+
 # 2.3.2
 Allan Nordhøy (1):
   * [9c947b4c] Updated Norwegian Bokmål translation using Weblate
