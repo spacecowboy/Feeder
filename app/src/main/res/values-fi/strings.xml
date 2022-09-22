@@ -151,4 +151,14 @@
     <string name="add_new_device">Lisää uusi laite</string>
     <string name="only_enable_for_bad_id_feeds">Ota käyttöön vain syötteille, joilla on huonot tunnukset</string>
     <string name="block_list">Estoluettelo</string>
+    <string name="article_image">Artikkelin kuva</string>
+    <string name="use_detect_language">Tunnista kieli</string>
+    <string name="only_available_on_android_n">Saatavilla vain Androidissa %1$s ja uudemmissa</string>
+    <string name="set_language">Aseta kieli</string>
+    <string name="description_for_read_aloud">Tunnistaa automaattisesti artikkelin kielen</string>
+    <string name="text_to_speech">Teksti puheeksi</string>
+    <string name="skip_to_next">Siirry seuraavaan</string>
+    <string name="qr_code">QR-koodi</string>
+    <string name="remove_device">Poista laite</string>
+    <string name="remove_device_question">Oletko varma, että haluat poistaa laitteen %1$s\?</string>
 </resources>

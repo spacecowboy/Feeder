@@ -184,4 +184,6 @@
     <string name="explanation_permission_notifications">Perizinan harus diberikan sebelum notifikasi diaktifkan.</string>
     <string name="dynamic_theme_use">Warna dinamis</string>
     <string name="new_indicator">Baru</string>
+    <string name="article_image">Gambar artikel</string>
+    <string name="set_language">Atur bahasa</string>
 </resources>

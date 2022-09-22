@@ -189,4 +189,5 @@
     <string name="bookmarked">Aggiunto ai segnalibri</string>
     <string name="new_indicator">Nuovo</string>
     <string name="dynamic_theme_use">Colori dinamici</string>
+    <string name="article_image">Immagine dell\'articolo</string>
 </resources>

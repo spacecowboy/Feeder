@@ -189,4 +189,5 @@
     <string name="pinned">Закріплено</string>
     <string name="bookmarked">Додано в закладки</string>
     <string name="new_indicator">Нове</string>
+    <string name="article_image">Зображення статті</string>
 </resources>
