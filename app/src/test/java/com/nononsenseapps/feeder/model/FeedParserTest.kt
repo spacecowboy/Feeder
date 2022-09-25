@@ -170,6 +170,24 @@ class FeedParserTest : DIAware {
     }
 
     @Test
+    fun parsesYahooMediaRss2() = runBlocking {
+        val feed = readResource("rss_myanimelist.xml") {
+            feedParser.parseFeedResponse(
+                URL("https://myanimelist.net/rss/news.xml"),
+                it,
+                null
+            )
+        }
+
+        val item = feed.items!!.first()
+
+        assertEquals(
+            "https://cdn.myanimelist.net/s/common/uploaded_files/1664092688-dd34666e64d7ae624e6e2c70087c181f.jpeg",
+            item.image
+        )
+    }
+
+    @Test
     @Throws(Exception::class)
     fun getAlternateFeedLinksDoesNotReturnRelativeLinks() {
         readResource("fz.html") {
