@@ -8,12 +8,16 @@ import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
 import com.rometools.modules.mediarss.MediaEntryModule
 import com.rometools.modules.mediarss.MediaModule
+import com.rometools.modules.mediarss.types.MediaContent
+import com.rometools.modules.mediarss.types.MediaGroup
+import com.rometools.modules.mediarss.types.Thumbnail
 import com.rometools.rome.feed.synd.SyndContent
 import com.rometools.rome.feed.synd.SyndEnclosure
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.feed.synd.SyndPerson
 import java.net.URL
+import kotlinx.coroutines.yield
 import org.jsoup.parser.Parser.unescapeEntities
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
@@ -219,18 +223,21 @@ fun SyndEntry.mediaDescription(): String? {
 fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     val media = this.getModule(MediaModule.URI) as MediaEntryModule?
 
-    val thumbnail: String? = media?.metadata?.thumbnail?.firstOrNull()?.url?.toString()
-        ?: media?.mediaContents?.firstNotNullOfOrNull { it.metadata?.thumbnail?.firstOrNull()?.url?.toString() }
-        ?: media?.mediaContents?.firstOrNull { "image" == it.medium }?.reference?.toString()
-        ?: media?.mediaGroups?.firstNotNullOfOrNull { it.metadata?.thumbnail?.firstOrNull()?.url?.toString() }
-        ?: enclosures?.asSequence()
-            ?.filterNotNull()
-            ?.filter { it.type?.startsWith("image/") == true }
-            ?.mapNotNull { it.url }
-            ?.firstOrNull()
+    val thumbnailCandidates = sequence {
+        media?.findThumbnailCandidates()?.let {
+            yieldAll(it)
+        }
+        enclosures?.asSequence()
+            ?.mapNotNull { it.findThumbnailCandidate() }
+            ?.let {
+                yieldAll(it)
+            }
+    }
+
+    val thumbnail = thumbnailCandidates.maxByOrNull { it.width ?: -1 }
 
     return when {
-        thumbnail != null -> relativeLinkIntoAbsolute(feedBaseUrl, thumbnail)
+        thumbnail != null -> relativeLinkIntoAbsolute(feedBaseUrl, thumbnail.url)
         else -> {
             val imgLink: String? =
                 naiveFindImageLink(this.contentHtml())?.let { unescapeEntities(it, true) }
@@ -251,6 +258,98 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
                 null
             }
         }
+    }
+}
+
+data class ThumbnailCandidate(
+    val width: Int?,
+    val height: Int?,
+    val url: String,
+)
+
+private fun MediaEntryModule.findThumbnailCandidates(): Sequence<ThumbnailCandidate> {
+    return sequence {
+        mediaContents?.forEach { mediaContent ->
+            yieldAll(mediaContent.findThumbnailCandidates())
+        }
+        metadata?.thumbnail?.let { thumbnails ->
+            yieldAll(
+                thumbnails.mapNotNull { it.findThumbnailCandidate() }
+            )
+        }
+        mediaGroups?.forEach { mediaGroup ->
+            yieldAll(mediaGroup.findThumbnailCandidates())
+        }
+    }
+}
+
+private fun SyndEnclosure.findThumbnailCandidate(): ThumbnailCandidate? {
+    if (type?.startsWith("image/") == true) {
+        url?.let { url ->
+            return ThumbnailCandidate(width = null, height = null, url = url)
+        }
+    }
+    return null
+}
+
+private fun MediaGroup.findThumbnailCandidates(): Sequence<ThumbnailCandidate> = sequence {
+    metadata.thumbnail?.forEach { thumbnail ->
+        thumbnail.findThumbnailCandidate()?.let { thumbnailCandidate ->
+            yield(thumbnailCandidate)
+        }
+    }
+}
+
+private fun Thumbnail.findThumbnailCandidate(): ThumbnailCandidate? {
+    return url?.let { url ->
+        ThumbnailCandidate(
+            width = width,
+            height = height,
+            url = url.toString(),
+        )
+    }
+}
+
+private fun MediaContent.findThumbnailCandidates(): Sequence<ThumbnailCandidate> =
+    sequence {
+        metadata?.thumbnail?.forEach { thumbnail ->
+            thumbnail.findThumbnailCandidate()?.let { thumbnailCandidate ->
+                yield(thumbnailCandidate)
+            }
+        }
+
+        if (isImage()) {
+            reference?.let { ref ->
+                yield(
+                    ThumbnailCandidate(
+                        width = width,
+                        height = height,
+                        url = ref.toString()
+                    )
+                )
+            }
+        }
+    }
+
+private fun MediaContent.isImage(): Boolean {
+    return when {
+        medium == "image" -> true
+        pointsToImage(reference.toString()) -> true
+        else -> false
+    }
+}
+
+private fun pointsToImage(url: String): Boolean {
+    return try {
+        val u = URL(url)
+
+        u.path.endsWith(".jpg", ignoreCase = true) ||
+            u.path.endsWith(".jpeg", ignoreCase = true) ||
+            u.path.endsWith(".gif", ignoreCase = true) ||
+            u.path.endsWith(".png", ignoreCase = true) ||
+            u.path.endsWith(".webp", ignoreCase = true)
+    } catch (_: Exception) {
+        false
     }
 }
 
