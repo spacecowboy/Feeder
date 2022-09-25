@@ -206,6 +206,23 @@ class FeedParserTest : DIAware {
     }
 
     @Test
+    fun encodingTestWithSmileys() = runBlocking {
+        val feed = readResource("rss_lawnchair.xml") {
+            feedParser.parseFeedResponse(
+                URL("https://nitter.weiler.rocks/lawnchairapp/rss"),
+                it,
+                null
+            )
+        }
+
+        val item = feed.items!!.first()
+
+        assertTrue {
+            "\uD83D\uDE0D\uD83E\uDD29" in item.content_html!!
+        }
+    }
+
+    @Test
     @Throws(Exception::class)
     fun getAlternateFeedLinksDoesNotReturnRelativeLinks() {
         readResource("fz.html") {
