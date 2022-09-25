@@ -774,7 +774,9 @@ fun TextNode.appendCorrectlyNormalizedWhiteSpace(
     var i = 0
     while (i < string.length) {
         val code = string.codePointAt(i)
-        val char = code.toChar()
+
+        // Unicode smileys are an example of where toChar() won't work. Needs to be String.
+        val char = String(intArrayOf(code), 0, 1)
         i += Character.charCount(code)
 
         lastWasWhite = if (isCollapsableWhiteSpace(char)) {
@@ -805,10 +807,20 @@ fun Element.appendCorrectlyNormalizedWhiteSpaceRecursively(
     }
 }
 
+private const val space = ' '
+private const val tab = '\t'
+private const val linefeed = '\n'
+private const val carriageReturn = '\r'
 // 12 is form feed which as no escape in kotlin
+private const val formFeed = 12.toChar()
 // 160 is &nbsp; (non-breaking space). Not in the spec but expected.
+private const val nonBreakableSpace = 160.toChar()
+
+private fun isCollapsableWhiteSpace(c: String) =
+    c.firstOrNull()?.let { isCollapsableWhiteSpace(it) } ?: false
+
 private fun isCollapsableWhiteSpace(c: Char) =
-    c == ' ' || c == '\t' || c == '\n' || c == 12.toChar() || c == '\r' || c == 160.toChar()
+    c == space || c == tab || c == linefeed || c == carriageReturn || c == formFeed || c == nonBreakableSpace
 
 /**
  * Super basic function to strip html formatting from alt-texts.

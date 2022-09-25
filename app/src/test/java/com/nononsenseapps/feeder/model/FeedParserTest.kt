@@ -170,6 +170,59 @@ class FeedParserTest : DIAware {
     }
 
     @Test
+    fun parsesYahooMediaRss2() = runBlocking {
+        val feed = readResource("rss_myanimelist.xml") {
+            feedParser.parseFeedResponse(
+                URL("https://myanimelist.net/rss/news.xml"),
+                it,
+                null
+            )
+        }
+
+        val item = feed.items!!.first()
+
+        assertEquals(
+            "https://cdn.myanimelist.net/s/common/uploaded_files/1664092688-dd34666e64d7ae624e6e2c70087c181f.jpeg",
+            item.image
+        )
+    }
+
+    @Test
+    fun parsesYahooMediaRssPicksLargestThumbnail() = runBlocking {
+        val feed = readResource("rss_theguardian.xml") {
+            feedParser.parseFeedResponse(
+                URL("https://www.theguardian.com/world/rss"),
+                it,
+                null
+            )
+        }
+
+        val item = feed.items!!.first()
+
+        assertEquals(
+            "https://i.guim.co.uk/img/media/c4d7049b24ee34d1c4c630c751094cabc57c54f6/0_32_6000_3601/master/6000.jpg?width=460&quality=85&auto=format&fit=max&s=919d72fef6d4f3469aff69e94964126c",
+            item.image
+        )
+    }
+
+    @Test
+    fun encodingTestWithSmileys() = runBlocking {
+        val feed = readResource("rss_lawnchair.xml") {
+            feedParser.parseFeedResponse(
+                URL("https://nitter.weiler.rocks/lawnchairapp/rss"),
+                it,
+                null
+            )
+        }
+
+        val item = feed.items!!.first()
+
+        assertTrue {
+            "\uD83D\uDE0D\uD83E\uDD29" in item.content_html!!
+        }
+    }
+
+    @Test
     @Throws(Exception::class)
     fun getAlternateFeedLinksDoesNotReturnRelativeLinks() {
         readResource("fz.html") {
@@ -627,7 +680,7 @@ class FeedParserTest : DIAware {
         )
 
         assertEquals(
-            "https://assets.londonist.com/uploads/2017/06/i300x150/chip_2.jpg",
+            "http://assets.londonist.com/uploads/2017/06/chip_2.jpg",
             image
         )
     }
