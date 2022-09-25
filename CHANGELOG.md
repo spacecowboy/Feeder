@@ -1,3 +1,9 @@
+# 2.3.4
+Jonas Kalderstam (5):
+  * [7036d422] Fixed parsing of additional types of thumbnails
+  * [a22aa525] Further improved thumbnail parsing
+  * [943695c5] Fixed decoding where smileys would not get rendered correctly
+
 # 2.3.3
 Agnieszka C (1):
   * [6145fb2a] Updated Polish translation using Weblate
