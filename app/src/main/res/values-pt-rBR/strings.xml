@@ -189,4 +189,5 @@
     <string name="bookmarked">Salvo</string>
     <string name="new_indicator">Novo</string>
     <string name="explanation_permission_notifications">A permissão deve ser concedida antes que as notificações possam ser habilitadas.</string>
+    <string name="article_image">Imagem do artigo</string>
 </resources>
