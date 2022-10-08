@@ -160,4 +160,25 @@ class HtmlToComposableUnitTest {
         val maxSize = 1
         assertEquals("http://foo/header.png", result.getBestImageForMaxSize(maxSize, 1.0f))
     }
+
+    @Test
+    fun findImageBestPoliticoSrcSet() {
+        every { element.attr("srcset") } returns "https://www.politico.eu/cdn-cgi/image/width=1024,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/10/07/thumbnail_Kal-econ-cartoon-10-7-22synd.jpeg 1024w, https://www.politico.eu/cdn-cgi/image/width=300,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/10/07/thumbnail_Kal-econ-cartoon-10-7-22synd.jpeg 300w, https://www.politico.eu/cdn-cgi/image/width=1280,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/10/07/thumbnail_Kal-econ-cartoon-10-7-22synd.jpeg 1280w"
+        every { element.attr("abs:src") } returns "https://www.politico.eu/wp-content/uploads/2022/10/07/thumbnail_Kal-econ-cartoon-10-7-22synd-1024x683.jpeg"
+        every { element.attr("width") } returns "1024"
+        every { element.attr("height") } returns "683"
+
+        val result = getImageSource("https://www.politico.eu/feed/", element)
+
+        assertTrue(result.hasImage)
+
+        val maxSize = 1024
+        assertEquals(
+            "https://www.politico.eu/cdn-cgi/image/width=1024,quality=80,onerror=redirect,format=auto/wp-content/uploads/2022/10/07/thumbnail_Kal-econ-cartoon-10-7-22synd.jpeg",
+            result.getBestImageForMaxSize(
+                maxSize,
+                8.0f
+            )
+        )
+    }
 }

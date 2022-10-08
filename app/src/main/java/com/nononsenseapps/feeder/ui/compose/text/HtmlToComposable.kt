@@ -719,7 +719,7 @@ internal class ImageCandidates(
      * Might throw if hasImage returns false
      */
     fun getBestImageForMaxSize(maxWidth: Int, pixelDensity: Float): String {
-        val setCandidate = srcSet.splitToSequence(",")
+        val setCandidate = srcSet.splitToSequence(", ")
             .map { it.trim() }
             .map { it.split(SpaceRegex).take(2).map { x -> x.trim() } }
             .fold(100f to "") { acc, candidate ->
@@ -750,10 +750,10 @@ internal class ImageCandidates(
             }
             .second
 
-        if (setCandidate.isNotBlank()) {
-            return StringUtil.resolve(baseUrl, setCandidate)
-        }
-        return StringUtil.resolve(baseUrl, absSrc)
+        return StringUtil.resolve(
+            baseUrl,
+            setCandidate.takeIf { it.isNotBlank() } ?: absSrc
+        )
     }
 }
 
@@ -811,8 +811,10 @@ private const val space = ' '
 private const val tab = '\t'
 private const val linefeed = '\n'
 private const val carriageReturn = '\r'
+
 // 12 is form feed which as no escape in kotlin
 private const val formFeed = 12.toChar()
+
 // 160 is &nbsp; (non-breaking space). Not in the spec but expected.
 private const val nonBreakableSpace = 160.toChar()
 
