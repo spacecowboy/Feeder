@@ -178,4 +178,16 @@
     <string name="block_list">Černá listina</string>
     <string name="add_item">Přidat položku</string>
     <string name="no_barcode_scanner_installed">Nelze najít čtečku čárových kódů</string>
+    <string name="use_detect_language">Detekovat jazyk</string>
+    <string name="description_for_read_aloud">Automaticky detekuje jazyk článku</string>
+    <string name="explanation_permission_notifications">Před povolením oznámení je nutné udělit oprávnění.</string>
+    <string name="article_image">Obrázek článku</string>
+    <string name="bookmarked">V záložkách</string>
+    <string name="set_language">Nastavit jazyk</string>
+    <string name="only_available_on_android_n">Dostupné pouze v Androidu %1$s nebo vyšším</string>
+    <string name="skip_to_next">Přeskočit na další</string>
+    <string name="text_to_speech">Převod textu na řeč</string>
+    <string name="new_indicator">Nový</string>
+    <string name="pinned">Připnuto</string>
+    <string name="dynamic_theme_use">Dynamické barvy</string>
 </resources>
