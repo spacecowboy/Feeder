@@ -1,3 +1,16 @@
+# 2.3.6
+Belmar Begić (1):
+  * [9b6b5a66] Updated Bosnian translation using Weblate
+
+Jonas Kalderstam (1):
+  * [8e662118] Fixed parsing of srcset images in Politico's feed
+
+Miraficus (1):
+  * [37a170df] Translated using Weblate (Czech)
+
+Simona Iacob (1):
+  * [db9b825d] Updated Romanian translation using Weblate
+
 # 2.3.5
 Ady (1):
   * [4cdc88ba] Translated using Weblate (French)
