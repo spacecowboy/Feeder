@@ -3,7 +3,7 @@
     <string name="delete_feed">Διαγραφή ροής</string>
     <string name="sync">Συγχρονισμός</string>
     <string name="sync_option_every_15min">Κάθε 15 λεπτά</string>
-    <string name="all_feeds">Όλες η ροές</string>
+    <string name="all_feeds">Όλες οι ροές</string>
     <string name="title_activity_settings">Ρυθμίσεις</string>
     <string name="sync_option_every_12_hours">Κάθε 12 ώρες</string>
     <string name="sync_option_every_6_hours">Κάθε 6 ώρες</string>
@@ -176,4 +176,12 @@
     <string name="device_sync_description_1">Ο συγχρονισμός της συσκευής σάς επιτρέπει να συγχρονίζετε συνδρομές τροφοδοσίας και να διαβάζετε άρθρα μεταξύ των διαφόρων συσκευών σας.</string>
     <string name="device_sync_description_2">Απλά σαρώστε τον κώδικα από την αλυσίδα συγχρονισμού που δημιουργήσατε σε άλλη συσκευή ή ξεκινήστε μια νέα αλυσίδα συγχρονισμού.</string>
     <string name="scan_or_enter_code">Σαρώστε ή εισαγάγετε τον κωδικό συγχρονισμού</string>
+    <string name="only_available_on_android_n">Διαθέσιμο μόνο σε Android %1$s και πάνω</string>
+    <string name="description_for_read_aloud">Ανιχνεύει αυτόματα τη γλώσσα του άρθρου</string>
+    <string name="bookmarked">Με σελιδοδείκτη</string>
+    <string name="permission_read_desc">Επιτρέπει στην εφαρμογή να διαβάζει ροές και άρθρα</string>
+    <string name="dynamic_theme_use">Δυναμικά χρώματα</string>
+    <string name="use_detect_language">Ανίχνευση γλώσσας</string>
+    <string name="pinned">Καρφιτσωμένο</string>
+    <string name="new_indicator">Νέο</string>
 </resources>

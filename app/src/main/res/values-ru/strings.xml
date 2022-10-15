@@ -183,4 +183,11 @@
     <string name="dynamic_theme_use">Динамические цвета</string>
     <string name="description_for_read_aloud">Автоматически определяет язык статьи</string>
     <string name="explanation_permission_notifications">Разрешение должно быть предоставлено перед включением уведомлений.</string>
+    <string name="bookmarked">В закладках</string>
+    <string name="permission_read_label">Доступ только для чтения для Feeder</string>
+    <string name="skip_to_next">Перейти к следующей</string>
+    <string name="pinned">Закреплено</string>
+    <string name="new_indicator">Новое</string>
+    <string name="article_image">Изображение статьи</string>
+    <string name="set_language">Установить язык</string>
 </resources>
