@@ -208,7 +208,6 @@ fun FeedItemCompact(
                     Text(
                         text = item.snippet,
                         style = FeedListItemStyle(),
-                        fontWeight = unreadBold,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 4,
                         modifier = Modifier
