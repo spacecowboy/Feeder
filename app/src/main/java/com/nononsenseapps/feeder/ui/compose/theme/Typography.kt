@@ -52,6 +52,13 @@ fun LinkTextStyle(): TextStyle =
         textDecoration = TextDecoration.Underline
     )
 
+fun titleFontWeight(unread: Boolean) =
+    if (unread) {
+        FontWeight.Bold
+    } else {
+        FontWeight.Normal
+    }
+
 @Composable
 fun FeedListItemTitleStyle(): SpanStyle =
     FeedListItemTitleTextStyle().toSpanStyle()
