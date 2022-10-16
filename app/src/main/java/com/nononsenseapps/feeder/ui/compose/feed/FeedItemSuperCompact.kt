@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,10 +76,19 @@ fun FeedItemSuperCompact(
                 .requiredHeightIn(min = minimumTouchSize)
                 .padding(vertical = 4.dp)
         ) {
+
+            val unreadBold: FontWeight
+            if (item.unread) {
+                unreadBold = FontWeight.ExtraBold
+            } else {
+                unreadBold = FontWeight.Normal
+            }
+
             withBidiDeterminedLayoutDirection(paragraph = item.title) {
                 Text(
                     text = item.title,
                     style = FeedListItemTitleTextStyle(),
+                    fontWeight = unreadBold,
                     modifier = Modifier
                         .padding(start = 4.dp, end = 4.dp)
                         .fillMaxWidth()
@@ -104,6 +114,7 @@ fun FeedItemSuperCompact(
                             Text(
                                 text = text,
                                 style = FeedListItemDateStyle(),
+                                fontWeight = unreadBold,
                                 maxLines = 1,
                                 overflow = TextOverflow.Clip,
                                 modifier = Modifier
