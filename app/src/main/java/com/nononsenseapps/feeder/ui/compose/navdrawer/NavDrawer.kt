@@ -27,12 +27,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -74,40 +77,40 @@ private fun ListOfFeedsAndTagsPreview() {
                         tag = "News tag",
                         unreadCount = 3,
                         -1111,
-                        totalChildren = 2
+                        totalChildren = 2,
                     ),
                     DrawerFeed(
-                        id = 1,
-                        displayTitle = "Times",
-                        tag = "News tag",
-                        unreadCount = 1
+                        id = 1, displayTitle = "Times", tag = "News tag", unreadCount = 1
                     ),
                     DrawerFeed(
                         id = 2,
                         displayTitle = "Post",
+                        imageUrl = URL("https://cowboyprogrammer.org/apple-touch-icon.png"),
                         tag = "News tag",
                         unreadCount = 2
                     ),
                     DrawerTag(
-                        tag = "Funny tag",
-                        unreadCount = 6,
-                        -2222,
-                        totalChildren = 1
+                        tag = "Funny tag", unreadCount = 6, -2222, totalChildren = 1
                     ),
                     DrawerFeed(
-                        id = 3,
-                        displayTitle = "Hidden",
-                        tag = "Funny tag",
-                        unreadCount = 6
+                        id = 3, displayTitle = "Hidden", tag = "Funny tag", unreadCount = 6
                     ),
                     DrawerFeed(
-                        id = 4,
-                        displayTitle = "Top Dog",
-                        unreadCount = 99,
+                        id = 4, displayTitle = "Top Dog", unreadCount = 99, tag = ""
+                    ),
+                    DrawerFeed(
+                        id = 5,
+                        imageUrl = URL("https://cowboyprogrammer.org/apple-touch-icon.png"),
+                        displayTitle = "Cowboy Programmer",
+                        unreadCount = 7,
                         tag = ""
+                    ),
+                ),
+                ImmutableHolder(
+                    setOf(
+                        "News tag", "Funny tag"
                     )
                 ),
-                ImmutableHolder(emptySet()),
                 {},
             ) {}
         }
@@ -122,6 +125,12 @@ fun ListOfFeedsAndTags(
     onToggleTagExpansion: (String) -> Unit,
     onItemClick: (DrawerItemWithUnreadCount) -> Unit,
 ) {
+    val firstTopFeed by remember(feedsAndTags) {
+        derivedStateOf {
+            feedsAndTags.item.asSequence().filterIsInstance<DrawerFeed>()
+                .filter { it.tag.isEmpty() }.firstOrNull()
+        }
+    }
     LazyColumn(
         contentPadding = WindowInsets.systemBars.asPaddingValues(),
         modifier = Modifier
@@ -145,14 +154,21 @@ fun ListOfFeedsAndTags(
                 }
                 is DrawerFeed -> {
                     when {
-                        item.tag.isEmpty() -> TopLevelFeed(
-                            unreadCount = item.unreadCount,
-                            title = item.title(),
-                            imageUrl = item.imageUrl,
-                            onItemClick = {
-                                onItemClick(item)
+                        item.tag.isEmpty() -> {
+                            if (item.id == firstTopFeed?.id) {
+                                Divider(
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                             }
-                        )
+                            TopLevelFeed(
+                                unreadCount = item.unreadCount,
+                                title = item.title(),
+                                imageUrl = item.imageUrl,
+                                onItemClick = {
+                                    onItemClick(item)
+                                }
+                            )
+                        }
                         else -> {
                             ChildFeed(
                                 unreadCount = item.unreadCount,
@@ -189,8 +205,7 @@ private fun ExpandableTag(
     onItemClick: () -> Unit = {},
 ) {
     val angle: Float by animateFloatAsState(
-        targetValue = if (expanded) 0f else 180f,
-        animationSpec = tween()
+        targetValue = if (expanded) 0f else 180f, animationSpec = tween()
     )
 
     val toggleExpandLabel = stringResource(id = R.string.toggle_tag_expansion)
@@ -224,12 +239,9 @@ private fun ExpandableTag(
                 }
             }
     ) {
-        ExpandArrow(
-            degrees = angle,
-            onClick = {
-                onToggleExpansion(title)
-            }
-        )
+        ExpandArrow(degrees = angle, onClick = {
+            onToggleExpansion(title)
+        })
         Box(
             modifier = Modifier
                 .fillMaxHeight()
@@ -244,8 +256,11 @@ private fun ExpandableTag(
                     .align(Alignment.CenterStart)
             )
         }
-        val unreadLabel = LocalContext.current.resources
-            .getQuantityString(R.plurals.n_unread_articles, unreadCount, unreadCount)
+        val unreadLabel = LocalContext.current.resources.getQuantityString(
+            R.plurals.n_unread_articles,
+            unreadCount,
+            unreadCount
+        )
         Text(
             text = unreadCount.toString(),
             maxLines = 1,
@@ -263,10 +278,7 @@ private fun ExpandArrow(
     degrees: Float,
     onClick: () -> Unit,
 ) {
-    IconButton(
-        onClick = onClick,
-        modifier = Modifier.clearAndSetSemantics { }
-    ) {
+    IconButton(onClick = onClick, modifier = Modifier.clearAndSetSemantics { }) {
         Icon(
             Icons.Filled.ExpandLess,
             contentDescription = stringResource(id = R.string.toggle_tag_expansion),
@@ -300,7 +312,10 @@ private fun TopLevelFeed(
     title = title,
     imageUrl = imageUrl,
     unreadCount = unreadCount,
-    startPadding = 16.dp,
+    startPadding = when (imageUrl) {
+        null -> 48.dp
+        else -> 0.dp
+    },
     onItemClick = onItemClick,
 )
 
@@ -322,7 +337,10 @@ private fun ChildFeed(
             title = title,
             imageUrl = imageUrl,
             unreadCount = unreadCount,
-            startPadding = 48.dp,
+            startPadding = when (imageUrl) {
+                null -> 48.dp
+                else -> 0.dp
+            },
             onItemClick = onItemClick,
         )
     }
@@ -342,10 +360,7 @@ private fun Feed(
         modifier = Modifier
             .clickable(onClick = onItemClick)
             .padding(
-                start = startPadding,
-                end = 16.dp,
-                top = 2.dp,
-                bottom = 2.dp
+                start = startPadding, end = 16.dp, top = 2.dp, bottom = 2.dp
             )
             .fillMaxWidth()
             .height(48.dp)
@@ -360,16 +375,9 @@ private fun Feed(
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(imageUrl.toString())
-                        .listener(
-                            onError = { a, b ->
-                                Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
-                            }
-                        )
-                        .scale(Scale.FIT)
-                        .size(64)
-                        .precision(Precision.INEXACT)
-                        .build(),
+                        .data(imageUrl.toString()).listener(onError = { a, b ->
+                            Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
+                        }).scale(Scale.FIT).size(64).precision(Precision.INEXACT).build(),
                     contentDescription = stringResource(id = R.string.feed_icon),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(24.dp)
@@ -389,11 +397,13 @@ private fun Feed(
                     .align(Alignment.CenterStart)
             )
         }
-        val unreadLabel = LocalContext.current.resources
-            .getQuantityString(R.plurals.n_unread_articles, unreadCount, unreadCount)
+        val unreadLabel = LocalContext.current.resources.getQuantityString(
+            R.plurals.n_unread_articles,
+            unreadCount,
+            unreadCount
+        )
         Text(
-            text = unreadCount.toString(),
-            maxLines = 1,
+            text = unreadCount.toString(), maxLines = 1,
             modifier = Modifier.semantics {
                 contentDescription = unreadLabel
             }
