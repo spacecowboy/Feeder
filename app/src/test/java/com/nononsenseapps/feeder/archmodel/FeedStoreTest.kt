@@ -142,11 +142,11 @@ class FeedStoreTest : DIAware {
             listOf(
                 DrawerTop(unreadCount = 19, syncingChildren = 2, totalChildren = 4),
                 DrawerTag("alpha", 12, -1002, syncingChildren = 1, totalChildren = 2),
-                DrawerFeed(3, "alpha", "alice", 5, currentlySyncing = true),
-                DrawerFeed(4, "alpha", "argh", 7, currentlySyncing = false),
+                DrawerFeed(3, "alpha", "alice", unreadCount = 5, currentlySyncing = true),
+                DrawerFeed(4, "alpha", "argh", unreadCount = 7, currentlySyncing = false),
                 DrawerTag("zork", 4, -1001, syncingChildren = 0, totalChildren = 1),
-                DrawerFeed(2, "zork", "bob", 4, currentlySyncing = false),
-                DrawerFeed(1, "", "zob", 3, currentlySyncing = true),
+                DrawerFeed(2, "zork", "bob", unreadCount = 4, currentlySyncing = false),
+                DrawerFeed(1, "", "zob", unreadCount = 3, currentlySyncing = true),
             ),
             drawerItems
         )

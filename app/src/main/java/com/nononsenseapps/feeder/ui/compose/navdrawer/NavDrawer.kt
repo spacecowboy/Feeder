@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -47,10 +49,15 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Precision
+import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
+import java.net.URL
 
 const val COLLAPSE_ANIMATION_DURATION = 300
 
@@ -150,6 +157,7 @@ fun ListOfFeedsAndTags(
                             unreadCount = item.unreadCount,
                             currentlySyncing = item.currentlySyncing,
                             title = item.title(),
+                            imageUrl = item.imageUrl,
                             onItemClick = {
                                 onItemClick(item)
                             }
@@ -159,6 +167,7 @@ fun ListOfFeedsAndTags(
                                 unreadCount = item.unreadCount,
                                 currentlySyncing = item.currentlySyncing,
                                 title = item.title(),
+                                imageUrl = item.imageUrl,
                                 visible = item.tag in expandedTags.item,
                                 onItemClick = {
                                     onItemClick(item)
@@ -301,6 +310,7 @@ private fun AllFeeds(
     onItemClick: () -> Unit = {},
 ) = Feed(
     title = title,
+    imageUrl = null,
     unreadCount = unreadCount,
     startPadding = 16.dp,
     onItemClick = onItemClick,
@@ -327,8 +337,10 @@ private fun TopLevelFeed(
     unreadCount: Int = 99,
     currentlySyncing: Boolean = false,
     onItemClick: () -> Unit = {},
+    imageUrl: URL? = null,
 ) = Feed(
     title = title,
+    imageUrl = imageUrl,
     unreadCount = unreadCount,
     startPadding = 16.dp,
     onItemClick = onItemClick,
@@ -350,6 +362,7 @@ private fun TopLevelFeed(
 @Composable
 private fun ChildFeed(
     title: String = "Foo",
+    imageUrl: URL? = null,
     unreadCount: Int = 99,
     currentlySyncing: Boolean = false,
     visible: Boolean = true,
@@ -362,6 +375,7 @@ private fun ChildFeed(
     ) {
         Feed(
             title = title,
+            imageUrl = imageUrl,
             unreadCount = unreadCount,
             startPadding = 48.dp,
             onItemClick = onItemClick,
@@ -384,6 +398,7 @@ private fun ChildFeed(
 @Composable
 private fun Feed(
     title: String,
+    imageUrl: URL?,
     unreadCount: Int,
     startPadding: Dp,
     syncIndicator: @Composable BoxScope.() -> Unit,
@@ -403,6 +418,24 @@ private fun Feed(
             .fillMaxWidth()
             .height(48.dp)
     ) {
+        if (imageUrl != null) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl.toString())
+                    .listener(
+                        onError = { a, b ->
+                            Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
+                        }
+                    )
+                    .scale(Scale.FIT)
+                    .size(64)
+                    .precision(Precision.INEXACT)
+                    .build(),
+                contentDescription = stringResource(id = R.string.feed_icon),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.size(24.dp)
+            )
+        }
         Box(
             modifier = Modifier
                 .fillMaxHeight()

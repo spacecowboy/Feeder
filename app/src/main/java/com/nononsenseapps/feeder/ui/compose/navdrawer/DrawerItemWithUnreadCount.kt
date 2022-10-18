@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.res.stringResource
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import java.net.URL
 
 @Immutable
 sealed class DrawerItemWithUnreadCount(
@@ -70,6 +71,7 @@ data class DrawerFeed(
     val id: Long,
     val tag: String,
     val displayTitle: String,
+    val imageUrl: URL? = null,
     override val unreadCount: Int,
     override val currentlySyncing: Boolean,
 ) : DrawerItemWithUnreadCount(title = { displayTitle }, unreadCount = unreadCount) {
