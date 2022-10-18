@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -350,22 +351,30 @@ private fun Feed(
             .height(48.dp)
     ) {
         if (imageUrl != null) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl.toString())
-                    .listener(
-                        onError = { a, b ->
-                            Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
-                        }
-                    )
-                    .scale(Scale.FIT)
-                    .size(64)
-                    .precision(Precision.INEXACT)
-                    .build(),
-                contentDescription = stringResource(id = R.string.feed_icon),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(24.dp)
-            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .height(48.dp)
+                    // Taking 4dp spacing into account
+                    .width(44.dp),
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrl.toString())
+                        .listener(
+                            onError = { a, b ->
+                                Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
+                            }
+                        )
+                        .scale(Scale.FIT)
+                        .size(64)
+                        .precision(Precision.INEXACT)
+                        .build(),
+                    contentDescription = stringResource(id = R.string.feed_icon),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
         Box(
             modifier = Modifier
