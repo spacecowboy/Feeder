@@ -77,6 +77,7 @@ class FeedStore(override val di: DI) : DIAware {
                 tag = feedDbo.tag,
                 id = feedDbo.id,
                 displayTitle = feedDbo.displayTitle,
+                imageUrl = feedDbo.imageUrl,
                 currentlySyncing = feedDbo.currentlySyncing,
             )
 
