@@ -190,4 +190,5 @@
     <string name="bookmarked">Bogmærket</string>
     <string name="new_indicator">Ny</string>
     <string name="article_image">Artikelbillede</string>
+    <string name="feed_icon">Feed-ikon</string>
 </resources>
