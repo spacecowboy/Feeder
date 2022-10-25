@@ -190,4 +190,5 @@
     <string name="bookmarked">Dodany do zakładek</string>
     <string name="new_indicator">Nowy</string>
     <string name="article_image">Obrazek artykułu</string>
+    <string name="feed_icon">Ikona kanału</string>
 </resources>
