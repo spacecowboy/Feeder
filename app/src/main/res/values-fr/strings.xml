@@ -190,4 +190,5 @@
     <string name="bookmarked">Ajouté aux marque-pages</string>
     <string name="new_indicator">Nouveau</string>
     <string name="article_image">Image de l\'article</string>
+    <string name="feed_icon">Icône de flux</string>
 </resources>
