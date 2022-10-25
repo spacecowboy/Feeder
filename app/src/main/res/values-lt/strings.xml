@@ -189,4 +189,6 @@
     <string name="new_indicator">Nauja</string>
     <string name="explanation_permission_notifications">Prieš įjungiant pranešimus turi būti suteiktas leidimas.</string>
     <string name="only_available_on_android_n">Pasiekiama tik \"Android\" %1$s ir naujesnėse versijose</string>
+    <string name="article_image">Straipsnio paveikslėlis</string>
+    <string name="feed_icon">Sklaidos kanalo piktograma</string>
 </resources>
