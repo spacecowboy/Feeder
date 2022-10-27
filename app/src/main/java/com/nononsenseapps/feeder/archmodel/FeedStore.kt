@@ -67,7 +67,7 @@ class FeedStore(override val di: DI) : DIAware {
     private fun mapFeedsToSortedDrawerItems(
         feeds: List<FeedUnreadCount>,
     ): List<DrawerItemWithUnreadCount> {
-        var topTag = DrawerTop(unreadCount = 0, syncingChildren = 0, totalChildren = 0)
+        var topTag = DrawerTop(unreadCount = 0, totalChildren = 0)
         val tags: MutableMap<String, DrawerTag> = mutableMapOf()
         val data: MutableList<DrawerItemWithUnreadCount> = mutableListOf()
 
@@ -78,18 +78,12 @@ class FeedStore(override val di: DI) : DIAware {
                 id = feedDbo.id,
                 displayTitle = feedDbo.displayTitle,
                 imageUrl = feedDbo.imageUrl,
-                currentlySyncing = feedDbo.currentlySyncing,
             )
 
             data.add(feed)
             topTag = topTag.copy(
                 unreadCount = topTag.unreadCount + feed.unreadCount,
                 totalChildren = topTag.totalChildren + 1,
-                syncingChildren = if (feedDbo.currentlySyncing) {
-                    topTag.syncingChildren + 1
-                } else {
-                    topTag.syncingChildren
-                }
             )
 
             if (feed.tag.isNotEmpty()) {
@@ -97,17 +91,11 @@ class FeedStore(override val di: DI) : DIAware {
                     tag = feed.tag,
                     unreadCount = 0,
                     uiId = getTagUiId(feed.tag),
-                    syncingChildren = 0,
                     totalChildren = 0,
                 )
                 tags[feed.tag] = tag.copy(
                     unreadCount = tag.unreadCount + feed.unreadCount,
                     totalChildren = tag.totalChildren + 1,
-                    syncingChildren = if (feedDbo.currentlySyncing) {
-                        tag.syncingChildren + 1
-                    } else {
-                        tag.syncingChildren
-                    },
                 )
             }
         }

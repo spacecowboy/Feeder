@@ -13,7 +13,6 @@ sealed class DrawerItemWithUnreadCount(
     open val unreadCount: Int,
 ) : Comparable<DrawerItemWithUnreadCount> {
     abstract val uiId: Long
-    abstract val currentlySyncing: Boolean
 
     override fun compareTo(other: DrawerItemWithUnreadCount): Int = when (this) {
         is DrawerFeed -> {
@@ -54,16 +53,9 @@ sealed class DrawerItemWithUnreadCount(
 data class DrawerTop(
     override val title: @Composable () -> String = { stringResource(id = R.string.all_feeds) },
     override val unreadCount: Int,
-    val syncingChildren: Int,
     val totalChildren: Int,
 ) : DrawerItemWithUnreadCount(title = title, unreadCount = unreadCount) {
     override val uiId: Long = ID_ALL_FEEDS
-    override val currentlySyncing = syncingChildren > 0
-    val syncProgress: Float = when {
-        syncingChildren == 0 -> 1.0f
-        totalChildren == 0 -> 1.0f
-        else -> 1.0f - syncingChildren.toFloat() / totalChildren.toFloat()
-    }
 }
 
 @Immutable
@@ -73,7 +65,6 @@ data class DrawerFeed(
     val displayTitle: String,
     val imageUrl: URL? = null,
     override val unreadCount: Int,
-    override val currentlySyncing: Boolean,
 ) : DrawerItemWithUnreadCount(title = { displayTitle }, unreadCount = unreadCount) {
     override val uiId: Long = id
 }
@@ -83,13 +74,5 @@ data class DrawerTag(
     val tag: String,
     override val unreadCount: Int,
     override val uiId: Long,
-    val syncingChildren: Int,
     val totalChildren: Int,
-) : DrawerItemWithUnreadCount(title = { tag }, unreadCount = unreadCount) {
-    override val currentlySyncing = syncingChildren > 0
-    val syncProgress: Float = when {
-        syncingChildren == 0 -> 1.0f
-        totalChildren == 0 -> 1.0f
-        else -> 1.0f - syncingChildren.toFloat() / totalChildren.toFloat()
-    }
-}
+) : DrawerItemWithUnreadCount(title = { tag }, unreadCount = unreadCount)
