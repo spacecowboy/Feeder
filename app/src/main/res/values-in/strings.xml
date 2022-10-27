@@ -190,4 +190,5 @@
     <string name="skip_to_next">Lewati ke item berikutnya</string>
     <string name="pinned">Disematkan</string>
     <string name="bookmarked">Ditandai</string>
+    <string name="feed_icon">Ikon feed</string>
 </resources>

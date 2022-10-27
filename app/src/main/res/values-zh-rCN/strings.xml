@@ -190,4 +190,5 @@
     <string name="set_language">设置语言</string>
     <string name="new_indicator">新</string>
     <string name="article_image">文章图片</string>
+    <string name="feed_icon">Feed 图标</string>
 </resources>

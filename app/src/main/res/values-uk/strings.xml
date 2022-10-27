@@ -190,4 +190,5 @@
     <string name="bookmarked">Додано в закладки</string>
     <string name="new_indicator">Нове</string>
     <string name="article_image">Зображення статті</string>
+    <string name="feed_icon">Значок стрічки</string>
 </resources>

@@ -92,7 +92,7 @@
     <string name="include_mobile_hotspots">Inkluder trådløsdelingspunkter</string>
     <string name="updated_feeds">Oppdaterte informasjonskanaler</string>
     <string name="toggle_tag_expansion">Veksle utfolding av etiketter</string>
-    <string name="discovered_feeds_list">Oppdaget informasjonskanalsliste</string>
+    <string name="discovered_feeds_list">Oppdaget informasjonkanalsliste</string>
     <string name="reader_settings">Leser</string>
     <string name="open_in_reader">Leser</string>
     <string name="check_for_updates">Se etter oppdateringer</string>
@@ -189,4 +189,6 @@
     <string name="pinned">Festet</string>
     <string name="bookmarked">Bokmerket</string>
     <string name="new_indicator">Ny</string>
+    <string name="feed_icon">Informasjonkanalsikon</string>
+    <string name="article_image">Artikkelbilde</string>
 </resources>
