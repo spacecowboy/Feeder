@@ -1,3 +1,63 @@
+# 2.3.7
+Ady (1):
+  * [30fab5dd] Updated French translation using Weblate
+
+Agnieszka C (1):
+  * [65a039ef] Updated Polish translation using Weblate
+
+Allan Nordhøy (1):
+  * [ee6fe99d] Updated Norwegian Bokmål translation using Weblate
+
+Andrij Mizyk (1):
+  * [d457772f] Updated Ukrainian translation using Weblate
+
+Dhruv Sangvikar (1):
+  * [81e46e5b] Add support for showing favicons in nav drawer
+
+ERYpTION (1):
+  * [f057e3fb] Updated Danish translation using Weblate
+
+El Pirujo (1):
+  * [11bc8b68] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [d8882a29] Updated Chinese (Simplified) translation using Weblate
+
+Gediminas Murauskas (1):
+  * [9328f4c8] Updated Lithuanian translation using Weblate
+
+Jacob Highfield (2):
+  * [f88ba589] Bold text on unread items
+  * [dd6dbcdb] Don't bold the snippet
+
+Jiri Grönroos (1):
+  * [267a1d83] Translated using Weblate (Finnish)
+
+Jonas Kalderstam (4):
+  * [a0b960c1] Reduced title font weight to Bold from ExtraBold
+  * [2020a70b] Removed unused parameter
+  * [63b8cb53] Fixed text alignment in navdrawer after feed icons added
+  * [3a93eb6b] Added divider in navdrawer so text can be aligned even with
+         icons
+
+Nikita Epifanov (1):
+  * [2863af80] Updated Russian translation using Weblate
+
+Oğuz Ersen (1):
+  * [e8df291a] Updated Turkish translation using Weblate
+
+VfBFan (1):
+  * [c29b1c08] Updated German translation using Weblate
+
+Zacharias Efraimidis (1):
+  * [22fc67c0] Updated Greek translation using Weblate
+
+bruh (1):
+  * [671d7af7] Translated using Weblate (Vietnamese)
+
+zmni (1):
+  * [1dc28299] Updated Indonesian translation using Weblate
+
 # 2.3.6
 Belmar Begić (1):
   * [9b6b5a66] Updated Bosnian translation using Weblate
