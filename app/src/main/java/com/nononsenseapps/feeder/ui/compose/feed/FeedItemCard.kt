@@ -59,6 +59,7 @@ fun FeedItemCard(
     onToggleBookmarked: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
+    newIndicator: Boolean,
 ) {
     ElevatedCard(
         modifier = modifier
@@ -103,7 +104,7 @@ fun FeedItemCard(
                                 .aspectRatio(16.0f / 9.0f)
                         )
                         FeedItemIndicatorRow(
-                            unread = item.unread,
+                            unread = item.unread && newIndicator,
                             bookmarked = item.bookmarked,
                             pinned = item.pinned,
                             modifier = Modifier.padding(
@@ -248,7 +249,7 @@ fun FeedItemCard(
                 }
                 if (!showThumbnail || item.imageUrl == null) {
                     FeedItemIndicatorColumn(
-                        unread = item.unread,
+                        unread = item.unread && newIndicator,
                         bookmarked = item.bookmarked,
                         pinned = item.pinned,
                         modifier = Modifier.padding(
@@ -288,7 +289,8 @@ private fun preview() {
             onTogglePinned = {},
             onToggleBookmarked = {},
             dropDownMenuExpanded = false,
-            onDismissDropdown = {}
+            onDismissDropdown = {},
+            newIndicator = true,
         )
     }
 }
@@ -319,6 +321,7 @@ private fun previewWithImage() {
             onToggleBookmarked = {},
             dropDownMenuExpanded = false,
             onDismissDropdown = {},
+            newIndicator = true,
         )
     }
 }

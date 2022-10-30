@@ -59,6 +59,7 @@ fun FeedItemSuperCompact(
     onToggleBookmarked: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
+    newIndicator: Boolean,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -219,7 +220,7 @@ fun FeedItemSuperCompact(
                     }
                 }
                 FeedItemIndicatorColumn(
-                    unread = item.unread,
+                    unread = item.unread && newIndicator,
                     bookmarked = item.bookmarked,
                     pinned = item.pinned,
                     spacing = 4.dp,
@@ -264,7 +265,8 @@ private fun previewRead() {
                 onTogglePinned = {},
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
-                onDismissDropdown = {}
+                onDismissDropdown = {},
+                newIndicator = true,
             )
         }
     }
@@ -296,7 +298,8 @@ private fun previewUnread() {
                 onTogglePinned = {},
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
-                onDismissDropdown = {}
+                onDismissDropdown = {},
+                newIndicator = true,
             )
         }
     }
@@ -329,6 +332,7 @@ private fun previewWithImage() {
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
+                newIndicator = true,
             )
         }
     }
