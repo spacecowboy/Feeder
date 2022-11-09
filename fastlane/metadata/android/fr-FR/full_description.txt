@@ -1,5 +1,5 @@
-<p>En avez-vous assez des lecteurs non libres boursoufflés qui volent vos informations personnelles ?<br/>
-Êtes-vous fatigué des réglages de synchronisation alambiqués nécessitant des heures de configuration de serveur ?<br/>
+<p>En avez-vous assez des lecteurs non libres boursouflés qui volent vos informations personnelles ?<br/>
+Êtes-vous fatigué(e) des réglages de synchronisation alambiqués nécessitant des heures de configuration de serveur ?<br/>
 En avez-vous marre d’avoir à créer des comptes partout ?<br/> </p>
 
 <p>Essayez plutôt Feeder !</p>

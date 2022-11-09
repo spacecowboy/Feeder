@@ -190,4 +190,5 @@
     <string name="new_indicator">Nuovo</string>
     <string name="dynamic_theme_use">Colori dinamici</string>
     <string name="article_image">Immagine dell\'articolo</string>
+    <string name="feed_icon">Icona del flusso</string>
 </resources>

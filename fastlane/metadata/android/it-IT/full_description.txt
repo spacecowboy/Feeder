@@ -1,5 +1,5 @@
-<p>Sei stufo di lettori complicati e non liberi che rubano le tue informazioni personali?<br/>
-Sei stanco di complessi sistemi di sincronizzazione che richiedono ore di configurazione del server?<br/>
+<p>Sei stufo/a di lettori complicati e non liberi che rubano le tue informazioni personali?<br/>
+Sei stanco/a di complessi sistemi di sincronizzazione che richiedono ore di configurazione del server?<br/>
 Non tolleri più il dover creare account ovunque? <br/> </p>
 
 <p>Prova Feeder!</p>
