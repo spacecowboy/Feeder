@@ -190,4 +190,5 @@
     <string name="explanation_permission_notifications">Trebuie să se acorde permisiunea înainte de a activa notificările.</string>
     <string name="only_available_on_android_n">Disponibil numai pe Android %1$s și mai sus</string>
     <string name="article_image">Imaginea articolului</string>
+    <string name="feed_icon">Pictograma Feed</string>
 </resources>
