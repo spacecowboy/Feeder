@@ -1,10 +1,10 @@
-<p>Sei stufo di lettori complicati e non liberi che rubano le tue informazioni personali?<br/>
-Sei stanco di complessi sistemi di sincronizzazione che richiedono ore di configurazione del server?<br/>
+<p>Sei stufo/a di lettori complicati e non liberi che rubano le tue informazioni personali?<br/>
+Sei stanco/a di complessi sistemi di sincronizzazione che richiedono ore di configurazione del server?<br/>
 Non tolleri più il dover creare account ovunque? <br/> </p>
 
 <p>Prova Feeder!</p>
 
-<p>Feeder è un lettore di flussi completamente libero. Supporta tutti i formati di flussi comuni, incluso JSONFeed. Non ti traccia. Non richiede alcuna configurazione. Non è nemmeno richiesta la creazione un account! È sufficiente impostare i flussi o importarli dal vecchio lettore tramite OPML, quindi procedere con la sincronizzazione e la lettura. </p>
+<p>Feeder è un lettore di feed completamente libero. Supporta tutti i formati di feed comuni, incluso JSONFeed. Non ti traccia. Non richiede alcuna configurazione. Non è nemmeno richiesta la creazione un account! È sufficiente impostare i feed o importarli dal vecchio lettore tramite OPML, quindi procedere con la sincronizzazione e la lettura. </p>
 
 <p> <b>Caratteristiche</b> </p>
 
