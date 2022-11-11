@@ -73,9 +73,6 @@ fun FeedItemCompact(
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
-            .padding(
-                start = LocalDimens.current.margin,
-            )
             .height(IntrinsicSize.Min)
     ) {
         Column(
@@ -346,30 +343,34 @@ private fun previewUnread() {
 private fun previewWithImage() {
     FeederTheme {
         Surface {
-            FeedItemCompact(
-                item = FeedListItem(
-                    title = "title",
-                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-                    feedTitle = "Super Duper Feed One two three hup di too dasf",
-                    pubDate = "Jun 9, 2021",
-                    unread = true,
-                    imageUrl = "blabla",
-                    link = null,
-                    id = ID_UNSET,
-                    pinned = true,
-                    bookmarked = true,
-                    feedImageUrl = null,
-                ),
-                showThumbnail = true,
-                onMarkAboveAsRead = {},
-                onMarkBelowAsRead = {},
-                onShareItem = {},
-                onTogglePinned = {},
-                onToggleBookmarked = {},
-                dropDownMenuExpanded = false,
-                onDismissDropdown = {},
-                newIndicator = true,
-            )
+            Box(
+                modifier = Modifier.width(400.dp)
+            ) {
+                FeedItemCompact(
+                    item = FeedListItem(
+                        title = "title",
+                        snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                        feedTitle = "Super Duper Feed One two three hup di too dasf",
+                        pubDate = "Jun 9, 2021",
+                        unread = true,
+                        imageUrl = "blabla",
+                        link = null,
+                        id = ID_UNSET,
+                        pinned = true,
+                        bookmarked = true,
+                        feedImageUrl = null,
+                    ),
+                    showThumbnail = true,
+                    onMarkAboveAsRead = {},
+                    onMarkBelowAsRead = {},
+                    onShareItem = {},
+                    onTogglePinned = {},
+                    onToggleBookmarked = {},
+                    dropDownMenuExpanded = false,
+                    onDismissDropdown = {},
+                    newIndicator = true,
+                )
+            }
         }
     }
 }

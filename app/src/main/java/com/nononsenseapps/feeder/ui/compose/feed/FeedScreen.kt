@@ -9,6 +9,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
@@ -27,6 +29,9 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -64,7 +69,10 @@ import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
 import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.addMargin
+import com.nononsenseapps.feeder.ui.compose.utils.addMarginLayout
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
@@ -107,21 +115,30 @@ fun FeedListContent(
             )
         }
 
+        val arrangement = when (viewState.feedItemStyle) {
+            FeedItemStyle.CARD -> Arrangement.spacedBy(LocalDimens.current.margin)
+            FeedItemStyle.COMPACT -> Arrangement.spacedBy(0.dp)
+            FeedItemStyle.SUPER_COMPACT -> Arrangement.spacedBy(0.dp)
+        }
+
         AnimatedVisibility(
             enter = fadeIn(),
             exit = fadeOut(),
             visible = viewState.haveVisibleFeedItems,
         ) {
-//            LazyVerticalStaggeredGrid(
-//                columns = StaggeredGridCells.Adaptive(350.dp),
-//                modifier = Modifier.fillMaxSize(),
-//            )
             LazyColumn(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = arrangement,
                 contentPadding = if (viewState.isBottomBarVisible) PaddingValues(0.dp) else WindowInsets.navigationBars.only(
                     WindowInsetsSides.Bottom
-                ).asPaddingValues(),
+                ).run {
+                    when (viewState.feedItemStyle) {
+                        FeedItemStyle.CARD -> addMargin(horizontal = LocalDimens.current.margin)
+                        FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> addMarginLayout(start = LocalDimens.current.margin)
+                    }
+                }
+                    .asPaddingValues(),
                 modifier = Modifier.fillMaxSize()
             ) {
                 /*
@@ -210,6 +227,128 @@ fun FeedListContent(
                                 .height((56 + 16).dp)
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun FeedGridContent(
+    viewState: FeedScreenViewState,
+    onOpenNavDrawer: () -> Unit,
+    onAddFeed: () -> Unit,
+    markBeforeAsRead: (Int) -> Unit,
+    markAfterAsRead: (Int) -> Unit,
+    onItemClick: (Long) -> Unit,
+    onSetPinned: (Long, Boolean) -> Unit,
+    onSetBookmarked: (Long, Boolean) -> Unit,
+    gridState: LazyStaggeredGridState,
+    pagedFeedItems: LazyPagingItems<FeedListItem>,
+    modifier: Modifier,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    Box(modifier = modifier) {
+        AnimatedVisibility(
+            enter = fadeIn(),
+            exit = fadeOut(),
+            visible = !viewState.haveVisibleFeedItems,
+        ) {
+            // Keeping the Box behind so the scrollability doesn't override clickable
+            // Separate box because scrollable will ignore max size.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            )
+            NothingToRead(
+                modifier = modifier,
+                onOpenOtherFeed = onOpenNavDrawer,
+                onAddFeed = onAddFeed
+            )
+        }
+
+        val arrangement = when (viewState.feedItemStyle) {
+            FeedItemStyle.CARD -> Arrangement.spacedBy(LocalDimens.current.gutter)
+            FeedItemStyle.COMPACT -> Arrangement.spacedBy(LocalDimens.current.gutter)
+            FeedItemStyle.SUPER_COMPACT -> Arrangement.spacedBy(LocalDimens.current.gutter)
+        }
+
+        val minItemWidth = when (viewState.feedItemStyle) {
+            // 300 - 16 - 16/2 : so that 600dp screens should get two columns
+            FeedItemStyle.CARD -> 276.dp
+            FeedItemStyle.COMPACT -> 400.dp
+            FeedItemStyle.SUPER_COMPACT -> 276.dp
+        }
+
+        AnimatedVisibility(
+            enter = fadeIn(),
+            exit = fadeOut(),
+            visible = viewState.haveVisibleFeedItems,
+        ) {
+            LazyVerticalStaggeredGrid(
+                state = gridState,
+                columns = StaggeredGridCells.Adaptive(minItemWidth),
+                contentPadding = if (viewState.isBottomBarVisible) PaddingValues(0.dp) else WindowInsets.navigationBars.only(
+                    WindowInsetsSides.Bottom
+                ).addMargin(LocalDimens.current.margin)
+                    .asPaddingValues(),
+                verticalArrangement = arrangement,
+                horizontalArrangement = arrangement,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                items(
+                    pagedFeedItems.itemCount,
+                    key = { itemIndex ->
+                        pagedFeedItems.itemSnapshotList.items[itemIndex].id
+                    }
+                ) { itemIndex ->
+                    val previewItem = pagedFeedItems[itemIndex]
+                        ?: return@items
+
+                    FixedFeedItemPreview(
+                        item = previewItem,
+                        showThumbnail = viewState.showThumbnails,
+                        feedItemStyle = viewState.feedItemStyle,
+                        onMarkAboveAsRead = {
+                            if (itemIndex > 0) {
+                                markBeforeAsRead(itemIndex)
+                                if (viewState.onlyUnread) {
+                                    coroutineScope.launch {
+                                        gridState.scrollToItem(0)
+                                    }
+                                }
+                            }
+                        },
+                        onMarkBelowAsRead = {
+                            markAfterAsRead(itemIndex)
+                        },
+                        onShareItem = {
+                            val intent = Intent.createChooser(
+                                Intent(Intent.ACTION_SEND).apply {
+                                    if (previewItem.link != null) {
+                                        putExtra(Intent.EXTRA_TEXT, previewItem.link)
+                                    }
+                                    putExtra(Intent.EXTRA_TITLE, previewItem.title)
+                                    type = "text/plain"
+                                },
+                                null
+                            )
+                            context.startActivity(intent)
+                        },
+                        onItemClick = {
+                            onItemClick(previewItem.id)
+                        },
+                        onTogglePinned = {
+                            onSetPinned(previewItem.id, !previewItem.pinned)
+                        },
+                        onToggleBookmarked = {
+                            onSetBookmarked(previewItem.id, !previewItem.bookmarked)
+                        },
+                    )
                 }
             }
         }

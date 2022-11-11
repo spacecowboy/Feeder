@@ -65,9 +65,6 @@ fun FeedItemSuperCompact(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .padding(
-                start = LocalDimens.current.margin,
-            )
             .height(IntrinsicSize.Min)
     ) {
         Column(

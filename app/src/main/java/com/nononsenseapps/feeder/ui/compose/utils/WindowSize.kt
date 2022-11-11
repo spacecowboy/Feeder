@@ -71,6 +71,6 @@ enum class ScreenType {
 
 fun getScreenType(windowSize: WindowSize) =
     when (windowSize) {
-        WindowSize.Compact, WindowSize.Medium -> ScreenType.SINGLE
-        WindowSize.Expanded -> ScreenType.DUAL
+        WindowSize.Compact -> ScreenType.SINGLE
+        WindowSize.Medium, WindowSize.Expanded -> ScreenType.DUAL
     }

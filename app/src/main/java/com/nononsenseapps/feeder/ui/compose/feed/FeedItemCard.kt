@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.DropdownMenu
@@ -42,7 +43,6 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.PlaceholderImage
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
@@ -63,12 +63,6 @@ fun FeedItemCard(
 ) {
     ElevatedCard(
         modifier = modifier
-            .padding(
-                top = 8.dp,
-                bottom = 8.dp,
-                start = LocalDimens.current.margin,
-                end = LocalDimens.current.margin
-            )
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -299,29 +293,33 @@ private fun preview() {
 @PreviewThemes
 private fun previewWithImage() {
     FeederTheme {
-        FeedItemCard(
-            item = FeedListItem(
-                title = "title",
-                snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
-                feedTitle = "Super Duper Feed One two three hup di too dasf",
-                pubDate = "Jun 9, 2021",
-                unread = true,
-                imageUrl = "blabla",
-                link = null,
-                id = ID_UNSET,
-                pinned = true,
-                bookmarked = true,
-                feedImageUrl = null,
-            ),
-            showThumbnail = true,
-            onMarkAboveAsRead = {},
-            onMarkBelowAsRead = {},
-            onShareItem = {},
-            onTogglePinned = {},
-            onToggleBookmarked = {},
-            dropDownMenuExpanded = false,
-            onDismissDropdown = {},
-            newIndicator = true,
-        )
+        Box(
+            modifier = Modifier.width((300 - 2 * 16).dp)
+        ) {
+            FeedItemCard(
+                item = FeedListItem(
+                    title = "title",
+                    snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
+                    feedTitle = "Super Duper Feed One two three hup di too dasf",
+                    pubDate = "Jun 9, 2021",
+                    unread = true,
+                    imageUrl = "blabla",
+                    link = null,
+                    id = ID_UNSET,
+                    pinned = true,
+                    bookmarked = true,
+                    feedImageUrl = null,
+                ),
+                showThumbnail = true,
+                onMarkAboveAsRead = {},
+                onMarkBelowAsRead = {},
+                onShareItem = {},
+                onTogglePinned = {},
+                onToggleBookmarked = {},
+                dropDownMenuExpanded = false,
+                onDismissDropdown = {},
+                newIndicator = true,
+            )
+        }
     }
 }
