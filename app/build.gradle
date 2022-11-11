@@ -14,7 +14,6 @@ android {
     compileSdkVersion 33
     minSdkVersion 23
     targetSdkVersion 33
-    multiDexEnabled true
 
     vectorDrawables.useSupportLibrary = true
 
@@ -189,9 +188,7 @@ dependencies {
   // BOMS
   implementation(platform("com.squareup.okhttp3:okhttp-bom:$okhttp_version"))
   implementation("io.coil-kt:coil-bom:$coilVersion")
-
-  // Needed pre SDK21
-  implementation "com.android.support:multidex:$multi_dex_version"
+  implementation(platform("androidx.compose:compose-bom:$composeBomVersion"))
 
   implementation "androidx.room:room-ktx:$roomVersion"
   implementation "androidx.room:room-paging:$roomVersion"
@@ -202,8 +199,6 @@ dependencies {
   implementation "androidx.legacy:legacy-support-v4:$legacy_support_version"
   implementation "androidx.appcompat:appcompat:$appcompat_version"
   implementation "androidx.preference:preference:$preference_version"
-  implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
-  implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
 
   // ViewModel
   implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
@@ -212,19 +207,19 @@ dependencies {
   implementation "androidx.paging:paging-runtime-ktx:$pagingVersion"
 
   // Compose
-  implementation "androidx.activity:activity-compose:$activityComposeVersion"
-  implementation "androidx.compose.ui:ui:$composeLibraryVersion"
-  implementation "androidx.compose.foundation:foundation:$composeLibraryVersion"
-  implementation "androidx.compose.foundation:foundation-layout:$composeLibraryVersion"
-  implementation "androidx.compose.material3:material3:$material3Version"
-  implementation "androidx.compose.material:material:$composeLibraryVersion"
-  implementation "androidx.compose.material:material-icons-extended:$composeLibraryVersion"
-  implementation "androidx.compose.runtime:runtime:$composeLibraryVersion"
-  implementation "androidx.compose.ui:ui-tooling:$composeLibraryVersion"
+  implementation "androidx.activity:activity-compose"
+  implementation "androidx.compose.ui:ui"
+  implementation "androidx.compose.foundation:foundation"
+  implementation "androidx.compose.foundation:foundation-layout"
+  implementation "androidx.compose.material3:material3"
+  implementation "androidx.compose.material:material"
+  implementation "androidx.compose.material:material-icons-extended"
+  implementation "androidx.compose.runtime:runtime"
+  implementation "androidx.compose.ui:ui-tooling"
+  implementation "androidx.navigation:navigation-compose"
+  implementation "androidx.paging:paging-compose:$pagingComposeVersion"
   implementation "androidx.window:window:$androidWindowVersion"
   implementation "com.google.android.material:material:$materialVersion"
-  implementation "androidx.navigation:navigation-compose:$navigationComposeVersion"
-  implementation "androidx.paging:paging-compose:$pagingComposeVersion"
   implementation "com.google.accompanist:accompanist-swiperefresh:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-permissions:$accompanistVersion"
   implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion"
@@ -282,6 +277,8 @@ dependencies {
   // Needed for unit testing timezone stuff
   testImplementation "org.threeten:threetenbp:$threetentest_version"
 
+  androidTestImplementation(platform("androidx.compose:compose-bom:$composeBomVersion"))
+
   androidTestImplementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
   androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
@@ -293,6 +290,6 @@ dependencies {
   androidTestImplementation "androidx.test:runner:$test_runner_version"
   androidTestImplementation "androidx.room:room-testing:$roomVersion"
   androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
-  androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeLibraryVersion"
-  debugImplementation("androidx.compose.ui:ui-test-manifest:$composeLibraryVersion")
+  androidTestImplementation "androidx.compose.ui:ui-test-junit4"
+  debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
