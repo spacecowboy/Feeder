@@ -1,3 +1,30 @@
+# 2.3.8
+ERYpTION (1):
+  * [9e04ef88] Updated Danish translation using Weblate
+
+Francesco Saltori (1):
+  * [2106104e] Translated using Weblate (Italian)
+
+J. Lavoie (1):
+  * [d9af5801] Translated using Weblate (Italian)
+
+Jonas Kalderstam (2):
+  * [2f281017] Removed new-indicator from Compact and SuperCompact view
+         styles
+  * [5a43aaa0] Added app title for Thai
+
+Mehmet (1):
+  * [8a4304e4] Updated Turkish translation using Weblate
+
+Sergi Font (1):
+  * [26b07252] Updated Catalan translation using Weblate
+
+Simona Iacob (1):
+  * [45e30113] Updated Romanian translation using Weblate
+
+bowornsin (1):
+  * [8aa363b7] Translated using Weblate (Thai)
+
 # 2.3.7
 Ady (1):
   * [30fab5dd] Updated French translation using Weblate
