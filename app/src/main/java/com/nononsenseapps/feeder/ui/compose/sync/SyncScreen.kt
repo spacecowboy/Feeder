@@ -181,6 +181,10 @@ fun SyncScreen(
         mutableStateOf(null)
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.updateDeviceList()
+    }
+
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
