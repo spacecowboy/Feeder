@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.os.Build.VERSION.SDK_INT
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
-import androidx.multidex.MultiDexApplication
 import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
 import coil.ImageLoader
@@ -53,7 +52,7 @@ import org.kodein.di.instance
 import org.kodein.di.singleton
 
 @Suppress("unused")
-class FeederApplication : MultiDexApplication(), DIAware, ImageLoaderFactory {
+class FeederApplication : Application(), DIAware, ImageLoaderFactory {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
     private val ttsStateHolder = TTSStateHolder(this, applicationCoroutineScope)
 

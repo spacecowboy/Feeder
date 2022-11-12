@@ -10,6 +10,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -24,6 +25,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.IconToggleButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -97,6 +100,7 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.opml.exportOpml
 import com.nononsenseapps.feeder.model.opml.importOpml
+import com.nononsenseapps.feeder.ui.compose.feed.FeedGridContent
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListContent
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
@@ -134,7 +138,7 @@ import org.kodein.di.instance
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZonedDateTime
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FeedArticleScreen(
     windowSize: WindowSize,
@@ -177,6 +181,9 @@ fun FeedArticleScreen(
     // switching feeds
     val feedListState = key(viewState.currentFeedOrTag) {
         rememberLazyListState()
+    }
+    val feedGridState = key(viewState.currentFeedOrTag) {
+        rememberLazyStaggeredGridState()
     }
     // Each article gets its own scroll state. Persists across device rotations, but is cleared
     // when switching articles.
@@ -269,9 +276,6 @@ fun FeedArticleScreen(
                 }
             )
         },
-        onInteractWithList = {
-            viewModel.setArticleOpen(false)
-        },
         onInteractWithArticle = {
             viewModel.setArticleOpen(true)
         },
@@ -329,12 +333,13 @@ fun FeedArticleScreen(
             viewModel.setBookmarked(itemId, value)
         },
         feedListState = feedListState,
+        feedGridState = feedGridState,
         articleListState = articleListState,
         pagedFeedItems = pagedFeedItems,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun FeedArticleScreen(
     feedArticleScreenType: FeedArticleScreenType,
@@ -367,7 +372,6 @@ private fun FeedArticleScreen(
     markBeforeAsRead: (Int) -> Unit,
     markAfterAsRead: (Int) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
-    onInteractWithList: () -> Unit,
     onInteractWithArticle: () -> Unit,
     onToggleFullText: () -> Unit,
     displayFullText: () -> Unit,
@@ -381,12 +385,13 @@ private fun FeedArticleScreen(
     onToggleCurrentArticleBookmarked: () -> Unit,
     onSetBookmarked: (Long, Boolean) -> Unit,
     feedListState: LazyListState,
+    feedGridState: LazyStaggeredGridState,
     articleListState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
 ) {
     AnimatedVisibility(
-        visible = feedArticleScreenType == FeedArticleScreenType.Feed,
+        visible = feedArticleScreenType == FeedArticleScreenType.Feed || feedArticleScreenType == FeedArticleScreenType.FeedGrid,
         enter = slideInHorizontally(tween(256), initialOffsetX = { -it }),
         exit = slideOutHorizontally(tween(256), targetOffsetX = { -it }),
     ) {
@@ -429,7 +434,9 @@ private fun FeedArticleScreen(
                     onSetPinned = onSetPinned,
                     onSetBookmarked = onSetBookmarked,
                     feedListState = feedListState,
+                    feedGridState = feedGridState,
                     pagedFeedItems = pagedFeedItems,
+                    feedArticleScreenType = feedArticleScreenType,
                 )
             }
         )
@@ -459,62 +466,6 @@ private fun FeedArticleScreen(
             onToggleBookmarked = onToggleCurrentArticleBookmarked,
             articleListState = articleListState,
             onNavigateUp = onNavigateUpFromArticle,
-        )
-    }
-
-    if (feedArticleScreenType == FeedArticleScreenType.FeedWithArticleDetails) {
-        ScreenWithNavDrawer(
-            drawerState = drawerState,
-            feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
-            expandedTags = ImmutableHolder(viewState.expandedTags),
-            onToggleTagExpansion = onToggleTagExpansion,
-            onDrawerItemSelected = onDrawerItemSelected,
-            content = {
-                FeedWithArticleScreen(
-                    viewState = viewState.copy(showFab = false),
-                    onRefreshVisible = onRefreshVisible,
-                    onRefreshAll = onRefreshAll,
-                    onToggleOnlyUnread = onToggleOnlyUnread,
-                    onToggleOnlyBookmarked = onToggleOnlyBookmarked,
-                    onMarkAllAsRead = onMarkAllAsRead,
-                    onShowToolbarMenu = onShowToolbarMenu,
-                    ttsOnPlay = ttsOnPlay,
-                    ttsOnPause = ttsOnPause,
-                    ttsOnStop = ttsOnStop,
-                    ttsOnSkipNext = ttsOnSkipNext,
-                    ttsOnSelectLanguage = ttsOnSelectLanguage,
-                    onOpenInCustomTab = onOpenInCustomTab,
-                    onAddFeed = onAddFeed,
-                    onEditFeed = onEditFeed,
-                    onShowEditDialog = onShowEditDialog,
-                    onDismissEditDialog = onDismissEditDialog,
-                    onDeleteFeeds = onDeleteFeeds,
-                    onShowDeleteDialog = onShowDeleteDialog,
-                    onDismissDeleteDialog = onDismissDeleteDialog,
-                    onSettings = onSettings,
-                    onSendFeedback = onSendFeedback,
-                    onImport = onImport,
-                    onExport = onExport,
-                    drawerState = drawerState,
-                    onShareArticle = onShareArticle,
-                    markAsUnread = markAsUnread,
-                    markBeforeAsRead = markBeforeAsRead,
-                    markAfterAsRead = markAfterAsRead,
-                    onOpenFeedItem = onOpenFeedItem,
-                    onInteractWithList = onInteractWithList,
-                    onInteractWithArticle = onInteractWithArticle,
-                    onFeedTitleClick = onFeedTitleClick,
-                    onToggleFullText = onToggleFullText,
-                    displayFullText = displayFullText,
-                    onToggleCurrentArticlePinned = onToggleCurrentArticlePinned,
-                    onSetPinned = onSetPinned,
-                    onToggleCurrentArticleBookmarked = onToggleCurrentArticleBookmarked,
-                    onSetBookmarked = onSetBookmarked,
-                    feedListState = feedListState,
-                    articleListState = articleListState,
-                    pagedFeedItems = pagedFeedItems,
-                )
-            }
         )
     }
 }
@@ -965,53 +916,54 @@ fun FeedWithArticleScreen(
                 }
             }
         },
-    ) { modifier ->
-        Row(modifier) {
-            FeedListContent(
-                viewState = viewState,
-                onOpenNavDrawer = {
-                    coroutineScope.launch {
-                        if (drawerState.isOpen) {
-                            drawerState.close()
-                        } else {
-                            drawerState.open()
+        content = { modifier ->
+            Row(modifier) {
+                FeedListContent(
+                    viewState = viewState,
+                    onOpenNavDrawer = {
+                        coroutineScope.launch {
+                            if (drawerState.isOpen) {
+                                drawerState.close()
+                            } else {
+                                drawerState.open()
+                            }
                         }
+                    },
+                    onAddFeed = onAddFeed,
+                    markAsUnread = markAsUnread,
+                    markBeforeAsRead = markBeforeAsRead,
+                    markAfterAsRead = markAfterAsRead,
+                    onItemClick = onOpenFeedItem,
+                    listState = feedListState,
+                    onSetPinned = onSetPinned,
+                    onSetBookmarked = onSetBookmarked,
+                    pagedFeedItems = pagedFeedItems,
+                    modifier = Modifier
+                        .width(334.dp)
+                        .notifyInput(onInteractWithList),
+                )
+                if (viewState.articleId > ID_UNSET) {
+                    // Avoid state sharing between articles
+                    key(viewState.articleId) {
+                        ArticleContent(
+                            viewState = viewState,
+                            screenType = ScreenType.DUAL,
+                            onFeedTitleClick = onFeedTitleClick,
+                            articleListState = articleListState,
+                            displayFullText = displayFullText,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .notifyInput(onInteractWithArticle)
+                            //                            .imePadding() // add padding for the on-screen keyboard
+                        )
                     }
-                },
-                onAddFeed = onAddFeed,
-                markAsUnread = markAsUnread,
-                markBeforeAsRead = markBeforeAsRead,
-                markAfterAsRead = markAfterAsRead,
-                onItemClick = onOpenFeedItem,
-                listState = feedListState,
-                onSetPinned = onSetPinned,
-                onSetBookmarked = onSetBookmarked,
-                pagedFeedItems = pagedFeedItems,
-                modifier = Modifier
-                    .width(334.dp)
-                    .notifyInput(onInteractWithList),
-            )
-            if (viewState.articleId > ID_UNSET) {
-                // Avoid state sharing between articles
-                key(viewState.articleId) {
-                    ArticleContent(
-                        viewState = viewState,
-                        screenType = ScreenType.DUAL,
-                        onFeedTitleClick = onFeedTitleClick,
-                        articleListState = articleListState,
-                        displayFullText = displayFullText,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .notifyInput(onInteractWithArticle)
-//                            .imePadding() // add padding for the on-screen keyboard
-                    )
                 }
             }
-        }
-    }
+        },
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FeedListScreen(
     viewState: FeedScreenViewState,
@@ -1045,7 +997,9 @@ fun FeedListScreen(
     onSetPinned: (Long, Boolean) -> Unit,
     onSetBookmarked: (Long, Boolean) -> Unit,
     feedListState: LazyListState,
+    feedGridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
+    feedArticleScreenType: FeedArticleScreenType,
 ) {
     val showingUnreadStateLabel = if (viewState.onlyUnread) {
         stringResource(R.string.showing_only_unread_articles)
@@ -1282,28 +1236,52 @@ fun FeedListScreen(
             }
         },
     ) { modifier ->
-        FeedListContent(
-            viewState = viewState,
-            onOpenNavDrawer = {
-                coroutineScope.launch {
-                    if (drawerState.isOpen) {
-                        drawerState.close()
-                    } else {
-                        drawerState.open()
+        if (feedArticleScreenType == FeedArticleScreenType.FeedGrid) {
+            FeedGridContent(
+                viewState = viewState,
+                gridState = feedGridState,
+                onOpenNavDrawer = {
+                    coroutineScope.launch {
+                        if (drawerState.isOpen) {
+                            drawerState.close()
+                        } else {
+                            drawerState.open()
+                        }
                     }
-                }
-            },
-            onAddFeed = onAddFeed,
-            markAsUnread = markAsUnread,
-            markBeforeAsRead = markBeforeAsRead,
-            markAfterAsRead = markAfterAsRead,
-            onItemClick = onOpenFeedItem,
-            listState = feedListState,
-            onSetPinned = onSetPinned,
-            onSetBookmarked = onSetBookmarked,
-            pagedFeedItems = pagedFeedItems,
-            modifier = modifier,
-        )
+                },
+                onAddFeed = onAddFeed,
+                markBeforeAsRead = markBeforeAsRead,
+                markAfterAsRead = markAfterAsRead,
+                onItemClick = onOpenFeedItem,
+                onSetPinned = onSetPinned,
+                onSetBookmarked = onSetBookmarked,
+                pagedFeedItems = pagedFeedItems,
+                modifier = modifier,
+            )
+        } else {
+            FeedListContent(
+                viewState = viewState,
+                onOpenNavDrawer = {
+                    coroutineScope.launch {
+                        if (drawerState.isOpen) {
+                            drawerState.close()
+                        } else {
+                            drawerState.open()
+                        }
+                    }
+                },
+                onAddFeed = onAddFeed,
+                markAsUnread = markAsUnread,
+                markBeforeAsRead = markBeforeAsRead,
+                markAfterAsRead = markAfterAsRead,
+                onItemClick = onOpenFeedItem,
+                listState = feedListState,
+                onSetPinned = onSetPinned,
+                onSetBookmarked = onSetBookmarked,
+                pagedFeedItems = pagedFeedItems,
+                modifier = modifier,
+            )
+        }
     }
 }
 
@@ -1651,8 +1629,8 @@ private fun LazyListScope.LoadingItem() {
     }
 }
 
-private enum class FeedArticleScreenType {
-    FeedWithArticleDetails,
+enum class FeedArticleScreenType {
+    FeedGrid,
     Feed,
     ArticleDetails,
 }
@@ -1667,7 +1645,12 @@ private fun getFeedArticleScreenType(
             else -> FeedArticleScreenType.Feed
         }
     }
-    ScreenType.DUAL -> FeedArticleScreenType.FeedWithArticleDetails
+    ScreenType.DUAL -> {
+        when {
+            viewState.isArticleOpen -> FeedArticleScreenType.ArticleDetails
+            else -> FeedArticleScreenType.FeedGrid
+        }
+    }
 }
 
 /**
