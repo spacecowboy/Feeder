@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.db.COL_SYNC_CHAIN_ID
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.SYNC_REMOTE_TABLE_NAME
 import java.net.URL
+import java.util.*
 import kotlin.random.Random
 import org.threeten.bp.Instant
 
@@ -48,10 +49,22 @@ const val DEFAULT_SERVER_ADDRESS = "https://$DEFAULT_SERVER_HOST:$DEFAULT_SERVER
 inline fun String?.ifBlankOrNull(defaultValue: () -> String?): String? =
     if (this?.isBlank() != false) defaultValue() else this
 
-fun generateDeviceName(): String =
-    Build.PRODUCT.ifBlankOrNull { Build.MODEL.ifBlankOrNull { Build.BRAND } } ?: "${Random.nextInt(100_000)}"
-
 val DEPRECATED_SYNC_HOSTS = listOf(
     "feederapp.nononsenseapps.com",
     "feeder-sync.nononsenseapps.workers.dev"
 )
+
+fun generateDeviceName(): String {
+    val manufacturer = Build.MANUFACTURER ?: ""
+    val model = Build.MODEL ?: ""
+
+    return if (model.startsWith(manufacturer, ignoreCase = true)) {
+        model
+    } else {
+        "$manufacturer $model"
+    }.replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(
+            Locale.getDefault()
+        ) else it.toString()
+    }.ifBlank { "${Random.nextInt(100_000)}" }
+}

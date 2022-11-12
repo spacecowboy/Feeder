@@ -6,20 +6,20 @@ import android.widget.Toast
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
-import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
+import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.urlEncode
 import java.net.URL
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -29,7 +29,9 @@ import org.kodein.di.instance
 class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
     private val context: Application by instance()
     private val repository: Repository by instance()
-    private val syncClient: SyncRestClient by instance()
+
+    //    private val syncClient: SyncRestClient by instance()
+    private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
     private val _syncCode: MutableStateFlow<String> = MutableStateFlow(
         state["syncCode"] ?: ""
@@ -76,13 +78,23 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
         _screenToShow.update { value }
     }
 
+    fun updateDeviceList() {
+        applicationCoroutineScope.launch {
+            logDebug(tag = LOG_TAG, "Update Devices")
+            repository.updateDeviceList()
+        }
+    }
+
     fun joinSyncChain(syncCode: String, secretKey: String) {
+        logDebug(tag = LOG_TAG, "Joining sync chain")
         viewModelScope.launch {
             try {
-                syncClient.join(syncCode = syncCode, remoteSecretKey = secretKey)
-                joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
-                syncClient.getDevices()
+                val joinJob = applicationCoroutineScope.launch {
+                    repository.joinSyncChain(syncCode = syncCode, secretKey = secretKey)
+                }
+                joinJob.join()
                 requestFeedSync(di)
+                joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Error when joining sync chain", e)
             }
@@ -90,8 +102,8 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
     }
 
     fun leaveSyncChain() {
-        viewModelScope.launch {
-            syncClient.leave()
+        applicationCoroutineScope.launch {
+            repository.leaveSyncChain()
             setSyncCode("")
             setSecretKey("")
             setScreen(SyncScreenToShow.SETUP)
@@ -99,9 +111,9 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
     }
 
     fun removeDevice(deviceId: Long) {
-        viewModelScope.launch {
+        applicationCoroutineScope.launch {
             try {
-                syncClient.removeDevice(deviceId = deviceId)
+                repository.removeDevice(deviceId = deviceId)
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Error when removing device", e)
             }
@@ -115,12 +127,10 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
     }
 
     fun startNewSyncChain() {
-        viewModelScope.launch {
+        applicationCoroutineScope.launch {
             try {
-                val syncCode = syncClient.create()
-                val syncRemote = repository.getSyncRemote()
-                joinedWithSyncCode(syncCode = syncCode, secretKey = syncRemote.secretKey)
-                syncClient.getDevices()
+                val (syncCode, secretKey) = repository.startNewSyncChain()
+                joinedWithSyncCode(syncCode = syncCode, secretKey = secretKey)
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Error when starting new sync chain", e)
             }

@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.db.room.RemoteFeed
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.model.workmanager.scheduleSendRead
+import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
@@ -46,6 +47,7 @@ class Repository(override val di: DI) : DIAware {
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
     private val application: Application by instance()
     private val syncRemoteStore: SyncRemoteStore by instance()
+    private val syncClient: SyncRestClient by instance()
 
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
@@ -476,6 +478,30 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun replaceRemoteFeedsWith(remoteFeeds: List<RemoteFeed>) {
         syncRemoteStore.replaceRemoteFeedsWith(remoteFeeds)
+    }
+
+    suspend fun updateDeviceList() {
+        syncClient.getDevices()
+    }
+
+    suspend fun joinSyncChain(syncCode: String, secretKey: String) {
+        syncClient.join(syncCode = syncCode, remoteSecretKey = secretKey)
+        syncClient.getDevices()
+    }
+
+    suspend fun leaveSyncChain() {
+        syncClient.leave()
+    }
+
+    suspend fun removeDevice(deviceId: Long) {
+        syncClient.removeDevice(deviceId = deviceId)
+    }
+
+    suspend fun startNewSyncChain(): Pair<String, String> {
+        val syncCode = syncClient.create()
+        val syncRemote = getSyncRemote()
+        updateDeviceList()
+        return syncCode to syncRemote.secretKey
     }
 }
 
