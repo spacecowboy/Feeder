@@ -16,8 +16,8 @@
     <string name="empty_feed_open">Başka bir yayın <annotation style="link">açabilirsiniz</annotation>.</string>
     <string name="empty_feed_add">Daha fazla yayın <annotation style="link">ekleyebilirsiniz</annotation>.</string>
     <string name="search_feed_empty_hint">Bir yayın adresi girin</string>
-    <string name="mark_as_read">Okundu olarak işaretle</string>
-    <string name="mark_as_unread">Okunmadı olarak işaretle</string>
+    <string name="mark_as_read">Okundu say</string>
+    <string name="mark_as_unread">Okunmadı say</string>
     <string name="mark_all_as_read">Tümünü okundu say</string>
     <string name="edit_feed">Yayını düzenle</string>
     <string name="delete_feed">Yayını sil</string>
@@ -34,10 +34,10 @@
     <string name="open_enclosed_media">İlişik medya ortamını aç</string>
     <string name="sync">Eşzamanla</string>
     <string name="export_feeds_to_opml">Yayınları OPML olarak aktar</string>
-    <string name="import_feeds_from_opml">OPML beslemeleri içe aktar</string>
+    <string name="import_feeds_from_opml">Yayınları OPML\'den içe aktar</string>
     <string name="view_debug_log">Hata ayıklama günlüğünü görüntüle</string>
     <string name="new_based_on_this">Buna göre yeni</string>
-    <string name="indicator_for_mark_as_read">Okundu olarak işaretleme göstergesi</string>
+    <string name="indicator_for_mark_as_read">Okundu sayma göstergesi</string>
     <string name="share">Paylaş</string>
     <string name="no_such_feed">Böyle bir yayın bulunamadı. HTTPS kullanmayı deneyebilir misiniz\?</string>
     <string name="nothing_to_display">Gösterilecek bir şey yok!</string>
@@ -62,7 +62,7 @@
     <string name="on_startup">Başlangıçta</string>
     <string name="show_fab">Kayan işlem düğmesini göster</string>
     <string name="include_mobile_hotspots">Mobil etkin noktaları dahil et</string>
-    <string name="updated_feeds">Güncellenen beslemeler</string>
+    <string name="updated_feeds">Güncellenen yayınlar</string>
     <string name="notification_channel_name">Okunmamış yayınlar</string>
     <string name="notification_channel_description">Bildirimler yalnızca yapılandırılan yayınlardaki okunmamış ögeler için gösterilir</string>
     <string name="open_in_reader">Okuyucu içinde</string>
@@ -88,7 +88,7 @@
     <string name="no_email_client">e-Posta istemcisi açılamadı</string>
     <string name="touch_to_play_video">Videoyu oynatmak için dokun</string>
     <string name="javascript">JavaScript</string>
-    <string name="open_feed">Beslemeyi aç</string>
+    <string name="open_feed">Yayını aç</string>
     <string name="mark_items_above_as_read">Üsttekileri okundu say</string>
     <string name="mark_items_below_as_read">Alttakileri okundu say</string>
     <string name="discovered_feeds_list">Keşfedilen yayın listesi</string>
@@ -103,7 +103,7 @@
     <string name="fetch_full_articles_by_default">Öntanımlı olarak makalelerin tamamını al</string>
     <string name="fetch_full_article">Makalenin tamamını al</string>
     <string name="failed_to_load_text_to_speech">Metin okuma yüklenemedi</string>
-    <string name="resume_reading">Okumaya devam et</string>
+    <string name="resume_reading">Okumayı sürdür</string>
     <string name="pause_reading">Okumayı duraklat</string>
     <string name="read_article">Yüksek sesle oku</string>
     <string name="use_app_default">Uygulama öntanımlı değerini kullan</string>
@@ -146,7 +146,7 @@
     <string name="remove_device">Aygıtı kaldır</string>
     <string name="press_scan_sync">Aygıtınızda, aygıt eşzamanlamasına gidin ve eşzamanlama kodunu tara düğmesine basın.</string>
     <string name="treat_like_password">Buna bir parola gibi davranın. Bağlantıya sahip olan herkes, eşzamanlanan verilerinizi okuyabilir.</string>
-    <string name="qr_code">QR Kodu</string>
+    <string name="qr_code">Karekod</string>
     <string name="feeder_device_sync_code">Feeder aygıt eşzamanlama kodu</string>
     <string name="leave_sync_chain">Eşzamanlama zincirinden ayrıl</string>
     <string name="device_sync_description_2">Başka bir aygıtta oluşturduğunuz eşzamanlama zincirinizdeki kodu taramanız veya yeni bir eşzamanlama zinciri başlatmanız yeterlidir.</string>
@@ -174,8 +174,8 @@
     <string name="remove">Kaldır</string>
     <string name="bookmarks_filter">Yalnızca yer imleri</string>
     <string name="showing_only_bookmarked_articles">Yalnızca yer imlerine eklenen makaleler gösteriliyor</string>
-    <string name="bookmark_article">Makaleyi yer imlerine ekle</string>
-    <string name="remove_bookmark">Yer imini kaldır</string>
+    <string name="bookmark_article">Makaleye ayraç koy</string>
+    <string name="remove_bookmark">Ayracı kaldır</string>
     <string name="permission_read_desc">Uygulamanın yayınları ve makaleleri okumasına izin verir</string>
     <string name="permission_read_label">Feeder salt okunur erişim</string>
     <string name="use_detect_language">Dili algıla</string>
@@ -185,7 +185,7 @@
     <string name="text_to_speech">Metin okuma</string>
     <string name="dynamic_theme_use">Değişken renkler</string>
     <string name="pinned">Sabitlendi</string>
-    <string name="bookmarked">Yer imlerine eklendi</string>
+    <string name="bookmarked">Ayraç koyuldu</string>
     <string name="set_language">Dili ayarla</string>
     <string name="skip_to_next">Sonrakine atla</string>
     <string name="new_indicator">Yeni</string>

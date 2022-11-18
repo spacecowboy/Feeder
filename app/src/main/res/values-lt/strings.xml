@@ -61,7 +61,7 @@
     <string name="notification_channel_name">Neskaityti kanalai</string>
     <string name="updated_feeds">Atnaujinti kanalai</string>
     <string name="on_startup">Paleidus programėlę</string>
-    <string name="image_loading">Vaizdas įkeliamas</string>
+    <string name="image_loading">Vaizdų įkėlimas</string>
     <string name="show_thumbnails">Rodyti miniatiūras</string>
     <string name="sync_option_every_day">Kasdien</string>
     <string name="sync_option_every_hour">Kas valandą</string>
@@ -147,7 +147,7 @@
     <string name="permission_read_desc">Leidžia programai skaityti sklaidos kanalus ir straipsnius</string>
     <string name="permission_read_label">Feeder tik skaitymo prieiga</string>
     <string name="from_anywhere">Iš bet kur</string>
-    <string name="swipe_to_mark_as_read">Perbraukite, kad pažymėtumėte kaip perskaitytą</string>
+    <string name="swipe_to_mark_as_read">Perbraukimas, kad būtų pažymėta kaip perskaitytą</string>
     <string name="device_sync">Įrenginio sinchronizavimas</string>
     <string name="block_list">Blokuojamųjų sąrašas</string>
     <string name="add_item">Pridėti elementą</string>
