@@ -34,9 +34,13 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -48,8 +52,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -57,8 +65,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -355,7 +361,10 @@ fun FeedGridContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
+    ExperimentalMaterialApi::class
+)
 @Composable
 fun FeedScreen(
     viewState: FeedScreenViewState,
@@ -375,15 +384,29 @@ fun FeedScreen(
     modifier: Modifier = Modifier,
     content: @Composable (Modifier) -> Unit,
 ) {
-    val refreshState = rememberSwipeRefreshState(
-        viewState.latestSyncTimestamp.isAfter(Instant.now().minusSeconds(20))
+    var lastMaxPoint by remember {
+        mutableStateOf(Instant.EPOCH)
+    }
+    val isRefreshing by remember(viewState.latestSyncTimestamp, lastMaxPoint) {
+        derivedStateOf {
+            viewState.latestSyncTimestamp.isAfter(
+                maxOf(
+                    lastMaxPoint,
+                    Instant.now().minusSeconds(20)
+                )
+            )
+        }
+    }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = onRefreshVisible,
     )
 
     LaunchedEffect(viewState.latestSyncTimestamp) {
         // GUI will only display refresh indicator for 10 seconds at most.
         // Fixes an issue where sync was triggered but no feed needed syncing, meaning no DB updates
         delay(10_000L)
-        refreshState.isRefreshing = false
+        lastMaxPoint = Instant.now()
     }
 
     val floatingActionButton: @Composable () -> Unit = {
@@ -460,12 +483,19 @@ fun FeedScreen(
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
     ) { padding ->
-        SwipeRefresh(
-            state = refreshState,
-            onRefresh = onRefreshVisible,
-            indicatorPadding = padding,
+        Box(
+            modifier = Modifier
+                .pullRefresh(pullRefreshState)
         ) {
             content(Modifier.padding(padding))
+
+            PullRefreshIndicator(
+                isRefreshing,
+                pullRefreshState,
+                Modifier
+                    .padding(padding)
+                    .align(Alignment.TopCenter)
+            )
         }
 
         if (viewState.showDeleteDialog) {
