@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -121,7 +122,6 @@ import com.nononsenseapps.feeder.ui.compose.reader.onLinkClick
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
-import com.nononsenseapps.feeder.ui.compose.utils.BackHandler
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize

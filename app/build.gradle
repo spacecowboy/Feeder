@@ -207,7 +207,8 @@ dependencies {
   implementation "androidx.paging:paging-runtime-ktx:$pagingVersion"
 
   // Compose
-  implementation "androidx.activity:activity-compose"
+  // Overriding this to newer version than BOM because of predictive back
+  implementation "androidx.activity:activity-compose:1.6.1"
   implementation "androidx.compose.ui:ui"
   implementation "androidx.compose.foundation:foundation"
   implementation "androidx.compose.foundation:foundation-layout"
