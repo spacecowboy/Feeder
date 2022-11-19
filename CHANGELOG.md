@@ -1,3 +1,27 @@
+# 2.3.9
+Aitor Salaberria (1):
+  * [c7c6c271] Updated Basque translation using Weblate
+
+ERYpTION (1):
+  * [bce0dae3] Updated Danish translation using Weblate
+
+Gediminas Murauskas (1):
+  * [e52e814a] Updated Lithuanian translation using Weblate
+
+Jonas Kalderstam (5):
+  * [ae04fa71] Implemented StaggeredGrid for tablets
+  * [866363b1] Improved reliability of device sync
+  * [8ead3242] Implemented predictive back
+
+Mehmet (1):
+  * [4a56f294] Updated Turkish translation using Weblate
+
+bowornsin (1):
+  * [cfe4f559] Updated Thai translation using Weblate
+
+ssantos (1):
+  * [cfedc4d4] Updated Portuguese (Portugal) translation using Weblate
+
 # 2.3.8
 ERYpTION (1):
   * [9e04ef88] Updated Danish translation using Weblate
