@@ -61,10 +61,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -84,7 +81,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
@@ -120,7 +116,9 @@ import com.nononsenseapps.feeder.ui.compose.reader.ReaderView
 import com.nononsenseapps.feeder.ui.compose.reader.dateTimeFormat
 import com.nononsenseapps.feeder.ui.compose.reader.onLinkClick
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
-import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
+import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
+import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
+import com.nononsenseapps.feeder.ui.compose.theme.dynamicScrollBehavior
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
@@ -1308,9 +1306,9 @@ fun ArticleScreen(
     onNavigateUp: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
-        rememberTopAppBarState()
-    )
+    val scrollBehavior = dynamicScrollBehavior()
+
+    SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     val bottomBarVisibleState = remember { MutableTransitionState(viewState.isBottomBarVisible) }
     LaunchedEffect(viewState.isBottomBarVisible) {
@@ -1323,17 +1321,9 @@ fun ArticleScreen(
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
-            TopAppBar(
+            DynamicTopAppBar(
                 scrollBehavior = scrollBehavior,
-                title = {
-                    withBidiDeterminedLayoutDirection(paragraph = viewState.feedDisplayTitle) {
-                        Text(
-                            text = viewState.feedDisplayTitle,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                },
+                title = viewState.feedDisplayTitle,
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(

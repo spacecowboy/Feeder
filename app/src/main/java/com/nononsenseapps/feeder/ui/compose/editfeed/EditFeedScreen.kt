@@ -30,9 +30,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -55,7 +52,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -73,8 +69,11 @@ import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.settings.GroupTitle
 import com.nononsenseapps.feeder.ui.compose.settings.RadioButtonSetting
 import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
+import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
+import com.nononsenseapps.feeder.ui.compose.theme.dynamicScrollBehavior
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -242,9 +241,9 @@ fun EditFeedScreen(
     onOk: () -> Unit,
     onCancel: () -> Unit,
 ) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-        rememberTopAppBarState()
-    )
+    val scrollBehavior = dynamicScrollBehavior()
+
+    SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
         modifier = Modifier
@@ -252,15 +251,9 @@ fun EditFeedScreen(
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
-            TopAppBar(
+            DynamicTopAppBar(
                 scrollBehavior = scrollBehavior,
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.edit_feed),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                },
+                title = stringResource(id = R.string.edit_feed),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -329,7 +322,8 @@ fun EditFeedView(
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.weight(1f, fill = true)
+                    modifier = Modifier
+                        .weight(1f, fill = true)
                         .padding(horizontal = dimens.margin, vertical = 8.dp)
                 ) {
                     leftContent(
@@ -342,7 +336,8 @@ fun EditFeedView(
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.weight(1f, fill = true)
+                    modifier = Modifier
+                        .weight(1f, fill = true)
                         .padding(horizontal = dimens.margin, vertical = 8.dp)
                 ) {
                     rightContent(

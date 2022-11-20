@@ -42,9 +42,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -80,8 +77,11 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
+import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
+import com.nononsenseapps.feeder.ui.compose.theme.dynamicScrollBehavior
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
@@ -94,9 +94,9 @@ fun SettingsScreen(
 ) {
     val viewState by settingsViewModel.viewState.collectAsState()
 
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-        rememberTopAppBarState()
-    )
+    val scrollBehavior = dynamicScrollBehavior()
+
+    SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
         modifier = Modifier
@@ -104,15 +104,9 @@ fun SettingsScreen(
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
-            TopAppBar(
+            DynamicTopAppBar(
                 scrollBehavior = scrollBehavior,
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.title_activity_settings),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
+                title = stringResource(id = R.string.title_activity_settings),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(

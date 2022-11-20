@@ -39,7 +39,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,8 +46,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,9 +58,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import com.nononsenseapps.feeder.R
@@ -74,8 +72,10 @@ import com.nononsenseapps.feeder.ui.compose.deletefeed.DeleteFeedDialog
 import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
-import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
+import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
+import com.nononsenseapps.feeder.ui.compose.theme.dynamicScrollBehavior
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.addMargin
 import com.nononsenseapps.feeder.ui.compose.utils.addMarginLayout
@@ -397,10 +397,6 @@ fun FeedScreen(
             )
         }
     }
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = isRefreshing,
-        onRefresh = onRefreshVisible,
-    )
 
     LaunchedEffect(viewState.latestSyncTimestamp) {
         // GUI will only display refresh indicator for 10 seconds at most.
@@ -425,20 +421,33 @@ fun FeedScreen(
         bottomBarVisibleState.targetState = viewState.isBottomBarVisible
     }
 
+    // TODO fix so this state remains "in stack" when opening article - as it does when opening settings
+    val topAppBarState = rememberTopAppBarState()
+    val scrollBehavior = dynamicScrollBehavior(topAppBarState)
+
+    val isTopAppBarExpanded by remember(topAppBarState.collapsedFraction) {
+        derivedStateOf {
+            topAppBarState.collapsedFraction == 0.0f
+        }
+    }
+
+    SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = {
+            if (isTopAppBarExpanded) {
+                onRefreshVisible()
+            }
+        },
+    )
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    val text = viewState.feedScreenTitle.title
-                        ?: stringResource(id = R.string.all_feeds)
-                    withBidiDeterminedLayoutDirection(paragraph = text) {
-                        Text(
-                            text,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                },
+            DynamicTopAppBar(
+                scrollBehavior = scrollBehavior,
+                title = viewState.feedScreenTitle.title
+                    ?: stringResource(id = R.string.all_feeds),
                 navigationIcon = {
                     IconButton(
                         onClick = onOpenNavDrawer
@@ -480,15 +489,21 @@ fun FeedScreen(
             }
         },
         modifier = modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
     ) { padding ->
         Box(
             modifier = Modifier
-                .pullRefresh(pullRefreshState)
+            // TODO decide what to do. It does not play nice with collapsable app bar
+//                .pullRefresh(
+//                    state = pullRefreshState,
+//                    enabled = isTopAppBarExpanded,
+//                )
         ) {
             content(Modifier.padding(padding))
 
+            // TODO use offset from top app bar?
             PullRefreshIndicator(
                 isRefreshing,
                 pullRefreshState,
