@@ -9,7 +9,7 @@ class WindowSizeTest {
 
     @Test
     fun getWindowSize_Compact() {
-        assertEquals(WindowSize.Compact, getWindowSizeClass(DpSize(599.5.dp, 300.dp)))
+        assertEquals(WindowSize.CompactTall, getWindowSizeClass(DpSize(599.5.dp, 300.dp)))
     }
 
     @Test

@@ -23,11 +23,11 @@ class SyncSetupTest : BaseComposeTest {
         composeTestRule.setContent {
             FeederTheme {
                 withDI {
-                    val windowSize = WindowSize.Compact
+                    val windowSize = WindowSize.CompactTall
                     val navController = rememberNavController()
 
                     NavHost(navController, startDestination = SyncScreenDestination.route) {
-                        SyncScreenDestination.register(this, navController, windowSize)
+                        SyncScreenDestination.register(this, navController)
                     }
                 }
             }

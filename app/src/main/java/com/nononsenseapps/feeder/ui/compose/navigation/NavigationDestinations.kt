@@ -29,7 +29,6 @@ import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreenViewModel
-import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.urlEncode
 
@@ -79,7 +78,6 @@ sealed class NavigationDestination(
     fun register(
         navGraphBuilder: NavGraphBuilder,
         navController: NavController,
-        windowSize: WindowSize,
     ) {
         navGraphBuilder.composable(
             route = route,
@@ -91,7 +89,6 @@ sealed class NavigationDestination(
             popExitTransition = popExitTransition,
         ) { backStackEntry ->
             registerScreen(
-                windowSize = windowSize,
                 navController = navController,
                 backStackEntry = backStackEntry,
             )
@@ -101,7 +98,6 @@ sealed class NavigationDestination(
     @Composable
     protected abstract fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry,
     )
 }
@@ -146,11 +142,9 @@ object SearchFeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         SearchFeedScreen(
-            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
@@ -191,13 +185,11 @@ object AddFeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         val createFeedScreenViewModel: CreateFeedScreenViewModel = backStackEntry.DIAwareViewModel()
 
         CreateFeedScreen(
-            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
@@ -226,12 +218,10 @@ object EditFeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         val editFeedScreenViewModel: EditFeedScreenViewModel = backStackEntry.DIAwareViewModel()
         EditFeedScreen(
-            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
@@ -257,7 +247,6 @@ object SettingsDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         SettingsScreen(
@@ -296,11 +285,9 @@ object FeedArticleDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         FeedArticleScreen(
-            windowSize = windowSize,
             navController = navController,
             viewModel = backStackEntry.DIAwareViewModel(),
         )
@@ -339,7 +326,6 @@ object FeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         val feedId = backStackEntry.arguments?.getLong("id")
@@ -378,7 +364,6 @@ object ArticleDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         val itemId = backStackEntry.arguments?.getLong("itemId")
@@ -430,13 +415,11 @@ object SyncScreenDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         val syncRemoteViewModel = backStackEntry.DIAwareViewModel<SyncScreenViewModel>()
 
         SyncScreen(
-            windowSize = windowSize,
             onNavigateUp = {
                 if (!navController.popBackStack()) {
                     SettingsDestination.navigate(navController)

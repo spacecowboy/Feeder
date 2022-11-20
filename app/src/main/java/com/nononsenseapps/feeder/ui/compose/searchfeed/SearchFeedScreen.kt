@@ -69,9 +69,9 @@ import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.theme.Dimensions
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
-import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.stableListHolderOf
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
@@ -85,12 +85,12 @@ import kotlinx.parcelize.Parcelize
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchFeedScreen(
-    windowSize: WindowSize,
     onNavigateUp: () -> Unit,
     initialFeedUrl: String? = null,
     searchFeedViewModel: SearchFeedViewModel,
     onClick: (SearchResult) -> Unit,
 ) {
+    val windowSize = LocalWindowSize()
     val screenType by remember(windowSize) {
         derivedStateOf {
             getScreenType(windowSize)

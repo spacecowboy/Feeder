@@ -82,6 +82,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
@@ -166,12 +167,12 @@ private fun SyncScaffold(
 
 @Composable
 fun SyncScreen(
-    windowSize: WindowSize,
     onNavigateUp: () -> Unit,
     viewModel: SyncScreenViewModel,
 ) {
     val viewState: SyncScreenViewState by viewModel.viewState.collectAsState()
 
+    val windowSize = LocalWindowSize()
     val syncScreenType = getSyncScreenType(
         windowSize = windowSize,
         viewState = viewState,

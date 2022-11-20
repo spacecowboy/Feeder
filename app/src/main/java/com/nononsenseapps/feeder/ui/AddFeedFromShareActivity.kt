@@ -19,7 +19,6 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.utils.rememberWindowSizeClass
 import org.kodein.di.compose.withDI
 
 /**
@@ -41,7 +40,6 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                 val currentTheme by viewModel.currentTheme.collectAsState()
                 val darkThemePreference by viewModel.darkThemePreference.collectAsState()
                 val dynamicColors by viewModel.dynamicColors.collectAsState()
-                val windowSize = rememberWindowSizeClass()
 
                 FeederTheme(
                     currentTheme = currentTheme,
@@ -78,7 +76,6 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                             },
                         ) { backStackEntry ->
                             SearchFeedScreen(
-                                windowSize = windowSize,
                                 onNavigateUp = {
                                     onNavigateUpFromIntentActivities()
                                 },
@@ -122,15 +119,13 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                             },
                         ) { backStackEntry ->
                             CreateFeedScreen(
-                                windowSize = windowSize,
                                 onNavigateUp = {
                                     navController.popBackStack()
                                 },
                                 createFeedScreenViewModel = backStackEntry.DIAwareViewModel(),
-                                {
-                                    finish()
-                                },
-                            )
+                            ) {
+                                finish()
+                            }
                         }
                     }
                 }

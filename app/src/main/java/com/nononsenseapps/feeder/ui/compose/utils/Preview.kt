@@ -5,7 +5,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 
 @Preview(
-    name = "Phone light",
+    name = "Phone portrait",
     device = Devices.PIXEL_2,
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_NO,

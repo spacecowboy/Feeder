@@ -123,6 +123,7 @@ import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
@@ -141,7 +142,6 @@ import org.threeten.bp.ZonedDateTime
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FeedArticleScreen(
-    windowSize: WindowSize,
     navController: NavController,
     viewModel: FeedArticleViewModel,
 ) {
@@ -171,7 +171,7 @@ fun FeedArticleScreen(
     }
 
     val feedArticleScreenType = getFeedArticleScreenType(
-        windowSize = windowSize,
+        windowSize = LocalWindowSize(),
         viewState = viewState,
     )
 

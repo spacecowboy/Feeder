@@ -76,15 +76,14 @@ import com.nononsenseapps.feeder.ui.compose.settings.SwitchSetting
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
-import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CreateFeedScreen(
-    windowSize: WindowSize,
     onNavigateUp: () -> Unit,
     createFeedScreenViewModel: CreateFeedScreenViewModel,
     onSaved: (Long) -> Unit,
@@ -107,6 +106,8 @@ fun CreateFeedScreen(
     var permissionDismissed by rememberSaveable {
         mutableStateOf(true)
     }
+
+    val windowSize = LocalWindowSize()
 
     val screenType by remember(windowSize) {
         derivedStateOf {
@@ -145,7 +146,6 @@ fun CreateFeedScreen(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun EditFeedScreen(
-    windowSize: WindowSize,
     onNavigateUp: () -> Unit,
     onOk: (Long) -> Unit,
     editFeedScreenViewModel: EditFeedScreenViewModel,
@@ -186,6 +186,8 @@ fun EditFeedScreen(
             }
         }
     }
+
+    val windowSize = LocalWindowSize()
 
     val screenType by remember(windowSize) {
         derivedStateOf {

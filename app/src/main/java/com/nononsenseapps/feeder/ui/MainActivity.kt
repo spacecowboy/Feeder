@@ -27,7 +27,7 @@ import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.utils.rememberWindowSizeClass
+import com.nononsenseapps.feeder.ui.compose.utils.withWindowSize
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.withDI
 import org.kodein.di.instance
@@ -95,7 +95,9 @@ class MainActivity : DIAwareComponentActivity() {
                 dynamicColors = dynamicColors,
             ) {
                 withDI {
-                    appContent()
+                    withWindowSize {
+                        appContent()
+                    }
                 }
             }
         }
@@ -104,8 +106,6 @@ class MainActivity : DIAwareComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun appContent() {
-        val windowSize = rememberWindowSizeClass()
-
         val navController = rememberAnimatedNavController().also {
             if (this.navController == null) {
                 this.navController = it
@@ -113,18 +113,18 @@ class MainActivity : DIAwareComponentActivity() {
         }
 
         AnimatedNavHost(navController, startDestination = FeedArticleDestination.route) {
-            FeedArticleDestination.register(this, navController, windowSize)
+            FeedArticleDestination.register(this, navController)
             // Deep links
-            FeedDestination.register(this, navController, windowSize)
-            ArticleDestination.register(this, navController, windowSize)
+            FeedDestination.register(this, navController)
+            ArticleDestination.register(this, navController)
             // Feed editing
-            EditFeedDestination.register(this, navController, windowSize)
-            SearchFeedDestination.register(this, navController, windowSize)
-            AddFeedDestination.register(this, navController, windowSize)
+            EditFeedDestination.register(this, navController)
+            SearchFeedDestination.register(this, navController)
+            AddFeedDestination.register(this, navController)
             // Settings
-            SettingsDestination.register(this, navController, windowSize)
+            SettingsDestination.register(this, navController)
             // Sync settings
-            SyncScreenDestination.register(this, navController, windowSize)
+            SyncScreenDestination.register(this, navController)
         }
     }
 }
