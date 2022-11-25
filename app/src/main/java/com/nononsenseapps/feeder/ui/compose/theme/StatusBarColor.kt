@@ -23,7 +23,8 @@ import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 fun SetStatusBarColorToMatchScrollableTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
-    val surfaceColor = MaterialTheme.colorScheme.surface
+    // This is what is changed by Black theme
+    val surfaceColor = MaterialTheme.colorScheme.background
     val surfaceScrolledColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 
     val colorTransitionFraction = scrollBehavior.state.overlappedFraction
