@@ -6,7 +6,6 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavArgumentBuilder
 import androidx.navigation.NavBackStackEntry
@@ -24,7 +23,8 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
-import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleScreen
+import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
+import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleScreen
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
@@ -196,7 +196,7 @@ object AddFeedDestination : NavigationDestination(
             createFeedScreenViewModel = createFeedScreenViewModel,
         ) { feedId ->
             createFeedScreenViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
-            FeedArticleDestination.navigate(navController)
+            FeedDestination.navigate(navController)
         }
     }
 }
@@ -227,7 +227,7 @@ object EditFeedDestination : NavigationDestination(
             },
             onOk = { feedId ->
                 editFeedScreenViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
-                FeedArticleDestination.navigate(navController)
+                FeedDestination.navigate(navController)
             },
             editFeedScreenViewModel = editFeedScreenViewModel
         )
@@ -252,7 +252,7 @@ object SettingsDestination : NavigationDestination(
         SettingsScreen(
             onNavigateUp = {
                 if (!navController.popBackStack()) {
-                    FeedArticleDestination.navigate(navController)
+                    FeedDestination.navigate(navController)
                 }
             },
             onNavigateToSyncScreen = {
@@ -263,33 +263,6 @@ object SettingsDestination : NavigationDestination(
                 )
             },
             settingsViewModel = backStackEntry.DIAwareViewModel(),
-        )
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-object FeedArticleDestination : NavigationDestination(
-    path = "feedarticle",
-    navArguments = emptyList(),
-    deepLinks = emptyList(),
-) {
-    fun navigate(
-        navController: NavController
-    ) {
-        navController.navigate(path) {
-            popUpTo(path)
-            launchSingleTop = true
-        }
-    }
-
-    @Composable
-    override fun registerScreen(
-        navController: NavController,
-        backStackEntry: NavBackStackEntry
-    ) {
-        FeedArticleScreen(
-            navController = navController,
-            viewModel = backStackEntry.DIAwareViewModel(),
         )
     }
 }
@@ -329,17 +302,20 @@ object FeedDestination : NavigationDestination(
         backStackEntry: NavBackStackEntry
     ) {
         val feedId = backStackEntry.arguments?.getLong("id")
-            ?: error("Missing mandatory argument: id")
+            ?: ID_UNSET
         val tag = backStackEntry.arguments?.getString("tag")
-            ?: error("Missing mandatory argument: tag")
+            ?: ""
 
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.DIAwareViewModel()
 
-        LaunchedEffect(feedId, tag) {
+        if (feedId > ID_UNSET || tag.isNotBlank()) {
             navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = tag)
-            FeedArticleDestination.navigate(navController)
         }
+        FeedScreen(
+            navController = navController,
+            viewModel = backStackEntry.DIAwareViewModel(),
+        )
     }
 }
 
@@ -372,12 +348,16 @@ object ArticleDestination : NavigationDestination(
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.DIAwareViewModel()
 
-        // TODO should this also set current feed? On tablet it might feel weird that
-        // the article is from one feed and the list displays a different feed
-        LaunchedEffect(itemId) {
-            navigationDeepLinkViewModel.setCurrentArticle(itemId = itemId)
-            FeedArticleDestination.navigate(navController)
-        }
+        navigationDeepLinkViewModel.setCurrentArticle(itemId = itemId)
+
+        ArticleScreen(
+            onNavigateUp = {
+                if (!navController.popBackStack()) {
+                    FeedDestination.navigate(navController)
+                }
+            },
+            viewModel = backStackEntry.DIAwareViewModel(),
+        )
     }
 }
 

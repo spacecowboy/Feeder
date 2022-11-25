@@ -202,6 +202,7 @@ class FeedArticleViewModel(
         itemId: Long,
         openInCustomTab: (String) -> Unit,
         openInBrowser: (String) -> Unit,
+        navigateToArticle: () -> Unit,
     ) = viewModelScope.launch {
         val itemOpener = repository.getArticleOpener(itemId = itemId)
         val articleLink = repository.getLink(itemId)
@@ -214,6 +215,7 @@ class FeedArticleViewModel(
             }
             else -> {
                 setCurrentArticle(itemId)
+                navigateToArticle()
             }
         }
         markAsRead(itemId)

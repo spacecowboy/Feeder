@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.utils
 
 import android.app.Activity
+import android.content.res.Configuration
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -27,6 +28,7 @@ import androidx.window.layout.WindowMetricsCalculator
 enum class WindowSize {
     CompactTall,
     CompactShort,
+    CompactWide,
     Medium,
     Expanded
 }
@@ -93,18 +95,27 @@ private val shortHeightLimit = 500.dp
  * Partitions a [DpSize] into a enumerated [WindowSize] class.
  */
 @VisibleForTesting
-fun getWindowSizeClass(windowDpSize: DpSize): WindowSize = when {
-    windowDpSize.width < 0.dp -> throw IllegalArgumentException("Dp value cannot be negative")
-    windowDpSize.width < 600.dp -> {
-        when {
-            windowDpSize.height < shortHeightLimit -> WindowSize.CompactShort
-            else -> WindowSize.CompactTall
+@Composable
+fun getWindowSizeClass(windowDpSize: DpSize): WindowSize {
+    val configuration = LocalConfiguration.current
+    return when {
+        windowDpSize.width < 0.dp -> throw IllegalArgumentException("Dp value cannot be negative")
+        windowDpSize.width < 600.dp -> {
+            when {
+                windowDpSize.height < shortHeightLimit -> {
+                    when (configuration.orientation) {
+                        Configuration.ORIENTATION_LANDSCAPE -> WindowSize.CompactWide
+                        else -> WindowSize.CompactShort
+                    }
+                }
+                else -> WindowSize.CompactTall
+            }
         }
+        windowDpSize.width < 840.dp -> {
+            WindowSize.Medium
+        }
+        else -> WindowSize.Expanded
     }
-    windowDpSize.width < 840.dp -> {
-        WindowSize.Medium
-    }
-    else -> WindowSize.Expanded
 }
 
 enum class ScreenType {
@@ -114,6 +125,6 @@ enum class ScreenType {
 
 fun getScreenType(windowSize: WindowSize) =
     when (windowSize) {
-        WindowSize.CompactTall -> ScreenType.SINGLE
-        WindowSize.CompactShort, WindowSize.Medium, WindowSize.Expanded -> ScreenType.DUAL
+        WindowSize.CompactTall, WindowSize.CompactShort -> ScreenType.SINGLE
+        WindowSize.CompactWide, WindowSize.Medium, WindowSize.Expanded -> ScreenType.DUAL
     }

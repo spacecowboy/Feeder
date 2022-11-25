@@ -21,7 +21,6 @@ import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
-import com.nononsenseapps.feeder.ui.compose.navigation.FeedArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.FeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
@@ -112,9 +111,7 @@ class MainActivity : DIAwareComponentActivity() {
             }
         }
 
-        AnimatedNavHost(navController, startDestination = FeedArticleDestination.route) {
-            FeedArticleDestination.register(this, navController)
-            // Deep links
+        AnimatedNavHost(navController, startDestination = FeedDestination.route) {
             FeedDestination.register(this, navController)
             ArticleDestination.register(this, navController)
             // Feed editing
