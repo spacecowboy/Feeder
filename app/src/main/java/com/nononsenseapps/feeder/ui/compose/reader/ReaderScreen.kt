@@ -36,6 +36,7 @@ import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
@@ -106,30 +107,36 @@ fun ReaderView(
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    withBidiDeterminedLayoutDirection(paragraph = feedTitle) {
-                        Text(
-                            text = feedTitle,
-                            style = MaterialTheme.typography.titleMedium.merge(LinkTextStyle()),
-                            modifier = Modifier
-                                .width(dimens.maxContentWidth)
-                                .clearAndSetSemantics {
-                                    contentDescription = feedTitle
-                                }
-                                .clickable {
-                                    onFeedTitleClick()
-                                }
+                    ProvideScaledText(
+                        style = MaterialTheme.typography.titleMedium.merge(
+                            LinkTextStyle()
                         )
+                    ) {
+                        withBidiDeterminedLayoutDirection(paragraph = feedTitle) {
+                            Text(
+                                text = feedTitle,
+                                modifier = Modifier
+                                    .width(dimens.maxContentWidth)
+                                    .clearAndSetSemantics {
+                                        contentDescription = feedTitle
+                                    }
+                                    .clickable {
+                                        onFeedTitleClick()
+                                    }
+                            )
+                        }
                     }
                     if (authorDate != null) {
                         Spacer(modifier = Modifier.height(4.dp))
-                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                            withBidiDeterminedLayoutDirection(paragraph = authorDate) {
-                                Text(
-                                    text = authorDate,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier
-                                        .width(dimens.maxContentWidth)
-                                )
+                        ProvideScaledText(style = MaterialTheme.typography.titleMedium) {
+                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                                withBidiDeterminedLayoutDirection(paragraph = authorDate) {
+                                    Text(
+                                        text = authorDate,
+                                        modifier = Modifier
+                                            .width(dimens.maxContentWidth)
+                                    )
+                                }
                             }
                         }
                     }
@@ -148,28 +155,33 @@ fun ReaderView(
                         modifier = Modifier
                             .width(dimens.maxContentWidth)
                     ) {
-                        Text(
-                            text = openLabel,
-                            style = MaterialTheme.typography.bodyLarge.merge(LinkTextStyle()),
-                            modifier = Modifier
-                                .clickable {
-                                    onEnclosureClick()
-                                }
-                                .clearAndSetSemantics {
-                                    try {
-                                        customActions = listOf(
-                                            CustomAccessibilityAction(openLabel) {
-                                                onEnclosureClick()
-                                                true
-                                            }
-                                        )
-                                    } catch (e: Exception) {
-                                        // Observed nullpointer exception when setting customActions
-                                        // No clue why it could be null
-                                        Log.e("FeederReaderScreen", "Exception in semantics", e)
+                        ProvideScaledText(
+                            style = MaterialTheme.typography.bodyLarge.merge(
+                                LinkTextStyle()
+                            )
+                        ) {
+                            Text(
+                                text = openLabel,
+                                modifier = Modifier
+                                    .clickable {
+                                        onEnclosureClick()
                                     }
-                                }
-                        )
+                                    .clearAndSetSemantics {
+                                        try {
+                                            customActions = listOf(
+                                                CustomAccessibilityAction(openLabel) {
+                                                    onEnclosureClick()
+                                                    true
+                                                }
+                                            )
+                                        } catch (e: Exception) {
+                                            // Observed nullpointer exception when setting customActions
+                                            // No clue why it could be null
+                                            Log.e("FeederReaderScreen", "Exception in semantics", e)
+                                        }
+                                    }
+                            )
+                        }
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }

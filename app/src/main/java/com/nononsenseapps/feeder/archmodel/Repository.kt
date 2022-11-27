@@ -125,6 +125,9 @@ class Repository(override val di: DI) : DIAware {
     val useDynamicTheme = settingsStore.useDynamicTheme
     fun setUseDynamicTheme(value: Boolean) = settingsStore.setUseDynamicTheme(value)
 
+    val textScale = settingsStore.textScale
+    fun setTextScale(value: Float) = settingsStore.setTextScale(value)
+
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
     fun setMaxCountPerFeed(value: Int) = settingsStore.setMaxCountPerFeed(value)
 

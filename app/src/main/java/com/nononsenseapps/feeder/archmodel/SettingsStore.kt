@@ -176,6 +176,19 @@ class SettingsStore(override val di: DI) : DIAware {
         sp.edit().putBoolean(PREF_DYNAMIC_THEME, value).apply()
     }
 
+    private val _textScale =
+        MutableStateFlow(
+            sp.getFloat(
+                PREF_TEXT_SCALE,
+                1f
+            )
+        )
+    val textScale = _textScale.asStateFlow()
+    fun setTextScale(value: Float) {
+        _textScale.value = value
+        sp.edit().putFloat(PREF_TEXT_SCALE, value).apply()
+    }
+
     private val _maximumCountPerFeed =
         MutableStateFlow(sp.getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt())
     val maximumCountPerFeed = _maximumCountPerFeed.asStateFlow()
@@ -411,6 +424,8 @@ const val PREF_VAL_OPEN_WITH_READER = "0"
 const val PREF_VAL_OPEN_WITH_WEBVIEW = "1"
 const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
+
+const val PREF_TEXT_SCALE = "pref_body_text_scale"
 
 /**
  * Block List Settings

@@ -163,7 +163,9 @@ fun SettingsScreen(
             swipeAsReadValue = viewState.swipeAsRead,
             onSwipeAsReadOptionChanged = settingsViewModel::setSwipeAsRead,
             useDynamicTheme = viewState.useDynamicTheme,
-            onUseDynamicTheme = settingsViewModel::setUseDynamicTheme
+            onUseDynamicTheme = settingsViewModel::setUseDynamicTheme,
+            textScale = viewState.textScale,
+            setTextScale = settingsViewModel::setTextScale,
         )
     }
 }
@@ -213,6 +215,8 @@ fun SettingsScreenPreview() {
                 swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
                 useDynamicTheme = true,
                 onUseDynamicTheme = {},
+                textScale = 1.5f,
+                setTextScale = {},
             )
         }
     }
@@ -259,6 +263,8 @@ fun SettingsList(
     onOpenSyncSettings: () -> Unit,
     useDynamicTheme: Boolean,
     onUseDynamicTheme: (Boolean) -> Unit,
+    textScale: Float,
+    setTextScale: (Float) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -344,6 +350,22 @@ fun SettingsList(
             onSelection = {
                 onSwipeAsReadOptionChanged(it.swipeAsRead)
             }
+        )
+
+        Divider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        GroupTitle { modifier ->
+            Text(
+                stringResource(id = R.string.text_scale),
+                modifier = modifier,
+            )
+        }
+
+        ScaleSetting(
+            currentValue = textScale,
+            onValueChange = setTextScale,
+            valueRange = 1f..2f,
+            steps = 9,
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -808,6 +830,75 @@ fun SwitchSetting(
             onCheckedChange = onCheckedChanged,
             modifier = Modifier.clearAndSetSemantics { },
             enabled = enabled,
+        )
+    }
+}
+
+@Composable
+fun ScaleSetting(
+    currentValue: Float,
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float>,
+    steps: Int,
+) {
+    val safeCurrentValue = currentValue.coerceIn(valueRange)
+    // People using screen readers probably don't care that much about text size
+    // so no point in adding screen reader action?
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .padding(start = 64.dp)
+            .semantics(mergeDescendants = true) {
+                stateDescription = "%.1fx".format(safeCurrentValue)
+            },
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            tonalElevation = 3.dp,
+        ) {
+            Text(
+                "Lorem ipsum dolor sit amet.",
+                style = MaterialTheme.typography.bodyLarge
+                    .merge(
+                        TextStyle(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * currentValue,
+                        )
+                    ),
+                modifier = Modifier.padding(4.dp),
+            )
+        }
+        SliderWithEndLabels(
+            value = safeCurrentValue,
+            onValueChange = onValueChange,
+            startLabel = {
+                Text(
+                    "A",
+                    style = MaterialTheme.typography.bodyLarge
+                        .merge(
+                            TextStyle(
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.start,
+                            )
+                        ),
+                    modifier = Modifier.alignByBaseline(),
+                )
+            },
+            endLabel = {
+                Text(
+                    "A",
+                    style = MaterialTheme.typography.bodyLarge
+                        .merge(
+                            TextStyle(
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.endInclusive,
+                            )
+                        ),
+                    modifier = Modifier.alignByBaseline(),
+                )
+            },
+            valueRange = valueRange,
+            steps = steps,
         )
     }
 }

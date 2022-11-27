@@ -3,6 +3,9 @@ package com.nononsenseapps.feeder.ui.compose.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -112,3 +115,23 @@ fun BlockQuoteStyle(): SpanStyle =
             fontWeight = FontWeight.Light
         )
     )
+
+@Immutable
+data class TypographySettings(
+    val fontScale: Float = 1.0f,
+)
+
+val LocalTypographySettings = staticCompositionLocalOf {
+    TypographySettings()
+}
+
+@Composable
+fun ProvideFontScale(
+    fontScale: Float,
+    content: @Composable () -> Unit,
+) {
+    val typographySettings = TypographySettings(
+        fontScale = fontScale,
+    )
+    CompositionLocalProvider(LocalTypographySettings provides typographySettings, content = content)
+}

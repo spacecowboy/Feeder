@@ -66,6 +66,17 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
+    fun textScaleSet() {
+        store.setTextScale(1.5f)
+
+        verify {
+            sp.edit().putFloat(PREF_TEXT_SCALE, 1.5f).apply()
+        }
+
+        assertEquals(1.5f, store.textScale.value, "Expected get to match mock")
+    }
+
+    @Test
     fun swipeAsReadBadValueInPrefs() {
         every { sp.getString(PREF_SWIPE_AS_READ, any()) } returns "Not an enum value"
 
