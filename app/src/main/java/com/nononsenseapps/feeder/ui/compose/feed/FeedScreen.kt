@@ -54,8 +54,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -80,6 +78,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -111,6 +110,9 @@ import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
+import com.nononsenseapps.feeder.ui.compose.pullrefresh.PullRefreshIndicator
+import com.nononsenseapps.feeder.ui.compose.pullrefresh.pullRefresh
+import com.nononsenseapps.feeder.ui.compose.pullrefresh.rememberPullRefreshState
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
 import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
@@ -646,25 +648,45 @@ fun FeedScreen(
     modifier: Modifier = Modifier,
     content: @Composable (Modifier) -> Unit,
 ) {
-    var lastMaxPoint by remember {
+    var manuallyTriggeredRefresh by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var syncIndicatorMax by rememberSaveable {
         mutableStateOf(Instant.EPOCH)
     }
-    val isRefreshing by remember(viewState.latestSyncTimestamp, lastMaxPoint) {
+    val isRefreshing by remember(viewState.latestSyncTimestamp, manuallyTriggeredRefresh) {
         derivedStateOf {
-            viewState.latestSyncTimestamp.isAfter(
-                maxOf(
-                    lastMaxPoint,
-                    Instant.now().minusSeconds(20)
-                )
-            )
+            // latestSync is equal to EPOCH when nothing is syncing
+            when {
+                manuallyTriggeredRefresh -> true
+                viewState.latestSyncTimestamp == Instant.EPOCH -> false
+                else -> {
+                    // In case an error happens in sync then this might never go back to EPOCH
+                    minOf(
+                        viewState.latestSyncTimestamp,
+                        syncIndicatorMax
+                    )
+                        .isAfter(Instant.now().minusSeconds(10))
+                }
+            }
         }
     }
 
     LaunchedEffect(viewState.latestSyncTimestamp) {
-        // GUI will only display refresh indicator for 10 seconds at most.
-        // Fixes an issue where sync was triggered but no feed needed syncing, meaning no DB updates
-        delay(10_000L)
-        lastMaxPoint = Instant.now()
+        if (manuallyTriggeredRefresh && viewState.latestSyncTimestamp.isAfter(Instant.EPOCH)) {
+            // A sync has happened so can safely set this to false now
+            manuallyTriggeredRefresh = false
+        }
+    }
+
+    LaunchedEffect(manuallyTriggeredRefresh) {
+        // In the event that pulling doesn't trigger a refresh. Say if no feeds are present
+        // or all feeds are so recent that no sync is triggered - or an error happens in sync
+        // THEN we need to manually disable this variable so we don't get an infinite spinner
+        if (manuallyTriggeredRefresh) {
+            delay(5_000L)
+            manuallyTriggeredRefresh = false
+        }
     }
 
     val floatingActionButton: @Composable () -> Unit = {
@@ -688,20 +710,14 @@ fun FeedScreen(
     }
     val scrollBehavior = dynamicScrollBehavior(topAppBarState)
 
-    val isTopAppBarExpanded by remember(topAppBarState.collapsedFraction) {
-        derivedStateOf {
-            topAppBarState.collapsedFraction == 0.0f
-        }
-    }
-
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = {
-            if (isTopAppBarExpanded) {
-                onRefreshVisible()
-            }
+            manuallyTriggeredRefresh = true
+            syncIndicatorMax = Instant.now().plusSeconds(10)
+            onRefreshVisible()
         },
     )
 
@@ -752,26 +768,24 @@ fun FeedScreen(
             }
         },
         modifier = modifier
+            // The order is important! PullToRefresh MUST come first
+            .pullRefresh(state = pullRefreshState)
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
     ) { padding ->
         Box(
             modifier = Modifier
-            // TODO decide what to do. It does not play nice with collapsable app bar
-//                .pullRefresh(
-//                    state = pullRefreshState,
-//                    enabled = isTopAppBarExpanded,
-//                )
+                .padding(padding)
         ) {
-            content(Modifier.padding(padding))
+            content(
+                Modifier
+            )
 
-            // TODO use offset from top app bar?
             PullRefreshIndicator(
                 isRefreshing,
                 pullRefreshState,
-                Modifier
-                    .padding(padding)
+                modifier = Modifier
                     .align(Alignment.TopCenter)
             )
         }
