@@ -11,7 +11,7 @@
     <string name="nothing_to_display">ไม่มีอะไรให้แสดง!</string>
     <string name="all_feeds">ฟีดทั้งหมด</string>
     <string name="sync_option_every_30min">ทุก 30 นาที</string>
-    <string name="image_loading">กำลังโหลดภาพ</string>
+    <string name="image_loading">การโหลดภาพ</string>
     <string name="action_settings">การตั้งค่า</string>
     <string name="navigation_drawer_open">เปิดแถบลิ้นชักการนำทาง</string>
     <string name="navigation_drawer_close">ปิดแถบลิ้นชักการนำทาง</string>
@@ -146,7 +146,7 @@
     <string name="fetch_full_article">ดึงบทความเต็ม</string>
     <string name="battery_optimization">การเพิ่มประสิทธิภาพแบตเตอรี่</string>
     <string name="battery_optimization_disabled">ปิด</string>
-    <string name="failed_to_parse">ดึงข้อมูล %1$s ไม่ได้</string>
+    <string name="failed_to_parse">ดึงข้อมูลจาก %1$s ไม่ได้</string>
     <string name="fetch_full_articles_by_default">ดึงข้อมูลบทความเต็มโดยค่าเรื่มต้น</string>
     <string name="failed_to_open_article">เปิดบทความไม่ได้</string>
     <string name="fetching_full_article">กำลังดึงข้อมูลบทความเต็ม…</string>
