@@ -72,7 +72,7 @@
     <string name="open_link_in_web_view">Abrir ligazóns en vista Web</string>
     <string name="open_in_web_view">Abrir en vista Web</string>
     <string name="max_feed_items">Número máximo de elementos por canle</string>
-    <string name="theme_system">Seguir ao sistema</string>
+    <string name="theme_system">Seguir o sistema</string>
     <string name="theme_automatic">Automático</string>
     <string name="theme_day">Día</string>
     <string name="theme_night">Noite</string>
@@ -189,4 +189,6 @@
     <string name="bookmarked">Marcado</string>
     <string name="new_indicator">Novo</string>
     <string name="explanation_permission_notifications">O permiso debe ser garantido antes de habilitar as notificacións.</string>
+    <string name="feed_icon">Icona da canle</string>
+    <string name="article_image">Imaxe do artigo</string>
 </resources>
