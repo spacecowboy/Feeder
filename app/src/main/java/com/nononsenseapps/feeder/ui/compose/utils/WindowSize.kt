@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui.compose.utils
 
 import android.app.Activity
 import android.content.res.Configuration
-import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidableCompositionLocal
@@ -94,7 +93,6 @@ private val shortHeightLimit = 500.dp
 /**
  * Partitions a [DpSize] into a enumerated [WindowSize] class.
  */
-@VisibleForTesting
 @Composable
 fun getWindowSizeClass(windowDpSize: DpSize): WindowSize {
     val configuration = LocalConfiguration.current
