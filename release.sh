@@ -17,7 +17,7 @@ else
   CURRENT_VERSION="${current_in}"
 fi
 
-next_default="$(cat app/build.gradle | grep "versionName" | sed "s|\s*versionName \"\(.*\)\"|\\1|")"
+next_default="$(cat app/build.gradle.kts | grep "versionName" | sed "s|\s*versionName = \"\(.*\)\"|\\1|")"
 echo >&2 -n "Next version [${next_default}]: "
 read -r next_in
 
@@ -27,7 +27,7 @@ else
   NEXT_VERSION="${next_in}"
 fi
 
-CURRENT_CODE="$(cat app/build.gradle | grep "versionCode" | sed "s|\s*versionCode\s*\([0-9]\+\)|\\1|")"
+CURRENT_CODE="$(cat app/build.gradle.kts | grep "versionCode" | sed "s|\s*versionCode = \([0-9]\+\)|\\1|")"
 echo >&2 "Current code ${CURRENT_CODE}"
 
 let next_code_default=CURRENT_CODE+1
@@ -39,6 +39,13 @@ if [ -z "${next_code_in}" ]; then
   NEXT_CODE="${next_code_default}"
 else
   NEXT_CODE="${next_code_in}"
+fi
+
+read -r -p "Update locales_config.xml? [y/N] " response
+if [[ "$response" =~ ^[yY]$ ]]
+then
+  ./gradlew :app:generateLocalesConfig
+  git add app/src/main/res/xml/locales_config.xml
 fi
 
 CL="# ${NEXT_VERSION}
@@ -75,19 +82,18 @@ fi
 read -r -p "Update gradle versions? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
 then
-  sed -i "s|\(\s*versionCode\s*\)[0-9]\+|\\1${NEXT_CODE}|" app/build.gradle
-  sed -i "s|\(\s*versionName\s*\).*|\\1\"${NEXT_VERSION}\"|" app/build.gradle
+  sed -i "s|\(\s*versionCode = \)[0-9]\+|\\1${NEXT_CODE}|" app/build.gradle.kts
+  sed -i "s|\(\s*versionName = \).*|\\1\"${NEXT_VERSION}\"|" app/build.gradle.kts
 fi
 
 read -r -p "Commit changes? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
 then
   git add "fastlane/metadata/android/en-US/changelogs/${NEXT_CODE}.txt"
-  git add app/build.gradle
+  git add app/build.gradle.kts
   git add CHANGELOG.md
   git commit -m "Releasing ${NEXT_VERSION}"
 fi
-
 
 read -r -p "Make tag? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]

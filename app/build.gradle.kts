@@ -30,6 +30,8 @@ android {
 
         vectorDrawables.useSupportLibrary = true
 
+        resourceConfigurations.addAll(getListOfSupportedLocales())
+
         // For espresso tests
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -317,4 +319,53 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.compose.ui.test.junit4)
     debugImplementation(libs.compose.ui.test.manifest)
+}
+
+fun getListOfSupportedLocales(): List<String> {
+    val resFolder = file(projectDir.resolve("src/main/res"))
+
+    return resFolder.list { _, s ->
+        s.startsWith("values")
+    }?.filter { folder ->
+        val stringsSize = resFolder.resolve("$folder/strings.xml").length()
+        // values/strings.xml is over 13k in size so this filters out too partial translations
+        stringsSize > 10_000L
+    }?.map { folder ->
+        if (folder == "values") {
+            "en"
+        } else {
+            folder.substringAfter("values-")
+        }
+    }?.sorted()
+        ?: listOf("en")
+}
+
+tasks {
+    register("generateLocalesConfig") {
+        val resFolder = file(projectDir.resolve("src/main/res"))
+        inputs.files(
+            resFolder.listFiles { file ->
+                file.name.startsWith("values")
+            }?.map { file ->
+                file.resolve("strings.xml")
+            } ?: error("Could not resolve values folders!")
+        )
+
+        val localesConfigFile = file(projectDir.resolve("src/main/res/xml/locales_config.xml"))
+        outputs.file(projectDir.resolve("src/main/res/xml/locales_config.xml"))
+
+        doLast {
+            val langs = getListOfSupportedLocales()
+            val localesConfig = """
+                <?xml version="1.0" encoding="utf-8"?>
+                <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+${langs.joinToString("\n") { "                  <locale android:name=\"$it\"/>" }}
+                </locale-config>
+            """.trimIndent()
+
+            localesConfigFile.bufferedWriter().use { writer ->
+                writer.write(localesConfig)
+            }
+        }
+    }
 }
