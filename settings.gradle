@@ -4,13 +4,6 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url "https://jitpack.io" }
-        jcenter() {
-            content {
-                includeModule("org.jetbrains.kotlinx", "kotlinx-collections-immutable-jvm")
-                includeModule("org.jetbrains.trove4j", "trove4j")
-                includeModule("com.linkedin.dexmaker", "dexmaker")
-            }
-        }
     }
 }
 include ':app'
