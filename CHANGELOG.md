@@ -1,3 +1,27 @@
+# 2.4.0
+Dritan Taulla (1):
+  * [fa0a128e] Updated Albanian translation using Weblate
+
+Jonas Kalderstam (18):
+  * [e5ff3dab] Made TopAppBar larger on tall screens to make it easier for
+         one-handed use
+  * [582c7088] Fixed color of status bar and top app bar in Black theme
+  * [f56169ee] Added setting for Font Size
+  * [84648be4] Added support for app specific locale
+  * [faa0e234] Changed animations from slide to fade
+
+Minh P (1):
+  * [0999d81e] Updated Vietnamese translation using Weblate
+
+Nikita Epifanov (1):
+  * [a39c4175] Updated Russian translation using Weblate
+
+WB (1):
+  * [e91fb923] Updated Galician translation using Weblate
+
+bowornsin (1):
+  * [b027d0c8] Updated Thai translation using Weblate
+
 # 2.3.9
 Aitor Salaberria (1):
   * [c7c6c271] Updated Basque translation using Weblate
