@@ -29,8 +29,8 @@ platform :android do
 
   desc "Bumps version code in gradle file"
   lane :bump_version_code do
-    path = '../app/build.gradle'
-    re = /versionCode\s+(\d+)/
+    path = '../app/build.gradle.kts'
+    re = /versionCode = (\d+)/
 
     last_version_code = get_latest_version
 
