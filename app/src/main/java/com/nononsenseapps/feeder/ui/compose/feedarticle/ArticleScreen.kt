@@ -73,6 +73,7 @@ import org.threeten.bp.ZonedDateTime
 @Composable
 fun ArticleScreen(
     onNavigateUp: () -> Unit,
+    onNavigateToFeed: (Long) -> Unit,
     viewModel: FeedArticleViewModel,
 ) {
     BackHandler(onBack = onNavigateUp)
@@ -130,12 +131,7 @@ fun ArticleScreen(
             }
         },
         onFeedTitleClick = {
-            // TODO navigate to feed
-            viewModel.setCurrentFeedAndTag(
-                viewState.articleFeedId,
-                ""
-            )
-            viewModel.setArticleOpen(false)
+            onNavigateToFeed(viewState.articleFeedId)
         },
         onNavigateUp = onNavigateUp,
         onTogglePinned = {

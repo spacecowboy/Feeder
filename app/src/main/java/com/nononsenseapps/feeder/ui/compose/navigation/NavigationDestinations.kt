@@ -356,6 +356,12 @@ object ArticleDestination : NavigationDestination(
                     FeedDestination.navigate(navController)
                 }
             },
+            onNavigateToFeed = { feedId ->
+                navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
+                if (!navController.popBackStack()) {
+                    FeedDestination.navigate(navController)
+                }
+            },
             viewModel = backStackEntry.DIAwareViewModel(),
         )
     }
