@@ -42,14 +42,13 @@ dependencyResolutionManagement {
             version("retrofit", "2.9.0")
             version("qrgen", "2.6.0")
             version("androidxCore", "1.7.0")
-            version("androidx_testcore", "1.4.0")
+            version("androidxTestcore", "1.4.0")
             version("workmanager", "2.7.0")
             version("appcompat", "1.3.0")
             version("material", "1.6.1")
             version("preference", "1.1.0")
-            version("test_runner", "1.4.0")
+            version("testRunner", "1.4.0")
             version("lifecycle", "2.3.1")
-            //    version("savedstate", "1.1.0")
             version("room", "2.4.3")
             // Compose related below
             version("compose", "2022.11.00")
@@ -275,8 +274,8 @@ dependencyResolutionManagement {
             library("threeten.bp", "org.threeten", "threetenbp").versionRef("threeten")
 
             library("mockk-android", "io.mockk", "mockk-android").versionRef("mockk")
-            library("androidx-test-core", "androidx.test", "core").versionRef("androidx_testcore")
-            library("androidx-test-runner", "androidx.test", "runner").versionRef("test_runner")
+            library("androidx-test-core", "androidx.test", "core").versionRef("androidxTestcore")
+            library("androidx-test-runner", "androidx.test", "runner").versionRef("testRunner")
             library("room-testing", "androidx.room", "room-testing").versionRef("room")
             library(
                 "espresso-core",
