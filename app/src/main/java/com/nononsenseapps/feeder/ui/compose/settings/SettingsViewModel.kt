@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -103,6 +102,11 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setSwipeAsRead(value)
     }
 
+    fun setTextScale(value: Float) {
+        // Just some sanity validation
+        repository.setTextScale(value.coerceIn(0.1f, 10f))
+    }
+
     private val batteryOptimizationIgnoredFlow: Flow<Boolean> = repository.resumeTime.map {
         val powerManager: PowerManager? = context.getSystemService()
         powerManager?.isIgnoringBatteryOptimizations(context.packageName) == true
@@ -134,6 +138,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.blockList,
                 repository.useDetectLanguage,
                 repository.useDynamicTheme,
+                repository.textScale,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -156,6 +161,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     blockList = params[16] as Set<String>,
                     useDetectLanguage = params[17] as Boolean,
                     useDynamicTheme = params[18] as Boolean,
+                    textScale = params[19] as Float,
                 )
             }.collect {
                 _viewState.value = it
@@ -185,4 +191,5 @@ data class SettingsViewState(
     val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
     val useDetectLanguage: Boolean = true,
     val useDynamicTheme: Boolean = true,
+    val textScale: Float = 1f,
 )

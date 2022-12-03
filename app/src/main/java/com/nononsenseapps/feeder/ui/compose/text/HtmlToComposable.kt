@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.DisableSelection
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,6 +49,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockStyle
 import com.nononsenseapps.feeder.ui.compose.theme.CodeInlineStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
 import java.io.InputStream
@@ -88,34 +90,37 @@ private fun LazyListScope.formatBody(
             val dimens = LocalDimens.current
             val paragraph = paragraphBuilder.toComposableAnnotatedString()
 
-            withBidiDeterminedLayoutDirection(paragraph.text) {
-                // ClickableText prevents taps from deselecting selected text
-                // So use regular Text if possible
-                if (
-                    paragraph.getStringAnnotations("URL", 0, paragraph.length)
-                        .isNotEmpty()
-                ) {
-                    ClickableText(
-                        text = paragraph,
-                        style = MaterialTheme.typography.bodyLarge
-                            .merge(TextStyle(color = MaterialTheme.colorScheme.onBackground)),
-                        modifier = Modifier
-                            .width(dimens.maxContentWidth)
-                    ) { offset ->
-                        paragraph.getStringAnnotations("URL", offset, offset)
-                            .firstOrNull()
-                            ?.let {
-                                onLinkClick(it.item)
-                            }
+            ProvideScaledText(
+                MaterialTheme.typography.bodyLarge.merge(
+                    TextStyle(color = MaterialTheme.colorScheme.onBackground)
+                )
+            ) {
+                withBidiDeterminedLayoutDirection(paragraph.text) {
+                    // ClickableText prevents taps from deselecting selected text
+                    // So use regular Text if possible
+                    if (
+                        paragraph.getStringAnnotations("URL", 0, paragraph.length)
+                            .isNotEmpty()
+                    ) {
+                        ClickableText(
+                            text = paragraph,
+                            style = LocalTextStyle.current,
+                            modifier = Modifier
+                                .width(dimens.maxContentWidth)
+                        ) { offset ->
+                            paragraph.getStringAnnotations("URL", offset, offset)
+                                .firstOrNull()
+                                ?.let {
+                                    onLinkClick(it.item)
+                                }
+                        }
+                    } else {
+                        Text(
+                            text = paragraph,
+                            modifier = Modifier
+                                .width(dimens.maxContentWidth)
+                        )
                     }
-                } else {
-                    Text(
-                        text = paragraph,
-                        style = MaterialTheme.typography.bodyLarge
-                            .merge(TextStyle(color = MaterialTheme.colorScheme.onBackground)),
-                        modifier = Modifier
-                            .width(dimens.maxContentWidth)
-                    )
                 }
             }
         }

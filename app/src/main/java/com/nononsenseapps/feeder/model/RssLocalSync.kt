@@ -209,8 +209,6 @@ private suspend fun syncFeed(
                     !response.isSuccessful -> {
                         throw ResponseFailure("${response.code} when fetching ${feedSql.displayTitle}: ${feedSql.url}")
                     }
-                    // TODO WTF is this for again?
-//                    feedSql.responseHash == responseHash -> null // no change
                     else -> feedParser.parseFeedResponse(
                         response.request.url.toUrl(),
                         responseBody
@@ -282,8 +280,6 @@ private suspend fun syncFeed(
 
         // Update feed last so lastsync is only set after all items have been handled
         // for the rare case that the job is cancelled prematurely
-        // TODO what's this for?
-//        feedSql.responseHash = responseHash
         feedSql.title = feed.title ?: feedSql.title
         // Not changing feed url because I don't want to override auth or token params
         // See https://gitlab.com/spacecowboy/Feeder/-/issues/390

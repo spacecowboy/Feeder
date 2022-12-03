@@ -203,4 +203,5 @@
   <string name="explanation_permission_notifications">Permission must be granted before notifications can be enabled.</string>
   <string name="article_image">Article image</string>
   <string name="feed_icon">Feed Icon</string>
+  <string name="text_scale">Text scale</string>
 </resources>

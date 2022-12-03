@@ -4,7 +4,8 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NamedNavArgument
@@ -24,12 +25,12 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
-import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleScreen
+import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
+import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleScreen
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreenViewModel
-import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.urlEncode
 
@@ -39,16 +40,16 @@ sealed class NavigationDestination(
     protected val navArguments: List<NavigationArgument>,
     val deepLinks: List<NavDeepLink>,
     private val enterTransition: (AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition?)? = {
-        slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(256))
+        fadeIn()
     },
     private val exitTransition: (AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition?)? = {
-        slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(256))
+        fadeOut()
     },
     private val popEnterTransition: (AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition?)? = {
-        slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(256))
+        fadeIn()
     },
     private val popExitTransition: (AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition?)? = {
-        slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(256))
+        fadeOut()
     },
 ) {
     val arguments: List<NamedNavArgument> = navArguments.map { it.namedNavArgument }
@@ -79,7 +80,6 @@ sealed class NavigationDestination(
     fun register(
         navGraphBuilder: NavGraphBuilder,
         navController: NavController,
-        windowSize: WindowSize,
     ) {
         navGraphBuilder.composable(
             route = route,
@@ -91,7 +91,6 @@ sealed class NavigationDestination(
             popExitTransition = popExitTransition,
         ) { backStackEntry ->
             registerScreen(
-                windowSize = windowSize,
                 navController = navController,
                 backStackEntry = backStackEntry,
             )
@@ -101,7 +100,6 @@ sealed class NavigationDestination(
     @Composable
     protected abstract fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry,
     )
 }
@@ -146,11 +144,9 @@ object SearchFeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         SearchFeedScreen(
-            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
@@ -191,20 +187,18 @@ object AddFeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         val createFeedScreenViewModel: CreateFeedScreenViewModel = backStackEntry.DIAwareViewModel()
 
         CreateFeedScreen(
-            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
             createFeedScreenViewModel = createFeedScreenViewModel,
         ) { feedId ->
             createFeedScreenViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
-            FeedArticleDestination.navigate(navController)
+            FeedDestination.navigate(navController)
         }
     }
 }
@@ -226,18 +220,16 @@ object EditFeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         val editFeedScreenViewModel: EditFeedScreenViewModel = backStackEntry.DIAwareViewModel()
         EditFeedScreen(
-            windowSize = windowSize,
             onNavigateUp = {
                 navController.popBackStack()
             },
             onOk = { feedId ->
                 editFeedScreenViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
-                FeedArticleDestination.navigate(navController)
+                FeedDestination.navigate(navController)
             },
             editFeedScreenViewModel = editFeedScreenViewModel
         )
@@ -257,13 +249,12 @@ object SettingsDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         SettingsScreen(
             onNavigateUp = {
                 if (!navController.popBackStack()) {
-                    FeedArticleDestination.navigate(navController)
+                    FeedDestination.navigate(navController)
                 }
             },
             onNavigateToSyncScreen = {
@@ -274,35 +265,6 @@ object SettingsDestination : NavigationDestination(
                 )
             },
             settingsViewModel = backStackEntry.DIAwareViewModel(),
-        )
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-object FeedArticleDestination : NavigationDestination(
-    path = "feedarticle",
-    navArguments = emptyList(),
-    deepLinks = emptyList(),
-) {
-    fun navigate(
-        navController: NavController
-    ) {
-        navController.navigate(path) {
-            popUpTo(path)
-            launchSingleTop = true
-        }
-    }
-
-    @Composable
-    override fun registerScreen(
-        navController: NavController,
-        windowSize: WindowSize,
-        backStackEntry: NavBackStackEntry
-    ) {
-        FeedArticleScreen(
-            windowSize = windowSize,
-            navController = navController,
-            viewModel = backStackEntry.DIAwareViewModel(),
         )
     }
 }
@@ -339,21 +301,25 @@ object FeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         val feedId = backStackEntry.arguments?.getLong("id")
-            ?: error("Missing mandatory argument: id")
+            ?: ID_UNSET
         val tag = backStackEntry.arguments?.getString("tag")
-            ?: error("Missing mandatory argument: tag")
+            ?: ""
 
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.DIAwareViewModel()
 
         LaunchedEffect(feedId, tag) {
-            navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = tag)
-            FeedArticleDestination.navigate(navController)
+            if (feedId > ID_UNSET || tag.isNotBlank()) {
+                navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = tag)
+            }
         }
+        FeedScreen(
+            navController = navController,
+            viewModel = backStackEntry.DIAwareViewModel(),
+        )
     }
 }
 
@@ -378,7 +344,6 @@ object ArticleDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         val itemId = backStackEntry.arguments?.getLong("itemId")
@@ -387,12 +352,24 @@ object ArticleDestination : NavigationDestination(
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.DIAwareViewModel()
 
-        // TODO should this also set current feed? On tablet it might feel weird that
-        // the article is from one feed and the list displays a different feed
         LaunchedEffect(itemId) {
             navigationDeepLinkViewModel.setCurrentArticle(itemId = itemId)
-            FeedArticleDestination.navigate(navController)
         }
+
+        ArticleScreen(
+            onNavigateUp = {
+                if (!navController.popBackStack()) {
+                    FeedDestination.navigate(navController)
+                }
+            },
+            onNavigateToFeed = { feedId ->
+                navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
+                if (!navController.popBackStack()) {
+                    FeedDestination.navigate(navController)
+                }
+            },
+            viewModel = backStackEntry.DIAwareViewModel(),
+        )
     }
 }
 
@@ -430,13 +407,11 @@ object SyncScreenDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        windowSize: WindowSize,
         backStackEntry: NavBackStackEntry
     ) {
         val syncRemoteViewModel = backStackEntry.DIAwareViewModel<SyncScreenViewModel>()
 
         SyncScreen(
-            windowSize = windowSize,
             onNavigateUp = {
                 if (!navController.popBackStack()) {
                     SettingsDestination.navigate(navController)

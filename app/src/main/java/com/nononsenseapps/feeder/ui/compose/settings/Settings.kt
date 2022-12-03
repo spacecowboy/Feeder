@@ -42,9 +42,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -80,8 +77,11 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
+import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
+import com.nononsenseapps.feeder.ui.compose.theme.dynamicScrollBehavior
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
@@ -94,9 +94,9 @@ fun SettingsScreen(
 ) {
     val viewState by settingsViewModel.viewState.collectAsState()
 
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-        rememberTopAppBarState()
-    )
+    val scrollBehavior = dynamicScrollBehavior()
+
+    SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
         modifier = Modifier
@@ -104,15 +104,9 @@ fun SettingsScreen(
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
-            TopAppBar(
+            DynamicTopAppBar(
                 scrollBehavior = scrollBehavior,
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.title_activity_settings),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
+                title = stringResource(id = R.string.title_activity_settings),
                 navigationIcon = {
                     IconButton(onClick = onNavigateUp) {
                         Icon(
@@ -169,7 +163,9 @@ fun SettingsScreen(
             swipeAsReadValue = viewState.swipeAsRead,
             onSwipeAsReadOptionChanged = settingsViewModel::setSwipeAsRead,
             useDynamicTheme = viewState.useDynamicTheme,
-            onUseDynamicTheme = settingsViewModel::setUseDynamicTheme
+            onUseDynamicTheme = settingsViewModel::setUseDynamicTheme,
+            textScale = viewState.textScale,
+            setTextScale = settingsViewModel::setTextScale,
         )
     }
 }
@@ -219,6 +215,8 @@ fun SettingsScreenPreview() {
                 swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
                 useDynamicTheme = true,
                 onUseDynamicTheme = {},
+                textScale = 1.5f,
+                setTextScale = {},
             )
         }
     }
@@ -265,6 +263,8 @@ fun SettingsList(
     onOpenSyncSettings: () -> Unit,
     useDynamicTheme: Boolean,
     onUseDynamicTheme: (Boolean) -> Unit,
+    textScale: Float,
+    setTextScale: (Float) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -350,6 +350,22 @@ fun SettingsList(
             onSelection = {
                 onSwipeAsReadOptionChanged(it.swipeAsRead)
             }
+        )
+
+        Divider(modifier = Modifier.width(dimens.maxContentWidth))
+
+        GroupTitle { modifier ->
+            Text(
+                stringResource(id = R.string.text_scale),
+                modifier = modifier,
+            )
+        }
+
+        ScaleSetting(
+            currentValue = textScale,
+            onValueChange = setTextScale,
+            valueRange = 1f..2f,
+            steps = 9,
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -814,6 +830,75 @@ fun SwitchSetting(
             onCheckedChange = onCheckedChanged,
             modifier = Modifier.clearAndSetSemantics { },
             enabled = enabled,
+        )
+    }
+}
+
+@Composable
+fun ScaleSetting(
+    currentValue: Float,
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float>,
+    steps: Int,
+) {
+    val safeCurrentValue = currentValue.coerceIn(valueRange)
+    // People using screen readers probably don't care that much about text size
+    // so no point in adding screen reader action?
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .padding(start = 64.dp)
+            .semantics(mergeDescendants = true) {
+                stateDescription = "%.1fx".format(safeCurrentValue)
+            },
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
+            tonalElevation = 3.dp,
+        ) {
+            Text(
+                "Lorem ipsum dolor sit amet.",
+                style = MaterialTheme.typography.bodyLarge
+                    .merge(
+                        TextStyle(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize * currentValue,
+                        )
+                    ),
+                modifier = Modifier.padding(4.dp),
+            )
+        }
+        SliderWithEndLabels(
+            value = safeCurrentValue,
+            onValueChange = onValueChange,
+            startLabel = {
+                Text(
+                    "A",
+                    style = MaterialTheme.typography.bodyLarge
+                        .merge(
+                            TextStyle(
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.start,
+                            )
+                        ),
+                    modifier = Modifier.alignByBaseline(),
+                )
+            },
+            endLabel = {
+                Text(
+                    "A",
+                    style = MaterialTheme.typography.bodyLarge
+                        .merge(
+                            TextStyle(
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize * valueRange.endInclusive,
+                            )
+                        ),
+                    modifier = Modifier.alignByBaseline(),
+                )
+            },
+            valueRange = valueRange,
+            steps = steps,
         )
     }
 }

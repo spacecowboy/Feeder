@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
@@ -19,7 +19,6 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.utils.rememberWindowSizeClass
 import org.kodein.di.compose.withDI
 
 /**
@@ -41,7 +40,6 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                 val currentTheme by viewModel.currentTheme.collectAsState()
                 val darkThemePreference by viewModel.darkThemePreference.collectAsState()
                 val dynamicColors by viewModel.dynamicColors.collectAsState()
-                val windowSize = rememberWindowSizeClass()
 
                 FeederTheme(
                     currentTheme = currentTheme,
@@ -52,33 +50,12 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                     AnimatedNavHost(navController, startDestination = "search") {
                         composable(
                             "search",
-                            enterTransition = {
-                                slideIntoContainer(
-                                    AnimatedContentScope.SlideDirection.Left,
-                                    animationSpec = tween(256)
-                                )
-                            },
-                            exitTransition = {
-                                slideOutOfContainer(
-                                    AnimatedContentScope.SlideDirection.Left,
-                                    animationSpec = tween(256)
-                                )
-                            },
-                            popEnterTransition = {
-                                slideIntoContainer(
-                                    AnimatedContentScope.SlideDirection.Right,
-                                    animationSpec = tween(256)
-                                )
-                            },
-                            popExitTransition = {
-                                slideOutOfContainer(
-                                    AnimatedContentScope.SlideDirection.Right,
-                                    animationSpec = tween(256)
-                                )
-                            },
+                            enterTransition = { fadeIn() },
+                            exitTransition = { fadeOut() },
+                            popEnterTransition = { fadeIn() },
+                            popExitTransition = { fadeOut() },
                         ) { backStackEntry ->
                             SearchFeedScreen(
-                                windowSize = windowSize,
                                 onNavigateUp = {
                                     onNavigateUpFromIntentActivities()
                                 },
@@ -96,41 +73,19 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                             route = AddFeedDestination.route,
                             arguments = AddFeedDestination.arguments,
                             deepLinks = AddFeedDestination.deepLinks,
-                            enterTransition = {
-                                slideIntoContainer(
-                                    AnimatedContentScope.SlideDirection.Left,
-                                    animationSpec = tween(256)
-                                )
-                            },
-                            exitTransition = {
-                                slideOutOfContainer(
-                                    AnimatedContentScope.SlideDirection.Left,
-                                    animationSpec = tween(256)
-                                )
-                            },
-                            popEnterTransition = {
-                                slideIntoContainer(
-                                    AnimatedContentScope.SlideDirection.Right,
-                                    animationSpec = tween(256)
-                                )
-                            },
-                            popExitTransition = {
-                                slideOutOfContainer(
-                                    AnimatedContentScope.SlideDirection.Right,
-                                    animationSpec = tween(256)
-                                )
-                            },
+                            enterTransition = { fadeIn() },
+                            exitTransition = { fadeOut() },
+                            popEnterTransition = { fadeIn() },
+                            popExitTransition = { fadeOut() },
                         ) { backStackEntry ->
                             CreateFeedScreen(
-                                windowSize = windowSize,
                                 onNavigateUp = {
                                     navController.popBackStack()
                                 },
                                 createFeedScreenViewModel = backStackEntry.DIAwareViewModel(),
-                                {
-                                    finish()
-                                },
-                            )
+                            ) {
+                                finish()
+                            }
                         }
                     }
                 }

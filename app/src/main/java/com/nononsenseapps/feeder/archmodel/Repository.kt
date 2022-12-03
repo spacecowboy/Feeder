@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
@@ -126,6 +125,9 @@ class Repository(override val di: DI) : DIAware {
     val useDynamicTheme = settingsStore.useDynamicTheme
     fun setUseDynamicTheme(value: Boolean) = settingsStore.setUseDynamicTheme(value)
 
+    val textScale = settingsStore.textScale
+    fun setTextScale(value: Float) = settingsStore.setTextScale(value)
+
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
     fun setMaxCountPerFeed(value: Int) = settingsStore.setMaxCountPerFeed(value)
 
@@ -145,10 +147,13 @@ class Repository(override val di: DI) : DIAware {
         sessionStore.setResumeTime(value)
     }
 
+    /**
+     * Returns EPOCH is no sync is currently happening
+     */
     val currentlySyncingLatestTimestamp: Flow<Instant>
         get() =
             feedStore.getCurrentlySyncingLatestTimestamp()
-                .map { value ->
+                .mapLatest { value ->
                     value ?: Instant.EPOCH
                 }
 

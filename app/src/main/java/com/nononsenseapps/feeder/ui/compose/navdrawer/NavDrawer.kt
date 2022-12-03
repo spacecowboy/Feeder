@@ -27,15 +27,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material3.DismissibleDrawerSheet
+import androidx.compose.material3.DismissibleNavigationDrawer
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -57,12 +64,58 @@ import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 import java.net.URL
+import kotlinx.coroutines.launch
 
 const val COLLAPSE_ANIMATION_DURATION = 300
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@Composable
+fun ScreenWithNavDrawer(
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+    feedsAndTags: ImmutableHolder<List<DrawerItemWithUnreadCount>>,
+    expandedTags: ImmutableHolder<Set<String>>,
+    onToggleTagExpansion: (String) -> Unit,
+    onDrawerItemSelected: (Long, String) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    DismissibleNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DismissibleDrawerSheet {
+                ListOfFeedsAndTags(
+                    feedsAndTags = feedsAndTags,
+                    expandedTags = expandedTags,
+                    onToggleTagExpansion = onToggleTagExpansion,
+                    onItemClick = { item ->
+                        coroutineScope.launch {
+                            val id = when (item) {
+                                is DrawerFeed -> item.id
+                                is DrawerTag -> ID_UNSET
+                                is DrawerTop -> ID_ALL_FEEDS
+                            }
+                            val tag = when (item) {
+                                is DrawerFeed -> item.tag
+                                is DrawerTag -> item.tag
+                                is DrawerTop -> ""
+                            }
+                            onDrawerItemSelected(id, tag)
+                            drawerState.close()
+                        }
+                    }
+                )
+            }
+        },
+        content = content,
+    )
+}
 
 @ExperimentalAnimationApi
 @Composable
