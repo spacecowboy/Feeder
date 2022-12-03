@@ -203,8 +203,6 @@ configurations.all {
     resolutionStrategy {
 //    failOnVersionConflict()
 //
-//    force "com.squareup.okhttp3:okhttp:$okhttp_version"
-//    force "com.squareup.okio:okio:$okio_version"
 //    force "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 //    force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
 //    force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"

@@ -68,8 +68,6 @@ val seed = Green700
 val NavBarScrimLight = Color(0xE3ffffff)
 val NavBarScrimDark = Color(0xC3000000)
 
-// OLD Material 2
-// TODO REMOVE
 val SwipingItemToReadColor = Color(0xffff5252)
 val SwipingItemToUnreadColor = Color(0xff1C9255)
 

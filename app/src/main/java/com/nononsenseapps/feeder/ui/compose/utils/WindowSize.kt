@@ -87,7 +87,7 @@ private fun Activity.rememberWindowSize(): Size {
     return windowMetrics.bounds.toComposeRect().size
 }
 
-// TODO experiment and see what is reasonable. Pixel emultor is 390 x 850
+// Pixel emulator is 390 x 850. This value was just a first guess
 private val shortHeightLimit = 500.dp
 
 /**

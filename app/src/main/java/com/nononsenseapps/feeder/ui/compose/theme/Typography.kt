@@ -14,39 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 
 // Set of Material typography styles to start with
-val Typography = Typography(
-//    TODO REMOVE
-//    h1 = TextStyle(
-//        fontWeight = FontWeight.Light,
-//        fontSize = 34.sp,
-//        letterSpacing = (-1.5).sp
-//    ),
-//    h2 = TextStyle(
-//        fontWeight = FontWeight.Light,
-//        fontSize = 30.sp,
-//        letterSpacing = (-0.5).sp
-//    ),
-//    h3 = TextStyle(
-//        fontWeight = FontWeight.Normal,
-//        fontSize = 28.sp,
-//        letterSpacing = 0.sp
-//    ),
-//    h4 = TextStyle(
-//        fontWeight = FontWeight.Normal,
-//        fontSize = 26.sp,
-//        letterSpacing = 0.25.sp
-//    ),
-//    h5 = TextStyle(
-//        fontWeight = FontWeight.Normal,
-//        fontSize = 24.sp,
-//        letterSpacing = 0.sp
-//    ),
-//    h6 = TextStyle(
-//        fontWeight = FontWeight.Medium,
-//        fontSize = 20.sp,
-//        letterSpacing = 0.15.sp
-//    ),
-)
+val Typography = Typography()
 
 @Composable
 fun LinkTextStyle(): TextStyle =
