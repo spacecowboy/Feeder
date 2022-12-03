@@ -4,7 +4,8 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavArgumentBuilder
@@ -38,16 +39,16 @@ sealed class NavigationDestination(
     protected val navArguments: List<NavigationArgument>,
     val deepLinks: List<NavDeepLink>,
     private val enterTransition: (AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition?)? = {
-        slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(256))
+        fadeIn()
     },
     private val exitTransition: (AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition?)? = {
-        slideOutOfContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(256))
+        fadeOut()
     },
     private val popEnterTransition: (AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition?)? = {
-        slideIntoContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(256))
+        fadeIn()
     },
     private val popExitTransition: (AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition?)? = {
-        slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(256))
+        fadeOut()
     },
 ) {
     val arguments: List<NamedNavArgument> = navArguments.map { it.namedNavArgument }

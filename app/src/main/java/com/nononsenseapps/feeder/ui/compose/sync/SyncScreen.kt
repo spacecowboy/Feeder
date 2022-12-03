@@ -7,11 +7,8 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -320,7 +317,7 @@ fun SyncScreen(
         visible = targetScreen == SyncScreenType.SINGLE_SETUP,
         enter = when (previousScreen) {
             null -> fadeIn(initialAlpha = 1.0f)
-            else -> slideInHorizontally(tween(256), initialOffsetX = { -it })
+            else -> fadeIn()
         },
         /*
         This may seem weird - but it's a special case. This exit animation actually runs
@@ -330,7 +327,7 @@ fun SyncScreen(
          */
         exit = when (previousScreen) {
             null -> fadeOut(targetAlpha = 1.0f)
-            else -> slideOutHorizontally(tween(256), targetOffsetX = { -it })
+            else -> fadeOut()
         },
     ) {
         SyncSetupScreen(
@@ -343,13 +340,8 @@ fun SyncScreen(
 
     AnimatedVisibility(
         visible = targetScreen == SyncScreenType.SINGLE_JOIN,
-        enter = slideInHorizontally(tween(256), initialOffsetX = { it }),
-        exit = slideOutHorizontally(tween(256), targetOffsetX = {
-            when (targetScreen) {
-                SyncScreenType.SINGLE_DEVICELIST -> -it
-                else -> it
-            }
-        }),
+        enter = fadeIn(),
+        exit = fadeOut(),
     ) {
         SyncJoinScreen(
             onNavigateUp = onLeaveSyncJoin,
@@ -365,19 +357,11 @@ fun SyncScreen(
     AnimatedVisibility(
         visible = targetScreen == SyncScreenType.SINGLE_DEVICELIST,
         enter = when (previousScreen) {
-            SyncScreenType.SINGLE_ADD_DEVICE -> slideInHorizontally(
-                tween(256),
-                initialOffsetX = { -it }
-            )
+            SyncScreenType.SINGLE_ADD_DEVICE -> fadeIn()
             null -> fadeIn(initialAlpha = 1.0f)
-            else -> slideInHorizontally(tween(256), initialOffsetX = { it })
+            else -> fadeIn()
         },
-        exit = slideOutHorizontally(tween(256), targetOffsetX = {
-            when (targetScreen) {
-                SyncScreenType.SINGLE_ADD_DEVICE -> -it
-                else -> it
-            }
-        }),
+        exit = fadeOut(),
     ) {
         SyncDeviceListScreen(
             onNavigateUp = onLeaveSyncSettings,
@@ -391,8 +375,8 @@ fun SyncScreen(
 
     AnimatedVisibility(
         visible = targetScreen == SyncScreenType.SINGLE_ADD_DEVICE,
-        enter = slideInHorizontally(tween(256), initialOffsetX = { it }),
-        exit = slideOutHorizontally(tween(256), targetOffsetX = { it }),
+        enter = fadeIn(),
+        exit = fadeOut(),
     ) {
         SyncAddNewDeviceScreen(
             onNavigateUp = onLeaveAddDevice,
@@ -947,10 +931,6 @@ fun SyncAddNewDeviceContent(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = dimens.margin, vertical = 8.dp)
-//            .scrollable(
-//                state = rememberScrollState(),
-//                orientation = Orientation.Vertical,
-//            )
     ) {
         Text(
             text = stringResource(R.string.press_scan_sync),
