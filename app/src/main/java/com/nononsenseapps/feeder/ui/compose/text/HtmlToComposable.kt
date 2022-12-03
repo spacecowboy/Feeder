@@ -502,11 +502,12 @@ private fun TextComposer.appendTextChildren(
                                         if (alt.isNotBlank()) {
                                             Spacer(modifier = Modifier.height(16.dp))
 
-                                            Text(
-                                                alt,
-                                                style = MaterialTheme.typography.labelMedium,
-                                                modifier = Modifier.fillMaxWidth()
-                                            )
+                                            ProvideScaledText(MaterialTheme.typography.labelMedium) {
+                                                Text(
+                                                    alt,
+                                                    modifier = Modifier.fillMaxWidth()
+                                                )
+                                            }
                                         }
 
                                         Spacer(modifier = Modifier.height(16.dp))
@@ -631,11 +632,12 @@ private fun TextComposer.appendTextChildren(
 
                                         Spacer(modifier = Modifier.height(16.dp))
 
-                                        Text(
-                                            text = stringResource(R.string.touch_to_play_video),
-                                            style = MaterialTheme.typography.labelMedium,
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
+                                        ProvideScaledText(MaterialTheme.typography.labelMedium) {
+                                            Text(
+                                                text = stringResource(R.string.touch_to_play_video),
+                                                modifier = Modifier.fillMaxWidth()
+                                            )
+                                        }
 
                                         Spacer(modifier = Modifier.height(16.dp))
                                     }
