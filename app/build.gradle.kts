@@ -292,6 +292,7 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.moshi.adapters)
     implementation(libs.qrgen)
+    implementation(libs.unifiedpush.android.connector)
     // tests
     testImplementation(libs.bundles.kotlin.stdlib)
     testImplementation(libs.kotlin.test.junit)

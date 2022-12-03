@@ -50,6 +50,7 @@ dependencyResolutionManagement {
             version("testRunner", "1.4.0")
             version("lifecycle", "2.3.1")
             version("room", "2.4.3")
+            version("unifiedpushAndroidConnector", "2.1.1")
             // Compose related below
             version("compose", "2022.11.00")
             val activityCompose = "1.6.1"
@@ -265,6 +266,7 @@ dependencyResolutionManagement {
             library("moshi-kotlin", "com.squareup.moshi", "moshi-kotlin").versionRef("moshi")
             library("moshi-adapters", "com.squareup.moshi", "moshi-adapters").versionRef("moshi")
             library("qrgen", "com.github.kenglxn.qrgen", "android").versionRef("qrgen")
+            library("unifiedpush-android-connector", "com.github.UnifiedPush", "android-connector").versionRef("unifiedpushAndroidConnector")
 
             // testing
             library("junit", "junit", "junit").versionRef("junit")

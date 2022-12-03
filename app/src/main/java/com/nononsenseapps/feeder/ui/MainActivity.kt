@@ -28,9 +28,15 @@ import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.ProvideFontScale
 import com.nononsenseapps.feeder.ui.compose.utils.withWindowSize
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.kodein.di.compose.withDI
 import org.kodein.di.instance
+import org.unifiedpush.android.connector.UnifiedPush.getDistributor
+import org.unifiedpush.android.connector.UnifiedPush.getDistributors
+import org.unifiedpush.android.connector.UnifiedPush.registerApp
+import org.unifiedpush.android.connector.UnifiedPush.saveDistributor
 
 class MainActivity : DIAwareComponentActivity() {
     private val notificationsWorker: NotificationsWorker by instance()
@@ -83,6 +89,26 @@ class MainActivity : DIAwareComponentActivity() {
         mainActivityViewModel.ensurePeriodicSyncConfigured()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val selectedDistributor = getDistributor(this)
+        Log.d("UNIFIED", "distributor: $selectedDistributor")
+        if (selectedDistributor.isNotEmpty()) {
+            // Re-register in case something broke
+            Log.d("UNIFIED", "registerApp")
+            registerApp(this)
+        } else {
+            val distributors = getDistributors(this)
+            Log.d("UNIFIED", "distributors: ${distributors.joinToString(", ")}")
+            val chosenDistributor = "io.heckel.ntfy"
+            Log.d("UNIFIED", "saveDistributor: $chosenDistributor")
+            saveDistributor(this, chosenDistributor)
+            Log.d("UNIFIED", "registerApp")
+            registerApp(this)
+        }
+
+        runBlocking(Dispatchers.IO) {
+            sendPushMessage("https://arstechnica.com/feed/FOOhttps://arstechnica.com/?p=1901755")
+        }
 
         setContent {
             val currentTheme by mainActivityViewModel.currentTheme.collectAsState()

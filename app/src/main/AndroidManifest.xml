@@ -177,5 +177,14 @@
       android:authorities="com.nononsenseapps.feeder.rssprovider"
       android:exported="true"
       android:readPermission="com.nononsenseapps.feeder.permission.read" />
+
+    <receiver android:exported="true"  android:enabled="true"  android:name=".ui.PushReceiver">
+      <intent-filter>
+        <action android:name="org.unifiedpush.android.connector.MESSAGE"/>
+        <action android:name="org.unifiedpush.android.connector.UNREGISTERED"/>
+        <action android:name="org.unifiedpush.android.connector.NEW_ENDPOINT"/>
+        <action android:name="org.unifiedpush.android.connector.REGISTRATION_REFUSED"/>
+      </intent-filter>
+    </receiver>
   </application>
 </manifest>
