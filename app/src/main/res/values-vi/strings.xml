@@ -190,4 +190,5 @@
     <string name="explanation_permission_notifications">Bạn phải cấp quyền trước khi bật thông báo.</string>
     <string name="text_to_speech">Văn bản sang giọng nói</string>
     <string name="set_language">Đặt ngôn ngữ</string>
+    <string name="feed_icon">Biểu tượng nguồn cấp dữ liệu</string>
 </resources>

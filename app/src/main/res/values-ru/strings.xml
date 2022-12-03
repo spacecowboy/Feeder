@@ -190,4 +190,5 @@
     <string name="new_indicator">Новое</string>
     <string name="article_image">Изображение статьи</string>
     <string name="set_language">Установить язык</string>
+    <string name="feed_icon">Значок ленты</string>
 </resources>
