@@ -7,6 +7,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavArgumentBuilder
 import androidx.navigation.NavBackStackEntry
@@ -310,8 +311,10 @@ object FeedDestination : NavigationDestination(
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.DIAwareViewModel()
 
-        if (feedId > ID_UNSET || tag.isNotBlank()) {
-            navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = tag)
+        LaunchedEffect(feedId, tag) {
+            if (feedId > ID_UNSET || tag.isNotBlank()) {
+                navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = tag)
+            }
         }
         FeedScreen(
             navController = navController,
@@ -349,7 +352,9 @@ object ArticleDestination : NavigationDestination(
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.DIAwareViewModel()
 
-        navigationDeepLinkViewModel.setCurrentArticle(itemId = itemId)
+        LaunchedEffect(itemId) {
+            navigationDeepLinkViewModel.setCurrentArticle(itemId = itemId)
+        }
 
         ArticleScreen(
             onNavigateUp = {
