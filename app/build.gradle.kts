@@ -154,8 +154,10 @@ android {
                 listOf(
                     "META-INF/DEPENDENCIES",
                     "META-INF/LICENSE",
+                    "META-INF/LICENSE.md",
                     "META-INF/LICENSE.txt",
                     "META-INF/license.txt",
+                    "META-INF/LICENSE-notice.md",
                     "META-INF/NOTICE",
                     "META-INF/NOTICE.txt",
                     "META-INF/notice.txt",
