@@ -191,4 +191,5 @@
     <string name="new_indicator">Nouveau</string>
     <string name="article_image">Image de l\'article</string>
     <string name="feed_icon">Icône de flux</string>
+    <string name="text_scale">Mise à l\'échelle du texte</string>
 </resources>

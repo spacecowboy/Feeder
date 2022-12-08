@@ -191,4 +191,5 @@
     <string name="dynamic_theme_use">Colori dinamici</string>
     <string name="article_image">Immagine dell\'articolo</string>
     <string name="feed_icon">Icona del feed</string>
+    <string name="text_scale">Scala del testo</string>
 </resources>

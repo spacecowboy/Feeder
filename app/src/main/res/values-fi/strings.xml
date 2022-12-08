@@ -186,4 +186,5 @@
     <string name="bookmark_article">Lisää artikkeli kirjanmerkkeihin</string>
     <string name="remove_bookmark">Poista kirjanmerkki</string>
     <string name="new_indicator">Uusi</string>
+    <string name="text_scale">Tekstiasteikko</string>
 </resources>
