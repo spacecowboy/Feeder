@@ -189,4 +189,7 @@
     <string name="skip_to_next">Hoppa till nästa</string>
     <string name="set_language">Sätt språk</string>
     <string name="text_to_speech">Text-till-tal</string>
+    <string name="feed_icon">Flödesikon</string>
+    <string name="article_image">Artikelbild</string>
+    <string name="text_scale">Textstorlek</string>
 </resources>

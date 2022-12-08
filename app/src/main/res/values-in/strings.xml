@@ -191,4 +191,5 @@
     <string name="pinned">Disematkan</string>
     <string name="bookmarked">Ditandai</string>
     <string name="feed_icon">Ikon feed</string>
+    <string name="text_scale">Skala teks</string>
 </resources>
