@@ -191,4 +191,5 @@
     <string name="new_indicator">Yeni</string>
     <string name="article_image">Makale görseli</string>
     <string name="feed_icon">Yayın Simgesi</string>
+    <string name="text_scale">Metin ölçeği</string>
 </resources>
