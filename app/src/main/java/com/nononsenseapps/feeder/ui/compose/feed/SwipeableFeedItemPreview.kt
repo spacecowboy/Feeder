@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -55,10 +56,14 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToReadColor
 import com.nononsenseapps.feeder.ui.compose.theme.SwipingItemToUnreadColor
+import com.nononsenseapps.feeder.util.logDebug
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
+
+private const val LOG_TAG = "FEEDER_SWIPEITEM"
 
 /**
  * OnSwipe takes a boolean parameter of the current read state of the item - so that it can be
@@ -70,6 +75,7 @@ import org.kodein.di.instance
 )
 @Composable
 fun SwipeableFeedItemPreview(
+    isLazyGrid: Boolean,
     onSwipe: suspend (Boolean) -> Unit,
     onlyUnread: Boolean,
     item: FeedListItem,
@@ -100,6 +106,7 @@ fun SwipeableFeedItemPreview(
 
     LaunchedEffect(key1 = onlyUnread, key2 = item.unread) {
         // critical state changes - reset ui state
+        logDebug(LOG_TAG, "resetting state")
         animatedVisibilityState.targetState = true
         swipeableState.animateTo(FeedItemSwipeState.NONE)
     }
@@ -110,7 +117,14 @@ fun SwipeableFeedItemPreview(
             swipeableState.targetValue != FeedItemSwipeState.NONE &&
             swipeableState.isAnimationRunning
         ) {
-            animatedVisibilityState.targetState = false
+            if (isLazyGrid) {
+                // Animations crash lazy grid so don't do them
+                logDebug(LOG_TAG, "Grid so mark as read direct no animation")
+                onSwipe(item.unread)
+            } else {
+                logDebug(LOG_TAG, "Starting hide")
+                animatedVisibilityState.targetState = false
+            }
         }
     }
 
@@ -118,7 +132,7 @@ fun SwipeableFeedItemPreview(
         if (swipeableState.currentValue != FeedItemSwipeState.NONE) {
             if (!onlyUnread) {
                 // Swipe is complete, toggle read state. If onlyUnread then wait for vertical hide
-                Log.d("JONAS", "Animation onSwipe ${item.unread}")
+                logDebug(LOG_TAG, "Animation onSwipe ${item.unread}")
                 onSwipe(item.unread)
             }
         }
@@ -127,7 +141,7 @@ fun SwipeableFeedItemPreview(
     // Once vertical hide animation completes then mark item as read
     LaunchedEffect(animatedVisibilityState.currentState, animatedVisibilityState.isIdle) {
         if (!animatedVisibilityState.currentState && animatedVisibilityState.isIdle) {
-            Log.d("JONAS", "Anim: onSwipe ${item.unread}")
+            logDebug(LOG_TAG, "Anim: onSwipe ${item.unread}")
             swipeableState.snapTo(FeedItemSwipeState.NONE)
             onSwipe(item.unread)
         }
@@ -257,6 +271,18 @@ fun SwipeableFeedItemPreview(
                 }
             }
 
+            val itemAlpha by remember(swipeableState.progress) {
+                derivedStateOf {
+                    if (swipeableState.progress.to == FeedItemSwipeState.NONE) {
+                        1f
+                    } else if (swipeableState.progress.from != FeedItemSwipeState.NONE) {
+                        0f
+                    } else {
+                        (1f - swipeableState.progress.fraction.absoluteValue).coerceIn(0f, 1f)
+                    }
+                }
+            }
+
             when (feedItemStyle) {
                 FeedItemStyle.CARD -> {
                     FeedItemCard(
@@ -272,6 +298,7 @@ fun SwipeableFeedItemPreview(
                         onToggleBookmarked = onToggleBookmarked,
                         modifier = Modifier
                             .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                            .graphicsLayer(alpha = itemAlpha)
                     )
                 }
                 FeedItemStyle.COMPACT -> {
@@ -288,6 +315,7 @@ fun SwipeableFeedItemPreview(
                         onToggleBookmarked = onToggleBookmarked,
                         modifier = Modifier
                             .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                            .graphicsLayer(alpha = itemAlpha)
                     )
                 }
                 FeedItemStyle.SUPER_COMPACT -> {
@@ -304,6 +332,7 @@ fun SwipeableFeedItemPreview(
                         onToggleBookmarked = onToggleBookmarked,
                         modifier = Modifier
                             .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
+                            .graphicsLayer(alpha = itemAlpha)
                     )
                 }
             }

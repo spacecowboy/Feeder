@@ -593,6 +593,7 @@ fun FeedScreen(
                         }
                     }
                 },
+                markAsUnread = markAsUnread,
                 onAddFeed = onAddFeed,
                 markBeforeAsRead = markBeforeAsRead,
                 markAfterAsRead = markAfterAsRead,
@@ -903,6 +904,7 @@ fun FeedListContent(
                         ?: return@items
 
                     SwipeableFeedItemPreview(
+                        isLazyGrid = false,
                         onSwipe = { currentState ->
                             markAsUnread(
                                 previewItem.id,
@@ -984,6 +986,7 @@ fun FeedGridContent(
     viewState: FeedScreenViewState,
     onOpenNavDrawer: () -> Unit,
     onAddFeed: () -> Unit,
+    markAsUnread: (Long, Boolean) -> Unit,
     markBeforeAsRead: (Int) -> Unit,
     markAfterAsRead: (Int) -> Unit,
     onItemClick: (Long) -> Unit,
@@ -1050,7 +1053,16 @@ fun FeedGridContent(
                     val previewItem = pagedFeedItems[itemIndex]
                         ?: return@items
 
-                    FixedFeedItemPreview(
+                    SwipeableFeedItemPreview(
+                        isLazyGrid = true,
+                        onSwipe = { currentState ->
+                            markAsUnread(
+                                previewItem.id,
+                                !currentState
+                            )
+                        },
+                        swipeAsRead = viewState.swipeAsRead,
+                        onlyUnread = viewState.onlyUnread,
                         item = previewItem,
                         showThumbnail = viewState.showThumbnails,
                         feedItemStyle = viewState.feedItemStyle,
