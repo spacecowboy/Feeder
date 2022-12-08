@@ -8,6 +8,7 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.util.ToastMaker
+import com.nononsenseapps.feeder.util.logDebug
 import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,7 +33,7 @@ suspend fun exportOpml(di: DI, uri: Uri) = withContext(Dispatchers.IO) {
                 }
             }
         }
-        Log.d("OPML", "Exported OPML in $time ms on ${Thread.currentThread().name}")
+        logDebug("OPML", "Exported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
         Log.e("OMPL", "Failed to export OPML", e)
         val toastMaker = di.direct.instance<ToastMaker>()
@@ -59,7 +60,7 @@ suspend fun importOpml(di: DI, uri: Uri) = withContext(Dispatchers.IO) {
             }
             requestFeedSync(di = di)
         }
-        Log.d("OPML", "Imported OPML in $time ms on ${Thread.currentThread().name}")
+        logDebug("OPML", "Imported OPML in $time ms on ${Thread.currentThread().name}")
     } catch (e: Throwable) {
         Log.e("OMPL", "Failed to import OPML", e)
         val toastMaker = di.direct.instance<ToastMaker>()

@@ -14,6 +14,7 @@ import androidx.work.WorkerParameters
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceGetUpdatesWorker.Companion.UNIQUE_GETUPDATES_NAME
 import com.nononsenseapps.feeder.sync.SyncRestClient
+import com.nononsenseapps.feeder.util.logDebug
 import java.util.concurrent.TimeUnit
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -34,7 +35,7 @@ class SyncServiceGetUpdatesWorker(val context: Context, workerParams: WorkerPara
 
     override suspend fun doWork(): Result {
         return try {
-            Log.d(LOG_TAG, "Doing work")
+            logDebug(LOG_TAG, "Doing work")
             syncClient.getRead()
             repository.applyRemoteReadMarks()
             syncClient.getDevices()
@@ -52,7 +53,8 @@ class SyncServiceGetUpdatesWorker(val context: Context, workerParams: WorkerPara
 }
 
 fun scheduleGetUpdates(di: DI) {
-    Log.d(SyncServiceGetUpdatesWorker.LOG_TAG, "Scheduling work")
+    return
+    logDebug(SyncServiceGetUpdatesWorker.LOG_TAG, "Scheduling work")
     val repository by di.instance<Repository>()
 
     val constraints = Constraints.Builder()

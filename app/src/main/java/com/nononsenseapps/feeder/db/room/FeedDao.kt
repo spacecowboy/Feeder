@@ -166,6 +166,25 @@ interface FeedDao {
 
     @Query(
         """
+            SELECT url
+            FROM feeds
+            ORDER BY url
+        """
+    )
+    suspend fun getFeedUrls(): List<URL>
+
+    @Query(
+        """
+            SELECT url
+            FROM feeds
+            WHERE id in (:ids)
+            ORDER BY url
+        """
+    )
+    suspend fun getFeedUrls(ids: List<Long>): List<URL>
+
+    @Query(
+        """
             SELECT *
             FROM feeds
             ORDER BY url

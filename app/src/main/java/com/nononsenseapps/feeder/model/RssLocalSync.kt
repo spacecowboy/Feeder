@@ -11,6 +11,7 @@ import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.sync.SyncRestClient
+import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
@@ -50,7 +51,7 @@ suspend fun syncFeeds(
 ): Boolean {
     val di: DI by closestDI(context)
     val repository: Repository by di.instance()
-    Log.d(LOG_TAG, "${Thread.currentThread().name}: Taking sync mutex")
+    logDebug(LOG_TAG, "${Thread.currentThread().name}: Taking sync mutex")
     return syncMutex.withLock {
         withContext(singleThreadedSync) {
             syncFeeds(
@@ -108,7 +109,7 @@ internal suspend fun syncFeeds(
 
                 val feedsToFetch = feedsToSync(db.feedDao(), feedId, feedTag, staleTime = staleTime)
 
-                Log.d(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
+                logDebug(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
 
                 val coroutineContext =
                     Dispatchers.Default + CoroutineExceptionHandler { _, throwable ->
@@ -178,7 +179,7 @@ internal suspend fun syncFeeds(
             }
         }
     }
-    Log.d(LOG_TAG, "Completed in $time ms")
+    logDebug(LOG_TAG, "Completed in $time ms")
     return result
 }
 
@@ -190,7 +191,7 @@ private suspend fun syncFeed(
     forceNetwork: Boolean = false,
     downloadTime: Instant,
 ) {
-    Log.d(LOG_TAG, "Fetching ${feedSql.displayTitle}")
+    logDebug(LOG_TAG, "Fetching ${feedSql.displayTitle}")
     val repository: Repository by di.instance()
     val feedParser: FeedParser by di.instance()
     val okHttpClient: OkHttpClient by di.instance()

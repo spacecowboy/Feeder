@@ -14,6 +14,7 @@ import androidx.work.WorkerParameters
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker.Companion.UNIQUE_SENDREAD_NAME
 import com.nononsenseapps.feeder.sync.SyncRestClient
+import com.nononsenseapps.feeder.util.logDebug
 import java.util.concurrent.TimeUnit
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -33,7 +34,7 @@ class SyncServiceSendReadWorker(val context: Context, workerParams: WorkerParame
 
     override suspend fun doWork(): Result {
         return try {
-            Log.d(LOG_TAG, "Doing work")
+            logDebug(LOG_TAG, "Doing work")
             syncClient.markAsRead()
             Result.success()
         } catch (e: Exception) {
@@ -49,7 +50,8 @@ class SyncServiceSendReadWorker(val context: Context, workerParams: WorkerParame
 }
 
 fun scheduleSendRead(di: DI) {
-    Log.d(SyncServiceSendReadWorker.LOG_TAG, "Scheduling work")
+    return
+    logDebug(SyncServiceSendReadWorker.LOG_TAG, "Scheduling work")
     val repository by di.instance<Repository>()
 
     val constraints = Constraints.Builder()

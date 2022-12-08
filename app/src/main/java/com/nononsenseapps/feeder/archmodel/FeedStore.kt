@@ -51,8 +51,8 @@ class FeedStore(override val di: DI) : DIAware {
     suspend fun getDisplayTitle(feedId: Long): String? =
         feedDao.getFeedTitle(feedId)?.displayTitle
 
-    suspend fun deleteFeeds(feedIds: List<Long>) {
-        feedDao.deleteFeeds(feedIds)
+    suspend fun deleteFeeds(feedIds: List<Long>): Int {
+        return feedDao.deleteFeeds(feedIds)
     }
 
     val allTags: Flow<List<String>> = feedDao.loadAllTags()
@@ -129,6 +129,14 @@ class FeedStore(override val di: DI) : DIAware {
 
     suspend fun getFeedsOrderedByUrl(): List<Feed> {
         return feedDao.getFeedsOrderedByUrl()
+    }
+
+    suspend fun getFeedUrls(): List<URL> {
+        return feedDao.getFeedUrls()
+    }
+
+    suspend fun getFeedUrls(feedIds: List<Long>): List<URL> {
+        return feedDao.getFeedUrls(feedIds)
     }
 
     fun getFlowOfFeedsOrderedByUrl(): Flow<List<Feed>> {

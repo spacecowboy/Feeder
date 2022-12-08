@@ -27,6 +27,8 @@ import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreen
 import com.nononsenseapps.feeder.ui.compose.editfeed.EditFeedScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.feed.FeedScreen
 import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleScreen
+import com.nononsenseapps.feeder.ui.compose.push.PushScreen
+import com.nononsenseapps.feeder.ui.compose.push.PushScreenViewModel
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
@@ -258,11 +260,17 @@ object SettingsDestination : NavigationDestination(
                 }
             },
             onNavigateToSyncScreen = {
-                SyncScreenDestination.navigate(
+                PushScreenDestination.navigate(
                     navController = navController,
                     syncCode = "",
                     secretKey = "",
                 )
+                // TODO
+//                SyncScreenDestination.navigate(
+//                    navController = navController,
+//                    syncCode = "",
+//                    secretKey = "",
+//                )
             },
             settingsViewModel = backStackEntry.DIAwareViewModel(),
         )
@@ -369,6 +377,55 @@ object ArticleDestination : NavigationDestination(
                 }
             },
             viewModel = backStackEntry.DIAwareViewModel(),
+        )
+    }
+}
+
+object PushScreenDestination : NavigationDestination(
+    path = "push",
+    navArguments = listOf(
+        QueryParamArgument("syncCode") {
+            type = NavType.StringType
+            defaultValue = ""
+        },
+        QueryParamArgument("secretKey") {
+            type = NavType.StringType
+            defaultValue = ""
+        }
+    ),
+    deepLinks = listOf(
+        navDeepLink {
+            uriPattern = "$DEEP_LINK_BASE_URI/push/join?sync_code={syncCode}&key={secretKey}"
+        },
+    ),
+) {
+    fun navigate(navController: NavController, syncCode: String, secretKey: String) {
+        val params = queryParams {
+            if (syncCode.isNotBlank()) {
+                +("syncCode" to syncCode)
+            }
+            if (secretKey.isNotBlank()) {
+                +("secretKey" to secretKey)
+            }
+        }
+
+        navController.navigate("$path$params")
+    }
+
+    @Composable
+    override fun registerScreen(
+        navController: NavController,
+        backStackEntry: NavBackStackEntry
+    ) {
+        val pushScreenViewModel = backStackEntry.DIAwareViewModel<PushScreenViewModel>()
+
+        PushScreen(
+            onNavigateUp = {
+                if (!navController.popBackStack()) {
+                    SettingsDestination.navigate(navController)
+                }
+            },
+            viewModel = pushScreenViewModel,
         )
     }
 }

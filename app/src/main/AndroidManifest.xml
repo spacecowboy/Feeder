@@ -178,7 +178,7 @@
       android:exported="true"
       android:readPermission="com.nononsenseapps.feeder.permission.read" />
 
-    <receiver android:exported="true"  android:enabled="true"  android:name=".ui.PushReceiver">
+    <receiver android:exported="true"  android:enabled="true"  android:name=".push.PushReceiver">
       <intent-filter>
         <action android:name="org.unifiedpush.android.connector.MESSAGE"/>
         <action android:name="org.unifiedpush.android.connector.UNREGISTERED"/>

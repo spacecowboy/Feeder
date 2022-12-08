@@ -31,6 +31,7 @@ dependencyResolutionManagement {
             // END Unison
 
             // Rest
+            version("wire", "4.4.3")
             version("kodein", "7.5.0")
             version("coroutines", "1.6.4")
             version("rome", "1.7.1-f8")
@@ -73,6 +74,7 @@ dependencyResolutionManagement {
             plugin("kotlin-jvm", "org.jetbrains.kotlin.jvm").versionRef("kotlin")
             plugin("kotlin-kapt", "org.jetbrains.kotlin.kapt").versionRef("kotlin")
             plugin("kotlin-parcelize", "org.jetbrains.kotlin.plugin.parcelize").versionRef("kotlin")
+            plugin("wire", "com.squareup.wire").versionRef("wire")
 
             // BOMS
             library("okhttp-bom", "com.squareup.okhttp3", "okhttp-bom").versionRef("okhttp")
@@ -267,6 +269,7 @@ dependencyResolutionManagement {
             library("moshi-adapters", "com.squareup.moshi", "moshi-adapters").versionRef("moshi")
             library("qrgen", "com.github.kenglxn.qrgen", "android").versionRef("qrgen")
             library("unifiedpush-android-connector", "com.github.UnifiedPush", "android-connector").versionRef("unifiedpushAndroidConnector")
+            library("wire-runtime", "com.squareup.wire", "wire-runtime").versionRef("wire")
 
             // testing
             library("junit", "junit", "junit").versionRef("junit")

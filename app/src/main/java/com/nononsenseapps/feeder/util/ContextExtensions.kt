@@ -6,7 +6,6 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
@@ -76,7 +75,7 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null
             }
         }
     } catch (error: Throwable) {
-        Log.d("FeederDynamicShortcut", "Error during add of shortcut: ${error.message}")
+        logDebug("FeederDynamicShortcut", "Error during add of shortcut: ${error.message}")
     }
 }
 
@@ -91,7 +90,7 @@ fun Context.reportShortcutToFeedUsed(id: Any) {
             shortcutManager.reportShortcutUsed("$id")
         }
     } catch (error: Throwable) {
-        Log.d("FeederDynamicShortcut", "Error during report use of shortcut: ${error.message}")
+        logDebug("FeederDynamicShortcut", "Error during report use of shortcut: ${error.message}")
     }
 }
 

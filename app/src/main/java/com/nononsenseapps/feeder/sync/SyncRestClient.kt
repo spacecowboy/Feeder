@@ -386,7 +386,7 @@ class SyncRestClient(override val di: DI) : DIAware {
 
         for (url in feedUrlsWhichWereDeletedOnRemote) {
             logDebug(LOG_TAG, "Deleting remotely deleted feed: $url")
-            repository.deleteFeed(url)
+            repository.deleteFeedNoBroadcast(url)
         }
 
         for (remoteFeed in remoteFeeds) {
@@ -397,7 +397,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                 dbFeed == null && !seenRemotelyBefore -> {
                     // Entirely new remote feed
                     logDebug(LOG_TAG, "Saving new feed: ${remoteFeed.url}")
-                    repository.saveFeed(
+                    repository.saveFeedNoBroadcast(
                         remoteFeed.updateFeedCopy(Feed())
                     )
                 }
@@ -410,7 +410,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                     // Compare modification date - only save if remote is newer
                     if (remoteFeed.whenModified > dbFeed.whenModified) {
                         logDebug(LOG_TAG, "Saving updated feed: ${remoteFeed.url}")
-                        repository.saveFeed(
+                        repository.saveFeedNoBroadcast(
                             remoteFeed.updateFeedCopy(dbFeed)
                         )
                     } else {

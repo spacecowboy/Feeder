@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.wire)
 }
 
 class RoomSchemaArgProvider(
@@ -177,6 +178,11 @@ android {
         ignoreWarnings = true
         textOutput = file("stdout")
         textReport = true
+    }
+}
+
+wire {
+    kotlin {
     }
 }
 

@@ -10,6 +10,7 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
+import com.nononsenseapps.feeder.util.logDebug
 import java.io.File
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -92,7 +93,7 @@ suspend fun parseFullArticle(
 ): Pair<Boolean, Throwable?> = withContext(Dispatchers.Default) {
     return@withContext try {
         val url = feedItem.link ?: return@withContext false to null
-        Log.d("FeederFullText", "Fetching full page ${feedItem.link}")
+        logDebug("FeederFullText", "Fetching full page ${feedItem.link}")
         val html: String = okHttpClient.curl(URL(url)) ?: return@withContext false to null
 
         // TODO verify encoding is respected in reader
@@ -102,7 +103,7 @@ suspend fun parseFullArticle(
         // TODO set image on item if none already
         // naiveFindImageLink(article.content)?.let { Parser.unescapeEntities(it, true) }
 
-        Log.d("FeederFullText", "Writing article ${feedItem.link}")
+        logDebug("FeederFullText", "Writing article ${feedItem.link}")
         withContext(Dispatchers.IO) {
             blobFullOutputStream(feedItem.id, filesDir).bufferedWriter().use { writer ->
                 writer.write(article.contentWithUtf8Encoding)

@@ -43,8 +43,11 @@ const val ID_ALL_FEEDS: Long = -10
         RemoteReadMark::class,
         RemoteFeed::class,
         SyncDevice::class,
+        ThisDevice::class,
+        KnownDevice::class,
+        QueuedMessage::class,
     ],
-    version = 24
+    version = 25
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -56,6 +59,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun remoteReadMarkDao(): RemoteReadMarkDao
     abstract fun remoteFeedDao(): RemoteFeedDao
     abstract fun syncDeviceDao(): SyncDeviceDao
+    abstract fun messageQueueDao(): MessageQueueDao
+    abstract fun knownDevicesDao(): KnownDevicesDao
+    abstract fun thisDeviceDao(): ThisDeviceDao
 
     companion object {
         // For Singleton instantiation
@@ -105,12 +111,43 @@ fun getAllMigrations(di: DI) = arrayOf(
     MIGRATION_21_22,
     MIGRATION_22_23,
     MigrationFrom23To24(di),
+    MIGRATION_24_25,
 )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+object MIGRATION_24_25 : Migration(24, 25) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `push_this_device` (`id` INTEGER PRIMARY KEY NOT NULL, `endpoint` TEXT NOT NULL, `device_name` TEXT NOT NULL)
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS `index_push_this_device_endpoint` ON `push_this_device` (`endpoint`)
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `push_known_devices` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `endpoint` TEXT NOT NULL, `device_name` TEXT NOT NULL, `last_seen` INTEGER NOT NULL)
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS `index_push_known_devices_endpoint` ON `push_known_devices` (`endpoint`)
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `push_message_queue` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `endpoint` TEXT NOT NULL, `body` BLOB NOT NULL, FOREIGN KEY(`endpoint`) REFERENCES `push_known_devices`(`endpoint`) ON UPDATE NO ACTION ON DELETE CASCADE)
+            """.trimIndent()
+        )
+    }
+}
+
 @Suppress("ClassName")
 class MigrationFrom23To24(override val di: DI) : Migration(23, 24), DIAware {
     private val sharedPrefs: SharedPreferences by instance()

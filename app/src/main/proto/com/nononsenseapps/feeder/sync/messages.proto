@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package com.nononsenseapps.feeder.push;
+
+message Update {
+    Device sender = 1;
+    Timestamp timestamp = 2;
+    oneof updates {
+        Devices devices = 3;
+        Feeds feeds = 4;
+        ReadMarks read_marks = 5;
+        DeletedFeeds deleted_feeds = 6;
+        DeletedDevices deleted_devices = 7;
+        ProofOfLife proof_of_life = 8;
+        SnapshotRequest snapshot_request = 9;
+    }
+}
+
+message Feeds {
+    repeated Feed feeds = 1;
+}
+
+message Feed {
+    string url = 1;
+    optional string title = 2;
+    string custom_title = 3;
+    string tag = 4;
+    optional string image_url = 5;
+    bool full_text_by_default = 6;
+    string open_articles_with = 7;
+    bool alternate_id = 8;
+    Timestamp modified_at = 9;
+}
+
+message DeletedFeeds {
+    repeated DeletedFeed deleted_feeds = 1;
+}
+
+message DeletedFeed {
+    string url = 1;
+}
+
+message Devices {
+    repeated Device devices = 1;
+}
+
+message Device {
+    string endpoint = 1;
+    // potentially user configurable
+    optional string name = 2;
+}
+
+message DeletedDevices {
+    repeated DeletedDevice deleted_devices = 1;
+}
+
+message DeletedDevice {
+    string endpoint = 1;
+}
+
+message ReadMarks {
+    repeated ReadMark read_marks = 1;
+}
+
+message ReadMark {
+    string feed_url = 1;
+    string article_guid = 2;
+}
+
+message ProofOfLife {}
+
+message SnapshotRequest {
+    oneof type_of_request {
+        FeedsRequest feeds_request = 1;
+        DevicesRequest devices_request = 2;
+    }
+}
+message FeedsRequest {}
+message DevicesRequest {}
+
+// Because Instant was added in API 26
+message Timestamp {
+    int64 seconds = 1;
+    int32 nanos = 2;
+}

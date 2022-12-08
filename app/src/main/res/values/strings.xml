@@ -167,6 +167,7 @@
   <string name="device_sync_financed_by_community">This service is payed for by the community. Please consider donating if you find it useful.</string>
   <string name="this_device">%1$s (this device)</string>
   <string name="disconnect_device_from_sync">Disconnect device from sync chain</string>
+  <string name="delete_device">Delete device</string>
   <string name="devices_on_sync_chain">Devices on sync chain</string>
   <string name="remove">Remove</string>
   <string name="remove_device">Remove device</string>

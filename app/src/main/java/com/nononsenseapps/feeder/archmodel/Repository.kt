@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
@@ -11,14 +12,36 @@ import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.KnownDevice
+import com.nononsenseapps.feeder.db.room.QueuedMessage
 import com.nononsenseapps.feeder.db.room.RemoteFeed
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
+import com.nononsenseapps.feeder.db.room.ThisDevice
+import com.nononsenseapps.feeder.db.room.generateDeviceName
 import com.nononsenseapps.feeder.model.workmanager.scheduleSendRead
+import com.nononsenseapps.feeder.push.DeletedDevice
+import com.nononsenseapps.feeder.push.DeletedDevices
+import com.nononsenseapps.feeder.push.DeletedFeed
+import com.nononsenseapps.feeder.push.DeletedFeeds
+import com.nononsenseapps.feeder.push.Device
+import com.nononsenseapps.feeder.push.Devices
+import com.nononsenseapps.feeder.push.DevicesRequest
+import com.nononsenseapps.feeder.push.Feeds
+import com.nononsenseapps.feeder.push.FeedsRequest
+import com.nononsenseapps.feeder.push.PushMaker
+import com.nononsenseapps.feeder.push.PushStore
+import com.nononsenseapps.feeder.push.ReadMark
+import com.nononsenseapps.feeder.push.ReadMarks
+import com.nononsenseapps.feeder.push.SnapshotRequest
+import com.nononsenseapps.feeder.push.Update
+import com.nononsenseapps.feeder.push.scheduleSendPush
+import com.nononsenseapps.feeder.push.toProto
 import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
+import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import java.net.URL
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,6 +70,7 @@ class Repository(override val di: DI) : DIAware {
     private val application: Application by instance()
     private val syncRemoteStore: SyncRemoteStore by instance()
     private val syncClient: SyncRestClient by instance()
+    private val pushStore: PushStore by instance()
 
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
@@ -239,7 +263,13 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun getFeed(url: URL): Feed? = feedStore.getFeed(url)
 
-    suspend fun saveFeed(feed: Feed): Long = feedStore.saveFeed(feed)
+    suspend fun saveFeed(feed: Feed): Long {
+        return feedStore.saveFeed(feed).also {
+            broadcastFeed(feed)
+        }
+    }
+
+    suspend fun saveFeedNoBroadcast(feed: Feed): Long = feedStore.saveFeed(feed)
 
     suspend fun setPinned(itemId: Long, pinned: Boolean) =
         feedItemStore.setPinned(itemId = itemId, pinned = pinned)
@@ -252,6 +282,7 @@ class Repository(override val di: DI) : DIAware {
     suspend fun markAsReadAndNotified(itemId: Long) {
         feedItemStore.markAsReadAndNotified(itemId)
         scheduleSendRead(di)
+        broadcastReadMarks()
     }
 
     suspend fun markAsUnread(itemId: Long, unread: Boolean = true) {
@@ -260,6 +291,7 @@ class Repository(override val di: DI) : DIAware {
             syncRemoteStore.setNotSynced(itemId)
         } else {
             scheduleSendRead(di)
+            broadcastReadMarks()
         }
     }
 
@@ -307,6 +339,7 @@ class Repository(override val di: DI) : DIAware {
         }
 
     suspend fun deleteFeeds(feedIds: List<Long>) {
+        broadcastFeedDelete(feedIds)
         feedStore.deleteFeeds(feedIds)
         androidSystemStore.removeDynamicShortcuts(feedIds)
     }
@@ -318,6 +351,7 @@ class Repository(override val di: DI) : DIAware {
             else -> feedItemStore.markAllAsRead()
         }
         scheduleSendRead(di)
+        broadcastReadMarks()
     }
 
     suspend fun markBeforeAsRead(itemIndex: Int, feedId: Long, tag: String) {
@@ -329,6 +363,7 @@ class Repository(override val di: DI) : DIAware {
             newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
         )
         scheduleSendRead(di)
+        broadcastReadMarks()
     }
 
     suspend fun markAfterAsRead(itemIndex: Int, feedId: Long, tag: String) {
@@ -339,7 +374,8 @@ class Repository(override val di: DI) : DIAware {
             onlyUnread = showOnlyUnread.value,
             newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
         )
-        scheduleSendRead(di)
+        scheduleSendPush(di)
+        broadcastReadMarks()
     }
 
     val allTags: Flow<List<String>> = feedStore.allTags
@@ -350,7 +386,6 @@ class Repository(override val di: DI) : DIAware {
     fun getVisibleFeedTitles(feedId: Long, tag: String): Flow<List<FeedTitle>> =
         feedStore.getFeedTitles(feedId, tag).buffer(1)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentlyVisibleFeedTitles(): Flow<List<FeedTitle>> =
         currentFeedAndTag.flatMapLatest { (feedId, tag) ->
             feedStore.getFeedTitles(feedId, tag)
@@ -469,6 +504,10 @@ class Repository(override val di: DI) : DIAware {
         return feedStore.getFeedsOrderedByUrl()
     }
 
+    suspend fun getFeedUrls(): List<URL> {
+        return feedStore.getFeedUrls()
+    }
+
     fun getFlowOfFeedsOrderedByUrl(): Flow<List<Feed>> {
         return feedStore.getFlowOfFeedsOrderedByUrl()
     }
@@ -477,7 +516,7 @@ class Repository(override val di: DI) : DIAware {
         return syncRemoteStore.getRemotelySeenFeeds()
     }
 
-    suspend fun deleteFeed(url: URL) {
+    suspend fun deleteFeedNoBroadcast(url: URL) {
         feedStore.deleteFeed(url)
     }
 
@@ -507,6 +546,313 @@ class Repository(override val di: DI) : DIAware {
         val syncRemote = getSyncRemote()
         updateDeviceList()
         return syncCode to syncRemote.secretKey
+    }
+
+    suspend fun updateKnownDeviceLastSeen(endpoint: String, timestamp: Instant) {
+        val knownDevice = pushStore.getKnownDevice(endpoint = endpoint)
+            ?: KnownDevice(endpoint = endpoint, lastSeen = Instant.EPOCH, name = "UNKNOWN")
+
+        if (pushStore.getThisDevice()?.endpoint == endpoint) {
+            return
+        }
+
+        pushStore.saveKnownDevice(knownDevice.copy(lastSeen = timestamp))
+    }
+
+    val thisDevice: Flow<ThisDevice?> = pushStore.getThisDeviceFlow()
+    val knownDevices: Flow<List<KnownDevice>> = pushStore.getKnownDevicesFlow()
+
+    suspend fun updateKnownDevices(devices: List<KnownDevice>) {
+        logDebug(LOG_TAG, "updateKnownDevices")
+        val alreadyKnownDevices = pushStore.getKnownDevices().associateBy { it.endpoint }
+        val thisDevice = pushStore.getThisDevice()
+
+        pushStore.saveKnownDevices(
+            devices
+                .filterNot { device -> thisDevice?.endpoint == device.endpoint }
+                .map { device ->
+                    val alreadyKnown = alreadyKnownDevices[device.endpoint]
+
+                    device.copy(
+                        name = device.name.ifEmpty { alreadyKnown?.name ?: "" },
+                        lastSeen = maxOf(device.lastSeen, alreadyKnown?.lastSeen ?: Instant.EPOCH),
+                    )
+                }
+        )
+    }
+
+    suspend fun joinSyncChain(knownDevices: List<KnownDevice>) {
+        val myself = pushStore.getThisDevice()?.let { me ->
+            Device(endpoint = me.endpoint, name = me.name)
+        } ?: return
+
+        val filteredDevices = knownDevices.filter {
+            it.endpoint != myself.endpoint
+        }
+
+        // Just in case
+        pushStore.deleteAllDevices()
+        updateKnownDevices(filteredDevices)
+
+        for (device in filteredDevices) {
+            scheduleUpdate(device.endpoint) { message ->
+                message.copy(
+                    devices = Devices(
+                        devices = listOf(
+                            myself
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    suspend fun deleteDevices(endpoints: List<String>) {
+        if (pushStore.deleteDevices(endpoints) > 0) {
+            // Can't wait until later because message queue uses a foreign key constraint
+            broadcastForgetMeRightNow(endpoints)
+        }
+    }
+
+    suspend fun deleteDevicesNoBroadcast(endpoints: List<String>) {
+        pushStore.deleteDevices(endpoints)
+    }
+
+    suspend fun requestSnapshotDevices(fallbackEndpoint: String) {
+        logDebug(LOG_TAG, "requestSnapshotDevices")
+        val randomEndpoint =
+            pushStore.getKnownDevices().randomOrNull()?.endpoint ?: fallbackEndpoint
+
+        scheduleUpdate(
+            toEndpoint = randomEndpoint,
+        ) { update ->
+            update.copy(
+                snapshot_request = SnapshotRequest(
+                    devices_request = DevicesRequest()
+                )
+            )
+        }
+    }
+
+    suspend fun requestSnapshotFeeds() {
+        logDebug(LOG_TAG, "requestSnapshotFeeds")
+        val randomDevice = pushStore.getKnownDevices().randomOrNull()
+
+        if (randomDevice == null) {
+            Log.e(LOG_TAG, "No endpoint to request feed snapshots from!")
+            return
+        }
+
+        scheduleUpdate(
+            toEndpoint = randomDevice.endpoint,
+        ) { update ->
+            update.copy(
+                snapshot_request = SnapshotRequest(
+                    feeds_request = FeedsRequest()
+                )
+            )
+        }
+    }
+
+    private suspend fun broadcastForgetMeRightNow(toEndpoints: List<String>) {
+        val myEndpoint = pushStore.getThisDevice()?.endpoint
+            ?: return
+
+        val body = Update(
+            sender = Device(endpoint = myEndpoint),
+            timestamp = Instant.now().toProto(),
+            deleted_devices = DeletedDevices(
+                deleted_devices = listOf(
+                    DeletedDevice(endpoint = myEndpoint)
+                )
+            )
+        ).encode()
+
+        // Special case because deleted device can't store messages in the queue
+        val pushMaker by instance<PushMaker>()
+
+        for (endpoint in toEndpoints) {
+            pushMaker.send(endpoint = endpoint, bytes = body)
+        }
+    }
+
+    suspend fun broadcastKnownDevices(toEndpoint: String?) {
+        val knownDevices = pushStore.getKnownDevices()
+        val myself = pushStore.getThisDevice()?.let { me ->
+            Device(endpoint = me.endpoint, name = me.name)
+        } ?: return
+
+        scheduleUpdates(
+            toEndpoints = toEndpoint?.let { listOf(it) } ?: knownDevices.map { it.endpoint }
+        ) { update ->
+            update.copy(
+                devices = Devices(
+                    devices = knownDevices.map {
+                        Device(
+                            endpoint = it.endpoint,
+                            name = it.name,
+                        )
+                    } + listOf(myself)
+                )
+            )
+        }
+    }
+
+    suspend fun broadcastFeed(feed: Feed) {
+        scheduleUpdates(
+            toEndpoints = pushStore.getKnownDevices().map { it.endpoint }
+        ) { update ->
+            update.copy(
+                feeds = Feeds(
+                    feeds = listOf(
+                        feed.toProto()
+                    ),
+                ),
+            )
+        }
+    }
+
+    private suspend fun broadcastFeedDelete(feedIds: List<Long>) {
+        val urls = feedStore.getFeedUrls(feedIds)
+        scheduleUpdates(
+            toEndpoints = pushStore.getKnownDevices().map { it.endpoint }
+        ) { update ->
+            update.copy(
+                deleted_feeds = DeletedFeeds(
+                    deleted_feeds = urls.map {
+                        DeletedFeed(url = it.toString())
+                    }
+                )
+            )
+        }
+    }
+
+    internal suspend fun broadcastFeeds(toEndpoint: String?) {
+        val feeds = getFeedsOrderedByUrl().map { it.toProto() }
+        scheduleUpdates(
+            toEndpoints = toEndpoint?.let { listOf(it) }
+                ?: pushStore.getKnownDevices().map { it.endpoint }
+        ) { update ->
+            update.copy(
+                feeds = Feeds(
+                    feeds = feeds,
+                ),
+            )
+        }
+    }
+
+    private suspend fun broadcastReadMarks() {
+        val readItems = getFeedItemsWithoutSyncedReadMark()
+        if (readItems.isEmpty()) {
+            return
+        }
+
+        scheduleUpdates(
+            toEndpoints = pushStore.getKnownDevices().map { it.endpoint }
+        ) { update ->
+            update.copy(
+                read_marks = ReadMarks(
+                    read_marks = readItems.map {
+                        it.toProto()
+                    }
+                )
+            )
+        }
+
+        for (feedItem in readItems) {
+            setSynced(feedItemId = feedItem.id)
+        }
+    }
+
+    suspend fun markAsReadByPush(readMarks: List<ReadMark>) {
+        for (readMark in readMarks) {
+            when (
+                val itemId = feedItemStore.getFeedItemId(
+                    feedUrl = URL(readMark.feed_url),
+                    articleGuid = readMark.article_guid
+                )
+            ) {
+                null -> {
+                    // TODO other store?
+                    syncRemoteStore.addRemoteReadMark(
+                        feedUrl = URL(readMark.feed_url),
+                        articleGuid = readMark.article_guid,
+                    )
+                }
+                else -> {
+                    feedItemStore.markAsReadAndNotified(itemId = itemId)
+                    syncRemoteStore.setSynced(itemId)
+                }
+            }
+        }
+    }
+
+    // TODO encryption
+    suspend fun updateThisDeviceEndpoint(endpoint: String) {
+        val thisDevice = pushStore.getThisDevice() ?: ThisDevice(
+            endpoint = "",
+            name = generateDeviceName(),
+        )
+        pushStore.saveThisDevice(
+            thisDevice.copy(endpoint = endpoint)
+        )
+    }
+
+    private suspend fun scheduleUpdate(toEndpoint: String, block: (Update) -> Update) =
+        scheduleUpdates(listOf(toEndpoint), block = block)
+
+    private suspend fun scheduleUpdates(toEndpoints: List<String>, block: (Update) -> Update) {
+        val senderEndpoint = pushStore.getThisDeviceEndpoint()
+            ?: return
+
+        val body = block(
+            Update(
+                sender = Device(endpoint = senderEndpoint),
+                timestamp = Instant.now().toProto(),
+            )
+        ).encode()
+
+        for (toEndpoint in toEndpoints) {
+            pushStore.addMessageToQueue(
+                QueuedMessage(
+                    toEndpoint = toEndpoint,
+                    body = body,
+                )
+            )
+        }
+
+        scheduleSendPush(di)
+    }
+
+    suspend fun getMessagesInQueue(): List<QueuedMessage> {
+        return pushStore.getMessagesInQueue()
+    }
+
+    suspend fun deleteMessagesInQueue(ids: List<Long>) {
+        pushStore.deleteMessagesInQueue(ids)
+    }
+
+    suspend fun getThisDeviceEndpoint(): String? {
+        return pushStore.getThisDeviceEndpoint()
+    }
+
+    suspend fun getKnownDevices(): List<KnownDevice> {
+        return pushStore.getKnownDevices()
+    }
+
+    suspend fun getKnownDevice(endpoint: String): KnownDevice? {
+        return pushStore.getKnownDevice(endpoint = endpoint)
+    }
+
+    val allUnifiedPushDistributors: StateFlow<List<String>> = pushStore.allDistributors
+    val currentUnifiedPushDistributor: StateFlow<String> = pushStore.distributor
+
+    fun setDistributor(value: String) {
+        pushStore.setDistributor(value)
+    }
+
+    companion object {
+        const val LOG_TAG = "FEEDER_REPOSITORY"
     }
 }
 
@@ -562,3 +908,8 @@ enum class TextToDisplay {
     FAILED_TO_LOAD_FULLTEXT,
     FULLTEXT,
 }
+
+fun FeedItemForReadMark.toProto() = ReadMark(
+    article_guid = guid,
+    feed_url = feedUrl.toString(),
+)

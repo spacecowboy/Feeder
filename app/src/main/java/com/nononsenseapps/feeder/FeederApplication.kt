@@ -20,17 +20,23 @@ import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
+import com.nononsenseapps.feeder.db.room.KnownDevicesDao
+import com.nononsenseapps.feeder.db.room.MessageQueueDao
 import com.nononsenseapps.feeder.db.room.ReadStatusSyncedDao
 import com.nononsenseapps.feeder.db.room.RemoteFeedDao
 import com.nononsenseapps.feeder.db.room.RemoteReadMarkDao
 import com.nononsenseapps.feeder.db.room.SyncDeviceDao
 import com.nononsenseapps.feeder.db.room.SyncRemoteDao
+import com.nononsenseapps.feeder.db.room.ThisDeviceDao
 import com.nononsenseapps.feeder.di.androidModule
 import com.nononsenseapps.feeder.di.archModelModule
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
+import com.nononsenseapps.feeder.push.PushHandler
+import com.nononsenseapps.feeder.push.PushMaker
+import com.nononsenseapps.feeder.push.PushStore
 import com.nononsenseapps.feeder.ui.compose.coil.TooLargeImageInterceptor
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.currentlyUnmetered
@@ -70,6 +76,12 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
         bind<RemoteFeedDao>() with singleton { instance<AppDatabase>().remoteFeedDao() }
         bind<SyncDeviceDao>() with singleton { instance<AppDatabase>().syncDeviceDao() }
         bind<BlocklistDao>() with singleton { instance<AppDatabase>().blocklistDao() }
+        bind<MessageQueueDao>() with singleton { instance<AppDatabase>().messageQueueDao() }
+        bind<KnownDevicesDao>() with singleton { instance<AppDatabase>().knownDevicesDao() }
+        bind<ThisDeviceDao>() with singleton { instance<AppDatabase>().thisDeviceDao() }
+        bind<PushStore>() with singleton { PushStore(di) }
+        bind<PushMaker>() with singleton { PushMaker(di) }
+        bind<PushHandler>() with singleton { PushHandler(di) }
 
         import(androidModule)
 
