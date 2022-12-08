@@ -123,6 +123,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.addMargin
 import com.nononsenseapps.feeder.ui.compose.utils.addMarginLayout
+import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.openGitlabIssues
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
@@ -132,6 +133,8 @@ import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
+
+private const val LOG_TAG = "FEEDER_FEEDSCREEN"
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -598,7 +601,7 @@ fun FeedScreen(
                 onSetBookmarked = onSetBookmarked,
                 pagedFeedItems = pagedFeedItems,
                 modifier = modifier,
-            )
+            ).also { logDebug(LOG_TAG, "Showing GRID") }
             FeedScreenType.FeedList -> FeedListContent(
                 viewState = viewState,
                 onOpenNavDrawer = {
@@ -620,7 +623,7 @@ fun FeedScreen(
                 onSetBookmarked = onSetBookmarked,
                 pagedFeedItems = pagedFeedItems,
                 modifier = modifier,
-            )
+            ).also { logDebug(LOG_TAG, "Showing LIST") }
         }
     }
 }
@@ -1019,12 +1022,8 @@ fun FeedGridContent(
             FeedItemStyle.SUPER_COMPACT -> Arrangement.spacedBy(LocalDimens.current.gutter)
         }
 
-        val minItemWidth = when (viewState.feedItemStyle) {
-            // 300 - 16 - 16/2 : so that 600dp screens should get two columns
-            FeedItemStyle.CARD -> 276.dp
-            FeedItemStyle.COMPACT -> 400.dp
-            FeedItemStyle.SUPER_COMPACT -> 276.dp
-        }
+        // Grid kicks in at 600.dp. So make sure at least 2 columns always in grid mode
+        val minItemWidth = (300.dp - LocalDimens.current.margin * 2)
 
         AnimatedVisibility(
             enter = fadeIn(),
