@@ -904,18 +904,17 @@ fun FeedListContent(
                         ?: return@items
 
                     SwipeableFeedItemPreview(
-                        isLazyGrid = false,
                         onSwipe = { currentState ->
                             markAsUnread(
                                 previewItem.id,
                                 !currentState
                             )
                         },
-                        swipeAsRead = viewState.swipeAsRead,
                         onlyUnread = viewState.onlyUnread,
                         item = previewItem,
                         showThumbnail = viewState.showThumbnails,
                         feedItemStyle = viewState.feedItemStyle,
+                        swipeAsRead = viewState.swipeAsRead,
                         onMarkAboveAsRead = {
                             if (itemIndex > 0) {
                                 markBeforeAsRead(itemIndex)
@@ -928,6 +927,12 @@ fun FeedListContent(
                         },
                         onMarkBelowAsRead = {
                             markAfterAsRead(itemIndex)
+                        },
+                        onTogglePinned = {
+                            onSetPinned(previewItem.id, !previewItem.pinned)
+                        },
+                        onToggleBookmarked = {
+                            onSetBookmarked(previewItem.id, !previewItem.bookmarked)
                         },
                         onShareItem = {
                             val intent = Intent.createChooser(
@@ -942,16 +947,9 @@ fun FeedListContent(
                             )
                             context.startActivity(intent)
                         },
-                        onItemClick = {
-                            onItemClick(previewItem.id)
-                        },
-                        onTogglePinned = {
-                            onSetPinned(previewItem.id, !previewItem.pinned)
-                        },
-                        onToggleBookmarked = {
-                            onSetBookmarked(previewItem.id, !previewItem.bookmarked)
-                        },
-                    )
+                    ) {
+                        onItemClick(previewItem.id)
+                    }
 
                     if (viewState.feedItemStyle != FeedItemStyle.CARD) {
                         if (itemIndex < pagedFeedItems.itemCount - 1) {
@@ -1054,18 +1052,17 @@ fun FeedGridContent(
                         ?: return@items
 
                     SwipeableFeedItemPreview(
-                        isLazyGrid = true,
                         onSwipe = { currentState ->
                             markAsUnread(
                                 previewItem.id,
                                 !currentState
                             )
                         },
-                        swipeAsRead = viewState.swipeAsRead,
                         onlyUnread = viewState.onlyUnread,
                         item = previewItem,
                         showThumbnail = viewState.showThumbnails,
                         feedItemStyle = viewState.feedItemStyle,
+                        swipeAsRead = viewState.swipeAsRead,
                         onMarkAboveAsRead = {
                             if (itemIndex > 0) {
                                 markBeforeAsRead(itemIndex)
@@ -1078,6 +1075,12 @@ fun FeedGridContent(
                         },
                         onMarkBelowAsRead = {
                             markAfterAsRead(itemIndex)
+                        },
+                        onTogglePinned = {
+                            onSetPinned(previewItem.id, !previewItem.pinned)
+                        },
+                        onToggleBookmarked = {
+                            onSetBookmarked(previewItem.id, !previewItem.bookmarked)
                         },
                         onShareItem = {
                             val intent = Intent.createChooser(
@@ -1092,16 +1095,9 @@ fun FeedGridContent(
                             )
                             context.startActivity(intent)
                         },
-                        onItemClick = {
-                            onItemClick(previewItem.id)
-                        },
-                        onTogglePinned = {
-                            onSetPinned(previewItem.id, !previewItem.pinned)
-                        },
-                        onToggleBookmarked = {
-                            onSetBookmarked(previewItem.id, !previewItem.bookmarked)
-                        },
-                    )
+                    ) {
+                        onItemClick(previewItem.id)
+                    }
                 }
             }
         }
