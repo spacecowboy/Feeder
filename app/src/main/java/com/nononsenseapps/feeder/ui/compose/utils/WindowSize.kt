@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.window.layout.WindowMetricsCalculator
+import com.nononsenseapps.feeder.util.logDebug
 
 /**
  * Opinionated set of viewport breakpoints
@@ -113,6 +114,8 @@ fun getWindowSizeClass(windowDpSize: DpSize): WindowSize {
             WindowSize.Medium
         }
         else -> WindowSize.Expanded
+    }.also {
+        logDebug("FEEDER_WINDOWSIZE", "getWindowSizeClass($windowDpSize) -> $it")
     }
 }
 
