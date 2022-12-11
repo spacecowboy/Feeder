@@ -1,3 +1,45 @@
+# 2.4.1
+Agnieszka C (1):
+  * [86b33eb1] Updated Polish translation using Weblate
+
+Andrij Mizyk (1):
+  * [f5557397] Updated Ukrainian translation using Weblate
+
+Dritan Taulla (1):
+  * [301cdff5] Updated Albanian translation using Weblate
+
+ERYpTION (1):
+  * [4b2c8749] Updated Danish translation using Weblate
+
+El Pirujo (1):
+  * [7fff2056] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [6e75150b] Updated Chinese (Simplified) translation using Weblate
+
+Gediminas Murauskas (1):
+  * [6e2d9edd] Updated Lithuanian translation using Weblate
+
+J. Lavoie (1):
+  * [72c5bca5] Updated Italian translation using Weblate
+
+Jonas Kalderstam (6):
+  * [2dd030b7] Fixed some text not scaling according to settings
+  * [b83c5d38] Fixed bug where swiping was not possible in list because of
+         grid
+  * [807722c7] Added SwipeToDismiss to GridView
+  * [5d0103a4] Fixed SwipeToDismiss so it works even with disabled
+         animations
+
+Oğuz Ersen (1):
+  * [872e93e2] Updated Turkish translation using Weblate
+
+VfBFan (1):
+  * [17a8a29c] Updated German translation using Weblate
+
+zmni (1):
+  * [4aaaa296] Updated Indonesian translation using Weblate
+
 # 2.4.0
 Dritan Taulla (1):
   * [fa0a128e] Updated Albanian translation using Weblate
