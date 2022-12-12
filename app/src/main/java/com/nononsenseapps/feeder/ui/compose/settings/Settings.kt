@@ -64,6 +64,8 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Devices.NEXUS_5
+import androidx.compose.ui.tooling.preview.Devices.PIXEL_C
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -171,7 +173,8 @@ fun SettingsScreen(
 }
 
 @Composable
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = PIXEL_C)
+@Preview(showBackground = true, device = NEXUS_5)
 fun SettingsScreenPreview() {
     FeederTheme(ThemeOptions.DAY) {
         Surface {
@@ -841,12 +844,15 @@ fun ScaleSetting(
     valueRange: ClosedFloatingPointRange<Float>,
     steps: Int,
 ) {
+    val dimens = LocalDimens.current
     val safeCurrentValue = currentValue.coerceIn(valueRange)
     // People using screen readers probably don't care that much about text size
     // so no point in adding screen reader action?
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
+            .width(dimens.maxContentWidth)
+            .heightIn(min = 64.dp)
             .padding(start = 64.dp)
             .semantics(mergeDescendants = true) {
                 stateDescription = "%.1fx".format(safeCurrentValue)
