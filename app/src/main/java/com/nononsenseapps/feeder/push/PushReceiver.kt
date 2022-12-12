@@ -23,6 +23,7 @@ class PushReceiver : MessagingReceiver() {
                 pushHandler.onUpdate(Update.ADAPTER.decode(message))
             }
         } catch (e: Exception) {
+            // Can fail for example if the message sent was too large and thus truncated
             Log.e(LOG_TAG, "Failed to handle message", e)
         }
     }

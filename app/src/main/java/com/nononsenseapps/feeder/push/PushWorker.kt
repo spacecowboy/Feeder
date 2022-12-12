@@ -58,12 +58,28 @@ class PushWorker(val context: Context, workerParams: WorkerParameters) :
         var success = true
         val toDelete = mutableListOf<Long>()
         for (message in repository.getMessagesInQueue()) {
-            if (pushMaker.send(message.toEndpoint, message.body)) {
+            if (message.body.size >= 4000) {
+                val update = Update.ADAPTER.decode(message.body)
+                val suffix = when {
+                    update.devices != null -> "${update.devices.devices.size} devices"
+                    update.feeds != null -> "${update.feeds.feeds.size} feeds"
+                    update.read_marks != null -> "${update.read_marks.read_marks.size} read marks"
+                    update.deleted_feeds != null -> "${update.deleted_feeds.deleted_feeds.size} deleted feeds"
+                    update.deleted_devices != null -> "${update.deleted_devices.deleted_devices.size} deleted devices"
+                    update.proof_of_life != null -> "proof of life"
+                    update.snapshot_request != null -> "snapshot request"
+                    else -> "UNKNOWN UPDATE TYPE?!"
+                }
+                logDebug(LOG_TAG, "WHOAH. Message is ${message.body.size}, trying to send $suffix")
                 toDelete.add(message.id)
             } else {
-                // TODO what if messages never are able to be sent? Then it must be possible for them to
-                // get cleared somehow. Maybe a retry count on the message?
-                success = false
+                if (pushMaker.send(message.toEndpoint, message.body)) {
+                    toDelete.add(message.id)
+                } else {
+                    // TODO what if messages never are able to be sent? Then it must be possible for them to
+                    // get cleared somehow. Maybe a retry count on the message?
+                    success = false
+                }
             }
         }
 

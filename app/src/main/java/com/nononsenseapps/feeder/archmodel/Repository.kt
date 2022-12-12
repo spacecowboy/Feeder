@@ -713,55 +713,61 @@ class Repository(override val di: DI) : DIAware {
     }
 
     private suspend fun broadcastFeedDelete(feedIds: List<Long>) {
-        val urls = feedStore.getFeedUrls(feedIds)
-        scheduleUpdates(
-            toEndpoints = pushStore.getKnownDevices().map { it.endpoint }
-        ) { update ->
-            update.copy(
-                deleted_feeds = DeletedFeeds(
-                    deleted_feeds = urls.map {
-                        DeletedFeed(url = it.toString())
-                    }
-                )
-            )
-        }
+        feedStore.getFeedUrls(feedIds).asSequence()
+            .chunked(10)
+            .forEach { urls ->
+                scheduleUpdates(
+                    toEndpoints = pushStore.getKnownDevices().map { it.endpoint }
+                ) { update ->
+                    update.copy(
+                        deleted_feeds = DeletedFeeds(
+                            deleted_feeds = urls.map {
+                                DeletedFeed(url = it.toString())
+                            }
+                        )
+                    )
+                }
+            }
     }
 
     internal suspend fun broadcastFeeds(toEndpoint: String?) {
-        val feeds = getFeedsOrderedByUrl().map { it.toProto() }
-        scheduleUpdates(
-            toEndpoints = toEndpoint?.let { listOf(it) }
-                ?: pushStore.getKnownDevices().map { it.endpoint }
-        ) { update ->
-            update.copy(
-                feeds = Feeds(
-                    feeds = feeds,
-                ),
-            )
-        }
+        getFeedsOrderedByUrl().asSequence()
+            .map { it.toProto() }
+            .chunked(10)
+            .forEach { feeds ->
+                scheduleUpdates(
+                    toEndpoints = toEndpoint?.let { listOf(it) }
+                        ?: pushStore.getKnownDevices().map { it.endpoint }
+                ) { update ->
+                    update.copy(
+                        feeds = Feeds(
+                            feeds = feeds,
+                        ),
+                    )
+                }
+            }
     }
 
     private suspend fun broadcastReadMarks() {
-        val readItems = getFeedItemsWithoutSyncedReadMark()
-        if (readItems.isEmpty()) {
-            return
-        }
+        getFeedItemsWithoutSyncedReadMark().asSequence()
+            .chunked(10)
+            .forEach { readItems ->
+                scheduleUpdates(
+                    toEndpoints = pushStore.getKnownDevices().map { it.endpoint }
+                ) { update ->
+                    update.copy(
+                        read_marks = ReadMarks(
+                            read_marks = readItems.map {
+                                it.toProto()
+                            }
+                        )
+                    )
+                }
 
-        scheduleUpdates(
-            toEndpoints = pushStore.getKnownDevices().map { it.endpoint }
-        ) { update ->
-            update.copy(
-                read_marks = ReadMarks(
-                    read_marks = readItems.map {
-                        it.toProto()
-                    }
-                )
-            )
-        }
-
-        for (feedItem in readItems) {
-            setSynced(feedItemId = feedItem.id)
-        }
+                for (feedItem in readItems) {
+                    setSynced(feedItemId = feedItem.id)
+                }
+            }
     }
 
     suspend fun markAsReadByPush(readMarks: List<ReadMark>) {
