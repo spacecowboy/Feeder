@@ -93,6 +93,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 fun SettingsScreen(
     onNavigateUp: () -> Unit,
     onNavigateToSyncScreen: () -> Unit,
+    onNavigateToPushScreen: () -> Unit,
     settingsViewModel: SettingsViewModel,
 ) {
     val viewState by settingsViewModel.viewState.collectAsState()
@@ -163,6 +164,7 @@ fun SettingsScreen(
             onSyncFrequencyChanged = settingsViewModel::setSyncFrequency,
             batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored,
             onOpenSyncSettings = onNavigateToSyncScreen,
+            onOpenPushSettings = onNavigateToPushScreen,
             swipeAsReadValue = viewState.swipeAsRead,
             onSwipeAsReadOptionChanged = settingsViewModel::setSwipeAsRead,
             useDynamicTheme = viewState.useDynamicTheme,
@@ -215,6 +217,7 @@ fun SettingsScreenPreview() {
                 onSyncFrequencyChanged = {},
                 batteryOptimizationIgnoredValue = false,
                 onOpenSyncSettings = {},
+                onOpenPushSettings = {},
                 onSwipeAsReadOptionChanged = {},
                 swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
                 useDynamicTheme = true,
@@ -265,6 +268,7 @@ fun SettingsList(
     onSyncFrequencyChanged: (SyncFrequency) -> Unit,
     batteryOptimizationIgnoredValue: Boolean,
     onOpenSyncSettings: () -> Unit,
+    onOpenPushSettings: () -> Unit,
     useDynamicTheme: Boolean,
     onUseDynamicTheme: (Boolean) -> Unit,
     textScale: Float,
@@ -466,6 +470,13 @@ fun SettingsList(
             title = stringResource(id = R.string.device_sync)
         ) {
             onOpenSyncSettings()
+        }
+
+        ExternalSetting(
+            currentValue = "",
+            title = "UnifiedPush"
+        ) {
+            onOpenPushSettings()
         }
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))

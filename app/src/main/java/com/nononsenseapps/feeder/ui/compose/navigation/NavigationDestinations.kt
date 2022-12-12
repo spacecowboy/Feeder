@@ -260,17 +260,18 @@ object SettingsDestination : NavigationDestination(
                 }
             },
             onNavigateToSyncScreen = {
+                SyncScreenDestination.navigate(
+                    navController = navController,
+                    syncCode = "",
+                    secretKey = "",
+                )
+            },
+            onNavigateToPushScreen = {
                 PushScreenDestination.navigate(
                     navController = navController,
                     syncCode = "",
                     secretKey = "",
                 )
-                // TODO
-//                SyncScreenDestination.navigate(
-//                    navController = navController,
-//                    syncCode = "",
-//                    secretKey = "",
-//                )
             },
             settingsViewModel = backStackEntry.DIAwareViewModel(),
         )
