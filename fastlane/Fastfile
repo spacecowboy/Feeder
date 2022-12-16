@@ -46,7 +46,7 @@ platform :android do
 
   desc "Build play bundle"
   lane :build_play_bundle do
-    gradle(task: "clean app:bundlePlay")
+    gradle(task: "app:bundlePlay")
   end
 
   desc "Deploy a new version to the Google Play"
@@ -54,7 +54,8 @@ platform :android do
     upload_to_play_store(
       mapping: "app/build/outputs/mapping/play/mapping.txt",
       aab: "app/build/outputs/bundle/play/app-play.aab",
-      track: options[:track]
+      track: options[:track],
+      skip_upload_apk: true
     )
   end
 
@@ -64,7 +65,8 @@ platform :android do
       mapping: "app/build/outputs/mapping/play/mapping.txt",
       aab: "app/build/outputs/bundle/play/app-play.aab",
       track: options[:track],
-      validate_only: true
+      validate_only: true,
+      skip_upload_apk: true
     )
   end
 
