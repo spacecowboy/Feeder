@@ -191,4 +191,5 @@
     <string name="article_image">Изображение статьи</string>
     <string name="set_language">Установить язык</string>
     <string name="feed_icon">Значок ленты</string>
+    <string name="text_scale">Размер шрифта</string>
 </resources>
