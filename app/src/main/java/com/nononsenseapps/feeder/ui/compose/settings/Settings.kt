@@ -62,6 +62,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices.NEXUS_5
@@ -190,7 +191,7 @@ fun SettingsScreenPreview() {
                 onShowFabChanged = {},
                 feedItemStyleValue = FeedItemStyle.CARD,
                 onFeedItemStyleChanged = {},
-                blockListValue = ImmutableHolder(emptySet()),
+                blockListValue = ImmutableHolder(emptyList()),
                 onBlockListChanged = {},
                 syncOnStartupValue = true,
                 onSyncOnStartupChanged = {},
@@ -238,8 +239,8 @@ fun SettingsList(
     onShowFabChanged: (Boolean) -> Unit,
     feedItemStyleValue: FeedItemStyle,
     onFeedItemStyleChanged: (FeedItemStyle) -> Unit,
-    blockListValue: ImmutableHolder<Set<String>>,
-    onBlockListChanged: (Iterable<String>) -> Unit,
+    blockListValue: ImmutableHolder<List<String>>,
+    onBlockListChanged: (List<String>) -> Unit,
     swipeAsReadValue: SwipeAsRead,
     onSwipeAsReadOptionChanged: (SwipeAsRead) -> Unit,
     syncOnStartupValue: Boolean,
@@ -355,6 +356,30 @@ fun SettingsList(
             }
         )
 
+        ListDialogSetting(
+            currentValue = ImmutableHolder(blockListValue.item.sorted()),
+            onSelection = onBlockListChanged,
+            title = stringResource(id = R.string.block_list),
+            dialogTitle = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.block_list),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    Text(
+                        text = stringResource(id = R.string.block_list_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = "feeder feed?r fe*er",
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                    )
+                }
+            }
+        )
+
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
         GroupTitle { modifier ->
@@ -379,12 +404,6 @@ fun SettingsList(
                 modifier = modifier,
             )
         }
-
-        ListDialogSetting(
-            currentValue = ImmutableHolder(blockListValue.item.sorted()),
-            onSelection = onBlockListChanged,
-            title = stringResource(id = R.string.block_list),
-        )
 
         MenuSetting(
             currentValue = currentSyncFrequencyValue.asSyncFreqOption(),
@@ -675,9 +694,10 @@ fun <T> MenuSetting(
 @Composable
 fun ListDialogSetting(
     title: String,
+    dialogTitle: @Composable () -> Unit,
     currentValue: ImmutableHolder<List<String>>,
     icon: @Composable () -> Unit = {},
-    onSelection: (Iterable<String>) -> Unit,
+    onSelection: (List<String>) -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
@@ -714,7 +734,7 @@ fun ListDialogSetting(
 
         if (expanded) {
             EditableListDialog(
-                title = title,
+                title = dialogTitle,
                 items = currentValue,
                 onDismiss = {
                     expanded = false

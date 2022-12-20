@@ -49,6 +49,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.kodein.di.DI
+import org.kodein.di.android.closestDI
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
@@ -58,6 +60,7 @@ import org.threeten.bp.ZonedDateTime
 class MigrationFromLegacy5ToLatest {
 
     private val feederApplication: FeederApplication = getApplicationContext()
+    private val di: DI by closestDI(feederApplication)
 
     @Rule
     @JvmField
@@ -83,7 +86,7 @@ class MigrationFromLegacy5ToLatest {
                 AppDatabase::class.java,
                 testDbName
             )
-                .addMigrations(*allMigrations)
+                .addMigrations(*getAllMigrations(di))
                 .build().also { testHelper.closeWhenFinished(it) }
 
     @Before
@@ -243,7 +246,8 @@ class MigrationFromLegacy5ToLatest {
         roomDb.let { db ->
             val feed = db.feedDao().loadFeeds()[0]
             assertEquals("feedA", feed.title)
-            @Suppress("DEPRECATION") val items = db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
+            @Suppress("DEPRECATION") val items =
+                db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
 
             assertEquals(2, items.size)
 
@@ -274,7 +278,8 @@ class MigrationFromLegacy5ToLatest {
         roomDb.let { db ->
             val feed = db.feedDao().loadFeeds()[1]
             assertEquals("feedB", feed.title)
-            @Suppress("DEPRECATION") val items = db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
+            @Suppress("DEPRECATION") val items =
+                db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
 
             assertEquals(2, items.size)
 

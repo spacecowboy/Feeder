@@ -77,6 +77,7 @@
   <string name="check_for_updates">Look for new articles…</string>
   <string name="on_startup">Upon app start</string>
   <string name="block_list">Block list</string>
+  <string name="block_list_description">Hides stories with titles containing any of these terms. Example filters:</string>
   <string name="add_item">Add item</string>
   <string name="show_fab">Show floating action button</string>
   <string name="include_mobile_hotspots">Include mobile hotspots</string>

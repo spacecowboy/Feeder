@@ -3,11 +3,14 @@ package com.nononsenseapps.feeder.archmodel
 import android.content.SharedPreferences
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
+import com.nononsenseapps.feeder.db.room.BlocklistDao
+import com.nononsenseapps.feeder.db.room.BlocklistEntry
 import com.nononsenseapps.feeder.model.workmanager.UNIQUE_PERIODIC_NAME
 import com.nononsenseapps.feeder.model.workmanager.oldPeriodics
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
@@ -28,11 +31,15 @@ class SettingsStoreTest : DIAware {
     private lateinit var sp: SharedPreferences
 
     @MockK
+    private lateinit var blocklistDao: BlocklistDao
+
+    @MockK
     private lateinit var workManager: WorkManager
     override val di by DI.lazy {
         bind<SharedPreferences>() with instance(sp)
         bind<WorkManager>() with instance(workManager)
         bind<SettingsStore>() with singleton { SettingsStore(di) }
+        bind<BlocklistDao>() with singleton { blocklistDao }
     }
 
     @Before
@@ -293,5 +300,18 @@ class SettingsStoreTest : DIAware {
         }
 
         assertEquals(SyncFrequency.EVERY_3_HOURS, store.syncFrequency.value)
+    }
+
+    @Test
+    fun blockListGlobs() {
+        runBlocking {
+            store.setBlockListPreference(listOf("foo", "bar"))
+        }
+        coVerify {
+            blocklistDao.insert(BlocklistEntry(globPattern = "*foo*"))
+            blocklistDao.insert(BlocklistEntry(globPattern = "*bar*"))
+            blocklistDao.deleteMissingPatterns(listOf("*foo*", "*bar*"))
+        }
+        confirmVerified(blocklistDao)
     }
 }

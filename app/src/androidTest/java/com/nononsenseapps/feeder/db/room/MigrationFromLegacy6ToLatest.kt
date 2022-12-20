@@ -48,6 +48,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.kodein.di.DI
+import org.kodein.di.android.closestDI
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
@@ -57,6 +59,7 @@ import org.threeten.bp.ZonedDateTime
 class MigrationFromLegacy6ToLatest {
 
     private val feederApplication: FeederApplication = getApplicationContext()
+    private val di: DI by closestDI(feederApplication)
 
     @Rule
     @JvmField
@@ -82,7 +85,7 @@ class MigrationFromLegacy6ToLatest {
                 AppDatabase::class.java,
                 testDbName
             )
-                .addMigrations(*allMigrations)
+                .addMigrations(*getAllMigrations(di))
                 .build().also { testHelper.closeWhenFinished(it) }
 
     @Before

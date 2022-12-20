@@ -87,8 +87,8 @@ class Repository(override val di: DI) : DIAware {
     fun setPreferredDarkTheme(value: DarkThemePreferences) =
         settingsStore.setDarkThemePreference(value)
 
-    val blockList: StateFlow<Set<String>> = settingsStore.blockListPreference
-    fun setBlockList(value: Iterable<String>) =
+    val blockList: Flow<List<String>> = settingsStore.blockListPreference
+    suspend fun setBlockList(value: Iterable<String>) =
         settingsStore.setBlockListPreference(value)
 
     val currentSorting: StateFlow<SortingOptions> = settingsStore.currentSorting

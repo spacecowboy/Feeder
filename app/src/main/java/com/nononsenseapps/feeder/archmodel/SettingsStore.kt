@@ -9,6 +9,8 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.room.BlocklistDao
+import com.nononsenseapps.feeder.db.room.BlocklistEntry
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.workmanager.FeedSyncer
 import com.nononsenseapps.feeder.model.workmanager.UNIQUE_PERIODIC_NAME
@@ -16,16 +18,21 @@ import com.nononsenseapps.feeder.model.workmanager.oldPeriodics
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.nononsenseapps.feeder.util.getStringNonNull
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SettingsStore(override val di: DI) : DIAware {
     private val sp: SharedPreferences by instance()
+    private val blocklistDao: BlocklistDao by instance()
 
     private val _showOnlyUnread = MutableStateFlow(sp.getBoolean(PREF_SHOW_ONLY_UNREAD, true))
     val showOnlyUnread: StateFlow<Boolean> = _showOnlyUnread.asStateFlow()
@@ -272,21 +279,31 @@ class SettingsStore(override val di: DI) : DIAware {
         ).apply()
     }
 
-    private val _blockListPreference = MutableStateFlow(
-        sp.getStringSet(PREF_BLOCK_LIST, null) ?: emptySet()
-    )
-    val blockListPreference = _blockListPreference.asStateFlow()
-    fun setBlockListPreference(value: Iterable<String>) {
-        val cleanedValue = value.cleanedSet()
-        _blockListPreference.value = cleanedValue
-        sp.edit().putStringSet(PREF_BLOCK_LIST, cleanedValue).apply()
+    val blockListPreference: Flow<List<String>>
+        get() = blocklistDao.getGlobPatterns()
+            .mapLatest { patterns ->
+                patterns.map { pattern ->
+                    // Remove start and ending *
+                    pattern.dropEnds(1, 1)
+                }
+            }
+
+    suspend fun setBlockListPreference(value: Iterable<String>) {
+        value.cleanedList()
+            .map { "*$it*" }
+            .onEach {
+                blocklistDao.insert(BlocklistEntry(globPattern = it))
+            }
+            .let { patterns ->
+                blocklistDao.deleteMissingPatterns(patterns)
+            }
     }
 
-    private fun Iterable<String>.cleanedSet(): Set<String> {
+    private fun Iterable<String>.cleanedList(): List<String> {
         return asSequence()
             .map { it.lowercase().trim() }
             .filter { it.isNotBlank() }
-            .toSet()
+            .toList()
     }
 
     private val _syncFrequency by lazy {
@@ -428,11 +445,6 @@ const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 const val PREF_TEXT_SCALE = "pref_body_text_scale"
 
 /**
- * Block List Settings
- */
-const val PREF_BLOCK_LIST = "pref_block_list_values"
-
-/**
  * Read Aloud Settings
  */
 const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloud_detect_lang"
@@ -509,4 +521,16 @@ enum class SwipeAsRead(
     DISABLED(R.string.disabled),
     ONLY_FROM_END(R.string.only_from_end),
     FROM_ANYWHERE(R.string.from_anywhere)
+}
+
+fun String.dropEnds(
+    starting: Int,
+    ending: Int
+): String {
+    require(starting >= 0) { "Requested character count $starting is less than zero." }
+    require(ending >= 0) { "Requested character count $ending is less than zero." }
+    return substring(
+        starting.coerceAtMost(length),
+        (length - ending).coerceAtLeast(0)
+    )
 }
