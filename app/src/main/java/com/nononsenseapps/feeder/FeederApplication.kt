@@ -17,6 +17,7 @@ import coil.disk.DiskCache
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.AppDatabase
+import com.nononsenseapps.feeder.db.room.BlocklistDao
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ReadStatusSyncedDao
@@ -68,6 +69,7 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
         bind<RemoteReadMarkDao>() with singleton { instance<AppDatabase>().remoteReadMarkDao() }
         bind<RemoteFeedDao>() with singleton { instance<AppDatabase>().remoteFeedDao() }
         bind<SyncDeviceDao>() with singleton { instance<AppDatabase>().syncDeviceDao() }
+        bind<BlocklistDao>() with singleton { instance<AppDatabase>().blocklistDao() }
 
         import(androidModule)
 

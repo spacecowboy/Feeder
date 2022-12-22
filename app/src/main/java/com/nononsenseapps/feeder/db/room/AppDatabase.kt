@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.db.room
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.Database
 import androidx.room.Room
@@ -16,6 +17,10 @@ import com.nononsenseapps.feeder.util.forEach
 import com.nononsenseapps.feeder.util.setInt
 import com.nononsenseapps.feeder.util.setLong
 import com.nononsenseapps.feeder.util.setString
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 
 const val DATABASE_NAME = "rssDatabase"
 const val ID_UNSET: Long = 0
@@ -32,18 +37,20 @@ const val ID_ALL_FEEDS: Long = -10
     entities = [
         Feed::class,
         FeedItem::class,
+        BlocklistEntry::class,
         SyncRemote::class,
         ReadStatusSynced::class,
         RemoteReadMark::class,
         RemoteFeed::class,
         SyncDevice::class,
     ],
-    version = 23
+    version = 24
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun feedDao(): FeedDao
     abstract fun feedItemDao(): FeedItemDao
+    abstract fun blocklistDao(): BlocklistDao
     abstract fun syncRemoteDao(): SyncRemoteDao
     abstract fun readStatusSyncedDao(): ReadStatusSyncedDao
     abstract fun remoteReadMarkDao(): RemoteReadMarkDao
@@ -69,15 +76,16 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         private fun buildDatabase(context: Context): AppDatabase {
+            val di: DI by closestDI(context)
             return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
-                .addMigrations(*allMigrations)
+                .addMigrations(*getAllMigrations(di))
                 .build()
         }
     }
 }
 
 // 17-20 were never part of any release, just made for easier testing
-val allMigrations = arrayOf(
+fun getAllMigrations(di: DI) = arrayOf(
     MIGRATION_5_7,
     MIGRATION_6_7,
     MIGRATION_7_8,
@@ -96,12 +104,53 @@ val allMigrations = arrayOf(
     MIGRATION_20_21,
     MIGRATION_21_22,
     MIGRATION_22_23,
+    MigrationFrom23To24(di),
 )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+@Suppress("ClassName")
+class MigrationFrom23To24(override val di: DI) : Migration(23, 24), DIAware {
+    private val sharedPrefs: SharedPreferences by instance()
+
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `blocklist`
+                (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                 `glob_pattern` TEXT NOT NULL)
+            """.trimIndent()
+        )
+
+        database.execSQL(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS `index_blocklist_glob_pattern` on `blocklist` (`glob_pattern`)
+            """.trimIndent()
+        )
+
+        val blocks = sharedPrefs.getStringSet("pref_block_list_values", null)
+            ?: emptySet()
+
+        if (blocks.isNotEmpty()) {
+            // ('*foo*'), ('*bar*'), ('*car*')
+            val valuesList = blocks.joinToString(separator = ",") { "('*$it*')" }
+            database.execSQL(
+                """
+                INSERT INTO `blocklist`
+                    (`glob_pattern`)
+                    VALUES $valuesList
+                """.trimIndent()
+            )
+
+            sharedPrefs.edit()
+                .remove("pref_block_list_values")
+                .apply()
+        }
+    }
+}
+
 @Suppress("ClassName")
 object MIGRATION_22_23 : Migration(22, 23) {
     override fun migrate(database: SupportSQLiteDatabase) {

@@ -47,7 +47,6 @@ suspend fun syncFeeds(
     feedTag: String = "",
     forceNetwork: Boolean = false,
     minFeedAgeMinutes: Int = 5,
-    blockList: Set<String> = emptySet(),
 ): Boolean {
     val di: DI by closestDI(context)
     val repository: Repository by di.instance()
@@ -62,7 +61,6 @@ suspend fun syncFeeds(
                 maxFeedItemCount = repository.maximumCountPerFeed.value,
                 forceNetwork = forceNetwork,
                 minFeedAgeMinutes = minFeedAgeMinutes,
-                blockList = blockList,
             )
         }
     }
@@ -76,7 +74,6 @@ internal suspend fun syncFeeds(
     maxFeedItemCount: Int = 100,
     forceNetwork: Boolean = false,
     minFeedAgeMinutes: Int = 5,
-    blockList: Set<String> = emptySet(),
 ): Boolean {
     val feedStore: FeedStore by di.instance()
     val db: AppDatabase by di.instance()
@@ -147,7 +144,6 @@ internal suspend fun syncFeeds(
                                 maxFeedItemCount = maxFeedItemCount,
                                 forceNetwork = forceNetwork,
                                 downloadTime = downloadTime,
-                                blockList = blockList,
                             )
                         } catch (e: Throwable) {
                             Log.e(
@@ -193,7 +189,6 @@ private suspend fun syncFeed(
     maxFeedItemCount: Int,
     forceNetwork: Boolean = false,
     downloadTime: Instant,
-    blockList: Set<String>,
 ) {
     Log.d(LOG_TAG, "Fetching ${feedSql.displayTitle}")
     val repository: Repository by di.instance()
@@ -229,7 +224,7 @@ private suspend fun syncFeed(
     if (feed == null) {
         repository.upsertFeed(feedSql)
     } else {
-        val items = feed.items?.filterNot { it.isBlockedBy(blockList) }
+        val items = feed.items
         val uniqueIdCount = items?.map { it.id }?.toSet()?.size
         // This can only detect between items present in one feed. See NIXOS
         val isNotUniqueIds = uniqueIdCount != items?.size
@@ -308,11 +303,6 @@ private suspend fun syncFeed(
         repository.deleteFeedItems(ids)
         repository.deleteStaleRemoteReadMarks()
     }
-}
-
-private fun Item.isBlockedBy(blockList: Collection<String>): Boolean {
-    val lowerTitle = title?.lowercase() ?: return false
-    return blockList.any { lowerTitle.contains(it) }
 }
 
 internal suspend fun feedsToSync(

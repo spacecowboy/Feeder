@@ -94,7 +94,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setFeedItemStyle(value)
     }
 
-    fun setBlockList(value: Iterable<String>) {
+    fun setBlockList(value: List<String>) = viewModelScope.launch {
         repository.setBlockList(value)
     }
 
@@ -158,7 +158,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     batteryOptimizationIgnored = params[13] as Boolean,
                     feedItemStyle = params[14] as FeedItemStyle,
                     swipeAsRead = params[15] as SwipeAsRead,
-                    blockList = params[16] as Set<String>,
+                    blockList = params[16] as List<String>,
                     useDetectLanguage = params[17] as Boolean,
                     useDynamicTheme = params[18] as Boolean,
                     textScale = params[19] as Float,
@@ -177,7 +177,7 @@ data class SettingsViewState(
     val currentSorting: SortingOptions = SortingOptions.NEWEST_FIRST,
     val showFab: Boolean = true,
     val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
-    val blockList: Set<String> = emptySet(),
+    val blockList: List<String> = emptyList(),
     val syncOnResume: Boolean = false,
     val syncOnlyOnWifi: Boolean = false,
     val syncOnlyWhenCharging: Boolean = false,

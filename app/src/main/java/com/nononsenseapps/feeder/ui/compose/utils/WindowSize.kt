@@ -88,8 +88,17 @@ private fun Activity.rememberWindowSize(): Size {
     return windowMetrics.bounds.toComposeRect().size
 }
 
-// Pixel emulator is 390 x 850. This value was just a first guess
-private val shortHeightLimit = 500.dp
+/*
+Formula: dp = px * 160 / DPI
+
+Mi A1: 762dp
+Pixel 2: 731dp
+Pixel 5: 850dp
+S22: 880dp
+S22+: 952dp
+S22 Ultra: 988dp
+*/
+private val shortHeightLimit = 850.dp
 
 /**
  * Partitions a [DpSize] into a enumerated [WindowSize] class.

@@ -1,7 +1,6 @@
 package com.nononsenseapps.feeder.db.room
 
 import android.database.Cursor
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
@@ -94,6 +93,7 @@ interface FeedItemDao {
         """
         SELECT $COL_ID as id, $COL_TITLE as title, $COL_PLAINSNIPPET as text
         FROM feed_items
+        WHERE NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY primary_sort_time DESC, pub_date DESC
         """
     )
@@ -104,6 +104,7 @@ interface FeedItemDao {
         SELECT $COL_ID as id, $COL_TITLE as title, $COL_PLAINSNIPPET as text
         FROM feed_items
         WHERE feed_items.feed_id = :feedId
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY primary_sort_time DESC, pub_date DESC
         """
     )
@@ -134,82 +135,8 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE feed_id IS :feedId
-        ORDER BY $feedItemsListOrderByDesc
-        """
-    )
-    fun loadLivePreviewsDesc(feedId: Long): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE feed_id IS :feedId
-        ORDER BY $feedItemsListOrderByAsc
-        """
-    )
-    fun loadLivePreviewsAsc(feedId: Long): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag
-        ORDER BY $feedItemsListOrderByDesc
-        """
-    )
-    fun loadLivePreviewsDesc(tag: String): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag
-        ORDER BY $feedItemsListOrderByAsc
-        """
-    )
-    fun loadLivePreviewsAsc(tag: String): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        ORDER BY $feedItemsListOrderByDesc
-        """
-    )
-    fun loadLivePreviewsDesc(): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        ORDER BY $feedItemsListOrderByAsc
-        """
-    )
-    fun loadLivePreviewsAsc(): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
-        ORDER BY $feedItemsListOrderByDesc
-        """
-    )
-    fun loadLiveUnreadPreviewsDesc(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """
     )
@@ -221,6 +148,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag AND (unread IS :unread OR pinned = 1)
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """
     )
@@ -232,6 +160,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE (unread IS :unread OR pinned = 1)
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """
     )
@@ -243,6 +172,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """
     )
@@ -254,6 +184,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag AND (unread IS :unread OR pinned = 1)
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """
     )
@@ -265,6 +196,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE (unread IS :unread OR pinned = 1)
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """
     )
@@ -276,6 +208,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """
     )
@@ -287,6 +220,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """
     )
@@ -297,6 +231,7 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """
     )
@@ -308,6 +243,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """
     )
@@ -319,6 +255,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """
     )
@@ -329,6 +266,7 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
+        WHERE NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """
     )
@@ -340,6 +278,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """
     )
@@ -351,6 +290,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1 AND feed_id IS :feedId
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """
     )
@@ -362,6 +302,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1 AND tag IS :tag
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """
     )
@@ -373,6 +314,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """
     )
@@ -384,6 +326,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1 AND feed_id IS :feedId
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """
     )
@@ -395,6 +338,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE bookmarked = 1 AND tag IS :tag
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """
     )
@@ -402,65 +346,11 @@ interface FeedItemDao {
 
     @Query(
         """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
-        ORDER BY $feedItemsListOrderByAsc
-        """
-    )
-    fun loadLiveUnreadPreviewsAsc(feedId: Long?, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag AND (unread IS :unread OR pinned = 1)
-        ORDER BY $feedItemsListOrderByDesc
-        """
-    )
-    fun loadLiveUnreadPreviewsDesc(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag AND (unread IS :unread OR pinned = 1)
-        ORDER BY $feedItemsListOrderByAsc
-        """
-    )
-    fun loadLiveUnreadPreviewsAsc(tag: String, unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE (unread IS :unread OR pinned = 1)
-        ORDER BY $feedItemsListOrderByDesc
-        """
-    )
-    fun loadLiveUnreadPreviewsDesc(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE (unread IS :unread OR pinned = 1)
-        ORDER BY $feedItemsListOrderByAsc
-        """
-    )
-    fun loadLiveUnreadPreviewsAsc(unread: Boolean = true): DataSource.Factory<Int, PreviewItem>
-
-    @Query(
-        """
         SELECT $feedItemColumnsWithFeed
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IN (:feedIds) AND notified IS 0 AND unread IS 1
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         """
     )
     suspend fun loadItemsToNotify(feedIds: List<Long>): List<FeedItemWithFeed>
@@ -657,6 +547,7 @@ interface FeedItemDao {
             FROM feed_items fi
             JOIN feeds f ON feed_id = f.id
             WHERE f.fulltext_by_default = 1
+                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """
     )
     fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>>
@@ -665,6 +556,7 @@ interface FeedItemDao {
         """
             SELECT count(*)
             FROM feed_items fi
+            WHERE NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """
     )
     fun getFeedItemCount(): Flow<Int>
@@ -675,6 +567,7 @@ interface FeedItemDao {
             FROM feed_items fi
             JOIN feeds f ON feed_id = f.id
             WHERE f.tag IS :tag
+              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """
     )
     fun getFeedItemCount(tag: String): Flow<Int>
@@ -684,6 +577,7 @@ interface FeedItemDao {
             SELECT count(*)
             FROM feed_items fi
             WHERE fi.feed_id IS :feedId
+              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """
     )
     fun getFeedItemCount(feedId: Long): Flow<Int>
@@ -695,6 +589,7 @@ interface FeedItemDao {
             SELECT count(*)
             FROM feed_items fi
             WHERE fi.unread IS 1 OR fi.pinned = 1
+              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """
     )
     fun getUnreadFeedItemCount(): Flow<Int>
@@ -705,6 +600,7 @@ interface FeedItemDao {
             FROM feed_items fi
             JOIN feeds f ON fi.feed_id = f.id
             WHERE f.tag IS :tag AND (fi.unread IS 1 OR fi.pinned = 1)
+              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """
     )
     fun getUnreadFeedItemCount(tag: String): Flow<Int>
@@ -714,6 +610,7 @@ interface FeedItemDao {
             SELECT count(*)
             FROM feed_items fi
             WHERE fi.feed_id IS :feedId AND (fi.unread IS 1 OR fi.pinned = 1)
+              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """
     )
     fun getUnreadFeedItemCount(feedId: Long): Flow<Int>
@@ -724,6 +621,7 @@ interface FeedItemDao {
             FROM feed_items fi
             JOIN feeds f ON feed_id = f.id
             WHERE f.notify IS 1 AND fi.notified IS 0 AND fi.unread is 1
+              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """
     )
     fun getFeedItemsNeedingNotifying(): Flow<List<Long>>

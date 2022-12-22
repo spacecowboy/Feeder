@@ -6,10 +6,12 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.robots.feedScreen
 import kotlin.test.assertFalse
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.kodein.di.compose.withDI
 
+@Ignore
 class StartingNavigationTest : BaseComposeTest {
 
     @get:Rule

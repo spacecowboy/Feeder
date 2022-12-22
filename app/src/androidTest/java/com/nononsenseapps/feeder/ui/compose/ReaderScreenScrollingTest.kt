@@ -1,8 +1,10 @@
 package com.nononsenseapps.feeder.ui.compose
 
 import androidx.compose.ui.test.junit4.createComposeRule
+import org.junit.Ignore
 import org.junit.Rule
 
+@Ignore
 class ReaderScreenScrollingTest {
 
     @get:Rule

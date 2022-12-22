@@ -9,10 +9,12 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.robots.feedScreen
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.kodein.di.compose.withDI
 
+@Ignore
 class SyncSetupTest : BaseComposeTest {
 
     @get:Rule

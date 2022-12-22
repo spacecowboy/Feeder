@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.ui.compose.dialog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,22 +34,24 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
+import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 
 @Composable
 fun EditableListDialog(
-    title: String,
+    title: @Composable () -> Unit,
     items: ImmutableHolder<List<String>>,
     onDismiss: () -> Unit,
-    onModifiedItems: (Iterable<String>) -> Unit
+    onModifiedItems: (List<String>) -> Unit
 ) {
     EditableListDialog(
         title = title,
@@ -69,7 +72,7 @@ fun EditableListDialog(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditableListDialog(
-    title: String,
+    title: @Composable () -> Unit,
     items: ImmutableHolder<List<String>>,
     onDismiss: () -> Unit,
     onRemoveItem: (String) -> Unit,
@@ -93,7 +96,6 @@ fun EditableListDialog(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
             ) {
                 OutlinedTextField(
                     value = newValue,
@@ -127,20 +129,13 @@ fun EditableListDialog(
                 )
             }
         },
-        title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-            )
-        },
+        title = title,
         text = {
             LazyColumn(
                 state = lazyListState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(TextFieldDefaults.MinHeight * 3)
+                    .height(TextFieldDefaults.MinHeight * 3.3f)
                     .padding(vertical = 8.dp),
             ) {
                 items(items.item) { item ->
@@ -171,4 +166,34 @@ fun EditableListDialog(
             }
         }
     )
+}
+
+@Preview
+@Composable
+fun PreviewDialog() {
+    FeederTheme {
+        EditableListDialog(
+            title = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.block_list),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    Text(
+                        text = "Hides stories with titles containing any of these terms. Example filters:",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = "feeder feed?r fe*er",
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                    )
+                }
+            },
+            items = ImmutableHolder(listOf("Foo")),
+            onDismiss = {},
+            onModifiedItems = {},
+        )
+    }
 }

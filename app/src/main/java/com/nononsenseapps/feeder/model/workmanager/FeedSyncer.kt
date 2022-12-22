@@ -66,7 +66,6 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
             val feedTag = inputData.getString(ARG_FEED_TAG) ?: ""
             val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
             val minFeedAgeMinutes = inputData.getInt(MIN_FEED_AGE_MINUTES, 5)
-            val blockList = repository.blockList.value
 
             success = syncFeeds(
                 context = applicationContext,
@@ -74,7 +73,6 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
                 feedTag = feedTag,
                 forceNetwork = forceNetwork,
                 minFeedAgeMinutes = minFeedAgeMinutes,
-                blockList = blockList,
             )
         } catch (e: Exception) {
             success = false
