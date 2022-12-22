@@ -47,7 +47,7 @@ const val ID_ALL_FEEDS: Long = -10
         KnownDevice::class,
         QueuedMessage::class,
     ],
-    version = 25
+    version = 26
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -112,12 +112,23 @@ fun getAllMigrations(di: DI) = arrayOf(
     MIGRATION_22_23,
     MigrationFrom23To24(di),
     MIGRATION_24_25,
+    MIGRATION_25_26,
 )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+object MIGRATION_25_26 : Migration(25, 26) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE INDEX IF NOT EXISTS `index_push_message_queue_endpoint` ON `push_message_queue` (`endpoint`)
+            """.trimIndent()
+        )
+    }
+}
+
 object MIGRATION_24_25 : Migration(24, 25) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(

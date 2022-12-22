@@ -18,6 +18,9 @@ import org.threeten.bp.Instant
 
 @Entity(
     tableName = PUSH_MESSAGE_QUEUE,
+    indices = [
+        Index(value = [COL_ENDPOINT])
+    ],
     foreignKeys = [
         ForeignKey(
             entity = KnownDevice::class,
