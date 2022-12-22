@@ -95,10 +95,10 @@ Mi A1: 762dp
 Pixel 2: 731dp
 Pixel 5: 850dp
 S22: 880dp
-S22+: 952dp
+S22+: 952dp (actual 832dp)
 S22 Ultra: 988dp
 */
-private val shortHeightLimit = 850.dp
+private val shortHeightLimit = 800.dp
 
 /**
  * Partitions a [DpSize] into a enumerated [WindowSize] class.
