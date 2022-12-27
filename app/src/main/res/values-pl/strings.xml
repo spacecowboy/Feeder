@@ -192,4 +192,5 @@
     <string name="article_image">Obrazek artykułu</string>
     <string name="feed_icon">Ikona kanału</string>
     <string name="text_scale">Rozmiar tekstu</string>
+    <string name="block_list_description">Ukrywa artykuły z tytułami zawierającymi dowolne z tych terminów. Przykładowe filtry:</string>
 </resources>
