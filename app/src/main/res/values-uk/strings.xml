@@ -192,4 +192,5 @@
     <string name="article_image">Зображення статті</string>
     <string name="feed_icon">Значок стрічки</string>
     <string name="text_scale">Розмір тексту</string>
+    <string name="block_list_description">Приховує історії з назвами, які містять будь-які з цих термінів. Приклад фільтрів:</string>
 </resources>
