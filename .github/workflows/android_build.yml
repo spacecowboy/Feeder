@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - githubactions
 
 jobs:
   # this job builds and uploads the apk
@@ -104,6 +105,7 @@ jobs:
           force-avd-creation: false
           disable-animations: false
           ram-size: 4096M
+          heap-size: 512M
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: echo "Generated AVD snapshot for caching."
 
@@ -113,6 +115,7 @@ jobs:
           api-level: 29
           disable-animations: true
           ram-size: 4096M
+          heap-size: 512M
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot-save
           # Clear logcat before tests begin
           script: |

@@ -11,7 +11,7 @@ on:
 
 jobs:
   # this job builds and uploads the apk
-  build_the_apk:
+  lint_and_check:
     runs-on: ubuntu-latest
     permissions:
       contents: read
