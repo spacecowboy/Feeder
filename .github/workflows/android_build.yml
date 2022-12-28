@@ -104,6 +104,7 @@ jobs:
           force-avd-creation: false
           disable-animations: false
           ram-size: 4096M
+          heap-size: 512M
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: echo "Generated AVD snapshot for caching."
 
