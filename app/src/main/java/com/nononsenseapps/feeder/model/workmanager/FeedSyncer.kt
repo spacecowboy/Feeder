@@ -11,15 +11,11 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.notify
 import com.nononsenseapps.feeder.model.syncFeeds
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
-import com.nononsenseapps.feeder.util.currentlyCharging
-import com.nononsenseapps.feeder.util.currentlyConnected
-import com.nononsenseapps.feeder.util.currentlyUnmetered
 import java.util.concurrent.TimeUnit
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -29,6 +25,7 @@ import org.kodein.di.instance
 const val ARG_FORCE_NETWORK = "force_network"
 
 const val UNIQUE_PERIODIC_NAME = "feeder_periodic_3"
+
 // Clear this for scheduler
 val oldPeriodics = listOf(
     "feeder_periodic",
@@ -37,22 +34,11 @@ val oldPeriodics = listOf(
 private const val UNIQUE_FEEDSYNC_NAME = "feeder_sync_onetime"
 private const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
 
-fun isOkToSyncAutomatically(context: Context): Boolean {
-    val di: DI by closestDI(context)
-    val repository: Repository by di.instance()
-    return (
-        currentlyConnected(context) &&
-            (!repository.syncOnlyWhenCharging.value || currentlyCharging(context)) &&
-            (!repository.syncOnlyOnWifi.value || currentlyUnmetered(context))
-        )
-}
-
 class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams), DIAware {
     override val di: DI by closestDI(context)
 
     private val notificationManager: NotificationManagerCompat by instance()
-    private val repository: Repository by instance()
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return createForegroundInfo(context, notificationManager)

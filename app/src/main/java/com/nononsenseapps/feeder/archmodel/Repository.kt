@@ -3,6 +3,11 @@ package com.nononsenseapps.feeder.archmodel
 import android.app.Application
 import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
@@ -14,13 +19,15 @@ import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.RemoteFeed
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
-import com.nononsenseapps.feeder.model.workmanager.scheduleSendRead
+import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
 import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
+import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import java.net.URL
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -47,6 +54,7 @@ class Repository(override val di: DI) : DIAware {
     private val application: Application by instance()
     private val syncRemoteStore: SyncRemoteStore by instance()
     private val syncClient: SyncRestClient by instance()
+    private val workManager: WorkManager by instance()
 
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
@@ -507,6 +515,36 @@ class Repository(override val di: DI) : DIAware {
         val syncRemote = getSyncRemote()
         updateDeviceList()
         return syncCode to syncRemote.secretKey
+    }
+
+    private fun scheduleSendRead(di: DI) {
+        logDebug(LOG_TAG, "Scheduling work")
+
+        val constraints = Constraints.Builder()
+            // This prevents expedited if true
+            .setRequiresCharging(syncOnlyWhenCharging.value)
+
+        if (syncOnlyOnWifi.value) {
+            constraints.setRequiredNetworkType(NetworkType.UNMETERED)
+        } else {
+            constraints.setRequiredNetworkType(NetworkType.CONNECTED)
+        }
+
+        val workRequest = OneTimeWorkRequestBuilder<SyncServiceSendReadWorker>()
+            .addTag("feeder")
+            .keepResultsForAtLeast(5, TimeUnit.MINUTES)
+            .setConstraints(constraints.build())
+            .setInitialDelay(10, TimeUnit.SECONDS)
+
+        workManager.enqueueUniqueWork(
+            SyncServiceSendReadWorker.UNIQUE_SENDREAD_NAME,
+            ExistingWorkPolicy.REPLACE,
+            workRequest.build()
+        )
+    }
+
+    companion object {
+        private const val LOG_TAG = "FEEDER_REPO"
     }
 }
 

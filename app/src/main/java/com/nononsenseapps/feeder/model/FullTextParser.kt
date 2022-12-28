@@ -10,6 +10,7 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
+import com.nononsenseapps.feeder.util.logDebug
 import java.io.File
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -25,10 +26,12 @@ import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 
+private const val LOG_TAG = "FEEDER_FULLTEXT"
+
 fun scheduleFullTextParse(
     di: DI,
 ) {
-    Log.i("FeederFullText", "Scheduling a full text parse work")
+    Log.i(LOG_TAG, "Scheduling a full text parse work")
     val workRequest = OneTimeWorkRequestBuilder<FullTextWorker>()
         .addTag("feeder")
         .keepResultsForAtLeast(1, TimeUnit.MINUTES)
@@ -46,7 +49,7 @@ class FullTextWorker(
     private val repository: Repository by instance()
 
     override suspend fun doWork(): Result {
-        Log.i("FeederFullText", "Parsing full texts for articles if missing")
+        Log.i(LOG_TAG, "Parsing full texts for articles if missing")
 
         val itemsToSync: List<FeedItemForFetching> =
             repository.getFeedsItemsWithDefaultFullTextParse()
@@ -92,17 +95,17 @@ suspend fun parseFullArticle(
 ): Pair<Boolean, Throwable?> = withContext(Dispatchers.Default) {
     return@withContext try {
         val url = feedItem.link ?: return@withContext false to null
-        Log.d("FeederFullText", "Fetching full page ${feedItem.link}")
+        logDebug(LOG_TAG, "Fetching full page ${feedItem.link}")
         val html: String = okHttpClient.curl(URL(url)) ?: return@withContext false to null
 
         // TODO verify encoding is respected in reader
-        Log.i("FeederFullText", "Parsing article ${feedItem.link}")
+        Log.i(LOG_TAG, "Parsing article ${feedItem.link}")
         val article = Readability4JExtended(url, html).parse()
 
         // TODO set image on item if none already
         // naiveFindImageLink(article.content)?.let { Parser.unescapeEntities(it, true) }
 
-        Log.d("FeederFullText", "Writing article ${feedItem.link}")
+        logDebug(LOG_TAG, "Writing article ${feedItem.link}")
         withContext(Dispatchers.IO) {
             blobFullOutputStream(feedItem.id, filesDir).bufferedWriter().use { writer ->
                 writer.write(article.contentWithUtf8Encoding)
@@ -111,7 +114,7 @@ suspend fun parseFullArticle(
         true to null
     } catch (e: Throwable) {
         Log.e(
-            "FeederFullText",
+            LOG_TAG,
             "Failed to get fulltext for ${feedItem.link}: ${e.message}",
             e
         )
