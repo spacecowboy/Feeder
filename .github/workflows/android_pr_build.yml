@@ -5,6 +5,7 @@ on:
     branches:
       - '*'
       - '!master'
+      - githubactions
   # PRs are in gitlab for now
   #pull_request:
   #  branches: [ "master" ]
