@@ -14,11 +14,9 @@ import androidx.navigation.NavController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
-import com.nononsenseapps.feeder.model.workmanager.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.model.workmanager.scheduleGetUpdates
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
-import com.nononsenseapps.feeder.push.schedulePeriodicProofOfLife
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
@@ -70,7 +68,7 @@ class MainActivity : DIAwareComponentActivity() {
 
     private fun maybeRequestSync() = lifecycleScope.launch {
         if (mainActivityViewModel.shouldSyncOnResume) {
-            if (isOkToSyncAutomatically(applicationContext)) {
+            if (mainActivityViewModel.isOkToSyncAutomatically()) {
                 requestFeedSync(
                     di = di,
                     forceNetwork = false,
@@ -83,7 +81,7 @@ class MainActivity : DIAwareComponentActivity() {
         super.onCreate(savedInstanceState)
 
         mainActivityViewModel.ensurePeriodicSyncConfigured()
-        schedulePeriodicProofOfLife(di)
+        mainActivityViewModel.schedulePeriodicProofOfLife()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 

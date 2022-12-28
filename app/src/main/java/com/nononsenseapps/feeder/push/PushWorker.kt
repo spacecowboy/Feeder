@@ -1,19 +1,10 @@
 package com.nononsenseapps.feeder.push
 
 import android.content.Context
-import androidx.work.Constraints
 import androidx.work.CoroutineWorker
-import androidx.work.Data
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.util.logDebug
-import java.util.concurrent.TimeUnit
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -96,69 +87,4 @@ class PushWorker(val context: Context, workerParams: WorkerParameters) :
         const val UNIQUE_PUSH_NAME = "feeder_push_onetime"
         const val UNIQUE_PROOF_OF_LIFE_NAME = "feeder_push_onetime"
     }
-}
-
-fun scheduleSendPush(di: DI) {
-    logDebug(PushWorker.LOG_TAG, "scheduleSendPush")
-    val repository by di.instance<Repository>()
-
-    val constraints = Constraints.Builder()
-        // This prevents expedited if true
-        .setRequiresCharging(repository.syncOnlyWhenCharging.value)
-
-    if (repository.syncOnlyOnWifi.value) {
-        constraints.setRequiredNetworkType(NetworkType.UNMETERED)
-    } else {
-        constraints.setRequiredNetworkType(NetworkType.CONNECTED)
-    }
-
-    val workRequest = OneTimeWorkRequestBuilder<PushWorker>()
-        .addTag("feeder")
-        .keepResultsForAtLeast(5, TimeUnit.MINUTES)
-        .setConstraints(constraints.build())
-        .setInitialDelay(5, TimeUnit.SECONDS)
-
-    val workManager by di.instance<WorkManager>()
-    workManager.enqueueUniqueWork(
-        PushWorker.UNIQUE_PUSH_NAME,
-        ExistingWorkPolicy.REPLACE,
-        workRequest.build()
-    )
-}
-
-fun schedulePeriodicProofOfLife(di: DI) {
-    logDebug(PushWorker.LOG_TAG, "schedulePeriodicProofOfLife")
-    val repository by di.instance<Repository>()
-
-    val constraints = Constraints.Builder()
-        // This prevents expedited if true
-        .setRequiresCharging(repository.syncOnlyWhenCharging.value)
-
-    if (repository.syncOnlyOnWifi.value) {
-        constraints.setRequiredNetworkType(NetworkType.UNMETERED)
-    } else {
-        constraints.setRequiredNetworkType(NetworkType.CONNECTED)
-    }
-
-    val workRequest = PeriodicWorkRequestBuilder<PushWorker>(
-        24,
-        TimeUnit.HOURS,
-        12,
-        TimeUnit.HOURS
-    )
-        .addTag("feeder")
-        .keepResultsForAtLeast(5, TimeUnit.MINUTES)
-        .setConstraints(constraints.build())
-        .setInputData(
-            Data.Builder()
-                .putBoolean(PushWorker.UNIQUE_PROOF_OF_LIFE_NAME, true)
-                .build()
-        )
-
-    val workManager by di.instance<WorkManager>()
-    workManager.enqueueUniquePeriodicWork(
-        PushWorker.UNIQUE_PROOF_OF_LIFE_NAME,
-        ExistingPeriodicWorkPolicy.KEEP,
-        workRequest.build()
-    )
 }

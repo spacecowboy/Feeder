@@ -4,6 +4,14 @@ import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.paging.PagingData
+import androidx.work.Constraints
+import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
@@ -31,11 +39,11 @@ import com.nononsenseapps.feeder.push.Feeds
 import com.nononsenseapps.feeder.push.FeedsRequest
 import com.nononsenseapps.feeder.push.PushMaker
 import com.nononsenseapps.feeder.push.PushStore
+import com.nononsenseapps.feeder.push.PushWorker
 import com.nononsenseapps.feeder.push.ReadMark
 import com.nononsenseapps.feeder.push.ReadMarks
 import com.nononsenseapps.feeder.push.SnapshotRequest
 import com.nononsenseapps.feeder.push.Update
-import com.nononsenseapps.feeder.push.scheduleSendPush
 import com.nononsenseapps.feeder.push.toProto
 import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
@@ -44,6 +52,7 @@ import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
 import java.net.URL
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -374,7 +383,7 @@ class Repository(override val di: DI) : DIAware {
             onlyUnread = showOnlyUnread.value,
             newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
         )
-        scheduleSendPush(di)
+        scheduleSendPush()
         broadcastReadMarks()
     }
 
@@ -827,7 +836,7 @@ class Repository(override val di: DI) : DIAware {
             )
         }
 
-        scheduleSendPush(di)
+        scheduleSendPush()
     }
 
     suspend fun getMessagesInQueue(): List<QueuedMessage> {
@@ -855,6 +864,67 @@ class Repository(override val di: DI) : DIAware {
 
     fun setDistributor(value: String) {
         pushStore.setDistributor(value)
+    }
+
+    private fun scheduleSendPush() {
+        logDebug(LOG_TAG, "scheduleSendPush")
+        val constraints = Constraints.Builder()
+            // This prevents expedited if true
+            .setRequiresCharging(syncOnlyWhenCharging.value)
+
+        if (syncOnlyOnWifi.value) {
+            constraints.setRequiredNetworkType(NetworkType.UNMETERED)
+        } else {
+            constraints.setRequiredNetworkType(NetworkType.CONNECTED)
+        }
+
+        val workRequest = OneTimeWorkRequestBuilder<PushWorker>()
+            .addTag("feeder")
+            .keepResultsForAtLeast(5, TimeUnit.MINUTES)
+            .setConstraints(constraints.build())
+            .setInitialDelay(5, TimeUnit.SECONDS)
+
+        val workManager by instance<WorkManager>()
+        workManager.enqueueUniqueWork(
+            PushWorker.UNIQUE_PUSH_NAME,
+            ExistingWorkPolicy.REPLACE,
+            workRequest.build()
+        )
+    }
+
+    fun schedulePeriodicProofOfLife() {
+        logDebug(LOG_TAG, "schedulePeriodicProofOfLife")
+        val constraints = Constraints.Builder()
+            // This prevents expedited if true
+            .setRequiresCharging(syncOnlyWhenCharging.value)
+
+        if (syncOnlyOnWifi.value) {
+            constraints.setRequiredNetworkType(NetworkType.UNMETERED)
+        } else {
+            constraints.setRequiredNetworkType(NetworkType.CONNECTED)
+        }
+
+        val workRequest = PeriodicWorkRequestBuilder<PushWorker>(
+            24,
+            TimeUnit.HOURS,
+            12,
+            TimeUnit.HOURS
+        )
+            .addTag("feeder")
+            .keepResultsForAtLeast(5, TimeUnit.MINUTES)
+            .setConstraints(constraints.build())
+            .setInputData(
+                Data.Builder()
+                    .putBoolean(PushWorker.UNIQUE_PROOF_OF_LIFE_NAME, true)
+                    .build()
+            )
+
+        val workManager by instance<WorkManager>()
+        workManager.enqueueUniquePeriodicWork(
+            PushWorker.UNIQUE_PROOF_OF_LIFE_NAME,
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest.build()
+        )
     }
 
     companion object {
