@@ -105,8 +105,8 @@ jobs:
           force-avd-creation: false
           disable-animations: false
           # ram-size: 4096M
-          heap-size: 512M
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 2048
+          #heap-size: 512M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -memory 2048M
           script: echo "Generated AVD snapshot for caching."
 
       - name: run tests
@@ -115,8 +115,8 @@ jobs:
           api-level: 29
           disable-animations: true
           # ram-size: 4096M
-          heap-size: 512M
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot-save -memory 2048
+          #heap-size: 512M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-snapshot-save -memory 2048M
           # Clear logcat before tests begin
           script: |
             adb logcat -c
