@@ -192,4 +192,5 @@
     <string name="article_image">Artikelbild</string>
     <string name="feed_icon">Feed-Symbol</string>
     <string name="text_scale">Textskalierung</string>
+    <string name="block_list_description">Blendet Beiträge aus, deren Titel einen dieser Begriffe enthalten. Beispiel-Filter:</string>
 </resources>

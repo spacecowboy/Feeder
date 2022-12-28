@@ -192,4 +192,5 @@
     <string name="article_image">Makale görseli</string>
     <string name="feed_icon">Yayın Simgesi</string>
     <string name="text_scale">Metin ölçeği</string>
+    <string name="block_list_description">Bu terimlerden herhangi birini içeren başlıklara sahip hikayeleri gizler. Örnek filtreler:</string>
 </resources>
