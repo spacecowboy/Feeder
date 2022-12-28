@@ -1,3 +1,44 @@
+# 2.4.2
+Agnieszka C (1):
+  * [f4bb4abf] Updated Polish translation using Weblate
+
+Axus Wizix (1):
+  * [b4351577] Updated Russian translation using Weblate
+
+Dan (2):
+  * [d0dd8fa2] Translated using Weblate (Ukrainian)
+  * [e9349b64] Updated Ukrainian translation using Weblate
+
+ERYpTION (1):
+  * [d1ea9ca3] Updated Danish translation using Weblate
+
+Eric (1):
+  * [bf17b3e0] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [d7609fb2] Updated French translation using Weblate
+
+Jonas Kalderstam (6):
+  * [eaf28eff] Fixed spacing issue in settings
+  * [d172d658] Changed so block list now works immediately instead of after
+         sync
+  * [f224bca4] Changed so more devices will won't use large top app bars
+
+Oğuz Ersen (1):
+  * [17d2f848] Updated Turkish translation using Weblate
+
+Simone Dotto (1):
+  * [b50bc9ad] Updated Italian translation using Weblate
+
+gallegonovato (1):
+  * [a0f49a1a] Updated Galician translation using Weblate
+
+haidarah esmander (1):
+  * [8bd20a6d] Added Arabic translation using Weblate
+
+zmni (1):
+  * [9c13bc84] Updated Indonesian translation using Weblate
+
 # 2.4.1
 Agnieszka C (1):
   * [86b33eb1] Updated Polish translation using Weblate
