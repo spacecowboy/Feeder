@@ -120,7 +120,7 @@ jobs:
           # Clear logcat before tests begin
           script: |
             adb logcat -c
-            ./gradlew connectedCheck
+            ./gradlew connectedDebugAndroidTest
             adb logcat -d *:D > logcat-dump.txt
 
       - name: upload the generated files
