@@ -12,6 +12,7 @@ import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
 import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
+import com.nononsenseapps.feeder.ui.compose.utils.withWindowSize
 import org.kodein.di.compose.withDI
 
 /**
@@ -25,33 +26,35 @@ class ManageSettingsActivity : DIAwareComponentActivity() {
 
         setContent {
             withDI {
-                val manageSettingsViewModel: ManageSettingsViewModel = DIAwareViewModel()
-                val currentTheme by manageSettingsViewModel.currentTheme.collectAsState()
-                val darkThemePreference by manageSettingsViewModel.darkThemePreference.collectAsState()
-                val dynamicColors by manageSettingsViewModel.dynamicColors.collectAsState()
+                withWindowSize {
+                    val manageSettingsViewModel: ManageSettingsViewModel = DIAwareViewModel()
+                    val currentTheme by manageSettingsViewModel.currentTheme.collectAsState()
+                    val darkThemePreference by manageSettingsViewModel.darkThemePreference.collectAsState()
+                    val dynamicColors by manageSettingsViewModel.dynamicColors.collectAsState()
 
-                FeederTheme(
-                    currentTheme = currentTheme,
-                    darkThemePreference = darkThemePreference,
-                    dynamicColors = dynamicColors,
-                ) {
-                    SettingsScreen(
-                        onNavigateUp = {
-                            onNavigateUpFromIntentActivities()
-                        },
-                        onNavigateToSyncScreen = {
-                            startActivity(
-                                Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse(SyncScreenDestination.deepLinks.first().uriPattern),
-                                    this,
-                                    MainActivity::class.java
+                    FeederTheme(
+                        currentTheme = currentTheme,
+                        darkThemePreference = darkThemePreference,
+                        dynamicColors = dynamicColors,
+                    ) {
+                        SettingsScreen(
+                            onNavigateUp = {
+                                onNavigateUpFromIntentActivities()
+                            },
+                            onNavigateToSyncScreen = {
+                                startActivity(
+                                    Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse(SyncScreenDestination.deepLinks.first().uriPattern),
+                                        this,
+                                        MainActivity::class.java
+                                    )
                                 )
-                            )
-                            finish()
-                        },
-                        settingsViewModel = DIAwareViewModel(),
-                    )
+                                finish()
+                            },
+                            settingsViewModel = DIAwareViewModel(),
+                        )
+                    }
                 }
             }
         }
