@@ -14,7 +14,6 @@ import androidx.navigation.NavController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
-import com.nononsenseapps.feeder.model.workmanager.isOkToSyncAutomatically
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.model.workmanager.scheduleGetUpdates
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
@@ -68,7 +67,7 @@ class MainActivity : DIAwareComponentActivity() {
 
     private fun maybeRequestSync() = lifecycleScope.launch {
         if (mainActivityViewModel.shouldSyncOnResume) {
-            if (isOkToSyncAutomatically(applicationContext)) {
+            if (mainActivityViewModel.isOkToSyncAutomatically()) {
                 requestFeedSync(
                     di = di,
                     forceNetwork = false,
