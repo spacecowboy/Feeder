@@ -2,6 +2,12 @@ syntax = "proto3";
 
 package com.nononsenseapps.feeder.push;
 
+message EncryptedUpdate {
+    bytes cipher_text = 1;
+    bytes nonce = 2;
+    bytes sender_public_key = 3;
+}
+
 message Update {
     Device sender = 1;
     Timestamp timestamp = 2;
@@ -48,6 +54,8 @@ message Device {
     string endpoint = 1;
     // potentially user configurable
     optional string name = 2;
+    // null when sent as part of regular updates since it is present in encrypted message itself
+    optional bytes public_key = 3;
 }
 
 message DeletedDevices {

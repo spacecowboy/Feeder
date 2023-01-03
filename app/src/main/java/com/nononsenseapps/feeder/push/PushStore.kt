@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.push
 
 import android.content.Context
+import com.nononsenseapps.feeder.db.room.DeviceDestination
 import com.nononsenseapps.feeder.db.room.KnownDevice
 import com.nononsenseapps.feeder.db.room.KnownDevicesDao
 import com.nononsenseapps.feeder.db.room.MessageQueueDao
@@ -108,6 +109,10 @@ class PushStore(override val di: DI) : DIAware {
 
     suspend fun getKnownDevices(): List<KnownDevice> {
         return knownDevicesDao.getKnownDevices()
+    }
+
+    suspend fun getKnownDeviceDestinations(): List<DeviceDestination> {
+        return knownDevicesDao.getKnownDeviceDestinations()
     }
 
     fun getKnownDevicesFlow(): Flow<List<KnownDevice>> {

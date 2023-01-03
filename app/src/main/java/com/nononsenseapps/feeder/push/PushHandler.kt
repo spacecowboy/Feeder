@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.push
 
 import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.crypto.Alan
+import com.nononsenseapps.feeder.crypto.EncryptedMessage
 import com.nononsenseapps.feeder.db.room.Feed as DbFeed
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.util.logDebug
@@ -12,10 +14,10 @@ import org.threeten.bp.Instant
 
 class PushHandler(override val di: DI) : DIAware {
     private val repository by instance<Repository>()
+    private val alan by instance<Alan>()
 
     suspend fun onUpdate(update: Update) {
         logDebug(LOG_TAG, "onUpdate")
-        // TODO decryption
         val sender = update.sender ?: throw IllegalMessage("Missing sender in update")
         val timestamp = update.timestamp ?: throw IllegalMessage("Missing timestamp")
 
@@ -34,6 +36,23 @@ class PushHandler(override val di: DI) : DIAware {
             )
             else -> throw IllegalMessage("None of the oneof was set or this fun is out of date!")
         }
+    }
+
+    suspend fun onEncryptedUpdate(encryptedUpdate: EncryptedUpdate) {
+        logDebug(LOG_TAG, "onEncryptedUpdate")
+
+        // TODO actual secret key
+        val secretKey = ByteArray(0)
+
+        val bytes = alan.decryptMessage(
+            encryptedMessage = EncryptedMessage(
+                cipherBytes = encryptedUpdate.cipher_text.toByteArray(),
+                nonce = encryptedUpdate.nonce.toByteArray(),
+            ),
+            publicKey = encryptedUpdate.sender_public_key.toByteArray(),
+            secretKey = secretKey,
+        )
+        onUpdate(Update.ADAPTER.decode(bytes))
     }
 
     private suspend fun onUpdateSnapshotRequest(sender: Device, snapshotRequest: SnapshotRequest) {

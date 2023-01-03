@@ -12,6 +12,7 @@ import com.nononsenseapps.feeder.db.room.RemoteReadMarkReadyToBeApplied
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
 import com.nononsenseapps.feeder.util.addDynamicShortcutToFeed
 import com.nononsenseapps.feeder.util.reportShortcutToFeedUsed
+import io.mockk.Awaits
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -236,7 +237,7 @@ class RepositoryTest : DIAware {
 
     @Test
     fun deleteFeeds() {
-        coEvery { feedStore.deleteFeeds(any()) } just Runs
+        coEvery { feedStore.deleteFeeds(any()) } just Awaits
 
         runBlocking {
             repository.deleteFeeds(listOf(1, 2))

@@ -52,6 +52,8 @@ dependencyResolutionManagement {
             version("lifecycle", "2.3.1")
             version("room", "2.4.3")
             version("unifiedpushAndroidConnector", "2.1.1")
+            version("lazysodiumAndroid", "5.1.0")
+            version("jna", "5.8.0")
             // Compose related below
             version("compose", "2022.11.00")
             val activityCompose = "1.6.1"
@@ -270,6 +272,10 @@ dependencyResolutionManagement {
             library("qrgen", "com.github.kenglxn.qrgen", "android").versionRef("qrgen")
             library("unifiedpush-android-connector", "com.github.UnifiedPush", "android-connector").versionRef("unifiedpushAndroidConnector")
             library("wire-runtime", "com.squareup.wire", "wire-runtime").versionRef("wire")
+
+            // These two are for encryption in sync
+            library("lazysodium-android", "com.goterl", "lazysodium-android").versionRef("lazysodiumAndroid")
+            library("jna", "net.java.dev.jna", "jna").versionRef("jna")
 
             // testing
             library("junit", "junit", "junit").versionRef("junit")

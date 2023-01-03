@@ -13,6 +13,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
+import com.nononsenseapps.feeder.crypto.Alan
+import com.nononsenseapps.feeder.db.room.DeviceDestination
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemForReadMark
@@ -35,6 +37,7 @@ import com.nononsenseapps.feeder.push.DeletedFeeds
 import com.nononsenseapps.feeder.push.Device
 import com.nononsenseapps.feeder.push.Devices
 import com.nononsenseapps.feeder.push.DevicesRequest
+import com.nononsenseapps.feeder.push.EncryptedUpdate
 import com.nononsenseapps.feeder.push.Feeds
 import com.nononsenseapps.feeder.push.FeedsRequest
 import com.nononsenseapps.feeder.push.PushMaker
@@ -62,6 +65,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import okio.ByteString.Companion.toByteString
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
@@ -80,6 +84,7 @@ class Repository(override val di: DI) : DIAware {
     private val syncRemoteStore: SyncRemoteStore by instance()
     private val syncClient: SyncRestClient by instance()
     private val pushStore: PushStore by instance()
+    private val alan: Alan by instance()
 
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
@@ -709,7 +714,7 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun broadcastFeed(feed: Feed) {
         scheduleUpdates(
-            toEndpoints = pushStore.getKnownDevices().map { it.endpoint }
+            toEndpoints = pushStore.getKnownDeviceDestinations()
         ) { update ->
             update.copy(
                 feeds = Feeds(
@@ -804,39 +809,65 @@ class Repository(override val di: DI) : DIAware {
 
     // TODO encryption
     suspend fun updateThisDeviceEndpoint(endpoint: String) {
-        val thisDevice = pushStore.getThisDevice() ?: ThisDevice(
-            endpoint = "",
-            name = generateDeviceName(),
-        )
+        val thisDevice = pushStore.getThisDevice() ?: run {
+            val keys = alan.generateKeys()
+            ThisDevice(
+                endpoint = "",
+                name = generateDeviceName(),
+                secretKey = keys.secretKey.asBytes,
+                publicKey = keys.publicKey.asBytes,
+            )
+        }
         pushStore.saveThisDevice(
             thisDevice.copy(endpoint = endpoint)
         )
     }
 
-    private suspend fun scheduleUpdate(toEndpoint: String, block: (Update) -> Update) =
+    private suspend fun scheduleUpdate(toEndpoint: DeviceDestination, block: (Update) -> Update) =
         scheduleUpdates(listOf(toEndpoint), block = block)
 
-    private suspend fun scheduleUpdates(toEndpoints: List<String>, block: (Update) -> Update) {
-        val senderEndpoint = pushStore.getThisDeviceEndpoint()
+    private suspend fun scheduleUpdates(toEndpoints: List<DeviceDestination>, block: (Update) -> Update) {
+        val src = pushStore.getThisDevice()
             ?: return
 
-        val body = block(
+        val message = block(
             Update(
-                sender = Device(endpoint = senderEndpoint),
+                sender = Device(endpoint = src.endpoint),
                 timestamp = Instant.now().toProto(),
             )
         ).encode()
 
-        for (toEndpoint in toEndpoints) {
+        for (dest in toEndpoints) {
             pushStore.addMessageToQueue(
                 QueuedMessage(
-                    toEndpoint = toEndpoint,
-                    body = body,
+                    toEndpoint = dest.endpoint,
+                    body = encryptMessage(
+                        message = message,
+                        dest = dest,
+                        src = src,
+                    ).encode(),
                 )
             )
         }
 
         scheduleSendPush()
+    }
+
+    private fun encryptMessage(
+        message: ByteArray,
+        dest: DeviceDestination,
+        src: ThisDevice,
+    ): EncryptedUpdate {
+        val result = alan.encryptMessage(
+            messageBytes = message,
+            publicKey = dest.publicKey,
+            secretKey = src.secretKey,
+        )
+        return EncryptedUpdate(
+            cipher_text = result.cipherBytes.toByteString(),
+            nonce = result.nonce.toByteString(),
+            sender_public_key = src.publicKey.toByteString(),
+        )
     }
 
     suspend fun getMessagesInQueue(): List<QueuedMessage> {

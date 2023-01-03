@@ -14,9 +14,7 @@ import org.kodein.di.instance
 class PushMaker(override val di: DI) : DIAware {
     private val okHttpClient by instance<OkHttpClient>()
 
-    //         .url("https://ntfy.sh/up0xKJNXvQFH6W?up=1")
     suspend fun send(endpoint: String, bytes: ByteArray): Boolean {
-        // TODO encryption
         val body = bytes.toRequestBody()
         val request = Request.Builder()
             .url(endpoint)

@@ -73,6 +73,13 @@ interface KnownDevicesDao {
         """
     )
     suspend fun getKnownDevices(): List<KnownDevice>
+
+    @Query(
+        """
+            SELECT endpoint, public_key FROM push_known_devices
+        """
+    )
+    suspend fun getKnownDeviceDestinations(): List<KnownDeviceDestination>
 }
 
 /**

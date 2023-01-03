@@ -299,6 +299,12 @@ dependencies {
     implementation(libs.moshi.adapters)
     implementation(libs.qrgen)
     implementation(libs.unifiedpush.android.connector)
+    implementation(libs.lazysodium.android)
+    implementation(libs.jna) {
+        artifact {
+            type = "aar"
+        }
+    }
     // tests
     testImplementation(libs.bundles.kotlin.stdlib)
     testImplementation(libs.kotlin.test.junit)

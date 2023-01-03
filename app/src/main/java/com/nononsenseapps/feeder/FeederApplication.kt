@@ -30,6 +30,7 @@ import com.nononsenseapps.feeder.db.room.SyncRemoteDao
 import com.nononsenseapps.feeder.db.room.ThisDeviceDao
 import com.nononsenseapps.feeder.di.androidModule
 import com.nononsenseapps.feeder.di.archModelModule
+import com.nononsenseapps.feeder.di.cryptoModule
 import com.nononsenseapps.feeder.di.networkModule
 import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
@@ -86,6 +87,8 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
         import(androidModule)
 
         import(archModelModule)
+
+        import(cryptoModule)
 
         bind<WorkManager>() with singleton { WorkManager.getInstance(this@FeederApplication) }
         bind<ContentResolver>() with singleton { contentResolver }
