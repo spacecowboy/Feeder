@@ -185,4 +185,6 @@
     <string name="bookmarked">คั่นหน้าแล้ว</string>
     <string name="new_indicator">ใหม่</string>
     <string name="explanation_permission_notifications">ต้องให้อนุญาตสิทธิ์ก่อนที่จะเปิดสามารถเปิดการแจ้งเตือนได้</string>
+    <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
+    <string name="text_scale">ขนาดข้อความ</string>
 </resources>
