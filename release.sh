@@ -92,6 +92,7 @@ then
   git add "fastlane/metadata/android/en-US/changelogs/${NEXT_CODE}.txt"
   git add app/build.gradle.kts
   git add CHANGELOG.md
+  git diff --staged
   git commit -m "Releasing ${NEXT_VERSION}"
 fi
 
