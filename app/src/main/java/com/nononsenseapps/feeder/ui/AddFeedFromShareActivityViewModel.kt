@@ -19,4 +19,7 @@ class AddFeedFromShareActivityViewModel(di: DI) : DIAwareViewModel(di) {
 
     val dynamicColors: StateFlow<Boolean> =
         repository.useDynamicTheme
+
+    val textScale: StateFlow<Float> =
+        repository.textScale
 }
