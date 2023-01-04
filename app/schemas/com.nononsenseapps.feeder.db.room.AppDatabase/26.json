@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 26,
-    "identityHash": "1577e55fa1f45d50dc8b0bc07df8893e",
+    "identityHash": "11e87c566497dd63760b925339a25ac0",
     "entities": [
       {
         "tableName": "feeds",
@@ -694,7 +694,7 @@
       },
       {
         "tableName": "push_this_device",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `endpoint` TEXT NOT NULL, `device_name` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `endpoint` TEXT NOT NULL, `device_name` TEXT NOT NULL, `secret_key` BLOB NOT NULL, `public_key` BLOB NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -712,6 +712,18 @@
             "fieldPath": "name",
             "columnName": "device_name",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "secretKey",
+            "columnName": "secret_key",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "publicKey",
+            "columnName": "public_key",
+            "affinity": "BLOB",
             "notNull": true
           }
         ],
@@ -736,7 +748,7 @@
       },
       {
         "tableName": "push_known_devices",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `endpoint` TEXT NOT NULL, `device_name` TEXT NOT NULL, `last_seen` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `endpoint` TEXT NOT NULL, `device_name` TEXT NOT NULL, `last_seen` INTEGER NOT NULL, `public_key` BLOB NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -760,6 +772,12 @@
             "fieldPath": "lastSeen",
             "columnName": "last_seen",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "publicKey",
+            "columnName": "public_key",
+            "affinity": "BLOB",
             "notNull": true
           }
         ],
@@ -840,7 +858,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1577e55fa1f45d50dc8b0bc07df8893e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '11e87c566497dd63760b925339a25ac0')"
     ]
   }
 }

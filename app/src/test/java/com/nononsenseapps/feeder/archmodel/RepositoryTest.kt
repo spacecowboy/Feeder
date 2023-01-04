@@ -85,8 +85,8 @@ class RepositoryTest : DIAware {
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true, relaxed = true)
 
-        every { repository.syncOnlyWhenCharging } returns MutableStateFlow(false)
-        every { repository.syncOnlyOnWifi } returns MutableStateFlow(false)
+        every { settingsStore.syncOnlyWhenCharging } returns MutableStateFlow(false)
+        every { settingsStore.syncOnlyOnWifi } returns MutableStateFlow(false)
     }
 
     @Test

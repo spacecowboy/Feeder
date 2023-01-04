@@ -178,4 +178,19 @@
     <string name="bookmark_article">Artikel een bladwijzer geven</string>
     <string name="permission_read_desc">Hiermee kan de toepassing feeds en artikelen lezen</string>
     <string name="permission_read_label">Feeder alleen-lezen toegang</string>
+    <string name="use_detect_language">Taal detecteren</string>
+    <string name="article_image">Beeld van het artikel</string>
+    <string name="block_list_description">Verbergt bijdragen met titels die een van deze termen bevatten. Voorbeeld filters:</string>
+    <string name="dynamic_theme_use">Dynamische kleuren</string>
+    <string name="pinned">Vastgepind</string>
+    <string name="bookmarked">Favoriet</string>
+    <string name="new_indicator">Nieuw</string>
+    <string name="explanation_permission_notifications">Toestemming moet worden verleend voordat meldingen kunnen worden ingeschakeld.</string>
+    <string name="feed_icon">Feed Icoon</string>
+    <string name="text_to_speech">Tekst-naar-spraak</string>
+    <string name="skip_to_next">Doorgaan naar volgende</string>
+    <string name="set_language">Taal instellen</string>
+    <string name="only_available_on_android_n">Alleen beschikbaar op Android %1$s en hoger</string>
+    <string name="description_for_read_aloud">Detecteert automatisch de taal van het artikel</string>
+    <string name="text_scale">Tekstschaal</string>
 </resources>

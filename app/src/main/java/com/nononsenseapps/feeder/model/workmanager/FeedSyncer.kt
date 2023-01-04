@@ -12,8 +12,8 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.RssLocalSync
 import com.nononsenseapps.feeder.model.notify
-import com.nononsenseapps.feeder.model.syncFeeds
 import com.nononsenseapps.feeder.ui.ARG_FEED_ID
 import com.nononsenseapps.feeder.ui.ARG_FEED_TAG
 import java.util.concurrent.TimeUnit
@@ -39,6 +39,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
     override val di: DI by closestDI(context)
 
     private val notificationManager: NotificationManagerCompat by instance()
+    private val rssLocalSync: RssLocalSync by instance()
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return createForegroundInfo(context, notificationManager)
@@ -53,7 +54,7 @@ class FeedSyncer(val context: Context, workerParams: WorkerParameters) :
             val forceNetwork = inputData.getBoolean(ARG_FORCE_NETWORK, false)
             val minFeedAgeMinutes = inputData.getInt(MIN_FEED_AGE_MINUTES, 5)
 
-            success = syncFeeds(
+            success = rssLocalSync.syncFeeds(
                 context = applicationContext,
                 feedId = feedId,
                 feedTag = feedTag,

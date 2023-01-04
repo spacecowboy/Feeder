@@ -26,8 +26,8 @@ class SyncServiceGetUpdatesWorker(val context: Context, workerParams: WorkerPara
     override val di: DI by closestDI(context)
 
     private val notificationManager: NotificationManagerCompat by instance()
-    private val syncClient: SyncRestClient by di.instance()
-    private val repository: Repository by di.instance()
+    private val syncClient: SyncRestClient by instance()
+    private val repository: Repository by instance()
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return createForegroundInfo(context, notificationManager)

@@ -1,3 +1,19 @@
+# 2.4.3
+Belmar Begić (1):
+  * [b230216a] Updated Bosnian translation using Weblate
+
+Jonas Kalderstam (4):
+  * [0657fd32] Fixed crash when sharing link to app
+  * [27a04033] Fixed a recursion bug with DI and some cleanup
+  * [ccf438c7] Fixed crash on database upgrade
+  * [855fe6d5] Show diff on release
+
+bowornsin (1):
+  * [69e93779] Updated Thai translation using Weblate
+
+mm4c (1):
+  * [591c92cf] Translated using Weblate (Dutch)
+
 # 2.4.2
 Agnieszka C (1):
   * [f4bb4abf] Updated Polish translation using Weblate

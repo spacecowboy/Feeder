@@ -120,9 +120,11 @@ data class KnownDevice(
 }
 
 data class KnownDeviceDestination @Ignore constructor(
-    @ColumnInfo(name = COL_ENDPOINT) override val endpoint: String,
-    @ColumnInfo(name = COL_PUBLIC_KEY) override val publicKey: ByteArray,
+    @ColumnInfo(name = COL_ENDPOINT) override var endpoint: String = "",
+    @ColumnInfo(name = COL_PUBLIC_KEY) override var publicKey: ByteArray = byteArrayOf(),
 ) : DeviceDestination {
+    constructor() : this(endpoint = "", publicKey = byteArrayOf())
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

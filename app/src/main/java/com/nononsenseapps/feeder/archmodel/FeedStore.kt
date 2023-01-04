@@ -146,4 +146,22 @@ class FeedStore(override val di: DI) : DIAware {
     suspend fun deleteFeed(url: URL) {
         feedDao.deleteFeedWithUrl(url)
     }
+
+    suspend fun loadFeedIfStale(feedId: Long, staleTime: Long) =
+        feedDao.loadFeedIfStale(feedId = feedId, staleTime = staleTime)
+
+    suspend fun loadFeed(feedId: Long): Feed? =
+        feedDao.loadFeed(feedId = feedId)
+
+    suspend fun loadFeedsIfStale(tag: String, staleTime: Long) =
+        feedDao.loadFeedsIfStale(tag = tag, staleTime = staleTime)
+
+    suspend fun loadFeedsIfStale(staleTime: Long) =
+        feedDao.loadFeedsIfStale(staleTime = staleTime)
+
+    suspend fun loadFeeds(tag: String) =
+        feedDao.loadFeeds(tag = tag)
+
+    suspend fun loadFeeds() =
+        feedDao.loadFeeds()
 }

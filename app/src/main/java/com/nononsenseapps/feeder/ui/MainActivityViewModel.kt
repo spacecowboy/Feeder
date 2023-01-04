@@ -1,6 +1,6 @@
 package com.nononsenseapps.feeder.ui
 
-import android.content.Context
+import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.Repository
@@ -17,7 +17,7 @@ import org.threeten.bp.Instant
 
 class MainActivityViewModel(di: DI) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
-    private val context: Context by instance()
+    private val context: Application by instance()
 
     fun setResumeTime() {
         repository.setResumeTime(Instant.now())

@@ -305,7 +305,7 @@ class SettingsStoreTest : DIAware {
     @Test
     fun blockListGlobs() {
         runBlocking {
-            store.setBlockListPreference(listOf("foo", "bar"))
+            store.setBlockListPreference(listOf("foo", "bar", "not'allowed", "not\\allowed", "  "))
         }
         coVerify {
             blocklistDao.insert(BlocklistEntry(globPattern = "*foo*"))

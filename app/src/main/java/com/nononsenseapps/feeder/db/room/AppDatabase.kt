@@ -3,6 +3,8 @@ package com.nononsenseapps.feeder.db.room
 import android.content.Context
 import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -184,13 +186,18 @@ class MigrationFrom23To24(override val di: DI) : Migration(23, 24), DIAware {
         if (blocks.isNotEmpty()) {
             // ('*foo*'), ('*bar*'), ('*car*')
             val valuesList = blocks.joinToString(separator = ",") { "('*$it*')" }
-            database.execSQL(
-                """
-                INSERT INTO `blocklist`
-                    (`glob_pattern`)
-                    VALUES $valuesList
-                """.trimIndent()
-            )
+
+            try {
+                database.execSQL(
+                    """
+                    INSERT INTO `blocklist`
+                        (`glob_pattern`)
+                        VALUES $valuesList
+                    """.trimIndent()
+                )
+            } catch (e: SQLiteException) {
+                Log.e("FEEDER_DB", "Failed to migrate blocklist", e)
+            }
 
             sharedPrefs.edit()
                 .remove("pref_block_list_values")

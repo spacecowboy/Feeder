@@ -303,6 +303,8 @@ class SettingsStore(override val di: DI) : DIAware {
         return asSequence()
             .map { it.lowercase().trim() }
             .filter { it.isNotBlank() }
+            .filterNot { it.contains("'") }
+            .filterNot { it.contains("\\") }
             .toList()
     }
 

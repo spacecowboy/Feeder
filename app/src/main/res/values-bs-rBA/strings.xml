@@ -190,4 +190,7 @@
     <string name="bookmarked">Zabilježeno</string>
     <string name="new_indicator">Novi</string>
     <string name="explanation_permission_notifications">Dozvole se moraju odobriti prije uključenja obavještenja.</string>
+    <string name="block_list_description">Sakriva članke s naslovima koji sadrže neke od ovih pojmova. Primjeri filtera:</string>
+    <string name="feed_icon">Ikonica izvora</string>
+    <string name="text_scale">Skaliranje teksta</string>
 </resources>
