@@ -27,7 +27,7 @@
     <string name="navigation_drawer_open">Άνοιγμα συρταριού πλοήγησης</string>
     <string name="navigation_drawer_close">Κλείσιμο συρταριού πλοήγησης</string>
     <string name="open_enclosed_media_file">Άνοιγμα %1$s</string>
-    <string name="share">Μοίρασμα</string>
+    <string name="share">Κοινή χρήση</string>
     <string name="sort">Ταξινόμηση κατά</string>
     <string name="javascript">JavaScript</string>
     <string name="go_back">Επιστροφή</string>
@@ -184,4 +184,13 @@
     <string name="use_detect_language">Ανίχνευση γλώσσας</string>
     <string name="pinned">Καρφιτσωμένο</string>
     <string name="new_indicator">Νέο</string>
+    <string name="permission_read_label">Feeder πρόσβαση μόνο για ανάγνωση</string>
+    <string name="article_image">Εικόνα άρθρου</string>
+    <string name="block_list_description">Αποκρύπτει ιστορίες με τίτλους που περιέχουν οποιονδήποτε από αυτούς τους όρους. Παραδείγματα φίλτρων:</string>
+    <string name="explanation_permission_notifications">Πρέπει να δοθεί άδεια προτού ενεργοποιηθούν οι ειδοποιήσεις.</string>
+    <string name="feed_icon">Εικονίδιο ροής</string>
+    <string name="text_to_speech">Κείμενο σε ομιλία</string>
+    <string name="skip_to_next">Μετάβαση στο επόμενο</string>
+    <string name="set_language">Ορισμός γλώσσας</string>
+    <string name="text_scale">Κλίμακα κειμένου</string>
 </resources>
