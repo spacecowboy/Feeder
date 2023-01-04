@@ -59,7 +59,7 @@ class FeedArticleViewModel(
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
     // Use this for actions which should complete even if app goes off screen
-    val applicationCoroutineScope: ApplicationCoroutineScope by instance()
+    private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
     val currentFeedListItems: Flow<PagingData<FeedListItem>> =
         repository.getCurrentFeedListItems()

@@ -259,7 +259,7 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun markAsReadAndNotified(itemId: Long) {
         feedItemStore.markAsReadAndNotified(itemId)
-        scheduleSendRead(di)
+        scheduleSendRead()
     }
 
     suspend fun markAsUnread(itemId: Long, unread: Boolean = true) {
@@ -267,7 +267,7 @@ class Repository(override val di: DI) : DIAware {
         if (unread) {
             syncRemoteStore.setNotSynced(itemId)
         } else {
-            scheduleSendRead(di)
+            scheduleSendRead()
         }
     }
 
@@ -325,7 +325,7 @@ class Repository(override val di: DI) : DIAware {
             tag.isNotBlank() -> feedItemStore.markAllAsReadInTag(tag)
             else -> feedItemStore.markAllAsRead()
         }
-        scheduleSendRead(di)
+        scheduleSendRead()
     }
 
     suspend fun markBeforeAsRead(itemIndex: Int, feedId: Long, tag: String) {
@@ -336,7 +336,7 @@ class Repository(override val di: DI) : DIAware {
             onlyUnread = showOnlyUnread.value,
             newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
         )
-        scheduleSendRead(di)
+        scheduleSendRead()
     }
 
     suspend fun markAfterAsRead(itemIndex: Int, feedId: Long, tag: String) {
@@ -347,7 +347,7 @@ class Repository(override val di: DI) : DIAware {
             onlyUnread = showOnlyUnread.value,
             newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
         )
-        scheduleSendRead(di)
+        scheduleSendRead()
     }
 
     val allTags: Flow<List<String>> = feedStore.allTags
@@ -517,7 +517,7 @@ class Repository(override val di: DI) : DIAware {
         return syncCode to syncRemote.secretKey
     }
 
-    private fun scheduleSendRead(di: DI) {
+    private fun scheduleSendRead() {
         logDebug(LOG_TAG, "Scheduling work")
 
         val constraints = Constraints.Builder()
@@ -542,6 +542,27 @@ class Repository(override val di: DI) : DIAware {
             workRequest.build()
         )
     }
+
+    suspend fun loadFeedIfStale(feedId: Long, staleTime: Long) =
+        feedStore.loadFeedIfStale(feedId = feedId, staleTime = staleTime)
+
+    suspend fun loadFeed(feedId: Long): Feed? =
+        feedStore.loadFeed(feedId = feedId)
+
+    suspend fun loadFeedsIfStale(tag: String, staleTime: Long) =
+        feedStore.loadFeedsIfStale(tag = tag, staleTime = staleTime)
+
+    suspend fun loadFeedsIfStale(staleTime: Long) =
+        feedStore.loadFeedsIfStale(staleTime = staleTime)
+
+    suspend fun loadFeeds(tag: String): List<Feed> =
+        feedStore.loadFeeds(tag = tag)
+
+    suspend fun loadFeeds(): List<Feed> =
+        feedStore.loadFeeds()
+
+    suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean, lastSync: Instant? = null) =
+        feedStore.setCurrentlySyncingOn(feedId = feedId, syncing = syncing, lastSync = lastSync)
 
     companion object {
         private const val LOG_TAG = "FEEDER_REPO"

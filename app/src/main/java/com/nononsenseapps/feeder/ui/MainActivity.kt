@@ -24,11 +24,8 @@ import com.nononsenseapps.feeder.ui.compose.navigation.FeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SearchFeedDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SettingsDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.SyncScreenDestination
-import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.theme.ProvideFontScale
-import com.nononsenseapps.feeder.ui.compose.utils.withWindowSize
+import com.nononsenseapps.feeder.ui.compose.utils.withAllProviders
 import kotlinx.coroutines.launch
-import org.kodein.di.compose.withDI
 import org.kodein.di.instance
 
 class MainActivity : DIAwareComponentActivity() {
@@ -89,18 +86,13 @@ class MainActivity : DIAwareComponentActivity() {
             val dynamicColors by mainActivityViewModel.dynamicColors.collectAsState()
             val textScale by mainActivityViewModel.textScale.collectAsState()
 
-            FeederTheme(
+            withAllProviders(
                 currentTheme = currentTheme,
                 darkThemePreference = darkThemePreference,
                 dynamicColors = dynamicColors,
+                textScale = textScale,
             ) {
-                withDI {
-                    withWindowSize {
-                        ProvideFontScale(fontScale = textScale) {
-                            appContent()
-                        }
-                    }
-                }
+                appContent()
             }
         }
     }

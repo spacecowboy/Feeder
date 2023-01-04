@@ -19,6 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+// This can be flaky
 @RunWith(AndroidJUnit4::class)
 class NotificationClearingTest {
     private val receiver: RssNotificationBroadcastReceiver = RssNotificationBroadcastReceiver()

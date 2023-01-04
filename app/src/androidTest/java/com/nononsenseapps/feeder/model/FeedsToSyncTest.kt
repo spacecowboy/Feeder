@@ -1,8 +1,13 @@
 package com.nononsenseapps.feeder.model
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.nononsenseapps.feeder.archmodel.FeedStore
+import com.nononsenseapps.feeder.archmodel.Repository
+import com.nononsenseapps.feeder.db.room.AppDatabase
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.TestDatabaseRule
 import com.nononsenseapps.feeder.util.minusMinutes
@@ -12,12 +17,28 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.kodein.di.DIAware
+import org.kodein.di.android.closestDI
+import org.kodein.di.android.subDI
+import org.kodein.di.bind
+import org.kodein.di.instance
+import org.kodein.di.singleton
 import org.threeten.bp.Instant
 
 @RunWith(AndroidJUnit4::class)
-class FeedsToSyncTest {
+class FeedsToSyncTest : DIAware {
     @get:Rule
     val testDb = TestDatabaseRule(getApplicationContext())
+
+    override val di by subDI(closestDI(getApplicationContext() as Context)) {
+        bind<AppDatabase>(overrides = true) with instance(testDb.db)
+        bind<FeedDao>(overrides = true) with singleton { testDb.db.feedDao() }
+        bind<FeedStore>(overrides = true) with singleton { FeedStore(di) }
+        bind<Repository>(overrides = true) with singleton { Repository(di) }
+        bind<RssLocalSync>(overrides = true) with singleton { RssLocalSync(di) }
+    }
+
+    private val rssLocalSync: RssLocalSync by instance()
 
     @Test
     fun returnsStaleFeed() = runBlocking {
@@ -25,7 +46,7 @@ class FeedsToSyncTest {
         val feed = withFeed()
 
         // when
-        val result = feedsToSync(testDb.db.feedDao(), feedId = feed.id, tag = "")
+        val result = rssLocalSync.feedsToSync(feedId = feed.id, tag = "")
 
         // then
         assertEquals(listOf(feed), result)
@@ -37,8 +58,8 @@ class FeedsToSyncTest {
         val feed = withFeed(lastSync = now.minusMinutes(1))
 
         // when
-        val result = feedsToSync(
-            testDb.db.feedDao(), feedId = feed.id, tag = "",
+        val result = rssLocalSync.feedsToSync(
+            feedId = feed.id, tag = "",
             staleTime = now.minusMinutes(2).toEpochMilli()
         )
 
@@ -53,7 +74,7 @@ class FeedsToSyncTest {
             withFeed(url = URL("http://two"))
         )
 
-        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "")
+        val result = rssLocalSync.feedsToSync(feedId = ID_UNSET, tag = "")
 
         assertEquals(items, result)
     }
@@ -66,7 +87,11 @@ class FeedsToSyncTest {
             withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3))
         )
 
-        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "", staleTime = now.minusMinutes(2).toEpochMilli())
+        val result = rssLocalSync.feedsToSync(
+            feedId = ID_UNSET,
+            tag = "",
+            staleTime = now.minusMinutes(2).toEpochMilli()
+        )
 
         assertEquals(listOf(items[1]), result)
     }
@@ -78,7 +103,7 @@ class FeedsToSyncTest {
             withFeed(url = URL("http://two"), tag = "tag")
         )
 
-        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "")
+        val result = rssLocalSync.feedsToSync(feedId = ID_UNSET, tag = "")
 
         assertEquals(items, result)
     }
@@ -91,7 +116,11 @@ class FeedsToSyncTest {
             withFeed(url = URL("http://two"), lastSync = now.minusMinutes(3), tag = "tag")
         )
 
-        val result = feedsToSync(testDb.db.feedDao(), feedId = ID_UNSET, tag = "tag", staleTime = now.minusMinutes(2).toEpochMilli())
+        val result = rssLocalSync.feedsToSync(
+            feedId = ID_UNSET,
+            tag = "tag",
+            staleTime = now.minusMinutes(2).toEpochMilli()
+        )
 
         assertEquals(listOf(items[1]), result)
     }

@@ -86,6 +86,10 @@ fun DynamicTopAppBar(
                 navigationIcon = navigationIcon,
                 actions = actions,
                 modifier = modifier,
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+                ),
             )
         }
     }
