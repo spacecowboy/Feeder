@@ -18,16 +18,14 @@ import com.nononsenseapps.feeder.util.logDebug
 
 /**
  * Opinionated set of viewport breakpoints
- *     - CompactTall: Most phones in portrait mode
- *     - CompactShort: Most phones in landscape - and small phones in portrait too
+ *     - Compact: Most phones
  *     - Medium: Most foldables and tablets in portrait mode
  *     - Expanded: Most tablets in landscape mode
  *
  * More info: https://material.io/archive/guidelines/layout/responsive-ui.html
  */
 enum class WindowSize {
-    CompactTall,
-    CompactShort,
+    Compact,
     CompactWide,
     Medium,
     Expanded
@@ -58,23 +56,6 @@ fun Activity.withWindowSize(content: @Composable () -> Unit) {
 }
 
 /**
- * Remembers the [WindowSize] class for the window corresponding to the current window metrics.
- */
-@Composable
-fun Activity.rememberWindowSizeClass(): WindowSize {
-    // Get the size (in pixels) of the window
-    val windowSize = rememberWindowSize()
-
-    // Convert the window size to [Dp]
-    val windowDpSize = with(LocalDensity.current) {
-        windowSize.toDpSize()
-    }
-
-    // Calculate the window size class
-    return getWindowSizeClass(windowDpSize)
-}
-
-/**
  * Remembers the [Size] in pixels of the window corresponding to the current window metrics.
  */
 @Composable
@@ -88,18 +69,6 @@ private fun Activity.rememberWindowSize(): Size {
     return windowMetrics.bounds.toComposeRect().size
 }
 
-/*
-Formula: dp = px * 160 / DPI
-
-Mi A1: 762dp
-Pixel 2: 731dp
-Pixel 5: 850dp
-S22: 880dp
-S22+: 952dp (actual 832dp)
-S22 Ultra: 988dp
-*/
-private val shortHeightLimit = 800.dp
-
 /**
  * Partitions a [DpSize] into a enumerated [WindowSize] class.
  */
@@ -109,14 +78,9 @@ fun getWindowSizeClass(windowDpSize: DpSize): WindowSize {
     return when {
         windowDpSize.width < 0.dp -> throw IllegalArgumentException("Dp value cannot be negative")
         windowDpSize.width < 600.dp -> {
-            when {
-                windowDpSize.height < shortHeightLimit -> {
-                    when (configuration.orientation) {
-                        Configuration.ORIENTATION_LANDSCAPE -> WindowSize.CompactWide
-                        else -> WindowSize.CompactShort
-                    }
-                }
-                else -> WindowSize.CompactTall
+            when (configuration.orientation) {
+                Configuration.ORIENTATION_LANDSCAPE -> WindowSize.CompactWide
+                else -> WindowSize.Compact
             }
         }
         windowDpSize.width < 840.dp -> {
@@ -135,6 +99,6 @@ enum class ScreenType {
 
 fun getScreenType(windowSize: WindowSize) =
     when (windowSize) {
-        WindowSize.CompactTall, WindowSize.CompactShort -> ScreenType.SINGLE
+        WindowSize.Compact -> ScreenType.SINGLE
         WindowSize.CompactWide, WindowSize.Medium, WindowSize.Expanded -> ScreenType.DUAL
     }

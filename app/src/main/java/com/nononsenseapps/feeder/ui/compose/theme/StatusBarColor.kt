@@ -11,12 +11,9 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
-import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,27 +27,14 @@ fun SetStatusBarColorToMatchScrollableTopAppBar(
     val colorTransitionFraction = scrollBehavior.state.overlappedFraction
     val fraction = if (colorTransitionFraction > 0.01f) 1f else 0f
 
-    val appBarContainerColor by when (LocalWindowSize()) {
-        WindowSize.CompactTall -> {
-            rememberUpdatedState(
-                lerp(
-                    surfaceColor,
-                    surfaceScrolledColor,
-                    FastOutLinearInEasing.transform(scrollBehavior.state.collapsedFraction)
-                )
-            )
-        }
-        else -> {
-            animateColorAsState(
-                targetValue = lerp(
-                    surfaceColor,
-                    surfaceScrolledColor,
-                    FastOutLinearInEasing.transform(fraction)
-                ),
-                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-            )
-        }
-    }
+    val appBarContainerColor by animateColorAsState(
+        targetValue = lerp(
+            surfaceColor,
+            surfaceScrolledColor,
+            FastOutLinearInEasing.transform(fraction)
+        ),
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+    )
 
     val systemUiController = rememberSystemUiController()
     DisposableEffect(systemUiController, appBarContainerColor) {

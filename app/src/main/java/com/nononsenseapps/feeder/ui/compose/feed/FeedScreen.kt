@@ -66,6 +66,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -114,10 +115,9 @@ import com.nononsenseapps.feeder.ui.compose.pullrefresh.PullRefreshIndicator
 import com.nononsenseapps.feeder.ui.compose.pullrefresh.pullRefresh
 import com.nononsenseapps.feeder.ui.compose.pullrefresh.rememberPullRefreshState
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
-import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
-import com.nononsenseapps.feeder.ui.compose.theme.dynamicScrollBehavior
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
@@ -574,7 +574,7 @@ fun FeedScreen(
         val screenType by remember(windowSize) {
             derivedStateOf {
                 when (windowSize) {
-                    WindowSize.CompactTall, WindowSize.CompactShort -> FeedScreenType.FeedList
+                    WindowSize.Compact -> FeedScreenType.FeedList
                     WindowSize.CompactWide, WindowSize.Medium, WindowSize.Expanded -> FeedScreenType.FeedGrid
                 }
             }
@@ -712,7 +712,7 @@ fun FeedScreen(
     val topAppBarState = key(viewState.currentFeedOrTag) {
         rememberTopAppBarState()
     }
-    val scrollBehavior = dynamicScrollBehavior(topAppBarState)
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState)
 
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
@@ -727,7 +727,7 @@ fun FeedScreen(
 
     Scaffold(
         topBar = {
-            DynamicTopAppBar(
+            SensibleTopAppBar(
                 scrollBehavior = scrollBehavior,
                 title = viewState.feedScreenTitle.title
                     ?: stringResource(id = R.string.all_feeds),

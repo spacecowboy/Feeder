@@ -47,6 +47,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -74,12 +75,11 @@ import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
-import com.nononsenseapps.feeder.ui.compose.theme.dynamicScrollBehavior
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -105,7 +105,7 @@ private fun SyncScaffold(
     var showToolbar by rememberSaveable {
         mutableStateOf(false)
     }
-    val scrollBehavior = dynamicScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
@@ -115,7 +115,7 @@ private fun SyncScaffold(
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
-            DynamicTopAppBar(
+            SensibleTopAppBar(
                 scrollBehavior = scrollBehavior,
                 title = title,
                 navigationIcon = {

@@ -32,6 +32,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -59,9 +60,8 @@ import com.nononsenseapps.feeder.ui.compose.reader.ReaderView
 import com.nononsenseapps.feeder.ui.compose.reader.dateTimeFormat
 import com.nononsenseapps.feeder.ui.compose.reader.onLinkClick
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
-import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
+import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
-import com.nononsenseapps.feeder.ui.compose.theme.dynamicScrollBehavior
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
@@ -165,7 +165,7 @@ fun ArticleScreen(
     articleListState: LazyListState,
     onNavigateUp: () -> Unit,
 ) {
-    val scrollBehavior = dynamicScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
@@ -180,7 +180,7 @@ fun ArticleScreen(
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
-            DynamicTopAppBar(
+            SensibleTopAppBar(
                 scrollBehavior = scrollBehavior,
                 title = viewState.feedDisplayTitle,
                 navigationIcon = {

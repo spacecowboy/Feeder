@@ -35,6 +35,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,11 +67,10 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.components.safeSemantics
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.theme.Dimensions
-import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
-import com.nononsenseapps.feeder.ui.compose.theme.dynamicScrollBehavior
 import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.StableHolder
@@ -98,7 +98,7 @@ fun SearchFeedScreen(
         }
     }
 
-    val scrollBehavior = dynamicScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
@@ -108,7 +108,7 @@ fun SearchFeedScreen(
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
-            DynamicTopAppBar(
+            SensibleTopAppBar(
                 scrollBehavior = scrollBehavior,
                 title = stringResource(id = R.string.add_feed),
                 navigationIcon = {

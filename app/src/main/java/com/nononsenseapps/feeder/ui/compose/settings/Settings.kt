@@ -42,6 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -80,11 +81,10 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
-import com.nononsenseapps.feeder.ui.compose.theme.DynamicTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
-import com.nononsenseapps.feeder.ui.compose.theme.dynamicScrollBehavior
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
@@ -97,7 +97,7 @@ fun SettingsScreen(
 ) {
     val viewState by settingsViewModel.viewState.collectAsState()
 
-    val scrollBehavior = dynamicScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
@@ -107,7 +107,7 @@ fun SettingsScreen(
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
-            DynamicTopAppBar(
+            SensibleTopAppBar(
                 scrollBehavior = scrollBehavior,
                 title = stringResource(id = R.string.title_activity_settings),
                 navigationIcon = {
