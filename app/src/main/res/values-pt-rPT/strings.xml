@@ -191,4 +191,6 @@
     <string name="permission_read_label">Acesso somente leitura</string>
     <string name="explanation_permission_notifications">A permissão deve ser concedida antes que as notificações possam ser ativadas.</string>
     <string name="article_image">Imagem do artigo</string>
+    <string name="block_list_description">Esconde histórias com títulos que contenham um dos seguintes termos. Exemplos de filtro:</string>
+    <string name="text_scale">escala do texto</string>
 </resources>
