@@ -314,7 +314,9 @@ dependencies {
     androidTestImplementation(libs.mockwebserver)
 
     androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.core.ktx)
     androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.junit.ktx)
     androidTestImplementation(libs.room.testing)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.compose.ui.test.junit4)

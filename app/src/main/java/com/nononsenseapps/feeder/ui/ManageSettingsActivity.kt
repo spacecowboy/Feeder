@@ -4,8 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.DIAwareViewModel
@@ -23,18 +21,7 @@ class ManageSettingsActivity : DIAwareComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val manageSettingsViewModel: ManageSettingsViewModel = DIAwareViewModel()
-            val currentTheme by manageSettingsViewModel.currentTheme.collectAsState()
-            val darkThemePreference by manageSettingsViewModel.darkThemePreference.collectAsState()
-            val dynamicColors by manageSettingsViewModel.dynamicColors.collectAsState()
-            val textScale by manageSettingsViewModel.textScale.collectAsState()
-
-            withAllProviders(
-                currentTheme = currentTheme,
-                darkThemePreference = darkThemePreference,
-                dynamicColors = dynamicColors,
-                textScale = textScale,
-            ) {
+            withAllProviders {
                 SettingsScreen(
                     onNavigateUp = {
                         onNavigateUpFromIntentActivities()

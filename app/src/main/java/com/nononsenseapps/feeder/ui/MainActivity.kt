@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
@@ -81,17 +80,7 @@ class MainActivity : DIAwareComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val currentTheme by mainActivityViewModel.currentTheme.collectAsState()
-            val darkThemePreference by mainActivityViewModel.darkThemePreference.collectAsState()
-            val dynamicColors by mainActivityViewModel.dynamicColors.collectAsState()
-            val textScale by mainActivityViewModel.textScale.collectAsState()
-
-            withAllProviders(
-                currentTheme = currentTheme,
-                darkThemePreference = darkThemePreference,
-                dynamicColors = dynamicColors,
-                textScale = textScale,
-            ) {
+            withAllProviders {
                 appContent()
             }
         }

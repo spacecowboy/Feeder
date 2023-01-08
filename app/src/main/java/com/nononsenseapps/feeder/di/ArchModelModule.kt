@@ -8,9 +8,8 @@ import com.nononsenseapps.feeder.archmodel.SettingsStore
 import com.nononsenseapps.feeder.archmodel.SyncRemoteStore
 import com.nononsenseapps.feeder.base.bindWithActivityViewModelScope
 import com.nononsenseapps.feeder.base.bindWithComposableViewModelScope
-import com.nononsenseapps.feeder.ui.AddFeedFromShareActivityViewModel
+import com.nononsenseapps.feeder.ui.CommonActivityViewModel
 import com.nononsenseapps.feeder.ui.MainActivityViewModel
-import com.nononsenseapps.feeder.ui.ManageSettingsViewModel
 import com.nononsenseapps.feeder.ui.NavigationDeepLinkViewModel
 import com.nononsenseapps.feeder.ui.OpenLinkInDefaultActivityViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreenViewModel
@@ -31,9 +30,8 @@ val archModelModule = DI.Module(name = "arch models") {
     bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
 
     bindWithActivityViewModelScope<MainActivityViewModel>()
-    bindWithActivityViewModelScope<ManageSettingsViewModel>()
     bindWithActivityViewModelScope<OpenLinkInDefaultActivityViewModel>()
-    bindWithActivityViewModelScope<AddFeedFromShareActivityViewModel>()
+    bindWithActivityViewModelScope<CommonActivityViewModel>()
 
     bindWithComposableViewModelScope<SettingsViewModel>()
     bindWithComposableViewModelScope<EditFeedScreenViewModel>()

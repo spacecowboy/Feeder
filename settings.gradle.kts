@@ -42,7 +42,7 @@ dependencyResolutionManagement {
             version("retrofit", "2.9.0")
             version("qrgen", "2.6.0")
             version("androidxCore", "1.7.0")
-            version("androidxTestcore", "1.4.0")
+            version("androidxTestcore", "1.5.0")
             version("workmanager", "2.7.0")
             version("appcompat", "1.3.0")
             version("material", "1.6.1")
@@ -65,6 +65,7 @@ dependencyResolutionManagement {
             version("mockk", "1.13.3")
             version("mockito", "2.13.0")
             version("customtabs", "28.0.0")
+            version("androidx-test-junit-ktx", "1.1.4")
 
             // Plugins
             plugin("android-application", "com.android.application").versionRef("androidPlugin")
@@ -275,6 +276,7 @@ dependencyResolutionManagement {
 
             library("mockk-android", "io.mockk", "mockk-android").versionRef("mockk")
             library("androidx-test-core", "androidx.test", "core").versionRef("androidxTestcore")
+            library("androidx-test-core-ktx", "androidx.test", "core-ktx").versionRef("androidxTestcore")
             library("androidx-test-runner", "androidx.test", "runner").versionRef("testRunner")
             library("room-testing", "androidx.room", "room-testing").versionRef("room")
             library(
@@ -284,6 +286,7 @@ dependencyResolutionManagement {
             ).versionRef("espresso")
             library("compose-ui-test-junit4", "androidx.compose.ui", "ui-test-junit4").withoutVersion()
             library("compose-ui-test-manifest", "androidx.compose.ui", "ui-test-manifest").withoutVersion()
+            library("androidx-test-junit-ktx", "androidx.test.ext", "junit-ktx").versionRef("androidx-test-junit-ktx")
         }
     }
 }

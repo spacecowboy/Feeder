@@ -7,8 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -34,18 +32,7 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
             (intent?.dataString ?: intent?.getStringExtra(Intent.EXTRA_TEXT))?.trim()
 
         setContent {
-            val viewModel: AddFeedFromShareActivityViewModel = DIAwareViewModel()
-            val currentTheme by viewModel.currentTheme.collectAsState()
-            val darkThemePreference by viewModel.darkThemePreference.collectAsState()
-            val dynamicColors by viewModel.dynamicColors.collectAsState()
-            val textScale by viewModel.textScale.collectAsState()
-
-            withAllProviders(
-                currentTheme = currentTheme,
-                darkThemePreference = darkThemePreference,
-                dynamicColors = dynamicColors,
-                textScale = textScale,
-            ) {
+            withAllProviders {
                 val navController = rememberAnimatedNavController()
                 AnimatedNavHost(navController, startDestination = "search") {
                     composable(
