@@ -18,10 +18,10 @@ dependencyResolutionManagement {
         create("libs") {
             // Compose compiler is highly coupled to Kotlin version
             // See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
-            val kotlinVersion = "1.7.10"
+            val kotlinVersion = "1.7.20"
             version("kotlin", kotlinVersion)
-            version("androidPlugin", "7.3.0")
-            version("composeCompiler", "1.3.1")
+            version("androidPlugin", "7.3.1")
+            version("composeCompiler", "1.3.2")
 
             // BEGIN These should be upgraded in unison
             version("okhttp", "4.10.0")
@@ -51,7 +51,7 @@ dependencyResolutionManagement {
             version("lifecycle", "2.3.1")
             version("room", "2.4.3")
             // Compose related below
-            version("compose", "2022.11.00")
+            version("compose", "2022.12.00")
             val activityCompose = "1.6.1"
             version("activityCompose", activityCompose)
             version("paging", "3.0.0")

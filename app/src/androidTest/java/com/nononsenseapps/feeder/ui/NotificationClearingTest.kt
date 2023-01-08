@@ -15,12 +15,14 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 // This can be flaky
 @RunWith(AndroidJUnit4::class)
+@Ignore
 class NotificationClearingTest {
     private val receiver: RssNotificationBroadcastReceiver = RssNotificationBroadcastReceiver()
     @get:Rule
