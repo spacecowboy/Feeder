@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.ContentResolver
 import android.content.SharedPreferences
 import android.os.Build.VERSION.SDK_INT
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
@@ -156,7 +157,13 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
 
     init {
         // Install Conscrypt to handle TLSv1.3 pre Android10
-        Security.insertProviderAt(Conscrypt.newProvider(), 1)
+        // This crashes if app is installed to SD-card. Since it should still work for many
+        // devices, try to ignore errors
+        try {
+            Security.insertProviderAt(Conscrypt.newProvider(), 1)
+        } catch (t: Throwable) {
+            Log.e(LOG_TAG, "Failed to insert Conscrypt. Attempt to ignore.", t)
+        }
     }
 
     override fun onCreate() {
@@ -174,6 +181,8 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
     companion object {
         // Needed for database migration
         lateinit var staticFilesDir: File
+
+        private const val LOG_TAG = "FEEDER_APP"
     }
 
     override fun newImageLoader(): ImageLoader {
