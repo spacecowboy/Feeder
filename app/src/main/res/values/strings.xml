@@ -164,7 +164,7 @@
   <string name="failed_to_export_OPML">"Failed to export OPML"</string>
   <string name="device_sync">Device sync</string>
   <string name="add_new_device">Add new device</string>
-  <string name="device_sync_financed_by_community">This service is payed for by the community. Please consider donating if you find it useful.</string>
+  <string name="device_sync_financed_by_community">This service is paid for by the community. Please consider donating if you find it useful.</string>
   <string name="this_device">%1$s (this device)</string>
   <string name="disconnect_device_from_sync">Disconnect device from sync chain</string>
   <string name="devices_on_sync_chain">Devices on sync chain</string>
