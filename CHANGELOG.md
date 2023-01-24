@@ -1,3 +1,36 @@
+# 2.4.6
+Aitor (2):
+  * [69989627] Translated using Weblate (Basque)
+  * [21629a41] Updated Basque translation using Weblate
+
+Hur Ezeiza Zaldua (1):
+  * [af3ff07b] Updated Basque translation using Weblate
+
+Jonas Kalderstam (2):
+  * [a87da794] Try to ignore if conscrypt insertion fails
+  * [8adb4114] Updated UserAgent to avoid some issues with anti-spam
+
+Retrial (1):
+  * [e176df4d] Translated using Weblate (Greek)
+
+Skrripy (1):
+  * [05f2f077] Translated using Weblate (Ukrainian)
+
+VfBFan (1):
+  * [2b1382df] Translated using Weblate (German)
+
+Vitor Henrique (1):
+  * [b34335b1] Updated Portuguese (Brazil) translation using Weblate
+
+slothtown (1):
+  * [5e000306] Fixed typo
+
+wackbyte (1):
+  * [1e4572c7] Translated using Weblate (Toki Pona)
+
+Ícar N. S (1):
+  * [dabcdbd2] Updated Catalan translation using Weblate
+
 # 2.4.5
 Jonas Kalderstam (3):
   * [7a26e00d] Fixed crash when sharing link to Feeder
