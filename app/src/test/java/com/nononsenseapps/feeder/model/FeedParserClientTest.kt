@@ -118,7 +118,7 @@ class FeedParserClientTest : DIAware {
             val userAgent = userAgents?.first()
 
             assertTrue(
-                userAgent!!.startsWith("Mozilla")
+                userAgent!!.startsWith("Mjukisbyxor")
             )
         }
     }
