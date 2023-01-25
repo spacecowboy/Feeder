@@ -22,8 +22,8 @@ android {
     namespace = "com.nononsenseapps.feeder"
     defaultConfig {
         applicationId = "com.nononsenseapps.feeder"
-        versionCode = 266
-        versionName = "2.4.6"
+        versionCode = 267
+        versionName = "2.4.6-1"
         compileSdk = 33
         minSdk = 23
         targetSdk = 33
