@@ -102,3 +102,5 @@ if [[ "$response" =~ ^[yY]$ ]]
 then
   git tag -asm "$(cat "${tmpfile}")" "${NEXT_VERSION}"
 fi
+
+git checkout app/src/main/res fastlane/metadata/android
