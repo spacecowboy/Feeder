@@ -12,7 +12,7 @@
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">von %1$s, %2$s</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Speichern</string>
-    <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würdest du gerne …</string>
+    <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würden Sie gerne …</string>
     <string name="empty_feed_open">Einen anderen Feed <annotation style="link">öffnen</annotation>?</string>
     <string name="empty_feed_add">Weitere Feeds <annotation style="link">hinzufügen</annotation>?</string>
     <string name="search_feed_empty_hint">Eingabe einer Feed-Adresse</string>
