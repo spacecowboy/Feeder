@@ -142,7 +142,7 @@
     <string name="failed_to_open_article">Tidak dapat membuka artikel</string>
     <string name="device_sync">Sinkronisasi perangkat</string>
     <string name="add_new_device">Tambah perangkat baru</string>
-    <string name="device_sync_financed_by_community">Layanan ini dibiayai oleh komunitas. Pertimbangkan untuk donasi jika Anda merasa ini bermanfaat.</string>
+    <string name="device_sync_financed_by_community">Layanan ini dibiayai oleh komunitas. Harap pertimbangkan untuk donasi jika Anda merasa ini bermanfaat.</string>
     <string name="treat_like_password">Jaga ini seperti sandi. Siapapun bisa membaca data sinkronisasi Anda jika mereka memiliki tautan ini.</string>
     <string name="disabled">Nonaktif</string>
     <string name="only_from_end">Hanya dari akhir</string>
