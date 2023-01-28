@@ -16,10 +16,12 @@ import com.nononsenseapps.feeder.R
 @Composable
 fun ExplainPermissionDialog(
     @StringRes explanation: Int,
+    modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     onOk: () -> Unit
 ) {
     AlertDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
         confirmButton = {
             Button(onClick = onOk) {

@@ -32,7 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -80,112 +80,12 @@ import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CreateFeedScreen(
     onNavigateUp: () -> Unit,
     createFeedScreenViewModel: CreateFeedScreenViewModel,
-    onSaved: (Long) -> Unit,
-) {
-    val viewState by createFeedScreenViewModel.viewState.collectAsState()
-
-    val notificationsPermissionState = rememberApiPermissionState(
-        permission = "android.permission.POST_NOTIFICATIONS",
-        minimumApiLevel = 33,
-    ) { value ->
-        createFeedScreenViewModel.setNotify(value)
-    }
-
-    val shouldShowExplanationForPermission by remember {
-        derivedStateOf {
-            notificationsPermissionState.status.shouldShowRationale
-        }
-    }
-
-    var permissionDismissed by rememberSaveable {
-        mutableStateOf(true)
-    }
-
-    val windowSize = LocalWindowSize()
-
-    val screenType by remember(windowSize) {
-        derivedStateOf {
-            getScreenType(windowSize)
-        }
-    }
-
-    EditFeedScreen(
-        screenType = screenType,
-        onNavigateUp = onNavigateUp,
-        viewState = viewState,
-        setUrl = createFeedScreenViewModel::setUrl,
-        setTitle = createFeedScreenViewModel::setTitle,
-        setTag = createFeedScreenViewModel::setTag,
-        setFullTextByDefault = createFeedScreenViewModel::setFullTextByDefault,
-        setNotify = createFeedScreenViewModel::setNotify,
-        setArticleOpener = createFeedScreenViewModel::setArticleOpener,
-        setAlternateId = createFeedScreenViewModel::setAlternateId,
-        showPermissionExplanation = shouldShowExplanationForPermission && !permissionDismissed,
-        onPermissionExplanationDismissed = {
-            permissionDismissed = true
-        },
-        onPermissionExplanationOk = {
-            notificationsPermissionState.launchPermissionRequest()
-        },
-        onOk = {
-            val feedId = createFeedScreenViewModel.saveAndRequestSync()
-            onSaved(feedId)
-        },
-        onCancel = {
-            onNavigateUp()
-        }
-    )
-}
-
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-fun EditFeedScreen(
-    onNavigateUp: () -> Unit,
     onOk: (Long) -> Unit,
-    editFeedScreenViewModel: EditFeedScreenViewModel,
 ) {
-    val viewState by editFeedScreenViewModel.viewState.collectAsState()
-
-    val notificationsPermissionState = rememberApiPermissionState(
-        permission = "android.permission.POST_NOTIFICATIONS",
-        minimumApiLevel = 33,
-    ) { value ->
-        editFeedScreenViewModel.setNotify(value)
-    }
-
-    val shouldShowExplanationForPermission by remember {
-        derivedStateOf {
-            notificationsPermissionState.status.shouldShowRationale
-        }
-    }
-
-    var permissionDismissed by rememberSaveable {
-        mutableStateOf(true)
-    }
-
-    fun setNotify(value: Boolean) {
-        if (!value) {
-            editFeedScreenViewModel.setNotify(value)
-        } else {
-            when (notificationsPermissionState.status) {
-                is PermissionStatus.Denied -> {
-                    if (notificationsPermissionState.status.shouldShowRationale) {
-                        // Dialog is shown inside EditFeedScreen with a button
-                        permissionDismissed = false
-                    } else {
-                        notificationsPermissionState.launchPermissionRequest()
-                    }
-                }
-                PermissionStatus.Granted -> editFeedScreenViewModel.setNotify(value)
-            }
-        }
-    }
-
     val windowSize = LocalWindowSize()
 
     val screenType by remember(windowSize) {
@@ -195,26 +95,13 @@ fun EditFeedScreen(
     }
 
     EditFeedScreen(
-        screenType = screenType,
         onNavigateUp = onNavigateUp,
-        viewState = viewState,
-        setUrl = editFeedScreenViewModel::setUrl,
-        setTitle = editFeedScreenViewModel::setTitle,
-        setTag = editFeedScreenViewModel::setTag,
-        setFullTextByDefault = editFeedScreenViewModel::setFullTextByDefault,
-        setNotify = ::setNotify,
-        setArticleOpener = editFeedScreenViewModel::setArticleOpener,
-        setAlternateId = editFeedScreenViewModel::setAlternateId,
-        showPermissionExplanation = shouldShowExplanationForPermission && !permissionDismissed,
-        onPermissionExplanationDismissed = {
-            permissionDismissed = true
-        },
-        onPermissionExplanationOk = {
-            notificationsPermissionState.launchPermissionRequest()
-        },
+        viewState = createFeedScreenViewModel,
+        screenType = screenType,
         onOk = {
-            editFeedScreenViewModel.saveInBackgroundAndRequestSync()
-            onOk(editFeedScreenViewModel.feedId)
+            createFeedScreenViewModel.saveAndRequestSync { feedId ->
+                onOk(feedId)
+            }
         },
         onCancel = {
             onNavigateUp()
@@ -222,25 +109,85 @@ fun EditFeedScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditFeedScreen(
-    screenType: ScreenType,
     onNavigateUp: () -> Unit,
-    viewState: EditFeedViewState,
-    setUrl: (String) -> Unit,
-    setTitle: (String) -> Unit,
-    setTag: (String) -> Unit,
-    setFullTextByDefault: (Boolean) -> Unit,
-    setNotify: (Boolean) -> Unit,
-    setArticleOpener: (String) -> Unit,
-    setAlternateId: (Boolean) -> Unit,
-    showPermissionExplanation: Boolean,
-    onPermissionExplanationDismissed: () -> Unit,
-    onPermissionExplanationOk: () -> Unit,
+    editFeedScreenViewModel: EditFeedScreenViewModel,
+    onOk: (Long) -> Unit,
+) {
+    val windowSize = LocalWindowSize()
+
+    val screenType by remember(windowSize) {
+        derivedStateOf {
+            getScreenType(windowSize)
+        }
+    }
+
+    EditFeedScreen(
+        onNavigateUp = onNavigateUp,
+        viewState = editFeedScreenViewModel,
+        screenType = screenType,
+        onOk = {
+            editFeedScreenViewModel.saveAndRequestSync { feedId ->
+                onOk(feedId)
+            }
+        },
+        onCancel = {
+            onNavigateUp()
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@Composable
+fun EditFeedScreen(
+    onNavigateUp: () -> Unit,
+    viewState: EditFeedScreenState,
+    screenType: ScreenType,
     onOk: () -> Unit,
     onCancel: () -> Unit,
 ) {
+    val notificationsPermissionState = rememberApiPermissionState(
+        permission = "android.permission.POST_NOTIFICATIONS",
+        minimumApiLevel = 33,
+    ) { value ->
+        viewState.notify = value
+    }
+
+    val shouldShowExplanationForPermission by remember {
+        derivedStateOf {
+            notificationsPermissionState.status.shouldShowRationale
+        }
+    }
+
+    var permissionDismissed by rememberSaveable {
+        mutableStateOf(true)
+    }
+
+    val screenState = remember {
+        object : EditFeedScreenState by viewState {
+            override var notify: Boolean
+                get() = viewState.notify
+                set(value) {
+                    if (!value) {
+                        viewState.notify = false
+                    } else {
+                        when (notificationsPermissionState.status) {
+                            is PermissionStatus.Denied -> {
+                                if (notificationsPermissionState.status.shouldShowRationale) {
+                                    // Dialog is shown inside EditFeedScreen with a button
+                                    permissionDismissed = false
+                                } else {
+                                    notificationsPermissionState.launchPermissionRequest()
+                                }
+                            }
+                            PermissionStatus.Granted -> viewState.notify = true
+                        }
+                    }
+                }
+        }
+    }
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
@@ -267,24 +214,21 @@ fun EditFeedScreen(
     ) { padding ->
         EditFeedView(
             screenType = screenType,
-            viewState = viewState,
-            setUrl = setUrl,
-            setTitle = setTitle,
-            setTag = setTag,
-            setFullTextByDefault = setFullTextByDefault,
-            setNotify = setNotify,
-            setArticleOpener = setArticleOpener,
-            setAlternateId = setAlternateId,
+            viewState = screenState,
             onOk = onOk,
             onCancel = onCancel,
             modifier = Modifier.padding(padding)
         )
 
-        if (showPermissionExplanation) {
+        if (shouldShowExplanationForPermission && !permissionDismissed) {
             ExplainPermissionDialog(
                 explanation = R.string.explanation_permission_notifications,
-                onDismiss = onPermissionExplanationDismissed,
-                onOk = onPermissionExplanationOk,
+                onDismiss = {
+                    permissionDismissed = true
+                },
+                onOk = {
+                    notificationsPermissionState.launchPermissionRequest()
+                },
             )
         }
     }
@@ -293,14 +237,7 @@ fun EditFeedScreen(
 @Composable
 fun EditFeedView(
     screenType: ScreenType,
-    viewState: EditFeedViewState,
-    setUrl: (String) -> Unit,
-    setTitle: (String) -> Unit,
-    setTag: (String) -> Unit,
-    setFullTextByDefault: (Boolean) -> Unit,
-    setNotify: (Boolean) -> Unit,
-    setArticleOpener: (String) -> Unit,
-    setAlternateId: (Boolean) -> Unit,
+    viewState: EditFeedScreenState,
     onOk: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier,
@@ -328,9 +265,6 @@ fun EditFeedView(
                 ) {
                     leftContent(
                         viewState = viewState,
-                        setUrl = setUrl,
-                        setTitle = setTitle,
-                        setTag = setTag
                     )
                 }
 
@@ -342,10 +276,6 @@ fun EditFeedView(
                 ) {
                     rightContent(
                         viewState = viewState,
-                        setFullTextByDefault = setFullTextByDefault,
-                        setNotify = setNotify,
-                        setArticleOpener = setArticleOpener,
-                        setAlternateId = setAlternateId
                     )
                 }
             }
@@ -356,9 +286,6 @@ fun EditFeedView(
             ) {
                 leftContent(
                     viewState = viewState,
-                    setUrl = setUrl,
-                    setTitle = setTitle,
-                    setTag = setTag
                 )
 
                 Divider(
@@ -367,10 +294,6 @@ fun EditFeedView(
 
                 rightContent(
                     viewState = viewState,
-                    setFullTextByDefault = setFullTextByDefault,
-                    setNotify = setNotify,
-                    setArticleOpener = setArticleOpener,
-                    setAlternateId = setAlternateId
                 )
             }
         }
@@ -380,16 +303,13 @@ fun EditFeedView(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ColumnScope.leftContent(
-    viewState: EditFeedViewState,
-    setUrl: (String) -> Unit,
-    setTitle: (String) -> Unit,
-    setTag: (String) -> Unit,
+    viewState: EditFeedScreenState,
 ) {
-    val filteredTags by remember(viewState.allTags, viewState.tag) {
+    val filteredTags by remember(viewState.allTags, viewState.feedTag) {
         derivedStateOf {
             ImmutableHolder(
                 viewState.allTags.filter { tag ->
-                    tag.isNotBlank() && tag.startsWith(viewState.tag, ignoreCase = true)
+                    tag.isNotBlank() && tag.startsWith(viewState.feedTag, ignoreCase = true)
                 }
             )
         }
@@ -401,8 +321,8 @@ fun ColumnScope.leftContent(
     var tagHasFocus by rememberSaveable { mutableStateOf(false) }
 
     TextField(
-        value = viewState.url,
-        onValueChange = setUrl,
+        value = viewState.feedUrl,
+        onValueChange = { viewState.feedUrl = it },
         label = {
             Text(stringResource(id = R.string.url))
         },
@@ -437,8 +357,8 @@ fun ColumnScope.leftContent(
         )
     }
     OutlinedTextField(
-        value = viewState.title,
-        onValueChange = setTitle,
+        value = viewState.feedTitle,
+        onValueChange = { viewState.feedTitle = it },
         placeholder = {
             Text(viewState.defaultTitle)
         },
@@ -473,7 +393,7 @@ fun ColumnScope.leftContent(
         displaySuggestions = tagHasFocus,
         suggestions = filteredTags,
         onSuggestionClicked = { tag ->
-            setTag(tag)
+            viewState.feedTag = tag
             focusManager.clearFocus()
         },
         suggestionContent = {
@@ -492,8 +412,8 @@ fun ColumnScope.leftContent(
         }
     ) {
         OutlinedTextField(
-            value = viewState.tag,
-            onValueChange = setTag,
+            value = viewState.feedTag,
+            onValueChange = { viewState.feedTag = it },
             label = {
                 Text(stringResource(id = R.string.tag))
             },
@@ -528,29 +448,25 @@ fun ColumnScope.leftContent(
 
 @Composable
 fun ColumnScope.rightContent(
-    viewState: EditFeedViewState,
-    setFullTextByDefault: (Boolean) -> Unit,
-    setNotify: (Boolean) -> Unit,
-    setArticleOpener: (String) -> Unit,
-    setAlternateId: (Boolean) -> Unit,
+    viewState: EditFeedScreenState,
 ) {
     SwitchSetting(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
         checked = viewState.fullTextByDefault,
-        onCheckedChanged = setFullTextByDefault,
+        onCheckedChanged = { viewState.fullTextByDefault = it },
         icon = null
     )
     SwitchSetting(
         title = stringResource(id = R.string.notify_for_new_items),
         checked = viewState.notify,
-        onCheckedChanged = setNotify,
+        onCheckedChanged = { viewState.notify = it },
         icon = null
     )
     SwitchSetting(
         title = stringResource(id = R.string.generate_extra_unique_ids),
         description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
         checked = viewState.alternateId,
-        onCheckedChanged = setAlternateId,
+        onCheckedChanged = { viewState.alternateId = it },
         icon = null
     )
     Divider(
@@ -568,7 +484,7 @@ fun ColumnScope.rightContent(
         minHeight = 48.dp,
         icon = null,
         onClick = {
-            setArticleOpener("")
+            viewState.articleOpener = ""
         }
     )
     RadioButtonSetting(
@@ -577,7 +493,7 @@ fun ColumnScope.rightContent(
         minHeight = 48.dp,
         icon = null,
         onClick = {
-            setArticleOpener(PREF_VAL_OPEN_WITH_READER)
+            viewState.articleOpener = PREF_VAL_OPEN_WITH_READER
         }
     )
     RadioButtonSetting(
@@ -586,7 +502,7 @@ fun ColumnScope.rightContent(
         minHeight = 48.dp,
         icon = null,
         onClick = {
-            setArticleOpener(PREF_VAL_OPEN_WITH_CUSTOM_TAB)
+            viewState.articleOpener = PREF_VAL_OPEN_WITH_CUSTOM_TAB
         }
     )
     RadioButtonSetting(
@@ -595,9 +511,49 @@ fun ColumnScope.rightContent(
         minHeight = 48.dp,
         icon = null,
         onClick = {
-            setArticleOpener(PREF_VAL_OPEN_WITH_BROWSER)
+            viewState.articleOpener = PREF_VAL_OPEN_WITH_BROWSER
         }
     )
+}
+
+@Stable
+interface EditFeedScreenState {
+    var feedUrl: String
+    var feedTitle: String
+    var feedTag: String
+    var fullTextByDefault: Boolean
+    var notify: Boolean
+    var articleOpener: String
+    var alternateId: Boolean
+    val isOkToSave: Boolean
+    val isNotValidUrl: Boolean
+    val isOpenItemWithBrowser: Boolean
+    val isOpenItemWithCustomTab: Boolean
+    val isOpenItemWithReader: Boolean
+    val isOpenItemWithAppDefault: Boolean
+    val allTags: List<String>
+    val defaultTitle: String
+}
+
+fun EditFeedScreenState(): EditFeedScreenState = ScreenState()
+
+private class ScreenState(
+    override val isOkToSave: Boolean = false,
+    override val isNotValidUrl: Boolean = false,
+    override val isOpenItemWithBrowser: Boolean = false,
+    override val isOpenItemWithCustomTab: Boolean = false,
+    override val isOpenItemWithReader: Boolean = false,
+    override val isOpenItemWithAppDefault: Boolean = false,
+    override val allTags: List<String> = emptyList(),
+    override val defaultTitle: String = "",
+) : EditFeedScreenState {
+    override var feedUrl: String by mutableStateOf("")
+    override var feedTitle: String by mutableStateOf("")
+    override var feedTag: String by mutableStateOf("")
+    override var fullTextByDefault: Boolean by mutableStateOf(false)
+    override var notify: Boolean by mutableStateOf(false)
+    override var articleOpener: String by mutableStateOf("")
+    override var alternateId: Boolean by mutableStateOf(false)
 }
 
 @Preview("Edit Feed Phone")
@@ -609,17 +565,7 @@ fun PreviewEditFeedScreenPhone() {
             onNavigateUp = {},
             onOk = {},
             onCancel = {},
-            viewState = EditFeedViewState(),
-            setUrl = {},
-            setTitle = {},
-            setTag = {},
-            setFullTextByDefault = {},
-            setNotify = {},
-            setArticleOpener = {},
-            setAlternateId = {},
-            showPermissionExplanation = true,
-            onPermissionExplanationDismissed = {},
-            onPermissionExplanationOk = {},
+            viewState = EditFeedScreenState(),
         )
     }
 }
@@ -634,17 +580,7 @@ fun PreviewEditFeedScreenLarge() {
             onNavigateUp = {},
             onOk = {},
             onCancel = {},
-            viewState = EditFeedViewState(),
-            setUrl = {},
-            setTitle = {},
-            setTag = {},
-            setFullTextByDefault = {},
-            setNotify = {},
-            setArticleOpener = {},
-            setAlternateId = {},
-            showPermissionExplanation = true,
-            onPermissionExplanationDismissed = {},
-            onPermissionExplanationOk = {},
+            viewState = EditFeedScreenState(),
         )
     }
 }

@@ -1,139 +1,93 @@
 package com.nononsenseapps.feeder.ui.compose.editfeed
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_BROWSER
+import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
+import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_READER
+import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_WEBVIEW
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
+import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
 import java.net.URL
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.kodein.di.DI
 import org.kodein.di.instance
 import org.threeten.bp.Instant
 
-class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAwareViewModel(di) {
+class CreateFeedScreenViewModel(
+    di: DI,
+    state: SavedStateHandle
+) : DIAwareViewModel(di), EditFeedScreenState {
     private val repository: Repository by instance()
 
-    private val _url: MutableStateFlow<String> = MutableStateFlow(
-        state["feedUrl"] ?: ""
-    )
-    fun setUrl(value: String) {
-        state["feedUrl"] = value
-        _url.update { value }
+    // These two are updated as a result of url updating
+    override var isNotValidUrl by mutableStateOf(false)
+    override var isOkToSave: Boolean by mutableStateOf(false)
+
+    override var feedUrl: String by mutableSavedStateOf(state, "") { value ->
+        isNotValidUrl = !isValidUrl(value)
+        isOkToSave = isValidUrl(value)
     }
+    override var feedTitle: String by mutableSavedStateOf(state, "")
+    override var feedTag: String by mutableSavedStateOf(state, "")
+    override var fullTextByDefault: Boolean by mutableSavedStateOf(state, false)
+    override var notify: Boolean by mutableSavedStateOf(state, false)
+    override var articleOpener: String by mutableSavedStateOf(state, "")
+    override var alternateId: Boolean by mutableSavedStateOf(state, false)
+    override var allTags: List<String> by mutableStateOf(emptyList())
+    override var defaultTitle: String by mutableStateOf(state["feedTitle"] ?: "")
 
-    private val _tag: MutableStateFlow<String> = MutableStateFlow(
-        state["feedTag"] ?: ""
-    )
-    fun setTag(value: String) {
-        state["feedTag"] = value
-        _tag.update { value }
-    }
+    override val isOpenItemWithBrowser: Boolean
+        get() = articleOpener == PREF_VAL_OPEN_WITH_BROWSER
 
-    private val _title: MutableStateFlow<String> = MutableStateFlow(
-        state["feedTitle"] ?: ""
-    )
-    fun setTitle(value: String) {
-        state["feedTitle"] = value
-        _title.update { value }
-    }
+    override val isOpenItemWithCustomTab: Boolean
+        get() = articleOpener == PREF_VAL_OPEN_WITH_CUSTOM_TAB
 
-    private val _fullTextByDefault: MutableStateFlow<Boolean> = MutableStateFlow(
-        state["fullTextByDefault"] ?: false
-    )
-    fun setFullTextByDefault(value: Boolean) {
-        state["fullTextByDefault"] = value
-        _fullTextByDefault.update { value }
-    }
+    override val isOpenItemWithReader: Boolean
+        get() = articleOpener == PREF_VAL_OPEN_WITH_READER
 
-    private val _notify: MutableStateFlow<Boolean> = MutableStateFlow(
-        state["notify"] ?: false
-    )
-    fun setNotify(value: Boolean) {
-        state["notify"] = value
-        _notify.update { value }
-    }
-
-    private val _articleOpener: MutableStateFlow<String> = MutableStateFlow(
-        state["articleOpener"] ?: ""
-    )
-    fun setArticleOpener(value: String) {
-        state["articleOpener"] = value
-        _articleOpener.update { value }
-    }
-
-    private val _alternateId: MutableStateFlow<Boolean> = MutableStateFlow(
-        state["alternateId"] ?: false
-    )
-    fun setAlternateId(value: Boolean) {
-        state["alternateId"] = value
-        _alternateId.update { value }
-    }
-
-    fun saveAndRequestSync(): Long {
-        val url = _url.value
-
-        val feedId = runBlocking {
-            repository.saveFeed(
-                Feed(
-                    url = URL(url),
-                    title = _title.value,
-                    customTitle = _title.value,
-                    tag = _tag.value,
-                    fullTextByDefault = _fullTextByDefault.value,
-                    notify = _notify.value,
-                    openArticlesWith = _articleOpener.value,
-                    alternateId = _alternateId.value,
-                    whenModified = Instant.now(),
-                )
-            )
+    override val isOpenItemWithAppDefault: Boolean
+        get() = when (articleOpener) {
+            PREF_VAL_OPEN_WITH_READER,
+            PREF_VAL_OPEN_WITH_WEBVIEW,
+            PREF_VAL_OPEN_WITH_BROWSER,
+            PREF_VAL_OPEN_WITH_CUSTOM_TAB,
+            -> false
+            else -> true
         }
-        requestFeedSync(
-            di,
-            feedId = feedId
-        )
-        return feedId
-    }
-
-    private val _viewState = MutableStateFlow(EditFeedViewState())
-    val viewState: StateFlow<EditFeedViewState>
-        get() = _viewState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            combine(
-                repository.allTags,
-                _tag,
-                _url,
-                _title,
-                _fullTextByDefault,
-                _notify,
-                _articleOpener,
-                _alternateId,
-            ) { params: Array<Any> ->
-                @Suppress("UNCHECKED_CAST")
-                EditFeedViewState(
-                    allTags = params[0] as List<String>,
-                    tag = params[1] as String,
-                    url = params[2] as String,
-                    title = params[3] as String,
-                    fullTextByDefault = params[4] as Boolean,
-                    notify = params[5] as Boolean,
-                    articleOpener = params[6] as String,
-                    alternateId = params[7] as Boolean,
-                    defaultTitle = "",
-                )
-            }.collect {
-                _viewState.value = it
-            }
+            repository.allTags
+                .collect { value ->
+                    allTags = value
+                }
         }
+    }
+
+    fun saveAndRequestSync(action: (Long) -> Unit) = viewModelScope.launch {
+        val feedId = repository.saveFeed(
+            Feed(
+                url = URL(feedUrl),
+                title = feedTitle,
+                customTitle = feedTitle,
+                tag = feedTag,
+                fullTextByDefault = fullTextByDefault,
+                notify = notify,
+                openArticlesWith = articleOpener,
+                alternateId = alternateId,
+                whenModified = Instant.now(),
+            )
+        )
+
+        requestFeedSync(di, feedId = feedId)
+
+        action(feedId)
     }
 }

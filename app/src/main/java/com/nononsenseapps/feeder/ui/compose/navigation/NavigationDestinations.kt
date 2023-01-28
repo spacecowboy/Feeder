@@ -233,11 +233,10 @@ object EditFeedDestination : NavigationDestination(
             onNavigateUp = {
                 navController.popBackStack()
             },
-            onOk = { feedId ->
-                FeedDestination.navigate(navController, feedId = feedId)
-            },
             editFeedScreenViewModel = editFeedScreenViewModel
-        )
+        ) { feedId ->
+            FeedDestination.navigate(navController, feedId = feedId)
+        }
     }
 }
 

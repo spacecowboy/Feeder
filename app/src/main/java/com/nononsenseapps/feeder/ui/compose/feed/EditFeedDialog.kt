@@ -34,10 +34,12 @@ import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 @Composable
 fun EditFeedDialog(
     feeds: ImmutableHolder<List<DeletableFeed>>,
+    modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     onEdit: (Long) -> Unit
 ) {
     AlertDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
         confirmButton = {
 //            Button(onClick = onOk) {
