@@ -56,6 +56,7 @@ class FeedParserClientTest : DIAware {
         server.enqueue(
             MockResponse().apply {
                 setResponseCode(200)
+                addHeader("Content-Type", "application/xml")
                 this.setBody(
                     """
 <?xml version='1.0' encoding='UTF-8'?>
@@ -128,6 +129,7 @@ class FeedParserClientTest : DIAware {
         server.enqueue(
             MockResponse().apply {
                 setResponseCode(200)
+                addHeader("Content-Type", "application/xml")
                 this.setBody(
                     """
 <?xml version="1.0" encoding="utf-8"?>
