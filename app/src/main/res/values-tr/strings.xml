@@ -140,7 +140,7 @@
     <string name="failed_to_import_OPML">OPML içe aktarılamadı</string>
     <string name="failed_to_export_OPML">OPML dışa aktarılamadı</string>
     <string name="failed_to_open_article">Makale açılamadı</string>
-    <string name="device_sync_financed_by_community">Bu hizmet topluluk tarafından desteklenmektedir. Faydalı buluyorsanız lütfen bağış yapmayı düşünün.</string>
+    <string name="device_sync_financed_by_community">Bu hizmetin bedeli topluluk tarafından karşılanmaktadır. Faydalı buluyorsanız lütfen bağış yapmayı düşünün.</string>
     <string name="disconnect_device_from_sync">Aygıtı eşzamanlama zincirinden ayır</string>
     <string name="devices_on_sync_chain">Eşzamanlama zincirindeki aygıtlar</string>
     <string name="remove_device">Aygıtı kaldır</string>
