@@ -14,6 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
+import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.contentValues
 import com.nononsenseapps.feeder.util.forEach
 import com.nononsenseapps.feeder.util.setInt
@@ -27,6 +28,8 @@ import org.kodein.di.instance
 const val DATABASE_NAME = "rssDatabase"
 const val ID_UNSET: Long = 0
 const val ID_ALL_FEEDS: Long = -10
+
+private const val LOG_TAG = "FEEDER_APPDB"
 
 /**
  * Database versions
@@ -46,7 +49,7 @@ const val ID_ALL_FEEDS: Long = -10
         RemoteFeed::class,
         SyncDevice::class,
     ],
-    version = 24
+    version = 25
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -107,12 +110,55 @@ fun getAllMigrations(di: DI) = arrayOf(
     MIGRATION_21_22,
     MIGRATION_22_23,
     MigrationFrom23To24(di),
+    MigrationFrom24To25(di),
 )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+@Suppress("ClassName")
+class MigrationFrom24To25(override val di: DI) : Migration(24, 25), DIAware {
+    private val filePathProvider: FilePathProvider by instance()
+
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            ALTER TABLE feed_items ADD COLUMN fulltext_downloaded INTEGER NOT NULL DEFAULT 0
+            """.trimIndent()
+        )
+
+        // Delete all existing full text
+        filePathProvider.filesDir.list { _, name ->
+            name.endsWith(".full.html.gz")
+        }?.forEach { name ->
+            try {
+                filePathProvider.filesDir.resolve(name).delete()
+            } catch (t: Throwable) {
+                Log.e(LOG_TAG, "Failed to delete: $name")
+            }
+        }
+
+        // Move all article texts to new location
+        filePathProvider.filesDir.list { _, name ->
+            name.endsWith(".txt.gz")
+        }?.forEach { name ->
+            try {
+                val src = filePathProvider.filesDir.resolve(name)
+                val dst = filePathProvider.articleDir.resolve(name)
+
+                if (!filePathProvider.articleDir.isDirectory) {
+                    filePathProvider.articleDir.mkdirs()
+                }
+
+                src.renameTo(dst)
+            } catch (t: Throwable) {
+                Log.e(LOG_TAG, "Failed to delete: $name")
+            }
+        }
+    }
+}
+
 @Suppress("ClassName")
 class MigrationFrom23To24(override val di: DI) : Migration(23, 24), DIAware {
     private val sharedPrefs: SharedPreferences by instance()

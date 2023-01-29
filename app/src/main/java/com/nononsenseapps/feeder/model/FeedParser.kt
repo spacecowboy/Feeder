@@ -288,6 +288,19 @@ class FeedParser(override val di: DI) : DIAware {
     @Throws(FeedParsingError::class)
     internal suspend fun parseRssAtom(baseUrl: URL, responseBody: ResponseBody): Feed {
         try {
+            val contentType = responseBody.contentType()
+            val validMimeType = when (contentType?.type) {
+                "application", "text" -> {
+                    when {
+                        contentType.subtype.contains("xml") -> true
+                        else -> false
+                    }
+                }
+                else -> false
+            }
+            if (!validMimeType) {
+                throw RuntimeException("Not parsing document with invalid RSS/Atom mimetype: ${contentType?.type}/${contentType?.subtype}")
+            }
             responseBody.byteStream().use { bs ->
                 val feed = XmlReader(bs, true, responseBody.contentType()?.charset()?.name()).use {
                     SyndFeedInput()
@@ -399,7 +412,16 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
 suspend fun OkHttpClient.curl(url: URL): String? {
     var result: String? = null
     curlAndOnResponse(url) {
-        result = it.body?.string()
+        val contentType = it.body?.contentType()
+        result = when (contentType?.type) {
+            "text" -> {
+                when (contentType.subtype) {
+                    "plain", "html" -> it.body?.string()
+                    else -> null
+                }
+            }
+            else -> null
+        }
     }
     return result
 }

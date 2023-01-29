@@ -87,8 +87,23 @@ class JsonFeedParser(
             throw IOException("Failed to download feed: $response")
         }
 
-        return response.body?.let {
-            parseJson(it)
+        return response.body?.let { body ->
+            val contentType = body.contentType()
+            when (contentType?.type) {
+                "application", "text" -> {
+                    when {
+                        contentType.subtype.contains("json") -> {
+                            parseJson(body)
+                        }
+                        else -> {
+                            throw IOException("Incorrect subtype: ${contentType.type}/${contentType.subtype}")
+                        }
+                    }
+                }
+                else -> {
+                    throw IOException("Incorrect type: ${contentType?.type}/${contentType?.subtype}")
+                }
+            }
         } ?: throw IOException("Failed to parse feed: body was NULL")
     }
 

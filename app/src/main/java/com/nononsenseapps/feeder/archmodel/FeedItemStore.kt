@@ -342,8 +342,11 @@ class FeedItemStore(override val di: DI) : DIAware {
         }
     }
 
-    fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>> =
-        dao.getFeedsItemsWithDefaultFullTextParse()
+    fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> =
+        dao.getFeedsItemsWithDefaultFullTextNeedingDownload()
+
+    suspend fun markAsFullTextDownloaded(feedItemId: Long) =
+        dao.markAsFullTextDownloaded(feedItemId)
 
     fun getFeedItemsNeedingNotifying(): Flow<List<Long>> {
         return dao.getFeedItemsNeedingNotifying()

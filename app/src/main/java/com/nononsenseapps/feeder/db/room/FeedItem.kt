@@ -12,6 +12,7 @@ import com.nononsenseapps.feeder.db.COL_BOOKMARKED
 import com.nononsenseapps.feeder.db.COL_ENCLOSURELINK
 import com.nononsenseapps.feeder.db.COL_FEEDID
 import com.nononsenseapps.feeder.db.COL_FIRSTSYNCEDTIME
+import com.nononsenseapps.feeder.db.COL_FULLTEXT_DOWNLOADED
 import com.nononsenseapps.feeder.db.COL_GUID
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_IMAGEURL
@@ -73,6 +74,7 @@ data class FeedItem @Ignore constructor(
     @ColumnInfo(name = COL_PRIMARYSORTTIME, typeAffinity = ColumnInfo.INTEGER) var primarySortTime: Instant = Instant.EPOCH,
     @ColumnInfo(name = COL_PINNED) var pinned: Boolean = false,
     @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
+    @ColumnInfo(name = COL_FULLTEXT_DOWNLOADED) var fullTextDownloaded: Boolean = false,
 ) : FeedItemForFetching {
 
     constructor() : this(id = ID_UNSET)

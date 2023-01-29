@@ -547,10 +547,20 @@ interface FeedItemDao {
             FROM feed_items fi
             JOIN feeds f ON feed_id = f.id
             WHERE f.fulltext_by_default = 1
+                AND fi.fulltext_downloaded <> 1
                 AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """
     )
-    fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>>
+    fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>>
+
+    @Query(
+        """
+            UPDATE feed_items
+            SET fulltext_downloaded = 1
+            WHERE id = :feedItemId
+        """
+    )
+    suspend fun markAsFullTextDownloaded(feedItemId: Long)
 
     @Query(
         """

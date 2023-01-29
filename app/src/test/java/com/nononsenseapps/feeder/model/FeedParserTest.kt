@@ -7,6 +7,7 @@ import java.io.BufferedReader
 import java.net.URL
 import kotlin.test.Ignore
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -491,6 +492,16 @@ class FeedParserTest : DIAware {
     }
 
     @Test
+    fun doesNotFetchVideos(): Unit = runBlocking {
+        val exception = assertFails {
+            videoResponse.use { feedParser.parseFeedResponse(it) }
+        }
+        assertTrue {
+            exception.message?.contains("video/mp4") ?: false
+        }
+    }
+
+    @Test
     @Throws(Exception::class)
     fun cyklist() = runBlocking {
         val feed = cyklistBloggen.use { feedParser.parseFeedResponse(it) }
@@ -929,6 +940,13 @@ class FeedParserTest : DIAware {
             "https://newsletter.nixers.net/feed.xml"
         )
 
+    private val videoResponse: Response
+        get() = bytesToResponse(
+            "rss_nixers_newsletter.xml",
+            "https://foo.bar/video.mp4",
+            "video/mp4"
+        )
+
     private val diskuse: Response
         get() = bytesToResponse(
             "rss_diskuse.xml",
@@ -944,11 +962,11 @@ class FeedParserTest : DIAware {
             "http://www.zoocoop.com/contentoob/o1.atom"
         )
 
-    private fun bytesToResponse(resourceName: String, url: String): Response {
+    private fun bytesToResponse(resourceName: String, url: String, contentType: String = "application/xml"): Response {
         val responseBody: ResponseBody =
             javaClass.getResourceAsStream(resourceName)!!
                 .use { it.readBytes() }
-                .toResponseBody("application/xml".toMediaTypeOrNull())
+                .toResponseBody(contentType.toMediaTypeOrNull())
 
         return Response.Builder()
             .body(responseBody)

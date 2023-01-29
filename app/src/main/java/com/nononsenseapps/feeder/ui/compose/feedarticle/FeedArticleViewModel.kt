@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
-import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.Article
 import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
@@ -24,16 +23,17 @@ import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FullTextParser
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
-import com.nononsenseapps.feeder.model.parseFullArticleIfMissing
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
-import java.util.Locale
+import com.nononsenseapps.feeder.util.FilePathProvider
+import java.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -47,7 +47,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import org.kodein.di.DI
-import org.kodein.di.direct
 import org.kodein.di.instance
 import org.threeten.bp.Instant
 import org.threeten.bp.ZonedDateTime
@@ -58,6 +57,8 @@ class FeedArticleViewModel(
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
+    private val fullTextParser: FullTextParser by instance()
+    private val filePathProvider: FilePathProvider by instance()
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
@@ -328,22 +329,18 @@ class FeedArticleViewModel(
     }
 
     private suspend fun loadFullTextThenDisplayIt(itemId: Long) {
-        val filesDir = getApplication<FeederApplication>().filesDir
-
-        if (blobFullFile(viewState.value.articleId, filesDir).isFile) {
+        if (blobFullFile(viewState.value.articleId, filePathProvider.fullArticleDir).isFile) {
             setTextToDisplayFor(itemId, TextToDisplay.FULLTEXT)
             return
         }
 
         setTextToDisplayFor(itemId, TextToDisplay.LOADING_FULLTEXT)
         val link = viewState.value.articleLink
-        val result = parseFullArticleIfMissing(
+        val result = fullTextParser.parseFullArticleIfMissing(
             object : FeedItemForFetching {
                 override val id = viewState.value.articleId
                 override val link = link
             },
-            di.direct.instance(),
-            filesDir,
         )
 
         setTextToDisplayFor(
@@ -372,11 +369,10 @@ class FeedArticleViewModel(
     }
 
     fun ttsPlay() {
-        val context = getApplication<FeederApplication>()
         viewModelScope.launch(Dispatchers.IO) {
             val fullText = when (viewState.value.textToDisplay) {
                 TextToDisplay.DEFAULT -> {
-                    blobInputStream(viewState.value.articleId, context.filesDir).use {
+                    blobInputStream(viewState.value.articleId, filePathProvider.articleDir).use {
                         htmlToAnnotatedString(
                             inputStream = it,
                             baseUrl = viewState.value.articleFeedUrl ?: ""
@@ -386,7 +382,7 @@ class FeedArticleViewModel(
                 TextToDisplay.FULLTEXT -> {
                     blobFullInputStream(
                         viewState.value.articleId,
-                        context.filesDir
+                        filePathProvider.fullArticleDir
                     ).use {
                         htmlToAnnotatedString(
                             inputStream = it,
