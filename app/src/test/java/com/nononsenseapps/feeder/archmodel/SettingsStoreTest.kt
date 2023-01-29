@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.db.room.BlocklistDao
-import com.nononsenseapps.feeder.db.room.BlocklistEntry
 import com.nononsenseapps.feeder.model.workmanager.UNIQUE_PERIODIC_NAME
 import com.nononsenseapps.feeder.model.workmanager.oldPeriodics
 import com.nononsenseapps.feeder.util.PREF_MAX_ITEM_COUNT_PER_FEED
@@ -305,12 +304,15 @@ class SettingsStoreTest : DIAware {
     @Test
     fun blockListGlobs() {
         runBlocking {
-            store.setBlockListPreference(listOf("foo", "bar", "not'allowed", "not\\allowed", "  "))
+            for (pattern in listOf("FOO", " bAr ", "inj'ection", "att\\ack", "  ")) {
+                store.addBlocklistPattern(pattern)
+            }
         }
         coVerify {
-            blocklistDao.insert(BlocklistEntry(globPattern = "*foo*"))
-            blocklistDao.insert(BlocklistEntry(globPattern = "*bar*"))
-            blocklistDao.deleteMissingPatterns(listOf("*foo*", "*bar*"))
+            blocklistDao.insertSafely("foo")
+            blocklistDao.insertSafely("bar")
+            blocklistDao.insertSafely("inj'ection")
+            blocklistDao.insertSafely("att\\ack")
         }
         confirmVerified(blocklistDao)
     }
