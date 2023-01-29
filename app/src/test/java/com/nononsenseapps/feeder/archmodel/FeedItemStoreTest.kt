@@ -725,10 +725,10 @@ class FeedItemStoreTest : DIAware {
             FeedItemIdWithLink(5L, "google.com"),
             FeedItemIdWithLink(6L, "cowboy.com"),
         )
-        every { dao.getFeedsItemsWithDefaultFullTextParse() } returns flowOf(expected)
+        every { dao.getFeedsItemsWithDefaultFullTextNeedingDownload() } returns flowOf(expected)
 
         val items = runBlocking {
-            store.getFeedsItemsWithDefaultFullTextParse().first()
+            store.getFeedsItemsWithDefaultFullTextNeedingDownload().first()
         }
 
         assertEquals(

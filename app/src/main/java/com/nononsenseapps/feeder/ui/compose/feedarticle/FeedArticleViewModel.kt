@@ -24,10 +24,10 @@ import com.nononsenseapps.feeder.blob.blobInputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.model.FullTextParser
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.PlaybackStatus
 import com.nononsenseapps.feeder.model.TTSStateHolder
-import com.nononsenseapps.feeder.model.parseFullArticleIfMissing
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
@@ -47,7 +47,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import org.kodein.di.DI
-import org.kodein.di.direct
 import org.kodein.di.instance
 import org.threeten.bp.Instant
 import org.threeten.bp.ZonedDateTime
@@ -58,6 +57,7 @@ class FeedArticleViewModel(
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
+    private val fullTextParser: FullTextParser by instance()
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
@@ -337,12 +337,11 @@ class FeedArticleViewModel(
 
         setTextToDisplayFor(itemId, TextToDisplay.LOADING_FULLTEXT)
         val link = viewState.value.articleLink
-        val result = parseFullArticleIfMissing(
+        val result = fullTextParser.parseFullArticleIfMissing(
             object : FeedItemForFetching {
                 override val id = viewState.value.articleId
                 override val link = link
             },
-            di.direct.instance(),
             filesDir,
         )
 

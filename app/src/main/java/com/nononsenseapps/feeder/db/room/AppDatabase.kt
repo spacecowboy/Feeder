@@ -46,7 +46,7 @@ const val ID_ALL_FEEDS: Long = -10
         RemoteFeed::class,
         SyncDevice::class,
     ],
-    version = 24
+    version = 25
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -107,12 +107,24 @@ fun getAllMigrations(di: DI) = arrayOf(
     MIGRATION_21_22,
     MIGRATION_22_23,
     MigrationFrom23To24(di),
+    MigrationFrom24To25,
 )
 
 /*
  * 6 represents legacy database
  * 7 represents new Room database
  */
+@Suppress("ClassName")
+object MigrationFrom24To25 : Migration(24, 25) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            ALTER TABLE feed_items ADD COLUMN fulltext_downloaded INTEGER NOT NULL DEFAULT 0
+            """.trimIndent()
+        )
+    }
+}
+
 @Suppress("ClassName")
 class MigrationFrom23To24(override val di: DI) : Migration(23, 24), DIAware {
     private val sharedPrefs: SharedPreferences by instance()

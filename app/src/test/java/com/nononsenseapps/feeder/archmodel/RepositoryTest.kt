@@ -266,10 +266,10 @@ class RepositoryTest : DIAware {
 
     @Test
     fun getFeedsItemsWithDefaultFullTextParse() {
-        coEvery { feedItemStore.getFeedsItemsWithDefaultFullTextParse() } returns flowOf(emptyList())
+        coEvery { feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload() } returns flowOf(emptyList())
 
         val result = runBlocking {
-            repository.getFeedsItemsWithDefaultFullTextParse().first()
+            repository.getFeedsItemsWithDefaultFullTextNeedingDownload().first()
         }
 
         assertTrue {
@@ -277,7 +277,7 @@ class RepositoryTest : DIAware {
         }
 
         coVerify {
-            feedItemStore.getFeedsItemsWithDefaultFullTextParse()
+            feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload()
         }
     }
 

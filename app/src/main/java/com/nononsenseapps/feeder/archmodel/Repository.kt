@@ -371,8 +371,11 @@ class Repository(override val di: DI) : DIAware {
     suspend fun ensurePeriodicSyncConfigured() =
         settingsStore.configurePeriodicSync(replace = false)
 
-    fun getFeedsItemsWithDefaultFullTextParse(): Flow<List<FeedItemIdWithLink>> =
-        feedItemStore.getFeedsItemsWithDefaultFullTextParse()
+    fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> =
+        feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload()
+
+    suspend fun markAsFullTextDownloaded(feedItemId: Long) =
+        feedItemStore.markAsFullTextDownloaded(feedItemId)
 
     fun getFeedItemsNeedingNotifying(): Flow<List<Long>> {
         return feedItemStore.getFeedItemsNeedingNotifying()
