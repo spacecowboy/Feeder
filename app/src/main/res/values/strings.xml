@@ -133,6 +133,7 @@
   <string name="fetch_full_articles_by_default">Fetch full articles by default</string>
   <string name="failed_to_fetch_full_article">Could not fetch full article</string>
   <string name="failed_to_open_article">Could not open article</string>
+  <string name="sync_to_fetch">Synchronize to fetch article</string>
   <string name="fetching_full_article">Fetching full article…</string>
   <string name="failed_to_load_text_to_speech">Could not load text to speech</string>
   <string name="go_back">Go back</string>

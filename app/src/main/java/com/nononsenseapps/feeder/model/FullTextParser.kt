@@ -6,14 +6,13 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.model.FullTextParser.Companion.LOG_TAG
+import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.logDebug
-import java.io.File
 import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +46,7 @@ class FullTextWorker(
 
     override suspend fun doWork(): Result {
         Log.i(LOG_TAG, "Performing full text parse work")
-        return when (fullTextParser.parseFullArticlesForMissing(context.filesDir)) {
+        return when (fullTextParser.parseFullArticlesForMissing()) {
             true -> Result.success()
             false -> Result.failure()
         }.also {
@@ -59,11 +58,10 @@ class FullTextWorker(
 class FullTextParser(override val di: DI) : DIAware {
     private val repository: Repository by instance()
     private val okHttpClient: OkHttpClient by instance()
+    private val filePathProvider: FilePathProvider by instance()
 
-    suspend fun parseFullArticlesForMissing(
-        filesDir: File = FeederApplication.staticFilesDir
-    ): Boolean {
-        Log.i(LOG_TAG, "Parsing full texts for missing")
+    suspend fun parseFullArticlesForMissing(): Boolean {
+        logDebug(LOG_TAG, "Parsing full texts for missing")
         val itemsToSync: List<FeedItemForFetching> =
             repository.getFeedsItemsWithDefaultFullTextNeedingDownload()
                 .firstOrNull()
@@ -73,7 +71,6 @@ class FullTextParser(override val di: DI) : DIAware {
             .map { feedItem ->
                 parseFullArticleIfMissing(
                     feedItem = feedItem,
-                    filesDir = filesDir,
                 )
             }
             .fold(true) { acc, value ->
@@ -81,57 +78,52 @@ class FullTextParser(override val di: DI) : DIAware {
             }
     }
 
-    suspend fun parseFullArticleIfMissing(
-        feedItem: FeedItemForFetching,
-        filesDir: File = FeederApplication.staticFilesDir
-    ): Boolean {
-        val fullArticleFile = blobFullFile(itemId = feedItem.id, filesDir = filesDir)
+    suspend fun parseFullArticleIfMissing(feedItem: FeedItemForFetching): Boolean {
+        val fullArticleFile =
+            blobFullFile(itemId = feedItem.id, filesDir = filePathProvider.fullArticleDir)
         if (fullArticleFile.isFile) {
             return true
         }
 
         return try {
-            parseFullArticle(
-                feedItem = feedItem,
-                filesDir = filesDir
-            ).first
+            parseFullArticle(feedItem = feedItem).first
         } finally {
             repository.markAsFullTextDownloaded(feedItem.id)
         }
     }
 
-    private suspend fun parseFullArticle(
-        feedItem: FeedItemForFetching,
-        filesDir: File
-    ): Pair<Boolean, Throwable?> = withContext(Dispatchers.Default) {
-        return@withContext try {
-            val url = feedItem.link ?: return@withContext false to null
-            logDebug(LOG_TAG, "Fetching full page ${feedItem.link}")
-            val html: String = okHttpClient.curl(URL(url)) ?: return@withContext false to null
+    private suspend fun parseFullArticle(feedItem: FeedItemForFetching): Pair<Boolean, Throwable?> =
+        withContext(Dispatchers.Default) {
+            return@withContext try {
+                val url = feedItem.link ?: return@withContext false to null
+                logDebug(LOG_TAG, "Fetching full page ${feedItem.link}")
+                val html: String = okHttpClient.curl(URL(url)) ?: return@withContext false to null
 
-            // TODO verify encoding is respected in reader
-            Log.i(LOG_TAG, "Parsing article ${feedItem.link}")
-            val article = Readability4JExtended(url, html).parse()
+                // TODO verify encoding is respected in reader
+                Log.i(LOG_TAG, "Parsing article ${feedItem.link}")
+                val article = Readability4JExtended(url, html).parse()
 
-            // TODO set image on item if none already
-            // naiveFindImageLink(article.content)?.let { Parser.unescapeEntities(it, true) }
+                // TODO set image on item if none already
+                // naiveFindImageLink(article.content)?.let { Parser.unescapeEntities(it, true) }
 
-            logDebug(LOG_TAG, "Writing article ${feedItem.link}")
-            withContext(Dispatchers.IO) {
-                blobFullOutputStream(feedItem.id, filesDir).bufferedWriter().use { writer ->
-                    writer.write(article.contentWithUtf8Encoding)
+                logDebug(LOG_TAG, "Writing article ${feedItem.link}")
+                withContext(Dispatchers.IO) {
+                    filePathProvider.fullArticleDir.mkdirs()
+                    blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
+                        .bufferedWriter().use { writer ->
+                            writer.write(article.contentWithUtf8Encoding)
+                        }
                 }
+                true to null
+            } catch (e: Throwable) {
+                Log.e(
+                    LOG_TAG,
+                    "Failed to get fulltext for ${feedItem.link}: ${e.message}",
+                    e
+                )
+                false to e
             }
-            true to null
-        } catch (e: Throwable) {
-            Log.e(
-                LOG_TAG,
-                "Failed to get fulltext for ${feedItem.link}: ${e.message}",
-                e
-            )
-            false to e
         }
-    }
 
     companion object {
         internal const val LOG_TAG = "FEEDER_FULLTEXT"

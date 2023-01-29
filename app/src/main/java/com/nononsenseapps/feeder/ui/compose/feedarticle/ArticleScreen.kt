@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.navigationBars
@@ -65,9 +66,13 @@ import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScroll
 import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
+import com.nononsenseapps.feeder.util.FilePathProvider
+import com.nononsenseapps.feeder.util.filePathProvider
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import com.nononsenseapps.feeder.util.unicodeWrap
+import org.kodein.di.compose.LocalDI
+import org.kodein.di.instance
 import org.threeten.bp.ZonedDateTime
 
 @Composable
@@ -351,6 +356,7 @@ fun ArticleContent(
     modifier: Modifier,
 ) {
     val isLightTheme = MaterialTheme.colorScheme.isLight
+    val filePathProvider by LocalDI.current.instance<FilePathProvider>()
 
     @DrawableRes
     val placeHolder: Int by remember(isLightTheme) {
@@ -369,7 +375,7 @@ fun ArticleContent(
 
     if (viewState.articleId > ID_UNSET &&
         viewState.textToDisplay == TextToDisplay.FULLTEXT &&
-        !blobFullFile(viewState.articleId, context.filesDir).isFile
+        !blobFullFile(viewState.articleId, filePathProvider.fullArticleDir).isFile
     ) {
         LaunchedEffect(viewState.articleId, viewState.textToDisplay) {
             // Trigger parse and fetch
@@ -412,8 +418,8 @@ fun ArticleContent(
         if (viewState.articleId > ID_UNSET) {
             when (viewState.textToDisplay) {
                 TextToDisplay.DEFAULT -> {
-                    if (blobFile(viewState.articleId, context.filesDir).isFile) {
-                        blobInputStream(viewState.articleId, context.filesDir).use {
+                    if (blobFile(viewState.articleId, filePathProvider.articleDir).isFile) {
+                        blobInputStream(viewState.articleId, filePathProvider.articleDir).use {
                             htmlFormattedText(
                                 inputStream = it,
                                 baseUrl = viewState.articleFeedUrl ?: "",
@@ -430,7 +436,10 @@ fun ArticleContent(
                         }
                     } else {
                         item {
-                            Text(text = stringResource(id = R.string.failed_to_open_article))
+                            Column {
+                                Text(text = stringResource(id = R.string.failed_to_open_article))
+                                Text(text = stringResource(id = R.string.sync_to_fetch))
+                            }
                         }
                     }
                 }
@@ -444,8 +453,8 @@ fun ArticleContent(
                 }
 
                 TextToDisplay.FULLTEXT -> {
-                    if (blobFullFile(viewState.articleId, context.filesDir).isFile) {
-                        blobFullInputStream(viewState.articleId, context.filesDir).use {
+                    if (blobFullFile(viewState.articleId, filePathProvider.fullArticleDir).isFile) {
+                        blobFullInputStream(viewState.articleId, filePathProvider.fullArticleDir).use {
                             htmlFormattedText(
                                 inputStream = it,
                                 baseUrl = viewState.articleFeedUrl ?: "",

@@ -33,8 +33,10 @@ import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.UserAgentInterceptor
 import com.nononsenseapps.feeder.notifications.NotificationsWorker
 import com.nononsenseapps.feeder.ui.compose.coil.TooLargeImageInterceptor
+import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.ToastMaker
 import com.nononsenseapps.feeder.util.currentlyUnmetered
+import com.nononsenseapps.feeder.util.filePathProvider
 import com.nononsenseapps.jsonfeed.cachingHttpClient
 import java.io.File
 import java.security.Security
@@ -61,6 +63,9 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
     override val di by DI.lazy {
         // import(androidXModule(this@FeederApplication))
 
+        bind<FilePathProvider>() with singleton {
+            filePathProvider(cacheDir = cacheDir, filesDir = filesDir)
+        }
         bind<Application>() with singleton { this@FeederApplication }
         bind<AppDatabase>() with singleton { AppDatabase.getInstance(this@FeederApplication) }
         bind<FeedDao>() with singleton { instance<AppDatabase>().feedDao() }
@@ -97,18 +102,20 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
         }
 
         bind<OkHttpClient>() with singleton {
+            val filePathProvider = instance<FilePathProvider>()
             cachingHttpClient(
-                cacheDirectory = (externalCacheDir ?: filesDir).resolve("http")
+                cacheDirectory = (filePathProvider.httpCacheDir)
             ).newBuilder()
                 .addNetworkInterceptor(UserAgentInterceptor)
                 .build()
         }
         bind<ImageLoader>() with singleton {
+            val filePathProvider = instance<FilePathProvider>()
             val repository = instance<Repository>()
             val okHttpClient = instance<OkHttpClient>()
                 .newBuilder()
                 // This is not used by Coil but no need to risk evicting the real cache
-                .cache(Cache((externalCacheDir ?: filesDir).resolve("dummy_img"), 1024L))
+                .cache(Cache(filePathProvider.cacheDir.resolve("dummy_img"), 1024L))
                 .addInterceptor { chain ->
                     chain.proceed(
                         when (!repository.loadImageOnlyOnWifi.value || currentlyUnmetered(this@FeederApplication)) {
@@ -134,7 +141,7 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
                 .okHttpClient(okHttpClient = okHttpClient)
                 .diskCache(
                     DiskCache.Builder()
-                        .directory((externalCacheDir ?: filesDir).resolve("image_cache"))
+                        .directory(filePathProvider.imageCacheDir)
                         .maxSizeBytes(250L * 1024 * 1024)
                         .build()
                 )
@@ -179,7 +186,7 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
     }
 
     companion object {
-        // Needed for database migration
+        @Deprecated("Only used by an old database migration")
         lateinit var staticFilesDir: File
 
         private const val LOG_TAG = "FEEDER_APP"

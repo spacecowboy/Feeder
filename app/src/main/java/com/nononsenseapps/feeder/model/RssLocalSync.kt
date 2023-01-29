@@ -1,18 +1,18 @@
 package com.nononsenseapps.feeder.model
 
-import android.content.Context
 import android.util.Log
 import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.blob.blobFile
+import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobOutputStream
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.sync.SyncRestClient
+import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.Item
-import java.io.File
 import java.io.IOException
 import java.util.concurrent.Executors
 import kotlin.math.max
@@ -42,9 +42,9 @@ class RssLocalSync(override val di: DI) : DIAware {
     private val syncClient: SyncRestClient by instance()
     private val feedParser: FeedParser by instance()
     private val okHttpClient: OkHttpClient by instance()
+    private val filePathProvider: FilePathProvider by instance()
 
     suspend fun syncFeeds(
-        context: Context,
         feedId: Long = ID_UNSET,
         feedTag: String = "",
         forceNetwork: Boolean = false,
@@ -54,7 +54,6 @@ class RssLocalSync(override val di: DI) : DIAware {
         return syncMutex.withLock {
             withContext(singleThreadedSync) {
                 syncFeeds(
-                    filesDir = context.filesDir,
                     feedId = feedId,
                     feedTag = feedTag,
                     maxFeedItemCount = repository.maximumCountPerFeed.value,
@@ -66,7 +65,6 @@ class RssLocalSync(override val di: DI) : DIAware {
     }
 
     internal suspend fun syncFeeds(
-        filesDir: File,
         feedId: Long = ID_UNSET,
         feedTag: String = "",
         maxFeedItemCount: Int = 100,
@@ -135,7 +133,6 @@ class RssLocalSync(override val di: DI) : DIAware {
                                 )
                                 syncFeed(
                                     feedSql = it,
-                                    filesDir = filesDir,
                                     maxFeedItemCount = maxFeedItemCount,
                                     forceNetwork = forceNetwork,
                                     downloadTime = downloadTime,
@@ -177,7 +174,6 @@ class RssLocalSync(override val di: DI) : DIAware {
 
     private suspend fun syncFeed(
         feedSql: com.nononsenseapps.feeder.db.room.Feed,
-        filesDir: File,
         maxFeedItemCount: Int,
         forceNetwork: Boolean = false,
         downloadTime: Instant,
@@ -256,7 +252,8 @@ class RssLocalSync(override val di: DI) : DIAware {
 
             repository.upsertFeedItems(feedItemSqls) { feedItem, text ->
                 withContext(Dispatchers.IO) {
-                    blobOutputStream(feedItem.id, filesDir).bufferedWriter().use {
+                    filePathProvider.articleDir.mkdirs()
+                    blobOutputStream(feedItem.id, filePathProvider.articleDir).bufferedWriter().use {
                         it.write(text)
                     }
                 }
@@ -279,13 +276,25 @@ class RssLocalSync(override val di: DI) : DIAware {
             )
 
             for (id in ids) {
-                val file = blobFile(itemId = id, filesDir = filesDir)
-                try {
-                    if (file.isFile) {
-                        file.delete()
+                blobFile(itemId = id, filesDir = filePathProvider.articleDir).let { file ->
+                    try {
+                        if (file.isFile) {
+                            file.delete()
+                        }
+                    } catch (e: IOException) {
+                        Log.e(LOG_TAG, "Failed to delete $file", e)
                     }
-                } catch (e: IOException) {
-                    Log.e(LOG_TAG, "Failed to delete $file", e)
+                    Unit
+                }
+                blobFullFile(itemId = id, filesDir = filePathProvider.fullArticleDir).let { file ->
+                    try {
+                        if (file.isFile) {
+                            file.delete()
+                        }
+                    } catch (e: IOException) {
+                        Log.e(LOG_TAG, "Failed to delete $file", e)
+                    }
+                    Unit
                 }
             }
 
