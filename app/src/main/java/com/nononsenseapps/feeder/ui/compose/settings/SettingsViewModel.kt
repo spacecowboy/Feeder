@@ -15,6 +15,7 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.util.logDebug
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -94,8 +95,14 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setFeedItemStyle(value)
     }
 
-    fun setBlockList(value: List<String>) = viewModelScope.launch {
-        repository.setBlockList(value)
+    fun addToBlockList(value: String) = viewModelScope.launch {
+        logDebug(LOG_TAG, "addBlocklistPattern: $value")
+        repository.addBlocklistPattern(value)
+    }
+
+    fun removeFromBlockList(value: String) = viewModelScope.launch {
+        logDebug(LOG_TAG, "removeBlocklistPattern: $value")
+        repository.removeBlocklistPattern(value)
     }
 
     fun setSwipeAsRead(value: SwipeAsRead) {
@@ -167,6 +174,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 _viewState.value = it
             }
         }
+    }
+
+    companion object {
+        private const val LOG_TAG = "FEEDER_SETTINGSVM"
     }
 }
 

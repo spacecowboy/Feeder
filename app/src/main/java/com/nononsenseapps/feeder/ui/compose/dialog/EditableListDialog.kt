@@ -24,7 +24,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -46,29 +45,6 @@ import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 
-@Composable
-fun EditableListDialog(
-    title: @Composable () -> Unit,
-    items: ImmutableHolder<List<String>>,
-    onDismiss: () -> Unit,
-    onModifiedItems: (List<String>) -> Unit
-) {
-    EditableListDialog(
-        title = title,
-        items = items,
-        onDismiss = {
-            onModifiedItems(items.item)
-            onDismiss()
-        },
-        onRemoveItem = { item ->
-            onModifiedItems(items.item - item)
-        },
-        onAddItem = { item ->
-            onModifiedItems(items.item + item)
-        }
-    )
-}
-
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditableListDialog(
@@ -83,12 +59,6 @@ fun EditableListDialog(
     }
 
     val lazyListState = rememberLazyListState()
-
-    LaunchedEffect(items.item.lastIndex) {
-        if (items.item.isNotEmpty()) {
-            lazyListState.scrollToItem(items.item.lastIndex)
-        }
-    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -193,7 +163,8 @@ fun PreviewDialog() {
             },
             items = ImmutableHolder(listOf("Foo")),
             onDismiss = {},
-            onModifiedItems = {},
+            onAddItem = {},
+            onRemoveItem = {},
         )
     }
 }

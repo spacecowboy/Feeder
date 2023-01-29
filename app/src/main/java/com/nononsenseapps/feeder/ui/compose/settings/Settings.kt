@@ -140,7 +140,8 @@ fun SettingsScreen(
             feedItemStyleValue = viewState.feedItemStyle,
             onFeedItemStyleChanged = settingsViewModel::setFeedItemStyle,
             blockListValue = ImmutableHolder(viewState.blockList),
-            onBlockListChanged = settingsViewModel::setBlockList,
+            swipeAsReadValue = viewState.swipeAsRead,
+            onSwipeAsReadOptionChanged = settingsViewModel::setSwipeAsRead,
             syncOnStartupValue = viewState.syncOnResume,
             onSyncOnStartupChanged = settingsViewModel::setSyncOnResume,
             syncOnlyOnWifiValue = viewState.syncOnlyOnWifi,
@@ -149,10 +150,10 @@ fun SettingsScreen(
             onSyncOnlyWhenChargingChanged = settingsViewModel::setSyncOnlyWhenCharging,
             loadImageOnlyOnWifiValue = viewState.loadImageOnlyOnWifi,
             onLoadImageOnlyOnWifiChanged = settingsViewModel::setLoadImageOnlyOnWifi,
-            useDetectLanguage = viewState.useDetectLanguage,
-            onUseDetectLanguageChanged = settingsViewModel::setUseDetectLanguage,
             showThumbnailsValue = viewState.showThumbnails,
             onShowThumbnailsChanged = settingsViewModel::setShowThumbnails,
+            useDetectLanguage = viewState.useDetectLanguage,
+            onUseDetectLanguageChanged = settingsViewModel::setUseDetectLanguage,
             maxItemsPerFeedValue = viewState.maximumCountPerFeed,
             onMaxItemsPerFeedChanged = settingsViewModel::setMaxCountPerFeed,
             currentItemOpenerValue = viewState.itemOpener,
@@ -163,12 +164,12 @@ fun SettingsScreen(
             onSyncFrequencyChanged = settingsViewModel::setSyncFrequency,
             batteryOptimizationIgnoredValue = viewState.batteryOptimizationIgnored,
             onOpenSyncSettings = onNavigateToSyncScreen,
-            swipeAsReadValue = viewState.swipeAsRead,
-            onSwipeAsReadOptionChanged = settingsViewModel::setSwipeAsRead,
             useDynamicTheme = viewState.useDynamicTheme,
             onUseDynamicTheme = settingsViewModel::setUseDynamicTheme,
             textScale = viewState.textScale,
             setTextScale = settingsViewModel::setTextScale,
+            onBlockListAdd = settingsViewModel::addToBlockList,
+            onBlockListRemove = settingsViewModel::removeFromBlockList,
         )
     }
 }
@@ -192,7 +193,8 @@ fun SettingsScreenPreview() {
                 feedItemStyleValue = FeedItemStyle.CARD,
                 onFeedItemStyleChanged = {},
                 blockListValue = ImmutableHolder(emptyList()),
-                onBlockListChanged = {},
+                swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
+                onSwipeAsReadOptionChanged = {},
                 syncOnStartupValue = true,
                 onSyncOnStartupChanged = {},
                 syncOnlyOnWifiValue = true,
@@ -202,9 +204,9 @@ fun SettingsScreenPreview() {
                 loadImageOnlyOnWifiValue = true,
                 onLoadImageOnlyOnWifiChanged = {},
                 showThumbnailsValue = true,
+                onShowThumbnailsChanged = {},
                 useDetectLanguage = true,
                 onUseDetectLanguageChanged = {},
-                onShowThumbnailsChanged = {},
                 maxItemsPerFeedValue = 101,
                 onMaxItemsPerFeedChanged = {},
                 currentItemOpenerValue = ItemOpener.CUSTOM_TAB,
@@ -215,12 +217,12 @@ fun SettingsScreenPreview() {
                 onSyncFrequencyChanged = {},
                 batteryOptimizationIgnoredValue = false,
                 onOpenSyncSettings = {},
-                onSwipeAsReadOptionChanged = {},
-                swipeAsReadValue = SwipeAsRead.ONLY_FROM_END,
                 useDynamicTheme = true,
                 onUseDynamicTheme = {},
                 textScale = 1.5f,
                 setTextScale = {},
+                onBlockListAdd = {},
+                onBlockListRemove = {},
             )
         }
     }
@@ -240,7 +242,6 @@ fun SettingsList(
     feedItemStyleValue: FeedItemStyle,
     onFeedItemStyleChanged: (FeedItemStyle) -> Unit,
     blockListValue: ImmutableHolder<List<String>>,
-    onBlockListChanged: (List<String>) -> Unit,
     swipeAsReadValue: SwipeAsRead,
     onSwipeAsReadOptionChanged: (SwipeAsRead) -> Unit,
     syncOnStartupValue: Boolean,
@@ -269,6 +270,8 @@ fun SettingsList(
     onUseDynamicTheme: (Boolean) -> Unit,
     textScale: Float,
     setTextScale: (Float) -> Unit,
+    onBlockListAdd: (String) -> Unit,
+    onBlockListRemove: (String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -357,8 +360,6 @@ fun SettingsList(
         )
 
         ListDialogSetting(
-            currentValue = ImmutableHolder(blockListValue.item.sorted()),
-            onSelection = onBlockListChanged,
             title = stringResource(id = R.string.block_list),
             dialogTitle = {
                 Column(
@@ -377,7 +378,10 @@ fun SettingsList(
                         style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
                     )
                 }
-            }
+            },
+            currentValue = ImmutableHolder(blockListValue.item.sorted()),
+            onAddItem = onBlockListAdd,
+            onRemoveItem = onBlockListRemove,
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -697,7 +701,8 @@ fun ListDialogSetting(
     dialogTitle: @Composable () -> Unit,
     currentValue: ImmutableHolder<List<String>>,
     icon: @Composable () -> Unit = {},
-    onSelection: (List<String>) -> Unit,
+    onAddItem: (String) -> Unit,
+    onRemoveItem: (String) -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
@@ -739,7 +744,8 @@ fun ListDialogSetting(
                 onDismiss = {
                     expanded = false
                 },
-                onModifiedItems = onSelection,
+                onAddItem = onAddItem,
+                onRemoveItem = onRemoveItem,
             )
         }
     }

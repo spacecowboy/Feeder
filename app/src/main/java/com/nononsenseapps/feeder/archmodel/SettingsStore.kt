@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.archmodel
 
 import android.content.SharedPreferences
+import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
 import androidx.annotation.StringRes
 import androidx.work.Constraints
@@ -10,7 +11,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.BlocklistDao
-import com.nononsenseapps.feeder.db.room.BlocklistEntry
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.workmanager.FeedSyncer
 import com.nononsenseapps.feeder.model.workmanager.UNIQUE_PERIODIC_NAME
@@ -288,24 +288,19 @@ class SettingsStore(override val di: DI) : DIAware {
                 }
             }
 
-    suspend fun setBlockListPreference(value: Iterable<String>) {
-        value.cleanedList()
-            .map { "*$it*" }
-            .onEach {
-                blocklistDao.insert(BlocklistEntry(globPattern = it))
-            }
-            .let { patterns ->
-                blocklistDao.deleteMissingPatterns(patterns)
-            }
+    suspend fun removeBlocklistPattern(value: String) {
+        blocklistDao.deletePattern(value)
     }
 
-    private fun Iterable<String>.cleanedList(): List<String> {
-        return asSequence()
-            .map { it.lowercase().trim() }
-            .filter { it.isNotBlank() }
-            .filterNot { it.contains("'") }
-            .filterNot { it.contains("\\") }
-            .toList()
+    suspend fun addBlocklistPattern(value: String) {
+        if (value.isBlank()) {
+            return
+        }
+        try {
+            blocklistDao.insertSafely(value.lowercase().trim())
+        } catch (e: SQLiteConstraintException) {
+            // Ignore: Query style method can't define ignore on constraint failures
+        }
     }
 
     private val _syncFrequency by lazy {
@@ -367,6 +362,10 @@ class SettingsStore(override val di: DI) : DIAware {
         } else {
             workManager.cancelUniqueWork(UNIQUE_PERIODIC_NAME)
         }
+    }
+
+    companion object {
+        private const val LOG_TAG = "FEEDER_SETTINGSSTORE"
     }
 }
 
