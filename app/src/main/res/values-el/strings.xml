@@ -167,7 +167,7 @@
     <string name="showing_only_unread_articles">Εμφανίζονται μόνο μη αναγνωσμένα άρθρα</string>
     <string name="synchronize_feeds">Συγχρονισμός ροών</string>
     <string name="remove">Αφαίρεση</string>
-    <string name="device_sync_financed_by_community">Αυτή η υπηρεσία πληρώνεται από την κοινότητα. Σκεφτείτε να κάνετε δωρεά εάν το θεωρείτε χρήσιμο.</string>
+    <string name="device_sync_financed_by_community">Αυτή η υπηρεσία πληρώνεται από την κοινότητα. Εξετάστε το ενδεχόμενο να κάνετε δωρεά αν το βρίσκετε χρήσιμο.</string>
     <string name="devices_on_sync_chain">Συσκευές στην αλυσίδα συγχρονισμού</string>
     <string name="remove_device_question">Είστε βέβαιοι ότι θέλετε να διαγράψετε τη συσκευή %1$s\?</string>
     <string name="disconnect_device_from_sync">Αποσύνδεση της συσκευής από την αλυσίδα συγχρονισμού</string>

@@ -97,7 +97,7 @@
     <string name="failed_to_export_OPML">Kunne ikke eksportere OPML</string>
     <string name="device_sync">Synkronisering af enhed</string>
     <string name="add_new_device">Tilføj ny enhed</string>
-    <string name="device_sync_financed_by_community">Denne service betales af fællesskabet. Overvej venligst at donere, hvis du finder den nyttig.</string>
+    <string name="device_sync_financed_by_community">Denne service betales af fællesskabet. Overvej at donere, hvis du finder den nyttig.</string>
     <string name="this_device">%1$s (denne enhed)</string>
     <string name="disconnect_device_from_sync">Afkobl enheden fra synkroniseringskæden</string>
     <string name="devices_on_sync_chain">Enheder på synkroniseringskæde</string>

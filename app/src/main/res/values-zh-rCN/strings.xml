@@ -140,7 +140,7 @@
     <string name="failed_to_import_OPML">导入 OPML 失败</string>
     <string name="failed_to_export_OPML">未能导出 OPML</string>
     <string name="failed_to_open_article">打不开文章</string>
-    <string name="device_sync_financed_by_community">这项服务是由社区支付的。如果你觉得有用，请考虑捐赠。</string>
+    <string name="device_sync_financed_by_community">这项服务是由社区支付的。如果您觉得有用，请考虑捐赠。</string>
     <string name="treat_like_password">把它当作密码。任何有此链接的人都都可以读取你的同步数据。</string>
     <string name="join_sync_chain">加入同步链</string>
     <string name="add_new_device">添加新设备</string>
