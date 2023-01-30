@@ -197,8 +197,7 @@ object AddFeedDestination : NavigationDestination(
             },
             createFeedScreenViewModel = createFeedScreenViewModel,
         ) { feedId ->
-            createFeedScreenViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
-            FeedDestination.navigate(navController)
+            FeedDestination.navigate(navController, feedId = feedId)
         }
     }
 }
@@ -228,8 +227,7 @@ object EditFeedDestination : NavigationDestination(
                 navController.popBackStack()
             },
             onOk = { feedId ->
-                editFeedScreenViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
-                FeedDestination.navigate(navController)
+                FeedDestination.navigate(navController, feedId = feedId)
             },
             editFeedScreenViewModel = editFeedScreenViewModel
         )
@@ -295,7 +293,11 @@ object FeedDestination : NavigationDestination(
             +("tag" to tag)
         }
 
-        navController.navigate("$path$params")
+        navController.navigate("$path$params") {
+            popUpTo(navController.graph.id) {
+                inclusive = true
+            }
+        }
     }
 
     @Composable
@@ -363,10 +365,7 @@ object ArticleDestination : NavigationDestination(
                 }
             },
             onNavigateToFeed = { feedId ->
-                navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = "")
-                if (!navController.popBackStack()) {
-                    FeedDestination.navigate(navController)
-                }
+                FeedDestination.navigate(navController, feedId = feedId)
             },
             viewModel = backStackEntry.DIAwareViewModel(),
         )

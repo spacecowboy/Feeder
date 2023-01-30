@@ -6,10 +6,10 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.DisposableEffect
+import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
@@ -30,19 +30,6 @@ import org.kodein.di.instance
 class MainActivity : DIAwareComponentActivity() {
     private val notificationsWorker: NotificationsWorker by instance()
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
-
-    // This reference is only used for intent navigation
-    private var navController: NavController? = null
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-
-        intent?.let {
-            if (navController?.handleDeepLink(intent) != true) {
-                Log.e("FeederMainActivity", "In onNewIntent, navController rejected the intent")
-            }
-        }
-    }
 
     override fun onStart() {
         super.onStart()
@@ -89,11 +76,7 @@ class MainActivity : DIAwareComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun appContent() {
-        val navController = rememberAnimatedNavController().also {
-            if (this.navController == null) {
-                this.navController = it
-            }
-        }
+        val navController = rememberAnimatedNavController()
 
         AnimatedNavHost(navController, startDestination = FeedDestination.route) {
             FeedDestination.register(this, navController)
@@ -107,5 +90,19 @@ class MainActivity : DIAwareComponentActivity() {
             // Sync settings
             SyncScreenDestination.register(this, navController)
         }
+
+        DisposableEffect(navController) {
+            val listener = Consumer<Intent> { intent ->
+                if (!navController.handleDeepLink(intent)) {
+                    Log.e(LOG_TAG, "NavController rejected intent: $intent")
+                }
+            }
+            addOnNewIntentListener(listener)
+            onDispose { removeOnNewIntentListener(listener) }
+        }
+    }
+
+    companion object {
+        private const val LOG_TAG = "FEEDER_MAIN"
     }
 }

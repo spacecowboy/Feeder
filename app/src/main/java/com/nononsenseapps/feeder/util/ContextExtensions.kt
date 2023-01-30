@@ -52,7 +52,13 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null
                 .setLongLabel(label)
                 .setIcon(
                     icon
-                        ?: Icon.createWithBitmap(getLetterIcon(label, id, radius = shortcutManager.iconMaxHeight))
+                        ?: Icon.createWithBitmap(
+                            getLetterIcon(
+                                label,
+                                id,
+                                radius = shortcutManager.iconMaxHeight
+                            )
+                        )
                 )
                 .setIntent(intent)
                 .setDisabledMessage("Feed deleted")

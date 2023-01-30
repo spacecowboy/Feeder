@@ -78,10 +78,6 @@ class CreateFeedScreenViewModel(di: DI, private val state: SavedStateHandle) : D
         _alternateId.update { value }
     }
 
-    fun setCurrentFeedAndTag(feedId: Long, tag: String) {
-        repository.setCurrentFeedAndTag(feedId, tag)
-    }
-
     fun saveAndRequestSync(): Long {
         val url = _url.value
 
