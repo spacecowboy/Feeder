@@ -152,7 +152,7 @@ fun PreviewDialog() {
                         style = MaterialTheme.typography.titleLarge,
                     )
                     Text(
-                        text = "Hides stories with titles containing any of these terms. Example filters:",
+                        text = "Hides articles with titles containing any of these terms. Example filters:",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
