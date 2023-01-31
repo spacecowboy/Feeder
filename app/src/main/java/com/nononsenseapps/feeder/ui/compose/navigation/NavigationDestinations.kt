@@ -18,6 +18,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
+import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.NavigationDeepLinkViewModel
@@ -32,7 +33,13 @@ import com.nononsenseapps.feeder.ui.compose.settings.SettingsScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreen
 import com.nononsenseapps.feeder.ui.compose.sync.SyncScreenViewModel
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
+import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.urlEncode
+import org.kodein.di.DI
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
+
+private const val LOG_TAG = "FEEDER_NAV"
 
 @OptIn(ExperimentalAnimationApi::class)
 sealed class NavigationDestination(
@@ -293,9 +300,25 @@ object FeedDestination : NavigationDestination(
             +("tag" to tag)
         }
 
-        navController.navigate("$path$params") {
-            popUpTo(navController.graph.id) {
-                inclusive = true
+        logDebug(LOG_TAG, "Current: ${navController.currentDestination?.route}")
+        val navigatedQuickly: Boolean = navController.currentBackStackEntry?.let { currentBackStackEntry ->
+            if (FeedDestination.route == currentBackStackEntry.destination.route) {
+                logDebug(LOG_TAG, "Current matched feed destination, navigating quickly...")
+                val di: DI by closestDI(navController.context)
+                val repository by di.instance<Repository>()
+                repository.setCurrentFeedAndTag(feedId = feedId, tag = tag)
+                true
+            } else {
+                false
+            }
+        } ?: false
+
+        if (!navigatedQuickly) {
+            logDebug(LOG_TAG, "Navigating properly to feed")
+            navController.navigate("$path$params") {
+                popUpTo(navController.graph.id) {
+                    inclusive = true
+                }
             }
         }
     }
