@@ -59,6 +59,7 @@ class FeedArticleViewModel(
     private val ttsStateHolder: TTSStateHolder by instance()
     private val fullTextParser: FullTextParser by instance()
     private val filePathProvider: FilePathProvider by instance()
+
     // Use this for actions which should complete even if app goes off screen
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
@@ -159,10 +160,6 @@ class FeedArticleViewModel(
     }
 
     fun toggleTagExpansion(tag: String) = repository.toggleTagExpansion(tag)
-
-    fun setCurrentFeedAndTag(feedId: Long, tag: String) {
-        repository.setCurrentFeedAndTag(feedId, tag)
-    }
 
     private val editDialogVisible = MutableStateFlow(false)
     fun setShowEditDialog(visible: Boolean) {
