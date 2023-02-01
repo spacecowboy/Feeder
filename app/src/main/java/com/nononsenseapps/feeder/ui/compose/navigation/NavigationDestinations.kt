@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavArgumentBuilder
 import androidx.navigation.NavBackStackEntry
@@ -18,7 +19,6 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
-import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.NavigationDeepLinkViewModel
@@ -35,9 +35,6 @@ import com.nononsenseapps.feeder.ui.compose.sync.SyncScreenViewModel
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.urlEncode
-import org.kodein.di.DI
-import org.kodein.di.android.closestDI
-import org.kodein.di.instance
 
 private const val LOG_TAG = "FEEDER_NAV"
 
@@ -145,7 +142,9 @@ object SearchFeedDestination : NavigationDestination(
             +("feedUrl" to feedUrl)
         }
 
-        navController.navigate(path + params)
+        navController.navigate(path + params) {
+            launchSingleTop = true
+        }
     }
 
     @Composable
@@ -188,7 +187,9 @@ object AddFeedDestination : NavigationDestination(
             +("feedTitle" to feedTitle)
         }
 
-        navController.navigate("$path/${feedUrl.urlEncode()}$params")
+        navController.navigate("$path/${feedUrl.urlEncode()}$params") {
+            launchSingleTop = true
+        }
     }
 
     @Composable
@@ -220,7 +221,9 @@ object EditFeedDestination : NavigationDestination(
 ) {
 
     fun navigate(navController: NavController, feedId: Long) {
-        navController.navigate("$path/$feedId")
+        navController.navigate("$path/$feedId") {
+            launchSingleTop = true
+        }
     }
 
     @Composable
@@ -247,7 +250,9 @@ object SettingsDestination : NavigationDestination(
     deepLinks = emptyList(),
 ) {
     fun navigate(navController: NavController) {
-        navController.navigate(path)
+        navController.navigate(path) {
+            launchSingleTop = true
+        }
     }
 
     @Composable
@@ -299,26 +304,18 @@ object FeedDestination : NavigationDestination(
             +("tag" to tag)
         }
 
-        logDebug(LOG_TAG, "Current: ${navController.currentDestination?.route}")
-        val navigatedQuickly: Boolean = navController.currentBackStackEntry?.let { currentBackStackEntry ->
-            if (FeedDestination.route == currentBackStackEntry.destination.route) {
-                logDebug(LOG_TAG, "Current matched feed destination, navigating quickly...")
-                val di: DI by closestDI(navController.context)
-                val repository by di.instance<Repository>()
-                repository.setCurrentFeedAndTag(feedId = feedId, tag = tag)
-                true
-            } else {
-                false
-            }
-        } ?: false
+        logDebug(LOG_TAG, "Navigate to $path$params. Current: ${navController.currentDestination?.route}")
 
-        if (!navigatedQuickly) {
-            logDebug(LOG_TAG, "Navigating properly to feed")
-            navController.navigate("$path$params") {
-                popUpTo(navController.graph.id) {
-                    inclusive = true
-                }
+        navController.navigate("$path$params") {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.id) {
+                inclusive = true
             }
+            // Avoid multiple copies of the same destination when
+            // re-selecting the same item
+            launchSingleTop = true
         }
     }
 
@@ -327,16 +324,21 @@ object FeedDestination : NavigationDestination(
         navController: NavController,
         backStackEntry: NavBackStackEntry
     ) {
-        val feedId = backStackEntry.arguments?.getLong("id")
-            ?: ID_UNSET
-        val tag = backStackEntry.arguments?.getString("tag")
-            ?: ""
+        val feedId = remember {
+            backStackEntry.arguments?.getLong("id")
+                ?: ID_UNSET
+        }
+        val tag = remember {
+            backStackEntry.arguments?.getString("tag")
+                ?: ""
+        }
 
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.DIAwareViewModel()
 
         LaunchedEffect(feedId, tag) {
-            if (feedId > ID_UNSET || tag.isNotBlank()) {
+            logDebug(LOG_TAG, "FeedDestinationScreen setCurrent: $feedId, $tag")
+            if (feedId != ID_UNSET || tag.isNotBlank()) {
                 navigationDeepLinkViewModel.setCurrentFeedAndTag(feedId = feedId, tag = tag)
             }
         }
@@ -362,7 +364,9 @@ object ArticleDestination : NavigationDestination(
     ),
 ) {
     fun navigate(navController: NavController, itemId: Long) {
-        navController.navigate("$path/$itemId")
+        navController.navigate("$path/$itemId") {
+            launchSingleTop = true
+        }
     }
 
     @Composable
@@ -370,8 +374,10 @@ object ArticleDestination : NavigationDestination(
         navController: NavController,
         backStackEntry: NavBackStackEntry
     ) {
-        val itemId = backStackEntry.arguments?.getLong("itemId")
-            ?: error("Missing mandatory argument: itemId")
+        val itemId = remember {
+            backStackEntry.arguments?.getLong("itemId")
+                ?: error("Missing mandatory argument: itemId")
+        }
 
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
             backStackEntry.DIAwareViewModel()
@@ -422,7 +428,9 @@ object SyncScreenDestination : NavigationDestination(
             }
         }
 
-        navController.navigate("$path$params")
+        navController.navigate("$path$params") {
+            launchSingleTop = true
+        }
     }
 
     @Composable

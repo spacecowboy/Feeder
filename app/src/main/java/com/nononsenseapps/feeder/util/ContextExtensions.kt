@@ -42,7 +42,9 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null
                 "$DEEP_LINK_BASE_URI/feed?id=$id".toUri(),
                 this,
                 MainActivity::class.java
-            )
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
 
             val current = shortcutManager.dynamicShortcuts.toMutableList()
 
