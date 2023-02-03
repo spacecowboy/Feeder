@@ -192,5 +192,6 @@
     <string name="article_image">文章图片</string>
     <string name="feed_icon">Feed 图标</string>
     <string name="text_scale">文本缩放</string>
-    <string name="block_list_description">隐藏标题中含任意下列词语的文章。示例筛选器：</string>
+    <string name="block_list_description">隐藏标题中含任意下列筛选器的文章。示例筛选器：</string>
+    <string name="sync_to_fetch">同步以获取文章</string>
 </resources>
