@@ -193,4 +193,5 @@
     <string name="feed_icon">Значок стрічки</string>
     <string name="text_scale">Розмір тексту</string>
     <string name="block_list_description">Приховує статті з назвами, які містять будь-який із цих фільтрів. Приклад фільтрів:</string>
+    <string name="sync_to_fetch">Синхронізувати, щоб отримати статтю</string>
 </resources>
