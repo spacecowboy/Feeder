@@ -186,11 +186,12 @@
     <string name="new_indicator">Νέο</string>
     <string name="permission_read_label">Feeder πρόσβαση μόνο για ανάγνωση</string>
     <string name="article_image">Εικόνα άρθρου</string>
-    <string name="block_list_description">Αποκρύπτει ιστορίες με τίτλους που περιέχουν οποιονδήποτε από αυτούς τους όρους. Παραδείγματα φίλτρων:</string>
+    <string name="block_list_description">Αποκρύπτει άρθρα με τίτλους που περιέχουν οποιοδήποτε από αυτά τα φίλτρα. Παραδείγματα φίλτρων:</string>
     <string name="explanation_permission_notifications">Πρέπει να δοθεί άδεια προτού ενεργοποιηθούν οι ειδοποιήσεις.</string>
     <string name="feed_icon">Εικονίδιο ροής</string>
     <string name="text_to_speech">Κείμενο σε ομιλία</string>
     <string name="skip_to_next">Μετάβαση στο επόμενο</string>
     <string name="set_language">Ορισμός γλώσσας</string>
     <string name="text_scale">Κλίμακα κειμένου</string>
+    <string name="sync_to_fetch">Συγχρονισμός για λήψη άρθρου</string>
 </resources>
