@@ -187,4 +187,11 @@
     <string name="remove_bookmark">Poista kirjanmerkki</string>
     <string name="new_indicator">Uusi</string>
     <string name="text_scale">Tekstiasteikko</string>
+    <string name="press_scan_sync">Laitteellasi, siirry synkronintiin ja paina skannaa synkronointi koodi.</string>
+    <string name="sync_to_fetch">Synkronoi noutamaan artikkeli</string>
+    <string name="block_list_description">Piilottaa artikkelit, joiden otsikot sisältävät jonkin näistä suodattimista. Esimerkkisuodattimet:</string>
+    <string name="device_sync_financed_by_community">Tämä palvelu on yhteisön rahoittama. Harkitse lahjoittamista, jos näät tämän hyödyllisenä.</string>
+    <string name="device_sync_description_2">Skannaa koodi synkronointiketjusta, jonka olet luonut toisella laitteella, tai aloita uusi synkronointiketju.</string>
+    <string name="feed_icon">Syötteen kuvake</string>
+    <string name="device_sync_description_1">Laitesynkronoinnin avulla voit synkronoida syötetilaukset ja luetut artikkelit eri laitteiden välillä.</string>
 </resources>

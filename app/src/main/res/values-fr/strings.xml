@@ -192,5 +192,6 @@
     <string name="article_image">Image de l\'article</string>
     <string name="feed_icon">Icône de flux</string>
     <string name="text_scale">Mise à l\'échelle du texte</string>
-    <string name="block_list_description">Masque les articles dont le titre contient l\'un de ces termes. Exemples de filtres :</string>
+    <string name="block_list_description">Masque les articles dont le titre contient l\'un de ces filtres. Exemples de filtres :</string>
+    <string name="sync_to_fetch">Synchroniser pour récupérer l\'article</string>
 </resources>
