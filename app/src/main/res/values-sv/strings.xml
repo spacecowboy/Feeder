@@ -192,4 +192,6 @@
     <string name="feed_icon">Flödesikon</string>
     <string name="article_image">Artikelbild</string>
     <string name="text_scale">Textstorlek</string>
+    <string name="block_list_description">Dölj artiklar med titlar som matchar någon av filterna. Exempelfilter:</string>
+    <string name="sync_to_fetch">Synkronisera för att hämta artikel</string>
 </resources>
