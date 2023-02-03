@@ -140,7 +140,7 @@
     <string name="failed_to_import_OPML">Nu a reușit să importe OPML</string>
     <string name="failed_to_export_OPML">Nu a reușit să exporte OPML</string>
     <string name="failed_to_open_article">Nu s-a putut deschide articolul</string>
-    <string name="device_sync_financed_by_community">Acest serviciu este plătit de către comunitate. Vă rugăm să luați în considerare posibilitatea de a dona dacă îl considerați util.</string>
+    <string name="device_sync_financed_by_community">Acest serviciu se plătește de către comunitate. Vă rugăm să luați în considerare posibilitatea de a dona dacă îl considerați util.</string>
     <string name="press_scan_sync">Pe dispozitiv, navigați la sincronizare dispozitiv și apăsați scanare cod sincronizare.</string>
     <string name="device_sync_description_1">Sincronizarea dispozitivelor vă permite să sincronizați abonamentele la fluxuri și articolele citite între diversele dumneavoastră dispozitive.</string>
     <string name="device_sync">Sincronizare dispozitiv</string>
@@ -191,4 +191,7 @@
     <string name="only_available_on_android_n">Disponibil numai pe Android %1$s și mai sus</string>
     <string name="article_image">Imaginea articolului</string>
     <string name="feed_icon">Pictograma Feed</string>
+    <string name="sync_to_fetch">Sincronizare pentru a prelua articolul</string>
+    <string name="block_list_description">Ascunde articolele cu titluri care conțin oricare dintre aceste filtre. Exemple de filtre:</string>
+    <string name="text_scale">Scala textului</string>
 </resources>
