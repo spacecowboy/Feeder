@@ -29,7 +29,7 @@ fun OkCancelWithContent(
     onOk: () -> Unit,
     onCancel: () -> Unit,
     okEnabled: Boolean,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val scrollState = rememberScrollState()

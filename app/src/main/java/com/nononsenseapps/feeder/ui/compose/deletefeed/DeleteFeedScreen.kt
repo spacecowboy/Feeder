@@ -39,7 +39,8 @@ import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 fun DeleteFeedDialog(
     feeds: ImmutableHolder<List<DeletableFeed>>,
     onDismiss: () -> Unit,
-    onDelete: (Iterable<Long>) -> Unit
+    onDelete: (Iterable<Long>) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var feedsToDelete by rememberSaveable {
         mutableStateOf(emptyMap<Long, Boolean>())
@@ -57,7 +58,8 @@ fun DeleteFeedDialog(
         },
         onToggleFeed = { feedId, checked ->
             feedsToDelete = feedsToDelete + (feedId to (checked ?: !feedsToDelete.contains(feedId)))
-        }
+        },
+        modifier = modifier,
     )
 }
 
@@ -67,9 +69,11 @@ fun DeleteFeedDialog(
     isChecked: (Long) -> Boolean,
     onDismiss: () -> Unit,
     onOk: () -> Unit,
-    onToggleFeed: (Long, Boolean?) -> Unit
+    onToggleFeed: (Long, Boolean?) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     AlertDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
         confirmButton = {
             Button(onClick = onOk) {

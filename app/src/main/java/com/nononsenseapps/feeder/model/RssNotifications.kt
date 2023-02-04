@@ -117,7 +117,9 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
         "$DEEP_LINK_BASE_URI/article/${item.id}".toUri(),
         context,
         MainActivity::class.java
-    )
+    ).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
 
     val pendingIntent = PendingIntent.getActivity(
         context,
@@ -253,11 +255,12 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
         deepLinkUri.toUri(),
         context,
         OpenLinkInDefaultActivity::class.java // Proxy activity to mark as read
-    ).also {
-        it.putExtra(
+    ).apply {
+        putExtra(
             EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED,
             LongArray(feedItems.size) { i -> feedItems[i].id }
         )
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
     val pendingIntent = PendingIntent.getActivity(

@@ -53,6 +53,7 @@ fun EditableListDialog(
     onDismiss: () -> Unit,
     onRemoveItem: (String) -> Unit,
     onAddItem: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var newValue by rememberSaveable {
         mutableStateOf("")
@@ -61,6 +62,7 @@ fun EditableListDialog(
     val lazyListState = rememberLazyListState()
 
     AlertDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
         confirmButton = {
             Box(

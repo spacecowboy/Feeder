@@ -19,8 +19,10 @@ fun ConfirmDialog(
     onOk: () -> Unit,
     @StringRes title: Int,
     @StringRes body: Int,
+    modifier: Modifier = Modifier,
 ) {
     AlertDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
         confirmButton = {
             Button(onClick = onOk) {
