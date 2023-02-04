@@ -1,3 +1,73 @@
+# 2.4.7
+Agnieszka C (1):
+  * [173a35ca] Updated Polish translation using Weblate
+
+Dan (1):
+  * [4c60bc5a] Updated Ukrainian translation using Weblate
+
+ERYpTION (2):
+  * [0bbf5ef0] Updated Danish translation using Weblate
+  * [0881c3d0] Updated Danish translation using Weblate
+
+El Pirujo (1):
+  * [f0865ca1] Updated Spanish translation using Weblate
+
+Eric (2):
+  * [8e4583c0] Updated Chinese (Simplified) translation using Weblate
+  * [3fe875ef] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [50a1550c] Updated Italian translation using Weblate
+
+Jonas Kalderstam (13):
+  * [01cce9a0] Tweaked release script
+  * [5fdb22d9] Added stricter ContentType restrictions on responses
+  * [2a3e3df1] Changed so full text articles are are not retried
+         automatically
+  * [2caa0032] Moved all article data to cacheDir instead of some in
+         filesDir
+  * [b69b4a0e] Fixed some issues related to block list
+  * [c4aa6f97] Fixed english translation
+  * [08408ca0] Fixed english translation
+  * [84d781db] Fixed bug where backstack would get stacked with multiple
+         feeds
+  * [8de0b6f2] Fixed feed navigation
+  * [c24a2c77] Really fixed feed navigation
+  * [d0cfbb42] Refactored to follow guidelines. Top to bottom reached empty
+  * [ee3c027d] Fixed navigation properly
+  * [fbd47e77] Updated Swedish translation using Weblate
+
+Oğuz Ersen (2):
+  * [5c04dc46] Updated Turkish translation using Weblate
+  * [510a76aa] Updated Turkish translation using Weblate
+
+Retrial (2):
+  * [5b1b6ad4] Updated Greek translation using Weblate
+  * [598cc6a3] Updated Greek translation using Weblate
+
+Simona Iacob (1):
+  * [ecdfb3f3] Updated Romanian translation using Weblate
+
+Skrripy (1):
+  * [db0fa1b2] Updated Ukrainian translation using Weblate
+
+Space Cowboy (5):
+  * [7a5074b4] Merge branch 'weblate-feeder-android-strings' into 'master'
+  * [3e92bc4a] Merge branch 'fix-data-consumption' into 'master'
+  * [d8c81995] Merge branch 'fix-glob-insert' into 'master'
+  * [5b0ae748] Merge branch 'weblate-feeder-android-strings' into 'master'
+  * [2464acaa] Merge branch 'guideliens' into 'master'
+
+VfBFan (2):
+  * [d3e91290] Updated German translation using Weblate
+  * [c73a4c2a] Updated German translation using Weblate
+
+gallegonovato (1):
+  * [c16eac5a] Updated Galician translation using Weblate
+
+zmni (1):
+  * [163f27ae] Updated Indonesian translation using Weblate
+
 # 2.4.6
 Aitor (2):
   * [69989627] Translated using Weblate (Basque)
