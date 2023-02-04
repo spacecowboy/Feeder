@@ -192,5 +192,6 @@
     <string name="article_image">Immagine dell\'articolo</string>
     <string name="feed_icon">Icona del feed</string>
     <string name="text_scale">Scala del testo</string>
-    <string name="block_list_description">Nasconde le storie contenenti uno qualsiasi di questi termini. Filtri di esempio:</string>
+    <string name="block_list_description">Nasconde gli articoli con titoli contenenti uno qualsiasi di questi filtri. Filtri di esempio:</string>
+    <string name="sync_to_fetch">Sincronizza per recuperare l\'articolo</string>
 </resources>

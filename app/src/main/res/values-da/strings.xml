@@ -192,5 +192,6 @@
     <string name="article_image">Artikelbillede</string>
     <string name="feed_icon">Feed-ikon</string>
     <string name="text_scale">Tekstskalering</string>
-    <string name="block_list_description">Skjuler historier med titler, der indeholder nogen af disse udtryk. Eksempel på filtre:</string>
+    <string name="block_list_description">Skjuler artikler med titler, der indeholder nogen af disse filtre. Eksempel på filtre:</string>
+    <string name="sync_to_fetch">Synkroniser for at hente artikel</string>
 </resources>

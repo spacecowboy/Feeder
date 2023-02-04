@@ -192,5 +192,6 @@
     <string name="article_image">Imagen del artículo</string>
     <string name="feed_icon">Icono de canal</string>
     <string name="text_scale">Escalar texto</string>
-    <string name="block_list_description">Oculta las historias cuyos títulos contengan alguno de estos términos. Filtros de ejemplo:</string>
+    <string name="block_list_description">Oculta los artículos cuyos títulos contengan alguno de estos filtros. Filtros de ejemplo:</string>
+    <string name="sync_to_fetch">Sincronizar para obtener el artículo</string>
 </resources>
