@@ -191,6 +191,7 @@
     <string name="pinned">Fixat</string>
     <string name="new_indicator">Nou</string>
     <string name="permission_read_label">Accés de només lectura</string>
-    <string name="block_list_description">Amaga històries amb títols que contenen algun d\'aquests termes. Filtres d\'exemple:</string>
+    <string name="block_list_description">Amaga històries amb títols que contenen algun d\'aquests filtres. Filtres d\'exemple:</string>
     <string name="text_scale">Escalat del text</string>
+    <string name="sync_to_fetch">Sincronitza per obtenir l\'article</string>
 </resources>
