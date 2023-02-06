@@ -191,6 +191,7 @@
     <string name="explanation_permission_notifications">Debe concederse o permiso antes de que se poidan activalas notificacións.</string>
     <string name="feed_icon">Icona da canle</string>
     <string name="article_image">Imaxe do artigo</string>
-    <string name="block_list_description">Ocultalas historias con títulos que conteñan algún destes termos. Filtros de exemplo:</string>
+    <string name="block_list_description">Ocultalos artigos con títulos que conteñan algún destes filtros. Filtros de exemplo:</string>
     <string name="text_scale">Escala do texto</string>
+    <string name="sync_to_fetch">Sincronizar para recuperalo artigo</string>
 </resources>
