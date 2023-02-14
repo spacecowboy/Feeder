@@ -86,6 +86,9 @@ fun SwipeableFeedItemPreview(
     val coroutineScope = rememberCoroutineScope()
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val swipeableState = rememberSwipeableState(initialValue = FeedItemSwipeState.NONE)
+    var ignoreSwipes by remember {
+        mutableStateOf(false)
+    }
 
     val color by animateColorAsState(
         when {
@@ -95,13 +98,15 @@ fun SwipeableFeedItemPreview(
         }
     )
 
-    LaunchedEffect(key1 = onlyUnread, key2 = item.unread) {
+    LaunchedEffect(onlyUnread, item.unread) {
         // critical state changes - reset ui state
+        ignoreSwipes = true
         swipeableState.animateTo(FeedItemSwipeState.NONE)
+        ignoreSwipes = false
     }
 
-    LaunchedEffect(swipeableState.currentValue, onlyUnread) {
-        if (swipeableState.currentValue != FeedItemSwipeState.NONE) {
+    LaunchedEffect(swipeableState.currentValue) {
+        if (!ignoreSwipes && swipeableState.currentValue != FeedItemSwipeState.NONE) {
             logDebug(LOG_TAG, "onSwipe ${item.unread}")
             onSwipe(item.unread)
         }
