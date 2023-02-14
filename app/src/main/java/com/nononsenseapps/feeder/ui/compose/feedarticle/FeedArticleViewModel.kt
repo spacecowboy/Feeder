@@ -53,7 +53,7 @@ import org.threeten.bp.ZonedDateTime
 
 class FeedArticleViewModel(
     di: DI,
-    private val state: SavedStateHandle
+    private val state: SavedStateHandle,
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val ttsStateHolder: TTSStateHolder by instance()
@@ -311,7 +311,7 @@ class FeedArticleViewModel(
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
-                FeedArticleScreenViewState()
+                FeedArticleScreenViewState(),
             )
 
     fun displayArticleText() {
@@ -345,7 +345,7 @@ class FeedArticleViewModel(
             when (result) {
                 true -> TextToDisplay.FULLTEXT
                 false -> TextToDisplay.FAILED_TO_LOAD_FULLTEXT
-            }
+            },
         )
     }
 
@@ -372,18 +372,18 @@ class FeedArticleViewModel(
                     blobInputStream(viewState.value.articleId, filePathProvider.articleDir).use {
                         htmlToAnnotatedString(
                             inputStream = it,
-                            baseUrl = viewState.value.articleFeedUrl ?: ""
+                            baseUrl = viewState.value.articleFeedUrl ?: "",
                         )
                     }
                 }
                 TextToDisplay.FULLTEXT -> {
                     blobFullInputStream(
                         viewState.value.articleId,
-                        filePathProvider.fullArticleDir
+                        filePathProvider.fullArticleDir,
                     ).use {
                         htmlToAnnotatedString(
                             inputStream = it,
-                            baseUrl = viewState.value.articleFeedUrl ?: ""
+                            baseUrl = viewState.value.articleFeedUrl ?: "",
                         )
                     }
                 }
@@ -396,7 +396,7 @@ class FeedArticleViewModel(
             } else {
                 ttsStateHolder.tts(
                     textArray = fullText,
-                    useDetectLanguage = viewState.value.useDetectLanguage
+                    useDetectLanguage = viewState.value.useDetectLanguage,
                 )
             }
         }

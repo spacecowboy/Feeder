@@ -9,7 +9,7 @@ import java.io.OutputStream
 suspend fun writeFile(
     path: String,
     tags: Iterable<String>,
-    feedsWithTag: suspend (String) -> Iterable<Feed>
+    feedsWithTag: suspend (String) -> Iterable<Feed>,
 ) {
     writeOutputStream(FileOutputStream(path), tags, feedsWithTag)
 }
@@ -17,7 +17,7 @@ suspend fun writeFile(
 suspend fun writeOutputStream(
     os: OutputStream,
     tags: Iterable<String>,
-    feedsWithTag: suspend (String) -> Iterable<Feed>
+    feedsWithTag: suspend (String) -> Iterable<Feed>,
 ) {
     try {
         os.bufferedWriter().use {
@@ -34,7 +34,7 @@ suspend fun writeOutputStream(
                                     outline(
                                         title = escape(it.displayTitle),
                                         type = "rss",
-                                        xmlUrl = escape(it.url.toString())
+                                        xmlUrl = escape(it.url.toString()),
                                     ) {}
                                 }
                             } else {
@@ -43,14 +43,14 @@ suspend fun writeOutputStream(
                                         outline(
                                             title = escape(it.displayTitle),
                                             type = "rss",
-                                            xmlUrl = escape(it.url.toString())
+                                            xmlUrl = escape(it.url.toString()),
                                         ) {}
                                     }
                                 }
                             }
                         }
                     }
-                }.toString()
+                }.toString(),
             )
         }
     } catch (e: IOException) {
@@ -169,7 +169,7 @@ abstract class BodyTag(name: String) : TagWithText(name) {
         text: String = title,
         type: String? = null,
         xmlUrl: String? = null,
-        init: suspend Outline.() -> Unit
+        init: suspend Outline.() -> Unit,
     ) {
         val o = initTag(Outline(), init)
         o.title = title

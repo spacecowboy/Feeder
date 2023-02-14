@@ -40,7 +40,7 @@ fun Bundle.asFeedItemFoo(): FeedItemWithFeed {
                 } catch (t: Throwable) {}
                 dt
             }
-        }
+        },
     )
 }
 

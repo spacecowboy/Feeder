@@ -22,7 +22,7 @@ import org.threeten.bp.Instant
 
 class EditFeedScreenViewModel(
     di: DI,
-    private val state: SavedStateHandle
+    private val state: SavedStateHandle,
 ) : DIAwareViewModel(di), EditFeedScreenState {
     private val repository: Repository by instance()
 
@@ -44,6 +44,7 @@ class EditFeedScreenViewModel(
     override var articleOpener: String by mutableSavedStateOf(state, "")
     override var alternateId: Boolean by mutableSavedStateOf(state, false)
     override var allTags: List<String> by mutableStateOf(emptyList())
+
     // Only set when loading feed
     override var defaultTitle: String by mutableStateOf("")
 
@@ -123,7 +124,7 @@ class EditFeedScreenViewModel(
             // In case clocks between different devices differ don't allow this date to go backwards
             updatedFeed.whenModified = maxOf(Instant.now(), feed.whenModified.plusMillis(1))
             val savedId = repository.saveFeed(
-                updatedFeed
+                updatedFeed,
             )
             requestFeedSync(
                 di,

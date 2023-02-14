@@ -15,9 +15,9 @@ fun ProvideScaledText(
     ProvideTextStyle(
         style.merge(
             TextStyle(
-                fontSize = style.fontSize * typographySettings.fontScale
-            )
-        )
+                fontSize = style.fontSize * typographySettings.fontScale,
+            ),
+        ),
     ) {
         content()
     }

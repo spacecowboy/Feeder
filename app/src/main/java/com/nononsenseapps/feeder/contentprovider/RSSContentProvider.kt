@@ -26,12 +26,12 @@ class RSSContentProvider : ContentProvider(), DIAware {
         addURI(
             AUTHORITY,
             RssContentProviderContract.articlesUriPathList,
-            URI_ARTICLE_LIST
+            URI_ARTICLE_LIST,
         )
         addURI(
             AUTHORITY,
             RssContentProviderContract.articlesUriPathItem,
-            URI_ARTICLE_IN_FEED_LIST
+            URI_ARTICLE_IN_FEED_LIST,
         )
     }
 
@@ -58,7 +58,7 @@ class RSSContentProvider : ContentProvider(), DIAware {
         uri: Uri,
         values: ContentValues?,
         selection: String?,
-        selectionArgs: Array<out String>?
+        selectionArgs: Array<out String>?,
     ): Int {
         throw UnsupportedOperationException("Not implemented")
     }
@@ -68,7 +68,7 @@ class RSSContentProvider : ContentProvider(), DIAware {
         projection: Array<out String>?,
         selection: String?,
         selectionArgs: Array<out String>?,
-        sortOrder: String?
+        sortOrder: String?,
     ): Cursor? {
         return when (uriMatcher.match(uri)) {
             URI_FEED_LIST -> feedDao.loadFeedsForContentProvider()

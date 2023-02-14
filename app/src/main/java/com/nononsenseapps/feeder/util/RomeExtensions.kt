@@ -30,7 +30,7 @@ suspend fun SyndFeed.asFeed(baseUrl: URL, feedIconFinder: suspend (URL) -> Strin
         baseUrl,
         this.links?.firstOrNull {
             "alternate" == it.rel && "text/html" == it.type
-        }?.href ?: this.link
+        }?.href ?: this.link,
     )
 
     // Base64 encoded images can be quite large - and crash database cursors
@@ -49,12 +49,12 @@ suspend fun SyndFeed.asFeed(baseUrl: URL, feedIconFinder: suspend (URL) -> Strin
             home_page_url = siteUrl,
             feed_url = relativeLinkIntoAbsoluteOrNull(
                 baseUrl,
-                this.links?.firstOrNull { "self" == it.rel }?.href
+                this.links?.firstOrNull { "self" == it.rel }?.href,
             ),
             description = this.description,
             icon = icon,
             author = feedAuthor,
-            items = this.entries?.map { it.asItem(baseUrl = baseUrl, feedAuthor = feedAuthor) }
+            items = this.entries?.map { it.asItem(baseUrl = baseUrl, feedAuthor = feedAuthor) },
         )
     } catch (t: Throwable) {
         throw t
@@ -89,7 +89,7 @@ fun SyndEntry.asItem(baseUrl: URL, feedAuthor: Author? = null): Item {
             date_published = publishedRFC3339Date(),
             date_modified = modifiedRFC3339Date(),
             author = writer,
-            attachments = enclosures?.map { it.asAttachment(baseUrl = baseUrl) }
+            attachments = enclosures?.map { it.asAttachment(baseUrl = baseUrl) },
         )
     } catch (t: Throwable) {
         throw t
@@ -129,10 +129,10 @@ fun SyndEnclosure.asAttachment(baseUrl: URL): Attachment {
     return Attachment(
         url = relativeLinkIntoAbsoluteOrNull(
             baseUrl,
-            this.url
+            this.url,
         ),
         mime_type = this.type,
-        size_in_bytes = this.length
+        size_in_bytes = this.length,
     )
 }
 
@@ -144,7 +144,7 @@ fun SyndPerson.asAuthor(): Author {
     }
     return Author(
         name = this.name,
-        url = url
+        url = url,
     )
 }
 
@@ -248,7 +248,7 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
                 when {
                     siteBaseUrl != null && imgLink != null -> relativeLinkIntoAbsolute(
                         URL(siteBaseUrl),
-                        imgLink
+                        imgLink,
                     )
                     imgLink != null -> relativeLinkIntoAbsolute(feedBaseUrl, imgLink)
                     else -> null
@@ -274,7 +274,7 @@ private fun MediaEntryModule.findThumbnailCandidates(): Sequence<ThumbnailCandid
         }
         metadata?.thumbnail?.let { thumbnails ->
             yieldAll(
-                thumbnails.mapNotNull { it.findThumbnailCandidate() }
+                thumbnails.mapNotNull { it.findThumbnailCandidate() },
             )
         }
         mediaGroups?.forEach { mediaGroup ->
@@ -324,8 +324,8 @@ private fun MediaContent.findThumbnailCandidates(): Sequence<ThumbnailCandidate>
                     ThumbnailCandidate(
                         width = width,
                         height = height,
-                        url = ref.toString()
-                    )
+                        url = ref.toString(),
+                    ),
                 )
             }
         }
@@ -357,7 +357,7 @@ fun SyndEntry.publishedRFC3339ZonedDateTime(): ZonedDateTime? =
     when (publishedDate != null) {
         true -> ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(publishedDate.time),
-            ZoneOffset.systemDefault()
+            ZoneOffset.systemDefault(),
         )
         // This is the required element in atom feeds so it is a good fallback
         else -> modifiedRFC3339ZonedDateTime()
@@ -367,7 +367,7 @@ fun SyndEntry.modifiedRFC3339ZonedDateTime(): ZonedDateTime? =
     when (updatedDate != null) {
         true -> ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(updatedDate.time),
-            ZoneOffset.systemDefault()
+            ZoneOffset.systemDefault(),
         )
         else -> null
     }

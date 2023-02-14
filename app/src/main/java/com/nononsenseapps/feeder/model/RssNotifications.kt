@@ -45,7 +45,7 @@ private const val articleNotificationGroup = "com.nononsenseapps.feeder.ARTICLE"
 
 suspend fun notify(
     appContext: Context,
-    updateSummaryOnly: Boolean = false
+    updateSummaryOnly: Boolean = false,
 ) = withContext(Dispatchers.Default) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         createNotificationChannel(appContext)
@@ -116,7 +116,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
         Intent.ACTION_VIEW,
         "$DEEP_LINK_BASE_URI/article/${item.id}".toUri(),
         context,
-        MainActivity::class.java
+        MainActivity::class.java,
     ).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
@@ -125,7 +125,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
         context,
         item.id.toInt(),
         contentIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
+        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
     )
 
     val builder = notificationBuilder(context)
@@ -150,8 +150,8 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
                 context,
                 item.id.toInt(),
                 getOpenInDefaultActivityIntent(context, item.id, enclosureLink),
-                PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
-            )
+                PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
+            ),
         )
     }
 
@@ -163,8 +163,8 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
                 context,
                 item.id.toInt(),
                 getOpenInDefaultActivityIntent(context, item.id, link),
-                PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
-            )
+                PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
+            ),
         )
     }
 
@@ -175,8 +175,8 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
             context,
             item.id.toInt(),
             getMarkAsReadIntent(context, item.id),
-            PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
-        )
+            PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
+        ),
     )
 
     style.setBuilder(builder)
@@ -186,7 +186,7 @@ private fun singleNotification(context: Context, item: FeedItemWithFeed): Notifi
 internal fun getOpenInDefaultActivityIntent(
     context: Context,
     feedItemId: Long,
-    link: String? = null
+    link: String? = null,
 ): Intent =
     Intent(
         Intent.ACTION_VIEW,
@@ -197,7 +197,7 @@ internal fun getOpenInDefaultActivityIntent(
             }
         }.build(),
         context,
-        OpenLinkInDefaultActivity::class.java
+        OpenLinkInDefaultActivity::class.java,
     )
 
 internal fun getMarkAsReadIntent(
@@ -209,7 +209,7 @@ internal fun getMarkAsReadIntent(
         // Important to keep the URI different so PendingIntents don't collide
         URI_FEEDITEMS.buildUpon().appendPath("$feedItemId").build(),
         context,
-        RssNotificationBroadcastReceiver::class.java
+        RssNotificationBroadcastReceiver::class.java,
     )
 
 /**
@@ -254,11 +254,11 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
         Intent.ACTION_VIEW,
         deepLinkUri.toUri(),
         context,
-        OpenLinkInDefaultActivity::class.java // Proxy activity to mark as read
+        OpenLinkInDefaultActivity::class.java, // Proxy activity to mark as read
     ).apply {
         putExtra(
             EXTRA_FEEDITEMS_TO_MARK_AS_NOTIFIED,
-            LongArray(feedItems.size) { i -> feedItems[i].id }
+            LongArray(feedItems.size) { i -> feedItems[i].id },
         )
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
@@ -267,7 +267,7 @@ private fun inboxNotification(context: Context, feedItems: List<FeedItemWithFeed
         context,
         summaryNotificationId,
         contentIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
+        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
     )
 
     val builder = notificationBuilder(context)
@@ -296,7 +296,7 @@ private fun getDeleteIntent(context: Context, feedItems: List<FeedItemWithFeed>)
         context,
         0,
         intent,
-        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
+        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
     )
 }
 
@@ -315,7 +315,7 @@ private fun getPendingDeleteIntent(context: Context, feedItem: FeedItemWithFeed)
         context,
         0,
         getDeleteIntent(context, feedItem),
-        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE
+        PendingIntent.FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
     )
 
 private fun notificationBuilder(context: Context): NotificationCompat.Builder {

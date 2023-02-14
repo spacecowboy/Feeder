@@ -69,7 +69,7 @@ class Repository(override val di: DI) : DIAware {
                     addDynamicShortcutToFeed(
                         feedStore.getDisplayTitle(feedId) ?: "",
                         feedId,
-                        null
+                        null,
                     )
                     // Report shortcut usage
                     reportShortcutToFeedUsed(feedId)
@@ -180,7 +180,7 @@ class Repository(override val di: DI) : DIAware {
             tag = tag,
             onlyUnread = showOnlyUnread,
             newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
-            onlyBookmarks = showOnlyBookmarked
+            onlyBookmarks = showOnlyBookmarked,
         )
     }.flatMapLatest {
         feedItemStore.getPagedFeedItems(
@@ -205,7 +205,7 @@ class Repository(override val di: DI) : DIAware {
             tag = tag,
             onlyUnread = showOnlyUnread,
             newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
-            onlyBookmarks = showOnlyBookmarked
+            onlyBookmarks = showOnlyBookmarked,
         )
     }.flatMapLatest {
         feedItemStore.getPagedFeedItems(
@@ -229,13 +229,13 @@ class Repository(override val di: DI) : DIAware {
             tag = tag,
             onlyUnread = showOnlyUnread,
             newestFirst = false,
-            onlyBookmarks = false
+            onlyBookmarks = false,
         )
     }.flatMapLatest {
         feedItemStore.getVisibleFeedItemCount(
             feedId = it.feedId,
             tag = it.tag,
-            onlyUnread = it.onlyUnread
+            onlyUnread = it.onlyUnread,
         )
     }
 
@@ -301,8 +301,8 @@ class Repository(override val di: DI) : DIAware {
                     feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
                     tag.isNotBlank() -> tag
                     else -> null
-                }
-            )
+                },
+            ),
         )
     }
 
@@ -314,7 +314,7 @@ class Repository(override val di: DI) : DIAware {
                     feedId > ID_UNSET -> feedStore.getDisplayTitle(feedId)
                     tag.isNotBlank() -> tag
                     else -> null
-                }
+                },
             )
         }
 
@@ -439,7 +439,7 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun upsertFeedItems(
         itemsWithText: List<Pair<FeedItem, String>>,
-        block: suspend (FeedItem, String) -> Unit
+        block: suspend (FeedItem, String) -> Unit,
     ) {
         feedItemStore.upsertFeedItems(itemsWithText, block)
     }
@@ -546,7 +546,7 @@ class Repository(override val di: DI) : DIAware {
         workManager.enqueueUniqueWork(
             SyncServiceSendReadWorker.UNIQUE_SENDREAD_NAME,
             ExistingWorkPolicy.REPLACE,
-            workRequest.build()
+            workRequest.build(),
         )
     }
 
@@ -599,7 +599,7 @@ data class Enclosure(
 
 @Immutable
 data class Article(
-    val item: FeedItemWithFeed?
+    val item: FeedItemWithFeed?,
 ) {
     val id: Long = item?.id ?: ID_UNSET
     val link: String? = item?.link
@@ -609,7 +609,7 @@ data class Article(
         Enclosure(
             present = true,
             link = link,
-            name = item.enclosureFilename ?: ""
+            name = item.enclosureFilename ?: "",
         )
     } ?: Enclosure(
         present = false,

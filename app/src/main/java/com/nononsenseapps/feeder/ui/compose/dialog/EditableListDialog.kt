@@ -67,7 +67,7 @@ fun EditableListDialog(
         confirmButton = {
             Box(
                 Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 OutlinedTextField(
                     value = newValue,
@@ -81,13 +81,13 @@ fun EditableListDialog(
                         capitalization = KeyboardCapitalization.None,
                         autoCorrect = true,
                         keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
+                        imeAction = ImeAction.Next,
                     ),
                     keyboardActions = KeyboardActions(
                         onNext = {
                             onAddItem(newValue)
                             newValue = ""
-                        }
+                        },
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -97,7 +97,7 @@ fun EditableListDialog(
                         }
                         .interceptKey(Key.Escape) {
                             onDismiss()
-                        }
+                        },
                 )
             }
         },
@@ -116,12 +116,12 @@ fun EditableListDialog(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = minimumTouchSize)
+                            .heightIn(min = minimumTouchSize),
                     ) {
                         Text(
                             text = item,
                             style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(1f, fill = true)
+                            modifier = Modifier.weight(1f, fill = true),
                         )
                         IconButton(
                             onClick = {
@@ -136,7 +136,7 @@ fun EditableListDialog(
                     }
                 }
             }
-        }
+        },
     )
 }
 

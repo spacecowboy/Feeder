@@ -11,6 +11,7 @@ const val SCHEME = "content://"
 // Feed
 @JvmField
 val URI_FEEDS: Uri = Uri.withAppendedPath(Uri.parse(SCHEME + AUTHORITY), "feeds")
+
 // Feed item
 @JvmField
 val URI_FEEDITEMS: Uri = Uri.withAppendedPath(Uri.parse(SCHEME + AUTHORITY), "feed_items")

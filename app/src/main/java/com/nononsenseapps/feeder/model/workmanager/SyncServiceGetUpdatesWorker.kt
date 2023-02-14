@@ -74,6 +74,6 @@ fun scheduleGetUpdates(di: DI) {
     workManager.enqueueUniqueWork(
         UNIQUE_GETUPDATES_NAME,
         ExistingWorkPolicy.REPLACE,
-        workRequest.build()
+        workRequest.build(),
     )
 }

@@ -26,7 +26,7 @@ interface ReadStatusSyncedDao {
     @Query(
         """
             DELETE FROM read_status_synced
-        """
+        """,
     )
     suspend fun deleteAll(): Int
 
@@ -50,7 +50,7 @@ interface ReadStatusSyncedDao {
                 )
             ORDER BY fi.id DESC
             LIMIT 1
-        """
+        """,
     )
     fun getNextFeedItemWithoutSyncedReadMark(): Flow<FeedItemForReadMark?>
 
@@ -74,7 +74,7 @@ interface ReadStatusSyncedDao {
                 )
             ORDER BY fi.id DESC
             LIMIT 100
-        """
+        """,
     )
     fun getFlowOfFeedItemsWithoutSyncedReadMark(): Flow<List<FeedItemForReadMark>>
 
@@ -94,7 +94,7 @@ interface ReadStatusSyncedDao {
                     FROM read_status_synced
                 )
             ORDER BY fi.id DESC
-        """
+        """,
     )
     suspend fun getFeedItemsWithoutSyncedReadMark(): List<FeedItemForReadMark>
 
@@ -102,7 +102,7 @@ interface ReadStatusSyncedDao {
         """
             DELETE FROM remote_read_mark
             WHERE id in (:ids)
-        """
+        """,
     )
     suspend fun deleteReadStatusSyncs(ids: List<Long>): Int
 
@@ -110,7 +110,7 @@ interface ReadStatusSyncedDao {
         """
             DELETE FROM read_status_synced
             WHERE feed_item = :feedItemId
-        """
+        """,
     )
     suspend fun deleteReadStatusSyncForItem(feedItemId: Long): Int
 }

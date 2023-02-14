@@ -39,7 +39,7 @@ fun OkCancelWithContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
-            .verticalScroll(scrollState)
+            .verticalScroll(scrollState),
     ) {
         Spacer(modifier = Modifier.height(16.dp))
         content()
@@ -48,7 +48,7 @@ fun OkCancelWithContent(
             onOk = onOk,
             onCancel = onCancel,
             okEnabled = okEnabled,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
         Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
     }
@@ -60,25 +60,25 @@ fun OkCancelButtons(
     onOk: () -> Unit = {},
     onCancel: () -> Unit = {},
     okEnabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
     Row(
         horizontalArrangement = Arrangement.End,
-        modifier = modifier.width(dimens.maxContentWidth)
+        modifier = modifier.width(dimens.maxContentWidth),
     ) {
         TextButton(onClick = onCancel) {
             Text(
-                text = stringResource(id = R.string.cancel)
+                text = stringResource(id = R.string.cancel),
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
         TextButton(
             enabled = okEnabled,
-            onClick = onOk
+            onClick = onOk,
         ) {
             Text(
-                text = stringResource(id = R.string.ok)
+                text = stringResource(id = R.string.ok),
             )
         }
     }

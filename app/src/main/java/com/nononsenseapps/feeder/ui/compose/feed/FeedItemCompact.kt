@@ -73,14 +73,14 @@ fun FeedItemCompact(
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
-            .height(IntrinsicSize.Min)
+            .height(IntrinsicSize.Min),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .weight(weight = 1.0f, fill = true)
                 .requiredHeightIn(min = minimumTouchSize)
-                .padding(vertical = 4.dp)
+                .padding(vertical = 4.dp),
         ) {
             withBidiDeterminedLayoutDirection(paragraph = item.title) {
                 Text(
@@ -89,7 +89,7 @@ fun FeedItemCompact(
                     fontWeight = titleFontWeight(item.unread),
                     modifier = Modifier
                         .padding(start = 4.dp, end = 4.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 )
             }
             // Want the dropdown to center on the middle text row
@@ -97,7 +97,7 @@ fun FeedItemCompact(
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 ) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         val text = buildAnnotatedString {
@@ -116,14 +116,14 @@ fun FeedItemCompact(
                                 overflow = TextOverflow.Clip,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 4.dp, end = 4.dp)
+                                    .padding(start = 4.dp, end = 4.dp),
                             )
                         }
                     }
                 }
                 DropdownMenu(
                     expanded = dropDownMenuExpanded,
-                    onDismissRequest = onDismissDropdown
+                    onDismissRequest = onDismissDropdown,
                 ) {
                     DropdownMenuItem(
                         onClick = {
@@ -136,10 +136,10 @@ fun FeedItemCompact(
                                     when (item.pinned) {
                                         true -> R.string.unpin_article
                                         false -> R.string.pin_article
-                                    }
-                                )
+                                    },
+                                ),
                             )
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -152,10 +152,10 @@ fun FeedItemCompact(
                                     when (item.bookmarked) {
                                         true -> R.string.remove_bookmark
                                         false -> R.string.bookmark_article
-                                    }
-                                )
+                                    },
+                                ),
                             )
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -164,9 +164,9 @@ fun FeedItemCompact(
                         },
                         text = {
                             Text(
-                                text = stringResource(id = R.string.mark_items_above_as_read)
+                                text = stringResource(id = R.string.mark_items_above_as_read),
                             )
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -175,9 +175,9 @@ fun FeedItemCompact(
                         },
                         text = {
                             Text(
-                                text = stringResource(id = R.string.mark_items_below_as_read)
+                                text = stringResource(id = R.string.mark_items_below_as_read),
                             )
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -186,9 +186,9 @@ fun FeedItemCompact(
                         },
                         text = {
                             Text(
-                                text = stringResource(R.string.share)
+                                text = stringResource(R.string.share),
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -201,7 +201,7 @@ fun FeedItemCompact(
                         maxLines = 4,
                         modifier = Modifier
                             .padding(start = 4.dp, end = 4.dp, bottom = 8.dp)
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
                     )
                 }
             }
@@ -221,7 +221,7 @@ fun FeedItemCompact(
                                 .listener(
                                     onError = { a, b ->
                                         Log.e("FEEDER_COMPACT", "error ${a.data}", b.throwable)
-                                    }
+                                    },
                                 )
                                 .scale(Scale.FIT)
                                 .placeholder(placeholder)
@@ -233,7 +233,7 @@ fun FeedItemCompact(
                             contentScale = ContentScale.Crop,
                             modifier = modifier
                                 .width(64.dp)
-                                .fillMaxHeight()
+                                .fillMaxHeight(),
                         )
                     }
                 }
@@ -344,7 +344,7 @@ private fun previewWithImage() {
     FeederTheme {
         Surface {
             Box(
-                modifier = Modifier.width(400.dp)
+                modifier = Modifier.width(400.dp),
             ) {
                 FeedItemCompact(
                     item = FeedListItem(

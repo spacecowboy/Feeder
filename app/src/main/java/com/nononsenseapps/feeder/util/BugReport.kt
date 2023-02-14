@@ -16,11 +16,11 @@ internal fun emailBody(isTablet: Boolean): String = """
             version ${BuildConfig.VERSION_NAME} (code ${BuildConfig.VERSION_CODE})
             on Android ${Build.VERSION.RELEASE} (SDK-${Build.VERSION.SDK_INT})
             on a Tablet? ${
-if (isTablet) {
-    "Yes"
-} else {
-    "No"
-}}
+    if (isTablet) {
+        "Yes"
+    } else {
+        "No"
+    }}
 
             Describe your issue and how to reproduce it below:
 """.trimIndent()

@@ -44,22 +44,22 @@ class AnnotatedParagraphStringBuilder {
         builder.pushStringAnnotation(tag = tag, annotation = annotation)
 
     fun pushComposableStyle(
-        style: @Composable () -> SpanStyle
+        style: @Composable () -> SpanStyle,
     ): Int {
         composableStyles.add(
             ComposableStyleWithStartEnd(
                 style = style,
-                start = builder.length
-            )
+                start = builder.length,
+            ),
         )
         return composableStyles.lastIndex
     }
 
     fun popComposableStyle(
-        index: Int
+        index: Int,
     ) {
         poppedComposableStyles.add(
-            composableStyles.removeAt(index).copy(end = builder.length)
+            composableStyles.removeAt(index).copy(end = builder.length),
         )
     }
 
@@ -84,14 +84,14 @@ class AnnotatedParagraphStringBuilder {
             builder.addStyle(
                 style = composableStyle.style(),
                 start = composableStyle.start,
-                end = composableStyle.end
+                end = composableStyle.end,
             )
         }
         for (composableStyle in composableStyles) {
             builder.addStyle(
                 style = composableStyle.style(),
                 start = composableStyle.start,
-                end = builder.length
+                end = builder.length,
             )
         }
         return builder.toAnnotatedString()
@@ -175,5 +175,5 @@ private fun <T> List<T>.peekSecondLatest(): T? {
 data class ComposableStyleWithStartEnd(
     val style: @Composable () -> SpanStyle,
     val start: Int,
-    val end: Int = -1
+    val end: Int = -1,
 )

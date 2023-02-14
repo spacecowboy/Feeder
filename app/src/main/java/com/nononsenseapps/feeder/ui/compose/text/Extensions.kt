@@ -36,7 +36,7 @@ fun annotatedStringResource(@StringRes id: Int): AnnotatedString {
                         addStyle(
                             spanStyle,
                             text.getSpanStart(annotation),
-                            text.getSpanEnd(annotation)
+                            text.getSpanEnd(annotation),
                         )
                     }
                 }

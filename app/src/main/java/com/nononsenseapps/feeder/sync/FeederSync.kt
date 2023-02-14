@@ -11,54 +11,54 @@ import retrofit2.http.Query
 interface FeederSync {
     @POST("create")
     suspend fun create(
-        @Body request: CreateRequest
+        @Body request: CreateRequest,
     ): JoinResponse
 
     @POST("join")
     suspend fun join(
         @Header("X-FEEDER-ID") syncChainId: String,
-        @Body request: JoinRequest
+        @Body request: JoinRequest,
     ): JoinResponse
 
     @GET("devices")
     suspend fun getDevices(
         @Header("X-FEEDER-ID") syncChainId: String,
-        @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long
+        @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
     ): DeviceListResponse
 
     @DELETE("devices/{deviceId}")
     suspend fun removeDevice(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
-        @Path("deviceId") deviceId: Long
+        @Path("deviceId") deviceId: Long,
     ): DeviceListResponse
 
     @GET("readmark")
     suspend fun getReadMarks(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
-        @Query("since") sinceMillis: Long
+        @Query("since") sinceMillis: Long,
     ): GetReadMarksResponse
 
     @POST("readmark")
     suspend fun sendReadMarks(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
-        @Body request: SendReadMarkBulkRequest
+        @Body request: SendReadMarkBulkRequest,
     ): SendReadMarkResponse
 
     @GET("ereadmark")
     suspend fun getEncryptedReadMarks(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
-        @Query("since") sinceMillis: Long
+        @Query("since") sinceMillis: Long,
     ): GetEncryptedReadMarksResponse
 
     @POST("ereadmark")
     suspend fun sendEncryptedReadMarks(
         @Header("X-FEEDER-ID") syncChainId: String,
         @Header("X-FEEDER-DEVICE-ID") currentDeviceId: Long,
-        @Body request: SendEncryptedReadMarkBulkRequest
+        @Body request: SendEncryptedReadMarkBulkRequest,
     ): SendReadMarkResponse
 
     @GET("feeds")

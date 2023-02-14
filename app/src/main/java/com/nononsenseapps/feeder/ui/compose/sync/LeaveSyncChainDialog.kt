@@ -21,6 +21,6 @@ fun LeaveSyncChainDialog(
 fun PreviewLeaveSyncChainDialog() {
     LeaveSyncChainDialog(
         onDismiss = {},
-        onOk = {}
+        onOk = {},
     )
 }

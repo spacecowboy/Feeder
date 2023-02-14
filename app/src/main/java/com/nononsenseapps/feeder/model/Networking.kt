@@ -10,7 +10,7 @@ object UserAgentInterceptor : Interceptor {
             chain.request()
                 .newBuilder()
                 .header("User-Agent", USER_AGENT_STRING)
-                .build()
+                .build(),
         )
     }
 }

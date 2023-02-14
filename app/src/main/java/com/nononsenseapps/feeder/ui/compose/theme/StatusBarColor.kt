@@ -31,9 +31,9 @@ fun SetStatusBarColorToMatchScrollableTopAppBar(
         targetValue = lerp(
             surfaceColor,
             surfaceScrolledColor,
-            FastOutLinearInEasing.transform(fraction)
+            FastOutLinearInEasing.transform(fraction),
         ),
-        animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
     )
 
     val systemUiController = rememberSystemUiController()

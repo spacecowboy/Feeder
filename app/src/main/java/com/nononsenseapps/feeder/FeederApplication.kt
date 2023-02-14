@@ -97,14 +97,14 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
         bind<NotificationManagerCompat>() with singleton { NotificationManagerCompat.from(this@FeederApplication) }
         bind<SharedPreferences>() with singleton {
             PreferenceManager.getDefaultSharedPreferences(
-                this@FeederApplication
+                this@FeederApplication,
             )
         }
 
         bind<OkHttpClient>() with singleton {
             val filePathProvider = instance<FilePathProvider>()
             cachingHttpClient(
-                cacheDirectory = (filePathProvider.httpCacheDir)
+                cacheDirectory = (filePathProvider.httpCacheDir),
             ).newBuilder()
                 .addNetworkInterceptor(UserAgentInterceptor)
                 .build()
@@ -128,11 +128,11 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
                                             .onlyIfCached()
                                             .maxStale(Int.MAX_VALUE, TimeUnit.SECONDS)
                                             .maxAge(Int.MAX_VALUE, TimeUnit.SECONDS)
-                                            .build()
+                                            .build(),
                                     )
                                     .build()
                             }
-                        }
+                        },
                     )
                 }
                 .build()
@@ -143,7 +143,7 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
                     DiskCache.Builder()
                         .directory(filePathProvider.imageCacheDir)
                         .maxSizeBytes(250L * 1024 * 1024)
-                        .build()
+                        .build(),
                 )
                 .components {
                     add(TooLargeImageInterceptor())

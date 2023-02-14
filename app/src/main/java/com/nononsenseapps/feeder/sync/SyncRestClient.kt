@@ -49,10 +49,10 @@ class SyncRestClient(override val di: DI) : DIAware {
                 if (DEPRECATED_SYNC_HOSTS.any { host -> host in "${syncRemote.url}" }) {
                     logDebug(
                         LOG_TAG,
-                        "Updating to latest sync host: $DEFAULT_SERVER_ADDRESS"
+                        "Updating to latest sync host: $DEFAULT_SERVER_ADDRESS",
                     )
                     syncRemote = syncRemote.copy(
-                        url = URL(DEFAULT_SERVER_ADDRESS)
+                        url = URL(DEFAULT_SERVER_ADDRESS),
                     )
                     repository.updateSyncRemote(syncRemote)
                 }
@@ -60,7 +60,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                     secretKey = AesCbcWithIntegrity.decodeKey(syncRemote.secretKey)
                     feederSync = getFeederSyncClient(
                         syncRemote = syncRemote,
-                        okHttpClient = okHttpClient
+                        okHttpClient = okHttpClient,
                     )
                 }
             } catch (e: Exception) {
@@ -93,25 +93,25 @@ class SyncRestClient(override val di: DI) : DIAware {
 
         val feederSync = getFeederSyncClient(
             syncRemote = syncRemote,
-            okHttpClient = okHttpClient
+            okHttpClient = okHttpClient,
         )
         this.feederSync = feederSync
 
         val response = feederSync.create(
             CreateRequest(
-                deviceName = AesCbcWithIntegrity.encryptString(syncRemote.deviceName, secretKey)
-            )
+                deviceName = AesCbcWithIntegrity.encryptString(syncRemote.deviceName, secretKey),
+            ),
         )
 
         syncRemote = syncRemote.copy(
             syncChainId = response.syncCode,
             deviceId = response.deviceId,
             deviceName = generateDeviceName(),
-            latestMessageTimestamp = Instant.EPOCH
+            latestMessageTimestamp = Instant.EPOCH,
         )
 
         repository.updateSyncRemote(
-            syncRemote
+            syncRemote,
         )
 
         return response.syncCode
@@ -132,7 +132,7 @@ class SyncRestClient(override val di: DI) : DIAware {
 
             val feederSync = getFeederSyncClient(
                 syncRemote = syncRemote,
-                okHttpClient = okHttpClient
+                okHttpClient = okHttpClient,
             )
             this.feederSync = feederSync
 
@@ -143,9 +143,9 @@ class SyncRestClient(override val di: DI) : DIAware {
                 request = JoinRequest(
                     deviceName = AesCbcWithIntegrity.encryptString(
                         syncRemote.deviceName,
-                        secretKey
-                    )
-                )
+                        secretKey,
+                    ),
+                ),
             )
 
             logDebug(LOG_TAG, "Join response: $response")
@@ -153,11 +153,11 @@ class SyncRestClient(override val di: DI) : DIAware {
             syncRemote = syncRemote.copy(
                 syncChainId = response.syncCode,
                 deviceId = response.deviceId,
-                latestMessageTimestamp = Instant.EPOCH
+                latestMessageTimestamp = Instant.EPOCH,
             )
 
             repository.updateSyncRemote(
-                syncRemote
+                syncRemote,
             )
 
             logDebug(LOG_TAG, "Updated sync remote")
@@ -168,9 +168,9 @@ class SyncRestClient(override val di: DI) : DIAware {
                 Log.e(
                     LOG_TAG,
                     "Error during leave: msg: code: ${e.code()}, error: ${
-                    e.response()?.errorBody()?.string()
+                        e.response()?.errorBody()?.string()
                     }",
-                    e
+                    e,
                 )
             } else {
                 Log.e(LOG_TAG, "Error during leave", e)
@@ -187,7 +187,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                 feederSync.removeDevice(
                     syncChainId = syncRemote.syncChainId,
                     currentDeviceId = syncRemote.deviceId,
-                    deviceId = syncRemote.deviceId
+                    deviceId = syncRemote.deviceId,
                 )
                 this.feederSync = null
                 this.secretKey = null
@@ -198,9 +198,9 @@ class SyncRestClient(override val di: DI) : DIAware {
                 Log.e(
                     LOG_TAG,
                     "Error during leave: msg: code: ${e.code()}, error: ${
-                    e.response()?.errorBody()?.string()
+                        e.response()?.errorBody()?.string()
                     }",
-                    e
+                    e,
                 )
             } else {
                 Log.e(LOG_TAG, "Error during leave", e)
@@ -215,7 +215,7 @@ class SyncRestClient(override val di: DI) : DIAware {
             val deviceListResponse = feederSync.removeDevice(
                 syncChainId = syncRemote.syncChainId,
                 currentDeviceId = syncRemote.deviceId,
-                deviceId = deviceId
+                deviceId = deviceId,
             )
 
             logDebug(LOG_TAG, "Updating device list: $deviceListResponse")
@@ -228,9 +228,9 @@ class SyncRestClient(override val di: DI) : DIAware {
                             it.deviceName,
                             secretKey,
                         ),
-                        syncRemote = syncRemote.id
+                        syncRemote = syncRemote.id,
                     )
-                }
+                },
             )
         }
     }
@@ -250,12 +250,12 @@ class SyncRestClient(override val di: DI) : DIAware {
                                     ReadMarkContent(
                                         feedUrl = feedItem.feedUrl,
                                         articleGuid = feedItem.guid,
-                                    )
-                                )
-                            )
+                                    ),
+                                ),
+                            ),
                         )
-                    }
-                )
+                    },
+                ),
             )
             for (feedItem in feedItems) {
                 repository.setSynced(feedItemId = feedItem.id)
@@ -288,7 +288,7 @@ class SyncRestClient(override val di: DI) : DIAware {
             logDebug(LOG_TAG, "getDevices Inside block")
             val response = feederSync.getDevices(
                 syncChainId = syncRemote.syncChainId,
-                currentDeviceId = syncRemote.deviceId
+                currentDeviceId = syncRemote.deviceId,
             )
 
             logDebug(LOG_TAG, "getDevices: $response")
@@ -300,11 +300,11 @@ class SyncRestClient(override val di: DI) : DIAware {
                         deviceId = it.deviceId,
                         deviceName = AesCbcWithIntegrity.decryptString(
                             it.deviceName,
-                            secretKey
+                            secretKey,
                         ),
                         syncRemote = syncRemote.id,
                     )
-                }
+                },
             )
         }
     }
@@ -316,12 +316,12 @@ class SyncRestClient(override val di: DI) : DIAware {
                 currentDeviceId = syncRemote.deviceId,
                 syncChainId = syncRemote.syncChainId,
                 // Add one ms so we don't get inclusive of last message we got
-                sinceMillis = syncRemote.latestMessageTimestamp.plusMillis(1).toEpochMilli()
+                sinceMillis = syncRemote.latestMessageTimestamp.plusMillis(1).toEpochMilli(),
             )
             logDebug(LOG_TAG, "getRead: ${response.readMarks.size} read marks")
             for (readMark in response.readMarks) {
                 val readMarkContent = readMarkAdapter.fromJson(
-                    AesCbcWithIntegrity.decryptString(readMark.encrypted, secretKey)
+                    AesCbcWithIntegrity.decryptString(readMark.encrypted, secretKey),
                 )
 
                 if (readMarkContent == null) {
@@ -358,7 +358,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                 AesCbcWithIntegrity.decryptString(
                     response.encrypted,
                     secretKeys = secretKey,
-                )
+                ),
             )
 
             if (encryptedFeeds == null) {
@@ -398,7 +398,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                     // Entirely new remote feed
                     logDebug(LOG_TAG, "Saving new feed: ${remoteFeed.url}")
                     repository.saveFeed(
-                        remoteFeed.updateFeedCopy(Feed())
+                        remoteFeed.updateFeedCopy(Feed()),
                     )
                 }
                 dbFeed == null && seenRemotelyBefore -> {
@@ -411,12 +411,12 @@ class SyncRestClient(override val di: DI) : DIAware {
                     if (remoteFeed.whenModified > dbFeed.whenModified) {
                         logDebug(LOG_TAG, "Saving updated feed: ${remoteFeed.url}")
                         repository.saveFeed(
-                            remoteFeed.updateFeedCopy(dbFeed)
+                            remoteFeed.updateFeedCopy(dbFeed),
                         )
                     } else {
                         logDebug(
                             LOG_TAG,
-                            "Not saving feed because local date trumps it: ${remoteFeed.url}"
+                            "Not saving feed because local date trumps it: ${remoteFeed.url}",
                         )
                     }
                 }
@@ -429,7 +429,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                     syncRemote = 1L,
                     url = it.url,
                 )
-            }
+            },
         )
     }
 
@@ -457,14 +457,14 @@ class SyncRestClient(override val di: DI) : DIAware {
                 feedsAdapter.toJson(
                     EncryptedFeeds(
                         feeds = feeds,
-                    )
+                    ),
                 ),
                 secretKeys = secretKey,
             )
 
             logDebug(
                 LOG_TAG,
-                "Sending updated feeds with locally computed hash: $currentContentHash"
+                "Sending updated feeds with locally computed hash: $currentContentHash",
             )
             // Might fail with 412 in case already updated remotely - need to call get
             try {
@@ -474,8 +474,8 @@ class SyncRestClient(override val di: DI) : DIAware {
                     etagValue = syncRemote.lastFeedsRemoteHash.asWeakETagValue(),
                     request = UpdateFeedsRequest(
                         contentHash = currentContentHash,
-                        encrypted = encrypted
-                    )
+                        encrypted = encrypted,
+                    ),
                 )
 
                 // Store hash for future

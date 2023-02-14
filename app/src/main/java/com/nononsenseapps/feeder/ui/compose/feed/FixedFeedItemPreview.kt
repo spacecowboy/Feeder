@@ -78,7 +78,7 @@ fun FixedFeedItemPreview(
                             when (item.pinned) {
                                 true -> unpinArticleLabel
                                 false -> pinArticleLabel
-                            }
+                            },
                         ) {
                             onTogglePinned()
                             true
@@ -87,7 +87,7 @@ fun FixedFeedItemPreview(
                             when (item.bookmarked) {
                                 true -> removeBookmarkLabel
                                 false -> bookmarkArticleLabel
-                            }
+                            },
                         ) {
                             onToggleBookmarked()
                             true
@@ -110,7 +110,7 @@ fun FixedFeedItemPreview(
                     // No clue why it could be null
                     Log.e("FeederSwipeableFIP", "Exception in semantics", e)
                 }
-            }
+            },
     ) {
         when (feedItemStyle) {
             FeedItemStyle.CARD -> {

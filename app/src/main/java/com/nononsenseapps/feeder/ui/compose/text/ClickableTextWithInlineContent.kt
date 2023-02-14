@@ -76,6 +76,6 @@ fun ClickableTextWithInlineContent(
             layoutResult.value = it
             onTextLayout(it)
         },
-        inlineContent = inlineContent
+        inlineContent = inlineContent,
     )
 }

@@ -22,7 +22,7 @@ import org.threeten.bp.Instant
 
 class CreateFeedScreenViewModel(
     di: DI,
-    state: SavedStateHandle
+    state: SavedStateHandle,
 ) : DIAwareViewModel(di), EditFeedScreenState {
     private val repository: Repository by instance()
 
@@ -83,7 +83,7 @@ class CreateFeedScreenViewModel(
                 openArticlesWith = articleOpener,
                 alternateId = alternateId,
                 whenModified = Instant.now(),
-            )
+            ),
         )
 
         requestFeedSync(di, feedId = feedId)

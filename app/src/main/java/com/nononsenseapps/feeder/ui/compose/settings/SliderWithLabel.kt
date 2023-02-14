@@ -38,24 +38,25 @@ fun SliderWithLabel(
     valueRange: ClosedFloatingPointRange<Float>,
     steps: Int = 0,
     labelMinWidth: Dp = 28.dp,
-    onValueChange: (Float) -> Unit
+    onValueChange: (Float) -> Unit,
 ) {
     Column {
         BoxWithConstraints(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             val offset = getSliderOffset(
                 value = value,
                 valueRange = valueRange,
                 boxWidth = maxWidth,
-                labelWidth = labelMinWidth + 8.dp // Since we use a padding of 4.dp on either sides of the SliderLabel, we need to account for this in our calculation
+                labelWidth = labelMinWidth + 8.dp, // Since we use a padding of 4.dp on either sides of the SliderLabel, we need to account for this in our calculation
             )
 
             SliderLabel(
-                label = valueToLabel(value), minWidth = labelMinWidth,
+                label = valueToLabel(value),
+                minWidth = labelMinWidth,
                 modifier = Modifier
-                    .padding(start = offset)
+                    .padding(start = offset),
             )
         }
 
@@ -80,7 +81,7 @@ fun SliderWithEndLabels(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -105,7 +106,7 @@ fun SliderWithEndLabels(
 fun SliderLabel(
     label: String,
     minWidth: Dp = 28.dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -115,7 +116,7 @@ fun SliderLabel(
                 shape = RoundedCornerShape(10.dp),
             )
             .padding(4.dp)
-            .size(minWidth)
+            .size(minWidth),
     ) {
         Text(
             label,
@@ -123,7 +124,7 @@ fun SliderLabel(
             color = MaterialTheme.colorScheme.onPrimary,
             style = MaterialTheme.typography.labelMedium,
             maxLines = 1,
-            modifier = Modifier
+            modifier = Modifier,
         )
     }
 }
@@ -132,7 +133,7 @@ private fun getSliderOffset(
     value: Float,
     valueRange: ClosedFloatingPointRange<Float>,
     boxWidth: Dp,
-    labelWidth: Dp
+    labelWidth: Dp,
 ): Dp {
     val coerced = value.coerceIn(valueRange.start, valueRange.endInclusive)
     val positionFraction = calcFraction(valueRange.start, valueRange.endInclusive, coerced)
@@ -182,7 +183,7 @@ fun PreviewSliderWithEndLabels() {
                                 TextStyle(
                                     color = MaterialTheme.colorScheme.onBackground,
                                     fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                                )
+                                ),
                             ),
                         modifier = Modifier.alignByBaseline(),
                     )
@@ -195,7 +196,7 @@ fun PreviewSliderWithEndLabels() {
                                 TextStyle(
                                     color = MaterialTheme.colorScheme.onBackground,
                                     fontSize = MaterialTheme.typography.bodyLarge.fontSize * 2,
-                                )
+                                ),
                             ),
                         modifier = Modifier.alignByBaseline(),
                     )

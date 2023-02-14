@@ -141,7 +141,7 @@ class RssLocalSync(override val di: DI) : DIAware {
                                 Log.e(
                                     LOG_TAG,
                                     "Failed to sync ${it.displayTitle}: ${it.url}",
-                                    e
+                                    e,
                                 )
                             } finally {
                                 repository.setCurrentlySyncingOn(feedId = it.id, syncing = false)
@@ -191,7 +191,7 @@ class RssLocalSync(override val di: DI) : DIAware {
                         }
                         else -> feedParser.parseFeedResponse(
                             response.request.url.toUrl(),
-                            responseBody
+                            responseBody,
                         )
                     }
                 }
@@ -233,10 +233,10 @@ class RssLocalSync(override val di: DI) : DIAware {
                         val feedItemSql =
                             repository.loadFeedItem(
                                 guid = item.alternateId,
-                                feedId = feedSql.id
+                                feedId = feedSql.id,
                             ) ?: repository.loadFeedItem(
                                 guid = item.id ?: item.alternateId,
-                                feedId = feedSql.id
+                                feedId = feedSql.id,
                             ) ?: FeedItem(firstSyncedTime = downloadTime)
 
                         feedItemSql.updateFromParsedEntry(item, guid, feed)
@@ -272,7 +272,7 @@ class RssLocalSync(override val di: DI) : DIAware {
             // Finally, prune database of old items
             val ids = repository.getItemsToBeCleanedFromFeed(
                 feedId = feedSql.id,
-                keepCount = max(maxFeedItemCount, items?.size ?: 0)
+                keepCount = max(maxFeedItemCount, items?.size ?: 0),
             )
 
             for (id in ids) {
@@ -306,24 +306,32 @@ class RssLocalSync(override val di: DI) : DIAware {
     internal suspend fun feedsToSync(
         feedId: Long,
         tag: String,
-        staleTime: Long = -1L
+        staleTime: Long = -1L,
     ): List<com.nononsenseapps.feeder.db.room.Feed> {
         return when {
             feedId > 0 -> {
-                val feed = if (staleTime > 0) repository.loadFeedIfStale(
-                    feedId,
-                    staleTime = staleTime
-                ) else repository.loadFeed(feedId)
+                val feed = if (staleTime > 0) {
+                    repository.loadFeedIfStale(
+                        feedId,
+                        staleTime = staleTime,
+                    )
+                } else {
+                    repository.loadFeed(feedId)
+                }
                 if (feed != null) {
                     listOf(feed)
                 } else {
                     emptyList()
                 }
             }
-            tag.isNotEmpty() -> if (staleTime > 0) repository.loadFeedsIfStale(
-                tag = tag,
-                staleTime = staleTime
-            ) else repository.loadFeeds(tag)
+            tag.isNotEmpty() -> if (staleTime > 0) {
+                repository.loadFeedsIfStale(
+                    tag = tag,
+                    staleTime = staleTime,
+                )
+            } else {
+                repository.loadFeeds(tag)
+            }
             else -> if (staleTime > 0) repository.loadFeedsIfStale(staleTime) else repository.loadFeeds()
         }
     }

@@ -43,23 +43,25 @@ const val MAX_SNIPPET_LENGTH = 200
     tableName = FEED_ITEMS_TABLE_NAME,
     indices = [
         Index(value = [COL_GUID, COL_FEEDID], unique = true),
-        Index(value = [COL_FEEDID])
+        Index(value = [COL_FEEDID]),
     ],
     foreignKeys = [
         ForeignKey(
             entity = Feed::class,
             parentColumns = [COL_ID],
             childColumns = [COL_FEEDID],
-            onDelete = CASCADE
-        )
-    ]
+            onDelete = CASCADE,
+        ),
+    ],
 )
 data class FeedItem @Ignore constructor(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COL_ID) override var id: Long = ID_UNSET,
+    @ColumnInfo(name = COL_ID)
+    override var id: Long = ID_UNSET,
     @ColumnInfo(name = COL_GUID) var guid: String = "",
     @Deprecated("This is never different from plainTitle", replaceWith = ReplaceWith("plainTitle"))
-    @ColumnInfo(name = COL_TITLE) var title: String = "",
+    @ColumnInfo(name = COL_TITLE)
+    var title: String = "",
     @ColumnInfo(name = COL_PLAINTITLE) var plainTitle: String = "",
     @ColumnInfo(name = COL_PLAINSNIPPET) var plainSnippet: String = "",
     @ColumnInfo(name = COL_IMAGEURL) var imageUrl: String? = null,
@@ -82,7 +84,7 @@ data class FeedItem @Ignore constructor(
     fun updateFromParsedEntry(
         entry: Item,
         entryGuid: String,
-        feed: com.nononsenseapps.jsonfeed.Feed
+        feed: com.nononsenseapps.jsonfeed.Feed,
     ) {
         val converter = HtmlToPlainTextConverter()
         // Be careful about nulls.

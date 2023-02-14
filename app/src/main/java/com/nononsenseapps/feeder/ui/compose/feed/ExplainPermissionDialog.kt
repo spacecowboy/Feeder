@@ -18,7 +18,7 @@ fun ExplainPermissionDialog(
     @StringRes explanation: Int,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
-    onOk: () -> Unit
+    onOk: () -> Unit,
 ) {
     AlertDialog(
         modifier = modifier,
@@ -33,9 +33,9 @@ fun ExplainPermissionDialog(
                 text = stringResource(id = explanation),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp),
             )
-        }
+        },
     )
 }
 
@@ -45,5 +45,5 @@ private fun preview() =
     ExplainPermissionDialog(
         explanation = R.string.explanation_permission_notifications,
         onDismiss = {},
-        onOk = {}
+        onOk = {},
     )

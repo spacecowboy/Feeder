@@ -47,12 +47,12 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                                 onNavigateUpFromIntentActivities()
                             },
                             initialFeedUrl = initialFeedUrl,
-                            searchFeedViewModel = backStackEntry.DIAwareViewModel()
+                            searchFeedViewModel = backStackEntry.DIAwareViewModel(),
                         ) {
                             AddFeedDestination.navigate(
                                 navController,
                                 feedUrl = it.url,
-                                feedTitle = it.title
+                                feedTitle = it.title,
                             )
                         }
                     }
@@ -84,8 +84,8 @@ fun Activity.onNavigateUpFromIntentActivities() {
     startActivity(
         Intent(
             this,
-            MainActivity::class.java
-        )
+            MainActivity::class.java,
+        ),
     )
     finish()
 }

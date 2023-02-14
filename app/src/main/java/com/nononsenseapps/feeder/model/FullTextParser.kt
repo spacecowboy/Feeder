@@ -39,7 +39,7 @@ fun scheduleFullTextParse(
 
 class FullTextWorker(
     val context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(context, workerParams), DIAware {
     override val di: DI by closestDI(context)
     private val fullTextParser: FullTextParser by instance()
@@ -119,7 +119,7 @@ class FullTextParser(override val di: DI) : DIAware {
                 Log.e(
                     LOG_TAG,
                     "Failed to get fulltext for ${feedItem.link}: ${e.message}",
-                    e
+                    e,
                 )
                 false to e
             }

@@ -42,8 +42,8 @@ class OpenLinkInDefaultActivity : DIAwareComponentActivity() {
                         Intent.ACTION_VIEW,
                         uri,
                         this,
-                        MainActivity::class.java
-                    )
+                        MainActivity::class.java,
+                    ),
                 )
             } else {
                 handleNotificationActions(intent)
@@ -68,7 +68,7 @@ class OpenLinkInDefaultActivity : DIAwareComponentActivity() {
                 startActivity(
                     Intent(Intent.ACTION_VIEW, Uri.parse(link)).also {
                         intent.putExtra(EXTRA_CREATE_NEW_TAB, true)
-                    }
+                    },
                 )
             } catch (e: Throwable) {
                 e.printStackTrace()

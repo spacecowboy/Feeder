@@ -20,16 +20,17 @@ import kotlin.random.Random
 import org.threeten.bp.Instant
 
 @Entity(
-    tableName = SYNC_REMOTE_TABLE_NAME
+    tableName = SYNC_REMOTE_TABLE_NAME,
 )
 data class SyncRemote @Ignore constructor(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
+    @ColumnInfo(name = COL_ID)
+    var id: Long = ID_UNSET,
     @ColumnInfo(name = COL_URL) var url: URL = URL(DEFAULT_SERVER_ADDRESS),
     @ColumnInfo(name = COL_SYNC_CHAIN_ID) var syncChainId: String = "",
     @ColumnInfo(
         name = COL_LATEST_MESSAGE_TIMESTAMP,
-        typeAffinity = ColumnInfo.INTEGER
+        typeAffinity = ColumnInfo.INTEGER,
     ) var latestMessageTimestamp: Instant = Instant.EPOCH,
     @ColumnInfo(name = COL_DEVICE_ID) var deviceId: Long = 0L,
     @ColumnInfo(name = COL_DEVICE_NAME) var deviceName: String = generateDeviceName(),
@@ -51,7 +52,7 @@ inline fun String?.ifBlankOrNull(defaultValue: () -> String?): String? =
 
 val DEPRECATED_SYNC_HOSTS = listOf(
     "feederapp.nononsenseapps.com",
-    "feeder-sync.nononsenseapps.workers.dev"
+    "feeder-sync.nononsenseapps.workers.dev",
 )
 
 fun generateDeviceName(): String {
@@ -63,8 +64,12 @@ fun generateDeviceName(): String {
     } else {
         "$manufacturer $model"
     }.replaceFirstChar {
-        if (it.isLowerCase()) it.titlecase(
-            Locale.getDefault()
-        ) else it.toString()
+        if (it.isLowerCase()) {
+            it.titlecase(
+                Locale.getDefault(),
+            )
+        } else {
+            it.toString()
+        }
     }.ifBlank { "${Random.nextInt(100_000)}" }
 }

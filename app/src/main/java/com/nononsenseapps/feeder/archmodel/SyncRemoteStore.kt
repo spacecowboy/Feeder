@@ -74,7 +74,7 @@ class SyncRemoteStore(override val di: DI) : DIAware {
             ReadStatusSynced(
                 feed_item = feedItemId,
                 sync_remote = 1L,
-            )
+            ),
         )
     }
 
@@ -91,7 +91,7 @@ class SyncRemoteStore(override val di: DI) : DIAware {
                 feedUrl = feedUrl,
                 guid = articleGuid,
                 timestamp = Instant.now(),
-            )
+            ),
         )
     }
 

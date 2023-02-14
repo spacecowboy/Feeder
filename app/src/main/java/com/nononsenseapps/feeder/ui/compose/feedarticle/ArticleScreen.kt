@@ -125,7 +125,7 @@ fun ArticleScreen(
                         putExtra(Intent.EXTRA_TITLE, viewState.articleTitle)
                         type = "text/plain"
                     },
-                    null
+                    null,
                 )
                 context.startActivity(intent)
             }
@@ -192,24 +192,24 @@ fun ArticleScreen(
                     IconButton(onClick = onNavigateUp) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.go_back)
+                            contentDescription = stringResource(R.string.go_back),
                         )
                     }
                 },
                 actions = {
                     IconButton(
-                        onClick = onToggleFullText
+                        onClick = onToggleFullText,
                     ) {
                         Icon(
                             Icons.Default.Article,
-                            contentDescription = stringResource(R.string.fetch_full_article)
+                            contentDescription = stringResource(R.string.fetch_full_article),
                         )
                     }
 
                     IconButton(onClick = onOpenInCustomTab) {
                         Icon(
                             Icons.Default.OpenInBrowser,
-                            contentDescription = stringResource(id = R.string.open_in_web_view)
+                            contentDescription = stringResource(id = R.string.open_in_web_view),
                         )
                     }
 
@@ -222,7 +222,7 @@ fun ArticleScreen(
                         }
                         DropdownMenu(
                             expanded = viewState.showToolbarMenu,
-                            onDismissRequest = { onShowToolbarMenu(false) }
+                            onDismissRequest = { onShowToolbarMenu(false) },
                         ) {
                             DropdownMenuItem(
                                 onClick = {
@@ -237,7 +237,7 @@ fun ArticleScreen(
                                 },
                                 text = {
                                     Text(stringResource(id = R.string.share))
-                                }
+                                },
                             )
 
                             DropdownMenuItem(
@@ -253,7 +253,7 @@ fun ArticleScreen(
                                 },
                                 text = {
                                     Text(stringResource(id = R.string.mark_as_unread))
-                                }
+                                },
                             )
                             DropdownMenuItem(
                                 onClick = {
@@ -273,10 +273,10 @@ fun ArticleScreen(
                                                 R.string.unpin_article
                                             } else {
                                                 R.string.pin_article
-                                            }
-                                        )
+                                            },
+                                        ),
                                     )
-                                }
+                                },
                             )
                             DropdownMenuItem(
                                 onClick = {
@@ -296,10 +296,10 @@ fun ArticleScreen(
                                                 R.string.remove_bookmark
                                             } else {
                                                 R.string.bookmark_article
-                                            }
-                                        )
+                                            },
+                                        ),
                                     )
-                                }
+                                },
                             )
                             DropdownMenuItem(
                                 onClick = {
@@ -314,11 +314,11 @@ fun ArticleScreen(
                                 },
                                 text = {
                                     Text(stringResource(id = R.string.read_article))
-                                }
+                                },
                             )
                         }
                     }
-                }
+                },
             )
         },
         bottomBar = {
@@ -341,7 +341,7 @@ fun ArticleScreen(
             onFeedTitleClick = onFeedTitleClick,
             displayFullText = displayFullText,
             modifier = Modifier
-                .padding(padding)
+                .padding(padding),
         )
     }
 }
@@ -353,7 +353,7 @@ fun ArticleContent(
     onFeedTitleClick: () -> Unit,
     articleListState: LazyListState,
     displayFullText: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val isLightTheme = MaterialTheme.colorScheme.isLight
     val filePathProvider by LocalDI.current.instance<FilePathProvider>()
@@ -400,7 +400,7 @@ fun ArticleContent(
             viewState.author == null && viewState.pubDate != null ->
                 stringResource(
                     R.string.on_date,
-                    (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat)
+                    (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat),
                 )
             viewState.author != null && viewState.pubDate != null ->
                 stringResource(
@@ -408,7 +408,7 @@ fun ArticleContent(
                     // Must wrap author in unicode marks to ensure it formats
                     // correctly in RTL
                     context.unicodeWrap(viewState.author ?: ""),
-                    (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat)
+                    (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat),
                 )
             else -> null
         },
@@ -429,9 +429,9 @@ fun ArticleContent(
                                         link = link,
                                         linkOpener = viewState.linkOpener,
                                         context = context,
-                                        toolbarColor = toolbarColor
+                                        toolbarColor = toolbarColor,
                                     )
-                                }
+                                },
                             )
                         }
                     } else {
@@ -464,9 +464,9 @@ fun ArticleContent(
                                         link = link,
                                         linkOpener = viewState.linkOpener,
                                         context = context,
-                                        toolbarColor = toolbarColor
+                                        toolbarColor = toolbarColor,
                                     )
-                                }
+                                },
                             )
                         }
                     } else {

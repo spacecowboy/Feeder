@@ -84,7 +84,7 @@ class PullRefreshState internal constructor(
     private val animationScope: CoroutineScope,
     private val onRefreshState: State<() -> Unit>,
     private val refreshingOffset: Float,
-    internal val threshold: Float
+    internal val threshold: Float,
 ) {
     /**
      * A float representing how far the user has pulled as a percentage of the refreshThreshold.

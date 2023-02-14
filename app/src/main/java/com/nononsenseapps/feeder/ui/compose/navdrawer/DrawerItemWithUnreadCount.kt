@@ -20,7 +20,7 @@ sealed class DrawerItemWithUnreadCount(
                 is DrawerFeed -> when {
                     tag.equals(other.tag, ignoreCase = true) -> displayTitle.compareTo(
                         other.displayTitle,
-                        ignoreCase = true
+                        ignoreCase = true,
                     )
                     tag.isEmpty() -> 1
                     other.tag.isEmpty() -> -1

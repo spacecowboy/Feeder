@@ -34,7 +34,7 @@ fun <T> AutoCompleteFoo(
     onSuggestionClicked: (T) -> Unit,
     maxHeight: Dp = TextFieldDefaults.MinHeight * 3,
     suggestionContent: @Composable (T) -> Unit,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Column {
         content()
@@ -48,13 +48,13 @@ fun <T> AutoCompleteFoo(
                     .fillMaxWidth(0.9f)
                     .border(
                         border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground),
-                        shape = RoundedCornerShape(8.dp)
-                    )
+                        shape = RoundedCornerShape(8.dp),
+                    ),
             ) {
                 items(suggestions.item) { suggestion ->
                     Box(
                         modifier = Modifier
-                            .clickable { onSuggestionClicked(suggestion) }
+                            .clickable { onSuggestionClicked(suggestion) },
                     ) {
                         suggestionContent(suggestion)
                     }
@@ -74,7 +74,7 @@ fun PreviewAutoCompleteOutlinedText() {
         suggestionContent = {
             Text(text = it)
         },
-        suggestions = immutableListHolderOf("One", "Two", "Three")
+        suggestions = immutableListHolderOf("One", "Two", "Three"),
     ) {
         OutlinedTextField(value = "Testing", onValueChange = {})
     }

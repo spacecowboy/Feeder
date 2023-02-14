@@ -35,25 +35,25 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 fun NothingToRead(
     modifier: Modifier = Modifier,
     onOpenOtherFeed: () -> Unit = {},
-    onAddFeed: () -> Unit = {}
+    onAddFeed: () -> Unit = {},
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .padding(horizontal = LocalDimens.current.margin)
             .fillMaxHeight()
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(id = R.string.empty_feed_top),
                 style = MaterialTheme.typography.headlineMedium.merge(
-                    TextStyle(fontWeight = FontWeight.Light)
+                    TextStyle(fontWeight = FontWeight.Light),
                 ),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Box(
@@ -63,14 +63,14 @@ fun NothingToRead(
                     .fillMaxWidth()
                     .clickable {
                         onOpenOtherFeed()
-                    }
+                    },
             ) {
                 Text(
                     text = annotatedStringResource(id = R.string.empty_feed_open),
                     style = MaterialTheme.typography.headlineMedium.merge(
-                        TextStyle(fontWeight = FontWeight.Light)
+                        TextStyle(fontWeight = FontWeight.Light),
                     ),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -81,14 +81,14 @@ fun NothingToRead(
                     .fillMaxWidth()
                     .clickable {
                         onAddFeed()
-                    }
+                    },
             ) {
                 Text(
                     text = annotatedStringResource(id = R.string.empty_feed_add),
                     style = MaterialTheme.typography.headlineMedium.merge(
-                        TextStyle(fontWeight = FontWeight.Light)
+                        TextStyle(fontWeight = FontWeight.Light),
                     ),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
         }
@@ -97,11 +97,11 @@ fun NothingToRead(
 
 @Preview(
     name = "Nothing to read day",
-    uiMode = Configuration.UI_MODE_NIGHT_NO
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 @Preview(
     name = "Nothing to read night",
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
 @Composable
 fun PreviewNothingToRead() {

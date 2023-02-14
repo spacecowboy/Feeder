@@ -87,57 +87,57 @@ fun TTSPlayer(
         floatingActionButton = floatingActionButton,
         actions = {
             IconButton(
-                onClick = onStop
+                onClick = onStop,
             ) {
                 Icon(
                     Icons.Default.Stop,
-                    contentDescription = stringResource(R.string.stop_reading)
+                    contentDescription = stringResource(R.string.stop_reading),
                 )
             }
             Crossfade(targetState = currentlyPlaying) { playing ->
                 if (playing) {
                     IconButton(
-                        onClick = onPause
+                        onClick = onPause,
                     ) {
                         Icon(
                             Icons.Default.Pause,
-                            contentDescription = stringResource(R.string.pause_reading)
+                            contentDescription = stringResource(R.string.pause_reading),
                         )
                     }
                 } else {
                     IconButton(
-                        onClick = onPlay
+                        onClick = onPlay,
                     ) {
                         Icon(
                             // TextToSpeech
                             Icons.Default.PlayArrow,
-                            contentDescription = stringResource(R.string.resume_reading)
+                            contentDescription = stringResource(R.string.resume_reading),
                         )
                     }
                 }
             }
             IconButton(
-                onClick = onSkipNext
+                onClick = onSkipNext,
             ) {
                 Icon(
                     Icons.Default.SkipNext,
-                    contentDescription = stringResource(R.string.skip_to_next)
+                    contentDescription = stringResource(R.string.skip_to_next),
                 )
             }
             Box {
                 IconButton(
                     onClick = {
                         showMenu = true
-                    }
+                    },
                 ) {
                     Icon(
                         Icons.Default.Translate,
-                        contentDescription = stringResource(R.string.set_language)
+                        contentDescription = stringResource(R.string.set_language),
                     )
                 }
                 DropdownMenu(
                     expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
+                    onDismissRequest = { showMenu = false },
                 ) {
                     DropdownMenuItem(
                         onClick = {
@@ -146,7 +146,7 @@ fun TTSPlayer(
                         },
                         text = {
                             Text(stringResource(id = R.string.use_app_default))
-                        }
+                        },
                     )
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         DropdownMenuItem(
@@ -156,7 +156,7 @@ fun TTSPlayer(
                             },
                             text = {
                                 Text(stringResource(id = R.string.use_detect_language))
-                            }
+                            },
                         )
                     }
                     Divider()
@@ -168,12 +168,12 @@ fun TTSPlayer(
                             },
                             text = {
                                 Text(text = lang.getDisplayName(lang))
-                            }
+                            },
                         )
                     }
                 }
             }
-        }
+        },
     )
 }
 
@@ -211,10 +211,10 @@ fun PlayerPreviewWithFab() {
                 ) {
                     Icon(
                         Icons.Default.DoneAll,
-                        contentDescription = stringResource(R.string.mark_all_as_read)
+                        contentDescription = stringResource(R.string.mark_all_as_read),
                     )
                 }
-            }
+            },
         )
     }
 }

@@ -91,12 +91,12 @@ fun DeleteFeedDialog(
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp),
             )
         },
         text = {
             LazyColumn(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 items(feeds.item) { feed ->
                     val stateLabel = if (isChecked(feed.id)) {
@@ -115,31 +115,31 @@ fun DeleteFeedDialog(
                             }
                             .semantics(mergeDescendants = true) {
                                 stateDescription = stateLabel
-                            }
+                            },
                     ) {
                         Checkbox(
                             checked = isChecked(feed.id),
                             onCheckedChange = { checked ->
                                 onToggleFeed(feed.id, checked)
                             },
-                            modifier = Modifier.clearAndSetSemantics { }
+                            modifier = Modifier.clearAndSetSemantics { },
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = feed.title,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                     }
                 }
             }
-        }
+        },
     )
 }
 
 @Immutable
 data class DeletableFeed(
     val id: Long,
-    val title: String
+    val title: String,
 )
 
 @Composable
@@ -148,8 +148,8 @@ private fun preview() =
     DeleteFeedDialog(
         feeds = immutableListHolderOf(
             DeletableFeed(1, "A Feed"),
-            DeletableFeed(2, "Another Feed")
+            DeletableFeed(2, "Another Feed"),
         ),
         onDismiss = {},
-        onDelete = {}
+        onDelete = {},
     )

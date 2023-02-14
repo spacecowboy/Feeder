@@ -20,7 +20,7 @@ val Typography = Typography()
 fun LinkTextStyle(): TextStyle =
     TextStyle(
         color = MaterialTheme.colorScheme.primary,
-        textDecoration = TextDecoration.Underline
+        textDecoration = TextDecoration.Underline,
     )
 
 fun titleFontWeight(unread: Boolean) =
@@ -58,7 +58,7 @@ fun TTSPlayerStyle(): TextStyle =
 fun CodeInlineStyle(): SpanStyle =
     SpanStyle(
         background = CodeBlockBackground(),
-        fontFamily = FontFamily.Monospace
+        fontFamily = FontFamily.Monospace,
     )
 
 /**
@@ -68,8 +68,8 @@ fun CodeInlineStyle(): SpanStyle =
 fun CodeBlockStyle(): TextStyle =
     MaterialTheme.typography.bodyMedium.merge(
         SpanStyle(
-            fontFamily = FontFamily.Monospace
-        )
+            fontFamily = FontFamily.Monospace,
+        ),
     )
 
 @Composable
@@ -80,8 +80,8 @@ fun CodeBlockBackground(): Color =
 fun BlockQuoteStyle(): SpanStyle =
     MaterialTheme.typography.bodyLarge.toSpanStyle().merge(
         SpanStyle(
-            fontWeight = FontWeight.Light
-        )
+            fontWeight = FontWeight.Light,
+        ),
     )
 
 @Immutable

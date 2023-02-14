@@ -72,11 +72,11 @@ fun ReaderView(
                     ScreenType.DUAL -> 0.dp // List items have enough padding
                     ScreenType.SINGLE -> dimens.margin
                 },
-                end = dimens.margin
+                end = dimens.margin,
             ),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             item {
                 val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
@@ -89,28 +89,28 @@ fun ReaderView(
                                     CustomAccessibilityAction(goToFeedLabel) {
                                         onFeedTitleClick()
                                         true
-                                    }
+                                    },
                                 )
                             } catch (e: Exception) {
                                 // Observed nullpointer exception when setting customActions
                                 // No clue why it could be null
                                 Log.e("FeederReaderScreen", "Exception in semantics", e)
                             }
-                        }
+                        },
                 ) {
                     withBidiDeterminedLayoutDirection(paragraph = articleTitle) {
                         Text(
                             text = articleTitle,
                             style = MaterialTheme.typography.headlineLarge,
                             modifier = Modifier
-                                .width(dimens.maxContentWidth)
+                                .width(dimens.maxContentWidth),
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     ProvideScaledText(
                         style = MaterialTheme.typography.titleMedium.merge(
-                            LinkTextStyle()
-                        )
+                            LinkTextStyle(),
+                        ),
                     ) {
                         withBidiDeterminedLayoutDirection(paragraph = feedTitle) {
                             Text(
@@ -122,7 +122,7 @@ fun ReaderView(
                                     }
                                     .clickable {
                                         onFeedTitleClick()
-                                    }
+                                    },
                             )
                         }
                     }
@@ -134,7 +134,7 @@ fun ReaderView(
                                     Text(
                                         text = authorDate,
                                         modifier = Modifier
-                                            .width(dimens.maxContentWidth)
+                                            .width(dimens.maxContentWidth),
                                     )
                                 }
                             }
@@ -153,12 +153,12 @@ fun ReaderView(
                     }
                     Column(
                         modifier = Modifier
-                            .width(dimens.maxContentWidth)
+                            .width(dimens.maxContentWidth),
                     ) {
                         ProvideScaledText(
                             style = MaterialTheme.typography.bodyLarge.merge(
-                                LinkTextStyle()
-                            )
+                                LinkTextStyle(),
+                            ),
                         ) {
                             Text(
                                 text = openLabel,
@@ -172,14 +172,14 @@ fun ReaderView(
                                                 CustomAccessibilityAction(openLabel) {
                                                     onEnclosureClick()
                                                     true
-                                                }
+                                                },
                                             )
                                         } catch (e: Exception) {
                                             // Observed nullpointer exception when setting customActions
                                             // No clue why it could be null
                                             Log.e("FeederReaderScreen", "Exception in semantics", e)
                                         }
-                                    }
+                                    },
                             )
                         }
                         Spacer(modifier = Modifier.height(16.dp))

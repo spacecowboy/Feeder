@@ -30,12 +30,13 @@ const val OPEN_ARTICLE_WITH_APPLICATION_DEFAULT = ""
     tableName = FEEDS_TABLE_NAME,
     indices = [
         Index(value = [COL_URL], unique = true),
-        Index(value = [COL_ID, COL_URL, COL_TITLE], unique = true)
-    ]
+        Index(value = [COL_ID, COL_URL, COL_TITLE], unique = true),
+    ],
 )
 data class Feed @Ignore constructor(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
+    @ColumnInfo(name = COL_ID)
+    var id: Long = ID_UNSET,
     @ColumnInfo(name = COL_TITLE) var title: String = "",
     @ColumnInfo(name = COL_CUSTOM_TITLE) var customTitle: String = "",
     @ColumnInfo(name = COL_URL) var url: URL = sloppyLinkToStrictURL(""),

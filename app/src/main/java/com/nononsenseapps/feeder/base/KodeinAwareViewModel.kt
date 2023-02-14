@@ -27,7 +27,7 @@ abstract class DIAwareViewModel(override val di: DI) :
     AndroidViewModel(di.direct.instance()), DIAware
 
 class DIAwareViewModelFactory(
-    override val di: DI
+    override val di: DI,
 ) : ViewModelProvider.AndroidViewModelFactory(di.direct.instance()), DIAware {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (DIAwareViewModel::class.java.isAssignableFrom(modelClass)) {
@@ -67,12 +67,12 @@ inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithComposableViewModel
 class DIAwareSavedStateViewModelFactory(
     override val di: DI,
     val owner: SavedStateRegistryOwner,
-    val defaultArgs: Bundle? = null
+    val defaultArgs: Bundle? = null,
 ) : AbstractSavedStateViewModelFactory(owner, defaultArgs), DIAware {
     override fun <T : ViewModel> create(
         key: String,
         modelClass: Class<T>,
-        handle: SavedStateHandle
+        handle: SavedStateHandle,
     ): T {
         return if (DIAwareViewModel::class.java.isAssignableFrom(modelClass)) {
             try {
@@ -93,26 +93,26 @@ class DIAwareSavedStateViewModelFactory(
 
 @Composable
 inline fun <reified T : DIAwareViewModel> SavedStateRegistryOwner.DIAwareViewModel(
-    key: String? = null
+    key: String? = null,
 ): T {
     val factory = DIAwareSavedStateViewModelFactory(LocalDI.current, this)
 
     return viewModel(
         modelClass = T::class.java,
         key = key,
-        factory = factory
+        factory = factory,
     )
 }
 
 @Composable
 inline fun <reified T : DIAwareViewModel> NavBackStackEntry.DIAwareViewModel(
-    key: String? = null
+    key: String? = null,
 ): T {
     val factory = DIAwareSavedStateViewModelFactory(LocalDI.current, this, arguments)
 
     return viewModel(
         modelClass = T::class.java,
         key = key,
-        factory = factory
+        factory = factory,
     )
 }

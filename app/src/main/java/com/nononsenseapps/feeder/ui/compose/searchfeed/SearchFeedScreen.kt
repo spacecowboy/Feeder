@@ -115,19 +115,19 @@ fun SearchFeedScreen(
                     IconButton(onClick = onNavigateUp) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.go_back)
+                            contentDescription = stringResource(R.string.go_back),
                         )
                     }
                 },
             )
-        }
+        },
     ) { padding ->
         SearchFeedView(
             screenType = screenType,
             initialFeedUrl = initialFeedUrl ?: "",
             modifier = Modifier.padding(padding),
             searchFeedViewModel = searchFeedViewModel,
-            onClick = onClick
+            onClick = onClick,
         )
     }
 }
@@ -136,7 +136,7 @@ fun SearchFeedScreen(
 fun SearchFeedView(
     screenType: ScreenType,
     initialFeedUrl: String = "",
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     searchFeedViewModel: SearchFeedViewModel,
     onClick: (SearchResult) -> Unit,
 ) {
@@ -185,7 +185,7 @@ fun SearchFeedView(
         errors = if (currentlySearching) StableHolder(emptyList()) else StableHolder(errors),
         currentlySearching = currentlySearching,
         modifier = modifier,
-        onClick = onClick
+        onClick = onClick,
     )
 }
 
@@ -199,7 +199,7 @@ fun SearchFeedView(
     results: StableHolder<List<SearchResult>>,
     errors: StableHolder<List<SearchResult>>,
     currentlySearching: Boolean,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onClick: (SearchResult) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -209,7 +209,7 @@ fun SearchFeedView(
     // If screen is opened from intent with pre-filled URL, trigger search directly
     LaunchedEffect(Unit) {
         if (results.item.isEmpty() && errors.item.isEmpty() && feedUrl.isNotBlank() && isValidUrl(
-                feedUrl
+                feedUrl,
             )
         ) {
             onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
@@ -222,7 +222,7 @@ fun SearchFeedView(
         contentAlignment = Alignment.TopCenter,
         modifier = modifier
             .fillMaxWidth()
-            .verticalScroll(scrollState)
+            .verticalScroll(scrollState),
     ) {
         if (screenType == ScreenType.DUAL) {
             Row(
@@ -233,7 +233,7 @@ fun SearchFeedView(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .weight(1f, fill = true)
-                        .padding(horizontal = dimens.margin, vertical = 8.dp)
+                        .padding(horizontal = dimens.margin, vertical = 8.dp),
                 ) {
                     leftContent(
                         feedUrl = feedUrl,
@@ -241,7 +241,7 @@ fun SearchFeedView(
                         dimens = dimens,
                         keyboardController = keyboardController,
                         onUrlChanged = onUrlChanged,
-                        onSearch = onSearch
+                        onSearch = onSearch,
                     )
                 }
 
@@ -250,13 +250,13 @@ fun SearchFeedView(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .weight(1f, fill = true)
-                        .padding(horizontal = dimens.margin, vertical = 8.dp)
+                        .padding(horizontal = dimens.margin, vertical = 8.dp),
                 ) {
                     rightContent(
                         results = results,
                         errors = errors,
                         currentlySearching = currentlySearching,
-                        onClick = onClick
+                        onClick = onClick,
                     )
                 }
             }
@@ -266,7 +266,7 @@ fun SearchFeedView(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(horizontal = dimens.margin, vertical = 8.dp)
-                    .width(dimens.maxContentWidth)
+                    .width(dimens.maxContentWidth),
             ) {
                 leftContent(
                     feedUrl = feedUrl,
@@ -274,13 +274,13 @@ fun SearchFeedView(
                     onSearch = onSearch,
                     focusManager = focusManager,
                     dimens = dimens,
-                    keyboardController = keyboardController
+                    keyboardController = keyboardController,
                 )
                 rightContent(
                     results = results,
                     errors = errors,
                     currentlySearching = currentlySearching,
-                    onClick = onClick
+                    onClick = onClick,
                 )
             }
         }
@@ -318,7 +318,7 @@ fun ColumnScope.leftContent(
             capitalization = KeyboardCapitalization.None,
             autoCorrect = false,
             keyboardType = KeyboardType.Uri,
-            imeAction = ImeAction.Search
+            imeAction = ImeAction.Search,
         ),
         keyboardActions = KeyboardActions(
             onSearch = {
@@ -326,7 +326,7 @@ fun ColumnScope.leftContent(
                     onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
                     keyboardController?.hide()
                 }
-            }
+            },
         ),
         singleLine = true,
         colors = TextFieldDefaults.textFieldColors(),
@@ -343,7 +343,7 @@ fun ColumnScope.leftContent(
             }
             .safeSemantics {
                 testTag = "urlField"
-            }
+            },
     )
 
     OutlinedButton(
@@ -353,10 +353,10 @@ fun ColumnScope.leftContent(
                 onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
                 focusManager.clearFocus()
             }
-        }
+        },
     ) {
         Text(
-            stringResource(android.R.string.search_go)
+            stringResource(android.R.string.search_go),
         )
     }
 }
@@ -372,11 +372,11 @@ fun ColumnScope.rightContent(
         for (error in errors.item) {
             val title = stringResource(
                 R.string.failed_to_parse,
-                error.url
+                error.url,
             )
             ErrorResultView(
                 title = title,
-                description = error.description
+                description = error.description,
             )
         }
     }
@@ -384,7 +384,7 @@ fun ColumnScope.rightContent(
         SearchResultView(
             title = result.title,
             url = result.url,
-            description = result.description
+            description = result.description,
         ) {
             onClick(result)
         }
@@ -402,7 +402,7 @@ fun SearchingIndicator() {
             .fillMaxWidth()
             .safeSemantics {
                 testTag = "searchingIndicator"
-            }
+            },
     ) {
         CircularProgressIndicator()
     }
@@ -423,25 +423,25 @@ fun SearchResultView(
             .width(dimens.maxContentWidth)
             .safeSemantics {
                 testTag = "searchResult"
-            }
+            },
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .width(dimens.maxContentWidth)
-                .padding(8.dp)
+                .padding(8.dp),
         ) {
             Text(
                 title,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.titleSmall,
             )
             Text(
                 url,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
             Text(
                 description,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }
@@ -459,22 +459,22 @@ fun ErrorResultView(
             .width(dimens.maxContentWidth)
             .safeSemantics {
                 testTag = "errorResult"
-            }
+            },
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .width(dimens.maxContentWidth)
-                .padding(8.dp)
+                .padding(8.dp),
         ) {
             Text(
                 title,
                 style = MaterialTheme.typography.titleSmall
-                    .copy(color = MaterialTheme.colorScheme.error)
+                    .copy(color = MaterialTheme.colorScheme.error),
             )
             Text(
                 description,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }

@@ -48,7 +48,6 @@ class FeedParser(override val di: DI) : DIAware {
         preferAtom: Boolean = false,
         preferJSON: Boolean = false,
     ): URL? {
-
         val feedLinks = getAlternateFeedLinksInHtml(html)
             .sortedBy {
                 val t = it.second.lowercase(Locale.getDefault())
@@ -95,7 +94,7 @@ class FeedParser(override val di: DI) : DIAware {
                 when {
                     baseUrl != null -> relativeLinkIntoAbsolute(
                         base = baseUrl,
-                        link = it.attr("href")
+                        link = it.attr("href"),
                     )
                     else -> sloppyLinkToStrictURL(it.attr("href")).toString()
                 }
@@ -156,7 +155,7 @@ class FeedParser(override val di: DI) : DIAware {
                 when {
                     baseUrl != null -> relativeLinkIntoAbsolute(
                         base = baseUrl,
-                        link = it.attr("href")
+                        link = it.attr("href"),
                     ) to it.attr("type")
                     else -> sloppyLinkToStrictURL(it.attr("href")).toString() to it.attr("type")
                 }
@@ -165,7 +164,7 @@ class FeedParser(override val di: DI) : DIAware {
         return when {
             feeds.isNotEmpty() -> feeds
             baseUrl?.host == "www.youtube.com" || baseUrl?.host == "youtube.com" -> findFeedLinksForYoutube(
-                doc
+                doc,
             )
             else -> emptyList()
         }
@@ -355,7 +354,7 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
                         it.maxAge(1, TimeUnit.MINUTES)
                     }
                 }
-                .build()
+                .build(),
         )
         .build()
 

@@ -58,7 +58,7 @@ private fun TextComposer.appendTextChildren(
                 } else {
                     node.appendCorrectlyNormalizedWhiteSpace(
                         this,
-                        stripLeading = endsWithWhitespace
+                        stripLeading = endsWithWhitespace,
                     )
                 }
             }
@@ -91,7 +91,7 @@ private fun TextComposer.appendTextChildren(
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
-                                stripLeading = endsWithWhitespace
+                                stripLeading = endsWithWhitespace,
                             )
                         }
                         terminateCurrentText()
@@ -101,7 +101,7 @@ private fun TextComposer.appendTextChildren(
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
-                                stripLeading = endsWithWhitespace
+                                stripLeading = endsWithWhitespace,
                             )
                         }
                         terminateCurrentText()
@@ -111,7 +111,7 @@ private fun TextComposer.appendTextChildren(
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
-                                stripLeading = endsWithWhitespace
+                                stripLeading = endsWithWhitespace,
                             )
                         }
                         terminateCurrentText()
@@ -121,7 +121,7 @@ private fun TextComposer.appendTextChildren(
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
-                                stripLeading = endsWithWhitespace
+                                stripLeading = endsWithWhitespace,
                             )
                         }
                         terminateCurrentText()
@@ -131,7 +131,7 @@ private fun TextComposer.appendTextChildren(
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
-                                stripLeading = endsWithWhitespace
+                                stripLeading = endsWithWhitespace,
                             )
                         }
                         terminateCurrentText()
@@ -141,7 +141,7 @@ private fun TextComposer.appendTextChildren(
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
-                                stripLeading = endsWithWhitespace
+                                stripLeading = endsWithWhitespace,
                             )
                         }
                         terminateCurrentText()

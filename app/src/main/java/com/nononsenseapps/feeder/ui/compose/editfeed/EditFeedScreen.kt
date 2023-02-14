@@ -105,7 +105,7 @@ fun CreateFeedScreen(
         },
         onCancel = {
             onNavigateUp()
-        }
+        },
     )
 }
 
@@ -134,7 +134,7 @@ fun EditFeedScreen(
         },
         onCancel = {
             onNavigateUp()
-        }
+        },
     )
 }
 
@@ -210,14 +210,14 @@ fun EditFeedScreen(
                     }
                 },
             )
-        }
+        },
     ) { padding ->
         EditFeedView(
             screenType = screenType,
             viewState = screenState,
             onOk = onOk,
             onCancel = onCancel,
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
         )
 
         if (shouldShowExplanationForPermission && !permissionDismissed) {
@@ -240,7 +240,7 @@ fun EditFeedView(
     viewState: EditFeedScreenState,
     onOk: () -> Unit,
     onCancel: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
 
@@ -251,7 +251,7 @@ fun EditFeedView(
         onCancel = onCancel,
         okEnabled = viewState.isOkToSave,
         modifier = modifier
-            .padding(horizontal = LocalDimens.current.margin)
+            .padding(horizontal = LocalDimens.current.margin),
     ) {
         if (screenType == ScreenType.DUAL) {
             Row(
@@ -261,7 +261,7 @@ fun EditFeedView(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier
                         .weight(1f, fill = true)
-                        .padding(horizontal = dimens.margin, vertical = 8.dp)
+                        .padding(horizontal = dimens.margin, vertical = 8.dp),
                 ) {
                     leftContent(
                         viewState = viewState,
@@ -272,7 +272,7 @@ fun EditFeedView(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier
                         .weight(1f, fill = true)
-                        .padding(horizontal = dimens.margin, vertical = 8.dp)
+                        .padding(horizontal = dimens.margin, vertical = 8.dp),
                 ) {
                     rightContent(
                         viewState = viewState,
@@ -282,14 +282,14 @@ fun EditFeedView(
         } else {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.width(dimens.maxContentWidth)
+                modifier = Modifier.width(dimens.maxContentWidth),
             ) {
                 leftContent(
                     viewState = viewState,
                 )
 
                 Divider(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 rightContent(
@@ -310,7 +310,7 @@ fun ColumnScope.leftContent(
             ImmutableHolder(
                 viewState.allTags.filter { tag ->
                     tag.isNotBlank() && tag.startsWith(viewState.feedTag, ignoreCase = true)
-                }
+                },
             )
         }
     }
@@ -331,12 +331,12 @@ fun ColumnScope.leftContent(
             capitalization = KeyboardCapitalization.None,
             autoCorrect = false,
             keyboardType = KeyboardType.Uri,
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Next,
         ),
         keyboardActions = KeyboardActions(
             onNext = {
                 focusTitle.requestFocus()
-            }
+            },
         ),
         singleLine = true,
         modifier = Modifier
@@ -347,7 +347,7 @@ fun ColumnScope.leftContent(
             }
             .interceptKey(Key.Escape) {
                 focusManager.clearFocus()
-            }
+            },
     )
     AnimatedVisibility(visible = viewState.isNotValidUrl) {
         Text(
@@ -370,12 +370,12 @@ fun ColumnScope.leftContent(
             capitalization = KeyboardCapitalization.Words,
             autoCorrect = true,
             keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Next,
         ),
         keyboardActions = KeyboardActions(
             onNext = {
                 focusTag.requestFocus()
-            }
+            },
         ),
         modifier = Modifier
             .focusRequester(focusTitle)
@@ -386,7 +386,7 @@ fun ColumnScope.leftContent(
             }
             .interceptKey(Key.Escape) {
                 focusManager.clearFocus()
-            }
+            },
     )
 
     AutoCompleteFoo(
@@ -402,14 +402,14 @@ fun ColumnScope.leftContent(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .height(48.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
-        }
+        },
     ) {
         OutlinedTextField(
             value = viewState.feedTag,
@@ -422,12 +422,12 @@ fun ColumnScope.leftContent(
                 capitalization = KeyboardCapitalization.Words,
                 autoCorrect = true,
                 keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done
+                imeAction = ImeAction.Done,
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
-                }
+                },
             ),
             modifier = Modifier
                 .focusRequester(focusTag)
@@ -441,7 +441,7 @@ fun ColumnScope.leftContent(
                 }
                 .interceptKey(Key.Escape) {
                     focusManager.clearFocus()
-                }
+                },
         )
     }
 }
@@ -454,27 +454,27 @@ fun ColumnScope.rightContent(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
         checked = viewState.fullTextByDefault,
         onCheckedChanged = { viewState.fullTextByDefault = it },
-        icon = null
+        icon = null,
     )
     SwitchSetting(
         title = stringResource(id = R.string.notify_for_new_items),
         checked = viewState.notify,
         onCheckedChanged = { viewState.notify = it },
-        icon = null
+        icon = null,
     )
     SwitchSetting(
         title = stringResource(id = R.string.generate_extra_unique_ids),
         description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
         checked = viewState.alternateId,
         onCheckedChanged = { viewState.alternateId = it },
-        icon = null
+        icon = null,
     )
     Divider(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     )
     GroupTitle(
         startingSpace = false,
-        height = 48.dp
+        height = 48.dp,
     ) {
         Text(stringResource(id = R.string.open_item_by_default_with))
     }
@@ -485,7 +485,7 @@ fun ColumnScope.rightContent(
         icon = null,
         onClick = {
             viewState.articleOpener = ""
-        }
+        },
     )
     RadioButtonSetting(
         title = stringResource(id = R.string.open_in_reader),
@@ -494,7 +494,7 @@ fun ColumnScope.rightContent(
         icon = null,
         onClick = {
             viewState.articleOpener = PREF_VAL_OPEN_WITH_READER
-        }
+        },
     )
     RadioButtonSetting(
         title = stringResource(id = R.string.open_in_custom_tab),
@@ -503,7 +503,7 @@ fun ColumnScope.rightContent(
         icon = null,
         onClick = {
             viewState.articleOpener = PREF_VAL_OPEN_WITH_CUSTOM_TAB
-        }
+        },
     )
     RadioButtonSetting(
         title = stringResource(id = R.string.open_in_default_browser),
@@ -512,7 +512,7 @@ fun ColumnScope.rightContent(
         icon = null,
         onClick = {
             viewState.articleOpener = PREF_VAL_OPEN_WITH_BROWSER
-        }
+        },
     )
 }
 

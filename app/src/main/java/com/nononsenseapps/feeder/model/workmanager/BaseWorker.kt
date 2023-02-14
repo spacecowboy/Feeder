@@ -23,7 +23,7 @@ private const val syncNotificationGroup = "com.nononsenseapps.feeder.SYNC"
 @RequiresApi(Build.VERSION_CODES.O)
 private fun createNotificationChannel(
     context: Context,
-    notificationManager: NotificationManagerCompat
+    notificationManager: NotificationManagerCompat,
 ) {
     val name = context.getString(R.string.sync_status)
     val description = context.getString(R.string.sync_status)
@@ -37,7 +37,7 @@ private fun createNotificationChannel(
 
 fun createForegroundInfo(
     context: Context,
-    notificationManager: NotificationManagerCompat
+    notificationManager: NotificationManagerCompat,
 ): ForegroundInfo {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         createNotificationChannel(context, notificationManager)
@@ -58,7 +58,7 @@ fun createForegroundInfo(
         ForegroundInfo(
             syncNotificationId,
             notification,
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE,
         )
     } else {
         ForegroundInfo(syncNotificationId, notification)

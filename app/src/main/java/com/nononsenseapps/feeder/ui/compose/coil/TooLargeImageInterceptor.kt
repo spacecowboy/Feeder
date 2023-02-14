@@ -11,7 +11,6 @@ import coil.request.SuccessResult
  */
 class TooLargeImageInterceptor : Interceptor {
     override suspend fun intercept(chain: Interceptor.Chain): ImageResult {
-
         return when (val result = chain.proceed(chain.request)) {
             is ErrorResult -> result
             is SuccessResult -> {
@@ -21,10 +20,11 @@ class TooLargeImageInterceptor : Interceptor {
                     return ErrorResult(
                         chain.request.error,
                         chain.request,
-                        RuntimeException("Image was (probably) too large to render within memory constraints: ${result.drawable.intrinsicWidth} x ${result.drawable.intrinsicHeight} > 2500 x 2500")
+                        RuntimeException("Image was (probably) too large to render within memory constraints: ${result.drawable.intrinsicWidth} x ${result.drawable.intrinsicHeight} > 2500 x 2500"),
                     )
-                } else
+                } else {
                     result
+                }
             }
         }
     }

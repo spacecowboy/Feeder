@@ -62,12 +62,12 @@ fun FeedItemCard(
     newIndicator: Boolean,
 ) {
     ElevatedCard(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
-                .requiredHeightIn(min = minimumTouchSize)
+                .requiredHeightIn(min = minimumTouchSize),
         ) {
             if (showThumbnail) {
                 val placeholder = PlaceholderImage()
@@ -82,7 +82,7 @@ fun FeedItemCard(
                                 .listener(
                                     onError = { a, b ->
                                         Log.e("FEEDER_CARD", "error ${a.data}", b.throwable)
-                                    }
+                                    },
                                 )
                                 .scale(Scale.FIT)
                                 .placeholder(placeholder)
@@ -95,7 +95,7 @@ fun FeedItemCard(
                             modifier = Modifier
                                 .clip(MaterialTheme.shapes.medium)
                                 .fillMaxWidth()
-                                .aspectRatio(16.0f / 9.0f)
+                                .aspectRatio(16.0f / 9.0f),
                         )
                         FeedItemIndicatorRow(
                             unread = item.unread && newIndicator,
@@ -124,7 +124,7 @@ fun FeedItemCard(
                             fontWeight = titleFontWeight(item.unread),
                             modifier = Modifier
                                 .padding(start = 8.dp, end = 8.dp, top = 8.dp)
-                                .fillMaxWidth()
+                                .fillMaxWidth(),
                         )
                     }
                     // Want the dropdown to center on the middle text row
@@ -132,7 +132,7 @@ fun FeedItemCard(
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxWidth(),
                         ) {
                             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                                 val text = buildAnnotatedString {
@@ -151,14 +151,14 @@ fun FeedItemCard(
                                         overflow = TextOverflow.Clip,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(start = 8.dp, end = 8.dp)
+                                            .padding(start = 8.dp, end = 8.dp),
                                     )
                                 }
                             }
                         }
                         DropdownMenu(
                             expanded = dropDownMenuExpanded,
-                            onDismissRequest = onDismissDropdown
+                            onDismissRequest = onDismissDropdown,
                         ) {
                             DropdownMenuItem(
                                 onClick = {
@@ -171,10 +171,10 @@ fun FeedItemCard(
                                             when (item.pinned) {
                                                 true -> R.string.unpin_article
                                                 false -> R.string.pin_article
-                                            }
-                                        )
+                                            },
+                                        ),
                                     )
-                                }
+                                },
                             )
                             DropdownMenuItem(
                                 onClick = {
@@ -187,10 +187,10 @@ fun FeedItemCard(
                                             when (item.bookmarked) {
                                                 true -> R.string.remove_bookmark
                                                 false -> R.string.bookmark_article
-                                            }
-                                        )
+                                            },
+                                        ),
                                     )
-                                }
+                                },
                             )
                             DropdownMenuItem(
                                 onClick = {
@@ -199,9 +199,9 @@ fun FeedItemCard(
                                 },
                                 text = {
                                     Text(
-                                        text = stringResource(id = R.string.mark_items_above_as_read)
+                                        text = stringResource(id = R.string.mark_items_above_as_read),
                                     )
-                                }
+                                },
                             )
                             DropdownMenuItem(
                                 onClick = {
@@ -210,9 +210,9 @@ fun FeedItemCard(
                                 },
                                 text = {
                                     Text(
-                                        text = stringResource(id = R.string.mark_items_below_as_read)
+                                        text = stringResource(id = R.string.mark_items_below_as_read),
                                     )
-                                }
+                                },
                             )
                             DropdownMenuItem(
                                 onClick = {
@@ -221,9 +221,9 @@ fun FeedItemCard(
                                 },
                                 text = {
                                     Text(
-                                        text = stringResource(R.string.share)
+                                        text = stringResource(R.string.share),
                                     )
-                                }
+                                },
                             )
                         }
                     }
@@ -238,7 +238,7 @@ fun FeedItemCard(
                     Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(8.dp)
+                            .height(8.dp),
                     )
                 }
                 if (!showThumbnail || item.imageUrl == null) {
@@ -294,7 +294,7 @@ private fun preview() {
 private fun previewWithImage() {
     FeederTheme {
         Box(
-            modifier = Modifier.width((300 - 2 * 16).dp)
+            modifier = Modifier.width((300 - 2 * 16).dp),
         ) {
             FeedItemCard(
                 item = FeedListItem(

@@ -65,14 +65,14 @@ fun FeedItemSuperCompact(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .height(IntrinsicSize.Min)
+            .height(IntrinsicSize.Min),
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .weight(weight = 1.0f, fill = true)
                 .requiredHeightIn(min = minimumTouchSize)
-                .padding(vertical = 4.dp)
+                .padding(vertical = 4.dp),
         ) {
             withBidiDeterminedLayoutDirection(paragraph = item.title) {
                 Text(
@@ -81,7 +81,7 @@ fun FeedItemSuperCompact(
                     fontWeight = titleFontWeight(item.unread),
                     modifier = Modifier
                         .padding(start = 4.dp, end = 4.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 )
             }
             // Want the dropdown to center on the middle text row
@@ -89,7 +89,7 @@ fun FeedItemSuperCompact(
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 ) {
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         val text = buildAnnotatedString {
@@ -108,14 +108,14 @@ fun FeedItemSuperCompact(
                                 overflow = TextOverflow.Clip,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 4.dp, end = 4.dp)
+                                    .padding(start = 4.dp, end = 4.dp),
                             )
                         }
                     }
                 }
                 DropdownMenu(
                     expanded = dropDownMenuExpanded,
-                    onDismissRequest = onDismissDropdown
+                    onDismissRequest = onDismissDropdown,
                 ) {
                     DropdownMenuItem(
                         onClick = {
@@ -128,10 +128,10 @@ fun FeedItemSuperCompact(
                                     when (item.pinned) {
                                         true -> R.string.unpin_article
                                         false -> R.string.pin_article
-                                    }
-                                )
+                                    },
+                                ),
                             )
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -144,10 +144,10 @@ fun FeedItemSuperCompact(
                                     when (item.bookmarked) {
                                         true -> R.string.remove_bookmark
                                         false -> R.string.bookmark_article
-                                    }
-                                )
+                                    },
+                                ),
                             )
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -156,9 +156,9 @@ fun FeedItemSuperCompact(
                         },
                         text = {
                             Text(
-                                text = stringResource(id = R.string.mark_items_above_as_read)
+                                text = stringResource(id = R.string.mark_items_above_as_read),
                             )
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -167,9 +167,9 @@ fun FeedItemSuperCompact(
                         },
                         text = {
                             Text(
-                                text = stringResource(id = R.string.mark_items_below_as_read)
+                                text = stringResource(id = R.string.mark_items_below_as_read),
                             )
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -178,9 +178,9 @@ fun FeedItemSuperCompact(
                         },
                         text = {
                             Text(
-                                text = stringResource(R.string.share)
+                                text = stringResource(R.string.share),
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -200,7 +200,7 @@ fun FeedItemSuperCompact(
                                 .listener(
                                     onError = { a, b ->
                                         Log.e("FEEDER_SUPERCOMPACT", "error ${a.data}", b.throwable)
-                                    }
+                                    },
                                 )
                                 .scale(Scale.FIT)
                                 .placeholder(placeholder)
@@ -212,7 +212,7 @@ fun FeedItemSuperCompact(
                             contentScale = ContentScale.Crop,
                             modifier = modifier
                                 .width(64.dp)
-                                .fillMaxHeight()
+                                .fillMaxHeight(),
                         )
                     }
                 }

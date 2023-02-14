@@ -40,7 +40,7 @@ class Dimensions(
     /**
      * Number of columns in feed screen
      */
-    val feedScreenColumns: Int
+    val feedScreenColumns: Int,
 )
 
 val phoneDimensions = Dimensions(
@@ -58,7 +58,7 @@ val tabletDimensions = Dimensions(
     margin = 32.dp,
     gutter = 32.dp,
     layoutColumns = 8,
-    feedScreenColumns = 2
+    feedScreenColumns = 2,
 )
 
 val wideTabletDimensions = Dimensions(
@@ -67,7 +67,7 @@ val wideTabletDimensions = Dimensions(
     margin = 32.dp,
     gutter = 32.dp,
     layoutColumns = 12,
-    feedScreenColumns = 4
+    feedScreenColumns = 4,
 )
 
 val LocalDimens = staticCompositionLocalOf {

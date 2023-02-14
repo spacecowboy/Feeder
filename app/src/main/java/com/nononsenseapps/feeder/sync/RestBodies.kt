@@ -6,20 +6,20 @@ import java.net.URL
 import org.threeten.bp.Instant
 
 data class CreateRequest(
-    val deviceName: String
+    val deviceName: String,
 )
 
 data class JoinRequest(
-    val deviceName: String
+    val deviceName: String,
 )
 
 data class JoinResponse(
     val syncCode: String,
-    val deviceId: Long
+    val deviceId: Long,
 )
 
 data class DeviceListResponse(
-    val devices: List<DeviceMessage>
+    val devices: List<DeviceMessage>,
 )
 
 data class DeviceMessage(
@@ -28,11 +28,11 @@ data class DeviceMessage(
 )
 
 data class GetReadMarksResponse(
-    val readMarks: List<ReadMark>
+    val readMarks: List<ReadMark>,
 )
 
 data class GetEncryptedReadMarksResponse(
-    val readMarks: List<EncryptedReadMark>
+    val readMarks: List<EncryptedReadMark>,
 )
 
 data class ReadMark(
@@ -48,11 +48,11 @@ data class EncryptedReadMark(
 )
 
 data class SendReadMarkBulkRequest(
-    val items: List<SendReadMarkRequest>
+    val items: List<SendReadMarkRequest>,
 )
 
 data class SendEncryptedReadMarkBulkRequest(
-    val items: List<SendEncryptedReadMarkRequest>
+    val items: List<SendEncryptedReadMarkRequest>,
 )
 
 data class SendReadMarkRequest(
@@ -65,7 +65,7 @@ data class SendEncryptedReadMarkRequest(
 )
 
 data class SendReadMarkResponse(
-    val timestamp: Instant
+    val timestamp: Instant,
 )
 
 data class ReadMarkContent(
@@ -90,7 +90,7 @@ data class GetFeedsResponse(
 )
 
 data class EncryptedFeeds(
-    val feeds: List<EncryptedFeed>
+    val feeds: List<EncryptedFeed>,
 )
 
 data class EncryptedFeed(

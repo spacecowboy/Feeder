@@ -86,13 +86,13 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
                     isFeedTag = true
                     val feedTitle = unescape(
                         atts?.getValue("title") ?: atts?.getValue("text")
-                            ?: ""
+                            ?: "",
                     )
                     val feed = Feed(
                         title = feedTitle,
                         customTitle = feedTitle,
                         tag = if (tagStack.isNotEmpty()) tagStack.peek() else "",
-                        url = sloppyLinkToStrictURL(atts?.getValue("xmlurl") ?: "")
+                        url = sloppyLinkToStrictURL(atts?.getValue("xmlurl") ?: ""),
                     )
 
                     feeds.add(feed)
@@ -101,8 +101,8 @@ class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
                     unescape(
                         atts?.getValue("title")
                             ?: atts?.getValue("text")
-                            ?: ""
-                    )
+                            ?: "",
+                    ),
                 )
             }
         }

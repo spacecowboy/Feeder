@@ -36,6 +36,7 @@ fun currentlyConnected(context: Context): Boolean {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         val net = connManager?.activeNetwork
+
         @Suppress("DEPRECATION")
         val netInfo = connManager?.getNetworkInfo(net)
         @Suppress("DEPRECATION")

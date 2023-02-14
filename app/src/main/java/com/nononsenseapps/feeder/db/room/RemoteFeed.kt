@@ -23,13 +23,14 @@ import java.net.URL
             entity = SyncRemote::class,
             parentColumns = [COL_ID],
             childColumns = ["sync_remote"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
 )
 data class RemoteFeed @Ignore constructor(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
+    @ColumnInfo(name = COL_ID)
+    var id: Long = ID_UNSET,
     @ColumnInfo(name = "sync_remote") var syncRemote: Long = ID_UNSET,
     @ColumnInfo(name = COL_URL) var url: URL = sloppyLinkToStrictURL(""),
 ) {

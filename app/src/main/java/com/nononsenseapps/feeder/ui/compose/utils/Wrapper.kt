@@ -39,10 +39,10 @@ data class ImmutableHolder<T>(val item: T) {
 
 fun <T> immutableListHolderOf(vararg elements: T): ImmutableHolder<List<T>> =
     ImmutableHolder(
-        listOf(*elements)
+        listOf(*elements),
     )
 
 fun <T> stableListHolderOf(vararg elements: T): StableHolder<List<T>> =
     StableHolder(
-        listOf(*elements)
+        listOf(*elements),
     )

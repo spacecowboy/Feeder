@@ -41,7 +41,7 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null
                 Intent.ACTION_VIEW,
                 "$DEEP_LINK_BASE_URI/feed?id=$id".toUri(),
                 this,
-                MainActivity::class.java
+                MainActivity::class.java,
             ).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
@@ -58,9 +58,9 @@ fun Context.addDynamicShortcutToFeed(label: String, id: Long, icon: Icon? = null
                             getLetterIcon(
                                 label,
                                 id,
-                                radius = shortcutManager.iconMaxHeight
-                            )
-                        )
+                                radius = shortcutManager.iconMaxHeight,
+                            ),
+                        ),
                 )
                 .setIntent(intent)
                 .setDisabledMessage("Feed deleted")

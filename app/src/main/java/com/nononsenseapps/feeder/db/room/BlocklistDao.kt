@@ -10,7 +10,7 @@ interface BlocklistDao {
         """
             INSERT INTO blocklist (id, glob_pattern)
             VALUES (null, '*' || :pattern || '*')
-        """
+        """,
     )
     suspend fun insertSafely(pattern: String)
 
@@ -18,7 +18,7 @@ interface BlocklistDao {
         """
             DELETE FROM blocklist
             WHERE glob_pattern = ('*' || :pattern || '*')
-        """
+        """,
     )
     suspend fun deletePattern(pattern: String)
 
@@ -27,7 +27,7 @@ interface BlocklistDao {
             SELECT glob_pattern
             FROM blocklist
             ORDER BY glob_pattern
-        """
+        """,
     )
     fun getGlobPatterns(): Flow<List<String>>
 }

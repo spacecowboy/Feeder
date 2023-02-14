@@ -13,10 +13,10 @@ import org.xml.sax.SAXException
 import org.xml.sax.SAXNotRecognizedException
 import org.xml.sax.SAXNotSupportedException
 
-@Suppress("UNUSED_PARAMETER")
 /**
  * Intended primarily to convert HTML into plaintext snippets, useful for previewing content in list.
  */
+@Suppress("UNUSED_PARAMETER")
 class HtmlToPlainTextConverter : ContentHandler {
     private val parser: Parser = Parser()
     private var builder: StringBuilder? = null

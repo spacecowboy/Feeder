@@ -53,7 +53,7 @@ fun PullRefreshIndicator(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
-    scale: Boolean = false
+    scale: Boolean = false,
 ) {
     val showElevation by remember(refreshing, state) {
         derivedStateOf { refreshing || state.position > 0.5f }
@@ -69,11 +69,11 @@ fun PullRefreshIndicator(
     ) {
         Crossfade(
             targetState = refreshing,
-            animationSpec = tween(durationMillis = CrossfadeDurationMs)
+            animationSpec = tween(durationMillis = CrossfadeDurationMs),
         ) { refreshing ->
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 val spinnerSize = (ArcRadius + StrokeWidth).times(2)
 
@@ -95,7 +95,7 @@ fun PullRefreshIndicator(
 private fun CircularArrowIndicator(
     state: PullRefreshState,
     color: Color,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val path = remember { Path().apply { fillType = PathFillType.EvenOdd } }
 
@@ -108,7 +108,7 @@ private fun CircularArrowIndicator(
                 size.center.x - arcRadius,
                 size.center.y - arcRadius,
                 size.center.x + arcRadius,
-                size.center.y + arcRadius
+                size.center.y + arcRadius,
             )
             drawArc(
                 color = color,
@@ -120,8 +120,8 @@ private fun CircularArrowIndicator(
                 size = arcBounds.size,
                 style = Stroke(
                     width = StrokeWidth.toPx(),
-                    cap = StrokeCap.Square
-                )
+                    cap = StrokeCap.Square,
+                ),
             )
             drawArrow(path, arcBounds, color, values)
         }
@@ -134,7 +134,7 @@ private class ArrowValues(
     val rotation: Float,
     val startAngle: Float,
     val endAngle: Float,
-    val scale: Float
+    val scale: Float,
 )
 
 private fun ArrowValues(progress: Float): ArrowValues {
@@ -166,7 +166,7 @@ private fun DrawScope.drawArrow(arrow: Path, bounds: Rect, color: Color, values:
     // Line to tip of arrow
     arrow.lineTo(
         x = ArrowWidth.toPx() * values.scale / 2,
-        y = ArrowHeight.toPx() * values.scale
+        y = ArrowHeight.toPx() * values.scale,
     )
 
     val radius = min(bounds.width, bounds.height) / 2f
@@ -174,8 +174,8 @@ private fun DrawScope.drawArrow(arrow: Path, bounds: Rect, color: Color, values:
     arrow.translate(
         Offset(
             x = radius + bounds.center.x - inset,
-            y = bounds.center.y + StrokeWidth.toPx() / 2f
-        )
+            y = bounds.center.y + StrokeWidth.toPx() / 2f,
+        ),
     )
     arrow.close()
     rotate(degrees = values.endAngle) {
@@ -202,7 +202,7 @@ fun Modifier.pullRefreshIndicatorTransform(
         name = "pullRefreshIndicatorTransform"
         properties["state"] = state
         properties["scale"] = scale
-    }
+    },
 ) {
     var height by remember { mutableStateOf(0) }
 

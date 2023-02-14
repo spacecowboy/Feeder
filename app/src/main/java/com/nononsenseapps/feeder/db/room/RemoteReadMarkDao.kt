@@ -23,7 +23,7 @@ interface RemoteReadMarkDao {
         """
             DELETE FROM remote_read_mark
             WHERE timestamp < :oldestTimestamp
-        """
+        """,
     )
     suspend fun deleteStaleRemoteReadMarks(oldestTimestamp: Instant): Int
 
@@ -34,7 +34,7 @@ interface RemoteReadMarkDao {
             INNER JOIN feed_items fi ON remote_read_mark.guid = fi.guid
             INNER JOIN feeds f on f.id = fi.feed_id
             WHERE f.url IS remote_read_mark.feed_url AND fi.unread = 1
-        """
+        """,
     )
     suspend fun getRemoteReadMarksReadyToBeApplied(): List<RemoteReadMarkReadyToBeApplied>
 
@@ -43,14 +43,14 @@ interface RemoteReadMarkDao {
             SELECT remote_read_mark.guid
             FROM remote_read_mark
             WHERE remote_read_mark.feed_url = :feedUrl
-        """
+        """,
     )
     suspend fun getGuidsWhichAreSyncedAsReadInFeed(feedUrl: URL): List<String>
 }
 
 data class RemoteReadMarkReadyToBeApplied @Ignore constructor(
     @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
-    @ColumnInfo(name = "feed_item_id") var feedItemId: Long = ID_UNSET
+    @ColumnInfo(name = "feed_item_id") var feedItemId: Long = ID_UNSET,
 ) {
     constructor() : this(id = ID_UNSET)
 }

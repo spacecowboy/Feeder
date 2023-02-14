@@ -12,7 +12,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 fun rememberApiPermissionState(
     permission: String,
     minimumApiLevel: Int = 1,
-    onPermissionResult: (Boolean) -> Unit = {}
+    onPermissionResult: (Boolean) -> Unit = {},
 ): PermissionState =
     if (Build.VERSION.SDK_INT >= minimumApiLevel) {
         rememberPermissionState(permission = permission, onPermissionResult = onPermissionResult)

@@ -132,7 +132,7 @@ object SearchFeedDestination : NavigationDestination(
             type = NavType.StringType
             defaultValue = null
             nullable = true
-        }
+        },
     ),
     deepLinks = emptyList(),
 ) {
@@ -150,19 +150,19 @@ object SearchFeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        backStackEntry: NavBackStackEntry
+        backStackEntry: NavBackStackEntry,
     ) {
         SearchFeedScreen(
             onNavigateUp = {
                 navController.popBackStack()
             },
             initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
-            searchFeedViewModel = backStackEntry.DIAwareViewModel()
+            searchFeedViewModel = backStackEntry.DIAwareViewModel(),
         ) {
             AddFeedDestination.navigate(
                 navController,
                 feedUrl = it.url,
-                feedTitle = it.title
+                feedTitle = it.title,
             )
         }
     }
@@ -177,7 +177,7 @@ object AddFeedDestination : NavigationDestination(
         QueryParamArgument("feedTitle") {
             type = NavType.StringType
             defaultValue = ""
-        }
+        },
     ),
     deepLinks = emptyList(),
 ) {
@@ -195,7 +195,7 @@ object AddFeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        backStackEntry: NavBackStackEntry
+        backStackEntry: NavBackStackEntry,
     ) {
         val createFeedScreenViewModel: CreateFeedScreenViewModel = backStackEntry.DIAwareViewModel()
 
@@ -215,7 +215,7 @@ object EditFeedDestination : NavigationDestination(
     navArguments = listOf(
         PathParamArgument("feedId") {
             type = NavType.LongType
-        }
+        },
     ),
     deepLinks = emptyList(),
 ) {
@@ -229,14 +229,14 @@ object EditFeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        backStackEntry: NavBackStackEntry
+        backStackEntry: NavBackStackEntry,
     ) {
         val editFeedScreenViewModel: EditFeedScreenViewModel = backStackEntry.DIAwareViewModel()
         EditFeedScreen(
             onNavigateUp = {
                 navController.popBackStack()
             },
-            editFeedScreenViewModel = editFeedScreenViewModel
+            editFeedScreenViewModel = editFeedScreenViewModel,
         ) { feedId ->
             FeedDestination.navigate(navController, feedId = feedId)
         }
@@ -258,7 +258,7 @@ object SettingsDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        backStackEntry: NavBackStackEntry
+        backStackEntry: NavBackStackEntry,
     ) {
         SettingsScreen(
             onNavigateUp = {
@@ -293,7 +293,7 @@ object FeedDestination : NavigationDestination(
     deepLinks = listOf(
         navDeepLink {
             uriPattern = "$DEEP_LINK_BASE_URI/feed?id={id}&tag={tag}"
-        }
+        },
     ),
 ) {
     fun navigate(navController: NavController, feedId: Long = ID_UNSET, tag: String = "") {
@@ -322,7 +322,7 @@ object FeedDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        backStackEntry: NavBackStackEntry
+        backStackEntry: NavBackStackEntry,
     ) {
         val feedId = remember {
             backStackEntry.arguments?.getLong("id")
@@ -355,12 +355,12 @@ object ArticleDestination : NavigationDestination(
     navArguments = listOf(
         PathParamArgument("itemId") {
             type = NavType.LongType
-        }
+        },
     ),
     deepLinks = listOf(
         navDeepLink {
             uriPattern = "$DEEP_LINK_BASE_URI/article/{itemId}"
-        }
+        },
     ),
 ) {
     fun navigate(navController: NavController, itemId: Long) {
@@ -372,7 +372,7 @@ object ArticleDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        backStackEntry: NavBackStackEntry
+        backStackEntry: NavBackStackEntry,
     ) {
         val itemId = remember {
             backStackEntry.arguments?.getLong("itemId")
@@ -410,7 +410,7 @@ object SyncScreenDestination : NavigationDestination(
         QueryParamArgument("secretKey") {
             type = NavType.StringType
             defaultValue = ""
-        }
+        },
     ),
     deepLinks = listOf(
         navDeepLink {
@@ -436,7 +436,7 @@ object SyncScreenDestination : NavigationDestination(
     @Composable
     override fun registerScreen(
         navController: NavController,
-        backStackEntry: NavBackStackEntry
+        backStackEntry: NavBackStackEntry,
     ) {
         val syncRemoteViewModel = backStackEntry.DIAwareViewModel<SyncScreenViewModel>()
 

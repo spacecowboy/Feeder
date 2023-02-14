@@ -34,7 +34,7 @@ interface FeedDao {
     @Query(
         """
         DELETE FROM feeds WHERE id IN (:ids)
-        """
+        """,
     )
     suspend fun deleteFeeds(ids: List<Long>): Int
 
@@ -55,7 +55,7 @@ interface FeedDao {
        SELECT * FROM feeds
        WHERE id is :feedId
        AND last_sync < :staleTime
-    """
+    """,
     )
     suspend fun loadFeedIfStale(feedId: Long, staleTime: Long): Feed?
 
@@ -73,7 +73,7 @@ interface FeedDao {
         SELECT $COL_ID as id, $COL_TITLE as title
         FROM feeds
         ORDER BY $COL_TITLE
-    """
+    """,
     )
     fun loadFeedsForContentProvider(): Cursor
 
@@ -97,7 +97,7 @@ interface FeedDao {
           GROUP BY feed_id
         )
         ON feeds.id = feed_id
-    """
+    """,
     )
     fun loadFlowOfFeedsWithUnreadCounts(): Flow<List<FeedUnreadCount>>
 
@@ -122,7 +122,7 @@ interface FeedDao {
         FROM feeds
         WHERE $COL_TAG IS :feedTag
         ORDER BY $COL_TITLE COLLATE NOCASE
-        """
+        """,
     )
     fun getFeedTitlesWithTag(feedTag: String): Flow<List<FeedTitle>>
 
@@ -134,7 +134,7 @@ interface FeedDao {
             SELECT MAX(last_sync)
             FROM feeds
             WHERE currently_syncing
-        """
+        """,
     )
     fun getCurrentlySyncingLatestTimestamp(): Flow<Instant?>
 
@@ -143,7 +143,7 @@ interface FeedDao {
             UPDATE feeds
             SET currently_syncing = :syncing
             WHERE id IS :feedId
-        """
+        """,
     )
     suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean)
 
@@ -152,7 +152,7 @@ interface FeedDao {
             UPDATE feeds
             SET currently_syncing = :syncing, last_sync = :lastSync
             WHERE id IS :feedId
-        """
+        """,
     )
     suspend fun setCurrentlySyncingOn(feedId: Long, syncing: Boolean, lastSync: Instant)
 
@@ -161,7 +161,7 @@ interface FeedDao {
             SELECT *
             FROM feeds
             ORDER BY url
-        """
+        """,
     )
     suspend fun getFeedsOrderedByUrl(): List<Feed>
 
@@ -170,7 +170,7 @@ interface FeedDao {
             SELECT *
             FROM feeds
             ORDER BY url
-        """
+        """,
     )
     fun getFlowOfFeedsOrderedByUrl(): Flow<List<Feed>>
 
@@ -178,7 +178,7 @@ interface FeedDao {
         """
             DELETE FROM feeds
             WHERE url is :url
-        """
+        """,
     )
     suspend fun deleteFeedWithUrl(url: URL): Int
 }

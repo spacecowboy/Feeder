@@ -66,7 +66,7 @@ class TTSStateHolder(
 
             @Deprecated(
                 "Deprecated in super class",
-                replaceWith = ReplaceWith("onError(utteranceId, errorCode)")
+                replaceWith = ReplaceWith("onError(utteranceId, errorCode)"),
             )
             override fun onError(utteranceId: String) {
                 Log.e(LOG_TAG, "onError utteranceId $utteranceId")
@@ -104,7 +104,7 @@ class TTSStateHolder(
                     }
                     lang is ForcedLocale -> {
                         sequenceOf(
-                            lang.locale
+                            lang.locale,
                         )
                     }
                     else -> {
@@ -166,7 +166,7 @@ class TTSStateHolder(
                     initializedState = null
                     textToSpeech = TextToSpeech(
                         context,
-                        this@TTSStateHolder
+                        this@TTSStateHolder,
                     )
                 }
                 while (initializedState == null) {
@@ -177,7 +177,7 @@ class TTSStateHolder(
                         Toast.makeText(
                             context,
                             R.string.failed_to_load_text_to_speech,
-                            Toast.LENGTH_SHORT
+                            Toast.LENGTH_SHORT,
                         )
                             .show()
                     }
@@ -255,18 +255,18 @@ class TTSStateHolder(
                 .map { it.locale }
                 .plus(
                     context.getLocales()
-                        .sortedBy { it.getDisplayName(it).lowercase(it) }
+                        .sortedBy { it.getDisplayName(it).lowercase(it) },
                 )
                 .plus(
                     allAvailableLanguages.asSequence()
-                        .sortedBy { it.getDisplayName(it).lowercase(it) }
+                        .sortedBy { it.getDisplayName(it).lowercase(it) },
                 )
         } else {
             context.getLocales()
                 .sortedBy { it.displayName }
                 .plus(
                     allAvailableLanguages.asSequence()
-                        .sortedBy { it.getDisplayName(it).lowercase(it) }
+                        .sortedBy { it.getDisplayName(it).lowercase(it) },
                 )
         }
             .distinctBy { it.toLanguageTag() }
@@ -402,7 +402,7 @@ fun Context.detectLocaleFromText(
                     LocaleWithConfidence(
                         locale = localeDetected.toLocale(),
                         confidence = confidence,
-                    )
+                    ),
                 )
             }
         }
@@ -417,7 +417,7 @@ data class LocaleWithConfidence(
 enum class PlaybackStatus {
     STOPPED,
     PAUSED,
-    PLAYING
+    PLAYING,
 }
 
 @Immutable

@@ -26,19 +26,20 @@ import org.threeten.bp.Instant
             entity = SyncRemote::class,
             parentColumns = [COL_ID],
             childColumns = ["sync_remote"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
 )
 data class RemoteReadMark @Ignore constructor(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
+    @ColumnInfo(name = COL_ID)
+    var id: Long = ID_UNSET,
     @ColumnInfo(name = "sync_remote") var sync_remote: Long = ID_UNSET,
     @ColumnInfo(name = COL_FEEDURL) var feedUrl: URL = sloppyLinkToStrictURL(""),
     @ColumnInfo(name = COL_GUID) var guid: String = "",
     @ColumnInfo(
         name = "timestamp",
-        typeAffinity = ColumnInfo.INTEGER
+        typeAffinity = ColumnInfo.INTEGER,
     ) var timestamp: Instant = Instant.EPOCH,
 ) {
     constructor() : this(id = ID_UNSET)

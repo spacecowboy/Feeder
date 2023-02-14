@@ -26,7 +26,7 @@ suspend fun exportOpml(di: DI, uri: Uri) = withContext(Dispatchers.IO) {
             contentResolver.openOutputStream(uri)?.let {
                 writeOutputStream(
                     it,
-                    feedDao.loadTags()
+                    feedDao.loadTags(),
                 ) { tag ->
                     feedDao.loadFeeds(tag = tag)
                 }

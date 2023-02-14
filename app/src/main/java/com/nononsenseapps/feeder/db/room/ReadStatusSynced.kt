@@ -21,21 +21,22 @@ import java.net.URL
             entity = FeedItem::class,
             parentColumns = [COL_ID],
             childColumns = ["feed_item"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
         ),
         ForeignKey(
             entity = SyncRemote::class,
             parentColumns = [COL_ID],
             childColumns = ["sync_remote"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
 )
 data class ReadStatusSynced @Ignore constructor(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = COL_ID) var id: Long = ID_UNSET,
+    @ColumnInfo(name = COL_ID)
+    var id: Long = ID_UNSET,
     @ColumnInfo(name = "sync_remote") var sync_remote: Long = ID_UNSET,
-    @ColumnInfo(name = "feed_item") var feed_item: Long = ID_UNSET
+    @ColumnInfo(name = "feed_item") var feed_item: Long = ID_UNSET,
 ) {
     constructor() : this(id = ID_UNSET)
 }

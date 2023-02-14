@@ -95,7 +95,7 @@ fun SwipeableFeedItemPreview(
             swipeableState.targetValue == FeedItemSwipeState.NONE -> Color.Transparent
             item.unread -> SwipingItemToReadColor
             else -> SwipingItemToUnreadColor
-        }
+        },
     )
 
     LaunchedEffect(onlyUnread, item.unread) {
@@ -172,7 +172,7 @@ fun SwipeableFeedItemPreview(
                             when (item.pinned) {
                                 true -> unpinArticleLabel
                                 false -> pinArticleLabel
-                            }
+                            },
                         ) {
                             onTogglePinned()
                             true
@@ -181,7 +181,7 @@ fun SwipeableFeedItemPreview(
                             when (item.bookmarked) {
                                 true -> removeBookmarkLabel
                                 false -> bookmarkArticleLabel
-                            }
+                            },
                         ) {
                             onToggleBookmarked()
                             true
@@ -204,7 +204,7 @@ fun SwipeableFeedItemPreview(
                     // No clue why it could be null
                     Log.e("FeederSwipeableFIP", "Exception in semantics", e)
                 }
-            }
+            },
     ) {
         val maxWidthPx = with(LocalDensity.current) {
             maxWidth.toPx()
@@ -214,12 +214,12 @@ fun SwipeableFeedItemPreview(
             modifier = Modifier
                 .matchParentSize()
                 .background(color)
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 24.dp),
         ) {
             AnimatedVisibility(
                 visible = swipeableState.targetValue != FeedItemSwipeState.NONE,
                 enter = fadeIn(),
-                exit = fadeOut()
+                exit = fadeOut(),
             ) {
                 Icon(
                     when (item.unread) {
@@ -258,7 +258,7 @@ fun SwipeableFeedItemPreview(
                     onToggleBookmarked = onToggleBookmarked,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                        .graphicsLayer(alpha = itemAlpha)
+                        .graphicsLayer(alpha = itemAlpha),
                 )
             }
             FeedItemStyle.COMPACT -> {
@@ -275,7 +275,7 @@ fun SwipeableFeedItemPreview(
                     onToggleBookmarked = onToggleBookmarked,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                        .graphicsLayer(alpha = itemAlpha)
+                        .graphicsLayer(alpha = itemAlpha),
                 )
             }
             FeedItemStyle.SUPER_COMPACT -> {
@@ -292,7 +292,7 @@ fun SwipeableFeedItemPreview(
                     onToggleBookmarked = onToggleBookmarked,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
-                        .graphicsLayer(alpha = itemAlpha)
+                        .graphicsLayer(alpha = itemAlpha),
                 )
             }
         }
@@ -303,7 +303,7 @@ fun SwipeableFeedItemPreview(
         if (swipeAsRead != SwipeAsRead.DISABLED && !item.pinned) {
             Box(
                 modifier = Modifier
-                    .matchParentSize()
+                    .matchParentSize(),
             ) {
                 val anchors = mutableMapOf(0f to FeedItemSwipeState.NONE)
                 Box(
@@ -339,8 +339,8 @@ fun SwipeableFeedItemPreview(
                             velocityThreshold = 1000.dp,
                             thresholds = { _, _ ->
                                 FractionalThreshold(0.50f)
-                            }
-                        )
+                            },
+                        ),
                 )
             }
         }
@@ -350,5 +350,5 @@ fun SwipeableFeedItemPreview(
 enum class FeedItemSwipeState {
     NONE,
     LEFT,
-    RIGHT
+    RIGHT,
 }

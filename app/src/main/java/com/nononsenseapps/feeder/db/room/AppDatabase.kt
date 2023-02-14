@@ -49,7 +49,7 @@ private const val LOG_TAG = "FEEDER_APPDB"
         RemoteFeed::class,
         SyncDevice::class,
     ],
-    version = 25
+    version = 25,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -125,7 +125,7 @@ class MigrationFrom24To25(override val di: DI) : Migration(24, 25), DIAware {
         database.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN fulltext_downloaded INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         // Delete all existing full text
@@ -169,13 +169,13 @@ class MigrationFrom23To24(override val di: DI) : Migration(23, 24), DIAware {
             CREATE TABLE IF NOT EXISTS `blocklist`
                 (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                  `glob_pattern` TEXT NOT NULL)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         database.execSQL(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS `index_blocklist_glob_pattern` on `blocklist` (`glob_pattern`)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val blocks = sharedPrefs.getStringSet("pref_block_list_values", null)
@@ -191,7 +191,7 @@ class MigrationFrom23To24(override val di: DI) : Migration(23, 24), DIAware {
                     INSERT INTO `blocklist`
                         (`glob_pattern`)
                         VALUES $valuesList
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
             } catch (e: SQLiteException) {
                 Log.e("FEEDER_DB", "Failed to migrate blocklist", e)
@@ -210,7 +210,7 @@ object MIGRATION_22_23 : Migration(22, 23) {
         database.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN bookmarked INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -221,7 +221,7 @@ object MIGRATION_21_22 : Migration(21, 22) {
         database.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -233,39 +233,39 @@ object MIGRATION_20_21 : Migration(20, 21) {
             """
             ALTER TABLE sync_remote
               ADD COLUMN secret_key TEXT NOT NULL DEFAULT ''
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
             ALTER TABLE sync_remote
               ADD COLUMN last_feeds_remote_hash INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
             ALTER TABLE feeds
               ADD COLUMN when_modified INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `remote_feed` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sync_remote` INTEGER NOT NULL, `url` TEXT NOT NULL, FOREIGN KEY(`sync_remote`) REFERENCES `sync_remote`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE UNIQUE INDEX IF NOT EXISTS `index_remote_feed_sync_remote_url` ON `remote_feed` (`sync_remote`, `url`)
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE INDEX IF NOT EXISTS `index_remote_feed_url` ON `remote_feed` (`url`)
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE INDEX IF NOT EXISTS `index_remote_feed_sync_remote` ON `remote_feed` (`sync_remote`)
-            """.trimIndent()
+            """.trimIndent(),
         )
         // And generate encryption key
         database.execSQL(
@@ -274,7 +274,7 @@ object MIGRATION_20_21 : Migration(20, 21) {
                     SET secret_key = ?
                     WHERE id IS 1
             """.trimIndent(),
-            arrayOf(AesCbcWithIntegrity.generateKey().toString())
+            arrayOf(AesCbcWithIntegrity.generateKey().toString()),
         )
     }
 }
@@ -286,28 +286,28 @@ object MIGRATION_19_20 : Migration(19, 20) {
             """
             ALTER TABLE sync_remote 
               ADD COLUMN device_id INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
             ALTER TABLE sync_remote 
               ADD COLUMN device_name TEXT NOT NULL DEFAULT ''
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS `sync_device` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sync_remote` INTEGER NOT NULL, `device_id` INTEGER NOT NULL, `device_name` TEXT NOT NULL, FOREIGN KEY(`sync_remote`) REFERENCES `sync_remote`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE UNIQUE INDEX IF NOT EXISTS `index_sync_device_sync_remote_device_id` ON `sync_device` (`sync_remote`, `device_id`)
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE INDEX IF NOT EXISTS `index_sync_device_sync_remote` ON `sync_device` (`sync_remote`)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -318,27 +318,27 @@ object MIGRATION_18_19 : Migration(18, 19) {
         database.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `remote_read_mark` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sync_remote` INTEGER NOT NULL, `feed_url` TEXT NOT NULL, `guid` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, FOREIGN KEY(`sync_remote`) REFERENCES `sync_remote`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE UNIQUE INDEX IF NOT EXISTS `index_remote_read_mark_sync_remote_feed_url_guid` ON `remote_read_mark` (`sync_remote`, `feed_url`, `guid`)
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE INDEX IF NOT EXISTS `index_remote_read_mark_feed_url_guid` ON `remote_read_mark` (`feed_url`, `guid`)
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE INDEX IF NOT EXISTS `index_remote_read_mark_sync_remote` ON `remote_read_mark` (`sync_remote`)
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE INDEX IF NOT EXISTS `index_remote_read_mark_timestamp` ON `remote_read_mark` (`timestamp`)
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -349,22 +349,22 @@ object MIGRATION_17_18 : Migration(17, 18) {
         database.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `read_status_synced` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sync_remote` INTEGER NOT NULL, `feed_item` INTEGER NOT NULL, FOREIGN KEY(`feed_item`) REFERENCES `feed_items`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`sync_remote`) REFERENCES `sync_remote`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE UNIQUE INDEX IF NOT EXISTS `index_read_status_synced_feed_item_sync_remote` ON `read_status_synced` (`feed_item`, `sync_remote`)
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE INDEX IF NOT EXISTS `index_read_status_synced_feed_item` ON `read_status_synced` (`feed_item`);
-            """.trimIndent()
+            """.trimIndent(),
         )
         database.execSQL(
             """
                 CREATE INDEX IF NOT EXISTS `index_read_status_synced_sync_remote` ON `read_status_synced` (`sync_remote`);
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -375,7 +375,7 @@ object MIGRATION_16_17 : Migration(16, 17) {
         database.execSQL(
             """
             CREATE TABLE sync_remote (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `url` TEXT NOT NULL, `sync_chain_id` TEXT NOT NULL, `latest_message_timestamp` INTEGER NOT NULL);
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -386,7 +386,7 @@ object MIGRATION_15_16 : Migration(15, 16) {
         database.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN currently_syncing INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -397,7 +397,7 @@ object MIGRATION_14_15 : Migration(14, 15) {
         database.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN alternate_id INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -408,7 +408,7 @@ object MIGRATION_13_14 : Migration(13, 14) {
         database.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN open_articles_with TEXT NOT NULL DEFAULT ''
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -419,7 +419,7 @@ object MIGRATION_12_13 : Migration(12, 13) {
         database.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN fulltext_by_default INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -430,7 +430,7 @@ object MIGRATION_11_12 : Migration(11, 12) {
         database.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN primary_sort_time INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -441,7 +441,7 @@ object MIGRATION_10_11 : Migration(10, 11) {
         database.execSQL(
             """
             ALTER TABLE feed_items ADD COLUMN first_synced_time INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -452,14 +452,14 @@ object MIGRATION_9_10 : Migration(9, 10) {
         database.execSQL(
             """
             CREATE TABLE IF NOT EXISTS `feed_items_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `guid` TEXT NOT NULL, `title` TEXT NOT NULL, `plain_title` TEXT NOT NULL, `plain_snippet` TEXT NOT NULL, `image_url` TEXT, `enclosure_link` TEXT, `author` TEXT, `pub_date` TEXT, `link` TEXT, `unread` INTEGER NOT NULL, `notified` INTEGER NOT NULL, `feed_id` INTEGER, FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         database.execSQL(
             """
             INSERT INTO `feed_items_new` (`id`, `guid`, `title`, `plain_title`, `plain_snippet`, `image_url`, `enclosure_link`, `author`, `pub_date`, `link`, `unread`, `notified`, `feed_id`)
             SELECT `id`, `guid`, `title`, `plain_title`, `plain_snippet`, `image_url`, `enclosure_link`, `author`, `pub_date`, `link`, `unread`, `notified`, `feed_id` FROM `feed_items`
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         // Iterate over all items using the minimum query. Also restrict the text field to
@@ -467,7 +467,7 @@ object MIGRATION_9_10 : Migration(9, 10) {
         database.query(
             """
             SELECT id, substr(description,0,1000000) FROM feed_items
-            """.trimIndent()
+            """.trimIndent(),
         )?.use { cursor ->
             cursor.forEach {
                 val feedItemId = cursor.getLong(0)
@@ -483,25 +483,25 @@ object MIGRATION_9_10 : Migration(9, 10) {
         database.execSQL(
             """
             DROP TABLE feed_items
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         database.execSQL(
             """
             ALTER TABLE feed_items_new RENAME TO feed_items
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         database.execSQL(
             """
             CREATE UNIQUE INDEX IF NOT EXISTS `index_feed_items_guid_feed_id` ON `feed_items` (`guid`, `feed_id`)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         database.execSQL(
             """
             CREATE INDEX IF NOT EXISTS `index_feed_items_feed_id` ON `feed_items` (`feed_id`)
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         // And reset response hash on all feeds to trigger parsing of results next sync so items
@@ -509,7 +509,7 @@ object MIGRATION_9_10 : Migration(9, 10) {
         database.execSQL(
             """
             UPDATE `feeds` SET `response_hash` = 0
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -519,7 +519,7 @@ object MIGRATION_8_9 : Migration(8, 9) {
         database.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN response_hash INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -529,7 +529,7 @@ object MIGRATION_7_8 : Migration(7, 8) {
         database.execSQL(
             """
             ALTER TABLE feeds ADD COLUMN last_sync INTEGER NOT NULL DEFAULT 0
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 }
@@ -552,34 +552,34 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
     database.execSQL(
         """
             CREATE TABLE IF NOT EXISTS `feeds` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `custom_title` TEXT NOT NULL, `url` TEXT NOT NULL, `tag` TEXT NOT NULL, `notify` INTEGER NOT NULL, `image_url` TEXT)
-        """.trimIndent()
+        """.trimIndent(),
     )
     database.execSQL(
         """
             CREATE UNIQUE INDEX `index_Feed_url` ON `feeds` (`url`)
-        """.trimIndent()
+        """.trimIndent(),
     )
     database.execSQL(
         """
             CREATE UNIQUE INDEX `index_Feed_id_url_title` ON `feeds` (`id`, `url`, `title`)
-        """.trimIndent()
+        """.trimIndent(),
     )
 
     // Items
     database.execSQL(
         """
             CREATE TABLE IF NOT EXISTS `feed_items` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `guid` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `plain_title` TEXT NOT NULL, `plain_snippet` TEXT NOT NULL, `image_url` TEXT, `enclosure_link` TEXT, `author` TEXT, `pub_date` TEXT, `link` TEXT, `unread` INTEGER NOT NULL, `notified` INTEGER NOT NULL, `feed_id` INTEGER, FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
-        """.trimIndent()
+        """.trimIndent(),
     )
     database.execSQL(
         """
             CREATE UNIQUE INDEX `index_feed_item_guid_feed_id` ON `feed_items` (`guid`, `feed_id`)
-        """.trimIndent()
+        """.trimIndent(),
     )
     database.execSQL(
         """
              CREATE  INDEX `index_feed_item_feed_id` ON `feed_items` (`feed_id`)
-        """.trimIndent()
+        """.trimIndent(),
     )
 
     // Migrate to new tables
@@ -587,7 +587,7 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
         """
             SELECT _id, title, url, tag, customtitle, notify ${if (version == 6) ", imageUrl" else ""}
             FROM Feed
-        """.trimIndent()
+        """.trimIndent(),
     )?.use { cursor ->
         cursor.forEach { _ ->
             val oldFeedId = cursor.getLong(0)
@@ -604,7 +604,7 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
                     if (version == 6) {
                         setString("image_url" to cursor.getString(6))
                     }
-                }
+                },
             )
 
             database.query(
@@ -613,7 +613,7 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
                            pubdate, unread, feed, enclosureLink, notified, guid
                     FROM FeedItem
                     WHERE feed = $oldFeedId
-                """.trimIndent()
+                """.trimIndent(),
             )?.use { cursor ->
                 database.inTransaction {
                     cursor.forEach { _ ->
@@ -634,7 +634,7 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
                                 setInt("unread" to cursor.getInt(8))
                                 setInt("notified" to cursor.getInt(11))
                                 setLong("feed_id" to newFeedId)
-                            }
+                            },
                         )
                     }
                 }

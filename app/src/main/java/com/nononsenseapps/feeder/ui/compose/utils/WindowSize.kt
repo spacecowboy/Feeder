@@ -28,7 +28,7 @@ enum class WindowSize {
     Compact,
     CompactWide,
     Medium,
-    Expanded
+    Expanded,
 }
 
 val localWindowSize: ProvidableCompositionLocal<WindowSize> =

@@ -109,7 +109,7 @@ fun FeedItemIndicator(
     content: @Composable (() -> Unit),
 ) {
     ProvideTextStyle(
-        value = MaterialTheme.typography.labelMedium
+        value = MaterialTheme.typography.labelMedium,
     ) {
         Surface(
             color = MaterialTheme.colorScheme.tertiaryContainer,

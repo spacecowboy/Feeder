@@ -109,7 +109,7 @@ fun ScreenWithNavDrawer(
                             onDrawerItemSelected(id, tag)
                             drawerState.close()
                         }
-                    }
+                    },
                 )
             }
         },
@@ -133,36 +133,49 @@ private fun ListOfFeedsAndTagsPreview() {
                         totalChildren = 2,
                     ),
                     DrawerFeed(
-                        id = 1, displayTitle = "Times", tag = "News tag", unreadCount = 1
+                        id = 1,
+                        displayTitle = "Times",
+                        tag = "News tag",
+                        unreadCount = 1,
                     ),
                     DrawerFeed(
                         id = 2,
                         displayTitle = "Post",
                         imageUrl = URL("https://cowboyprogrammer.org/apple-touch-icon.png"),
                         tag = "News tag",
-                        unreadCount = 2
+                        unreadCount = 2,
                     ),
                     DrawerTag(
-                        tag = "Funny tag", unreadCount = 6, -2222, totalChildren = 1
+                        tag = "Funny tag",
+                        unreadCount = 6,
+                        -2222,
+                        totalChildren = 1,
                     ),
                     DrawerFeed(
-                        id = 3, displayTitle = "Hidden", tag = "Funny tag", unreadCount = 6
+                        id = 3,
+                        displayTitle = "Hidden",
+                        tag = "Funny tag",
+                        unreadCount = 6,
                     ),
                     DrawerFeed(
-                        id = 4, displayTitle = "Top Dog", unreadCount = 99, tag = ""
+                        id = 4,
+                        displayTitle = "Top Dog",
+                        unreadCount = 99,
+                        tag = "",
                     ),
                     DrawerFeed(
                         id = 5,
                         imageUrl = URL("https://cowboyprogrammer.org/apple-touch-icon.png"),
                         displayTitle = "Cowboy Programmer",
                         unreadCount = 7,
-                        tag = ""
+                        tag = "",
                     ),
                 ),
                 ImmutableHolder(
                     setOf(
-                        "News tag", "Funny tag"
-                    )
+                        "News tag",
+                        "Funny tag",
+                    ),
                 ),
                 {},
             ) {}
@@ -190,7 +203,7 @@ fun ListOfFeedsAndTags(
             .fillMaxSize()
             .semantics {
                 testTag = "feedsAndTags"
-            }
+            },
     ) {
         items(feedsAndTags.item, key = { it.uiId }) { item ->
             when (item) {
@@ -202,7 +215,7 @@ fun ListOfFeedsAndTags(
                         title = item.title(),
                         onItemClick = {
                             onItemClick(item)
-                        }
+                        },
                     )
                 }
                 is DrawerFeed -> {
@@ -210,7 +223,7 @@ fun ListOfFeedsAndTags(
                         item.tag.isEmpty() -> {
                             if (item.id == firstTopFeed?.id) {
                                 Divider(
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth(),
                                 )
                             }
                             TopLevelFeed(
@@ -219,7 +232,7 @@ fun ListOfFeedsAndTags(
                                 imageUrl = item.imageUrl,
                                 onItemClick = {
                                     onItemClick(item)
-                                }
+                                },
                             )
                         }
                         else -> {
@@ -230,7 +243,7 @@ fun ListOfFeedsAndTags(
                                 visible = item.tag in expandedTags.item,
                                 onItemClick = {
                                     onItemClick(item)
-                                }
+                                },
                             )
                         }
                     }
@@ -240,7 +253,7 @@ fun ListOfFeedsAndTags(
                     title = item.title(),
                     onItemClick = {
                         onItemClick(item)
-                    }
+                    },
                 )
             }
         }
@@ -258,7 +271,8 @@ private fun ExpandableTag(
     onItemClick: () -> Unit = {},
 ) {
     val angle: Float by animateFloatAsState(
-        targetValue = if (expanded) 0f else 180f, animationSpec = tween()
+        targetValue = if (expanded) 0f else 180f,
+        animationSpec = tween(),
     )
 
     val toggleExpandLabel = stringResource(id = R.string.toggle_tag_expansion)
@@ -283,14 +297,14 @@ private fun ExpandableTag(
                         CustomAccessibilityAction(toggleExpandLabel) {
                             onToggleExpansion(title)
                             true
-                        }
+                        },
                     )
                 } catch (e: Exception) {
                     // Observed nullpointer exception when setting customActions
                     // No clue why it could be null
                     Log.e("FeederNavDrawer", "Exception in semantics", e)
                 }
-            }
+            },
     ) {
         ExpandArrow(degrees = angle, onClick = {
             onToggleExpansion(title)
@@ -298,7 +312,7 @@ private fun ExpandableTag(
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(1.0f, fill = true)
+                .weight(1.0f, fill = true),
         ) {
             Text(
                 text = title,
@@ -306,13 +320,13 @@ private fun ExpandableTag(
                 modifier = Modifier
                     .padding(end = 2.dp)
                     .fillMaxWidth()
-                    .align(Alignment.CenterStart)
+                    .align(Alignment.CenterStart),
             )
         }
         val unreadLabel = LocalContext.current.resources.getQuantityString(
             R.plurals.n_unread_articles,
             unreadCount,
-            unreadCount
+            unreadCount,
         )
         Text(
             text = unreadCount.toString(),
@@ -321,7 +335,7 @@ private fun ExpandableTag(
                 .padding(start = 2.dp)
                 .semantics {
                     contentDescription = unreadLabel
-                }
+                },
         )
     }
 }
@@ -335,7 +349,7 @@ private fun ExpandArrow(
         Icon(
             Icons.Filled.ExpandLess,
             contentDescription = stringResource(id = R.string.toggle_tag_expansion),
-            modifier = Modifier.rotate(degrees = degrees)
+            modifier = Modifier.rotate(degrees = degrees),
         )
     }
 }
@@ -384,7 +398,7 @@ private fun ChildFeed(
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
-        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut()
+        exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
     ) {
         Feed(
             title = title,
@@ -413,10 +427,13 @@ private fun Feed(
         modifier = Modifier
             .clickable(onClick = onItemClick)
             .padding(
-                start = startPadding, end = 16.dp, top = 2.dp, bottom = 2.dp
+                start = startPadding,
+                end = 16.dp,
+                top = 2.dp,
+                bottom = 2.dp,
             )
             .fillMaxWidth()
-            .height(48.dp)
+            .height(48.dp),
     ) {
         if (imageUrl != null) {
             Box(
@@ -433,33 +450,34 @@ private fun Feed(
                         }).scale(Scale.FIT).size(64).precision(Precision.INEXACT).build(),
                     contentDescription = stringResource(id = R.string.feed_icon),
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(1.0f, fill = true)
+                .weight(1.0f, fill = true),
         ) {
             Text(
                 text = title,
                 maxLines = 1,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.CenterStart)
+                    .align(Alignment.CenterStart),
             )
         }
         val unreadLabel = LocalContext.current.resources.getQuantityString(
             R.plurals.n_unread_articles,
             unreadCount,
-            unreadCount
+            unreadCount,
         )
         Text(
-            text = unreadCount.toString(), maxLines = 1,
+            text = unreadCount.toString(),
+            maxLines = 1,
             modifier = Modifier.semantics {
                 contentDescription = unreadLabel
-            }
+            },
         )
     }
 }

@@ -56,7 +56,7 @@ fun PaddedBottomAppBar(
     containerColor = containerColor,
     contentColor = contentColor,
     tonalElevation = tonalElevation,
-    contentPadding = contentPadding
+    contentPadding = contentPadding,
 ) {
     actions()
     if (floatingActionButton != null) {
@@ -66,9 +66,9 @@ fun PaddedBottomAppBar(
                 .fillMaxHeight()
                 .padding(
                     top = FABVerticalPadding,
-                    end = FABHorizontalPadding
+                    end = FABHorizontalPadding,
                 ),
-            contentAlignment = Alignment.TopStart
+            contentAlignment = Alignment.TopStart,
         ) {
             floatingActionButton()
         }
@@ -84,22 +84,22 @@ fun PreviewPaddedBottomBar() {
                 IconButton(onClick = {}) {
                     Icon(
                         Icons.Default.PlayArrow,
-                        contentDescription = null
+                        contentDescription = null,
                     )
                 }
                 IconButton(onClick = {}) {
                     Icon(
                         Icons.Default.Pause,
-                        contentDescription = null
+                        contentDescription = null,
                     )
                 }
                 IconButton(onClick = {}) {
                     Icon(
                         Icons.Default.Stop,
-                        contentDescription = null
+                        contentDescription = null,
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -121,19 +121,19 @@ private fun BottomAppBar(
     contentColor: Color = contentColorFor(containerColor),
     tonalElevation: Dp = BottomAppBarDefaults.ContainerElevation,
     contentPadding: PaddingValues = BottomAppBarDefaults.ContentPadding,
-    content: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit,
 ) {
     Surface(
         color = containerColor,
         contentColor = contentColor,
         tonalElevation = tonalElevation,
         shape = RectangleShape,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Box(
             modifier = Modifier.windowInsetsPadding(
-                WindowInsets.navigationBars.only(WindowInsetsSides.Bottom)
-            )
+                WindowInsets.navigationBars.only(WindowInsetsSides.Bottom),
+            ),
         ) {
             Row(
                 Modifier
@@ -142,7 +142,7 @@ private fun BottomAppBar(
                     .padding(contentPadding),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
-                content = content
+                content = content,
             )
         }
     }

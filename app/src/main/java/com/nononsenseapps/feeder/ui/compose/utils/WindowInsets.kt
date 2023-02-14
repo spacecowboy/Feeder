@@ -55,5 +55,5 @@ fun WindowInsets.addMargin(
         right = right,
         top = top,
         bottom = bottom,
-    )
+    ),
 )

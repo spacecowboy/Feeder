@@ -36,7 +36,7 @@ fun EditFeedDialog(
     feeds: ImmutableHolder<List<DeletableFeed>>,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
-    onEdit: (Long) -> Unit
+    onEdit: (Long) -> Unit,
 ) {
     AlertDialog(
         modifier = modifier,
@@ -57,13 +57,13 @@ fun EditFeedDialog(
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp),
             )
         },
         text = {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 items(feeds.item) { feed ->
                     Row(
@@ -76,7 +76,7 @@ fun EditFeedDialog(
                                 onEdit(feed.id)
                                 onDismiss()
                             }
-                            .semantics(mergeDescendants = true) {}
+                            .semantics(mergeDescendants = true) {},
                     ) {
                         RadioButton(
                             selected = false,
@@ -84,17 +84,17 @@ fun EditFeedDialog(
                                 onEdit(feed.id)
                                 onDismiss()
                             },
-                            modifier = Modifier.clearAndSetSemantics { }
+                            modifier = Modifier.clearAndSetSemantics { },
                         )
                         Spacer(modifier = Modifier.width(32.dp))
                         Text(
                             text = feed.title,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
                         )
                     }
                 }
             }
-        }
+        },
     )
 }
 
@@ -105,10 +105,10 @@ private fun preview() {
         EditFeedDialog(
             feeds = immutableListHolderOf(
                 DeletableFeed(1, "A Feed"),
-                DeletableFeed(2, "Another Feed")
+                DeletableFeed(2, "Another Feed"),
             ),
             onDismiss = {},
-            onEdit = {}
+            onEdit = {},
         )
     }
 }

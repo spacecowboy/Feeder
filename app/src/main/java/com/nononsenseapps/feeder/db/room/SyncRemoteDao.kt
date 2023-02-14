@@ -28,7 +28,7 @@ interface SyncRemoteDao {
             SELECT *
             FROM sync_remote
             WHERE id IS 1
-        """
+        """,
     )
     suspend fun getSyncRemote(): SyncRemote?
 
@@ -37,7 +37,7 @@ interface SyncRemoteDao {
             SELECT *
             FROM sync_remote
             WHERE id IS 1
-        """
+        """,
     )
     fun getSyncRemoteFlow(): Flow<SyncRemote?>
 
@@ -46,14 +46,14 @@ interface SyncRemoteDao {
             UPDATE sync_remote
             SET latest_message_timestamp = :timestamp
             WHERE id IS 1 AND latest_message_timestamp < :timestamp
-        """
+        """,
     )
     suspend fun updateLastMessageTimestamp(timestamp: Instant): Int
 
     @Query(
         """
             DELETE FROM sync_remote WHERE id IS 1
-        """
+        """,
     )
     suspend fun deleteSyncRemote(): Int
 
@@ -65,7 +65,7 @@ interface SyncRemoteDao {
                 id = 1L,
                 deviceName = Build.PRODUCT.ifBlank { Build.MODEL.ifBlank { Build.BRAND } },
                 secretKey = AesCbcWithIntegrity.generateKey().toString(),
-            )
+            ),
         )
     }
 }

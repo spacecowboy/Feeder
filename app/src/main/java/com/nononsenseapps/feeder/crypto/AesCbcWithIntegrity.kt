@@ -97,7 +97,7 @@ object AesCbcWithIntegrity {
             }
             SecretKeys(
                 SecretKeySpec(confidentialityKey, 0, confidentialityKey.size, CIPHER),
-                SecretKeySpec(integrityKey, HMAC_ALGORITHM)
+                SecretKeySpec(integrityKey, HMAC_ALGORITHM),
             )
         }
     }
@@ -150,7 +150,8 @@ object AesCbcWithIntegrity {
         val keySpec: KeySpec = PBEKeySpec(
             password.toCharArray(),
             salt,
-            PBE_ITERATION_COUNT, AES_KEY_LENGTH_BITS + HMAC_KEY_LENGTH_BITS
+            PBE_ITERATION_COUNT,
+            AES_KEY_LENGTH_BITS + HMAC_KEY_LENGTH_BITS,
         )
         val keyFactory = SecretKeyFactory
             .getInstance(PBE_ALGORITHM)
@@ -160,7 +161,7 @@ object AesCbcWithIntegrity {
         val confidentialityKeyBytes = keyBytes.copyOfRange(0, AES_KEY_LENGTH_BITS / 8)
         val integrityKeyBytes = keyBytes.copyOfRange(
             AES_KEY_LENGTH_BITS / 8,
-            AES_KEY_LENGTH_BITS / 8 + HMAC_KEY_LENGTH_BITS / 8
+            AES_KEY_LENGTH_BITS / 8 + HMAC_KEY_LENGTH_BITS / 8,
         )
 
         // Generate the AES key
@@ -221,6 +222,7 @@ object AesCbcWithIntegrity {
         random.nextBytes(b)
         return b
     }
+
 /*
  * -----------------------------------------------------------------
  * Encryption
@@ -242,7 +244,7 @@ object AesCbcWithIntegrity {
     fun encryptString(
         plaintext: String,
         secretKeys: SecretKeys,
-        encoding: Charset = Charsets.UTF_8
+        encoding: Charset = Charsets.UTF_8,
     ): String = encrypt(
         plaintext = plaintext,
         secretKeys = secretKeys,
@@ -265,7 +267,7 @@ object AesCbcWithIntegrity {
     fun encrypt(
         plaintext: String,
         secretKeys: SecretKeys,
-        encoding: Charset = Charsets.UTF_8
+        encoding: Charset = Charsets.UTF_8,
     ): CipherTextIvMac {
         return encrypt(plaintext.toByteArray(encoding), secretKeys)
     }
@@ -286,7 +288,7 @@ object AesCbcWithIntegrity {
         aesCipherForEncryption.init(
             Cipher.ENCRYPT_MODE,
             secretKeys.confidentialityKey,
-            IvParameterSpec(iv)
+            IvParameterSpec(iv),
         )
 
         /*
@@ -319,7 +321,7 @@ object AesCbcWithIntegrity {
     fun decryptString(
         civ: String,
         secretKeys: SecretKeys,
-        encoding: Charset = Charsets.UTF_8
+        encoding: Charset = Charsets.UTF_8,
     ): String {
         return String(decrypt(CipherTextIvMac(civ), secretKeys), encoding)
     }
@@ -338,7 +340,7 @@ object AesCbcWithIntegrity {
     fun decrypt(
         civ: CipherTextIvMac,
         secretKeys: SecretKeys,
-        encoding: Charset = Charsets.UTF_8
+        encoding: Charset = Charsets.UTF_8,
     ): String {
         return String(decrypt(civ, secretKeys), encoding)
     }
@@ -360,13 +362,14 @@ object AesCbcWithIntegrity {
             aesCipherForDecryption.init(
                 Cipher.DECRYPT_MODE,
                 secretKeys.confidentialityKey,
-                IvParameterSpec(civ.iv)
+                IvParameterSpec(civ.iv),
             )
             aesCipherForDecryption.doFinal(civ.cipherText)
         } else {
             throw GeneralSecurityException("MAC stored in civ does not match computed MAC.")
         }
     }
+
 /*
  * -----------------------------------------------------------------
  * Helper Code
@@ -412,7 +415,7 @@ object AesCbcWithIntegrity {
  */
 class SecretKeys(
     val confidentialityKey: SecretKey,
-    val integrityKey: SecretKey
+    val integrityKey: SecretKey,
 ) {
     /**
      * Encodes the two keys as a string
@@ -422,12 +425,12 @@ class SecretKeys(
         return (
             Base64.encodeToString(
                 confidentialityKey.encoded,
-                AesCbcWithIntegrity.BASE64_FLAGS
+                AesCbcWithIntegrity.BASE64_FLAGS,
             ) +
                 ":" + Base64.encodeToString(
-                integrityKey.encoded,
-                AesCbcWithIntegrity.BASE64_FLAGS
-            )
+                    integrityKey.encoded,
+                    AesCbcWithIntegrity.BASE64_FLAGS,
+                )
             )
     }
 

@@ -50,7 +50,7 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _currentFeedAndTag = MutableStateFlow(
-        sp.getLong(PREF_LAST_FEED_ID, ID_UNSET) to (sp.getString(PREF_LAST_FEED_TAG, null) ?: "")
+        sp.getLong(PREF_LAST_FEED_ID, ID_UNSET) to (sp.getString(PREF_LAST_FEED_TAG, null) ?: ""),
     )
     val currentFeedAndTag = _currentFeedAndTag.asStateFlow()
     fun setCurrentFeedAndTag(feedId: Long, tag: String) {
@@ -60,7 +60,7 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _currentArticle = MutableStateFlow(
-        sp.getLong(PREF_LAST_ARTICLE_ID, ID_UNSET)
+        sp.getLong(PREF_LAST_ARTICLE_ID, ID_UNSET),
     )
     val currentArticleId = _currentArticle.asStateFlow()
     fun setCurrentArticle(articleId: Long) {
@@ -69,7 +69,7 @@ class SettingsStore(override val di: DI) : DIAware {
     }
 
     private val _isArticleOpen = MutableStateFlow(
-        sp.getBoolean(PREF_IS_ARTICLE_OPEN, false)
+        sp.getBoolean(PREF_IS_ARTICLE_OPEN, false),
     )
     val isArticleOpen: StateFlow<Boolean> = _isArticleOpen.asStateFlow()
     fun setIsArticleOpen(open: Boolean) {
@@ -81,11 +81,11 @@ class SettingsStore(override val di: DI) : DIAware {
         try {
             ThemeOptions.valueOf(
                 sp.getString(PREF_THEME, null)?.uppercase()
-                    ?: ThemeOptions.SYSTEM.name
+                    ?: ThemeOptions.SYSTEM.name,
             )
         } catch (_: Exception) {
             ThemeOptions.SYSTEM
-        }
+        },
     )
     val currentTheme = _currentTheme.asStateFlow()
     fun setCurrentTheme(value: ThemeOptions) {
@@ -96,8 +96,8 @@ class SettingsStore(override val di: DI) : DIAware {
     private val _darkThemePreference = MutableStateFlow(
         DarkThemePreferences.valueOf(
             sp.getString(PREF_DARK_THEME, null)?.uppercase()
-                ?: DarkThemePreferences.BLACK.name
-        )
+                ?: DarkThemePreferences.BLACK.name,
+        ),
     )
     val darkThemePreference = _darkThemePreference.asStateFlow()
     fun setDarkThemePreference(value: DarkThemePreferences) {
@@ -108,8 +108,8 @@ class SettingsStore(override val di: DI) : DIAware {
     private val _currentSorting = MutableStateFlow(
         SortingOptions.valueOf(
             sp.getString(PREF_SORT, null)?.uppercase()
-                ?: SortingOptions.NEWEST_FIRST.name
-        )
+                ?: SortingOptions.NEWEST_FIRST.name,
+        ),
     )
     val currentSorting = _currentSorting.asStateFlow()
     fun setCurrentSorting(value: SortingOptions) {
@@ -174,8 +174,8 @@ class SettingsStore(override val di: DI) : DIAware {
         MutableStateFlow(
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && sp.getBoolean(
                 PREF_DYNAMIC_THEME,
-                true
-            )
+                true,
+            ),
         )
     val useDynamicTheme = _useDynamicTheme.asStateFlow()
     fun setUseDynamicTheme(value: Boolean) {
@@ -187,8 +187,8 @@ class SettingsStore(override val di: DI) : DIAware {
         MutableStateFlow(
             sp.getFloat(
                 PREF_TEXT_SCALE,
-                1f
-            )
+                1f,
+            ),
         )
     val textScale = _textScale.asStateFlow()
     fun setTextScale(value: Float) {
@@ -211,7 +211,7 @@ class SettingsStore(override val di: DI) : DIAware {
             PREF_VAL_OPEN_WITH_CUSTOM_TAB,
             -> ItemOpener.CUSTOM_TAB
             else -> ItemOpener.READER
-        }
+        },
     )
     val itemOpener = _itemOpener.asStateFlow()
     fun setItemOpener(value: ItemOpener) {
@@ -222,7 +222,7 @@ class SettingsStore(override val di: DI) : DIAware {
                 ItemOpener.READER -> PREF_VAL_OPEN_WITH_READER
                 ItemOpener.CUSTOM_TAB -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
                 ItemOpener.DEFAULT_BROWSER -> PREF_VAL_OPEN_WITH_BROWSER
-            }
+            },
         ).apply()
     }
 
@@ -230,7 +230,7 @@ class SettingsStore(override val di: DI) : DIAware {
         when (sp.getStringNonNull(PREF_OPEN_LINKS_WITH, PREF_VAL_OPEN_WITH_CUSTOM_TAB)) {
             PREF_VAL_OPEN_WITH_BROWSER -> LinkOpener.DEFAULT_BROWSER
             else -> LinkOpener.CUSTOM_TAB
-        }
+        },
     )
     val linkOpener = _linkOpener.asStateFlow()
     fun setLinkOpener(value: LinkOpener) {
@@ -240,7 +240,7 @@ class SettingsStore(override val di: DI) : DIAware {
             when (value) {
                 LinkOpener.CUSTOM_TAB -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
                 LinkOpener.DEFAULT_BROWSER -> PREF_VAL_OPEN_WITH_BROWSER
-            }
+            },
         ).apply()
     }
 
@@ -250,32 +250,32 @@ class SettingsStore(override val di: DI) : DIAware {
             FeedItemStyle.COMPACT.name -> FeedItemStyle.COMPACT
             FeedItemStyle.SUPER_COMPACT.name -> FeedItemStyle.SUPER_COMPACT
             else -> FeedItemStyle.CARD
-        }
+        },
     )
     val feedItemStyle = _feedItemStyle.asStateFlow()
     fun setFeedItemStyle(value: FeedItemStyle) {
         _feedItemStyle.value = value
         sp.edit().putString(
             PREF_FEED_ITEM_STYLE,
-            value.name
+            value.name,
         ).apply()
     }
 
     private val _swipeAsRead = MutableStateFlow(
         try {
             SwipeAsRead.valueOf(
-                sp.getStringNonNull(PREF_SWIPE_AS_READ, SwipeAsRead.ONLY_FROM_END.name)
+                sp.getStringNonNull(PREF_SWIPE_AS_READ, SwipeAsRead.ONLY_FROM_END.name),
             )
         } catch (_: Exception) {
             SwipeAsRead.ONLY_FROM_END
-        }
+        },
     )
     val swipeAsRead = _swipeAsRead.asStateFlow()
     fun setSwipeAsRead(value: SwipeAsRead) {
         _swipeAsRead.value = value
         sp.edit().putString(
             PREF_SWIPE_AS_READ,
-            value.name
+            value.name,
         ).apply()
     }
 
@@ -310,7 +310,7 @@ class SettingsStore(override val di: DI) : DIAware {
                 .firstOrNull {
                     it.minutes == savedValue
                 }
-                ?: SyncFrequency.MANUAL
+                ?: SyncFrequency.MANUAL,
         )
     }
     val syncFrequency = _syncFrequency.asStateFlow()
@@ -357,7 +357,7 @@ class SettingsStore(override val di: DI) : DIAware {
                     true -> ExistingPeriodicWorkPolicy.REPLACE
                     false -> ExistingPeriodicWorkPolicy.KEEP
                 },
-                syncWork
+                syncWork,
             )
         } else {
             workManager.cancelUniqueWork(UNIQUE_PERIODIC_NAME)
@@ -454,7 +454,7 @@ enum class PrefValOpenWith {
     OPEN_WITH_DEFAULT,
     OPEN_WITH_READER,
     OPEN_WITH_CUSTOM_TAB,
-    OPEN_WITH_BROWSER
+    OPEN_WITH_BROWSER,
 }
 
 enum class ThemeOptions(
@@ -469,7 +469,7 @@ enum class DarkThemePreferences(
     @StringRes val stringId: Int,
 ) {
     BLACK(R.string.dark_theme_preference_black),
-    DARK(R.string.dark_theme_preference_dark)
+    DARK(R.string.dark_theme_preference_dark),
 }
 
 enum class SortingOptions(
@@ -496,7 +496,7 @@ enum class LinkOpener(
 
 enum class SyncFrequency(
     val minutes: Long,
-    @StringRes val stringId: Int
+    @StringRes val stringId: Int,
 ) {
     MANUAL(-1L, R.string.sync_option_manually),
     EVERY_15_MIN(15L, R.string.sync_option_every_15min),
@@ -505,7 +505,7 @@ enum class SyncFrequency(
     EVERY_3_HOURS(180L, R.string.sync_option_every_3_hours),
     EVERY_6_HOURS(360L, R.string.sync_option_every_6_hours),
     EVERY_12_HOURS(720L, R.string.sync_option_every_12_hours),
-    EVERY_DAY(1440L, R.string.sync_option_every_day);
+    EVERY_DAY(1440L, R.string.sync_option_every_day),
 }
 
 enum class FeedItemStyle(
@@ -513,7 +513,7 @@ enum class FeedItemStyle(
 ) {
     CARD(R.string.feed_item_style_card),
     COMPACT(R.string.feed_item_style_compact),
-    SUPER_COMPACT(R.string.feed_item_style_super_compact)
+    SUPER_COMPACT(R.string.feed_item_style_super_compact),
 }
 
 enum class SwipeAsRead(
@@ -521,17 +521,17 @@ enum class SwipeAsRead(
 ) {
     DISABLED(R.string.disabled),
     ONLY_FROM_END(R.string.only_from_end),
-    FROM_ANYWHERE(R.string.from_anywhere)
+    FROM_ANYWHERE(R.string.from_anywhere),
 }
 
 fun String.dropEnds(
     starting: Int,
-    ending: Int
+    ending: Int,
 ): String {
     require(starting >= 0) { "Requested character count $starting is less than zero." }
     require(ending >= 0) { "Requested character count $ending is less than zero." }
     return substring(
         starting.coerceAtMost(length),
-        (length - ending).coerceAtLeast(0)
+        (length - ending).coerceAtLeast(0),
     )
 }

@@ -28,7 +28,7 @@ class RssNotificationBroadcastReceiver : BroadcastReceiver() {
             ACTION_MARK_AS_READ -> markAsReadAndNotified(
                 context.applicationContext,
                 dao,
-                intent.data?.lastPathSegment?.toLongOrNull() ?: ID_UNSET
+                intent.data?.lastPathSegment?.toLongOrNull() ?: ID_UNSET,
             )
         }
     }

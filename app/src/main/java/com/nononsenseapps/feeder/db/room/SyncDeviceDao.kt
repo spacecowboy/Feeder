@@ -21,14 +21,14 @@ interface SyncDeviceDao {
             SELECT *
             FROM sync_device
             ORDER BY device_name
-        """
+        """,
     )
     fun getDevices(): Flow<List<SyncDevice>>
 
     @Query(
         """
             DELETE FROM sync_device
-        """
+        """,
     )
     fun deleteAll(): Int
 

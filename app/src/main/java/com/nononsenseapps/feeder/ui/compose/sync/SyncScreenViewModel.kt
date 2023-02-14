@@ -34,15 +34,15 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
     private val _syncCode: MutableStateFlow<String> = MutableStateFlow(
-        state["syncCode"] ?: ""
+        state["syncCode"] ?: "",
     )
 
     private val _secretKey: MutableStateFlow<String> = MutableStateFlow(
-        state["secretKey"] ?: ""
+        state["secretKey"] ?: "",
     )
 
     private val _screenToShow: MutableStateFlow<SyncScreenToShow> = MutableStateFlow(
-        state["syncScreen"] ?: SyncScreenToShow.SETUP
+        state["syncScreen"] ?: SyncScreenToShow.SETUP,
     )
 
     init {
@@ -172,22 +172,26 @@ class SyncScreenViewModel(di: DI, private val state: SavedStateHandle) : DIAware
                     when (screen) {
                         // Setup and join only possible if nothing setup already
                         SyncScreenToShow.SETUP,
-                        SyncScreenToShow.JOIN -> SyncScreenToShow.DEVICELIST
+                        SyncScreenToShow.JOIN,
+                        -> SyncScreenToShow.DEVICELIST
                         SyncScreenToShow.DEVICELIST,
-                        SyncScreenToShow.ADD_DEVICE -> screen
+                        SyncScreenToShow.ADD_DEVICE,
+                        -> screen
                     }
                 } else {
                     when (screen) {
                         SyncScreenToShow.SETUP,
-                        SyncScreenToShow.JOIN -> screen
+                        SyncScreenToShow.JOIN,
+                        -> screen
                         SyncScreenToShow.DEVICELIST,
-                        SyncScreenToShow.ADD_DEVICE -> SyncScreenToShow.SETUP
+                        SyncScreenToShow.ADD_DEVICE,
+                        -> SyncScreenToShow.SETUP
                     }
                 }
 
                 Log.v(
                     LOG_TAG,
-                    "Showing $actualScreen, remoteCode: ${syncRemote?.syncChainId?.take(10)}"
+                    "Showing $actualScreen, remoteCode: ${syncRemote?.syncChainId?.take(10)}",
                 )
 
                 val remoteKeyEncoded = (syncRemote?.secretKey ?: "").urlEncode()

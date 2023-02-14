@@ -100,7 +100,7 @@ private fun SyncScaffold(
     leaveSyncVisible: Boolean,
     onLeaveSyncChain: () -> Unit,
     title: String,
-    content: @Composable (Modifier) -> Unit
+    content: @Composable (Modifier) -> Unit,
 ) {
     var showToolbar by rememberSaveable {
         mutableStateOf(false)
@@ -137,7 +137,7 @@ private fun SyncScaffold(
                             }
                             DropdownMenu(
                                 expanded = showToolbar,
-                                onDismissRequest = { showToolbar = false }
+                                onDismissRequest = { showToolbar = false },
                             ) {
                                 DropdownMenuItem(
                                     onClick = {
@@ -146,19 +146,19 @@ private fun SyncScaffold(
                                     },
                                     text = {
                                         Text(stringResource(R.string.leave_sync_chain))
-                                    }
+                                    },
                                 )
                             }
                         }
                     }
-                }
+                },
             )
         },
         content = {
             content(
                 Modifier
                     .padding(it)
-                    .navigationBarsPadding()
+                    .navigationBarsPadding(),
             )
         },
     )
@@ -396,7 +396,7 @@ enum class SyncScreenType {
 
 fun getSyncScreenType(
     windowSize: WindowSize,
-    viewState: SyncScreenViewState
+    viewState: SyncScreenViewState,
 ): SyncScreenType = when (getScreenType(windowSize)) {
     ScreenType.SINGLE -> {
         when (viewState.singleScreenToShow) {
@@ -452,7 +452,7 @@ fun DualSyncScreen(
                         onScanSyncCode = onScanSyncCode,
                         onStartNewSyncChain = onStartNewSyncChain,
                         modifier = Modifier
-                            .weight(1f, fill = true)
+                            .weight(1f, fill = true),
                     )
                 }
                 LeftScreenToShow.DEVICELIST -> {
@@ -463,7 +463,7 @@ fun DualSyncScreen(
                         onDeleteDevice = onDeleteDevice,
                         showAddDeviceButton = false,
                         modifier = Modifier
-                            .weight(1f, fill = true)
+                            .weight(1f, fill = true),
                     )
                 }
             }
@@ -473,7 +473,7 @@ fun DualSyncScreen(
                     SyncAddNewDeviceContent(
                         syncUrl = addDeviceUrl,
                         modifier = Modifier
-                            .weight(1f, fill = true)
+                            .weight(1f, fill = true),
                     )
                 }
                 RightScreenToShow.JOIN -> {
@@ -518,7 +518,7 @@ fun SyncSetupScreen(
 
 @Composable
 fun SyncSetupContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onScanSyncCode: () -> Unit,
     onStartNewSyncChain: () -> Unit,
 ) {
@@ -529,7 +529,7 @@ fun SyncSetupContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimens.margin, vertical = 8.dp)
+            .padding(horizontal = dimens.margin, vertical = 8.dp),
     ) {
         Text(
             text = stringResource(R.string.device_sync_description_1),
@@ -569,7 +569,7 @@ fun SyncSetupContent(
         Spacer(modifier = Modifier.size(24.dp))
 
         Button(
-            onClick = onScanSyncCode
+            onClick = onScanSyncCode,
         ) {
             Text(
                 text = stringResource(R.string.scan_or_enter_code),
@@ -577,7 +577,7 @@ fun SyncSetupContent(
             )
         }
         TextButton(
-            onClick = onStartNewSyncChain
+            onClick = onStartNewSyncChain,
         ) {
             Text(
                 text = stringResource(R.string.start_new_sync_chain),
@@ -635,7 +635,7 @@ fun SyncJoinScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SyncJoinContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onJoinSyncChain: (String, String) -> Unit,
     syncCode: String,
     onSetSyncCode: (String) -> Unit,
@@ -649,7 +649,7 @@ fun SyncJoinContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimens.margin, vertical = 8.dp)
+            .padding(horizontal = dimens.margin, vertical = 8.dp),
     ) {
         TextField(
             value = syncCode,
@@ -661,7 +661,7 @@ fun SyncJoinContent(
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 64.dp)
+                .heightIn(min = 64.dp),
         )
         TextField(
             value = secretKey,
@@ -672,13 +672,13 @@ fun SyncJoinContent(
             isError = !AesCbcWithIntegrity.isKeyDecodable(secretKey),
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 64.dp)
+                .heightIn(min = 64.dp),
         )
         Button(
             enabled = syncCode.syncCodeQueryParam.length == 64,
             onClick = {
                 onJoinSyncChain(syncCode, secretKey)
-            }
+            },
         ) {
             Text(
                 text = stringResource(R.string.join_sync_chain),
@@ -719,7 +719,7 @@ fun SyncDeviceListScreen(
 
 @Composable
 fun SyncDeviceListContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     currentDeviceId: Long,
     devices: ImmutableHolder<List<SyncDevice>>,
     onAddNewDevice: () -> Unit,
@@ -736,14 +736,14 @@ fun SyncDeviceListContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimens.margin, vertical = 8.dp)
+            .padding(horizontal = dimens.margin, vertical = 8.dp),
     ) {
         Text(
             text = stringResource(R.string.devices_on_sync_chain),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
                 .padding(top = 8.dp, bottom = 8.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         )
         for (device in devices.item) {
             DeviceEntry(
@@ -751,7 +751,7 @@ fun SyncDeviceListContent(
                 device = device,
                 onDelete = {
                     itemToDelete = device
-                }
+                },
             )
         }
         Text(
@@ -777,7 +777,7 @@ fun SyncDeviceListContent(
         if (showAddDeviceButton) {
             Button(
                 onClick = onAddNewDevice,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
             ) {
                 Text(
                     text = stringResource(R.string.add_new_device),
@@ -792,7 +792,7 @@ fun SyncDeviceListContent(
     if (itemToDelete.deviceId != ID_UNSET) {
         DeleteDeviceDialog(
             deviceName = itemToDelete.deviceName,
-            onDismiss = { itemToDelete = SyncDevice(deviceId = ID_UNSET, deviceName = "") }
+            onDismiss = { itemToDelete = SyncDevice(deviceId = ID_UNSET, deviceName = "") },
         ) {
             onDeleteDevice(itemToDelete.deviceId)
             itemToDelete = SyncDevice(deviceId = ID_UNSET, deviceName = "")
@@ -811,7 +811,7 @@ fun DeviceEntry(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = minimumTouchSize)
+            .heightIn(min = minimumTouchSize),
     ) {
         val text = if (device.deviceId == currentDeviceId) {
             stringResource(id = R.string.this_device, device.deviceName)
@@ -821,7 +821,7 @@ fun DeviceEntry(
         Text(
             text = text,
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.weight(1f, fill = true)
+            modifier = Modifier.weight(1f, fill = true),
         )
         IconButton(onClick = onDelete) {
             Icon(
@@ -850,7 +850,7 @@ fun PreviewDeviceEntry() {
 fun DeleteDeviceDialog(
     deviceName: String,
     onDismiss: () -> Unit,
-    onOk: () -> Unit
+    onOk: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -870,7 +870,7 @@ fun DeleteDeviceDialog(
                 style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 8.dp),
             )
         },
         text = {
@@ -878,7 +878,7 @@ fun DeleteDeviceDialog(
                 text = stringResource(R.string.remove_device_question, deviceName),
                 style = MaterialTheme.typography.bodyLarge,
             )
-        }
+        },
     )
 }
 
@@ -906,7 +906,7 @@ fun SyncAddNewDeviceScreen(
 
 @Composable
 fun SyncAddNewDeviceContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     syncUrl: ImmutableHolder<URL>,
 ) {
     val context = LocalContext.current
@@ -916,7 +916,7 @@ fun SyncAddNewDeviceContent(
             QRCode.from(
                 Url().also {
                     it.url = "${syncUrl.item}"
-                }
+                },
             )
                 .withSize(1000, 1000)
                 .bitmap()
@@ -930,7 +930,7 @@ fun SyncAddNewDeviceContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = dimens.margin, vertical = 8.dp)
+            .padding(horizontal = dimens.margin, vertical = 8.dp),
     ) {
         Text(
             text = stringResource(R.string.press_scan_sync),
@@ -954,7 +954,7 @@ fun SyncAddNewDeviceContent(
             bitmap = qrCode,
             contentDescription = stringResource(R.string.qr_code),
             contentScale = ContentScale.Fit,
-            modifier = Modifier.size(250.dp)
+            modifier = Modifier.size(250.dp),
         )
         val intentTitle = stringResource(R.string.feeder_device_sync_code)
         Text(
@@ -969,10 +969,10 @@ fun SyncAddNewDeviceContent(
                             putExtra(Intent.EXTRA_TITLE, intentTitle)
                             type = "text/plain"
                         },
-                        null
+                        null,
                     )
                     context.startActivity(intent)
-                }
+                },
         )
     }
 }
@@ -996,7 +996,7 @@ fun PreviewDualSyncScreenDeviceList() {
                     SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
                     SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
                     SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
-                )
+                ),
             ),
             addDeviceUrl = ImmutableHolder(URL("$DEEP_LINK_BASE_URI/sync/join?sync_code=123foo")),
             onJoinSyncChain = { _, _ -> },
@@ -1028,7 +1028,7 @@ fun PreviewDualSyncScreenSetup() {
                     SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
                     SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
                     SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
-                )
+                ),
             ),
             addDeviceUrl = ImmutableHolder(URL("$DEEP_LINK_BASE_URI/sync/join?sync_code=123foo&key=123ABF")),
             onJoinSyncChain = { _, _ -> },
@@ -1084,7 +1084,7 @@ fun PreviewDeviceList() {
                     SyncDevice(deviceId = 1L, deviceName = "ONEPLUS A6003"),
                     SyncDevice(deviceId = 2L, deviceName = "SM-T970"),
                     SyncDevice(deviceId = 3L, deviceName = "Nexus 6"),
-                )
+                ),
             ),
             onAddNewDevice = {},
             onDeleteDevice = {},

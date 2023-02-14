@@ -30,7 +30,7 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
                             title = feed.title ?: "",
                             url = feed.feed_url ?: it.toString(),
                             description = feed.description ?: "",
-                            isError = false
+                            isError = false,
                         )
                     }
                 } catch (t: Throwable) {
@@ -39,7 +39,7 @@ class SearchFeedViewModel(di: DI) : DIAwareViewModel(di) {
                         title = FAILED_TO_PARSE_PLACEHOLDER,
                         url = it.toString(),
                         description = t.message ?: "",
-                        isError = true
+                        isError = true,
                     )
                 }
             }

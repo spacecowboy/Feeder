@@ -148,7 +148,7 @@ fun FeedScreen(
 
     val di = LocalDI.current
     val opmlExporter = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/xml")
+        ActivityResultContracts.CreateDocument("application/xml"),
     ) { uri ->
         if (uri != null) {
             val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
@@ -158,7 +158,7 @@ fun FeedScreen(
         }
     }
     val opmlImporter = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocument()
+        ActivityResultContracts.OpenDocument(),
     ) { uri ->
         if (uri != null) {
             val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
@@ -252,8 +252,8 @@ fun FeedScreen(
                             "text/plain",
                             "text/xml",
                             "text/opml",
-                            "*/*"
-                        )
+                            "*/*",
+                        ),
                     )
                 },
                 onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml") },
@@ -294,7 +294,7 @@ fun FeedScreen(
                 feedGridState = feedGridState,
                 pagedFeedItems = pagedFeedItems,
             )
-        }
+        },
     )
 }
 
@@ -377,7 +377,7 @@ fun FeedScreen(
                 onCheckedChange = onToggleOnlyUnread,
                 modifier = Modifier.semantics {
                     stateDescription = showingUnreadStateLabel
-                }
+                },
             ) {
                 if (viewState.onlyUnread) {
                     Icon(
@@ -396,7 +396,7 @@ fun FeedScreen(
                 onCheckedChange = onToggleOnlyBookmarked,
                 modifier = Modifier.semantics {
                     stateDescription = showingBookmarksStateLabel
-                }
+                },
             ) {
                 if (viewState.onlyBookmarked) {
                     Icon(
@@ -420,7 +420,7 @@ fun FeedScreen(
                 }
                 DropdownMenu(
                     expanded = viewState.showToolbarMenu,
-                    onDismissRequest = { onShowToolbarMenu(false) }
+                    onDismissRequest = { onShowToolbarMenu(false) },
                 ) {
                     DropdownMenuItem(
                         onClick = {
@@ -435,7 +435,7 @@ fun FeedScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.mark_all_as_read))
-                        }
+                        },
                     )
                     Divider()
                     DropdownMenuItem(
@@ -451,7 +451,7 @@ fun FeedScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.synchronize_feeds))
-                        }
+                        },
                     )
                     Divider()
                     DropdownMenuItem(
@@ -467,7 +467,7 @@ fun FeedScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.add_feed))
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -486,7 +486,7 @@ fun FeedScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.edit_feed))
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -501,7 +501,7 @@ fun FeedScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.delete_feed))
-                        }
+                        },
                     )
                     Divider()
                     DropdownMenuItem(
@@ -517,7 +517,7 @@ fun FeedScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.import_feeds_from_opml))
-                        }
+                        },
                     )
                     DropdownMenuItem(
                         onClick = {
@@ -532,7 +532,7 @@ fun FeedScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.export_feeds_to_opml))
-                        }
+                        },
                     )
                     Divider()
                     DropdownMenuItem(
@@ -548,7 +548,7 @@ fun FeedScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.action_settings))
-                        }
+                        },
                     )
                     Divider()
                     DropdownMenuItem(
@@ -564,7 +564,7 @@ fun FeedScreen(
                         },
                         text = {
                             Text(stringResource(id = R.string.send_bug_report))
-                        }
+                        },
                     )
                 }
             }
@@ -631,8 +631,9 @@ fun FeedScreen(
 }
 
 @OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
-    ExperimentalMaterialApi::class
+    ExperimentalMaterial3Api::class,
+    ExperimentalAnimationApi::class,
+    ExperimentalMaterialApi::class,
 )
 @Composable
 fun FeedScreen(
@@ -669,7 +670,7 @@ fun FeedScreen(
                     // In case an error happens in sync then this might never go back to EPOCH
                     minOf(
                         viewState.latestSyncTimestamp,
-                        syncIndicatorMax
+                        syncIndicatorMax,
                     )
                         .isAfter(Instant.now().minusSeconds(10))
                 }
@@ -701,7 +702,7 @@ fun FeedScreen(
         ) {
             Icon(
                 Icons.Default.DoneAll,
-                contentDescription = stringResource(R.string.mark_all_as_read)
+                contentDescription = stringResource(R.string.mark_all_as_read),
             )
         }
     }
@@ -734,11 +735,11 @@ fun FeedScreen(
                     ?: stringResource(id = R.string.all_feeds),
                 navigationIcon = {
                     IconButton(
-                        onClick = onOpenNavDrawer
+                        onClick = onOpenNavDrawer,
                     ) {
                         Icon(
                             Icons.Default.Menu,
-                            contentDescription = stringResource(R.string.navigation_drawer_open)
+                            contentDescription = stringResource(R.string.navigation_drawer_open),
                         )
                     }
                 },
@@ -758,7 +759,7 @@ fun FeedScreen(
                 floatingActionButton = when (viewState.showFab) {
                     true -> floatingActionButton
                     false -> null
-                }
+                },
             )
         },
         floatingActionButton = {
@@ -781,17 +782,17 @@ fun FeedScreen(
     ) { padding ->
         Box(
             modifier = Modifier
-                .padding(padding)
+                .padding(padding),
         ) {
             content(
-                Modifier
+                Modifier,
             )
 
             PullRefreshIndicator(
                 isRefreshing,
                 pullRefreshState,
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
+                    .align(Alignment.TopCenter),
             )
         }
 
@@ -800,10 +801,10 @@ fun FeedScreen(
                 feeds = ImmutableHolder(
                     viewState.visibleFeeds.map {
                         DeletableFeed(it.id, it.displayTitle)
-                    }
+                    },
                 ),
                 onDismiss = onDismissDeleteDialog,
-                onDelete = onDelete
+                onDelete = onDelete,
             )
         }
 
@@ -813,12 +814,12 @@ fun FeedScreen(
                     viewState.visibleFeeds.map {
                         DeletableFeed(
                             it.id,
-                            it.displayTitle
+                            it.displayTitle,
                         )
-                    }
+                    },
                 ),
                 onDismiss = onDismissEditDialog,
-                onEdit = onEditFeed
+                onEdit = onEditFeed,
             )
         }
     }
@@ -837,7 +838,7 @@ fun FeedListContent(
     onSetBookmarked: (Long, Boolean) -> Unit,
     listState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -853,12 +854,12 @@ fun FeedListContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
             )
             NothingToRead(
                 modifier = modifier,
                 onOpenOtherFeed = onOpenNavDrawer,
-                onAddFeed = onAddFeed
+                onAddFeed = onAddFeed,
             )
         }
 
@@ -877,16 +878,20 @@ fun FeedListContent(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = arrangement,
-                contentPadding = if (viewState.isBottomBarVisible) PaddingValues(0.dp) else WindowInsets.navigationBars.only(
-                    WindowInsetsSides.Bottom
-                ).run {
-                    when (viewState.feedItemStyle) {
-                        FeedItemStyle.CARD -> addMargin(horizontal = LocalDimens.current.margin)
-                        FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> addMarginLayout(start = LocalDimens.current.margin)
+                contentPadding = if (viewState.isBottomBarVisible) {
+                    PaddingValues(0.dp)
+                } else {
+                    WindowInsets.navigationBars.only(
+                        WindowInsetsSides.Bottom,
+                    ).run {
+                        when (viewState.feedItemStyle) {
+                            FeedItemStyle.CARD -> addMargin(horizontal = LocalDimens.current.margin)
+                            FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> addMarginLayout(start = LocalDimens.current.margin)
+                        }
                     }
-                }
-                    .asPaddingValues(),
-                modifier = Modifier.fillMaxSize()
+                        .asPaddingValues()
+                },
+                modifier = Modifier.fillMaxSize(),
             ) {
                 /*
                 This is a trick to make the list stay at item 0 when updates come in IF it is
@@ -899,7 +904,7 @@ fun FeedListContent(
                     pagedFeedItems.itemCount,
                     key = { itemIndex ->
                         pagedFeedItems.itemSnapshotList.items[itemIndex].id
-                    }
+                    },
                 ) { itemIndex ->
                     val previewItem = pagedFeedItems[itemIndex]
                         ?: return@items
@@ -908,7 +913,7 @@ fun FeedListContent(
                         onSwipe = { currentState ->
                             markAsUnread(
                                 previewItem.id,
-                                !currentState
+                                !currentState,
                             )
                         },
                         onlyUnread = viewState.onlyUnread,
@@ -944,7 +949,7 @@ fun FeedListContent(
                                     putExtra(Intent.EXTRA_TITLE, previewItem.title)
                                     type = "text/plain"
                                 },
-                                null
+                                null,
                             )
                             context.startActivity(intent)
                         },
@@ -957,7 +962,7 @@ fun FeedListContent(
                             Divider(
                                 modifier = Modifier
                                     .height(1.dp)
-                                    .fillMaxWidth()
+                                    .fillMaxWidth(),
                             )
                         }
                     }
@@ -970,7 +975,7 @@ fun FeedListContent(
                         Spacer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height((56 + 16).dp)
+                                .height((56 + 16).dp),
                         )
                     }
                 }
@@ -993,7 +998,7 @@ fun FeedGridContent(
     onSetBookmarked: (Long, Boolean) -> Unit,
     gridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -1009,12 +1014,12 @@ fun FeedGridContent(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
             )
             NothingToRead(
                 modifier = modifier,
                 onOpenOtherFeed = onOpenNavDrawer,
-                onAddFeed = onAddFeed
+                onAddFeed = onAddFeed,
             )
         }
 
@@ -1035,10 +1040,14 @@ fun FeedGridContent(
             LazyVerticalStaggeredGrid(
                 state = gridState,
                 columns = StaggeredGridCells.Adaptive(minItemWidth),
-                contentPadding = if (viewState.isBottomBarVisible) PaddingValues(0.dp) else WindowInsets.navigationBars.only(
-                    WindowInsetsSides.Bottom
-                ).addMargin(LocalDimens.current.margin)
-                    .asPaddingValues(),
+                contentPadding = if (viewState.isBottomBarVisible) {
+                    PaddingValues(0.dp)
+                } else {
+                    WindowInsets.navigationBars.only(
+                        WindowInsetsSides.Bottom,
+                    ).addMargin(LocalDimens.current.margin)
+                        .asPaddingValues()
+                },
                 verticalArrangement = arrangement,
                 horizontalArrangement = arrangement,
                 modifier = Modifier.fillMaxSize(),
@@ -1047,7 +1056,7 @@ fun FeedGridContent(
                     pagedFeedItems.itemCount,
                     key = { itemIndex ->
                         pagedFeedItems.itemSnapshotList.items[itemIndex].id
-                    }
+                    },
                 ) { itemIndex ->
                     val previewItem = pagedFeedItems[itemIndex]
                         ?: return@items
@@ -1056,7 +1065,7 @@ fun FeedGridContent(
                         onSwipe = { currentState ->
                             markAsUnread(
                                 previewItem.id,
-                                !currentState
+                                !currentState,
                             )
                         },
                         onlyUnread = viewState.onlyUnread,
@@ -1092,7 +1101,7 @@ fun FeedGridContent(
                                     putExtra(Intent.EXTRA_TITLE, previewItem.title)
                                     type = "text/plain"
                                 },
-                                null
+                                null,
                             )
                             context.startActivity(intent)
                         },

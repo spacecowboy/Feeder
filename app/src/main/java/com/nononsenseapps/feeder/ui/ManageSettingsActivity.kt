@@ -32,8 +32,8 @@ class ManageSettingsActivity : DIAwareComponentActivity() {
                                 Intent.ACTION_VIEW,
                                 Uri.parse(SyncScreenDestination.deepLinks.first().uriPattern),
                                 this,
-                                MainActivity::class.java
-                            )
+                                MainActivity::class.java,
+                            ),
                         )
                         finish()
                     },

@@ -29,7 +29,7 @@ const val UNIQUE_PERIODIC_NAME = "feeder_periodic_3"
 // Clear this for scheduler
 val oldPeriodics = listOf(
     "feeder_periodic",
-    "feeder_periodic_2"
+    "feeder_periodic_2",
 )
 private const val UNIQUE_FEEDSYNC_NAME = "feeder_sync_onetime"
 private const val MIN_FEED_AGE_MINUTES = "min_feed_age_minutes"
@@ -97,6 +97,6 @@ fun requestFeedSync(
     workManager.enqueueUniqueWork(
         UNIQUE_FEEDSYNC_NAME,
         ExistingWorkPolicy.KEEP,
-        workRequest.build()
+        workRequest.build(),
     )
 }

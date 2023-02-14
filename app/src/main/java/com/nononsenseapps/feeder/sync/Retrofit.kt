@@ -11,7 +11,7 @@ import retrofit2.create
 
 fun getFeederSyncClient(
     syncRemote: SyncRemote,
-    okHttpClient: OkHttpClient
+    okHttpClient: OkHttpClient,
 ): FeederSync {
     val moshi = getMoshi()
 
@@ -24,9 +24,9 @@ fun getFeederSyncClient(
                         chain.request().newBuilder()
                             .header(
                                 "Authorization",
-                                Credentials.basic(HARDCODED_USER, HARDCODED_PASSWORD)
+                                Credentials.basic(HARDCODED_USER, HARDCODED_PASSWORD),
                             )
-                            .build()
+                            .build(),
                     )
                 }
                 .addInterceptor { chain ->
@@ -35,11 +35,11 @@ fun getFeederSyncClient(
                         response.cacheResponse != null && (response.networkResponse == null || response.networkResponse?.code == 304)
                     Log.v(
                         "FEEDER_SYNC_CLIENT",
-                        "Response cached: $isCachedResponse, ${response.networkResponse?.code}, cache-Control: ${response.cacheControl}"
+                        "Response cached: $isCachedResponse, ${response.networkResponse?.code}, cache-Control: ${response.cacheControl}",
                     )
                     response
                 }
-                .build()
+                .build(),
         )
         .baseUrl(URL(syncRemote.url, "/api/v1/"))
         .addConverterFactory(MoshiConverterFactory.create(moshi))

@@ -21,14 +21,14 @@ interface RemoteFeedDao {
             SELECT url
             FROM remote_feed
             WHERE sync_remote IS 1
-        """
+        """,
     )
     suspend fun getRemotelySeenFeeds(): List<URL>
 
     @Query(
         """
             DELETE FROM remote_feed
-        """
+        """,
     )
     suspend fun deleteAllRemoteFeeds()
 
