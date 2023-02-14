@@ -140,7 +140,7 @@
     <string name="empty_feed_add">of feeds <annotation style="link">toevoegen</annotation>\?</string>
     <string name="nothing_to_display">Niets weer te geven!</string>
     <string name="failed_to_open_article">Kon artikel niet openen</string>
-    <string name="device_sync_financed_by_community">De sync-dienst wordt betaald door de gemeenschap. Overweeg om te doneren als je het nuttig vindt.</string>
+    <string name="device_sync_financed_by_community">Deze dienst wordt betaald door de gemeenschap. Overweeg een donatie als u het nuttig vindt</string>
     <string name="press_scan_sync">Ga naar \'Toestellen-synchroniseren\' en klik op \'Sync-code scannen of invoeren\'.</string>
     <string name="devices_on_sync_chain">Toestellen in de Sync-keten</string>
     <string name="device_sync">Toestellen synchroniseren</string>
@@ -180,7 +180,7 @@
     <string name="permission_read_label">Feeder alleen-lezen toegang</string>
     <string name="use_detect_language">Taal detecteren</string>
     <string name="article_image">Beeld van het artikel</string>
-    <string name="block_list_description">Verbergt bijdragen met titels die een van deze termen bevatten. Voorbeeld filters:</string>
+    <string name="block_list_description">Verbergt artikels met titels die een van deze filters bevatten. Voorbeeld filters:</string>
     <string name="dynamic_theme_use">Dynamische kleuren</string>
     <string name="pinned">Vastgepind</string>
     <string name="bookmarked">Favoriet</string>
@@ -193,4 +193,5 @@
     <string name="only_available_on_android_n">Alleen beschikbaar op Android %1$s en hoger</string>
     <string name="description_for_read_aloud">Detecteert automatisch de taal van het artikel</string>
     <string name="text_scale">Tekstschaal</string>
+    <string name="sync_to_fetch">Synchroniseren om een artikel op te halen</string>
 </resources>

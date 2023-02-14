@@ -62,7 +62,7 @@
     <string name="syncing">กำลังซิงค์</string>
     <string name="use_detect_language">ตรวจหาภาษา</string>
     <string name="only_available_on_android_n">ใช้ได้เฉพาะบน Android %1$s ขึ้นไป</string>
-    <string name="only_when_charging">เมื่อกำลังชาร์จแบตเตอรื่อยู่เท่านั้น</string>
+    <string name="only_when_charging">เมื่อกำลังชาร์จแบตเตอรี่อยู่เท่านั้น</string>
     <string name="block_list">รายการที่ถูกบล็อก</string>
     <string name="add_item">เพื่มรายการใหม่</string>
     <string name="no_barcode_scanner_installed">ไม่พบแอปสแกนบาร์โค้ด</string>
@@ -165,7 +165,7 @@
     <string name="failed_to_import_OPML">นำเข้าไฟล์ OPML ล้มเหลว</string>
     <string name="failed_to_export_OPML">ส่งออกไฟล์ OPML ล้มเหลว</string>
     <string name="add_new_device">เพื่มอุปกรณ์ใหม่</string>
-    <string name="device_sync_financed_by_community">ระบบนี้อยู่ได้ด้วยการสนับสนุนจากคนในชุมชน ได้โปรดบริจาคเงินถ้าเห็นว่าคุณลักษณะนี้มีประโยชน์กับคุณ</string>
+    <string name="device_sync_financed_by_community">ระบบนี้อยู่ได้ด้วยเงินสนับสนุนจากชุมชน ได้โปรดบริจาคเงินถ้าเห็นว่าคุณลักษณะนี้มีประโยชน์กับคุณ</string>
     <string name="remove">เอาออก</string>
     <string name="remove_device">เอาอุปกรณ์ออก</string>
     <string name="device_sync">การซิงค์ระหว่างอุปกรณ์</string>
@@ -187,4 +187,9 @@
     <string name="explanation_permission_notifications">ต้องให้อนุญาตสิทธิ์ก่อนที่จะเปิดสามารถเปิดการแจ้งเตือนได้</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="text_scale">ขนาดข้อความ</string>
+    <string name="sync_to_fetch">ซิงค์เพื่อเรียกบทความ</string>
+    <string name="block_list_description">ซ่อนบทความที่หัวข้อมีข้อความที่กรองไว้ ตัวอย่างเช่น:</string>
+    <string name="expanded_tag">เปิดแท็ก</string>
+    <string name="contracted_tag">ปิดแท็ก</string>
+    <string name="toggle_tag_expansion">สลับเลือกส่วนขยายแท็ก</string>
 </resources>
