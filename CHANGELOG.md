@@ -1,3 +1,27 @@
+# 2.4.8
+Carles Muñoz Gorriz (1):
+  * [be63937d] Updated Catalan translation using Weblate
+
+Felix Otto (1):
+  * [b14eb758] adjust URLs of screenshots
+
+Gabriel Camargo (1):
+  * [da170316] Updated Portuguese (Brazil) translation using Weblate
+
+Jonas Kalderstam (2):
+  * [736935e5] Fixed articles marking themselves as unread when toggling
+         view unread
+  * [cac7d5e8] Fixed trailing commas
+
+bowornsin (1):
+  * [d070511f] Updated Thai translation using Weblate
+
+gallegonovato (1):
+  * [a3211c77] Updated Galician translation using Weblate
+
+mm4c (1):
+  * [c45efb88] Updated Dutch translation using Weblate
+
 # 2.4.7
 Agnieszka C (1):
   * [173a35ca] Updated Polish translation using Weblate
