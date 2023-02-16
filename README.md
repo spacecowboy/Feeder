@@ -44,6 +44,6 @@ This is a no-nonsense RSS/Atom/JSON feed reader app for Android.
 
 ### Screenshots
 
-<img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1_en-US.png" width=50%/><img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2_en-US.png" width=50%/>
-<img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3_en-US.png" width=50%/><img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/4_en-US.png" width=50%/>
-<img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/5_en-US.png" width=50%/><img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/6_en-US.png" width=50%/>
+<img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/1_en-US_phone_portrait_light_list.png" width=50%/><img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/2_en-US_phone_portrait_dark_list.png" width=50%/>
+<img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/3_en-US_phone_portrait_light_article.png" width=50%/><img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/4_en-US_phone_portrait_dark_article.png" width=50%/>
+<img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/5_en-US_phone_portrait_light_settings.png" width=50%/><img src="https://gitlab.com/spacecowboy/Feeder/-/raw/master/fastlane/metadata/android/en-US/images/phoneScreenshots/6_en-US_phone_portrait_dark_settings.png" width=50%/>
