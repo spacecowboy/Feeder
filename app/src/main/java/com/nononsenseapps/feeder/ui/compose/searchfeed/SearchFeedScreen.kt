@@ -87,6 +87,7 @@ import kotlinx.parcelize.Parcelize
 @Composable
 fun SearchFeedScreen(
     onNavigateUp: () -> Unit,
+    modifier: Modifier = Modifier,
     initialFeedUrl: String? = null,
     searchFeedViewModel: SearchFeedViewModel,
     onClick: (SearchResult) -> Unit,
@@ -103,7 +104,7 @@ fun SearchFeedScreen(
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,

@@ -146,6 +146,7 @@ fun EditFeedScreen(
     screenType: ScreenType,
     onOk: () -> Unit,
     onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val notificationsPermissionState = rememberApiPermissionState(
         permission = "android.permission.POST_NOTIFICATIONS",
@@ -193,7 +194,7 @@ fun EditFeedScreen(
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
@@ -263,7 +264,7 @@ fun EditFeedView(
                         .weight(1f, fill = true)
                         .padding(horizontal = dimens.margin, vertical = 8.dp),
                 ) {
-                    leftContent(
+                    LeftContent(
                         viewState = viewState,
                     )
                 }
@@ -274,7 +275,7 @@ fun EditFeedView(
                         .weight(1f, fill = true)
                         .padding(horizontal = dimens.margin, vertical = 8.dp),
                 ) {
-                    rightContent(
+                    RightContent(
                         viewState = viewState,
                     )
                 }
@@ -284,7 +285,7 @@ fun EditFeedView(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.width(dimens.maxContentWidth),
             ) {
-                leftContent(
+                LeftContent(
                     viewState = viewState,
                 )
 
@@ -292,7 +293,7 @@ fun EditFeedView(
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                rightContent(
+                RightContent(
                     viewState = viewState,
                 )
             }
@@ -302,7 +303,7 @@ fun EditFeedView(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun ColumnScope.leftContent(
+fun ColumnScope.LeftContent(
     viewState: EditFeedScreenState,
 ) {
     val filteredTags by remember(viewState.allTags, viewState.feedTag) {
@@ -447,7 +448,7 @@ fun ColumnScope.leftContent(
 }
 
 @Composable
-fun ColumnScope.rightContent(
+fun ColumnScope.RightContent(
     viewState: EditFeedScreenState,
 ) {
     SwitchSetting(

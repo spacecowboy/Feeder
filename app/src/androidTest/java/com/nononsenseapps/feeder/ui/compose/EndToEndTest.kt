@@ -21,7 +21,7 @@ class EndToEndTest : BaseComposeTest {
         composeTestRule.setContent {
             FeederTheme {
                 withDI {
-                    composeTestRule.activity.appContent()
+                    composeTestRule.activity.AppContent()
                 }
             }
         }

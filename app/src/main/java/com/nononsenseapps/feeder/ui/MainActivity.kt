@@ -68,14 +68,14 @@ class MainActivity : DIAwareComponentActivity() {
 
         setContent {
             withAllProviders {
-                appContent()
+                AppContent()
             }
         }
     }
 
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
-    fun appContent() {
+    fun AppContent() {
         val navController = rememberAnimatedNavController()
 
         AnimatedNavHost(navController, startDestination = FeedDestination.route) {
