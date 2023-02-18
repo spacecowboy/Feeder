@@ -92,7 +92,7 @@ class DIAwareSavedStateViewModelFactory(
 }
 
 @Composable
-inline fun <reified T : DIAwareViewModel> SavedStateRegistryOwner.DIAwareViewModel(
+inline fun <reified T : DIAwareViewModel> SavedStateRegistryOwner.diAwareViewModel(
     key: String? = null,
 ): T {
     val factory = DIAwareSavedStateViewModelFactory(LocalDI.current, this)
@@ -105,7 +105,7 @@ inline fun <reified T : DIAwareViewModel> SavedStateRegistryOwner.DIAwareViewMod
 }
 
 @Composable
-inline fun <reified T : DIAwareViewModel> NavBackStackEntry.DIAwareViewModel(
+inline fun <reified T : DIAwareViewModel> NavBackStackEntry.diAwareViewModel(
     key: String? = null,
 ): T {
     val factory = DIAwareSavedStateViewModelFactory(LocalDI.current, this, arguments)

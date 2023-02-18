@@ -12,7 +12,7 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
-import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.base.diAwareViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
 import com.nononsenseapps.feeder.ui.compose.navigation.AddFeedDestination
 import com.nononsenseapps.feeder.ui.compose.searchfeed.SearchFeedScreen
@@ -47,7 +47,7 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                                 onNavigateUpFromIntentActivities()
                             },
                             initialFeedUrl = initialFeedUrl,
-                            searchFeedViewModel = backStackEntry.DIAwareViewModel(),
+                            searchFeedViewModel = backStackEntry.diAwareViewModel(),
                         ) {
                             AddFeedDestination.navigate(
                                 navController,
@@ -69,7 +69,7 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                             onNavigateUp = {
                                 navController.popBackStack()
                             },
-                            createFeedScreenViewModel = backStackEntry.DIAwareViewModel(),
+                            createFeedScreenViewModel = backStackEntry.diAwareViewModel(),
                         ) {
                             finish()
                         }

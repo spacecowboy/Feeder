@@ -19,7 +19,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.composable
-import com.nononsenseapps.feeder.base.DIAwareViewModel
+import com.nononsenseapps.feeder.base.diAwareViewModel
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.NavigationDeepLinkViewModel
 import com.nononsenseapps.feeder.ui.compose.editfeed.CreateFeedScreen
@@ -157,7 +157,7 @@ object SearchFeedDestination : NavigationDestination(
                 navController.popBackStack()
             },
             initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
-            searchFeedViewModel = backStackEntry.DIAwareViewModel(),
+            searchFeedViewModel = backStackEntry.diAwareViewModel(),
         ) {
             AddFeedDestination.navigate(
                 navController,
@@ -197,7 +197,7 @@ object AddFeedDestination : NavigationDestination(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     ) {
-        val createFeedScreenViewModel: CreateFeedScreenViewModel = backStackEntry.DIAwareViewModel()
+        val createFeedScreenViewModel: CreateFeedScreenViewModel = backStackEntry.diAwareViewModel()
 
         CreateFeedScreen(
             onNavigateUp = {
@@ -231,7 +231,7 @@ object EditFeedDestination : NavigationDestination(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     ) {
-        val editFeedScreenViewModel: EditFeedScreenViewModel = backStackEntry.DIAwareViewModel()
+        val editFeedScreenViewModel: EditFeedScreenViewModel = backStackEntry.diAwareViewModel()
         EditFeedScreen(
             onNavigateUp = {
                 navController.popBackStack()
@@ -273,7 +273,7 @@ object SettingsDestination : NavigationDestination(
                     secretKey = "",
                 )
             },
-            settingsViewModel = backStackEntry.DIAwareViewModel(),
+            settingsViewModel = backStackEntry.diAwareViewModel(),
         )
     }
 }
@@ -334,7 +334,7 @@ object FeedDestination : NavigationDestination(
         }
 
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
-            backStackEntry.DIAwareViewModel()
+            backStackEntry.diAwareViewModel()
 
         LaunchedEffect(feedId, tag) {
             logDebug(LOG_TAG, "FeedDestinationScreen setCurrent: $feedId, $tag")
@@ -344,7 +344,7 @@ object FeedDestination : NavigationDestination(
         }
         FeedScreen(
             navController = navController,
-            viewModel = backStackEntry.DIAwareViewModel(),
+            viewModel = backStackEntry.diAwareViewModel(),
         )
     }
 }
@@ -380,7 +380,7 @@ object ArticleDestination : NavigationDestination(
         }
 
         val navigationDeepLinkViewModel: NavigationDeepLinkViewModel =
-            backStackEntry.DIAwareViewModel()
+            backStackEntry.diAwareViewModel()
 
         LaunchedEffect(itemId) {
             navigationDeepLinkViewModel.setCurrentArticle(itemId = itemId)
@@ -395,7 +395,7 @@ object ArticleDestination : NavigationDestination(
             onNavigateToFeed = { feedId ->
                 FeedDestination.navigate(navController, feedId = feedId)
             },
-            viewModel = backStackEntry.DIAwareViewModel(),
+            viewModel = backStackEntry.diAwareViewModel(),
         )
     }
 }
@@ -438,7 +438,7 @@ object SyncScreenDestination : NavigationDestination(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     ) {
-        val syncRemoteViewModel = backStackEntry.DIAwareViewModel<SyncScreenViewModel>()
+        val syncRemoteViewModel = backStackEntry.diAwareViewModel<SyncScreenViewModel>()
 
         SyncScreen(
             onNavigateUp = {
