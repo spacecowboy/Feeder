@@ -12,7 +12,7 @@
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">von %1$s, %2$s</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">Speichern</string>
-    <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würden Sie gerne …</string>
+    <string name="empty_feed_top">Hier gibt es nichts zu lesen. Würdest du gerne …</string>
     <string name="empty_feed_open">Einen anderen Feed <annotation style="link">öffnen</annotation>?</string>
     <string name="empty_feed_add">Weitere Feeds <annotation style="link">hinzufügen</annotation>?</string>
     <string name="search_feed_empty_hint">Eingabe einer Feed-Adresse</string>
@@ -58,7 +58,7 @@
     <string name="only_when_charging">Nur beim Aufladen</string>
     <string name="image_loading">Bilder herunterladen</string>
     <string name="no_activity_for_link">Installiere zuerst etwas, mit dem du diesen Link öffnen kannst</string>
-    <string name="check_for_updates">Nach neuen Artikeln suchen …</string>
+    <string name="check_for_updates">Nach neuen Artikeln suchen …</string>
     <string name="on_startup">Beim App-Start</string>
     <string name="show_fab">„Alle gelesen“-Schaltfläche</string>
     <string name="include_mobile_hotspots">Mobile Hotspots verwenden</string>
@@ -98,7 +98,7 @@
     <string name="battery_optimization_enabled">Ein</string>
     <string name="preload_custom_tab">Standard-Registerkarte vorladen</string>
     <string name="failed_to_parse">%1$s konnte nicht analysiert werden</string>
-    <string name="fetching_full_article">Vollständiger Artikel wird abgerufen …</string>
+    <string name="fetching_full_article">Vollständiger Artikel wird abgerufen …</string>
     <string name="failed_to_fetch_full_article">Vollständiger Artikel konnte nicht abgerufen werden</string>
     <string name="fetch_full_articles_by_default">Vollständige Artikel abrufen</string>
     <string name="fetch_full_article">Vollständigen Artikel abrufen</string>
@@ -144,20 +144,20 @@
     <string name="add_new_device">Neues Gerät hinzufügen</string>
     <string name="remove_device">Gerät entfernen</string>
     <string name="qr_code">QR-Code</string>
-    <string name="device_sync">Geräte-Synchronisierung</string>
-    <string name="device_sync_financed_by_community">Dieser Dienst wird von der Gemeinschaft bezahlt. Bitte denken Sie über eine Spende nach, wenn Sie ihn nützlich finden.</string>
+    <string name="device_sync">Gerätesynchronisierung</string>
+    <string name="device_sync_financed_by_community">Dieser Dienst wird von der Gemeinschaft bezahlt. Bitte denke über eine Spende nach, wenn du ihn nützlich findest.</string>
     <string name="disconnect_device_from_sync">Gerät von der Synchronisierungskette trennen</string>
     <string name="devices_on_sync_chain">Geräte in der Synchronisierungskette</string>
-    <string name="press_scan_sync">Navigieren Sie auf Ihrem Gerät zu Gerätesynchronisierung und drücken Sie auf Synchronisierungscode scannen.</string>
-    <string name="treat_like_password">Behandeln Sie dies wie ein Passwort. Jeder kann Ihre synchronisierten Daten lesen, wenn er den Link hat.</string>
-    <string name="or_open_device_sync_link">Stattdessen können Sie den Link auch auf Ihrem Gerät öffnen.</string>
-    <string name="device_sync_description_2">Scannen Sie einfach den Code aus Ihrer Synchronisierungskette, die Sie auf einem anderen Gerät erstellt haben, oder starten Sie eine neue Synchronisierungskette.</string>
+    <string name="press_scan_sync">Navigiere auf deinem Gerät zur Gerätesynchronisierung und drücke auf Synchronisierungscode scannen.</string>
+    <string name="treat_like_password">Behandele dies wie ein Passwort. Jeder kann deine synchronisierten Daten lesen, wenn er den Link hat.</string>
+    <string name="or_open_device_sync_link">Stattdessen kannst du den Link auch auf deinem Gerät öffnen.</string>
+    <string name="device_sync_description_2">Scanne einfach den Code aus deiner Synchronisierungskette, die du auf einem anderen Gerät erstellt hast, oder starte eine neue Synchronisierungskette.</string>
     <string name="join_sync_chain">Synchronisierungskette beitreten</string>
-    <string name="remove_device_question">Möchten Sie das Gerät %1$s wirklich löschen\?</string>
+    <string name="remove_device_question">Möchtest du das Gerät %1$s wirklich löschen\?</string>
     <string name="scan_or_enter_code">Synchronisierungscode scannen oder eingeben</string>
     <string name="leave_sync_chain">Synchronisierungskette verlassen</string>
     <string name="feeder_device_sync_code">Feeder-Synchronisierungscode</string>
-    <string name="device_sync_description_1">Mit der Gerätesynchronisierung können Sie Feed-Abonnements und gelesene Artikel zwischen Ihren verschiedenen Geräten synchronisieren.</string>
+    <string name="device_sync_description_1">Mit der Gerätesynchronisierung kannst du Feed-Abonnements und gelesene Artikel zwischen deinen verschiedenen Geräten synchronisieren.</string>
     <string name="start_new_sync_chain">Neue Synchronisierungskette starten</string>
     <string name="sync_code">Synchronisierungscode</string>
     <string name="secret_key">Geheimer Schlüssel</string>
@@ -165,7 +165,7 @@
     <string name="only_from_end">Nur vom Ende</string>
     <string name="swipe_to_mark_as_read">Wischen, um als gelesen zu markieren</string>
     <string name="from_anywhere">Von überall</string>
-    <string name="are_you_sure_leave_sync_chain">Möchten Sie die Synchronisierungskette wirklich verlassen\?</string>
+    <string name="are_you_sure_leave_sync_chain">Möchtest du die Synchronisierungskette wirklich verlassen\?</string>
     <string name="no_barcode_scanner_installed">Konnte keinen Barcode-Scanner finden</string>
     <string name="pin_article">Artikel anheften</string>
     <string name="unpin_article">Artikel loslösen</string>
