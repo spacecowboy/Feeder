@@ -3,6 +3,8 @@
     Please do NOT submit a bug report because you don't like the choice
     of color in the app.
 
+    Also please do NOT submit confidential issues. They will be closed.
+
 -->
 
 ## Description
