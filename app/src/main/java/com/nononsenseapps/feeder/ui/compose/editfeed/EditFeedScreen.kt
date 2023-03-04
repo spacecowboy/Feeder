@@ -94,6 +94,7 @@ fun CreateFeedScreen(
         }
     }
 
+    @Suppress("ktlint:twitter-compose:vm-forwarding-check")
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
         viewState = createFeedScreenViewModel,
@@ -123,6 +124,7 @@ fun EditFeedScreen(
         }
     }
 
+    @Suppress("ktlint:twitter-compose:vm-forwarding-check")
     EditFeedScreen(
         onNavigateUp = onNavigateUp,
         viewState = editFeedScreenViewModel,
@@ -227,10 +229,9 @@ fun EditFeedScreen(
                 onDismiss = {
                     permissionDismissed = true
                 },
-                onOk = {
-                    notificationsPermissionState.launchPermissionRequest()
-                },
-            )
+            ) {
+                notificationsPermissionState.launchPermissionRequest()
+            }
         }
     }
 }
@@ -301,6 +302,7 @@ fun EditFeedView(
     }
 }
 
+@Suppress("ktlint:twitter-compose:modifier-missing-check")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ColumnScope.LeftContent(
@@ -447,6 +449,7 @@ fun ColumnScope.LeftContent(
     }
 }
 
+@Suppress("ktlint:twitter-compose:modifier-missing-check")
 @Composable
 fun ColumnScope.RightContent(
     viewState: EditFeedScreenState,
@@ -454,22 +457,19 @@ fun ColumnScope.RightContent(
     SwitchSetting(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
         checked = viewState.fullTextByDefault,
-        onCheckedChanged = { viewState.fullTextByDefault = it },
         icon = null,
-    )
+    ) { viewState.fullTextByDefault = it }
     SwitchSetting(
         title = stringResource(id = R.string.notify_for_new_items),
         checked = viewState.notify,
-        onCheckedChanged = { viewState.notify = it },
         icon = null,
-    )
+    ) { viewState.notify = it }
     SwitchSetting(
         title = stringResource(id = R.string.generate_extra_unique_ids),
-        description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
         checked = viewState.alternateId,
-        onCheckedChanged = { viewState.alternateId = it },
+        description = stringResource(id = R.string.only_enable_for_bad_id_feeds),
         icon = null,
-    )
+    ) { viewState.alternateId = it }
     Divider(
         modifier = Modifier.fillMaxWidth(),
     )

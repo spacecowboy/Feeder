@@ -31,11 +31,11 @@ enum class WindowSize {
     Expanded,
 }
 
-val localWindowSize: ProvidableCompositionLocal<WindowSize> =
+val LocalWindowSize: ProvidableCompositionLocal<WindowSize> =
     compositionLocalOf { error("Missing WindowSize container!") }
 
 @Composable
-fun LocalWindowSize(): WindowSize = localWindowSize.current
+fun LocalWindowSize(): WindowSize = LocalWindowSize.current
 
 @Composable
 fun Activity.withWindowSize(content: @Composable () -> Unit) {
@@ -50,7 +50,7 @@ fun Activity.withWindowSize(content: @Composable () -> Unit) {
     // Calculate the window size class
     val windowSizeclass = getWindowSizeClass(windowDpSize)
 
-    CompositionLocalProvider(localWindowSize provides windowSizeclass) {
+    CompositionLocalProvider(LocalWindowSize provides windowSizeclass) {
         content()
     }
 }

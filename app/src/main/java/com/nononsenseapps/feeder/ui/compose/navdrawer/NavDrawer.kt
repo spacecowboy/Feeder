@@ -77,11 +77,11 @@ const val COLLAPSE_ANIMATION_DURATION = 300
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun ScreenWithNavDrawer(
-    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     feedsAndTags: ImmutableHolder<List<DrawerItemWithUnreadCount>>,
     expandedTags: ImmutableHolder<Set<String>>,
     onToggleTagExpansion: (String) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     content: @Composable () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -189,6 +189,7 @@ fun ListOfFeedsAndTags(
     feedsAndTags: ImmutableHolder<List<DrawerItemWithUnreadCount>>,
     expandedTags: ImmutableHolder<Set<String>>,
     onToggleTagExpansion: (String) -> Unit,
+    modifier: Modifier = Modifier,
     onItemClick: (DrawerItemWithUnreadCount) -> Unit,
 ) {
     val firstTopFeed by remember(feedsAndTags) {
@@ -199,7 +200,7 @@ fun ListOfFeedsAndTags(
     }
     LazyColumn(
         contentPadding = WindowInsets.systemBars.asPaddingValues(),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .semantics {
                 testTag = "feedsAndTags"
@@ -306,9 +307,12 @@ private fun ExpandableTag(
                 }
             },
     ) {
-        ExpandArrow(degrees = angle, onClick = {
-            onToggleExpansion(title)
-        })
+        ExpandArrow(
+            degrees = angle,
+            onClick = {
+                onToggleExpansion(title)
+            },
+        )
         Box(
             modifier = Modifier
                 .fillMaxHeight()
@@ -445,9 +449,11 @@ private fun Feed(
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(imageUrl.toString()).listener(onError = { a, b ->
-                            Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
-                        }).scale(Scale.FIT).size(64).precision(Precision.INEXACT).build(),
+                        .data(imageUrl.toString()).listener(
+                            onError = { a, b ->
+                                Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
+                            },
+                        ).scale(Scale.FIT).size(64).precision(Precision.INEXACT).build(),
                     contentDescription = stringResource(id = R.string.feed_icon),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(24.dp),

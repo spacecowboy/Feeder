@@ -45,10 +45,10 @@ fun OkCancelWithContent(
         content()
         Spacer(modifier = Modifier.height(24.dp))
         OkCancelButtons(
+            modifier = Modifier.padding(bottom = 16.dp),
             onOk = onOk,
             onCancel = onCancel,
             okEnabled = okEnabled,
-            modifier = Modifier.padding(bottom = 16.dp),
         )
         Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
     }
@@ -57,10 +57,10 @@ fun OkCancelWithContent(
 @Composable
 @Preview(showBackground = true)
 fun OkCancelButtons(
+    modifier: Modifier = Modifier,
     onOk: () -> Unit = {},
     onCancel: () -> Unit = {},
     okEnabled: Boolean = true,
-    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
     Row(

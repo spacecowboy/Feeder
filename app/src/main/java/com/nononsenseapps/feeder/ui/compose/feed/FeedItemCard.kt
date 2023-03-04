@@ -38,20 +38,19 @@ import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
+import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.theme.PlaceholderImage
+import com.nononsenseapps.feeder.ui.compose.theme.rememberPlaceholderImage
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
-import com.nononsenseapps.feeder.ui.compose.utils.PreviewThemes
+import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
 
 @Composable
 fun FeedItemCard(
     item: FeedListItem,
     showThumbnail: Boolean,
-    modifier: Modifier = Modifier,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
@@ -60,6 +59,7 @@ fun FeedItemCard(
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     newIndicator: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
         modifier = modifier,
@@ -70,7 +70,7 @@ fun FeedItemCard(
                 .requiredHeightIn(min = minimumTouchSize),
         ) {
             if (showThumbnail) {
-                val placeholder = PlaceholderImage()
+                val placeholder = rememberPlaceholderImage()
                 item.imageUrl?.let { imageUrl ->
                     Box(
                         modifier = Modifier.fillMaxWidth(),
@@ -117,7 +117,7 @@ fun FeedItemCard(
                     modifier = Modifier
                         .weight(1f, fill = true),
                 ) {
-                    withBidiDeterminedLayoutDirection(paragraph = item.title) {
+                    WithBidiDeterminedLayoutDirection(paragraph = item.title) {
                         Text(
                             text = item.title,
                             style = FeedListItemTitleTextStyle(),
@@ -143,7 +143,7 @@ fun FeedItemCard(
                                         append(item.feedTitle)
                                     }
                                 }
-                                withBidiDeterminedLayoutDirection(paragraph = text.text) {
+                                WithBidiDeterminedLayoutDirection(paragraph = text.text) {
                                     Text(
                                         text = text,
                                         style = FeedListItemDateStyle(),
@@ -259,8 +259,8 @@ fun FeedItemCard(
 }
 
 @Composable
-@PreviewThemes
-private fun preview() {
+@ThemePreviews
+private fun Preview() {
     FeederTheme {
         FeedItemCard(
             item = FeedListItem(
@@ -290,8 +290,8 @@ private fun preview() {
 }
 
 @Composable
-@PreviewThemes
-private fun previewWithImage() {
+@ThemePreviews
+private fun PreviewWithImage() {
     FeederTheme {
         Box(
             modifier = Modifier.width((300 - 2 * 16).dp),

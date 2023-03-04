@@ -81,6 +81,7 @@ fun SwipeableFeedItemPreview(
     onTogglePinned: () -> Unit,
     onToggleBookmarked: () -> Unit,
     onShareItem: () -> Unit,
+    modifier: Modifier = Modifier,
     onItemClick: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -150,7 +151,7 @@ fun SwipeableFeedItemPreview(
     val dimens = LocalDimens.current
 
     BoxWithConstraints(
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .combinedClickable(
                 onLongClick = {
@@ -251,11 +252,11 @@ fun SwipeableFeedItemPreview(
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
-                    newIndicator = true,
-                    dropDownMenuExpanded = dropDownMenuExpanded,
-                    onDismissDropdown = { dropDownMenuExpanded = false },
                     onTogglePinned = onTogglePinned,
                     onToggleBookmarked = onToggleBookmarked,
+                    dropDownMenuExpanded = dropDownMenuExpanded,
+                    onDismissDropdown = { dropDownMenuExpanded = false },
+                    newIndicator = true,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
@@ -268,11 +269,11 @@ fun SwipeableFeedItemPreview(
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
-                    newIndicator = false,
-                    dropDownMenuExpanded = dropDownMenuExpanded,
-                    onDismissDropdown = { dropDownMenuExpanded = false },
                     onTogglePinned = onTogglePinned,
                     onToggleBookmarked = onToggleBookmarked,
+                    dropDownMenuExpanded = dropDownMenuExpanded,
+                    onDismissDropdown = { dropDownMenuExpanded = false },
+                    newIndicator = false,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),
@@ -285,11 +286,11 @@ fun SwipeableFeedItemPreview(
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
-                    newIndicator = false,
-                    dropDownMenuExpanded = dropDownMenuExpanded,
-                    onDismissDropdown = { dropDownMenuExpanded = false },
                     onTogglePinned = onTogglePinned,
                     onToggleBookmarked = onToggleBookmarked,
+                    dropDownMenuExpanded = dropDownMenuExpanded,
+                    onDismissDropdown = { dropDownMenuExpanded = false },
+                    newIndicator = false,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),

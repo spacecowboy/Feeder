@@ -69,9 +69,9 @@ fun FeedItemIndicatorColumn(
     unread: Boolean,
     bookmarked: Boolean,
     pinned: Boolean,
+    modifier: Modifier = Modifier,
     spacing: Dp = 8.dp,
     iconSize: Dp = 16.dp,
-    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -106,12 +106,14 @@ fun FeedItemIndicatorColumn(
 
 @Composable
 fun FeedItemIndicator(
+    modifier: Modifier = Modifier,
     content: @Composable (() -> Unit),
 ) {
     ProvideTextStyle(
         value = MaterialTheme.typography.labelMedium,
     ) {
         Surface(
+            modifier = modifier,
             color = MaterialTheme.colorScheme.tertiaryContainer,
             shape = MaterialTheme.shapes.medium,
         ) {

@@ -36,13 +36,14 @@ fun SliderWithLabel(
     value: Float,
     valueToLabel: (Float) -> String,
     valueRange: ClosedFloatingPointRange<Float>,
+    modifier: Modifier = Modifier,
     steps: Int = 0,
     labelMinWidth: Dp = 28.dp,
     onValueChange: (Float) -> Unit,
 ) {
     Column {
         BoxWithConstraints(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth(),
         ) {
             val offset = getSliderOffset(
@@ -54,9 +55,9 @@ fun SliderWithLabel(
 
             SliderLabel(
                 label = valueToLabel(value),
-                minWidth = labelMinWidth,
                 modifier = Modifier
                     .padding(start = offset),
+                minWidth = labelMinWidth,
             )
         }
 
@@ -73,12 +74,12 @@ fun SliderWithLabel(
 @Composable
 fun SliderWithEndLabels(
     value: Float,
-    startLabel: @Composable RowScope.() -> Unit,
-    endLabel: @Composable RowScope.() -> Unit,
+    startLabel: @Composable (RowScope.() -> Unit),
+    endLabel: @Composable (RowScope.() -> Unit),
     valueRange: ClosedFloatingPointRange<Float>,
+    modifier: Modifier = Modifier,
     steps: Int = 0,
     onValueChange: (Float) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -105,8 +106,8 @@ fun SliderWithEndLabels(
 @Composable
 fun SliderLabel(
     label: String,
-    minWidth: Dp = 28.dp,
     modifier: Modifier = Modifier,
+    minWidth: Dp = 28.dp,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -174,7 +175,6 @@ fun PreviewSliderWithEndLabels() {
             }
             SliderWithEndLabels(
                 value = value,
-                onValueChange = { value = it },
                 startLabel = {
                     Text(
                         "A",
@@ -203,7 +203,7 @@ fun PreviewSliderWithEndLabels() {
                 },
                 valueRange = 1f..2f,
                 steps = 9,
-            )
+            ) { value = it }
         }
     }
 }

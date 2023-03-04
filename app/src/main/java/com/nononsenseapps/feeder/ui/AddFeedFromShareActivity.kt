@@ -46,8 +46,8 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                             onNavigateUp = {
                                 onNavigateUpFromIntentActivities()
                             },
-                            initialFeedUrl = initialFeedUrl,
                             searchFeedViewModel = backStackEntry.diAwareViewModel(),
+                            initialFeedUrl = initialFeedUrl,
                         ) {
                             AddFeedDestination.navigate(
                                 navController,

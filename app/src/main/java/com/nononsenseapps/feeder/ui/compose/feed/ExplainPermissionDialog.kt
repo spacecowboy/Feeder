@@ -16,8 +16,8 @@ import com.nononsenseapps.feeder.R
 @Composable
 fun ExplainPermissionDialog(
     @StringRes explanation: Int,
-    modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
     onOk: () -> Unit,
 ) {
     AlertDialog(
@@ -41,9 +41,8 @@ fun ExplainPermissionDialog(
 
 @Composable
 @Preview
-private fun preview() =
+private fun Preview() =
     ExplainPermissionDialog(
         explanation = R.string.explanation_permission_notifications,
         onDismiss = {},
-        onOk = {},
-    )
+    ) {}

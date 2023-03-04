@@ -94,6 +94,7 @@ fun SettingsScreen(
     onNavigateUp: () -> Unit,
     onNavigateToSyncScreen: () -> Unit,
     settingsViewModel: SettingsViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val viewState by settingsViewModel.viewState.collectAsState()
 
@@ -102,7 +103,7 @@ fun SettingsScreen(
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
@@ -122,7 +123,6 @@ fun SettingsScreen(
         },
     ) { padding ->
         SettingsList(
-            modifier = Modifier.padding(padding),
             currentThemeValue = viewState.currentTheme.asThemeOption(),
             onThemeChanged = { value ->
                 settingsViewModel.setCurrentTheme(value.currentTheme)
@@ -170,6 +170,7 @@ fun SettingsScreen(
             setTextScale = settingsViewModel::setTextScale,
             onBlockListAdd = settingsViewModel::addToBlockList,
             onBlockListRemove = settingsViewModel::removeFromBlockList,
+            modifier = Modifier.padding(padding),
         )
     }
 }
@@ -181,7 +182,6 @@ fun SettingsScreenPreview() {
     FeederTheme(ThemeOptions.DAY) {
         Surface {
             SettingsList(
-                modifier = Modifier,
                 currentThemeValue = ThemeOptions.SYSTEM.asThemeOption(),
                 onThemeChanged = {},
                 currentDarkThemePreference = DarkThemePreferences.BLACK.asDarkThemeOption(),
@@ -223,6 +223,7 @@ fun SettingsScreenPreview() {
                 setTextScale = {},
                 onBlockListAdd = {},
                 onBlockListRemove = {},
+                modifier = Modifier,
             )
         }
     }
@@ -230,7 +231,6 @@ fun SettingsScreenPreview() {
 
 @Composable
 fun SettingsList(
-    modifier: Modifier = Modifier,
     currentThemeValue: ThemeOption,
     onThemeChanged: (ThemeOption) -> Unit,
     currentDarkThemePreference: DarkThemeOption,
@@ -272,6 +272,7 @@ fun SettingsList(
     setTextScale: (Float) -> Unit,
     onBlockListAdd: (String) -> Unit,
     onBlockListRemove: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -298,9 +299,8 @@ fun SettingsList(
         )
 
         SwitchSetting(
-            checked = useDynamicTheme,
-            onCheckedChanged = onUseDynamicTheme,
             title = stringResource(id = R.string.dynamic_theme_use),
+            checked = useDynamicTheme,
             description = when {
                 isAndroidSAndAbove -> {
                     null
@@ -313,6 +313,7 @@ fun SettingsList(
                 }
             },
             enabled = isAndroidSAndAbove,
+            onCheckedChanged = onUseDynamicTheme,
         )
 
         MenuSetting(
@@ -336,9 +337,9 @@ fun SettingsList(
         )
 
         SwitchSetting(
+            title = stringResource(id = R.string.show_fab),
             checked = showFabValue,
             onCheckedChanged = onShowFabChanged,
-            title = stringResource(id = R.string.show_fab),
         )
 
         MenuSetting(
@@ -386,10 +387,10 @@ fun SettingsList(
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle { modifier ->
+        GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.text_scale),
-                modifier = modifier,
+                modifier = innerModifier,
             )
         }
 
@@ -402,10 +403,10 @@ fun SettingsList(
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle { modifier ->
+        GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.synchronization),
-                modifier = modifier,
+                modifier = innerModifier,
             )
         }
 
@@ -423,21 +424,21 @@ fun SettingsList(
         )
 
         SwitchSetting(
+            title = stringResource(id = R.string.on_startup),
             checked = syncOnStartupValue,
             onCheckedChanged = onSyncOnStartupChanged,
-            title = stringResource(id = R.string.on_startup),
         )
 
         SwitchSetting(
+            title = stringResource(id = R.string.only_on_wifi),
             checked = syncOnlyOnWifiValue,
             onCheckedChanged = onSyncOnlyOnWifiChanged,
-            title = stringResource(id = R.string.only_on_wifi),
         )
 
         SwitchSetting(
+            title = stringResource(id = R.string.only_when_charging),
             checked = syncOnlyWhenChargingValue,
             onCheckedChanged = onSyncOnlyWhenChargingChanged,
-            title = stringResource(id = R.string.only_when_charging),
         )
 
         MenuSetting(
@@ -474,31 +475,31 @@ fun SettingsList(
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle { modifier ->
+        GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.image_loading),
-                modifier = modifier,
+                modifier = innerModifier,
             )
         }
 
         SwitchSetting(
+            title = stringResource(id = R.string.only_on_wifi),
             checked = loadImageOnlyOnWifiValue,
             onCheckedChanged = onLoadImageOnlyOnWifiChanged,
-            title = stringResource(id = R.string.only_on_wifi),
         )
 
         SwitchSetting(
+            title = stringResource(id = R.string.show_thumbnails),
             checked = showThumbnailsValue,
             onCheckedChanged = onShowThumbnailsChanged,
-            title = stringResource(id = R.string.show_thumbnails),
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle { modifier ->
+        GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.reader_settings),
-                modifier = modifier,
+                modifier = innerModifier,
             )
         }
 
@@ -529,17 +530,16 @@ fun SettingsList(
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
 
-        GroupTitle { modifier ->
+        GroupTitle { innerModifier ->
             Text(
                 stringResource(id = R.string.text_to_speech),
-                modifier = modifier,
+                modifier = innerModifier,
             )
         }
 
         SwitchSetting(
-            checked = useDetectLanguage,
-            onCheckedChanged = onUseDetectLanguageChanged,
             title = stringResource(id = R.string.use_detect_language),
+            checked = useDetectLanguage,
             description = when {
                 isAndroidQAndAbove -> stringResource(id = R.string.description_for_read_aloud)
                 else -> stringResource(
@@ -548,6 +548,7 @@ fun SettingsList(
                 )
             },
             enabled = isAndroidQAndAbove,
+            onCheckedChanged = onUseDetectLanguageChanged,
         )
 
         Spacer(modifier = Modifier.navigationBarsPadding())
@@ -556,13 +557,14 @@ fun SettingsList(
 
 @Composable
 fun GroupTitle(
+    modifier: Modifier = Modifier,
     startingSpace: Boolean = true,
     height: Dp = 64.dp,
     title: @Composable (Modifier) -> Unit,
 ) {
     val dimens = LocalDimens.current
     Row(
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -593,12 +595,13 @@ fun GroupTitle(
 fun ExternalSetting(
     currentValue: String,
     title: String,
+    modifier: Modifier = Modifier,
     icon: @Composable () -> Unit = {},
     onClick: () -> Unit,
 ) {
     val dimens = LocalDimens.current
     Row(
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .clickable { onClick() }
             .semantics {
@@ -631,13 +634,14 @@ fun <T> MenuSetting(
     title: String,
     currentValue: T,
     values: ImmutableHolder<List<T>>,
+    modifier: Modifier = Modifier,
     icon: @Composable () -> Unit = {},
     onSelection: (T) -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
     Row(
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .clickable { expanded = !expanded }
             .semantics {
@@ -700,14 +704,15 @@ fun ListDialogSetting(
     title: String,
     dialogTitle: @Composable () -> Unit,
     currentValue: ImmutableHolder<List<String>>,
-    icon: @Composable () -> Unit = {},
     onAddItem: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    icon: @Composable () -> Unit = {},
     onRemoveItem: (String) -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val dimens = LocalDimens.current
     Row(
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .clickable { expanded = !expanded }
             .semantics {
@@ -755,6 +760,7 @@ fun ListDialogSetting(
 fun RadioButtonSetting(
     title: String,
     selected: Boolean,
+    modifier: Modifier = Modifier,
     icon: (@Composable () -> Unit)? = {},
     minHeight: Dp = 64.dp,
     onClick: () -> Unit,
@@ -766,7 +772,7 @@ fun RadioButtonSetting(
     }
     val dimens = LocalDimens.current
     Row(
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .heightIn(min = minHeight)
             .clickable { onClick() }
@@ -806,11 +812,12 @@ fun RadioButtonSetting(
 @Composable
 fun SwitchSetting(
     title: String,
-    description: String? = null,
     checked: Boolean,
-    icon: (@Composable () -> Unit)? = {},
-    onCheckedChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    description: String? = null,
+    icon: @Composable (() -> Unit)? = {},
     enabled: Boolean = true,
+    onCheckedChanged: (Boolean) -> Unit,
 ) {
     val stateLabel = if (checked) {
         stringResource(R.string.on)
@@ -819,7 +826,7 @@ fun SwitchSetting(
     }
     val dimens = LocalDimens.current
     Row(
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .heightIn(min = 64.dp)
             .clickable(
@@ -869,6 +876,7 @@ fun ScaleSetting(
     onValueChange: (Float) -> Unit,
     valueRange: ClosedFloatingPointRange<Float>,
     steps: Int,
+    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
     val safeCurrentValue = currentValue.coerceIn(valueRange)
@@ -876,7 +884,7 @@ fun ScaleSetting(
     // so no point in adding screen reader action?
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .heightIn(min = 64.dp)
             .padding(start = 64.dp)
@@ -904,7 +912,6 @@ fun ScaleSetting(
         }
         SliderWithEndLabels(
             value = safeCurrentValue,
-            onValueChange = onValueChange,
             startLabel = {
                 Text(
                     "A",
@@ -931,6 +938,7 @@ fun ScaleSetting(
             },
             valueRange = valueRange,
             steps = steps,
+            onValueChange = onValueChange,
         )
     }
 }

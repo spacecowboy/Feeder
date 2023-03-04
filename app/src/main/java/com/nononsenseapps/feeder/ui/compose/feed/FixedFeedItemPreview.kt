@@ -33,6 +33,7 @@ fun FixedFeedItemPreview(
     onTogglePinned: () -> Unit,
     onToggleBookmarked: () -> Unit,
     onShareItem: () -> Unit,
+    modifier: Modifier = Modifier,
     onItemClick: () -> Unit,
 ) {
     var dropDownMenuExpanded by rememberSaveable {
@@ -62,7 +63,7 @@ fun FixedFeedItemPreview(
     val dimens = LocalDimens.current
 
     BoxWithConstraints(
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .combinedClickable(
                 onLongClick = {
@@ -120,11 +121,11 @@ fun FixedFeedItemPreview(
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
-                    newIndicator = true,
-                    dropDownMenuExpanded = dropDownMenuExpanded,
-                    onDismissDropdown = { dropDownMenuExpanded = false },
                     onTogglePinned = onTogglePinned,
                     onToggleBookmarked = onToggleBookmarked,
+                    dropDownMenuExpanded = dropDownMenuExpanded,
+                    onDismissDropdown = { dropDownMenuExpanded = false },
+                    newIndicator = true,
                 )
             }
             FeedItemStyle.COMPACT -> {
@@ -134,11 +135,11 @@ fun FixedFeedItemPreview(
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
-                    newIndicator = false,
-                    dropDownMenuExpanded = dropDownMenuExpanded,
-                    onDismissDropdown = { dropDownMenuExpanded = false },
                     onTogglePinned = onTogglePinned,
                     onToggleBookmarked = onToggleBookmarked,
+                    dropDownMenuExpanded = dropDownMenuExpanded,
+                    onDismissDropdown = { dropDownMenuExpanded = false },
+                    newIndicator = false,
                 )
             }
             FeedItemStyle.SUPER_COMPACT -> {
@@ -148,11 +149,11 @@ fun FixedFeedItemPreview(
                     onMarkAboveAsRead = onMarkAboveAsRead,
                     onMarkBelowAsRead = onMarkBelowAsRead,
                     onShareItem = onShareItem,
-                    newIndicator = false,
-                    dropDownMenuExpanded = dropDownMenuExpanded,
-                    onDismissDropdown = { dropDownMenuExpanded = false },
                     onTogglePinned = onTogglePinned,
                     onToggleBookmarked = onToggleBookmarked,
+                    dropDownMenuExpanded = dropDownMenuExpanded,
+                    onDismissDropdown = { dropDownMenuExpanded = false },
+                    newIndicator = false,
                 )
             }
         }

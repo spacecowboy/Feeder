@@ -17,7 +17,6 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
-import okhttp3.Authenticator
 import okhttp3.CacheControl
 import okhttp3.Credentials
 import okhttp3.MediaType
@@ -25,7 +24,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
-import okhttp3.Route
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.kodein.di.DI
@@ -358,6 +356,7 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
         )
         .build()
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     val clientToUse = if (url.userInfo?.isNotBlank() == true) {
         val parts = url.userInfo.split(':')
         val user = parts.first()
@@ -370,34 +369,30 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
         val decodedPass = URLDecoder.decode(pass, "UTF-8")
         val credentials = Credentials.basic(decodedUser, decodedPass)
         newBuilder()
-            .authenticator(object : Authenticator {
-                override fun authenticate(route: Route?, response: Response): Request? {
-                    return when {
-                        response.request.header("Authorization") != null -> {
-                            null
-                        }
-                        else -> {
-                            response.request.newBuilder()
-                                .header("Authorization", credentials)
-                                .build()
-                        }
+            .authenticator { _, response ->
+                when {
+                    response.request.header("Authorization") != null -> {
+                        null
+                    }
+                    else -> {
+                        response.request.newBuilder()
+                            .header("Authorization", credentials)
+                            .build()
                     }
                 }
-            })
-            .proxyAuthenticator(object : Authenticator {
-                override fun authenticate(route: Route?, response: Response): Request? {
-                    return when {
-                        response.request.header("Proxy-Authorization") != null -> {
-                            null
-                        }
-                        else -> {
-                            response.request.newBuilder()
-                                .header("Proxy-Authorization", credentials)
-                                .build()
-                        }
+            }
+            .proxyAuthenticator { _, response ->
+                when {
+                    response.request.header("Proxy-Authorization") != null -> {
+                        null
+                    }
+                    else -> {
+                        response.request.newBuilder()
+                            .header("Proxy-Authorization", credentials)
+                            .build()
                     }
                 }
-            })
+            }
             .build()
     } else {
         this

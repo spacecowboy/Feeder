@@ -168,7 +168,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                 Log.e(
                     LOG_TAG,
                     "Error during leave: msg: code: ${e.code()}, error: ${
-                        e.response()?.errorBody()?.string()
+                    e.response()?.errorBody()?.string()
                     }",
                     e,
                 )
@@ -198,7 +198,7 @@ class SyncRestClient(override val di: DI) : DIAware {
                 Log.e(
                     LOG_TAG,
                     "Error during leave: msg: code: ${e.code()}, error: ${
-                        e.response()?.errorBody()?.string()
+                    e.response()?.errorBody()?.string()
                     }",
                     e,
                 )

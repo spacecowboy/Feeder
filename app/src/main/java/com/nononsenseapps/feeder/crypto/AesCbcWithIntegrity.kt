@@ -422,16 +422,15 @@ class SecretKeys(
      * @return base64(confidentialityKey):base64(integrityKey)
      */
     override fun toString(): String {
-        return (
-            Base64.encodeToString(
-                confidentialityKey.encoded,
-                AesCbcWithIntegrity.BASE64_FLAGS,
-            ) +
-                ":" + Base64.encodeToString(
-                    integrityKey.encoded,
-                    AesCbcWithIntegrity.BASE64_FLAGS,
-                )
-            )
+        val a = Base64.encodeToString(
+            confidentialityKey.encoded,
+            AesCbcWithIntegrity.BASE64_FLAGS,
+        )
+        val b = Base64.encodeToString(
+            integrityKey.encoded,
+            AesCbcWithIntegrity.BASE64_FLAGS,
+        )
+        return "$a:$b"
     }
 
     override fun hashCode(): Int {

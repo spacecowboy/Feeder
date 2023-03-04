@@ -32,11 +32,12 @@ fun <T> AutoCompleteFoo(
     displaySuggestions: Boolean,
     suggestions: ImmutableHolder<List<T>>,
     onSuggestionClicked: (T) -> Unit,
-    maxHeight: Dp = TextFieldDefaults.MinHeight * 3,
     suggestionContent: @Composable (T) -> Unit,
+    modifier: Modifier = Modifier,
+    maxHeight: Dp = TextFieldDefaults.MinHeight * 3,
     content: @Composable () -> Unit,
 ) {
-    Column {
+    Column(modifier = modifier) {
         content()
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -70,11 +71,11 @@ fun <T> AutoCompleteFoo(
 fun PreviewAutoCompleteOutlinedText() {
     AutoCompleteFoo(
         displaySuggestions = true,
+        suggestions = immutableListHolderOf("One", "Two", "Three"),
         onSuggestionClicked = {},
         suggestionContent = {
             Text(text = it)
         },
-        suggestions = immutableListHolderOf("One", "Two", "Three"),
     ) {
         OutlinedTextField(value = "Testing", onValueChange = {})
     }

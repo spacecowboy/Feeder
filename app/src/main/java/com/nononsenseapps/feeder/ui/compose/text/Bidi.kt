@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import java.text.Bidi
 
 @Composable
-inline fun withBidiDeterminedLayoutDirection(
+inline fun WithBidiDeterminedLayoutDirection(
     paragraph: String,
     crossinline content: @Composable () -> Unit,
 ) {

@@ -87,9 +87,9 @@ import kotlinx.parcelize.Parcelize
 @Composable
 fun SearchFeedScreen(
     onNavigateUp: () -> Unit,
+    searchFeedViewModel: SearchFeedViewModel,
     modifier: Modifier = Modifier,
     initialFeedUrl: String? = null,
-    searchFeedViewModel: SearchFeedViewModel,
     onClick: (SearchResult) -> Unit,
 ) {
     val windowSize = LocalWindowSize()
@@ -125,9 +125,9 @@ fun SearchFeedScreen(
     ) { padding ->
         SearchFeedView(
             screenType = screenType,
-            initialFeedUrl = initialFeedUrl ?: "",
-            modifier = Modifier.padding(padding),
             searchFeedViewModel = searchFeedViewModel,
+            modifier = Modifier.padding(padding),
+            initialFeedUrl = initialFeedUrl ?: "",
             onClick = onClick,
         )
     }
@@ -136,9 +136,9 @@ fun SearchFeedScreen(
 @Composable
 fun SearchFeedView(
     screenType: ScreenType,
-    initialFeedUrl: String = "",
-    modifier: Modifier = Modifier,
     searchFeedViewModel: SearchFeedViewModel,
+    modifier: Modifier = Modifier,
+    initialFeedUrl: String = "",
     onClick: (SearchResult) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -160,7 +160,6 @@ fun SearchFeedView(
 
     SearchFeedView(
         screenType = screenType,
-        feedUrl = feedUrl,
         onUrlChanged = {
             feedUrl = it
         },
@@ -186,6 +185,7 @@ fun SearchFeedView(
         errors = if (currentlySearching) StableHolder(emptyList()) else StableHolder(errors),
         currentlySearching = currentlySearching,
         modifier = modifier,
+        feedUrl = feedUrl,
         onClick = onClick,
     )
 }
@@ -194,13 +194,13 @@ fun SearchFeedView(
 @Composable
 fun SearchFeedView(
     screenType: ScreenType,
-    feedUrl: String = "",
     onUrlChanged: (String) -> Unit,
     onSearch: (URL) -> Unit,
     results: StableHolder<List<SearchResult>>,
     errors: StableHolder<List<SearchResult>>,
     currentlySearching: Boolean,
     modifier: Modifier = Modifier,
+    feedUrl: String = "",
     onClick: (SearchResult) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -297,6 +297,7 @@ fun ColumnScope.leftContent(
     focusManager: FocusManager,
     dimens: Dimensions,
     keyboardController: SoftwareKeyboardController?,
+    modifier: Modifier = Modifier,
 ) {
     val isNotValidUrl by remember(feedUrl) {
         derivedStateOf {
@@ -331,7 +332,7 @@ fun ColumnScope.leftContent(
         ),
         singleLine = true,
         colors = TextFieldDefaults.textFieldColors(),
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .interceptKey(Key.Enter) {
                 if (isValidUrl(feedUrl)) {
@@ -396,10 +397,12 @@ fun ColumnScope.rightContent(
 }
 
 @Composable
-fun SearchingIndicator() {
+fun SearchingIndicator(
+    modifier: Modifier = Modifier,
+) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .safeSemantics {
                 testTag = "searchingIndicator"
@@ -415,12 +418,13 @@ fun SearchResultView(
     title: String,
     url: String,
     description: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     val dimens = LocalDimens.current
     Card(
         onClick = onClick,
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .safeSemantics {
                 testTag = "searchResult"
@@ -452,11 +456,12 @@ fun SearchResultView(
 fun ErrorResultView(
     title: String,
     description: String,
+    modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .width(dimens.maxContentWidth)
             .safeSemantics {
                 testTag = "errorResult"
@@ -493,9 +498,8 @@ fun SearchPreview() {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.SINGLE,
-                feedUrl = "https://cowboyprogrammer.org",
-                currentlySearching = false,
-                errors = stableListHolderOf(),
+                onUrlChanged = {},
+                onSearch = {},
                 results = stableListHolderOf(
                     SearchResult(
                         title = "Atom feed",
@@ -510,11 +514,11 @@ fun SearchPreview() {
                         isError = false,
                     ),
                 ),
+                errors = stableListHolderOf(),
+                currentlySearching = false,
                 modifier = Modifier,
-                onClick = {},
-                onSearch = {},
-                onUrlChanged = {},
-            )
+                feedUrl = "https://cowboyprogrammer.org",
+            ) {}
         }
     }
 }
@@ -531,8 +535,9 @@ fun ErrorPreview() {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.SINGLE,
-                feedUrl = "https://cowboyprogrammer.org",
-                currentlySearching = false,
+                onUrlChanged = {},
+                onSearch = {},
+                results = stableListHolderOf(),
                 errors = stableListHolderOf(
                     SearchResult(
                         title = "Unknown Error",
@@ -541,12 +546,10 @@ fun ErrorPreview() {
                         isError = true,
                     ),
                 ),
-                results = stableListHolderOf(),
+                currentlySearching = false,
                 modifier = Modifier,
-                onClick = {},
-                onSearch = {},
-                onUrlChanged = {},
-            )
+                feedUrl = "https://cowboyprogrammer.org",
+            ) {}
         }
     }
 }
@@ -569,9 +572,8 @@ fun SearchPreviewLarge() {
         Surface {
             SearchFeedView(
                 screenType = ScreenType.DUAL,
-                feedUrl = "https://cowboyprogrammer.org",
-                currentlySearching = false,
-                errors = stableListHolderOf(),
+                onUrlChanged = {},
+                onSearch = {},
                 results = stableListHolderOf(
                     SearchResult(
                         title = "Atom feed",
@@ -586,11 +588,11 @@ fun SearchPreviewLarge() {
                         isError = false,
                     ),
                 ),
+                errors = stableListHolderOf(),
+                currentlySearching = false,
                 modifier = Modifier,
-                onClick = {},
-                onSearch = {},
-                onUrlChanged = {},
-            )
+                feedUrl = "https://cowboyprogrammer.org",
+            ) {}
         }
     }
 }

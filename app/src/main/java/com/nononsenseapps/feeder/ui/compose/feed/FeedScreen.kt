@@ -185,7 +185,6 @@ fun FeedScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     ScreenWithNavDrawer(
-        drawerState = drawerState,
         feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
         expandedTags = ImmutableHolder(viewState.expandedTags),
         onToggleTagExpansion = { tag ->
@@ -194,108 +193,108 @@ fun FeedScreen(
         onDrawerItemSelected = { feedId, tag ->
             FeedDestination.navigate(navController, feedId = feedId, tag = tag)
         },
-        content = {
-            FeedScreen(
-                viewState = viewState,
-                drawerState = drawerState,
-                onRefreshVisible = {
-                    viewModel.requestImmediateSyncOfCurrentFeedOrTag()
-                },
-                onRefreshAll = {
-                    viewModel.requestImmediateSyncOfAll()
-                },
-                onToggleOnlyUnread = { value ->
-                    viewModel.setShowOnlyUnread(value)
-                },
-                onToggleOnlyBookmarked = { value ->
-                    viewModel.setShowOnlyBookmarked(value)
-                },
-                onMarkAllAsRead = {
-                    viewModel.markAllAsRead()
-                },
-                onShowToolbarMenu = { visible ->
-                    viewModel.setToolbarMenuVisible(visible)
-                },
-                ttsOnPlay = viewModel::ttsPlay,
-                ttsOnPause = viewModel::ttsPause,
-                ttsOnStop = viewModel::ttsStop,
-                ttsOnSkipNext = viewModel::ttsSkipNext,
-                ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
-                onAddFeed = { SearchFeedDestination.navigate(navController) },
-                onEditFeed = { feedId ->
-                    EditFeedDestination.navigate(navController, feedId)
-                },
-                onShowEditDialog = {
-                    viewModel.setShowEditDialog(true)
-                },
-                onDismissEditDialog = {
-                    viewModel.setShowEditDialog(false)
-                },
-                onDeleteFeeds = { feedIds ->
-                    viewModel.deleteFeeds(feedIds.toList())
-                },
-                onShowDeleteDialog = {
-                    viewModel.setShowDeleteDialog(true)
-                },
-                onDismissDeleteDialog = {
-                    viewModel.setShowDeleteDialog(false)
-                },
-                onSettings = {
-                    SettingsDestination.navigate(navController)
-                },
-                onSendFeedback = {
-                    context.startActivity(openGitlabIssues())
-                },
-                onImport = {
-                    opmlImporter.launch(
-                        arrayOf(
-                            "text/plain",
-                            "text/xml",
-                            "text/opml",
-                            "*/*",
-                        ),
-                    )
-                },
-                onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml") },
-                markAsUnread = { itemId, unread ->
-                    if (unread) {
-                        viewModel.markAsUnread(itemId)
-                    } else {
-                        viewModel.markAsRead(itemId)
-                    }
-                },
-                markBeforeAsRead = { index ->
-                    viewModel.markBeforeAsRead(index)
-                },
-                markAfterAsRead = { index ->
-                    viewModel.markAfterAsRead(index)
-                },
-                onOpenFeedItem = { itemId ->
-                    viewModel.openArticle(
-                        itemId = itemId,
-                        openInBrowser = { articleLink ->
-                            openLinkInBrowser(context, articleLink)
-                        },
-                        openInCustomTab = { articleLink ->
-                            openLinkInCustomTab(context, articleLink, toolbarColor)
-                        },
-                        navigateToArticle = {
-                            ArticleDestination.navigate(navController, itemId)
-                        },
-                    )
-                },
-                onSetPinned = { itemId, value ->
-                    viewModel.setPinned(itemId, value)
-                },
-                onSetBookmarked = { itemId, value ->
-                    viewModel.setBookmarked(itemId, value)
-                },
-                feedListState = feedListState,
-                feedGridState = feedGridState,
-                pagedFeedItems = pagedFeedItems,
-            )
-        },
-    )
+        drawerState = drawerState,
+    ) {
+        FeedScreen(
+            viewState = viewState,
+            drawerState = drawerState,
+            onRefreshVisible = {
+                viewModel.requestImmediateSyncOfCurrentFeedOrTag()
+            },
+            onRefreshAll = {
+                viewModel.requestImmediateSyncOfAll()
+            },
+            onToggleOnlyUnread = { value ->
+                viewModel.setShowOnlyUnread(value)
+            },
+            onToggleOnlyBookmarked = { value ->
+                viewModel.setShowOnlyBookmarked(value)
+            },
+            onMarkAllAsRead = {
+                viewModel.markAllAsRead()
+            },
+            onShowToolbarMenu = { visible ->
+                viewModel.setToolbarMenuVisible(visible)
+            },
+            ttsOnPlay = viewModel::ttsPlay,
+            ttsOnPause = viewModel::ttsPause,
+            ttsOnStop = viewModel::ttsStop,
+            ttsOnSkipNext = viewModel::ttsSkipNext,
+            ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
+            onAddFeed = { SearchFeedDestination.navigate(navController) },
+            onEditFeed = { feedId ->
+                EditFeedDestination.navigate(navController, feedId)
+            },
+            onShowEditDialog = {
+                viewModel.setShowEditDialog(true)
+            },
+            onDismissEditDialog = {
+                viewModel.setShowEditDialog(false)
+            },
+            onDeleteFeeds = { feedIds ->
+                viewModel.deleteFeeds(feedIds.toList())
+            },
+            onShowDeleteDialog = {
+                viewModel.setShowDeleteDialog(true)
+            },
+            onDismissDeleteDialog = {
+                viewModel.setShowDeleteDialog(false)
+            },
+            onSettings = {
+                SettingsDestination.navigate(navController)
+            },
+            onSendFeedback = {
+                context.startActivity(openGitlabIssues())
+            },
+            onImport = {
+                opmlImporter.launch(
+                    arrayOf(
+                        "text/plain",
+                        "text/xml",
+                        "text/opml",
+                        "*/*",
+                    ),
+                )
+            },
+            onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml") },
+            markAsUnread = { itemId, unread ->
+                if (unread) {
+                    viewModel.markAsUnread(itemId)
+                } else {
+                    viewModel.markAsRead(itemId)
+                }
+            },
+            markBeforeAsRead = { index ->
+                viewModel.markBeforeAsRead(index)
+            },
+            markAfterAsRead = { index ->
+                viewModel.markAfterAsRead(index)
+            },
+            onOpenFeedItem = { itemId ->
+                viewModel.openArticle(
+                    itemId = itemId,
+                    openInBrowser = { articleLink ->
+                        openLinkInBrowser(context, articleLink)
+                    },
+                    openInCustomTab = { articleLink ->
+                        openLinkInCustomTab(context, articleLink, toolbarColor)
+                    },
+                    navigateToArticle = {
+                        ArticleDestination.navigate(navController, itemId)
+                    },
+                )
+            },
+            onSetPinned = { itemId, value ->
+                viewModel.setPinned(itemId, value)
+            },
+            onSetBookmarked = { itemId, value ->
+                viewModel.setBookmarked(itemId, value)
+            },
+            feedListState = feedListState,
+            feedGridState = feedGridState,
+            pagedFeedItems = pagedFeedItems,
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -334,6 +333,7 @@ fun FeedScreen(
     feedListState: LazyListState,
     feedGridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
+    modifier: Modifier = Modifier,
 ) {
     val showingUnreadStateLabel = if (viewState.onlyUnread) {
         stringResource(R.string.showing_only_unread_articles)
@@ -350,6 +350,7 @@ fun FeedScreen(
     val coroutineScope = rememberCoroutineScope()
 
     FeedScreen(
+        modifier = modifier,
         viewState = viewState,
         onRefreshVisible = onRefreshVisible,
         onOpenNavDrawer = {
@@ -569,7 +570,7 @@ fun FeedScreen(
                 }
             }
         },
-    ) { modifier ->
+    ) { innerModifier ->
         val windowSize = LocalWindowSize()
 
         val screenType by remember(windowSize) {
@@ -602,7 +603,7 @@ fun FeedScreen(
                 onSetPinned = onSetPinned,
                 onSetBookmarked = onSetBookmarked,
                 pagedFeedItems = pagedFeedItems,
-                modifier = modifier,
+                modifier = innerModifier,
             ).also { logDebug(LOG_TAG, "Showing GRID") }
             FeedScreenType.FeedList -> FeedListContent(
                 viewState = viewState,
@@ -624,7 +625,7 @@ fun FeedScreen(
                 onSetPinned = onSetPinned,
                 onSetBookmarked = onSetBookmarked,
                 pagedFeedItems = pagedFeedItems,
-                modifier = modifier,
+                modifier = innerModifier,
             ).also { logDebug(LOG_TAG, "Showing LIST") }
         }
     }
@@ -650,7 +651,7 @@ fun FeedScreen(
     onDismissEditDialog: () -> Unit,
     onDelete: (Iterable<Long>) -> Unit,
     onEditFeed: (Long) -> Unit,
-    toolbarActions: @Composable() (RowScope.() -> Unit),
+    toolbarActions: @Composable (RowScope.() -> Unit),
     modifier: Modifier = Modifier,
     content: @Composable (Modifier) -> Unit,
 ) {
@@ -754,12 +755,12 @@ fun FeedScreen(
                 onPause = ttsOnPause,
                 onStop = ttsOnStop,
                 onSkipNext = ttsOnSkipNext,
-                onSelectLanguage = ttsOnSelectLanguage,
                 languages = ImmutableHolder(viewState.ttsLanguages),
                 floatingActionButton = when (viewState.showFab) {
                     true -> floatingActionButton
                     false -> null
                 },
+                onSelectLanguage = ttsOnSelectLanguage,
             )
         },
         floatingActionButton = {
@@ -857,7 +858,7 @@ fun FeedListContent(
                     .verticalScroll(rememberScrollState()),
             )
             NothingToRead(
-                modifier = modifier,
+                modifier = Modifier,
                 onOpenOtherFeed = onOpenNavDrawer,
                 onAddFeed = onAddFeed,
             )
@@ -1017,7 +1018,7 @@ fun FeedGridContent(
                     .verticalScroll(rememberScrollState()),
             )
             NothingToRead(
-                modifier = modifier,
+                modifier = Modifier,
                 onOpenOtherFeed = onOpenNavDrawer,
                 onAddFeed = onAddFeed,
             )

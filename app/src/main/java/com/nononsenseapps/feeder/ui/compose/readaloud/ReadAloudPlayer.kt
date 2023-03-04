@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.nononsenseapps.feeder.R
@@ -43,27 +44,29 @@ import java.util.*
 fun HideableTTSPlayer(
     visibleState: MutableTransitionState<Boolean>,
     currentlyPlaying: Boolean,
-    floatingActionButton: @Composable (() -> Unit)? = null,
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onStop: () -> Unit,
     onSkipNext: () -> Unit,
     languages: ImmutableHolder<List<Locale>>,
+    modifier: Modifier = Modifier,
+    floatingActionButton: @Composable (() -> Unit)? = null,
     onSelectLanguage: (LocaleOverride) -> Unit,
 ) {
     AnimatedVisibility(
+        modifier = modifier,
         visibleState = visibleState,
         enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(256)),
         exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(256)),
     ) {
         TTSPlayer(
             currentlyPlaying = currentlyPlaying,
-            floatingActionButton = floatingActionButton,
             onPlay = onPlay,
             onPause = onPause,
             onStop = onStop,
             onSkipNext = onSkipNext,
             languages = languages,
+            floatingActionButton = floatingActionButton,
             onSelectLanguage = onSelectLanguage,
         )
     }
@@ -72,18 +75,20 @@ fun HideableTTSPlayer(
 @Composable
 fun TTSPlayer(
     currentlyPlaying: Boolean,
-    floatingActionButton: @Composable (() -> Unit)? = null,
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onStop: () -> Unit,
     onSkipNext: () -> Unit,
     languages: ImmutableHolder<List<Locale>>,
+    modifier: Modifier = Modifier,
+    floatingActionButton: @Composable (() -> Unit)? = null,
     onSelectLanguage: (LocaleOverride) -> Unit,
 ) {
     var showMenu by remember {
         mutableStateOf(false)
     }
     PaddedBottomAppBar(
+        modifier = modifier,
         floatingActionButton = floatingActionButton,
         actions = {
             IconButton(
@@ -187,9 +192,8 @@ fun PlayerPreview() {
             onPause = {},
             onStop = {},
             onSkipNext = {},
-            onSelectLanguage = {},
             languages = ImmutableHolder(emptyList()),
-        )
+        ) {}
     }
 }
 
@@ -203,7 +207,6 @@ fun PlayerPreviewWithFab() {
             onPause = {},
             onStop = {},
             onSkipNext = {},
-            onSelectLanguage = {},
             languages = ImmutableHolder(emptyList()),
             floatingActionButton = {
                 FloatingActionButton(
@@ -215,6 +218,6 @@ fun PlayerPreviewWithFab() {
                     )
                 }
             },
-        )
+        ) {}
     }
 }

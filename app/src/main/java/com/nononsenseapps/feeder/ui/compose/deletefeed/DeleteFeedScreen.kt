@@ -144,7 +144,7 @@ data class DeletableFeed(
 
 @Composable
 @Preview
-private fun preview() =
+private fun Preview() =
     DeleteFeedDialog(
         feeds = immutableListHolderOf(
             DeletableFeed(1, "A Feed"),

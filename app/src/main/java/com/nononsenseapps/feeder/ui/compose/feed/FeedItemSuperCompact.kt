@@ -38,20 +38,19 @@ import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
-import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
+import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
-import com.nononsenseapps.feeder.ui.compose.theme.PlaceholderImage
+import com.nononsenseapps.feeder.ui.compose.theme.rememberPlaceholderImage
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 
 @Composable
 fun FeedItemSuperCompact(
     item: FeedListItem,
     showThumbnail: Boolean,
-    modifier: Modifier = Modifier,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
@@ -60,6 +59,7 @@ fun FeedItemSuperCompact(
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     newIndicator: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -74,7 +74,7 @@ fun FeedItemSuperCompact(
                 .requiredHeightIn(min = minimumTouchSize)
                 .padding(vertical = 4.dp),
         ) {
-            withBidiDeterminedLayoutDirection(paragraph = item.title) {
+            WithBidiDeterminedLayoutDirection(paragraph = item.title) {
                 Text(
                     text = item.title,
                     style = FeedListItemTitleTextStyle(),
@@ -100,7 +100,7 @@ fun FeedItemSuperCompact(
                                 append(item.feedTitle)
                             }
                         }
-                        withBidiDeterminedLayoutDirection(paragraph = text.text) {
+                        WithBidiDeterminedLayoutDirection(paragraph = text.text) {
                             Text(
                                 text = text,
                                 style = FeedListItemDateStyle(),
@@ -193,7 +193,7 @@ fun FeedItemSuperCompact(
             ) {
                 (item.imageUrl ?: item.feedImageUrl?.toString())?.let { imageUrl ->
                     if (showThumbnail) {
-                        val placeholder = PlaceholderImage()
+                        val placeholder = rememberPlaceholderImage()
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
                                 .data(imageUrl)
@@ -210,7 +210,7 @@ fun FeedItemSuperCompact(
                                 .build(),
                             contentDescription = stringResource(id = R.string.article_image),
                             contentScale = ContentScale.Crop,
-                            modifier = modifier
+                            modifier = Modifier
                                 .width(64.dp)
                                 .fillMaxHeight(),
                         )
@@ -220,13 +220,13 @@ fun FeedItemSuperCompact(
                     unread = item.unread && newIndicator,
                     bookmarked = item.bookmarked,
                     pinned = item.pinned,
-                    spacing = 4.dp,
-                    iconSize = 8.dp,
                     modifier = Modifier.padding(
                         top = 4.dp,
                         bottom = 4.dp,
                         end = 4.dp,
                     ),
+                    spacing = 4.dp,
+                    iconSize = 8.dp,
                 )
             }
         } else {
@@ -238,7 +238,7 @@ fun FeedItemSuperCompact(
 
 @Composable
 @Preview(showBackground = true)
-private fun previewRead() {
+private fun PreviewRead() {
     FeederTheme {
         Surface {
             FeedItemSuperCompact(
@@ -271,7 +271,7 @@ private fun previewRead() {
 
 @Composable
 @Preview(showBackground = true)
-private fun previewUnread() {
+private fun PreviewUnread() {
     FeederTheme {
         Surface {
             FeedItemSuperCompact(
@@ -304,7 +304,7 @@ private fun previewUnread() {
 
 @Composable
 @Preview(showBackground = true)
-private fun previewWithImage() {
+private fun PreviewWithImage() {
     FeederTheme {
         Surface {
             FeedItemSuperCompact(

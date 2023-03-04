@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.LinkOpener
-import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
+import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
@@ -50,15 +50,15 @@ val dateTimeFormat: DateTimeFormatter =
 
 @Composable
 fun ReaderView(
-    modifier: Modifier = Modifier,
     screenType: ScreenType,
+    onEnclosureClick: () -> Unit,
+    onFeedTitleClick: () -> Unit,
+    modifier: Modifier = Modifier,
     articleListState: LazyListState = rememberLazyListState(),
+    enclosure: Enclosure = Enclosure(),
     articleTitle: String = "Article title on top",
     feedTitle: String = "Feed Title is here",
     authorDate: String? = "2018-01-02",
-    enclosure: Enclosure = Enclosure(),
-    onEnclosureClick: () -> Unit,
-    onFeedTitleClick: () -> Unit,
     articleBody: LazyListScope.() -> Unit,
 ) {
     val dimens = LocalDimens.current
@@ -98,7 +98,7 @@ fun ReaderView(
                             }
                         },
                 ) {
-                    withBidiDeterminedLayoutDirection(paragraph = articleTitle) {
+                    WithBidiDeterminedLayoutDirection(paragraph = articleTitle) {
                         Text(
                             text = articleTitle,
                             style = MaterialTheme.typography.headlineLarge,
@@ -112,7 +112,7 @@ fun ReaderView(
                             LinkTextStyle(),
                         ),
                     ) {
-                        withBidiDeterminedLayoutDirection(paragraph = feedTitle) {
+                        WithBidiDeterminedLayoutDirection(paragraph = feedTitle) {
                             Text(
                                 text = feedTitle,
                                 modifier = Modifier
@@ -130,7 +130,7 @@ fun ReaderView(
                         Spacer(modifier = Modifier.height(4.dp))
                         ProvideScaledText(style = MaterialTheme.typography.titleMedium) {
                             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                                withBidiDeterminedLayoutDirection(paragraph = authorDate) {
+                                WithBidiDeterminedLayoutDirection(paragraph = authorDate) {
                                     Text(
                                         text = authorDate,
                                         modifier = Modifier

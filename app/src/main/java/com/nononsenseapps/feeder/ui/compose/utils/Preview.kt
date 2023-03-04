@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
-annotation class PreviewDevices()
+annotation class DevicePreviews()
 
 @Preview(
     name = "Light",
@@ -34,4 +34,4 @@ annotation class PreviewDevices()
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
-annotation class PreviewThemes()
+annotation class ThemePreviews()

@@ -11,19 +11,21 @@ import com.nononsenseapps.feeder.BuildConfig
 
 internal fun emailSubject(): String = "Bug report for Feeder"
 
-internal fun emailBody(isTablet: Boolean): String = """
-            ${BuildConfig.APPLICATION_ID} (flavor ${BuildConfig.BUILD_TYPE.ifBlank { "None" }})
-            version ${BuildConfig.VERSION_NAME} (code ${BuildConfig.VERSION_CODE})
-            on Android ${Build.VERSION.RELEASE} (SDK-${Build.VERSION.SDK_INT})
-            on a Tablet? ${
+internal fun emailBody(isTablet: Boolean): String =
+    """
+    ${BuildConfig.APPLICATION_ID} (flavor ${BuildConfig.BUILD_TYPE.ifBlank { "None" }})
+    version ${BuildConfig.VERSION_NAME} (code ${BuildConfig.VERSION_CODE})
+    on Android ${Build.VERSION.RELEASE} (SDK-${Build.VERSION.SDK_INT})
+    on a Tablet? ${
     if (isTablet) {
         "Yes"
     } else {
         "No"
-    }}
+    }
+    }
 
-            Describe your issue and how to reproduce it below:
-""".trimIndent()
+    Describe your issue and how to reproduce it below:
+    """.trimIndent()
 
 internal fun emailReportAddress(): String = "jonas.feederbugs@cowboyprogrammer.org"
 

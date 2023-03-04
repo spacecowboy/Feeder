@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.nononsenseapps.feeder.ui.compose.text.withBidiDeterminedLayoutDirection
+import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 
 /**
  * On a small but tall screen this will be a LargeTopAppBar to make the screen
@@ -33,7 +33,7 @@ fun SensibleTopAppBar(
     TopAppBar(
         scrollBehavior = scrollBehavior,
         title = {
-            withBidiDeterminedLayoutDirection(paragraph = title) {
+            WithBidiDeterminedLayoutDirection(paragraph = title) {
                 Text(
                     title,
                     maxLines = 1,

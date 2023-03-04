@@ -100,6 +100,7 @@ private fun SyncScaffold(
     leaveSyncVisible: Boolean,
     onLeaveSyncChain: () -> Unit,
     title: String,
+    modifier: Modifier = Modifier,
     content: @Composable (Modifier) -> Unit,
 ) {
     var showToolbar by rememberSaveable {
@@ -110,7 +111,7 @@ private fun SyncScaffold(
     SetStatusBarColorToMatchScrollableTopAppBar(scrollBehavior)
 
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
@@ -426,6 +427,7 @@ fun DualSyncScreen(
     onSetSyncCode: (String) -> Unit,
     secretKey: String,
     onSetSecretKey: (String) -> Unit,
+    modifier: Modifier = Modifier,
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
@@ -441,18 +443,19 @@ fun DualSyncScreen(
         title = stringResource(id = R.string.device_sync),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
-    ) { modifier ->
+        modifier = modifier,
+    ) { innerModifier ->
         Row(
-            modifier = modifier
+            modifier = innerModifier
                 .verticalScroll(scrollState),
         ) {
             when (leftScreenToShow) {
                 LeftScreenToShow.SETUP -> {
                     SyncSetupContent(
                         onScanSyncCode = onScanSyncCode,
-                        onStartNewSyncChain = onStartNewSyncChain,
                         modifier = Modifier
                             .weight(1f, fill = true),
+                        onStartNewSyncChain = onStartNewSyncChain,
                     )
                 }
                 LeftScreenToShow.DEVICELIST -> {
@@ -478,12 +481,12 @@ fun DualSyncScreen(
                 }
                 RightScreenToShow.JOIN -> {
                     SyncJoinContent(
-                        modifier = Modifier
-                            .weight(1f, fill = true),
                         onJoinSyncChain = onJoinSyncChain,
                         syncCode = syncCode,
                         onSetSyncCode = onSetSyncCode,
                         secretKey = secretKey,
+                        modifier = Modifier
+                            .weight(1f, fill = true),
                         onSetSecretKey = onSetSecretKey,
                     )
                 }
@@ -497,6 +500,7 @@ fun SyncSetupScreen(
     onNavigateUp: () -> Unit,
     onScanSyncCode: () -> Unit,
     onStartNewSyncChain: () -> Unit,
+    modifier: Modifier = Modifier,
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
@@ -507,10 +511,11 @@ fun SyncSetupScreen(
         title = stringResource(id = R.string.device_sync),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
-    ) { modifier ->
+        modifier = modifier,
+    ) { innerModifier ->
         SyncSetupContent(
-            modifier = modifier.verticalScroll(scrollState),
             onScanSyncCode = onScanSyncCode,
+            modifier = innerModifier.verticalScroll(scrollState),
             onStartNewSyncChain = onStartNewSyncChain,
         )
     }
@@ -518,8 +523,8 @@ fun SyncSetupScreen(
 
 @Composable
 fun SyncSetupContent(
-    modifier: Modifier = Modifier,
     onScanSyncCode: () -> Unit,
+    modifier: Modifier = Modifier,
     onStartNewSyncChain: () -> Unit,
 ) {
     val dimens = LocalDimens.current
@@ -610,6 +615,7 @@ fun SyncJoinScreen(
     onSetSyncCode: (String) -> Unit,
     secretKey: String,
     onSetSecretKey: (String) -> Unit,
+    modifier: Modifier = Modifier,
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
@@ -620,13 +626,14 @@ fun SyncJoinScreen(
         title = stringResource(id = R.string.join_sync_chain),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
-    ) { modifier ->
+        modifier = modifier,
+    ) { innerModifier ->
         SyncJoinContent(
-            modifier = modifier.verticalScroll(scrollState),
             onJoinSyncChain = onJoinSyncChain,
             syncCode = syncCode,
             onSetSyncCode = onSetSyncCode,
             secretKey = secretKey,
+            modifier = innerModifier.verticalScroll(scrollState),
             onSetSecretKey = onSetSecretKey,
         )
     }
@@ -635,11 +642,11 @@ fun SyncJoinScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SyncJoinContent(
-    modifier: Modifier = Modifier,
     onJoinSyncChain: (String, String) -> Unit,
     syncCode: String,
     onSetSyncCode: (String) -> Unit,
     secretKey: String,
+    modifier: Modifier = Modifier,
     onSetSecretKey: (String) -> Unit,
 ) {
     val dimens = LocalDimens.current
@@ -695,6 +702,7 @@ fun SyncDeviceListScreen(
     devices: ImmutableHolder<List<SyncDevice>>,
     onAddNewDevice: () -> Unit,
     onDeleteDevice: (Long) -> Unit,
+    modifier: Modifier = Modifier,
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
@@ -705,26 +713,27 @@ fun SyncDeviceListScreen(
         title = stringResource(id = R.string.device_sync),
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
-    ) { modifier ->
+        modifier = modifier,
+    ) { innerModifier ->
         SyncDeviceListContent(
-            modifier = modifier.verticalScroll(scrollState),
             currentDeviceId = currentDeviceId,
             devices = devices,
             onAddNewDevice = onAddNewDevice,
             onDeleteDevice = onDeleteDevice,
             showAddDeviceButton = true,
+            modifier = innerModifier.verticalScroll(scrollState),
         )
     }
 }
 
 @Composable
 fun SyncDeviceListContent(
-    modifier: Modifier = Modifier,
     currentDeviceId: Long,
     devices: ImmutableHolder<List<SyncDevice>>,
     onAddNewDevice: () -> Unit,
     onDeleteDevice: (Long) -> Unit,
     showAddDeviceButton: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     var itemToDelete by remember {
         mutableStateOf(SyncDevice(deviceId = ID_UNSET, deviceName = ""))
@@ -804,12 +813,13 @@ fun SyncDeviceListContent(
 fun DeviceEntry(
     currentDeviceId: Long,
     device: SyncDevice,
+    modifier: Modifier = Modifier,
     onDelete: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .heightIn(min = minimumTouchSize),
     ) {
@@ -886,6 +896,7 @@ fun DeleteDeviceDialog(
 fun SyncAddNewDeviceScreen(
     onNavigateUp: () -> Unit,
     syncUrl: ImmutableHolder<URL>,
+    modifier: Modifier = Modifier,
     onLeaveSyncChain: () -> Unit,
 ) {
     BackHandler(onBack = onNavigateUp)
@@ -896,18 +907,19 @@ fun SyncAddNewDeviceScreen(
         onNavigateUp = onNavigateUp,
         onLeaveSyncChain = onLeaveSyncChain,
         title = stringResource(id = R.string.add_new_device),
-    ) { modifier ->
+        modifier = modifier,
+    ) { innerModifier ->
         SyncAddNewDeviceContent(
-            modifier = modifier.verticalScroll(scrollState),
             syncUrl = syncUrl,
+            modifier = innerModifier.verticalScroll(scrollState),
         )
     }
 }
 
 @Composable
 fun SyncAddNewDeviceContent(
-    modifier: Modifier = Modifier,
     syncUrl: ImmutableHolder<URL>,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 

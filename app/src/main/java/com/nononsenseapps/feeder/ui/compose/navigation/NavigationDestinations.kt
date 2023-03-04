@@ -94,7 +94,7 @@ sealed class NavigationDestination(
             popEnterTransition = popEnterTransition,
             popExitTransition = popExitTransition,
         ) { backStackEntry ->
-            registerScreen(
+            RegisterScreen(
                 navController = navController,
                 backStackEntry = backStackEntry,
             )
@@ -102,7 +102,7 @@ sealed class NavigationDestination(
     }
 
     @Composable
-    protected abstract fun registerScreen(
+    protected abstract fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     )
@@ -148,7 +148,7 @@ object SearchFeedDestination : NavigationDestination(
     }
 
     @Composable
-    override fun registerScreen(
+    override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     ) {
@@ -156,8 +156,8 @@ object SearchFeedDestination : NavigationDestination(
             onNavigateUp = {
                 navController.popBackStack()
             },
-            initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
             searchFeedViewModel = backStackEntry.diAwareViewModel(),
+            initialFeedUrl = backStackEntry.arguments?.getString("feedUrl"),
         ) {
             AddFeedDestination.navigate(
                 navController,
@@ -193,7 +193,7 @@ object AddFeedDestination : NavigationDestination(
     }
 
     @Composable
-    override fun registerScreen(
+    override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     ) {
@@ -227,7 +227,7 @@ object EditFeedDestination : NavigationDestination(
     }
 
     @Composable
-    override fun registerScreen(
+    override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     ) {
@@ -256,7 +256,7 @@ object SettingsDestination : NavigationDestination(
     }
 
     @Composable
-    override fun registerScreen(
+    override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     ) {
@@ -320,7 +320,7 @@ object FeedDestination : NavigationDestination(
     }
 
     @Composable
-    override fun registerScreen(
+    override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     ) {
@@ -370,7 +370,7 @@ object ArticleDestination : NavigationDestination(
     }
 
     @Composable
-    override fun registerScreen(
+    override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     ) {
@@ -434,7 +434,7 @@ object SyncScreenDestination : NavigationDestination(
     }
 
     @Composable
-    override fun registerScreen(
+    override fun RegisterScreen(
         navController: NavController,
         backStackEntry: NavBackStackEntry,
     ) {

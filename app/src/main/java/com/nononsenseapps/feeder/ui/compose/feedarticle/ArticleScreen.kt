@@ -67,7 +67,6 @@ import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.util.FilePathProvider
-import com.nononsenseapps.feeder.util.filePathProvider
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import com.nononsenseapps.feeder.util.unicodeWrap
@@ -168,6 +167,7 @@ fun ArticleScreen(
     onTogglePinned: () -> Unit,
     onToggleBookmarked: () -> Unit,
     articleListState: LazyListState,
+    modifier: Modifier = Modifier,
     onNavigateUp: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -180,7 +180,7 @@ fun ArticleScreen(
     }
 
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets.statusBars,
@@ -384,18 +384,18 @@ fun ArticleContent(
     }
 
     ReaderView(
-        modifier = modifier,
         screenType = screenType,
-        articleListState = articleListState,
-        articleTitle = viewState.articleTitle,
-        feedTitle = viewState.feedDisplayTitle,
-        enclosure = viewState.enclosure,
         onEnclosureClick = {
             if (viewState.enclosure.present) {
                 openLinkInBrowser(context, viewState.enclosure.link)
             }
         },
         onFeedTitleClick = onFeedTitleClick,
+        modifier = modifier,
+        articleListState = articleListState,
+        enclosure = viewState.enclosure,
+        articleTitle = viewState.articleTitle,
+        feedTitle = viewState.feedDisplayTitle,
         authorDate = when {
             viewState.author == null && viewState.pubDate != null ->
                 stringResource(

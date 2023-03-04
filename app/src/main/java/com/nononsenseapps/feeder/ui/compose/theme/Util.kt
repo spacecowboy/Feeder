@@ -10,7 +10,7 @@ import com.nononsenseapps.feeder.R
 
 @DrawableRes
 @Composable
-inline fun PlaceholderImage(): Int {
+fun rememberPlaceholderImage(): Int {
     val isLightTheme = MaterialTheme.colorScheme.isLight
 
     @DrawableRes
