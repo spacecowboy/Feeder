@@ -20,7 +20,7 @@ dependencyResolutionManagement {
             // See https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility
             val kotlinVersion = "1.7.20"
             version("kotlin", kotlinVersion)
-            version("androidPlugin", "7.3.1")
+            version("androidPlugin", "7.4.2")
             version("composeCompiler", "1.3.2")
 
             // BEGIN These should be upgraded in unison
