@@ -1,15 +1,10 @@
 package com.nononsenseapps.jsonfeed
 
 import kotlin.test.assertEquals
-import org.junit.Rule
+import org.junit.Assert
 import org.junit.Test
-import org.junit.rules.ExpectedException
 
 class JsonFeedParserTest {
-
-    @Rule
-    @JvmField
-    val expected: ExpectedException = ExpectedException.none()
 
     @Test
     fun basic() {
@@ -35,7 +30,7 @@ class JsonFeedParserTest {
         }
     ]
 }
-        """
+        """,
         )
 
         assertEquals("https://jsonfeed.org/version/1", feed.version)
@@ -75,7 +70,7 @@ class JsonFeedParserTest {
         }
     ]
 }
-        """
+        """,
         )
 
         assertEquals("https://jsonfeed.org/version/1", feed.version)
@@ -107,8 +102,11 @@ class JsonFeedParserTest {
 
     @Test
     fun badUrl() {
-        expected.expectMessage("Bad URL. Perhaps it is missing an http:// prefix?")
-        expected.expect(IllegalArgumentException::class.java)
-        JsonFeedParser().parseUrl("cowboyprogrammer.org/feed.json")
+        Assert.assertThrows(
+            "Bad URL. Perhaps it is missing an http:// prefix?",
+            IllegalArgumentException::class.java,
+        ) {
+            JsonFeedParser().parseUrl("cowboyprogrammer.org/feed.json")
+        }
     }
 }
