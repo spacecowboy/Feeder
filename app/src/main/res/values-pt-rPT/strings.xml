@@ -166,7 +166,7 @@
     <string name="failed_to_export_OPML">Falha ao exportar OPML</string>
     <string name="device_sync">Sincronização de aparelhos</string>
     <string name="add_new_device">Adicionar novo aparelho</string>
-    <string name="device_sync_financed_by_community">Este serviço é pago pela comunidade. Por favor, considere doar se achar útil.</string>
+    <string name="device_sync_financed_by_community">Este serviço é pago pela comunidade. Por favor, considere a possibilidade de doar se o considerar útil.</string>
     <string name="this_device">%1$s (este aparelho)</string>
     <string name="disconnect_device_from_sync">Desconectar aparelho da cadeia de sincronização</string>
     <string name="devices_on_sync_chain">Aparelhos na cadeia de sincronização</string>
@@ -191,6 +191,7 @@
     <string name="permission_read_label">Acesso somente leitura</string>
     <string name="explanation_permission_notifications">A permissão deve ser concedida antes que as notificações possam ser ativadas.</string>
     <string name="article_image">Imagem do artigo</string>
-    <string name="block_list_description">Esconde histórias com títulos que contenham um dos seguintes termos. Exemplos de filtro:</string>
+    <string name="block_list_description">Esconde artigos com títulos que contenham qualquer um destes filtros. Exemplos de filtros:</string>
     <string name="text_scale">escala do texto</string>
+    <string name="sync_to_fetch">Sincronizar para buscar artigo</string>
 </resources>
