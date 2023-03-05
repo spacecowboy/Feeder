@@ -56,7 +56,7 @@
     <string name="sync_option_every_15min">15 minuturo</string>
     <string name="sync_option_every_hour">Orduro</string>
     <string name="sync_option_every_day">Egunero</string>
-    <string name="block_list_description">Termino hauetakoren bat duten izenburuak dituzten istorioak ezkutatzen ditu. Iragazkien adibideak:</string>
+    <string name="block_list_description">Artikuluak ezkutatzen ditu, hauetako izenburuek hurrengo edozein iragazki badute. Iragazkien adibideak:</string>
     <string name="open_link_in_web_view">Ireki esteka web ikuspegian</string>
     <string name="open_in_web_view">Ireki Web ikuspegian</string>
     <string name="max_feed_items">Gehienezko elementuak jario bakoitzeko</string>
@@ -193,4 +193,5 @@
     <string name="bookmark_article">Artikulua markatu</string>
     <string name="remove_bookmark">Markagailua ezabatu</string>
     <string name="text_scale">Testuaren eskala</string>
+    <string name="sync_to_fetch">Sinkronizatu artikuluak eskuratzeko</string>
 </resources>
