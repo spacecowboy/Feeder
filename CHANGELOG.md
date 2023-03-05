@@ -1,3 +1,19 @@
+# 2.4.9
+Aitor Salaberria (1):
+  * [3d295d48] Updated Basque translation using Weblate
+
+Jonas Kalderstam (8):
+  * [cfe0511a] Fixed all lint errors
+
+VfBFan (1):
+  * [dbfa1c90] Translated using Weblate (German)
+
+jc (1):
+  * [76b24997] Translated using Weblate (Portuguese (Portugal))
+
+zmni (1):
+  * [6a822bb8] Updated Indonesian translation using Weblate
+
 # 2.4.8
 Carles Muñoz Gorriz (1):
   * [be63937d] Updated Catalan translation using Weblate
