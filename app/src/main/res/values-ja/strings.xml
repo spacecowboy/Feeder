@@ -167,7 +167,7 @@
     <string name="leave_sync_chain">同期チェーンを終了</string>
     <string name="join_sync_chain">同期チェーンを始める</string>
     <string name="only_from_end">端からのみ</string>
-    <string name="unpin_article">記事のピン留め解除</string>
+    <string name="unpin_article">記事のピン留めを解除する</string>
     <string name="pin_article">記事をピン留めする</string>
     <string name="block_list">ブロックリスト</string>
     <string name="add_item">アイテムの追加</string>
@@ -187,5 +187,11 @@
     <string name="text_to_speech">テキスト読み上げ</string>
     <string name="skip_to_next">次へスキップ</string>
     <string name="set_language">言語の設定</string>
-    <string name="pinned"></string>
+    <string name="pinned">ピン留め済み</string>
+    <string name="sync_to_fetch">記事を取得するために同期する</string>
+    <string name="article_image">記事の画像</string>
+    <string name="text_scale">文字の大きさ</string>
+    <string name="bookmarked">ブックマーク済み</string>
+    <string name="block_list_description">次のフィルターをタイトルに含む記事を隠します。例:</string>
+    <string name="feed_icon">フィードのアイコン</string>
 </resources>
