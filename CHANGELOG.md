@@ -1,3 +1,11 @@
+# 2.4.10
+Jonas Kalderstam (3):
+  * [c2010a4f] Disabled emulator tests on github
+  * [24a024f5] Upgraded kotlin, compose compiler and compose BOM
+
+S-H-Y-A (1):
+  * [6a786c1f] Translated using Weblate (Japanese)
+
 # 2.4.9
 Aitor Salaberria (1):
   * [3d295d48] Updated Basque translation using Weblate
