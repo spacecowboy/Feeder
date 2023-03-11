@@ -1,6 +1,5 @@
 package com.nononsenseapps.feeder.model
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.nononsenseapps.feeder.base.DIAwareIntentService
@@ -13,6 +12,7 @@ const val ACTION_MARK_AS_UNREAD = "MARK_AS_READ"
 class FeederService : DIAwareIntentService("FeederService") {
     private val dao: FeedItemDao by instance()
 
+    @Deprecated("Deprecated in Java")
     override fun onHandleIntent(intent: Intent?) {
         when (intent?.action) {
             ACTION_MARK_AS_UNREAD -> intent.data?.let { markAsUnread(it) }
@@ -25,13 +25,5 @@ class FeederService : DIAwareIntentService("FeederService") {
                 dao.markAsRead(id = id, unread = true)
             }
         }
-    }
-
-    companion object {
-        fun getIntentForId(context: Context, feedItemId: Long): Intent =
-            Intent(context, FeederService::class.java).apply {
-                action = ACTION_MARK_AS_UNREAD
-                data = Uri.parse("com.nononsenseapps.feeder/feeditem/$feedItemId")
-            }
     }
 }
