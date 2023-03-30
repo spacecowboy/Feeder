@@ -193,4 +193,5 @@
     <string name="block_list_description">Sakriva članke s naslovima koji sadrže neke od ovih pojmova. Primjeri filtera:</string>
     <string name="feed_icon">Ikonica izvora</string>
     <string name="text_scale">Skaliranje teksta</string>
+    <string name="sync_to_fetch">Sinhronizuj za dohvatanje članka</string>
 </resources>
