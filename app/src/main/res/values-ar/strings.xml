@@ -12,10 +12,10 @@
     <string name="block_list_description">يخفي المقالات ذات العناوين التي تحتوي على أي من هذه المرشحات. مثال مرشحات:</string>
     <string name="touch_to_play_video">المس لتشغيل الفيديو</string>
     <string name="javascript">جافاسكربت</string>
-    <string name="open_feed">افتح تلقيماً</string>
+    <string name="open_feed">افتح خلاصة</string>
     <string name="mark_items_above_as_read">علّم الذي بالأعلى أنه مقروء</string>
     <string name="expanded_tag">افتح وسم</string>
-    <string name="synchronize_feeds">زامن التلقيمات</string>
+    <string name="synchronize_feeds">زامن الخلاصات</string>
     <string name="bookmarks_filter">المعَلَمة فقط</string>
     <string name="zero_unread_articles">%1$s مقال غير مقروء</string>
     <string name="one_unread_article">%1$s مقالان غير مقروءين</string>
@@ -24,7 +24,7 @@
     <string name="remove_device">أزل الجهاز</string>
     <string name="pinned">مثبت</string>
     <string name="bookmark_article">علّم المقال</string>
-    <string name="feed_icon">رمز التلقيم</string>
+    <string name="feed_icon">رمز الخلاصة</string>
     <string name="text_scale">مقاس النص</string>
     <string name="article_image">صورة المقال</string>
     <string name="navigation_drawer_open">افتح خزنة التصفح</string>
@@ -40,24 +40,24 @@
     <string name="sync_option_every_12_hours">كلّ ١٢ ساعة</string>
     <string name="sync_option_every_day">كل يوم</string>
     <string name="action_settings">إعدادات</string>
-    <string name="add_feed">أضف تلقيمًا</string>
-    <string name="title_activity_edit_feed">اشترك بتلقيم</string>
+    <string name="add_feed">أضف خلاصة</string>
+    <string name="title_activity_edit_feed">اشترك بخلاصة</string>
     <string name="url">العنوان</string>
     <string name="tag">الوسم</string>
-    <string name="add_feed_search_hint">مسار التلقيم</string>
+    <string name="add_feed_search_hint">مسار الخلاصة</string>
     <string name="title">العنوان</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s، %2$s</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="save">احفظ</string>
     <string name="empty_feed_top">لا يوجد شيء هنا. هل ترغب في…</string>
-    <string name="empty_feed_open"><annotation style="link">فتح</annotation> تلقيما أخر\?</string>
-    <string name="empty_feed_add"><annotation style="link">إضافة</annotation> المزيد من التلقيمات\?</string>
-    <string name="search_feed_empty_hint">أدخل عنوان تلقيم</string>
+    <string name="empty_feed_open"><annotation style="link">فتح</annotation> خلاصة أخرى؟</string>
+    <string name="empty_feed_add"><annotation style="link">أضف</annotation> المزيد من الخلاصات؟</string>
+    <string name="search_feed_empty_hint">أدخل عنوان خلاصة</string>
     <string name="mark_as_read">علّم كمقروءة</string>
     <string name="mark_as_unread">علّم كَغَير مقروءة</string>
     <string name="mark_all_as_read">علّم الكلّ كمقروءة</string>
-    <string name="edit_feed">حرّر التلقيم...</string>
-    <string name="delete_feed">احذف التلقيم</string>
+    <string name="edit_feed">حرّر خلاصة</string>
+    <string name="delete_feed">احذف خلاصة</string>
     <string name="show_all_items">أظهر كل العناصر</string>
     <string name="show_unread_items">أظهر العناصر غير المقروءة</string>
     <string name="new_items_available">عناصر جديدة متوفرة</string>
@@ -73,16 +73,16 @@
     <string name="skip_to_next">تخطى للتالي</string>
     <string name="set_language">اضبط اللغة</string>
     <string name="sync">مزامنه</string>
-    <string name="export_feeds_to_opml">صدر التلقيمات كـOPML</string>
-    <string name="import_feeds_from_opml">استورد تلقيمات من OPML</string>
+    <string name="export_feeds_to_opml">صدر الخلاصات كـOPML</string>
+    <string name="import_feeds_from_opml">استورد الخلاصات من OPML</string>
     <string name="view_debug_log">اعرض سجل التنقيح</string>
     <string name="new_based_on_this">جديد بناءً على هذه</string>
     <string name="indicator_for_mark_as_read">مؤشر لتعْليم المقروء</string>
     <string name="share">شارك</string>
-    <string name="no_such_feed">لا يمكن العثور على مثل هذه التلقيم. حاول استخدام HTTPS ربما يفيد؟</string>
+    <string name="no_such_feed">لا يمكن العثور على مثل هذه الخلاصة. حاول استخدام HTTPS ربما يفيد؟</string>
     <string name="nothing_to_display">لا يوجد شيء لعرضه!</string>
     <string name="title_activity_settings">إعدادات</string>
-    <string name="all_feeds">كل التلقيمات</string>
+    <string name="all_feeds">كل الخلاصات</string>
     <string name="sync_option_manually">يدويا</string>
     <string name="sync_option_every_15min">كلّ ١٥ دقيقة</string>
     <string name="sync_option_every_30min">كلّ ٣٠ دقيقة</string>
@@ -101,8 +101,8 @@
     <string name="on_startup">عند بدء التطبيق</string>
     <string name="block_list">قائمة المنع</string>
     <string name="add_item">أضف عنصرًا</string>
-    <string name="updated_feeds">تلقيمات المحدثة</string>
-    <string name="notification_channel_name">تلقيمات غير مقروءة</string>
+    <string name="updated_feeds">خلاصات المحدثة</string>
+    <string name="notification_channel_name">خلاصات غير مقروءة</string>
     <string name="sync_status">حالة المزامنة</string>
     <string name="open_in_reader">القارئ</string>
     <string name="open_in_webview">عرض الويب</string>
@@ -114,7 +114,7 @@
     <string name="reader_settings">القارئ</string>
     <string name="open_link_in_web_view">افتح الرابط في عرض الويب</string>
     <string name="open_in_web_view">افتح في عرض الويب</string>
-    <string name="max_feed_items">أقصى عدد للعناصر لكل تلقيم</string>
+    <string name="max_feed_items">أقصى عدد للعناصر لكل خلاصة</string>
     <string name="could_not_load_url">لا يمكن تحميل العنوان</string>
     <string name="theme_system">النظام</string>
     <string name="theme_automatic">آليّ</string>
@@ -131,7 +131,7 @@
     <string name="send_bug_report">أرسل تقرير عن العلة</string>
     <string name="no_email_client">تعذر فتح عميل البريد الإلكتروني</string>
     <string name="mark_items_below_as_read">علّم الذي بالأسفل أنه مقروء</string>
-    <string name="discovered_feeds_list">قائمة التلقيمات المكتشفة</string>
+    <string name="discovered_feeds_list">قائمة الخلاصات المكتشفة</string>
     <string name="toggle_tag_expansion">بدل توسيع الوسوم</string>
     <string name="contracted_tag">وسم مغلق</string>
     <string name="battery_optimization">تحسين المدخرة</string>
@@ -160,4 +160,38 @@
     <string name="remove_bookmark">احذف العلامة</string>
     <string name="bookmarked">حفظت العلامة</string>
     <string name="new_indicator">جديد</string>
+    <string name="generate_extra_unique_ids">ولّد معرفات فريدة إضافية</string>
+    <string name="only_enable_for_bad_id_feeds">فعله للخلاصات ذات المعرفات السيئة فقط</string>
+    <string name="invalid_url">عنوان غير صالح</string>
+    <string name="failed_to_import_OPML">فشل استيراد OPML</string>
+    <string name="failed_to_export_OPML">أخفق تصدير OPML</string>
+    <string name="device_sync">مزامنة جهاز</string>
+    <string name="press_scan_sync">على جهازك، تنقل إلى مزامنة جهاز واضغط على امسح رمز المزامنة.</string>
+    <string name="feeder_device_sync_code">رمز المزامنة للجهاز المزود</string>
+    <string name="leave_sync_chain">اخرج من سلسلة المزامنة</string>
+    <string name="scan_or_enter_code">امسح أو أدخل رمز المزامنة</string>
+    <string name="start_new_sync_chain">ابدأ سلسلة مزامنة جديدة</string>
+    <string name="sync_code">رمز المزامنة</string>
+    <string name="secret_key">المفتاح السر</string>
+    <string name="device_sync_description_1">تتيح لك مزامنة جهاز مزامنة اشتراكات الخلاصة وقراءة المقالات بين أجهزتك المختلفة.</string>
+    <string name="join_sync_chain">انضم لسلسلة مزامنة</string>
+    <string name="no_barcode_scanner_installed">لم يتمكن من العثور على ماسح الرموز</string>
+    <string name="this_device">%1$s (هذا الجهاز)</string>
+    <string name="devices_on_sync_chain">الأجهزة التي ستزامن</string>
+    <string name="remove_device_question">هل تريد حذف هذا الجهاز %1$s؟</string>
+    <string name="swipe_to_mark_as_read">مرر لتعلمها كمقروءة</string>
+    <string name="explanation_permission_notifications">يجب أن يحصل على الصلاحيات قبل أن تمكن الإخطارات.</string>
+    <string name="permission_read_desc">تسمح للتطبيق أن يقرأ الخلاصات و المقالات</string>
+    <string name="permission_read_label">وصول القراءة فقط لفيدر</string>
+    <string name="device_sync_financed_by_community">هذه الخدمة مدفوعة بواسطة المجتمع. الرجاء تبرع إذا وجدتها مفيدة.</string>
+    <string name="disconnect_device_from_sync">افصل جهاز من سلسلة المزامنة</string>
+    <string name="treat_like_password">عامل هذا ككلمة سر. أي شخص يمكنه أن يقرأ بياناتك المزامنة إذا امتلكوا هذا الرابط.</string>
+    <string name="are_you_sure_leave_sync_chain">هل تريد ترك سلسلة المزامنة؟</string>
+    <string name="only_from_end">فقط من النهاية</string>
+    <string name="or_open_device_sync_link">يمكنك أيضا فتح الرابط على جهازك.</string>
+    <string name="from_anywhere">من أي مكان</string>
+    <string name="device_sync_description_2">ما عليك سوى مسح الرمز من سلسلة المزامنة التي أنشأتها على جهاز آخر، أو بَدْء سلسلة مزامنة جديدة.</string>
+    <string name="show_fab">أظهر زر الإجراءات العائم</string>
+    <string name="include_mobile_hotspots">ضمّن شبكة المشاركة من المحمول</string>
+    <string name="notification_channel_description">تُعرض الإخطارات فقط للعناصر غير المقروءة في الخلاصات المضبوطة</string>
 </resources>
