@@ -140,7 +140,7 @@
     <string name="empty_feed_add">of feeds <annotation style="link">toevoegen</annotation>\?</string>
     <string name="nothing_to_display">Niets weer te geven!</string>
     <string name="failed_to_open_article">Kon artikel niet openen</string>
-    <string name="device_sync_financed_by_community">Deze dienst wordt betaald door de gemeenschap. Overweeg een donatie als u het nuttig vindt</string>
+    <string name="device_sync_financed_by_community">Deze dienst wordt betaald door de gemeenschap. Overweeg een donatie als u het nuttig vindt.</string>
     <string name="press_scan_sync">Ga naar \'Toestellen-synchroniseren\' en klik op \'Sync-code scannen of invoeren\'.</string>
     <string name="devices_on_sync_chain">Toestellen in de Sync-keten</string>
     <string name="device_sync">Toestellen synchroniseren</string>
