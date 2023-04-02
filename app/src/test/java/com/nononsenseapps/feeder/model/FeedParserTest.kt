@@ -51,7 +51,7 @@ class FeedParserTest : DIAware {
                 feedParser.getAlternateFeedLinksAtUrl(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A"))
             assertEquals(
                 listOf("https://www.youtube.com/feeds/videos.xml?channel_id=UCG1h-Wqjtwz7uUANw6gazRw" to "atom"),
-                feeds
+                feeds,
             )
         }
     }
@@ -62,7 +62,7 @@ class FeedParserTest : DIAware {
             val feed = feedParser.parseFeedResponse(
                 URL("http://https://www.openstreetmap.org/diary/rss"),
                 it,
-                null
+                null,
             )
             val item = feed.items!!.first()
 
@@ -77,21 +77,21 @@ class FeedParserTest : DIAware {
             val feed = feedParser.parseFeedResponse(
                 URL("http://hnapp.com/rss?q=type%3Astory%20score%3E36%20-bitcoin%20-ethereum%20-cryptocurrency%20-blockchain%20-snowden%20-hiring%20-ask"),
                 it,
-                null
+                null,
             )
 
             val item = feed.items!![0]
             assertEquals(
                 "37 – Spectre Mitigations in Microsoft's C/C++ Compiler",
-                item.title
+                item.title,
             )
             assertEquals(
                 "37 points, 1 comment",
-                item.content_text
+                item.content_text,
             )
             assertEquals(
                 "<p>37 points, <a href=\"https://news.ycombinator.com/item?id=16381978\">1 comment</a></p>",
-                item.content_html
+                item.content_html,
             )
         }
     }
@@ -103,13 +103,13 @@ class FeedParserTest : DIAware {
             val feed = feedParser.parseFeedResponse(
                 URL("http://www.lemonde.fr/rss/une.xml"),
                 it,
-                null
+                null,
             )
 
             val item = feed.items!![0]
             assertEquals(
                 "http://s1.lemde.fr/image/2018/02/11/644x322/5255112_3_a8dc_martin-fourcade_02be61d126b2da39d977b2e1902c819a.jpg",
-                item.image
+                item.image,
             )
         }
     }
@@ -120,7 +120,7 @@ class FeedParserTest : DIAware {
             feedParser.parseFeedResponse(
                 URL("http://www.youtube.com/feeds/videos.xml"),
                 it,
-                null
+                null,
             )
         }
 
@@ -144,7 +144,7 @@ class FeedParserTest : DIAware {
         assertEquals("1.4. Et les réseaux sociaux ?", item.title)
         assertEquals(
             "https://framatube.org/static/thumbnails/ed5c048d-01f3-4ceb-97db-6e278de512b0.jpg",
-            item.image
+            item.image,
         )
         assertTrue {
             item.content_text!!.startsWith("MOOC CHATONS#1 - Internet")
@@ -157,7 +157,7 @@ class FeedParserTest : DIAware {
             feedParser.parseFeedResponse(
                 URL("https://rutube.ru/mrss/video/person/11234072/"),
                 it,
-                null
+                null,
             )
         }
 
@@ -166,7 +166,7 @@ class FeedParserTest : DIAware {
         assertEquals("Камеди Клаб: «3 сентября»", item.title)
         assertEquals(
             "https://pic.rutubelist.ru/video/93/24/93245691f0e18d063da5fa5cd60fa6de.jpg?size=l",
-            item.image
+            item.image,
         )
     }
 
@@ -176,7 +176,7 @@ class FeedParserTest : DIAware {
             feedParser.parseFeedResponse(
                 URL("https://myanimelist.net/rss/news.xml"),
                 it,
-                null
+                null,
             )
         }
 
@@ -184,7 +184,7 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "https://cdn.myanimelist.net/s/common/uploaded_files/1664092688-dd34666e64d7ae624e6e2c70087c181f.jpeg",
-            item.image
+            item.image,
         )
     }
 
@@ -194,7 +194,7 @@ class FeedParserTest : DIAware {
             feedParser.parseFeedResponse(
                 URL("https://www.theguardian.com/world/rss"),
                 it,
-                null
+                null,
             )
         }
 
@@ -202,7 +202,7 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "https://i.guim.co.uk/img/media/c4d7049b24ee34d1c4c630c751094cabc57c54f6/0_32_6000_3601/master/6000.jpg?width=460&quality=85&auto=format&fit=max&s=919d72fef6d4f3469aff69e94964126c",
-            item.image
+            item.image,
         )
     }
 
@@ -212,7 +212,7 @@ class FeedParserTest : DIAware {
             feedParser.parseFeedResponse(
                 URL("https://nitter.weiler.rocks/lawnchairapp/rss"),
                 it,
-                null
+                null,
             )
         }
 
@@ -267,11 +267,11 @@ class FeedParserTest : DIAware {
         readResource("nixos.html") {
             val alts: List<Pair<String, String>> = feedParser.getAlternateFeedLinksInHtml(
                 it,
-                URL("https://nixos.org")
+                URL("https://nixos.org"),
             )
             assertEquals(
                 listOf("https://nixos.org/news-rss.xml" to "application/rss+xml"),
-                alts
+                alts,
             )
         }
     }
@@ -283,14 +283,14 @@ class FeedParserTest : DIAware {
             val alts: List<Pair<String, String>> =
                 feedParser.getAlternateFeedLinksInHtml(
                     it,
-                    baseUrl = URL("https://www.fz.se/index.html")
+                    baseUrl = URL("https://www.fz.se/index.html"),
                 )
             assertEquals(
                 listOf(
                     "https://www.fz.se/feeds/nyheter" to "application/rss+xml",
-                    "https://www.fz.se/feeds/forum" to "application/rss+xml"
+                    "https://www.fz.se/feeds/forum" to "application/rss+xml",
                 ),
-                alts
+                alts,
             )
         }
     }
@@ -355,7 +355,7 @@ class FeedParserTest : DIAware {
         assertEquals(
             true,
             feed?.items?.get(0)?.content_text?.contains("größte"),
-            feed?.items?.get(0)?.content_text!!
+            feed?.items?.get(0)?.content_text!!,
         )
     }
 
@@ -366,18 +366,17 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "http://utdelningsseglaren.blogspot.com/2017/12/tips-pa-6-podcasts.html",
-            feed?.items?.first()?.url
+            feed?.items?.first()?.url,
         )
     }
 
     @Test
     @Throws(Exception::class)
     fun relativeLinksAreMadeAbsoluteAtom() = runBlocking {
-
         val feed = feedParser.parseFeedResponse(
             URL("http://cowboyprogrammer.org/feed.atom"),
             atomRelative,
-            null
+            null,
         )
         assertNotNull(feed)
 
@@ -387,11 +386,10 @@ class FeedParserTest : DIAware {
     @Test
     @Throws(Exception::class)
     fun relativeLinksAreMadeAbsoluteAtomNoBase() = runBlocking {
-
         val feed = feedParser.parseFeedResponse(
             URL("http://cowboyprogrammer.org/feed.atom"),
             atomRelativeNoBase,
-            null
+            null,
         )
         assertNotNull(feed)
 
@@ -411,7 +409,7 @@ class FeedParserTest : DIAware {
         assertEquals("https://lineageos.org/Changelog-16/", feed.items?.get(0)?.url)
         assertEquals(
             "https://lineageos.org/images/2018-02-25/lineageos-15.1-hero.png",
-            feed.items?.get(0)?.image
+            feed.items?.get(0)?.image,
         )
     }
 
@@ -431,13 +429,13 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "QArt Codes",
-            title
+            title,
         )
 
         // Style tags should be ignored
         assertEquals(
             "QR codes are 2-dimensional bar codes that encode arbitrary text strings. A common use of QR codes is to encode URLs so that people can scan a QR code (for example, on an advertising poster, building r",
-            summary
+            summary,
         )
     }
 
@@ -515,18 +513,18 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "http://www.cyklistbloggen.se/wp-content/uploads/2014/01/Danviksklippan-skyltad.jpg",
-            image
+            image,
         )
 
         assertEquals(
             "Ingen ombyggning av Danvikstull",
-            title
+            title,
         )
 
         // Make sure character 160 (non-breaking space) is trimmed
         assertEquals(
             "För mer än tre år sedan aviserade dåvarande Allians-styrda Stockholms Stad att man äntligen skulle bredda den extremt smala passagen på pendlingsstråket vid Danvikstull: I smalaste passagen är gångdel",
-            summary
+            summary,
         )
     }
 
@@ -544,7 +542,7 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "https://cowboyprogrammer.org/images/zopfli_all_the_things.jpg",
-            entry.image
+            entry.image,
         )
 
         // Snippet should not contain images
@@ -552,14 +550,14 @@ class FeedParserTest : DIAware {
         assertEquals("Fixing the up button in Python shell history", entry.title)
         assertEquals(
             "In case your python/ipython shell doesn’t have a working history, e.g. pressing ↑ only prints some nonsensical ^[[A, then you are missing either the readline or ncurses library. Ipython is more descri",
-            entry.summary
+            entry.summary,
         )
         // Snippet should not contain links
         entry = feed.items!![1]
         assertEquals("Compress all the images!", entry.title)
         assertEquals(
             "Update 2016-11-22: Made the Makefile compatible with BSD sed (MacOS) One advantage that static sites, such as those built by Hugo, provide is fast loading times. Because there is no processing to be d",
-            entry.summary
+            entry.summary,
         )
     }
 
@@ -577,21 +575,21 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-            title
+            title,
         )
         assertEquals(
             "Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-            title
+            title,
         )
 
         assertEquals(
             "För tredje månaden på raken ligger Konjunkturinsitutets barometerindikator (\"konjunkturbarometern\") kvar i överhettat läge. Det råder alltså en klart och tydligt långsiktig säljsignal i enlighet med k",
-            summary
+            summary,
         )
         assertTrue(content_html!!.startsWith("För tredje månaden på raken"))
         assertEquals(
             "https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s72-c/konj.png",
-            image
+            image,
         )
 
         assertEquals<List<Any>?>(emptyList(), attachments)
@@ -611,21 +609,21 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-            title
+            title,
         )
         assertEquals(
             "Tredje månaden med överhettad svensk ekonomi - tydlig säljsignal för börsen",
-            title
+            title,
         )
 
         assertEquals(
             "För tredje månaden på raken ligger Konjunkturinsitutets barometerindikator (\"konjunkturbarometern\") kvar i överhettat läge. Det råder alltså en klart och tydligt långsiktig säljsignal i enlighet med k",
-            summary
+            summary,
         )
         assertTrue(content_html!!.startsWith("För tredje månaden på raken"))
         assertEquals(
             "https://1.bp.blogspot.com/-hD_mqKJx-XY/WLwTIKSEt6I/AAAAAAAAqfI/sztWEjwSYAoN22y_YfnZ-yotKjQsypZHACLcB/s72-c/konj.png",
-            image
+            image,
         )
 
         assertEquals<List<Any>?>(emptyList(), attachments)
@@ -644,7 +642,7 @@ class FeedParserTest : DIAware {
         assertTrue(date_published!!.contains("2016"), "Should take the updated timestamp")
         assertEquals(
             "http://localhost:1313/images/zopfli_all_the_things.jpg",
-            image
+            image,
         )
 
         assertEquals("http://localhost:1313/css/images/logo.png", icon)
@@ -664,12 +662,12 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "Thou shalt not depend on me: analysing the use of outdated JavaScript libraries on the web",
-            title
+            title,
         )
 
         assertEquals(
             "http://1.gravatar.com/avatar/a795b4f89a6d096f314fc0a2c80479c1?s=96&d=identicon&r=G",
-            image
+            image,
         )
     }
 
@@ -687,12 +685,12 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "Make The Most Of London's Offerings With Chip",
-            title
+            title,
         )
 
         assertEquals(
             "http://assets.londonist.com/uploads/2017/06/chip_2.jpg",
-            image
+            image,
         )
     }
 
@@ -746,7 +744,7 @@ class FeedParserTest : DIAware {
 
             assertEquals(
                 "Kajman, O této diskusi: test <pre> in <description> and <b>bold</b> in title",
-                entry.title
+                entry.title,
             )
         }
     }
@@ -766,12 +764,12 @@ class FeedParserTest : DIAware {
 
         assertEquals(
             "Nier: Automata bjuder på maffig lanseringstrailer",
-            title
+            title,
         )
 
         assertEquals(
             "http://d2ihp3fq52ho68.cloudfront.net/YTo2OntzOjI6ImlkIjtpOjEzOTI3OTM7czoxOiJ3IjtpOjUwMDtzOjE6ImgiO2k6OTk5OTtzOjE6ImMiO2k6MDtzOjE6InMiO2k6MDtzOjE6ImsiO3M6NDA6IjU5YjA2YjgyZjkyY2IxZjBiMDZjZmI5MmE3NTk5NjMzMjIyMmU4NGMiO30=",
-            image
+            image,
         )
     }
 
@@ -791,11 +789,11 @@ class FeedParserTest : DIAware {
         val item = feed.items!!.single()
 
         assertFalse(
-            item.content_html!!.contains(" <pre><code class=\"language-R\">obs.lon <- ncvar_get(nc.obs, 'lon')")
+            item.content_html!!.contains(" <pre><code class=\"language-R\">obs.lon <- ncvar_get(nc.obs, 'lon')"),
         )
 
         assertTrue(
-            item.content_html!!.contains(" <pre><code class=\"language-R\">obs.lon &lt;- ncvar_get(nc.obs, 'lon')")
+            item.content_html!!.contains(" <pre><code class=\"language-R\">obs.lon &lt;- ncvar_get(nc.obs, 'lon')"),
         )
     }
 
@@ -804,18 +802,18 @@ class FeedParserTest : DIAware {
         val feed = feedParser.parseFeedResponse(
             URL("http://cowboyprogrammer.org"),
             rssWithHtmlEscapedDescription,
-            null
+            null,
         )
 
         val item = feed.items!!.single()
 
         assertEquals(
             "http://cowboyprogrammer.org/hello.jpg&cached=true",
-            item.image
+            item.image,
         )
         assertEquals(
             "<img src=\"hello.jpg&amp;cached=true\">",
-            item.content_html
+            item.content_html,
         )
     }
 
@@ -824,37 +822,48 @@ class FeedParserTest : DIAware {
         val feed = feedParser.parseFeedResponse(
             URL("http://cowboyprogrammer.org"),
             atomWithHtmlEscapedContents,
-            null
+            null,
         )
 
         val text = feed.items!!.first()
         assertEquals(
             "http://cowboyprogrammer.org/hello.jpg&cached=true",
-            text.image
+            text.image,
         )
         assertEquals(
             "<img src=\"hello.jpg&amp;cached=true\">",
-            text.content_html
+            text.content_html,
         )
 
         val html = feed.items!![1]
         assertEquals(
             "http://cowboyprogrammer.org/hello.jpg&cached=true",
-            html.image
+            html.image,
         )
         assertEquals(
             "<img src=\"hello.jpg&amp;cached=true\">",
-            html.content_html
+            html.content_html,
         )
 
         val xhtml = feed.items!![2]
         assertEquals(
             "http://cowboyprogrammer.org/hello.jpg&cached=true",
-            xhtml.image
+            xhtml.image,
         )
         assertTrue("Actual:\n${xhtml.content_html}") {
             "<img src=\"hello.jpg&amp;cached=true\" />" in xhtml.content_html!!
         }
+    }
+
+    @Test
+    fun handlesUnknownProtocols() = runBlocking {
+        val feed = feedParser.parseFeedResponse(
+            URL("https://gemini.circumlunar.space"),
+            atomWithUnknownProtocol,
+            null,
+        )
+
+        assertEquals(8, feed.items!!.size)
     }
 
     private fun <T> readResource(asdf: String, block: suspend (String) -> T): T {
@@ -877,7 +886,7 @@ class FeedParserTest : DIAware {
     private val emptySlashComment: Response
         get() = bytesToResponse(
             "empty_slash_comment.xml",
-            "https://rss.golem.de/rss.php?feed=RSS2.0"
+            "https://rss.golem.de/rss.php?feed=RSS2.0",
         )
 
     private val golemDe: Response
@@ -889,7 +898,7 @@ class FeedParserTest : DIAware {
     private val utdelningsSeglarenAtom: Response
         get() = bytesToResponse(
             "atom_utdelningsseglaren.xml",
-            "http://utdelningsseglaren.blogspot.com/feeds/posts/default"
+            "http://utdelningsseglaren.blogspot.com/feeds/posts/default",
         )
 
     private val lineageosRss: Response
@@ -898,13 +907,13 @@ class FeedParserTest : DIAware {
     private val cornucopiaAtom: Response
         get() = bytesToResponse(
             "atom_cornucopia.xml",
-            "https://cornucopia.cornubot.se/feeds/posts/default"
+            "https://cornucopia.cornubot.se/feeds/posts/default",
         )
 
     private val cornucopiaRss: Response
         get() = bytesToResponse(
             "rss_cornucopia.xml",
-            "https://cornucopia.cornubot.se/feeds/posts/default?alt=rss"
+            "https://cornucopia.cornubot.se/feeds/posts/default?alt=rss",
         )
 
     private val cowboyRss: Response
@@ -937,20 +946,20 @@ class FeedParserTest : DIAware {
     private val nixersRss: Response
         get() = bytesToResponse(
             "rss_nixers_newsletter.xml",
-            "https://newsletter.nixers.net/feed.xml"
+            "https://newsletter.nixers.net/feed.xml",
         )
 
     private val videoResponse: Response
         get() = bytesToResponse(
             "rss_nixers_newsletter.xml",
             "https://foo.bar/video.mp4",
-            "video/mp4"
+            "video/mp4",
         )
 
     private val diskuse: Response
         get() = bytesToResponse(
             "rss_diskuse.xml",
-            "https://diskuse.jakpsatweb.cz/rss2.php?topic=173233"
+            "https://diskuse.jakpsatweb.cz/rss2.php?topic=173233",
         )
 
     private val geekpark: Response
@@ -959,7 +968,7 @@ class FeedParserTest : DIAware {
     private val contentTypeHtml: Response
         get() = bytesToResponse(
             "atom_content_type_html.xml",
-            "http://www.zoocoop.com/contentoob/o1.atom"
+            "http://www.zoocoop.com/contentoob/o1.atom",
         )
 
     private fun bytesToResponse(resourceName: String, url: String, contentType: String = "application/xml"): Response {
@@ -976,7 +985,7 @@ class FeedParserTest : DIAware {
             .request(
                 Request.Builder()
                     .url(url)
-                    .build()
+                    .build(),
             )
             .build()
     }
@@ -1075,4 +1084,69 @@ const val rssWithHtmlEscapedDescription = """
     </item>
   </channel>
 </rss>
+"""
+
+@Language("xml")
+const val atomWithUnknownProtocol = """
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<id>gemini://gemini.circumlunar.space/news/</id>
+<title>Official Project Gemini news feed</title>
+<updated>2023-03-01T18:34:36.714818+00:00</updated>
+<author>
+<name>Solderpunk</name>
+<email>solderpunk@posteo.net</email>
+</author>
+<link href="gemini://gemini.circumlunar.space/news/atom.xml" rel="self"/>
+<link href="gemini://gemini.circumlunar.space/news/" rel="alternate"/>
+<generator uri="https://lkiesow.github.io/python-feedgen" version="0.9.0">python-feedgen</generator>
+<entry>
+<id>gemini://gemini.circumlunar.space/news/2022_01_16.gmi</id>
+<title>2022-01-16 - Mailing list downtime, official news feed</title>
+<updated>2022-01-16T16:10:48.445244+00:00</updated>
+<link href="gemini://gemini.circumlunar.space/news/2022_01_16.gmi" rel="alternate"/>
+</entry>
+<entry>
+<id>gemini://gemini.circumlunar.space/news/2022_01_22.gmi</id>
+<title>2022-01-22 - Mailing list archives, Atom feed for official news</title>
+<updated>2022-01-22T18:44:56.495170+00:00</updated>
+<link href="gemini://gemini.circumlunar.space/news/2022_01_22.gmi" rel="alternate"/>
+</entry>
+<entry>
+<id>gemini://gemini.circumlunar.space/news/2022_01_30.gmi</id>
+<title>2022-01-30 - Minor specification update (0.16.1)</title>
+<updated>2022-01-30T14:38:04.738832+00:00</updated>
+<link href="gemini://gemini.circumlunar.space/news/2022_01_30.gmi" rel="alternate"/>
+</entry>
+<entry>
+<id>gemini://gemini.circumlunar.space/news/2022_06_20.gmi</id>
+<title>2022-06-20 - Three years of Gemini!</title>
+<updated>2022-06-20T17:48:06.479966+00:00</updated>
+<link href="gemini://gemini.circumlunar.space/news/2022_06_20.gmi" rel="alternate"/>
+</entry>
+<entry>
+<id>gemini://gemini.circumlunar.space/news/2023_01_08.gmi</id>
+<title>2023-01-08 - Changing DNS server</title>
+<updated>2023-01-08T14:12:22.568187+00:00</updated>
+<link href="gemini://gemini.circumlunar.space/news/2023_01_08.gmi" rel="alternate"/>
+</entry>
+<entry>
+<id>gemini://gemini.circumlunar.space/news/2023_01_14.gmi</id>
+<title>2023-01-14 - Tidying up gemini.circumlunar.space user capsules</title>
+<updated>2023-01-14T15:58:26.933828+00:00</updated>
+<link href="gemini://gemini.circumlunar.space/news/2023_01_14.gmi" rel="alternate"/>
+</entry>
+<entry>
+<id>gemini://gemini.circumlunar.space/news/2023_02_14.gmi</id>
+<title>2023-02-14 - Empty user capsules removed</title>
+<updated>2023-02-14T08:45:03.559039+00:00</updated>
+<link href="gemini://gemini.circumlunar.space/news/2023_02_14.gmi" rel="alternate"/>
+</entry>
+<entry>
+<id>gemini://gemini.circumlunar.space/news/2023_03_01.gmi</id>
+<title>2023-03-01 - Molly Brown upgrade</title>
+<updated>2023-03-01T18:34:36.714818+00:00</updated>
+<link href="gemini://gemini.circumlunar.space/news/2023_03_01.gmi" rel="alternate"/>
+</entry>
+</feed>
 """

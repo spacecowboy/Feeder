@@ -34,13 +34,21 @@ suspend fun SyndFeed.asFeed(baseUrl: URL, feedIconFinder: suspend (URL) -> Strin
     )
 
     // Base64 encoded images can be quite large - and crash database cursors
-    val icon = image?.url?.let { url ->
-        when {
-            url.startsWith("data:") -> null
-            else -> url
+    val icon = try {
+        image?.url?.let { url ->
+            when {
+                url.startsWith("http") -> url
+                else -> null
+            }
+        } ?: siteUrl?.let { siteUrl ->
+            when {
+                siteUrl.startsWith("http") -> feedIconFinder(URL(siteUrl))
+                else -> null
+            }
         }
-    } ?: siteUrl?.let {
-        feedIconFinder(URL(it))
+    } catch (e: Exception) {
+        Log.e("FEEDER_ROME", "Unable to find feed icon", e)
+        null
     }
 
     try {
