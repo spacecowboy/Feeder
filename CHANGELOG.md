@@ -1,3 +1,21 @@
+# 2.4.12
+Belmar Begić (1):
+  * [9157af8f] Updated Bosnian translation using Weblate
+
+Jonas Kalderstam (4):
+  * [43518971] Fixed couldn't add a feed with unknown protocols in links
+  * [c83e7054] Improved link handling
+  * [ca3a977b] Some cleanup
+
+Raman (1):
+  * [043f5da1] Updated Malayalam translation using Weblate
+
+Zayed Al-Saidi (1):
+  * [95e0e8c0] Translated using Weblate (Arabic)
+
+fincent (1):
+  * [b502d1ff] Updated Dutch translation using Weblate
+
 # 2.4.11
 Juraj Liso (1):
   * [61a263f3] Added Slovak translation using Weblate
