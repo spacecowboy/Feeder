@@ -25,6 +25,7 @@ import com.nononsenseapps.feeder.db.COL_UNREAD
 import com.nononsenseapps.feeder.db.COL_URL
 import com.nononsenseapps.feeder.db.FEEDS_TABLE_NAME
 import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
+import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
 import java.net.URI
 import java.net.URL
@@ -86,18 +87,8 @@ data class FeedItemWithFeed @Ignore constructor(
             return null
         }
 
-    val pubDateString: String?
-        get() = pubDate?.toString()
-
     val domain: String?
         get() {
-            val l: String? = enclosureLink ?: link
-            if (l != null) {
-                try {
-                    return URL(l).host.replace("www.", "")
-                } catch (e: Throwable) {
-                }
-            }
-            return null
+            return (enclosureLink ?: link)?.host()
         }
 }

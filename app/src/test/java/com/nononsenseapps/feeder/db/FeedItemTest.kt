@@ -9,10 +9,10 @@ class FeedItemTest {
     @Test
     fun getDomain() {
         val fi1 = FeedItem(link = "https://www.cowboyprogrammer.org/some/path.txt")
-        assertEquals("cowboyprogrammer.org", fi1.domain)
+        assertEquals("www.cowboyprogrammer.org", fi1.domain)
 
         val fi2 = FeedItem(enclosureLink = "https://www.cowboyprogrammer.org/some/path.txt")
-        assertEquals("cowboyprogrammer.org", fi2.domain)
+        assertEquals("www.cowboyprogrammer.org", fi2.domain)
 
         val fi3 = FeedItem(enclosureLink = "asdff\\asdf")
         assertEquals(null, fi3.domain)

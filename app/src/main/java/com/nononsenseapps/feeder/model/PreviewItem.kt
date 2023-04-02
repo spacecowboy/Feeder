@@ -42,37 +42,21 @@ data class PreviewItem @Ignore constructor(
     constructor() : this(id = ID_UNSET)
 
     val feedDisplayTitle: String
-        get() = if (feedCustomTitle.isBlank()) feedTitle else feedCustomTitle
-
-    val enclosureFilename: String?
-        get() {
-            if (enclosureLink != null) {
-                var fname: String? = null
-                try {
-                    fname = URI(enclosureLink).path.split("/").last()
-                } catch (e: Exception) {
-                }
-                if (fname == null || fname.isEmpty()) {
-                    return null
-                } else {
-                    return fname
-                }
-            }
-            return null
-        }
-
-    val pubDateString: String?
-        get() = pubDate?.toString()
+        get() = feedCustomTitle.ifBlank { feedTitle }
 
     val domain: String?
         get() {
-            val l: String? = enclosureLink ?: link
-            if (l != null) {
-                try {
-                    return URL(l).host.replace("www.", "")
-                } catch (e: Throwable) {
-                }
-            }
-            return null
+            return (enclosureLink ?: link)?.host()
         }
+}
+
+fun String?.host(): String? {
+    val l: String? = this
+    if (l != null) {
+        try {
+            return URI(l).host
+        } catch (_: Throwable) {
+        }
+    }
+    return null
 }

@@ -26,12 +26,12 @@ import com.nononsenseapps.feeder.db.COL_PUBDATE
 import com.nononsenseapps.feeder.db.COL_TITLE
 import com.nononsenseapps.feeder.db.COL_UNREAD
 import com.nononsenseapps.feeder.db.FEED_ITEMS_TABLE_NAME
+import com.nononsenseapps.feeder.model.host
 import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import com.nononsenseapps.jsonfeed.Item
 import java.net.URI
-import java.net.URL
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
@@ -129,9 +129,6 @@ data class FeedItem @Ignore constructor(
         primarySortTime = minOf(firstSyncedTime, pubDate?.toInstant() ?: firstSyncedTime)
     }
 
-    val pubDateString: String?
-        get() = pubDate?.toString()
-
     val enclosureFilename: String?
         get() {
             enclosureLink?.let { enclosureLink ->
@@ -151,14 +148,7 @@ data class FeedItem @Ignore constructor(
 
     val domain: String?
         get() {
-            val l: String? = enclosureLink ?: link
-            if (l != null) {
-                try {
-                    return URL(l).host.replace("www.", "")
-                } catch (_: Throwable) {
-                }
-            }
-            return null
+            return (enclosureLink ?: link)?.host()
         }
 }
 
