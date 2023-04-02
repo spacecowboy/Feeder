@@ -4,7 +4,7 @@ import android.util.Log
 import com.nononsenseapps.feeder.util.asFeed
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
-import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.JsonFeedParser
 import com.rometools.rome.io.SyndFeedInput
@@ -56,8 +56,8 @@ class FeedParser(override val di: DI) : DIAware {
                     else -> t
                 }
             }
-            .map {
-                sloppyLinkToStrictURL(it.first) to it.second
+            .mapNotNull {
+                sloppyLinkToStrictURLOrNull(it.first)?.let { l -> l to it.second }
             }
 
         return feedLinks.firstOrNull()?.first
@@ -88,15 +88,15 @@ class FeedParser(override val di: DI) : DIAware {
                 doc.getElementsByAttributeValue("rel", "shortcut icon")
             )
             .filter { it.hasAttr("href") }
-            .map {
+            .firstNotNullOfOrNull { e ->
                 when {
                     baseUrl != null -> relativeLinkIntoAbsolute(
                         base = baseUrl,
-                        link = it.attr("href"),
+                        link = e.attr("href"),
                     )
-                    else -> sloppyLinkToStrictURL(it.attr("href")).toString()
+                    else -> sloppyLinkToStrictURLOrNull(e.attr("href"))?.toString()
                 }
-            }.firstOrNull()
+            }
     }
 
     /**
@@ -149,13 +149,17 @@ class FeedParser(override val di: DI) : DIAware {
                     false
                 }
             }
-            ?.map {
+            ?.mapNotNull { e ->
                 when {
                     baseUrl != null -> relativeLinkIntoAbsolute(
                         base = baseUrl,
-                        link = it.attr("href"),
-                    ) to it.attr("type")
-                    else -> sloppyLinkToStrictURL(it.attr("href")).toString() to it.attr("type")
+                        link = e.attr("href"),
+                    ) to e.attr("type")
+                    else -> sloppyLinkToStrictURLOrNull(e.attr("href"))?.let { l ->
+                        l.toString() to e.attr(
+                            "type",
+                        )
+                    }
                 }
             } ?: emptyList()
 
