@@ -27,7 +27,7 @@ class BugReportKTest {
 
             Describe your issue and how to reproduce it below:
             """.trimIndent(),
-            emailBody(false)
+            emailBody(false),
         )
     }
 
@@ -42,7 +42,7 @@ class BugReportKTest {
 
             Describe your issue and how to reproduce it below:
             """.trimIndent(),
-            emailBody(true)
+            emailBody(true),
         )
     }
 
@@ -50,15 +50,15 @@ class BugReportKTest {
     fun subjectIsSensible() {
         assertEquals(
             "Bug report for Feeder",
-            emailSubject()
+            emailSubject(),
         )
     }
 
     @Test
     fun emailAddressIsCorrect() {
         assertEquals(
-            "jonas.feederbugs@cowboyprogrammer.org",
-            emailReportAddress()
+            "feeder@nononsenseapps.com",
+            emailReportAddress(),
         )
     }
 

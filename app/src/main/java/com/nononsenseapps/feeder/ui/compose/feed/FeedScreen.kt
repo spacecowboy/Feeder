@@ -124,8 +124,8 @@ import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.addMargin
 import com.nononsenseapps.feeder.ui.compose.utils.addMarginLayout
+import com.nononsenseapps.feeder.util.emailBugReportIntent
 import com.nononsenseapps.feeder.util.logDebug
-import com.nononsenseapps.feeder.util.openGitlabIssues
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import kotlinx.coroutines.delay
@@ -254,7 +254,7 @@ fun FeedScreen(
                 SettingsDestination.navigate(navController)
             },
             onSendFeedback = {
-                context.startActivity(openGitlabIssues())
+                context.startActivity(emailBugReportIntent())
             },
             onImport = {
                 opmlImporter.launch(
