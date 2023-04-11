@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.model
 
+import android.Manifest
 import android.annotation.TargetApi
 import android.app.Notification
 import android.app.NotificationChannel
@@ -9,6 +10,7 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -17,6 +19,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.GROUP_ALERT_SUMMARY
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.navigation.NavDeepLinkBuilder
 import com.nononsenseapps.feeder.R
@@ -47,6 +50,14 @@ suspend fun notify(
     appContext: Context,
     updateSummaryOnly: Boolean = false,
 ) = withContext(Dispatchers.Default) {
+    if (ContextCompat.checkSelfPermission(
+            appContext,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        return@withContext
+    }
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         createNotificationChannel(appContext)
     }
@@ -75,6 +86,14 @@ suspend fun cancelNotification(context: Context, feedItemId: Long) =
 
 suspend fun cancelNotifications(context: Context, feedItemIds: List<Long>) =
     withContext(Dispatchers.Default) {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS,
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return@withContext
+        }
+
         val nm = context.notificationManager
 
         for (feedItemId in feedItemIds) {
