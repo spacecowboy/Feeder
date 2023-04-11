@@ -142,7 +142,7 @@
     <string name="failed_to_open_article">Не удалось открыть статью</string>
     <string name="add_new_device">Добавить новое устройство</string>
     <string name="device_sync">Синхр. устройства</string>
-    <string name="device_sync_financed_by_community">Эта служба оплачивается сообществом. Пожалуйста, подумайте о пожертвовании, если вы считаете ее полезной.</string>
+    <string name="device_sync_financed_by_community">Данный сервис оплачивается сообществом. Пожалуйста, подумайте о пожертвовании, если вы считаете его полезным.</string>
     <string name="devices_on_sync_chain">Устройства в цепи синхронизации</string>
     <string name="join_sync_chain">Присоединиться к цепочке синхронизации</string>
     <string name="remove_device_question">Вы уверены, что хотите удалить устройство %1$s\?</string>
@@ -192,4 +192,6 @@
     <string name="set_language">Установить язык</string>
     <string name="feed_icon">Значок ленты</string>
     <string name="text_scale">Размер шрифта</string>
+    <string name="block_list_description">Скрывает статьи с заголовками, содержащими любой из этих фильтров. Пример фильтров:</string>
+    <string name="sync_to_fetch">Синхронизация для получения статьи</string>
 </resources>
