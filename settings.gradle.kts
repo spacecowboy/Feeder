@@ -21,7 +21,7 @@ dependencyResolutionManagement {
             val kotlinVersion = "1.8.10"
             version("kotlin", kotlinVersion)
             version("androidPlugin", "7.4.2")
-            version("composeCompiler", "1.4.3")
+            version("composeCompiler", "1.4.4")
 
             // BEGIN These should be upgraded in unison
             version("okhttp", "4.10.0")
@@ -51,8 +51,8 @@ dependencyResolutionManagement {
             version("lifecycle", "2.3.1")
             version("room", "2.4.3")
             // Compose related below
-            version("compose", "2023.01.00")
-            val activityCompose = "1.6.1"
+            version("compose", "2023.04.00")
+            val activityCompose = "1.7.0"
             version("activityCompose", activityCompose)
             version("paging", "3.0.0")
             version("pagingCompose", "1.0.0-alpha17")

@@ -1049,7 +1049,7 @@ fun FeedGridContent(
                     ).addMargin(LocalDimens.current.margin)
                         .asPaddingValues()
                 },
-                verticalArrangement = arrangement,
+                verticalItemSpacing = LocalDimens.current.gutter,
                 horizontalArrangement = arrangement,
                 modifier = Modifier.fillMaxSize(),
             ) {
