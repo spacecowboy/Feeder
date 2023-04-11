@@ -184,6 +184,8 @@ fun FeedScreen(
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
+    val coroutineScope = rememberCoroutineScope()
+
     ScreenWithNavDrawer(
         feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
         expandedTags = ImmutableHolder(viewState.expandedTags),
@@ -203,6 +205,14 @@ fun FeedScreen(
             },
             onRefreshAll = {
                 viewModel.requestImmediateSyncOfAll()
+                coroutineScope.launch {
+                    if (feedListState.firstVisibleItemIndex != 0) {
+                        feedListState.animateScrollToItem(0)
+                    }
+                    if (feedGridState.firstVisibleItemIndex != 0) {
+                        feedGridState.animateScrollToItem(0)
+                    }
+                }
             },
             onToggleOnlyUnread = { value ->
                 viewModel.setShowOnlyUnread(value)
@@ -887,7 +897,9 @@ fun FeedListContent(
                     ).run {
                         when (viewState.feedItemStyle) {
                             FeedItemStyle.CARD -> addMargin(horizontal = LocalDimens.current.margin)
-                            FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> addMarginLayout(start = LocalDimens.current.margin)
+                            FeedItemStyle.COMPACT, FeedItemStyle.SUPER_COMPACT -> addMarginLayout(
+                                start = LocalDimens.current.margin,
+                            )
                         }
                     }
                         .asPaddingValues()
