@@ -27,7 +27,7 @@ internal fun emailBody(isTablet: Boolean): String =
     Describe your issue and how to reproduce it below:
     """.trimIndent()
 
-internal fun emailReportAddress(): String = "jonas.feederbugs@cowboyprogrammer.org"
+internal fun emailReportAddress(): String = "feeder@nononsenseapps.com"
 
 fun emailBugReportIntent(): Intent = Intent(ACTION_SENDTO).also {
     it.putExtra(EXTRA_SUBJECT, emailSubject())
