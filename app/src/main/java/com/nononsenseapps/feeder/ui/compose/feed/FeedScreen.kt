@@ -55,8 +55,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -67,7 +65,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -106,6 +103,9 @@ import com.nononsenseapps.feeder.ui.compose.empty.NothingToRead
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleScreenViewState
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedArticleViewModel
 import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
+import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
+import com.nononsenseapps.feeder.ui.compose.material3.DrawerValue
+import com.nononsenseapps.feeder.ui.compose.material3.rememberDrawerState
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ScreenWithNavDrawer
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
