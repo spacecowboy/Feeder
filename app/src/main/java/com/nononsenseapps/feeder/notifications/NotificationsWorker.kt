@@ -7,7 +7,6 @@ import com.nononsenseapps.feeder.archmodel.Repository
 import com.nononsenseapps.feeder.model.cancelNotification
 import com.nononsenseapps.feeder.model.notify
 import com.nononsenseapps.feeder.model.summaryNotificationId
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -27,7 +26,6 @@ class NotificationsWorker(override val di: DI) : DIAware {
     private val repository: Repository by instance()
     private var job: Job? = null
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun runForever() {
         job?.cancel("runForever")
         job = applicationCoroutineScope.launch {
