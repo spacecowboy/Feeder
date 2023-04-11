@@ -282,7 +282,7 @@ dependencies {
     // Dependency injection
     implementation(libs.kodein.androidx)
     // Custom tabs
-    implementation(libs.android.support.customtabs)
+    implementation(libs.androidx.browser)
     // Full text
     implementation(libs.readability4j)
     // For feeder-sync

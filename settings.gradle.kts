@@ -59,12 +59,13 @@ dependencyResolutionManagement {
             version("accompanist", "0.27.1")
             version("coil", "2.2.2")
             version("androidWindow", "1.0.0")
+            // Formerly customtabs
+            version("androidxBrowser", "1.5.0")
             // Tests
             version("junit", "4.13.2")
             version("espresso", "3.3.0")
             version("mockk", "1.13.3")
             version("mockito", "2.13.0")
-            version("customtabs", "28.0.0")
             version("androidx-test-junit-ktx", "1.1.4")
 
             // Plugins
@@ -248,7 +249,7 @@ dependencyResolutionManagement {
                 "kodein-di-framework-android-x"
             ).versionRef("kodein")
             // Custom tabs
-            library("android-support-customtabs", "com.android.support", "customtabs").versionRef("customtabs")
+            library("androidx-browser", "androidx.browser", "browser").versionRef("androidxBrowser")
             // Full text
             library(
                 "readability4j",
