@@ -1,3 +1,20 @@
+# 2.4.13
+Hotarun (1):
+  * [a25e1cbb] Updated Russian translation using Weblate
+
+Jonas Kalderstam (9):
+  * [9f8dd7e4] Updated versions and enabled gradle configuration cache
+  * [34843b8e] Syncing will now scroll list to top so new items are
+         immediately visible
+  * [3016f72c] Fixed send bug report to open email client instead of GitLab
+  * [10c661ad] Added check for notification permission before trying to
+         notify
+  * [d58e2955] Improved build performance
+  * [bca3f845] Fixed screen getting offset when increasing display size on
+         device
+  * [cf81e5e5] Fixed so release script can generate config locales
+  * [2854679f] Tweaked release script
+
 # 2.4.12
 Belmar Begić (1):
   * [9157af8f] Updated Bosnian translation using Weblate
