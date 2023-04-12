@@ -1,6 +1,4 @@
-#!/bin/bash
-
-set -u
+#!/bin/bash -eu
 
 TARGET="${1:-HEAD}"
 
@@ -45,7 +43,7 @@ read -r -p "Update locales_config.xml? [y/N] " response
 if [[ "$response" =~ ^[yY]$ ]]
 then
   ci/delete-unwanted-langs
-  ./gradlew :app:generateLocalesConfig
+  ./gradlew --no-configuration-cache :app:generateLocalesConfig
   git add app/src/main/res/xml/locales_config.xml
 fi
 
