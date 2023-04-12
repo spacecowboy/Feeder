@@ -2,9 +2,7 @@
 
 TARGET="${1:-HEAD}"
 
-
 current_default="$(git describe --tags --abbrev=0 "${TARGET}")"
-
 
 echo >&2 -n "Current version [${current_default}]: "
 read -r current_in
@@ -15,7 +13,7 @@ else
   CURRENT_VERSION="${current_in}"
 fi
 
-next_default="$(cat app/build.gradle.kts | grep "versionName" | sed "s|\s*versionName = \"\(.*\)\"|\\1|")"
+next_default="$(grep "versionName" app/build.gradle.kts | sed "s|\s*versionName = \"\(.*\)\"|\\1|")"
 echo >&2 -n "Next version [${next_default}]: "
 read -r next_in
 
@@ -25,10 +23,10 @@ else
   NEXT_VERSION="${next_in}"
 fi
 
-CURRENT_CODE="$(cat app/build.gradle.kts | grep "versionCode" | sed "s|\s*versionCode = \([0-9]\+\)|\\1|")"
+CURRENT_CODE="$(grep "versionCode" app/build.gradle.kts | sed "s|\s*versionCode = \([0-9]\+\)|\\1|")"
 echo >&2 "Current code ${CURRENT_CODE}"
 
-let next_code_default=CURRENT_CODE+1
+next_code_default=$(( CURRENT_CODE+1 ))
 
 echo >&2 -n "Next code [${next_code_default}]: "
 read -r next_code_in
@@ -48,7 +46,7 @@ then
 fi
 
 CL="# ${NEXT_VERSION}
-$(git shortlog -w76,2,9 --format='* [%h] %s' ${CURRENT_VERSION}..HEAD)
+$(git shortlog -w76,2,9 --format='* [%h] %s' "${CURRENT_VERSION}..HEAD")
 "
 
 tmpfile="$(mktemp)"
@@ -68,7 +66,7 @@ then
 
   PREV=""
   if [ -f CHANGELOG.md ]; then
-    read -r -d '' PREV <CHANGELOG.md
+    PREV="$(cat CHANGELOG.md)"
   fi
 
   cat >CHANGELOG.md <<EOF
