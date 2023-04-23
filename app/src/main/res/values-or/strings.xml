@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tag">ଟ୍ୟାଗ୍</string>
+    <string name="action_settings">ସେଟିଂ</string>
+    <string name="title">ଆଖ୍ୟା</string>
+    <string name="text_to_speech">ପାଠ୍ୟ ରୁ କଥନ</string>
+    <string name="set_language">ଭାଷା ଠିକ୍ କରିବା</string>
+    <string name="sync">ସୀଙ୍କ୍</string>
+    <string name="title_activity_settings">ସେଟିଂ</string>
+    <string name="sync_option_every_15min">ପ୍ରତି ୧୫ ମିନିଟରେ</string>
+    <string name="sync_option_every_30min">ପ୍ରତି ୩୦ ମିନିଟରେ</string>
+    <string name="sync_option_every_3_hours">ପ୍ରତି ୩ ଘଣ୍ଟାରେ</string>
+    <string name="sync_option_every_6_hours">ପ୍ରତି ୬ ଘଣ୍ଟାରେ</string>
+    <string name="sync_option_every_12_hours">ପ୍ରତି ୧୨ ଘଣ୍ଟାରେ</string>
+    <string name="sync_option_every_day">ପ୍ରତିଦିନ</string>
+    <string name="sync_status">ସୀଙ୍କ୍ ସ୍ଥିତି</string>
+    <string name="open_in_reader">ପାଠକ</string>
+    <string name="reader_settings">ପାଠକ</string>
+    <string name="theme_system">ସିଷ୍ଟମ୍</string>
+    <string name="theme_automatic">ସ୍ୱତଃ</string>
+    <string name="theme_day">ଦିନ</string>
+    <string name="theme_night">ରାତି</string>
+    <string name="theme">ଥିମ୍</string>
+    <string name="dark_theme_preference_black">କଳା</string>
+    <string name="dark_theme_preference_dark">ଗାଢ଼</string>
+    <string name="unread">ପଢ଼ି ନାହାଁନ୍ତି</string>
+    <string name="already_read">ପଢ଼ି ସାରିଛନ୍ତି</string>
+    <string name="feed_item_style_card">ପତ୍ର</string>
+    <string name="new_indicator">ନୂଆ</string>
+    <string name="battery_optimization_disabled">ବନ୍ଦ</string>
+    <string name="battery_optimization_enabled">ଚାଲୁ</string>
+    <string name="device_sync">ଡିଵାଇସ୍ ସୀଙ୍କ୍</string>
+</resources>
