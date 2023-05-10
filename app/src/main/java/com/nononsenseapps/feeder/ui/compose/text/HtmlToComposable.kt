@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -61,22 +62,28 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 
+private const val LOG_TAG = "FEEDER_HTMLTOCOM"
+
 fun LazyListScope.htmlFormattedText(
     inputStream: InputStream,
     baseUrl: String,
     @DrawableRes imagePlaceholder: Int,
     onLinkClick: (String) -> Unit,
 ) {
-    Jsoup.parse(inputStream, null, baseUrl)
-        ?.body()
-        ?.let { body ->
-            formatBody(
-                element = body,
-                imagePlaceholder = imagePlaceholder,
-                onLinkClick = onLinkClick,
-                baseUrl = baseUrl,
-            )
-        }
+    try {
+        Jsoup.parse(inputStream, null, baseUrl)
+            ?.body()
+            ?.let { body ->
+                formatBody(
+                    element = body,
+                    imagePlaceholder = imagePlaceholder,
+                    onLinkClick = onLinkClick,
+                    baseUrl = baseUrl,
+                )
+            }
+    } catch (e: Exception) {
+        Log.e(LOG_TAG, "htmlFormattingFailed", e)
+    }
 }
 
 private fun LazyListScope.formatBody(
