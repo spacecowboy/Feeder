@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.ui.compose.searchfeed
 
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import android.os.Parcelable
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -82,6 +83,8 @@ import java.net.URL
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+
+private const val LOG_TAG = "FEEDER_SEARCH"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -352,8 +355,12 @@ fun ColumnScope.leftContent(
         enabled = isValidUrl,
         onClick = {
             if (isValidUrl) {
-                onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
-                focusManager.clearFocus()
+                try {
+                    onSearch(sloppyLinkToStrictURLNoThrows(feedUrl))
+                    focusManager.clearFocus()
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Can't search", e)
+                }
             }
         },
     ) {

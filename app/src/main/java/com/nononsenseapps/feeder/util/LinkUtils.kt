@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.util
 
 import java.net.MalformedURLException
 import java.net.URI
+import java.net.URISyntaxException
 import java.net.URL
 
 /**
@@ -12,14 +13,19 @@ fun sloppyLinkToStrictURL(url: String): URL = try {
     URL(url)
 } catch (_: MalformedURLException) {
     // Might be an unknown protocol in which case a URL is not valid to be created
-    val uri = URI(url)
+    sloppyLinktoURIOrNull(url)?.let { uri ->
+        if (uri.isAbsolute) {
+            uri.toURL()
+        } else {
+            null
+        }
+    } ?: URL("http://$url") // No scheme, assume http
+}
 
-    if (uri.isAbsolute) {
-        uri.toURL()
-    } else {
-        // No scheme, assume http
-        URL("http://$url")
-    }
+fun sloppyLinktoURIOrNull(text: String): URI? = try {
+    URI(text)
+} catch (_: URISyntaxException) {
+    null
 }
 
 fun sloppyLinkToStrictURLOrNull(url: String): URL? = try {
