@@ -51,7 +51,7 @@ class FeedParserClientTest : DIAware {
         server.enqueue(
             MockResponse().apply {
                 setResponseCode(401)
-            }
+            },
         )
         server.enqueue(
             MockResponse().apply {
@@ -63,9 +63,9 @@ class FeedParserClientTest : DIAware {
 <feed xmlns="http://www.w3.org/2005/Atom">
 	<title>No auth</title>
 </feed>
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
-            }
+            },
         )
 
         val url = server.url("/foo").newBuilder().username("user").build().toUrl()
@@ -80,11 +80,11 @@ class FeedParserClientTest : DIAware {
         }
         assertNull(
             server.takeRequest().headers.get("Authorization"),
-            message = "First request is done with no auth"
+            message = "First request is done with no auth",
         )
         assertNotNull(
             server.takeRequest().headers.get("Authorization"),
-            message = "After a 401 a new request is made with auth"
+            message = "After a 401 a new request is made with auth",
         )
     }
 
@@ -93,7 +93,7 @@ class FeedParserClientTest : DIAware {
         server.enqueue(
             MockResponse().apply {
                 setResponseCode(403)
-            }
+            },
         )
 
         // Some feeds return 403 unless they get a user-agent
@@ -119,7 +119,7 @@ class FeedParserClientTest : DIAware {
             val userAgent = userAgents?.first()
 
             assertTrue(
-                userAgent!!.startsWith("Mjukisbyxor")
+                userAgent!!.startsWith("SpaceCowboy"),
             )
         }
     }
@@ -157,9 +157,9 @@ class FeedParserClientTest : DIAware {
     </item>
   </channel>
 </rss>
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
-            }
+            },
         )
 
         val url = server.url("/foo").toUrl()
