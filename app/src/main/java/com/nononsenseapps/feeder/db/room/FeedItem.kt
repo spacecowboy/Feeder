@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.db.room
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.ForeignKey.CASCADE
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -50,7 +49,7 @@ const val MAX_SNIPPET_LENGTH = 200
             entity = Feed::class,
             parentColumns = [COL_ID],
             childColumns = [COL_FEEDID],
-            onDelete = CASCADE,
+            onDelete = ForeignKey.CASCADE,
         ),
     ],
 )

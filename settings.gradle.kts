@@ -48,10 +48,10 @@ dependencyResolutionManagement {
             version("material", "1.6.1")
             version("preference", "1.1.0")
             version("testRunner", "1.4.0")
-            version("lifecycle", "2.3.1")
-            version("room", "2.4.3")
+            version("lifecycle", "2.6.1")
+            version("room", "2.5.1")
             // Compose related below
-            version("compose", "2023.04.00")
+            version("compose", "2023.05.00")
             val activityCompose = "1.7.0"
             version("activityCompose", activityCompose)
             version("paging", "3.0.0")
