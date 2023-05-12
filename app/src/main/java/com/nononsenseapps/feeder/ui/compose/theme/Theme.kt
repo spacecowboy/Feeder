@@ -92,7 +92,7 @@ fun FeederTheme(
     val colorScheme = currentTheme.getColorScheme(darkThemePreference, dynamicColors)
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = FeederTypography.typography,
     ) {
         val systemUiController = rememberSystemUiController()
         val surfaceColor = Color(MaterialTheme.colorScheme.surface.value)
