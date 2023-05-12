@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.archmodel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedTitle
-import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerTag
@@ -54,7 +53,7 @@ class FeedStoreTest : DIAware {
 
         assertEquals(
             Feed(id = 5L),
-            feed
+            feed,
         )
     }
 
@@ -66,7 +65,7 @@ class FeedStoreTest : DIAware {
             "bob",
             runBlocking {
                 store.getDisplayTitle(5L)
-            }
+            },
         )
     }
 
@@ -91,7 +90,7 @@ class FeedStoreTest : DIAware {
 
         assertEquals(
             listOf("one", "two"),
-            tags
+            tags,
         )
     }
 
@@ -105,7 +104,7 @@ class FeedStoreTest : DIAware {
 
         assertEquals(
             5L,
-            id
+            id,
         )
     }
 
@@ -131,7 +130,7 @@ class FeedStoreTest : DIAware {
                     FeedUnreadCount(id = 2, title = "bob", tag = "zork", unreadCount = 4, currentlySyncing = false),
                     FeedUnreadCount(id = 3, title = "alice", tag = "alpha", unreadCount = 5, currentlySyncing = true),
                     FeedUnreadCount(id = 4, title = "argh", tag = "alpha", unreadCount = 7, currentlySyncing = false),
-                )
+                ),
             )
         }
         val drawerItems = runBlocking {
@@ -148,7 +147,7 @@ class FeedStoreTest : DIAware {
                 DrawerFeed(2, "zork", "bob", unreadCount = 4),
                 DrawerFeed(1, "", "zob", unreadCount = 3),
             ),
-            drawerItems
+            drawerItems,
         )
     }
 
@@ -156,43 +155,43 @@ class FeedStoreTest : DIAware {
     fun getFeedTitles() {
         every { dao.getFeedTitlesWithId(5L) } returns flowOf(
             listOf(
-                FeedTitle(5L, "fejd")
-            )
+                FeedTitle(5L, "fejd"),
+            ),
         )
         every { dao.getFeedTitlesWithTag("foo") } returns flowOf(
             listOf(
                 FeedTitle(5L, "fejd"),
-                FeedTitle(7L, "axv")
-            )
+                FeedTitle(7L, "axv"),
+            ),
         )
         every { dao.getAllFeedTitles() } returns flowOf(
             listOf(
                 FeedTitle(5L, "fejd"),
                 FeedTitle(7L, "axv"),
-                FeedTitle(8L, "zzz")
-            )
+                FeedTitle(8L, "zzz"),
+            ),
         )
 
         assertEquals(
             listOf(FeedTitle(5L, "fejd")),
-            runBlocking { store.getFeedTitles(5L, "flopp").toList().first() }
-        )
-
-        assertEquals(
-            listOf(
-                FeedTitle(5L, "fejd"),
-                FeedTitle(7L, "axv")
-            ),
-            runBlocking { store.getFeedTitles(-1L, "foo").toList().first() }
+            runBlocking { store.getFeedTitles(5L, "flopp").toList().first() },
         )
 
         assertEquals(
             listOf(
                 FeedTitle(5L, "fejd"),
                 FeedTitle(7L, "axv"),
-                FeedTitle(8L, "zzz")
             ),
-            runBlocking { store.getFeedTitles(-1L, "").toList().first() }
+            runBlocking { store.getFeedTitles(-1L, "foo").toList().first() },
+        )
+
+        assertEquals(
+            listOf(
+                FeedTitle(5L, "fejd"),
+                FeedTitle(7L, "axv"),
+                FeedTitle(8L, "zzz"),
+            ),
+            runBlocking { store.getFeedTitles(-1L, "").toList().first() },
         )
     }
 
@@ -225,7 +224,7 @@ class FeedStoreTest : DIAware {
 
     @Test
     fun upsertFeed() {
-        coEvery { dao.upsertFeed(any()) } returns 6L
+        coEvery { dao.upsert(any()) } returns 6L
 
         val result = runBlocking {
             store.upsertFeed(Feed())
@@ -234,7 +233,7 @@ class FeedStoreTest : DIAware {
         assertEquals(6L, result)
 
         coVerify {
-            dao.upsertFeed(Feed())
+            dao.upsert(Feed())
         }
     }
 }
