@@ -953,6 +953,7 @@ fun FeedListContent(
                         showThumbnail = viewState.showThumbnails,
                         feedItemStyle = viewState.feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
+                        newIndicator = !viewState.onlyUnread,
                         onMarkAboveAsRead = {
                             if (itemIndex > 0) {
                                 markBeforeAsRead(itemIndex)
@@ -1105,6 +1106,7 @@ fun FeedGridContent(
                         showThumbnail = viewState.showThumbnails,
                         feedItemStyle = viewState.feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
+                        newIndicator = !viewState.onlyUnread,
                         onMarkAboveAsRead = {
                             if (itemIndex > 0) {
                                 markBeforeAsRead(itemIndex)
