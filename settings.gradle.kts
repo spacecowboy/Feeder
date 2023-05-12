@@ -98,6 +98,11 @@ dependencyResolutionManagement {
 
             // ViewModel
             library(
+                "lifecycle-runtime-compose",
+                "androidx.lifecycle",
+                "lifecycle-runtime-compose"
+            ).versionRef("lifecycle")
+            library(
                 "lifecycle-runtime-ktx",
                 "androidx.lifecycle",
                 "lifecycle-runtime-ktx"

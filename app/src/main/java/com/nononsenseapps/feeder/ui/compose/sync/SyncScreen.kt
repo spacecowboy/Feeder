@@ -50,7 +50,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,6 +68,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.BuildConfig
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
@@ -170,7 +170,7 @@ fun SyncScreen(
     onNavigateUp: () -> Unit,
     viewModel: SyncScreenViewModel,
 ) {
-    val viewState: SyncScreenViewState by viewModel.viewState.collectAsState()
+    val viewState: SyncScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
 
     val windowSize = LocalWindowSize()
     val syncScreenType = getSyncScreenType(
