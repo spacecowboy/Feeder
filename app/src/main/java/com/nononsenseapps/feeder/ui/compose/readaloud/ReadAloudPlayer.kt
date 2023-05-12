@@ -18,9 +18,11 @@ import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -72,6 +74,7 @@ fun HideableTTSPlayer(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TTSPlayer(
     currentlyPlaying: Boolean,
@@ -91,54 +94,69 @@ fun TTSPlayer(
         modifier = modifier,
         floatingActionButton = floatingActionButton,
         actions = {
-            IconButton(
-                onClick = onStop,
-            ) {
-                Icon(
-                    Icons.Default.Stop,
-                    contentDescription = stringResource(R.string.stop_reading),
-                )
+            PlainTooltipBox(tooltip = { Text(stringResource(R.string.stop_reading)) }) {
+                IconButton(
+                    onClick = onStop,
+                    modifier = Modifier.tooltipAnchor(),
+                ) {
+                    Icon(
+                        Icons.Default.Stop,
+                        contentDescription = stringResource(R.string.stop_reading),
+                    )
+                }
             }
             Crossfade(targetState = currentlyPlaying) { playing ->
                 if (playing) {
-                    IconButton(
-                        onClick = onPause,
-                    ) {
-                        Icon(
-                            Icons.Default.Pause,
-                            contentDescription = stringResource(R.string.pause_reading),
-                        )
+                    PlainTooltipBox(tooltip = { Text(stringResource(R.string.pause_reading)) }) {
+                        IconButton(
+                            onClick = onPause,
+                            modifier = Modifier.tooltipAnchor(),
+                        ) {
+                            Icon(
+                                Icons.Default.Pause,
+                                contentDescription = stringResource(R.string.pause_reading),
+                            )
+                        }
                     }
                 } else {
-                    IconButton(
-                        onClick = onPlay,
-                    ) {
-                        Icon(
-                            // TextToSpeech
-                            Icons.Default.PlayArrow,
-                            contentDescription = stringResource(R.string.resume_reading),
-                        )
+                    PlainTooltipBox(tooltip = { Text(stringResource(R.string.resume_reading)) }) {
+                        IconButton(
+                            onClick = onPlay,
+                            modifier = Modifier.tooltipAnchor(),
+                        ) {
+                            Icon(
+                                // TextToSpeech
+                                Icons.Default.PlayArrow,
+                                contentDescription = stringResource(R.string.resume_reading),
+                            )
+                        }
                     }
                 }
             }
-            IconButton(
-                onClick = onSkipNext,
-            ) {
-                Icon(
-                    Icons.Default.SkipNext,
-                    contentDescription = stringResource(R.string.skip_to_next),
-                )
-            }
-            Box {
+            PlainTooltipBox(tooltip = { Text(stringResource(R.string.skip_to_next)) }) {
                 IconButton(
-                    onClick = {
-                        showMenu = true
-                    },
+                    onClick = onSkipNext,
+                    modifier = Modifier.tooltipAnchor(),
                 ) {
                     Icon(
-                        Icons.Default.Translate,
-                        contentDescription = stringResource(R.string.set_language),
+                        Icons.Default.SkipNext,
+                        contentDescription = stringResource(R.string.skip_to_next),
                     )
+                }
+            }
+            Box {
+                PlainTooltipBox(tooltip = { Text(stringResource(R.string.set_language)) }) {
+                    IconButton(
+                        onClick = {
+                            showMenu = true
+                        },
+                        modifier = Modifier.tooltipAnchor(),
+                    ) {
+                        Icon(
+                            Icons.Default.Translate,
+                            contentDescription = stringResource(R.string.set_language),
+                        )
+                    }
                 }
                 DropdownMenu(
                     expanded = showMenu,

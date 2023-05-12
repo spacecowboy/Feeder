@@ -139,7 +139,10 @@ dependencyResolutionManagement {
                 "androidx.compose.foundation",
                 "foundation-layout"
             ).withoutVersion()
-            library("compose-material3", "androidx.compose.material3", "material3").withoutVersion()
+            library("compose-material3", "androidx.compose.material3", "material3").version {
+                // 1.1.0 introduced tooltips, not part of compose 05 bom at least
+                require("1.1.0")
+            }
             library("compose-material", "androidx.compose.material", "material").withoutVersion()
             library(
                 "compose-material-icons-extended",
