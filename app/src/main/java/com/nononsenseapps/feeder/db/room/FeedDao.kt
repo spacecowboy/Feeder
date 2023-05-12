@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.nononsenseapps.feeder.db.COL_CUSTOM_TITLE
 import com.nononsenseapps.feeder.db.COL_ID
 import com.nononsenseapps.feeder.db.COL_TAG
@@ -181,17 +182,7 @@ interface FeedDao {
         """,
     )
     suspend fun deleteFeedWithUrl(url: URL): Int
-}
 
-/**
- * Inserts or updates feed depending on if ID is valid. Returns ID.
- */
-suspend fun FeedDao.upsertFeed(feed: Feed): Long = when (feed.id > ID_UNSET) {
-    true -> {
-        updateFeed(feed)
-        feed.id
-    }
-    false -> {
-        insertFeed(feed)
-    }
+    @Upsert
+    suspend fun upsert(feed: Feed): Long
 }
