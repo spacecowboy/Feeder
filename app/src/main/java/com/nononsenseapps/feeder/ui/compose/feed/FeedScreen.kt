@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -184,8 +185,18 @@ fun FeedScreen(
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
     val coroutineScope = rememberCoroutineScope()
+
+    BackHandler(
+        enabled = drawerState.isOpen,
+        onBack = {
+            if (drawerState.isOpen) {
+                coroutineScope.launch {
+                    drawerState.close()
+                }
+            }
+        },
+    )
 
     ScreenWithNavDrawer(
         feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
