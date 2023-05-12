@@ -42,6 +42,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -129,26 +130,31 @@ private fun SyncScaffold(
                 },
                 actions = {
                     if (leaveSyncVisible) {
-                        Box {
-                            IconButton(onClick = { showToolbar = true }) {
-                                Icon(
-                                    Icons.Default.MoreVert,
-                                    contentDescription = stringResource(id = R.string.open_menu),
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = showToolbar,
-                                onDismissRequest = { showToolbar = false },
-                            ) {
-                                DropdownMenuItem(
-                                    onClick = {
-                                        showToolbar = false
-                                        onLeaveSyncChain()
-                                    },
-                                    text = {
-                                        Text(stringResource(R.string.leave_sync_chain))
-                                    },
-                                )
+                        PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.open_menu)) }) {
+                            Box {
+                                IconButton(
+                                    onClick = { showToolbar = true },
+                                    modifier = Modifier.tooltipAnchor(),
+                                ) {
+                                    Icon(
+                                        Icons.Default.MoreVert,
+                                        contentDescription = stringResource(id = R.string.open_menu),
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = showToolbar,
+                                    onDismissRequest = { showToolbar = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            showToolbar = false
+                                            onLeaveSyncChain()
+                                        },
+                                        text = {
+                                            Text(stringResource(R.string.leave_sync_chain))
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
@@ -407,6 +413,7 @@ fun getSyncScreenType(
             SyncScreenToShow.JOIN -> SyncScreenType.SINGLE_JOIN
         }
     }
+
     ScreenType.DUAL -> SyncScreenType.DUAL
 }
 
@@ -458,6 +465,7 @@ fun DualSyncScreen(
                         onStartNewSyncChain = onStartNewSyncChain,
                     )
                 }
+
                 LeftScreenToShow.DEVICELIST -> {
                     SyncDeviceListContent(
                         currentDeviceId = currentDeviceId,
@@ -479,6 +487,7 @@ fun DualSyncScreen(
                             .weight(1f, fill = true),
                     )
                 }
+
                 RightScreenToShow.JOIN -> {
                     SyncJoinContent(
                         onJoinSyncChain = onJoinSyncChain,

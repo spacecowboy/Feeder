@@ -31,6 +31,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -197,125 +198,138 @@ fun ArticleScreen(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = onToggleFullText,
-                    ) {
-                        Icon(
-                            Icons.Default.Article,
-                            contentDescription = stringResource(R.string.fetch_full_article),
-                        )
-                    }
-
-                    IconButton(onClick = onOpenInCustomTab) {
-                        Icon(
-                            Icons.Default.OpenInBrowser,
-                            contentDescription = stringResource(id = R.string.open_in_web_view),
-                        )
-                    }
-
-                    Box {
-                        IconButton(onClick = { onShowToolbarMenu(true) }) {
+                    PlainTooltipBox(tooltip = { Text(stringResource(R.string.fetch_full_article)) }) {
+                        IconButton(
+                            onClick = onToggleFullText,
+                            modifier = Modifier.tooltipAnchor(),
+                        ) {
                             Icon(
-                                Icons.Default.MoreVert,
-                                contentDescription = stringResource(id = R.string.open_menu),
+                                Icons.Default.Article,
+                                contentDescription = stringResource(R.string.fetch_full_article),
                             )
                         }
-                        DropdownMenu(
-                            expanded = viewState.showToolbarMenu,
-                            onDismissRequest = { onShowToolbarMenu(false) },
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    onShowToolbarMenu(false)
-                                    onShare()
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Share,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.share))
-                                },
-                            )
+                    }
 
-                            DropdownMenuItem(
-                                onClick = {
-                                    onShowToolbarMenu(false)
-                                    onMarkAsUnread()
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.VisibilityOff,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.mark_as_unread))
-                                },
+                    PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.open_in_web_view)) }) {
+                        IconButton(
+                            onClick = onOpenInCustomTab,
+                            modifier = Modifier.tooltipAnchor(),
+                        ) {
+                            Icon(
+                                Icons.Default.OpenInBrowser,
+                                contentDescription = stringResource(id = R.string.open_in_web_view),
                             )
-                            DropdownMenuItem(
-                                onClick = {
-                                    onShowToolbarMenu(false)
-                                    onTogglePinned()
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.PushPin,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(
-                                        stringResource(
-                                            if (viewState.isPinned) {
-                                                R.string.unpin_article
-                                            } else {
-                                                R.string.pin_article
-                                            },
-                                        ),
-                                    )
-                                },
-                            )
-                            DropdownMenuItem(
-                                onClick = {
-                                    onShowToolbarMenu(false)
-                                    onToggleBookmarked()
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Default.Bookmark,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(
-                                        stringResource(
-                                            if (viewState.isBookmarked) {
-                                                R.string.remove_bookmark
-                                            } else {
-                                                R.string.bookmark_article
-                                            },
-                                        ),
-                                    )
-                                },
-                            )
-                            DropdownMenuItem(
-                                onClick = {
-                                    onShowToolbarMenu(false)
-                                    ttsOnPlay()
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.CustomFilled.TextToSpeech,
-                                        contentDescription = null,
-                                    )
-                                },
-                                text = {
-                                    Text(stringResource(id = R.string.read_article))
-                                },
-                            )
+                        }
+                    }
+
+                    PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.open_menu)) }) {
+                        Box {
+                            IconButton(
+                                onClick = { onShowToolbarMenu(true) },
+                                modifier = Modifier.tooltipAnchor(),
+                            ) {
+                                Icon(
+                                    Icons.Default.MoreVert,
+                                    contentDescription = stringResource(id = R.string.open_menu),
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = viewState.showToolbarMenu,
+                                onDismissRequest = { onShowToolbarMenu(false) },
+                            ) {
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onShowToolbarMenu(false)
+                                        onShare()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Share,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(stringResource(id = R.string.share))
+                                    },
+                                )
+
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onShowToolbarMenu(false)
+                                        onMarkAsUnread()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.VisibilityOff,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(stringResource(id = R.string.mark_as_unread))
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onShowToolbarMenu(false)
+                                        onTogglePinned()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.PushPin,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(
+                                            stringResource(
+                                                if (viewState.isPinned) {
+                                                    R.string.unpin_article
+                                                } else {
+                                                    R.string.pin_article
+                                                },
+                                            ),
+                                        )
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onShowToolbarMenu(false)
+                                        onToggleBookmarked()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.Bookmark,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(
+                                            stringResource(
+                                                if (viewState.isBookmarked) {
+                                                    R.string.remove_bookmark
+                                                } else {
+                                                    R.string.bookmark_article
+                                                },
+                                            ),
+                                        )
+                                    },
+                                )
+                                DropdownMenuItem(
+                                    onClick = {
+                                        onShowToolbarMenu(false)
+                                        ttsOnPlay()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.CustomFilled.TextToSpeech,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                    text = {
+                                        Text(stringResource(id = R.string.read_article))
+                                    },
+                                )
+                            }
                         }
                     }
                 },
@@ -402,6 +416,7 @@ fun ArticleContent(
                     R.string.on_date,
                     (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat),
                 )
+
             viewState.author != null && viewState.pubDate != null ->
                 stringResource(
                     R.string.by_author_on_date,
@@ -410,6 +425,7 @@ fun ArticleContent(
                     context.unicodeWrap(viewState.author ?: ""),
                     (viewState.pubDate ?: ZonedDateTime.now()).format(dateTimeFormat),
                 )
+
             else -> null
         },
     ) {
@@ -443,18 +459,23 @@ fun ArticleContent(
                         }
                     }
                 }
+
                 TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> {
                     item {
                         Text(text = stringResource(id = R.string.failed_to_fetch_full_article))
                     }
                 }
+
                 TextToDisplay.LOADING_FULLTEXT -> {
                     LoadingItem()
                 }
 
                 TextToDisplay.FULLTEXT -> {
                     if (blobFullFile(viewState.articleId, filePathProvider.fullArticleDir).isFile) {
-                        blobFullInputStream(viewState.articleId, filePathProvider.fullArticleDir).use {
+                        blobFullInputStream(
+                            viewState.articleId,
+                            filePathProvider.fullArticleDir,
+                        ).use {
                             htmlFormattedText(
                                 inputStream = it,
                                 baseUrl = viewState.articleFeedUrl ?: "",
