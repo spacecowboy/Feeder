@@ -1,8 +1,8 @@
 package com.nononsenseapps.feeder.ui.compose.utils
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.base.DIAwareComponentActivity
 import com.nononsenseapps.feeder.base.diAwareViewModel
 import com.nononsenseapps.feeder.ui.CommonActivityViewModel
@@ -16,10 +16,10 @@ fun DIAwareComponentActivity.withAllProviders(
 ) {
     withDI {
         val viewModel: CommonActivityViewModel = diAwareViewModel()
-        val currentTheme by viewModel.currentTheme.collectAsState()
-        val darkThemePreference by viewModel.darkThemePreference.collectAsState()
-        val dynamicColors by viewModel.dynamicColors.collectAsState()
-        val textScale by viewModel.textScale.collectAsState()
+        val currentTheme by viewModel.currentTheme.collectAsStateWithLifecycle()
+        val darkThemePreference by viewModel.darkThemePreference.collectAsStateWithLifecycle()
+        val dynamicColors by viewModel.dynamicColors.collectAsStateWithLifecycle()
+        val textScale by viewModel.textScale.collectAsStateWithLifecycle()
         FeederTheme(
             currentTheme = currentTheme,
             darkThemePreference = darkThemePreference,

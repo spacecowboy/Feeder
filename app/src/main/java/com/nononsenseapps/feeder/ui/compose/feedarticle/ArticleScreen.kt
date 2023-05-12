@@ -36,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -46,6 +45,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.TextToDisplay
 import com.nononsenseapps.feeder.blob.blobFile
@@ -81,7 +81,7 @@ fun ArticleScreen(
     viewModel: FeedArticleViewModel,
 ) {
     BackHandler(onBack = onNavigateUp)
-    val viewState: FeedArticleScreenViewState by viewModel.viewState.collectAsState()
+    val viewState: FeedArticleScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
 
