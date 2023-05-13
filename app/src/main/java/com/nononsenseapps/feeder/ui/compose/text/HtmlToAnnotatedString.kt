@@ -230,12 +230,10 @@ private fun TextComposer.appendTextChildren(
                             )
                         }
                     }
+                    "figure" -> {
+                        emitTextBuffer()
+                    }
                     "img" -> {
-                        terminateCurrentText()
-                        val alt = element.attr("alt") ?: ""
-                        if (alt.isNotEmpty()) {
-                            append(alt)
-                        }
                         emitTextBuffer()
                     }
                     "ul" -> {
