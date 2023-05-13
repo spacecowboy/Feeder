@@ -2,7 +2,6 @@ package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.content.Intent
 import androidx.activity.compose.BackHandler
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
@@ -64,7 +62,6 @@ import com.nononsenseapps.feeder.ui.compose.reader.onLinkClick
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
-import com.nononsenseapps.feeder.ui.compose.theme.isLight
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -369,19 +366,7 @@ fun ArticleContent(
     displayFullText: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isLightTheme = MaterialTheme.colorScheme.isLight
     val filePathProvider by LocalDI.current.instance<FilePathProvider>()
-
-    @DrawableRes
-    val placeHolder: Int by remember(isLightTheme) {
-        derivedStateOf {
-            if (isLightTheme) {
-                R.drawable.placeholder_image_article_day
-            } else {
-                R.drawable.placeholder_image_article_night
-            }
-        }
-    }
 
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
@@ -439,16 +424,14 @@ fun ArticleContent(
                             htmlFormattedText(
                                 inputStream = it,
                                 baseUrl = viewState.articleFeedUrl ?: "",
-                                imagePlaceholder = placeHolder,
-                                onLinkClick = { link ->
-                                    onLinkClick(
-                                        link = link,
-                                        linkOpener = viewState.linkOpener,
-                                        context = context,
-                                        toolbarColor = toolbarColor,
-                                    )
-                                },
-                            )
+                            ) { link ->
+                                onLinkClick(
+                                    link = link,
+                                    linkOpener = viewState.linkOpener,
+                                    context = context,
+                                    toolbarColor = toolbarColor,
+                                )
+                            }
                         }
                     } else {
                         item {
@@ -479,16 +462,14 @@ fun ArticleContent(
                             htmlFormattedText(
                                 inputStream = it,
                                 baseUrl = viewState.articleFeedUrl ?: "",
-                                imagePlaceholder = placeHolder,
-                                onLinkClick = { link ->
-                                    onLinkClick(
-                                        link = link,
-                                        linkOpener = viewState.linkOpener,
-                                        context = context,
-                                        toolbarColor = toolbarColor,
-                                    )
-                                },
-                            )
+                            ) { link ->
+                                onLinkClick(
+                                    link = link,
+                                    linkOpener = viewState.linkOpener,
+                                    context = context,
+                                    toolbarColor = toolbarColor,
+                                )
+                            }
                         }
                     } else {
                         // Already trigger load in effect above
