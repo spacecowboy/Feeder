@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -117,6 +118,7 @@ fun FeedItemCard(
                     modifier = Modifier
                         .weight(1f, fill = true),
                 ) {
+                    val opacity = if (item.unread) 1.0f else 0.8f;
                     WithBidiDeterminedLayoutDirection(paragraph = item.title) {
                         Text(
                             text = item.title,
@@ -124,7 +126,8 @@ fun FeedItemCard(
                             fontWeight = titleFontWeight(item.unread),
                             modifier = Modifier
                                 .padding(start = 8.dp, end = 8.dp, top = 8.dp)
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .alpha(opacity),
                         )
                     }
                     // Want the dropdown to center on the middle text row
