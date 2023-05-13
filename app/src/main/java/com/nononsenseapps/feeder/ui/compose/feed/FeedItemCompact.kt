@@ -24,6 +24,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -82,6 +83,7 @@ fun FeedItemCompact(
                 .requiredHeightIn(min = minimumTouchSize)
                 .padding(vertical = 4.dp),
         ) {
+            val opacity = if (item.unread) 1.0f else 0.7f;
             WithBidiDeterminedLayoutDirection(paragraph = item.title) {
                 Text(
                     text = item.title,
@@ -89,7 +91,8 @@ fun FeedItemCompact(
                     fontWeight = titleFontWeight(item.unread),
                     modifier = Modifier
                         .padding(start = 4.dp, end = 4.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .alpha(opacity),
                 )
             }
             // Want the dropdown to center on the middle text row
@@ -116,7 +119,8 @@ fun FeedItemCompact(
                                 overflow = TextOverflow.Clip,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 4.dp, end = 4.dp),
+                                    .padding(start = 4.dp, end = 4.dp)
+                                    .alpha(opacity),
                             )
                         }
                     }
@@ -201,7 +205,8 @@ fun FeedItemCompact(
                         maxLines = 4,
                         modifier = Modifier
                             .padding(start = 4.dp, end = 4.dp, bottom = 8.dp)
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .alpha(opacity),
                     )
                 }
             }

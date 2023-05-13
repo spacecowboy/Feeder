@@ -113,12 +113,12 @@ fun FeedItemCard(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                val opacity = if (item.unread) 1.0f else 0.7F;
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier
                         .weight(1f, fill = true),
                 ) {
-                    val opacity = if (item.unread) 1.0f else 0.8f;
                     WithBidiDeterminedLayoutDirection(paragraph = item.title) {
                         Text(
                             text = item.title,
@@ -154,7 +154,8 @@ fun FeedItemCard(
                                         overflow = TextOverflow.Clip,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(start = 8.dp, end = 8.dp),
+                                            .padding(start = 8.dp, end = 8.dp)
+                                            .alpha(opacity),
                                     )
                                 }
                             }
