@@ -30,7 +30,7 @@ private fun formatBody(
     baseUrl: String,
 ): List<AnnotatedString> {
     val result = mutableListOf<AnnotatedString>()
-    val composer = TextComposer { paragraphBuilder ->
+    val composer = TextComposer { paragraphBuilder, _ ->
         result.add(paragraphBuilder.toAnnotatedString())
     }
 
@@ -39,7 +39,7 @@ private fun formatBody(
         baseUrl = baseUrl,
     )
 
-    composer.terminateCurrentText()
+    composer.emitTextBuffer()
 
     return result
 }
@@ -66,7 +66,7 @@ private fun TextComposer.appendTextChildren(
                 val element = node
                 when (element.tagName()) {
                     "p" -> {
-                        terminateCurrentText()
+                        emitTextBuffer()
                         // Readability4j inserts p-tags in divs for algorithmic purposes.
                         // They screw up formatting.
                         if (node.hasClass("readability-styled")) {
@@ -83,68 +83,68 @@ private fun TextComposer.appendTextChildren(
                             }
                         }
 
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "br" -> append('\n')
                     "h1" -> {
-                        terminateCurrentText()
+                        emitTextBuffer()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "h2" -> {
-                        terminateCurrentText()
+                        emitTextBuffer()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "h3" -> {
-                        terminateCurrentText()
+                        emitTextBuffer()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "h4" -> {
-                        terminateCurrentText()
+                        emitTextBuffer()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "h5" -> {
-                        terminateCurrentText()
+                        emitTextBuffer()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "h6" -> {
-                        terminateCurrentText()
+                        emitTextBuffer()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "strong", "b" -> {
                         appendTextChildren(
@@ -193,34 +193,34 @@ private fun TextComposer.appendTextChildren(
                         )
                     }
                     "pre" -> {
-                        terminateCurrentText()
+                        emitTextBuffer()
                         // TODO some TTS annotation?
                         appendTextChildren(
                             element.childNodes(),
                             preFormatted = true,
                             baseUrl = baseUrl,
                         )
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "code" -> {
-                        terminateCurrentText()
+                        emitTextBuffer()
                         // TODO some TTS annotation?
                         appendTextChildren(
                             element.childNodes(),
                             preFormatted = preFormatted,
                             baseUrl = baseUrl,
                         )
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "blockquote" -> {
-                        terminateCurrentText()
+                        emitTextBuffer()
                         withParagraph {
                             appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                             )
                         }
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "a" -> {
                         withAnnotation("URL", element.attr("abs:href") ?: "") {
@@ -236,7 +236,7 @@ private fun TextComposer.appendTextChildren(
                         if (alt.isNotEmpty()) {
                             append(alt)
                         }
-                        terminateCurrentText()
+                        emitTextBuffer()
                     }
                     "ul" -> {
                         element.children()
@@ -285,7 +285,7 @@ private fun TextComposer.appendTextChildren(
                                         baseUrl = baseUrl,
                                     )
                                     ensureDoubleNewline()
-                                    terminateCurrentText()
+                                    emitTextBuffer()
                                 }
 
                             element.children()
@@ -299,7 +299,7 @@ private fun TextComposer.appendTextChildren(
                                         row.childNodes(),
                                         baseUrl = baseUrl,
                                     )
-                                    terminateCurrentText()
+                                    emitTextBuffer()
                                 }
 
                             append("\n\n")

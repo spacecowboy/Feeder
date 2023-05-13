@@ -10,7 +10,7 @@ class AnnotatedParagraphStringBuilder {
     private val builder: AnnotatedString.Builder = AnnotatedString.Builder()
 
     private val poppedComposableStyles = mutableListOf<ComposableStyleWithStartEnd>()
-    val composableStyles = mutableListOf<ComposableStyleWithStartEnd>()
+    private val composableStyles = mutableListOf<ComposableStyleWithStartEnd>()
     val lastTwoChars: MutableList<Char> = mutableListOf()
 
     val length: Int

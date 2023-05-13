@@ -20,8 +20,10 @@ import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Terrain
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,8 +80,8 @@ fun LazyListScope.htmlFormattedText(
             ?.let { body ->
                 formatBody(
                     element = body,
-                    onLinkClick = onLinkClick,
                     baseUrl = baseUrl,
+                    onLinkClick = onLinkClick,
                 )
             }
     } catch (e: Exception) {
@@ -89,16 +91,16 @@ fun LazyListScope.htmlFormattedText(
 
 private fun LazyListScope.formatBody(
     element: Element,
-    onLinkClick: (String) -> Unit,
     baseUrl: String,
+    onLinkClick: (String) -> Unit,
 ) {
-    val composer = TextComposer { paragraphBuilder ->
+    val composer = TextComposer { paragraphBuilder, textStyler ->
         item {
             val dimens = LocalDimens.current
             val paragraph = paragraphBuilder.toComposableAnnotatedString()
 
             ProvideScaledText(
-                MaterialTheme.typography.bodyLarge.merge(
+                textStyler?.textStyle() ?: MaterialTheme.typography.bodyLarge.merge(
                     TextStyle(color = MaterialTheme.colorScheme.onBackground),
                 ),
             ) {
@@ -136,11 +138,11 @@ private fun LazyListScope.formatBody(
     composer.appendTextChildren(
         element.childNodes(),
         lazyListScope = this,
-        onLinkClick = onLinkClick,
         baseUrl = baseUrl,
+        onLinkClick = onLinkClick,
     )
 
-    composer.terminateCurrentText()
+    composer.emitTextBuffer()
 }
 
 private fun LazyListScope.formatCodeBlock(
@@ -148,7 +150,7 @@ private fun LazyListScope.formatCodeBlock(
     onLinkClick: (String) -> Unit,
     baseUrl: String,
 ) {
-    val composer = TextComposer { paragraphBuilder ->
+    val composer = TextComposer { paragraphBuilder, textStyler ->
         item {
             val dimens = LocalDimens.current
             val scrollState = rememberScrollState()
@@ -164,7 +166,7 @@ private fun LazyListScope.formatCodeBlock(
                 Box(modifier = Modifier.padding(all = 4.dp)) {
                     Text(
                         text = paragraphBuilder.toComposableAnnotatedString(),
-                        style = CodeBlockStyle(),
+                        style = textStyler?.textStyle() ?: CodeBlockStyle(),
                         softWrap = false,
                     )
                 }
@@ -176,19 +178,19 @@ private fun LazyListScope.formatCodeBlock(
         element.childNodes(),
         preFormatted = true,
         lazyListScope = this,
-        onLinkClick = onLinkClick,
         baseUrl = baseUrl,
+        onLinkClick = onLinkClick,
     )
 
-    composer.terminateCurrentText()
+    composer.emitTextBuffer()
 }
 
 private fun TextComposer.appendTextChildren(
     nodes: List<Node>,
     preFormatted: Boolean = false,
     lazyListScope: LazyListScope,
-    onLinkClick: (String) -> Unit,
     baseUrl: String,
+    onLinkClick: (String) -> Unit,
 ) {
     var node = nodes.firstOrNull()
     while (node != null) {
@@ -203,6 +205,7 @@ private fun TextComposer.appendTextChildren(
                     )
                 }
             }
+
             is Element -> {
                 val element = node
                 when (element.tagName()) {
@@ -213,20 +216,21 @@ private fun TextComposer.appendTextChildren(
                             appendTextChildren(
                                 element.childNodes(),
                                 lazyListScope = lazyListScope,
-                                onLinkClick = onLinkClick,
                                 baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
                             )
                         } else {
                             withParagraph {
                                 appendTextChildren(
                                     element.childNodes(),
                                     lazyListScope = lazyListScope,
-                                    onLinkClick = onLinkClick,
                                     baseUrl = baseUrl,
+                                    onLinkClick = onLinkClick,
                                 )
                             }
                         }
                     }
+
                     "br" -> append('\n')
                     "h1" -> {
                         withParagraph {
@@ -240,6 +244,7 @@ private fun TextComposer.appendTextChildren(
                             }
                         }
                     }
+
                     "h2" -> {
                         withParagraph {
                             withComposableStyle(
@@ -252,6 +257,7 @@ private fun TextComposer.appendTextChildren(
                             }
                         }
                     }
+
                     "h3" -> {
                         withParagraph {
                             withComposableStyle(
@@ -264,6 +270,7 @@ private fun TextComposer.appendTextChildren(
                             }
                         }
                     }
+
                     "h4" -> {
                         withParagraph {
                             withComposableStyle(
@@ -276,6 +283,7 @@ private fun TextComposer.appendTextChildren(
                             }
                         }
                     }
+
                     "h5" -> {
                         withParagraph {
                             withComposableStyle(
@@ -288,6 +296,7 @@ private fun TextComposer.appendTextChildren(
                             }
                         }
                     }
+
                     "h6" -> {
                         withParagraph {
                             withComposableStyle(
@@ -300,89 +309,98 @@ private fun TextComposer.appendTextChildren(
                             }
                         }
                     }
+
                     "strong", "b" -> {
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                             appendTextChildren(
                                 element.childNodes(),
                                 lazyListScope = lazyListScope,
-                                onLinkClick = onLinkClick,
                                 baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
+
                     "i", "em", "cite", "dfn" -> {
                         withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
                             appendTextChildren(
                                 element.childNodes(),
                                 lazyListScope = lazyListScope,
-                                onLinkClick = onLinkClick,
                                 baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
+
                     "tt" -> {
                         withStyle(SpanStyle(fontFamily = FontFamily.Monospace)) {
                             appendTextChildren(
                                 element.childNodes(),
                                 lazyListScope = lazyListScope,
-                                onLinkClick = onLinkClick,
                                 baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
+
                     "u" -> {
                         withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) {
                             appendTextChildren(
                                 element.childNodes(),
                                 lazyListScope = lazyListScope,
-                                onLinkClick = onLinkClick,
                                 baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
+
                     "sup" -> {
                         withStyle(SpanStyle(baselineShift = BaselineShift.Superscript)) {
                             appendTextChildren(
                                 element.childNodes(),
                                 lazyListScope = lazyListScope,
-                                onLinkClick = onLinkClick,
                                 baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
+
                     "sub" -> {
                         withStyle(SpanStyle(baselineShift = BaselineShift.Subscript)) {
                             appendTextChildren(
                                 element.childNodes(),
                                 lazyListScope = lazyListScope,
-                                onLinkClick = onLinkClick,
                                 baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
+
                     "font" -> {
                         val fontFamily: FontFamily? = element.attr("face")?.asFontFamily()
                         withStyle(SpanStyle(fontFamily = fontFamily)) {
                             appendTextChildren(
                                 element.childNodes(),
                                 lazyListScope = lazyListScope,
-                                onLinkClick = onLinkClick,
                                 baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
                             )
                         }
                     }
+
                     "pre" -> {
                         appendTextChildren(
                             element.childNodes(),
                             preFormatted = true,
                             lazyListScope = lazyListScope,
-                            onLinkClick = onLinkClick,
                             baseUrl = baseUrl,
+                            onLinkClick = onLinkClick,
                         )
                     }
+
                     "code" -> {
                         if (element.parent()?.tagName() == "pre") {
-                            terminateCurrentText()
+                            emitTextBuffer()
                             lazyListScope.formatCodeBlock(
                                 element = element,
                                 onLinkClick = onLinkClick,
@@ -397,12 +415,13 @@ private fun TextComposer.appendTextChildren(
                                     element.childNodes(),
                                     preFormatted = preFormatted,
                                     lazyListScope = lazyListScope,
-                                    onLinkClick = onLinkClick,
                                     baseUrl = baseUrl,
+                                    onLinkClick = onLinkClick,
                                 )
                             }
                         }
                     }
+
                     "blockquote" -> {
                         withParagraph {
                             withComposableStyle(
@@ -411,12 +430,13 @@ private fun TextComposer.appendTextChildren(
                                 appendTextChildren(
                                     element.childNodes(),
                                     lazyListScope = lazyListScope,
-                                    onLinkClick = onLinkClick,
                                     baseUrl = baseUrl,
+                                    onLinkClick = onLinkClick,
                                 )
                             }
                         }
                     }
+
                     "a" -> {
                         withComposableStyle(
                             style = { LinkTextStyle().toSpanStyle() },
@@ -425,12 +445,30 @@ private fun TextComposer.appendTextChildren(
                                 appendTextChildren(
                                     element.childNodes(),
                                     lazyListScope = lazyListScope,
-                                    onLinkClick = onLinkClick,
                                     baseUrl = baseUrl,
+                                    onLinkClick = onLinkClick,
                                 )
                             }
                         }
                     }
+
+                    "figure" -> {
+                        emitTextBuffer()
+                        withTextStyle(NestedTextStyle.CAPTION) {
+                            appendTextChildren(
+                                element.childNodes(),
+                                lazyListScope = lazyListScope,
+                                baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
+                            )
+                            emitTextBuffer()
+                            lazyListScope.item {
+                                // Space to following text
+                                Spacer(modifier = Modifier.height(16.dp))
+                            }
+                        }
+                    }
+
                     "img" -> {
                         val imageCandidates = getImageSource(baseUrl, element)
                         if (imageCandidates.hasImage) {
@@ -467,45 +505,58 @@ private fun TextComposer.appendTextChildren(
 //                                            }
                                             ) {
                                                 val imageWidth = maxImageWidth()
-                                                AsyncImage(
-                                                    model = ImageRequest.Builder(LocalContext.current)
-                                                        .data(
-                                                            imageCandidates.getBestImageForMaxSize(
-                                                                pixelDensity = pixelDensity(),
-                                                                maxWidth = imageWidth,
-                                                            ),
-                                                        )
-                                                        .scale(Scale.FIT)
-                                                        .size(imageWidth)
-                                                        .precision(Precision.INEXACT)
-                                                        .build(),
-                                                    contentDescription = alt,
-                                                    placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
-                                                    error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                                                    contentScale = ContentScale.FillWidth,
-                                                    modifier = Modifier
-                                                        .fillMaxWidth(),
-                                                )
+                                                WithTooltipIfNotBlank(tooltip = alt) { modifier ->
+                                                    AsyncImage(
+                                                        model = ImageRequest.Builder(LocalContext.current)
+                                                            .data(
+                                                                imageCandidates.getBestImageForMaxSize(
+                                                                    pixelDensity = pixelDensity(),
+                                                                    maxWidth = imageWidth,
+                                                                ),
+                                                            )
+                                                            .scale(Scale.FIT)
+                                                            .size(imageWidth)
+                                                            .precision(Precision.INEXACT)
+                                                            .build(),
+                                                        contentDescription = alt,
+                                                        placeholder = rememberTintedVectorPainter(
+                                                            Icons.Outlined.Terrain,
+                                                        ),
+                                                        error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                                                        contentScale = ContentScale.FillWidth,
+                                                        modifier = modifier
+                                                            .fillMaxWidth(),
+                                                    )
+                                                }
                                             }
                                         }
 
-                                        if (alt.isNotBlank()) {
+                                        // Space to captions
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                        // Figure will emit own space
+                                        // Care to take a guess at how many divs lie between figure and img
+                                        // at The Verge?
+                                        if (element.notAncestorOf("figure")) {
+                                            if (alt.isNotBlank()) {
+                                                // Assuming figure will have explicit captions
+                                                ProvideScaledText(MaterialTheme.typography.labelMedium) {
+                                                    Text(
+                                                        alt,
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                    )
+                                                }
+                                            }
+
+                                            // Space to following text
                                             Spacer(modifier = Modifier.height(16.dp))
-
-                                            ProvideScaledText(MaterialTheme.typography.labelMedium) {
-                                                Text(
-                                                    alt,
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                )
-                                            }
                                         }
-
-                                        Spacer(modifier = Modifier.height(16.dp))
                                     }
                                 }
                             }
                         }
                     }
+
                     "ul" -> {
                         element.children()
                             .filter { it.tagName() == "li" }
@@ -516,12 +567,13 @@ private fun TextComposer.appendTextChildren(
                                     appendTextChildren(
                                         listItem.childNodes(),
                                         lazyListScope = lazyListScope,
-                                        onLinkClick = onLinkClick,
                                         baseUrl = baseUrl,
+                                        onLinkClick = onLinkClick,
                                     )
                                 }
                             }
                     }
+
                     "ol" -> {
                         element.children()
                             .filter { it.tagName() == "li" }
@@ -532,12 +584,13 @@ private fun TextComposer.appendTextChildren(
                                     appendTextChildren(
                                         listItem.childNodes(),
                                         lazyListScope = lazyListScope,
-                                        onLinkClick = onLinkClick,
                                         baseUrl = baseUrl,
+                                        onLinkClick = onLinkClick,
                                     )
                                 }
                             }
                     }
+
                     "table" -> {
                         appendTable {
                             /*
@@ -555,11 +608,11 @@ private fun TextComposer.appendTextChildren(
                                     appendTextChildren(
                                         it.childNodes(),
                                         lazyListScope = lazyListScope,
-                                        onLinkClick = onLinkClick,
                                         baseUrl = baseUrl,
+                                        onLinkClick = onLinkClick,
                                     )
                                     ensureDoubleNewline()
-                                    terminateCurrentText()
+                                    emitTextBuffer()
                                 }
 
                             element.children()
@@ -572,15 +625,16 @@ private fun TextComposer.appendTextChildren(
                                     appendTextChildren(
                                         row.childNodes(),
                                         lazyListScope = lazyListScope,
-                                        onLinkClick = onLinkClick,
                                         baseUrl = baseUrl,
+                                        onLinkClick = onLinkClick,
                                     )
-                                    terminateCurrentText()
+                                    emitTextBuffer()
                                 }
 
                             append("\n\n")
                         }
                     }
+
                     "iframe" -> {
                         val video: Video? = getVideo(element.attr("abs:src"))
 
@@ -631,20 +685,23 @@ private fun TextComposer.appendTextChildren(
                             }
                         }
                     }
+
                     "rt", "rp" -> {
                         // Ruby text elements. Not rendering them might be better than not
                         // handling them well
                     }
+
                     "video" -> {
                         // not implemented yet. remember to disable selection
                     }
+
                     else -> {
                         appendTextChildren(
                             nodes = element.childNodes(),
                             preFormatted = preFormatted,
                             lazyListScope = lazyListScope,
-                            onLinkClick = onLinkClick,
                             baseUrl = baseUrl,
+                            onLinkClick = onLinkClick,
                         )
                     }
                 }
@@ -653,6 +710,35 @@ private fun TextComposer.appendTextChildren(
 
         node = node.nextSibling()
     }
+}
+
+private fun Element.notAncestorOf(tagName: String): Boolean {
+    var current: Element? = this
+
+    while (current != null) {
+        val parent = current.parent()
+
+        current = when {
+            parent == null || parent.tagName() == "#root" -> {
+                null
+            }
+            parent.tagName() == tagName -> {
+                return false
+            }
+            else -> {
+                parent
+            }
+        }
+    }
+
+    return true
+}
+
+private enum class NestedTextStyle : TextStyler {
+    CAPTION {
+        @Composable
+        override fun textStyle() = MaterialTheme.typography.labelMedium
+    },
 }
 
 private fun String.asFontFamily(): FontFamily? = when (this.lowercase()) {
@@ -723,9 +809,11 @@ internal class ImageCandidates(
                             descriptor.substringBefore("w").toFloat() / maxWidth
                                 .toFloat()
                         }
+
                         descriptor.endsWith("x", ignoreCase = true) -> {
                             descriptor.substringBefore("x").toFloat() / pixelDensity
                         }
+
                         else -> {
                             return@fold acc
                         }
@@ -839,4 +927,20 @@ fun stripHtml(html: String): String {
     }
 
     return result.toString()
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WithTooltipIfNotBlank(
+    tooltip: String,
+    modifier: Modifier = Modifier,
+    content: @Composable (Modifier) -> Unit,
+) {
+    if (tooltip.isNotBlank()) {
+        PlainTooltipBox(tooltip = { Text(tooltip) }) {
+            content(modifier.tooltipAnchor())
+        }
+    } else {
+        content(modifier)
+    }
 }

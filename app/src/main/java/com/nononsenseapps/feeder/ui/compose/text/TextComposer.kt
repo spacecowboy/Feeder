@@ -2,22 +2,24 @@ package com.nononsenseapps.feeder.ui.compose.text
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 
 class TextComposer(
-    val paragraphEmitter: (AnnotatedParagraphStringBuilder) -> Unit,
+    val paragraphEmitter: (AnnotatedParagraphStringBuilder, TextStyler?) -> Unit,
 ) {
     val spanStack: MutableList<Span> = mutableListOf()
+    private val textStyleStack: MutableList<TextStyler> = mutableListOf()
 
     // The identity of this will change - do not reference it in blocks
     private var builder: AnnotatedParagraphStringBuilder = AnnotatedParagraphStringBuilder()
 
-    fun terminateCurrentText() {
+    fun emitTextBuffer() {
         if (builder.isEmpty()) {
             // Nothing to emit, and nothing to reset
             return
         }
 
-        paragraphEmitter(builder)
+        paragraphEmitter(builder, textStyleStack.lastOrNull())
 
         builder = AnnotatedParagraphStringBuilder()
 
@@ -48,7 +50,7 @@ class TextComposer(
 
     fun <R> appendTable(block: () -> R): R {
         builder.ensureDoubleNewline()
-        terminateCurrentText()
+        emitTextBuffer()
         return block()
     }
 
@@ -61,7 +63,7 @@ class TextComposer(
     ): R {
         val url = link ?: findClosestLink()
         builder.ensureDoubleNewline()
-        terminateCurrentText()
+        emitTextBuffer()
         val onClick: (() -> Unit)? = if (url?.isNotBlank() == true) {
             {
                 onLinkClick(url)
@@ -87,6 +89,12 @@ class TextComposer(
     fun popComposableStyle(index: Int) =
         builder.popComposableStyle(index)
 
+    fun pushTextStyle(style: TextStyler) =
+        textStyleStack.add(style)
+
+    fun popTextStyle() =
+        textStyleStack.removeLastOrNull()
+
     private fun findClosestLink(): String? {
         for (span in spanStack.reversed()) {
             if (span is SpanWithAnnotation && span.tag == "URL") {
@@ -94,6 +102,18 @@ class TextComposer(
             }
         }
         return null
+    }
+}
+
+inline fun <R : Any> TextComposer.withTextStyle(
+    textStyler: TextStyler,
+    crossinline block: TextComposer.() -> R,
+): R {
+    pushTextStyle(textStyler)
+    return try {
+        block()
+    } finally {
+        popTextStyle()
     }
 }
 
@@ -165,3 +185,8 @@ data class SpanWithComposableStyle(
 data class SpanWithVerbatim(
     val verbatim: String,
 ) : Span()
+
+interface TextStyler {
+    @Composable
+    fun textStyle(): TextStyle
+}
