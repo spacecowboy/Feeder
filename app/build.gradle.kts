@@ -44,6 +44,10 @@ android {
                 argument("room.incremental", "true")
             }
         }
+
+        kotlinOptions {
+            jvmTarget = "11"
+        }
     }
 
     sourceSets {
