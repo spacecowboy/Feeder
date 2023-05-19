@@ -29,22 +29,19 @@ private fun formatBody(
     element: Element,
     baseUrl: String,
 ): List<AnnotatedString> {
-    val result = mutableListOf<AnnotatedString>()
-    val composer = TextComposer { paragraphBuilder, _ ->
-        result.add(paragraphBuilder.toAnnotatedString())
-    }
+    val composer = AnnotatedStringComposer()
 
     composer.appendTextChildren(
         nodes = element.childNodes(),
         baseUrl = baseUrl,
     )
 
-    composer.emitTextBuffer()
+    composer.emitParagraph()
 
-    return result
+    return composer.result
 }
 
-private fun TextComposer.appendTextChildren(
+private fun AnnotatedStringComposer.appendTextChildren(
     nodes: List<Node>,
     preFormatted: Boolean = false,
     baseUrl: String,
@@ -62,11 +59,12 @@ private fun TextComposer.appendTextChildren(
                     )
                 }
             }
+
             is Element -> {
                 val element = node
                 when (element.tagName()) {
                     "p" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                         // Readability4j inserts p-tags in divs for algorithmic purposes.
                         // They screw up formatting.
                         if (node.hasClass("readability-styled")) {
@@ -83,93 +81,104 @@ private fun TextComposer.appendTextChildren(
                             }
                         }
 
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "br" -> append('\n')
                     "h1" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "h2" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "h3" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "h4" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "h5" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "h6" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                         withParagraph {
                             element.appendCorrectlyNormalizedWhiteSpaceRecursively(
                                 this,
                                 stripLeading = endsWithWhitespace,
                             )
                         }
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "strong", "b" -> {
                         appendTextChildren(
                             element.childNodes(),
                             baseUrl = baseUrl,
                         )
                     }
+
                     "i", "em", "cite", "dfn" -> {
                         appendTextChildren(
                             element.childNodes(),
                             baseUrl = baseUrl,
                         )
                     }
+
                     "tt" -> {
                         appendTextChildren(
                             element.childNodes(),
                             baseUrl = baseUrl,
                         )
                     }
+
                     "u" -> {
                         appendTextChildren(
                             element.childNodes(),
                             baseUrl = baseUrl,
                         )
                     }
+
                     "sup" -> {
                         withStyle(SpanStyle(baselineShift = BaselineShift.Superscript)) {
                             appendTextChildren(
@@ -178,6 +187,7 @@ private fun TextComposer.appendTextChildren(
                             )
                         }
                     }
+
                     "sub" -> {
                         withStyle(SpanStyle(baselineShift = BaselineShift.Subscript)) {
                             appendTextChildren(
@@ -186,42 +196,47 @@ private fun TextComposer.appendTextChildren(
                             )
                         }
                     }
+
                     "font" -> {
                         appendTextChildren(
                             element.childNodes(),
                             baseUrl = baseUrl,
                         )
                     }
+
                     "pre" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                         // TODO some TTS annotation?
                         appendTextChildren(
                             element.childNodes(),
                             preFormatted = true,
                             baseUrl = baseUrl,
                         )
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "code" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                         // TODO some TTS annotation?
                         appendTextChildren(
                             element.childNodes(),
                             preFormatted = preFormatted,
                             baseUrl = baseUrl,
                         )
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "blockquote" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                         withParagraph {
                             appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                             )
                         }
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "a" -> {
                         withAnnotation("URL", element.attr("abs:href") ?: "") {
                             appendTextChildren(
@@ -230,12 +245,15 @@ private fun TextComposer.appendTextChildren(
                             )
                         }
                     }
+
                     "figure" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "img" -> {
-                        emitTextBuffer()
+                        emitParagraph()
                     }
+
                     "ul" -> {
                         element.children()
                             .filter { it.tagName() == "li" }
@@ -250,6 +268,7 @@ private fun TextComposer.appendTextChildren(
                                 }
                             }
                     }
+
                     "ol" -> {
                         element.children()
                             .filter { it.tagName() == "li" }
@@ -264,6 +283,7 @@ private fun TextComposer.appendTextChildren(
                                 }
                             }
                     }
+
                     "table" -> {
                         appendTable {
                             /*
@@ -282,12 +302,26 @@ private fun TextComposer.appendTextChildren(
                                         it.childNodes(),
                                         baseUrl = baseUrl,
                                     )
-                                    ensureDoubleNewline()
-                                    emitTextBuffer()
+                                    emitParagraph()
                                 }
 
                             element.children()
-                                .filter { it.tagName() == "thead" || it.tagName() == "tbody" || it.tagName() == "tfoot" }
+                            element.children()
+                                .filter {
+                                    it.tagName() in setOf(
+                                        "thead",
+                                        "tbody",
+                                        "tfoot",
+                                    )
+                                }
+                                .sortedBy {
+                                    when (it.tagName()) {
+                                        "thead" -> 0
+                                        "tbody" -> 1
+                                        "tfoot" -> 10
+                                        else -> 2
+                                    }
+                                }
                                 .flatMap {
                                     it.children()
                                         .filter { it.tagName() == "tr" }
@@ -297,22 +331,27 @@ private fun TextComposer.appendTextChildren(
                                         row.childNodes(),
                                         baseUrl = baseUrl,
                                     )
-                                    emitTextBuffer()
+                                    emitParagraph()
                                 }
 
+                            // This is just for TTS so newlines are fine
                             append("\n\n")
                         }
                     }
+
                     "rt", "rp" -> {
                         // Ruby text elements. TTS has no need for furigana and similar
                         // so ignore
                     }
+
                     "iframe" -> {
                         // not implemented
                     }
+
                     "video" -> {
                         // not implemented
                     }
+
                     else -> {
                         appendTextChildren(
                             nodes = element.childNodes(),

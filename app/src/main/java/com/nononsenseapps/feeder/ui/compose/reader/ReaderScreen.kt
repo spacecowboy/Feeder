@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.ColorInt
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -75,6 +76,7 @@ fun ReaderView(
                 end = dimens.margin,
             ),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = modifier
                 .fillMaxWidth(),
         ) {
@@ -140,7 +142,6 @@ fun ReaderView(
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
 
@@ -182,7 +183,6 @@ fun ReaderView(
                                     },
                             )
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
