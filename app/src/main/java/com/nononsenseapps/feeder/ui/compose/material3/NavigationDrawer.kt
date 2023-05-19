@@ -16,7 +16,6 @@
 
 package com.nononsenseapps.feeder.ui.compose.material3
 
-import android.util.Log
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Canvas
@@ -369,7 +368,7 @@ fun DismissibleNavigationDrawer(
 ) {
     val drawerWidth = getContainerWidth()
     val drawerWidthPx = with(LocalDensity.current) { drawerWidth.toPx() }
-    val minValue = -drawerWidthPx.also { Log.d("JONAS", "MinValue: $drawerWidthPx, $drawerWidth") }
+    val minValue = -drawerWidthPx
     val maxValue = 0f
 
     val scope = rememberCoroutineScope()
@@ -413,8 +412,6 @@ fun DismissibleNavigationDrawer(
         },) { measurables, constraints ->
             val sheetPlaceable = measurables[0].measure(constraints)
             val contentPlaceable = measurables[1].measure(constraints)
-            Log.d("JONAS", "cw: ${contentPlaceable.width}, spw: ${sheetPlaceable.width}, of: ${drawerState.offset.value.roundToInt()}")
-            Log.d("JONAS", "ch: ${contentPlaceable.height}, sph: ${sheetPlaceable.height}")
             layout(contentPlaceable.width, contentPlaceable.height) {
                 contentPlaceable.placeRelative(
                     sheetPlaceable.width + drawerState.offset.value.roundToInt(),
