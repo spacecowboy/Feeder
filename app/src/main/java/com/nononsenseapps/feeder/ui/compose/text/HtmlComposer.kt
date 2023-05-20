@@ -21,7 +21,10 @@ abstract class HtmlParser {
     // The identity of this will change - do not reference it in blocks
     protected var builder: AnnotatedParagraphStringBuilder = AnnotatedParagraphStringBuilder()
 
-    abstract fun emitParagraph()
+    /**
+     * returns true if any content was emitted, false otherwise
+     */
+    abstract fun emitParagraph(): Boolean
 
     val endsWithWhitespace: Boolean
         get() = builder.endsWithWhitespace
@@ -89,9 +92,13 @@ inline fun <R : Any> HtmlParser.withParagraph(
 }
 
 inline fun <R : Any> HtmlParser.withStyle(
-    style: SpanStyle,
+    style: SpanStyle?,
     crossinline block: HtmlParser.() -> R,
 ): R {
+    if (style == null) {
+        return block()
+    }
+
     pushSpan(SpanWithStyle(style))
     val index = pushStyle(style)
     return try {

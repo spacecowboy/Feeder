@@ -8,11 +8,14 @@ class EagerComposer(
     private val paragraphs: MutableList<@Composable () -> Unit> = mutableListOf()
 
     @Composable
-    fun Render() {
+    fun render(): Boolean {
+        emitParagraph()
+        val result = paragraphs.isNotEmpty()
         for (p in paragraphs) {
             p()
         }
         paragraphs.clear()
+        return result
     }
 
     override fun appendTable(block: @Composable () -> Unit) {
@@ -47,10 +50,10 @@ class EagerComposer(
         }
     }
 
-    override fun emitParagraph() {
+    override fun emitParagraph(): Boolean {
         if (builder.isEmpty()) {
             // Nothing to emit, and nothing to reset
-            return
+            return false
         }
 
         // Important that we reference the correct builder in the lambda - reset will create a new
@@ -62,6 +65,7 @@ class EagerComposer(
             paragraphEmitter(actualBuilder, actualTextStyle)
         }
         resetAfterEmit()
+        return true
     }
 
     private fun resetAfterEmit() {

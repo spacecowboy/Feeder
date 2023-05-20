@@ -8,15 +8,16 @@ class AnnotatedStringComposer : HtmlParser() {
     val result: List<AnnotatedString> =
         strings
 
-    override fun emitParagraph() {
+    override fun emitParagraph(): Boolean {
         if (builder.isEmpty()) {
             // Nothing to emit, and nothing to reset
-            return
+            return false
         }
 
         strings.add(builder.toAnnotatedString())
 
         resetAfterEmit()
+        return true
     }
 
     fun appendTable(block: () -> Unit) {
