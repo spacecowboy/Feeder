@@ -5,7 +5,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 
 abstract class HtmlComposer : HtmlParser() {
-    abstract fun appendTable(block: @Composable () -> Unit)
 
     abstract fun appendImage(
         link: String? = null,
@@ -76,10 +75,12 @@ inline fun <R : Any> HtmlComposer.withTextStyle(
     textStyler: TextStyler,
     crossinline block: HtmlComposer.() -> R,
 ): R {
+    emitParagraph()
     pushTextStyle(textStyler)
     return try {
         block()
     } finally {
+        emitParagraph()
         popTextStyle()
     }
 }
@@ -88,7 +89,9 @@ inline fun <R : Any> HtmlParser.withParagraph(
     crossinline block: HtmlParser.() -> R,
 ): R {
     emitParagraph()
-    return block(this)
+    return block(this).also {
+        emitParagraph()
+    }
 }
 
 inline fun <R : Any> HtmlParser.withStyle(
