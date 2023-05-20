@@ -26,14 +26,6 @@ class LazyListComposer(
         return true
     }
 
-    override fun appendTable(block: @Composable () -> Unit) {
-        emitParagraph()
-
-        lazyListScope.item {
-            block()
-        }
-    }
-
     override fun appendImage(
         link: String?,
         onLinkClick: (String) -> Unit,

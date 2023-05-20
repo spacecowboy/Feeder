@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.VerbatimTtsAnnotation
@@ -82,7 +83,7 @@ class AnnotatedParagraphStringBuilder {
     }
 
     @Composable
-    fun toComposableAnnotatedString(): AnnotatedString {
+    fun rememberComposableAnnotatedString(): AnnotatedString {
         for (composableStyle in poppedComposableStyles) {
             builder.addStyle(
                 style = composableStyle.style(),
@@ -97,7 +98,9 @@ class AnnotatedParagraphStringBuilder {
                 end = builder.length,
             )
         }
-        return builder.toAnnotatedString()
+        return remember {
+            builder.toAnnotatedString()
+        }
     }
 
     fun toAnnotatedString(): AnnotatedString {

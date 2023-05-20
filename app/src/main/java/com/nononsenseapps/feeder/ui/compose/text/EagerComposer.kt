@@ -18,14 +18,6 @@ class EagerComposer(
         return result
     }
 
-    override fun appendTable(block: @Composable () -> Unit) {
-        emitParagraph()
-
-        paragraphs.add {
-            block()
-        }
-    }
-
     override fun appendImage(
         link: String?,
         onLinkClick: (String) -> Unit,

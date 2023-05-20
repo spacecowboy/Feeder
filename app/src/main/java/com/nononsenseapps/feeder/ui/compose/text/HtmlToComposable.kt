@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.DisableSelection
@@ -30,6 +31,10 @@ import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
@@ -99,7 +104,7 @@ private fun ParagraphText(
     modifier: Modifier = Modifier,
     onLinkClick: (String) -> Unit,
 ) {
-    val paragraph = paragraphBuilder.toComposableAnnotatedString()
+    val paragraph = paragraphBuilder.rememberComposableAnnotatedString()
 
     // just for debug
 //    check(paragraph.text.isNotEmpty()) {
@@ -386,7 +391,7 @@ private fun HtmlComposer.appendTextChildren(
                                         ) {
                                             Box(modifier = Modifier.padding(all = 4.dp)) {
                                                 Text(
-                                                    text = paragraphBuilder.toComposableAnnotatedString(),
+                                                    text = paragraphBuilder.rememberComposableAnnotatedString(),
                                                     style = textStyler?.textStyle()
                                                         ?: CodeBlockStyle(),
                                                     softWrap = false,
@@ -496,7 +501,6 @@ private fun HtmlComposer.appendTextChildren(
                                                     baseUrl = baseUrl,
                                                     onLinkClick = onLinkClick,
                                                 )
-                                                emitParagraph()
                                             }
                                             render()
                                         }
@@ -514,7 +518,7 @@ private fun HtmlComposer.appendTextChildren(
                                 modifier = Modifier
                                     .width(dimens.maxContentWidth),
                             ) {
-                                jonasImage(
+                                renderImage(
                                     baseUrl = baseUrl,
                                     onClick = onClick,
                                     element = element,
@@ -556,22 +560,12 @@ private fun HtmlComposer.appendTextChildren(
                     }
 
                     "table" -> {
-                        appendTable {
-                            val composer = EagerComposer { paragraphBuilder, textStyler ->
-                                ParagraphText(
-                                    paragraphBuilder = paragraphBuilder,
-                                    textStyler = textStyler,
-                                    modifier = Modifier,
-                                    onLinkClick = onLinkClick,
-                                )
-                            }
-                            with(composer) {
-                                tableColFirst(
-                                    baseUrl = baseUrl,
-                                    onLinkClick = onLinkClick,
-                                    element = element,
-                                )
-                            }
+                        if (this is LazyListComposer) {
+                            appendTable(
+                                baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
+                                element = element,
+                            )
                         }
                     }
 
@@ -589,7 +583,7 @@ private fun HtmlComposer.appendTextChildren(
                                         BoxWithConstraints(
                                             modifier = Modifier.fillMaxWidth(),
                                         ) {
-                                            val imageWidth = maxImageWidth()
+                                            val imageWidth by rememberMaxImageWidth()
                                             AsyncImage(
                                                 model = ImageRequest.Builder(LocalContext.current)
                                                     .placeholder(R.drawable.youtube_icon)
@@ -653,18 +647,23 @@ private fun HtmlComposer.appendTextChildren(
 
 @Suppress("UnusedReceiverParameter")
 @Composable
-private fun ColumnScope.jonasImage(
+private fun ColumnScope.renderImage(
     baseUrl: String,
     onClick: (() -> Unit)?,
     element: Element,
 ) {
-    val imageCandidates = getImageSource(baseUrl, element)
-    // TODO render error image instead
-    if (imageCandidates.notHasImage) {
-        return
+    val imageCandidates by remember {
+        derivedStateOf {
+            getImageSource(baseUrl, element)
+        }
     }
+
     // Some sites are silly and insert formatting in alt text
-    val alt = stripHtml(element.attr("alt") ?: "")
+    val alt by remember {
+        derivedStateOf {
+            stripHtml(element.attr("alt") ?: "")
+        }
+    }
 
     DisableSelection {
         BoxWithConstraints(
@@ -677,35 +676,54 @@ private fun ColumnScope.jonasImage(
                 }
                 .fillMaxWidth(),
         ) {
-            val imageWidth = maxImageWidth()
+            val imageWidth by rememberMaxImageWidth()
             WithTooltipIfNotBlank(tooltip = alt) { modifier ->
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(
+                if (imageCandidates.notHasImage) {
+                    Image(
+                        rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                        contentDescription = alt,
+                        contentScale = ContentScale.FillWidth,
+                        modifier = modifier
+                            .fillMaxWidth(),
+                    )
+                } else {
+                    val pixelDensity = LocalDensity.current.density
+                    val bestImage by remember {
+                        derivedStateOf {
                             imageCandidates.getBestImageForMaxSize(
-                                pixelDensity = pixelDensity(),
+                                pixelDensity = pixelDensity,
                                 maxWidth = imageWidth,
-                            ),
-                        )
-                        .scale(Scale.FIT)
-                        .size(imageWidth)
-                        .precision(Precision.INEXACT)
-                        .build(),
-                    contentDescription = alt,
-                    placeholder = rememberTintedVectorPainter(
-                        Icons.Outlined.Terrain,
-                    ),
-                    error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                    contentScale = ContentScale.FillWidth,
-                    modifier = modifier
-                        .fillMaxWidth(),
-                )
+                            )
+                        }
+                    }
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(bestImage)
+                            .scale(Scale.FIT)
+                            .size(imageWidth)
+                            .precision(Precision.INEXACT)
+                            .build(),
+                        contentDescription = alt,
+                        placeholder = rememberTintedVectorPainter(
+                            Icons.Outlined.Terrain,
+                        ),
+                        error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
+                        contentScale = ContentScale.FillWidth,
+                        modifier = modifier
+                            .fillMaxWidth(),
+                    )
+                }
             }
         }
     }
 
     // Figure has own caption so don't use alt text as caption there
-    if (element.notAncestorOf("figure")) {
+    val notFigureAncestor by remember {
+        derivedStateOf {
+            (element.notAncestorOf("figure"))
+        }
+    }
+    if (notFigureAncestor) {
         if (alt.isNotBlank()) {
             ProvideScaledText(
                 MaterialTheme.typography.labelMedium.merge(
@@ -721,100 +739,30 @@ private fun ColumnScope.jonasImage(
     }
 }
 
-@Composable
-private fun EagerComposer.tableRowFirst(
+private fun LazyListComposer.appendTable(
     baseUrl: String,
     onLinkClick: (String) -> Unit,
     element: Element,
 ) {
-    /*
-    In this order:
-    optionally a caption element (containing text children for instance),
-    followed by zero or more colgroup elements,
-    followed optionally by a thead element,
-    followed by either zero or more tbody elements
-    or one or more tr elements,
-    followed optionally by a tfoot element
-     */
-    val dimens = LocalDimens.current
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier
-            .width(dimens.maxContentWidth),
-    ) {
-        element.children()
-            .filter { it.tagName() == "caption" }
-            .forEach {
-                withTextStyle(NestedTextStyle.CAPTION) {
-                    appendTextChildren(
-                        it.childNodes(),
-                        baseUrl = baseUrl,
-                        onLinkClick = onLinkClick,
-                    )
-                    emitParagraph()
-                }
-                render()
-            }
+    emitParagraph()
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier
-                .run {
-                    if (element.hasDescendant("img")) {
-                        // If images inside, then render them to screen width instead
-                        this
-                    } else {
-                        horizontalScroll(rememberScrollState())
-                    }
-                }
-                .width(dimens.maxContentWidth),
-        ) {
-            element.children()
-                .filter {
-                    it.tagName() in setOf(
-                        "thead",
-                        "tbody",
-                        "tfoot",
-                    )
-                }
-                .sortedBy {
-                    when (it.tagName()) {
-                        "thead" -> 0
-                        "tbody" -> 1
-                        "tfoot" -> 10
-                        else -> 2
-                    }
-                }
-                .map {
-                    it.tagName() to it.children()
-                        .filter { child -> child.tagName() == "tr" }
-                }
-                .forEach { (tag, rows) ->
-                    rows.forEach { row ->
-                        Surface(
-                            tonalElevation = when (tag) {
-                                "thead" -> 3.dp
-                                "tbody" -> 0.dp
-                                "tfoot" -> 1.dp
-                                else -> 0.dp
-                            },
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(
-                                    32.dp,
-                                ),
-                                modifier = Modifier,
-                            ) {
-                                appendTextChildren(
-                                    row.childNodes(),
-                                    baseUrl = baseUrl,
-                                    onLinkClick = onLinkClick,
-                                )
-                                render()
-                            }
-                        }
-                    }
-                }
+    val imgDescendant = element.hasDescendant("img")
+
+    if (imgDescendant) {
+        appendTextChildren(element.childNodes(), baseUrl = baseUrl, onLinkClick = onLinkClick)
+    } else {
+        item {
+            val composer = EagerComposer { paragraphBuilder, textStyler ->
+                ParagraphText(
+                    paragraphBuilder = paragraphBuilder,
+                    textStyler = textStyler,
+                    modifier = Modifier,
+                    onLinkClick = onLinkClick,
+                )
+            }
+            with(composer) {
+                tableColFirst(baseUrl = baseUrl, onLinkClick = onLinkClick, element = element)
+            }
         }
     }
 }
@@ -825,11 +773,22 @@ private fun EagerComposer.tableColFirst(
     onLinkClick: (String) -> Unit,
     element: Element,
 ) {
-    val rowCount = element.descendants("tr").count()
-    val colCount = element.descendants()
-        .filter {
-            it.tagName() in setOf("th", "td")
-        }.count()
+    val rowCount by remember {
+        derivedStateOf {
+            element.descendants("tr").count()
+        }
+    }
+    val colCount by remember {
+        derivedStateOf {
+            element.descendants("tr")
+                .map { row ->
+                    row.descendants()
+                        .filter {
+                            it.tagName() in setOf("th", "td")
+                        }.count()
+                }.max()
+        }
+    }
 
     /*
     In this order:
@@ -846,100 +805,102 @@ private fun EagerComposer.tableColFirst(
         modifier = Modifier
             .width(dimens.maxContentWidth),
     ) {
-        element.children()
-            .filter { it.tagName() == "caption" }
-            .forEach {
-                withTextStyle(NestedTextStyle.CAPTION) {
-                    appendTextChildren(
-                        it.childNodes(),
-                        baseUrl = baseUrl,
-                        onLinkClick = onLinkClick,
-                    )
-                    emitParagraph()
+        key(element, baseUrl, onLinkClick) {
+            element.children()
+                .filter { it.tagName() == "caption" }
+                .forEach {
+                    withTextStyle(NestedTextStyle.CAPTION) {
+                        appendTextChildren(
+                            it.childNodes(),
+                            baseUrl = baseUrl,
+                            onLinkClick = onLinkClick,
+                        )
+                    }
+                    render()
                 }
-                render()
-            }
+        }
 
-        val rowData = element.children()
-            .filter {
-                it.tagName() in setOf(
-                    "thead",
-                    "tbody",
-                    "tfoot",
-                )
-            }
-            .sortedBy {
-                when (it.tagName()) {
-                    "thead" -> 0
-                    "tbody" -> 1
-                    "tfoot" -> 10
-                    else -> 2
-                }
-            }
-            .flatMap {
-                it.children()
-                    .filter { child -> child.tagName() == "tr" }
-                    .map { child ->
-                        it.tagName() to child
+        val rowData by remember {
+            derivedStateOf {
+                element.children()
+                    .filter {
+                        it.tagName() in setOf(
+                            "thead",
+                            "tbody",
+                            "tfoot",
+                        )
+                    }
+                    .sortedBy {
+                        when (it.tagName()) {
+                            "thead" -> 0
+                            "tbody" -> 1
+                            "tfoot" -> 10
+                            else -> 2
+                        }
+                    }
+                    .flatMap {
+                        it.children()
+                            .filter { child -> child.tagName() == "tr" }
+                            .map { child ->
+                                it.tagName() to child
+                            }
                     }
             }
+        }
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(32.dp),
-            modifier = Modifier
-                .run {
-                    if (element.hasDescendant("img")) {
-                        // If images inside, then render them to screen width instead
-                        this
-                    } else {
-                        horizontalScroll(rememberScrollState())
-                    }
-                }
-                .width(dimens.maxContentWidth),
-        ) {
-            for (colIndex in 0 until colCount) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier,
-                ) {
-                    for (rowIndex in 0 until rowCount) {
-                        val (section, rowElement) = rowData.getOrNull(rowIndex) ?: break
-                        var emptyCell = false
-                        Surface(
-                            tonalElevation = when (section) {
-                                "thead" -> 3.dp
-                                "tbody" -> 0.dp
-                                "tfoot" -> 1.dp
-                                else -> 0.dp
-                            },
-                        ) {
-                            rowElement.children()
-                                .filter { it.tagName() in setOf("th", "td") }
-                                .elementAtOrNullWithSpans(colIndex)
-                                ?.let { colElement ->
-                                    withParagraph {
-                                        withStyle(
-                                            if (colElement.tagName() == "th") {
-                                                SpanStyle(fontWeight = FontWeight.Bold)
-                                            } else {
-                                                null
-                                            },
-                                        ) {
-                                            appendTextChildren(
-                                                colElement.childNodes(),
-                                                baseUrl = baseUrl,
-                                                onLinkClick = onLinkClick,
-                                            )
+        key(rowCount, colCount, rowData, baseUrl, onLinkClick) {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(32.dp),
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .width(dimens.maxContentWidth),
+            ) {
+                items(
+                    count = colCount,
+                ) { colIndex ->
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier,
+                    ) {
+                        for (rowIndex in 0 until rowCount) {
+                            val (section, rowElement) = rowData.getOrNull(rowIndex) ?: break
+                            var emptyCell = false
+                            Surface(
+                                tonalElevation = when (section) {
+                                    "thead" -> 3.dp
+                                    "tbody" -> 0.dp
+                                    "tfoot" -> 1.dp
+                                    else -> 0.dp
+                                },
+                            ) {
+                                rowElement.children()
+                                    .filter { it.tagName() in setOf("th", "td") }
+                                    .elementAtOrNullWithSpans(colIndex)
+                                    ?.let { colElement ->
+                                        withParagraph {
+                                            withStyle(
+                                                if (colElement.tagName() == "th") {
+                                                    SpanStyle(fontWeight = FontWeight.Bold)
+                                                } else {
+                                                    null
+                                                },
+                                            ) {
+                                                appendTextChildren(
+                                                    colElement.childNodes(),
+                                                    baseUrl = baseUrl,
+                                                    onLinkClick = onLinkClick,
+                                                )
+                                            }
                                         }
                                     }
-                                }
-                            emptyCell = !render()
-                        }
-                        if (emptyCell) {
-                            // An empty cell looks better if it has some height - but don't want
-                            // the surface because having one space wide surface is weird
-                            append(' ')
-                            render()
+                                emptyCell = !render()
+                            }
+                            if (emptyCell) {
+                                // An empty cell looks better if it has some height - but don't want
+                                // the surface because having one space wide surface is weird
+                                append(' ')
+                                render()
+                            }
                         }
                     }
                 }
@@ -1055,13 +1016,12 @@ private fun TestIt() {
 }
 
 @Composable
-private fun pixelDensity() = with(LocalDensity.current) {
-    density
-}
-
-@Composable
-fun BoxWithConstraintsScope.maxImageWidth() = with(LocalDensity.current) {
-    maxWidth.toPx().roundToInt().coerceAtMost(2000)
+fun BoxWithConstraintsScope.rememberMaxImageWidth() = with(LocalDensity.current) {
+    remember {
+        derivedStateOf {
+            maxWidth.toPx().roundToInt().coerceAtMost(2000)
+        }
+    }
 }
 
 /**
