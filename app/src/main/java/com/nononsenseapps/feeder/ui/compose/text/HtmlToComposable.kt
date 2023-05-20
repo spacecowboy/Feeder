@@ -472,6 +472,7 @@ private fun HtmlComposer.appendTextChildren(
                     "figure" -> {
                         emitParagraph()
 
+                        // Wordpress likes nested figures to get images side by side
                         if (this is LazyListComposer) {
                             val imgElement = element.firstDescendant(tagName = "img")
 
@@ -507,6 +508,12 @@ private fun HtmlComposer.appendTextChildren(
                                     }
                                 }
                             }
+                        } else if (this is EagerComposer) {
+                            appendTextChildren(
+                                element.childNodes(),
+                                baseUrl = baseUrl,
+                                onLinkClick = onLinkClick,
+                            )
                         }
                     }
 
