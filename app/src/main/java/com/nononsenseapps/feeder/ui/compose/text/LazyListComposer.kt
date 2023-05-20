@@ -8,10 +8,10 @@ class LazyListComposer(
     private val paragraphEmitter: @Composable (AnnotatedParagraphStringBuilder, TextStyler?) -> Unit,
 ) : HtmlComposer() {
 
-    override fun emitParagraph() {
+    override fun emitParagraph(): Boolean {
         if (builder.isEmpty()) {
             // Nothing to emit, and nothing to reset
-            return
+            return false
         }
 
         // Important that we reference the correct builder in the lambda - reset will create a new
@@ -23,6 +23,7 @@ class LazyListComposer(
             paragraphEmitter(actualBuilder, actualTextStyle)
         }
         resetAfterEmit()
+        return true
     }
 
     override fun appendTable(block: @Composable () -> Unit) {

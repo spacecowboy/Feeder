@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -95,9 +96,9 @@ fun LazyListScope.htmlFormattedText(
 private fun ParagraphText(
     paragraphBuilder: AnnotatedParagraphStringBuilder,
     textStyler: TextStyler?,
+    modifier: Modifier = Modifier,
     onLinkClick: (String) -> Unit,
 ) {
-    val dimens = LocalDimens.current
     val paragraph = paragraphBuilder.toComposableAnnotatedString()
 
     // just for debug
@@ -120,8 +121,7 @@ private fun ParagraphText(
                 ClickableText(
                     text = paragraph,
                     style = LocalTextStyle.current,
-                    modifier = Modifier
-                        .width(dimens.maxContentWidth),
+                    modifier = modifier,
                 ) { offset ->
                     paragraph.getStringAnnotations("URL", offset, offset)
                         .firstOrNull()
@@ -132,8 +132,7 @@ private fun ParagraphText(
             } else {
                 Text(
                     text = paragraph,
-                    modifier = Modifier
-                        .width(dimens.maxContentWidth),
+                    modifier = modifier,
                 )
             }
         }
@@ -146,9 +145,12 @@ private fun LazyListScope.formatBody(
     onLinkClick: (String) -> Unit,
 ) {
     val composer = LazyListComposer(this) { paragraphBuilder, textStyler ->
+        val dimens = LocalDimens.current
         ParagraphText(
             paragraphBuilder = paragraphBuilder,
             textStyler = textStyler,
+            modifier = Modifier
+                .width(dimens.maxContentWidth),
             onLinkClick = onLinkClick,
         )
     }
@@ -402,10 +404,11 @@ private fun HtmlComposer.appendTextChildren(
                                                 onLinkClick = onLinkClick,
                                             )
                                             emitParagraph()
-                                            Render()
+                                            render()
                                         }
                                     }
                                 }
+
                                 is EagerComposer -> {
                                     // Should never happen as far as I know. But render text just in
                                     // case
@@ -465,13 +468,16 @@ private fun HtmlComposer.appendTextChildren(
                         emitParagraph()
 
                         if (this is LazyListComposer) {
-                            val imgElement = element.firstDecendant(tagName = "img")
+                            val imgElement = element.firstDescendant(tagName = "img")
 
                             if (imgElement != null) {
                                 val composer = EagerComposer { paragraphBuilder, textStyler ->
+                                    val dimens = LocalDimens.current
                                     ParagraphText(
                                         paragraphBuilder = paragraphBuilder,
                                         textStyler = textStyler,
+                                        modifier = Modifier
+                                            .width(dimens.maxContentWidth),
                                         onLinkClick = onLinkClick,
                                     )
                                 }
@@ -492,7 +498,7 @@ private fun HtmlComposer.appendTextChildren(
                                                 )
                                                 emitParagraph()
                                             }
-                                            Render()
+                                            render()
                                         }
                                     }
                                 }
@@ -555,69 +561,16 @@ private fun HtmlComposer.appendTextChildren(
                                 ParagraphText(
                                     paragraphBuilder = paragraphBuilder,
                                     textStyler = textStyler,
+                                    modifier = Modifier,
                                     onLinkClick = onLinkClick,
                                 )
                             }
                             with(composer) {
-                                /*
-                                In this order:
-                                optionally a caption element (containing text children for instance),
-                                followed by zero or more colgroup elements,
-                                followed optionally by a thead element,
-                                followed by either zero or more tbody elements
-                                or one or more tr elements,
-                                followed optionally by a tfoot element
-                                 */
-                                val dimens = LocalDimens.current
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                                    modifier = Modifier
-                                        .width(dimens.maxContentWidth),
-                                ) {
-                                    element.children()
-                                        .filter { it.tagName() == "caption" }
-                                        .forEach {
-                                            withTextStyle(NestedTextStyle.CAPTION) {
-                                                appendTextChildren(
-                                                    it.childNodes(),
-                                                    baseUrl = baseUrl,
-                                                    onLinkClick = onLinkClick,
-                                                )
-                                                emitParagraph()
-                                            }
-                                        }
-
-                                    element.children()
-                                        .filter {
-                                            it.tagName() in setOf(
-                                                "thead",
-                                                "tbody",
-                                                "tfoot",
-                                            )
-                                        }
-                                        .sortedBy {
-                                            when (it.tagName()) {
-                                                "thead" -> 0
-                                                "tbody" -> 1
-                                                "tfoot" -> 10
-                                                else -> 2
-                                            }
-                                        }
-                                        .flatMap {
-                                            it.children()
-                                                .filter { child -> child.tagName() == "tr" }
-                                        }
-                                        .forEach { row ->
-                                            appendTextChildren(
-                                                row.childNodes(),
-                                                baseUrl = baseUrl,
-                                                onLinkClick = onLinkClick,
-                                            )
-                                            emitParagraph()
-                                        }
-
-                                    Render()
-                                }
+                                tableColFirst(
+                                    baseUrl = baseUrl,
+                                    onLinkClick = onLinkClick,
+                                    element = element,
+                                )
                             }
                         }
                     }
@@ -768,21 +721,280 @@ private fun ColumnScope.jonasImage(
     }
 }
 
-private fun Element.firstDecendant(tagName: String): Element? {
-    return children().firstNotNullOfOrNull { recursiveSearch(it, tagName) }
+@Composable
+private fun EagerComposer.tableRowFirst(
+    baseUrl: String,
+    onLinkClick: (String) -> Unit,
+    element: Element,
+) {
+    /*
+    In this order:
+    optionally a caption element (containing text children for instance),
+    followed by zero or more colgroup elements,
+    followed optionally by a thead element,
+    followed by either zero or more tbody elements
+    or one or more tr elements,
+    followed optionally by a tfoot element
+     */
+    val dimens = LocalDimens.current
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier
+            .width(dimens.maxContentWidth),
+    ) {
+        element.children()
+            .filter { it.tagName() == "caption" }
+            .forEach {
+                withTextStyle(NestedTextStyle.CAPTION) {
+                    appendTextChildren(
+                        it.childNodes(),
+                        baseUrl = baseUrl,
+                        onLinkClick = onLinkClick,
+                    )
+                    emitParagraph()
+                }
+                render()
+            }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .run {
+                    if (element.hasDescendant("img")) {
+                        // If images inside, then render them to screen width instead
+                        this
+                    } else {
+                        horizontalScroll(rememberScrollState())
+                    }
+                }
+                .width(dimens.maxContentWidth),
+        ) {
+            element.children()
+                .filter {
+                    it.tagName() in setOf(
+                        "thead",
+                        "tbody",
+                        "tfoot",
+                    )
+                }
+                .sortedBy {
+                    when (it.tagName()) {
+                        "thead" -> 0
+                        "tbody" -> 1
+                        "tfoot" -> 10
+                        else -> 2
+                    }
+                }
+                .map {
+                    it.tagName() to it.children()
+                        .filter { child -> child.tagName() == "tr" }
+                }
+                .forEach { (tag, rows) ->
+                    rows.forEach { row ->
+                        Surface(
+                            tonalElevation = when (tag) {
+                                "thead" -> 3.dp
+                                "tbody" -> 0.dp
+                                "tfoot" -> 1.dp
+                                else -> 0.dp
+                            },
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    32.dp,
+                                ),
+                                modifier = Modifier,
+                            ) {
+                                appendTextChildren(
+                                    row.childNodes(),
+                                    baseUrl = baseUrl,
+                                    onLinkClick = onLinkClick,
+                                )
+                                render()
+                            }
+                        }
+                    }
+                }
+        }
+    }
 }
 
-private fun recursiveSearch(element: Element, tagName: String): Element? {
-    if (element.tagName() == tagName) {
-        return element
-    }
+@Composable
+private fun EagerComposer.tableColFirst(
+    baseUrl: String,
+    onLinkClick: (String) -> Unit,
+    element: Element,
+) {
+    val rowCount = element.descendants("tr").count()
+    val colCount = element.descendants()
+        .filter {
+            it.tagName() in setOf("th", "td")
+        }.count()
 
-    if (element.childNodeSize() == 0) {
-        return null
-    }
+    /*
+    In this order:
+    optionally a caption element (containing text children for instance),
+    followed by zero or more colgroup elements,
+    followed optionally by a thead element,
+    followed by either zero or more tbody elements
+    or one or more tr elements,
+    followed optionally by a tfoot element
+     */
+    val dimens = LocalDimens.current
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier
+            .width(dimens.maxContentWidth),
+    ) {
+        element.children()
+            .filter { it.tagName() == "caption" }
+            .forEach {
+                withTextStyle(NestedTextStyle.CAPTION) {
+                    appendTextChildren(
+                        it.childNodes(),
+                        baseUrl = baseUrl,
+                        onLinkClick = onLinkClick,
+                    )
+                    emitParagraph()
+                }
+                render()
+            }
 
-    return element.children()
-        .firstNotNullOfOrNull { recursiveSearch(it, tagName) }
+        val rowData = element.children()
+            .filter {
+                it.tagName() in setOf(
+                    "thead",
+                    "tbody",
+                    "tfoot",
+                )
+            }
+            .sortedBy {
+                when (it.tagName()) {
+                    "thead" -> 0
+                    "tbody" -> 1
+                    "tfoot" -> 10
+                    else -> 2
+                }
+            }
+            .flatMap {
+                it.children()
+                    .filter { child -> child.tagName() == "tr" }
+                    .map { child ->
+                        it.tagName() to child
+                    }
+            }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
+            modifier = Modifier
+                .run {
+                    if (element.hasDescendant("img")) {
+                        // If images inside, then render them to screen width instead
+                        this
+                    } else {
+                        horizontalScroll(rememberScrollState())
+                    }
+                }
+                .width(dimens.maxContentWidth),
+        ) {
+            for (colIndex in 0 until colCount) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier,
+                ) {
+                    for (rowIndex in 0 until rowCount) {
+                        val (section, rowElement) = rowData.getOrNull(rowIndex) ?: break
+                        var emptyCell = false
+                        Surface(
+                            tonalElevation = when (section) {
+                                "thead" -> 3.dp
+                                "tbody" -> 0.dp
+                                "tfoot" -> 1.dp
+                                else -> 0.dp
+                            },
+                        ) {
+                            rowElement.children()
+                                .filter { it.tagName() in setOf("th", "td") }
+                                .elementAtOrNullWithSpans(colIndex)
+                                ?.let { colElement ->
+                                    withParagraph {
+                                        withStyle(
+                                            if (colElement.tagName() == "th") {
+                                                SpanStyle(fontWeight = FontWeight.Bold)
+                                            } else {
+                                                null
+                                            },
+                                        ) {
+                                            appendTextChildren(
+                                                colElement.childNodes(),
+                                                baseUrl = baseUrl,
+                                                onLinkClick = onLinkClick,
+                                            )
+                                        }
+                                    }
+                                }
+                            emptyCell = !render()
+                        }
+                        if (emptyCell) {
+                            // An empty cell looks better if it has some height - but don't want
+                            // the surface because having one space wide surface is weird
+                            append(' ')
+                            render()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Just ensures that columns coming after a spanned entry ends up in the right column
+fun Iterable<Element>.elementAtOrNullWithSpans(index: Int): Element? {
+    var currentColumn = 0
+    forEach {
+        if (currentColumn > index) {
+            // Span over this column
+            return null
+        }
+        if (currentColumn == index) {
+            return it
+        }
+        val spans = it.attr("colspan") ?: "1"
+        currentColumn += when (val spanCount = spans.toIntOrNull()) {
+            null, 1 -> (spanCount ?: 1)
+            0 -> return null // Firefox special - spans to end
+            else -> spanCount.coerceAtLeast(1)
+        }
+    }
+    return null
+}
+
+private fun Element.descendants(tagName: String): Sequence<Element> {
+    return descendants().filter { it.tagName() == tagName }
+}
+
+private fun Element.descendants(): Sequence<Element> {
+    return sequence {
+        children().forEach {
+            recursiveSequence(it)
+        }
+    }
+}
+
+private suspend fun SequenceScope<Element>.recursiveSequence(element: Element) {
+    yield(element)
+
+    element.children().forEach {
+        recursiveSequence(it)
+    }
+}
+
+private fun Element.hasDescendant(tagName: String): Boolean {
+    return descendants(tagName).any()
+}
+
+private fun Element.firstDescendant(tagName: String): Element? {
+    return descendants(tagName).firstOrNull()
 }
 
 private fun Element.notAncestorOf(tagName: String): Boolean {
