@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -72,9 +73,9 @@ fun FeedNotificationsDialog(
                     .heightIn(min = TextFieldDefaults.MinHeight * 3.3f),
             ) {
                 items(
-                    count = items.item.size,
-                    key = { index -> items.item[index].feedId },
-                ) { index ->
+                    items.item,
+                    key = { item -> item.feedId },
+                ) { item ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -82,7 +83,7 @@ fun FeedNotificationsDialog(
                             .fillMaxWidth()
                             .heightIn(min = minimumTouchSize),
                     ) {
-                        val stateLabel = if (items.item[index].notify) {
+                        val stateLabel = if (item.notify) {
                             stringResource(R.string.on)
                         } else {
                             stringResource(R.string.off)
@@ -96,8 +97,8 @@ fun FeedNotificationsDialog(
                                     enabled = true,
                                     onClick = {
                                         onToggleItem(
-                                            items.item[index].feedId,
-                                            !items.item[index].notify,
+                                            item.feedId,
+                                            !item.notify,
                                         )
                                     },
                                 )
@@ -110,7 +111,7 @@ fun FeedNotificationsDialog(
                         ) {
                             ProvideTextStyle(value = MaterialTheme.typography.titleMedium) {
                                 Text(
-                                    items.item[index].title,
+                                    item.title,
                                     overflow = TextOverflow.Ellipsis,
                                     maxLines = 2,
                                     modifier = Modifier.weight(1f),
@@ -118,11 +119,11 @@ fun FeedNotificationsDialog(
                             }
 
                             Switch(
-                                checked = items.item[index].notify,
+                                checked = item.notify,
                                 onCheckedChange = {
                                     onToggleItem(
-                                        items.item[index].feedId,
-                                        !items.item[index].notify,
+                                        item.feedId,
+                                        !item.notify,
                                     )
                                 },
                                 modifier = Modifier.clearAndSetSemantics { },

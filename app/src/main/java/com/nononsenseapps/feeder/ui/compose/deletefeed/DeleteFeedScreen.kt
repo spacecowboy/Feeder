@@ -98,7 +98,10 @@ fun DeleteFeedDialog(
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                items(feeds.item) { feed ->
+                items(
+                    feeds.item,
+                    key = { feed -> feed.id },
+                ) { feed ->
                     val stateLabel = if (isChecked(feed.id)) {
                         stringResource(R.string.selected)
                     } else {

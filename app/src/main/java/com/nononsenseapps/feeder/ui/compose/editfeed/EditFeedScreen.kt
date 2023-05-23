@@ -63,7 +63,7 @@ import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_BROWSER
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.nononsenseapps.feeder.archmodel.PREF_VAL_OPEN_WITH_READER
-import com.nononsenseapps.feeder.ui.compose.components.AutoCompleteFoo
+import com.nononsenseapps.feeder.ui.compose.components.AutoCompleteResults
 import com.nononsenseapps.feeder.ui.compose.components.OkCancelWithContent
 import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
 import com.nononsenseapps.feeder.ui.compose.modifiers.interceptKey
@@ -392,7 +392,7 @@ fun ColumnScope.LeftContent(
             },
     )
 
-    AutoCompleteFoo(
+    AutoCompleteResults(
         displaySuggestions = tagHasFocus,
         suggestions = filteredTags,
         onSuggestionClicked = { tag ->
