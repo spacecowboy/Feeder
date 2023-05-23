@@ -53,6 +53,18 @@ interface FeedDao {
 
     @Query(
         """
+        SELECT 
+            id,
+            COALESCE(NULLIF(custom_title, ''), title) as title,
+            notify
+        FROM feeds
+        ORDER BY COALESCE(NULLIF(custom_title, ''), title) COLLATE NOCASE
+        """,
+    )
+    fun loadFlowOfFeedsForSettings(): Flow<List<FeedForSettings>>
+
+    @Query(
+        """
        SELECT * FROM feeds
        WHERE id is :feedId
        AND last_sync < :staleTime

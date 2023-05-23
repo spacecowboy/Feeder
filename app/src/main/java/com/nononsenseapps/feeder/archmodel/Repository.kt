@@ -10,6 +10,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.db.room.Feed
+import com.nononsenseapps.feeder.db.room.FeedForSettings
 import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemForReadMark
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
@@ -260,6 +261,11 @@ class Repository(override val di: DI) : DIAware {
         feedItemStore.setBookmarked(itemId = itemId, bookmarked = bookmarked)
 
     suspend fun markAsNotified(itemIds: List<Long>) = feedItemStore.markAsNotified(itemIds)
+
+    suspend fun toggleNotifications(feedId: Long, value: Boolean) =
+        feedStore.toggleNotifications(feedId, value)
+
+    val feedNotificationSettings: Flow<List<FeedForSettings>> = feedStore.feedForSettings
 
     suspend fun markAsReadAndNotified(itemId: Long) {
         feedItemStore.markAsReadAndNotified(itemId)
