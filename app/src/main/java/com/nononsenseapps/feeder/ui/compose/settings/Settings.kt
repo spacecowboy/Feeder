@@ -755,7 +755,7 @@ fun ListDialogSetting(
             },
             subtitle = {
                 Text(
-                    text = currentValue.item.joinToString(" "),
+                    text = currentValue.item.joinToString(" ", limit = 5),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
