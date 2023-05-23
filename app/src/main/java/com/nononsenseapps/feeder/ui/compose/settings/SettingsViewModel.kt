@@ -5,6 +5,7 @@ import android.os.PowerManager
 import androidx.compose.runtime.Immutable
 import androidx.core.content.getSystemService
 import androidx.lifecycle.viewModelScope
+import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.ItemOpener
@@ -15,7 +16,7 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.base.DIAwareViewModel
-import com.nononsenseapps.feeder.util.logDebug
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -30,6 +32,7 @@ import org.kodein.di.instance
 class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val context: Application by instance()
+    private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
 
     fun setCurrentTheme(value: ThemeOptions) {
         repository.setCurrentTheme(value)
@@ -51,11 +54,11 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setSyncOnResume(value)
     }
 
-    fun setSyncOnlyOnWifi(value: Boolean) = viewModelScope.launch {
+    fun setSyncOnlyOnWifi(value: Boolean) = applicationCoroutineScope.launch {
         repository.setSyncOnlyOnWifi(value)
     }
 
-    fun setSyncOnlyWhenCharging(value: Boolean) = viewModelScope.launch {
+    fun setSyncOnlyWhenCharging(value: Boolean) = applicationCoroutineScope.launch {
         repository.setSyncOnlyWhenCharging(value)
     }
 
@@ -87,7 +90,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setLinkOpener(value)
     }
 
-    fun setSyncFrequency(value: SyncFrequency) = viewModelScope.launch {
+    fun setSyncFrequency(value: SyncFrequency) = applicationCoroutineScope.launch {
         repository.setSyncFrequency(value)
     }
 
@@ -95,14 +98,16 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setFeedItemStyle(value)
     }
 
-    fun addToBlockList(value: String) = viewModelScope.launch {
-        logDebug(LOG_TAG, "addBlocklistPattern: $value")
+    fun addToBlockList(value: String) = applicationCoroutineScope.launch {
         repository.addBlocklistPattern(value)
     }
 
-    fun removeFromBlockList(value: String) = viewModelScope.launch {
-        logDebug(LOG_TAG, "removeBlocklistPattern: $value")
+    fun removeFromBlockList(value: String) = applicationCoroutineScope.launch {
         repository.removeBlocklistPattern(value)
+    }
+
+    fun toggleNotifications(feedId: Long, value: Boolean) = applicationCoroutineScope.launch {
+        repository.toggleNotifications(feedId, value)
     }
 
     fun setSwipeAsRead(value: SwipeAsRead) {
@@ -113,6 +118,19 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         // Just some sanity validation
         repository.setTextScale(value.coerceIn(0.1f, 10f))
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val immutableFeedsSettings =
+        repository.feedNotificationSettings
+            .mapLatest { values ->
+                values.map {
+                    UIFeedSettings(
+                        feedId = it.id,
+                        title = it.title,
+                        notify = it.notify,
+                    )
+                }
+            }
 
     private val batteryOptimizationIgnoredFlow: Flow<Boolean> = repository.resumeTime.map {
         val powerManager: PowerManager? = context.getSystemService()
@@ -146,6 +164,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.useDetectLanguage,
                 repository.useDynamicTheme,
                 repository.textScale,
+                immutableFeedsSettings,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -169,6 +188,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     useDetectLanguage = params[17] as Boolean,
                     useDynamicTheme = params[18] as Boolean,
                     textScale = params[19] as Float,
+                    feedsSettings = params[20] as List<UIFeedSettings>,
                 )
             }.collect {
                 _viewState.value = it
@@ -203,4 +223,11 @@ data class SettingsViewState(
     val useDetectLanguage: Boolean = true,
     val useDynamicTheme: Boolean = true,
     val textScale: Float = 1f,
+    val feedsSettings: List<UIFeedSettings> = emptyList(),
+)
+
+data class UIFeedSettings(
+    val feedId: Long,
+    val title: String,
+    val notify: Boolean,
 )

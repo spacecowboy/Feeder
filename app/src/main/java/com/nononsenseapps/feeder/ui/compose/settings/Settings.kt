@@ -46,8 +46,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -71,6 +73,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.shouldShowRationale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
@@ -81,12 +86,15 @@ import com.nononsenseapps.feeder.archmodel.SwipeAsRead
 import com.nononsenseapps.feeder.archmodel.SyncFrequency
 import com.nononsenseapps.feeder.archmodel.ThemeOptions
 import com.nononsenseapps.feeder.ui.compose.dialog.EditableListDialog
+import com.nononsenseapps.feeder.ui.compose.dialog.FeedNotificationsDialog
+import com.nononsenseapps.feeder.ui.compose.feed.ExplainPermissionDialog
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
+import com.nononsenseapps.feeder.ui.compose.utils.rememberApiPermissionState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -139,7 +147,7 @@ fun SettingsScreen(
             onShowFabChanged = settingsViewModel::setShowFab,
             feedItemStyleValue = viewState.feedItemStyle,
             onFeedItemStyleChanged = settingsViewModel::setFeedItemStyle,
-            blockListValue = ImmutableHolder(viewState.blockList),
+            blockListValue = ImmutableHolder(viewState.blockList.sorted()),
             swipeAsReadValue = viewState.swipeAsRead,
             onSwipeAsReadOptionChanged = settingsViewModel::setSwipeAsRead,
             syncOnStartupValue = viewState.syncOnResume,
@@ -170,6 +178,8 @@ fun SettingsScreen(
             setTextScale = settingsViewModel::setTextScale,
             onBlockListAdd = settingsViewModel::addToBlockList,
             onBlockListRemove = settingsViewModel::removeFromBlockList,
+            feedsSettings = ImmutableHolder(viewState.feedsSettings),
+            onToggleNotification = settingsViewModel::toggleNotifications,
             modifier = Modifier.padding(padding),
         )
     }
@@ -223,6 +233,8 @@ fun SettingsScreenPreview() {
                 setTextScale = {},
                 onBlockListAdd = {},
                 onBlockListRemove = {},
+                feedsSettings = ImmutableHolder(emptyList()),
+                onToggleNotification = { _, _ -> },
                 modifier = Modifier,
             )
         }
@@ -272,6 +284,8 @@ fun SettingsList(
     setTextScale: (Float) -> Unit,
     onBlockListAdd: (String) -> Unit,
     onBlockListRemove: (String) -> Unit,
+    feedsSettings: ImmutableHolder<List<UIFeedSettings>>,
+    onToggleNotification: (Long, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -305,6 +319,7 @@ fun SettingsList(
                 isAndroidSAndAbove -> {
                     null
                 }
+
                 else -> {
                     stringResource(
                         id = R.string.only_available_on_android_n,
@@ -380,9 +395,14 @@ fun SettingsList(
                     )
                 }
             },
-            currentValue = ImmutableHolder(blockListValue.item.sorted()),
+            currentValue = blockListValue,
             onAddItem = onBlockListAdd,
             onRemoveItem = onBlockListRemove,
+        )
+
+        NotificationsSetting(
+            items = feedsSettings,
+            onToggleItem = onToggleNotification,
         )
 
         Divider(modifier = Modifier.width(dimens.maxContentWidth))
@@ -751,6 +771,119 @@ fun ListDialogSetting(
                 },
                 onAddItem = onAddItem,
                 onRemoveItem = onRemoveItem,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun NotificationsSetting(
+    items: ImmutableHolder<List<UIFeedSettings>>,
+    onToggleItem: (Long, Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    icon: @Composable () -> Unit = {},
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    val notificationsPermissionState = rememberApiPermissionState(
+        permission = "android.permission.POST_NOTIFICATIONS",
+        minimumApiLevel = 33,
+    ) { value ->
+        expanded = value
+    }
+
+    val shouldShowExplanationForPermission by remember {
+        derivedStateOf {
+            notificationsPermissionState.status.shouldShowRationale
+        }
+    }
+
+    val permissionDenied by remember {
+        derivedStateOf {
+            notificationsPermissionState.status is PermissionStatus.Denied
+        }
+    }
+
+    var permissionDismissed by rememberSaveable {
+        mutableStateOf(true)
+    }
+
+    val dimens = LocalDimens.current
+    Row(
+        modifier = modifier
+            .width(dimens.maxContentWidth)
+            .clickable {
+                when (notificationsPermissionState.status) {
+                    is PermissionStatus.Denied -> {
+                        if (notificationsPermissionState.status.shouldShowRationale) {
+                            permissionDismissed = false
+                        } else {
+                            notificationsPermissionState.launchPermissionRequest()
+                        }
+                    }
+
+                    PermissionStatus.Granted -> expanded = true
+                }
+            }
+            .semantics {
+                role = Role.Button
+            },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier.size(64.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                icon()
+            }
+        }
+
+        TitleAndSubtitle(
+            title = {
+                Text(stringResource(id = R.string.notify_for_new_items))
+            },
+            subtitle = {
+                Text(
+                    text = when (permissionDenied) {
+                        true -> stringResource(id = R.string.explanation_permission_notifications)
+                        false -> {
+                            items.item.asSequence()
+                                .filter { it.notify }
+                                .map { it.title }
+                                .take(4)
+                                .joinToString(", ", limit = 3)
+                        }
+                    },
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                )
+            },
+        )
+
+        if (shouldShowExplanationForPermission && !permissionDismissed) {
+            ExplainPermissionDialog(
+                explanation = R.string.explanation_permission_notifications,
+                onDismiss = {
+                    permissionDismissed = true
+                },
+            ) {
+                notificationsPermissionState.launchPermissionRequest()
+            }
+        } else if (expanded && permissionDismissed) {
+            FeedNotificationsDialog(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.notify_for_new_items),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+                onToggleItem = onToggleItem,
+                items = items,
+                onDismiss = {
+                    expanded = false
+                },
             )
         }
     }

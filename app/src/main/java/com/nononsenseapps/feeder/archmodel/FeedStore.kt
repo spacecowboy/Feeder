@@ -2,6 +2,7 @@ package com.nononsenseapps.feeder.archmodel
 
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
+import com.nononsenseapps.feeder.db.room.FeedForSettings
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.FeedUnreadCount
@@ -47,6 +48,9 @@ class FeedStore(override val di: DI) : DIAware {
         }
     }
 
+    suspend fun toggleNotifications(feedId: Long, value: Boolean) =
+        feedDao.setNotify(id = feedId, notify = value)
+
     suspend fun getDisplayTitle(feedId: Long): String? =
         feedDao.getFeedTitle(feedId)?.displayTitle
 
@@ -55,6 +59,8 @@ class FeedStore(override val di: DI) : DIAware {
     }
 
     val allTags: Flow<List<String>> = feedDao.loadAllTags()
+
+    val feedForSettings: Flow<List<FeedForSettings>> = feedDao.loadFlowOfFeedsForSettings()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val drawerItemsWithUnreadCounts: Flow<List<DrawerItemWithUnreadCount>> =
