@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -26,13 +25,12 @@ import androidx.compose.ui.unit.dp
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T> AutoCompleteFoo(
+fun AutoCompleteResults(
     displaySuggestions: Boolean,
-    suggestions: ImmutableHolder<List<T>>,
-    onSuggestionClicked: (T) -> Unit,
-    suggestionContent: @Composable (T) -> Unit,
+    suggestions: ImmutableHolder<List<String>>,
+    onSuggestionClicked: (String) -> Unit,
+    suggestionContent: @Composable (String) -> Unit,
     modifier: Modifier = Modifier,
     maxHeight: Dp = TextFieldDefaults.MinHeight * 3,
     content: @Composable () -> Unit,
@@ -52,12 +50,15 @@ fun <T> AutoCompleteFoo(
                         shape = RoundedCornerShape(8.dp),
                     ),
             ) {
-                items(suggestions.item) { suggestion ->
+                items(
+                    suggestions.item,
+                    key = { item -> item },
+                ) { item ->
                     Box(
                         modifier = Modifier
-                            .clickable { onSuggestionClicked(suggestion) },
+                            .clickable { onSuggestionClicked(item) },
                     ) {
-                        suggestionContent(suggestion)
+                        suggestionContent(item)
                     }
                 }
             }
@@ -65,11 +66,10 @@ fun <T> AutoCompleteFoo(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PreviewAutoCompleteOutlinedText() {
-    AutoCompleteFoo(
+    AutoCompleteResults(
         displaySuggestions = true,
         suggestions = immutableListHolderOf("One", "Two", "Three"),
         onSuggestionClicked = {},

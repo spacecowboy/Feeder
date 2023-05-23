@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -106,9 +107,9 @@ fun EditableListDialog(
                     .heightIn(min = TextFieldDefaults.MinHeight * 3.3f),
             ) {
                 items(
-                    count = items.item.size,
-                    key = { index -> items.item[index] },
-                ) { index ->
+                    items.item,
+                    key = { item -> item },
+                ) { item ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -117,13 +118,13 @@ fun EditableListDialog(
                             .heightIn(min = minimumTouchSize),
                     ) {
                         Text(
-                            text = items.item[index],
+                            text = item,
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.weight(1f, fill = true),
                         )
                         IconButton(
                             onClick = {
-                                onRemoveItem(items.item[index])
+                                onRemoveItem(item)
                             },
                         ) {
                             Icon(

@@ -65,7 +65,10 @@ fun EditFeedDialog(
                 modifier = Modifier
                     .fillMaxWidth(),
             ) {
-                items(feeds.item) { feed ->
+                items(
+                    feeds.item,
+                    key = { feed -> feed.id },
+                ) { feed ->
                     Row(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = Alignment.CenterVertically,
