@@ -16,7 +16,6 @@
 
 package com.nononsenseapps.feeder.ui.compose.material3
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
@@ -138,7 +137,7 @@ internal open class SwipeableState<T>(
             requireNotNull(initialOffset) {
                 "The initial value must have an associated anchor."
             }
-            offsetState.value = initialOffset.also { Log.d("JONAS", "Initial offset: $it") }
+            offsetState.value = initialOffset
             absoluteOffset.value = initialOffset
         }
     }

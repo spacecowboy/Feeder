@@ -11,10 +11,50 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
 
-// Set of Material typography styles to start with
-val Typography = Typography()
+object FeederTypography {
+    private val materialTypography = Typography()
+
+    val typography: Typography =
+        materialTypography.copy(
+            headlineLarge = materialTypography.headlineLarge.merge(
+                TextStyle(
+                    lineBreak = LineBreak.Paragraph,
+                ),
+            ),
+            headlineMedium = materialTypography.headlineMedium.merge(
+                TextStyle(
+                    lineBreak = LineBreak.Paragraph,
+                ),
+            ),
+            headlineSmall = materialTypography.headlineSmall.merge(
+                TextStyle(
+                    lineBreak = LineBreak.Paragraph,
+                ),
+            ),
+            bodyLarge = materialTypography.bodyLarge.merge(
+                TextStyle(
+                    hyphens = Hyphens.Auto,
+                    lineBreak = LineBreak.Paragraph,
+                ),
+            ),
+            bodyMedium = materialTypography.bodyMedium.merge(
+                TextStyle(
+                    hyphens = Hyphens.Auto,
+                    lineBreak = LineBreak.Paragraph,
+                ),
+            ),
+            bodySmall = materialTypography.bodySmall.merge(
+                TextStyle(
+                    hyphens = Hyphens.Auto,
+                    lineBreak = LineBreak.Paragraph,
+                ),
+            ),
+        )
+}
 
 @Composable
 fun LinkTextStyle(): TextStyle =
@@ -31,12 +71,10 @@ fun titleFontWeight(unread: Boolean) =
     }
 
 @Composable
-fun FeedListItemTitleStyle(): SpanStyle =
-    FeedListItemTitleTextStyle().toSpanStyle()
-
-@Composable
 fun FeedListItemTitleTextStyle(): TextStyle =
-    MaterialTheme.typography.titleMedium
+    MaterialTheme.typography.titleMedium.merge(
+        TextStyle(lineBreak = LineBreak.Paragraph, hyphens = Hyphens.Auto),
+    )
 
 @Composable
 fun FeedListItemStyle(): TextStyle =

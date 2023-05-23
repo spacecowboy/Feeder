@@ -4,7 +4,6 @@ import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
-import com.nononsenseapps.feeder.db.room.upsertFeed
 import com.nononsenseapps.feeder.model.FeedUnreadCount
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerFeed
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
@@ -125,7 +124,7 @@ class FeedStore(override val di: DI) : DIAware {
     }
 
     suspend fun upsertFeed(feedSql: Feed) =
-        feedDao.upsertFeed(feed = feedSql)
+        feedDao.upsert(feed = feedSql)
 
     suspend fun getFeedsOrderedByUrl(): List<Feed> {
         return feedDao.getFeedsOrderedByUrl()

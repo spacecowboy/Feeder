@@ -468,7 +468,7 @@ object MIGRATION_9_10 : Migration(9, 10) {
             """
             SELECT id, substr(description,0,1000000) FROM feed_items
             """.trimIndent(),
-        )?.use { cursor ->
+        ).use { cursor ->
             cursor.forEach {
                 val feedItemId = cursor.getLong(0)
                 val description = cursor.getString(1)
@@ -588,7 +588,7 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
             SELECT _id, title, url, tag, customtitle, notify ${if (version == 6) ", imageUrl" else ""}
             FROM Feed
         """.trimIndent(),
-    )?.use { cursor ->
+    ).use { cursor ->
         cursor.forEach { _ ->
             val oldFeedId = cursor.getLong(0)
 
@@ -614,7 +614,7 @@ private fun legacyMigration(database: SupportSQLiteDatabase, version: Int) {
                     FROM FeedItem
                     WHERE feed = $oldFeedId
                 """.trimIndent(),
-            )?.use { cursor ->
+            ).use { cursor ->
                 database.inTransaction {
                     cursor.forEach { _ ->
                         database.insert(

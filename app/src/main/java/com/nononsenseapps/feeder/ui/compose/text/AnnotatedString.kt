@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.text
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.VerbatimTtsAnnotation
@@ -10,18 +11,21 @@ class AnnotatedParagraphStringBuilder {
     private val builder: AnnotatedString.Builder = AnnotatedString.Builder()
 
     private val poppedComposableStyles = mutableListOf<ComposableStyleWithStartEnd>()
-    val composableStyles = mutableListOf<ComposableStyleWithStartEnd>()
-    val lastTwoChars: MutableList<Char> = mutableListOf()
+    private val composableStyles = mutableListOf<ComposableStyleWithStartEnd>()
+    private val mLastTwoChars: MutableList<Char> = mutableListOf()
+
+    val lastTwoChars: List<Char>
+        get() = mLastTwoChars
 
     val length: Int
         get() = builder.length
 
     val endsWithWhitespace: Boolean
         get() {
-            if (lastTwoChars.isEmpty()) {
+            if (mLastTwoChars.isEmpty()) {
                 return true
             }
-            lastTwoChars.peekLatest()?.let { latest ->
+            mLastTwoChars.peekLatest()?.let { latest ->
                 // Non-breaking space (160) is not caught by trim or whitespace identification
                 if (latest.isWhitespace() || latest.code == 160) {
                     return true
@@ -65,21 +69,21 @@ class AnnotatedParagraphStringBuilder {
 
     fun append(text: String) {
         if (text.count() >= 2) {
-            lastTwoChars.pushMaxTwo(text.secondToLast())
+            mLastTwoChars.pushMaxTwo(text.secondToLast())
         }
         if (text.isNotEmpty()) {
-            lastTwoChars.pushMaxTwo(text.last())
+            mLastTwoChars.pushMaxTwo(text.last())
         }
         builder.append(text)
     }
 
     fun append(char: Char) {
-        lastTwoChars.pushMaxTwo(char)
+        mLastTwoChars.pushMaxTwo(char)
         builder.append(char)
     }
 
     @Composable
-    fun toComposableAnnotatedString(): AnnotatedString {
+    fun rememberComposableAnnotatedString(): AnnotatedString {
         for (composableStyle in poppedComposableStyles) {
             builder.addStyle(
                 style = composableStyle.style(),
@@ -94,7 +98,9 @@ class AnnotatedParagraphStringBuilder {
                 end = builder.length,
             )
         }
-        return builder.toAnnotatedString()
+        return remember {
+            builder.toAnnotatedString()
+        }
     }
 
     fun toAnnotatedString(): AnnotatedString {
@@ -104,48 +110,6 @@ class AnnotatedParagraphStringBuilder {
 
 fun AnnotatedParagraphStringBuilder.isEmpty() = lastTwoChars.isEmpty()
 fun AnnotatedParagraphStringBuilder.isNotEmpty() = lastTwoChars.isNotEmpty()
-
-fun AnnotatedParagraphStringBuilder.ensureDoubleNewline() {
-    when {
-        lastTwoChars.isEmpty() -> {
-            // Nothing to do
-        }
-        length == 1 && lastTwoChars.peekLatest()?.isWhitespace() == true -> {
-            // Nothing to do
-        }
-        length == 2 &&
-            lastTwoChars.peekLatest()?.isWhitespace() == true &&
-            lastTwoChars.peekSecondLatest()?.isWhitespace() == true -> {
-            // Nothing to do
-        }
-        lastTwoChars.peekLatest() == '\n' && lastTwoChars.peekSecondLatest() == '\n' -> {
-            // Nothing to do
-        }
-        lastTwoChars.peekLatest() == '\n' -> {
-            append('\n')
-        }
-        else -> {
-            append("\n\n")
-        }
-    }
-}
-
-private fun AnnotatedParagraphStringBuilder.ensureSingleNewline() {
-    when {
-        lastTwoChars.isEmpty() -> {
-            // Nothing to do
-        }
-        length == 1 && lastTwoChars.peekLatest()?.isWhitespace() == true -> {
-            // Nothing to do
-        }
-        lastTwoChars.peekLatest() == '\n' -> {
-            // Nothing to do
-        }
-        else -> {
-            append('\n')
-        }
-    }
-}
 
 private fun CharSequence.secondToLast(): Char {
     if (count() < 2) {

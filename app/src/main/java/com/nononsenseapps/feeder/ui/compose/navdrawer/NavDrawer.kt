@@ -128,7 +128,7 @@ private fun ListOfFeedsAndTagsPreview() {
                     DrawerTop(unreadCount = 100, totalChildren = 4),
                     DrawerTag(
                         tag = "News tag",
-                        unreadCount = 3,
+                        unreadCount = 0,
                         -1111,
                         totalChildren = 2,
                     ),
@@ -136,7 +136,7 @@ private fun ListOfFeedsAndTagsPreview() {
                         id = 1,
                         displayTitle = "Times",
                         tag = "News tag",
-                        unreadCount = 1,
+                        unreadCount = 0,
                     ),
                     DrawerFeed(
                         id = 2,
@@ -327,20 +327,22 @@ private fun ExpandableTag(
                     .align(Alignment.CenterStart),
             )
         }
-        val unreadLabel = LocalContext.current.resources.getQuantityString(
-            R.plurals.n_unread_articles,
-            unreadCount,
-            unreadCount,
-        )
-        Text(
-            text = unreadCount.toString(),
-            maxLines = 1,
-            modifier = Modifier
-                .padding(start = 2.dp)
-                .semantics {
-                    contentDescription = unreadLabel
-                },
-        )
+        if (unreadCount > 0) {
+            val unreadLabel = LocalContext.current.resources.getQuantityString(
+                R.plurals.n_unread_articles,
+                unreadCount,
+                unreadCount,
+            )
+            Text(
+                text = unreadCount.toString(),
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(start = 2.dp)
+                    .semantics {
+                        contentDescription = unreadLabel
+                    },
+            )
+        }
     }
 }
 
@@ -473,17 +475,19 @@ private fun Feed(
                     .align(Alignment.CenterStart),
             )
         }
-        val unreadLabel = LocalContext.current.resources.getQuantityString(
-            R.plurals.n_unread_articles,
-            unreadCount,
-            unreadCount,
-        )
-        Text(
-            text = unreadCount.toString(),
-            maxLines = 1,
-            modifier = Modifier.semantics {
-                contentDescription = unreadLabel
-            },
-        )
+        if (unreadCount > 0) {
+            val unreadLabel = LocalContext.current.resources.getQuantityString(
+                R.plurals.n_unread_articles,
+                unreadCount,
+                unreadCount,
+            )
+            Text(
+                text = unreadCount.toString(),
+                maxLines = 1,
+                modifier = Modifier.semantics {
+                    contentDescription = unreadLabel
+                },
+            )
+        }
     }
 }

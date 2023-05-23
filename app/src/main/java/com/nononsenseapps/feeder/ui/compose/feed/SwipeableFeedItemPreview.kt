@@ -76,6 +76,7 @@ fun SwipeableFeedItemPreview(
     showThumbnail: Boolean,
     feedItemStyle: FeedItemStyle,
     swipeAsRead: SwipeAsRead,
+    newIndicator: Boolean,
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onTogglePinned: () -> Unit,
@@ -256,7 +257,7 @@ fun SwipeableFeedItemPreview(
                     onToggleBookmarked = onToggleBookmarked,
                     dropDownMenuExpanded = dropDownMenuExpanded,
                     onDismissDropdown = { dropDownMenuExpanded = false },
-                    newIndicator = true,
+                    newIndicator = newIndicator,
                     modifier = Modifier
                         .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                         .graphicsLayer(alpha = itemAlpha),

@@ -42,6 +42,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -50,7 +51,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,6 +69,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.BuildConfig
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.crypto.AesCbcWithIntegrity
@@ -129,26 +130,31 @@ private fun SyncScaffold(
                 },
                 actions = {
                     if (leaveSyncVisible) {
-                        Box {
-                            IconButton(onClick = { showToolbar = true }) {
-                                Icon(
-                                    Icons.Default.MoreVert,
-                                    contentDescription = stringResource(id = R.string.open_menu),
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = showToolbar,
-                                onDismissRequest = { showToolbar = false },
-                            ) {
-                                DropdownMenuItem(
-                                    onClick = {
-                                        showToolbar = false
-                                        onLeaveSyncChain()
-                                    },
-                                    text = {
-                                        Text(stringResource(R.string.leave_sync_chain))
-                                    },
-                                )
+                        PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.open_menu)) }) {
+                            Box {
+                                IconButton(
+                                    onClick = { showToolbar = true },
+                                    modifier = Modifier.tooltipAnchor(),
+                                ) {
+                                    Icon(
+                                        Icons.Default.MoreVert,
+                                        contentDescription = stringResource(id = R.string.open_menu),
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = showToolbar,
+                                    onDismissRequest = { showToolbar = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            showToolbar = false
+                                            onLeaveSyncChain()
+                                        },
+                                        text = {
+                                            Text(stringResource(R.string.leave_sync_chain))
+                                        },
+                                    )
+                                }
                             }
                         }
                     }
@@ -170,7 +176,7 @@ fun SyncScreen(
     onNavigateUp: () -> Unit,
     viewModel: SyncScreenViewModel,
 ) {
-    val viewState: SyncScreenViewState by viewModel.viewState.collectAsState()
+    val viewState: SyncScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
 
     val windowSize = LocalWindowSize()
     val syncScreenType = getSyncScreenType(
@@ -407,6 +413,7 @@ fun getSyncScreenType(
             SyncScreenToShow.JOIN -> SyncScreenType.SINGLE_JOIN
         }
     }
+
     ScreenType.DUAL -> SyncScreenType.DUAL
 }
 
@@ -458,6 +465,7 @@ fun DualSyncScreen(
                         onStartNewSyncChain = onStartNewSyncChain,
                     )
                 }
+
                 LeftScreenToShow.DEVICELIST -> {
                     SyncDeviceListContent(
                         currentDeviceId = currentDeviceId,
@@ -479,6 +487,7 @@ fun DualSyncScreen(
                             .weight(1f, fill = true),
                     )
                 }
+
                 RightScreenToShow.JOIN -> {
                     SyncJoinContent(
                         onJoinSyncChain = onJoinSyncChain,

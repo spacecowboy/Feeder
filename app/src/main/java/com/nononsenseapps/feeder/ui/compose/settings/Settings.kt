@@ -46,7 +46,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -71,6 +70,7 @@ import androidx.compose.ui.tooling.preview.Devices.PIXEL_C
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.DarkThemePreferences
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
@@ -96,7 +96,7 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val viewState by settingsViewModel.viewState.collectAsState()
+    val viewState by settingsViewModel.viewState.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 

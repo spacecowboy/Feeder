@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Terrain
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
@@ -38,13 +41,13 @@ import coil.size.Precision
 import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
 import com.nononsenseapps.feeder.ui.compose.text.WithBidiDeterminedLayoutDirection
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemDateStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemFeedTitleStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
-import com.nononsenseapps.feeder.ui.compose.theme.rememberPlaceholderImage
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
 
@@ -71,7 +74,6 @@ fun FeedItemCard(
                 .requiredHeightIn(min = minimumTouchSize),
         ) {
             if (showThumbnail) {
-                val placeholder = rememberPlaceholderImage()
                 item.imageUrl?.let { imageUrl ->
                     Box(
                         modifier = Modifier.fillMaxWidth(),
@@ -86,11 +88,11 @@ fun FeedItemCard(
                                     },
                                 )
                                 .scale(Scale.FIT)
-                                .placeholder(placeholder)
                                 .size(1000)
-                                .error(placeholder)
                                 .precision(Precision.INEXACT)
                                 .build(),
+                            placeholder = rememberTintedVectorPainter(Icons.Outlined.Terrain),
+                            error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
                             contentDescription = stringResource(id = R.string.article_image),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier

@@ -48,10 +48,10 @@ dependencyResolutionManagement {
             version("material", "1.6.1")
             version("preference", "1.1.0")
             version("testRunner", "1.4.0")
-            version("lifecycle", "2.3.1")
-            version("room", "2.4.3")
+            version("lifecycle", "2.6.1")
+            version("room", "2.5.1")
             // Compose related below
-            version("compose", "2023.04.00")
+            version("compose", "2023.05.00")
             val activityCompose = "1.7.0"
             version("activityCompose", activityCompose)
             version("paging", "3.0.0")
@@ -98,6 +98,11 @@ dependencyResolutionManagement {
 
             // ViewModel
             library(
+                "lifecycle-runtime-compose",
+                "androidx.lifecycle",
+                "lifecycle-runtime-compose"
+            ).versionRef("lifecycle")
+            library(
                 "lifecycle-runtime-ktx",
                 "androidx.lifecycle",
                 "lifecycle-runtime-ktx"
@@ -134,7 +139,10 @@ dependencyResolutionManagement {
                 "androidx.compose.foundation",
                 "foundation-layout"
             ).withoutVersion()
-            library("compose-material3", "androidx.compose.material3", "material3").withoutVersion()
+            library("compose-material3", "androidx.compose.material3", "material3").version {
+                // 1.1.0 introduced tooltips, not part of compose 05 bom at least
+                require("1.1.0")
+            }
             library("compose-material", "androidx.compose.material", "material").withoutVersion()
             library(
                 "compose-material-icons-extended",

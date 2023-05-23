@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.feed
 
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -62,6 +63,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -69,7 +71,6 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -87,6 +88,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -143,7 +145,7 @@ fun FeedScreen(
     navController: NavController,
     viewModel: FeedArticleViewModel,
 ) {
-    val viewState: FeedArticleScreenViewState by viewModel.viewState.collectAsState()
+    val viewState: FeedArticleScreenViewState by viewModel.viewState.collectAsStateWithLifecycle()
     val pagedFeedItems = viewModel.currentFeedListItems.collectAsLazyPagingItems()
 
     val di = LocalDI.current
@@ -183,8 +185,18 @@ fun FeedScreen(
     val toolbarColor = MaterialTheme.colorScheme.surface.toArgb()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
     val coroutineScope = rememberCoroutineScope()
+
+    BackHandler(
+        enabled = drawerState.isOpen,
+        onBack = {
+            if (drawerState.isOpen) {
+                coroutineScope.launch {
+                    drawerState.close()
+                }
+            }
+        },
+    )
 
     ScreenWithNavDrawer(
         feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
@@ -383,200 +395,213 @@ fun FeedScreen(
         onDelete = onDeleteFeeds,
         onEditFeed = onEditFeed,
         toolbarActions = {
-            IconToggleButton(
-                checked = viewState.onlyUnread,
-                onCheckedChange = onToggleOnlyUnread,
-                modifier = Modifier.semantics {
-                    stateDescription = showingUnreadStateLabel
-                },
-            ) {
-                if (viewState.onlyUnread) {
-                    Icon(
-                        Icons.Default.VisibilityOff,
-                        contentDescription = null,
-                    )
-                } else {
-                    Icon(
-                        Icons.Default.Visibility,
-                        contentDescription = null,
-                    )
+            PlainTooltipBox(tooltip = { Text(showingUnreadStateLabel) }) {
+                IconToggleButton(
+                    checked = viewState.onlyUnread,
+                    onCheckedChange = onToggleOnlyUnread,
+                    modifier = Modifier
+                        .tooltipAnchor()
+                        .semantics {
+                            stateDescription = showingUnreadStateLabel
+                        },
+                ) {
+                    if (viewState.onlyUnread) {
+                        Icon(
+                            Icons.Default.VisibilityOff,
+                            contentDescription = null,
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.Visibility,
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
-            IconToggleButton(
-                checked = viewState.onlyBookmarked,
-                onCheckedChange = onToggleOnlyBookmarked,
-                modifier = Modifier.semantics {
-                    stateDescription = showingBookmarksStateLabel
-                },
-            ) {
-                if (viewState.onlyBookmarked) {
-                    Icon(
-                        Icons.Default.BookmarkRemove,
-                        contentDescription = null,
-                    )
-                } else {
-                    Icon(
-                        Icons.Default.Bookmark,
-                        contentDescription = null,
-                    )
+            PlainTooltipBox(tooltip = { Text(showingBookmarksStateLabel) }) {
+                IconToggleButton(
+                    checked = viewState.onlyBookmarked,
+                    onCheckedChange = onToggleOnlyBookmarked,
+                    modifier = Modifier
+                        .tooltipAnchor()
+                        .semantics {
+                            stateDescription = showingBookmarksStateLabel
+                        },
+                ) {
+                    if (viewState.onlyBookmarked) {
+                        Icon(
+                            Icons.Default.BookmarkRemove,
+                            contentDescription = null,
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.Bookmark,
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
 
-            Box {
-                IconButton(onClick = { onShowToolbarMenu(true) }) {
-                    Icon(
-                        Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.open_menu),
-                    )
-                }
-                DropdownMenu(
-                    expanded = viewState.showToolbarMenu,
-                    onDismissRequest = { onShowToolbarMenu(false) },
-                ) {
-                    DropdownMenuItem(
-                        onClick = {
-                            onMarkAllAsRead()
-                            onShowToolbarMenu(false)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.DoneAll,
-                                contentDescription = null,
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.mark_all_as_read))
-                        },
-                    )
-                    Divider()
-                    DropdownMenuItem(
-                        onClick = {
-                            onRefreshAll()
-                            onShowToolbarMenu(false)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = stringResource(R.string.synchronize_feeds),
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.synchronize_feeds))
-                        },
-                    )
-                    Divider()
-                    DropdownMenuItem(
-                        onClick = {
-                            onShowToolbarMenu(false)
-                            onAddFeed()
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = null,
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.add_feed))
-                        },
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            if (viewState.visibleFeeds.size == 1) {
-                                onEditFeed(viewState.visibleFeeds.first().id)
-                            } else {
-                                onShowEditDialog()
-                            }
-                            onShowToolbarMenu(false)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = null,
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.edit_feed))
-                        },
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onShowDeleteDialog()
-                            onShowToolbarMenu(false)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = null,
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.delete_feed))
-                        },
-                    )
-                    Divider()
-                    DropdownMenuItem(
-                        onClick = {
-                            onShowToolbarMenu(false)
-                            onImport()
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.ImportExport,
-                                contentDescription = null,
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.import_feeds_from_opml))
-                        },
-                    )
-                    DropdownMenuItem(
-                        onClick = {
-                            onShowToolbarMenu(false)
-                            onExport()
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.ImportExport,
-                                contentDescription = null,
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.export_feeds_to_opml))
-                        },
-                    )
-                    Divider()
-                    DropdownMenuItem(
-                        onClick = {
-                            onShowToolbarMenu(false)
-                            onSettings()
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Settings,
-                                contentDescription = null,
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.action_settings))
-                        },
-                    )
-                    Divider()
-                    DropdownMenuItem(
-                        onClick = {
-                            onShowToolbarMenu(false)
-                            onSendFeedback()
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Email,
-                                contentDescription = null,
-                            )
-                        },
-                        text = {
-                            Text(stringResource(id = R.string.send_bug_report))
-                        },
-                    )
+            PlainTooltipBox(tooltip = { Text(stringResource(R.string.open_menu)) }) {
+                Box {
+                    IconButton(
+                        onClick = { onShowToolbarMenu(true) },
+                        modifier = Modifier.tooltipAnchor(),
+                    ) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.open_menu),
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = viewState.showToolbarMenu,
+                        onDismissRequest = { onShowToolbarMenu(false) },
+                    ) {
+                        DropdownMenuItem(
+                            onClick = {
+                                onMarkAllAsRead()
+                                onShowToolbarMenu(false)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.DoneAll,
+                                    contentDescription = null,
+                                )
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.mark_all_as_read))
+                            },
+                        )
+                        Divider()
+                        DropdownMenuItem(
+                            onClick = {
+                                onRefreshAll()
+                                onShowToolbarMenu(false)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Refresh,
+                                    contentDescription = stringResource(R.string.synchronize_feeds),
+                                )
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.synchronize_feeds))
+                            },
+                        )
+                        Divider()
+                        DropdownMenuItem(
+                            onClick = {
+                                onShowToolbarMenu(false)
+                                onAddFeed()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = null,
+                                )
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.add_feed))
+                            },
+                        )
+                        DropdownMenuItem(
+                            onClick = {
+                                if (viewState.visibleFeeds.size == 1) {
+                                    onEditFeed(viewState.visibleFeeds.first().id)
+                                } else {
+                                    onShowEditDialog()
+                                }
+                                onShowToolbarMenu(false)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Edit,
+                                    contentDescription = null,
+                                )
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.edit_feed))
+                            },
+                        )
+                        DropdownMenuItem(
+                            onClick = {
+                                onShowDeleteDialog()
+                                onShowToolbarMenu(false)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = null,
+                                )
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.delete_feed))
+                            },
+                        )
+                        Divider()
+                        DropdownMenuItem(
+                            onClick = {
+                                onShowToolbarMenu(false)
+                                onImport()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.ImportExport,
+                                    contentDescription = null,
+                                )
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.import_feeds_from_opml))
+                            },
+                        )
+                        DropdownMenuItem(
+                            onClick = {
+                                onShowToolbarMenu(false)
+                                onExport()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.ImportExport,
+                                    contentDescription = null,
+                                )
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.export_feeds_to_opml))
+                            },
+                        )
+                        Divider()
+                        DropdownMenuItem(
+                            onClick = {
+                                onShowToolbarMenu(false)
+                                onSettings()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = null,
+                                )
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.action_settings))
+                            },
+                        )
+                        Divider()
+                        DropdownMenuItem(
+                            onClick = {
+                                onShowToolbarMenu(false)
+                                onSendFeedback()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Email,
+                                    contentDescription = null,
+                                )
+                            },
+                            text = {
+                                Text(stringResource(id = R.string.send_bug_report))
+                            },
+                        )
+                    }
                 }
             }
         },
@@ -615,6 +640,7 @@ fun FeedScreen(
                 pagedFeedItems = pagedFeedItems,
                 modifier = innerModifier,
             ).also { logDebug(LOG_TAG, "Showing GRID") }
+
             FeedScreenType.FeedList -> FeedListContent(
                 viewState = viewState,
                 onOpenNavDrawer = {
@@ -707,14 +733,18 @@ fun FeedScreen(
     }
 
     val floatingActionButton: @Composable () -> Unit = {
-        FloatingActionButton(
-            onClick = onMarkAllAsRead,
-            modifier = Modifier.navigationBarsPadding(),
-        ) {
-            Icon(
-                Icons.Default.DoneAll,
-                contentDescription = stringResource(R.string.mark_all_as_read),
-            )
+        PlainTooltipBox(tooltip = { Text(stringResource(R.string.mark_all_as_read)) }) {
+            FloatingActionButton(
+                onClick = onMarkAllAsRead,
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .tooltipAnchor(),
+            ) {
+                Icon(
+                    Icons.Default.DoneAll,
+                    contentDescription = stringResource(R.string.mark_all_as_read),
+                )
+            }
         }
     }
     val bottomBarVisibleState = remember { MutableTransitionState(viewState.isBottomBarVisible) }
@@ -934,6 +964,7 @@ fun FeedListContent(
                         showThumbnail = viewState.showThumbnails,
                         feedItemStyle = viewState.feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
+                        newIndicator = !viewState.onlyUnread,
                         onMarkAboveAsRead = {
                             if (itemIndex > 0) {
                                 markBeforeAsRead(itemIndex)
@@ -1086,6 +1117,7 @@ fun FeedGridContent(
                         showThumbnail = viewState.showThumbnails,
                         feedItemStyle = viewState.feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
+                        newIndicator = !viewState.onlyUnread,
                         onMarkAboveAsRead = {
                             if (itemIndex > 0) {
                                 markBeforeAsRead(itemIndex)
