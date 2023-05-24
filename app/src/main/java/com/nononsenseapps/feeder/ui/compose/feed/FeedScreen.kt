@@ -42,8 +42,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconToggleButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkRemove
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
@@ -95,6 +93,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
+import com.nononsenseapps.feeder.archmodel.FeedType
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.opml.exportOpml
@@ -201,6 +200,7 @@ fun FeedScreen(
     ScreenWithNavDrawer(
         feedsAndTags = ImmutableHolder(viewState.drawerItemsWithUnreadCounts),
         expandedTags = ImmutableHolder(viewState.expandedTags),
+        unreadBookmarksCount = viewState.unreadBookmarksCount,
         onToggleTagExpansion = { tag ->
             viewModel.toggleTagExpansion(tag)
         },
@@ -228,9 +228,6 @@ fun FeedScreen(
             },
             onToggleOnlyUnread = { value ->
                 viewModel.setShowOnlyUnread(value)
-            },
-            onToggleOnlyBookmarked = { value ->
-                viewModel.setShowOnlyBookmarked(value)
             },
             onMarkAllAsRead = {
                 viewModel.markAllAsRead()
@@ -326,7 +323,6 @@ fun FeedScreen(
     onRefreshVisible: () -> Unit,
     onRefreshAll: () -> Unit,
     onToggleOnlyUnread: (Boolean) -> Unit,
-    onToggleOnlyBookmarked: (Boolean) -> Unit,
     onMarkAllAsRead: () -> Unit,
     onShowToolbarMenu: (Boolean) -> Unit,
     ttsOnPlay: () -> Unit,
@@ -359,12 +355,6 @@ fun FeedScreen(
 ) {
     val showingUnreadStateLabel = if (viewState.onlyUnread) {
         stringResource(R.string.showing_only_unread_articles)
-    } else {
-        stringResource(R.string.showing_all_articles)
-    }
-
-    val showingBookmarksStateLabel = if (viewState.onlyBookmarked) {
-        stringResource(R.string.showing_only_bookmarked_articles)
     } else {
         stringResource(R.string.showing_all_articles)
     }
@@ -418,29 +408,7 @@ fun FeedScreen(
                     }
                 }
             }
-            PlainTooltipBox(tooltip = { Text(showingBookmarksStateLabel) }) {
-                IconToggleButton(
-                    checked = viewState.onlyBookmarked,
-                    onCheckedChange = onToggleOnlyBookmarked,
-                    modifier = Modifier
-                        .tooltipAnchor()
-                        .semantics {
-                            stateDescription = showingBookmarksStateLabel
-                        },
-                ) {
-                    if (viewState.onlyBookmarked) {
-                        Icon(
-                            Icons.Default.BookmarkRemove,
-                            contentDescription = null,
-                        )
-                    } else {
-                        Icon(
-                            Icons.Default.Bookmark,
-                            contentDescription = null,
-                        )
-                    }
-                }
-            }
+            // TODO move one into bar
 
             PlainTooltipBox(tooltip = { Text(stringResource(R.string.open_menu)) }) {
                 Box {
@@ -772,8 +740,12 @@ fun FeedScreen(
         topBar = {
             SensibleTopAppBar(
                 scrollBehavior = scrollBehavior,
-                title = viewState.feedScreenTitle.title
-                    ?: stringResource(id = R.string.all_feeds),
+                title = when (viewState.feedScreenTitle.type) {
+                    FeedType.FEED -> viewState.feedScreenTitle.title
+                    FeedType.TAG -> viewState.feedScreenTitle.title
+                    FeedType.SAVED_ARTICLES -> stringResource(id = R.string.saved_articles)
+                    FeedType.ALL_FEEDS -> stringResource(id = R.string.all_feeds)
+                } ?: "",
                 navigationIcon = {
                     IconButton(
                         onClick = onOpenNavDrawer,

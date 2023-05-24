@@ -206,4 +206,6 @@
   <string name="article_image">Article image</string>
   <string name="feed_icon">Feed Icon</string>
   <string name="text_scale">Text scale</string>
+
+  <string name="saved_articles">Saved articles</string>
 </resources>

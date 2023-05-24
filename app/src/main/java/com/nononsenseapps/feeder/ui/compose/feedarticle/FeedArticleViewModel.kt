@@ -9,6 +9,7 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.archmodel.Article
 import com.nononsenseapps.feeder.archmodel.Enclosure
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
+import com.nononsenseapps.feeder.archmodel.FeedType
 import com.nononsenseapps.feeder.archmodel.ItemOpener
 import com.nononsenseapps.feeder.archmodel.LinkOpener
 import com.nononsenseapps.feeder.archmodel.Repository
@@ -80,7 +81,7 @@ class FeedArticleViewModel(
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
-                ScreenTitle(""),
+                ScreenTitle("", FeedType.ALL_FEEDS),
             )
 
     private val visibleFeeds: StateFlow<List<FeedTitle>> =
@@ -93,10 +94,6 @@ class FeedArticleViewModel(
 
     fun setShowOnlyUnread(value: Boolean) = viewModelScope.launch {
         repository.setShowOnlyUnread(value)
-    }
-
-    fun setShowOnlyBookmarked(value: Boolean) = viewModelScope.launch {
-        repository.setShowOnlyBookmarked(value)
     }
 
     fun deleteFeeds(feedIds: List<Long>) = applicationCoroutineScope.launch {
@@ -208,9 +205,11 @@ class FeedArticleViewModel(
             ItemOpener.CUSTOM_TAB == itemOpener && articleLink != null -> {
                 openInCustomTab(articleLink)
             }
+
             ItemOpener.DEFAULT_BROWSER == itemOpener && articleLink != null -> {
                 openInBrowser(articleLink)
             }
+
             else -> {
                 setCurrentArticle(itemId)
                 navigateToArticle()
@@ -256,9 +255,9 @@ class FeedArticleViewModel(
             ttsStateHolder.ttsState,
             repository.swipeAsRead,
             textToDisplayTrigger, // Never actually read, only used as trigger
-            repository.showOnlyBookmarked,
             repository.useDetectLanguage,
             ttsStateHolder.availableLanguages,
+            repository.getUnreadBookmarksCount,
         ) { params: Array<Any> ->
             @Suppress("UNCHECKED_CAST")
             val article = params[17] as Article
@@ -303,9 +302,9 @@ class FeedArticleViewModel(
                 swipeAsRead = params[19] as SwipeAsRead,
                 isPinned = article.pinned,
                 isBookmarked = article.bookmarked,
-                onlyBookmarked = params[21] as Boolean,
-                useDetectLanguage = params[22] as Boolean,
-                ttsLanguages = params[23] as List<Locale>,
+                useDetectLanguage = params[21] as Boolean,
+                ttsLanguages = params[22] as List<Locale>,
+                unreadBookmarksCount = params[23] as Int,
             )
         }
             .stateIn(
@@ -376,6 +375,7 @@ class FeedArticleViewModel(
                         )
                     }
                 }
+
                 TextToDisplay.FULLTEXT -> {
                     blobFullInputStream(
                         viewState.value.articleId,
@@ -387,6 +387,7 @@ class FeedArticleViewModel(
                         )
                     }
                 }
+
                 TextToDisplay.LOADING_FULLTEXT -> null
                 TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> null
             }
@@ -411,7 +412,6 @@ class FeedArticleViewModel(
 interface FeedScreenViewState {
     val currentFeedOrTag: FeedOrTag
     val onlyUnread: Boolean
-    val onlyBookmarked: Boolean
     val showFab: Boolean
     val showThumbnails: Boolean
     val currentTheme: ThemeOptions
@@ -419,6 +419,7 @@ interface FeedScreenViewState {
     val feedScreenTitle: ScreenTitle
     val visibleFeeds: List<FeedTitle>
     val drawerItemsWithUnreadCounts: List<DrawerItemWithUnreadCount>
+    val unreadBookmarksCount: Int
     val feedItemStyle: FeedItemStyle
     val expandedTags: Set<String>
     val isBottomBarVisible: Boolean
@@ -456,15 +457,15 @@ interface ArticleScreenViewState {
 data class FeedArticleScreenViewState(
     override val currentFeedOrTag: FeedOrTag = FeedOrTag(ID_UNSET, ""),
     override val onlyUnread: Boolean = true,
-    override val onlyBookmarked: Boolean = false,
     override val showFab: Boolean = true,
     override val showThumbnails: Boolean = true,
     override val currentTheme: ThemeOptions = ThemeOptions.SYSTEM,
     override val latestSyncTimestamp: Instant = Instant.EPOCH,
     // Defaults to empty string to avoid rendering until loading complete
-    override val feedScreenTitle: ScreenTitle = ScreenTitle(""),
+    override val feedScreenTitle: ScreenTitle = ScreenTitle("", FeedType.FEED),
     override val visibleFeeds: List<FeedTitle> = emptyList(),
     override val drawerItemsWithUnreadCounts: List<DrawerItemWithUnreadCount> = emptyList(),
+    override val unreadBookmarksCount: Int = 0,
     override val feedItemStyle: FeedItemStyle = FeedItemStyle.CARD,
     override val expandedTags: Set<String> = emptySet(),
     override val isBottomBarVisible: Boolean = false,

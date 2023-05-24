@@ -22,11 +22,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -52,7 +53,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -60,7 +60,7 @@ import coil.size.Precision
 import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
-import com.nononsenseapps.feeder.db.room.ID_UNSET
+import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleDrawerSheet
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleNavigationDrawer
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
@@ -72,13 +72,12 @@ import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
 import java.net.URL
 import kotlinx.coroutines.launch
 
-const val COLLAPSE_ANIMATION_DURATION = 300
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun ScreenWithNavDrawer(
     feedsAndTags: ImmutableHolder<List<DrawerItemWithUnreadCount>>,
     expandedTags: ImmutableHolder<Set<String>>,
+    unreadBookmarksCount: Int,
     onToggleTagExpansion: (String) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
@@ -93,20 +92,11 @@ fun ScreenWithNavDrawer(
                 ListOfFeedsAndTags(
                     feedsAndTags = feedsAndTags,
                     expandedTags = expandedTags,
+                    unreadBookmarksCount = unreadBookmarksCount,
                     onToggleTagExpansion = onToggleTagExpansion,
                     onItemClick = { item ->
                         coroutineScope.launch {
-                            val id = when (item) {
-                                is DrawerFeed -> item.id
-                                is DrawerTag -> ID_UNSET
-                                is DrawerTop -> ID_ALL_FEEDS
-                            }
-                            val tag = when (item) {
-                                is DrawerFeed -> item.tag
-                                is DrawerTag -> item.tag
-                                is DrawerTop -> ""
-                            }
-                            onDrawerItemSelected(id, tag)
+                            onDrawerItemSelected(item.id, item.tag)
                             drawerState.close()
                         }
                     },
@@ -126,6 +116,7 @@ private fun ListOfFeedsAndTagsPreview() {
             ListOfFeedsAndTags(
                 immutableListHolderOf(
                     DrawerTop(unreadCount = 100, totalChildren = 4),
+                    DrawerSavedArticles(unreadCount = 5),
                     DrawerTag(
                         tag = "News tag",
                         unreadCount = 0,
@@ -177,6 +168,7 @@ private fun ListOfFeedsAndTagsPreview() {
                         "Funny tag",
                     ),
                 ),
+                1,
                 {},
             ) {}
         }
@@ -188,14 +180,17 @@ private fun ListOfFeedsAndTagsPreview() {
 fun ListOfFeedsAndTags(
     feedsAndTags: ImmutableHolder<List<DrawerItemWithUnreadCount>>,
     expandedTags: ImmutableHolder<Set<String>>,
+    unreadBookmarksCount: Int,
     onToggleTagExpansion: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onItemClick: (DrawerItemWithUnreadCount) -> Unit,
+    onItemClick: (FeedIdTag) -> Unit,
 ) {
     val firstTopFeed by remember(feedsAndTags) {
         derivedStateOf {
-            feedsAndTags.item.asSequence().filterIsInstance<DrawerFeed>()
-                .filter { it.tag.isEmpty() }.firstOrNull()
+            feedsAndTags.item.asSequence()
+                .filterIsInstance<DrawerFeed>()
+                .filter { it.tag.isEmpty() }
+                .firstOrNull()
         }
     }
     LazyColumn(
@@ -206,7 +201,48 @@ fun ListOfFeedsAndTags(
                 testTag = "feedsAndTags"
             },
     ) {
-        items(feedsAndTags.item, key = { it.uiId }) { item ->
+        item(
+            key = ID_ALL_FEEDS,
+            contentType = ID_ALL_FEEDS,
+        ) {
+            val item = feedsAndTags.item.firstOrNull() ?: DrawerTop(
+                { stringResource(id = R.string.all_feeds) },
+
+                0,
+                0,
+            )
+            AllFeeds(
+                unreadCount = item.unreadCount,
+                title = stringResource(id = R.string.all_feeds),
+                onItemClick = {
+                    onItemClick(item)
+                },
+            )
+        }
+        item(
+            key = ID_SAVED_ARTICLES,
+            contentType = ID_SAVED_ARTICLES,
+        ) {
+            SavedArticles(
+                unreadCount = unreadBookmarksCount,
+                title = stringResource(id = R.string.saved_articles),
+                onItemClick = {
+                    onItemClick(DrawerSavedArticles(unreadCount = 1))
+                },
+            )
+        }
+        items(
+            feedsAndTags.item.drop(1),
+            key = { it.uiId },
+            contentType = {
+                when (it) {
+                    is DrawerFeed -> 1L
+                    is DrawerTag -> it.id
+                    is DrawerSavedArticles -> it.id
+                    is DrawerTop -> it.id
+                }
+            },
+        ) { item ->
             when (item) {
                 is DrawerTag -> {
                     ExpandableTag(
@@ -219,6 +255,7 @@ fun ListOfFeedsAndTags(
                         },
                     )
                 }
+
                 is DrawerFeed -> {
                     when {
                         item.tag.isEmpty() -> {
@@ -236,6 +273,7 @@ fun ListOfFeedsAndTags(
                                 },
                             )
                         }
+
                         else -> {
                             ChildFeed(
                                 unreadCount = item.unreadCount,
@@ -249,13 +287,32 @@ fun ListOfFeedsAndTags(
                         }
                     }
                 }
-                is DrawerTop -> AllFeeds(
+
+                is DrawerTop -> {
+                    // Handled at top
+                    /*
+                    AllFeeds(
                     unreadCount = item.unreadCount,
                     title = item.title(),
                     onItemClick = {
                         onItemClick(item)
                     },
                 )
+                     */
+                }
+
+                is DrawerSavedArticles -> {
+                    // Handled at top
+                    /*
+                    SavedArticles(
+                    unreadCount = item.unreadCount,
+                    title = item.title(),
+                    onItemClick = {
+                        onItemClick(item)
+                    },
+                )
+                     */
+                }
             }
         }
     }
@@ -281,6 +338,7 @@ private fun ExpandableTag(
     val contractedLabel = stringResource(id = R.string.contracted_tag)
 
     Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .clickable(onClick = onItemClick)
@@ -322,7 +380,6 @@ private fun ExpandableTag(
                 text = title,
                 maxLines = 1,
                 modifier = Modifier
-                    .padding(end = 2.dp)
                     .fillMaxWidth()
                     .align(Alignment.CenterStart),
             )
@@ -337,7 +394,6 @@ private fun ExpandableTag(
                 text = unreadCount.toString(),
                 maxLines = 1,
                 modifier = Modifier
-                    .padding(start = 2.dp)
                     .semantics {
                         contentDescription = unreadLabel
                     },
@@ -362,17 +418,24 @@ private fun ExpandArrow(
 
 @Preview(showBackground = true)
 @Composable
-private fun AllFeeds(
-    title: String = "Foo",
-    unreadCount: Int = 99,
+private fun SavedArticles(
+    title: String = "Bar",
+    unreadCount: Int = 10,
     onItemClick: () -> Unit = {},
-) = Feed(
-    title = title,
-    imageUrl = null,
-    unreadCount = unreadCount,
-    startPadding = 16.dp,
-    onItemClick = onItemClick,
-)
+) {
+    Feed(
+        title = title,
+        unreadCount = unreadCount,
+        onItemClick = onItemClick,
+        image = {
+            Icon(
+                Icons.Default.Star,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+            )
+        },
+    )
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -385,10 +448,6 @@ private fun TopLevelFeed(
     title = title,
     imageUrl = imageUrl,
     unreadCount = unreadCount,
-    startPadding = when (imageUrl) {
-        null -> 48.dp
-        else -> 0.dp
-    },
     onItemClick = onItemClick,
 )
 
@@ -410,21 +469,67 @@ private fun ChildFeed(
             title = title,
             imageUrl = imageUrl,
             unreadCount = unreadCount,
-            startPadding = when (imageUrl) {
-                null -> 48.dp
-                else -> 0.dp
-            },
             onItemClick = onItemClick,
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AllFeeds(
+    title: String = "All Feeds",
+    unreadCount: Int = 99,
+    onItemClick: () -> Unit = {},
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clickable(onClick = onItemClick)
+            .padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = 2.dp,
+                bottom = 2.dp,
+            )
+            .fillMaxWidth()
+            .height(48.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1.0f, fill = true),
+        ) {
+            Text(
+                text = title,
+                maxLines = 1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterStart),
+            )
+        }
+        if (unreadCount > 0) {
+            val unreadLabel = LocalContext.current.resources.getQuantityString(
+                R.plurals.n_unread_articles,
+                unreadCount,
+                unreadCount,
+            )
+            Text(
+                text = unreadCount.toString(),
+                maxLines = 1,
+                modifier = Modifier.semantics {
+                    contentDescription = unreadLabel
+                },
+            )
+        }
     }
 }
 
 @Composable
 private fun Feed(
     title: String,
-    imageUrl: URL?,
+    image: (@Composable () -> Unit),
     unreadCount: Int,
-    startPadding: Dp,
     onItemClick: () -> Unit,
 ) {
     Row(
@@ -433,7 +538,7 @@ private fun Feed(
         modifier = Modifier
             .clickable(onClick = onItemClick)
             .padding(
-                start = startPadding,
+                start = 0.dp,
                 end = 16.dp,
                 top = 2.dp,
                 bottom = 2.dp,
@@ -441,26 +546,15 @@ private fun Feed(
             .fillMaxWidth()
             .height(48.dp),
     ) {
-        if (imageUrl != null) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .height(48.dp)
-                    // Taking 4dp spacing into account
-                    .width(44.dp),
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(imageUrl.toString()).listener(
-                            onError = { a, b ->
-                                Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
-                            },
-                        ).scale(Scale.FIT).size(64).precision(Precision.INEXACT).build(),
-                    contentDescription = stringResource(id = R.string.feed_icon),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .minimumInteractiveComponentSize(),
+//                    .height(48.dp)
+//                    // Taking 4dp spacing into account
+//                    .width(44.dp),
+        ) {
+            image()
         }
         Box(
             modifier = Modifier
@@ -490,4 +584,37 @@ private fun Feed(
             )
         }
     }
+}
+
+@Composable
+private fun Feed(
+    title: String,
+    imageUrl: URL?,
+    unreadCount: Int,
+    onItemClick: () -> Unit,
+) {
+    Feed(
+        title = title,
+        unreadCount = unreadCount,
+        onItemClick = onItemClick,
+        image = if (imageUrl != null) {
+            {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrl.toString()).listener(
+                            onError = { a, b ->
+                                Log.e("FEEDER_DRAWER", "error ${a.data}", b.throwable)
+                            },
+                        ).scale(Scale.FIT).size(64).precision(Precision.INEXACT).build(),
+                    contentDescription = stringResource(id = R.string.feed_icon),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        } else {
+            {
+                Box(modifier = Modifier.size(24.dp)) {}
+            }
+        },
+    )
 }
