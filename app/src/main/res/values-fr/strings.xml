@@ -170,11 +170,7 @@
   <string name="add_item">Ajouter un élément</string>
     <string name="block_list">Liste de blocage</string>
     <string name="remove">Retirer</string>
-    <string name="showing_only_bookmarked_articles">Seuls les articles marqués sont affichés</string>
-    <string name="bookmarks_filter">Tous les marque-pages</string>
-    <string name="bookmark_article">Ajouter un marque-page</string>
-    <string name="remove_bookmark">Supprimer le marque-page</string>
-    <string name="permission_read_desc">Permet à l\'application de lire des flux et des articles</string>
+  <string name="permission_read_desc">Permet à l\'application de lire des flux et des articles</string>
     <string name="permission_read_label">Accès en lecture seule Feeder</string>
     <string name="use_detect_language">Détecter la langue</string>
     <string name="only_available_on_android_n">Disponible uniquement sur Android %1$s et plus</string>
@@ -184,8 +180,7 @@
     <string name="set_language">Définir la langue</string>
     <string name="text_to_speech">Synthèse vocale</string>
     <string name="dynamic_theme_use">Couleurs dynamiques</string>
-    <string name="bookmarked">Ajouté aux marque-pages</string>
-    <string name="new_indicator">Nouveau</string>
+  <string name="new_indicator">Nouveau</string>
     <string name="article_image">Image de l\'article</string>
     <string name="feed_icon">Icône de flux</string>
     <string name="text_scale">Mise à l\'échelle du texte</string>

@@ -170,11 +170,7 @@
   <string name="add_item">Adicionar item</string>
     <string name="remove">Remover</string>
     <string name="block_list">Lista de bloqueio</string>
-    <string name="bookmarks_filter">Apenas salvos</string>
-    <string name="showing_only_bookmarked_articles">Mostrando apenas artigos salvos</string>
-    <string name="bookmark_article">Salvar artigo</string>
-    <string name="remove_bookmark">Remover dos salvos</string>
-    <string name="permission_read_label">Acesso somente leitura</string>
+  <string name="permission_read_label">Acesso somente leitura</string>
     <string name="permission_read_desc">Permite que o aplicativo leia feeds e artigos</string>
     <string name="skip_to_next">Pular para o próximo</string>
     <string name="set_language">Definir idioma</string>
@@ -183,8 +179,7 @@
     <string name="text_to_speech">Texto para fala</string>
     <string name="description_for_read_aloud">Detecta o idioma do artigo automaticamente</string>
     <string name="dynamic_theme_use">Cores dinâmicas</string>
-    <string name="bookmarked">Salvo</string>
-    <string name="new_indicator">Novo</string>
+  <string name="new_indicator">Novo</string>
     <string name="explanation_permission_notifications">A permissão deve ser concedida antes que as notificações possam ser habilitadas.</string>
     <string name="article_image">Imagem do artigo</string>
     <string name="block_list_description">Oculta artigos com títulos que contenham qualquer um desses filtros. Exemplo de filtros:</string>

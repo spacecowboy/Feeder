@@ -170,11 +170,7 @@
   <string name="block_list">Sperrliste</string>
     <string name="add_item">Eintrag hinzufügen</string>
     <string name="remove">Entfernen</string>
-    <string name="bookmarks_filter">Nur Lesezeichen</string>
-    <string name="showing_only_bookmarked_articles">Nur mit Lesezeichen versehene Artikel anzeigen</string>
-    <string name="remove_bookmark">Lesezeichen entfernen</string>
-    <string name="bookmark_article">Lesezeichen hinzufügen</string>
-    <string name="permission_read_desc">Ermöglicht es der Anwendung, Feeds und Artikel zu lesen</string>
+  <string name="permission_read_desc">Ermöglicht es der Anwendung, Feeds und Artikel zu lesen</string>
     <string name="permission_read_label">Feeder Nur-Lese-Zugriff</string>
     <string name="use_detect_language">Sprache erkennen</string>
     <string name="only_available_on_android_n">Nur auf Android %1$s und höher verfügbar</string>
@@ -183,8 +179,7 @@
     <string name="text_to_speech">Text in Sprache</string>
     <string name="set_language">Sprache einstellen</string>
     <string name="skip_to_next">Weiter zum Nächsten</string>
-    <string name="bookmarked">Lesezeichen</string>
-    <string name="new_indicator">Neu</string>
+  <string name="new_indicator">Neu</string>
     <string name="dynamic_theme_use">Dynamische Farben</string>
     <string name="article_image">Artikelbild</string>
     <string name="feed_icon">Feed-Symbol</string>

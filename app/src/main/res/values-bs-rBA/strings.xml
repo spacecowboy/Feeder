@@ -170,11 +170,7 @@
     <string name="block_list">Lista blokiranja</string>
     <string name="add_item">Dodaj stavku</string>
     <string name="remove">Ukloni</string>
-    <string name="showing_only_bookmarked_articles">Prikazivanje samo zabilježenih članaka</string>
-    <string name="bookmarks_filter">Samo zabilješke</string>
-    <string name="bookmark_article">Dodaj članak u zabilješke</string>
-    <string name="remove_bookmark">Ukloni zabilješku</string>
-    <string name="use_detect_language">Otkrij jezik</string>
+  <string name="use_detect_language">Otkrij jezik</string>
     <string name="permission_read_label">Feeder-ov pristup samo za čitanje</string>
     <string name="description_for_read_aloud">Automatsko otkrivanje jezika članka</string>
     <string name="permission_read_desc">Dopušta aplikaciji da čita izvore i članke</string>
@@ -184,8 +180,7 @@
     <string name="text_to_speech">Govor iz teksta</string>
     <string name="only_available_on_android_n">Dostupno samo na Androidu %1$s ili novijem</string>
     <string name="dynamic_theme_use">Dinamičke boje</string>
-    <string name="bookmarked">Zabilježeno</string>
-    <string name="new_indicator">Novi</string>
+  <string name="new_indicator">Novi</string>
     <string name="explanation_permission_notifications">Dozvole se moraju odobriti prije uključenja obavještenja.</string>
     <string name="block_list_description">Sakriva članke s naslovima koji sadrže neke od ovih pojmova. Primjeri filtera:</string>
     <string name="feed_icon">Ikonica izvora</string>

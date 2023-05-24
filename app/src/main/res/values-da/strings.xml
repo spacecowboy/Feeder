@@ -170,11 +170,7 @@
   <string name="block_list">Blokeringsliste</string>
     <string name="add_item">Tilføj emne</string>
     <string name="remove">Fjern</string>
-    <string name="bookmarks_filter">Kun bogmærker</string>
-    <string name="showing_only_bookmarked_articles">Viser kun artikler med bogmærke</string>
-    <string name="bookmark_article">Sæt bogmærke på artiklen</string>
-    <string name="remove_bookmark">Fjern bogmærke</string>
-    <string name="permission_read_label">Feeder skrivebeskyttet adgang</string>
+  <string name="permission_read_label">Feeder skrivebeskyttet adgang</string>
     <string name="permission_read_desc">Gør det muligt for applikationen at læse feeds og artikler</string>
     <string name="use_detect_language">Registrer sprog</string>
     <string name="description_for_read_aloud">Registrerer artiklens sprog automatisk</string>
@@ -184,8 +180,7 @@
     <string name="skip_to_next">Spring til næste</string>
     <string name="set_language">Indstil sprog</string>
     <string name="dynamic_theme_use">Dynamiske farver</string>
-    <string name="bookmarked">Bogmærket</string>
-    <string name="new_indicator">Ny</string>
+  <string name="new_indicator">Ny</string>
     <string name="article_image">Artikelbillede</string>
     <string name="feed_icon">Feed-ikon</string>
     <string name="text_scale">Tekstskalering</string>

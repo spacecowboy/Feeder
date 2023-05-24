@@ -170,11 +170,7 @@
   <string name="block_list">Lista de bloqueos</string>
     <string name="add_item">Añadir elemento</string>
     <string name="remove">Retirar</string>
-    <string name="showing_only_bookmarked_articles">Mostrando solo los artículos marcados</string>
-    <string name="bookmarks_filter">Solo marcadores</string>
-    <string name="remove_bookmark">Eliminar marcador</string>
-    <string name="bookmark_article">Añadir artículo a marcadores</string>
-    <string name="permission_read_desc">Permite a la aplicación leer fuentes y artículos</string>
+  <string name="permission_read_desc">Permite a la aplicación leer fuentes y artículos</string>
     <string name="permission_read_label">Acceso de solo lectura</string>
     <string name="use_detect_language">Detectar idioma</string>
     <string name="only_available_on_android_n">Disponible solo en Android %1$s y superior</string>
@@ -184,8 +180,7 @@
     <string name="skip_to_next">Saltar al siguiente</string>
     <string name="set_language">Establecer idioma</string>
     <string name="dynamic_theme_use">Colores dinámicos</string>
-    <string name="bookmarked">Marcado</string>
-    <string name="new_indicator">Nuevo</string>
+  <string name="new_indicator">Nuevo</string>
     <string name="article_image">Imagen del artículo</string>
     <string name="feed_icon">Icono de canal</string>
     <string name="text_scale">Escalar texto</string>

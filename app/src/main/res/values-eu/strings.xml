@@ -129,11 +129,9 @@
     <string name="unread">Irakurri gabeak</string>
     <string name="already_read">Jada irakurriak</string>
     <string name="showing_only_unread_articles">Irakurri gabeko artikuluak soilik erakusten</string>
-    <string name="showing_only_bookmarked_articles">Markatutako artikuluak soilik erakusten</string>
-    <string name="showing_all_articles">Artikulu guztiak erakusten</string>
+  <string name="showing_all_articles">Artikulu guztiak erakusten</string>
     <string name="synchronize_feeds">Jarioak sinkronizatu</string>
-    <string name="bookmarks_filter">Soilik markagailuak</string>
-    <string name="zero_unread_articles">Irakurri gabeko %1$s artikulu</string>
+  <string name="zero_unread_articles">Irakurri gabeko %1$s artikulu</string>
     <string name="one_unread_article">Irakurri gabeko artikulu %1$s</string>
     <string name="two_unread_articles">Irakurri gabeko %1$s artikulu</string>
     <string name="few_unread_articles">Irakurri gabeko %1$s artikulu</string>
@@ -178,8 +176,7 @@
     <string name="from_anywhere">Edozein lekutik</string>
     <string name="sync_code">Sinkronizazio-kodea</string>
     <string name="secret_key">Gako pribatua</string>
-    <string name="bookmarked">Markatua</string>
-    <string name="new_indicator">Berria</string>
+  <string name="new_indicator">Berria</string>
   <string name="permission_read_desc">Artikuluak eta jarioak aplikazioari irakurtzea baimentzen du</string>
     <string name="permission_read_label">Sarrera soilik irakurketarako</string>
     <string name="explanation_permission_notifications">Jakinarazpenak aktibatu ahal izateko lehenik baimena eman behar da.</string>
@@ -187,8 +184,6 @@
     <string name="feed_icon">Jarioaren ikonoa</string>
     <string name="are_you_sure_leave_sync_chain">Ziur al zaude sinkronizazio-katetik irten nahi duzula\?</string>
     <string name="no_barcode_scanner_installed">Ezin izan da barra-kode eskaneatzailerik aurkitu</string>
-  <string name="bookmark_article">Artikulua markatu</string>
-    <string name="remove_bookmark">Markagailua ezabatu</string>
-    <string name="text_scale">Testuaren eskala</string>
+  <string name="text_scale">Testuaren eskala</string>
     <string name="sync_to_fetch">Sinkronizatu artikuluak eskuratzeko</string>
 </resources>

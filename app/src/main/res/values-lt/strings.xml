@@ -156,9 +156,7 @@
     <string name="are_you_sure_leave_sync_chain">Ar tikrai norite išeiti iš sinchronizavimo grandinės\?</string>
     <string name="join_sync_chain">Prisijunkiti prie sinchronizavimo grandinės</string>
     <string name="no_barcode_scanner_installed">Nepavyko rasti brūkšninių kodų skaitytuvo</string>
-    <string name="showing_only_bookmarked_articles">Rodomi tik pažymėti straipsniai</string>
-    <string name="bookmarks_filter">Tik žymės</string>
-    <string name="devices_on_sync_chain">Sinchronizavimo grandinėje esantys įrenginiai</string>
+  <string name="devices_on_sync_chain">Sinchronizavimo grandinėje esantys įrenginiai</string>
     <string name="remove">Pašalinti</string>
     <string name="remove_device">Pašalinti įrenginį</string>
     <string name="remove_device_question">Ar tikrai norite pašalinti įrenginį %1$s\?</string>
@@ -171,9 +169,7 @@
     <string name="leave_sync_chain">Palikti sinchronizavimo grandinę</string>
     <string name="device_sync_description_2">Tiesiog nuskaitykite kodą iš jūsų sinchronizavimo grandinės, kurią sukūrėte kitame prietaise, arba pradėkite naują sinchronizavimo grandinę.</string>
     <string name="scan_or_enter_code">Nuskaitykite arba įveskite sinchronizavimo kodą</string>
-    <string name="bookmark_article">Pažymėti straipsnį</string>
-    <string name="remove_bookmark">Pašalinti žymę</string>
-    <string name="failed_to_open_article">Nepavyko atidaryti straipsnio</string>
+  <string name="failed_to_open_article">Nepavyko atidaryti straipsnio</string>
     <string name="failed_to_import_OPML">Nepavyko importuoti OPML</string>
     <string name="failed_to_export_OPML">Nepavyko eksportuoti OPML</string>
   <string name="use_detect_language">Aptikti kalbą</string>
@@ -182,8 +178,7 @@
     <string name="skip_to_next">Pereiti prie kito</string>
     <string name="set_language">Nustatyti kalbą</string>
     <string name="dynamic_theme_use">Dinaminės spalvos</string>
-    <string name="bookmarked">Pažymėta</string>
-    <string name="new_indicator">Nauja</string>
+  <string name="new_indicator">Nauja</string>
     <string name="explanation_permission_notifications">Prieš įjungiant pranešimus turi būti suteiktas leidimas.</string>
     <string name="only_available_on_android_n">Pasiekiama tik \"Android\" %1$s ir naujesnėse versijose</string>
     <string name="article_image">Straipsnio paveikslėlis</string>

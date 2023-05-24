@@ -142,9 +142,7 @@
     <string name="invalid_url">Ikke en gyldig nettadresse</string>
     <string name="use_detect_language">Oppdag språk</string>
     <string name="description_for_read_aloud">Oppdager artikkelspråk automatisk</string>
-    <string name="showing_only_bookmarked_articles">Viser kun bokmerkede artikler</string>
-    <string name="bookmarks_filter">Kun bokmerkede</string>
-    <string name="device_sync_description_2">Skann koden fra din synkronisering som du opprettet på en annen enhet, eller opprett en ny.</string>
+  <string name="device_sync_description_2">Skann koden fra din synkronisering som du opprettet på en annen enhet, eller opprett en ny.</string>
     <string name="start_new_sync_chain">Start ny synkronisering</string>
     <string name="block_list">Svarteliste</string>
     <string name="add_item">Legg til element</string>
@@ -172,8 +170,6 @@
     <string name="join_sync_chain">Ta del i synkronisering</string>
     <string name="disabled">Avskrudd</string>
     <string name="swipe_to_mark_as_read">Dra for å markere som lest</string>
-    <string name="bookmark_article">Bokmerk artikkel</string>
-    <string name="remove_bookmark">Opphev bokmerking</string>
   <string name="qr_code">QR-kode</string>
     <string name="text_to_speech">Tekst til tale</string>
     <string name="skip_to_next">Hopp til neste</string>
@@ -184,8 +180,7 @@
     <string name="remove_device_question">Vil du slette «%1$s»-enheten\?</string>
     <string name="press_scan_sync">Naviger til enhetssynkronisering på enheten din og trykk «Skann synkroniseringskode».</string>
     <string name="or_open_device_sync_link">Alternativt kan du åpne lenken på enheten din.</string>
-    <string name="bookmarked">Bokmerket</string>
-    <string name="new_indicator">Ny</string>
+  <string name="new_indicator">Ny</string>
     <string name="feed_icon">Informasjonkanalsikon</string>
     <string name="article_image">Artikkelbilde</string>
 </resources>
