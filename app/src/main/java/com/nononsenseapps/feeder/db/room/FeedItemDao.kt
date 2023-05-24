@@ -135,84 +135,14 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByDesc
-        """,
-    )
-    fun pagingUnreadPreviewsDesc(feedId: Long, unread: Boolean = true): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag AND (unread IS :unread OR pinned = 1)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByDesc
-        """,
-    )
-    fun pagingUnreadPreviewsDesc(tag: String, unread: Boolean = true): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE (unread IS :unread OR pinned = 1)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByDesc
-        """,
-    )
-    fun pagingUnreadPreviewsDesc(unread: Boolean = true): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE feed_id IS :feedId AND (unread IS :unread OR pinned = 1)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByAsc
-        """,
-    )
-    fun pagingUnreadPreviewsAsc(feedId: Long, unread: Boolean = true): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag AND (unread IS :unread OR pinned = 1)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByAsc
-        """,
-    )
-    fun pagingUnreadPreviewsAsc(tag: String, unread: Boolean = true): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE (unread IS :unread OR pinned = 1)
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByAsc
-        """,
-    )
-    fun pagingUnreadPreviewsAsc(unread: Boolean = true): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
+          AND (unread in (1, :unread) OR pinned = 1)
+          AND (bookmarked in (1, :bookmarked))
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """,
     )
-    fun pagingPreviewsDesc(feedId: Long): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsDesc(feedId: Long, unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
 
     @Query(
         """
@@ -220,22 +150,26 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
+          AND (unread in (1, :unread) OR pinned = 1)
+          AND (bookmarked in (1, :bookmarked))
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """,
     )
-    fun pagingPreviewsDesc(tag: String): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsDesc(tag: String, unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
 
     @Query(
         """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+        WHERE (unread in (1, :unread) OR pinned = 1)
+          AND (bookmarked in (1, :bookmarked))
+          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """,
     )
-    fun pagingPreviewsDesc(): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsDesc(unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
 
     @Query(
         """
@@ -243,106 +177,40 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
+          AND (unread in (1, :unread) OR pinned = 1)
+          AND (bookmarked in (1, :bookmarked))
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """,
     )
-    fun pagingPreviewsAsc(feedId: Long): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsAsc(feedId: Long, unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
 
     @Query(
         """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE tag IS :tag
+        WHERE tag IS :tag 
+          AND (unread in (1, :unread) OR pinned = 1)
+          AND (bookmarked in (1, :bookmarked))
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """,
     )
-    fun pagingPreviewsAsc(tag: String): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsAsc(tag: String, unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
 
     @Query(
         """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByAsc
-        """,
-    )
-    fun pagingPreviewsAsc(): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE bookmarked = 1
+        WHERE (unread in (1, :unread) OR pinned = 1)
+          AND (bookmarked in (1, :bookmarked))
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """,
     )
-    fun pagingBookmarksAsc(): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE bookmarked = 1 AND feed_id IS :feedId
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByAsc
-        """,
-    )
-    fun pagingBookmarksAsc(feedId: Long): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE bookmarked = 1 AND tag IS :tag
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByAsc
-        """,
-    )
-    fun pagingBookmarksAsc(tag: String): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE bookmarked = 1
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByDesc
-        """,
-    )
-    fun pagingBookmarksDesc(): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE bookmarked = 1 AND feed_id IS :feedId
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByDesc
-        """,
-    )
-    fun pagingBookmarksDesc(feedId: Long): PagingSource<Int, PreviewItem>
-
-    @Query(
-        """
-        SELECT $previewColumns
-        FROM feed_items
-        LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE bookmarked = 1 AND tag IS :tag
-          AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
-        ORDER BY $feedItemsListOrderByDesc
-        """,
-    )
-    fun pagingBookmarksDesc(tag: String): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsAsc(unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
 
     @Query(
         """
@@ -566,10 +434,13 @@ interface FeedItemDao {
         """
             SELECT count(*)
             FROM feed_items fi
-            WHERE NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
+            WHERE
+              unread in (1, :unread)
+              and bookmarked in (1, :bookmarked)
+              and NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
-    fun getFeedItemCount(): Flow<Int>
+    fun getFeedItemCount(unread: Boolean, bookmarked: Boolean): Flow<Int>
 
     @Query(
         """
@@ -577,53 +448,24 @@ interface FeedItemDao {
             FROM feed_items fi
             JOIN feeds f ON feed_id = f.id
             WHERE f.tag IS :tag
+              and unread in (1, :unread)
+              and bookmarked in (1, :bookmarked)
               AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
-    fun getFeedItemCount(tag: String): Flow<Int>
+    fun getFeedItemCount(tag: String, unread: Boolean, bookmarked: Boolean): Flow<Int>
 
     @Query(
         """
             SELECT count(*)
             FROM feed_items fi
             WHERE fi.feed_id IS :feedId
+              and unread in (1, :unread)
+              and bookmarked in (1, :bookmarked)
               AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
     )
-    fun getFeedItemCount(feedId: Long): Flow<Int>
-
-    // //
-
-    @Query(
-        """
-            SELECT count(*)
-            FROM feed_items fi
-            WHERE fi.unread IS 1 OR fi.pinned = 1
-              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
-        """,
-    )
-    fun getUnreadFeedItemCount(): Flow<Int>
-
-    @Query(
-        """
-            SELECT count(*)
-            FROM feed_items fi
-            JOIN feeds f ON fi.feed_id = f.id
-            WHERE f.tag IS :tag AND (fi.unread IS 1 OR fi.pinned = 1)
-              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
-        """,
-    )
-    fun getUnreadFeedItemCount(tag: String): Flow<Int>
-
-    @Query(
-        """
-            SELECT count(*)
-            FROM feed_items fi
-            WHERE fi.feed_id IS :feedId AND (fi.unread IS 1 OR fi.pinned = 1)
-              AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
-        """,
-    )
-    fun getUnreadFeedItemCount(feedId: Long): Flow<Int>
+    fun getFeedItemCount(feedId: Long, unread: Boolean, bookmarked: Boolean): Flow<Int>
 
     @Query(
         """

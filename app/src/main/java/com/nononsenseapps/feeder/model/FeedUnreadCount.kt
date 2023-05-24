@@ -13,11 +13,13 @@ data class FeedUnreadCount @Ignore constructor(
     var title: String = "",
     var url: URL = sloppyLinkToStrictURLNoThrows(""),
     var tag: String = "",
-    @ColumnInfo(name = "custom_title") var customTitle: String = "",
+    @ColumnInfo(name = "custom_title")
+    var customTitle: String = "",
     var notify: Boolean = false,
     @ColumnInfo(name = COL_CURRENTLY_SYNCING) var currentlySyncing: Boolean = false,
     @ColumnInfo(name = "image_url") var imageUrl: URL? = null,
     @ColumnInfo(name = "unread_count") var unreadCount: Int = 0,
+
 ) : Comparable<FeedUnreadCount> {
     constructor() : this(id = ID_UNSET)
 

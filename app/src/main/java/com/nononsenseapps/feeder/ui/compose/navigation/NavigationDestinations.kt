@@ -125,6 +125,7 @@ class PathParamArgument(
     builder: NavArgumentBuilder.() -> Unit,
 ) : NavigationArgument(name, builder)
 
+@OptIn(ExperimentalAnimationApi::class)
 object SearchFeedDestination : NavigationDestination(
     path = "search/feed",
     navArguments = listOf(
@@ -168,6 +169,7 @@ object SearchFeedDestination : NavigationDestination(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 object AddFeedDestination : NavigationDestination(
     path = "add/feed",
     navArguments = listOf(
@@ -210,6 +212,7 @@ object AddFeedDestination : NavigationDestination(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 object EditFeedDestination : NavigationDestination(
     path = "edit/feed",
     navArguments = listOf(
@@ -278,6 +281,7 @@ object SettingsDestination : NavigationDestination(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 object FeedDestination : NavigationDestination(
     path = "feed",
     navArguments = listOf(
@@ -400,6 +404,7 @@ object ArticleDestination : NavigationDestination(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 object SyncScreenDestination : NavigationDestination(
     path = "sync",
     navArguments = listOf(

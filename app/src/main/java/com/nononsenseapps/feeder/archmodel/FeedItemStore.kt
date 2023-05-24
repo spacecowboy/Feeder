@@ -8,6 +8,7 @@ import com.nononsenseapps.feeder.db.room.FeedItem
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
+import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.upsertFeedItems
 import com.nononsenseapps.feeder.model.PreviewItem
@@ -23,33 +24,37 @@ import org.kodein.di.instance
 class FeedItemStore(override val di: DI) : DIAware {
     private val dao: FeedItemDao by instance()
 
-    fun getVisibleFeedItemCount(
+    fun getFeedItemCount(
         feedId: Long,
         tag: String,
         onlyUnread: Boolean,
-    ): Flow<Int> = when {
-        onlyUnread -> {
-            when {
-                feedId > ID_UNSET -> dao.getUnreadFeedItemCount(feedId = feedId)
-                tag.isNotEmpty() -> dao.getUnreadFeedItemCount(tag = tag)
-                else -> dao.getUnreadFeedItemCount()
-            }
+    ): Flow<Int> =
+        when {
+            feedId > ID_UNSET -> dao.getFeedItemCount(
+                feedId = feedId,
+                unread = onlyUnread,
+                bookmarked = false,
+            )
+
+            tag.isNotEmpty() -> dao.getFeedItemCount(
+                tag = tag,
+                unread = onlyUnread,
+                bookmarked = false,
+            )
+
+            feedId == ID_SAVED_ARTICLES -> dao.getFeedItemCount(
+                unread = onlyUnread,
+                bookmarked = true,
+            )
+
+            else -> dao.getFeedItemCount(unread = onlyUnread, bookmarked = false)
         }
-        else -> {
-            when {
-                feedId > ID_UNSET -> dao.getFeedItemCount(feedId = feedId)
-                tag.isNotEmpty() -> dao.getFeedItemCount(tag = tag)
-                else -> dao.getFeedItemCount()
-            }
-        }
-    }
 
     fun getPagedFeedItems(
         feedId: Long,
         tag: String,
         onlyUnread: Boolean,
         newestFirst: Boolean,
-        onlyBookmarks: Boolean = false,
     ): Flow<PagingData<FeedListItem>> =
         Pager(
             config = PagingConfig(
@@ -57,47 +62,47 @@ class FeedItemStore(override val di: DI) : DIAware {
                 enablePlaceholders = false,
             ),
         ) {
+            val onlyBookmarks = feedId == ID_SAVED_ARTICLES
             when {
-                onlyBookmarks && newestFirst -> {
-                    when {
-                        feedId > ID_UNSET -> dao.pagingBookmarksDesc(feedId = feedId)
-                        tag.isNotEmpty() -> dao.pagingBookmarksDesc(tag = tag)
-                        else -> dao.pagingBookmarksDesc()
-                    }
-                }
-                onlyBookmarks -> {
-                    when {
-                        feedId > ID_UNSET -> dao.pagingBookmarksAsc(feedId = feedId)
-                        tag.isNotEmpty() -> dao.pagingBookmarksAsc(tag = tag)
-                        else -> dao.pagingBookmarksAsc()
-                    }
-                }
-                onlyUnread && newestFirst -> {
-                    when {
-                        feedId > ID_UNSET -> dao.pagingUnreadPreviewsDesc(feedId = feedId)
-                        tag.isNotEmpty() -> dao.pagingUnreadPreviewsDesc(tag = tag)
-                        else -> dao.pagingUnreadPreviewsDesc()
-                    }
-                }
-                onlyUnread -> {
-                    when {
-                        feedId > ID_UNSET -> dao.pagingUnreadPreviewsAsc(feedId = feedId)
-                        tag.isNotEmpty() -> dao.pagingUnreadPreviewsAsc(tag = tag)
-                        else -> dao.pagingUnreadPreviewsAsc()
-                    }
-                }
                 newestFirst -> {
                     when {
-                        feedId > ID_UNSET -> dao.pagingPreviewsDesc(feedId = feedId)
-                        tag.isNotEmpty() -> dao.pagingPreviewsDesc(tag = tag)
-                        else -> dao.pagingPreviewsDesc()
+                        feedId > ID_UNSET -> dao.pagingUnreadPreviewsDesc(
+                            feedId = feedId,
+                            unread = onlyUnread,
+                            bookmarked = onlyBookmarks,
+                        )
+
+                        tag.isNotEmpty() -> dao.pagingUnreadPreviewsDesc(
+                            tag = tag,
+                            unread = onlyUnread,
+                            bookmarked = onlyBookmarks,
+                        )
+
+                        else -> dao.pagingUnreadPreviewsDesc(
+                            unread = onlyUnread,
+                            bookmarked = onlyBookmarks,
+                        )
                     }
                 }
+
                 else -> {
                     when {
-                        feedId > ID_UNSET -> dao.pagingPreviewsAsc(feedId = feedId)
-                        tag.isNotEmpty() -> dao.pagingPreviewsAsc(tag = tag)
-                        else -> dao.pagingPreviewsAsc()
+                        feedId > ID_UNSET -> dao.pagingUnreadPreviewsAsc(
+                            feedId = feedId,
+                            unread = onlyUnread,
+                            bookmarked = onlyBookmarks,
+                        )
+
+                        tag.isNotEmpty() -> dao.pagingUnreadPreviewsAsc(
+                            tag = tag,
+                            unread = onlyUnread,
+                            bookmarked = onlyBookmarks,
+                        )
+
+                        else -> dao.pagingUnreadPreviewsAsc(
+                            unread = onlyUnread,
+                            bookmarked = onlyBookmarks,
+                        )
                     }
                 }
             }
@@ -179,12 +184,14 @@ class FeedItemStore(override val di: DI) : DIAware {
                         feedId = feedId,
                         onlyUnread = 1,
                     )
+
                     tag.isNotEmpty() -> dao.markAsReadDesc(
                         offset = offset,
                         limit = index,
                         tag = tag,
                         onlyUnread = 1,
                     )
+
                     else -> dao.markAsReadDesc(
                         offset = offset,
                         limit = index,
@@ -192,6 +199,7 @@ class FeedItemStore(override val di: DI) : DIAware {
                     )
                 }
             }
+
             onlyUnread -> {
                 when {
                     feedId > ID_UNSET -> dao.markAsReadAsc(
@@ -200,12 +208,14 @@ class FeedItemStore(override val di: DI) : DIAware {
                         feedId = feedId,
                         onlyUnread = 1,
                     )
+
                     tag.isNotEmpty() -> dao.markAsReadAsc(
                         offset = offset,
                         limit = index,
                         tag = tag,
                         onlyUnread = 1,
                     )
+
                     else -> dao.markAsReadAsc(
                         offset = offset,
                         limit = index,
@@ -213,6 +223,7 @@ class FeedItemStore(override val di: DI) : DIAware {
                     )
                 }
             }
+
             newestFirst -> {
                 when {
                     feedId > ID_UNSET -> dao.markAsReadDesc(
@@ -221,12 +232,14 @@ class FeedItemStore(override val di: DI) : DIAware {
                         feedId = feedId,
                         onlyUnread = 0,
                     )
+
                     tag.isNotEmpty() -> dao.markAsReadDesc(
                         offset = offset,
                         limit = index,
                         tag = tag,
                         onlyUnread = 0,
                     )
+
                     else -> dao.markAsReadDesc(
                         offset = offset,
                         limit = index,
@@ -234,6 +247,7 @@ class FeedItemStore(override val di: DI) : DIAware {
                     )
                 }
             }
+
             else -> {
                 when {
                     feedId > ID_UNSET -> dao.markAsReadAsc(
@@ -242,12 +256,14 @@ class FeedItemStore(override val di: DI) : DIAware {
                         feedId = feedId,
                         onlyUnread = 0,
                     )
+
                     tag.isNotEmpty() -> dao.markAsReadAsc(
                         offset = offset,
                         limit = index,
                         tag = tag,
                         onlyUnread = 0,
                     )
+
                     else -> dao.markAsReadAsc(
                         offset = offset,
                         limit = index,
@@ -274,17 +290,20 @@ class FeedItemStore(override val di: DI) : DIAware {
                         feedId = feedId,
                         onlyUnread = 1,
                     )
+
                     tag.isNotEmpty() -> dao.markAsReadDesc(
                         offset = offset,
                         tag = tag,
                         onlyUnread = 1,
                     )
+
                     else -> dao.markAsReadDesc(
                         offset = offset,
                         onlyUnread = 1,
                     )
                 }
             }
+
             onlyUnread -> {
                 when {
                     feedId > ID_UNSET -> dao.markAsReadAsc(
@@ -292,17 +311,20 @@ class FeedItemStore(override val di: DI) : DIAware {
                         feedId = feedId,
                         onlyUnread = 1,
                     )
+
                     tag.isNotEmpty() -> dao.markAsReadAsc(
                         offset = offset,
                         tag = tag,
                         onlyUnread = 1,
                     )
+
                     else -> dao.markAsReadAsc(
                         offset = offset,
                         onlyUnread = 1,
                     )
                 }
             }
+
             newestFirst -> {
                 when {
                     feedId > ID_UNSET -> dao.markAsReadDesc(
@@ -310,17 +332,20 @@ class FeedItemStore(override val di: DI) : DIAware {
                         feedId = feedId,
                         onlyUnread = 0,
                     )
+
                     tag.isNotEmpty() -> dao.markAsReadDesc(
                         offset = offset,
                         tag = tag,
                         onlyUnread = 0,
                     )
+
                     else -> dao.markAsReadDesc(
                         offset = offset,
                         onlyUnread = 0,
                     )
                 }
             }
+
             else -> {
                 when {
                     feedId > ID_UNSET -> dao.markAsReadAsc(
@@ -328,11 +353,13 @@ class FeedItemStore(override val di: DI) : DIAware {
                         feedId = feedId,
                         onlyUnread = 0,
                     )
+
                     tag.isNotEmpty() -> dao.markAsReadAsc(
                         offset = offset,
                         tag = tag,
                         onlyUnread = 0,
                     )
+
                     else -> dao.markAsReadAsc(
                         offset = offset,
                         onlyUnread = 0,
