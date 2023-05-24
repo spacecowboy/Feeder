@@ -5,6 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
@@ -167,83 +168,41 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.markAllAsRead()
     }
 
-    suspend fun markBeforeAsRead(
-        index: Int,
+    suspend fun markAsRead(
         feedId: Long,
         tag: String,
         onlyUnread: Boolean,
-        newestFirst: Boolean,
+        descending: Boolean,
+        cursor: FeedItemCursor,
     ) {
-        val offset = 0
+        val onlyBookmarks = feedId == ID_SAVED_ARTICLES
         when {
-            onlyUnread && newestFirst -> {
+            descending -> {
                 when {
                     feedId > ID_UNSET -> dao.markAsReadDesc(
-                        offset = offset,
-                        limit = index,
+                        primarySortTime = cursor.primarySortTime,
+                        pubDate = cursor.pubDate,
+                        id = cursor.id,
                         feedId = feedId,
-                        onlyUnread = 1,
+                        onlyUnread = onlyUnread,
+                        onlyBookmarked = onlyBookmarks,
                     )
 
                     tag.isNotEmpty() -> dao.markAsReadDesc(
-                        offset = offset,
-                        limit = index,
+                        primarySortTime = cursor.primarySortTime,
+                        pubDate = cursor.pubDate,
+                        id = cursor.id,
                         tag = tag,
-                        onlyUnread = 1,
+                        onlyUnread = onlyUnread,
+                        onlyBookmarked = onlyBookmarks,
                     )
 
                     else -> dao.markAsReadDesc(
-                        offset = offset,
-                        limit = index,
-                        onlyUnread = 1,
-                    )
-                }
-            }
-
-            onlyUnread -> {
-                when {
-                    feedId > ID_UNSET -> dao.markAsReadAsc(
-                        offset = offset,
-                        limit = index,
-                        feedId = feedId,
-                        onlyUnread = 1,
-                    )
-
-                    tag.isNotEmpty() -> dao.markAsReadAsc(
-                        offset = offset,
-                        limit = index,
-                        tag = tag,
-                        onlyUnread = 1,
-                    )
-
-                    else -> dao.markAsReadAsc(
-                        offset = offset,
-                        limit = index,
-                        onlyUnread = 1,
-                    )
-                }
-            }
-
-            newestFirst -> {
-                when {
-                    feedId > ID_UNSET -> dao.markAsReadDesc(
-                        offset = offset,
-                        limit = index,
-                        feedId = feedId,
-                        onlyUnread = 0,
-                    )
-
-                    tag.isNotEmpty() -> dao.markAsReadDesc(
-                        offset = offset,
-                        limit = index,
-                        tag = tag,
-                        onlyUnread = 0,
-                    )
-
-                    else -> dao.markAsReadDesc(
-                        offset = offset,
-                        limit = index,
-                        onlyUnread = 0,
+                        primarySortTime = cursor.primarySortTime,
+                        pubDate = cursor.pubDate,
+                        id = cursor.id,
+                        onlyUnread = onlyUnread,
+                        onlyBookmarked = onlyBookmarks,
                     )
                 }
             }
@@ -251,118 +210,29 @@ class FeedItemStore(override val di: DI) : DIAware {
             else -> {
                 when {
                     feedId > ID_UNSET -> dao.markAsReadAsc(
-                        offset = offset,
-                        limit = index,
+                        primarySortTime = cursor.primarySortTime,
+                        pubDate = cursor.pubDate,
+                        id = cursor.id,
                         feedId = feedId,
-                        onlyUnread = 0,
+                        onlyUnread = onlyUnread,
+                        onlyBookmarked = onlyBookmarks,
                     )
 
                     tag.isNotEmpty() -> dao.markAsReadAsc(
-                        offset = offset,
-                        limit = index,
+                        primarySortTime = cursor.primarySortTime,
+                        pubDate = cursor.pubDate,
+                        id = cursor.id,
                         tag = tag,
-                        onlyUnread = 0,
+                        onlyUnread = onlyUnread,
+                        onlyBookmarked = onlyBookmarks,
                     )
 
                     else -> dao.markAsReadAsc(
-                        offset = offset,
-                        limit = index,
-                        onlyUnread = 0,
-                    )
-                }
-            }
-        }
-    }
-
-    suspend fun markAfterAsRead(
-        index: Int,
-        feedId: Long,
-        tag: String,
-        onlyUnread: Boolean,
-        newestFirst: Boolean,
-    ) {
-        val offset = index + 1
-        when {
-            onlyUnread && newestFirst -> {
-                when {
-                    feedId > ID_UNSET -> dao.markAsReadDesc(
-                        offset = offset,
-                        feedId = feedId,
-                        onlyUnread = 1,
-                    )
-
-                    tag.isNotEmpty() -> dao.markAsReadDesc(
-                        offset = offset,
-                        tag = tag,
-                        onlyUnread = 1,
-                    )
-
-                    else -> dao.markAsReadDesc(
-                        offset = offset,
-                        onlyUnread = 1,
-                    )
-                }
-            }
-
-            onlyUnread -> {
-                when {
-                    feedId > ID_UNSET -> dao.markAsReadAsc(
-                        offset = offset,
-                        feedId = feedId,
-                        onlyUnread = 1,
-                    )
-
-                    tag.isNotEmpty() -> dao.markAsReadAsc(
-                        offset = offset,
-                        tag = tag,
-                        onlyUnread = 1,
-                    )
-
-                    else -> dao.markAsReadAsc(
-                        offset = offset,
-                        onlyUnread = 1,
-                    )
-                }
-            }
-
-            newestFirst -> {
-                when {
-                    feedId > ID_UNSET -> dao.markAsReadDesc(
-                        offset = offset,
-                        feedId = feedId,
-                        onlyUnread = 0,
-                    )
-
-                    tag.isNotEmpty() -> dao.markAsReadDesc(
-                        offset = offset,
-                        tag = tag,
-                        onlyUnread = 0,
-                    )
-
-                    else -> dao.markAsReadDesc(
-                        offset = offset,
-                        onlyUnread = 0,
-                    )
-                }
-            }
-
-            else -> {
-                when {
-                    feedId > ID_UNSET -> dao.markAsReadAsc(
-                        offset = offset,
-                        feedId = feedId,
-                        onlyUnread = 0,
-                    )
-
-                    tag.isNotEmpty() -> dao.markAsReadAsc(
-                        offset = offset,
-                        tag = tag,
-                        onlyUnread = 0,
-                    )
-
-                    else -> dao.markAsReadAsc(
-                        offset = offset,
-                        onlyUnread = 0,
+                        primarySortTime = cursor.primarySortTime,
+                        pubDate = cursor.pubDate,
+                        id = cursor.id,
+                        onlyUnread = onlyUnread,
+                        onlyBookmarked = onlyBookmarks,
                     )
                 }
             }
@@ -414,4 +284,6 @@ private fun PreviewItem.toFeedListItem() =
         pinned = pinned,
         bookmarked = bookmarked,
         feedImageUrl = feedImageUrl,
+        rawPubDate = pubDate,
+        primarySortTime = primarySortTime,
     )

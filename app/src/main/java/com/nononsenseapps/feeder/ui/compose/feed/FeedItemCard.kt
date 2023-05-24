@@ -49,6 +49,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
+import org.threeten.bp.Instant
 
 @Composable
 fun FeedItemCard(
@@ -62,6 +63,7 @@ fun FeedItemCard(
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     newIndicator: Boolean,
+    bookmarkIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
@@ -101,7 +103,7 @@ fun FeedItemCard(
                         )
                         FeedItemIndicatorRow(
                             unread = item.unread && newIndicator,
-                            bookmarked = item.bookmarked,
+                            bookmarked = item.bookmarked && bookmarkIndicator,
                             pinned = item.pinned,
                             modifier = Modifier.padding(
                                 top = 12.dp,
@@ -277,6 +279,8 @@ private fun Preview() {
                 pinned = false,
                 bookmarked = false,
                 feedImageUrl = null,
+                primarySortTime = Instant.EPOCH,
+                rawPubDate = null,
             ),
             showThumbnail = true,
             onMarkAboveAsRead = {},
@@ -287,6 +291,7 @@ private fun Preview() {
             dropDownMenuExpanded = false,
             onDismissDropdown = {},
             newIndicator = true,
+            bookmarkIndicator = true,
         )
     }
 }
@@ -311,6 +316,8 @@ private fun PreviewWithImage() {
                     pinned = true,
                     bookmarked = true,
                     feedImageUrl = null,
+                    primarySortTime = Instant.EPOCH,
+                    rawPubDate = null,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
@@ -321,6 +328,7 @@ private fun PreviewWithImage() {
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 newIndicator = true,
+                bookmarkIndicator = true,
             )
         }
     }

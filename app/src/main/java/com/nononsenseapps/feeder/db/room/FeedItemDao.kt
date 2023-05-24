@@ -17,6 +17,8 @@ import com.nononsenseapps.feeder.model.PreviewItem
 import com.nononsenseapps.feeder.model.previewColumns
 import java.net.URL
 import kotlinx.coroutines.flow.Flow
+import org.threeten.bp.Instant
+import org.threeten.bp.ZonedDateTime
 
 @Dao
 interface FeedItemDao {
@@ -136,13 +138,17 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-          AND (unread in (1, :unread) OR pinned = 1)
-          AND (bookmarked in (1, :bookmarked))
+          AND unread in (1, :unread)
+          AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """,
     )
-    fun pagingUnreadPreviewsDesc(feedId: Long, unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsDesc(
+        feedId: Long,
+        unread: Boolean,
+        bookmarked: Boolean,
+    ): PagingSource<Int, PreviewItem>
 
     @Query(
         """
@@ -150,26 +156,33 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
-          AND (unread in (1, :unread) OR pinned = 1)
-          AND (bookmarked in (1, :bookmarked))
+          AND unread in (1, :unread)
+          AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """,
     )
-    fun pagingUnreadPreviewsDesc(tag: String, unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsDesc(
+        tag: String,
+        unread: Boolean,
+        bookmarked: Boolean,
+    ): PagingSource<Int, PreviewItem>
 
     @Query(
         """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE (unread in (1, :unread) OR pinned = 1)
-          AND (bookmarked in (1, :bookmarked))
+        WHERE unread in (1, :unread)
+          AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
         """,
     )
-    fun pagingUnreadPreviewsDesc(unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsDesc(
+        unread: Boolean,
+        bookmarked: Boolean,
+    ): PagingSource<Int, PreviewItem>
 
     @Query(
         """
@@ -177,13 +190,17 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-          AND (unread in (1, :unread) OR pinned = 1)
-          AND (bookmarked in (1, :bookmarked))
+          AND unread in (1, :unread)
+          AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """,
     )
-    fun pagingUnreadPreviewsAsc(feedId: Long, unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsAsc(
+        feedId: Long,
+        unread: Boolean,
+        bookmarked: Boolean,
+    ): PagingSource<Int, PreviewItem>
 
     @Query(
         """
@@ -191,26 +208,33 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag 
-          AND (unread in (1, :unread) OR pinned = 1)
-          AND (bookmarked in (1, :bookmarked))
+          AND unread in (1, :unread)
+          AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """,
     )
-    fun pagingUnreadPreviewsAsc(tag: String, unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsAsc(
+        tag: String,
+        unread: Boolean,
+        bookmarked: Boolean,
+    ): PagingSource<Int, PreviewItem>
 
     @Query(
         """
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE (unread in (1, :unread) OR pinned = 1)
-          AND (bookmarked in (1, :bookmarked))
+        WHERE unread in (1, :unread)
+          AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
         """,
     )
-    fun pagingUnreadPreviewsAsc(unread: Boolean, bookmarked: Boolean): PagingSource<Int, PreviewItem>
+    fun pagingUnreadPreviewsAsc(
+        unread: Boolean,
+        bookmarked: Boolean,
+    ): PagingSource<Int, PreviewItem>
 
     @Query(
         """
@@ -285,13 +309,24 @@ interface FeedItemDao {
             WHERE id IN (
                 SELECT feed_items.id
                 FROM feed_items
-                WHERE unread = 1 OR unread = :onlyUnread
-                ORDER BY $feedItemsListOrderByDesc
-                LIMIT :limit OFFSET :offset
+                WHERE unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+                -- this version of sqlite doesn't seem to support tuple comparisons
+                and (
+                    primary_sort_time < :primarySortTime
+                    or primary_sort_time = :primarySortTime and pub_date < :pubDate
+                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id < :id
+                )
             )
         """,
     )
-    suspend fun markAsReadDesc(onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+    suspend fun markAsReadDesc(
+        onlyUnread: Boolean,
+        onlyBookmarked: Boolean,
+        primarySortTime: Instant,
+        pubDate: ZonedDateTime?,
+        id: Long,
+    )
 
     @Query(
         """
@@ -299,13 +334,24 @@ interface FeedItemDao {
             WHERE id IN (
                 SELECT feed_items.id
                 FROM feed_items
-                WHERE unread = 1 OR unread = :onlyUnread
-                ORDER BY $feedItemsListOrderByAsc
-                LIMIT :limit OFFSET :offset
+                WHERE unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+                -- this version of sqlite doesn't seem to support tuple comparisons
+                and (
+                    primary_sort_time > :primarySortTime
+                    or primary_sort_time = :primarySortTime and pub_date > :pubDate
+                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id > :id
+                )
             )
         """,
     )
-    suspend fun markAsReadAsc(onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+    suspend fun markAsReadAsc(
+        onlyUnread: Boolean,
+        onlyBookmarked: Boolean,
+        primarySortTime: Instant,
+        pubDate: ZonedDateTime?,
+        id: Long,
+    )
 
     @Query(
         """
@@ -313,17 +359,24 @@ interface FeedItemDao {
             WHERE id IN (
                 SELECT feed_items.id
                 FROM feed_items
-                WHERE feed_id = :feedId AND (unread = 1 OR unread = :onlyUnread)
-                ORDER BY $feedItemsListOrderByDesc
-                LIMIT :limit OFFSET :offset
+                WHERE feed_id = :feedId AND unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+                -- this version of sqlite doesn't seem to support tuple comparisons
+                and (
+                    primary_sort_time < :primarySortTime
+                    or primary_sort_time = :primarySortTime and pub_date < :pubDate
+                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id < :id
+                )
             )
         """,
     )
     suspend fun markAsReadDesc(
         feedId: Long,
-        onlyUnread: Int,
-        limit: Int = Int.MAX_VALUE,
-        offset: Int,
+        onlyUnread: Boolean,
+        onlyBookmarked: Boolean,
+        primarySortTime: Instant,
+        pubDate: ZonedDateTime?,
+        id: Long,
     )
 
     @Query(
@@ -332,17 +385,24 @@ interface FeedItemDao {
             WHERE id IN (
                 SELECT feed_items.id
                 FROM feed_items
-                WHERE feed_id = :feedId AND (unread = 1 OR unread = :onlyUnread)
-                ORDER BY $feedItemsListOrderByAsc
-                LIMIT :limit OFFSET :offset
+                WHERE feed_id = :feedId AND unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+                -- this version of sqlite doesn't seem to support tuple comparisons
+                and (
+                    primary_sort_time > :primarySortTime
+                    or primary_sort_time = :primarySortTime and pub_date > :pubDate
+                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id > :id
+                )
             )
         """,
     )
     suspend fun markAsReadAsc(
         feedId: Long,
-        onlyUnread: Int,
-        limit: Int = Int.MAX_VALUE,
-        offset: Int,
+        onlyUnread: Boolean,
+        onlyBookmarked: Boolean,
+        primarySortTime: Instant,
+        pubDate: ZonedDateTime?,
+        id: Long,
     )
 
     @Query(
@@ -352,17 +412,24 @@ interface FeedItemDao {
                 SELECT feed_items.id
                 FROM feed_items
                 LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-                WHERE tag IS :tag AND (unread = 1 OR unread = :onlyUnread)
-                ORDER BY $feedItemsListOrderByDesc
-                LIMIT :limit OFFSET :offset
+                WHERE tag IS :tag AND unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+                -- this version of sqlite doesn't seem to support tuple comparisons
+                and (
+                    primary_sort_time < :primarySortTime
+                    or primary_sort_time = :primarySortTime and pub_date < :pubDate
+                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id < :id
+                )
             )
         """,
     )
     suspend fun markAsReadDesc(
         tag: String,
-        onlyUnread: Int,
-        limit: Int = Int.MAX_VALUE,
-        offset: Int,
+        onlyUnread: Boolean,
+        onlyBookmarked: Boolean,
+        primarySortTime: Instant,
+        pubDate: ZonedDateTime?,
+        id: Long,
     )
 
     @Query(
@@ -372,13 +439,25 @@ interface FeedItemDao {
                 SELECT feed_items.id
                 FROM feed_items
                 LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-                WHERE tag IS :tag AND (unread = 1 OR unread = :onlyUnread)
-                ORDER BY $feedItemsListOrderByAsc
-                LIMIT :limit OFFSET :offset
+                WHERE tag IS :tag and unread in (1, :onlyUnread) and bookmarked in (1, :onlyBookmarked)
+                AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
+                -- this version of sqlite doesn't seem to support tuple comparisons
+                and (
+                    primary_sort_time > :primarySortTime
+                    or primary_sort_time = :primarySortTime and pub_date > :pubDate
+                    or primary_sort_time = :primarySortTime and pub_date = :pubDate and feed_items.id > :id
+                )
             )
         """,
     )
-    suspend fun markAsReadAsc(tag: String, onlyUnread: Int, limit: Int = Int.MAX_VALUE, offset: Int)
+    suspend fun markAsReadAsc(
+        tag: String,
+        onlyUnread: Boolean,
+        onlyBookmarked: Boolean,
+        primarySortTime: Instant,
+        pubDate: ZonedDateTime?,
+        id: Long,
+    )
 
     @Query(
         """
@@ -489,8 +568,11 @@ interface FeedItemDao {
     suspend fun getItemWith(feedUrl: URL, articleGuid: String): Long?
 
     companion object {
-        private const val feedItemsListOrderByDesc = "pinned DESC, primary_sort_time DESC, pub_date DESC"
-        private const val feedItemsListOrderByAsc = "pinned DESC, primary_sort_time ASC, pub_date ASC"
+        // These are backed by a database index
+        private const val feedItemsListOrderByDesc =
+            "primary_sort_time DESC, pub_date DESC, feed_items.id DESC"
+        private const val feedItemsListOrderByAsc =
+            "primary_sort_time ASC, pub_date ASC, feed_items.id ASC"
     }
 }
 

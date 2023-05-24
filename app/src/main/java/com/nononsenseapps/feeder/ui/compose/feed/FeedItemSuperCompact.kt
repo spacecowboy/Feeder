@@ -49,6 +49,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
+import org.threeten.bp.Instant
 
 @Composable
 fun FeedItemSuperCompact(
@@ -256,6 +257,8 @@ private fun PreviewRead() {
                     pinned = false,
                     bookmarked = false,
                     feedImageUrl = null,
+                    primarySortTime = Instant.EPOCH,
+                    rawPubDate = null,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
@@ -289,6 +292,8 @@ private fun PreviewUnread() {
                     pinned = false,
                     bookmarked = false,
                     feedImageUrl = null,
+                    primarySortTime = Instant.EPOCH,
+                    rawPubDate = null,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
@@ -322,6 +327,8 @@ private fun PreviewWithImage() {
                     pinned = true,
                     bookmarked = false,
                     feedImageUrl = null,
+                    primarySortTime = Instant.EPOCH,
+                    rawPubDate = null,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
