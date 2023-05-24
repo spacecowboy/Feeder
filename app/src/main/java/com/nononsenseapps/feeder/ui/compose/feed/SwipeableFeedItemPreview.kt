@@ -129,8 +129,8 @@ fun SwipeableFeedItemPreview(
     }
 
     val toggleReadStatusLabel = stringResource(R.string.toggle_read_status)
-    val bookmarkArticleLabel = stringResource(R.string.bookmark_article)
-    val removeBookmarkLabel = stringResource(R.string.remove_bookmark)
+    val saveArticleLabel = stringResource(R.string.save_article)
+    val unSaveArticleLabel = stringResource(R.string.unsave_article)
     val markAboveAsReadLabel = stringResource(R.string.mark_items_above_as_read)
     val markBelowAsReadLabel = stringResource(R.string.mark_items_below_as_read)
     val shareLabel = stringResource(R.string.share)
@@ -170,8 +170,8 @@ fun SwipeableFeedItemPreview(
                         },
                         CustomAccessibilityAction(
                             when (item.bookmarked) {
-                                true -> removeBookmarkLabel
-                                false -> bookmarkArticleLabel
+                                true -> unSaveArticleLabel
+                                false -> saveArticleLabel
                             },
                         ) {
                             onToggleBookmarked()

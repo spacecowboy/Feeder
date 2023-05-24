@@ -45,7 +45,7 @@ fun FeedItemIndicatorRow(
             FeedItemIndicator {
                 Icon(
                     Icons.Default.Star,
-                    contentDescription = stringResource(id = R.string.bookmark_article),
+                    contentDescription = stringResource(id = R.string.saved_article),
                     modifier = Modifier.size(16.dp),
                 )
             }
@@ -75,7 +75,7 @@ fun FeedItemIndicatorColumn(
             FeedItemIndicator {
                 Icon(
                     Icons.Default.Star,
-                    contentDescription = stringResource(id = R.string.bookmark_article),
+                    contentDescription = stringResource(id = R.string.saved_article),
                     modifier = Modifier.size(iconSize),
                 )
             }

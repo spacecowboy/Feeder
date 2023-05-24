@@ -89,8 +89,7 @@
     <string name="include_mobile_hotspots">รวมฮอตสปอตจากมือถือด้วย</string>
     <string name="updated_feeds">อัปเดตฟีดแล้ว</string>
     <string name="two_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
-    <string name="remove_bookmark">ลบที่คั่นหน้าบทความ</string>
-    <string name="open_in_default_browser">เว็บเบราว์เซอร์เรื่มต้น</string>
+  <string name="open_in_default_browser">เว็บเบราว์เซอร์เรื่มต้น</string>
     <string name="dark_theme_preference_black">ดำสนิท</string>
     <string name="dark_theme_preference_dark">มืด</string>
     <string name="sort_oldest_first">รายการเก่าที่สุดก่อน</string>
@@ -99,12 +98,10 @@
     <string name="failed_to_fetch_full_article">ดึงข้อมูลบทความเต็มไม่ได้</string>
     <string name="battery_optimization_enabled">เปิด</string>
     <string name="already_read">อ่านไปแล้ว</string>
-    <string name="showing_only_bookmarked_articles">แสดงเฉพาะบทความที่คั่นหน้าไว้แล้ว</string>
-    <string name="many_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
+  <string name="many_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
     <string name="other_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
     <string name="synchronize_feeds">ซิงค์ฟีด</string>
-    <string name="bookmarks_filter">ที่คั้นหน้าไว้เท่านั้น</string>
-    <string name="few_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
+  <string name="few_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
     <string name="feed_item_style">รูปแบบบทความ</string>
     <string name="feed_item_style_card">การ์ด</string>
     <string name="this_device">%1$s (อุปกรณ์นี้)</string>
@@ -178,9 +175,7 @@
     <string name="only_from_end">เฉพาะจากช่วงสุดท้าย</string>
     <string name="from_anywhere">จากที่ไหนก็ได้</string>
     <string name="swipe_to_mark_as_read">ปัดเพื่อทำเครื่องหมายว่าอ่านแล้ว</string>
-    <string name="bookmark_article">คั่นหน้าบทความ</string>
-    <string name="bookmarked">คั่นหน้าแล้ว</string>
-    <string name="new_indicator">ใหม่</string>
+  <string name="new_indicator">ใหม่</string>
     <string name="explanation_permission_notifications">ต้องให้อนุญาตสิทธิ์ก่อนที่จะเปิดสามารถเปิดการแจ้งเตือนได้</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="text_scale">ขนาดข้อความ</string>

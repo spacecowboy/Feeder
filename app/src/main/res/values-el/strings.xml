@@ -119,18 +119,14 @@
     <string name="other_unread_articles">%1$s μη αναγνωσμένα άρθρα</string>
     <string name="only_enable_for_bad_id_feeds">Ενεργοποίηση μόνο για τις ροές με κακά αναγνωριστικά</string>
     <string name="failed_to_load_text_to_speech">Δεν μπόρεσε να φορτώσει η λειτουργία κείμενο σε ομιλία</string>
-    <string name="showing_only_bookmarked_articles">Εμφανίζονται μόνο άρθρα με σελιδοδείκτη</string>
-    <string name="bookmarks_filter">Μόνο σελιδοδείκτες</string>
-    <string name="one_unread_article">%1$s μη αναγνωσμένο άρθρο</string>
+  <string name="one_unread_article">%1$s μη αναγνωσμένο άρθρο</string>
     <string name="generate_extra_unique_ids">Δημιουργία επιπλέον μοναδικών αναγνωριστικών</string>
     <string name="press_scan_sync">Στη συσκευή σας, μεταβείτε στον συγχρονισμό συσκευών και πατήστε στον κωδικό συγχρονισμού σάρωσης.</string>
     <string name="or_open_device_sync_link">Εναλλακτικά, ανοίξτε τον σύνδεσμο στη συσκευή σας.</string>
     <string name="treat_like_password">Αντιμετωπίστε αυτό σαν έναν κωδικό πρόσβασης. Ο καθένας μπορεί να διαβάσει τα συγχρονισμένα δεδομένα σας εάν έχουν τον σύνδεσμο.</string>
     <string name="start_new_sync_chain">Ξεκινήστε νέα αλυσίδα συγχρονισμού</string>
     <string name="no_barcode_scanner_installed">Δεν ήταν δυνατή η εύρεση ενός σαρωτή γραμμωτού κώδικα</string>
-    <string name="bookmark_article">Δημιουργία σελιδοδείκτη για το άρθρο</string>
-    <string name="remove_bookmark">Κατάργηση σελιδοδείκτη</string>
-    <string name="two_unread_articles">%1$s μη αναγνωσμένα άρθρα</string>
+  <string name="two_unread_articles">%1$s μη αναγνωσμένα άρθρα</string>
     <string name="few_unread_articles">%1$s μη αναγνωσμένα άρθρα</string>
     <string name="feed_item_style_super_compact">Σούπερ συμπαγής</string>
   <string name="empty_feed_add"><annotation style="link">Προσθήκη</annotation> περισσότερων ροών;</string>
@@ -176,8 +172,7 @@
     <string name="scan_or_enter_code">Σαρώστε ή εισαγάγετε τον κωδικό συγχρονισμού</string>
     <string name="only_available_on_android_n">Διαθέσιμο μόνο σε Android %1$s και πάνω</string>
     <string name="description_for_read_aloud">Ανιχνεύει αυτόματα τη γλώσσα του άρθρου</string>
-    <string name="bookmarked">Με σελιδοδείκτη</string>
-    <string name="permission_read_desc">Επιτρέπει στην εφαρμογή να διαβάζει ροές και άρθρα</string>
+  <string name="permission_read_desc">Επιτρέπει στην εφαρμογή να διαβάζει ροές και άρθρα</string>
     <string name="dynamic_theme_use">Δυναμικά χρώματα</string>
     <string name="use_detect_language">Ανίχνευση γλώσσας</string>
     <string name="new_indicator">Νέο</string>

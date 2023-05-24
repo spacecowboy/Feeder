@@ -107,8 +107,7 @@
     <string name="unread">Olvasatlan</string>
     <string name="already_read">Már elolvasott</string>
     <string name="showing_only_unread_articles">Csak olvasatlan cikkek mutatása</string>
-    <string name="showing_only_bookmarked_articles">Csak kedvencek mutatása</string>
-    <string name="showing_all_articles">Minden cikk mutatása</string>
+  <string name="showing_all_articles">Minden cikk mutatása</string>
     <string name="synchronize_feeds">Feedek szinkelése</string>
     <string name="zero_unread_articles">%1$s olvasatlan cikk</string>
     <string name="one_unread_article">%1$s olvasatlan cikk</string>
@@ -149,9 +148,7 @@
     <string name="swipe_to_mark_as_read">Húzd félre az olvasottnak jelöléshez</string>
     <string name="are_you_sure_leave_sync_chain">Biztos vagy benne, hogy el akarod hagyni a szink láncot\?</string>
     <string name="no_barcode_scanner_installed">Nem találtam vonalkód szkennelőt</string>
-  <string name="bookmark_article">Cikk kedvencekbe rakása</string>
-    <string name="remove_bookmark">Cikk kivétele kedvencekből</string>
-    <string name="permission_read_desc">Engedélyezi az alkalmazás számára, hogy feedeket és cikkeket olvasson</string>
+  <string name="permission_read_desc">Engedélyezi az alkalmazás számára, hogy feedeket és cikkeket olvasson</string>
     <string name="permission_read_label">Feeder csak olvasási engedély</string>
     <string name="open_enclosed_media">Média melléklet megnyitása</string>
     <string name="open_enclosed_media_file">%1$s megnyitása</string>
@@ -171,8 +168,7 @@
     <string name="battery_optimization_disabled">Ki</string>
     <string name="battery_optimization">Akkumulátor optimalizáció</string>
     <string name="battery_optimization_enabled">Be</string>
-    <string name="bookmarks_filter">Csak kedvencek</string>
-    <string name="feed_item_style_compact">Kompakt</string>
+  <string name="feed_item_style_compact">Kompakt</string>
     <string name="feed_item_style_super_compact">Szuper kompakt</string>
     <string name="invalid_url">Nem valós cím</string>
     <string name="remove_device">Eszköz eltávolítása</string>

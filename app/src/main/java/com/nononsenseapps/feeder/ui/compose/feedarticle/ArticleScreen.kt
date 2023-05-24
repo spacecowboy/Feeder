@@ -275,9 +275,9 @@ fun ArticleScreen(
                                         Text(
                                             stringResource(
                                                 if (viewState.isBookmarked) {
-                                                    R.string.remove_bookmark
+                                                    R.string.unsave_article
                                                 } else {
-                                                    R.string.bookmark_article
+                                                    R.string.save_article
                                                 },
                                             ),
                                         )

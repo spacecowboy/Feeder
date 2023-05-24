@@ -170,11 +170,7 @@
   <string name="block_list">Engelleme listesi</string>
     <string name="add_item">Öge ekle</string>
     <string name="remove">Kaldır</string>
-    <string name="bookmarks_filter">Yalnızca yer imleri</string>
-    <string name="showing_only_bookmarked_articles">Yalnızca yer imlerine eklenen makaleler gösteriliyor</string>
-    <string name="bookmark_article">Makaleye ayraç koy</string>
-    <string name="remove_bookmark">Ayracı kaldır</string>
-    <string name="permission_read_desc">Uygulamanın yayınları ve makaleleri okumasına izin verir</string>
+  <string name="permission_read_desc">Uygulamanın yayınları ve makaleleri okumasına izin verir</string>
     <string name="permission_read_label">Feeder salt okunur erişim</string>
     <string name="use_detect_language">Dili algıla</string>
     <string name="only_available_on_android_n">Yalnızca Android %1$s ve üzerinde kullanılabilir</string>
@@ -182,8 +178,7 @@
     <string name="explanation_permission_notifications">Bildirimlerin etkinleştirilebilmesi için önce izin verilmelidir.</string>
     <string name="text_to_speech">Metin okuma</string>
     <string name="dynamic_theme_use">Değişken renkler</string>
-    <string name="bookmarked">Ayraç koyuldu</string>
-    <string name="set_language">Dili ayarla</string>
+  <string name="set_language">Dili ayarla</string>
     <string name="skip_to_next">Sonrakine atla</string>
     <string name="new_indicator">Yeni</string>
     <string name="article_image">Makale görseli</string>

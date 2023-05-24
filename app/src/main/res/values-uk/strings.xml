@@ -170,11 +170,7 @@
   <string name="block_list">Список блокування</string>
     <string name="add_item">Додати елемент</string>
     <string name="remove">Вилучити</string>
-    <string name="showing_only_bookmarked_articles">Показувати лише статті в закладках</string>
-    <string name="bookmarks_filter">Лише закладки</string>
-    <string name="bookmark_article">Додати до закладок</string>
-    <string name="remove_bookmark">Вилучити закладку</string>
-    <string name="permission_read_desc">Дозволяє програмі читати стрічки і статті</string>
+  <string name="permission_read_desc">Дозволяє програмі читати стрічки і статті</string>
     <string name="permission_read_label">Доступ лише для читання для Feeder</string>
     <string name="use_detect_language">Визначити мову</string>
     <string name="description_for_read_aloud">Автоматично визначати мову статті</string>
@@ -184,8 +180,7 @@
     <string name="set_language">Вказати мову</string>
     <string name="skip_to_next">Перейти до наступного</string>
     <string name="dynamic_theme_use">Динамічні кольори</string>
-    <string name="bookmarked">Додано в закладки</string>
-    <string name="new_indicator">Нове</string>
+  <string name="new_indicator">Нове</string>
     <string name="article_image">Зображення статті</string>
     <string name="feed_icon">Значок стрічки</string>
     <string name="text_scale">Розмір тексту</string>

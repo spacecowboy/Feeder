@@ -171,8 +171,8 @@ fun FeedItemCard(
                                     Text(
                                         text = stringResource(
                                             when (item.bookmarked) {
-                                                true -> R.string.remove_bookmark
-                                                false -> R.string.bookmark_article
+                                                true -> R.string.unsave_article
+                                                false -> R.string.save_article
                                             },
                                         ),
                                     )

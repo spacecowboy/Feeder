@@ -156,11 +156,8 @@
     <string name="other_unread_articles">%1$s articles sense llegir</string>
     <string name="only_enable_for_bad_id_feeds">Habilita-ho només per canals amb identificadors dolents</string>
     <string name="from_anywhere">Des de qualsevol lloc</string>
-    <string name="bookmark_article">Desa l\'article</string>
-    <string name="are_you_sure_leave_sync_chain">Esteu segurs que voleu sortir de la cadena de sincronització\?</string>
-    <string name="remove_bookmark">Elimina l\'article desat</string>
-    <string name="bookmarked">Desat</string>
-    <string name="only_available_on_android_n">Només disponible a l\'Android %1$s i superior</string>
+  <string name="are_you_sure_leave_sync_chain">Esteu segurs que voleu sortir de la cadena de sincronització\?</string>
+  <string name="only_available_on_android_n">Només disponible a l\'Android %1$s i superior</string>
     <string name="use_app_default">Utilitza l\'opció per defecte</string>
     <string name="device_sync_financed_by_community">Aquest servei és pagat per la comunitat. Si us plau, considereu fer una donació si el troba útil.</string>
     <string name="add_new_device">Afegeix un dispositiu nou</string>
@@ -172,9 +169,7 @@
     <string name="dark_theme_preference_black">Negre</string>
     <string name="unread">Sense llegir</string>
     <string name="already_read">Ja llegit</string>
-    <string name="showing_only_bookmarked_articles">Només visualitza els articles desats</string>
-    <string name="bookmarks_filter">Només els articles desats</string>
-    <string name="one_unread_article">%1$s article sense llegir</string>
+  <string name="one_unread_article">%1$s article sense llegir</string>
     <string name="invalid_url">URL no vàlida</string>
     <string name="device_sync">Sincronització del dispositiu</string>
     <string name="disconnect_device_from_sync">Desconnecta el dispositiu de la cadena de sincronització</string>

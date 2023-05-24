@@ -170,11 +170,7 @@
   <string name="block_list">Lista zablokowanych</string>
     <string name="add_item">Dodaj element</string>
     <string name="remove">Usuń</string>
-    <string name="bookmarks_filter">Tylko z zakładek</string>
-    <string name="remove_bookmark">Usuń z zakładek</string>
-    <string name="bookmark_article">Dodaj do zakładek</string>
-    <string name="showing_only_bookmarked_articles">Wyświetlanie tylko artykułów z zakładek</string>
-    <string name="permission_read_label">Dostęp tylko do odczytu dla Feedera</string>
+  <string name="permission_read_label">Dostęp tylko do odczytu dla Feedera</string>
     <string name="permission_read_desc">Umożliwia aplikacji odczytywanie kanałów i artykułów</string>
     <string name="use_detect_language">Wykrywaj język</string>
     <string name="only_available_on_android_n">Dostępne tylko na Androidzie %1$s i nowszych</string>
@@ -184,8 +180,7 @@
     <string name="set_language">Ustaw język</string>
     <string name="text_to_speech">Zamiana tekstu na mowę</string>
     <string name="dynamic_theme_use">Dynamiczne kolory</string>
-    <string name="bookmarked">Dodany do zakładek</string>
-    <string name="new_indicator">Nowy</string>
+  <string name="new_indicator">Nowy</string>
     <string name="article_image">Obrazek artykułu</string>
     <string name="feed_icon">Ikona kanału</string>
     <string name="text_scale">Rozmiar tekstu</string>

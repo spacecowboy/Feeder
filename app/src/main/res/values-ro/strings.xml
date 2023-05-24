@@ -169,12 +169,8 @@
     <string name="no_barcode_scanner_installed">Nu a putut găsi un cititor de coduri de bare</string>
     <string name="block_list">Lista de blocuri</string>
     <string name="add_item">Adăugați elementul</string>
-  <string name="showing_only_bookmarked_articles">Afișarea numai a articolelor marcate ca favorite</string>
-    <string name="bookmarks_filter">Numai marcaje</string>
-    <string name="remove">Eliminați</string>
-  <string name="bookmark_article">Marcați articolul</string>
-    <string name="remove_bookmark">Eliminați marcajul</string>
-    <string name="permission_read_desc">Permite aplicației să citească fluxuri și articole</string>
+  <string name="remove">Eliminați</string>
+  <string name="permission_read_desc">Permite aplicației să citească fluxuri și articole</string>
     <string name="permission_read_label">Acces numai pentru citire la Feeder</string>
     <string name="use_detect_language">Detectarea limbii</string>
     <string name="text_to_speech">Text la vorbire</string>
@@ -182,8 +178,7 @@
     <string name="set_language">Setați limba</string>
     <string name="description_for_read_aloud">Detectează automat limba articolului</string>
     <string name="dynamic_theme_use">Culori dinamice</string>
-    <string name="bookmarked">Marcat în favorite</string>
-    <string name="new_indicator">Nou</string>
+  <string name="new_indicator">Nou</string>
     <string name="explanation_permission_notifications">Trebuie să se acorde permisiunea înainte de a activa notificările.</string>
     <string name="only_available_on_android_n">Disponibil numai pe Android %1$s și mai sus</string>
     <string name="article_image">Imaginea articolului</string>
