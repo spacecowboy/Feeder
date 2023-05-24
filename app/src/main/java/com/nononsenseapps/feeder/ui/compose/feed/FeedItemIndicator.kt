@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -46,7 +46,7 @@ fun FeedItemIndicatorRow(
         if (bookmarked) {
             FeedItemIndicator {
                 Icon(
-                    Icons.Default.Bookmark,
+                    Icons.Default.Star,
                     contentDescription = stringResource(id = R.string.bookmark_article),
                     modifier = Modifier.size(16.dp),
                 )
@@ -86,7 +86,7 @@ fun FeedItemIndicatorColumn(
         if (bookmarked) {
             FeedItemIndicator {
                 Icon(
-                    Icons.Default.Bookmark,
+                    Icons.Default.Star,
                     contentDescription = stringResource(id = R.string.bookmark_article),
                     modifier = Modifier.size(iconSize),
                 )

@@ -94,6 +94,8 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.archmodel.FeedItemStyle
 import com.nononsenseapps.feeder.archmodel.FeedType
+import com.nononsenseapps.feeder.db.room.FeedItemCursor
+import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.model.opml.exportOpml
@@ -283,11 +285,11 @@ fun FeedScreen(
                     viewModel.markAsRead(itemId)
                 }
             },
-            markBeforeAsRead = { index ->
-                viewModel.markBeforeAsRead(index)
+            markBeforeAsRead = { cursor ->
+                viewModel.markBeforeAsRead(cursor)
             },
-            markAfterAsRead = { index ->
-                viewModel.markAfterAsRead(index)
+            markAfterAsRead = { cursor ->
+                viewModel.markAfterAsRead(cursor)
             },
             onOpenFeedItem = { itemId ->
                 viewModel.openArticle(
@@ -343,8 +345,8 @@ fun FeedScreen(
     onExport: () -> Unit,
     drawerState: DrawerState,
     markAsUnread: (Long, Boolean) -> Unit,
-    markBeforeAsRead: (Int) -> Unit,
-    markAfterAsRead: (Int) -> Unit,
+    markBeforeAsRead: (FeedItemCursor) -> Unit,
+    markAfterAsRead: (FeedItemCursor) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
     onSetPinned: (Long, Boolean) -> Unit,
     onSetBookmarked: (Long, Boolean) -> Unit,
@@ -385,30 +387,31 @@ fun FeedScreen(
         onDelete = onDeleteFeeds,
         onEditFeed = onEditFeed,
         toolbarActions = {
-            PlainTooltipBox(tooltip = { Text(showingUnreadStateLabel) }) {
-                IconToggleButton(
-                    checked = viewState.onlyUnread,
-                    onCheckedChange = onToggleOnlyUnread,
-                    modifier = Modifier
-                        .tooltipAnchor()
-                        .semantics {
-                            stateDescription = showingUnreadStateLabel
-                        },
-                ) {
-                    if (viewState.onlyUnread) {
-                        Icon(
-                            Icons.Default.VisibilityOff,
-                            contentDescription = null,
-                        )
-                    } else {
-                        Icon(
-                            Icons.Default.Visibility,
-                            contentDescription = null,
-                        )
+            if (viewState.currentFeedOrTag.isNotSavedArticles) {
+                PlainTooltipBox(tooltip = { Text(showingUnreadStateLabel) }) {
+                    IconToggleButton(
+                        checked = viewState.onlyUnread,
+                        onCheckedChange = onToggleOnlyUnread,
+                        modifier = Modifier
+                            .tooltipAnchor()
+                            .semantics {
+                                stateDescription = showingUnreadStateLabel
+                            },
+                    ) {
+                        if (viewState.onlyUnread) {
+                            Icon(
+                                Icons.Default.VisibilityOff,
+                                contentDescription = null,
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.Visibility,
+                                contentDescription = null,
+                            )
+                        }
                     }
                 }
             }
-            // TODO move one into bar
 
             PlainTooltipBox(tooltip = { Text(stringResource(R.string.open_menu)) }) {
                 Box {
@@ -844,8 +847,8 @@ fun FeedListContent(
     onOpenNavDrawer: () -> Unit,
     onAddFeed: () -> Unit,
     markAsUnread: (Long, Boolean) -> Unit,
-    markBeforeAsRead: (Int) -> Unit,
-    markAfterAsRead: (Int) -> Unit,
+    markBeforeAsRead: (FeedItemCursor) -> Unit,
+    markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
     onSetPinned: (Long, Boolean) -> Unit,
     onSetBookmarked: (Long, Boolean) -> Unit,
@@ -937,18 +940,17 @@ fun FeedListContent(
                         feedItemStyle = viewState.feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
                         newIndicator = !viewState.onlyUnread,
+                        bookmarkIndicator = !viewState.currentFeedOrTag.isSavedArticles,
                         onMarkAboveAsRead = {
-                            if (itemIndex > 0) {
-                                markBeforeAsRead(itemIndex)
-                                if (viewState.onlyUnread) {
-                                    coroutineScope.launch {
-                                        listState.scrollToItem(0)
-                                    }
+                            markBeforeAsRead(previewItem.cursor)
+                            if (viewState.onlyUnread) {
+                                coroutineScope.launch {
+                                    listState.scrollToItem(0)
                                 }
                             }
                         },
                         onMarkBelowAsRead = {
-                            markAfterAsRead(itemIndex)
+                            markAfterAsRead(previewItem.cursor)
                         },
                         onTogglePinned = {
                             onSetPinned(previewItem.id, !previewItem.pinned)
@@ -1007,8 +1009,8 @@ fun FeedGridContent(
     onOpenNavDrawer: () -> Unit,
     onAddFeed: () -> Unit,
     markAsUnread: (Long, Boolean) -> Unit,
-    markBeforeAsRead: (Int) -> Unit,
-    markAfterAsRead: (Int) -> Unit,
+    markBeforeAsRead: (FeedItemCursor) -> Unit,
+    markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
     onSetPinned: (Long, Boolean) -> Unit,
     onSetBookmarked: (Long, Boolean) -> Unit,
@@ -1090,18 +1092,17 @@ fun FeedGridContent(
                         feedItemStyle = viewState.feedItemStyle,
                         swipeAsRead = viewState.swipeAsRead,
                         newIndicator = !viewState.onlyUnread,
+                        bookmarkIndicator = !viewState.currentFeedOrTag.isSavedArticles,
                         onMarkAboveAsRead = {
-                            if (itemIndex > 0) {
-                                markBeforeAsRead(itemIndex)
-                                if (viewState.onlyUnread) {
-                                    coroutineScope.launch {
-                                        gridState.scrollToItem(0)
-                                    }
+                            markBeforeAsRead(previewItem.cursor)
+                            if (viewState.onlyUnread) {
+                                coroutineScope.launch {
+                                    gridState.scrollToItem(0)
                                 }
                             }
                         },
                         onMarkBelowAsRead = {
-                            markAfterAsRead(itemIndex)
+                            markAfterAsRead(previewItem.cursor)
                         },
                         onTogglePinned = {
                             onSetPinned(previewItem.id, !previewItem.pinned)
@@ -1139,6 +1140,12 @@ data class FeedOrTag(
 
 val FeedOrTag.isFeed
     get() = id > ID_UNSET
+
+val FeedOrTag.isSavedArticles
+    get() = id == ID_SAVED_ARTICLES
+
+val FeedOrTag.isNotSavedArticles
+    get() = !isSavedArticles
 
 enum class FeedScreenType {
     FeedGrid,

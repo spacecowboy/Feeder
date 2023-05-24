@@ -21,6 +21,7 @@ import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.blob.blobFullFile
 import com.nononsenseapps.feeder.blob.blobFullInputStream
 import com.nononsenseapps.feeder.blob.blobInputStream
+import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedItemForFetching
 import com.nononsenseapps.feeder.db.room.FeedTitle
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -31,6 +32,7 @@ import com.nononsenseapps.feeder.model.TTSStateHolder
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
+import com.nononsenseapps.feeder.ui.compose.feed.isNotSavedArticles
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -113,14 +115,14 @@ class FeedArticleViewModel(
         repository.markAsReadAndNotified(itemId)
     }
 
-    fun markBeforeAsRead(itemIndex: Int) = applicationCoroutineScope.launch {
+    fun markBeforeAsRead(cursor: FeedItemCursor) = applicationCoroutineScope.launch {
         val (feedId, feedTag) = repository.currentFeedAndTag.value
-        repository.markBeforeAsRead(itemIndex, feedId, feedTag)
+        repository.markBeforeAsRead(cursor, feedId, feedTag)
     }
 
-    fun markAfterAsRead(itemIndex: Int) = applicationCoroutineScope.launch {
+    fun markAfterAsRead(cursor: FeedItemCursor) = applicationCoroutineScope.launch {
         val (feedId, feedTag) = repository.currentFeedAndTag.value
-        repository.markAfterAsRead(itemIndex, feedId, feedTag)
+        repository.markAfterAsRead(cursor, feedId, feedTag)
     }
 
     fun setPinned(itemId: Long, pinned: Boolean) = applicationCoroutineScope.launch {
@@ -269,8 +271,11 @@ class FeedArticleViewModel(
             val haveVisibleFeedItems = (params[9] as Int) > 0
 
             @Suppress("UNCHECKED_CAST")
+            val currentFeedOrTag = params[16] as FeedOrTag
+
+            @Suppress("UNCHECKED_CAST")
             FeedArticleScreenViewState(
-                onlyUnread = params[0] as Boolean,
+                onlyUnread = currentFeedOrTag.isNotSavedArticles && (params[0] as Boolean),
                 showFab = haveVisibleFeedItems && (params[1] as Boolean),
                 showThumbnails = params[2] as Boolean,
                 currentTheme = params[3] as ThemeOptions,
@@ -292,7 +297,7 @@ class FeedArticleViewModel(
                 enclosure = article.enclosure,
                 articleTitle = article.title,
                 feedDisplayTitle = article.feedDisplayTitle,
-                currentFeedOrTag = params[16] as FeedOrTag,
+                currentFeedOrTag = currentFeedOrTag,
                 articleLink = article.link,
                 textToDisplay = getTextToDisplayFor(article.id),
                 isTTSPlaying = ttsState == PlaybackStatus.PLAYING,

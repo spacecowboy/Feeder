@@ -40,6 +40,7 @@ import coil.request.ImageRequest
 import coil.size.Precision
 import coil.size.Scale
 import com.nononsenseapps.feeder.R
+import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
 import com.nononsenseapps.feeder.ui.compose.minimumTouchSize
@@ -53,6 +54,8 @@ import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import java.net.URL
 import java.util.*
+import org.threeten.bp.Instant
+import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 
@@ -272,7 +275,16 @@ data class FeedListItem(
     val pinned: Boolean,
     val bookmarked: Boolean,
     val feedImageUrl: URL?,
-)
+    val primarySortTime: Instant,
+    val rawPubDate: ZonedDateTime?,
+) {
+    val cursor: FeedItemCursor
+        get() = object : FeedItemCursor {
+            override val primarySortTime: Instant = this@FeedListItem.primarySortTime
+            override val pubDate: ZonedDateTime? = this@FeedListItem.rawPubDate
+            override val id: Long = this@FeedListItem.id
+        }
+}
 
 @Composable
 @Preview(showBackground = true)
@@ -292,6 +304,8 @@ private fun PreviewRead() {
                     pinned = false,
                     bookmarked = false,
                     feedImageUrl = null,
+                    primarySortTime = Instant.EPOCH,
+                    rawPubDate = null,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
@@ -325,6 +339,8 @@ private fun PreviewUnread() {
                     pinned = false,
                     bookmarked = false,
                     feedImageUrl = null,
+                    primarySortTime = Instant.EPOCH,
+                    rawPubDate = null,
                 ),
                 showThumbnail = true,
                 onMarkAboveAsRead = {},
@@ -361,6 +377,8 @@ private fun PreviewWithImage() {
                         pinned = true,
                         bookmarked = true,
                         feedImageUrl = null,
+                        primarySortTime = Instant.EPOCH,
+                        rawPubDate = null,
                     ),
                     showThumbnail = true,
                     onMarkAboveAsRead = {},

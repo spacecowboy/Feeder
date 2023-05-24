@@ -12,6 +12,7 @@ import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedForSettings
 import com.nononsenseapps.feeder.db.room.FeedItem
+import com.nononsenseapps.feeder.db.room.FeedItemCursor
 import com.nononsenseapps.feeder.db.room.FeedItemForReadMark
 import com.nononsenseapps.feeder.db.room.FeedItemIdWithLink
 import com.nononsenseapps.feeder.db.room.FeedItemWithFeed
@@ -200,7 +201,10 @@ class Repository(override val di: DI) : DIAware {
         FeedListArgs(
             feedId = feedId,
             tag = tag,
-            onlyUnread = showOnlyUnread,
+            onlyUnread = when (feedId) {
+                ID_SAVED_ARTICLES -> false
+                else -> showOnlyUnread
+            },
             newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
         )
     }.flatMapLatest {
@@ -222,7 +226,10 @@ class Repository(override val di: DI) : DIAware {
         FeedListArgs(
             feedId = feedId,
             tag = tag,
-            onlyUnread = showOnlyUnread,
+            onlyUnread = when (feedId) {
+                ID_SAVED_ARTICLES -> false
+                else -> showOnlyUnread
+            },
             newestFirst = false,
         )
     }.flatMapLatest {
@@ -343,24 +350,24 @@ class Repository(override val di: DI) : DIAware {
         scheduleSendRead()
     }
 
-    suspend fun markBeforeAsRead(itemIndex: Int, feedId: Long, tag: String) {
-        feedItemStore.markBeforeAsRead(
-            index = itemIndex,
+    suspend fun markBeforeAsRead(cursor: FeedItemCursor, feedId: Long, tag: String) {
+        feedItemStore.markAsRead(
             feedId = feedId,
             tag = tag,
             onlyUnread = showOnlyUnread.value,
-            newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
+            descending = SortingOptions.NEWEST_FIRST != currentSorting.value,
+            cursor = cursor,
         )
         scheduleSendRead()
     }
 
-    suspend fun markAfterAsRead(itemIndex: Int, feedId: Long, tag: String) {
-        feedItemStore.markAfterAsRead(
-            index = itemIndex,
+    suspend fun markAfterAsRead(cursor: FeedItemCursor, feedId: Long, tag: String) {
+        feedItemStore.markAsRead(
             feedId = feedId,
             tag = tag,
             onlyUnread = showOnlyUnread.value,
-            newestFirst = SortingOptions.NEWEST_FIRST == currentSorting.value,
+            descending = SortingOptions.NEWEST_FIRST == currentSorting.value,
+            cursor = cursor,
         )
         scheduleSendRead()
     }
