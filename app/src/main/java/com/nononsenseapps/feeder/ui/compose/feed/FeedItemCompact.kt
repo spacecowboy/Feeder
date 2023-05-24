@@ -69,11 +69,11 @@ fun FeedItemCompact(
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
-    onTogglePinned: () -> Unit,
     onToggleBookmarked: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
     newIndicator: Boolean,
+    bookmarkIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -131,22 +131,6 @@ fun FeedItemCompact(
                     expanded = dropDownMenuExpanded,
                     onDismissRequest = onDismissDropdown,
                 ) {
-                    DropdownMenuItem(
-                        onClick = {
-                            onDismissDropdown()
-                            onTogglePinned()
-                        },
-                        text = {
-                            Text(
-                                text = stringResource(
-                                    when (item.pinned) {
-                                        true -> R.string.unpin_article
-                                        false -> R.string.pin_article
-                                    },
-                                ),
-                            )
-                        },
-                    )
                     DropdownMenuItem(
                         onClick = {
                             onDismissDropdown()
@@ -213,7 +197,9 @@ fun FeedItemCompact(
             }
         }
 
-        if (showThumbnail && (item.imageUrl != null || item.feedImageUrl != null) || item.unread || item.bookmarked || item.pinned) {
+        val asUnread = item.unread && newIndicator
+        val asBookmarked = item.bookmarked && bookmarkIndicator
+        if (showThumbnail && (item.imageUrl != null || item.feedImageUrl != null) || asUnread || asBookmarked) {
             Box(
                 modifier = Modifier.fillMaxHeight(),
                 contentAlignment = Alignment.TopEnd,
@@ -243,9 +229,8 @@ fun FeedItemCompact(
                     }
                 }
                 FeedItemIndicatorColumn(
-                    unread = item.unread && newIndicator,
-                    bookmarked = item.bookmarked,
-                    pinned = item.pinned,
+                    unread = asUnread,
+                    bookmarked = asBookmarked,
                     modifier = Modifier.padding(
                         top = 4.dp,
                         bottom = 4.dp,
@@ -272,7 +257,6 @@ data class FeedListItem(
     val pubDate: String,
     val imageUrl: String?,
     val link: String?,
-    val pinned: Boolean,
     val bookmarked: Boolean,
     val feedImageUrl: URL?,
     val primarySortTime: Instant,
@@ -301,7 +285,6 @@ private fun PreviewRead() {
                     imageUrl = null,
                     link = null,
                     id = ID_UNSET,
-                    pinned = false,
                     bookmarked = false,
                     feedImageUrl = null,
                     primarySortTime = Instant.EPOCH,
@@ -311,11 +294,11 @@ private fun PreviewRead() {
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
-                onTogglePinned = {},
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 newIndicator = true,
+                bookmarkIndicator = true,
             )
         }
     }
@@ -336,7 +319,6 @@ private fun PreviewUnread() {
                     imageUrl = null,
                     link = null,
                     id = ID_UNSET,
-                    pinned = false,
                     bookmarked = false,
                     feedImageUrl = null,
                     primarySortTime = Instant.EPOCH,
@@ -346,11 +328,11 @@ private fun PreviewUnread() {
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
-                onTogglePinned = {},
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},
                 newIndicator = true,
+                bookmarkIndicator = true,
             )
         }
     }
@@ -374,7 +356,6 @@ private fun PreviewWithImage() {
                         imageUrl = "blabla",
                         link = null,
                         id = ID_UNSET,
-                        pinned = true,
                         bookmarked = true,
                         feedImageUrl = null,
                         primarySortTime = Instant.EPOCH,
@@ -384,11 +365,11 @@ private fun PreviewWithImage() {
                     onMarkAboveAsRead = {},
                     onMarkBelowAsRead = {},
                     onShareItem = {},
-                    onTogglePinned = {},
                     onToggleBookmarked = {},
                     dropDownMenuExpanded = false,
                     onDismissDropdown = {},
                     newIndicator = true,
+                    bookmarkIndicator = true,
                 )
             }
         }

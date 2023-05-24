@@ -123,8 +123,7 @@
     <string name="feeder_device_sync_code">Código de sincronização de aparelhos do Feeder</string>
     <string name="are_you_sure_leave_sync_chain">Quer mesmo sair da cadeia de sincronização\?</string>
     <string name="no_barcode_scanner_installed">Não foi possível encontrar um leitor de código de barras</string>
-    <string name="unpin_article">Desafixar artigo</string>
-    <string name="bookmark_article">Gravar artigo</string>
+  <string name="bookmark_article">Gravar artigo</string>
     <string name="remove_bookmark">Remover dos salvos</string>
     <string name="go_back">Voltar</string>
     <string name="open_menu">Abrir menu</string>
@@ -183,9 +182,7 @@
     <string name="start_new_sync_chain">Iniciar nova cadeia de sincronização</string>
     <string name="disabled">Desativado</string>
     <string name="only_from_end">Somente do final</string>
-    <string name="pin_article">Fixar o artigo</string>
-    <string name="pinned">Fixado</string>
-    <string name="bookmarked">Salvo</string>
+  <string name="bookmarked">Salvo</string>
     <string name="new_indicator">Novo</string>
     <string name="permission_read_desc">Permite que a aplicação leia feeds e artigos</string>
     <string name="permission_read_label">Acesso somente leitura</string>

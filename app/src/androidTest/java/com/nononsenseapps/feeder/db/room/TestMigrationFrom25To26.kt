@@ -31,7 +31,20 @@ class TestMigrationFrom25To26 : DIAware {
 
     @Test
     fun migrate() {
-        testHelper.createDatabase(dbName, 25)
+        testHelper.createDatabase(dbName, 25).let { oldDB ->
+            oldDB.execSQL(
+                """
+                INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash, fulltext_by_default, open_articles_with, alternate_id, currently_syncing, when_modified)
+                VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666, 0, '', 0, 0, 0)
+                """.trimIndent(),
+            )
+            oldDB.execSQL(
+                """
+            INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time, primary_sort_time, pinned, bookmarked, fulltext_downloaded)
+            VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0, 0, 1, 0, 0)
+                """.trimIndent(),
+            )
+        }
         testHelper.runMigrationsAndValidate(dbName, 26, true, MigrationFrom25To26(di))
     }
 }

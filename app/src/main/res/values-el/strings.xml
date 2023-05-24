@@ -133,9 +133,7 @@
     <string name="two_unread_articles">%1$s μη αναγνωσμένα άρθρα</string>
     <string name="few_unread_articles">%1$s μη αναγνωσμένα άρθρα</string>
     <string name="feed_item_style_super_compact">Σούπερ συμπαγής</string>
-    <string name="pin_article">Pin Άρθρου</string>
-    <string name="unpin_article">Unpin άρθρου</string>
-    <string name="empty_feed_add"><annotation style="link">Προσθήκη</annotation> περισσότερων ροών;</string>
+  <string name="empty_feed_add"><annotation style="link">Προσθήκη</annotation> περισσότερων ροών;</string>
     <string name="open_enclosed_media">Άνοιγμα περιεχομένων μέσων</string>
     <string name="new_based_on_this">Νέα με βάση αυτό</string>
     <string name="image_loading">Φόρτωση εικόνων</string>
@@ -182,7 +180,6 @@
     <string name="permission_read_desc">Επιτρέπει στην εφαρμογή να διαβάζει ροές και άρθρα</string>
     <string name="dynamic_theme_use">Δυναμικά χρώματα</string>
     <string name="use_detect_language">Ανίχνευση γλώσσας</string>
-    <string name="pinned">Καρφιτσωμένο</string>
     <string name="new_indicator">Νέο</string>
     <string name="permission_read_label">Feeder πρόσβαση μόνο για ανάγνωση</string>
     <string name="article_image">Εικόνα άρθρου</string>

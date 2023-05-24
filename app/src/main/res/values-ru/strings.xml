@@ -170,9 +170,7 @@
     <string name="block_list">Список блокировок</string>
     <string name="add_item">Добавить элемент</string>
     <string name="remove">Удалить</string>
-    <string name="pin_article">Закрепить статью</string>
-    <string name="unpin_article">Открепить статью</string>
-    <string name="showing_only_bookmarked_articles">Показывать только статьи в закладках</string>
+  <string name="showing_only_bookmarked_articles">Показывать только статьи в закладках</string>
     <string name="bookmarks_filter">Только закладки</string>
     <string name="bookmark_article">Добавить в закладки</string>
     <string name="remove_bookmark">Удалить закладку</string>
@@ -186,7 +184,6 @@
     <string name="bookmarked">В закладках</string>
     <string name="permission_read_label">Доступ только для чтения для Feeder</string>
     <string name="skip_to_next">Перейти к следующей</string>
-    <string name="pinned">Закреплено</string>
     <string name="new_indicator">Новое</string>
     <string name="article_image">Изображение статьи</string>
     <string name="set_language">Установить язык</string>

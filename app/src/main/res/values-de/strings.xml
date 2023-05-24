@@ -167,9 +167,7 @@
     <string name="from_anywhere">Von überall</string>
     <string name="are_you_sure_leave_sync_chain">Möchtest du die Synchronisierungskette wirklich verlassen\?</string>
     <string name="no_barcode_scanner_installed">Konnte keinen Barcode-Scanner finden</string>
-    <string name="pin_article">Artikel anheften</string>
-    <string name="unpin_article">Artikel loslösen</string>
-    <string name="block_list">Sperrliste</string>
+  <string name="block_list">Sperrliste</string>
     <string name="add_item">Eintrag hinzufügen</string>
     <string name="remove">Entfernen</string>
     <string name="bookmarks_filter">Nur Lesezeichen</string>
@@ -182,7 +180,6 @@
     <string name="only_available_on_android_n">Nur auf Android %1$s und höher verfügbar</string>
     <string name="explanation_permission_notifications">Die Berechtigung muss erteilt werden, bevor Benachrichtigungen aktiviert werden können.</string>
     <string name="description_for_read_aloud">Erkennt automatisch die Sprache des Artikels</string>
-    <string name="pinned">Angeheftet</string>
     <string name="text_to_speech">Text in Sprache</string>
     <string name="set_language">Sprache einstellen</string>
     <string name="skip_to_next">Weiter zum Nächsten</string>

@@ -172,9 +172,7 @@
     <string name="bookmarks_filter">Pouze záložky</string>
     <string name="bookmark_article">Založit článek</string>
     <string name="remove_bookmark">Odstranit záložku</string>
-    <string name="pin_article">Připnout článek</string>
-    <string name="unpin_article">Odepnout článek</string>
-    <string name="remove">Odstranit</string>
+  <string name="remove">Odstranit</string>
     <string name="block_list">Černá listina</string>
     <string name="add_item">Přidat položku</string>
     <string name="no_barcode_scanner_installed">Nelze najít čtečku čárových kódů</string>
@@ -188,7 +186,6 @@
     <string name="skip_to_next">Přeskočit na další</string>
     <string name="text_to_speech">Převod textu na řeč</string>
     <string name="new_indicator">Nový</string>
-    <string name="pinned">Připnuto</string>
     <string name="dynamic_theme_use">Dynamické barvy</string>
     <string name="sync_to_fetch">Synchronizovat pro načtení článku</string>
     <string name="text_scale">Textové měřítko</string>

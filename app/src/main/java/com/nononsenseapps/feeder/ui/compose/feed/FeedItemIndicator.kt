@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +29,6 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 fun FeedItemIndicatorRow(
     unread: Boolean,
     bookmarked: Boolean,
-    pinned: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -52,15 +50,6 @@ fun FeedItemIndicatorRow(
                 )
             }
         }
-        if (pinned) {
-            FeedItemIndicator {
-                Icon(
-                    Icons.Default.PushPin,
-                    contentDescription = stringResource(id = R.string.pinned),
-                    modifier = Modifier.size(16.dp),
-                )
-            }
-        }
     }
 }
 
@@ -68,7 +57,6 @@ fun FeedItemIndicatorRow(
 fun FeedItemIndicatorColumn(
     unread: Boolean,
     bookmarked: Boolean,
-    pinned: Boolean,
     modifier: Modifier = Modifier,
     spacing: Dp = 8.dp,
     iconSize: Dp = 16.dp,
@@ -88,15 +76,6 @@ fun FeedItemIndicatorColumn(
                 Icon(
                     Icons.Default.Star,
                     contentDescription = stringResource(id = R.string.bookmark_article),
-                    modifier = Modifier.size(iconSize),
-                )
-            }
-        }
-        if (pinned) {
-            FeedItemIndicator {
-                Icon(
-                    Icons.Default.PushPin,
-                    contentDescription = stringResource(id = R.string.pinned),
                     modifier = Modifier.size(iconSize),
                 )
             }
@@ -147,7 +126,6 @@ fun PreviewLightFeedItemIndicatorRow() {
                 FeedItemIndicatorRow(
                     unread = true,
                     bookmarked = true,
-                    pinned = true,
                 )
             }
         }
@@ -167,7 +145,6 @@ fun PreviewDarkFeedItemIndicatorRow() {
                 FeedItemIndicatorRow(
                     unread = true,
                     bookmarked = true,
-                    pinned = true,
                 )
             }
         }
@@ -187,7 +164,6 @@ fun PreviewLightFeedItemIndicatorColumn() {
                 FeedItemIndicatorColumn(
                     unread = true,
                     bookmarked = true,
-                    pinned = true,
                 )
             }
         }
@@ -207,7 +183,6 @@ fun PreviewDarkFeedItemIndicatorColumn() {
                 FeedItemIndicatorColumn(
                     unread = true,
                     bookmarked = true,
-                    pinned = true,
                 )
             }
         }

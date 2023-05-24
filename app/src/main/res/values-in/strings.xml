@@ -167,9 +167,7 @@
     <string name="device_sync_description_1">Sinkronisasi perangkat memungkinkan Anda menyinkronisasi langganan dan membaca artikel pada perangkat Anda yang lain.</string>
     <string name="scan_or_enter_code">Pindai atau masukkan kode sinkronisasi</string>
     <string name="device_sync_description_2">Cukup pindai kode dari tautan sinkronisasi yang Anda buat pada perangkat yang lain, atau mulai tautan sinkronisasi baru.</string>
-    <string name="pin_article">Sematkan artikel</string>
-    <string name="unpin_article">Berhenti menyematkan artikel</string>
-    <string name="block_list">Daftar blokir</string>
+  <string name="block_list">Daftar blokir</string>
     <string name="add_item">Tambah item</string>
     <string name="remove">Hapus</string>
     <string name="bookmarks_filter">Hanya ditandai</string>
@@ -188,7 +186,6 @@
     <string name="set_language">Atur bahasa</string>
     <string name="text_to_speech">Teks ke suara</string>
     <string name="skip_to_next">Lewati ke item berikutnya</string>
-    <string name="pinned">Disematkan</string>
     <string name="bookmarked">Ditandai</string>
     <string name="feed_icon">Ikon feed</string>
     <string name="text_scale">Skala teks</string>

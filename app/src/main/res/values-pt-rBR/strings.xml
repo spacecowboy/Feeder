@@ -167,9 +167,7 @@
     <string name="sync_code">Código de sincronização</string>
     <string name="only_from_end">Somente do final</string>
     <string name="from_anywhere">De qualquer lugar</string>
-    <string name="pin_article">Fixar o artigo</string>
-    <string name="unpin_article">Desafixar artigo</string>
-    <string name="add_item">Adicionar item</string>
+  <string name="add_item">Adicionar item</string>
     <string name="remove">Remover</string>
     <string name="block_list">Lista de bloqueio</string>
     <string name="bookmarks_filter">Apenas salvos</string>
@@ -185,7 +183,6 @@
     <string name="text_to_speech">Texto para fala</string>
     <string name="description_for_read_aloud">Detecta o idioma do artigo automaticamente</string>
     <string name="dynamic_theme_use">Cores dinâmicas</string>
-    <string name="pinned">Fixado</string>
     <string name="bookmarked">Salvo</string>
     <string name="new_indicator">Novo</string>
     <string name="explanation_permission_notifications">A permissão deve ser concedida antes que as notificações possam ser habilitadas.</string>

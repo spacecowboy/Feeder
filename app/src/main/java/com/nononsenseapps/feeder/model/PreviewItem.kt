@@ -3,7 +3,6 @@ package com.nononsenseapps.feeder.model
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import com.nononsenseapps.feeder.db.COL_BOOKMARKED
-import com.nononsenseapps.feeder.db.COL_PINNED
 import com.nononsenseapps.feeder.db.COL_PRIMARYSORTTIME
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLNoThrows
@@ -16,7 +15,7 @@ const val previewColumns = """
     feed_items.id AS id, guid, plain_title, plain_snippet, feed_items.image_url, enclosure_link,
     author, pub_date, link, unread, feeds.tag AS tag, feeds.id AS feed_id, feeds.title AS feed_title,
     feeds.custom_title as feed_customtitle, feeds.url AS feed_url,
-    feeds.open_articles_with AS feed_open_articles_with, pinned, bookmarked,
+    feeds.open_articles_with AS feed_open_articles_with, bookmarked,
     feeds.image_url as feed_image_url, primary_sort_time
 """
 
@@ -37,7 +36,6 @@ data class PreviewItem @Ignore constructor(
     @ColumnInfo(name = "feed_customtitle") var feedCustomTitle: String = "",
     @ColumnInfo(name = "feed_url") var feedUrl: URL = sloppyLinkToStrictURLNoThrows(""),
     @ColumnInfo(name = "feed_open_articles_with") var feedOpenArticlesWith: String = "",
-    @ColumnInfo(name = COL_PINNED) var pinned: Boolean = false,
     @ColumnInfo(name = COL_BOOKMARKED) var bookmarked: Boolean = false,
     @ColumnInfo(name = "feed_image_url") var feedImageUrl: URL? = null,
     @ColumnInfo(name = COL_PRIMARYSORTTIME) var primarySortTime: Instant = Instant.EPOCH,

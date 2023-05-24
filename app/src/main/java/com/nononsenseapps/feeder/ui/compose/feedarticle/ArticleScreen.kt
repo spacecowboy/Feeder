@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -93,17 +92,6 @@ fun ArticleScreen(
 
     ArticleScreen(
         viewState = viewState,
-        onShowToolbarMenu = { visible ->
-            viewModel.setToolbarMenuVisible(visible)
-        },
-        ttsOnPlay = viewModel::ttsPlay,
-        ttsOnPause = viewModel::ttsPause,
-        ttsOnStop = viewModel::ttsStop,
-        ttsOnSkipNext = viewModel::ttsSkipNext,
-        ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
-        onMarkAsUnread = {
-            viewModel.markAsUnread(viewState.articleId)
-        },
         onToggleFullText = {
             if (viewState.textToDisplay == TextToDisplay.FULLTEXT) {
                 viewModel.displayArticleText()
@@ -111,7 +99,9 @@ fun ArticleScreen(
                 viewModel.displayFullText()
             }
         },
-        displayFullText = viewModel::displayFullText,
+        onMarkAsUnread = {
+            viewModel.markAsUnread(viewState.articleId)
+        },
         onShare = {
             if (viewState.articleId > ID_UNSET) {
                 val intent = Intent.createChooser(
@@ -135,14 +125,20 @@ fun ArticleScreen(
         onFeedTitleClick = {
             onNavigateToFeed(viewState.articleFeedId)
         },
-        onNavigateUp = onNavigateUp,
-        onTogglePinned = {
-            viewModel.setPinned(viewState.articleId, !viewState.isPinned)
+        onShowToolbarMenu = { visible ->
+            viewModel.setToolbarMenuVisible(visible)
         },
+        displayFullText = viewModel::displayFullText,
+        ttsOnPlay = viewModel::ttsPlay,
+        ttsOnPause = viewModel::ttsPause,
+        ttsOnStop = viewModel::ttsStop,
+        ttsOnSkipNext = viewModel::ttsSkipNext,
+        ttsOnSelectLanguage = viewModel::ttsOnSelectLanguage,
         onToggleBookmarked = {
             viewModel.setBookmarked(viewState.articleId, !viewState.isBookmarked)
         },
         articleListState = articleListState,
+        onNavigateUp = onNavigateUp,
     )
 }
 
@@ -162,7 +158,6 @@ fun ArticleScreen(
     ttsOnStop: () -> Unit,
     ttsOnSkipNext: () -> Unit,
     ttsOnSelectLanguage: (LocaleOverride) -> Unit,
-    onTogglePinned: () -> Unit,
     onToggleBookmarked: () -> Unit,
     articleListState: LazyListState,
     modifier: Modifier = Modifier,
@@ -263,29 +258,6 @@ fun ArticleScreen(
                                     },
                                     text = {
                                         Text(stringResource(id = R.string.mark_as_unread))
-                                    },
-                                )
-                                DropdownMenuItem(
-                                    onClick = {
-                                        onShowToolbarMenu(false)
-                                        onTogglePinned()
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            Icons.Default.PushPin,
-                                            contentDescription = null,
-                                        )
-                                    },
-                                    text = {
-                                        Text(
-                                            stringResource(
-                                                if (viewState.isPinned) {
-                                                    R.string.unpin_article
-                                                } else {
-                                                    R.string.pin_article
-                                                },
-                                            ),
-                                        )
                                     },
                                 )
                                 DropdownMenuItem(

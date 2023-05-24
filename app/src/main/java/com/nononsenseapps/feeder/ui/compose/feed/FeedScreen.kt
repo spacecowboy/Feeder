@@ -213,7 +213,6 @@ fun FeedScreen(
     ) {
         FeedScreen(
             viewState = viewState,
-            drawerState = drawerState,
             onRefreshVisible = {
                 viewModel.requestImmediateSyncOfCurrentFeedOrTag()
             },
@@ -278,6 +277,7 @@ fun FeedScreen(
                 )
             },
             onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml") },
+            drawerState = drawerState,
             markAsUnread = { itemId, unread ->
                 if (unread) {
                     viewModel.markAsUnread(itemId)
@@ -304,9 +304,6 @@ fun FeedScreen(
                         ArticleDestination.navigate(navController, itemId)
                     },
                 )
-            },
-            onSetPinned = { itemId, value ->
-                viewModel.setPinned(itemId, value)
             },
             onSetBookmarked = { itemId, value ->
                 viewModel.setBookmarked(itemId, value)
@@ -348,7 +345,6 @@ fun FeedScreen(
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
-    onSetPinned: (Long, Boolean) -> Unit,
     onSetBookmarked: (Long, Boolean) -> Unit,
     feedListState: LazyListState,
     feedGridState: LazyStaggeredGridState,
@@ -591,7 +587,6 @@ fun FeedScreen(
         when (screenType) {
             FeedScreenType.FeedGrid -> FeedGridContent(
                 viewState = viewState,
-                gridState = feedGridState,
                 onOpenNavDrawer = {
                     coroutineScope.launch {
                         if (drawerState.isOpen) {
@@ -601,13 +596,13 @@ fun FeedScreen(
                         }
                     }
                 },
-                markAsUnread = markAsUnread,
                 onAddFeed = onAddFeed,
+                markAsUnread = markAsUnread,
                 markBeforeAsRead = markBeforeAsRead,
                 markAfterAsRead = markAfterAsRead,
                 onItemClick = onOpenFeedItem,
-                onSetPinned = onSetPinned,
                 onSetBookmarked = onSetBookmarked,
+                gridState = feedGridState,
                 pagedFeedItems = pagedFeedItems,
                 modifier = innerModifier,
             ).also { logDebug(LOG_TAG, "Showing GRID") }
@@ -628,9 +623,8 @@ fun FeedScreen(
                 markBeforeAsRead = markBeforeAsRead,
                 markAfterAsRead = markAfterAsRead,
                 onItemClick = onOpenFeedItem,
-                listState = feedListState,
-                onSetPinned = onSetPinned,
                 onSetBookmarked = onSetBookmarked,
+                listState = feedListState,
                 pagedFeedItems = pagedFeedItems,
                 modifier = innerModifier,
             ).also { logDebug(LOG_TAG, "Showing LIST") }
@@ -850,7 +844,6 @@ fun FeedListContent(
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
-    onSetPinned: (Long, Boolean) -> Unit,
     onSetBookmarked: (Long, Boolean) -> Unit,
     listState: LazyListState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
@@ -952,9 +945,6 @@ fun FeedListContent(
                         onMarkBelowAsRead = {
                             markAfterAsRead(previewItem.cursor)
                         },
-                        onTogglePinned = {
-                            onSetPinned(previewItem.id, !previewItem.pinned)
-                        },
                         onToggleBookmarked = {
                             onSetBookmarked(previewItem.id, !previewItem.bookmarked)
                         },
@@ -1012,7 +1002,6 @@ fun FeedGridContent(
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
-    onSetPinned: (Long, Boolean) -> Unit,
     onSetBookmarked: (Long, Boolean) -> Unit,
     gridState: LazyStaggeredGridState,
     pagedFeedItems: LazyPagingItems<FeedListItem>,
@@ -1103,9 +1092,6 @@ fun FeedGridContent(
                         },
                         onMarkBelowAsRead = {
                             markAfterAsRead(previewItem.cursor)
-                        },
-                        onTogglePinned = {
-                            onSetPinned(previewItem.id, !previewItem.pinned)
                         },
                         onToggleBookmarked = {
                             onSetBookmarked(previewItem.id, !previewItem.bookmarked)

@@ -170,16 +170,13 @@
     <string name="block_list">Blocklista</string>
     <string name="add_item">Lägg till</string>
     <string name="remove">Ta bort</string>
-    <string name="pin_article">Fäst artikel</string>
-    <string name="unpin_article">Släpp artikel</string>
-    <string name="permission_read_desc">Tillåter appen att läsa flöden och artiklar</string>
+  <string name="permission_read_desc">Tillåter appen att läsa flöden och artiklar</string>
     <string name="permission_read_label">Feeder skrivskyddad åtkomst</string>
     <string name="showing_only_bookmarked_articles">Visar endast bokmärkta artiklar</string>
     <string name="bookmarks_filter">Bokmärken endast</string>
     <string name="bookmark_article">Bokmärk artikel</string>
     <string name="remove_bookmark">Ta bort bokmärke</string>
     <string name="bookmarked">Bokmärkad</string>
-    <string name="pinned">Fäst</string>
     <string name="new_indicator">Ny</string>
     <string name="explanation_permission_notifications">Innan notiser kan aktiveras måste de tillåtas.</string>
     <string name="dynamic_theme_use">Dynamiska färger</string>

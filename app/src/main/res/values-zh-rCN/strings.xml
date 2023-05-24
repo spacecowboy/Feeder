@@ -167,9 +167,7 @@
     <string name="from_anywhere">来自任何地方</string>
     <string name="are_you_sure_leave_sync_chain">你确定你想离开同步链吗？</string>
     <string name="no_barcode_scanner_installed">找不到条形码扫描器</string>
-    <string name="unpin_article">取消固定文章</string>
-    <string name="pin_article">固定文章</string>
-    <string name="remove">删除</string>
+  <string name="remove">删除</string>
     <string name="block_list">拦截列表</string>
     <string name="add_item">添加项目</string>
     <string name="bookmarks_filter">仅书签</string>
@@ -184,7 +182,6 @@
     <string name="explanation_permission_notifications">必须先授予权限才能启用通知。</string>
     <string name="text_to_speech">文本转语音</string>
     <string name="dynamic_theme_use">动态颜色</string>
-    <string name="pinned">已固定</string>
     <string name="bookmarked">已加书签</string>
     <string name="skip_to_next">跳到下一篇</string>
     <string name="set_language">设置语言</string>
