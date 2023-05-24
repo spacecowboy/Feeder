@@ -7,6 +7,7 @@ import androidx.work.WorkManager
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.FeederApplication
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
+import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
 import com.nononsenseapps.feeder.db.room.RemoteReadMarkReadyToBeApplied
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
@@ -98,7 +99,7 @@ class RepositoryTest : DIAware {
             application.addDynamicShortcutToFeed(
                 "fooFeed",
                 10L,
-                null
+                null,
             )
             application.reportShortcutToFeedUsed(10L)
         }
@@ -117,7 +118,7 @@ class RepositoryTest : DIAware {
             application.addDynamicShortcutToFeed(
                 "fooFeed",
                 10L,
-                null
+                null,
             )
             application.reportShortcutToFeedUsed(10L)
         }
@@ -132,14 +133,14 @@ class RepositoryTest : DIAware {
             TextToDisplay.FULLTEXT,
             runBlocking {
                 repository.getTextToDisplayForItem(5L)
-            }
+            },
         )
 
         assertEquals(
             TextToDisplay.DEFAULT,
             runBlocking {
                 repository.getTextToDisplayForItem(6L)
-            }
+            },
         )
     }
 
@@ -151,7 +152,7 @@ class RepositoryTest : DIAware {
             ItemOpener.CUSTOM_TAB,
             runBlocking {
                 repository.getArticleOpener(5L)
-            }
+            },
         )
     }
 
@@ -164,7 +165,7 @@ class RepositoryTest : DIAware {
             ItemOpener.DEFAULT_BROWSER,
             runBlocking {
                 repository.getArticleOpener(5L)
-            }
+            },
         )
     }
 
@@ -204,10 +205,19 @@ class RepositoryTest : DIAware {
     @Test
     fun getScreenTitleForCurrentFeedOrTagAll() {
         val result = runBlocking {
-            repository.getScreenTitleForFeedOrTag(ID_UNSET, "").toList().first()
+            repository.getScreenTitleForFeedOrTag(ID_ALL_FEEDS, "").toList().first()
         }
 
-        assertEquals(ScreenTitle(title = null), result)
+        assertEquals(ScreenTitle(title = null, type = FeedType.ALL_FEEDS), result)
+    }
+
+    @Test
+    fun getScreenTitleForCurrentFeedOrTagSavedArticles() {
+        val result = runBlocking {
+            repository.getScreenTitleForFeedOrTag(ID_SAVED_ARTICLES, "").toList().first()
+        }
+
+        assertEquals(ScreenTitle(title = null, type = FeedType.SAVED_ARTICLES), result)
     }
 
     @Test
@@ -216,7 +226,7 @@ class RepositoryTest : DIAware {
             repository.getScreenTitleForFeedOrTag(ID_UNSET, "fwr").toList().first()
         }
 
-        assertEquals(ScreenTitle(title = "fwr"), result)
+        assertEquals(ScreenTitle(title = "fwr", type = FeedType.TAG), result)
     }
 
     @Test
@@ -227,7 +237,7 @@ class RepositoryTest : DIAware {
             repository.getScreenTitleForFeedOrTag(5L, "fwr").toList().first()
         }
 
-        assertEquals(ScreenTitle(title = "floppa"), result)
+        assertEquals(ScreenTitle(title = "floppa", type = FeedType.FEED), result)
 
         coVerify {
             feedStore.getDisplayTitle(5L)
@@ -301,7 +311,7 @@ class RepositoryTest : DIAware {
     fun applyRemoteReadMarks() {
         coEvery { syncRemoteStore.getRemoteReadMarksReadyToBeApplied() } returns listOf(
             RemoteReadMarkReadyToBeApplied(1L, 2L),
-            RemoteReadMarkReadyToBeApplied(3L, 4L)
+            RemoteReadMarkReadyToBeApplied(3L, 4L),
         )
 
         runBlocking {

@@ -141,9 +141,7 @@
     <string name="failed_to_export_OPML">Neuspješan izvoz OPML-a</string>
     <string name="are_you_sure_leave_sync_chain">Jeste li sigurni da napustite sinhronizacijsku mrežu\?</string>
     <string name="no_barcode_scanner_installed">Nemoguće pronaći skener bar kodova</string>
-    <string name="pin_article">Zakači članak</string>
-    <string name="unpin_article">Otkači članak</string>
-    <string name="dark_theme_preference_black">Crna</string>
+  <string name="dark_theme_preference_black">Crna</string>
     <string name="dark_theme_preference_dark">Tamna</string>
     <string name="dark_theme_preference">Preferirana tamna tema</string>
     <string name="device_sync_financed_by_community">Ovu uslugu plaća zajednica. Molimo da razmotrite donaciju, ako Vam je usluga korisna.</string>
@@ -186,7 +184,6 @@
     <string name="text_to_speech">Govor iz teksta</string>
     <string name="only_available_on_android_n">Dostupno samo na Androidu %1$s ili novijem</string>
     <string name="dynamic_theme_use">Dinamičke boje</string>
-    <string name="pinned">Zakačeno</string>
     <string name="bookmarked">Zabilježeno</string>
     <string name="new_indicator">Novi</string>
     <string name="explanation_permission_notifications">Dozvole se moraju odobriti prije uključenja obavještenja.</string>

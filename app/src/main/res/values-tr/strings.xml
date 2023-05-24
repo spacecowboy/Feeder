@@ -167,9 +167,7 @@
     <string name="swipe_to_mark_as_read">Okundu saymak için kaydır</string>
     <string name="are_you_sure_leave_sync_chain">Eşzamanlama zincirinden ayrılmak istediğinizden emin misiniz\?</string>
     <string name="no_barcode_scanner_installed">Barkod tarayıcı bulunamadı</string>
-    <string name="pin_article">Makaleyi sabitle</string>
-    <string name="unpin_article">Makalenin sabitlemesini kaldır</string>
-    <string name="block_list">Engelleme listesi</string>
+  <string name="block_list">Engelleme listesi</string>
     <string name="add_item">Öge ekle</string>
     <string name="remove">Kaldır</string>
     <string name="bookmarks_filter">Yalnızca yer imleri</string>
@@ -184,7 +182,6 @@
     <string name="explanation_permission_notifications">Bildirimlerin etkinleştirilebilmesi için önce izin verilmelidir.</string>
     <string name="text_to_speech">Metin okuma</string>
     <string name="dynamic_theme_use">Değişken renkler</string>
-    <string name="pinned">Sabitlendi</string>
     <string name="bookmarked">Ayraç koyuldu</string>
     <string name="set_language">Dili ayarla</string>
     <string name="skip_to_next">Sonrakine atla</string>

@@ -128,10 +128,6 @@ class FeedItemStore(override val di: DI) : DIAware {
         dao.markAsRead(itemId, unread)
     }
 
-    suspend fun setPinned(itemId: Long, pinned: Boolean) {
-        dao.setPinned(itemId, pinned)
-    }
-
     suspend fun setBookmarked(itemId: Long, bookmarked: Boolean) {
         dao.setBookmarked(itemId, bookmarked)
     }
@@ -281,7 +277,6 @@ private fun PreviewItem.toFeedListItem() =
         pubDate = pubDate?.toLocalDate()?.format(shortDateTimeFormat) ?: "",
         imageUrl = imageUrl,
         link = link,
-        pinned = pinned,
         bookmarked = bookmarked,
         feedImageUrl = feedImageUrl,
         rawPubDate = pubDate,

@@ -254,9 +254,6 @@ class Repository(override val di: DI) : DIAware {
 
     suspend fun saveFeed(feed: Feed): Long = feedStore.saveFeed(feed)
 
-    suspend fun setPinned(itemId: Long, pinned: Boolean) =
-        feedItemStore.setPinned(itemId = itemId, pinned = pinned)
-
     suspend fun setBookmarked(itemId: Long, bookmarked: Boolean) =
         feedItemStore.setBookmarked(itemId = itemId, bookmarked = bookmarked)
 
@@ -650,7 +647,6 @@ data class Article(
     val pubDate: ZonedDateTime? = item?.pubDate
     val feedId: Long = item?.feedId ?: ID_UNSET
     val feedUrl: String? = item?.feedUrl?.toString()
-    val pinned: Boolean = item?.pinned ?: false
     val bookmarked: Boolean = item?.bookmarked ?: false
 }
 

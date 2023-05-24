@@ -58,7 +58,6 @@ fun FeedItemCard(
     onMarkAboveAsRead: () -> Unit,
     onMarkBelowAsRead: () -> Unit,
     onShareItem: () -> Unit,
-    onTogglePinned: () -> Unit,
     onToggleBookmarked: () -> Unit,
     dropDownMenuExpanded: Boolean,
     onDismissDropdown: () -> Unit,
@@ -104,7 +103,6 @@ fun FeedItemCard(
                         FeedItemIndicatorRow(
                             unread = item.unread && newIndicator,
                             bookmarked = item.bookmarked && bookmarkIndicator,
-                            pinned = item.pinned,
                             modifier = Modifier.padding(
                                 top = 12.dp,
                                 end = 12.dp,
@@ -164,22 +162,6 @@ fun FeedItemCard(
                             expanded = dropDownMenuExpanded,
                             onDismissRequest = onDismissDropdown,
                         ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    onDismissDropdown()
-                                    onTogglePinned()
-                                },
-                                text = {
-                                    Text(
-                                        text = stringResource(
-                                            when (item.pinned) {
-                                                true -> R.string.unpin_article
-                                                false -> R.string.pin_article
-                                            },
-                                        ),
-                                    )
-                                },
-                            )
                             DropdownMenuItem(
                                 onClick = {
                                     onDismissDropdown()
@@ -248,8 +230,7 @@ fun FeedItemCard(
                 if (!showThumbnail || item.imageUrl == null) {
                     FeedItemIndicatorColumn(
                         unread = item.unread && newIndicator,
-                        bookmarked = item.bookmarked,
-                        pinned = item.pinned,
+                        bookmarked = item.bookmarked && bookmarkIndicator,
                         modifier = Modifier.padding(
                             top = 12.dp,
                             bottom = 12.dp,
@@ -276,7 +257,6 @@ private fun Preview() {
                 imageUrl = null,
                 link = null,
                 id = ID_UNSET,
-                pinned = false,
                 bookmarked = false,
                 feedImageUrl = null,
                 primarySortTime = Instant.EPOCH,
@@ -286,7 +266,6 @@ private fun Preview() {
             onMarkAboveAsRead = {},
             onMarkBelowAsRead = {},
             onShareItem = {},
-            onTogglePinned = {},
             onToggleBookmarked = {},
             dropDownMenuExpanded = false,
             onDismissDropdown = {},
@@ -313,7 +292,6 @@ private fun PreviewWithImage() {
                     imageUrl = "blabla",
                     link = null,
                     id = ID_UNSET,
-                    pinned = true,
                     bookmarked = true,
                     feedImageUrl = null,
                     primarySortTime = Instant.EPOCH,
@@ -323,7 +301,6 @@ private fun PreviewWithImage() {
                 onMarkAboveAsRead = {},
                 onMarkBelowAsRead = {},
                 onShareItem = {},
-                onTogglePinned = {},
                 onToggleBookmarked = {},
                 dropDownMenuExpanded = false,
                 onDismissDropdown = {},

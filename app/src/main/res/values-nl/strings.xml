@@ -167,9 +167,7 @@
     <string name="only_from_end">Alleen vanaf het einde</string>
     <string name="are_you_sure_leave_sync_chain">Sync-keten inderdaad verlaten\?</string>
     <string name="no_barcode_scanner_installed">Geen barcodescanner gevonden</string>
-    <string name="unpin_article">Artikel losmaken</string>
-    <string name="pin_article">Artikel vastzetten</string>
-    <string name="add_item">Item toevoegen</string>
+  <string name="add_item">Item toevoegen</string>
     <string name="remove">Verwijderen</string>
     <string name="block_list">Lijst blokkeren</string>
     <string name="bookmarks_filter">Alleen bladwijzers</string>
@@ -182,7 +180,6 @@
     <string name="article_image">Beeld van het artikel</string>
     <string name="block_list_description">Verbergt artikels met titels die een van deze filters bevatten. Voorbeeld filters:</string>
     <string name="dynamic_theme_use">Dynamische kleuren</string>
-    <string name="pinned">Vastgepind</string>
     <string name="bookmarked">Favoriet</string>
     <string name="new_indicator">Nieuw</string>
     <string name="explanation_permission_notifications">Toestemming moet worden verleend voordat meldingen kunnen worden ingeschakeld.</string>

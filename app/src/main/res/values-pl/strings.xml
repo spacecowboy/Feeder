@@ -167,9 +167,7 @@
     <string name="only_from_end">Tylko od prawej strony</string>
     <string name="are_you_sure_leave_sync_chain">Czy na pewno chcesz opuścić łańcuch synchronizacji\?</string>
     <string name="no_barcode_scanner_installed">Nie udało się znaleźć skanera kodów kreskowych</string>
-    <string name="pin_article">Przypnij artykuł</string>
-    <string name="unpin_article">Odepnij artykuł</string>
-    <string name="block_list">Lista zablokowanych</string>
+  <string name="block_list">Lista zablokowanych</string>
     <string name="add_item">Dodaj element</string>
     <string name="remove">Usuń</string>
     <string name="bookmarks_filter">Tylko z zakładek</string>
@@ -182,7 +180,6 @@
     <string name="only_available_on_android_n">Dostępne tylko na Androidzie %1$s i nowszych</string>
     <string name="description_for_read_aloud">Automatycznie wykrywa język artykułów</string>
     <string name="explanation_permission_notifications">Uprawnienie musi zostać przyznane przed włączeniem powiadomień.</string>
-    <string name="pinned">Przypięty</string>
     <string name="skip_to_next">Przejdź do następnego</string>
     <string name="set_language">Ustaw język</string>
     <string name="text_to_speech">Zamiana tekstu na mowę</string>

@@ -140,9 +140,7 @@
     <string name="failed_to_export_OPML">Није успео извоз OPML фајла</string>
     <string name="are_you_sure_leave_sync_chain">Да ли сте сигурни да желите напустити ланац синхронизације\?</string>
     <string name="no_barcode_scanner_installed">Не може да се пронађе скенер бар кодова</string>
-    <string name="pin_article">Прикачи чланак</string>
-    <string name="unpin_article">Откачи чланак</string>
-    <string name="go_back">Повратак назад</string>
+  <string name="go_back">Повратак назад</string>
     <string name="expanded_tag">Отворена ознака</string>
     <string name="contracted_tag">Затворена ознака</string>
     <string name="add_new_device">Додај нови уређај</string>

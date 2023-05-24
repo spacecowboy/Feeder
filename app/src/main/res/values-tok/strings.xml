@@ -86,13 +86,11 @@
     <string name="remove">o weka</string>
     <string name="or_open_device_sync_link">ante la, o open e nasin lon ilo sina.</string>
     <string name="no_barcode_scanner_installed">mi ken ala alasa e ilo pi sitelen nanpa</string>
-    <string name="pin_article">o awen e lipu</string>
     <string name="qr_code">sitelen QR</string>
     <string name="only_from_end">tan pini taso</string>
     <string name="disabled">lon ala</string>
     <string name="from_anywhere">tan ale</string>
-    <string name="unpin_article">o awen ala e lipu</string>
-    <string name="action_settings">nasin ilo</string>
+  <string name="action_settings">nasin ilo</string>
     <string name="could_not_load_url">ilo li ken ala open e nasin URL ni</string>
     <string name="mark_as_unread">mi lukin ala e ni</string>
     <string name="by_author_on_date" comment="1 is the author, 2 is the date. So the default format will be shown as&#10;&#10;John Smith, Saturday, 9 January 2021 15:49&#10;&#10;if better for other language, it can be changed. For example &#10;&#10;%1$s on %2$s:&#10;&#10;John Smith on Saturday, 9 January 2021 15:49">%1$s, %2$s</string>

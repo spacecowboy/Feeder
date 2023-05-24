@@ -167,9 +167,7 @@
     <string name="device_sync_description_2">Du skal blot scanne koden fra din synkroniseringskæde, som du har oprettet på en anden enhed, eller start en ny synkroniseringskæde.</string>
     <string name="are_you_sure_leave_sync_chain">Er du sikker på, at du vil forlade synkroniseringskæden\?</string>
     <string name="no_barcode_scanner_installed">Kunne ikke finde en stregkodescanner</string>
-    <string name="pin_article">Fastgør artikel</string>
-    <string name="unpin_article">Frigør artikel</string>
-    <string name="block_list">Blokeringsliste</string>
+  <string name="block_list">Blokeringsliste</string>
     <string name="add_item">Tilføj emne</string>
     <string name="remove">Fjern</string>
     <string name="bookmarks_filter">Kun bogmærker</string>
@@ -186,7 +184,6 @@
     <string name="skip_to_next">Spring til næste</string>
     <string name="set_language">Indstil sprog</string>
     <string name="dynamic_theme_use">Dynamiske farver</string>
-    <string name="pinned">Fastgjort</string>
     <string name="bookmarked">Bogmærket</string>
     <string name="new_indicator">Ny</string>
     <string name="article_image">Artikelbillede</string>

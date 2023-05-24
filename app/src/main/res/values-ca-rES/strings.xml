@@ -148,9 +148,7 @@
     <string name="few_unread_articles">%1$s articles sense llegir</string>
     <string name="failed_to_import_OPML">Ha fallat la importació de l\'OPML</string>
     <string name="failed_to_export_OPML">Ha fallat l\'exportació de l\'OPML</string>
-    <string name="pin_article">Fixa l\'article</string>
-    <string name="unpin_article">No fixis l\'article</string>
-    <string name="dark_theme_preference">Tema fosc preferit</string>
+  <string name="dark_theme_preference">Tema fosc preferit</string>
     <string name="many_unread_articles">%1$s articles sense llegir</string>
     <string name="showing_all_articles">Visualitza tots els articles</string>
     <string name="feed_item_style_compact">Compacte</string>
@@ -188,7 +186,6 @@
     <string name="secret_key">Clau secreta</string>
     <string name="join_sync_chain">Unir-se a la cadena de sincronització</string>
     <string name="no_barcode_scanner_installed">No s\'ha trobat un escàner de codi de barres</string>
-    <string name="pinned">Fixat</string>
     <string name="new_indicator">Nou</string>
     <string name="permission_read_label">Accés de només lectura</string>
     <string name="block_list_description">Amaga històries amb títols que contenen algun d\'aquests filtres. Filtres d\'exemple:</string>

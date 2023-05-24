@@ -125,10 +125,6 @@ class FeedArticleViewModel(
         repository.markAfterAsRead(cursor, feedId, feedTag)
     }
 
-    fun setPinned(itemId: Long, pinned: Boolean) = applicationCoroutineScope.launch {
-        repository.setPinned(itemId, pinned)
-    }
-
     fun setBookmarked(itemId: Long, bookmarked: Boolean) = applicationCoroutineScope.launch {
         repository.setBookmarked(itemId, bookmarked)
     }
@@ -305,7 +301,6 @@ class FeedArticleViewModel(
                 articleId = article.id,
                 isArticleOpen = params[14] as Boolean,
                 swipeAsRead = params[19] as SwipeAsRead,
-                isPinned = article.pinned,
                 isBookmarked = article.bookmarked,
                 useDetectLanguage = params[21] as Boolean,
                 ttsLanguages = params[22] as List<Locale>,
@@ -454,7 +449,6 @@ interface ArticleScreenViewState {
     val articleTitle: String
     val showToolbarMenu: Boolean
     val feedDisplayTitle: String
-    val isPinned: Boolean
     val isBookmarked: Boolean
 }
 
@@ -493,7 +487,6 @@ data class FeedArticleScreenViewState(
     override val feedDisplayTitle: String = "",
     override val articleId: Long = ID_UNSET,
     override val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
-    override val isPinned: Boolean = false,
     override val isBookmarked: Boolean = false,
     override val useDetectLanguage: Boolean = false,
     val isArticleOpen: Boolean = false,

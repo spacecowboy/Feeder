@@ -7,9 +7,7 @@
     <string name="feed_item_style_super_compact">مضغوط جداً</string>
     <string name="add_new_device">أضف جهازًا جديدًا</string>
     <string name="disabled">معطّل</string>
-    <string name="pin_article">ثبت المقال</string>
-    <string name="unpin_article">ألغ تثبيت المقال</string>
-    <string name="block_list_description">يخفي المقالات ذات العناوين التي تحتوي على أي من هذه المرشحات. مثال مرشحات:</string>
+  <string name="block_list_description">يخفي المقالات ذات العناوين التي تحتوي على أي من هذه المرشحات. مثال مرشحات:</string>
     <string name="touch_to_play_video">المس لتشغيل الفيديو</string>
     <string name="javascript">جافاسكربت</string>
     <string name="open_feed">افتح خلاصة</string>
@@ -22,7 +20,6 @@
     <string name="two_unread_articles">%1$s مقالات غير مقروءة</string>
     <string name="remove">أزل</string>
     <string name="remove_device">أزل الجهاز</string>
-    <string name="pinned">مثبت</string>
     <string name="bookmark_article">علّم المقال</string>
     <string name="feed_icon">رمز الخلاصة</string>
     <string name="text_scale">مقاس النص</string>

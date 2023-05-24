@@ -144,9 +144,7 @@
     <string name="secret_key">Salainen avain</string>
     <string name="join_sync_chain">Liity synkronointiketjuun</string>
     <string name="no_barcode_scanner_installed">Viivakoodiskanneria ei löytynyt</string>
-    <string name="pin_article">Kiinnitä artikkeli</string>
-    <string name="unpin_article">Poista artikkelin kiinnitys</string>
-    <string name="add_item">Lisää kohde</string>
+  <string name="add_item">Lisää kohde</string>
     <string name="device_sync">Laitteen synkronointi</string>
     <string name="add_new_device">Lisää uusi laite</string>
     <string name="only_enable_for_bad_id_feeds">Ota käyttöön vain syötteille, joilla on huonot tunnukset</string>
@@ -181,7 +179,6 @@
     <string name="leave_sync_chain">Poistu synkronointiketjusta</string>
     <string name="start_new_sync_chain">Käynnistä uusi synkronointiketju</string>
     <string name="are_you_sure_leave_sync_chain">Haluatko varmasti poistua synkronointiketjusta\?</string>
-    <string name="pinned">Kiinnitetty</string>
     <string name="sync_code">Synkronointikoodi</string>
     <string name="bookmark_article">Lisää artikkeli kirjanmerkkeihin</string>
     <string name="remove_bookmark">Poista kirjanmerkki</string>

@@ -167,9 +167,7 @@
     <string name="swipe_to_mark_as_read">Balayer pour marquer comme lu</string>
     <string name="are_you_sure_leave_sync_chain">Voulez-vous vraiment quitter la chaîne de synchronisation \?</string>
     <string name="no_barcode_scanner_installed">Impossible de trouver un scanneur de codes-barres</string>
-    <string name="pin_article">Épingler l\'article</string>
-    <string name="unpin_article">Désépingler l\'article</string>
-    <string name="add_item">Ajouter un élément</string>
+  <string name="add_item">Ajouter un élément</string>
     <string name="block_list">Liste de blocage</string>
     <string name="remove">Retirer</string>
     <string name="showing_only_bookmarked_articles">Seuls les articles marqués sont affichés</string>
@@ -182,7 +180,6 @@
     <string name="only_available_on_android_n">Disponible uniquement sur Android %1$s et plus</string>
     <string name="description_for_read_aloud">Détection automatique de la langue de l\'article</string>
     <string name="explanation_permission_notifications">L\'autorisation doit être accordée avant que les notifications puissent être activées.</string>
-    <string name="pinned">Épinglé</string>
     <string name="skip_to_next">Passer au suivant</string>
     <string name="set_language">Définir la langue</string>
     <string name="text_to_speech">Synthèse vocale</string>

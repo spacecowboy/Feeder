@@ -170,9 +170,7 @@
     <string name="block_list">Danh sách chặn</string>
     <string name="add_item">Thêm mục</string>
     <string name="remove">Xoá</string>
-    <string name="pin_article">Ghim bài viết</string>
-    <string name="unpin_article">Bỏ ghim bài viết</string>
-    <string name="permission_read_desc">Cho phép ứng dụng đọc feed và bài viết</string>
+  <string name="permission_read_desc">Cho phép ứng dụng đọc feed và bài viết</string>
     <string name="permission_read_label">Quyền truy cập chỉ đọc</string>
     <string name="showing_only_bookmarked_articles">Đang chỉ hiện bài viết đã đánh dấu</string>
     <string name="bookmarks_filter">Chỉ dấu trang</string>
@@ -184,7 +182,6 @@
     <string name="skip_to_next">Nhảy sang mục tiếp</string>
     <string name="only_available_on_android_n">Chỉ có sẵn ở Android %1$s và cao hơn</string>
     <string name="dynamic_theme_use">Màu sắc động</string>
-    <string name="pinned">Đã ghim</string>
     <string name="bookmarked">Đã đánh dấu trang</string>
     <string name="new_indicator">Mới</string>
     <string name="explanation_permission_notifications">Bạn phải cấp quyền trước khi bật thông báo.</string>
