@@ -190,4 +190,8 @@
     <string name="new_indicator">Nový</string>
     <string name="pinned">Připnuto</string>
     <string name="dynamic_theme_use">Dynamické barvy</string>
+    <string name="sync_to_fetch">Synchronizovat pro načtení článku</string>
+    <string name="text_scale">Textové měřítko</string>
+    <string name="block_list_description">Skryje články s nadpisy obsahujícími některý z těchto filtrů. Příklady filtrů:</string>
+    <string name="feed_icon">Ikona kanálu</string>
 </resources>
