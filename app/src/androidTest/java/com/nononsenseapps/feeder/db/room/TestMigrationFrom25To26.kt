@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nononsenseapps.feeder.FeederApplication
+import kotlin.test.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,6 +46,16 @@ class TestMigrationFrom25To26 : DIAware {
                 """.trimIndent(),
             )
         }
-        testHelper.runMigrationsAndValidate(dbName, 26, true, MigrationFrom25To26(di))
+        val db = testHelper.runMigrationsAndValidate(dbName, 26, true, MigrationFrom25To26(di))
+
+        db.query(
+            """
+            SELECT bookmarked FROM feed_items
+            """.trimIndent(),
+        ).use {
+            assert(it.count == 1)
+            assert(it.moveToFirst())
+            assertEquals(1, it.getInt(0))
+        }
     }
 }

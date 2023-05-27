@@ -128,6 +128,14 @@ class MigrationFrom25To26(override val di: DI) : Migration(25, 26), DIAware {
             ON feed_items (primary_sort_time, pub_date, id)
             """.trimIndent(),
         )
+
+        database.execSQL(
+            """
+            update feed_items
+                set bookmarked = 1
+            where pinned = 1;
+            """.trimIndent(),
+        )
     }
 }
 
