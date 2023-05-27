@@ -119,6 +119,10 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
         repository.setTextScale(value.coerceIn(0.1f, 10f))
     }
 
+    fun setIsMarkAsReadOnScroll(value: Boolean) {
+        repository.setIsMarkAsReadOnScroll(value)
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val immutableFeedsSettings =
         repository.feedNotificationSettings
@@ -165,6 +169,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                 repository.useDynamicTheme,
                 repository.textScale,
                 immutableFeedsSettings,
+                repository.isMarkAsReadOnScroll,
             ) { params: Array<Any> ->
                 @Suppress("UNCHECKED_CAST")
                 SettingsViewState(
@@ -189,6 +194,7 @@ class SettingsViewModel(di: DI) : DIAwareViewModel(di) {
                     useDynamicTheme = params[18] as Boolean,
                     textScale = params[19] as Float,
                     feedsSettings = params[20] as List<UIFeedSettings>,
+                    isMarkAsReadOnScroll = params[21] as Boolean,
                 )
             }.collect {
                 _viewState.value = it
@@ -224,6 +230,7 @@ data class SettingsViewState(
     val useDynamicTheme: Boolean = true,
     val textScale: Float = 1f,
     val feedsSettings: List<UIFeedSettings> = emptyList(),
+    val isMarkAsReadOnScroll: Boolean = false,
 )
 
 data class UIFeedSettings(

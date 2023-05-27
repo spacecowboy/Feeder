@@ -69,6 +69,15 @@ class SettingsStore(override val di: DI) : DIAware {
         sp.edit().putBoolean(PREF_IS_ARTICLE_OPEN, open).apply()
     }
 
+    private val _isMarkAsReadOnScroll = MutableStateFlow(
+        sp.getBoolean(PREF_IS_MARK_AS_READ_ON_SCROLL, false),
+    )
+    val isMarkAsReadOnScroll: StateFlow<Boolean> = _isMarkAsReadOnScroll.asStateFlow()
+    fun setIsMarkAsReadOnScroll(open: Boolean) {
+        _isMarkAsReadOnScroll.update { open }
+        sp.edit().putBoolean(PREF_IS_MARK_AS_READ_ON_SCROLL, open).apply()
+    }
+
     private val _currentTheme = MutableStateFlow(
         try {
             ThemeOptions.valueOf(
@@ -202,6 +211,7 @@ class SettingsStore(override val di: DI) : DIAware {
             PREF_VAL_OPEN_WITH_WEBVIEW,
             PREF_VAL_OPEN_WITH_CUSTOM_TAB,
             -> ItemOpener.CUSTOM_TAB
+
             else -> ItemOpener.READER
         },
     )
@@ -436,6 +446,8 @@ const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 
 const val PREF_TEXT_SCALE = "pref_body_text_scale"
+
+const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
 /**
  * Read Aloud Settings

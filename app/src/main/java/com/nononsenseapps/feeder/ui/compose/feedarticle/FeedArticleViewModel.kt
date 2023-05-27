@@ -111,8 +111,12 @@ class FeedArticleViewModel(
         repository.markAsUnread(itemId)
     }
 
-    fun markAsRead(itemId: Long) = applicationCoroutineScope.launch {
-        repository.markAsReadAndNotified(itemId)
+    fun markAsRead(itemId: Long, feedOrTag: FeedOrTag?) = applicationCoroutineScope.launch {
+        val (feedId, tag) = repository.currentFeedAndTag.value
+        // Ensure mark as read on scroll doesn't fire when navigating between feeds
+        if (feedOrTag == null || feedId == feedOrTag.id && tag == feedOrTag.tag) {
+            repository.markAsReadAndNotified(itemId)
+        }
     }
 
     fun markBeforeAsRead(cursor: FeedItemCursor) = applicationCoroutineScope.launch {
@@ -213,7 +217,7 @@ class FeedArticleViewModel(
                 navigateToArticle()
             }
         }
-        markAsRead(itemId)
+        markAsRead(itemId, null)
     }
 
     // Used to trigger state update
@@ -256,6 +260,7 @@ class FeedArticleViewModel(
             repository.useDetectLanguage,
             ttsStateHolder.availableLanguages,
             repository.getUnreadBookmarksCount,
+            repository.isMarkAsReadOnScroll,
         ) { params: Array<Any> ->
             @Suppress("UNCHECKED_CAST")
             val article = params[17] as Article
@@ -305,6 +310,7 @@ class FeedArticleViewModel(
                 useDetectLanguage = params[21] as Boolean,
                 ttsLanguages = params[22] as List<Locale>,
                 unreadBookmarksCount = params[23] as Int,
+                markAsReadOnScroll = params[24] as Boolean,
             )
         }
             .stateIn(
@@ -430,6 +436,7 @@ interface FeedScreenViewState {
     val showEditDialog: Boolean
     val haveVisibleFeedItems: Boolean
     val swipeAsRead: SwipeAsRead
+    val markAsReadOnScroll: Boolean
 }
 
 interface ArticleScreenViewState {
@@ -489,5 +496,6 @@ data class FeedArticleScreenViewState(
     override val swipeAsRead: SwipeAsRead = SwipeAsRead.ONLY_FROM_END,
     override val isBookmarked: Boolean = false,
     override val useDetectLanguage: Boolean = false,
+    override val markAsReadOnScroll: Boolean = false,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState

@@ -203,4 +203,5 @@
   <string name="saved_article">Saved article</string>
   <string name="save_article">Save article</string>
   <string name="unsave_article">Stop saving article</string>
+  <string name="mark_as_read_on_scroll">Mark as read on scroll</string>
 </resources>
