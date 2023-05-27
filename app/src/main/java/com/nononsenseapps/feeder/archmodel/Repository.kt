@@ -86,6 +86,11 @@ class Repository(override val di: DI) : DIAware {
         settingsStore.setIsArticleOpen(open)
     }
 
+    val isMarkAsReadOnScroll: StateFlow<Boolean> = settingsStore.isMarkAsReadOnScroll
+    fun setIsMarkAsReadOnScroll(value: Boolean) {
+        settingsStore.setIsMarkAsReadOnScroll(value)
+    }
+
     val currentArticleId: StateFlow<Long> = settingsStore.currentArticleId
     fun setCurrentArticle(articleId: Long) =
         settingsStore.setCurrentArticle(articleId)

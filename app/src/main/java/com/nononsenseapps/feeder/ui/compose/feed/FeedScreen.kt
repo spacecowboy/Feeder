@@ -38,7 +38,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconToggleButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -67,6 +66,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -81,7 +81,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -127,10 +129,14 @@ import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.addMargin
 import com.nononsenseapps.feeder.ui.compose.utils.addMarginLayout
+import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemMostlyVisible
+import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemVisible
 import com.nononsenseapps.feeder.util.emailBugReportIntent
 import com.nononsenseapps.feeder.util.logDebug
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.LocalDI
@@ -278,11 +284,11 @@ fun FeedScreen(
             },
             onExport = { opmlExporter.launch("feeder-export-${LocalDateTime.now()}.opml") },
             drawerState = drawerState,
-            markAsUnread = { itemId, unread ->
+            markAsUnread = { itemId, unread, feedOrTag ->
                 if (unread) {
                     viewModel.markAsUnread(itemId)
                 } else {
-                    viewModel.markAsRead(itemId)
+                    viewModel.markAsRead(itemId, feedOrTag)
                 }
             },
             markBeforeAsRead = { cursor ->
@@ -341,7 +347,7 @@ fun FeedScreen(
     onImport: () -> Unit,
     onExport: () -> Unit,
     drawerState: DrawerState,
-    markAsUnread: (Long, Boolean) -> Unit,
+    markAsUnread: (Long, Boolean, FeedOrTag?) -> Unit,
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onOpenFeedItem: (Long) -> Unit,
@@ -635,7 +641,6 @@ fun FeedScreen(
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalAnimationApi::class,
-    ExperimentalMaterialApi::class,
 )
 @Composable
 fun FeedScreen(
@@ -840,7 +845,7 @@ fun FeedListContent(
     viewState: FeedScreenViewState,
     onOpenNavDrawer: () -> Unit,
     onAddFeed: () -> Unit,
-    markAsUnread: (Long, Boolean) -> Unit,
+    markAsUnread: (Long, Boolean, FeedOrTag?) -> Unit,
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
@@ -883,6 +888,9 @@ fun FeedListContent(
             exit = fadeOut(),
             visible = viewState.haveVisibleFeedItems,
         ) {
+            val screenHeightPx = with(LocalDensity.current) {
+                LocalConfiguration.current.screenHeightDp.dp.toPx().toInt()
+            }
             LazyColumn(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -920,11 +928,30 @@ fun FeedListContent(
                     val previewItem = pagedFeedItems[itemIndex]
                         ?: return@items
 
+                    if (viewState.markAsReadOnScroll && previewItem.unread) {
+                        val visible: Boolean by listState.rememberIsItemVisible(
+                            key = previewItem.id,
+                        )
+                        val mostlyVisible: Boolean by listState.rememberIsItemMostlyVisible(
+                            key = previewItem.id,
+                            screenHeightPx = screenHeightPx,
+                        )
+                        MarkItemAsReadOnScroll(
+                            itemId = previewItem.id,
+                            visible = visible,
+                            mostlyVisible = mostlyVisible,
+                            currentFeedOrTag = viewState.currentFeedOrTag,
+                            coroutineScope = coroutineScope,
+                            markAsRead = markAsUnread,
+                        )
+                    }
+
                     SwipeableFeedItemPreview(
                         onSwipe = { currentState ->
                             markAsUnread(
                                 previewItem.id,
                                 !currentState,
+                                null,
                             )
                         },
                         onlyUnread = viewState.onlyUnread,
@@ -998,7 +1025,7 @@ fun FeedGridContent(
     viewState: FeedScreenViewState,
     onOpenNavDrawer: () -> Unit,
     onAddFeed: () -> Unit,
-    markAsUnread: (Long, Boolean) -> Unit,
+    markAsUnread: (Long, Boolean, FeedOrTag?) -> Unit,
     markBeforeAsRead: (FeedItemCursor) -> Unit,
     markAfterAsRead: (FeedItemCursor) -> Unit,
     onItemClick: (Long) -> Unit,
@@ -1009,6 +1036,9 @@ fun FeedGridContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val screenHeightPx = with(LocalDensity.current) {
+        LocalConfiguration.current.screenHeightDp.dp.toPx().toInt()
+    }
 
     Box(modifier = modifier) {
         AnimatedVisibility(
@@ -1068,11 +1098,30 @@ fun FeedGridContent(
                     val previewItem = pagedFeedItems[itemIndex]
                         ?: return@items
 
+                    if (viewState.markAsReadOnScroll && previewItem.unread) {
+                        val visible: Boolean by gridState.rememberIsItemVisible(
+                            key = previewItem.id,
+                        )
+                        val mostlyVisible: Boolean by gridState.rememberIsItemMostlyVisible(
+                            key = previewItem.id,
+                            screenHeightPx = screenHeightPx,
+                        )
+                        MarkItemAsReadOnScroll(
+                            itemId = previewItem.id,
+                            visible = visible,
+                            mostlyVisible = mostlyVisible,
+                            currentFeedOrTag = viewState.currentFeedOrTag,
+                            coroutineScope = coroutineScope,
+                            markAsRead = markAsUnread,
+                        )
+                    }
+
                     SwipeableFeedItemPreview(
                         onSwipe = { currentState ->
                             markAsUnread(
                                 previewItem.id,
                                 !currentState,
+                                null,
                             )
                         },
                         onlyUnread = viewState.onlyUnread,
@@ -1149,5 +1198,58 @@ fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
         0 -> remember(this) { LazyListState(0, 0) }
         // Return rememberLazyListState (normal case).
         else -> androidx.compose.foundation.lazy.rememberLazyListState()
+    }
+}
+
+/**
+ * @param itemId id of item to mark as read
+ * @param visible if item is visible at all
+ * @param mostlyVisible if item is mostly visible
+ * @param currentFeedOrTag current feed or tag at the time of display
+ * @param coroutineScope a scope which will be cancelled when navigated away from feed screen
+ * @param markAsRead action to run
+ */
+@Composable
+fun MarkItemAsReadOnScroll(
+    itemId: Long,
+    visible: Boolean,
+    mostlyVisible: Boolean,
+    currentFeedOrTag: FeedOrTag,
+    coroutineScope: CoroutineScope,
+    markAsRead: (Long, Boolean, FeedOrTag?) -> Unit,
+) {
+    var debounced by remember {
+        mutableStateOf(false)
+    }
+    if (mostlyVisible) {
+        LaunchedEffect(null) {
+            delay(1000)
+            debounced = true
+        }
+    }
+    if (visible) {
+        DisposableEffect(null) {
+            onDispose {
+                if (debounced) {
+                    coroutineScope.launch(Dispatchers.Default) {
+                        // Why Coroutine? Why a delay?
+                        // Because this scope will be cancelled if the screen
+                        // is navigated away from and I only want things to be marked
+                        // during scroll - not during navigation.
+                        // Navigating between feeds is a special case, which is
+                        // why the currentFeedOrTag needs to be passed to the
+                        // view model.
+                        @Suppress("UNNECESSARYVARIABLE")
+                        val feedOrTag = currentFeedOrTag
+                        delay(100)
+                        markAsRead(
+                            itemId,
+                            false,
+                            feedOrTag,
+                        )
+                    }
+                }
+            }
+        }
     }
 }

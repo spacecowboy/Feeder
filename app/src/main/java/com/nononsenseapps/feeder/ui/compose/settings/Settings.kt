@@ -180,6 +180,8 @@ fun SettingsScreen(
             onBlockListRemove = settingsViewModel::removeFromBlockList,
             feedsSettings = ImmutableHolder(viewState.feedsSettings),
             onToggleNotification = settingsViewModel::toggleNotifications,
+            isMarkAsReadOnScroll = viewState.isMarkAsReadOnScroll,
+            onMarkAsReadOnScroll = settingsViewModel::setIsMarkAsReadOnScroll,
             modifier = Modifier.padding(padding),
         )
     }
@@ -235,6 +237,8 @@ fun SettingsScreenPreview() {
                 onBlockListRemove = {},
                 feedsSettings = ImmutableHolder(emptyList()),
                 onToggleNotification = { _, _ -> },
+                isMarkAsReadOnScroll = false,
+                onMarkAsReadOnScroll = {},
                 modifier = Modifier,
             )
         }
@@ -286,6 +290,8 @@ fun SettingsList(
     onBlockListRemove: (String) -> Unit,
     feedsSettings: ImmutableHolder<List<UIFeedSettings>>,
     onToggleNotification: (Long, Boolean) -> Unit,
+    isMarkAsReadOnScroll: Boolean,
+    onMarkAsReadOnScroll: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -373,6 +379,12 @@ fun SettingsList(
             onSelection = {
                 onSwipeAsReadOptionChanged(it.swipeAsRead)
             },
+        )
+
+        SwitchSetting(
+            title = stringResource(id = R.string.mark_as_read_on_scroll),
+            checked = isMarkAsReadOnScroll,
+            onCheckedChanged = onMarkAsReadOnScroll,
         )
 
         ListDialogSetting(
