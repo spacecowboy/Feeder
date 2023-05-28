@@ -167,10 +167,10 @@
     <string name="from_anywhere">来自任何地方</string>
     <string name="are_you_sure_leave_sync_chain">你确定你想离开同步链吗？</string>
     <string name="no_barcode_scanner_installed">找不到条形码扫描器</string>
-  <string name="remove">删除</string>
+    <string name="remove">删除</string>
     <string name="block_list">拦截列表</string>
     <string name="add_item">添加项目</string>
-  <string name="permission_read_label">Feeder 只读权限</string>
+    <string name="permission_read_label">Feeder 只读权限</string>
     <string name="permission_read_desc">允许应用读取源和文章</string>
     <string name="use_detect_language">检测语言</string>
     <string name="description_for_read_aloud">自动检测文章语言</string>
@@ -178,7 +178,7 @@
     <string name="explanation_permission_notifications">必须先授予权限才能启用通知。</string>
     <string name="text_to_speech">文本转语音</string>
     <string name="dynamic_theme_use">动态颜色</string>
-  <string name="skip_to_next">跳到下一篇</string>
+    <string name="skip_to_next">跳到下一篇</string>
     <string name="set_language">设置语言</string>
     <string name="new_indicator">新</string>
     <string name="article_image">文章图片</string>
@@ -186,4 +186,8 @@
     <string name="text_scale">文本缩放</string>
     <string name="block_list_description">隐藏标题中含任意下列筛选器的文章。示例筛选器：</string>
     <string name="sync_to_fetch">同步以获取文章</string>
+    <string name="saved_articles">已保存文章</string>
+    <string name="saved_article">已保存文章</string>
+    <string name="save_article">保存文章</string>
+    <string name="unsave_article">停止保存文章</string>
 </resources>
