@@ -167,10 +167,10 @@
     <string name="from_anywhere">Von überall</string>
     <string name="are_you_sure_leave_sync_chain">Möchtest du die Synchronisierungskette wirklich verlassen\?</string>
     <string name="no_barcode_scanner_installed">Konnte keinen Barcode-Scanner finden</string>
-  <string name="block_list">Sperrliste</string>
+    <string name="block_list">Sperrliste</string>
     <string name="add_item">Eintrag hinzufügen</string>
     <string name="remove">Entfernen</string>
-  <string name="permission_read_desc">Ermöglicht es der Anwendung, Feeds und Artikel zu lesen</string>
+    <string name="permission_read_desc">Ermöglicht es der Anwendung, Feeds und Artikel zu lesen</string>
     <string name="permission_read_label">Feeder Nur-Lese-Zugriff</string>
     <string name="use_detect_language">Sprache erkennen</string>
     <string name="only_available_on_android_n">Nur auf Android %1$s und höher verfügbar</string>
@@ -179,11 +179,15 @@
     <string name="text_to_speech">Text in Sprache</string>
     <string name="set_language">Sprache einstellen</string>
     <string name="skip_to_next">Weiter zum Nächsten</string>
-  <string name="new_indicator">Neu</string>
+    <string name="new_indicator">Neu</string>
     <string name="dynamic_theme_use">Dynamische Farben</string>
     <string name="article_image">Artikelbild</string>
     <string name="feed_icon">Feed-Symbol</string>
     <string name="text_scale">Textskalierung</string>
-    <string name="block_list_description">Blendet Artikel aus, deren Titel einen dieser Filter enthalten. Beispiel-Filter:</string>
+    <string name="block_list_description">Blendet Artikel aus, deren Titel einen dieser Filter enthalten. Beispielfilter:</string>
     <string name="sync_to_fetch">Synchronisieren, um Artikel abzurufen</string>
+    <string name="saved_article">Gespeicherter Artikel</string>
+    <string name="saved_articles">Gespeicherte Artikel</string>
+    <string name="save_article">Artikel speichern</string>
+    <string name="unsave_article">Artikel nicht mehr speichern</string>
 </resources>
