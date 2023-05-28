@@ -167,10 +167,10 @@
     <string name="swipe_to_mark_as_read">Deslizar para marcar como leído</string>
     <string name="are_you_sure_leave_sync_chain">¿Estás seguro que quieres abandonar la cadena de sincronización\?</string>
     <string name="no_barcode_scanner_installed">No se encontró un escáner de código de barras</string>
-  <string name="block_list">Lista de bloqueos</string>
+    <string name="block_list">Lista de bloqueos</string>
     <string name="add_item">Añadir elemento</string>
     <string name="remove">Retirar</string>
-  <string name="permission_read_desc">Permite a la aplicación leer fuentes y artículos</string>
+    <string name="permission_read_desc">Permite a la aplicación leer fuentes y artículos</string>
     <string name="permission_read_label">Acceso de solo lectura</string>
     <string name="use_detect_language">Detectar idioma</string>
     <string name="only_available_on_android_n">Disponible solo en Android %1$s y superior</string>
@@ -180,10 +180,14 @@
     <string name="skip_to_next">Saltar al siguiente</string>
     <string name="set_language">Establecer idioma</string>
     <string name="dynamic_theme_use">Colores dinámicos</string>
-  <string name="new_indicator">Nuevo</string>
+    <string name="new_indicator">Nuevo</string>
     <string name="article_image">Imagen del artículo</string>
     <string name="feed_icon">Icono de canal</string>
     <string name="text_scale">Escalar texto</string>
     <string name="block_list_description">Oculta los artículos cuyos títulos contengan alguno de estos filtros. Filtros de ejemplo:</string>
     <string name="sync_to_fetch">Sincronizar para obtener el artículo</string>
+    <string name="save_article">Guardar artículo</string>
+    <string name="unsave_article">Dejar de guardar artículo</string>
+    <string name="saved_articles">Artículos guardados</string>
+    <string name="saved_article">Artículo guardado</string>
 </resources>
