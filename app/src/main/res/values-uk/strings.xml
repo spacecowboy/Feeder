@@ -167,10 +167,10 @@
     <string name="swipe_to_mark_as_read">Ковзніть, щоб позначити прочитаним</string>
     <string name="are_you_sure_leave_sync_chain">Ви справді хочете покинути ланцюжок синхронізації\?</string>
     <string name="no_barcode_scanner_installed">Не вдалося знайти сканер штрихкодів</string>
-  <string name="block_list">Список блокування</string>
+    <string name="block_list">Список блокування</string>
     <string name="add_item">Додати елемент</string>
     <string name="remove">Вилучити</string>
-  <string name="permission_read_desc">Дозволяє програмі читати стрічки і статті</string>
+    <string name="permission_read_desc">Дозволяє програмі читати стрічки і статті</string>
     <string name="permission_read_label">Доступ лише для читання для Feeder</string>
     <string name="use_detect_language">Визначити мову</string>
     <string name="description_for_read_aloud">Автоматично визначати мову статті</string>
@@ -180,10 +180,14 @@
     <string name="set_language">Вказати мову</string>
     <string name="skip_to_next">Перейти до наступного</string>
     <string name="dynamic_theme_use">Динамічні кольори</string>
-  <string name="new_indicator">Нове</string>
+    <string name="new_indicator">Нове</string>
     <string name="article_image">Зображення статті</string>
     <string name="feed_icon">Значок стрічки</string>
     <string name="text_scale">Розмір тексту</string>
     <string name="block_list_description">Приховує статті з назвами, які містять будь-який із цих фільтрів. Приклад фільтрів:</string>
     <string name="sync_to_fetch">Синхронізувати, щоб отримати статтю</string>
+    <string name="saved_articles">Збережені статті</string>
+    <string name="saved_article">Збережена стаття</string>
+    <string name="save_article">Зберегти статтю</string>
+    <string name="unsave_article">Зупинити збереження статті</string>
 </resources>
