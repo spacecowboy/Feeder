@@ -167,10 +167,10 @@
     <string name="only_from_end">Tylko od prawej strony</string>
     <string name="are_you_sure_leave_sync_chain">Czy na pewno chcesz opuścić łańcuch synchronizacji\?</string>
     <string name="no_barcode_scanner_installed">Nie udało się znaleźć skanera kodów kreskowych</string>
-  <string name="block_list">Lista zablokowanych</string>
+    <string name="block_list">Lista zablokowanych</string>
     <string name="add_item">Dodaj element</string>
     <string name="remove">Usuń</string>
-  <string name="permission_read_label">Dostęp tylko do odczytu dla Feedera</string>
+    <string name="permission_read_label">Dostęp tylko do odczytu dla Feedera</string>
     <string name="permission_read_desc">Umożliwia aplikacji odczytywanie kanałów i artykułów</string>
     <string name="use_detect_language">Wykrywaj język</string>
     <string name="only_available_on_android_n">Dostępne tylko na Androidzie %1$s i nowszych</string>
@@ -180,10 +180,14 @@
     <string name="set_language">Ustaw język</string>
     <string name="text_to_speech">Zamiana tekstu na mowę</string>
     <string name="dynamic_theme_use">Dynamiczne kolory</string>
-  <string name="new_indicator">Nowy</string>
+    <string name="new_indicator">Nowy</string>
     <string name="article_image">Obrazek artykułu</string>
     <string name="feed_icon">Ikona kanału</string>
     <string name="text_scale">Rozmiar tekstu</string>
     <string name="block_list_description">Ukrywa artykuły z tytułami zawierającymi dowolny z tych filtrów. Przykładowe filtry:</string>
     <string name="sync_to_fetch">Zsynchronizuj, aby pobrać artykuł</string>
+    <string name="saved_articles">Zapisane artykuły</string>
+    <string name="save_article">Zapisz artykuł</string>
+    <string name="saved_article">Zapisany artykuł</string>
+    <string name="unsave_article">Usuń z zapisanych</string>
 </resources>
