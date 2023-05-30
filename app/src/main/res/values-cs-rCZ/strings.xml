@@ -168,7 +168,7 @@
     <string name="only_from_end">Jen od konce</string>
     <string name="from_anywhere">Odkudkoliv</string>
     <string name="swipe_to_mark_as_read">Označte jako přečtené posunutím prstem do strany</string>
-  <string name="remove">Odstranit</string>
+    <string name="remove">Odstranit</string>
     <string name="block_list">Černá listina</string>
     <string name="add_item">Přidat položku</string>
     <string name="no_barcode_scanner_installed">Nelze najít čtečku čárových kódů</string>
@@ -176,7 +176,7 @@
     <string name="description_for_read_aloud">Automaticky detekuje jazyk článku</string>
     <string name="explanation_permission_notifications">Před povolením oznámení je nutné udělit oprávnění.</string>
     <string name="article_image">Obrázek článku</string>
-  <string name="set_language">Nastavit jazyk</string>
+    <string name="set_language">Nastavit jazyk</string>
     <string name="only_available_on_android_n">Dostupné pouze v Androidu %1$s nebo vyšším</string>
     <string name="skip_to_next">Přeskočit na další</string>
     <string name="text_to_speech">Převod textu na řeč</string>
@@ -186,4 +186,8 @@
     <string name="text_scale">Textové měřítko</string>
     <string name="block_list_description">Skryje články s nadpisy obsahujícími některý z těchto filtrů. Příklady filtrů:</string>
     <string name="feed_icon">Ikona kanálu</string>
+    <string name="saved_articles">Uložené články</string>
+    <string name="saved_article">Uložený článek</string>
+    <string name="save_article">Uložit článek</string>
+    <string name="unsave_article">Přestat ukládat článek</string>
 </resources>
