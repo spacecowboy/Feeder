@@ -167,10 +167,10 @@
     <string name="swipe_to_mark_as_read">Balayer pour marquer comme lu</string>
     <string name="are_you_sure_leave_sync_chain">Voulez-vous vraiment quitter la chaîne de synchronisation \?</string>
     <string name="no_barcode_scanner_installed">Impossible de trouver un scanneur de codes-barres</string>
-  <string name="add_item">Ajouter un élément</string>
+    <string name="add_item">Ajouter un élément</string>
     <string name="block_list">Liste de blocage</string>
     <string name="remove">Retirer</string>
-  <string name="permission_read_desc">Permet à l\'application de lire des flux et des articles</string>
+    <string name="permission_read_desc">Permet à l\'application de lire des flux et des articles</string>
     <string name="permission_read_label">Accès en lecture seule Feeder</string>
     <string name="use_detect_language">Détecter la langue</string>
     <string name="only_available_on_android_n">Disponible uniquement sur Android %1$s et plus</string>
@@ -180,10 +180,14 @@
     <string name="set_language">Définir la langue</string>
     <string name="text_to_speech">Synthèse vocale</string>
     <string name="dynamic_theme_use">Couleurs dynamiques</string>
-  <string name="new_indicator">Nouveau</string>
+    <string name="new_indicator">Nouveau</string>
     <string name="article_image">Image de l\'article</string>
     <string name="feed_icon">Icône de flux</string>
     <string name="text_scale">Mise à l\'échelle du texte</string>
     <string name="block_list_description">Masque les articles dont le titre contient l\'un de ces filtres. Exemples de filtres :</string>
     <string name="sync_to_fetch">Synchroniser pour récupérer l\'article</string>
+    <string name="saved_articles">Articles sauvegardés</string>
+    <string name="unsave_article">Ne plus sauvegarder l\'article</string>
+    <string name="saved_article">Article sauvegardé</string>
+    <string name="save_article">Sauvegarder l\'article</string>
 </resources>
