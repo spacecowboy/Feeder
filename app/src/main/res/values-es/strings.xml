@@ -190,4 +190,5 @@
     <string name="unsave_article">Dejar de guardar artículo</string>
     <string name="saved_articles">Artículos guardados</string>
     <string name="saved_article">Artículo guardado</string>
+    <string name="mark_as_read_on_scroll">Marcar como leído al desplazar</string>
 </resources>
