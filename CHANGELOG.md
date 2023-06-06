@@ -1,3 +1,76 @@
+# 2.4.16
+Jonas Kalderstam (11):
+  * [3493e09b] Added global notifications setting as an alternative way to
+         toggle feed notifications
+  * [6d11e165] Changed block list setting to have dynamic size
+  * [7d4e275e] Cleaned up some code
+  * [cce0be9b] Added an entry in the nav drawer to easily access bookmarked
+         articles
+  * [fd0577d4] Fixed mark as read after/before
+  * [502c16cd] Removed ability to pin articles
+  * [a3630e7a] Renamed "bookmark" to "save article"
+  * [b903a8f5] Ensured old pinned articles becomes saved articles when
+         upgrading
+  * [e390d229] Changed so Feeder will try and parse responses from sites
+         even if the mimetype is wrong
+  * [06179eab] Added option to mark as read while scrolling
+  * [835329dc] Changed mark as read on scroll delay to 800ms down from
+         1000ms
+
+Agnieszka C (2):
+  * [0368c1ed] Updated Polish translation using Weblate
+  * [cec966ba] Updated Polish translation using Weblate
+
+Alexthegib (1):
+  * [052eeb59] Updated Portuguese (Portugal) translation using Weblate
+
+Dan (2):
+  * [8ac1d5f0] Updated Ukrainian translation using Weblate
+  * [810d0766] Updated Ukrainian translation using Weblate
+
+ERYpTION (2):
+  * [4910290a] Updated Danish translation using Weblate
+  * [50490d02] Updated Danish translation using Weblate
+
+El Pirujo (2):
+  * [b62198f8] Updated Spanish translation using Weblate
+  * [ae153e5b] Updated Spanish translation using Weblate
+
+Eric (2):
+  * [f4bee166] Updated Chinese (Simplified) translation using Weblate
+  * [b660084f] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [5fa9186e] Updated Italian translation using Weblate
+
+Nicola Masarone (1):
+  * [7807be16] Updated Italian translation using Weblate
+
+Oğuz Ersen (1):
+  * [81db851a] Updated Turkish translation using Weblate
+
+ROCK TAKEY (1):
+  * [fd41e07c] Updated Japanese translation using Weblate
+
+Retrial (1):
+  * [a533ebf8] Updated Greek translation using Weblate
+
+VfBFan (2):
+  * [18901a75] Updated German translation using Weblate
+  * [c56fb097] Updated German translation using Weblate
+
+eevan78 (1):
+  * [37648ec4] Translated using Weblate (Serbian)
+
+pchelium (3):
+  * [e64914ef] Updated Czech translation using Weblate
+  * [6dafba63] Updated Czech translation using Weblate
+  * [546751ab] Updated Czech translation using Weblate
+
+zmni (2):
+  * [936ee470] Updated Indonesian translation using Weblate
+  * [647040b6] Updated Indonesian translation using Weblate
+
 # 2.4.15
 Jonas Kalderstam (15):
   * [6838e46a] Updated versions
