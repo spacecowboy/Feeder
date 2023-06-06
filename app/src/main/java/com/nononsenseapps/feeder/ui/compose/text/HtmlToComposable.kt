@@ -2,8 +2,11 @@ package com.nononsenseapps.feeder.ui.compose.text
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -64,6 +67,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.CodeInlineStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
+import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
 import com.nononsenseapps.feeder.ui.text.Video
 import com.nononsenseapps.feeder.ui.text.getVideo
 import java.io.InputStream
@@ -106,17 +110,13 @@ private fun ParagraphText(
 ) {
     val paragraph = paragraphBuilder.rememberComposableAnnotatedString()
 
-    // just for debug
-//    check(paragraph.text.isNotEmpty()) {
-//        "Text is empty - you failed"
-//    }
-
     ProvideScaledText(
         textStyler?.textStyle() ?: MaterialTheme.typography.bodyLarge.merge(
             TextStyle(color = MaterialTheme.colorScheme.onBackground),
         ),
     ) {
         WithBidiDeterminedLayoutDirection(paragraph.text) {
+            val interactionSource = remember { MutableInteractionSource() }
             // ClickableText prevents taps from deselecting selected text
             // So use regular Text if possible
             if (
@@ -126,7 +126,9 @@ private fun ParagraphText(
                 ClickableText(
                     text = paragraph,
                     style = LocalTextStyle.current,
-                    modifier = modifier,
+                    modifier = modifier
+                        .indication(interactionSource, LocalIndication.current)
+                        .focusableInNonTouchMode(interactionSource = interactionSource),
                 ) { offset ->
                     paragraph.getStringAnnotations("URL", offset, offset)
                         .firstOrNull()
@@ -137,7 +139,9 @@ private fun ParagraphText(
             } else {
                 Text(
                     text = paragraph,
-                    modifier = modifier,
+                    modifier = modifier
+                        .indication(interactionSource, LocalIndication.current)
+                        .focusableInNonTouchMode(interactionSource = interactionSource),
                 )
             }
         }
@@ -380,6 +384,8 @@ private fun HtmlComposer.appendTextChildren(
                                     val composer = EagerComposer { paragraphBuilder, textStyler ->
                                         val dimens = LocalDimens.current
                                         val scrollState = rememberScrollState()
+                                        val interactionSource =
+                                            remember { MutableInteractionSource() }
                                         Surface(
                                             color = CodeBlockBackground(),
                                             shape = MaterialTheme.shapes.medium,
@@ -387,7 +393,12 @@ private fun HtmlComposer.appendTextChildren(
                                                 .horizontalScroll(
                                                     state = scrollState,
                                                 )
-                                                .width(dimens.maxContentWidth),
+                                                .width(dimens.maxContentWidth)
+                                                .indication(
+                                                    interactionSource,
+                                                    LocalIndication.current,
+                                                )
+                                                .focusableInNonTouchMode(interactionSource = interactionSource),
                                         ) {
                                             Box(modifier = Modifier.padding(all = 4.dp)) {
                                                 Text(
@@ -617,9 +628,13 @@ private fun HtmlComposer.appendTextChildren(
                                             TextStyle(color = MaterialTheme.colorScheme.onBackground),
                                         ),
                                     ) {
+                                        val interactionSource = remember { MutableInteractionSource() }
                                         Text(
                                             text = stringResource(R.string.touch_to_play_video),
-                                            modifier = Modifier.fillMaxWidth(),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .indication(interactionSource, LocalIndication.current)
+                                                .focusableInNonTouchMode(interactionSource = interactionSource),
                                         )
                                     }
                                 }
@@ -737,9 +752,13 @@ private fun ColumnScope.renderImage(
                     TextStyle(color = MaterialTheme.colorScheme.onBackground),
                 ),
             ) {
+                val interactionSource = remember { MutableInteractionSource() }
                 Text(
                     alt,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .indication(interactionSource, LocalIndication.current)
+                        .focusableInNonTouchMode(interactionSource = interactionSource),
                 )
             }
         }

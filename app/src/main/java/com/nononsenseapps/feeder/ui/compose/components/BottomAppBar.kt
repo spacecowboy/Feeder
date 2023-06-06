@@ -1,5 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,6 +44,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
  *
  * A bottom app bar displays navigation and key actions at the bottom of mobile screens.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PaddedBottomAppBar(
     actions: @Composable RowScope.() -> Unit,
@@ -52,7 +55,7 @@ fun PaddedBottomAppBar(
     tonalElevation: Dp = BottomAppBarDefaults.ContainerElevation,
     contentPadding: PaddingValues = BottomAppBarDefaults.ContentPadding,
 ) = BottomAppBar(
-    modifier = modifier,
+    modifier = modifier.focusGroup(),
     containerColor = containerColor,
     contentColor = contentColor,
     tonalElevation = tonalElevation,
@@ -114,6 +117,7 @@ private val BottomAppBarVerticalPadding = 16.dp - 12.dp
 private val FABHorizontalPadding = 16.dp - BottomAppBarHorizontalPadding
 private val FABVerticalPadding = 12.dp - BottomAppBarVerticalPadding
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun BottomAppBar(
     modifier: Modifier = Modifier,
@@ -136,10 +140,11 @@ private fun BottomAppBar(
             ),
         ) {
             Row(
-                Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(bottomBarHeight)
-                    .padding(contentPadding),
+                    .padding(contentPadding)
+                    .focusGroup(),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
                 content = content,

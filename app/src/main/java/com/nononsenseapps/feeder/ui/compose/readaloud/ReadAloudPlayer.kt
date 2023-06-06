@@ -40,6 +40,7 @@ import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.components.PaddedBottomAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
+import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import java.util.*
 
 @Composable
@@ -161,6 +162,9 @@ fun TTSPlayer(
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
+                    modifier = Modifier.onKeyEventLikeEscape {
+                        showMenu = false
+                    },
                 ) {
                     DropdownMenuItem(
                         onClick = {

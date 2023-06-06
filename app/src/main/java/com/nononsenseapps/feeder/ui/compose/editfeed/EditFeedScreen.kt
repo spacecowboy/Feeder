@@ -1,6 +1,8 @@
 package com.nononsenseapps.feeder.ui.compose.editfeed
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,12 +44,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -184,6 +190,7 @@ fun EditFeedScreen(
                                     notificationsPermissionState.launchPermissionRequest()
                                 }
                             }
+
                             PermissionStatus.Granted -> viewState.notify = true
                         }
                     }
@@ -236,6 +243,7 @@ fun EditFeedScreen(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun EditFeedView(
     screenType: ScreenType,
@@ -245,6 +253,8 @@ fun EditFeedView(
     modifier: Modifier = Modifier,
 ) {
     val dimens = LocalDimens.current
+
+    val (leftFocusRequester, rightFocusRequester) = createRefs()
 
     OkCancelWithContent(
         onOk = {
@@ -267,6 +277,7 @@ fun EditFeedView(
                 ) {
                     LeftContent(
                         viewState = viewState,
+                        rightFocusRequester = rightFocusRequester,
                     )
                 }
 
@@ -278,6 +289,8 @@ fun EditFeedView(
                 ) {
                     RightContent(
                         viewState = viewState,
+                        leftFocusRequester = leftFocusRequester,
+                        rightFocusRequester = rightFocusRequester,
                     )
                 }
             }
@@ -288,6 +301,7 @@ fun EditFeedView(
             ) {
                 LeftContent(
                     viewState = viewState,
+                    rightFocusRequester = rightFocusRequester,
                 )
 
                 Divider(
@@ -296,6 +310,8 @@ fun EditFeedView(
 
                 RightContent(
                     viewState = viewState,
+                    leftFocusRequester = leftFocusRequester,
+                    rightFocusRequester = rightFocusRequester,
                 )
             }
         }
@@ -303,10 +319,14 @@ fun EditFeedView(
 }
 
 @Suppress("ktlint:twitter-compose:modifier-missing-check")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class,
+    ExperimentalFoundationApi::class,
+)
 @Composable
 fun ColumnScope.LeftContent(
     viewState: EditFeedScreenState,
+    rightFocusRequester: FocusRequester,
 ) {
     val filteredTags by remember(viewState.allTags, viewState.feedTag) {
         derivedStateOf {
@@ -318,14 +338,14 @@ fun ColumnScope.LeftContent(
         }
     }
 
-    val (focusTitle, focusTag) = createRefs()
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-    var tagHasFocus by rememberSaveable { mutableStateOf(false) }
+    var showTagSuggestions by rememberSaveable { mutableStateOf(false) }
 
     TextField(
         value = viewState.feedUrl,
-        onValueChange = { viewState.feedUrl = it },
+        onValueChange = { viewState.feedUrl = it.trim() },
         label = {
             Text(stringResource(id = R.string.url))
         },
@@ -338,7 +358,7 @@ fun ColumnScope.LeftContent(
         ),
         keyboardActions = KeyboardActions(
             onNext = {
-                focusTitle.requestFocus()
+                focusManager.moveFocus(focusDirection = FocusDirection.Down)
             },
         ),
         singleLine = true,
@@ -346,10 +366,7 @@ fun ColumnScope.LeftContent(
             .fillMaxWidth()
             .heightIn(min = 64.dp)
             .interceptKey(Key.Enter) {
-                focusTitle.requestFocus()
-            }
-            .interceptKey(Key.Escape) {
-                focusManager.clearFocus()
+                focusManager.moveFocus(FocusDirection.Down)
             },
     )
     AnimatedVisibility(visible = viewState.isNotValidUrl) {
@@ -377,27 +394,30 @@ fun ColumnScope.LeftContent(
         ),
         keyboardActions = KeyboardActions(
             onNext = {
-                focusTag.requestFocus()
+                focusManager.moveFocus(focusDirection = FocusDirection.Down)
             },
         ),
         modifier = Modifier
-            .focusRequester(focusTitle)
             .fillMaxWidth()
             .heightIn(min = 64.dp)
             .interceptKey(Key.Enter) {
-                focusTag.requestFocus()
-            }
-            .interceptKey(Key.Escape) {
-                focusManager.clearFocus()
+                focusManager.moveFocus(FocusDirection.Down)
             },
     )
 
     AutoCompleteResults(
-        displaySuggestions = tagHasFocus,
+        modifier = Modifier
+            .focusGroup()
+            .onFocusChanged {
+                // Someone in hierarchy has focus - different from isFocused
+                showTagSuggestions = it.hasFocus
+            },
+        displaySuggestions = showTagSuggestions,
         suggestions = filteredTags,
         onSuggestionClicked = { tag ->
             viewState.feedTag = tag
-            focusManager.clearFocus()
+            rightFocusRequester.requestFocus()
+            showTagSuggestions = false
         },
         suggestionContent = {
             Box(
@@ -429,21 +449,16 @@ fun ColumnScope.LeftContent(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    focusManager.clearFocus()
+                    showTagSuggestions = false
+                    keyboardController?.hide()
+                    rightFocusRequester.requestFocus()
                 },
             ),
             modifier = Modifier
-                .focusRequester(focusTag)
-                .onFocusChanged {
-                    tagHasFocus = it.isFocused
-                }
                 .fillMaxWidth()
                 .heightIn(min = 64.dp)
                 .interceptKey(Key.Enter) {
-                    focusManager.clearFocus()
-                }
-                .interceptKey(Key.Escape) {
-                    focusManager.clearFocus()
+                    rightFocusRequester.requestFocus()
                 },
         )
     }
@@ -453,11 +468,17 @@ fun ColumnScope.LeftContent(
 @Composable
 fun ColumnScope.RightContent(
     viewState: EditFeedScreenState,
+    leftFocusRequester: FocusRequester,
+    rightFocusRequester: FocusRequester,
 ) {
     SwitchSetting(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
         checked = viewState.fullTextByDefault,
         icon = null,
+        modifier = Modifier.focusRequester(rightFocusRequester)
+            .focusProperties {
+                previous = leftFocusRequester
+            },
     ) { viewState.fullTextByDefault = it }
     SwitchSetting(
         title = stringResource(id = R.string.notify_for_new_items),

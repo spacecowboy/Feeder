@@ -3,7 +3,12 @@ package com.nononsenseapps.feeder.ui.compose.reader
 import android.content.Context
 import android.util.Log
 import androidx.annotation.ColorInt
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusGroup
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -39,6 +45,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
+import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
 import java.util.*
@@ -49,6 +56,7 @@ val dateTimeFormat: DateTimeFormatter =
     DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)
         .withLocale(Locale.getDefault())
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ReaderView(
     screenType: ScreenType,
@@ -78,7 +86,8 @@ fun ReaderView(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .focusGroup(),
         ) {
             item {
                 val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
@@ -88,6 +97,7 @@ fun ReaderView(
                         .semantics(mergeDescendants = true) {
                             try {
                                 customActions = listOf(
+                                    // TODO enclosure?
                                     CustomAccessibilityAction(goToFeedLabel) {
                                         onFeedTitleClick()
                                         true
@@ -101,10 +111,13 @@ fun ReaderView(
                         },
                 ) {
                     WithBidiDeterminedLayoutDirection(paragraph = articleTitle) {
+                        val interactionSource = remember { MutableInteractionSource() }
                         Text(
                             text = articleTitle,
                             style = MaterialTheme.typography.headlineLarge,
                             modifier = Modifier
+                                .indication(interactionSource, LocalIndication.current)
+                                .focusableInNonTouchMode(interactionSource = interactionSource)
                                 .width(dimens.maxContentWidth),
                         )
                     }
@@ -133,10 +146,13 @@ fun ReaderView(
                         ProvideScaledText(style = MaterialTheme.typography.titleMedium) {
                             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                                 WithBidiDeterminedLayoutDirection(paragraph = authorDate) {
+                                    val interactionSource = remember { MutableInteractionSource() }
                                     Text(
                                         text = authorDate,
                                         modifier = Modifier
-                                            .width(dimens.maxContentWidth),
+                                            .width(dimens.maxContentWidth)
+                                            .indication(interactionSource, LocalIndication.current)
+                                            .focusableInNonTouchMode(interactionSource = interactionSource),
                                     )
                                 }
                             }
@@ -202,6 +218,7 @@ fun onLinkClick(
         LinkOpener.CUSTOM_TAB -> {
             openLinkInCustomTab(context, link, toolbarColor)
         }
+
         LinkOpener.DEFAULT_BROWSER -> {
             openLinkInBrowser(context, link)
         }

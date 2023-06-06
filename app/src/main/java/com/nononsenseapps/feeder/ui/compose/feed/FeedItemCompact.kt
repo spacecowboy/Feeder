@@ -52,6 +52,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
+import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import java.net.URL
 import java.util.*
 import org.threeten.bp.Instant
@@ -130,6 +131,7 @@ fun FeedItemCompact(
                 DropdownMenu(
                     expanded = dropDownMenuExpanded,
                     onDismissRequest = onDismissDropdown,
+                    modifier = Modifier.onKeyEventLikeEscape(onDismissDropdown),
                 ) {
                     DropdownMenuItem(
                         onClick = {
