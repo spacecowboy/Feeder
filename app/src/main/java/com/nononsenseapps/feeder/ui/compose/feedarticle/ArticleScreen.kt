@@ -4,6 +4,8 @@ import android.content.Intent
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -39,7 +41,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -64,6 +70,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
+import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.openLinkInBrowser
 import com.nononsenseapps.feeder.util.openLinkInCustomTab
@@ -143,7 +150,11 @@ fun ArticleScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalComposeUiApi::class,
+    ExperimentalFoundationApi::class,
+)
 @Composable
 fun ArticleScreen(
     viewState: ArticleScreenViewState,
@@ -173,6 +184,10 @@ fun ArticleScreen(
         bottomBarVisibleState.targetState = viewState.isBottomBarVisible
     }
 
+    val (focusArticle, focusTopBar) = remember {
+        FocusRequester.createRefs()
+    }
+
     Scaffold(
         modifier = modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -180,6 +195,12 @@ fun ArticleScreen(
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             SensibleTopAppBar(
+                modifier = Modifier
+                    .focusGroup()
+                    .focusRequester(focusTopBar)
+                    .focusProperties {
+                        down = focusArticle
+                    },
                 scrollBehavior = scrollBehavior,
                 title = viewState.feedDisplayTitle,
                 navigationIcon = {
@@ -219,7 +240,8 @@ fun ArticleScreen(
                         Box {
                             IconButton(
                                 onClick = { onShowToolbarMenu(true) },
-                                modifier = Modifier.tooltipAnchor(),
+                                modifier = Modifier
+                                    .tooltipAnchor(),
                             ) {
                                 Icon(
                                     Icons.Default.MoreVert,
@@ -229,6 +251,10 @@ fun ArticleScreen(
                             DropdownMenu(
                                 expanded = viewState.showToolbarMenu,
                                 onDismissRequest = { onShowToolbarMenu(false) },
+                                modifier = Modifier
+                                    .onKeyEventLikeEscape {
+                                        onShowToolbarMenu(false)
+                                    },
                             ) {
                                 DropdownMenuItem(
                                     onClick = {
@@ -325,7 +351,12 @@ fun ArticleScreen(
             onFeedTitleClick = onFeedTitleClick,
             displayFullText = displayFullText,
             modifier = Modifier
-                .padding(padding),
+                .padding(padding)
+                .focusGroup()
+                .focusRequester(focusArticle)
+                .focusProperties {
+                    up = focusTopBar
+                },
         )
     }
 }

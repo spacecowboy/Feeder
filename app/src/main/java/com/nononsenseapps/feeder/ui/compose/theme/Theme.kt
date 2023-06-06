@@ -160,9 +160,11 @@ private fun ThemeOptions.getColorScheme(
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && dynamicColors && dark -> {
             dynamicDarkColorScheme(LocalContext.current)
         }
+
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && dynamicColors && !dark -> {
             dynamicLightColorScheme(LocalContext.current)
         }
+
         dark -> darkColors
         else -> lightColors
     }

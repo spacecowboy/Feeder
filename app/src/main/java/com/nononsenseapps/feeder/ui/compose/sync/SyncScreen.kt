@@ -86,6 +86,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.ScreenType
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.getScreenType
+import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.util.DEEP_LINK_BASE_URI
 import com.nononsenseapps.feeder.util.KOFI_URL
 import com.nononsenseapps.feeder.util.openKoFiIntent
@@ -144,6 +145,9 @@ private fun SyncScaffold(
                                 DropdownMenu(
                                     expanded = showToolbar,
                                     onDismissRequest = { showToolbar = false },
+                                    modifier = Modifier.onKeyEventLikeEscape {
+                                        showToolbar = false
+                                    },
                                 ) {
                                     DropdownMenuItem(
                                         onClick = {

@@ -9,6 +9,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -42,8 +44,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -64,11 +69,10 @@ import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleDrawerSheet
 import com.nononsenseapps.feeder.ui.compose.material3.DismissibleNavigationDrawer
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
-import com.nononsenseapps.feeder.ui.compose.material3.DrawerValue
-import com.nononsenseapps.feeder.ui.compose.material3.rememberDrawerState
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.utils.ImmutableHolder
 import com.nononsenseapps.feeder.ui.compose.utils.immutableListHolderOf
+import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import java.net.URL
 import kotlinx.coroutines.launch
 
@@ -80,16 +84,32 @@ fun ScreenWithNavDrawer(
     unreadBookmarksCount: Int,
     onToggleTagExpansion: (String) -> Unit,
     onDrawerItemSelected: (Long, String) -> Unit,
-    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+    drawerState: DrawerState,
+    focusRequester: FocusRequester,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(drawerState.isOpen) {
+        if (drawerState.isOpen) {
+            focusRequester.requestFocus()
+        }
+    }
+
     DismissibleNavigationDrawer(
+        modifier = modifier
+            .onKeyEventLikeEscape {
+                coroutineScope.launch {
+                    drawerState.close()
+                }
+            },
         drawerState = drawerState,
         drawerContent = {
             DismissibleDrawerSheet {
                 ListOfFeedsAndTags(
+                    modifier = Modifier
+                        .focusRequester(focusRequester),
                     feedsAndTags = feedsAndTags,
                     expandedTags = expandedTags,
                     unreadBookmarksCount = unreadBookmarksCount,
@@ -318,6 +338,7 @@ fun ListOfFeedsAndTags(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @ExperimentalAnimationApi
 @Preview(showBackground = true)
 @Composable
@@ -337,11 +358,12 @@ private fun ExpandableTag(
     val expandedLabel = stringResource(id = R.string.expanded_tag)
     val contractedLabel = stringResource(id = R.string.contracted_tag)
 
+    val inputModeManager = LocalInputModeManager.current
+
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .clickable(onClick = onItemClick)
             .padding(top = 2.dp, bottom = 2.dp, end = 16.dp)
             .fillMaxWidth()
             .height(48.dp)
@@ -373,6 +395,7 @@ private fun ExpandableTag(
         )
         Box(
             modifier = Modifier
+                .clickable(onClick = onItemClick)
                 .fillMaxHeight()
                 .weight(1.0f, fill = true),
         ) {

@@ -79,6 +79,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
@@ -129,6 +130,7 @@ import com.nononsenseapps.feeder.ui.compose.utils.LocalWindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.WindowSize
 import com.nononsenseapps.feeder.ui.compose.utils.addMargin
 import com.nononsenseapps.feeder.ui.compose.utils.addMarginLayout
+import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemMostlyVisible
 import com.nononsenseapps.feeder.ui.compose.utils.rememberIsItemVisible
 import com.nononsenseapps.feeder.util.emailBugReportIntent
@@ -146,7 +148,10 @@ import org.threeten.bp.LocalDateTime
 
 private const val LOG_TAG = "FEEDER_FEEDSCREEN"
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
+)
 @Composable
 fun FeedScreen(
     navController: NavController,
@@ -194,6 +199,8 @@ fun FeedScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
+    val focusNavDrawer = remember { FocusRequester() }
+
     BackHandler(
         enabled = drawerState.isOpen,
         onBack = {
@@ -215,6 +222,7 @@ fun FeedScreen(
         onDrawerItemSelected = { feedId, tag ->
             FeedDestination.navigate(navController, feedId = feedId, tag = tag)
         },
+        focusRequester = focusNavDrawer,
         drawerState = drawerState,
     ) {
         FeedScreen(
@@ -429,6 +437,9 @@ fun FeedScreen(
                     DropdownMenu(
                         expanded = viewState.showToolbarMenu,
                         onDismissRequest = { onShowToolbarMenu(false) },
+                        modifier = Modifier.onKeyEventLikeEscape {
+                            onShowToolbarMenu(false)
+                        },
                     ) {
                         DropdownMenuItem(
                             onClick = {

@@ -49,6 +49,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.FeedListItemTitleTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.FeederTheme
 import com.nononsenseapps.feeder.ui.compose.theme.titleFontWeight
 import com.nononsenseapps.feeder.ui.compose.utils.ThemePreviews
+import com.nononsenseapps.feeder.ui.compose.utils.onKeyEventLikeEscape
 import org.threeten.bp.Instant
 
 @Composable
@@ -161,6 +162,7 @@ fun FeedItemCard(
                         DropdownMenu(
                             expanded = dropDownMenuExpanded,
                             onDismissRequest = onDismissDropdown,
+                            modifier = Modifier.onKeyEventLikeEscape(onDismissDropdown),
                         ) {
                             DropdownMenuItem(
                                 onClick = {
