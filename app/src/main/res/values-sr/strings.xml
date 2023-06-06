@@ -140,7 +140,7 @@
     <string name="failed_to_export_OPML">Није успео извоз OPML фајла</string>
     <string name="are_you_sure_leave_sync_chain">Да ли сте сигурни да желите напустити ланац синхронизације\?</string>
     <string name="no_barcode_scanner_installed">Не може да се пронађе скенер бар кодова</string>
-  <string name="go_back">Повратак назад</string>
+    <string name="go_back">Повратак назад</string>
     <string name="expanded_tag">Отворена ознака</string>
     <string name="contracted_tag">Затворена ознака</string>
     <string name="add_new_device">Додај нови уређај</string>
@@ -167,4 +167,28 @@
     <string name="device_sync_description_1">Синхронизација уређаја вам омогућава да на различитим уређајима које поседујете синхронизујете претплате на изворе и прочитане чланке.</string>
     <string name="secret_key">Тајни кључ</string>
     <string name="device_sync_description_2">Једноставно скенирајте кôд из вашег ланца синхронизације који сте креирали на другом уређају, или започните нови ланац синхронизације.</string>
+    <string name="sync_to_fetch">Сингронизуј да добавиш чланак</string>
+    <string name="text_scale">Размера текста</string>
+    <string name="description_for_read_aloud">Аутоматски открива језик чланка</string>
+    <string name="remove">Уклони</string>
+    <string name="permission_read_label">Feeder приступ само за читање</string>
+    <string name="block_list_description">Сакрива чланке са насловима који садржи неки од ових филтера. Пример филтера:</string>
+    <string name="dynamic_theme_use">Динамичке боје</string>
+    <string name="new_indicator">Ново</string>
+    <string name="permission_read_desc">Омогућава да апликација чита објаве и чланке</string>
+    <string name="explanation_permission_notifications">Пре укључивања обавештења, потребно је да се одобри дозвола.</string>
+    <string name="article_image">Слика чланка</string>
+    <string name="feed_icon">Икона објаве</string>
+    <string name="only_available_on_android_n">Доступно само на Android %1$s и новијим</string>
+    <string name="unsave_article">Прекини чување чланка</string>
+    <string name="mark_as_read_on_scroll">Приликом скроловања, означи као прочитано</string>
+    <string name="text_to_speech">Текст у говор</string>
+    <string name="skip_to_next">Прескочи на наредно</string>
+    <string name="set_language">Постави језик</string>
+    <string name="use_detect_language">Откриј језик</string>
+    <string name="block_list">Листа блокираних</string>
+    <string name="add_item">Додај ставку</string>
+    <string name="saved_articles">Сачувани чланци</string>
+    <string name="saved_article">Сачувани чланак</string>
+    <string name="save_article">Сачувај чланак</string>
 </resources>
