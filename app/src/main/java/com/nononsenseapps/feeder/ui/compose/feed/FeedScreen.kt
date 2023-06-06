@@ -1223,7 +1223,7 @@ fun MarkItemAsReadOnScroll(
     }
     if (mostlyVisible) {
         LaunchedEffect(null) {
-            delay(1000)
+            delay(800)
             debounced = true
         }
     }
