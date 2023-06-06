@@ -190,4 +190,5 @@
     <string name="unsave_article">Stop med at gemme artikel</string>
     <string name="saved_article">Gemt artikel</string>
     <string name="save_article">Gem artikel</string>
+    <string name="mark_as_read_on_scroll">Markér som læst, når der scrolles</string>
 </resources>
