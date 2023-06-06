@@ -123,7 +123,7 @@
     <string name="feeder_device_sync_code">Código de sincronização de aparelhos do Feeder</string>
     <string name="are_you_sure_leave_sync_chain">Quer mesmo sair da cadeia de sincronização\?</string>
     <string name="no_barcode_scanner_installed">Não foi possível encontrar um leitor de código de barras</string>
-  <string name="go_back">Voltar</string>
+    <string name="go_back">Voltar</string>
     <string name="open_menu">Abrir menu</string>
     <string name="text_to_speech">Texto para fala</string>
     <string name="syncing">Sincronizando</string>
@@ -144,8 +144,8 @@
     <string name="failed_to_open_article">Não foi possível abrir o artigo</string>
     <string name="unread">Não lidos</string>
     <string name="already_read">Já lidos</string>
-  <string name="showing_all_articles">Mostrar todos os artigos</string>
-  <string name="zero_unread_articles">%1$s artigos não lidos</string>
+    <string name="showing_all_articles">Mostrar todos os artigos</string>
+    <string name="zero_unread_articles">%1$s artigos não lidos</string>
     <string name="one_unread_article">%1$s artigo não lido</string>
     <string name="two_unread_articles">%1$s artigos não lidos</string>
     <string name="few_unread_articles">%1$s artigos não lidos</string>
@@ -178,7 +178,7 @@
     <string name="start_new_sync_chain">Iniciar nova cadeia de sincronização</string>
     <string name="disabled">Desativado</string>
     <string name="only_from_end">Somente do final</string>
-  <string name="new_indicator">Novo</string>
+    <string name="new_indicator">Novo</string>
     <string name="permission_read_desc">Permite que a aplicação leia feeds e artigos</string>
     <string name="permission_read_label">Acesso somente leitura</string>
     <string name="explanation_permission_notifications">A permissão deve ser concedida antes que as notificações possam ser ativadas.</string>
@@ -186,4 +186,9 @@
     <string name="block_list_description">Esconde artigos com títulos que contenham qualquer um destes filtros. Exemplos de filtros:</string>
     <string name="text_scale">escala do texto</string>
     <string name="sync_to_fetch">Sincronizar para buscar artigo</string>
+    <string name="unsave_article">Deixar de guardar o artigo</string>
+    <string name="saved_articles">Artigos guardados</string>
+    <string name="saved_article">Artigo guardado</string>
+    <string name="save_article">Guardar artigo</string>
+    <string name="mark_as_read_on_scroll">Marcar como lido no rolo</string>
 </resources>
