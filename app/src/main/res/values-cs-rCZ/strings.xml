@@ -190,4 +190,5 @@
     <string name="saved_article">Uložený článek</string>
     <string name="save_article">Uložit článek</string>
     <string name="unsave_article">Přestat ukládat článek</string>
+    <string name="mark_as_read_on_scroll">Označit jako přečtené při posouvání</string>
 </resources>
