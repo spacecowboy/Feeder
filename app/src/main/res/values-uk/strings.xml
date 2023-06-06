@@ -190,4 +190,5 @@
     <string name="saved_article">Збережена стаття</string>
     <string name="save_article">Зберегти статтю</string>
     <string name="unsave_article">Зупинити збереження статті</string>
+    <string name="mark_as_read_on_scroll">Позначити як прочитане під час прокручування</string>
 </resources>
