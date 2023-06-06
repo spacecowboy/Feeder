@@ -190,4 +190,5 @@
     <string name="saved_article">Articolo salvato</string>
     <string name="save_article">Salva l\'articolo</string>
     <string name="unsave_article">Smetti di salvare l\'articolo</string>
+    <string name="mark_as_read_on_scroll">Segna come letto quando scorri</string>
 </resources>
