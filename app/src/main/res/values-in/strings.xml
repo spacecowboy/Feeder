@@ -167,10 +167,10 @@
     <string name="device_sync_description_1">Sinkronisasi perangkat memungkinkan Anda menyinkronisasi langganan dan membaca artikel pada perangkat Anda yang lain.</string>
     <string name="scan_or_enter_code">Pindai atau masukkan kode sinkronisasi</string>
     <string name="device_sync_description_2">Cukup pindai kode dari tautan sinkronisasi yang Anda buat pada perangkat yang lain, atau mulai tautan sinkronisasi baru.</string>
-  <string name="block_list">Daftar blokir</string>
+    <string name="block_list">Daftar blokir</string>
     <string name="add_item">Tambah item</string>
     <string name="remove">Hapus</string>
-  <string name="permission_read_desc">Memungkinkan aplikasi untuk membaca umpan dan artikel</string>
+    <string name="permission_read_desc">Memungkinkan aplikasi untuk membaca umpan dan artikel</string>
     <string name="permission_read_label">Akses Feeder hanya-baca</string>
     <string name="description_for_read_aloud">Secara otomatis mendeteksi bahasa artikel</string>
     <string name="use_detect_language">Deteksi bahasa</string>
@@ -182,8 +182,11 @@
     <string name="set_language">Atur bahasa</string>
     <string name="text_to_speech">Teks ke suara</string>
     <string name="skip_to_next">Lewati ke item berikutnya</string>
-  <string name="feed_icon">Ikon feed</string>
+    <string name="feed_icon">Ikon feed</string>
     <string name="text_scale">Skala teks</string>
     <string name="block_list_description">Sembunyikan artikel dengan judul yang mengandung salah satu dari filter ini. Contoh filter:</string>
     <string name="sync_to_fetch">Sinkronasikan untuk mengambil artikel</string>
+    <string name="unsave_article">Berhenti menyimpan artikel</string>
+    <string name="mark_as_read_on_scroll">Tandai dibaca saat menggulir</string>
+    <string name="save_article">Simpan artikel</string>
 </resources>
