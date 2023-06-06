@@ -190,4 +190,5 @@
     <string name="save_article">Zapisz artykuł</string>
     <string name="saved_article">Zapisany artykuł</string>
     <string name="unsave_article">Usuń z zapisanych</string>
+    <string name="mark_as_read_on_scroll">Oznaczaj jako przeczytane podczas przewijania</string>
 </resources>
