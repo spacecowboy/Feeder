@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.model.FullTextParser.Companion.LOG_TAG
 import com.nononsenseapps.feeder.util.FilePathProvider
 import com.nononsenseapps.feeder.util.logDebug
 import java.net.URL
+import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
@@ -97,14 +98,21 @@ class FullTextParser(override val di: DI) : DIAware {
             return@withContext try {
                 val url = feedItem.link ?: return@withContext false to null
                 logDebug(LOG_TAG, "Fetching full page ${feedItem.link}")
-                val html: String = okHttpClient.curl(URL(url)) ?: return@withContext false to null
 
-                // TODO verify encoding is respected in reader
-                Log.i(LOG_TAG, "Parsing article ${feedItem.link}")
+                val html: String = okHttpClient.curlAndOnResponse(URL(url)) { response ->
+                    val bytes = response.body?.use { body ->
+                        body.bytes()
+                    } ?: return@curlAndOnResponse null
+
+                    val charset = response.body?.contentType()?.charset() ?: findMetaCharset(bytes)
+
+                    logDebug(LOG_TAG, "Full article charset: $charset")
+
+                    String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
+                } ?: return@withContext false to null
+
+                logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
                 val article = Readability4JExtended(url, html).parse()
-
-                // TODO set image on item if none already
-                // naiveFindImageLink(article.content)?.let { Parser.unescapeEntities(it, true) }
 
                 logDebug(LOG_TAG, "Writing article ${feedItem.link}")
                 withContext(Dispatchers.IO) {
@@ -125,7 +133,164 @@ class FullTextParser(override val di: DI) : DIAware {
             }
         }
 
+    /**
+     * For sites which don't use UTF-8 like http://www.muhasebetr.com/rss/
+     */
+    private fun findMetaCharset(html: ByteArray): Charset? {
+        val builder = StringBuilder()
+        var state = CharsetState.INIT
+        html.forEach { b ->
+            state = nextCharsetState(b, state)
+
+            when (state) {
+                CharsetState.CHARSET -> {
+                    builder.append(b.toInt().toChar())
+                }
+
+                CharsetState.END -> {
+                    try {
+                        return if (builder.isNotBlank()) {
+                            Charset.forName(builder.toString())
+                        } else {
+                            null
+                        }
+                    } catch (e: Exception) {
+                        // No charset present
+                    }
+                }
+
+                else -> {
+                    // Nothing to do
+                }
+            }
+        }
+        return null
+    }
+
+    private fun nextCharsetState(byte: Byte, state: CharsetState): CharsetState =
+        when (state) {
+            CharsetState.END -> CharsetState.END
+            CharsetState.INIT -> when (byte.toInt().toChar()) {
+                '<' -> CharsetState.TAG_START
+                else -> CharsetState.INIT
+            }
+
+            CharsetState.TAG_START -> when (byte.toInt().toChar()) {
+                'm' -> CharsetState.META_M
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.TAG_END -> when (byte.toInt().toChar()) {
+                '>' -> CharsetState.INIT
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.META_M -> when (byte.toInt().toChar()) {
+                'e' -> CharsetState.META_E
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.META_E -> when (byte.toInt().toChar()) {
+                't' -> CharsetState.META_T
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.META_T -> when (byte.toInt().toChar()) {
+                'a' -> CharsetState.META_A
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.META_A -> {
+                val c = byte.toInt().toChar()
+                when {
+                    c.isWhitespace() -> CharsetState.META_SPACE
+                    else -> CharsetState.TAG_END
+                }
+            }
+
+            CharsetState.META_SPACE -> {
+                val c = byte.toInt().toChar()
+                when {
+                    c.isWhitespace() -> CharsetState.META_SPACE
+                    c == 'c' -> CharsetState.CHARSET_C
+                    else -> CharsetState.TAG_END
+                }
+            }
+
+            CharsetState.CHARSET_C -> when (byte.toInt().toChar()) {
+                'h' -> CharsetState.CHARSET_H
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.CHARSET_H -> when (byte.toInt().toChar()) {
+                'a' -> CharsetState.CHARSET_A
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.CHARSET_A -> when (byte.toInt().toChar()) {
+                'r' -> CharsetState.CHARSET_R
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.CHARSET_R -> when (byte.toInt().toChar()) {
+                's' -> CharsetState.CHARSET_S
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.CHARSET_S -> when (byte.toInt().toChar()) {
+                'e' -> CharsetState.CHARSET_E
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.CHARSET_E -> when (byte.toInt().toChar()) {
+                't' -> CharsetState.CHARSET_T
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.CHARSET_T -> when (byte.toInt().toChar()) {
+                '=' -> CharsetState.CHARSET_EQUALS
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.CHARSET_EQUALS -> when (byte.toInt().toChar()) {
+                '"' -> CharsetState.CHARSET_QUOTE
+                else -> CharsetState.TAG_END
+            }
+
+            CharsetState.CHARSET_QUOTE -> when (byte.toInt().toChar()) {
+                '"' -> CharsetState.END
+                else -> CharsetState.CHARSET
+            }
+
+            CharsetState.CHARSET -> when (byte.toInt().toChar()) {
+                '"' -> CharsetState.END
+                else -> CharsetState.CHARSET
+            }
+        }
+
     companion object {
         internal const val LOG_TAG = "FEEDER_FULLTEXT"
     }
+}
+
+enum class CharsetState {
+    END,
+    INIT,
+    TAG_START,
+    TAG_END,
+    META_M,
+    META_E,
+    META_T,
+    META_A,
+    META_SPACE,
+    CHARSET_C,
+    CHARSET_H,
+    CHARSET_A,
+    CHARSET_R,
+    CHARSET_S,
+    CHARSET_E,
+    CHARSET_T,
+    CHARSET_EQUALS,
+    CHARSET_QUOTE,
+    CHARSET,
 }

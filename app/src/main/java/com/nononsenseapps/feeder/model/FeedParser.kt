@@ -437,14 +437,14 @@ suspend fun OkHttpClient.curl(url: URL): String? {
     return result
 }
 
-suspend fun OkHttpClient.curlAndOnResponse(url: URL, block: (suspend (Response) -> Unit)) {
+suspend fun <T> OkHttpClient.curlAndOnResponse(url: URL, block: (suspend (Response) -> T)): T {
     val response = getResponse(url)
 
     if (!response.isSuccessful) {
         throw IOException("Unexpected code $response")
     }
 
-    response.use {
+    return response.use {
         block(it)
     }
 }
