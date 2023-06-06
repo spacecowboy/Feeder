@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Box
@@ -387,22 +388,29 @@ fun ArticleContent(
         },
     ) {
         // Can take a composition or two before viewstate is set to its actual values
-        // TODO show something in case no article to show
         if (viewState.articleId > ID_UNSET) {
             when (viewState.textToDisplay) {
                 TextToDisplay.DEFAULT -> {
                     if (blobFile(viewState.articleId, filePathProvider.articleDir).isFile) {
-                        blobInputStream(viewState.articleId, filePathProvider.articleDir).use {
-                            htmlFormattedText(
-                                inputStream = it,
-                                baseUrl = viewState.articleFeedUrl ?: "",
-                            ) { link ->
-                                onLinkClick(
-                                    link = link,
-                                    linkOpener = viewState.linkOpener,
-                                    context = context,
-                                    toolbarColor = toolbarColor,
-                                )
+                        try {
+                            blobInputStream(viewState.articleId, filePathProvider.articleDir).use {
+                                htmlFormattedText(
+                                    inputStream = it,
+                                    baseUrl = viewState.articleFeedUrl ?: "",
+                                ) { link ->
+                                    onLinkClick(
+                                        link = link,
+                                        linkOpener = viewState.linkOpener,
+                                        context = context,
+                                        toolbarColor = toolbarColor,
+                                    )
+                                }
+                            }
+                        } catch (e: Exception) {
+                            // EOFException is possible
+                            Log.e(LOG_TAG, "Could not open blob", e)
+                            item {
+                                Text(text = stringResource(id = R.string.failed_to_open_article))
                             }
                         }
                     } else {
@@ -427,20 +435,28 @@ fun ArticleContent(
 
                 TextToDisplay.FULLTEXT -> {
                     if (blobFullFile(viewState.articleId, filePathProvider.fullArticleDir).isFile) {
-                        blobFullInputStream(
-                            viewState.articleId,
-                            filePathProvider.fullArticleDir,
-                        ).use {
-                            htmlFormattedText(
-                                inputStream = it,
-                                baseUrl = viewState.articleFeedUrl ?: "",
-                            ) { link ->
-                                onLinkClick(
-                                    link = link,
-                                    linkOpener = viewState.linkOpener,
-                                    context = context,
-                                    toolbarColor = toolbarColor,
-                                )
+                        try {
+                            blobFullInputStream(
+                                viewState.articleId,
+                                filePathProvider.fullArticleDir,
+                            ).use {
+                                htmlFormattedText(
+                                    inputStream = it,
+                                    baseUrl = viewState.articleFeedUrl ?: "",
+                                ) { link ->
+                                    onLinkClick(
+                                        link = link,
+                                        linkOpener = viewState.linkOpener,
+                                        context = context,
+                                        toolbarColor = toolbarColor,
+                                    )
+                                }
+                            }
+                        } catch (e: Exception) {
+                            // EOFException is possible
+                            Log.e(LOG_TAG, "Could not open blob", e)
+                            item {
+                                Text(text = stringResource(id = R.string.failed_to_open_article))
                             }
                         }
                     } else {
@@ -459,3 +475,5 @@ private fun LazyListScope.LoadingItem() {
         Text(text = stringResource(id = R.string.fetching_full_article))
     }
 }
+
+private const val LOG_TAG = "FEEDER_ARTICLESCREEN"
