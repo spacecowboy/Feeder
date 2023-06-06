@@ -190,4 +190,5 @@
     <string name="saved_articles">Gespeicherte Artikel</string>
     <string name="save_article">Artikel speichern</string>
     <string name="unsave_article">Artikel nicht mehr speichern</string>
+    <string name="mark_as_read_on_scroll">Beim Scrollen als gelesen markieren</string>
 </resources>
