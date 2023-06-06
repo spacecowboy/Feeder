@@ -167,10 +167,10 @@
     <string name="swipe_to_mark_as_read">Okundu saymak için kaydır</string>
     <string name="are_you_sure_leave_sync_chain">Eşzamanlama zincirinden ayrılmak istediğinizden emin misiniz\?</string>
     <string name="no_barcode_scanner_installed">Barkod tarayıcı bulunamadı</string>
-  <string name="block_list">Engelleme listesi</string>
+    <string name="block_list">Engelleme listesi</string>
     <string name="add_item">Öge ekle</string>
     <string name="remove">Kaldır</string>
-  <string name="permission_read_desc">Uygulamanın yayınları ve makaleleri okumasına izin verir</string>
+    <string name="permission_read_desc">Uygulamanın yayınları ve makaleleri okumasına izin verir</string>
     <string name="permission_read_label">Feeder salt okunur erişim</string>
     <string name="use_detect_language">Dili algıla</string>
     <string name="only_available_on_android_n">Yalnızca Android %1$s ve üzerinde kullanılabilir</string>
@@ -178,7 +178,7 @@
     <string name="explanation_permission_notifications">Bildirimlerin etkinleştirilebilmesi için önce izin verilmelidir.</string>
     <string name="text_to_speech">Metin okuma</string>
     <string name="dynamic_theme_use">Değişken renkler</string>
-  <string name="set_language">Dili ayarla</string>
+    <string name="set_language">Dili ayarla</string>
     <string name="skip_to_next">Sonrakine atla</string>
     <string name="new_indicator">Yeni</string>
     <string name="article_image">Makale görseli</string>
@@ -186,4 +186,9 @@
     <string name="text_scale">Metin ölçeği</string>
     <string name="block_list_description">Bu filtrelerden herhangi birini içeren başlıklara sahip hikayeleri gizler. Örnek filtreler:</string>
     <string name="sync_to_fetch">Makaleyi almak için eşzamanla</string>
+    <string name="mark_as_read_on_scroll">Kaydırmada okundu olarak işaretle</string>
+    <string name="unsave_article">Makaleyi kaydetmeyi durdur</string>
+    <string name="saved_articles">Kaydedilen makaleler</string>
+    <string name="saved_article">Kaydedilen makale</string>
+    <string name="save_article">Makaleyi kaydet</string>
 </resources>
