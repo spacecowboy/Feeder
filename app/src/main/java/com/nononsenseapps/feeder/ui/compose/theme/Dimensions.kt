@@ -28,6 +28,10 @@ class Dimensions(
      */
     val maxContentWidth: Dp,
     /**
+     * The max width of the reader in case of very wide screens.
+     */
+    val maxReaderWidth: Dp,
+    /**
      * Non-null if image has a constrained aspect ratio in reader (TVs)
      */
     val imageAspectRatioInReader: Float?,
@@ -52,6 +56,7 @@ val Dimensions.hasImageAspectRatioInReader: Boolean
 
 val phoneDimensions = Dimensions(
     maxContentWidth = 840.dp,
+    maxReaderWidth = 840.dp,
     imageAspectRatioInReader = null,
     navIconMargin = 16.dp,
     margin = 16.dp,
@@ -70,7 +75,8 @@ fun tabletDimensions(screenWidthDp: Int): Dimensions {
     }
     return Dimensions(
         maxContentWidth = 840.dp,
-        imageAspectRatioInReader = null,
+        maxReaderWidth = 640.dp,
+        imageAspectRatioInReader = 16.0f / 9.0f,
         navIconMargin = 32.dp,
         margin = 32.dp,
         gutter = 32.dp,
@@ -80,7 +86,8 @@ fun tabletDimensions(screenWidthDp: Int): Dimensions {
 }
 
 val tvDimensions = Dimensions(
-    maxContentWidth = 640.dp,
+    maxContentWidth = 840.dp,
+    maxReaderWidth = 640.dp,
     imageAspectRatioInReader = 16.0f / 9.0f,
     navIconMargin = 32.dp,
     margin = 32.dp,

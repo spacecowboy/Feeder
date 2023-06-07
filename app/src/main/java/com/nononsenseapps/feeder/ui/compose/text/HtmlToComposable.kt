@@ -161,7 +161,7 @@ private fun LazyListScope.formatBody(
             paragraphBuilder = paragraphBuilder,
             textStyler = textStyler,
             modifier = Modifier
-                .width(dimens.maxContentWidth),
+                .width(dimens.maxReaderWidth),
             onLinkClick = onLinkClick,
         )
     }
@@ -395,7 +395,7 @@ private fun HtmlComposer.appendTextChildren(
                                                 .horizontalScroll(
                                                     state = scrollState,
                                                 )
-                                                .width(dimens.maxContentWidth)
+                                                .width(dimens.maxReaderWidth)
                                                 .indication(
                                                     interactionSource,
                                                     LocalIndication.current,
@@ -496,7 +496,7 @@ private fun HtmlComposer.appendTextChildren(
                                         paragraphBuilder = paragraphBuilder,
                                         textStyler = textStyler,
                                         modifier = Modifier
-                                            .width(dimens.maxContentWidth),
+                                            .width(dimens.maxReaderWidth),
                                         onLinkClick = onLinkClick,
                                     )
                                 }
@@ -507,7 +507,7 @@ private fun HtmlComposer.appendTextChildren(
                                         Column(
                                             verticalArrangement = Arrangement.spacedBy(8.dp),
                                             modifier = Modifier
-                                                .width(dimens.maxContentWidth),
+                                                .width(dimens.maxReaderWidth),
                                         ) {
                                             withTextStyle(NestedTextStyle.CAPTION) {
                                                 appendTextChildren(
@@ -536,7 +536,7 @@ private fun HtmlComposer.appendTextChildren(
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 modifier = Modifier
-                                    .width(dimens.maxContentWidth),
+                                    .width(dimens.maxReaderWidth),
                             ) {
                                 renderImage(
                                     baseUrl = baseUrl,
@@ -597,7 +597,7 @@ private fun HtmlComposer.appendTextChildren(
                                 val dimens = LocalDimens.current
                                 Column(
                                     modifier = Modifier
-                                        .width(dimens.maxContentWidth),
+                                        .width(dimens.maxReaderWidth),
                                 ) {
                                     DisableSelection {
                                         BoxWithConstraints(
@@ -860,7 +860,7 @@ private fun EagerComposer.tableColFirst(
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = Modifier
-            .width(dimens.maxContentWidth),
+            .width(dimens.maxReaderWidth),
     ) {
         key(element, baseUrl, onLinkClick) {
             element.children()
@@ -910,7 +910,7 @@ private fun EagerComposer.tableColFirst(
                 horizontalArrangement = Arrangement.spacedBy(32.dp),
                 modifier = Modifier
                     .horizontalScroll(rememberScrollState())
-                    .width(dimens.maxContentWidth),
+                    .width(dimens.maxReaderWidth),
             ) {
                 items(
                     count = colCount,
