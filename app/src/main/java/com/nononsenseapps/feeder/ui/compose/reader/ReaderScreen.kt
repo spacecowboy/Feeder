@@ -93,7 +93,7 @@ fun ReaderView(
                 val goToFeedLabel = stringResource(R.string.go_to_feed, feedTitle)
                 Column(
                     modifier = Modifier
-                        .width(dimens.maxContentWidth)
+                        .width(dimens.maxReaderWidth)
                         .semantics(mergeDescendants = true) {
                             try {
                                 customActions = listOf(
@@ -118,7 +118,7 @@ fun ReaderView(
                             modifier = Modifier
                                 .indication(interactionSource, LocalIndication.current)
                                 .focusableInNonTouchMode(interactionSource = interactionSource)
-                                .width(dimens.maxContentWidth),
+                                .width(dimens.maxReaderWidth),
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
@@ -131,7 +131,7 @@ fun ReaderView(
                             Text(
                                 text = feedTitle,
                                 modifier = Modifier
-                                    .width(dimens.maxContentWidth)
+                                    .width(dimens.maxReaderWidth)
                                     .clearAndSetSemantics {
                                         contentDescription = feedTitle
                                     }
@@ -150,7 +150,7 @@ fun ReaderView(
                                     Text(
                                         text = authorDate,
                                         modifier = Modifier
-                                            .width(dimens.maxContentWidth)
+                                            .width(dimens.maxReaderWidth)
                                             .indication(interactionSource, LocalIndication.current)
                                             .focusableInNonTouchMode(interactionSource = interactionSource),
                                     )
@@ -170,7 +170,7 @@ fun ReaderView(
                     }
                     Column(
                         modifier = Modifier
-                            .width(dimens.maxContentWidth),
+                            .width(dimens.maxReaderWidth),
                     ) {
                         ProvideScaledText(
                             style = MaterialTheme.typography.bodyLarge.merge(
