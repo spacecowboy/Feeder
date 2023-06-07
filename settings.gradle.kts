@@ -56,7 +56,7 @@ dependencyResolutionManagement {
             version("activityCompose", activityCompose)
             version("paging", "3.0.0")
             version("pagingCompose", "1.0.0-alpha17")
-            version("accompanist", "0.27.1")
+            version("accompanist", "0.30.1")
             version("coil", "2.2.2")
             version("androidWindow", "1.0.0")
             // Formerly customtabs
@@ -181,6 +181,11 @@ dependencyResolutionManagement {
                 "accompanist-navigation-animation",
                 "com.google.accompanist",
                 "accompanist-navigation-animation"
+            ).versionRef("accompanist")
+            library(
+                "accompanist-adaptive",
+                "com.google.accompanist",
+                "accompanist-adaptive"
             ).versionRef("accompanist")
 
             // Better times
