@@ -2,8 +2,14 @@ package com.nononsenseapps.feeder.ui.compose.material3.tokens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
+import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.utils.LocalFoldableHinge
 
 internal object NavigationDrawerTokens {
     val ActiveFocusIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
@@ -43,7 +49,22 @@ internal object NavigationDrawerTokens {
 
     @Composable
     fun getContainerWidth(): Dp {
-        val configuration = LocalConfiguration.current
-        return minOf(ContainerWidth, configuration.screenWidthDp.dp)
+        val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+        val foldableHinge = LocalFoldableHinge.current
+
+        // TODO remember here?
+        return if (foldableHinge != null && foldableHinge.isTopToBottom) {
+            val dimens = LocalDimens.current
+            val layoutDirection = LocalLayoutDirection.current
+
+            with(LocalDensity.current) {
+                when (layoutDirection) {
+                    LayoutDirection.Ltr -> foldableHinge.bounds.left.toDp()
+                    LayoutDirection.Rtl -> screenWidth - foldableHinge.bounds.right.toDp()
+                } - dimens.gutter / 2
+            }
+        } else {
+            ContainerWidth
+        }.coerceAtMost(screenWidth)
     }
 }

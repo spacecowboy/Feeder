@@ -15,7 +15,7 @@ ij_wrap_on_typing = false
 
 [*.{kt,kts}]
 ktlint_code_style = official
-twitter_compose_allowed_composition_locals = LocalTypographySettings,LocalDimens,LocalWindowSize
+twitter_compose_allowed_composition_locals = LocalTypographySettings,LocalDimens,LocalWindowSize,LocalFoldableHinge
 
 [*.java]
 ij_java_align_consecutive_assignments = false

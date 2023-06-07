@@ -255,6 +255,7 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.accompanist.navigation.animation)
+    implementation(libs.accompanist.adaptive)
 
     // Better times
     implementation(libs.threeten.abp)
