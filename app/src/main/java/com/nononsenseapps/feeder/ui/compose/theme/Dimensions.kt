@@ -28,6 +28,10 @@ class Dimensions(
      */
     val maxContentWidth: Dp,
     /**
+     * Non-null if image has a constrained aspect ratio in reader (TVs)
+     */
+    val imageAspectRatioInReader: Float?,
+    /**
      * The responsive column grid is made up of columns, gutters, and margins, providing a
      * convenient structure for the layout of elements within the body region.
      * Components, imagery, and text align with the column grid to ensure a logical and
@@ -43,8 +47,12 @@ class Dimensions(
     val feedScreenColumns: Int,
 )
 
+val Dimensions.hasImageAspectRatioInReader: Boolean
+    get() = imageAspectRatioInReader != null
+
 val phoneDimensions = Dimensions(
     maxContentWidth = 840.dp,
+    imageAspectRatioInReader = null,
     navIconMargin = 16.dp,
     margin = 16.dp,
     gutter = 16.dp,
@@ -54,6 +62,7 @@ val phoneDimensions = Dimensions(
 
 val tabletDimensions = Dimensions(
     maxContentWidth = 840.dp,
+    imageAspectRatioInReader = null,
     navIconMargin = 32.dp,
     margin = 32.dp,
     gutter = 32.dp,
@@ -63,11 +72,22 @@ val tabletDimensions = Dimensions(
 
 val wideTabletDimensions = Dimensions(
     maxContentWidth = 840.dp,
+    imageAspectRatioInReader = null,
     navIconMargin = 32.dp,
     margin = 32.dp,
     gutter = 32.dp,
     layoutColumns = 12,
     feedScreenColumns = 4,
+)
+
+val tvDimensions = Dimensions(
+    maxContentWidth = 640.dp,
+    imageAspectRatioInReader = 16.0f / 9.0f,
+    navIconMargin = 32.dp,
+    margin = 32.dp,
+    gutter = 32.dp,
+    layoutColumns = 12,
+    feedScreenColumns = 3,
 )
 
 val LocalDimens = staticCompositionLocalOf {
@@ -81,6 +101,7 @@ fun ProvideDimens(
     val config = LocalConfiguration.current
     val dimensionSet = remember {
         when {
+            config.screenWidthDp == 960 && config.screenHeightDp == 540 -> tvDimensions
             config.smallestScreenWidthDp >= 600 -> tabletDimensions
             else -> phoneDimensions
         }

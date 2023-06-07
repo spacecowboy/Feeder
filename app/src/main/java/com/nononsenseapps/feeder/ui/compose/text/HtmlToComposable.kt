@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -66,6 +67,7 @@ import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockStyle
 import com.nononsenseapps.feeder.ui.compose.theme.CodeInlineStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LinkTextStyle
 import com.nononsenseapps.feeder.ui.compose.theme.LocalDimens
+import com.nononsenseapps.feeder.ui.compose.theme.hasImageAspectRatioInReader
 import com.nononsenseapps.feeder.ui.compose.utils.ProvideScaledText
 import com.nononsenseapps.feeder.ui.compose.utils.focusableInNonTouchMode
 import com.nononsenseapps.feeder.ui.text.Video
@@ -610,13 +612,22 @@ private fun HtmlComposer.appendTextChildren(
                                                     .size(imageWidth)
                                                     .precision(Precision.INEXACT)
                                                     .build(),
-                                                contentScale = ContentScale.FillWidth,
                                                 contentDescription = stringResource(R.string.touch_to_play_video),
+                                                contentScale = if (dimens.hasImageAspectRatioInReader) {
+                                                    ContentScale.Fit
+                                                } else {
+                                                    ContentScale.FillWidth
+                                                },
                                                 modifier = Modifier
                                                     .clickable {
                                                         onLinkClick(video.link)
                                                     }
-                                                    .fillMaxWidth(),
+                                                    .fillMaxWidth()
+                                                    .run {
+                                                        dimens.imageAspectRatioInReader?.let { ratio ->
+                                                            aspectRatio(ratio)
+                                                        } ?: this
+                                                    },
                                             )
                                         }
                                     }
@@ -674,6 +685,8 @@ private fun ColumnScope.renderImage(
     onClick: (() -> Unit)?,
     element: Element,
 ) {
+    val dimens = LocalDimens.current
+
     val imageCandidates by remember {
         derivedStateOf {
             getImageSource(baseUrl, element)
@@ -704,9 +717,18 @@ private fun ColumnScope.renderImage(
                     Image(
                         rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
                         contentDescription = alt,
-                        contentScale = ContentScale.FillWidth,
+                        contentScale = if (dimens.hasImageAspectRatioInReader) {
+                            ContentScale.Fit
+                        } else {
+                            ContentScale.FillWidth
+                        },
                         modifier = modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .run {
+                                dimens.imageAspectRatioInReader?.let { ratio ->
+                                    aspectRatio(ratio)
+                                } ?: this
+                            },
                     )
                 } else {
                     val pixelDensity = LocalDensity.current.density
@@ -730,9 +752,18 @@ private fun ColumnScope.renderImage(
                             Icons.Outlined.Terrain,
                         ),
                         error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                        contentScale = ContentScale.FillWidth,
+                        contentScale = if (dimens.hasImageAspectRatioInReader) {
+                            ContentScale.Fit
+                        } else {
+                            ContentScale.FillWidth
+                        },
                         modifier = modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .run {
+                                dimens.imageAspectRatioInReader?.let { ratio ->
+                                    aspectRatio(ratio)
+                                } ?: this
+                            },
                     )
                 }
             }
