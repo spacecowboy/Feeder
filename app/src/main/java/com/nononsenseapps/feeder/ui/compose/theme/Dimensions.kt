@@ -60,25 +60,24 @@ val phoneDimensions = Dimensions(
     feedScreenColumns = 1,
 )
 
-val tabletDimensions = Dimensions(
-    maxContentWidth = 840.dp,
-    imageAspectRatioInReader = null,
-    navIconMargin = 32.dp,
-    margin = 32.dp,
-    gutter = 32.dp,
-    layoutColumns = 8,
-    feedScreenColumns = 2,
-)
-
-val wideTabletDimensions = Dimensions(
-    maxContentWidth = 840.dp,
-    imageAspectRatioInReader = null,
-    navIconMargin = 32.dp,
-    margin = 32.dp,
-    gutter = 32.dp,
-    layoutColumns = 12,
-    feedScreenColumns = 4,
-)
+fun tabletDimensions(screenWidthDp: Int): Dimensions {
+    // Items look good at around 300dp width. Account for 32dp margin at the sides, and the gutters
+    // 3 columns: 3*300 + 4*32 = 1028
+    val columns = when {
+        screenWidthDp > 1360 -> 4
+        screenWidthDp > 1028 -> 3
+        else -> 2
+    }
+    return Dimensions(
+        maxContentWidth = 840.dp,
+        imageAspectRatioInReader = null,
+        navIconMargin = 32.dp,
+        margin = 32.dp,
+        gutter = 32.dp,
+        layoutColumns = columns * 4,
+        feedScreenColumns = columns,
+    )
+}
 
 val tvDimensions = Dimensions(
     maxContentWidth = 640.dp,
@@ -102,7 +101,7 @@ fun ProvideDimens(
     val dimensionSet = remember {
         when {
             config.screenWidthDp == 960 && config.screenHeightDp == 540 -> tvDimensions
-            config.smallestScreenWidthDp >= 600 -> tabletDimensions
+            config.smallestScreenWidthDp >= 600 -> tabletDimensions(config.screenWidthDp)
             else -> phoneDimensions
         }
     }

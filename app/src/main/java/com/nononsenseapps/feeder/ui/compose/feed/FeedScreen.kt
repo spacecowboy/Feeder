@@ -1077,9 +1077,6 @@ fun FeedGridContent(
             FeedItemStyle.SUPER_COMPACT -> Arrangement.spacedBy(LocalDimens.current.gutter)
         }
 
-        // Grid kicks in at 600.dp. So make sure at least 2 columns always in grid mode
-        val minItemWidth = (300.dp - LocalDimens.current.margin * 2)
-
         AnimatedVisibility(
             enter = fadeIn(),
             exit = fadeOut(),
@@ -1087,7 +1084,7 @@ fun FeedGridContent(
         ) {
             LazyVerticalStaggeredGrid(
                 state = gridState,
-                columns = StaggeredGridCells.Adaptive(minItemWidth),
+                columns = StaggeredGridCells.Fixed(LocalDimens.current.feedScreenColumns),
                 contentPadding = if (viewState.isBottomBarVisible) {
                     PaddingValues(0.dp)
                 } else {
