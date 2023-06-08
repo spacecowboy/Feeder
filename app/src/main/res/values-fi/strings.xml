@@ -57,7 +57,7 @@
     <string name="may_result_data_charges">Voi johtaa mobiiliverkon tiedonsiirto kuluihin.</string>
     <string name="only_when_charging">Vain ladattaessa</string>
     <string name="image_loading">Kuvien lataaminen</string>
-    <string name="no_activity_for_link">Ei löydetty aktiviteettiä, jolla tämä linkki avattaisiin</string>
+    <string name="no_activity_for_link">Asenna ensin jotain avataksesi tämän linkin</string>
     <string name="check_for_updates">Uusia artikkeleita etsitään…</string>
     <string name="on_startup">Sovelluksen käynnistyessä</string>
     <string name="show_fab">Kelluva toimintopainike</string>
@@ -144,7 +144,7 @@
     <string name="secret_key">Salainen avain</string>
     <string name="join_sync_chain">Liity synkronointiketjuun</string>
     <string name="no_barcode_scanner_installed">Viivakoodiskanneria ei löytynyt</string>
-  <string name="add_item">Lisää kohde</string>
+    <string name="add_item">Lisää kohde</string>
     <string name="device_sync">Laitteen synkronointi</string>
     <string name="add_new_device">Lisää uusi laite</string>
     <string name="only_enable_for_bad_id_feeds">Ota käyttöön vain syötteille, joilla on huonot tunnukset</string>
@@ -162,7 +162,7 @@
     <string name="scan_or_enter_code">Skannaa tai kirjoita synkronointikoodi</string>
     <string name="permission_read_desc">Sallii sovelluksen lukea syötteitä ja artikkeleja</string>
     <string name="permission_read_label">Feederin \"vain luku\"-pääsyoikeus</string>
-  <string name="failed_to_export_OPML">OPML:n vieminen epäonnistui</string>
+    <string name="failed_to_export_OPML">OPML:n vieminen epäonnistui</string>
     <string name="dynamic_theme_use">Dynaamiset värit</string>
     <string name="explanation_permission_notifications">Ennen kuin ilmoitukset voi ottaa käyttöön, sitä varten tulee antaa käyttöoikeus.</string>
     <string name="failed_to_import_OPML">OPML:n tuominen epäonnistui</string>
@@ -171,19 +171,24 @@
     <string name="devices_on_sync_chain">Laitteet synkronointiketjussa</string>
     <string name="or_open_device_sync_link">Vaihtoehtoisesti avaa linkki laitteellasi.</string>
     <string name="treat_like_password">Kohtele tätä kuin salasanaa. Kuka tahansa, kenellä on tämä linkki, voi lukea synkronoituja tietojasi.</string>
-  <string name="remove">Poista</string>
+    <string name="remove">Poista</string>
     <string name="feeder_device_sync_code">Feeder-laitteen synkronointikoodi</string>
     <string name="leave_sync_chain">Poistu synkronointiketjusta</string>
     <string name="start_new_sync_chain">Käynnistä uusi synkronointiketju</string>
     <string name="are_you_sure_leave_sync_chain">Haluatko varmasti poistua synkronointiketjusta\?</string>
     <string name="sync_code">Synkronointikoodi</string>
-  <string name="new_indicator">Uusi</string>
-    <string name="text_scale">Tekstiasteikko</string>
+    <string name="new_indicator">Uusi</string>
+    <string name="text_scale">Tekstin skaalaus</string>
     <string name="press_scan_sync">Laitteellasi, siirry synkronintiin ja paina skannaa synkronointi koodi.</string>
     <string name="sync_to_fetch">Synkronoi noutamaan artikkeli</string>
     <string name="block_list_description">Piilottaa artikkelit, joiden otsikot sisältävät jonkin näistä suodattimista. Esimerkkisuodattimet:</string>
     <string name="device_sync_financed_by_community">Tämä palvelu on yhteisön rahoittama. Harkitse lahjoittamista, jos näät tämän hyödyllisenä.</string>
-    <string name="device_sync_description_2">Skannaa koodi synkronointiketjusta, jonka olet luonut toisella laitteella, tai aloita uusi synkronointiketju.</string>
+    <string name="device_sync_description_2">Skannaa yksinkertaisesti koodi synkronointiketjustasi, jonka loin toisella laitteella, tai aloita uusi synkronointiketju.</string>
     <string name="feed_icon">Syötteen kuvake</string>
-    <string name="device_sync_description_1">Laitesynkronoinnin avulla voit synkronoida syötetilaukset ja luetut artikkelit eri laitteiden välillä.</string>
+    <string name="device_sync_description_1">Laitteen synkronointi mahdollistaa syötteiden tilausten ja lukemiesi artikkeleiden synkronoinnin eri laitteidesi välillä.</string>
+    <string name="saved_article">Tallennettu artikkeli</string>
+    <string name="save_article">Tallenna Artikkeli</string>
+    <string name="mark_as_read_on_scroll">Merkitse luetuksi vierityksellä</string>
+    <string name="saved_articles">Tallennetut artikkelit</string>
+    <string name="unsave_article">Lopeta artikkelin tallentaminen</string>
 </resources>
