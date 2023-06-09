@@ -1,3 +1,26 @@
+# 2.4.17
+Jonas Kalderstam (10):
+  * [71835f81] Fixed possible crash during article parsing
+  * [36f08f92] Fixed charset detection for sites not using UTF-8
+  * [4b2c4bd3] Fixed lineheight not scaling with text size
+  * [f3d1b0f5] Improved keyboard navigation through the app
+  * [dbd9af16] Added suitable dimensions for TVs
+  * [b7501f87] Changed how number of columns in grid layout is calculated
+  * [032b77ae] Added some special UI handling for Foldable devices
+  * [c0578304] Adjusted width of reader on large screens
+  * [967797dd] Fixed some code deprecations and such
+  * [7103a0fc] Temporarily disabled mark as read on scroll in Grid because
+         it just doesn't work well enough
+
+Patrik Daniel (1):
+  * [bbd66edc] Updated Finnish translation using Weblate
+
+S3aBreeze (1):
+  * [ea412aa2] Updated Russian translation using Weblate
+
+mm4c (1):
+  * [16ce2cb1] Updated Dutch translation using Weblate
+
 # 2.4.16
 Jonas Kalderstam (11):
   * [3493e09b] Added global notifications setting as an alternative way to
