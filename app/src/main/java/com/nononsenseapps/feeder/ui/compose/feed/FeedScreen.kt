@@ -1106,23 +1106,26 @@ fun FeedGridContent(
                     val previewItem = pagedFeedItems[itemIndex]
                         ?: return@items
 
-                    if (viewState.markAsReadOnScroll && previewItem.unread) {
-                        val visible: Boolean by gridState.rememberIsItemVisible(
-                            key = previewItem.id,
-                        )
-                        val mostlyVisible: Boolean by gridState.rememberIsItemMostlyVisible(
-                            key = previewItem.id,
-                            screenHeightPx = screenHeightPx,
-                        )
-                        MarkItemAsReadOnScroll(
-                            itemId = previewItem.id,
-                            visible = visible,
-                            mostlyVisible = mostlyVisible,
-                            currentFeedOrTag = viewState.currentFeedOrTag,
-                            coroutineScope = coroutineScope,
-                            markAsRead = markAsUnread,
-                        )
-                    }
+                    // TODO
+                    // Because staggered items - it is horrible when hiding read items
+                    // Because the new tag moves the text to fit - it is horrible when showing read items
+//                    if (viewState.markAsReadOnScroll && previewItem.unread) {
+//                        val visible: Boolean by gridState.rememberIsItemVisible(
+//                            key = previewItem.id,
+//                        )
+//                        val mostlyVisible: Boolean by gridState.rememberIsItemMostlyVisible(
+//                            key = previewItem.id,
+//                            screenHeightPx = screenHeightPx,
+//                        )
+//                        MarkItemAsReadOnScroll(
+//                            itemId = previewItem.id,
+//                            visible = visible,
+//                            mostlyVisible = mostlyVisible,
+//                            currentFeedOrTag = viewState.currentFeedOrTag,
+//                            coroutineScope = coroutineScope,
+//                            markAsRead = markAsUnread,
+//                        )
+//                    }
 
                     SwipeableFeedItemPreview(
                         onSwipe = { currentState ->
