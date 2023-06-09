@@ -322,7 +322,7 @@ class SettingsStore(override val di: DI) : DIAware {
         configurePeriodicSync(replace = true)
     }
 
-    suspend fun configurePeriodicSync(replace: Boolean) {
+    fun configurePeriodicSync(replace: Boolean) {
         val workManager: WorkManager by instance()
         val shouldSync = syncFrequency.value.minutes > 0
 

@@ -119,7 +119,6 @@ fun getAllMigrations(di: DI) = arrayOf(
  * 6 represents legacy database
  * 7 represents new Room database
  */
-@Suppress("ClassName")
 class MigrationFrom25To26(override val di: DI) : Migration(25, 26), DIAware {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
@@ -139,7 +138,6 @@ class MigrationFrom25To26(override val di: DI) : Migration(25, 26), DIAware {
     }
 }
 
-@Suppress("ClassName")
 class MigrationFrom24To25(override val di: DI) : Migration(24, 25), DIAware {
     private val filePathProvider: FilePathProvider by instance()
 
@@ -181,7 +179,6 @@ class MigrationFrom24To25(override val di: DI) : Migration(24, 25), DIAware {
     }
 }
 
-@Suppress("ClassName")
 class MigrationFrom23To24(override val di: DI) : Migration(23, 24), DIAware {
     private val sharedPrefs: SharedPreferences by instance()
 
@@ -495,6 +492,7 @@ object MIGRATION_9_10 : Migration(9, 10) {
                 val feedItemId = cursor.getLong(0)
                 val description = cursor.getString(1)
 
+                @Suppress("DEPRECATION")
                 blobOutputStream(feedItemId, FeederApplication.staticFilesDir).bufferedWriter()
                     .use {
                         it.write(description)

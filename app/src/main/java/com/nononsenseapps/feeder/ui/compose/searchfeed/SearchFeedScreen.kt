@@ -35,7 +35,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -291,6 +290,7 @@ fun SearchFeedView(
     }
 }
 
+@Suppress("UnusedReceiverParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ColumnScope.leftContent(
@@ -334,7 +334,6 @@ fun ColumnScope.leftContent(
             },
         ),
         singleLine = true,
-        colors = TextFieldDefaults.textFieldColors(),
         modifier = modifier
             .width(dimens.maxContentWidth)
             .interceptKey(Key.Enter) {

@@ -28,8 +28,9 @@ class TestMigrationFrom23To24 {
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        AppDatabase::class.java,
+        emptyList(),
+        FrameworkSQLiteOpenHelperFactory(),
     )
 
     @Test
@@ -52,8 +53,8 @@ class TestMigrationFrom23To24 {
         db.query(
             """
             SELECT glob_pattern FROM blocklist
-            """.trimIndent()
-        )!!.use {
+            """.trimIndent(),
+        ).use {
             assert(it.count == 3)
 
             assert(it.moveToFirst())

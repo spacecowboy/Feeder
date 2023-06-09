@@ -65,7 +65,7 @@ data class FeedItemWithFeed @Ignore constructor(
     constructor() : this(id = ID_UNSET)
 
     val feedDisplayTitle: String
-        get() = if (feedCustomTitle.isBlank()) feedTitle else feedCustomTitle
+        get() = feedCustomTitle.ifBlank { feedTitle }
 
     val enclosureFilename: String?
         get() {
@@ -75,7 +75,7 @@ data class FeedItemWithFeed @Ignore constructor(
                     fname = URI(enclosureLink).path.split("/").last()
                 } catch (e: Exception) {
                 }
-                return if (fname == null || fname.isEmpty()) {
+                return if (fname.isNullOrEmpty()) {
                     null
                 } else {
                     fname

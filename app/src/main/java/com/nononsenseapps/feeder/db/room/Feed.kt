@@ -55,5 +55,5 @@ data class Feed @Ignore constructor(
     constructor() : this(id = ID_UNSET)
 
     val displayTitle: String
-        get() = (if (customTitle.isBlank()) title else customTitle)
+        get() = (customTitle.ifBlank { title })
 }

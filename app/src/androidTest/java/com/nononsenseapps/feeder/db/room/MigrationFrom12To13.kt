@@ -19,8 +19,9 @@ class MigrationFrom12To13 {
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        AppDatabase::class.java,
+        emptyList(),
+        FrameworkSQLiteOpenHelperFactory(),
     )
 
     @Test
@@ -32,14 +33,14 @@ class MigrationFrom12To13 {
                 """
             INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash)
             VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666)
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             db.execSQL(
                 """
             INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time, primary_sort_time)
             VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0, 0)
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -48,8 +49,8 @@ class MigrationFrom12To13 {
         db.query(
             """
             SELECT fulltext_by_default FROM feeds
-            """.trimIndent()
-        )!!.use {
+            """.trimIndent(),
+        ).use {
             assert(it.count == 1)
             assert(it.moveToFirst())
             assertEquals(0L, it.getLong(0))

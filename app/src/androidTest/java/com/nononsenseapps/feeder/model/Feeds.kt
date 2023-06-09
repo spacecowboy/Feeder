@@ -7,17 +7,17 @@ class Feeds {
 
     companion object {
         val nixosRss: InputStream
-            get() = javaClass.getResourceAsStream("rss_nixos.xml")!!
+            get() = Companion::class.java.getResourceAsStream("rss_nixos.xml")!!
 
         val cowboyJson: String
             get() = String(
-                javaClass.getResourceAsStream("cowboyprogrammer_feed.json")!!
-                    .use { it.readBytes() }
+                Companion::class.java.getResourceAsStream("cowboyprogrammer_feed.json")!!
+                    .use { it.readBytes() },
             )
 
         val cowboyAtom: String
             get() = String(
-                javaClass.getResourceAsStream("cowboyprogrammer_atom.xml")!!.use { it.readBytes() }
+                Companion::class.java.getResourceAsStream("cowboyprogrammer_atom.xml")!!.use { it.readBytes() },
             )
 
         /**

@@ -66,8 +66,9 @@ class MigrationFromLegacy5ToLatest {
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        AppDatabase::class.java,
+        emptyList(),
+        FrameworkSQLiteOpenHelperFactory(),
     )
 
     private val testDbName = "TestingDatabase"
@@ -76,7 +77,7 @@ class MigrationFromLegacy5ToLatest {
         get() = LegacyDatabaseHandler(
             context = feederApplication,
             name = testDbName,
-            version = 5
+            version = 5,
         )
 
     private val roomDb: AppDatabase
@@ -84,7 +85,7 @@ class MigrationFromLegacy5ToLatest {
             Room.databaseBuilder(
                 feederApplication,
                 AppDatabase::class.java,
-                testDbName
+                testDbName,
             )
                 .addMigrations(*getAllMigrations(di))
                 .build().also { testHelper.closeWhenFinished(it) }
@@ -102,7 +103,7 @@ class MigrationFromLegacy5ToLatest {
                   $COL_TAG TEXT NOT NULL DEFAULT '',
                   $COL_NOTIFY INTEGER NOT NULL DEFAULT 0,
                   UNIQUE($COL_URL) ON CONFLICT REPLACE
-                )"""
+                )""",
             )
             db.execSQL(CREATE_FEED_ITEM_TABLE)
             db.execSQL(CREATE_TAG_TRIGGER)
@@ -115,36 +116,39 @@ class MigrationFromLegacy5ToLatest {
                      FROM $FEED_ITEM_TABLE_NAME
                      WHERE $COL_UNREAD IS 1
                      GROUP BY $COL_FEED)
-                   ON $FEED_TABLE_NAME.$COL_ID = $COL_FEED"""
+                   ON $FEED_TABLE_NAME.$COL_ID = $COL_FEED""",
             )
             db.execSQL(CREATE_TAGS_VIEW)
 
             // Bare minimum non-null feeds
             val idA = db.insert(
-                FEED_TABLE_NAME, null,
+                FEED_TABLE_NAME,
+                null,
                 contentValues {
                     setString(COL_TITLE to "feedA")
                     setString(COL_CUSTOM_TITLE to "feedACustom")
                     setString(COL_URL to "https://feedA")
                     setString(COL_TAG to "")
-                }
+                },
             )
 
             // All fields filled
             val idB = db.insert(
-                FEED_TABLE_NAME, null,
+                FEED_TABLE_NAME,
+                null,
                 contentValues {
                     setString(COL_TITLE to "feedB")
                     setString(COL_CUSTOM_TITLE to "feedBCustom")
                     setString(COL_URL to "https://feedB")
                     setString(COL_TAG to "tag")
                     setInt(COL_NOTIFY to 1)
-                }
+                },
             )
 
             IntRange(0, 1).forEach { index ->
                 db.insert(
-                    FEED_ITEM_TABLE_NAME, null,
+                    FEED_ITEM_TABLE_NAME,
+                    null,
                     contentValues {
                         setLong(COL_FEED to idA)
                         setString(COL_GUID to "guid$index")
@@ -155,11 +159,12 @@ class MigrationFromLegacy5ToLatest {
                         setString(COL_FEEDTITLE to "feedA")
                         setString(COL_FEEDURL to "https://feedA")
                         setString(COL_TAG to "")
-                    }
+                    },
                 )
 
                 db.insert(
-                    FEED_ITEM_TABLE_NAME, null,
+                    FEED_ITEM_TABLE_NAME,
+                    null,
                     contentValues {
                         setLong(COL_FEED to idB)
                         setString(COL_GUID to "guid$index")
@@ -177,7 +182,7 @@ class MigrationFromLegacy5ToLatest {
                         setString(COL_IMAGEURL to "https://image$index")
                         setString(COL_PUBDATE to "2018-02-03T04:05:00Z")
                         setString(COL_LINK to "https://link$index")
-                    }
+                    },
                 )
             }
         }
@@ -191,8 +196,11 @@ class MigrationFromLegacy5ToLatest {
     @Test
     fun legacyMigrationTo7MinimalFeed() = runBlocking {
         testHelper.runMigrationsAndValidate(
-            testDbName, 7, true,
-            MIGRATION_5_7, MIGRATION_7_8
+            testDbName,
+            7,
+            true,
+            MIGRATION_5_7,
+            MIGRATION_7_8,
         )
 
         roomDb.let { db ->
@@ -215,8 +223,11 @@ class MigrationFromLegacy5ToLatest {
     @Test
     fun legacyMigrationTo7CompleteFeed() = runBlocking {
         testHelper.runMigrationsAndValidate(
-            testDbName, 7, true,
-            MIGRATION_5_7, MIGRATION_7_8
+            testDbName,
+            7,
+            true,
+            MIGRATION_5_7,
+            MIGRATION_7_8,
         )
 
         roomDb.let { db ->
@@ -239,14 +250,18 @@ class MigrationFromLegacy5ToLatest {
     @Test
     fun legacyMigrationTo7MinimalFeedItem() = runBlocking {
         testHelper.runMigrationsAndValidate(
-            testDbName, 7, true,
-            MIGRATION_5_7, MIGRATION_7_8
+            testDbName,
+            7,
+            true,
+            MIGRATION_5_7,
+            MIGRATION_7_8,
         )
 
         roomDb.let { db ->
             val feed = db.feedDao().loadFeeds()[0]
             assertEquals("feedA", feed.title)
-            @Suppress("DEPRECATION") val items =
+            @Suppress("DEPRECATION")
+            val items =
                 db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
 
             assertEquals(2, items.size)
@@ -271,14 +286,18 @@ class MigrationFromLegacy5ToLatest {
     @Test
     fun legacyMigrationTo7CompleteFeedItem() = runBlocking {
         testHelper.runMigrationsAndValidate(
-            testDbName, 7, true,
-            MIGRATION_5_7, MIGRATION_7_8
+            testDbName,
+            7,
+            true,
+            MIGRATION_5_7,
+            MIGRATION_7_8,
         )
 
         roomDb.let { db ->
             val feed = db.feedDao().loadFeeds()[1]
             assertEquals("feedB", feed.title)
-            @Suppress("DEPRECATION") val items =
+            @Suppress("DEPRECATION")
+            val items =
                 db.feedItemDao().loadFeedItemsInFeedDesc(feedId = feed.id)
 
             assertEquals(2, items.size)

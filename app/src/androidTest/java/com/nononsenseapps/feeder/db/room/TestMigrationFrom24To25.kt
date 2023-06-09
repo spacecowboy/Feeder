@@ -7,7 +7,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.nononsenseapps.feeder.FeederApplication
-import com.nononsenseapps.feeder.util.FilePathProvider
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -17,7 +16,6 @@ import org.junit.runner.RunWith
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
-import org.kodein.di.instance
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -25,14 +23,14 @@ class TestMigrationFrom24To25 : DIAware {
     private val dbName = "testDb"
     private val feederApplication: FeederApplication = ApplicationProvider.getApplicationContext()
     override val di: DI by closestDI(feederApplication)
-    private val filePathProvider: FilePathProvider by instance()
 
     @Rule
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        AppDatabase::class.java,
+        emptyList(),
+        FrameworkSQLiteOpenHelperFactory(),
     )
 
     @Test
@@ -42,13 +40,13 @@ class TestMigrationFrom24To25 : DIAware {
                 """
                 INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash, fulltext_by_default, open_articles_with, alternate_id, currently_syncing, when_modified)
                 VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666, 0, '', 0, 0, 0)
-                """.trimIndent()
+                """.trimIndent(),
             )
             oldDB.execSQL(
                 """
             INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time, primary_sort_time, pinned, bookmarked)
             VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0, 0, 0, 0)
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -79,8 +77,8 @@ class TestMigrationFrom24To25 : DIAware {
         db.query(
             """
             SELECT fulltext_downloaded FROM feed_items
-            """.trimIndent()
-        )!!.use {
+            """.trimIndent(),
+        ).use {
             assert(it.count == 1)
             assert(it.moveToFirst())
             assertEquals(0, it.getInt(0))

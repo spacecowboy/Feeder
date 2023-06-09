@@ -19,8 +19,9 @@ class MigrationFrom21To22 {
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        AppDatabase::class.java,
+        emptyList(),
+        FrameworkSQLiteOpenHelperFactory(),
     )
 
     @Test
@@ -30,13 +31,13 @@ class MigrationFrom21To22 {
                 """
                 INSERT INTO feeds(id, title, url, custom_title, tag, notify, last_sync, response_hash, fulltext_by_default, open_articles_with, alternate_id, currently_syncing, when_modified)
                 VALUES(1, 'feed', 'http://url', '', '', 0, 0, 666, 0, '', 0, 0, 0)
-                """.trimIndent()
+                """.trimIndent(),
             )
             oldDB.execSQL(
                 """
             INSERT INTO feed_items(id, guid, title, plain_title, plain_snippet, unread, notified, feed_id, first_synced_time, primary_sort_time)
             VALUES(8, 'http://item', 'title', 'ptitle', 'psnippet', 1, 0, 1, 0, 0)
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -45,8 +46,8 @@ class MigrationFrom21To22 {
         db.query(
             """
             SELECT pinned FROM feed_items
-            """.trimIndent()
-        )!!.use {
+            """.trimIndent(),
+        ).use {
             assert(it.count == 1)
             assert(it.moveToFirst())
             assertEquals(0, it.getInt(0))

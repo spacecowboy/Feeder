@@ -142,7 +142,7 @@ data class FeedItem @Ignore constructor(
                     fname = URI(enclosureLink).path.split("/").last()
                 } catch (_: Exception) {
                 }
-                return if (fname == null || fname.isEmpty()) {
+                return if (fname.isNullOrEmpty()) {
                     null
                 } else {
                     fname

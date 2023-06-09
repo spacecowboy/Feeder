@@ -19,28 +19,27 @@ class MigrationFrom19To20 {
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        AppDatabase::class.java,
+        emptyList(),
+        FrameworkSQLiteOpenHelperFactory(),
     )
 
     @Test
     fun migrate() {
-        testHelper.createDatabase(dbName, 19).let { oldDB ->
-            oldDB.execSQL(
-                """
-                INSERT INTO sync_remote(id, url, sync_chain_id, latest_message_timestamp)
-                VALUES (1, '', '', 0)
-                """.trimIndent()
-            )
-        }
+        testHelper.createDatabase(dbName, 19).execSQL(
+            """
+            INSERT INTO sync_remote(id, url, sync_chain_id, latest_message_timestamp)
+            VALUES (1, '', '', 0)
+            """.trimIndent(),
+        )
 
         val db = testHelper.runMigrationsAndValidate(dbName, 20, true, MIGRATION_19_20)
 
         db.query(
             """
             SELECT device_id, device_name FROM sync_remote WHERE id IS 1
-            """.trimIndent()
-        )!!.use {
+            """.trimIndent(),
+        ).use {
             assert(it.count == 1)
             assert(it.moveToFirst())
             Assert.assertEquals(ID_UNSET, it.getLong(0))

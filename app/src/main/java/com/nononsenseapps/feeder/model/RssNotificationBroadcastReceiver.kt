@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import com.nononsenseapps.feeder.db.room.FeedItemDao
 import com.nononsenseapps.feeder.db.room.ID_UNSET
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -34,6 +35,7 @@ class RssNotificationBroadcastReceiver : BroadcastReceiver() {
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 private fun markAsReadAndNotified(context: Context, feedItemDao: FeedItemDao, itemId: Long) {
     GlobalScope.launch(Dispatchers.Default) {
         feedItemDao.markAsReadAndNotified(itemId)
@@ -41,6 +43,7 @@ private fun markAsReadAndNotified(context: Context, feedItemDao: FeedItemDao, it
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 private fun markAsNotified(context: Context, feedItemDao: FeedItemDao, itemIds: LongArray?) {
     if (itemIds != null) {
         GlobalScope.launch(Dispatchers.Default) {
