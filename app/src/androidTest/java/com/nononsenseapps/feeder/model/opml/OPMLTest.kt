@@ -12,6 +12,8 @@ import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.util.ArrayList
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.createTempFile
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -59,8 +61,8 @@ class OPMLTest {
     @Before
     fun setup() {
         // Get internal data dir
-        dir = createTempDir()
-        path = createTempFile()
+        dir = createTempDirectory().toFile()
+        path = createTempFile().toFile()
         assertTrue("Need to be able to write to data dir $dir", dir!!.canWrite())
 
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
@@ -80,7 +82,7 @@ class OPMLTest {
 
         writeFile(
             path!!.absolutePath,
-            getTags()
+            getTags(),
         ) { tag ->
             db.feedDao().loadFeeds(tag = tag)
         }
@@ -143,14 +145,14 @@ class OPMLTest {
         var feednew = Feed(
             url = URL("http://somedomain20.com/rss.xml"),
             title = "\"20\"",
-            tag = "kapow"
+            tag = "kapow",
         )
         var id = db.feedDao().insertFeed(feednew)
         feednew = feednew.copy(id = id)
         // Create something that will exist
         var feedold = Feed(
             url = URL("http://somedomain0.com/rss.xml"),
-            title = "\"0\""
+            title = "\"0\"",
         )
         id = db.feedDao().insertFeed(feedold)
 
@@ -263,7 +265,7 @@ class OPMLTest {
                     1 -> "tag1"
                     2 -> "tag2"
                     else -> ""
-                }
+                },
             )
 
             db.feedDao().insertFeed(feed)

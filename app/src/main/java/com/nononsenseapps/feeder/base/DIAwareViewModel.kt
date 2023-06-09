@@ -67,7 +67,7 @@ inline fun <reified T : DIAwareViewModel> DI.Builder.bindWithComposableViewModel
 class DIAwareSavedStateViewModelFactory(
     override val di: DI,
     val owner: SavedStateRegistryOwner,
-    val defaultArgs: Bundle? = null,
+    defaultArgs: Bundle? = null,
 ) : AbstractSavedStateViewModelFactory(owner, defaultArgs), DIAware {
     override fun <T : ViewModel> create(
         key: String,

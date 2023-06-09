@@ -19,8 +19,9 @@ class MigrationFrom8To9 {
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        AppDatabase::class.java,
+        emptyList(),
+        FrameworkSQLiteOpenHelperFactory(),
     )
 
     @Test
@@ -32,7 +33,7 @@ class MigrationFrom8To9 {
                 """
             INSERT INTO feeds(title, url, custom_title, tag, notify, last_sync)
             VALUES('feed', 'http://url', '', '', 0, 0)
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -41,8 +42,8 @@ class MigrationFrom8To9 {
         db.query(
             """
             SELECT title, url, response_hash FROM feeds
-            """.trimIndent()
-        )!!.use {
+            """.trimIndent(),
+        ).use {
             assert(it.count == 1)
             assert(it.moveToFirst())
             assertEquals("feed", it.getString(0))

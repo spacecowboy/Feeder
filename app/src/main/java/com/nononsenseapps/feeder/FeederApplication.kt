@@ -55,7 +55,6 @@ import org.kodein.di.direct
 import org.kodein.di.instance
 import org.kodein.di.singleton
 
-@Suppress("unused")
 class FeederApplication : Application(), DIAware, ImageLoaderFactory {
     private val applicationCoroutineScope = ApplicationCoroutineScope()
     private val ttsStateHolder = TTSStateHolder(this, applicationCoroutineScope)
@@ -176,6 +175,7 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
         AndroidThreeTen.init(this)
+        @Suppress("DEPRECATION")
         staticFilesDir = filesDir
     }
 

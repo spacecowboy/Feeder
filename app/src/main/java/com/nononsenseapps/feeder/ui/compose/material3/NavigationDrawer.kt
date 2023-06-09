@@ -907,7 +907,7 @@ private val AnimationSpec = TweenSpec<Float>(durationMillis = 256)
 
 @Immutable
 @kotlin.jvm.JvmInline
-internal value class Strings private constructor(@Suppress("unused") private val value: Int) {
+internal value class Strings private constructor(private val value: Int) {
     companion object {
         val NavigationMenu = Strings(0)
         val CloseDrawer = Strings(1)

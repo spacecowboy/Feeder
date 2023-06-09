@@ -243,7 +243,7 @@ fun EditFeedScreen(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EditFeedView(
     screenType: ScreenType,
@@ -464,7 +464,7 @@ fun ColumnScope.LeftContent(
     }
 }
 
-@Suppress("ktlint:twitter-compose:modifier-missing-check")
+@Suppress("ktlint:twitter-compose:modifier-missing-check", "UnusedReceiverParameter")
 @Composable
 fun ColumnScope.RightContent(
     viewState: EditFeedScreenState,

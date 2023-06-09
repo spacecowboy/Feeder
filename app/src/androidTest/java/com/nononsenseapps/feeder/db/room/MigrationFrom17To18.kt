@@ -18,8 +18,9 @@ class MigrationFrom17To18 {
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        AppDatabase::class.java,
+        emptyList(),
+        FrameworkSQLiteOpenHelperFactory(),
     )
 
     @Test
@@ -31,8 +32,8 @@ class MigrationFrom17To18 {
         db.query(
             """
             SELECT * FROM read_status_synced
-            """.trimIndent()
-        )!!.use {
+            """.trimIndent(),
+        ).use {
             assert(it.count == 0)
         }
     }

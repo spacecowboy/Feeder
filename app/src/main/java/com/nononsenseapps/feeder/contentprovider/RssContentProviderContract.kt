@@ -1,8 +1,8 @@
 package com.nononsenseapps.feeder.contentprovider
 
 object RssContentProviderContract {
-    val feedsMimeTypeList = "vnd.android.cursor.dir/vnd.rssprovider.feeds"
-    val feedsUriPathList = "feeds"
+    const val feedsMimeTypeList = "vnd.android.cursor.dir/vnd.rssprovider.feeds"
+    const val feedsUriPathList = "feeds"
 
     /**
      * Columns available via the content provider
@@ -12,10 +12,10 @@ object RssContentProviderContract {
         "title",
     )
 
-    val articlesMimeTypeList = "vnd.android.cursor.dir/vnd.rssprovider.items"
-    val articlesUriPathList = "articles"
-    val articlesMimeTypeItem = "vnd.android.cursor.item/vnd.rssprovider.item"
-    val articlesUriPathItem = "articles/#"
+    const val articlesMimeTypeList = "vnd.android.cursor.dir/vnd.rssprovider.items"
+    const val articlesUriPathList = "articles"
+    const val articlesMimeTypeItem = "vnd.android.cursor.item/vnd.rssprovider.item"
+    const val articlesUriPathItem = "articles/#"
 
     /**
      * Columns available via the content provider

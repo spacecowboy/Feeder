@@ -26,7 +26,8 @@ class TestMigrationFrom25To26 : DIAware {
     @JvmField
     val testHelper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
+        AppDatabase::class.java,
+        emptyList(),
         FrameworkSQLiteOpenHelperFactory(),
     )
 

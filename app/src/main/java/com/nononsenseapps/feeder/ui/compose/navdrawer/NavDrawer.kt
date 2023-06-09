@@ -9,7 +9,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,7 +47,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -338,7 +336,6 @@ fun ListOfFeedsAndTags(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @ExperimentalAnimationApi
 @Preview(showBackground = true)
 @Composable
@@ -357,8 +354,6 @@ private fun ExpandableTag(
     val toggleExpandLabel = stringResource(id = R.string.toggle_tag_expansion)
     val expandedLabel = stringResource(id = R.string.expanded_tag)
     val contractedLabel = stringResource(id = R.string.contracted_tag)
-
-    val inputModeManager = LocalInputModeManager.current
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),

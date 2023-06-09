@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 @Suppress("ObjectPropertyName")
 private var _textToSpeech: ImageVector? = null
 
-@Suppress("unused")
+@Suppress("UnusedReceiverParameter")
 val CustomFilledIcons.TextToSpeech: ImageVector
     get() {
         return _textToSpeech ?: materialIcon(name = "Filled.TextToSpeech") {

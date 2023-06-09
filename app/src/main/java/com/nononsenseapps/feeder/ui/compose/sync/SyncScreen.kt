@@ -652,7 +652,6 @@ fun SyncJoinScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SyncJoinContent(
     onJoinSyncChain: (String, String) -> Unit,

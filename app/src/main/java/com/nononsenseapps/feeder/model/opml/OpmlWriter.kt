@@ -5,13 +5,17 @@ import com.nononsenseapps.feeder.db.room.Feed
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 suspend fun writeFile(
     path: String,
     tags: Iterable<String>,
     feedsWithTag: suspend (String) -> Iterable<Feed>,
 ) {
-    writeOutputStream(FileOutputStream(path), tags, feedsWithTag)
+    withContext(Dispatchers.IO) {
+        writeOutputStream(FileOutputStream(path), tags, feedsWithTag)
+    }
 }
 
 suspend fun writeOutputStream(
@@ -28,22 +32,22 @@ suspend fun writeOutputStream(
                         title { +"Feeder" }
                     }
                     body {
-                        tags.forEach {
-                            if (it.isEmpty()) {
-                                feedsWithTag(it).forEach {
+                        tags.forEach { tag ->
+                            if (tag.isEmpty()) {
+                                feedsWithTag(tag).forEach { feed ->
                                     outline(
-                                        title = escape(it.displayTitle),
+                                        title = escape(feed.displayTitle),
                                         type = "rss",
-                                        xmlUrl = escape(it.url.toString()),
+                                        xmlUrl = escape(feed.url.toString()),
                                     ) {}
                                 }
                             } else {
-                                outline(title = escape(it)) {
-                                    feedsWithTag(it).forEach {
+                                outline(title = escape(tag)) {
+                                    feedsWithTag(tag).forEach { feed ->
                                         outline(
-                                            title = escape(it.displayTitle),
+                                            title = escape(feed.displayTitle),
                                             type = "rss",
-                                            xmlUrl = escape(it.url.toString()),
+                                            xmlUrl = escape(feed.url.toString()),
                                         ) {}
                                     }
                                 }
@@ -121,7 +125,7 @@ abstract class Tag(val name: String) : Element {
         } else {
             builder.append(">\n")
             for (c in children) {
-                c.render(builder, indent + "  ")
+                c.render(builder, "$indent  ")
             }
             builder.append("$indent</$name>\n")
         }

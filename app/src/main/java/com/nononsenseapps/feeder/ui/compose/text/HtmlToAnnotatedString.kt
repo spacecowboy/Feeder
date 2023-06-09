@@ -324,7 +324,7 @@ private fun AnnotatedStringComposer.appendTextChildren(
                                 }
                                 .flatMap {
                                     it.children()
-                                        .filter { it.tagName() == "tr" }
+                                        .filter { child -> child.tagName() == "tr" }
                                 }
                                 .forEach { row ->
                                     appendTextChildren(
