@@ -112,6 +112,7 @@ import com.nononsenseapps.feeder.ui.compose.feedarticle.FeedScreenViewState
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerState
 import com.nononsenseapps.feeder.ui.compose.material3.DrawerValue
 import com.nononsenseapps.feeder.ui.compose.material3.rememberDrawerState
+import com.nononsenseapps.feeder.ui.compose.modifiers.lazyListScrollbar
 import com.nononsenseapps.feeder.ui.compose.navdrawer.ScreenWithNavDrawer
 import com.nononsenseapps.feeder.ui.compose.navigation.ArticleDestination
 import com.nononsenseapps.feeder.ui.compose.navigation.EditFeedDestination
@@ -902,6 +903,7 @@ fun FeedListContent(
             val screenHeightPx = with(LocalDensity.current) {
                 LocalConfiguration.current.screenHeightDp.dp.toPx().toInt()
             }
+
             LazyColumn(
                 state = listState,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -921,7 +923,9 @@ fun FeedListContent(
                     }
                         .asPaddingValues()
                 },
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .lazyListScrollbar(listState),
             ) {
                 /*
                 This is a trick to make the list stay at item 0 when updates come in IF it is
