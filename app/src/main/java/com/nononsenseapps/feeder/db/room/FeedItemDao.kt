@@ -138,7 +138,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-          AND unread in (1, :unread)
+          AND (unread in (1, :unread) OR bookmarked = 1)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
@@ -156,7 +156,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag
-          AND unread in (1, :unread)
+          AND (unread in (1, :unread) OR bookmarked = 1)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
@@ -173,7 +173,7 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE unread in (1, :unread)
+        WHERE (unread in (1, :unread) OR bookmarked = 1)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByDesc
@@ -190,7 +190,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE feed_id IS :feedId
-          AND unread in (1, :unread)
+          AND (unread in (1, :unread) OR bookmarked = 1)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
@@ -208,7 +208,7 @@ interface FeedItemDao {
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
         WHERE tag IS :tag 
-          AND unread in (1, :unread)
+          AND (unread in (1, :unread) OR bookmarked = 1)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
@@ -225,7 +225,7 @@ interface FeedItemDao {
         SELECT $previewColumns
         FROM feed_items
         LEFT JOIN feeds ON feed_items.feed_id = feeds.id
-        WHERE unread in (1, :unread)
+        WHERE (unread in (1, :unread) OR bookmarked = 1)
           AND bookmarked in (1, :bookmarked)
           AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(feed_items.plain_title) GLOB blocklist.glob_pattern)
         ORDER BY $feedItemsListOrderByAsc
@@ -511,7 +511,7 @@ interface FeedItemDao {
             SELECT count(*)
             FROM feed_items fi
             WHERE
-              unread in (1, :unread)
+              (unread in (1, :unread) or bookmarked = 1)
               and bookmarked in (1, :bookmarked)
               and NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
@@ -524,7 +524,7 @@ interface FeedItemDao {
             FROM feed_items fi
             JOIN feeds f ON feed_id = f.id
             WHERE f.tag IS :tag
-              and unread in (1, :unread)
+              and (unread in (1, :unread) or bookmarked = 1)
               and bookmarked in (1, :bookmarked)
               AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
@@ -536,7 +536,7 @@ interface FeedItemDao {
             SELECT count(*)
             FROM feed_items fi
             WHERE fi.feed_id IS :feedId
-              and unread in (1, :unread)
+              and (unread in (1, :unread) or bookmarked = 1)
               and bookmarked in (1, :bookmarked)
               AND NOT EXISTS (SELECT 1 FROM blocklist WHERE lower(fi.plain_title) GLOB blocklist.glob_pattern)
         """,
