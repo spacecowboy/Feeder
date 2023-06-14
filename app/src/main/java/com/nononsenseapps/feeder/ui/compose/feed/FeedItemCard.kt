@@ -105,8 +105,8 @@ fun FeedItemCard(
                             unread = item.unread && newIndicator,
                             bookmarked = item.bookmarked && bookmarkIndicator,
                             modifier = Modifier.padding(
-                                top = 12.dp,
-                                end = 12.dp,
+                                top = 8.dp,
+                                end = 8.dp,
                             ),
                         )
                     }
@@ -120,15 +120,31 @@ fun FeedItemCard(
                     modifier = Modifier
                         .weight(1f, fill = true),
                 ) {
-                    WithBidiDeterminedLayoutDirection(paragraph = item.title) {
-                        Text(
-                            text = item.title,
-                            style = FeedListItemTitleTextStyle(),
-                            fontWeight = titleFontWeight(item.unread),
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 8.dp, top = 8.dp)
-                                .fillMaxWidth(),
-                        )
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.TopEnd,
+                    ) {
+                        WithBidiDeterminedLayoutDirection(paragraph = item.title) {
+                            Text(
+                                text = item.title,
+                                style = FeedListItemTitleTextStyle(),
+                                fontWeight = titleFontWeight(item.unread),
+                                modifier = Modifier
+                                    .padding(start = 8.dp, end = 8.dp, top = 8.dp)
+                                    .fillMaxWidth(),
+                            )
+                        }
+                        if (!showThumbnail || item.imageUrl == null) {
+                            FeedItemIndicatorColumn(
+                                unread = item.unread && newIndicator,
+                                bookmarked = item.bookmarked && bookmarkIndicator,
+                                modifier = Modifier
+                                    .padding(
+                                        top = 8.dp,
+                                        end = 8.dp,
+                                    ),
+                            )
+                        }
                     }
                     // Want the dropdown to center on the middle text row
                     Box {
@@ -229,17 +245,6 @@ fun FeedItemCard(
                             .height(8.dp),
                     )
                 }
-                if (!showThumbnail || item.imageUrl == null) {
-                    FeedItemIndicatorColumn(
-                        unread = item.unread && newIndicator,
-                        bookmarked = item.bookmarked && bookmarkIndicator,
-                        modifier = Modifier.padding(
-                            top = 12.dp,
-                            bottom = 12.dp,
-                            end = 12.dp,
-                        ),
-                    )
-                }
             }
         }
     }
@@ -251,7 +256,7 @@ private fun Preview() {
     FeederTheme {
         FeedItemCard(
             item = FeedListItem(
-                title = "title",
+                title = "title wafasd sss assf eycsdf asdf asdfas bneraw",
                 snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
                 feedTitle = "Super Duper Feed One two three hup di too dasf",
                 pubDate = "Jun 9, 2021",
@@ -286,7 +291,7 @@ private fun PreviewWithImage() {
         ) {
             FeedItemCard(
                 item = FeedListItem(
-                    title = "title",
+                    title = "title whi as fas asdf",
                     snippet = "snippet which is quite long as you might expect from a snipper of a story. It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and snowing",
                     feedTitle = "Super Duper Feed One two three hup di too dasf",
                     pubDate = "Jun 9, 2021",

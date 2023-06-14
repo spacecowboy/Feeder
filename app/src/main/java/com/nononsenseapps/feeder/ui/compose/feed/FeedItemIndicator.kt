@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -36,18 +37,17 @@ fun FeedItemIndicatorRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (unread) {
-            FeedItemIndicator {
-                Text(stringResource(id = R.string.new_indicator))
-            }
-        }
         if (bookmarked) {
-            FeedItemIndicator {
+            FeedItemIndicator(modifier = Modifier.alpha(0.75f)) {
                 Icon(
                     Icons.Default.Star,
                     contentDescription = stringResource(id = R.string.saved_article),
                     modifier = Modifier.size(16.dp),
                 )
+            }
+        } else if (unread) {
+            FeedItemIndicator(modifier = Modifier.alpha(0.75f)) {
+                Text(stringResource(id = R.string.new_indicator))
             }
         }
     }
@@ -66,18 +66,17 @@ fun FeedItemIndicatorColumn(
         verticalArrangement = Arrangement.spacedBy(spacing),
         horizontalAlignment = Alignment.End,
     ) {
-        if (unread) {
-            FeedItemIndicator {
-                Text(stringResource(id = R.string.new_indicator))
-            }
-        }
         if (bookmarked) {
-            FeedItemIndicator {
+            FeedItemIndicator(modifier = Modifier.alpha(0.75f)) {
                 Icon(
                     Icons.Default.Star,
                     contentDescription = stringResource(id = R.string.saved_article),
                     modifier = Modifier.size(iconSize),
                 )
+            }
+        } else if (unread) {
+            FeedItemIndicator(modifier = Modifier.alpha(0.75f)) {
+                Text(stringResource(id = R.string.new_indicator))
             }
         }
     }
