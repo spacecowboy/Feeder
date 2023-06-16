@@ -204,4 +204,18 @@
   <string name="save_article">Save article</string>
   <string name="unsave_article">Stop saving article</string>
   <string name="mark_as_read_on_scroll">Mark as read on scroll</string>
+    <string name="no_feeds">No feeds</string>
+  <string name="zero_feeds">%1$s feeds</string>
+  <string name="one_feed">%1$s feed</string>
+  <string name="two_feeds">%1$s feeds</string>
+  <string name="few_feeds">%1$s feeds</string>
+  <string name="many_feeds">%1$s feeds</string>
+  <string name="other_feeds">%1$s feeds</string>
+  <string name="import_x_feeds_with_y_tags">Import %1$s with %2$s?</string>
+  <string name="zero_tags">%1$s tags</string>
+  <string name="one_tags">%1$s tag</string>
+  <string name="two_tags">%1$s tags</string>
+  <string name="few_tags">%1$s tags</string>
+  <string name="many_tags">%1$s tags</string>
+  <string name="other_tags">%1$s tags</string>
 </resources>

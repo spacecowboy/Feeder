@@ -3,6 +3,7 @@ package com.nononsenseapps.feeder.ui.compose.components
 import android.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -30,7 +31,7 @@ fun OkCancelWithContent(
     onCancel: () -> Unit,
     okEnabled: Boolean,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
@@ -44,6 +45,31 @@ fun OkCancelWithContent(
         Spacer(modifier = Modifier.height(16.dp))
         content()
         Spacer(modifier = Modifier.height(24.dp))
+        OkCancelButtons(
+            modifier = Modifier.padding(bottom = 16.dp),
+            onOk = onOk,
+            onCancel = onCancel,
+            okEnabled = okEnabled,
+        )
+        Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+    }
+}
+
+@Composable
+fun OkCancelWithNonScrollableContent(
+    onOk: () -> Unit,
+    onCancel: () -> Unit,
+    okEnabled: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxWidth(),
+    ) {
+        content()
         OkCancelButtons(
             modifier = Modifier.padding(bottom = 16.dp),
             onOk = onOk,

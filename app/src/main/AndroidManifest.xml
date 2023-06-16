@@ -85,6 +85,29 @@
       </intent-filter>
     </activity>
 
+    <activity android:name=".ui.ImportOMPLFileActivity"
+      android:exported="true"
+      android:excludeFromRecents="true"
+      android:label="@string/import_feeds_from_opml"
+      android:theme="@style/AppThemeDialog"
+      android:parentActivityName=".ui.MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <action android:name="android.intent.action.SEND" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data android:scheme="content" />
+        <data android:host="*" />
+
+        <data android:mimeType="text/xml" />
+        <data android:mimeType="application/xml" />
+        <data android:mimeType="text/x-opml" />
+        <data android:mimeType="application/octet-stream" />
+      </intent-filter>
+    </activity>
+
     <activity
       android:name=".ui.AddFeedFromShareActivity"
       android:exported="true"

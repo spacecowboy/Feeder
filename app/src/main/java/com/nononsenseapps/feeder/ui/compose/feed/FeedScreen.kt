@@ -162,7 +162,7 @@ fun FeedScreen(
 
     val di = LocalDI.current
     val opmlExporter = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/xml"),
+        ActivityResultContracts.CreateDocument("text/x-opml"),
     ) { uri ->
         if (uri != null) {
             val applicationCoroutineScope: ApplicationCoroutineScope by di.instance()
@@ -283,9 +283,13 @@ fun FeedScreen(
             onImport = {
                 opmlImporter.launch(
                     arrayOf(
-                        "text/plain",
+                        // All valid for OPML files
                         "text/xml",
-                        "text/opml",
+                        "text/x-opml",
+                        "application/xml",
+                        // This is the mimetype the file actually gets when exported
+                        "application/octet-stream",
+                        // But just in case a file isn't named right etc, accept all
                         "*/*",
                     ),
                 )

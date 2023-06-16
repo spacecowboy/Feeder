@@ -1,7 +1,7 @@
 package com.nononsenseapps.feeder.model.opml
 
 import com.nononsenseapps.feeder.db.room.Feed
-import com.nononsenseapps.feeder.model.OPMLParserToDatabase
+import com.nononsenseapps.feeder.model.OPMLParserHandler
 import com.nononsenseapps.feeder.util.sloppyLinkToStrictURL
 import java.io.File
 import java.io.IOException
@@ -16,10 +16,10 @@ import org.xml.sax.InputSource
 import org.xml.sax.Locator
 import org.xml.sax.SAXException
 
-class OpmlParser(val opmlToDb: OPMLParserToDatabase) : ContentHandler {
+class OpmlParser(val opmlToDb: OPMLParserHandler) : ContentHandler {
 
     val parser: Parser = Parser()
-    val tagStack: Stack<String> = Stack()
+    private val tagStack: Stack<String> = Stack()
     var isFeedTag = false
     var ignoring = 0
     var feeds: MutableList<Feed> = mutableListOf()

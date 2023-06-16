@@ -8,4 +8,20 @@
     <item quantity="many">@string/many_unread_articles</item>
     <item quantity="other">@string/other_unread_articles</item>
   </plurals>
+  <plurals name="n_feeds">
+    <item quantity="zero">@string/zero_feeds</item>
+    <item quantity="one">@string/one_feed</item>
+    <item quantity="two">@string/two_feeds</item>
+    <item quantity="few">@string/few_feeds</item>
+    <item quantity="many">@string/many_feeds</item>
+    <item quantity="other">@string/other_feeds</item>
+  </plurals>
+  <plurals name="n_tags">
+    <item quantity="zero">@string/zero_tags</item>
+    <item quantity="one">@string/one_tags</item>
+    <item quantity="two">@string/two_tags</item>
+    <item quantity="few">@string/few_tags</item>
+    <item quantity="many">@string/many_tags</item>
+    <item quantity="other">@string/other_tags</item>
+  </plurals>
 </resources>
