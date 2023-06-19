@@ -191,4 +191,18 @@
     <string name="save_article">保存文章</string>
     <string name="unsave_article">停止保存文章</string>
     <string name="mark_as_read_on_scroll">滚动时标记为已读</string>
+    <string name="zero_feeds">%1$s 个订阅源</string>
+    <string name="one_feed">%1$s 个订阅源</string>
+    <string name="two_feeds">%1$s 个订阅源</string>
+    <string name="many_feeds">%1$s 个订阅源</string>
+    <string name="other_feeds">%1$s 个订阅源</string>
+    <string name="zero_tags">%1$s 标签</string>
+    <string name="one_tags">%1$s 标签</string>
+    <string name="two_tags">%1$s 标签</string>
+    <string name="few_tags">%1$s 标签</string>
+    <string name="many_tags">%1$s 标签</string>
+    <string name="other_tags">%1$s 标签</string>
+    <string name="no_feeds">没有订阅源</string>
+    <string name="few_feeds">%1$s 个订阅源</string>
+    <string name="import_x_feeds_with_y_tags">导入 %1$s 个含 %2$s 标签的订阅源？</string>
 </resources>
