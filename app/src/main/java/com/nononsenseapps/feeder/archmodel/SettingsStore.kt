@@ -34,6 +34,13 @@ class SettingsStore(override val di: DI) : DIAware {
     private val sp: SharedPreferences by instance()
     private val blocklistDao: BlocklistDao by instance()
 
+    private val _addedFeederNews = MutableStateFlow(sp.getBoolean(PREF_ADDED_FEEDER_NEWS, false))
+    val addedFeederNews: StateFlow<Boolean> = _addedFeederNews.asStateFlow()
+    fun setAddedFeederNews(value: Boolean) {
+        sp.edit().putBoolean(PREF_ADDED_FEEDER_NEWS, value).apply()
+        _addedFeederNews.value = value
+    }
+
     private val _showOnlyUnread = MutableStateFlow(sp.getBoolean(PREF_SHOW_ONLY_UNREAD, true))
     val showOnlyUnread: StateFlow<Boolean> = _showOnlyUnread.asStateFlow()
     fun setShowOnlyUnread(value: Boolean) {
@@ -382,9 +389,9 @@ const val PREF_WELCOME_DONE = "pref_welcome_done"
 const val PREF_SHOW_ONLY_UNREAD = "pref_show_only_unread"
 
 /**
- * Boolean indicating if only bookmarked items should be shown
+ * Boolean indicating if Feeder News feed has been added or not
  */
-const val PREF_SHOW_ONLY_BOOKMARKED = "pref_show_only_bookmarked"
+const val PREF_ADDED_FEEDER_NEWS = "pref_added_feeder_news"
 
 /**
  * These indicate which fragment to open by default

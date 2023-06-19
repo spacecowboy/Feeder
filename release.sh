@@ -46,7 +46,7 @@ then
 fi
 
 CL="# ${NEXT_VERSION}
-$(git shortlog -w76,2,9 --format='* [%h] %s' "${CURRENT_VERSION}..HEAD")
+$(git shortlog -w76,2,9 --max-parents=1 --format='* [%h] %s' "${CURRENT_VERSION}..HEAD")
 "
 
 tmpfile="$(mktemp)"
@@ -100,3 +100,23 @@ then
 fi
 
 git checkout app/src/main/res fastlane/metadata/android
+
+read -r -p "Post to feed? [y/N] " response
+if [[ "$response" =~ ^[yY]$ ]]
+then
+  scripts/changelog-to-hugo.main.kts  ../feeder-news/content/posts/ "${NEXT_VERSION}"
+  pushd ../feeder-news
+  git add content/posts/
+  git diff --staged
+  git commit -m "Released ${NEXT_VERSION}"
+  popd
+fi
+
+read -r -p "Push the lot? [y/N] " response
+if [[ "$response" =~ ^[yY]$ ]]
+then
+  git push --follow-tags
+  pushd ../feeder-news
+  git push
+  popd
+fi

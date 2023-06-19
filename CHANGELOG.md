@@ -1252,7 +1252,7 @@ bruh (1):
 mm4c (1):
   * [6fe26dc0] Updated Dutch translation using Weblate
 
-# 2.1.0
+# 2.1.0-1
 Jonas Kalderstam (19):
   * [24c0c8fd] Implemented multi device sync
   * [211b1281] Fixed spaces getting replaced by + in feed titles
@@ -1395,13 +1395,6 @@ zmni (1):
 
 Éfrit (1):
   * [5959c512] Updated French translation using Weblate
-
-# 2.1.0-beta.1
-Jonas Kalderstam (1):
-  * [24c0c8fd] Implemented multi device sync
-
-Meiru (1):
-  * [9957d68b] Updated Japanese translation using Weblate
 
 # 2.0.14
 Jonas Kalderstam (1):
