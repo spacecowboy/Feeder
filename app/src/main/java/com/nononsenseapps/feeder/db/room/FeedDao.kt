@@ -126,6 +126,9 @@ interface FeedDao {
     @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds WHERE id IS :feedId")
     suspend fun getFeedTitle(feedId: Long): FeedTitle?
 
+    @Query("SELECT $COL_ID FROM feeds where url is :url")
+    suspend fun getFeedIdForUrl(url: URL): Long?
+
     @Query("SELECT $COL_ID, $COL_TITLE, $COL_CUSTOM_TITLE FROM feeds WHERE id IS :feedId")
     fun getFeedTitlesWithId(feedId: Long): Flow<List<FeedTitle>>
 

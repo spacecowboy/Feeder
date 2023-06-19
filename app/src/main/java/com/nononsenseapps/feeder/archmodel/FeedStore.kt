@@ -1,5 +1,6 @@
 package com.nononsenseapps.feeder.archmodel
 
+import android.database.sqlite.SQLiteConstraintException
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.FeedDao
 import com.nononsenseapps.feeder.db.room.FeedForSettings
@@ -129,8 +130,24 @@ class FeedStore(override val di: DI) : DIAware {
         }
     }
 
-    suspend fun upsertFeed(feedSql: Feed) =
-        feedDao.upsert(feed = feedSql)
+    suspend fun upsertFeed(feedSql: Feed): Long {
+        return try {
+            feedDao.upsert(feed = feedSql)
+        } catch (e: SQLiteConstraintException) {
+            // upsert only works if ID is defined - need to catch constraint errors still
+            if (feedSql.id == ID_UNSET) {
+                val feedId = feedDao.getFeedIdForUrl(feedSql.url)
+
+                if (feedId != null) {
+                    feedDao.upsert(feed = feedSql.copy(id = feedId))
+                } else {
+                    throw e
+                }
+            } else {
+                throw e
+            }
+        }
+    }
 
     suspend fun getFeedsOrderedByUrl(): List<Feed> {
         return feedDao.getFeedsOrderedByUrl()
