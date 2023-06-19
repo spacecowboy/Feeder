@@ -191,4 +191,18 @@
     <string name="saved_article">Zapisany artykuł</string>
     <string name="unsave_article">Usuń z zapisanych</string>
     <string name="mark_as_read_on_scroll">Oznaczaj jako przeczytane podczas przewijania</string>
+    <string name="zero_feeds">%1$s kanałów</string>
+    <string name="two_feeds">%1$s kanały</string>
+    <string name="few_feeds">%1$s kanały</string>
+    <string name="many_feeds">%1$s kanałów</string>
+    <string name="other_feeds">%1$s kanałów</string>
+    <string name="import_x_feeds_with_y_tags">Zaimportować %1$s z %2$s\?</string>
+    <string name="one_tags">%1$s grupą</string>
+    <string name="other_tags">%1$s grupami</string>
+    <string name="no_feeds">Brak kanałów</string>
+    <string name="one_feed">%1$s kanał</string>
+    <string name="few_tags">%1$s grupami</string>
+    <string name="zero_tags">%1$s grupami</string>
+    <string name="two_tags">%1$s grupami</string>
+    <string name="many_tags">%1$s grupami</string>
 </resources>
