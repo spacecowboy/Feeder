@@ -1,3 +1,39 @@
+# 2.4.18
+Agnieszka C (1):
+  * [565de63c] Updated Polish translation using Weblate
+
+Aitor Salaberria (1):
+  * [72cd7fab] Updated Basque translation using Weblate
+
+Dan (1):
+  * [4d7b2ac6] Updated Ukrainian translation using Weblate
+
+ERYpTION (1):
+  * [d81a686b] Updated Danish translation using Weblate
+
+El Pirujo (1):
+  * [f203fdaa] Updated Spanish translation using Weblate
+
+Eric (1):
+  * [31a7aee8] Updated Chinese (Simplified) translation using Weblate
+
+J. Lavoie (1):
+  * [0b71640c] Updated French translation using Weblate
+
+Jonas Kalderstam (4):
+  * [dff22b65] Added ability to open OPML files
+  * [2b0dd5d1] Updated Swedish translation using Weblate
+  * [8a3340d1] Added Feeder News feed for all users. So sorry for modifying
+         everyone's subscriptions! It only happens once for each user. Feel
+         free to delete it if you don't want it.
+  * [06e27ca6] Fixed possible crash when inserting duplicate feeds
+
+WB (1):
+  * [d4ad5623] Updated Galician translation using Weblate
+
+Wolfgang (1):
+  * [4fcf1af2] Updated German translation using Weblate
+
 # 2.4.17
 Jonas Kalderstam (10):
   * [71835f81] Fixed possible crash during article parsing
