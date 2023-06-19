@@ -128,7 +128,7 @@
     <string name="secret_key">Chave secreta</string>
     <string name="swipe_to_mark_as_read">Deslice para marcar como lido</string>
     <string name="no_barcode_scanner_installed">O código de barras non se puído encontrar</string>
-  <string name="navigation_drawer_open">Abrir caixón de navegación</string>
+    <string name="navigation_drawer_open">Abrir caixón de navegación</string>
     <string name="title">Título</string>
     <string name="empty_feed_add"><annotation style="link">Engadir</annotation> máis canles\?</string>
     <string name="open_in_browser">Abrir no navegador</string>
@@ -170,7 +170,7 @@
     <string name="only_from_end">Só dende o final</string>
     <string name="are_you_sure_leave_sync_chain">Está seguro de querer abandonar a cadea de sincronización\?</string>
     <string name="open_enclosed_media">Abrir audiovisuales incluídos</string>
-  <string name="permission_read_desc">Permirtir á aplicación ler fontes e artigos</string>
+    <string name="permission_read_desc">Permirtir á aplicación ler fontes e artigos</string>
     <string name="permission_read_label">Acceso de só lectura</string>
     <string name="skip_to_next">Saltar ao seguinte</string>
     <string name="use_detect_language">Detectar lingua</string>
@@ -179,11 +179,16 @@
     <string name="text_to_speech">Texto a voz</string>
     <string name="set_language">Estabelecer lingua</string>
     <string name="dynamic_theme_use">Cores dinámicos</string>
-  <string name="new_indicator">Novo</string>
+    <string name="new_indicator">Novo</string>
     <string name="explanation_permission_notifications">Debe concederse o permiso antes de que se poidan activalas notificacións.</string>
     <string name="feed_icon">Icona da canle</string>
     <string name="article_image">Imaxe do artigo</string>
     <string name="block_list_description">Ocultalos artigos con títulos que conteñan algún destes filtros. Filtros de exemplo:</string>
     <string name="text_scale">Escala do texto</string>
     <string name="sync_to_fetch">Sincronizar para recuperalo artigo</string>
+    <string name="mark_as_read_on_scroll">Marcar como lido ao desprazar</string>
+    <string name="saved_articles">Artigos gardados</string>
+    <string name="saved_article">Artigo gardado</string>
+    <string name="save_article">Gardar artigo</string>
+    <string name="unsave_article">Deixar de gardar artigo</string>
 </resources>
