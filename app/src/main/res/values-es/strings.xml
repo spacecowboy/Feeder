@@ -191,4 +191,18 @@
     <string name="saved_articles">Artículos guardados</string>
     <string name="saved_article">Artículo guardado</string>
     <string name="mark_as_read_on_scroll">Marcar como leído al desplazar</string>
+    <string name="zero_feeds">%1$s canales</string>
+    <string name="other_feeds">%1$s canales</string>
+    <string name="import_x_feeds_with_y_tags">¿Importar %1$s con %2$s\?</string>
+    <string name="zero_tags">%1$s etiquetas</string>
+    <string name="one_tags">%1$s etiqueta</string>
+    <string name="other_tags">%1$s etiquetas</string>
+    <string name="few_tags">%1$s etiquetas</string>
+    <string name="no_feeds">Sin canales</string>
+    <string name="one_feed">%1$s canal</string>
+    <string name="two_feeds">%1$s canales</string>
+    <string name="few_feeds">%1$s canales</string>
+    <string name="many_feeds">%1$s canales</string>
+    <string name="two_tags">%1$s etiquetas</string>
+    <string name="many_tags">%1$s etiquetas</string>
 </resources>
