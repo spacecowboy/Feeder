@@ -6,6 +6,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.nononsenseapps.feeder.ApplicationCoroutineScope
 import com.nononsenseapps.feeder.FeederApplication
+import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.db.room.ID_ALL_FEEDS
 import com.nononsenseapps.feeder.db.room.ID_SAVED_ARTICLES
 import com.nononsenseapps.feeder.db.room.ID_UNSET
@@ -87,6 +88,43 @@ class RepositoryTest : DIAware {
 
         every { settingsStore.syncOnlyWhenCharging } returns MutableStateFlow(false)
         every { settingsStore.syncOnlyOnWifi } returns MutableStateFlow(false)
+        every { settingsStore.addedFeederNews } returns MutableStateFlow(true)
+    }
+
+    @Test
+    fun initialStartWillAddFeederNews() {
+        every { settingsStore.addedFeederNews } returns MutableStateFlow(false)
+
+        // Construct it
+        repository
+
+        coVerify(timeout = 500L, exactly = 1) {
+            settingsStore.addedFeederNews
+            feedStore.upsertFeed(
+                Feed(
+                    title = "Feeder News",
+                    url = URL("https://news.nononsenseapps.com/index.atom"),
+                ),
+            )
+            settingsStore.setAddedFeederNews(true)
+        }
+    }
+
+    @Test
+    fun secondStartWillNotAddFeederNews() {
+        every { settingsStore.addedFeederNews } returns MutableStateFlow(true)
+
+        // Construct it
+        repository
+
+        coVerify(timeout = 500L, exactly = 0) {
+            feedStore.upsertFeed(
+                Feed(
+                    title = "Feeder News",
+                    url = URL("https://news.nononsenseapps.com/index.atom"),
+                ),
+            )
+        }
     }
 
     @Test
@@ -276,7 +314,9 @@ class RepositoryTest : DIAware {
 
     @Test
     fun getFeedsItemsWithDefaultFullTextParse() {
-        coEvery { feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload() } returns flowOf(emptyList())
+        coEvery { feedItemStore.getFeedsItemsWithDefaultFullTextNeedingDownload() } returns flowOf(
+            emptyList(),
+        )
 
         val result = runBlocking {
             repository.getFeedsItemsWithDefaultFullTextNeedingDownload().first()

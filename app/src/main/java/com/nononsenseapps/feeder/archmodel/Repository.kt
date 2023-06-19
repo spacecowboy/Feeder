@@ -24,6 +24,7 @@ import com.nononsenseapps.feeder.db.room.RemoteFeed
 import com.nononsenseapps.feeder.db.room.SyncDevice
 import com.nononsenseapps.feeder.db.room.SyncRemote
 import com.nononsenseapps.feeder.model.workmanager.SyncServiceSendReadWorker
+import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.sync.SyncRestClient
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
@@ -59,6 +60,28 @@ class Repository(override val di: DI) : DIAware {
     private val syncRemoteStore: SyncRemoteStore by instance()
     private val syncClient: SyncRestClient by instance()
     private val workManager: WorkManager by instance()
+
+    init {
+        addFeederNewsIfInitialStart()
+    }
+
+    private fun addFeederNewsIfInitialStart() {
+        if (!settingsStore.addedFeederNews.value) {
+            applicationCoroutineScope.launch {
+                val feedId = feedStore.upsertFeed(
+                    Feed(
+                        title = "Feeder News",
+                        url = URL("https://news.nononsenseapps.com/index.atom"),
+                    ),
+                )
+                settingsStore.setAddedFeederNews(true)
+                requestFeedSync(
+                    di = di,
+                    feedId = feedId,
+                )
+            }
+        }
+    }
 
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
