@@ -190,4 +190,5 @@
     <string name="unsave_article">Ne plus sauvegarder l\'article</string>
     <string name="saved_article">Article sauvegardé</string>
     <string name="save_article">Sauvegarder l\'article</string>
+    <string name="mark_as_read_on_scroll">Marquer comme lu en défilant</string>
 </resources>
