@@ -191,4 +191,18 @@
     <string name="saved_article">Gemt artikel</string>
     <string name="save_article">Gem artikel</string>
     <string name="mark_as_read_on_scroll">Markér som læst, når der scrolles</string>
+    <string name="zero_feeds">%1$s feeds</string>
+    <string name="one_feed">%1$s feed</string>
+    <string name="few_feeds">%1$s feeds</string>
+    <string name="many_feeds">%1$s feeds</string>
+    <string name="other_feeds">%1$s feeds</string>
+    <string name="zero_tags">%1$s etiketter</string>
+    <string name="one_tags">%1$s etiket</string>
+    <string name="two_tags">%1$s etiketter</string>
+    <string name="few_tags">%1$s etiketter</string>
+    <string name="other_tags">%1$s etiketter</string>
+    <string name="two_feeds">%1$s feeds</string>
+    <string name="no_feeds">Ingen feeds</string>
+    <string name="import_x_feeds_with_y_tags">Importér %1$s med %2$s\?</string>
+    <string name="many_tags">%1$s etiketter</string>
 </resources>
