@@ -28,7 +28,7 @@
     <string name="no_tag">Keine Gruppe</string>
     <string name="notify_for_new_items">Benachrichtigungen einschalten</string>
     <string name="dont_notify_for_new_items">Benachrichtigungen ausschalten</string>
-    <string name="toggle_read_status">Lesestatus verändern</string>
+    <string name="toggle_read_status">Lesestatus umschalten</string>
     <string name="open_link_in_browser">Link im Webbrowser öffnen</string>
     <string name="open_in_browser">Im Webbrowser öffnen</string>
     <string name="open_enclosed_media">Öffne eingebettete Medien</string>
@@ -92,7 +92,7 @@
     <string name="mark_items_above_as_read">Obere als gelesen markieren</string>
     <string name="mark_items_below_as_read">Untere als gelesen markieren</string>
     <string name="discovered_feeds_list">Liste der entdeckten Feeds</string>
-    <string name="toggle_tag_expansion">Gruppe-Erweiterung ein-/ausschalten</string>
+    <string name="toggle_tag_expansion">Gruppe-Erweiterung umschalten</string>
     <string name="battery_optimization">Akkuoptimierung</string>
     <string name="battery_optimization_disabled">Aus</string>
     <string name="battery_optimization_enabled">Ein</string>
