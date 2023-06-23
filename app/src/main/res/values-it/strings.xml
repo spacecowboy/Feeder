@@ -191,4 +191,18 @@
     <string name="save_article">Salva l\'articolo</string>
     <string name="unsave_article">Smetti di salvare l\'articolo</string>
     <string name="mark_as_read_on_scroll">Segna come letto quando scorri</string>
+    <string name="no_feeds">Nessun feed</string>
+    <string name="zero_feeds">%1$s feed</string>
+    <string name="one_feed">%1$s feed</string>
+    <string name="two_feeds">%1$s feed</string>
+    <string name="few_feeds">%1$s feed</string>
+    <string name="other_feeds">%1$s feed</string>
+    <string name="import_x_feeds_with_y_tags">Importare %1$s con %2$s\?</string>
+    <string name="zero_tags">%1$s etichette</string>
+    <string name="one_tags">%1$s etichetta</string>
+    <string name="two_tags">%1$s etichette</string>
+    <string name="few_tags">%1$s etichette</string>
+    <string name="other_tags">%1$s etichette</string>
+    <string name="many_feeds">%1$s feed</string>
+    <string name="many_tags">%1$s etichette</string>
 </resources>
