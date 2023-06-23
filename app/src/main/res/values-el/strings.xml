@@ -190,4 +190,19 @@
     <string name="unsave_article">Σταματήστε την αποθήκευση του άρθρου</string>
     <string name="saved_articles">Αποθηκευμένα άρθρα</string>
     <string name="saved_article">Αποθηκευμένο άρθρο</string>
+    <string name="no_feeds">Δεν υπάρχουν ροές</string>
+    <string name="zero_feeds">%1$s ροές</string>
+    <string name="one_feed">%1$s ροή</string>
+    <string name="other_feeds">%1$s ροές</string>
+    <string name="import_x_feeds_with_y_tags">Εισαγωγή %1$s με %2$s;</string>
+    <string name="one_tags">%1$s ετικέτα</string>
+    <string name="many_tags">%1$s ετικέτες</string>
+    <string name="many_feeds">%1$s ροές</string>
+    <string name="few_feeds">%1$s ροές</string>
+    <string name="two_feeds">%1$s ροές</string>
+    <string name="zero_tags">%1$s ετικέτες</string>
+    <string name="two_tags">%1$s ετικέτες</string>
+    <string name="few_tags">%1$s ετικέτες</string>
+    <string name="other_tags">%1$s ετικέτες</string>
+    <string name="mark_as_read_on_scroll">Επισήμανση ως αναγνωσμένου κατά την κύλιση</string>
 </resources>
