@@ -66,7 +66,7 @@
     <string name="block_list">รายการที่ถูกบล็อก</string>
     <string name="add_item">เพื่มรายการใหม่</string>
     <string name="no_barcode_scanner_installed">ไม่พบแอปสแกนบาร์โค้ด</string>
-  <string name="disconnect_device_from_sync">ตัดการเชื่อมต่อจากกลุ่มการซิงค์</string>
+    <string name="disconnect_device_from_sync">ตัดการเชื่อมต่อจากกลุ่มการซิงค์</string>
     <string name="devices_on_sync_chain">อุปกรณ์บนกลุ่มการซิงค์</string>
     <string name="open_item_by_default_with">เปิดรายการโดยเรื่มต้นด้วย</string>
     <string name="use_app_default">ใช้แอปเรื่มต้น</string>
@@ -89,7 +89,7 @@
     <string name="include_mobile_hotspots">รวมฮอตสปอตจากมือถือด้วย</string>
     <string name="updated_feeds">อัปเดตฟีดแล้ว</string>
     <string name="two_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
-  <string name="open_in_default_browser">เว็บเบราว์เซอร์เรื่มต้น</string>
+    <string name="open_in_default_browser">เว็บเบราว์เซอร์เรื่มต้น</string>
     <string name="dark_theme_preference_black">ดำสนิท</string>
     <string name="dark_theme_preference_dark">มืด</string>
     <string name="sort_oldest_first">รายการเก่าที่สุดก่อน</string>
@@ -98,10 +98,10 @@
     <string name="failed_to_fetch_full_article">ดึงข้อมูลบทความเต็มไม่ได้</string>
     <string name="battery_optimization_enabled">เปิด</string>
     <string name="already_read">อ่านไปแล้ว</string>
-  <string name="many_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
+    <string name="many_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
     <string name="other_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
     <string name="synchronize_feeds">ซิงค์ฟีด</string>
-  <string name="few_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
+    <string name="few_unread_articles">%1$s บทความที่ยังไม่ได้อ่าน</string>
     <string name="feed_item_style">รูปแบบบทความ</string>
     <string name="feed_item_style_card">การ์ด</string>
     <string name="this_device">%1$s (อุปกรณ์นี้)</string>
@@ -114,7 +114,7 @@
     <string name="are_you_sure_leave_sync_chain">แน่ใจนะว่าจะออกจากกลุ่มการซิงค์\?</string>
     <string name="permission_read_desc">อนุญาตให้แอปอ่านฟีดและบทความ</string>
     <string name="article_image">รูปภาพบทความ</string>
-  <string name="sync_code">รหัสการซิงค์</string>
+    <string name="sync_code">รหัสการซิงค์</string>
     <string name="indicator_for_mark_as_read">ตัวบอกเครื่องหมายว่าอ่านแล้ว</string>
     <string name="notification_channel_name">ฟีดที่ยังไม่ได้อ่าน</string>
     <string name="sync_status">สถานะการซิงค์</string>
@@ -175,7 +175,7 @@
     <string name="only_from_end">เฉพาะจากช่วงสุดท้าย</string>
     <string name="from_anywhere">จากที่ไหนก็ได้</string>
     <string name="swipe_to_mark_as_read">ปัดเพื่อทำเครื่องหมายว่าอ่านแล้ว</string>
-  <string name="new_indicator">ใหม่</string>
+    <string name="new_indicator">ใหม่</string>
     <string name="explanation_permission_notifications">ต้องให้อนุญาตสิทธิ์ก่อนที่จะเปิดสามารถเปิดการแจ้งเตือนได้</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="text_scale">ขนาดข้อความ</string>
@@ -184,4 +184,23 @@
     <string name="expanded_tag">เปิดแท็ก</string>
     <string name="contracted_tag">ปิดแท็ก</string>
     <string name="toggle_tag_expansion">สลับเลือกส่วนขยายแท็ก</string>
+    <string name="no_feeds">ไม่มีฟีด</string>
+    <string name="zero_feeds">%1$s ฟีด</string>
+    <string name="one_feed">%1$s ฟีด</string>
+    <string name="many_feeds">%1$s ฟีด</string>
+    <string name="import_x_feeds_with_y_tags">นำเข้า %1$s ด้วย %2$s\?</string>
+    <string name="two_tags">%1$s แท็ก</string>
+    <string name="saved_articles">บทความที่บันทึกแล้ว</string>
+    <string name="saved_article">บันทึกบทความแล้ว</string>
+    <string name="few_feeds">%1$s ฟีด</string>
+    <string name="save_article">บันทึกบทความ</string>
+    <string name="mark_as_read_on_scroll">ทำเครื่องหมายว่าอ่านแล้วเมื่อเลื่อนผ่าน</string>
+    <string name="unsave_article">หยุดบันทึกบทความ</string>
+    <string name="two_feeds">%1$s ฟีด</string>
+    <string name="other_feeds">%1$s ฟีด</string>
+    <string name="one_tags">%1$s แท็ก</string>
+    <string name="few_tags">%1$s แท็ก</string>
+    <string name="other_tags">%1$s แท็ก</string>
+    <string name="zero_tags">%1$s แท็ก</string>
+    <string name="many_tags">%1$s แท็ก</string>
 </resources>
