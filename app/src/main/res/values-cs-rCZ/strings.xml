@@ -191,4 +191,17 @@
     <string name="save_article">Uložit článek</string>
     <string name="unsave_article">Přestat ukládat článek</string>
     <string name="mark_as_read_on_scroll">Označit jako přečtené při posouvání</string>
+    <string name="no_feeds">Žádné kanály</string>
+    <string name="zero_feeds">%1$s kanálů</string>
+    <string name="one_feed">%1$s kanál</string>
+    <string name="two_feeds">%1$s kanály</string>
+    <string name="one_tags">%1$s tag</string>
+    <string name="zero_tags">%1$s tagů</string>
+    <string name="two_tags">%1$s tagy</string>
+    <string name="few_tags">%1$s tagů</string>
+    <string name="many_tags">%1$s tagů</string>
+    <string name="other_tags">%1$s tagů</string>
+    <string name="few_feeds">%1$s kanálů</string>
+    <string name="many_feeds">%1$s kanálů</string>
+    <string name="other_feeds">%1$s kanálů</string>
 </resources>
