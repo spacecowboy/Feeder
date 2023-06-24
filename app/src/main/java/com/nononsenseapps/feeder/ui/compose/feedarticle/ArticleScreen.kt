@@ -62,9 +62,6 @@ import com.nononsenseapps.feeder.model.LocaleOverride
 import com.nononsenseapps.feeder.ui.compose.icons.CustomFilled
 import com.nononsenseapps.feeder.ui.compose.icons.TextToSpeech
 import com.nononsenseapps.feeder.ui.compose.readaloud.HideableTTSPlayer
-import com.nononsenseapps.feeder.ui.compose.reader.ReaderView
-import com.nononsenseapps.feeder.ui.compose.reader.dateTimeFormat
-import com.nononsenseapps.feeder.ui.compose.reader.onLinkClick
 import com.nononsenseapps.feeder.ui.compose.text.htmlFormattedText
 import com.nononsenseapps.feeder.ui.compose.theme.SensibleTopAppBar
 import com.nononsenseapps.feeder.ui.compose.theme.SetStatusBarColorToMatchScrollableTopAppBar
@@ -428,6 +425,7 @@ fun ArticleContent(
                                 htmlFormattedText(
                                     inputStream = it,
                                     baseUrl = viewState.articleFeedUrl ?: "",
+                                    keyHolder = viewState.keyHolder,
                                 ) { link ->
                                     onLinkClick(
                                         link = link,
@@ -474,6 +472,7 @@ fun ArticleContent(
                                 htmlFormattedText(
                                     inputStream = it,
                                     baseUrl = viewState.articleFeedUrl ?: "",
+                                    keyHolder = viewState.keyHolder,
                                 ) { link ->
                                     onLinkClick(
                                         link = link,

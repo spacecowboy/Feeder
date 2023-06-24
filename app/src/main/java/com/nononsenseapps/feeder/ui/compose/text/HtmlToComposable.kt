@@ -61,6 +61,7 @@ import coil.size.Precision
 import coil.size.Scale
 import com.nononsenseapps.feeder.R
 import com.nononsenseapps.feeder.ui.compose.coil.rememberTintedVectorPainter
+import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleItemKeyHolder
 import com.nononsenseapps.feeder.ui.compose.theme.BlockQuoteStyle
 import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockBackground
 import com.nononsenseapps.feeder.ui.compose.theme.CodeBlockStyle
@@ -75,6 +76,7 @@ import com.nononsenseapps.feeder.ui.text.getVideo
 import java.io.InputStream
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.random.Random
 import org.jsoup.Jsoup
 import org.jsoup.helper.StringUtil
 import org.jsoup.nodes.Element
@@ -84,6 +86,7 @@ import org.jsoup.nodes.TextNode
 private const val LOG_TAG = "FEEDER_HTMLTOCOM"
 
 fun LazyListScope.htmlFormattedText(
+    keyHolder: ArticleItemKeyHolder,
     inputStream: InputStream,
     baseUrl: String,
     onLinkClick: (String) -> Unit,
@@ -95,6 +98,7 @@ fun LazyListScope.htmlFormattedText(
                 formatBody(
                     element = body,
                     baseUrl = baseUrl,
+                    keyHolder = keyHolder,
                     onLinkClick = onLinkClick,
                 )
             }
@@ -153,9 +157,10 @@ private fun ParagraphText(
 private fun LazyListScope.formatBody(
     element: Element,
     baseUrl: String,
+    keyHolder: ArticleItemKeyHolder,
     onLinkClick: (String) -> Unit,
 ) {
-    val composer = LazyListComposer(this) { paragraphBuilder, textStyler ->
+    val composer = LazyListComposer(this, keyHolder = keyHolder) { paragraphBuilder, textStyler ->
         val dimens = LocalDimens.current
         ParagraphText(
             paragraphBuilder = paragraphBuilder,
@@ -170,6 +175,7 @@ private fun LazyListScope.formatBody(
         element.childNodes(),
         baseUrl = baseUrl,
         onLinkClick = onLinkClick,
+        keyHolder = keyHolder,
     )
 
     composer.emitParagraph()
@@ -179,6 +185,7 @@ private fun HtmlComposer.appendTextChildren(
     nodes: List<Node>,
     preFormatted: Boolean = false,
     baseUrl: String,
+    keyHolder: ArticleItemKeyHolder,
     onLinkClick: (String) -> Unit,
 ) {
     var node = nodes.firstOrNull()
@@ -206,6 +213,7 @@ private fun HtmlComposer.appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                                 onLinkClick = onLinkClick,
+                                keyHolder = keyHolder,
                             )
                         } else {
                             withParagraph {
@@ -213,6 +221,7 @@ private fun HtmlComposer.appendTextChildren(
                                     element.childNodes(),
                                     baseUrl = baseUrl,
                                     onLinkClick = onLinkClick,
+                                    keyHolder = keyHolder,
                                 )
                             }
                         }
@@ -303,6 +312,7 @@ private fun HtmlComposer.appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                                 onLinkClick = onLinkClick,
+                                keyHolder = keyHolder,
                             )
                         }
                     }
@@ -313,6 +323,7 @@ private fun HtmlComposer.appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                                 onLinkClick = onLinkClick,
+                                keyHolder = keyHolder,
                             )
                         }
                     }
@@ -323,6 +334,7 @@ private fun HtmlComposer.appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                                 onLinkClick = onLinkClick,
+                                keyHolder = keyHolder,
                             )
                         }
                     }
@@ -333,6 +345,7 @@ private fun HtmlComposer.appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                                 onLinkClick = onLinkClick,
+                                keyHolder = keyHolder,
                             )
                         }
                     }
@@ -343,6 +356,7 @@ private fun HtmlComposer.appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                                 onLinkClick = onLinkClick,
+                                keyHolder = keyHolder,
                             )
                         }
                     }
@@ -353,6 +367,7 @@ private fun HtmlComposer.appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                                 onLinkClick = onLinkClick,
+                                keyHolder = keyHolder,
                             )
                         }
                     }
@@ -364,6 +379,7 @@ private fun HtmlComposer.appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                                 onLinkClick = onLinkClick,
+                                keyHolder = keyHolder,
                             )
                         }
                     }
@@ -374,6 +390,7 @@ private fun HtmlComposer.appendTextChildren(
                             preFormatted = true,
                             baseUrl = baseUrl,
                             onLinkClick = onLinkClick,
+                            keyHolder = keyHolder,
                         )
                     }
 
@@ -414,12 +431,13 @@ private fun HtmlComposer.appendTextChildren(
                                     }
 
                                     with(composer) {
-                                        item {
+                                        item(keyHolder) {
                                             appendTextChildren(
                                                 element.childNodes(),
                                                 preFormatted = true,
                                                 baseUrl = baseUrl,
                                                 onLinkClick = onLinkClick,
+                                                keyHolder = keyHolder,
                                             )
                                             emitParagraph()
                                             render()
@@ -435,6 +453,7 @@ private fun HtmlComposer.appendTextChildren(
                                         preFormatted = true,
                                         baseUrl = baseUrl,
                                         onLinkClick = onLinkClick,
+                                        keyHolder = keyHolder,
                                     )
                                     emitParagraph()
                                 }
@@ -449,6 +468,7 @@ private fun HtmlComposer.appendTextChildren(
                                     preFormatted = preFormatted,
                                     baseUrl = baseUrl,
                                     onLinkClick = onLinkClick,
+                                    keyHolder = keyHolder,
                                 )
                             }
                         }
@@ -463,6 +483,7 @@ private fun HtmlComposer.appendTextChildren(
                                     element.childNodes(),
                                     baseUrl = baseUrl,
                                     onLinkClick = onLinkClick,
+                                    keyHolder = keyHolder,
                                 )
                             }
                         }
@@ -477,6 +498,7 @@ private fun HtmlComposer.appendTextChildren(
                                     element.childNodes(),
                                     baseUrl = baseUrl,
                                     onLinkClick = onLinkClick,
+                                    keyHolder = keyHolder,
                                 )
                             }
                         }
@@ -501,7 +523,7 @@ private fun HtmlComposer.appendTextChildren(
                                     )
                                 }
 
-                                item {
+                                item(keyHolder) {
                                     with(composer) {
                                         val dimens = LocalDimens.current
                                         Column(
@@ -514,6 +536,7 @@ private fun HtmlComposer.appendTextChildren(
                                                     element.childNodes(),
                                                     baseUrl = baseUrl,
                                                     onLinkClick = onLinkClick,
+                                                    keyHolder = keyHolder,
                                                 )
                                             }
                                             render()
@@ -526,6 +549,7 @@ private fun HtmlComposer.appendTextChildren(
                                 element.childNodes(),
                                 baseUrl = baseUrl,
                                 onLinkClick = onLinkClick,
+                                keyHolder = keyHolder,
                             )
                         }
                     }
@@ -558,6 +582,7 @@ private fun HtmlComposer.appendTextChildren(
                                         listItem.childNodes(),
                                         baseUrl = baseUrl,
                                         onLinkClick = onLinkClick,
+                                        keyHolder = keyHolder,
                                     )
                                 }
                             }
@@ -574,6 +599,7 @@ private fun HtmlComposer.appendTextChildren(
                                         listItem.childNodes(),
                                         baseUrl = baseUrl,
                                         onLinkClick = onLinkClick,
+                                        keyHolder = keyHolder,
                                     )
                                 }
                             }
@@ -583,6 +609,7 @@ private fun HtmlComposer.appendTextChildren(
                         if (this is LazyListComposer) {
                             appendTable(
                                 baseUrl = baseUrl,
+                                keyHolder = keyHolder,
                                 onLinkClick = onLinkClick,
                                 element = element,
                             )
@@ -639,12 +666,16 @@ private fun HtmlComposer.appendTextChildren(
                                             TextStyle(color = MaterialTheme.colorScheme.onBackground),
                                         ),
                                     ) {
-                                        val interactionSource = remember { MutableInteractionSource() }
+                                        val interactionSource =
+                                            remember { MutableInteractionSource() }
                                         Text(
                                             text = stringResource(R.string.touch_to_play_video),
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .indication(interactionSource, LocalIndication.current)
+                                                .indication(
+                                                    interactionSource,
+                                                    LocalIndication.current,
+                                                )
                                                 .focusableInNonTouchMode(interactionSource = interactionSource),
                                         )
                                     }
@@ -668,6 +699,7 @@ private fun HtmlComposer.appendTextChildren(
                             preFormatted = preFormatted,
                             baseUrl = baseUrl,
                             onLinkClick = onLinkClick,
+                            keyHolder = keyHolder,
                         )
                     }
                 }
@@ -798,6 +830,7 @@ private fun ColumnScope.renderImage(
 
 private fun LazyListComposer.appendTable(
     baseUrl: String,
+    keyHolder: ArticleItemKeyHolder,
     onLinkClick: (String) -> Unit,
     element: Element,
 ) {
@@ -806,9 +839,14 @@ private fun LazyListComposer.appendTable(
     val imgDescendant = element.hasDescendant("img")
 
     if (imgDescendant) {
-        appendTextChildren(element.childNodes(), baseUrl = baseUrl, onLinkClick = onLinkClick)
+        appendTextChildren(
+            element.childNodes(),
+            baseUrl = baseUrl,
+            onLinkClick = onLinkClick,
+            keyHolder = keyHolder,
+        )
     } else {
-        item {
+        item(keyHolder) {
             val composer = EagerComposer { paragraphBuilder, textStyler ->
                 ParagraphText(
                     paragraphBuilder = paragraphBuilder,
@@ -818,7 +856,12 @@ private fun LazyListComposer.appendTable(
                 )
             }
             with(composer) {
-                tableColFirst(baseUrl = baseUrl, onLinkClick = onLinkClick, element = element)
+                tableColFirst(
+                    baseUrl = baseUrl,
+                    onLinkClick = onLinkClick,
+                    element = element,
+                    keyHolder = keyHolder,
+                )
             }
         }
     }
@@ -828,6 +871,7 @@ private fun LazyListComposer.appendTable(
 private fun EagerComposer.tableColFirst(
     baseUrl: String,
     onLinkClick: (String) -> Unit,
+    keyHolder: ArticleItemKeyHolder,
     element: Element,
 ) {
     val rowCount by remember {
@@ -871,6 +915,7 @@ private fun EagerComposer.tableColFirst(
                             it.childNodes(),
                             baseUrl = baseUrl,
                             onLinkClick = onLinkClick,
+                            keyHolder = keyHolder,
                         )
                     }
                     render()
@@ -946,6 +991,7 @@ private fun EagerComposer.tableColFirst(
                                                     colElement.childNodes(),
                                                     baseUrl = baseUrl,
                                                     onLinkClick = onLinkClick,
+                                                    keyHolder = keyHolder,
                                                 )
                                             }
                                         }
@@ -1067,6 +1113,11 @@ private fun TestIt() {
             htmlFormattedText(
                 inputStream = stream,
                 baseUrl = "https://cowboyprogrammer.org",
+                keyHolder = object : ArticleItemKeyHolder {
+                    override fun getAndIncrementKey(): Long {
+                        return Random.nextLong()
+                    }
+                },
             ) {}
         }
     }

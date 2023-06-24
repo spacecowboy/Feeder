@@ -1,4 +1,4 @@
-package com.nononsenseapps.feeder.ui.compose.reader
+package com.nononsenseapps.feeder.ui.compose.feedarticle
 
 import android.content.Context
 import android.util.Log
