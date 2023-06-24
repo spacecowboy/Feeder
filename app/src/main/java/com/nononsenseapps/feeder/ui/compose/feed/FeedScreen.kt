@@ -38,20 +38,20 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.IconToggleButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -86,8 +86,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -244,11 +242,17 @@ fun FeedScreen(
             onToggleOnlyUnread = { value ->
                 viewModel.setShowOnlyUnread(value)
             },
+            onToggleOnlyBookmarks = { value ->
+                viewModel.setShowOnlyBookmarks(value)
+            },
             onMarkAllAsRead = {
                 viewModel.markAllAsRead()
             },
             onShowToolbarMenu = { visible ->
                 viewModel.setToolbarMenuVisible(visible)
+            },
+            onShowFilterMenu = { visible ->
+                viewModel.setFilterMenuVisible(visible)
             },
             ttsOnPlay = viewModel::ttsPlay,
             ttsOnPause = viewModel::ttsPause,
@@ -340,8 +344,10 @@ fun FeedScreen(
     onRefreshVisible: () -> Unit,
     onRefreshAll: () -> Unit,
     onToggleOnlyUnread: (Boolean) -> Unit,
+    onToggleOnlyBookmarks: (Boolean) -> Unit,
     onMarkAllAsRead: () -> Unit,
     onShowToolbarMenu: (Boolean) -> Unit,
+    onShowFilterMenu: (Boolean) -> Unit,
     ttsOnPlay: () -> Unit,
     ttsOnPause: () -> Unit,
     ttsOnStop: () -> Unit,
@@ -369,12 +375,6 @@ fun FeedScreen(
     pagedFeedItems: LazyPagingItems<FeedListItem>,
     modifier: Modifier = Modifier,
 ) {
-    val showingUnreadStateLabel = if (viewState.onlyUnread) {
-        stringResource(R.string.showing_only_unread_articles)
-    } else {
-        stringResource(R.string.showing_all_articles)
-    }
-
     val coroutineScope = rememberCoroutineScope()
 
     FeedScreen(
@@ -402,25 +402,59 @@ fun FeedScreen(
         onEditFeed = onEditFeed,
         toolbarActions = {
             if (viewState.currentFeedOrTag.isNotSavedArticles) {
-                PlainTooltipBox(tooltip = { Text(showingUnreadStateLabel) }) {
-                    IconToggleButton(
-                        checked = viewState.onlyUnread,
-                        onCheckedChange = onToggleOnlyUnread,
-                        modifier = Modifier
-                            .tooltipAnchor()
-                            .semantics {
-                                stateDescription = showingUnreadStateLabel
-                            },
-                    ) {
-                        if (viewState.onlyUnread) {
+                PlainTooltipBox(tooltip = { Text(stringResource(id = R.string.filter)) }) {
+                    Box {
+                        IconButton(
+                            onClick = { onShowFilterMenu(true) },
+                            modifier = Modifier.tooltipAnchor(),
+                        ) {
                             Icon(
-                                Icons.Default.VisibilityOff,
-                                contentDescription = null,
+                                Icons.Default.FilterList,
+                                contentDescription = stringResource(R.string.filter),
                             )
-                        } else {
-                            Icon(
-                                Icons.Default.Visibility,
-                                contentDescription = null,
+                        }
+                        DropdownMenu(
+                            expanded = viewState.showFilterMenu,
+                            onDismissRequest = { onShowFilterMenu(false) },
+                            modifier = Modifier.onKeyEventLikeEscape {
+                                onShowFilterMenu(false)
+                            },
+                        ) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    onToggleOnlyUnread(!viewState.onlyUnread)
+                                    onShowFilterMenu(false)
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        when (viewState.onlyUnread) {
+                                            true -> Icons.Default.CheckBox
+                                            false -> Icons.Default.CheckBoxOutlineBlank
+                                        },
+                                        contentDescription = null,
+                                    )
+                                },
+                                text = {
+                                    Text(stringResource(id = R.string.only_unread_articles))
+                                },
+                            )
+                            DropdownMenuItem(
+                                onClick = {
+                                    onToggleOnlyBookmarks(!viewState.onlyBookmarks)
+                                    onShowFilterMenu(false)
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        when (viewState.onlyBookmarks) {
+                                            true -> Icons.Default.CheckBox
+                                            false -> Icons.Default.CheckBoxOutlineBlank
+                                        },
+                                        contentDescription = null,
+                                    )
+                                },
+                                text = {
+                                    Text(stringResource(id = R.string.only_saved_articles))
+                                },
                             )
                         }
                     }

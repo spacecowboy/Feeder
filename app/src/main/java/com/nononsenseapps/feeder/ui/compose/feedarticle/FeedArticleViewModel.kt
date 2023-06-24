@@ -33,6 +33,7 @@ import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.feed.FeedListItem
 import com.nononsenseapps.feeder.ui.compose.feed.FeedOrTag
 import com.nononsenseapps.feeder.ui.compose.feed.isNotSavedArticles
+import com.nononsenseapps.feeder.ui.compose.feed.isSavedArticles
 import com.nononsenseapps.feeder.ui.compose.navdrawer.DrawerItemWithUnreadCount
 import com.nononsenseapps.feeder.ui.compose.text.htmlToAnnotatedString
 import com.nononsenseapps.feeder.util.FilePathProvider
@@ -98,6 +99,10 @@ class FeedArticleViewModel(
         repository.setShowOnlyUnread(value)
     }
 
+    fun setShowOnlyBookmarks(value: Boolean) = viewModelScope.launch {
+        repository.setShowOnlyBookmarks(value)
+    }
+
     fun deleteFeeds(feedIds: List<Long>) = applicationCoroutineScope.launch {
         repository.deleteFeeds(feedIds)
     }
@@ -156,6 +161,14 @@ class FeedArticleViewModel(
     fun setToolbarMenuVisible(visible: Boolean) {
         state["toolbarMenuVisible"] = visible
         toolbarVisible.update { visible }
+    }
+
+    private val filterMenuVisible: MutableStateFlow<Boolean> =
+        MutableStateFlow(state["filterMenuVisible"] ?: false)
+
+    fun setFilterMenuVisible(visible: Boolean) {
+        state["filterMenuVisible"] = visible
+        filterMenuVisible.update { visible }
     }
 
     fun toggleTagExpansion(tag: String) = repository.toggleTagExpansion(tag)
@@ -261,6 +274,8 @@ class FeedArticleViewModel(
             ttsStateHolder.availableLanguages,
             repository.getUnreadBookmarksCount,
             repository.isMarkAsReadOnScroll,
+            filterMenuVisible,
+            repository.showOnlyBookmarks,
         ) { params: Array<Any> ->
             @Suppress("UNCHECKED_CAST")
             val article = params[17] as Article
@@ -311,6 +326,8 @@ class FeedArticleViewModel(
                 ttsLanguages = params[22] as List<Locale>,
                 unreadBookmarksCount = params[23] as Int,
                 markAsReadOnScroll = params[24] as Boolean,
+                showFilterMenu = params[25] as Boolean,
+                onlyBookmarks = currentFeedOrTag.isSavedArticles || (params[26] as Boolean),
             )
         }
             .stateIn(
@@ -418,6 +435,7 @@ class FeedArticleViewModel(
 interface FeedScreenViewState {
     val currentFeedOrTag: FeedOrTag
     val onlyUnread: Boolean
+    val onlyBookmarks: Boolean
     val showFab: Boolean
     val showThumbnails: Boolean
     val currentTheme: ThemeOptions
@@ -437,6 +455,7 @@ interface FeedScreenViewState {
     val haveVisibleFeedItems: Boolean
     val swipeAsRead: SwipeAsRead
     val markAsReadOnScroll: Boolean
+    val showFilterMenu: Boolean
 }
 
 interface ArticleScreenViewState {
@@ -510,5 +529,7 @@ data class FeedArticleScreenViewState(
     override val useDetectLanguage: Boolean = false,
     override val markAsReadOnScroll: Boolean = false,
     override val keyHolder: ArticleItemKeyHolder = RotatingArticleItemKeyHolder,
+    override val showFilterMenu: Boolean = false,
+    override val onlyBookmarks: Boolean = false,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState

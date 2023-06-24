@@ -36,7 +36,6 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -85,6 +84,9 @@ class Repository(override val di: DI) : DIAware {
 
     val showOnlyUnread: StateFlow<Boolean> = settingsStore.showOnlyUnread
     fun setShowOnlyUnread(value: Boolean) = settingsStore.setShowOnlyUnread(value)
+
+    val showOnlyBookmarks: StateFlow<Boolean> = settingsStore.showOnlyBookmarks
+    fun setShowOnlyBookmarks(value: Boolean) = settingsStore.setShowOnlyBookmarks(value)
 
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentFeedAndTag
     fun setCurrentFeedAndTag(feedId: Long, tag: String) {
@@ -200,31 +202,12 @@ class Repository(override val di: DI) : DIAware {
                 }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getFeedListItems(feedId: Long, tag: String): Flow<PagingData<FeedListItem>> = combine(
-        showOnlyUnread,
-        currentSorting,
-    ) { showOnlyUnread, currentSorting ->
-        FeedListArgs(
-            feedId = feedId,
-            tag = tag,
-            onlyUnread = showOnlyUnread,
-            newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
-        )
-    }.flatMapLatest {
-        feedItemStore.getPagedFeedItems(
-            feedId = it.feedId,
-            tag = it.tag,
-            onlyUnread = it.onlyUnread,
-            newestFirst = it.newestFirst,
-        )
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentFeedListItems(): Flow<PagingData<FeedListItem>> = combine(
         currentFeedAndTag,
         showOnlyUnread,
+        showOnlyBookmarks,
         currentSorting,
-    ) { feedAndTag, showOnlyUnread, currentSorting ->
+    ) { feedAndTag, showOnlyUnread, showOnlyBookmarks, currentSorting ->
         val (feedId, tag) = feedAndTag
         FeedListArgs(
             feedId = feedId,
@@ -233,6 +216,10 @@ class Repository(override val di: DI) : DIAware {
                 ID_SAVED_ARTICLES -> false
                 else -> showOnlyUnread
             },
+            onlyBookmarks = when (feedId) {
+                ID_SAVED_ARTICLES -> true
+                else -> showOnlyBookmarks
+            },
             newestFirst = currentSorting == SortingOptions.NEWEST_FIRST,
         )
     }.flatMapLatest {
@@ -240,16 +227,19 @@ class Repository(override val di: DI) : DIAware {
             feedId = it.feedId,
             tag = it.tag,
             onlyUnread = it.onlyUnread,
+            onlyBookmarks = it.onlyBookmarks,
             newestFirst = it.newestFirst,
         )
     }
 
+    // TODO down
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentFeedListVisibleItemCount(): Flow<Int> = combine(
         currentFeedAndTag,
         showOnlyUnread,
+        showOnlyBookmarks,
         currentSorting,
-    ) { feedAndTag, showOnlyUnread, _ ->
+    ) { feedAndTag, showOnlyUnread, showOnlyBookmarks, _ ->
         val (feedId, tag) = feedAndTag
         FeedListArgs(
             feedId = feedId,
@@ -257,6 +247,10 @@ class Repository(override val di: DI) : DIAware {
             onlyUnread = when (feedId) {
                 ID_SAVED_ARTICLES -> false
                 else -> showOnlyUnread
+            },
+            onlyBookmarks = when (feedId) {
+                ID_SAVED_ARTICLES -> true
+                else -> showOnlyBookmarks
             },
             newestFirst = false,
         )
@@ -265,6 +259,7 @@ class Repository(override val di: DI) : DIAware {
             feedId = it.feedId,
             tag = it.tag,
             onlyUnread = it.onlyUnread,
+            onlyBookmarks = it.onlyBookmarks,
         )
     }
 
@@ -407,10 +402,8 @@ class Repository(override val di: DI) : DIAware {
             feedId = ID_SAVED_ARTICLES,
             tag = "",
             onlyUnread = true,
+            onlyBookmarks = true,
         )
-
-    fun getVisibleFeedTitles(feedId: Long, tag: String): Flow<List<FeedTitle>> =
-        feedStore.getFeedTitles(feedId, tag).buffer(1)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getCurrentlyVisibleFeedTitles(): Flow<List<FeedTitle>> =
@@ -631,6 +624,7 @@ private data class FeedListArgs(
     val tag: String,
     val newestFirst: Boolean,
     val onlyUnread: Boolean,
+    val onlyBookmarks: Boolean,
 )
 
 // Wrapper class because flow combine doesn't like nulls

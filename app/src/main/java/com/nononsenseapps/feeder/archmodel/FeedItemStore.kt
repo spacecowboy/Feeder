@@ -29,32 +29,29 @@ class FeedItemStore(override val di: DI) : DIAware {
         feedId: Long,
         tag: String,
         onlyUnread: Boolean,
+        onlyBookmarks: Boolean,
     ): Flow<Int> =
         when {
             feedId > ID_UNSET -> dao.getFeedItemCount(
                 feedId = feedId,
                 unread = onlyUnread,
-                bookmarked = false,
+                bookmarked = onlyBookmarks,
             )
 
             tag.isNotEmpty() -> dao.getFeedItemCount(
                 tag = tag,
                 unread = onlyUnread,
-                bookmarked = false,
+                bookmarked = onlyBookmarks,
             )
 
-            feedId == ID_SAVED_ARTICLES -> dao.getFeedItemCount(
-                unread = onlyUnread,
-                bookmarked = true,
-            )
-
-            else -> dao.getFeedItemCount(unread = onlyUnread, bookmarked = false)
+            else -> dao.getFeedItemCount(unread = onlyUnread, bookmarked = onlyBookmarks)
         }
 
     fun getPagedFeedItems(
         feedId: Long,
         tag: String,
         onlyUnread: Boolean,
+        onlyBookmarks: Boolean,
         newestFirst: Boolean,
     ): Flow<PagingData<FeedListItem>> =
         Pager(
@@ -63,7 +60,6 @@ class FeedItemStore(override val di: DI) : DIAware {
                 enablePlaceholders = false,
             ),
         ) {
-            val onlyBookmarks = feedId == ID_SAVED_ARTICLES
             when {
                 newestFirst -> {
                     when {

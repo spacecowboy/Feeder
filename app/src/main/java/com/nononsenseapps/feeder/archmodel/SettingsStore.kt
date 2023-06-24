@@ -41,11 +41,18 @@ class SettingsStore(override val di: DI) : DIAware {
         _addedFeederNews.value = value
     }
 
-    private val _showOnlyUnread = MutableStateFlow(sp.getBoolean(PREF_SHOW_ONLY_UNREAD, true))
+    private val _showOnlyUnread = MutableStateFlow(sp.getBoolean(PREF_SHOW_ONLY_UNREAD, false))
     val showOnlyUnread: StateFlow<Boolean> = _showOnlyUnread.asStateFlow()
     fun setShowOnlyUnread(value: Boolean) {
         sp.edit().putBoolean(PREF_SHOW_ONLY_UNREAD, value).apply()
         _showOnlyUnread.value = value
+    }
+
+    private val _showOnlyBookmarks = MutableStateFlow(sp.getBoolean(PREF_SHOW_ONLY_BOOKMARKS, false))
+    val showOnlyBookmarks: StateFlow<Boolean> = _showOnlyBookmarks.asStateFlow()
+    fun setShowOnlyBookmarks(value: Boolean) {
+        sp.edit().putBoolean(PREF_SHOW_ONLY_BOOKMARKS, value).apply()
+        _showOnlyBookmarks.value = value
     }
 
     private val _currentFeedAndTag = MutableStateFlow(
@@ -387,6 +394,11 @@ const val PREF_WELCOME_DONE = "pref_welcome_done"
  * Boolean indicating if only unread items should be shown
  */
 const val PREF_SHOW_ONLY_UNREAD = "pref_show_only_unread"
+
+/**
+ * Boolean indicating if only bookmarked items should be shown
+ */
+const val PREF_SHOW_ONLY_BOOKMARKS = "pref_show_only_bookmarks"
 
 /**
  * Boolean indicating if Feeder News feed has been added or not

@@ -218,4 +218,7 @@
   <string name="few_tags">%1$s tags</string>
   <string name="many_tags">%1$s tags</string>
   <string name="other_tags">%1$s tags</string>
+  <string name="filter">Filter</string>
+  <string name="only_unread_articles">Only unread articles</string>
+  <string name="only_saved_articles">Only saved articles</string>
 </resources>
