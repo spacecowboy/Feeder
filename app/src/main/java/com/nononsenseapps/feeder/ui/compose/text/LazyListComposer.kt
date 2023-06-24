@@ -2,9 +2,11 @@ package com.nononsenseapps.feeder.ui.compose.text
 
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
+import com.nononsenseapps.feeder.ui.compose.feedarticle.ArticleItemKeyHolder
 
 class LazyListComposer(
     private val lazyListScope: LazyListScope,
+    private val keyHolder: ArticleItemKeyHolder,
     private val paragraphEmitter: @Composable (AnnotatedParagraphStringBuilder, TextStyler?) -> Unit,
 ) : HtmlComposer() {
 
@@ -19,7 +21,7 @@ class LazyListComposer(
         val actualBuilder = builder
         val actualTextStyle = textStyleStack.lastOrNull()
 
-        lazyListScope.item {
+        item(keyHolder = keyHolder) {
             paragraphEmitter(actualBuilder, actualTextStyle)
         }
         resetAfterEmit()
@@ -45,13 +47,17 @@ class LazyListComposer(
             }
         }
 
-        lazyListScope.item {
+        item(keyHolder = keyHolder) {
             block(onClick)
         }
     }
 
-    fun item(block: @Composable () -> Unit) {
-        lazyListScope.item {
+    /**
+     * Key is necessary or when you switch between default and full text - the initial items
+     * will have the same index and will not recompose.
+     */
+    fun item(keyHolder: ArticleItemKeyHolder, block: @Composable () -> Unit) {
+        lazyListScope.item(key = keyHolder.getAndIncrementKey()) {
             block()
         }
     }

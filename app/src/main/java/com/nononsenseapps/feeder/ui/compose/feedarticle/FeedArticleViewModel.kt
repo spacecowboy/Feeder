@@ -457,6 +457,18 @@ interface ArticleScreenViewState {
     val showToolbarMenu: Boolean
     val feedDisplayTitle: String
     val isBookmarked: Boolean
+    val keyHolder: ArticleItemKeyHolder
+}
+
+interface ArticleItemKeyHolder {
+    fun getAndIncrementKey(): Long
+}
+
+object RotatingArticleItemKeyHolder : ArticleItemKeyHolder {
+    private var key: Long = 0L
+    override fun getAndIncrementKey(): Long {
+        return key++
+    }
 }
 
 @Immutable
@@ -497,5 +509,6 @@ data class FeedArticleScreenViewState(
     override val isBookmarked: Boolean = false,
     override val useDetectLanguage: Boolean = false,
     override val markAsReadOnScroll: Boolean = false,
+    override val keyHolder: ArticleItemKeyHolder = RotatingArticleItemKeyHolder,
     val isArticleOpen: Boolean = false,
 ) : FeedScreenViewState, ArticleScreenViewState
