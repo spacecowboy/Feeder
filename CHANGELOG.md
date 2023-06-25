@@ -1,3 +1,30 @@
+# 2.4.19
+Alexthegib (1):
+  * [9a6ec389] Updated Portuguese (Portugal) translation using Weblate
+
+Jonas Kalderstam (4):
+  * [794e0928] Fixed article ending up in a mixture of full article and
+         regular
+  * [4350b21d] Fixed full text download worker to be slightly more optimal
+  * [9cad034f] Tweaked requests' Cache Control headers
+  * [aaf9a9c6] Fixed sites getting fetched on every sync if they didn't
+         specify an icon
+
+Retrial (1):
+  * [0c626ff8] Updated Greek translation using Weblate
+
+VfBFan (1):
+  * [29affd7e] Updated German translation using Weblate
+
+atilluF (1):
+  * [05dd33b7] Updated Italian translation using Weblate
+
+bowornsin (1):
+  * [55418c06] Updated Thai translation using Weblate
+
+pchelium (1):
+  * [491e0545] Updated Czech translation using Weblate
+
 # 2.4.18
 Agnieszka C (1):
   * [565de63c] Updated Polish translation using Weblate
