@@ -357,13 +357,13 @@ suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): R
         .url(url)
         .cacheControl(
             CacheControl.Builder()
-                .let {
+                .run {
                     if (forceNetwork) {
-                        // Force a cache revalidation
-                        it.maxAge(0, TimeUnit.SECONDS)
+                        // Force cache-revalidation
+                        maxAge(0, TimeUnit.SECONDS)
                     } else {
-                        // Do a cache revalidation at most every minute
-                        it.maxAge(1, TimeUnit.MINUTES)
+                        // Will accept anything generated in the last X
+                        maxAge(10, TimeUnit.MINUTES)
                     }
                 }
                 .build(),
