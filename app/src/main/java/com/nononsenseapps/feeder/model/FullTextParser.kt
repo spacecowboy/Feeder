@@ -82,12 +82,13 @@ class FullTextParser(override val di: DI) : DIAware {
     suspend fun parseFullArticleIfMissing(feedItem: FeedItemForFetching): Boolean {
         val fullArticleFile =
             blobFullFile(itemId = feedItem.id, filesDir = filePathProvider.fullArticleDir)
-        if (fullArticleFile.isFile) {
-            return true
-        }
 
         return try {
-            parseFullArticle(feedItem = feedItem).first
+            if (fullArticleFile.isFile) {
+                true
+            } else {
+                parseFullArticle(feedItem = feedItem).first
+            }
         } finally {
             repository.markAsFullTextDownloaded(feedItem.id)
         }
