@@ -262,11 +262,17 @@ class RssLocalSync(override val di: DI) : DIAware {
             // Update feed last so lastsync is only set after all items have been handled
             // for the rare case that the job is cancelled prematurely
             feedSql.title = feed.title ?: feedSql.title
+
             // Not changing feed url because I don't want to override auth or token params
             // See https://gitlab.com/spacecowboy/Feeder/-/issues/390
 //        feedSql.url = feed.feed_url?.let { sloppyLinkToStrictURLNoThrows(it) } ?: feedSql.url
+
+            // Important to keep image if there is one in case of null
+            // the image is fetched when adding a feed by fetching the main site and looking
+            // for favicons - but only when first added and icon missing from feed.
             feedSql.imageUrl = feed.icon?.let { sloppyLinkToStrictURLNoThrows(it) }
                 ?: feedSql.imageUrl
+
             repository.upsertFeed(feedSql)
 
             // Finally, prune database of old items

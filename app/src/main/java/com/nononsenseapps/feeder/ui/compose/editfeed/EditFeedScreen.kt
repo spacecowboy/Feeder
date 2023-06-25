@@ -475,7 +475,8 @@ fun ColumnScope.RightContent(
         title = stringResource(id = R.string.fetch_full_articles_by_default),
         checked = viewState.fullTextByDefault,
         icon = null,
-        modifier = Modifier.focusRequester(rightFocusRequester)
+        modifier = Modifier
+            .focusRequester(rightFocusRequester)
             .focusProperties {
                 previous = leftFocusRequester
             },
@@ -555,6 +556,7 @@ interface EditFeedScreenState {
     val isOpenItemWithAppDefault: Boolean
     val allTags: List<String>
     val defaultTitle: String
+    val feedImage: String
 }
 
 fun EditFeedScreenState(): EditFeedScreenState = ScreenState()
@@ -568,6 +570,7 @@ private class ScreenState(
     override val isOpenItemWithAppDefault: Boolean = false,
     override val allTags: List<String> = emptyList(),
     override val defaultTitle: String = "",
+    override val feedImage: String = "",
 ) : EditFeedScreenState {
     override var feedUrl: String by mutableStateOf("")
     override var feedTitle: String by mutableStateOf("")

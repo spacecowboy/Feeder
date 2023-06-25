@@ -164,6 +164,7 @@ object SearchFeedDestination : NavigationDestination(
                 navController,
                 feedUrl = it.url,
                 feedTitle = it.title,
+                feedImage = it.feedImage,
             )
         }
     }
@@ -180,13 +181,23 @@ object AddFeedDestination : NavigationDestination(
             type = NavType.StringType
             defaultValue = ""
         },
+        QueryParamArgument("feedImage") {
+            type = NavType.StringType
+            defaultValue = ""
+        },
     ),
     deepLinks = emptyList(),
 ) {
 
-    fun navigate(navController: NavController, feedUrl: String, feedTitle: String = "") {
+    fun navigate(
+        navController: NavController,
+        feedUrl: String,
+        feedTitle: String = "",
+        feedImage: String = "",
+    ) {
         val params = queryParams {
             +("feedTitle" to feedTitle)
+            +("feedImage" to feedImage)
         }
 
         navController.navigate("$path/${feedUrl.urlEncode()}$params") {

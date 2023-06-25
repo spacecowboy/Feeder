@@ -34,7 +34,7 @@ class RomeExtensionsKtTest {
     fun author() {
         assertEquals(
             Author(name = "Bobby Jane"),
-            mockSyndPerson(name = "Bobby Jane").asAuthor()
+            mockSyndPerson(name = "Bobby Jane").asAuthor(),
         )
     }
 
@@ -42,9 +42,7 @@ class RomeExtensionsKtTest {
     fun feedLinkButNoLinks() = runBlocking {
         assertEquals(
             Feed(home_page_url = "$baseUrl/homepage", title = "", items = emptyList()),
-            mockSyndFeed(link = "homepage").asFeed(baseUrl) {
-                null
-            }
+            mockSyndFeed(link = "homepage").asFeed(baseUrl),
         )
     }
 
@@ -56,12 +54,11 @@ class RomeExtensionsKtTest {
                 links = listOf(
                     mockSyndLink(
                         href = "homepage",
-                        rel = "alternate", type = "text/html"
-                    )
-                )
-            ).asFeed(baseUrl) {
-                null
-            }
+                        rel = "alternate",
+                        type = "text/html",
+                    ),
+                ),
+            ).asFeed(baseUrl),
         )
     }
 
@@ -79,18 +76,16 @@ class RomeExtensionsKtTest {
                         url = null,
                         summary = "",
                         title = "",
-                        attachments = emptyList()
-                    )
-                )
+                        attachments = emptyList(),
+                    ),
+                ),
             ),
             mockSyndFeed(
                 author = mockSyndPerson(name = "bob"),
                 entries = listOf(
-                    mockSyndEntry(uri = "id")
-                )
-            ).asFeed(baseUrl) {
-                null
-            }
+                    mockSyndEntry(uri = "id"),
+                ),
+            ).asFeed(baseUrl),
         )
     }
 
@@ -102,11 +97,16 @@ class RomeExtensionsKtTest {
 
         assertEquals(
             Item(
-                id = "$baseUrl/id", title = "", content_text = expectedSummary, summary = expectedSummary,
+                id = "$baseUrl/id",
+                title = "",
+                content_text = expectedSummary,
+                summary = expectedSummary,
                 url = null,
-                content_html = html, image = "http://google.com/image.png", attachments = emptyList()
+                content_html = html,
+                image = "http://google.com/image.png",
+                attachments = emptyList(),
             ),
-            mockSyndEntry(uri = "id", description = mockSyndContent(value = html)).asItem(baseUrl)
+            mockSyndEntry(uri = "id", description = mockSyndContent(value = html)).asItem(baseUrl),
         )
     }
 
@@ -121,11 +121,15 @@ class RomeExtensionsKtTest {
 
         assertEquals(
             Item(
-                id = "$baseUrl/id", title = "", content_text = longText, summary = expectedSummary,
+                id = "$baseUrl/id",
+                title = "",
+                content_text = longText,
+                summary = expectedSummary,
                 url = null,
-                content_html = longText, attachments = emptyList()
+                content_html = longText,
+                attachments = emptyList(),
             ),
-            mockSyndEntry(uri = "id", description = mockSyndContent(value = longText)).asItem(baseUrl)
+            mockSyndEntry(uri = "id", description = mockSyndContent(value = longText)).asItem(baseUrl),
         )
     }
 
@@ -133,11 +137,15 @@ class RomeExtensionsKtTest {
     fun itemShortTextShouldNotBeIndexOutOfBounds() {
         assertEquals(
             Item(
-                id = "$baseUrl/id", content_text = "abc", summary = "abc", title = "",
+                id = "$baseUrl/id",
+                content_text = "abc",
+                summary = "abc",
+                title = "",
                 url = null,
-                content_html = "abc", attachments = emptyList()
+                content_html = "abc",
+                attachments = emptyList(),
             ),
-            mockSyndEntry(uri = "id", description = mockSyndContent(value = "abc")).asItem(baseUrl)
+            mockSyndEntry(uri = "id", description = mockSyndContent(value = "abc")).asItem(baseUrl),
         )
     }
 
@@ -145,13 +153,19 @@ class RomeExtensionsKtTest {
     fun itemLinkButNoLinks() {
         assertEquals(
             Item(
-                id = "$baseUrl/id", content_text = "", summary = "", title = "",
-                content_html = "", attachments = emptyList(), url = "$baseUrl/abc"
+                id = "$baseUrl/id",
+                content_text = "",
+                summary = "",
+                title = "",
+                content_html = "",
+                attachments = emptyList(),
+                url = "$baseUrl/abc",
             ),
             mockSyndEntry(
-                uri = "id", description = mockSyndContent(value = ""),
-                link = "abc"
-            ).asItem(baseUrl)
+                uri = "id",
+                description = mockSyndContent(value = ""),
+                link = "abc",
+            ).asItem(baseUrl),
         )
     }
 
@@ -159,16 +173,22 @@ class RomeExtensionsKtTest {
     fun itemLinks() {
         assertEquals(
             Item(
-                id = "$baseUrl/id", content_text = "", summary = "", title = "",
-                content_html = "", attachments = emptyList(), url = "$baseUrl/abc"
+                id = "$baseUrl/id",
+                content_text = "",
+                summary = "",
+                title = "",
+                content_html = "",
+                attachments = emptyList(),
+                url = "$baseUrl/abc",
             ),
             mockSyndEntry(
-                uri = "id", description = mockSyndContent(value = ""),
+                uri = "id",
+                description = mockSyndContent(value = ""),
                 links = listOf(
                     mockSyndLink(href = "abc", rel = "self"),
-                    mockSyndLink(href = "bcd")
-                )
-            ).asItem(baseUrl)
+                    mockSyndLink(href = "bcd"),
+                ),
+            ).asItem(baseUrl),
         )
     }
 
@@ -176,7 +196,7 @@ class RomeExtensionsKtTest {
     fun asAttachment() {
         assertEquals(
             Attachment(url = "$baseUrl/uurl", mime_type = "text/html", size_in_bytes = 5),
-            mockSyndEnclosure(url = "uurl", type = "text/html", length = 5).asAttachment(baseUrl)
+            mockSyndEnclosure(url = "uurl", type = "text/html", length = 5).asAttachment(baseUrl),
         )
     }
 
@@ -184,9 +204,13 @@ class RomeExtensionsKtTest {
     fun contentTextWithPlainAndOthers() {
         assertEquals(
             Item(
-                id = "$baseUrl/id", content_text = "PLAIN", summary = "PLAIN", title = "",
+                id = "$baseUrl/id",
+                content_text = "PLAIN",
+                summary = "PLAIN",
+                title = "",
                 url = null,
-                content_html = "<b>html</b>", attachments = emptyList()
+                content_html = "<b>html</b>",
+                attachments = emptyList(),
             ),
             mockSyndEntry(
                 uri = "id",
@@ -194,9 +218,9 @@ class RomeExtensionsKtTest {
                     mockSyndContent(value = "PLAIN", type = "text"),
                     mockSyndContent(value = "<b>html</b>", type = "html"),
                     mockSyndContent(value = null, type = "xhtml"),
-                    mockSyndContent(value = "bah", type = null)
-                )
-            ).asItem(baseUrl)
+                    mockSyndContent(value = "bah", type = null),
+                ),
+            ).asItem(baseUrl),
         )
     }
 
@@ -204,18 +228,22 @@ class RomeExtensionsKtTest {
     fun contentTextWithNullAndOthers() {
         assertEquals(
             Item(
-                id = "$baseUrl/id", content_text = "bah", summary = "bah", title = "",
+                id = "$baseUrl/id",
+                content_text = "bah",
+                summary = "bah",
+                title = "",
                 url = null,
-                content_html = "<b>html</b>", attachments = emptyList()
+                content_html = "<b>html</b>",
+                attachments = emptyList(),
             ),
             mockSyndEntry(
                 uri = "id",
                 contents = listOf(
                     mockSyndContent(value = "<b>html</b>", type = "html"),
                     mockSyndContent(value = null, type = "xhtml"),
-                    mockSyndContent(value = "bah", type = null)
-                )
-            ).asItem(baseUrl)
+                    mockSyndContent(value = "bah", type = null),
+                ),
+            ).asItem(baseUrl),
         )
     }
 
@@ -223,17 +251,21 @@ class RomeExtensionsKtTest {
     fun contentTextWithOthers() {
         assertEquals(
             Item(
-                id = "$baseUrl/id", content_text = "html", summary = "html", title = "",
+                id = "$baseUrl/id",
+                content_text = "html",
+                summary = "html",
+                title = "",
                 url = null,
-                content_html = "<b>html</b>", attachments = emptyList()
+                content_html = "<b>html</b>",
+                attachments = emptyList(),
             ),
             mockSyndEntry(
                 uri = "id",
                 contents = listOf(
                     mockSyndContent(value = "<b>html</b>", type = "html"),
-                    mockSyndContent(value = null, type = "xhtml")
-                )
-            ).asItem(baseUrl)
+                    mockSyndContent(value = null, type = "xhtml"),
+                ),
+            ).asItem(baseUrl),
         )
     }
 
@@ -241,16 +273,20 @@ class RomeExtensionsKtTest {
     fun contentHtmlAtomWithOnlyUnknown() {
         assertEquals(
             Item(
-                id = "$baseUrl/id", title = "", content_text = "foo", summary = "foo",
+                id = "$baseUrl/id",
+                title = "",
+                content_text = "foo",
+                summary = "foo",
                 url = null,
-                content_html = "foo", attachments = emptyList()
+                content_html = "foo",
+                attachments = emptyList(),
             ),
             mockSyndEntry(
                 uri = "id",
                 contents = listOf(
-                    mockSyndContent(value = "foo")
-                )
-            ).asItem(baseUrl)
+                    mockSyndContent(value = "foo"),
+                ),
+            ).asItem(baseUrl),
         )
     }
 
@@ -263,12 +299,12 @@ class RomeExtensionsKtTest {
                 content_text = "",
                 summary = "",
                 url = null,
-                attachments = emptyList()
+                attachments = emptyList(),
             ),
             mockSyndEntry(
                 uri = "id",
-                titleEx = mockSyndContent(value = "600 &#8211; Email is your electronic memory", type = "html")
-            ).asItem(baseUrl)
+                titleEx = mockSyndContent(value = "600 &#8211; Email is your electronic memory", type = "html"),
+            ).asItem(baseUrl),
         )
     }
 
@@ -281,12 +317,12 @@ class RomeExtensionsKtTest {
                 content_text = "",
                 summary = "",
                 url = null,
-                attachments = emptyList()
+                attachments = emptyList(),
             ),
             mockSyndEntry(
                 uri = "id",
-                titleEx = mockSyndContent(value = "600 &#8211; Email is your electronic memory", type = "xhtml")
-            ).asItem(baseUrl)
+                titleEx = mockSyndContent(value = "600 &#8211; Email is your electronic memory", type = "xhtml"),
+            ).asItem(baseUrl),
         )
     }
 
@@ -299,12 +335,12 @@ class RomeExtensionsKtTest {
                 content_text = "",
                 summary = "",
                 url = null,
-                attachments = emptyList()
+                attachments = emptyList(),
             ),
             mockSyndEntry(
                 uri = "id",
-                title = "600 &#8211; Email is your electronic memory"
-            ).asItem(baseUrl)
+                title = "600 &#8211; Email is your electronic memory",
+            ).asItem(baseUrl),
         )
     }
 
@@ -312,14 +348,18 @@ class RomeExtensionsKtTest {
     fun contentHtmlRss() {
         assertEquals(
             Item(
-                id = "$baseUrl/id", content_text = "html", summary = "html", title = "",
+                id = "$baseUrl/id",
+                content_text = "html",
+                summary = "html",
+                title = "",
                 url = null,
-                content_html = "<b>html</b>", attachments = emptyList()
+                content_html = "<b>html</b>",
+                attachments = emptyList(),
             ),
             mockSyndEntry(
                 uri = "id",
-                description = mockSyndContent(value = "<b>html</b>")
-            ).asItem(baseUrl)
+                description = mockSyndContent(value = "<b>html</b>"),
+            ).asItem(baseUrl),
         )
     }
 
@@ -333,12 +373,12 @@ class RomeExtensionsKtTest {
                 summary = "",
                 attachments = emptyList(),
                 url = null,
-                image = "$baseUrl/img"
+                image = "$baseUrl/img",
             ),
             mockSyndEntry(
                 uri = "id",
-                thumbnails = arrayOf(mockThumbnail(url = URI.create("img")))
-            ).asItem(baseUrl)
+                thumbnails = arrayOf(mockThumbnail(url = URI.create("img"))),
+            ).asItem(baseUrl),
         )
     }
 
@@ -352,7 +392,7 @@ class RomeExtensionsKtTest {
                 summary = "",
                 attachments = emptyList(),
                 url = null,
-                image = null
+                image = null,
             ),
             mockSyndEntry(
                 uri = "id",
@@ -362,11 +402,11 @@ class RomeExtensionsKtTest {
                             "data:image/png;base64,iVBORw0KGgoAAA" +
                                 "ANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4" +
                                 "//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU" +
-                                "5ErkJggg=="
-                        )
-                    )
-                )
-            ).asItem(baseUrl)
+                                "5ErkJggg==",
+                        ),
+                    ),
+                ),
+            ).asItem(baseUrl),
         )
     }
 
@@ -380,12 +420,12 @@ class RomeExtensionsKtTest {
                 summary = "",
                 attachments = emptyList(),
                 url = null,
-                image = "$baseUrl/img"
+                image = "$baseUrl/img",
             ),
             mockSyndEntry(
                 uri = "id",
-                mediaContents = arrayOf(mockMediaContent(url = "img", medium = "image"))
-            ).asItem(baseUrl)
+                mediaContents = arrayOf(mockMediaContent(url = "img", medium = "image")),
+            ).asItem(baseUrl),
         )
     }
 
@@ -395,17 +435,17 @@ class RomeExtensionsKtTest {
             value = """
                     <img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
             """.trimIndent(),
-            type = null
+            type = null,
         )
 
         val item = mockSyndEntry(
             uri = "id",
-            description = description
+            description = description,
         ).asItem(baseUrl)
 
         assertEquals(
             "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
-            item.image
+            item.image,
         )
     }
 
@@ -415,17 +455,17 @@ class RomeExtensionsKtTest {
             value = """
             <img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
             """.trimIndent(),
-            type = "text"
+            type = "text",
         )
 
         val item = mockSyndEntry(
             uri = "id",
-            description = description
+            description = description,
         ).asItem(baseUrl)
 
         assertEquals(
             "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
-            item.image
+            item.image,
         )
     }
 
@@ -435,17 +475,17 @@ class RomeExtensionsKtTest {
             value = """
                 <img src="https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a" />Google didn&#039;t completely scrap its robotic dreams after it sold off Boston Dynamics and shuttered the other robotic start-ups it acquired over the past decade. Now, the tech giant has given us a glimpse of how the program has changed in a blog post a...
             """.trimIndent(),
-            type = "html"
+            type = "html",
         )
 
         val item = mockSyndEntry(
             uri = "id",
-            description = description
+            description = description,
         ).asItem(baseUrl)
 
         assertEquals(
             "https://o.aolcdn.com/images/dims?crop=1200%2C627%2C0%2C0&quality=85&format=jpg&resize=1600%2C836&image_uri=https%3A%2F%2Fs.yimg.com%2Fos%2Fcreatr-uploaded-images%2F2019-03%2Ffa057c20-5050-11e9-bfef-d1614983d7cc&client=a1acac3e1b3290917d92&signature=351348aa11c53a569d5ad40f3a7ef697471b645a",
-            item.image
+            item.image,
         )
     }
 
@@ -462,12 +502,12 @@ class RomeExtensionsKtTest {
                 summary = "",
                 attachments = emptyList(),
                 url = null,
-                date_published = dateTime.toString()
+                date_published = dateTime.toString(),
             ),
             mockSyndEntry(
                 uri = "id",
-                publishedDate = romeDate
-            ).asItem(baseUrl)
+                publishedDate = romeDate,
+            ).asItem(baseUrl),
         )
     }
 
@@ -485,12 +525,12 @@ class RomeExtensionsKtTest {
                 attachments = emptyList(),
                 url = null,
                 date_modified = dateTime.toString(),
-                date_published = dateTime.toString()
+                date_published = dateTime.toString(),
             ),
             mockSyndEntry(
                 uri = "id",
-                updatedDate = romeDate
-            ).asItem(baseUrl)
+                updatedDate = romeDate,
+            ).asItem(baseUrl),
         )
     }
 
@@ -510,20 +550,20 @@ class RomeExtensionsKtTest {
                 attachments = emptyList(),
                 url = null,
                 date_modified = modDate.toString(),
-                date_published = pubDate.toString()
+                date_published = pubDate.toString(),
             ),
             mockSyndEntry(
                 uri = "id",
                 updatedDate = romeModDate,
-                publishedDate = romePubDate
-            ).asItem(baseUrl)
+                publishedDate = romePubDate,
+            ).asItem(baseUrl),
         )
     }
 
     private fun mockSyndPerson(
         name: String? = null,
         uri: String? = null,
-        email: String? = null
+        email: String? = null,
     ): SyndPerson {
         val mock = mock(SyndPerson::class.java)
 
@@ -538,7 +578,7 @@ class RomeExtensionsKtTest {
         link: String? = null,
         author: SyndPerson? = null,
         links: List<SyndLink> = emptyList(),
-        entries: List<SyndEntry>? = null
+        entries: List<SyndEntry>? = null,
     ): SyndFeed {
         val mock = mock(SyndFeed::class.java)
 
@@ -576,7 +616,7 @@ class RomeExtensionsKtTest {
         thumbnails: Array<Thumbnail>? = null,
         mediaContents: Array<MediaContent>? = null,
         title: String? = null,
-        titleEx: SyndContent? = null
+        titleEx: SyndContent? = null,
     ): SyndEntry {
         val mock = mock(SyndEntry::class.java)
 
@@ -618,7 +658,7 @@ class RomeExtensionsKtTest {
     private fun mockSyndEnclosure(
         url: String? = null,
         length: Long? = 0,
-        type: String? = null
+        type: String? = null,
     ): SyndEnclosure {
         val mock = mock(SyndEnclosure::class.java)
 

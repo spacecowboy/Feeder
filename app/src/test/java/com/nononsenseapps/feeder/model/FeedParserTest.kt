@@ -47,10 +47,13 @@ class FeedParserTest : DIAware {
     fun getAlternateLinksHandlesYoutube() {
         // I want this to be an Online test to make sure that I notice if/when Youtube changes something which breaks it
         runBlocking {
-            val feeds: List<Pair<String, String>> =
-                feedParser.getAlternateFeedLinksAtUrl(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A"))
+            val feeds =
+                feedParser.getSiteMetaData(URL("https://www.youtube.com/watch?v=-m5I_5Vnh6A"))!!.alternateFeedLinks.first()
             assertEquals(
-                listOf("https://www.youtube.com/feeds/videos.xml?channel_id=UCG1h-Wqjtwz7uUANw6gazRw" to "atom"),
+                AlternateLink(
+                    URL("https://www.youtube.com/feeds/videos.xml?channel_id=UCG1h-Wqjtwz7uUANw6gazRw"),
+                    "atom",
+                ),
                 feeds,
             )
         }
@@ -227,20 +230,24 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun getAlternateFeedLinksDoesNotReturnRelativeLinks() {
         readResource("fz.html") {
-            val alts: List<Pair<String, String>> =
-                feedParser.getAlternateFeedLinksInHtml(it)
-            assertEquals(emptyList(), alts)
+            val metadata = feedParser.getSiteMetaDataInHtml(URL("https://www.fz.se"), it)
+            assertEquals(
+                listOf(
+                    AlternateLink(link = URL("https://www.fz.se/feeds/nyheter"), type = "application/rss+xml"),
+                    AlternateLink(link = URL("https://www.fz.se/feeds/forum"), type = "application/rss+xml"),
+                ),
+                metadata!!.alternateFeedLinks,
+            )
         }
     }
 
     @Test
     fun findsAppleTouchIconForFeed() = runBlocking {
-        // This relies on internet - in case it fails check site for changes
-        val feed = readResource("rss_fz_2022.xml") {
-            feedParser.parseFeedResponse(URL("https://www.fz.se/nyheter"), it, null)
+        val metadata = readResource("fz.html") {
+            feedParser.getSiteMetaDataInHtml(URL("https://www.fz.se"), it)
         }
 
-        assertEquals("https://www.fz.se/apple-touch-icon.png", feed.icon)
+        assertEquals("https://www.fz.se/apple-touch-icon.png", metadata!!.feedImage)
     }
 
     @Test
@@ -265,13 +272,10 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun successfullyParsesAlternateLinkInBodyOfDocument() {
         readResource("nixos.html") {
-            val alts: List<Pair<String, String>> = feedParser.getAlternateFeedLinksInHtml(
-                it,
-                URL("https://nixos.org"),
-            )
+            val metadata = feedParser.getSiteMetaDataInHtml(URL("https://nixos.org"), it)
             assertEquals(
-                listOf("https://nixos.org/news-rss.xml" to "application/rss+xml"),
-                alts,
+                listOf(AlternateLink(URL("https://nixos.org/news-rss.xml"), "application/rss+xml")),
+                metadata!!.alternateFeedLinks,
             )
         }
     }
@@ -280,61 +284,15 @@ class FeedParserTest : DIAware {
     @Throws(Exception::class)
     fun getAlternateFeedLinksResolvesRelativeLinksGivenBaseUrl() {
         readResource("fz.html") {
-            val alts: List<Pair<String, String>> =
-                feedParser.getAlternateFeedLinksInHtml(
-                    it,
-                    baseUrl = URL("https://www.fz.se/index.html"),
-                )
+            val metadata = feedParser.getSiteMetaDataInHtml(URL("https://www.fz.se/index.html"), it)
             assertEquals(
                 listOf(
-                    "https://www.fz.se/feeds/nyheter" to "application/rss+xml",
-                    "https://www.fz.se/feeds/forum" to "application/rss+xml",
+                    AlternateLink(URL("https://www.fz.se/feeds/nyheter"), "application/rss+xml"),
+                    AlternateLink(URL("https://www.fz.se/feeds/forum"), "application/rss+xml"),
                 ),
-                alts,
+                metadata!!.alternateFeedLinks,
             )
         }
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun findsAlternateLinksReturnsNullIfNoLink() = runBlocking {
-        val rssLink = feedParser.findFeedUrl(atomRelative)
-        assertNull(rssLink)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun findsAlternateLinksReturnsAlternatesForFeedsWithAlternateLinks() = runBlocking {
-        val rssLink = feedParser.findFeedUrl(atomWithAlternateLinks)
-        assertEquals(URL("http://localhost:1313/feed.json"), rssLink)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun findsAlternateLinksPrefersAtomByDefault() = runBlocking {
-        val rssLink = feedParser.findFeedUrl(getCowboyHtml())
-        assertEquals(URL("https://cowboyprogrammer.org/atom.xml"), rssLink)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun findsAlternateLinksPreferAtom() = runBlocking {
-        val rssLink = feedParser.findFeedUrl(getCowboyHtml(), preferAtom = true)
-        assertEquals(URL("https://cowboyprogrammer.org/atom.xml"), rssLink)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun findsAlternateLinksPreferRss() = runBlocking {
-        val rssLink = feedParser.findFeedUrl(getCowboyHtml(), preferRss = true)
-        assertEquals(URL("https://cowboyprogrammer.org/index.xml"), rssLink)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun findsAlternateLinksPreferJSON() = runBlocking {
-        val rssLink = feedParser.findFeedUrl(getCowboyHtml(), preferJSON = true)
-        assertEquals(URL("https://cowboyprogrammer.org/feed.json"), rssLink)
     }
 
     @Test
@@ -971,7 +929,11 @@ class FeedParserTest : DIAware {
             "http://www.zoocoop.com/contentoob/o1.atom",
         )
 
-    private fun bytesToResponse(resourceName: String, url: String, contentType: String = "application/xml"): Response {
+    private fun bytesToResponse(
+        resourceName: String,
+        url: String,
+        contentType: String = "application/xml",
+    ): Response {
         val responseBody: ResponseBody =
             javaClass.getResourceAsStream(resourceName)!!
                 .use { it.readBytes() }

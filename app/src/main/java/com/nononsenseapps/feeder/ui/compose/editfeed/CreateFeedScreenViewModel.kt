@@ -14,6 +14,7 @@ import com.nononsenseapps.feeder.base.DIAwareViewModel
 import com.nononsenseapps.feeder.db.room.Feed
 import com.nononsenseapps.feeder.model.workmanager.requestFeedSync
 import com.nononsenseapps.feeder.ui.compose.utils.mutableSavedStateOf
+import com.nononsenseapps.feeder.util.sloppyLinkToStrictURLOrNull
 import java.net.URL
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
@@ -42,6 +43,7 @@ class CreateFeedScreenViewModel(
     override var alternateId: Boolean by mutableSavedStateOf(state, false)
     override var allTags: List<String> by mutableStateOf(emptyList())
     override var defaultTitle: String by mutableStateOf(state["feedTitle"] ?: "")
+    override var feedImage: String by mutableStateOf(state["feedImage"] ?: "")
 
     override val isOpenItemWithBrowser: Boolean
         get() = articleOpener == PREF_VAL_OPEN_WITH_BROWSER
@@ -59,6 +61,7 @@ class CreateFeedScreenViewModel(
             PREF_VAL_OPEN_WITH_BROWSER,
             PREF_VAL_OPEN_WITH_CUSTOM_TAB,
             -> false
+
             else -> true
         }
 
@@ -83,6 +86,7 @@ class CreateFeedScreenViewModel(
                 openArticlesWith = articleOpener,
                 alternateId = alternateId,
                 whenModified = Instant.now(),
+                imageUrl = sloppyLinkToStrictURLOrNull(feedImage),
             ),
         )
 

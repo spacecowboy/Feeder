@@ -45,6 +45,8 @@ class EditFeedScreenViewModel(
     override var alternateId: Boolean by mutableSavedStateOf(state, false)
     override var allTags: List<String> by mutableStateOf(emptyList())
 
+    override var feedImage: String by mutableStateOf("")
+
     // Only set when loading feed
     override var defaultTitle: String by mutableStateOf("")
 
@@ -64,6 +66,7 @@ class EditFeedScreenViewModel(
             PREF_VAL_OPEN_WITH_BROWSER,
             PREF_VAL_OPEN_WITH_CUSTOM_TAB,
             -> false
+
             else -> true
         }
 
@@ -74,6 +77,7 @@ class EditFeedScreenViewModel(
                 ?: throw IllegalArgumentException("No feed with id $feedId!")
 
             defaultTitle = feed.title
+            feedImage = feed.imageUrl?.toString() ?: ""
 
             if (!state.contains("feedUrl")) {
                 feedUrl = feed.url.toString()
