@@ -53,6 +53,7 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                                 navController,
                                 feedUrl = it.url,
                                 feedTitle = it.title,
+                                feedImage = it.feedImage,
                             )
                         }
                     }

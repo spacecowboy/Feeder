@@ -1,6 +1,7 @@
 package com.nononsenseapps.feeder.model
 
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import com.nononsenseapps.feeder.util.asFeed
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsolute
 import com.nononsenseapps.feeder.util.relativeLinkIntoAbsoluteOrThrow
@@ -30,7 +31,6 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 
-val slashPattern = """<\s*slash:comments\s*/>""".toRegex(RegexOption.IGNORE_CASE)
 private const val YOUTUBE_CHANNEL_ID_ATTR = "data-channel-external-id"
 
 class FeedParser(override val di: DI) : DIAware {
@@ -38,45 +38,38 @@ class FeedParser(override val di: DI) : DIAware {
     private val jsonFeedParser: JsonFeedParser by instance()
 
     /**
-     * Finds the preferred alternate link in the header of an HTML/XML document pointing to feeds.
+     * Parses all relevant information from a main site so duplicate calls aren't needed
      */
-    fun findFeedUrl(
-        html: String,
-        preferRss: Boolean = false,
-        preferAtom: Boolean = false,
-        preferJSON: Boolean = false,
-    ): URL? {
-        val feedLinks = getAlternateFeedLinksInHtml(html)
-            .sortedBy {
-                val t = it.second.lowercase(Locale.getDefault())
-                when {
-                    preferAtom && t.contains("atom") -> "0"
-                    preferRss && t.contains("rss") -> "1"
-                    preferJSON && t.contains("json") -> "2"
-                    else -> t
-                }
-            }
-            .mapNotNull {
-                sloppyLinkToStrictURLOrNull(it.first)?.let { l -> l to it.second }
-            }
-
-        return feedLinks.firstOrNull()?.first
-    }
-
-    private suspend fun getFeedIconAtUrl(url: URL): String? {
+    suspend fun getSiteMetaData(url: URL): SiteMetaData? {
         return try {
             val html = curl(url)
-            when {
-                html != null -> getFeedIconInHtml(html, baseUrl = url)
-                else -> null
-            }
+            return getSiteMetaDataInHtml(url, html)
         } catch (t: Throwable) {
-            Log.e("FeedParser", "Error when fetching feed icon", t)
+            Log.e(LOG_TAG, "Error when fetching site metadata", t)
             null
         }
     }
 
-    fun getFeedIconInHtml(
+    @VisibleForTesting
+    internal fun getSiteMetaDataInHtml(url: URL, html: String?): SiteMetaData? {
+        return try {
+            if (html?.contains("<head>", ignoreCase = true) != true) {
+                // Probably a a feed URL and not a page
+                return null
+            }
+            SiteMetaData(
+                url = url,
+                alternateFeedLinks = getAlternateFeedLinksInHtml(html, baseUrl = url),
+                feedImage = getFeedIconInHtml(html, baseUrl = url),
+            )
+        } catch (t: Throwable) {
+            Log.e(LOG_TAG, "Error when fetching site metadata", t)
+            null
+        }
+    }
+
+    @VisibleForTesting
+    internal fun getFeedIconInHtml(
         html: String,
         baseUrl: URL? = null,
     ): String? {
@@ -101,28 +94,12 @@ class FeedParser(override val di: DI) : DIAware {
     }
 
     /**
-     * Returns all alternate links in the header of an HTML/XML document pointing to feeds.
-     */
-    suspend fun getAlternateFeedLinksAtUrl(url: URL): List<Pair<String, String>> {
-        return try {
-            val html = curl(url)
-            when {
-                html != null -> getAlternateFeedLinksInHtml(html, baseUrl = url)
-                else -> emptyList()
-            }
-        } catch (t: Throwable) {
-            Log.e("FeedParser", "Error when fetching alternate links", t)
-            emptyList()
-        }
-    }
-
-    /**
      * Returns all alternate links in the HTML/XML document pointing to feeds.
      */
-    fun getAlternateFeedLinksInHtml(
+    private fun getAlternateFeedLinksInHtml(
         html: String,
         baseUrl: URL? = null,
-    ): List<Pair<String, String>> {
+    ): List<AlternateLink> {
         val doc = Jsoup.parse(html.byteInputStream(), "UTF-8", "")
 
         val feeds = doc.getElementsByAttributeValue("rel", "alternate")
@@ -152,14 +129,24 @@ class FeedParser(override val di: DI) : DIAware {
             }
             ?.mapNotNull { e ->
                 when {
-                    baseUrl != null -> relativeLinkIntoAbsolute(
-                        base = baseUrl,
-                        link = e.attr("href"),
-                    ) to e.attr("type")
+                    baseUrl != null -> {
+                        try {
+                            AlternateLink(
+                                type = e.attr("type"),
+                                link = relativeLinkIntoAbsoluteOrThrow(
+                                    base = baseUrl,
+                                    link = e.attr("href"),
+                                ),
+                            )
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
 
                     else -> sloppyLinkToStrictURLOrNull(e.attr("href"))?.let { l ->
-                        l.toString() to e.attr(
-                            "type",
+                        AlternateLink(
+                            type = e.attr("type"),
+                            link = l,
                         )
                     }
                 }
@@ -175,14 +162,19 @@ class FeedParser(override val di: DI) : DIAware {
         }
     }
 
-    private fun findFeedLinksForYoutube(doc: Document): List<Pair<String, String>> {
+    private fun findFeedLinksForYoutube(doc: Document): List<AlternateLink> {
         val channelId: String? = doc.body()?.getElementsByAttribute(YOUTUBE_CHANNEL_ID_ATTR)
             ?.firstOrNull()
             ?.attr(YOUTUBE_CHANNEL_ID_ATTR)
 
         return when (channelId) {
             null -> emptyList()
-            else -> listOf("https://www.youtube.com/feeds/videos.xml?channel_id=$channelId" to "atom")
+            else -> listOf(
+                AlternateLink(
+                    type = "atom",
+                    link = URL("https://www.youtube.com/feeds/videos.xml?channel_id=$channelId"),
+                ),
+            )
         }
     }
 
@@ -212,7 +204,7 @@ class FeedParser(override val di: DI) : DIAware {
     }
 
     @Throws(FeedParsingError::class)
-    suspend fun parseFeedResponse(response: Response): Feed? {
+    internal fun parseFeedResponse(response: Response): Feed? {
         return response.body?.use {
             // OkHttp string method handles BOM and Content-Type header in request
             parseFeedResponse(
@@ -226,7 +218,7 @@ class FeedParser(override val di: DI) : DIAware {
      * Takes body as bytes to handle encoding correctly
      */
     @Throws(FeedParsingError::class)
-    suspend fun parseFeedResponse(
+    fun parseFeedResponse(
         url: URL,
         responseBody: ResponseBody,
     ): Feed {
@@ -251,7 +243,7 @@ class FeedParser(override val di: DI) : DIAware {
      * Takes body as bytes to handle encoding correctly
      */
     @Throws(FeedParsingError::class)
-    suspend fun parseFeedResponse(
+    internal fun parseFeedResponse(
         url: URL,
         body: String,
         contentType: MediaType?,
@@ -273,24 +265,8 @@ class FeedParser(override val di: DI) : DIAware {
         }
     }
 
-    /**
-     * Takes body as bytes to handle encoding correctly
-     */
     @Throws(FeedParsingError::class)
-    suspend fun parseFeedResponseOrFallbackToAlternateLink(response: Response): Feed? {
-        val body = response.body?.string() ?: return null
-
-        val alternateFeedLink = findFeedUrl(body, preferAtom = true)
-
-        return if (alternateFeedLink != null) {
-            parseFeedUrl(alternateFeedLink)
-        } else {
-            parseFeedResponse(response.request.url.toUrl(), body, response.body?.contentType())
-        }
-    }
-
-    @Throws(FeedParsingError::class)
-    internal suspend fun parseRssAtom(baseUrl: URL, responseBody: ResponseBody): Feed {
+    internal fun parseRssAtom(baseUrl: URL, responseBody: ResponseBody): Feed {
         try {
             val contentType = responseBody.contentType()
             val validMimeType = when (contentType?.type) {
@@ -320,9 +296,7 @@ class FeedParser(override val di: DI) : DIAware {
                         }
                         .build(it)
                 }
-                return feed.asFeed(baseUrl = baseUrl) { siteUrl ->
-                    getFeedIconAtUrl(siteUrl)
-                }
+                return feed.asFeed(baseUrl = baseUrl)
             }
         } catch (t: Throwable) {
             throw FeedParsingError(baseUrl, t)
@@ -330,7 +304,7 @@ class FeedParser(override val di: DI) : DIAware {
     }
 
     @Throws(FeedParsingError::class)
-    internal suspend fun parseRssAtom(baseUrl: URL, body: String): Feed {
+    internal fun parseRssAtom(baseUrl: URL, body: String): Feed {
         try {
             body.byteInputStream().use { bs ->
                 val feed = XmlReader(bs, true).use {
@@ -340,17 +314,19 @@ class FeedParser(override val di: DI) : DIAware {
                         }
                         .build(it)
                 }
-                return feed.asFeed(baseUrl = baseUrl) { siteUrl ->
-                    getFeedIconAtUrl(siteUrl)
-                }
+                return feed.asFeed(baseUrl = baseUrl)
             }
         } catch (t: Throwable) {
             throw FeedParsingError(baseUrl, t)
         }
     }
 
-    class FeedParsingError(val url: URL, e: Throwable) : Exception(e.message, e)
+    companion object {
+        private const val LOG_TAG = "FEEDER_FEEDPARSER"
+    }
 }
+
+class FeedParsingError(val url: URL, e: Throwable) : Exception(e.message, e)
 
 suspend fun OkHttpClient.getResponse(url: URL, forceNetwork: Boolean = false): Response {
     val request = Request.Builder()

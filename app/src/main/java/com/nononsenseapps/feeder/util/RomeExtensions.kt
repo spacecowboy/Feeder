@@ -17,13 +17,12 @@ import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.feed.synd.SyndPerson
 import java.net.URL
-import kotlinx.coroutines.yield
 import org.jsoup.parser.Parser.unescapeEntities
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
 
-suspend fun SyndFeed.asFeed(baseUrl: URL, feedIconFinder: suspend (URL) -> String?): Feed {
+fun SyndFeed.asFeed(baseUrl: URL): Feed {
     val feedAuthor: Author? = this.authors?.firstOrNull()?.asAuthor()
 
     val siteUrl = relativeLinkIntoAbsoluteOrNull(
@@ -38,11 +37,6 @@ suspend fun SyndFeed.asFeed(baseUrl: URL, feedIconFinder: suspend (URL) -> Strin
         image?.url?.let { url ->
             when {
                 url.startsWith("http") -> url
-                else -> null
-            }
-        } ?: siteUrl?.let { siteUrl ->
-            when {
-                siteUrl.startsWith("http") -> feedIconFinder(URL(siteUrl))
                 else -> null
             }
         }
