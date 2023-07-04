@@ -28,7 +28,7 @@ fun DIAwareComponentActivity.withAllProviders(
             ) {
                 withWindowSize {
                     ProvideFontScale(fontScale = textScale) {
-                        content()
+                        withFeederTextToolbar(content)
                     }
                 }
             }
