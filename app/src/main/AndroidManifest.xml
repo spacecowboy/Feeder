@@ -25,7 +25,6 @@
     <intent>
       <action android:name="android.intent.action.TTS_SERVICE" />
     </intent>
-    <!--    TODO implement custom text selection actions -->
     <intent>
       <action android:name="android.intent.action.PROCESS_TEXT" />
       <data android:mimeType="text/plain" />

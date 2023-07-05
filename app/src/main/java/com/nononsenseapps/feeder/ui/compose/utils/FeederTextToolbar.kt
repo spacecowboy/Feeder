@@ -59,7 +59,7 @@ class FeederTextToolbar(private val view: View) : TextToolbar {
             status = TextToolbarStatus.Shown
             actionMode = view.startActionMode(
                 FloatingTextActionModeCallback(textActionModeCallback),
-                ActionMode.TYPE_FLOATING
+                ActionMode.TYPE_FLOATING,
             )
         } else {
             actionMode?.invalidate()
@@ -75,7 +75,7 @@ class FeederTextActionModeCallback(
     var onPasteRequested: (() -> Unit)? = null,
     var onCutRequested: (() -> Unit)? = null,
     var onSelectAllRequested: (() -> Unit)? = null
-): ActionMode.Callback {
+) : ActionMode.Callback {
     private val displayNameComparator by lazy {
         ResolveInfo.DisplayNameComparator(packageManager)
     }
@@ -138,12 +138,12 @@ class FeederTextActionModeCallback(
                     textProcessors.getOrNull(itemId - 100)?.let { cn ->
                         context.startActivity(
                             Intent(Intent.ACTION_PROCESS_TEXT).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+                                type = "text/plain"
                                 component = cn
                                 putExtra(Intent.EXTRA_PROCESS_TEXT, clip.getItemAt(0).text)
                             }.also {
                                 logDebug("JONAS", "Selected $it")
-                            }
+                            },
                         )
                     }
                 }
@@ -165,7 +165,9 @@ class FeederTextActionModeCallback(
         logDebug("JONAS", "Looking for PROCESS TEXT apps")
         textProcessors.clear()
         packageManager.queryIntentActivities(
-            Intent(Intent.ACTION_PROCESS_TEXT),
+            Intent(Intent.ACTION_PROCESS_TEXT).apply {
+                type = "text/plain"
+            },
             0,
         ).sortedWith(displayNameComparator)
             .forEachIndexed { index, info ->
@@ -177,24 +179,14 @@ class FeederTextActionModeCallback(
                     menu.add(1, id, id, label)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
                 }
-//                info.loadIcon(packageManager)
 
                 textProcessors.add(
                     ComponentName(
                         info.activityInfo.applicationInfo.packageName,
                         info.activityInfo.name,
-                    )
+                    ),
                 )
             }
-
-//        for (i in 0..10) {
-//            val id = 1000 + i
-//            if (menu.findItem(id) == null) {
-//                // groupId, itemId, order, title
-//                menu.add(1, id, id, "JONAS $id")
-//                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
-//            }
-//        }
     }
 
     private fun updateMenuItems(menu: Menu) {
@@ -274,7 +266,7 @@ internal class FloatingTextActionModeCallback(
             rect.left.toInt(),
             rect.top.toInt(),
             rect.right.toInt(),
-            rect.bottom.toInt()
+            rect.bottom.toInt(),
         )
     }
 }
