@@ -5,7 +5,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
+import android.os.Build
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
@@ -17,7 +19,6 @@ import androidx.compose.ui.platform.LocalTextToolbar
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
-import com.nononsenseapps.feeder.util.logDebug
 
 @Composable
 fun withFeederTextToolbar(content: @Composable () -> Unit) {
@@ -129,11 +130,9 @@ class FeederTextActionModeCallback(
 
                 // Since we can't access the selected text - hack it by using the clipboard
                 val prevClip = clipboardManager.primaryClip
-                logDebug("JONAS", "PrevClip: ${prevClip?.getItemAt(0)?.text}")
                 onCopyRequested?.invoke()
 
                 val clip = clipboardManager.primaryClip
-                logDebug("JONAS", "hack: ${clip?.getItemAt(0)?.text}")
                 if (clip != null && clip.itemCount > 0) {
                     textProcessors.getOrNull(itemId - 100)?.let { cn ->
                         context.startActivity(
@@ -141,14 +140,11 @@ class FeederTextActionModeCallback(
                                 type = "text/plain"
                                 component = cn
                                 putExtra(Intent.EXTRA_PROCESS_TEXT, clip.getItemAt(0).text)
-                            }.also {
-                                logDebug("JONAS", "Selected $it")
                             },
                         )
                     }
                 }
 
-                logDebug("JONAS", "restore: ${prevClip?.getItemAt(0)?.text}")
                 prevClip?.let { clipboardManager.setPrimaryClip(it) }
             }
         }
@@ -161,18 +157,21 @@ class FeederTextActionModeCallback(
     }
 
     private fun addTextProcessors(menu: Menu) {
-        // TODO handle deprecation in 33+
-        logDebug("JONAS", "Looking for PROCESS TEXT apps")
         textProcessors.clear()
-        packageManager.queryIntentActivities(
-            Intent(Intent.ACTION_PROCESS_TEXT).apply {
-                type = "text/plain"
-            },
-            0,
-        ).sortedWith(displayNameComparator)
+
+        val intent = Intent(Intent.ACTION_PROCESS_TEXT).apply {
+            type = "text/plain"
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0L))
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.queryIntentActivities(intent, 0)
+        }
+            .sortedWith(displayNameComparator)
             .forEachIndexed { index, info ->
                 val label = info.loadLabel(packageManager)
-                logDebug("JONAS", "app: $label")
                 val id = 100 + index
                 if (menu.findItem(id) == null) {
                     // groupId, itemId, order, title
