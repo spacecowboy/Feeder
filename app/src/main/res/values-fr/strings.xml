@@ -191,4 +191,18 @@
     <string name="saved_article">Article sauvegardé</string>
     <string name="save_article">Sauvegarder l\'article</string>
     <string name="mark_as_read_on_scroll">Marquer comme lu en défilant</string>
+    <string name="no_feeds">Aucun flux</string>
+    <string name="zero_feeds">%1$s flux</string>
+    <string name="one_feed">%1$s flux</string>
+    <string name="two_feeds">%1$s flux</string>
+    <string name="few_feeds">%1$s flux</string>
+    <string name="many_feeds">%1$s flux</string>
+    <string name="other_feeds">%1$s flux</string>
+    <string name="import_x_feeds_with_y_tags">Importer %1$s avec %2$s \?</string>
+    <string name="zero_tags">%1$s étiquettes</string>
+    <string name="one_tags">%1$s étiquette</string>
+    <string name="two_tags">%1$s étiquettes</string>
+    <string name="few_tags">%1$s étiquettes</string>
+    <string name="many_tags">%1$s étiquettes</string>
+    <string name="other_tags">%1$s étiquettes</string>
 </resources>
