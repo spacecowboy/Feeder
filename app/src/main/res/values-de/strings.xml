@@ -198,11 +198,11 @@
     <string name="few_feeds">%1$s Feeds</string>
     <string name="many_feeds">%1$s Feeds</string>
     <string name="other_feeds">%1$s Feeds</string>
-    <string name="one_tags">%1$s Tag</string>
-    <string name="zero_tags">%1$s Tags</string>
-    <string name="two_tags">%1$s Tags</string>
-    <string name="few_tags">%1$s Tags</string>
-    <string name="many_tags">%1$s Tags</string>
-    <string name="other_tags">%1$s Tags</string>
+    <string name="one_tags">%1$s Schlagwort</string>
+    <string name="zero_tags">%1$s Schlagwörter</string>
+    <string name="two_tags">%1$s Schlagwörter</string>
+    <string name="few_tags">%1$s Schlagwörter</string>
+    <string name="many_tags">%1$s Schlagwörter</string>
+    <string name="other_tags">%1$s Schlagwörter</string>
     <string name="import_x_feeds_with_y_tags">%1$s mit %2$s importieren\?</string>
 </resources>
