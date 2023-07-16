@@ -189,4 +189,11 @@
     <string name="unsave_article">Berhenti menyimpan artikel</string>
     <string name="mark_as_read_on_scroll">Tandai dibaca saat menggulir</string>
     <string name="save_article">Simpan artikel</string>
+    <string name="import_x_feeds_with_y_tags">Impor %1$s dengan %2$s\?</string>
+    <string name="few_tags">%1$s tag</string>
+    <string name="zero_tags">%1$s tag</string>
+    <string name="one_tags">%1$s tag</string>
+    <string name="two_tags">%1$s tag</string>
+    <string name="many_tags">%1$s tag</string>
+    <string name="other_tags">%1$s tag</string>
 </resources>
