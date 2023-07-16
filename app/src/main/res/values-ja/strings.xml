@@ -190,4 +190,19 @@
     <string name="saved_article">保存された記事</string>
     <string name="save_article">記事を保存する</string>
     <string name="unsave_article">記事を保存するのをやめる</string>
+    <string name="no_feeds">フィードがありません</string>
+    <string name="zero_feeds">%1$sフィード</string>
+    <string name="one_feed">%1$sフィード</string>
+    <string name="two_feeds">%1$sフィード</string>
+    <string name="few_feeds">%1$sフィード</string>
+    <string name="many_feeds">%1$sフィード</string>
+    <string name="other_feeds">%1$sフィード</string>
+    <string name="zero_tags">%1$sタグ</string>
+    <string name="import_x_feeds_with_y_tags">%1$sを%2$sでインポートしますか\?</string>
+    <string name="one_tags">%1$sタグ</string>
+    <string name="two_tags">%1$sタグ</string>
+    <string name="few_tags">%1$sタグ</string>
+    <string name="many_tags">%1$sタグ</string>
+    <string name="other_tags">%1$sタグ</string>
+    <string name="mark_as_read_on_scroll">スクロールして既読にする</string>
 </resources>
