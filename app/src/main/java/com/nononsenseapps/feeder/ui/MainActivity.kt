@@ -62,6 +62,8 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        installExceptionHandler()
+
         mainActivityViewModel.ensurePeriodicSyncConfigured()
 
         WindowCompat.setDecorFitsSystemWindows(window, false)

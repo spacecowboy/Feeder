@@ -26,6 +26,8 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        installExceptionHandler()
+
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val initialFeedUrl =

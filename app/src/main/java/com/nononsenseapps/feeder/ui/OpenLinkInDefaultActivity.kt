@@ -28,6 +28,8 @@ class OpenLinkInDefaultActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        installExceptionHandler()
+
         intent?.let { intent ->
             val uri = intent.data
 

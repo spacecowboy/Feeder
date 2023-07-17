@@ -9,30 +9,48 @@ import android.net.Uri
 import android.os.Build
 import com.nononsenseapps.feeder.BuildConfig
 
-internal fun emailSubject(): String = "Bug report for Feeder"
+private fun deviceInfoBlock(): String = """
+    Application: ${BuildConfig.APPLICATION_ID} (flavor ${BuildConfig.BUILD_TYPE.ifBlank { "None" }})
+    Version: ${BuildConfig.VERSION_NAME} (code ${BuildConfig.VERSION_CODE})
+    Android: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})
+    Device: ${Build.MANUFACTURER} ${Build.MODEL}
+""".trimIndent()
 
-internal fun emailBody(isTablet: Boolean): String =
+private fun bugBody(): String =
     """
-    ${BuildConfig.APPLICATION_ID} (flavor ${BuildConfig.BUILD_TYPE.ifBlank { "None" }})
-    version ${BuildConfig.VERSION_NAME} (code ${BuildConfig.VERSION_CODE})
-    on Android ${Build.VERSION.RELEASE} (SDK-${Build.VERSION.SDK_INT})
-    on a Tablet? ${
-    if (isTablet) {
-        "Yes"
-    } else {
-        "No"
-    }
-    }
-
-    Describe your issue and how to reproduce it below:
+    ${deviceInfoBlock()}
+    
+    Hello.
+    
+    I'd like to report an issue:
     """.trimIndent()
 
-internal fun emailReportAddress(): String = "feeder@nononsenseapps.com"
+private const val emailReportAddress: String = "feeder@nononsenseapps.com"
 
-fun emailBugReportIntent(): Intent = Intent(ACTION_SENDTO).also {
-    it.putExtra(EXTRA_SUBJECT, emailSubject())
-    it.putExtra(EXTRA_EMAIL, emailReportAddress())
-    it.data = Uri.parse("mailto:${emailReportAddress()}")
+fun emailBugReportIntent(): Intent = Intent(ACTION_SENDTO).apply {
+    data = Uri.parse("mailto:$emailReportAddress")
+    putExtra(EXTRA_SUBJECT, "Bug report for Feeder")
+    putExtra(EXTRA_EMAIL, emailReportAddress)
+    putExtra(Intent.EXTRA_TEXT, bugBody())
+}
+
+private const val crashReportAddress: String = "crashes@nononsenseapps.com"
+
+private fun crashBody(throwable: Throwable): String =
+    """
+    ${deviceInfoBlock()}
+    
+    Unhandled exception:
+    
+    ${throwable.stackTraceToString()}
+    """.trimIndent()
+
+fun emailCrashReportIntent(throwable: Throwable): Intent = Intent(ACTION_SENDTO).apply {
+    data = Uri.parse("mailto:$crashReportAddress")
+    putExtra(EXTRA_SUBJECT, "Crash report for Feeder")
+    putExtra(EXTRA_EMAIL, crashReportAddress)
+    putExtra(Intent.EXTRA_TEXT, crashBody(throwable))
+    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 }
 
 fun openGitlabIssues(): Intent = Intent(ACTION_VIEW).also {
