@@ -4,72 +4,50 @@ import android.content.Intent.ACTION_SENDTO
 import android.content.Intent.ACTION_VIEW
 import android.content.Intent.EXTRA_EMAIL
 import android.content.Intent.EXTRA_SUBJECT
+import android.content.Intent.EXTRA_TEXT
 import android.net.Uri
-import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.nononsenseapps.feeder.BuildConfig
-import org.junit.Assert.assertEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class BugReportKTest {
-    @Test
-    fun bodyContainsAndroidInformation() {
-        assertEquals(
-            """
-            ${BuildConfig.APPLICATION_ID} (flavor ${BuildConfig.BUILD_TYPE.ifBlank { "None" }})
-            version ${BuildConfig.VERSION_NAME} (code ${BuildConfig.VERSION_CODE})
-            on Android ${Build.VERSION.RELEASE} (SDK-${Build.VERSION.SDK_INT})
-            on a Tablet? No
-
-            Describe your issue and how to reproduce it below:
-            """.trimIndent(),
-            emailBody(false),
-        )
-    }
 
     @Test
-    fun bodyContainsAndroidInformationAsTablet() {
-        assertEquals(
-            """
-            ${BuildConfig.APPLICATION_ID} (flavor ${BuildConfig.BUILD_TYPE.ifBlank { "None" }})
-            version ${BuildConfig.VERSION_NAME} (code ${BuildConfig.VERSION_CODE})
-            on Android ${Build.VERSION.RELEASE} (SDK-${Build.VERSION.SDK_INT})
-            on a Tablet? Yes
-
-            Describe your issue and how to reproduce it below:
-            """.trimIndent(),
-            emailBody(true),
-        )
-    }
-
-    @Test
-    fun subjectIsSensible() {
-        assertEquals(
-            "Bug report for Feeder",
-            emailSubject(),
-        )
-    }
-
-    @Test
-    fun emailAddressIsCorrect() {
-        assertEquals(
-            "feeder@nononsenseapps.com",
-            emailReportAddress(),
-        )
-    }
-
-    @Test
-    fun emailIntentIsCorrect() {
+    fun bugIntentIsCorrect() {
         val intent = emailBugReportIntent()
 
         assertEquals(ACTION_SENDTO, intent.action)
-        assertEquals(Uri.parse("mailto:${emailReportAddress()}"), intent.data)
-        assertEquals(emailSubject(), intent.getStringExtra(EXTRA_SUBJECT))
-        assertEquals(emailReportAddress(), intent.getStringExtra(EXTRA_EMAIL))
+        assertEquals(Uri.parse("mailto:feeder@nononsenseapps.com"), intent.data)
+        assertEquals("Bug report for Feeder", intent.getStringExtra(EXTRA_SUBJECT))
+        assertEquals("feeder@nononsenseapps.com", intent.getStringExtra(EXTRA_EMAIL))
+
+        assertTrue(intent.getStringExtra(EXTRA_TEXT)) {
+            "Application: " in intent.getStringExtra(EXTRA_TEXT)!!
+        }
+    }
+
+    @Test
+    fun crashIntentIsCorrect() {
+        try {
+            @Suppress("DIVISION_BY_ZERO")
+            1 / 0
+        } catch (e: Exception) {
+            val intent = emailCrashReportIntent(e)
+
+            assertEquals(ACTION_SENDTO, intent.action)
+            assertEquals(Uri.parse("mailto:crashes@nononsenseapps.com"), intent.data)
+            assertEquals("Crash report for Feeder", intent.getStringExtra(EXTRA_SUBJECT))
+            assertEquals("crashes@nononsenseapps.com", intent.getStringExtra(EXTRA_EMAIL))
+
+            assertTrue(intent.getStringExtra(EXTRA_TEXT)) {
+                "java.lang.ArithmeticException: divide by zero" in intent.getStringExtra(EXTRA_TEXT)!!
+            }
+        }
     }
 
     @Test
