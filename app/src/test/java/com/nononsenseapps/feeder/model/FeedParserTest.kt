@@ -414,7 +414,6 @@ class FeedParserTest : DIAware {
     }
 
     @Test
-    @Throws(Exception::class)
     fun nixos() = runBlocking {
         val feed = nixosRss.use { feedParser.parseFeedResponse(it) }
         assertNotNull(feed)

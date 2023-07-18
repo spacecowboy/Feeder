@@ -17,7 +17,6 @@ import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.feed.synd.SyndPerson
 import java.net.URL
-import org.jsoup.parser.Parser.unescapeEntities
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
@@ -241,24 +240,9 @@ fun SyndEntry.thumbnail(feedBaseUrl: URL): String? {
     return when {
         thumbnail != null -> relativeLinkIntoAbsolute(feedBaseUrl, thumbnail.url)
         else -> {
-            val imgLink: String? =
-                naiveFindImageLink(this.contentHtml())?.let { unescapeEntities(it, true) }
             // Now we are resolving against original, not the feed
-            val siteBaseUrl: String? = this.linkToHtml(feedBaseUrl)
-
-            try {
-                when {
-                    siteBaseUrl != null && imgLink != null -> relativeLinkIntoAbsolute(
-                        URL(siteBaseUrl),
-                        imgLink,
-                    )
-                    imgLink != null -> relativeLinkIntoAbsolute(feedBaseUrl, imgLink)
-                    else -> null
-                }
-            } catch (t: Throwable) {
-                Log.e("FeederRomeExt", "Encountered some bad link: [$siteBaseUrl, $feedBaseUrl]", t)
-                null
-            }
+            val baseUrl: String = this.linkToHtml(feedBaseUrl) ?: feedBaseUrl.toString()
+            findFirstImageLinkInHtml(this.contentHtml(), baseUrl)
         }
     }
 }

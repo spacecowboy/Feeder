@@ -165,6 +165,6 @@ class FeedParserClientTest : DIAware {
         val url = server.url("/foo").toUrl()
         // This should not crash
         val result = feedParser.parseFeedUrl(url)
-        assertNull(result?.items?.first()?.image)
+        assertEquals("http://www.questionablecontent.net/comics/4776.png", result?.items?.first()?.image)
     }
 }
