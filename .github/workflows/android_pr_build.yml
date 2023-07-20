@@ -1,13 +1,7 @@
 name: PR Checks
 
 on:
-  push:
-    branches:
-      - '*'
-      - '!master'
-  # PRs are in gitlab for now
-  #pull_request:
-  #  branches: [ "master" ]
+  pull_request:
 
 jobs:
   # this job builds and uploads the apk

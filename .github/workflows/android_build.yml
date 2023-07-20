@@ -28,36 +28,28 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
 
-    - name: delete unwanted langs
+    - name: prepare for build
       shell: bash
-      run: ci/delete-unwanted-langs
-
-    - name: gradle build
-      uses: gradle/gradle-build-action@v2
-      with:
-        arguments: build :app:lint check
-      env:
-        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
-        KEYSTORE: ${{ secrets.KEYSTORE }}
-        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
-        KEYALIAS: ${{ secrets.KEYALIAS }}
-
-    - name: add APK to artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: apk
-        path: app/build/outputs/apk/debugMini/app-debugMini.apk
-        retention-days: 7 # we're not publishing the app: nobody needs this apk
-
-    - name: validate deploy
-      shell: bash
-      run: ci/run-if-not-release ./deploy_playstore.sh --dry-run
+      run: ./prepare_for_build.sh
       env:
         SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
         KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
         KEYSTORE: ${{ secrets.KEYSTORE }}
         KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
         KEYALIAS: ${{ secrets.KEYALIAS }}
+
+    - name: bump version if not release
+      shell: bash
+      run: ci/run-if-not-release fastlane bump_version_code
+
+    - name: gradle build
+      uses: gradle/gradle-build-action@v2
+      with:
+        arguments: build app:bundlePlay :app:lint check
+
+    - name: validate deploy
+      shell: bash
+      run: ci/run-if-not-release ./deploy_playstore_fast.sh --dry-run
 
   # Runs emulator tests
   # connected_check:
@@ -130,42 +122,3 @@ jobs:
   #           logcat-dump.txt
   #           app/build/reports/androidTests/**
 
-  # this job deploys to playstore
-  deploy:
-    needs:
-      - build
-      #- connected_check
-
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-    - name: perform the checkout
-      uses: actions/checkout@v3
-      with:
-        submodules: 'recursive'
-        fetch-depth: 0
-
-    # Verify the SHA-sum
-    - name: validate gradle wrapper
-      uses: gradle/wrapper-validation-action@v1
-
-    - name: setup JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-
-    - name: delete unwanted langs
-      shell: bash
-      run: ci/delete-unwanted-langs
-
-    - name: deploy to play store
-      shell: bash
-      run: ci/run-if-release ./deploy_playstore.sh
-      env:
-        SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
-        KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
-        KEYSTORE: ${{ secrets.KEYSTORE }}
-        KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
-        KEYALIAS: ${{ secrets.KEYALIAS }}
