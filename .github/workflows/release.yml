@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: perform the checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      - name: version
+        run: echo "::set-output name=versioncode::$(grep "versionCode" app/build.gradle.kts | sed "s|\s*versionCode = \([0-9]\+\)|\\1|")"
+        id: version
+
+      # Verify the SHA-sum
+      - name: validate gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: setup JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: prepare for build
+        shell: bash
+        run: ./prepare_for_build.sh
+        env:
+          SERVICEACCOUNTJSON: ${{ secrets.SERVICEACCOUNTJSON }}
+          KEYSTOREPASSWORD: ${{ secrets.KEYSTOREPASSWORD }}
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+          KEYPASSWORD: ${{ secrets.KEYPASSWORD }}
+          KEYALIAS: ${{ secrets.KEYALIAS }}
+
+      - name: gradle build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build :app:lint check app:bundlePlay
+
+      - name: deploy to play store
+        shell: bash
+        run: ci/run-if-release ./deploy_playstore_fast.sh
+
+      - name: release
+        uses: softprops/action-gh-release@v1
+        #if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: false
+          #tag_name: 2.4.20
+          body_path: fastlane/metadata/android/en-US/changelogs/${{ steps.version.outputs.versioncode }}.txt
+          fail_on_unmatched_files: true
+          files: |
+            app/build/outputs/apk/debugMini/app-debugMini.apk
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/apk/play/app-play.apk

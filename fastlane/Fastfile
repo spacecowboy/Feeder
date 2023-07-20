@@ -72,13 +72,12 @@ platform :android do
 
   desc "Build and deploy a new version to the Google Play"
   lane :build_and_deploy do |options|
-    # Keep same version for changelog
-    #bump_version_code
+    # Never change version for releases
     build_play_bundle
     deploy(options)
   end
 
-  desc "Build and valdidate deployment of a new version to the Google Play"
+  desc "Build and validate deployment of a new version to the Google Play"
   lane :build_and_validate do |options|
     # Validation should never fail so bump version
     bump_version_code
