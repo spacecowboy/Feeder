@@ -218,4 +218,7 @@
   <string name="few_tags">%1$s tags</string>
   <string name="many_tags">%1$s tags</string>
   <string name="other_tags">%1$s tags</string>
+  <string name="failed_to_fetch_full_article_missing_body">Found nothing to fetch</string>
+  <string name="failed_to_fetch_full_article_missing_link">Feed is missing link to article</string>
+  <string name="failed_to_fetch_full_article_not_html">Link is not an HTML document</string>
 </resources>

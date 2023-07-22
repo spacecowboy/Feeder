@@ -102,6 +102,9 @@ fun ArticleScreen(
                 TextToDisplay.DEFAULT -> viewModel.displayFullText()
                 TextToDisplay.LOADING_FULLTEXT,
                 TextToDisplay.FAILED_TO_LOAD_FULLTEXT,
+                TextToDisplay.FAILED_MISSING_BODY,
+                TextToDisplay.FAILED_MISSING_LINK,
+                TextToDisplay.FAILED_NOT_HTML,
                 TextToDisplay.FULLTEXT -> viewModel.displayArticleText()
             }
         },
@@ -453,12 +456,6 @@ fun ArticleContent(
                     }
                 }
 
-                TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> {
-                    item {
-                        Text(text = stringResource(id = R.string.failed_to_fetch_full_article))
-                    }
-                }
-
                 TextToDisplay.LOADING_FULLTEXT -> {
                     LoadingItem()
                 }
@@ -493,6 +490,30 @@ fun ArticleContent(
                     } else {
                         // Already trigger load in effect above
                         LoadingItem()
+                    }
+                }
+
+                TextToDisplay.FAILED_TO_LOAD_FULLTEXT -> {
+                    item {
+                        Text(text = stringResource(id = R.string.failed_to_fetch_full_article))
+                    }
+                }
+
+                TextToDisplay.FAILED_MISSING_BODY -> {
+                    item {
+                        Text(text = stringResource(id = R.string.failed_to_fetch_full_article_missing_body))
+                    }
+                }
+
+                TextToDisplay.FAILED_MISSING_LINK -> {
+                    item {
+                        Text(text = stringResource(id = R.string.failed_to_fetch_full_article_missing_link))
+                    }
+                }
+
+                TextToDisplay.FAILED_NOT_HTML -> {
+                    item {
+                        Text(text = stringResource(id = R.string.failed_to_fetch_full_article_not_html))
                     }
                 }
             }
