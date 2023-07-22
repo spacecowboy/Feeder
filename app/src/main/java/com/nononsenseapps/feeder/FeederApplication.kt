@@ -88,7 +88,7 @@ class FeederApplication : Application(), DIAware, ImageLoaderFactory {
                     Toast.makeText(this@FeederApplication, text, Toast.LENGTH_SHORT).show()
                 }
 
-                override suspend fun makeToast(resId: Int) {
+                override suspend fun makeToast(resId: Int) = withContext(Dispatchers.Main) {
                     Toast.makeText(this@FeederApplication, resId, Toast.LENGTH_SHORT).show()
                 }
             }
