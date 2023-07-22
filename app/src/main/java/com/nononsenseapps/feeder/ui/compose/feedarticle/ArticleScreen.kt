@@ -98,10 +98,11 @@ fun ArticleScreen(
     ArticleScreen(
         viewState = viewState,
         onToggleFullText = {
-            if (viewState.textToDisplay == TextToDisplay.FULLTEXT) {
-                viewModel.displayArticleText()
-            } else {
-                viewModel.displayFullText()
+            when (viewState.textToDisplay) {
+                TextToDisplay.DEFAULT -> viewModel.displayFullText()
+                TextToDisplay.LOADING_FULLTEXT,
+                TextToDisplay.FAILED_TO_LOAD_FULLTEXT,
+                TextToDisplay.FULLTEXT -> viewModel.displayArticleText()
             }
         },
         onMarkAsUnread = {
