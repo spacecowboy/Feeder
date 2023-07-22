@@ -101,12 +101,14 @@ class FullTextParser(override val di: DI) : DIAware {
                 val url = feedItem.link ?: throw MissingLink()
 
                 val html: String = okHttpClient.curlAndOnResponse(URL(url)) { response ->
-                    val bytes = response.body?.use { body ->
-                        body.bytes()
-                    } ?: throw MissingBody()
+                    val body = response.body ?: throw MissingBody()
 
-                    val contentType = response.body?.contentType()
+                    val contentType = body.contentType()
                         ?: throw NotHtmlContent("null")
+
+                    val bytes = body.use {
+                        it.bytes()
+                    }
 
                     logDebug(LOG_TAG, "contentType: $contentType")
 
